@@ -1,0 +1,312 @@
+{
+  "type": "View",
+  "id": "home_page",
+  "data": [
+    {"class": "HomeViewModel", "name": "viewModel"}
+  ],
+  "width": "matchParent",
+  "orientation": "vertical",
+  "child": [
+    {
+      "type": "View",
+      "id": "hero_section",
+      "width": "matchParent",
+      "padding": [80, 24],
+      "orientation": "vertical",
+      "gravity": "center",
+      "background": "#F6F7F9",
+      "child": [
+        {
+          "type": "Label",
+          "text": "hero_title",
+          "fontSize": 64,
+          "fontWeight": "bold",
+          "fontColor": "#087EA4",
+          "textAlign": "Center"
+        },
+        { "style": "spacer_16" },
+        {
+          "type": "Label",
+          "text": "hero_subtitle",
+          "fontSize": 24,
+          "fontColor": "#5E687E",
+          "textAlign": "Center"
+        },
+        { "style": "spacer_32" },
+        {
+          "type": "View",
+          "orientation": "horizontal",
+          "gravity": "center",
+          "child": [
+            {
+              "type": "Button",
+              "style": "button_primary",
+              "text": "btn_get_started",
+              "onClick": "viewModel.onClickGetStarted"
+            },
+            {
+              "type": "View",
+              "width": 16
+            },
+            {
+              "type": "Button",
+              "style": "button_secondary",
+              "text": "btn_api_reference",
+              "onClick": "viewModel.onClickApiReference"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "View",
+      "id": "code_example_section",
+      "width": "matchParent",
+      "padding": [64, 48],
+      "orientation": "vertical",
+      "background": "#FFFFFF",
+      "child": [
+        {
+          "type": "Label",
+          "text": "code_example_title",
+          "fontSize": 32,
+          "fontWeight": "bold",
+          "fontColor": "#23272F",
+          "textAlign": "Center"
+        },
+        { "style": "spacer_8" },
+        {
+          "type": "Label",
+          "text": "code_example_subtitle",
+          "fontSize": 18,
+          "fontColor": "#5E687E",
+          "textAlign": "Center"
+        },
+        { "style": "spacer_32" },
+        {
+          "type": "View",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "gravity": "center",
+          "child": [
+            {
+              "type": "View",
+              "style": "code_block",
+              "width": 500,
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    {\n      \"type\": \"Label\",\n      \"text\": \"Hello, World!\",\n      \"fontSize\": 24\n    },\n    {\n      \"type\": \"Button\",\n      \"text\": \"Click Me\",\n      \"onClick\": \"handleClick\"\n    }\n  ]\n}",
+                  "fontSize": 14,
+                  "fontColor": "#D4D4D4",
+                  "fontFamily": "monospace"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "View",
+      "id": "platforms_section",
+      "width": "matchParent",
+      "padding": [64, 24],
+      "orientation": "vertical",
+      "background": "#23272F",
+      "child": [
+        {
+          "type": "View",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "child": [
+            {
+              "type": "View",
+              "style": "platform_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "margins": [0, 8, 0, 0],
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "platform_swift_title",
+                  "fontSize": 20,
+                  "fontWeight": "bold",
+                  "fontColor": "#FA7343"
+                },
+                { "style": "spacer_16" },
+                {
+                  "type": "Label",
+                  "text": "platform_swift_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E"
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "style": "platform_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "margins": [0, 8, 0, 0],
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "platform_kotlin_title",
+                  "fontSize": 20,
+                  "fontWeight": "bold",
+                  "fontColor": "#7F52FF"
+                },
+                { "style": "spacer_16" },
+                {
+                  "type": "Label",
+                  "text": "platform_kotlin_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E"
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "style": "platform_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "platform_react_title",
+                  "fontSize": 20,
+                  "fontWeight": "bold",
+                  "fontColor": "#61DAFB"
+                },
+                { "style": "spacer_16" },
+                {
+                  "type": "Label",
+                  "text": "platform_react_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "View",
+      "id": "features_section",
+      "width": "matchParent",
+      "padding": [64, 24],
+      "background": "#FFFFFF",
+      "orientation": "vertical",
+      "child": [
+        {
+          "type": "View",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "child": [
+            {
+              "type": "View",
+              "style": "feature_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "margins": [0, 8, 0, 0],
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "feature_write_once",
+                  "fontSize": 18,
+                  "fontWeight": "semibold",
+                  "fontColor": "#23272F"
+                },
+                { "style": "spacer_16" },
+                {
+                  "type": "Label",
+                  "text": "feature_write_once_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E"
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "style": "feature_card",
+              "weight": 1,
+              "margins": [0, 0, 8, 0],
+              "orientation": "vertical",
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "feature_type_safe",
+                  "fontSize": 18,
+                  "fontWeight": "semibold",
+                  "fontColor": "#23272F"
+                },
+                { "style": "spacer_16" },
+                {
+                  "type": "Label",
+                  "text": "feature_type_safe_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E"
+                }
+              ]
+            }
+          ]
+        },
+        { "style": "spacer_24" },
+        {
+          "type": "View",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "child": [
+            {
+              "type": "View",
+              "style": "feature_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "margins": [0, 8, 0, 0],
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "feature_hot_reload",
+                  "fontSize": 18,
+                  "fontWeight": "semibold",
+                  "fontColor": "#23272F"
+                },
+                { "style": "spacer_16" },
+                {
+                  "type": "Label",
+                  "text": "feature_hot_reload_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E"
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "style": "feature_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "feature_data_binding",
+                  "fontSize": 18,
+                  "fontWeight": "semibold",
+                  "fontColor": "#23272F"
+                },
+                { "style": "spacer_16" },
+                {
+                  "type": "Label",
+                  "text": "feature_data_binding_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
