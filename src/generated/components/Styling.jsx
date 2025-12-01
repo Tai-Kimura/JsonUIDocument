@@ -6,10 +6,9 @@ import { StringManager } from '@/generated/StringManager';
 import { CodeBlock } from '@/components/extensions/CodeBlock';
 
 
-export const Styling = () => {
+export const Styling = ({ viewModel }) => {
   return (
   <div id="styling_page" className="w-full flex flex-col">
-    <div className="" />
     <div id="styling_hero" className="w-full py-12 px-6 bg-[#F6F7F9] flex flex-col items-center justify-center">
       <span className="text-[#23272F] text-5xl font-bold text-center font-bold">{StringManager.currentLanguage.stylingTitle}</span>
       <div className="h-[16px]" />
@@ -30,32 +29,25 @@ export const Styling = () => {
       <div className="h-[48px]" />
       <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.stylingAttributesTitle}</span>
       <div className="h-[16px]" />
-      <div className="w-full flex flex-row">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col grow-[1]">
+      <div className="w-full flex flex-row items-stretch">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.stylingSizeTitle}</span>
           <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">• width
-• height
-• padding
-• margins</span>
+          <span className="text-[#5E687E] text-sm"><>• width<br />• height<br />• padding<br />• margins</></span>
         </div>
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col grow-[1]">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.stylingColorTitle}</span>
           <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">• background
-• fontColor
-• borderColor</span>
+          <span className="text-[#5E687E] text-sm"><>• background<br />• fontColor<br />• borderColor</></span>
         </div>
-        <div className="flex flex-col grow-[1]">
+        <div className="flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.stylingTextTitle}</span>
           <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">• fontSize
-• fontWeight
-• textAlign</span>
+          <span className="text-[#5E687E] text-sm"><>• fontSize<br />• fontWeight<br />• textAlign</></span>
         </div>
       </div>
       <div className="h-[48px]" />
-      <div className="flex flex-row items-center justify-center">
+      <div className="flex flex-row items-stretch items-center justify-center">
         <button className="cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickComponents}>{StringManager.currentLanguage.stylingPrev}</button>
         <div className="w-[16px]" />
         <button className="py-3 px-6 bg-[#087EA4] rounded-lg text-[#FFFFFF] text-base font-semibold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickDataBinding}>{StringManager.currentLanguage.stylingNext}</button>

@@ -6,16 +6,15 @@ import { StringManager } from '@/generated/StringManager';
 import { CodeBlock } from '@/components/extensions/CodeBlock';
 
 
-export const Home = () => {
+export const Home = ({ viewModel }) => {
   return (
   <div id="home_page" className="w-full flex flex-col">
-    <div className="" />
     <div id="hero_section" className="w-full py-16 px-6 bg-[#F6F7F9] flex flex-col items-center justify-center">
       <span className="text-[#087EA4] text-[64px] font-bold text-center font-bold">{StringManager.currentLanguage.heroTitle}</span>
       <div className="h-[16px]" />
       <span className="text-[#5E687E] text-2xl text-center">{StringManager.currentLanguage.heroSubtitle}</span>
       <div className="h-[32px]" />
-      <div className="flex flex-row items-center justify-center">
+      <div className="flex flex-row items-stretch items-center justify-center">
         <button className="py-3 px-6 bg-[#087EA4] rounded-lg text-[#FFFFFF] text-base font-semibold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickGetStarted}>{StringManager.currentLanguage.btnGetStarted}</button>
         <div className="w-[16px]" />
         <button className="py-3 px-6 bg-[#FFFFFF] rounded-lg text-[#087EA4] text-base font-semibold border border-[#087EA4] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickApiReference}>{StringManager.currentLanguage.btnApiReference}</button>
@@ -26,23 +25,23 @@ export const Home = () => {
       <div className="h-[8px]" />
       <span className="text-[#5E687E] text-lg text-center">{StringManager.currentLanguage.codeExampleSubtitle}</span>
       <div className="h-[32px]" />
-      <div className="w-full flex flex-row items-center justify-center">
+      <div className="w-full flex flex-row items-stretch items-center justify-center">
         <CodeBlock className="flex flex-col w-[800px]" file="hello_world.json" language="json" />
       </div>
     </div>
     <div id="platforms_section" className="w-full py-16 px-6 bg-[#23272F] flex flex-col">
-      <div className="w-full flex flex-row">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+      <div className="w-full flex flex-row items-stretch">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#FA7343] text-xl font-bold font-bold">{StringManager.currentLanguage.platformSwiftTitle}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.platformSwiftDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#7F52FF] text-xl font-bold font-bold">{StringManager.currentLanguage.platformKotlinTitle}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.platformKotlinDesc}</span>
         </div>
-        <div className="p-6 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#61DAFB] text-xl font-bold font-bold">{StringManager.currentLanguage.platformReactTitle}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.platformReactDesc}</span>
@@ -50,26 +49,26 @@ export const Home = () => {
       </div>
     </div>
     <div id="features_section" className="w-full py-16 px-6 bg-[#FFFFFF] flex flex-col">
-      <div className="w-full flex flex-row">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col grow-[1]">
+      <div className="w-full flex flex-row items-stretch">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.featureWriteOnce}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.featureWriteOnceDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-0 mb-2 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col grow-[1]">
+        <div className="p-6 mt-0 mr-0 mb-2 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.featureTypeSafe}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.featureTypeSafeDesc}</span>
         </div>
       </div>
       <div className="h-[24px]" />
-      <div className="w-full flex flex-row">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col grow-[1]">
+      <div className="w-full flex flex-row items-stretch">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.featureHotReload}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.featureHotReloadDesc}</span>
         </div>
-        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col grow-[1]">
+        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.featureDataBinding}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.featureDataBindingDesc}</span>

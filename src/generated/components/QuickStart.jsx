@@ -6,81 +6,86 @@ import { StringManager } from '@/generated/StringManager';
 import { CodeBlock } from '@/components/extensions/CodeBlock';
 
 
-export const QuickStart = () => {
+export const QuickStart = ({ viewModel }) => {
   return (
   <div id="quick_start_page" className="w-full flex flex-col">
-    <div className="" />
     <div id="quick_start_hero" className="w-full py-12 px-6 bg-[#F6F7F9] flex flex-col items-center justify-center">
       <span className="text-[#23272F] text-5xl font-bold text-center font-bold">{StringManager.currentLanguage.quickStartTitle}</span>
       <div className="h-[16px]" />
       <span className="text-[#5E687E] text-xl text-center">{StringManager.currentLanguage.quickStartSubtitle}</span>
     </div>
     <div id="quick_start_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-      <div id="platform_tabs" className="inline-flex rounded-lg bg-gray-100 p-1">
-        <button key={0} className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${viewModel.currentTab === 0 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => viewModel.onTabChange(0)}>Swift</button>
-        <button key={1} className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${viewModel.currentTab === 1 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => viewModel.onTabChange(1)}>Kotlin</button>
-        <button key={2} className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${viewModel.currentTab === 2 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => viewModel.onTabChange(2)}>React</button>
+      <div id="platform_tabs" className="w-full flex rounded-lg bg-gray-100 p-1">
+        <button key={0} className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${viewModel.currentTab === 0 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => viewModel.onTabChange(0)}>Swift</button>
+        <button key={1} className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${viewModel.currentTab === 1 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => viewModel.onTabChange(1)}>Kotlin</button>
+        <button key={2} className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${viewModel.currentTab === 2 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => viewModel.onTabChange(2)}>React</button>
       </div>
       <div className="h-[24px]" />
+      {(viewModel.currentTab === 0) !== 'gone' && (
       <div id="swift_content" className="flex flex-col">
         <span className="text-[#FA7343] text-2xl font-bold font-bold">{StringManager.currentLanguage.qsSwiftStep1Title}</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.qsSwiftStep1Desc}</span>
         <div className="h-[16px]" />
-        <CodeBlock className="flex flex-col" file="qs_swift_step1.sh" language="bash" />
+        <CodeBlock className="flex flex-col" file="qs_swift_step1.sh" language="bash" showPreview={false} />
         <div className="h-[24px]" />
         <span className="text-[#FA7343] text-2xl font-bold font-bold">{StringManager.currentLanguage.qsSwiftStep2Title}</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.qsSwiftStep2Desc}</span>
         <div className="h-[16px]" />
-        <CodeBlock className="flex flex-col" file="qs_swift_step2.json" language="json" />
+        <CodeBlock className="flex flex-col" file="qs_swift_step2.json" language="json" showPreview={false} />
         <div className="h-[24px]" />
         <span className="text-[#FA7343] text-2xl font-bold font-bold">{StringManager.currentLanguage.qsSwiftStep3Title}</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.qsSwiftStep3Desc}</span>
         <div className="h-[16px]" />
-        <CodeBlock className="flex flex-col" file="qs_swift_step3.sh" language="bash" />
+        <CodeBlock className="flex flex-col" file="qs_swift_step3.sh" language="bash" showPreview={false} />
       </div>
+      )}
+      {(viewModel.currentTab === 1) !== 'gone' && (
       <div id="kotlin_content" className="flex flex-col">
         <span className="text-[#7F52FF] text-2xl font-bold font-bold">{StringManager.currentLanguage.qsKotlinStep1Title}</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.qsKotlinStep1Desc}</span>
         <div className="h-[16px]" />
-        <CodeBlock className="flex flex-col" file="qs_kotlin_step1.sh" language="bash" />
+        <CodeBlock className="flex flex-col" file="qs_kotlin_step1.sh" language="bash" showPreview={false} />
         <div className="h-[24px]" />
         <span className="text-[#7F52FF] text-2xl font-bold font-bold">{StringManager.currentLanguage.qsKotlinStep2Title}</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.qsKotlinStep2Desc}</span>
         <div className="h-[16px]" />
-        <CodeBlock className="flex flex-col" file="qs_kotlin_step2.json" language="json" />
+        <CodeBlock className="flex flex-col" file="qs_kotlin_step2.json" language="json" showPreview={false} />
         <div className="h-[24px]" />
         <span className="text-[#7F52FF] text-2xl font-bold font-bold">{StringManager.currentLanguage.qsKotlinStep3Title}</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.qsKotlinStep3Desc}</span>
         <div className="h-[16px]" />
-        <CodeBlock className="flex flex-col" file="qs_kotlin_step3.sh" language="bash" />
+        <CodeBlock className="flex flex-col" file="qs_kotlin_step3.sh" language="bash" showPreview={false} />
       </div>
+      )}
+      {(viewModel.currentTab === 2) !== 'gone' && (
       <div id="react_content" className="flex flex-col">
         <span className="text-[#61DAFB] text-2xl font-bold font-bold">{StringManager.currentLanguage.qsReactStep1Title}</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.qsReactStep1Desc}</span>
         <div className="h-[16px]" />
-        <CodeBlock className="flex flex-col" file="qs_react_step1.sh" language="bash" />
+        <CodeBlock className="flex flex-col" file="qs_react_step1.sh" language="bash" showPreview={false} />
         <div className="h-[24px]" />
         <span className="text-[#61DAFB] text-2xl font-bold font-bold">{StringManager.currentLanguage.qsReactStep2Title}</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.qsReactStep2Desc}</span>
         <div className="h-[16px]" />
-        <CodeBlock className="flex flex-col" file="qs_react_step2.json" language="json" />
+        <CodeBlock className="flex flex-col" file="qs_react_step2.json" language="json" showPreview={false} />
         <div className="h-[24px]" />
         <span className="text-[#61DAFB] text-2xl font-bold font-bold">{StringManager.currentLanguage.qsReactStep3Title}</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.qsReactStep3Desc}</span>
         <div className="h-[16px]" />
-        <CodeBlock className="flex flex-col" file="qs_react_step3.sh" language="bash" />
+        <CodeBlock className="flex flex-col" file="qs_react_step3.sh" language="bash" showPreview={false} />
       </div>
+      )}
       <div className="h-[48px]" />
-      <div className="flex flex-row items-center justify-center">
+      <div className="flex flex-row items-stretch items-center justify-center">
         <button className="cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickInstallation}>{StringManager.currentLanguage.quickStartPrev}</button>
         <div className="w-[16px]" />
         <button className="py-3 px-6 bg-[#087EA4] rounded-lg text-[#FFFFFF] text-base font-semibold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickComponents}>{StringManager.currentLanguage.quickStartNext}</button>

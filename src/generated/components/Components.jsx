@@ -5,10 +5,9 @@ import React from 'react';
 import { StringManager } from '@/generated/StringManager';
 
 
-export const Components = () => {
+export const Components = ({ viewModel }) => {
   return (
   <div id="components_page" className="w-full flex flex-col">
-    <div className="" />
     <div id="components_hero" className="w-full py-12 px-6 bg-[#F6F7F9] flex flex-col items-center justify-center">
       <span className="text-[#23272F] text-5xl font-bold text-center font-bold">{StringManager.currentLanguage.componentsTitle}</span>
       <div className="h-[16px]" />
@@ -17,18 +16,18 @@ export const Components = () => {
     <div id="components_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
       <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.componentsLayoutTitle}</span>
       <div className="h-[16px]" />
-      <div className="w-full flex flex-row">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+      <div className="w-full flex flex-row items-stretch">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickViewDetail}>
           <span className="text-[#23272F] text-lg font-semibold">View</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsViewDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickScrollViewDetail}>
           <span className="text-[#23272F] text-lg font-semibold">ScrollView</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsScrollDesc}</span>
         </div>
-        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickCollectionDetail}>
           <span className="text-[#23272F] text-lg font-semibold">Collection</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsCollectionDesc}</span>
@@ -37,18 +36,18 @@ export const Components = () => {
       <div className="h-[48px]" />
       <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.componentsTextTitle}</span>
       <div className="h-[16px]" />
-      <div className="w-full flex flex-row">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+      <div className="w-full flex flex-row items-stretch">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickLabelDetail}>
           <span className="text-[#23272F] text-lg font-semibold">Label</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsLabelDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickTextFieldDetail}>
           <span className="text-[#23272F] text-lg font-semibold">TextField</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsTextfieldDesc}</span>
         </div>
-        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickTextViewDetail}>
           <span className="text-[#23272F] text-lg font-semibold">TextView</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsTextviewDesc}</span>
@@ -57,25 +56,25 @@ export const Components = () => {
       <div className="h-[48px]" />
       <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.componentsInputTitle}</span>
       <div className="h-[16px]" />
-      <div className="w-full flex flex-row">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+      <div className="w-full flex flex-row items-stretch">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickButtonDetail}>
           <span className="text-[#23272F] text-lg font-semibold">Button</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsButtonDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickSwitchDetail}>
           <span className="text-[#23272F] text-lg font-semibold">Switch</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsSwitchDesc}</span>
         </div>
-        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickSliderDetail}>
           <span className="text-[#23272F] text-lg font-semibold">Slider</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsSliderDesc}</span>
         </div>
       </div>
       <div className="h-[48px]" />
-      <div className="flex flex-row items-center justify-center">
+      <div className="flex flex-row items-stretch items-center justify-center">
         <button className="cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickQuickStart}>{StringManager.currentLanguage.componentsPrev}</button>
         <div className="w-[16px]" />
         <button className="py-3 px-6 bg-[#087EA4] rounded-lg text-[#FFFFFF] text-base font-semibold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickStyling}>{StringManager.currentLanguage.componentsNext}</button>

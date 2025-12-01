@@ -5,20 +5,24 @@ import React from 'react';
 import { CodeBlock } from '@/components/extensions/CodeBlock';
 import PlatformBadgeSwift from './PlatformBadgeSwift';
 import PlatformBadgeKotlin from './PlatformBadgeKotlin';
+import PlatformBadgeReact from './PlatformBadgeReact';
+import AttributeTableHeader from './AttributeTableHeader';
+import AttributeRow from './AttributeRow';
 
 
-export const ViewDetail = () => {
+export const ViewDetail = ({ viewModel }) => {
   return (
   <div id="view_detail_page" className="w-full flex flex-col">
-    <div className="" />
-    <div id="view_detail_scroll" className="w-full h-full overflow-y-auto flex flex-col">
+    <div id="view_detail_scroll" className="w-full h-auto overflow-y-auto flex flex-col">
       <div id="view_detail_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
         <span className="text-[#23272F] text-[32px] font-bold font-bold">View</span>
         <span className="text-[#4B5563] text-base">The fundamental container component for building layouts. View acts as a flexible container that can hold other components and supports various layout configurations.</span>
-        <div className="flex flex-row">
+        <div className="flex flex-row items-stretch">
           <PlatformBadgeSwift />
           <div className="w-[8px]" />
           <PlatformBadgeKotlin />
+          <div className="w-[8px]" />
+          <PlatformBadgeReact />
         </div>
         <span className="text-[#23272F] text-xl font-bold font-bold">Platform Support</span>
         <div className="flex flex-col">
@@ -26,16 +30,17 @@ export const ViewDetail = () => {
           <span className="text-[#4B5563] text-sm">• SwiftUI: Full support - DynamicComponent wrapper</span>
           <span className="text-[#4B5563] text-sm">• Jetpack Compose: Full support - Maps to Box/Column/Row</span>
           <span className="text-[#4B5563] text-sm">• Android XML: Maps to LinearLayout or ConstraintLayout</span>
+          <span className="text-[#4B5563] text-sm">• React/Next.js: Full support - Maps to div with Tailwind CSS</span>
         </div>
         <span className="text-[#23272F] text-xl font-bold font-bold">Attributes</span>
-        <div className="w-full rounded-lg border border-[#E5E7EB] overflow-hidden grid grid-cols-2">
-          <components/attribute_table_headerView />
+        <div className="w-full rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
+          <AttributeTableHeader />
           {viewModel.viewAttributes?.map((item, index) => (
-            <components/attribute_rowView key={index} data={item} />
+            <AttributeRow key={index} data={item} />
           ))}
         </div>
         <span className="text-[#23272F] text-xl font-bold font-bold">Basic Example</span>
-        <CodeBlock className="flex flex-col" file="view_example.json" language="json" />
+        <CodeBlock className="flex flex-col" file="view_example.json" language="json" showPreview={false} />
       </div>
     </div>
   </div>

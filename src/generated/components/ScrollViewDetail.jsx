@@ -5,17 +5,18 @@ import React from 'react';
 import { CodeBlock } from '@/components/extensions/CodeBlock';
 import PlatformBadgeSwift from './PlatformBadgeSwift';
 import PlatformBadgeKotlin from './PlatformBadgeKotlin';
+import AttributeTableHeader from './AttributeTableHeader';
+import AttributeRow from './AttributeRow';
 
 
-export const ScrollViewDetail = () => {
+export const ScrollViewDetail = ({ viewModel }) => {
   return (
   <div id="scroll_view_detail_page" className="w-full flex flex-col">
-    <div className="" />
-    <div id="scroll_view_detail_scroll" className="w-full h-full overflow-y-auto flex flex-col">
+    <div id="scroll_view_detail_scroll" className="w-full h-auto overflow-y-auto flex flex-col">
       <div id="scroll_view_detail_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
         <span className="text-[#23272F] text-[32px] font-bold font-bold">ScrollView</span>
         <span className="text-[#4B5563] text-base">A scrollable container for content that exceeds the screen size. Supports both vertical and horizontal scrolling with various customization options.</span>
-        <div className="flex flex-row">
+        <div className="flex flex-row items-stretch">
           <PlatformBadgeSwift />
           <div className="w-[8px]" />
           <PlatformBadgeKotlin />
@@ -28,14 +29,14 @@ export const ScrollViewDetail = () => {
           <span className="text-[#4B5563] text-sm">• Android XML: ScrollView / HorizontalScrollView</span>
         </div>
         <span className="text-[#23272F] text-xl font-bold font-bold">Attributes</span>
-        <div className="w-full rounded-lg border border-[#E5E7EB] overflow-hidden grid grid-cols-2">
-          <components/attribute_table_headerView />
+        <div className="w-full rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
+          <AttributeTableHeader />
           {viewModel.scrollViewAttributes?.map((item, index) => (
-            <components/attribute_rowView key={index} data={item} />
+            <AttributeRow key={index} data={item} />
           ))}
         </div>
         <span className="text-[#23272F] text-xl font-bold font-bold">Basic Example</span>
-        <CodeBlock className="flex flex-col" file="scroll_example.json" language="json" />
+        <CodeBlock className="flex flex-col" file="scroll_example.json" language="json" showPreview={false} />
       </div>
     </div>
   </div>

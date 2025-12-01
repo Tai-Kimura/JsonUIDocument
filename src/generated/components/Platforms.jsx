@@ -5,10 +5,9 @@ import React from 'react';
 import { StringManager } from '@/generated/StringManager';
 
 
-export const Platforms = () => {
+export const Platforms = ({ viewModel }) => {
   return (
   <div id="platforms_page" className="w-full flex flex-col">
-    <div className="" />
     <div id="platforms_hero" className="w-full py-12 px-6 bg-[#F6F7F9] flex flex-col items-center justify-center">
       <span className="text-[#23272F] text-5xl font-bold text-center font-bold">{StringManager.currentLanguage.platformsTitle}</span>
       <div className="h-[16px]" />
@@ -16,9 +15,9 @@ export const Platforms = () => {
     </div>
     <div id="platforms_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
       <div className="w-full p-8 bg-[#F6F7F9] rounded-2xl flex flex-col border border-[#E5E7EB]">
-        <div className="w-full flex flex-row items-center justify-center">
+        <div className="w-full flex flex-row items-stretch items-center justify-center">
           <span className="text-[#FA7343] text-[28px] font-bold font-bold">{StringManager.currentLanguage.platformSwiftTitle}</span>
-          <div className="grow-[1]" />
+          <div className="flex-1" />
           <button className="py-2 px-4 bg-[#FFFFFF] rounded-lg text-[#FA7343] text-sm font-medium border border-[#FA7343] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickSwiftDocs}>{StringManager.currentLanguage.platformsViewDocs}</button>
           <div className="w-[8px]" />
           <button className="py-2 px-4 bg-[#FFFFFF] rounded-lg text-[#FA7343] text-sm font-medium border border-[#FA7343] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickSwiftGitHub}>{StringManager.currentLanguage.platformsViewGithub}</button>
@@ -31,18 +30,14 @@ export const Platforms = () => {
         <span className="text-[#23272F] text-sm font-semibold">{StringManager.currentLanguage.platformsInstall}</span>
         <div className="h-[8px]" />
         <div className="flex flex-col py-4 px-4 bg-[#1E1E1E] rounded-lg">
-          <span className="text-[#D4D4D4] text-xs"># CocoaPods
-pod 'SwiftJsonUI'
-
-# Swift Package Manager
-.package(url: "https://github.com/user/SwiftJsonUI.git")</span>
+          <span className="text-[#D4D4D4] text-xs"><># CocoaPods<br />{`pod 'SwiftJsonUI'`}<br /><br /># Swift Package Manager<br />.package(url: "https://github.com/user/SwiftJsonUI.git")</></span>
         </div>
       </div>
       <div className="h-[24px]" />
       <div className="w-full p-8 bg-[#F6F7F9] rounded-2xl flex flex-col border border-[#E5E7EB]">
-        <div className="w-full flex flex-row items-center justify-center">
+        <div className="w-full flex flex-row items-stretch items-center justify-center">
           <span className="text-[#7F52FF] text-[28px] font-bold font-bold">{StringManager.currentLanguage.platformKotlinTitle}</span>
-          <div className="grow-[1]" />
+          <div className="flex-1" />
           <button className="py-2 px-4 bg-[#FFFFFF] rounded-lg text-[#7F52FF] text-sm font-medium border border-[#7F52FF] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickKotlinDocs}>{StringManager.currentLanguage.platformsViewDocs}</button>
           <div className="w-[8px]" />
           <button className="py-2 px-4 bg-[#FFFFFF] rounded-lg text-[#7F52FF] text-sm font-medium border border-[#7F52FF] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickKotlinGitHub}>{StringManager.currentLanguage.platformsViewGithub}</button>
@@ -55,17 +50,14 @@ pod 'SwiftJsonUI'
         <span className="text-[#23272F] text-sm font-semibold">{StringManager.currentLanguage.platformsInstall}</span>
         <div className="h-[8px]" />
         <div className="flex flex-col py-4 px-4 bg-[#1E1E1E] rounded-lg">
-          <span className="text-[#D4D4D4] text-xs">{`// build.gradle.kts
-dependencies {
-    implementation("com.tanosys:kotlinjsonui:1.0.0")
-}`}</span>
+          <span className="text-[#D4D4D4] text-xs"><>// build.gradle.kts<br />{`dependencies {`}<br />    implementation("com.tanosys:kotlinjsonui:1.0.0")<br />{`}`}</></span>
         </div>
       </div>
       <div className="h-[24px]" />
       <div className="w-full p-8 bg-[#F6F7F9] rounded-2xl flex flex-col border border-[#E5E7EB]">
-        <div className="w-full flex flex-row items-center justify-center">
+        <div className="w-full flex flex-row items-stretch items-center justify-center">
           <span className="text-[#61DAFB] text-[28px] font-bold font-bold">{StringManager.currentLanguage.platformReactTitle}</span>
-          <div className="grow-[1]" />
+          <div className="flex-1" />
           <button className="py-2 px-4 bg-[#FFFFFF] rounded-lg text-[#61DAFB] text-sm font-medium border border-[#61DAFB] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickReactDocs}>{StringManager.currentLanguage.platformsViewDocs}</button>
           <div className="w-[8px]" />
           <button className="py-2 px-4 bg-[#FFFFFF] rounded-lg text-[#61DAFB] text-sm font-medium border border-[#61DAFB] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickReactGitHub}>{StringManager.currentLanguage.platformsViewGithub}</button>
@@ -78,11 +70,7 @@ dependencies {
         <span className="text-[#23272F] text-sm font-semibold">{StringManager.currentLanguage.platformsInstall}</span>
         <div className="h-[8px]" />
         <div className="flex flex-col py-4 px-4 bg-[#1E1E1E] rounded-lg">
-          <span className="text-[#D4D4D4] text-xs"># npm
-npm install react-jsonui
-
-# yarn
-yarn add react-jsonui</span>
+          <span className="text-[#D4D4D4] text-xs"><># npm<br />npm install react-jsonui<br /><br /># yarn<br />yarn add react-jsonui</></span>
         </div>
       </div>
     </div>

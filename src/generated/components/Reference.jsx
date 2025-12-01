@@ -15,36 +15,36 @@ export const Reference = () => {
       <span className="text-[#5E687E] text-xl text-center">{StringManager.currentLanguage.refSubtitle}</span>
     </div>
     <div id="ref_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-      <div className="w-full flex flex-row">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+      <div className="w-full flex flex-row items-stretch">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#087EA4] text-xl font-bold font-bold">{StringManager.currentLanguage.refComponents}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.refComponentsDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#087EA4] text-xl font-bold font-bold">{StringManager.currentLanguage.refAttributes}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.refAttributesDesc}</span>
         </div>
-        <div className="p-6 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#087EA4] text-xl font-bold font-bold">{StringManager.currentLanguage.refDataBinding}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.refDataBindingDesc}</span>
         </div>
       </div>
       <div className="h-[24px]" />
-      <div className="w-full flex flex-row">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+      <div className="w-full flex flex-row items-stretch">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#087EA4] text-xl font-bold font-bold">{StringManager.currentLanguage.refInclude}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.refIncludeDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#087EA4] text-xl font-bold font-bold">{StringManager.currentLanguage.refStyles}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.refStylesDesc}</span>
         </div>
-        <div className="p-6 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#087EA4] text-xl font-bold font-bold">{StringManager.currentLanguage.refEvents}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.refEventsDesc}</span>
@@ -53,51 +53,38 @@ export const Reference = () => {
       <div className="h-[48px]" />
       <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.refComponentList}</span>
       <div className="h-[24px]" />
-      <div className="w-full flex flex-row">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col grow-[1]">
+      <div className="w-full flex flex-row items-stretch">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-base font-semibold">{StringManager.currentLanguage.refLayoutComponents}</span>
           <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">• View
-• SafeAreaView
-• Scroll / ScrollView
-• Collection / Table</span>
+          <span className="text-[#5E687E] text-sm"><>• View<br />• SafeAreaView<br />• Scroll / ScrollView<br />• Collection / Table</></span>
         </div>
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col grow-[1]">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-base font-semibold">{StringManager.currentLanguage.refTextComponents}</span>
           <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">• Label / Text
-• TextField
-• TextView</span>
+          <span className="text-[#5E687E] text-sm"><>• Label / Text<br />• TextField<br />• TextView</></span>
         </div>
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col grow-[1]">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-base font-semibold">{StringManager.currentLanguage.refInputComponents}</span>
           <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">• Button
-• Switch / Toggle
-• Slider
-• Segment
-• SelectBox</span>
+          <span className="text-[#5E687E] text-sm"><>• Button<br />• Switch / Toggle<br />• Slider<br />• Segment<br />• SelectBox</></span>
         </div>
-        <div className="flex flex-col grow-[1]">
+        <div className="flex flex-col flex-1">
           <span className="text-[#23272F] text-base font-semibold">{StringManager.currentLanguage.refMediaComponents}</span>
           <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">• Image
-• CircleImage
-• NetworkImage
-• Progress
-• Indicator</span>
+          <span className="text-[#5E687E] text-sm"><>• Image<br />• CircleImage<br />• NetworkImage<br />• Progress<br />• Indicator</></span>
         </div>
       </div>
       <div className="h-[48px]" />
       <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.refExampleTitle}</span>
       <div className="h-[24px]" />
-      <div className="w-full flex flex-row">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col grow-[1]">
+      <div className="w-full flex flex-row items-stretch">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-base font-semibold">{StringManager.currentLanguage.refExampleView}</span>
           <div className="h-[8px]" />
           <CodeBlock className="flex flex-col" file="view_reference.json" language="json" />
         </div>
-        <div className="flex flex-col grow-[1]">
+        <div className="flex flex-col flex-1">
           <span className="text-[#23272F] text-base font-semibold">{StringManager.currentLanguage.refExampleButton}</span>
           <div className="h-[8px]" />
           <CodeBlock className="flex flex-col" file="button_reference.json" language="json" />

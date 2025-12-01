@@ -6,10 +6,9 @@ import { StringManager } from '@/generated/StringManager';
 import { CodeBlock } from '@/components/extensions/CodeBlock';
 
 
-export const DataBinding = () => {
+export const DataBinding = ({ viewModel }) => {
   return (
   <div id="data_binding_page" className="w-full flex flex-col">
-    <div className="" />
     <div id="data_binding_hero" className="w-full py-12 px-6 bg-[#F6F7F9] flex flex-col items-center justify-center">
       <span className="text-[#23272F] text-5xl font-bold text-center font-bold">{StringManager.currentLanguage.dataBindingTitle}</span>
       <div className="h-[16px]" />
@@ -24,18 +23,18 @@ export const DataBinding = () => {
       <div className="h-[48px]" />
       <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.dataBindingSyntaxTitle}</span>
       <div className="h-[16px]" />
-      <div className="w-full flex flex-row">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+      <div className="w-full flex flex-row items-stretch">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#087EA4] text-lg font-semibold">{property}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.dataBindingPropertyDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#087EA4] text-lg font-semibold">{object.property}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.dataBindingNestedDesc}</span>
         </div>
-        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] grow-[1]">
+        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#087EA4] text-lg font-semibold">{item.property}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.dataBindingItemDesc}</span>
@@ -48,7 +47,7 @@ export const DataBinding = () => {
       <div className="h-[16px]" />
       <CodeBlock className="flex flex-col" file="collection_example.json" language="json" />
       <div className="h-[48px]" />
-      <div className="flex flex-row items-center justify-center">
+      <div className="flex flex-row items-stretch items-center justify-center">
         <button className="cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickStyling}>{StringManager.currentLanguage.dataBindingPrev}</button>
         <div className="w-[16px]" />
         <button className="py-3 px-6 bg-[#087EA4] rounded-lg text-[#FFFFFF] text-base font-semibold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickLearn}>{StringManager.currentLanguage.dataBindingNext}</button>

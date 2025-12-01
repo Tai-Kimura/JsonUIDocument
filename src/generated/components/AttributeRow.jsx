@@ -2,24 +2,25 @@
 import React from 'react';
 
 
-export const AttributeRow = () => {
+export const AttributeRow = ({ data }) => {
   return (
   <div id="attribute_row_container" className="w-full flex flex-col">
-    <div className="" />
-    <div className="w-full py-0 px-4 flex flex-row">
-      <span className="py-3 px-0 text-[#1F2937] text-[13px] grow-[1]">{data.name}</span>
-      <div className="w-[1px] h-full bg-[#E5E7EB]" />
-      <span className="py-3 px-0 text-sm text-center grow-[1]">{data.uikit ? '✅' : '❌'}</span>
-      <div className="w-[1px] h-full bg-[#E5E7EB]" />
-      <span className="py-3 px-0 text-sm text-center grow-[1]">{data.swiftui ? '✅' : '❌'}</span>
-      <div className="w-[1px] h-full bg-[#E5E7EB]" />
-      <span className="py-3 px-0 text-sm text-center grow-[1]">{data.compose ? '✅' : '❌'}</span>
-      <div className="w-[1px] h-full bg-[#E5E7EB]" />
-      <span className="py-3 px-0 text-sm text-center grow-[1]">{data.xml ? '✅' : '❌'}</span>
-      <div className="w-[1px] h-full bg-[#E5E7EB]" />
-      <span className="py-3 px-0 text-[#6B7280] text-[13px] grow-[1]">{data.type}</span>
+    <div className="w-full py-0 px-4 flex flex-row items-stretch">
+      <span className="py-3 px-0 text-[#1F2937] text-[13px] flex-1">{data.name}</span>
+      <div className="w-[1px] h-auto bg-[#E5E7EB]" />
+      <span className="py-3 px-0 text-sm text-center flex-1">{data.uikit ? '✅' : '❌'}</span>
+      <div className="w-[1px] h-auto bg-[#E5E7EB]" />
+      <span className="py-3 px-0 text-sm text-center flex-1">{data.swiftui ? '✅' : '❌'}</span>
+      <div className="w-[1px] h-auto bg-[#E5E7EB]" />
+      <span className="py-3 px-0 text-sm text-center flex-1">{data.compose ? '✅' : '❌'}</span>
+      <div className="w-[1px] h-auto bg-[#E5E7EB]" />
+      <span className="py-3 px-0 text-sm text-center flex-1">{data.xml ? '✅' : '❌'}</span>
+      <div className="w-[1px] h-auto bg-[#E5E7EB]" />
+      <span className="py-3 px-0 text-[#6B7280] text-[13px] flex-1">{data.type}</span>
     </div>
+    {!data.isLast && (
     <div className="w-full h-[1px] bg-[#E5E7EB]" />
+    )}
   </div>
   );
 };
