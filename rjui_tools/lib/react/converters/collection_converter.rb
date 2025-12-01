@@ -24,7 +24,7 @@ module RjuiTools
         def build_class_name
           classes = [super]
 
-          columns = json['columns'] || 2
+          columns = json['columnCount'] || json['columns'] || 1
           layout = json['layout'] || 'vertical'
           is_horizontal = layout == 'horizontal'
 
@@ -149,6 +149,13 @@ module RjuiTools
 
           return nil unless class_name
 
+          # Handle path-based component references like "components/attribute_row"
+          if class_name.include?('/')
+            # Extract the last part of the path and convert to PascalCase
+            base_name = class_name.split('/').last
+            return to_pascal_case(base_name)
+          end
+
           # Convert UIKit cell class name to React component name
           # InformationListCollectionViewCell -> InformationListView
           # SomeCell -> SomeCellView
@@ -163,6 +170,10 @@ module RjuiTools
           else
             class_name
           end
+        end
+
+        def to_pascal_case(string)
+          string.split('_').map(&:capitalize).join
         end
 
         def extract_binding_property(items_property)

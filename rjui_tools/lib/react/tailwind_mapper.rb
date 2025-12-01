@@ -158,7 +158,7 @@ module RjuiTools
         def map_height(height)
           case height
           when 'matchParent'
-            'h-full'
+            'h-auto'
           when 'wrapContent'
             'h-auto'
           when Numeric
@@ -184,7 +184,7 @@ module RjuiTools
         def map_orientation(orientation)
           case orientation&.downcase
           when 'horizontal'
-            'flex flex-row'
+            'flex flex-row items-stretch'
           when 'vertical'
             'flex flex-col'
           else
@@ -300,7 +300,11 @@ module RjuiTools
         def map_flex_grow(weight)
           return '' unless weight
 
-          weight > 0 ? "grow-[#{weight}]" : 'grow-0'
+          case weight
+          when 0 then 'grow-0'
+          when 1 then 'flex-1'
+          else "grow-[#{weight}]"
+          end
         end
 
         private

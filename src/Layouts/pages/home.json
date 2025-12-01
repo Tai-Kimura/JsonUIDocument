@@ -1,12 +1,10 @@
 {
   "type": "View",
   "id": "home_page",
-  "data": [
-    {"class": "HomeViewModel", "name": "viewModel"}
-  ],
   "width": "matchParent",
   "orientation": "vertical",
   "child": [
+    { "data": [{ "class": "HomeViewModel", "name": "viewModel" }] },
     {
       "type": "View",
       "id": "hero_section",
@@ -42,7 +40,7 @@
               "type": "Button",
               "style": "button_primary",
               "text": "btn_get_started",
-              "onClick": "viewModel.onClickGetStarted"
+              "onClick": "@{viewModel.onClickGetStarted}"
             },
             {
               "type": "View",
@@ -52,7 +50,7 @@
               "type": "Button",
               "style": "button_secondary",
               "text": "btn_api_reference",
-              "onClick": "viewModel.onClickApiReference"
+              "onClick": "@{viewModel.onClickApiReference}"
             }
           ]
         }
@@ -90,18 +88,10 @@
           "gravity": "center",
           "child": [
             {
-              "type": "View",
-              "style": "code_block",
-              "width": 500,
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    {\n      \"type\": \"Label\",\n      \"text\": \"Hello, World!\",\n      \"fontSize\": 24\n    },\n    {\n      \"type\": \"Button\",\n      \"text\": \"Click Me\",\n      \"onClick\": \"handleClick\"\n    }\n  ]\n}",
-                  "fontSize": 14,
-                  "fontColor": "#D4D4D4",
-                  "fontFamily": "monospace"
-                }
-              ]
+              "type": "CodeBlock",
+              "width": 800,
+              "file": "hello_world.json",
+              "language": "json"
             }
           ]
         }

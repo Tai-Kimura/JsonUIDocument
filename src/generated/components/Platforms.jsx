@@ -5,9 +5,10 @@ import React from 'react';
 import { StringManager } from '@/generated/StringManager';
 
 
-export const Platforms = ({ viewModel }) => {
+export const Platforms = () => {
   return (
   <div id="platforms_page" className="w-full flex flex-col">
+    <div className="" />
     <div id="platforms_hero" className="w-full py-12 px-6 bg-[#F6F7F9] flex flex-col items-center justify-center">
       <span className="text-[#23272F] text-5xl font-bold text-center font-bold">{StringManager.currentLanguage.platformsTitle}</span>
       <div className="h-[16px]" />

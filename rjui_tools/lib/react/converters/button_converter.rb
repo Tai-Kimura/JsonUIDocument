@@ -39,16 +39,7 @@ module RjuiTools
         end
 
         def build_on_click
-          handler = json['onClick'] || json['onclick']
-          return '' unless handler
-
-          if handler.start_with?('@{')
-            # Binding: @{handleClick} -> {handleClick}
-            " onClick={#{handler.gsub(/@\{|\}/, '')}}"
-          else
-            # Direct handler name
-            " onClick={#{handler}}"
-          end
+          build_onclick_attr
         end
       end
     end

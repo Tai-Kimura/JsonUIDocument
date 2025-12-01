@@ -1,9 +1,6 @@
 {
   "type": "View",
   "id": "header",
-  "data": [
-    {"class": "HeaderViewModel", "name": "viewModel"}
-  ],
   "width": "matchParent",
   "height": 64,
   "background": "#FFFFFF",
@@ -13,6 +10,7 @@
   "borderWidth": 1,
   "borderColor": "#E5E7EB",
   "child": [
+    { "data": [{ "class": "HeaderViewModel", "name": "viewModel" }] },
     {
       "type": "View",
       "orientation": "horizontal",
@@ -25,7 +23,7 @@
           "fontSize": 24,
           "fontWeight": "bold",
           "fontColor": "#087EA4",
-          "onClick": "viewModel.onClickHome"
+          "onClick": "@{viewModel.onClickHome}"
         }
       ]
     },
@@ -43,28 +41,28 @@
           "style": "nav_link",
           "text": "nav_learn",
           "margins": [0, 16, 0, 0],
-          "onClick": "viewModel.onClickLearn"
+          "onClick": "@{viewModel.onClickLearn}"
         },
         {
           "type": "Label",
           "style": "nav_link",
           "text": "nav_reference",
           "margins": [0, 16, 0, 0],
-          "onClick": "viewModel.onClickReference"
+          "onClick": "@{viewModel.onClickReference}"
         },
         {
           "type": "Label",
           "style": "nav_link",
           "text": "nav_platforms",
           "margins": [0, 16, 0, 0],
-          "onClick": "viewModel.onClickPlatforms"
+          "onClick": "@{viewModel.onClickPlatforms}"
         },
         {
           "type": "Label",
           "style": "nav_link",
           "text": "nav_community",
           "margins": [0, 16, 0, 0],
-          "onClick": "viewModel.onClickCommunity"
+          "onClick": "@{viewModel.onClickCommunity}"
         },
         {
           "type": "Label",
@@ -73,7 +71,7 @@
           "fontSize": 16,
           "fontWeight": "medium",
           "margins": [0, 24, 0, 0],
-          "onClick": "viewModel.onClickGitHub"
+          "onClick": "@{viewModel.onClickGitHub}"
         }
       ]
     }

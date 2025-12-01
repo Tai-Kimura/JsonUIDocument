@@ -1,0 +1,294 @@
+{
+  "type": "View",
+  "id": "quick_start_page",
+  "width": "matchParent",
+  "orientation": "vertical",
+  "child": [
+    { "data": [{ "class": "QuickStartViewModel", "name": "viewModel" }] },
+    {
+      "type": "View",
+      "id": "quick_start_hero",
+      "width": "matchParent",
+      "padding": [48, 24],
+      "orientation": "vertical",
+      "gravity": "center",
+      "background": "#F6F7F9",
+      "child": [
+        {
+          "type": "Label",
+          "text": "quick_start_title",
+          "fontSize": 48,
+          "fontWeight": "bold",
+          "fontColor": "#23272F",
+          "textAlign": "Center"
+        },
+        { "style": "spacer_16" },
+        {
+          "type": "Label",
+          "text": "quick_start_subtitle",
+          "fontSize": 20,
+          "fontColor": "#5E687E",
+          "textAlign": "Center"
+        }
+      ]
+    },
+    {
+      "type": "View",
+      "id": "quick_start_content",
+      "width": "matchParent",
+      "padding": [48, 24],
+      "orientation": "vertical",
+      "background": "#FFFFFF",
+      "child": [
+        {
+          "type": "Segment",
+          "id": "platform_tabs",
+          "items": ["Swift", "Kotlin", "React"],
+          "selectedIndex": "@{viewModel.currentTab}",
+          "onValueChanged": "@{viewModel.onTabChange}"
+        },
+        { "style": "spacer_24" },
+        {
+          "type": "View",
+          "id": "swift_content",
+          "orientation": "vertical",
+          "visibility": "@{viewModel.currentTab === 0}",
+          "child": [
+            {
+              "type": "Label",
+              "text": "qs_swift_step1_title",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#FA7343"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "Label",
+              "text": "qs_swift_step1_desc",
+              "fontSize": 16,
+              "fontColor": "#5E687E"
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "CodeBlock",
+              "file": "qs_swift_step1.sh",
+              "language": "bash",
+              "showPreview": false
+            },
+            { "style": "spacer_24" },
+            {
+              "type": "Label",
+              "text": "qs_swift_step2_title",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#FA7343"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "Label",
+              "text": "qs_swift_step2_desc",
+              "fontSize": 16,
+              "fontColor": "#5E687E"
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "CodeBlock",
+              "file": "qs_swift_step2.json",
+              "language": "json",
+              "showPreview": false
+            },
+            { "style": "spacer_24" },
+            {
+              "type": "Label",
+              "text": "qs_swift_step3_title",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#FA7343"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "Label",
+              "text": "qs_swift_step3_desc",
+              "fontSize": 16,
+              "fontColor": "#5E687E"
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "CodeBlock",
+              "file": "qs_swift_step3.sh",
+              "language": "bash",
+              "showPreview": false
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "kotlin_content",
+          "orientation": "vertical",
+          "visibility": "@{viewModel.currentTab === 1}",
+          "child": [
+            {
+              "type": "Label",
+              "text": "qs_kotlin_step1_title",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#7F52FF"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "Label",
+              "text": "qs_kotlin_step1_desc",
+              "fontSize": 16,
+              "fontColor": "#5E687E"
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "CodeBlock",
+              "file": "qs_kotlin_step1.sh",
+              "language": "bash",
+              "showPreview": false
+            },
+            { "style": "spacer_24" },
+            {
+              "type": "Label",
+              "text": "qs_kotlin_step2_title",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#7F52FF"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "Label",
+              "text": "qs_kotlin_step2_desc",
+              "fontSize": 16,
+              "fontColor": "#5E687E"
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "CodeBlock",
+              "file": "qs_kotlin_step2.json",
+              "language": "json",
+              "showPreview": false
+            },
+            { "style": "spacer_24" },
+            {
+              "type": "Label",
+              "text": "qs_kotlin_step3_title",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#7F52FF"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "Label",
+              "text": "qs_kotlin_step3_desc",
+              "fontSize": 16,
+              "fontColor": "#5E687E"
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "CodeBlock",
+              "file": "qs_kotlin_step3.sh",
+              "language": "bash",
+              "showPreview": false
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "react_content",
+          "orientation": "vertical",
+          "visibility": "@{viewModel.currentTab === 2}",
+          "child": [
+            {
+              "type": "Label",
+              "text": "qs_react_step1_title",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#61DAFB"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "Label",
+              "text": "qs_react_step1_desc",
+              "fontSize": 16,
+              "fontColor": "#5E687E"
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "CodeBlock",
+              "file": "qs_react_step1.sh",
+              "language": "bash",
+              "showPreview": false
+            },
+            { "style": "spacer_24" },
+            {
+              "type": "Label",
+              "text": "qs_react_step2_title",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#61DAFB"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "Label",
+              "text": "qs_react_step2_desc",
+              "fontSize": 16,
+              "fontColor": "#5E687E"
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "CodeBlock",
+              "file": "qs_react_step2.json",
+              "language": "json",
+              "showPreview": false
+            },
+            { "style": "spacer_24" },
+            {
+              "type": "Label",
+              "text": "qs_react_step3_title",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#61DAFB"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "Label",
+              "text": "qs_react_step3_desc",
+              "fontSize": 16,
+              "fontColor": "#5E687E"
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "CodeBlock",
+              "file": "qs_react_step3.sh",
+              "language": "bash",
+              "showPreview": false
+            }
+          ]
+        },
+        { "style": "spacer_48" },
+        {
+          "type": "View",
+          "orientation": "horizontal",
+          "gravity": "center",
+          "child": [
+            {
+              "type": "Button",
+              "style": "button_outline",
+              "text": "quick_start_prev",
+              "onClick": "@{viewModel.onClickInstallation}"
+            },
+            { "type": "View", "width": 16 },
+            {
+              "type": "Button",
+              "style": "button_primary",
+              "text": "quick_start_next",
+              "onClick": "@{viewModel.onClickComponents}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -80,8 +80,14 @@ module RjuiTools
           opacity = json['opacity'] || json['alpha']
           classes << TailwindMapper.map_opacity(opacity) if opacity && opacity < 1
 
-          # Visibility
+          # Visibility (hidden attribute - static)
           classes << TailwindMapper.map_visibility(json['hidden']) if json['hidden']
+
+          # Visibility attribute (supports data binding)
+          # If it's a binding, we'll handle it with conditional class
+          if json['visibility'] && !has_binding?(json['visibility'])
+            classes << 'hidden' unless json['visibility']
+          end
 
           # Clip to bounds
           classes << TailwindMapper.map_overflow(json['clipToBounds']) if json['clipToBounds']
@@ -120,10 +126,20 @@ module RjuiTools
         def convert_children(indent)
           return '' unless json['child'].is_a?(Array)
 
-          json['child'].map do |child|
+          json['child'].filter_map do |child|
+            # Skip data-only elements (they define props, not rendered content)
+            next nil if data_only_element?(child)
+
             converter = create_converter_for_child(child)
             converter.convert(indent + 2)
           end.join("\n")
+        end
+
+        # Check if a child element is a data-only element (should not be rendered)
+        # Data-only element: { "data": [...] } with only the data key
+        def data_only_element?(child)
+          return false unless child.is_a?(Hash)
+          child.keys == ['data'] && child['data'].is_a?(Array)
         end
 
         def create_converter_for_child(child)
@@ -165,6 +181,10 @@ module RjuiTools
         end
 
         def get_converter_class(type)
+          # First check extension converters
+          extension_converters = config['_extension_converters'] || {}
+          return extension_converters[type] if extension_converters[type]
+
           require_relative 'view_converter'
           require_relative 'label_converter'
           require_relative 'button_converter'
@@ -231,8 +251,38 @@ module RjuiTools
             return escape_jsx_braces_with_bindings(converted)
           end
 
+          # Convert newlines to <br /> and escape JSX braces
+          convert_text_with_newlines(value)
+        end
+
+        # Convert text with newline characters to JSX with <br /> tags
+        def convert_text_with_newlines(value)
+          return value unless value.is_a?(String)
+
+          # If text contains newlines, convert to JSX fragment with <br /> tags
+          if value.include?("\n")
+            parts = value.split("\n")
+            # Build JSX expression: <>line1<br />line2<br />line3</>
+            jsx_parts = parts.map.with_index do |part, i|
+              escaped_part = escape_text_for_jsx(part)
+              i < parts.length - 1 ? "#{escaped_part}<br />" : escaped_part
+            end
+            return "<>#{jsx_parts.join('')}</>"
+          end
+
           # Escape { and } in plain text for JSX (must be wrapped as JSX expressions)
           escape_jsx_braces(value)
+        end
+
+        # Escape special characters in text for JSX (without wrapping)
+        def escape_text_for_jsx(text)
+          return text unless text.is_a?(String)
+          # Escape if text contains braces or single quotes
+          return text unless text.include?('{') || text.include?('}') || text.include?("'")
+
+          # Wrap text containing special characters in JSX expression
+          escaped = text.gsub('`', '\\`').gsub('${', '\\${')
+          "{`#{escaped}`}"
         end
 
         def escape_jsx_braces_with_bindings(value)
@@ -254,15 +304,30 @@ module RjuiTools
 
         def escape_jsx_braces(value)
           return value unless value.is_a?(String)
-          return value unless value.include?('{') || value.include?('}')
+          # Escape if text contains braces or single quotes (which can break JSX attributes)
+          return value unless value.include?('{') || value.include?('}') || value.include?("'")
 
-          # For text containing braces, wrap entire string in JSX expression with template literal
+          # For text containing special characters, wrap entire string in JSX expression with template literal
           escaped = value.gsub('`', '\\`').gsub('${', '\\${')
           "{`#{escaped}`}"
         end
 
         def extract_id
           json['id'] || json['propertyName']
+        end
+
+        # Build onClick attribute - converts @{handler} to {handler}
+        def build_onclick_attr
+          handler = json['onClick']
+          return '' unless handler
+
+          if handler.start_with?('@{')
+            # Binding: @{handleClick} -> {handleClick}
+            " onClick={#{handler.gsub(/@\{|\}/, '')}}"
+          else
+            # Direct handler name
+            " onClick={#{handler}}"
+          end
         end
 
         # Get default value from config

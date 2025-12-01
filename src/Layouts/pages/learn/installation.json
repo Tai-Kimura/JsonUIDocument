@@ -1,0 +1,223 @@
+{
+  "type": "View",
+  "id": "installation_page",
+  "width": "matchParent",
+  "orientation": "vertical",
+  "child": [
+    { "data": [{ "class": "InstallationViewModel", "name": "viewModel" }] },
+    {
+      "type": "View",
+      "id": "installation_hero",
+      "width": "matchParent",
+      "padding": [48, 24],
+      "orientation": "vertical",
+      "gravity": "center",
+      "background": "#F6F7F9",
+      "child": [
+        {
+          "type": "Label",
+          "text": "installation_title",
+          "fontSize": 48,
+          "fontWeight": "bold",
+          "fontColor": "#23272F",
+          "textAlign": "Center"
+        },
+        { "style": "spacer_16" },
+        {
+          "type": "Label",
+          "text": "installation_subtitle",
+          "fontSize": 20,
+          "fontColor": "#5E687E",
+          "textAlign": "Center"
+        }
+      ]
+    },
+    {
+      "type": "View",
+      "id": "installation_content",
+      "width": "matchParent",
+      "padding": [48, 24],
+      "orientation": "vertical",
+      "background": "#FFFFFF",
+      "child": [
+        {
+          "type": "Segment",
+          "id": "platform_tabs",
+          "items": ["Swift", "Kotlin", "React"],
+          "selectedIndex": "@{viewModel.currentTab}",
+          "onValueChanged": "@{viewModel.onTabChange}"
+        },
+        { "style": "spacer_24" },
+        {
+          "type": "View",
+          "id": "swift_content",
+          "orientation": "vertical",
+          "visibility": "@{viewModel.currentTab === 0}",
+          "child": [
+            {
+              "type": "Label",
+              "text": "installation_swift_title",
+              "fontSize": 28,
+              "fontWeight": "bold",
+              "fontColor": "#FA7343"
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "Label",
+              "text": "installation_swift_spm",
+              "fontSize": 18,
+              "fontWeight": "semibold",
+              "fontColor": "#23272F"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "View",
+              "style": "code_block",
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "dependencies: [\n    .package(url: \"https://github.com/Tai-Kimura/SwiftJsonUI.git\", from: \"7.2.0\")\n]",
+                  "fontSize": 14,
+                  "fontColor": "#D4D4D4",
+                  "fontFamily": "monospace"
+                }
+              ]
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "Label",
+              "text": "installation_swift_cli",
+              "fontSize": 18,
+              "fontWeight": "semibold",
+              "fontColor": "#23272F"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "View",
+              "style": "code_block",
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "# One-line installer\ncurl -fsSL https://raw.githubusercontent.com/Tai-Kimura/SwiftJsonUI/master/installer/bootstrap.sh | bash\n\n# Initialize project\nsjui_tools/bin/sjui init --mode swiftui\nsjui_tools/bin/sjui setup",
+                  "fontSize": 14,
+                  "fontColor": "#D4D4D4",
+                  "fontFamily": "monospace"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "kotlin_content",
+          "orientation": "vertical",
+          "visibility": "@{viewModel.currentTab === 1}",
+          "child": [
+            {
+              "type": "Label",
+              "text": "installation_kotlin_title",
+              "fontSize": 28,
+              "fontWeight": "bold",
+              "fontColor": "#7F52FF"
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "Label",
+              "text": "installation_kotlin_gradle",
+              "fontSize": 18,
+              "fontWeight": "semibold",
+              "fontColor": "#23272F"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "View",
+              "style": "code_block",
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "dependencies {\n    implementation(\"io.github.tai-kimura:kotlinjsonui:1.0.0\")\n    \n    // Dynamic module for debug builds\n    debugImplementation(\"io.github.tai-kimura:kotlinjsonui-dynamic:1.0.0\")\n}",
+                  "fontSize": 14,
+                  "fontColor": "#D4D4D4",
+                  "fontFamily": "monospace"
+                }
+              ]
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "Label",
+              "text": "installation_kotlin_cli",
+              "fontSize": 18,
+              "fontWeight": "semibold",
+              "fontColor": "#23272F"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "View",
+              "style": "code_block",
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "# One-line installer\ncurl -fsSL https://raw.githubusercontent.com/Tai-Kimura/KotlinJsonUI/main/installer/bootstrap.sh | bash\n\n# Initialize project\nkjui_tools/bin/kjui init --mode compose",
+                  "fontSize": 14,
+                  "fontColor": "#D4D4D4",
+                  "fontFamily": "monospace"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "react_content",
+          "orientation": "vertical",
+          "visibility": "@{viewModel.currentTab === 2}",
+          "child": [
+            {
+              "type": "Label",
+              "text": "installation_react_title",
+              "fontSize": 28,
+              "fontWeight": "bold",
+              "fontColor": "#61DAFB"
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "Label",
+              "text": "installation_react_npm",
+              "fontSize": 18,
+              "fontWeight": "semibold",
+              "fontColor": "#23272F"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "View",
+              "style": "code_block",
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "# Install CLI tools\ncurl -fsSL https://raw.githubusercontent.com/anthropics/ReactJsonUI/main/installer/bootstrap.sh | bash\n\n# Initialize project\nrjui_tools/bin/rjui init\nrjui_tools/bin/rjui setup",
+                  "fontSize": 14,
+                  "fontColor": "#D4D4D4",
+                  "fontFamily": "monospace"
+                }
+              ]
+            }
+          ]
+        },
+        { "style": "spacer_48" },
+        {
+          "type": "View",
+          "orientation": "horizontal",
+          "gravity": "center",
+          "child": [
+            {
+              "type": "Button",
+              "style": "button_primary",
+              "text": "installation_next_quick_start",
+              "onClick": "@{viewModel.onClickQuickStart}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

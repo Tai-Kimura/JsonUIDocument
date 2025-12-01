@@ -1,0 +1,1 @@
+rjui_tools/bin/rjui g view HomeView --root
