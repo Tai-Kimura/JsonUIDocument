@@ -6,6 +6,7 @@ interface AttributeData {
   swiftui: boolean;
   compose: boolean;
   xml: boolean;
+  react: boolean;
   type: string;
 }
 
@@ -34,15 +35,15 @@ export class CollectionDetailViewModel {
 
   get collectionAttributes(): AttributeData[] {
     return [
-      { name: "items", uikit: true, swiftui: true, compose: true, xml: false, type: "string" },
-      { name: "sections", uikit: false, swiftui: true, compose: true, xml: false, type: "array" },
-      { name: "horizontalScroll", uikit: true, swiftui: true, compose: true, xml: false, type: "boolean" },
-      { name: "columnSpacing", uikit: true, swiftui: true, compose: true, xml: false, type: "float" },
-      { name: "lineSpacing", uikit: true, swiftui: true, compose: true, xml: false, type: "float" },
-      { name: "insets", uikit: true, swiftui: true, compose: true, xml: false, type: "array" },
-      { name: "paging", uikit: true, swiftui: true, compose: true, xml: false, type: "boolean" },
-      { name: "cellClasses", uikit: true, swiftui: false, compose: true, xml: false, type: "array" },
-      { name: "headerClasses", uikit: true, swiftui: false, compose: true, xml: false, type: "array" }
+      { name: "items", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "string" },
+      { name: "sections", uikit: false, swiftui: true, compose: true, xml: false, react: true, type: "array" },
+      { name: "horizontalScroll", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "boolean" },
+      { name: "columnSpacing", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "float" },
+      { name: "lineSpacing", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "float" },
+      { name: "insets", uikit: true, swiftui: true, compose: true, xml: false, react: false, type: "array" },
+      { name: "paging", uikit: true, swiftui: true, compose: true, xml: false, react: false, type: "boolean" },
+      { name: "cellClasses", uikit: true, swiftui: false, compose: true, xml: false, react: true, type: "array" },
+      { name: "headerClasses", uikit: true, swiftui: false, compose: true, xml: false, react: true, type: "array" }
     ];
   }
 }

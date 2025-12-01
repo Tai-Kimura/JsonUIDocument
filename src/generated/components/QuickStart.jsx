@@ -21,6 +21,7 @@ export const QuickStart = ({ viewModel }) => {
         <button key={2} className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${viewModel.currentTab === 2 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => viewModel.onTabChange(2)}>React</button>
       </div>
       <div className="h-[24px]" />
+      {viewModel.currentTab === 0 && (
       <div id="swift_content" className="flex flex-col">
         <span className="text-[#FA7343] text-2xl font-bold font-bold">{StringManager.currentLanguage.qsSwiftStep1Title}</span>
         <div className="h-[8px]" />
@@ -40,6 +41,8 @@ export const QuickStart = ({ viewModel }) => {
         <div className="h-[16px]" />
         <CodeBlock className="flex flex-col" file="qs_swift_step3.sh" language="bash" showPreview={false} />
       </div>
+      )}
+      {viewModel.currentTab === 1 && (
       <div id="kotlin_content" className="flex flex-col">
         <span className="text-[#7F52FF] text-2xl font-bold font-bold">{StringManager.currentLanguage.qsKotlinStep1Title}</span>
         <div className="h-[8px]" />
@@ -59,6 +62,8 @@ export const QuickStart = ({ viewModel }) => {
         <div className="h-[16px]" />
         <CodeBlock className="flex flex-col" file="qs_kotlin_step3.sh" language="bash" showPreview={false} />
       </div>
+      )}
+      {viewModel.currentTab === 2 && (
       <div id="react_content" className="flex flex-col">
         <span className="text-[#61DAFB] text-2xl font-bold font-bold">{StringManager.currentLanguage.qsReactStep1Title}</span>
         <div className="h-[8px]" />
@@ -78,6 +83,7 @@ export const QuickStart = ({ viewModel }) => {
         <div className="h-[16px]" />
         <CodeBlock className="flex flex-col" file="qs_react_step3.sh" language="bash" showPreview={false} />
       </div>
+      )}
       <div className="h-[48px]" />
       <div className="flex flex-row items-stretch items-center justify-center">
         <button className="cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickInstallation}>{StringManager.currentLanguage.quickStartPrev}</button>

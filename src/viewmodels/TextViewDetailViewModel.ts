@@ -6,6 +6,7 @@ interface AttributeData {
   swiftui: boolean;
   compose: boolean;
   xml: boolean;
+  react: boolean;
   type: string;
 }
 
@@ -34,17 +35,17 @@ export class TextViewDetailViewModel {
 
   get textViewAttributes(): AttributeData[] {
     return [
-      { name: "text", uikit: true, swiftui: true, compose: true, xml: true, type: "string" },
-      { name: "hint", uikit: true, swiftui: true, compose: true, xml: true, type: "string" },
-      { name: "font", uikit: true, swiftui: true, compose: true, xml: true, type: "string" },
-      { name: "fontSize", uikit: true, swiftui: true, compose: true, xml: true, type: "float" },
-      { name: "fontColor", uikit: true, swiftui: true, compose: true, xml: true, type: "string" },
-      { name: "editable", uikit: true, swiftui: true, compose: true, xml: true, type: "boolean" },
-      { name: "scrollEnabled", uikit: true, swiftui: true, compose: true, xml: true, type: "boolean" },
-      { name: "flexible", uikit: true, swiftui: true, compose: false, xml: false, type: "boolean" },
-      { name: "minHeight", uikit: true, swiftui: true, compose: true, xml: false, type: "float" },
-      { name: "maxHeight", uikit: true, swiftui: true, compose: true, xml: false, type: "float" },
-      { name: "onTextChange", uikit: true, swiftui: true, compose: true, xml: false, type: "string" }
+      { name: "text", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "string" },
+      { name: "hint", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "string" },
+      { name: "font", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "string" },
+      { name: "fontSize", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "float" },
+      { name: "fontColor", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "string" },
+      { name: "editable", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "boolean" },
+      { name: "scrollEnabled", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "boolean" },
+      { name: "flexible", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "boolean" },
+      { name: "minHeight", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "float" },
+      { name: "maxHeight", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "float" },
+      { name: "onTextChange", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "string" }
     ];
   }
 }

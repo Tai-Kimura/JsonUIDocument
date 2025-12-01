@@ -9,6 +9,9 @@ module RjuiTools
       module Extensions
         CONVERTER_MAPPINGS = {
           'CodeBlock' => 'CodeBlockConverter',
+          'ComponentsSidebar' => 'ComponentsSidebarConverter',
+          'LanguageSelector' => 'LanguageSelectorConverter',
+          'LanguageProvider' => 'LanguageProviderConverter',
         }.freeze
       end
     end

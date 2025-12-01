@@ -6,6 +6,7 @@ interface AttributeData {
   swiftui: boolean;
   compose: boolean;
   xml: boolean;
+  react: boolean;
   type: string;
 }
 
@@ -34,14 +35,14 @@ export class SliderDetailViewModel {
 
   get sliderAttributes(): AttributeData[] {
     return [
-      { name: "value", uikit: true, swiftui: true, compose: true, xml: true, type: "float" },
-      { name: "minimum", uikit: true, swiftui: true, compose: true, xml: true, type: "float" },
-      { name: "maximum", uikit: true, swiftui: true, compose: true, xml: true, type: "float" },
-      { name: "tintColor", uikit: true, swiftui: true, compose: true, xml: false, type: "string" },
-      { name: "onValueChange", uikit: true, swiftui: true, compose: true, xml: false, type: "string" },
-      { name: "enabled", uikit: true, swiftui: true, compose: true, xml: true, type: "boolean" },
-      { name: "minimumValueImage", uikit: true, swiftui: false, compose: false, xml: false, type: "string" },
-      { name: "maximumValueImage", uikit: true, swiftui: false, compose: false, xml: false, type: "string" }
+      { name: "value", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "float" },
+      { name: "minimum", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "float" },
+      { name: "maximum", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "float" },
+      { name: "tintColor", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "string" },
+      { name: "onValueChange", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "string" },
+      { name: "enabled", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "boolean" },
+      { name: "minimumValueImage", uikit: true, swiftui: false, compose: false, xml: false, react: false, type: "string" },
+      { name: "maximumValueImage", uikit: true, swiftui: false, compose: false, xml: false, react: false, type: "string" }
     ];
   }
 }

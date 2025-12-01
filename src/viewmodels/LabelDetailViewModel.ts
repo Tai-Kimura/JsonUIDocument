@@ -6,6 +6,7 @@ interface AttributeData {
   swiftui: boolean;
   compose: boolean;
   xml: boolean;
+  react: boolean;
   type: string;
 }
 
@@ -34,19 +35,19 @@ export class LabelDetailViewModel {
 
   get labelAttributes(): AttributeData[] {
     return [
-      { name: "text", uikit: true, swiftui: true, compose: true, xml: true, type: "string" },
-      { name: "font", uikit: true, swiftui: true, compose: false, xml: true, type: "string" },
-      { name: "fontSize", uikit: true, swiftui: true, compose: true, xml: true, type: "float" },
-      { name: "fontColor", uikit: true, swiftui: true, compose: true, xml: true, type: "string" },
-      { name: "textAlign", uikit: true, swiftui: true, compose: true, xml: true, type: "string" },
-      { name: "lines", uikit: true, swiftui: true, compose: true, xml: true, type: "integer" },
-      { name: "lineBreakMode", uikit: true, swiftui: true, compose: false, xml: true, type: "string" },
-      { name: "underline", uikit: true, swiftui: true, compose: true, xml: false, type: "JSON" },
-      { name: "strikethrough", uikit: true, swiftui: true, compose: true, xml: false, type: "JSON" },
-      { name: "lineHeightMultiple", uikit: true, swiftui: true, compose: true, xml: false, type: "float" },
-      { name: "partialAttributes", uikit: true, swiftui: true, compose: true, xml: false, type: "array" },
-      { name: "linkable", uikit: true, swiftui: true, compose: true, xml: true, type: "boolean" },
-      { name: "hint", uikit: true, swiftui: true, compose: false, xml: true, type: "string" }
+      { name: "text", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "string" },
+      { name: "font", uikit: true, swiftui: true, compose: false, xml: true, react: true, type: "string" },
+      { name: "fontSize", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "float" },
+      { name: "fontColor", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "string" },
+      { name: "textAlign", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "string" },
+      { name: "lines", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "integer" },
+      { name: "lineBreakMode", uikit: true, swiftui: true, compose: false, xml: true, react: true, type: "string" },
+      { name: "underline", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "JSON" },
+      { name: "strikethrough", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "JSON" },
+      { name: "lineHeightMultiple", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "float" },
+      { name: "partialAttributes", uikit: true, swiftui: true, compose: true, xml: false, react: false, type: "array" },
+      { name: "linkable", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "boolean" },
+      { name: "hint", uikit: true, swiftui: true, compose: false, xml: true, react: true, type: "string" }
     ];
   }
 }

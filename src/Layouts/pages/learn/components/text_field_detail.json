@@ -2,9 +2,11 @@
   "type": "View",
   "id": "text_field_detail_page",
   "width": "matchParent",
-  "orientation": "vertical",
+  "height": "matchParent",
+  "orientation": "horizontal",
   "child": [
     { "data": [{ "class": "TextFieldDetailViewModel", "name": "viewModel" }] },
+    { "type": "ComponentsSidebar" },
     {
       "type": "ScrollView",
       "id": "text_field_detail_scroll",
@@ -21,56 +23,59 @@
           "child": [
             {
               "type": "Label",
-              "text": "TextField",
+              "text": "comp_textfield_title",
               "fontSize": 32,
               "fontWeight": "bold",
               "fontColor": "#23272F",
-              "marginBottom": 8
+              "bottomMargin": 8
             },
             {
               "type": "Label",
-              "text": "A single-line text input component for user data entry. Supports various keyboard types, placeholder text, and input validation.",
+              "text": "comp_textfield_desc",
               "fontSize": 16,
               "fontColor": "#4B5563",
-              "marginBottom": 24,
+              "bottomMargin": 24,
               "lineHeight": 1.6
             },
             {
               "type": "View",
               "orientation": "horizontal",
-              "marginBottom": 24,
+              "bottomMargin": 24,
               "child": [
                 { "include": "components/platform_badge_swift" },
                 { "type": "View", "width": 8 },
-                { "include": "components/platform_badge_kotlin" }
+                { "include": "components/platform_badge_kotlin" },
+                { "type": "View", "width": 8 },
+                { "include": "components/platform_badge_react" }
               ]
             },
             {
               "type": "Label",
-              "text": "Platform Support",
+              "text": "comp_detail_platform_support",
               "fontSize": 20,
               "fontWeight": "bold",
               "fontColor": "#23272F",
-              "marginBottom": 12
+              "bottomMargin": 12
             },
             {
               "type": "View",
               "orientation": "vertical",
-              "marginBottom": 24,
+              "bottomMargin": 24,
               "child": [
-                { "type": "Label", "text": "• UIKit: Full support - Maps to SJUITextField", "fontSize": 14, "fontColor": "#4B5563", "marginBottom": 4 },
-                { "type": "Label", "text": "• SwiftUI: Full support - DynamicComponent wrapper", "fontSize": 14, "fontColor": "#4B5563", "marginBottom": 4 },
-                { "type": "Label", "text": "• Jetpack Compose: Full support - Maps to TextField", "fontSize": 14, "fontColor": "#4B5563", "marginBottom": 4 },
-                { "type": "Label", "text": "• Android XML: Maps to KjuiEditText", "fontSize": 14, "fontColor": "#4B5563" }
+                { "type": "Label", "text": "comp_textfield_uikit", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 4 },
+                { "type": "Label", "text": "comp_textfield_swiftui", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 4 },
+                { "type": "Label", "text": "comp_textfield_compose", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 4 },
+                { "type": "Label", "text": "comp_textfield_android_xml", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 4 },
+                { "type": "Label", "text": "comp_textfield_react", "fontSize": 14, "fontColor": "#4B5563" }
               ]
             },
             {
               "type": "Label",
-              "text": "Attributes",
+              "text": "comp_detail_attributes",
               "fontSize": 20,
               "fontWeight": "bold",
               "fontColor": "#23272F",
-              "marginBottom": 12
+              "bottomMargin": 12
             },
             {
               "type": "Collection",
@@ -86,12 +91,12 @@
             },
             {
               "type": "Label",
-              "text": "Basic Example",
+              "text": "comp_detail_basic_example",
               "fontSize": 20,
               "fontWeight": "bold",
               "fontColor": "#23272F",
-              "marginTop": 32,
-              "marginBottom": 12
+              "topMargin": 32,
+              "bottomMargin": 12
             },
             {
               "type": "CodeBlock",

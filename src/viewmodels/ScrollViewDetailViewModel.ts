@@ -6,6 +6,7 @@ interface AttributeData {
   swiftui: boolean;
   compose: boolean;
   xml: boolean;
+  react: boolean;
   type: string;
 }
 
@@ -34,15 +35,15 @@ export class ScrollViewDetailViewModel {
 
   get scrollViewAttributes(): AttributeData[] {
     return [
-      { name: "showsHorizontalScrollIndicator", uikit: true, swiftui: true, compose: true, xml: false, type: "boolean" },
-      { name: "showsVerticalScrollIndicator", uikit: true, swiftui: true, compose: true, xml: false, type: "boolean" },
-      { name: "paging", uikit: true, swiftui: true, compose: true, xml: false, type: "boolean" },
-      { name: "bounces", uikit: true, swiftui: true, compose: true, xml: false, type: "boolean" },
-      { name: "scrollEnabled", uikit: true, swiftui: true, compose: true, xml: true, type: "boolean" },
-      { name: "contentInsetAdjustmentBehavior", uikit: true, swiftui: true, compose: true, xml: false, type: "string" },
-      { name: "keyboardDismissMode", uikit: true, swiftui: true, compose: true, xml: true, type: "string" },
-      { name: "maxZoom", uikit: true, swiftui: true, compose: true, xml: false, type: "float" },
-      { name: "minZoom", uikit: true, swiftui: true, compose: true, xml: false, type: "float" }
+      { name: "showsHorizontalScrollIndicator", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "boolean" },
+      { name: "showsVerticalScrollIndicator", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "boolean" },
+      { name: "paging", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "boolean" },
+      { name: "bounces", uikit: true, swiftui: true, compose: true, xml: false, react: false, type: "boolean" },
+      { name: "scrollEnabled", uikit: true, swiftui: true, compose: true, xml: true, react: false, type: "boolean" },
+      { name: "contentInsetAdjustmentBehavior", uikit: true, swiftui: true, compose: true, xml: false, react: false, type: "string" },
+      { name: "keyboardDismissMode", uikit: true, swiftui: true, compose: true, xml: true, react: false, type: "string" },
+      { name: "maxZoom", uikit: true, swiftui: true, compose: true, xml: false, react: false, type: "float" },
+      { name: "minZoom", uikit: true, swiftui: true, compose: true, xml: false, react: false, type: "float" }
     ];
   }
 }

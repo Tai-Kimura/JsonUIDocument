@@ -6,6 +6,7 @@ interface AttributeData {
   swiftui: boolean;
   compose: boolean;
   xml: boolean;
+  react: boolean;
   type: string;
 }
 
@@ -34,12 +35,12 @@ export class SwitchDetailViewModel {
 
   get switchAttributes(): AttributeData[] {
     return [
-      { name: "value", uikit: true, swiftui: true, compose: true, xml: true, type: "boolean" },
-      { name: "tint", uikit: true, swiftui: true, compose: true, xml: false, type: "string" },
-      { name: "thumbTintColor", uikit: true, swiftui: true, compose: true, xml: false, type: "string" },
-      { name: "offTintColor", uikit: true, swiftui: false, compose: true, xml: false, type: "string" },
-      { name: "onValueChange", uikit: true, swiftui: true, compose: true, xml: false, type: "string" },
-      { name: "enabled", uikit: true, swiftui: true, compose: true, xml: true, type: "boolean" }
+      { name: "value", uikit: true, swiftui: true, compose: true, xml: true, react: false, type: "boolean" },
+      { name: "tint", uikit: true, swiftui: true, compose: true, xml: false, react: false, type: "string" },
+      { name: "thumbTintColor", uikit: true, swiftui: true, compose: true, xml: false, react: false, type: "string" },
+      { name: "offTintColor", uikit: true, swiftui: false, compose: true, xml: false, react: false, type: "string" },
+      { name: "onValueChange", uikit: true, swiftui: true, compose: true, xml: false, react: false, type: "string" },
+      { name: "enabled", uikit: true, swiftui: true, compose: true, xml: true, react: false, type: "boolean" }
     ];
   }
 }
