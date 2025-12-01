@@ -16,6 +16,8 @@ export const AttributeRow = ({ data }) => {
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
       <span className="py-3 px-0 text-sm text-center flex-1">{data.xml ? '✅' : '❌'}</span>
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
+      <span className="py-3 px-0 text-sm text-center flex-1">{data.react ? '✅' : '❌'}</span>
+      <div className="w-[1px] h-auto bg-[#E5E7EB]" />
       <span className="py-3 px-0 text-[#6B7280] text-[13px] flex-1">{data.type}</span>
     </div>
     {!data.isLast && (

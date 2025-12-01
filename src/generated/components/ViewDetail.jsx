@@ -15,31 +15,31 @@ export const ViewDetail = ({ viewModel }) => {
   <div id="view_detail_page" className="w-full flex flex-col">
     <div id="view_detail_scroll" className="w-full h-auto overflow-y-auto flex flex-col">
       <div id="view_detail_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-        <span className="text-[#23272F] text-[32px] font-bold font-bold">View</span>
-        <span className="text-[#4B5563] text-base">The fundamental container component for building layouts. View acts as a flexible container that can hold other components and supports various layout configurations.</span>
-        <div className="flex flex-row items-stretch">
+        <span className="mb-4 text-[#23272F] text-[32px] font-bold font-bold">View</span>
+        <span className="mb-6 text-[#4B5563] text-base">The fundamental container component for building layouts. View acts as a flexible container that can hold other components and supports various layout configurations.</span>
+        <div className="mb-8 flex flex-row items-stretch">
           <PlatformBadgeSwift />
           <div className="w-[8px]" />
           <PlatformBadgeKotlin />
           <div className="w-[8px]" />
           <PlatformBadgeReact />
         </div>
-        <span className="text-[#23272F] text-xl font-bold font-bold">Platform Support</span>
-        <div className="flex flex-col">
-          <span className="text-[#4B5563] text-sm">• UIKit: Full support - Maps to SJUIView</span>
-          <span className="text-[#4B5563] text-sm">• SwiftUI: Full support - DynamicComponent wrapper</span>
-          <span className="text-[#4B5563] text-sm">• Jetpack Compose: Full support - Maps to Box/Column/Row</span>
-          <span className="text-[#4B5563] text-sm">• Android XML: Maps to LinearLayout or ConstraintLayout</span>
+        <span className="mb-4 text-[#23272F] text-xl font-bold font-bold">Platform Support</span>
+        <div className="mb-8 flex flex-col">
+          <span className="mb-2 text-[#4B5563] text-sm">• UIKit: Full support - Maps to SJUIView</span>
+          <span className="mb-2 text-[#4B5563] text-sm">• SwiftUI: Full support - DynamicComponent wrapper</span>
+          <span className="mb-2 text-[#4B5563] text-sm">• Jetpack Compose: Full support - Maps to Box/Column/Row</span>
+          <span className="mb-2 text-[#4B5563] text-sm">• Android XML: Maps to LinearLayout or ConstraintLayout</span>
           <span className="text-[#4B5563] text-sm">• React/Next.js: Full support - Maps to div with Tailwind CSS</span>
         </div>
-        <span className="text-[#23272F] text-xl font-bold font-bold">Attributes</span>
+        <span className="mb-4 text-[#23272F] text-xl font-bold font-bold">Attributes</span>
         <div className="w-full rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
           <AttributeTableHeader />
           {viewModel.viewAttributes?.map((item, index) => (
             <AttributeRow key={index} data={item} />
           ))}
         </div>
-        <span className="text-[#23272F] text-xl font-bold font-bold">Basic Example</span>
+        <span className="mt-8 mb-3 text-[#23272F] text-xl font-bold font-bold">Basic Example</span>
         <CodeBlock className="flex flex-col" file="view_example.json" language="json" showPreview={false} />
       </div>
     </div>

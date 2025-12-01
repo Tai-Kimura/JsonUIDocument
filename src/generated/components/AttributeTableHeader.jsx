@@ -16,6 +16,8 @@ export const AttributeTableHeader = () => {
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
       <span className="py-3 px-0 text-[#374151] text-[13px] font-bold text-center flex-1 font-bold">XML</span>
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
+      <span className="py-3 px-0 text-[#374151] text-[13px] font-bold text-center flex-1 font-bold">React</span>
+      <div className="w-[1px] h-auto bg-[#E5E7EB]" />
       <span className="py-3 px-0 text-[#374151] text-[13px] font-bold flex-1 font-bold">Type</span>
     </div>
     <div className="w-full h-[1px] bg-[#E5E7EB]" />
