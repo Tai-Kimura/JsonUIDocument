@@ -21,7 +21,7 @@ export const Installation = ({ viewModel }) => {
         <button key={2} className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${viewModel.currentTab === 2 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => viewModel.onTabChange(2)}>React</button>
       </div>
       <div className="h-[24px]" />
-      {(viewModel.currentTab === 0) !== 'gone' && (
+      {viewModel.currentTab === 0 && (
       <div id="swift_content" className="flex flex-col">
         <span className="text-[#FA7343] text-[28px] font-bold font-bold">{StringManager.currentLanguage.installationSwiftTitle}</span>
         <div className="h-[16px]" />
@@ -34,7 +34,7 @@ export const Installation = ({ viewModel }) => {
         <CodeBlock className="flex flex-col" file="swift_cli.sh" language="bash" showPreview={false} />
       </div>
       )}
-      {(viewModel.currentTab === 1) !== 'gone' && (
+      {viewModel.currentTab === 1 && (
       <div id="kotlin_content" className="flex flex-col">
         <span className="text-[#7F52FF] text-[28px] font-bold font-bold">{StringManager.currentLanguage.installationKotlinTitle}</span>
         <div className="h-[16px]" />
@@ -47,7 +47,7 @@ export const Installation = ({ viewModel }) => {
         <CodeBlock className="flex flex-col" file="kotlin_cli.sh" language="bash" showPreview={false} />
       </div>
       )}
-      {(viewModel.currentTab === 2) !== 'gone' && (
+      {viewModel.currentTab === 2 && (
       <div id="react_content" className="flex flex-col">
         <span className="text-[#61DAFB] text-[28px] font-bold font-bold">{StringManager.currentLanguage.installationReactTitle}</span>
         <div className="h-[16px]" />
