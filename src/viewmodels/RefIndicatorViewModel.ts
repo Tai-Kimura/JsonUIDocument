@@ -38,10 +38,11 @@ export class RefIndicatorViewModel {
 
   get indicatorAttributes(): RefAttributeData[] {
     return [
-      { name: "animating", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "boolean/string", description: StringManager.getString("ref_indicator_attr_animating_desc") },
-      { name: "indicatorStyle", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "string", description: StringManager.getString("ref_indicator_attr_indicatorstyle_desc") },
-      { name: "color", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "string", description: StringManager.getString("ref_indicator_attr_color_desc") },
-      { name: "hidesWhenStopped", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "boolean", description: StringManager.getString("ref_indicator_attr_hideswhenstopped_desc"), isLast: true }
+      { name: "animating", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "boolean/string", description: StringManager.getString("ref_indicator_animating_desc") },
+      { name: "indicatorStyle", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "string", description: StringManager.getString("ref_indicator_style_desc") },
+      { name: "color", uikit: true, swiftui: true, compose: false, xml: false, react: true, type: "string", description: StringManager.getString("ref_indicator_color_desc") },
+      { name: "size", uikit: false, swiftui: false, compose: false, xml: false, react: true, type: "string", description: StringManager.getString("ref_indicator_attr_size_desc") },
+      { name: "hidesWhenStopped", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "boolean", description: StringManager.getString("ref_indicator_hides_when_stopped_desc"), isLast: true }
     ];
   }
 }

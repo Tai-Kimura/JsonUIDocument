@@ -45,7 +45,10 @@ export class RefTableViewModel {
       { name: "bounces", uikit: true, swiftui: true, compose: true, xml: false, react: false, type: "boolean", description: StringManager.getString("ref_table_attr_bounces_desc") },
       { name: "scrollEnabled", uikit: true, swiftui: true, compose: true, xml: true, react: false, type: "boolean", description: StringManager.getString("ref_table_attr_scrollenabled_desc") },
       { name: "allowsSelection", uikit: true, swiftui: true, compose: true, xml: false, react: false, type: "boolean", description: StringManager.getString("ref_table_attr_allowsselection_desc") },
-      { name: "keyboardDismissMode", uikit: true, swiftui: true, compose: true, xml: true, react: false, type: "string", description: StringManager.getString("ref_table_attr_keyboarddismissmode_desc"), isLast: true }
+      { name: "keyboardDismissMode", uikit: true, swiftui: true, compose: true, xml: true, react: false, type: "string", description: StringManager.getString("ref_table_attr_keyboarddismissmode_desc") },
+      { name: "columnCount", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "integer", description: StringManager.getString("ref_table_attr_columncount_desc") },
+      { name: "itemSpacing", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "float", description: StringManager.getString("ref_table_attr_itemspacing_desc") },
+      { name: "items", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "string", description: StringManager.getString("ref_table_attr_items_desc"), isLast: true }
     ];
   }
 }

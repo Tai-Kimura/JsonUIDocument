@@ -38,9 +38,9 @@ export class RefProgressViewModel {
 
   get progressAttributes(): RefAttributeData[] {
     return [
-      { name: "progress", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "float/string", description: StringManager.getString("ref_progress_attr_progress_desc") },
-      { name: "tintColor", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "string", description: StringManager.getString("ref_progress_attr_tintcolor_desc") },
-      { name: "progressTintColor", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "string", description: StringManager.getString("ref_progress_attr_progresstintcolor_desc") },
+      { name: "progress", uikit: true, swiftui: true, compose: false, xml: false, react: true, type: "float/string", description: StringManager.getString("ref_progress_attr_progress_desc") },
+      { name: "tintColor", uikit: true, swiftui: true, compose: false, xml: false, react: true, type: "string", description: StringManager.getString("ref_progress_attr_tintcolor_desc") },
+      { name: "progressTintColor", uikit: true, swiftui: true, compose: false, xml: false, react: true, type: "string", description: StringManager.getString("ref_progress_attr_progresstintcolor_desc") },
       { name: "trackTintColor", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "string", description: StringManager.getString("ref_progress_attr_tracktintcolor_desc") },
       { name: "progressViewStyle", uikit: true, swiftui: false, compose: false, xml: false, react: false, type: "string", description: StringManager.getString("ref_progress_attr_progressviewstyle_desc"), isLast: true }
     ];

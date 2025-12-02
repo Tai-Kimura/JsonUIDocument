@@ -38,7 +38,8 @@ export class RefSafeAreaViewViewModel {
 
   get safeAreaViewAttributes(): RefAttributeData[] {
     return [
-      { name: "safeAreaInsetPositions", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "array", description: StringManager.getString("ref_safe_area_view_inset_positions_desc"), isLast: true },
+      { name: "safeAreaInsetPositions", uikit: true, swiftui: true, compose: false, xml: false, react: false, type: "array", description: StringManager.getString("ref_safe_area_view_inset_positions_desc") },
+      { name: "All View attributes", uikit: true, swiftui: true, compose: false, xml: false, react: true, type: "-", description: StringManager.getString("ref_safe_area_view_inherits_desc"), isLast: true },
     ];
   }
 }

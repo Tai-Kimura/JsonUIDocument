@@ -661,7 +661,12 @@ const strings = {
     "ref_safe_area_view_desc": "A container that respects device safe area insets. Ensures content is not obscured by system UI elements.",
     "comp_safe_area_view_uikit": "• UIKit: Full support - Inherits from SJUIView with safe area handling",
     "comp_safe_area_view_swiftui": "• SwiftUI: Full support - Native safe area with customizable edges",
-    "ref_safe_area_view_inset_positions_desc": "Controls which edges apply safe area insets: top, bottom, leading, trailing, all. Default: [all]"
+    "ref_safe_area_view_inset_positions_desc": "Controls which edges apply safe area insets: top, bottom, leading, trailing, all. Default: [all]",
+    "ref_safe_area_view_inherits_desc": "Inherits all View attributes for layout and styling",
+    "ref_table_attr_columncount_desc": "Number of columns for grid layout",
+    "ref_table_attr_itemspacing_desc": "Spacing between items",
+    "ref_table_attr_items_desc": "Data binding expression for collection items",
+    "ref_indicator_attr_size_desc": "Indicator size: small, medium, large (React only)"
   },
   "ja": {
     "nav_learn": "学ぶ",
@@ -1320,7 +1325,12 @@ const strings = {
     "ref_safe_area_view_desc": "デバイスのセーフエリアインセットを尊重するコンテナ。コンテンツがシステムUI要素で隠されないことを保証します。",
     "comp_safe_area_view_uikit": "• UIKit: フルサポート - セーフエリア処理付きSJUIViewを継承",
     "comp_safe_area_view_swiftui": "• SwiftUI: フルサポート - カスタマイズ可能なエッジを持つネイティブセーフエリア",
-    "ref_safe_area_view_inset_positions_desc": "セーフエリアインセットを適用するエッジを制御: top、bottom、leading、trailing、all。デフォルト: [all]"
+    "ref_safe_area_view_inset_positions_desc": "セーフエリアインセットを適用するエッジを制御: top、bottom、leading、trailing、all。デフォルト: [all]",
+    "ref_safe_area_view_inherits_desc": "レイアウトとスタイリングのためのViewの属性をすべて継承",
+    "ref_table_attr_columncount_desc": "グリッドレイアウトの列数",
+    "ref_table_attr_itemspacing_desc": "アイテム間のスペース",
+    "ref_table_attr_items_desc": "コレクションアイテムのデータバインディング式",
+    "ref_indicator_attr_size_desc": "インジケーターサイズ: small、medium、large（Reactのみ）"
   }
 };
 
