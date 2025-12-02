@@ -1,0 +1,91 @@
+{
+  "type": "View",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "child": [
+    { "data": [{ "class": "ComponentsViewModel", "name": "viewModel" }] },
+    {
+      "type": "Label",
+      "text": "components_layout_title",
+      "fontSize": 24,
+      "fontWeight": "bold",
+      "fontColor": "#087EA4"
+    },
+    { "style": "spacer_16" },
+    {
+      "type": "View",
+      "orientation": "horizontal",
+      "width": "matchParent",
+      "child": [
+        {
+          "type": "View",
+          "style": "component_card",
+          "weight": 1,
+          "margins": [0, 8, 0, 0],
+          "onClick": "@{viewModel.onClickViewDetail}",
+          "child": [
+            {
+              "type": "Label",
+              "text": "View",
+              "fontSize": 18,
+              "fontWeight": "semibold",
+              "fontColor": "#23272F"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "Label",
+              "text": "components_view_desc",
+              "fontSize": 14,
+              "fontColor": "#5E687E"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "style": "component_card",
+          "weight": 1,
+          "margins": [0, 8, 0, 0],
+          "onClick": "@{viewModel.onClickScrollViewDetail}",
+          "child": [
+            {
+              "type": "Label",
+              "text": "ScrollView",
+              "fontSize": 18,
+              "fontWeight": "semibold",
+              "fontColor": "#23272F"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "Label",
+              "text": "components_scroll_desc",
+              "fontSize": 14,
+              "fontColor": "#5E687E"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "style": "component_card",
+          "weight": 1,
+          "onClick": "@{viewModel.onClickCollectionDetail}",
+          "child": [
+            {
+              "type": "Label",
+              "text": "Collection",
+              "fontSize": 18,
+              "fontWeight": "semibold",
+              "fontColor": "#23272F"
+            },
+            { "style": "spacer_8" },
+            {
+              "type": "Label",
+              "text": "components_collection_desc",
+              "fontSize": 14,
+              "fontColor": "#5E687E"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

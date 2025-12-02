@@ -18,17 +18,17 @@ export const Learn = ({ viewModel }) => {
       <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.learnGettingStarted}</span>
       <div className="h-[24px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-[1] cursor-pointer" onClick={viewModel.onClickInstallation}>
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickInstallation}>
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnInstallation}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnInstallationDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-[1] cursor-pointer" onClick={viewModel.onClickQuickStart}>
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickQuickStart}>
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnQuickStart}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnQuickStartDesc}</span>
         </div>
-        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-[1] cursor-pointer" onClick={viewModel.onClickQuickStart}>
+        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickQuickStart}>
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnJsonBasics}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnJsonBasicsDesc}</span>
@@ -38,17 +38,17 @@ export const Learn = ({ viewModel }) => {
       <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.learnComponents}</span>
       <div className="h-[24px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-[1] cursor-pointer" onClick={viewModel.onClickComponents}>
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickComponents}>
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnComponents}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnComponentsDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-[1] cursor-pointer" onClick={viewModel.onClickStyling}>
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickStyling}>
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStyling}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStylingDesc}</span>
         </div>
-        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-[1] cursor-pointer" onClick={viewModel.onClickDataBinding}>
+        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickDataBinding}>
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnDataBinding}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnDataBindingDesc}</span>
@@ -60,7 +60,7 @@ export const Learn = ({ viewModel }) => {
       <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.learnTutorialSubtitle}</span>
       <div className="h-[24px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-[1]">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStep1Title}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStep1Desc}</span>
@@ -69,7 +69,7 @@ export const Learn = ({ viewModel }) => {
       </div>
       <div className="h-[32px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-[1]">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStep2Title}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStep2Desc}</span>
@@ -78,7 +78,7 @@ export const Learn = ({ viewModel }) => {
       </div>
       <div className="h-[32px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-[1]">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStep3Title}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStep3Desc}</span>
@@ -91,7 +91,7 @@ export const Learn = ({ viewModel }) => {
       <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.learnAdvancedSubtitle}</span>
       <div className="h-[24px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-[1]">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnIncludeTitle}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnIncludeDesc}</span>
@@ -100,7 +100,7 @@ export const Learn = ({ viewModel }) => {
       </div>
       <div className="h-[32px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-[1]">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStylesTitle}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStylesDesc}</span>
@@ -109,7 +109,7 @@ export const Learn = ({ viewModel }) => {
       </div>
       <div className="h-[32px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-[1]">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnLocalizationTitle}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnLocalizationDesc}</span>
@@ -122,7 +122,7 @@ export const Learn = ({ viewModel }) => {
       <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.learnCollectionsSubtitle}</span>
       <div className="h-[24px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-[1]">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnCollectionTitle}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnCollectionDesc}</span>
@@ -131,7 +131,7 @@ export const Learn = ({ viewModel }) => {
       </div>
       <div className="h-[32px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-[1]">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnFormTitle}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnFormDesc}</span>

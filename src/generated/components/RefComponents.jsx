@@ -4,6 +4,9 @@
 import React from 'react';
 import { StringManager } from '@/generated/StringManager';
 import { ReferenceSidebar } from '@/components/extensions/ReferenceSidebar';
+import ComponentSectionLayout from './ComponentSectionLayout';
+import ComponentSectionText from './ComponentSectionText';
+import ComponentSectionInput from './ComponentSectionInput';
 
 
 export const RefComponents = ({ viewModel }) => {
@@ -12,53 +15,17 @@ export const RefComponents = ({ viewModel }) => {
     <ReferenceSidebar className="flex flex-col" />
     <div id="ref_components_scroll" className="w-full h-auto overflow-y-auto flex flex-col">
       <div id="ref_components_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-        <span className="mb-2 text-[#23272F] text-[32px] font-bold font-bold">{StringManager.currentLanguage.refComponents}</span>
-        <span className="mb-8 text-[#4B5563] text-base">{StringManager.currentLanguage.refComponentsOverview}</span>
-        <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refLayoutComponents}</span>
-        <div className="w-full mb-6 flex flex-col">
-          <div className="w-full py-4 px-3 mb-2 bg-[#F9FAFB] rounded-lg flex flex-row items-stretch cursor-pointer active:bg-[#E5E7EB] transition-colors" onClick={viewModel.goToView}>
-            <span className="w-[120px] text-[#087EA4] text-sm font-semibold">{StringManager.currentLanguage.compViewTitle}</span>
-            <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.componentsViewDesc}</span>
-          </div>
-          <div className="w-full py-4 px-3 mb-2 bg-[#F9FAFB] rounded-lg flex flex-row items-stretch cursor-pointer active:bg-[#E5E7EB] transition-colors" onClick={viewModel.goToScrollView}>
-            <span className="w-[120px] text-[#087EA4] text-sm font-semibold">{StringManager.currentLanguage.compScrollviewTitle}</span>
-            <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.componentsScrollDesc}</span>
-          </div>
-          <div className="w-full py-4 px-3 bg-[#F9FAFB] rounded-lg flex flex-row items-stretch cursor-pointer active:bg-[#E5E7EB] transition-colors" onClick={viewModel.goToCollection}>
-            <span className="w-[120px] text-[#087EA4] text-sm font-semibold">{StringManager.currentLanguage.compCollectionTitle}</span>
-            <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.componentsCollectionDesc}</span>
-          </div>
+        <div id="ref_components_hero" className="w-full py-0 px-6 flex flex-col items-center justify-center">
+          <span className="text-[#23272F] text-5xl font-bold text-center font-bold">{StringManager.currentLanguage.componentsTitle}</span>
+          <div className="h-[16px]" />
+          <span className="text-[#5E687E] text-xl text-center">{StringManager.currentLanguage.componentsSubtitle}</span>
         </div>
-        <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refTextComponents}</span>
-        <div className="w-full mb-6 flex flex-col">
-          <div className="w-full py-4 px-3 mb-2 bg-[#F9FAFB] rounded-lg flex flex-row items-stretch cursor-pointer active:bg-[#E5E7EB] transition-colors" onClick={viewModel.goToLabel}>
-            <span className="w-[120px] text-[#087EA4] text-sm font-semibold">{StringManager.currentLanguage.compLabelTitle}</span>
-            <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.componentsLabelDesc}</span>
-          </div>
-          <div className="w-full py-4 px-3 mb-2 bg-[#F9FAFB] rounded-lg flex flex-row items-stretch cursor-pointer active:bg-[#E5E7EB] transition-colors" onClick={viewModel.goToTextField}>
-            <span className="w-[120px] text-[#087EA4] text-sm font-semibold">{StringManager.currentLanguage.compTextfieldTitle}</span>
-            <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.componentsTextfieldDesc}</span>
-          </div>
-          <div className="w-full py-4 px-3 bg-[#F9FAFB] rounded-lg flex flex-row items-stretch cursor-pointer active:bg-[#E5E7EB] transition-colors" onClick={viewModel.goToTextView}>
-            <span className="w-[120px] text-[#087EA4] text-sm font-semibold">{StringManager.currentLanguage.compTextviewTitle}</span>
-            <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.componentsTextviewDesc}</span>
-          </div>
-        </div>
-        <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refInputComponents}</span>
-        <div className="w-full flex flex-col">
-          <div className="w-full py-4 px-3 mb-2 bg-[#F9FAFB] rounded-lg flex flex-row items-stretch cursor-pointer active:bg-[#E5E7EB] transition-colors" onClick={viewModel.goToButton}>
-            <span className="w-[120px] text-[#087EA4] text-sm font-semibold">{StringManager.currentLanguage.compButtonTitle}</span>
-            <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.componentsButtonDesc}</span>
-          </div>
-          <div className="w-full py-4 px-3 mb-2 bg-[#F9FAFB] rounded-lg flex flex-row items-stretch cursor-pointer active:bg-[#E5E7EB] transition-colors" onClick={viewModel.goToSwitch}>
-            <span className="w-[120px] text-[#087EA4] text-sm font-semibold">{StringManager.currentLanguage.compSwitchTitle}</span>
-            <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.componentsSwitchDesc}</span>
-          </div>
-          <div className="w-full py-4 px-3 bg-[#F9FAFB] rounded-lg flex flex-row items-stretch cursor-pointer active:bg-[#E5E7EB] transition-colors" onClick={viewModel.goToSlider}>
-            <span className="w-[120px] text-[#087EA4] text-sm font-semibold">{StringManager.currentLanguage.compSliderTitle}</span>
-            <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.componentsSliderDesc}</span>
-          </div>
-        </div>
+        <div className="h-[48px]" />
+        <ComponentSectionLayout viewModel={viewModel} />
+        <div className="h-[48px]" />
+        <ComponentSectionText viewModel={viewModel} />
+        <div className="h-[48px]" />
+        <ComponentSectionInput viewModel={viewModel} />
       </div>
     </div>
   </div>

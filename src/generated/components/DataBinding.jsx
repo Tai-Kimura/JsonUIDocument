@@ -24,17 +24,17 @@ export const DataBinding = ({ viewModel }) => {
       <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.dataBindingSyntaxTitle}</span>
       <div className="h-[16px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-[1]">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#087EA4] text-lg font-semibold">{property}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.dataBindingPropertyDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-[1]">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#087EA4] text-lg font-semibold">{object.property}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.dataBindingNestedDesc}</span>
         </div>
-        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-[1]">
+        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
           <span className="text-[#087EA4] text-lg font-semibold">{item.property}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.dataBindingItemDesc}</span>

@@ -17,7 +17,7 @@ export const Platforms = ({ viewModel }) => {
       <div className="w-full p-8 bg-[#F6F7F9] rounded-2xl flex flex-col border border-[#E5E7EB]">
         <div className="w-full flex flex-row items-stretch items-center justify-center">
           <span className="text-[#FA7343] text-[28px] font-bold font-bold">{StringManager.currentLanguage.platformSwiftTitle}</span>
-          <div className="flex-[1]" />
+          <div className="flex-1" />
           <button className="py-2 px-4 bg-[#FFFFFF] rounded-lg text-[#FA7343] text-sm font-medium border border-[#FA7343] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickSwiftDocs}>{StringManager.currentLanguage.platformsViewDocs}</button>
           <div className="w-[8px]" />
           <button className="py-2 px-4 bg-[#FFFFFF] rounded-lg text-[#FA7343] text-sm font-medium border border-[#FA7343] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickSwiftGitHub}>{StringManager.currentLanguage.platformsViewGithub}</button>
@@ -37,7 +37,7 @@ export const Platforms = ({ viewModel }) => {
       <div className="w-full p-8 bg-[#F6F7F9] rounded-2xl flex flex-col border border-[#E5E7EB]">
         <div className="w-full flex flex-row items-stretch items-center justify-center">
           <span className="text-[#7F52FF] text-[28px] font-bold font-bold">{StringManager.currentLanguage.platformKotlinTitle}</span>
-          <div className="flex-[1]" />
+          <div className="flex-1" />
           <button className="py-2 px-4 bg-[#FFFFFF] rounded-lg text-[#7F52FF] text-sm font-medium border border-[#7F52FF] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickKotlinDocs}>{StringManager.currentLanguage.platformsViewDocs}</button>
           <div className="w-[8px]" />
           <button className="py-2 px-4 bg-[#FFFFFF] rounded-lg text-[#7F52FF] text-sm font-medium border border-[#7F52FF] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickKotlinGitHub}>{StringManager.currentLanguage.platformsViewGithub}</button>
@@ -57,7 +57,7 @@ export const Platforms = ({ viewModel }) => {
       <div className="w-full p-8 bg-[#F6F7F9] rounded-2xl flex flex-col border border-[#E5E7EB]">
         <div className="w-full flex flex-row items-stretch items-center justify-center">
           <span className="text-[#61DAFB] text-[28px] font-bold font-bold">{StringManager.currentLanguage.platformReactTitle}</span>
-          <div className="flex-[1]" />
+          <div className="flex-1" />
           <button className="py-2 px-4 bg-[#FFFFFF] rounded-lg text-[#61DAFB] text-sm font-medium border border-[#61DAFB] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickReactDocs}>{StringManager.currentLanguage.platformsViewDocs}</button>
           <div className="w-[8px]" />
           <button className="py-2 px-4 bg-[#FFFFFF] rounded-lg text-[#61DAFB] text-sm font-medium border border-[#61DAFB] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickReactGitHub}>{StringManager.currentLanguage.platformsViewGithub}</button>

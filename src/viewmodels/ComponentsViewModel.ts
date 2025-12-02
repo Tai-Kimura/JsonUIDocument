@@ -52,4 +52,12 @@ export class ComponentsViewModel {
   onClickSliderDetail = () => {
     this.router.push("/reference/components/ref-slider");
   };
+
+  onClickSelectBoxDetail = () => {
+    this.router.push("/reference/components/ref-select-box");
+  };
+
+  onClickRadioDetail = () => {
+    this.router.push("/reference/components/ref-radio");
+  };
 }

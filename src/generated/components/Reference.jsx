@@ -17,20 +17,20 @@ export const Reference = () => {
         <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refComponents}</span>
         <span className="mb-6 text-[#4B5563] text-sm">{StringManager.currentLanguage.refComponentsOverview}</span>
         <div className="w-full mb-8 flex flex-row items-stretch">
-          <div className="mr-4 flex flex-col flex-[1]">
+          <div className="mr-4 flex flex-col flex-1">
             <span className="mb-2 text-[#23272F] text-base font-semibold">{StringManager.currentLanguage.refLayoutComponents}</span>
             <span className="mb-1 text-[#4B5563] text-sm">• View</span>
             <span className="mb-1 text-[#4B5563] text-sm">• SafeAreaView</span>
             <span className="mb-1 text-[#4B5563] text-sm">• ScrollView</span>
             <span className="text-[#4B5563] text-sm">• Collection</span>
           </div>
-          <div className="mr-4 flex flex-col flex-[1]">
+          <div className="mr-4 flex flex-col flex-1">
             <span className="mb-2 text-[#23272F] text-base font-semibold">{StringManager.currentLanguage.refTextComponents}</span>
             <span className="mb-1 text-[#4B5563] text-sm">• Label</span>
             <span className="mb-1 text-[#4B5563] text-sm">• TextField</span>
             <span className="text-[#4B5563] text-sm">• TextView</span>
           </div>
-          <div className="flex flex-col flex-[1]">
+          <div className="flex flex-col flex-1">
             <span className="mb-2 text-[#23272F] text-base font-semibold">{StringManager.currentLanguage.refInputComponents}</span>
             <span className="mb-1 text-[#4B5563] text-sm">• Button</span>
             <span className="mb-1 text-[#4B5563] text-sm">• Switch</span>

@@ -24,18 +24,32 @@ module RjuiTools
             props << "showPreview={#{showPreview_value}}" unless showPreview_value.nil?
             props_str = props.empty? ? '' : " #{props.join(' ')}"
 
-            <<~JSX.chomp
-              #{indent_str(indent)}<CodeBlock#{id_attr} className="#{class_name}"#{props_str} />
-            JSX
+            # Auto-detect container based on children or child
+            is_container = (json['children'] && !json['children'].empty?) || (json['child'] && !json['child'].empty?)
+
+            if is_container
+              children_jsx = convert_children(indent + 2)
+              <<~JSX.chomp
+                #{indent_str(indent)}<CodeBlock#{id_attr} className="#{class_name}"#{props_str}>
+                #{children_jsx}
+                #{indent_str(indent)}</CodeBlock>
+              JSX
+            else
+              <<~JSX.chomp
+                #{indent_str(indent)}<CodeBlock#{id_attr} className="#{class_name}"#{props_str} />
+              JSX
+            end
           end
 
           protected
 
           def build_class_name
-            classes = ['flex', 'flex-col']
+            # Get base classes from parent (handles margins, padding, etc.)
+            base_classes = super
 
-            classes << TailwindMapper.map_width(json['width']) if json['width']
-            classes << TailwindMapper.map_flex_grow(json['weight']) if json['weight']
+            # Add component-specific classes
+            classes = ['flex', 'flex-col']
+            classes << base_classes unless base_classes.empty?
 
             classes.compact.reject(&:empty?).join(' ')
           end

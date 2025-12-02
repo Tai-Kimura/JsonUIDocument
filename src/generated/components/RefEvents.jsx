@@ -17,7 +17,7 @@ export const RefEvents = ({ viewModel }) => {
         <span className="mb-8 text-[#4B5563] text-base">{StringManager.currentLanguage.refEventsOverview}</span>
         <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refEventsOnclick}</span>
         <span className="mb-4 text-[#4B5563] text-sm">Trigger action when component is clicked</span>
-        <CodeBlock className="flex flex-col" file="event_onclick.json" language="json" showPreview={false} />
+        <CodeBlock className="flex flex-col mb-6" file="event_onclick.json" language="json" showPreview={false} />
         <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refEventsOnchange}</span>
         <span className="mb-4 text-[#4B5563] text-sm">Trigger action when value changes</span>
         <CodeBlock className="flex flex-col" file="event_onchange.json" language="json" showPreview={false} />

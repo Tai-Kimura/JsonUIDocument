@@ -83,6 +83,17 @@ npm run dev
 - Location: `rjui_tools/` (project root)
 - Main tool: `./rjui_tools/bin/rjui`
 
+### Updating rjui_tools
+- **IMPORTANT**: When modifying files under `rjui_tools/`, always apply the same changes to the ReactJsonUI library
+- ReactJsonUI library location: `~/resource/ReactJsonUI/rjui_tools/`
+- After updating ReactJsonUI, commit and push the changes:
+```bash
+cd ~/resource/ReactJsonUI
+git add -A
+git commit -m "Your commit message"
+git push origin main
+```
+
 ## Related Projects
 
 JsonUI is a cross-platform UI framework that generates native views from the same JSON definition:

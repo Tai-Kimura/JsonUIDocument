@@ -23,42 +23,50 @@ export class RefComponentsViewModel {
     this._setCurrentTab(index);
   };
 
-  // Layout components
-  goToView = () => {
+  // Layout components - using same method names as ComponentsViewModel for shared components
+  onClickViewDetail = () => {
     this.router.push("/reference/components/ref-view");
   };
 
-  goToScrollView = () => {
+  onClickScrollViewDetail = () => {
     this.router.push("/reference/components/ref-scroll-view");
   };
 
-  goToCollection = () => {
+  onClickCollectionDetail = () => {
     this.router.push("/reference/components/ref-collection");
   };
 
   // Text components
-  goToLabel = () => {
+  onClickLabelDetail = () => {
     this.router.push("/reference/components/ref-label");
   };
 
-  goToTextField = () => {
+  onClickTextFieldDetail = () => {
     this.router.push("/reference/components/ref-text-field");
   };
 
-  goToTextView = () => {
+  onClickTextViewDetail = () => {
     this.router.push("/reference/components/ref-text-view");
   };
 
   // Input components
-  goToButton = () => {
+  onClickButtonDetail = () => {
     this.router.push("/reference/components/ref-button");
   };
 
-  goToSwitch = () => {
+  onClickSwitchDetail = () => {
     this.router.push("/reference/components/ref-switch");
   };
 
-  goToSlider = () => {
+  onClickSliderDetail = () => {
     this.router.push("/reference/components/ref-slider");
+  };
+
+  onClickSelectBoxDetail = () => {
+    this.router.push("/reference/components/ref-select-box");
+  };
+
+  onClickRadioDetail = () => {
+    this.router.push("/reference/components/ref-radio");
   };
 }

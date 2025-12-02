@@ -1,0 +1,108 @@
+{
+  "type": "View",
+  "id": "ref_table_page",
+  "width": "matchParent",
+  "height": "matchParent",
+  "orientation": "horizontal",
+  "child": [
+    { "data": [{ "class": "RefTableViewModel", "name": "viewModel" }] },
+    { "type": "ReferenceSidebar" },
+    {
+      "type": "ScrollView",
+      "id": "ref_table_scroll",
+      "width": "matchParent",
+      "height": "matchParent",
+      "child": [
+        {
+          "type": "View",
+          "id": "ref_table_content",
+          "width": "matchParent",
+          "padding": [48, 24],
+          "orientation": "vertical",
+          "background": "#FFFFFF",
+          "child": [
+            {
+              "type": "Label",
+              "text": "ref_table_title",
+              "fontSize": 32,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 16
+            },
+            {
+              "type": "Label",
+              "text": "ref_table_desc",
+              "fontSize": 16,
+              "fontColor": "#4B5563",
+              "bottomMargin": 24,
+              "lineHeight": 1.6
+            },
+            {
+              "type": "View",
+              "orientation": "horizontal",
+              "bottomMargin": 32,
+              "child": [
+                { "include": "components/platform_badge_swift" },
+                { "type": "View", "width": 8 },
+                { "include": "components/platform_badge_kotlin" }
+              ]
+            },
+            {
+              "type": "Label",
+              "text": "comp_detail_platform_support",
+              "fontSize": 20,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 16
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "bottomMargin": 32,
+              "child": [
+                { "type": "Label", "text": "comp_table_uikit", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 8 },
+                { "type": "Label", "text": "comp_table_swiftui", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 8 },
+                { "type": "Label", "text": "comp_table_compose", "fontSize": 14, "fontColor": "#4B5563" }
+              ]
+            },
+            {
+              "type": "Label",
+              "text": "comp_detail_attributes",
+              "fontSize": 20,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 16
+            },
+            {
+              "type": "Collection",
+              "width": "matchParent",
+              "borderWidth": 1,
+              "borderColor": "#E5E7EB",
+              "cornerRadius": 8,
+              "clipToBounds": true,
+              "columnCount": 1,
+              "headerClasses": ["components/ref_attribute_table_header"],
+              "cellClasses": ["components/ref_attribute_row"],
+              "items": "@{viewModel.tableAttributes}"
+            },
+            {
+              "type": "Label",
+              "text": "comp_detail_basic_example",
+              "fontSize": 20,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "topMargin": 32,
+              "bottomMargin": 12
+            },
+            {
+              "type": "CodeBlock",
+              "file": "table_example.json",
+              "language": "json",
+              "showPreview": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

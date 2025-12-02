@@ -74,8 +74,14 @@
           "onClick": "@{viewModel.onClickGitHub}"
         },
         {
-          "type": "LanguageSelector",
-          "margins": [0, 16, 0, 0]
+          "type": "SelectBox",
+          "id": "language_selector",
+          "height": 32,
+          "margins": [0, 16, 0, 0],
+          "borderWidth": 0,
+          "items": "@{viewModel.languageItems}",
+          "selectedValue": "@{viewModel.currentLanguage}",
+          "onValueChanged": "@{viewModel.onLanguageChange}"
         }
       ]
     }

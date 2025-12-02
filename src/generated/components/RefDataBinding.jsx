@@ -15,15 +15,38 @@ export const RefDataBinding = ({ viewModel }) => {
       <div id="ref_data_binding_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
         <span className="mb-2 text-[#23272F] text-[32px] font-bold font-bold">{StringManager.currentLanguage.refDataBinding}</span>
         <span className="mb-8 text-[#4B5563] text-base">{StringManager.currentLanguage.refDataBindingOverview}</span>
-        <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refBindingBasic}</span>
+        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refBindingDataDeclaration}</span>
+        <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refBindingDataDeclarationDesc}</span>
+        <CodeBlock className="flex flex-col mb-12" file="binding_data_declaration.json" language="json" showPreview={false} />
+        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refBindingBasic}</span>
         <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refBindingBasicDesc}</span>
-        <CodeBlock className="flex flex-col" file="binding_basic.json" language="json" showPreview={false} />
-        <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refBindingNested}</span>
+        <CodeBlock className="flex flex-col mb-12" file="binding_basic.json" language="json" showPreview={false} />
+        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refBindingNested}</span>
         <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refBindingNestedDesc}</span>
-        <CodeBlock className="flex flex-col" file="binding_nested.json" language="json" showPreview={false} />
-        <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refBindingCollections}</span>
+        <CodeBlock className="flex flex-col mb-12" file="binding_nested.json" language="json" showPreview={false} />
+        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refBindingOptional}</span>
+        <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refBindingOptionalDesc}</span>
+        <CodeBlock className="flex flex-col mb-12" file="binding_optional.json" language="json" showPreview={false} />
+        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refBindingTernary}</span>
+        <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refBindingTernaryDesc}</span>
+        <CodeBlock className="flex flex-col mb-12" file="binding_ternary.json" language="json" showPreview={false} />
+        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refBindingVisibility}</span>
+        <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refBindingVisibilityDesc}</span>
+        <CodeBlock className="flex flex-col mb-12" file="binding_visibility.json" language="json" showPreview={false} />
+        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refBindingTwoway}</span>
+        <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refBindingTwowayDesc}</span>
+        <CodeBlock className="flex flex-col mb-12" file="binding_twoway.json" language="json" showPreview={false} />
+        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refBindingNullSafety}</span>
+        <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refBindingNullSafetyDesc}</span>
+        <CodeBlock className="flex flex-col mb-12" file="binding_null_safety.json" language="json" showPreview={false} />
+        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refBindingCollections}</span>
         <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refBindingCollectionsDesc}</span>
-        <CodeBlock className="flex flex-col" file="binding_collection.json" language="json" showPreview={false} />
+        <CodeBlock className="flex flex-col mb-12" file="binding_collection.json" language="json" showPreview={false} />
+        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refBindingGroups}</span>
+        <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refBindingGroupsDesc}</span>
+        <CodeBlock className="flex flex-col mb-12" file="binding_groups.json" language="json" showPreview={false} />
+        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refBindingBestPractices}</span>
+        <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.refBindingBestPracticesDesc}</span>
       </div>
     </div>
   </div>
