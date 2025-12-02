@@ -38,9 +38,11 @@ export class RefSwitchViewModel {
 
   get switchAttributes(): RefAttributeData[] {
     return [
-      { name: "on", uikit: true, swiftui: true, compose: true, xml: true, react: false, type: "boolean", description: StringManager.getString("ref_switch_attr_on_desc") },
-      { name: "onChange", uikit: true, swiftui: true, compose: true, xml: true, react: false, type: "string", description: StringManager.getString("ref_switch_attr_onchange_desc") },
-      { name: "onTintColor", uikit: true, swiftui: true, compose: true, xml: true, react: false, type: "string", description: StringManager.getString("ref_switch_attr_ontintcolor_desc") },
+      { name: "on", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "boolean", description: StringManager.getString("ref_switch_attr_on_desc") },
+      { name: "onChange", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "string", description: StringManager.getString("ref_switch_attr_onchange_desc") },
+      { name: "onTintColor", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "string", description: StringManager.getString("ref_switch_attr_ontintcolor_desc") },
+      { name: "label", uikit: true, swiftui: true, compose: true, xml: false, react: true, type: "string", description: StringManager.getString("ref_switch_attr_label_desc") },
+      { name: "enabled", uikit: true, swiftui: true, compose: true, xml: true, react: true, type: "boolean/string", description: StringManager.getString("ref_switch_attr_enabled_desc") },
       { name: "thumbColor", uikit: true, swiftui: true, compose: true, xml: true, react: false, type: "string", description: StringManager.getString("ref_switch_attr_thumbcolor_desc"), isLast: true }
     ];
   }
