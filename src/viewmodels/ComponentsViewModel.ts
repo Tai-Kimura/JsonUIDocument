@@ -16,40 +16,40 @@ export class ComponentsViewModel {
     this.router.push("/learn/styling");
   };
 
-  // Navigation to component detail pages
+  // Navigation to component detail pages (redirects to reference section)
   onClickViewDetail = () => {
-    this.router.push("/learn/components/view-detail");
+    this.router.push("/reference/components/ref-view");
   };
 
   onClickScrollViewDetail = () => {
-    this.router.push("/learn/components/scroll-view-detail");
+    this.router.push("/reference/components/ref-scroll-view");
   };
 
   onClickCollectionDetail = () => {
-    this.router.push("/learn/components/collection-detail");
+    this.router.push("/reference/components/ref-collection");
   };
 
   onClickLabelDetail = () => {
-    this.router.push("/learn/components/label-detail");
+    this.router.push("/reference/components/ref-label");
   };
 
   onClickTextFieldDetail = () => {
-    this.router.push("/learn/components/text-field-detail");
+    this.router.push("/reference/components/ref-text-field");
   };
 
   onClickTextViewDetail = () => {
-    this.router.push("/learn/components/text-view-detail");
+    this.router.push("/reference/components/ref-text-view");
   };
 
   onClickButtonDetail = () => {
-    this.router.push("/learn/components/button-detail");
+    this.router.push("/reference/components/ref-button");
   };
 
   onClickSwitchDetail = () => {
-    this.router.push("/learn/components/switch-detail");
+    this.router.push("/reference/components/ref-switch");
   };
 
   onClickSliderDetail = () => {
-    this.router.push("/learn/components/slider-detail");
+    this.router.push("/reference/components/ref-slider");
   };
 }

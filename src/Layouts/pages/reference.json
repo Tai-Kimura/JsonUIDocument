@@ -2,351 +2,199 @@
   "type": "View",
   "id": "reference_page",
   "width": "matchParent",
-  "orientation": "vertical",
+  "height": "matchParent",
+  "orientation": "horizontal",
   "child": [
+    { "type": "ReferenceSidebar" },
     {
-      "type": "View",
-      "id": "ref_hero",
+      "type": "ScrollView",
+      "id": "reference_scroll",
       "width": "matchParent",
-      "padding": [48, 24],
-      "orientation": "vertical",
-      "gravity": "center",
-      "background": "#F6F7F9",
-      "child": [
-        {
-          "type": "Label",
-          "text": "ref_title",
-          "fontSize": 48,
-          "fontWeight": "bold",
-          "fontColor": "#23272F",
-          "textAlign": "Center"
-        },
-        { "style": "spacer_16" },
-        {
-          "type": "Label",
-          "text": "ref_subtitle",
-          "fontSize": 20,
-          "fontColor": "#5E687E",
-          "textAlign": "Center"
-        }
-      ]
-    },
-    {
-      "type": "View",
-      "id": "ref_content",
-      "width": "matchParent",
-      "padding": [48, 24],
-      "orientation": "vertical",
-      "background": "#FFFFFF",
+      "height": "matchParent",
       "child": [
         {
           "type": "View",
-          "orientation": "horizontal",
+          "id": "reference_content",
           "width": "matchParent",
+          "padding": [48, 24],
+          "orientation": "vertical",
+          "background": "#FFFFFF",
           "child": [
             {
+              "type": "Label",
+              "text": "ref_title",
+              "fontSize": 32,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 8
+            },
+            {
+              "type": "Label",
+              "text": "ref_subtitle",
+              "fontSize": 16,
+              "fontColor": "#4B5563",
+              "bottomMargin": 32,
+              "lineHeight": 1.6
+            },
+            {
+              "type": "Label",
+              "text": "ref_components",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 12
+            },
+            {
+              "type": "Label",
+              "text": "ref_components_overview",
+              "fontSize": 14,
+              "fontColor": "#4B5563",
+              "bottomMargin": 24,
+              "lineHeight": 1.6
+            },
+            {
               "type": "View",
-              "style": "ref_card",
-              "weight": 1,
-              "orientation": "vertical",
-              "margins": [0, 8, 0, 0],
+              "orientation": "horizontal",
+              "width": "matchParent",
+              "bottomMargin": 32,
               "child": [
                 {
-                  "type": "Label",
-                  "text": "ref_components",
-                  "fontSize": 20,
-                  "fontWeight": "bold",
-                  "fontColor": "#087EA4"
+                  "type": "View",
+                  "weight": 1,
+                  "orientation": "vertical",
+                  "rightMargin": 16,
+                  "child": [
+                    {
+                      "type": "Label",
+                      "text": "ref_layout_components",
+                      "fontSize": 16,
+                      "fontWeight": "semibold",
+                      "fontColor": "#23272F",
+                      "bottomMargin": 8
+                    },
+                    { "type": "Label", "text": "• View", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 4 },
+                    { "type": "Label", "text": "• SafeAreaView", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 4 },
+                    { "type": "Label", "text": "• ScrollView", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 4 },
+                    { "type": "Label", "text": "• Collection", "fontSize": 14, "fontColor": "#4B5563" }
+                  ]
                 },
-                { "style": "spacer_8" },
                 {
-                  "type": "Label",
-                  "text": "ref_components_desc",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
+                  "type": "View",
+                  "weight": 1,
+                  "orientation": "vertical",
+                  "rightMargin": 16,
+                  "child": [
+                    {
+                      "type": "Label",
+                      "text": "ref_text_components",
+                      "fontSize": 16,
+                      "fontWeight": "semibold",
+                      "fontColor": "#23272F",
+                      "bottomMargin": 8
+                    },
+                    { "type": "Label", "text": "• Label", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 4 },
+                    { "type": "Label", "text": "• TextField", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 4 },
+                    { "type": "Label", "text": "• TextView", "fontSize": 14, "fontColor": "#4B5563" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "weight": 1,
+                  "orientation": "vertical",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "text": "ref_input_components",
+                      "fontSize": 16,
+                      "fontWeight": "semibold",
+                      "fontColor": "#23272F",
+                      "bottomMargin": 8
+                    },
+                    { "type": "Label", "text": "• Button", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 4 },
+                    { "type": "Label", "text": "• Switch", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 4 },
+                    { "type": "Label", "text": "• Slider", "fontSize": 14, "fontColor": "#4B5563" }
+                  ]
                 }
               ]
             },
             {
-              "type": "View",
-              "style": "ref_card",
-              "weight": 1,
-              "orientation": "vertical",
-              "margins": [0, 8, 0, 0],
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "ref_attributes",
-                  "fontSize": 20,
-                  "fontWeight": "bold",
-                  "fontColor": "#087EA4"
-                },
-                { "style": "spacer_8" },
-                {
-                  "type": "Label",
-                  "text": "ref_attributes_desc",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
+              "type": "Label",
+              "text": "ref_attributes",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 12
             },
             {
-              "type": "View",
-              "style": "ref_card",
-              "weight": 1,
-              "orientation": "vertical",
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "ref_data_binding",
-                  "fontSize": 20,
-                  "fontWeight": "bold",
-                  "fontColor": "#087EA4"
-                },
-                { "style": "spacer_8" },
-                {
-                  "type": "Label",
-                  "text": "ref_data_binding_desc",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
-            }
-          ]
-        },
-        { "style": "spacer_24" },
-        {
-          "type": "View",
-          "orientation": "horizontal",
-          "width": "matchParent",
-          "child": [
-            {
-              "type": "View",
-              "style": "ref_card",
-              "weight": 1,
-              "orientation": "vertical",
-              "margins": [0, 8, 0, 0],
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "ref_include",
-                  "fontSize": 20,
-                  "fontWeight": "bold",
-                  "fontColor": "#087EA4"
-                },
-                { "style": "spacer_8" },
-                {
-                  "type": "Label",
-                  "text": "ref_include_desc",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
+              "type": "Label",
+              "text": "ref_attributes_overview",
+              "fontSize": 14,
+              "fontColor": "#4B5563",
+              "bottomMargin": 24,
+              "lineHeight": 1.6
             },
             {
-              "type": "View",
-              "style": "ref_card",
-              "weight": 1,
-              "orientation": "vertical",
-              "margins": [0, 8, 0, 0],
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "ref_styles",
-                  "fontSize": 20,
-                  "fontWeight": "bold",
-                  "fontColor": "#087EA4"
-                },
-                { "style": "spacer_8" },
-                {
-                  "type": "Label",
-                  "text": "ref_styles_desc",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
+              "type": "Label",
+              "text": "ref_data_binding",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 12
             },
             {
-              "type": "View",
-              "style": "ref_card",
-              "weight": 1,
-              "orientation": "vertical",
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "ref_events",
-                  "fontSize": 20,
-                  "fontWeight": "bold",
-                  "fontColor": "#087EA4"
-                },
-                { "style": "spacer_8" },
-                {
-                  "type": "Label",
-                  "text": "ref_events_desc",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
-            }
-          ]
-        },
-        { "style": "spacer_48" },
-        {
-          "type": "Label",
-          "text": "ref_component_list",
-          "fontSize": 24,
-          "fontWeight": "bold",
-          "fontColor": "#087EA4"
-        },
-        { "style": "spacer_24" },
-        {
-          "type": "View",
-          "orientation": "horizontal",
-          "width": "matchParent",
-          "child": [
-            {
-              "type": "View",
-              "weight": 1,
-              "orientation": "vertical",
-              "margins": [0, 16, 0, 0],
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "ref_layout_components",
-                  "fontSize": 16,
-                  "fontWeight": "semibold",
-                  "fontColor": "#23272F"
-                },
-                { "style": "spacer_8" },
-                {
-                  "type": "Label",
-                  "text": "• View\n• SafeAreaView\n• Scroll / ScrollView\n• Collection / Table",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
+              "type": "Label",
+              "text": "ref_data_binding_overview",
+              "fontSize": 14,
+              "fontColor": "#4B5563",
+              "bottomMargin": 24,
+              "lineHeight": 1.6
             },
             {
-              "type": "View",
-              "weight": 1,
-              "orientation": "vertical",
-              "margins": [0, 16, 0, 0],
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "ref_text_components",
-                  "fontSize": 16,
-                  "fontWeight": "semibold",
-                  "fontColor": "#23272F"
-                },
-                { "style": "spacer_8" },
-                {
-                  "type": "Label",
-                  "text": "• Label / Text\n• TextField\n• TextView",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
+              "type": "Label",
+              "text": "ref_include",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 12
             },
             {
-              "type": "View",
-              "weight": 1,
-              "orientation": "vertical",
-              "margins": [0, 16, 0, 0],
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "ref_input_components",
-                  "fontSize": 16,
-                  "fontWeight": "semibold",
-                  "fontColor": "#23272F"
-                },
-                { "style": "spacer_8" },
-                {
-                  "type": "Label",
-                  "text": "• Button\n• Switch / Toggle\n• Slider\n• Segment\n• SelectBox",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
+              "type": "Label",
+              "text": "ref_include_overview",
+              "fontSize": 14,
+              "fontColor": "#4B5563",
+              "bottomMargin": 24,
+              "lineHeight": 1.6
             },
             {
-              "type": "View",
-              "weight": 1,
-              "orientation": "vertical",
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "ref_media_components",
-                  "fontSize": 16,
-                  "fontWeight": "semibold",
-                  "fontColor": "#23272F"
-                },
-                { "style": "spacer_8" },
-                {
-                  "type": "Label",
-                  "text": "• Image\n• CircleImage\n• NetworkImage\n• Progress\n• Indicator",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
-            }
-          ]
-        },
-        { "style": "spacer_48" },
-        {
-          "type": "Label",
-          "text": "ref_example_title",
-          "fontSize": 24,
-          "fontWeight": "bold",
-          "fontColor": "#087EA4"
-        },
-        { "style": "spacer_24" },
-        {
-          "type": "View",
-          "orientation": "horizontal",
-          "width": "matchParent",
-          "child": [
-            {
-              "type": "View",
-              "weight": 1,
-              "orientation": "vertical",
-              "margins": [0, 16, 0, 0],
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "ref_example_view",
-                  "fontSize": 16,
-                  "fontWeight": "semibold",
-                  "fontColor": "#23272F"
-                },
-                { "style": "spacer_8" },
-                {
-                  "type": "CodeBlock",
-                  "file": "view_reference.json",
-                  "language": "json"
-                }
-              ]
+              "type": "Label",
+              "text": "ref_styles",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 12
             },
             {
-              "type": "View",
-              "weight": 1,
-              "orientation": "vertical",
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "ref_example_button",
-                  "fontSize": 16,
-                  "fontWeight": "semibold",
-                  "fontColor": "#23272F"
-                },
-                { "style": "spacer_8" },
-                {
-                  "type": "CodeBlock",
-                  "file": "button_reference.json",
-                  "language": "json"
-                }
-              ]
+              "type": "Label",
+              "text": "ref_styles_overview",
+              "fontSize": 14,
+              "fontColor": "#4B5563",
+              "bottomMargin": 24,
+              "lineHeight": 1.6
+            },
+            {
+              "type": "Label",
+              "text": "ref_events",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 12
+            },
+            {
+              "type": "Label",
+              "text": "ref_events_overview",
+              "fontSize": 14,
+              "fontColor": "#4B5563",
+              "lineHeight": 1.6
             }
           ]
         }

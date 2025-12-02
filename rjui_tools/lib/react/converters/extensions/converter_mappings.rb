@@ -12,6 +12,7 @@ module RjuiTools
           'ComponentsSidebar' => 'ComponentsSidebarConverter',
           'LanguageSelector' => 'LanguageSelectorConverter',
           'LanguageProvider' => 'LanguageProviderConverter',
+          'ReferenceSidebar' => 'ReferenceSidebarConverter',
         }.freeze
       end
     end

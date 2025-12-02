@@ -31,17 +31,17 @@ export const Home = ({ viewModel }) => {
     </div>
     <div id="platforms_section" className="w-full py-16 px-6 bg-[#23272F] flex flex-col">
       <div className="w-full flex flex-row items-stretch">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-[1]">
           <span className="text-[#FA7343] text-xl font-bold font-bold">{StringManager.currentLanguage.platformSwiftTitle}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.platformSwiftDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-[1]">
           <span className="text-[#7F52FF] text-xl font-bold font-bold">{StringManager.currentLanguage.platformKotlinTitle}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.platformKotlinDesc}</span>
         </div>
-        <div className="p-6 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
+        <div className="p-6 bg-[#FFFFFF] rounded-xl flex flex-col border border-[#E5E7EB] flex-[1]">
           <span className="text-[#61DAFB] text-xl font-bold font-bold">{StringManager.currentLanguage.platformReactTitle}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.platformReactDesc}</span>
@@ -50,12 +50,12 @@ export const Home = ({ viewModel }) => {
     </div>
     <div id="features_section" className="w-full py-16 px-6 bg-[#FFFFFF] flex flex-col">
       <div className="w-full flex flex-row items-stretch">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col flex-1">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col flex-[1]">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.featureWriteOnce}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.featureWriteOnceDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-0 mb-2 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col flex-1">
+        <div className="p-6 mt-0 mr-0 mb-2 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col flex-[1]">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.featureTypeSafe}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.featureTypeSafeDesc}</span>
@@ -63,12 +63,12 @@ export const Home = ({ viewModel }) => {
       </div>
       <div className="h-[24px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col flex-1">
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col flex-[1]">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.featureHotReload}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.featureHotReloadDesc}</span>
         </div>
-        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col flex-1">
+        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col flex-[1]">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.featureDataBinding}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.featureDataBindingDesc}</span>

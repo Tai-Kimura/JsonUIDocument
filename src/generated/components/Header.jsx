@@ -12,7 +12,7 @@ export const Header = ({ viewModel }) => {
     <div className="flex flex-row items-stretch items-center justify-center">
       <span id="logo" className="text-[#087EA4] text-2xl font-bold font-bold cursor-pointer" onClick={viewModel.onClickHome}>JsonUI</span>
     </div>
-    <div className="flex-1" />
+    <div className="flex-[1]" />
     <div className="flex flex-row items-stretch items-center justify-center">
       <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={viewModel.onClickLearn}>{StringManager.currentLanguage.navLearn}</span>
       <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={viewModel.onClickReference}>{StringManager.currentLanguage.navReference}</span>

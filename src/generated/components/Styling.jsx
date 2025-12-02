@@ -30,17 +30,17 @@ export const Styling = ({ viewModel }) => {
       <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.stylingAttributesTitle}</span>
       <div className="h-[16px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-[1]">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.stylingSizeTitle}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm"><>• width<br />• height<br />• padding<br />• margins</></span>
         </div>
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
+        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-[1]">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.stylingColorTitle}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm"><>• background<br />• fontColor<br />• borderColor</></span>
         </div>
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-[1]">
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.stylingTextTitle}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm"><>• fontSize<br />• fontWeight<br />• textAlign</></span>

@@ -9,7 +9,7 @@ export const Footer = () => {
   return (
   <div id="footer" className="w-full py-12 px-6 bg-[#23272F] flex flex-col">
     <div className="w-full flex flex-row items-stretch">
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-[1]">
         <span className="text-[#FFFFFF] text-base font-semibold">{StringManager.currentLanguage.navLearn}</span>
         <div className="h-[16px]" />
         <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.learnGettingStarted}</span>
@@ -18,7 +18,7 @@ export const Footer = () => {
         <div className="h-[16px]" />
         <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.learnJsonBasics}</span>
       </div>
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-[1]">
         <span className="text-[#FFFFFF] text-base font-semibold">{StringManager.currentLanguage.navReference}</span>
         <div className="h-[16px]" />
         <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.refComponents}</span>
@@ -27,7 +27,7 @@ export const Footer = () => {
         <div className="h-[16px]" />
         <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.refDataBinding}</span>
       </div>
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-[1]">
         <span className="text-[#FFFFFF] text-base font-semibold">{StringManager.currentLanguage.navPlatforms}</span>
         <div className="h-[16px]" />
         <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.platformSwiftTitle}</span>
@@ -36,7 +36,7 @@ export const Footer = () => {
         <div className="h-[16px]" />
         <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.platformReactTitle}</span>
       </div>
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-[1]">
         <span className="text-[#FFFFFF] text-base font-semibold">{StringManager.currentLanguage.navCommunity}</span>
         <div className="h-[16px]" />
         <span className="text-[#9CA3AF] text-sm">GitHub</span>
