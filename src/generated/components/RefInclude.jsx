@@ -17,10 +17,51 @@ export const RefInclude = ({ viewModel }) => {
         <span className="mb-8 text-[#4B5563] text-base">{StringManager.currentLanguage.refIncludeOverview}</span>
         <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refIncludeSyntax}</span>
         <div className="flex flex-col w-full py-4 px-3 mb-6 bg-[#F6F8FA] rounded-lg">
-          <span className="text-[#24292E] text-sm">{`{ "include": "path/to/component" }`}</span>
+          <span className="text-[#24292E] text-sm">{`{ "include": "path/to/component.json" }`}</span>
+        </div>
+        <span className="mb-4 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refIncludeAttributesTitle}</span>
+        <div className="flex flex-col w-full mb-8 bg-[#FFFFFF] rounded-lg border border-[#E5E7EB]">
+          <div className="w-full py-4 px-3 bg-[#F9FAFB] flex flex-row items-stretch">
+            <span className="w-[120px] text-[#374151] text-sm">Attribute</span>
+            <span className="w-[100px] text-[#374151] text-sm">Type</span>
+            <span className="text-[#374151] text-sm flex-1">Description</span>
+          </div>
+          <div className="w-full py-4 px-3 flex flex-row items-stretch border border-[#E5E7EB]">
+            <span className="w-[120px] text-[#059669] text-sm">{StringManager.currentLanguage.include}</span>
+            <span className="w-[100px] text-[#6B7280] text-sm">{StringManager.currentLanguage.string}</span>
+            <span className="text-[#374151] text-sm flex-1">{StringManager.currentLanguage.refIncludeAttrIncludeDesc}</span>
+          </div>
+          <div className="w-full py-4 px-3 flex flex-row items-stretch border border-[#E5E7EB]">
+            <span className="w-[120px] text-[#059669] text-sm">{StringManager.currentLanguage.sharedData}</span>
+            <span className="w-[100px] text-[#6B7280] text-sm">{StringManager.currentLanguage.object}</span>
+            <span className="text-[#374151] text-sm flex-1">{StringManager.currentLanguage.refIncludeAttrSharedDataDesc}</span>
+          </div>
+          <div className="w-full py-4 px-3 flex flex-row items-stretch">
+            <span className="w-[120px] text-[#059669] text-sm">{StringManager.currentLanguage.bindingId}</span>
+            <span className="w-[100px] text-[#6B7280] text-sm">{StringManager.currentLanguage.string}</span>
+            <span className="text-[#374151] text-sm flex-1">{StringManager.currentLanguage.refIncludeAttrBindingIdDesc}</span>
+          </div>
         </div>
         <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refIncludeExample}</span>
-        <CodeBlock className="flex flex-col" file="include_example.json" language="json" showPreview={false} />
+        <CodeBlock className="flex flex-col mb-8" file="include_basic.json" language="json" showPreview={false} />
+        <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refIncludeDataSharingTitle}</span>
+        <span className="mb-4 text-[#4B5563] text-base">{StringManager.currentLanguage.refIncludeDataSharingDesc}</span>
+        <span className="mb-3 text-[#23272F] text-base">{StringManager.currentLanguage.refIncludeDataSharingExampleTitle}</span>
+        <CodeBlock className="flex flex-col mb-8" file="include_shared_data.json" language="json" showPreview={false} />
+        <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refIncludeBindingIdTitle}</span>
+        <span className="mb-4 text-[#4B5563] text-base">{StringManager.currentLanguage.refIncludeBindingIdDesc}</span>
+        <CodeBlock className="flex flex-col mb-8" file="include_binding_id.json" language="json" showPreview={false} />
+        <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refIncludeNestedTitle}</span>
+        <span className="mb-4 text-[#4B5563] text-base">{StringManager.currentLanguage.refIncludeNestedDesc}</span>
+        <CodeBlock className="flex flex-col mb-8" file="include_nested.json" language="json" showPreview={false} />
+        <span className="mb-4 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refIncludeBestPracticesTitle}</span>
+        <div className="flex flex-col w-full py-5 px-4 mb-8 bg-[#F0FDF4] rounded-lg">
+          <span className="mb-2 text-[#166534] text-sm">• ref_include_practice_1</span>
+          <span className="mb-2 text-[#166534] text-sm">• ref_include_practice_2</span>
+          <span className="mb-2 text-[#166534] text-sm">• ref_include_practice_3</span>
+          <span className="mb-2 text-[#166534] text-sm">• ref_include_practice_4</span>
+          <span className="text-[#166534] text-sm">• ref_include_practice_5</span>
+        </div>
       </div>
     </div>
   </div>

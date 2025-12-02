@@ -1,0 +1,58 @@
+// Level 1: main.json
+{
+  "data": [
+    { "name": "appState", "class": "AppState" }
+  ],
+  "type": "View",
+  "child": [
+    {
+      "include": "screens/dashboard.json",
+      "shared_data": {
+        "userId": "@{appState.currentUserId}",
+        "theme": "@{appState.theme}"
+      }
+    }
+  ]
+}
+
+// Level 2: screens/dashboard.json
+{
+  "type": "View",
+  "orientation": "vertical",
+  "child": [
+    {
+      "include": "components/dashboard_header.json",
+      "shared_data": {
+        "title": "Dashboard",
+        "userId": "@{userId}"
+      }
+    },
+    {
+      "include": "components/dashboard_stats.json",
+      "shared_data": {
+        "userId": "@{userId}"
+      }
+    }
+  ]
+}
+
+// Level 3: components/dashboard_header.json
+{
+  "type": "View",
+  "orientation": "horizontal",
+  "padding": [16, 12],
+  "child": [
+    {
+      "type": "Label",
+      "text": "@{title}",
+      "fontSize": 24,
+      "fontWeight": "bold"
+    },
+    {
+      "type": "Label",
+      "text": "User: @{userId}",
+      "fontSize": 14,
+      "fontColor": "#6B7280"
+    }
+  ]
+}

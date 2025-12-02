@@ -1,0 +1,45 @@
+// Parent component (main.json)
+{
+  "data": [
+    { "name": "currentUser", "class": "User" }
+  ],
+  "type": "View",
+  "child": [
+    {
+      "include": "components/user_card.json",
+      "shared_data": {
+        "user": "@{currentUser}",
+        "showBadge": true
+      }
+    }
+  ]
+}
+
+// Included component (components/user_card.json)
+{
+  "type": "View",
+  "padding": [16, 12],
+  "background": "#FFFFFF",
+  "cornerRadius": 8,
+  "child": [
+    {
+      "type": "NetworkImage",
+      "src": "@{user.avatarUrl}",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "type": "Label",
+      "text": "@{user.name}",
+      "fontSize": 16,
+      "fontWeight": "bold"
+    },
+    {
+      "type": "Label",
+      "text": "@{user.email}",
+      "fontSize": 14,
+      "fontColor": "#6B7280",
+      "visibility": "@{showBadge ? 'visible' : 'gone'}"
+    }
+  ]
+}

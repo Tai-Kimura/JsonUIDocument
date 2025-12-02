@@ -59,9 +59,77 @@
               "child": [
                 {
                   "type": "Label",
-                  "text": "{ \"include\": \"path/to/component\" }",
+                  "text": "{ \"include\": \"path/to/component.json\" }",
                   "fontSize": 14,
                   "fontColor": "#24292E"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "text": "ref_include_attributes_title",
+              "fontSize": 20,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 16
+            },
+            {
+              "type": "View",
+              "width": "matchParent",
+              "background": "#FFFFFF",
+              "borderWidth": 1,
+              "borderColor": "#E5E7EB",
+              "cornerRadius": 8,
+              "bottomMargin": 32,
+              "child": [
+                {
+                  "type": "View",
+                  "width": "matchParent",
+                  "padding": [16, 12],
+                  "background": "#F9FAFB",
+                  "orientation": "horizontal",
+                  "child": [
+                    { "type": "Label", "text": "Attribute", "width": 120, "fontWeight": "600", "fontSize": 14, "fontColor": "#374151" },
+                    { "type": "Label", "text": "Type", "width": 100, "fontWeight": "600", "fontSize": 14, "fontColor": "#374151" },
+                    { "type": "Label", "text": "Description", "weight": 1, "fontWeight": "600", "fontSize": 14, "fontColor": "#374151" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "width": "matchParent",
+                  "padding": [16, 12],
+                  "orientation": "horizontal",
+                  "borderColor": "#E5E7EB",
+                  "borderWidth": 1,
+                  "child": [
+                    { "type": "Label", "text": "include", "width": 120, "fontSize": 14, "fontColor": "#059669", "fontWeight": "500" },
+                    { "type": "Label", "text": "string", "width": 100, "fontSize": 14, "fontColor": "#6B7280" },
+                    { "type": "Label", "text": "ref_include_attr_include_desc", "weight": 1, "fontSize": 14, "fontColor": "#374151", "lineHeight": 1.5 }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "width": "matchParent",
+                  "padding": [16, 12],
+                  "orientation": "horizontal",
+                  "borderColor": "#E5E7EB",
+                  "borderWidth": 1,
+                  "child": [
+                    { "type": "Label", "text": "shared_data", "width": 120, "fontSize": 14, "fontColor": "#059669", "fontWeight": "500" },
+                    { "type": "Label", "text": "object", "width": 100, "fontSize": 14, "fontColor": "#6B7280" },
+                    { "type": "Label", "text": "ref_include_attr_shared_data_desc", "weight": 1, "fontSize": 14, "fontColor": "#374151", "lineHeight": 1.5 }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "width": "matchParent",
+                  "padding": [16, 12],
+                  "orientation": "horizontal",
+                  "child": [
+                    { "type": "Label", "text": "binding_id", "width": 120, "fontSize": 14, "fontColor": "#059669", "fontWeight": "500" },
+                    { "type": "Label", "text": "string", "width": 100, "fontSize": 14, "fontColor": "#6B7280" },
+                    { "type": "Label", "text": "ref_include_attr_binding_id_desc", "weight": 1, "fontSize": 14, "fontColor": "#374151", "lineHeight": 1.5 }
+                  ]
                 }
               ]
             },
@@ -75,9 +143,144 @@
             },
             {
               "type": "CodeBlock",
-              "file": "include_example.json",
+              "file": "include_basic.json",
               "language": "json",
-              "showPreview": false
+              "showPreview": false,
+              "bottomMargin": 32
+            },
+            {
+              "type": "Label",
+              "text": "ref_include_data_sharing_title",
+              "fontSize": 20,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 12
+            },
+            {
+              "type": "Label",
+              "text": "ref_include_data_sharing_desc",
+              "fontSize": 16,
+              "fontColor": "#4B5563",
+              "bottomMargin": 16,
+              "lineHeight": 1.6
+            },
+            {
+              "type": "Label",
+              "text": "ref_include_data_sharing_example_title",
+              "fontSize": 16,
+              "fontWeight": "600",
+              "fontColor": "#23272F",
+              "bottomMargin": 12
+            },
+            {
+              "type": "CodeBlock",
+              "file": "include_shared_data.json",
+              "language": "json",
+              "showPreview": false,
+              "bottomMargin": 32
+            },
+            {
+              "type": "Label",
+              "text": "ref_include_binding_id_title",
+              "fontSize": 20,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 12
+            },
+            {
+              "type": "Label",
+              "text": "ref_include_binding_id_desc",
+              "fontSize": 16,
+              "fontColor": "#4B5563",
+              "bottomMargin": 16,
+              "lineHeight": 1.6
+            },
+            {
+              "type": "CodeBlock",
+              "file": "include_binding_id.json",
+              "language": "json",
+              "showPreview": false,
+              "bottomMargin": 32
+            },
+            {
+              "type": "Label",
+              "text": "ref_include_nested_title",
+              "fontSize": 20,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 12
+            },
+            {
+              "type": "Label",
+              "text": "ref_include_nested_desc",
+              "fontSize": 16,
+              "fontColor": "#4B5563",
+              "bottomMargin": 16,
+              "lineHeight": 1.6
+            },
+            {
+              "type": "CodeBlock",
+              "file": "include_nested.json",
+              "language": "json",
+              "showPreview": false,
+              "bottomMargin": 32
+            },
+            {
+              "type": "Label",
+              "text": "ref_include_best_practices_title",
+              "fontSize": 20,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "bottomMargin": 16
+            },
+            {
+              "type": "View",
+              "width": "matchParent",
+              "padding": [20, 16],
+              "background": "#F0FDF4",
+              "cornerRadius": 8,
+              "bottomMargin": 32,
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "• ref_include_practice_1",
+                  "fontSize": 14,
+                  "fontColor": "#166534",
+                  "bottomMargin": 8,
+                  "lineHeight": 1.5
+                },
+                {
+                  "type": "Label",
+                  "text": "• ref_include_practice_2",
+                  "fontSize": 14,
+                  "fontColor": "#166534",
+                  "bottomMargin": 8,
+                  "lineHeight": 1.5
+                },
+                {
+                  "type": "Label",
+                  "text": "• ref_include_practice_3",
+                  "fontSize": 14,
+                  "fontColor": "#166534",
+                  "bottomMargin": 8,
+                  "lineHeight": 1.5
+                },
+                {
+                  "type": "Label",
+                  "text": "• ref_include_practice_4",
+                  "fontSize": 14,
+                  "fontColor": "#166534",
+                  "bottomMargin": 8,
+                  "lineHeight": 1.5
+                },
+                {
+                  "type": "Label",
+                  "text": "• ref_include_practice_5",
+                  "fontSize": 14,
+                  "fontColor": "#166534",
+                  "lineHeight": 1.5
+                }
+              ]
             }
           ]
         }
