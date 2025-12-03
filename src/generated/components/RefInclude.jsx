@@ -5,6 +5,8 @@ import React from 'react';
 import { StringManager } from '@/generated/StringManager';
 import { ReferenceSidebar } from '@/components/extensions/ReferenceSidebar';
 import { CodeBlock } from '@/components/extensions/CodeBlock';
+import IncludeAttributeTableHeader from './IncludeAttributeTableHeader';
+import IncludeAttributeRow from './IncludeAttributeRow';
 
 
 export const RefInclude = ({ viewModel }) => {
@@ -20,27 +22,11 @@ export const RefInclude = ({ viewModel }) => {
           <span className="text-[#24292E] text-sm">{`{ "include": "path/to/component.json" }`}</span>
         </div>
         <span className="mb-4 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refIncludeAttributesTitle}</span>
-        <div className="flex flex-col w-full mb-8 bg-[#FFFFFF] rounded-lg border border-[#E5E7EB]">
-          <div className="w-full py-4 px-3 bg-[#F9FAFB] flex flex-row items-stretch">
-            <span className="w-[120px] text-[#374151] text-sm">Attribute</span>
-            <span className="w-[100px] text-[#374151] text-sm">Type</span>
-            <span className="text-[#374151] text-sm flex-1">Description</span>
-          </div>
-          <div className="w-full py-4 px-3 flex flex-row items-stretch border border-[#E5E7EB]">
-            <span className="w-[120px] text-[#059669] text-sm">{StringManager.currentLanguage.include}</span>
-            <span className="w-[100px] text-[#6B7280] text-sm">{StringManager.currentLanguage.string}</span>
-            <span className="text-[#374151] text-sm flex-1">{StringManager.currentLanguage.refIncludeAttrIncludeDesc}</span>
-          </div>
-          <div className="w-full py-4 px-3 flex flex-row items-stretch border border-[#E5E7EB]">
-            <span className="w-[120px] text-[#059669] text-sm">{StringManager.currentLanguage.sharedData}</span>
-            <span className="w-[100px] text-[#6B7280] text-sm">{StringManager.currentLanguage.object}</span>
-            <span className="text-[#374151] text-sm flex-1">{StringManager.currentLanguage.refIncludeAttrSharedDataDesc}</span>
-          </div>
-          <div className="w-full py-4 px-3 flex flex-row items-stretch">
-            <span className="w-[120px] text-[#059669] text-sm">{StringManager.currentLanguage.bindingId}</span>
-            <span className="w-[100px] text-[#6B7280] text-sm">{StringManager.currentLanguage.string}</span>
-            <span className="text-[#374151] text-sm flex-1">{StringManager.currentLanguage.refIncludeAttrBindingIdDesc}</span>
-          </div>
+        <div className="w-full mb-8 rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
+          <IncludeAttributeTableHeader />
+          {viewModel.includeAttributes?.map((item, index) => (
+            <IncludeAttributeRow key={index} data={item} />
+          ))}
         </div>
         <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refIncludeExample}</span>
         <CodeBlock className="flex flex-col mb-8" file="include_basic.json" language="json" showPreview={false} />

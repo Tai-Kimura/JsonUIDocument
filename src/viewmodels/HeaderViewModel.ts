@@ -59,6 +59,10 @@ export class HeaderViewModel {
     this.router.push("/platforms");
   };
 
+  onClickCLI = () => {
+    this.router.push("/cli");
+  };
+
   onClickCommunity = () => {
     // TODO: Add community page
     console.log("Community page coming soon");

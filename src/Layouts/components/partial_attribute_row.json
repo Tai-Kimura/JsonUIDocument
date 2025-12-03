@@ -1,0 +1,62 @@
+{
+  "type": "View",
+  "id": "partial_attribute_row_container",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "child": [
+    { "data": [{ "class": "PartialAttributeData", "name": "data" }] },
+    {
+      "type": "View",
+      "orientation": "horizontal",
+      "width": "matchParent",
+      "padding": [0, 16],
+      "child": [
+        {
+          "type": "Label",
+          "text": "@{data.name}",
+          "fontSize": 13,
+          "fontColor": "#059669",
+          "font": "monospace",
+          "fontWeight": "500",
+          "weight": 2,
+          "padding": [12]
+        },
+        {
+          "type": "View",
+          "width": 1,
+          "height": "matchParent",
+          "background": "#E5E7EB"
+        },
+        {
+          "type": "Label",
+          "text": "@{data.type}",
+          "fontSize": 13,
+          "fontColor": "#6B7280",
+          "weight": 1,
+          "padding": [12]
+        },
+        {
+          "type": "View",
+          "width": 1,
+          "height": "matchParent",
+          "background": "#E5E7EB"
+        },
+        {
+          "type": "Label",
+          "text": "@{data.description}",
+          "fontSize": 13,
+          "fontColor": "#374151",
+          "weight": 5,
+          "padding": [12]
+        }
+      ]
+    },
+    {
+      "type": "View",
+      "width": "matchParent",
+      "height": 1,
+      "background": "#E5E7EB",
+      "visibility": "@{data.isLast ? 'gone' : 'visible'}"
+    }
+  ]
+}

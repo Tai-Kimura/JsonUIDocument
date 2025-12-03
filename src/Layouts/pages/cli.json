@@ -1,0 +1,309 @@
+{
+  "type": "ScrollView",
+  "id": "cli_page",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#FFFFFF",
+  "child": [
+    {
+      "type": "View",
+      "width": "matchParent",
+      "orientation": "vertical",
+      "child": [
+        { "data": [{ "class": "CLIViewModel", "name": "viewModel" }] },
+        {
+          "type": "View",
+          "id": "cli_hero",
+          "width": "matchParent",
+          "padding": [48, 24],
+          "orientation": "vertical",
+          "gravity": "center",
+          "background": "#F6F7F9",
+          "child": [
+            {
+              "type": "Label",
+              "text": "cli_title",
+              "fontSize": 48,
+              "fontWeight": "bold",
+              "fontColor": "#23272F",
+              "textAlign": "Center"
+            },
+            { "style": "spacer_16" },
+            {
+              "type": "Label",
+              "text": "cli_subtitle",
+              "fontSize": 20,
+              "fontColor": "#5E687E",
+              "textAlign": "Center"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "cli_content",
+          "width": "matchParent",
+          "padding": [48, 24],
+          "orientation": "vertical",
+          "child": [
+            {
+              "type": "Segment",
+              "id": "platform_tabs",
+              "items": ["Swift (sjui)", "Kotlin (kjui)", "React (rjui)"],
+              "selectedIndex": "@{viewModel.currentTab}",
+              "onValueChanged": "@{viewModel.onTabChange}"
+            },
+            { "style": "spacer_32" },
+            {
+              "type": "View",
+              "id": "swift_content",
+              "orientation": "vertical",
+              "visibility": "@{viewModel.currentTab === 0 ? 'visible' : 'gone' }",
+              "child": [
+                { "type": "Label", "text": "cli_swift_overview", "fontSize": 16, "fontColor": "#4B5563", "lineHeight": 1.6, "bottomMargin": 24 },
+                { "type": "Label", "text": "cli_installation_title", "fontSize": 24, "fontWeight": "bold", "fontColor": "#FA7343", "bottomMargin": 12 },
+                { "type": "CodeBlock", "file": "cli_swift_install.sh", "language": "bash", "showPreview": false, "bottomMargin": 32 },
+                { "type": "Label", "text": "cli_commands_title", "fontSize": 24, "fontWeight": "bold", "fontColor": "#FA7343", "bottomMargin": 16 },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_init", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "sjui init [--mode MODE]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_swift_init_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_options_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "headerClasses": ["components/cli_table_header_option"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.swiftInitOptions}" }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_setup", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "sjui setup", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_swift_setup_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5 }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_generate", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "sjui generate TYPE NAME [OPTIONS]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_swift_generate_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_arguments_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_argument"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.swiftGenArgs}" },
+                    { "type": "Label", "text": "cli_options_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_option"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.swiftGenOptions}" },
+                    { "type": "Label", "text": "cli_examples_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "CodeBlock", "file": "cli_swift_generate.sh", "language": "bash", "showPreview": false }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_build", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "sjui build [OPTIONS]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_swift_build_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_options_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_option"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.swiftBuildOptions}" },
+                    { "type": "Label", "text": "cli_examples_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "CodeBlock", "file": "cli_swift_build.sh", "language": "bash", "showPreview": false }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_watch", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "sjui watch [--mode MODE]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_swift_watch_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_options_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "headerClasses": ["components/cli_table_header_option"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.swiftWatchOptions}" }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_hotload", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "sjui hotload [SUBCOMMAND] [OPTIONS]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_swift_hotload_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_subcommands_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_subcommand"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.swiftHotloadSubcommands}" },
+                    { "type": "Label", "text": "cli_options_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_option"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.swiftHotloadOptions}" },
+                    { "type": "Label", "text": "cli_examples_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "CodeBlock", "file": "cli_swift_hotload.sh", "language": "bash", "showPreview": false }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_convert", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "sjui convert NAME [OPTIONS]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_swift_convert_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_arguments_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_argument"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.swiftConvertArgs}" },
+                    { "type": "Label", "text": "cli_options_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_option"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.swiftConvertOptions}" },
+                    { "type": "Label", "text": "cli_examples_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "CodeBlock", "file": "cli_swift_convert.sh", "language": "bash", "showPreview": false }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_destroy", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "sjui destroy TYPE NAME [OPTIONS]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_swift_destroy_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_arguments_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_argument"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.swiftDestroyArgs}" },
+                    { "type": "Label", "text": "cli_options_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_option"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.swiftDestroyOptions}" },
+                    { "type": "Label", "text": "cli_examples_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "CodeBlock", "file": "cli_swift_destroy.sh", "language": "bash", "showPreview": false }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_validate", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "sjui validate [OPTIONS]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_swift_validate_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_options_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "headerClasses": ["components/cli_table_header_option"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.swiftValidateOptions}" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "kotlin_content",
+              "orientation": "vertical",
+              "visibility": "@{viewModel.currentTab === 1 ? 'visible' : 'gone' }",
+              "child": [
+                { "type": "Label", "text": "cli_kotlin_overview", "fontSize": 16, "fontColor": "#4B5563", "lineHeight": 1.6, "bottomMargin": 24 },
+                { "type": "Label", "text": "cli_installation_title", "fontSize": 24, "fontWeight": "bold", "fontColor": "#7F52FF", "bottomMargin": 12 },
+                { "type": "CodeBlock", "file": "cli_kotlin_install.sh", "language": "bash", "showPreview": false, "bottomMargin": 32 },
+                { "type": "Label", "text": "cli_commands_title", "fontSize": 24, "fontWeight": "bold", "fontColor": "#7F52FF", "bottomMargin": 16 },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_init", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "kjui init [--mode MODE]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_kotlin_init_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_options_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "headerClasses": ["components/cli_table_header_option"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.kotlinInitOptions}" }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_setup", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "kjui setup", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_kotlin_setup_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5 }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_generate", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "kjui generate TYPE NAME [OPTIONS]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_kotlin_generate_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_arguments_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_argument"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.kotlinGenArgs}" },
+                    { "type": "Label", "text": "cli_options_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_option"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.kotlinGenOptions}" },
+                    { "type": "Label", "text": "cli_examples_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "CodeBlock", "file": "cli_kotlin_generate.sh", "language": "bash", "showPreview": false }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_build", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "kjui build [OPTIONS]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_kotlin_build_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_options_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_option"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.kotlinBuildOptions}" },
+                    { "type": "Label", "text": "cli_examples_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "CodeBlock", "file": "cli_kotlin_build.sh", "language": "bash", "showPreview": false }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_hotload", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "kjui hotload [SUBCOMMAND]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_kotlin_hotload_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_subcommands_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_subcommand"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.kotlinHotloadSubcommands}" },
+                    { "type": "Label", "text": "cli_examples_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "CodeBlock", "file": "cli_kotlin_hotload.sh", "language": "bash", "showPreview": false }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "react_content",
+              "orientation": "vertical",
+              "visibility": "@{viewModel.currentTab === 2 ? 'visible' : 'gone' }",
+              "child": [
+                { "type": "Label", "text": "cli_react_overview", "fontSize": 16, "fontColor": "#4B5563", "lineHeight": 1.6, "bottomMargin": 24 },
+                { "type": "Label", "text": "cli_installation_title", "fontSize": 24, "fontWeight": "bold", "fontColor": "#61DAFB", "bottomMargin": 12 },
+                { "type": "CodeBlock", "file": "cli_react_install.sh", "language": "bash", "showPreview": false, "bottomMargin": 32 },
+                { "type": "Label", "text": "cli_commands_title", "fontSize": 24, "fontWeight": "bold", "fontColor": "#61DAFB", "bottomMargin": 16 },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_init", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "rjui init", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_react_init_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5 }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_generate", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "rjui generate TYPE NAME [OPTIONS]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_react_generate_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_arguments_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_argument"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.reactGenArgs}" },
+                    { "type": "Label", "text": "cli_options_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_option"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.reactGenOptions}" },
+                    { "type": "Label", "text": "cli_examples_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "CodeBlock", "file": "cli_react_generate.sh", "language": "bash", "showPreview": false }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_build", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "rjui build", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_react_build_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5 }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_watch", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "rjui watch", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_react_watch_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5 }
+                  ]
+                },
+                {
+                  "type": "View", "width": "matchParent", "orientation": "vertical", "bottomMargin": 32,
+                  "child": [
+                    { "type": "Label", "text": "cli_cmd_hotload", "fontSize": 20, "fontWeight": "bold", "fontColor": "#23272F", "bottomMargin": 8 },
+                    { "type": "View", "width": "matchParent", "padding": [16, 12], "background": "#F3F4F6", "cornerRadius": 6, "bottomMargin": 12, "child": [{ "type": "Label", "text": "rjui hotload [SUBCOMMAND]", "fontSize": 14, "fontColor": "#1F2937", "font": "monospace" }] },
+                    { "type": "Label", "text": "cli_react_hotload_desc", "fontSize": 14, "fontColor": "#4B5563", "lineHeight": 1.5, "bottomMargin": 12 },
+                    { "type": "Label", "text": "cli_subcommands_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "Collection", "width": "matchParent", "borderWidth": 1, "borderColor": "#E5E7EB", "cornerRadius": 6, "clipToBounds": true, "bottomMargin": 12, "headerClasses": ["components/cli_table_header_subcommand"], "cellClasses": ["components/cli_table_row"], "items": "@{viewModel.reactHotloadSubcommands}" },
+                    { "type": "Label", "text": "cli_examples_title", "fontSize": 14, "fontWeight": "600", "fontColor": "#374151", "bottomMargin": 8 },
+                    { "type": "CodeBlock", "file": "cli_react_hotload.sh", "language": "bash", "showPreview": false }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

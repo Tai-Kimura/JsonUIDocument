@@ -10,6 +10,8 @@ import PlatformBadgeKotlin from './PlatformBadgeKotlin';
 import PlatformBadgeReact from './PlatformBadgeReact';
 import RefAttributeTableHeader from './RefAttributeTableHeader';
 import RefAttributeRow from './RefAttributeRow';
+import PartialAttributeTableHeader from './PartialAttributeTableHeader';
+import PartialAttributeRow from './PartialAttributeRow';
 
 
 export const RefLabel = ({ viewModel }) => {
@@ -44,6 +46,23 @@ export const RefLabel = ({ viewModel }) => {
         </div>
         <span className="mt-8 mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.compDetailBasicExample}</span>
         <CodeBlock className="flex flex-col" file="label_example.json" language="json" showPreview={false} />
+        <span className="mt-8 mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refLabelPartialAttributes}</span>
+        <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refLabelPartialAttributesDesc}</span>
+        <div className="w-full mb-6 rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
+          <PartialAttributeTableHeader />
+          {viewModel.partialAttributes?.map((item, index) => (
+            <PartialAttributeRow key={index} data={item} />
+          ))}
+        </div>
+        <span className="mb-2 text-[#23272F] text-base font-semibold">{StringManager.currentLanguage.refLabelPartialRangeText}</span>
+        <span className="mb-2 text-[#4B5563] text-sm">{StringManager.currentLanguage.refLabelPartialRangeTextDesc}</span>
+        <CodeBlock className="flex flex-col mb-4" file="partial_attributes_example.json" language="json" showPreview={false} />
+        <span className="mb-2 text-[#23272F] text-base font-semibold">{StringManager.currentLanguage.refLabelPartialRangeNumeric}</span>
+        <span className="mb-2 text-[#4B5563] text-sm">{StringManager.currentLanguage.refLabelPartialRangeNumericDesc}</span>
+        <CodeBlock className="flex flex-col mb-4" file="partial_attributes_range.json" language="json" showPreview={false} />
+        <span className="mb-2 text-[#23272F] text-base font-semibold">{StringManager.currentLanguage.refLabelPartialOnclick}</span>
+        <span className="mb-2 text-[#4B5563] text-sm">{StringManager.currentLanguage.refLabelPartialOnclickDesc}</span>
+        <CodeBlock className="flex flex-col" file="partial_attributes_onclick.json" language="json" showPreview={false} />
       </div>
     </div>
   </div>

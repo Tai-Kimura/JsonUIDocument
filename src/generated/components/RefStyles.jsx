@@ -16,7 +16,11 @@ export const RefStyles = ({ viewModel }) => {
         <span className="mb-2 text-[#23272F] text-[32px] font-bold font-bold">{StringManager.currentLanguage.refStyles}</span>
         <span className="mb-8 text-[#4B5563] text-base">{StringManager.currentLanguage.refStylesOverview}</span>
         <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refStylesDefinition}</span>
-        <CodeBlock className="flex flex-col mb-6" file="styles_definition.json" language="json" showPreview={false} />
+        <span className="mb-2 text-[#4B5563] text-sm">{StringManager.currentLanguage.refStylesFileStructure}</span>
+        <span className="mb-1 text-[#6B7280] text-[13px]">Styles/primary_button.json</span>
+        <CodeBlock className="flex flex-col mb-4" file="styles_primary_button.json" language="json" showPreview={false} />
+        <span className="mb-1 text-[#6B7280] text-[13px]">Styles/secondary_button.json</span>
+        <CodeBlock className="flex flex-col mb-6" file="styles_secondary_button.json" language="json" showPreview={false} />
         <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refStylesApplication}</span>
         <CodeBlock className="flex flex-col" file="styles_usage.json" language="json" showPreview={false} />
       </div>

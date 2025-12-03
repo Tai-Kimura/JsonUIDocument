@@ -74,64 +74,16 @@
               "bottomMargin": 16
             },
             {
-              "type": "View",
+              "type": "Collection",
               "width": "matchParent",
-              "background": "#FFFFFF",
               "borderWidth": 1,
               "borderColor": "#E5E7EB",
               "cornerRadius": 8,
+              "clipToBounds": true,
               "bottomMargin": 32,
-              "child": [
-                {
-                  "type": "View",
-                  "width": "matchParent",
-                  "padding": [16, 12],
-                  "background": "#F9FAFB",
-                  "orientation": "horizontal",
-                  "child": [
-                    { "type": "Label", "text": "Attribute", "width": 120, "fontWeight": "600", "fontSize": 14, "fontColor": "#374151" },
-                    { "type": "Label", "text": "Type", "width": 100, "fontWeight": "600", "fontSize": 14, "fontColor": "#374151" },
-                    { "type": "Label", "text": "Description", "weight": 1, "fontWeight": "600", "fontSize": 14, "fontColor": "#374151" }
-                  ]
-                },
-                {
-                  "type": "View",
-                  "width": "matchParent",
-                  "padding": [16, 12],
-                  "orientation": "horizontal",
-                  "borderColor": "#E5E7EB",
-                  "borderWidth": 1,
-                  "child": [
-                    { "type": "Label", "text": "include", "width": 120, "fontSize": 14, "fontColor": "#059669", "fontWeight": "500" },
-                    { "type": "Label", "text": "string", "width": 100, "fontSize": 14, "fontColor": "#6B7280" },
-                    { "type": "Label", "text": "ref_include_attr_include_desc", "weight": 1, "fontSize": 14, "fontColor": "#374151", "lineHeight": 1.5 }
-                  ]
-                },
-                {
-                  "type": "View",
-                  "width": "matchParent",
-                  "padding": [16, 12],
-                  "orientation": "horizontal",
-                  "borderColor": "#E5E7EB",
-                  "borderWidth": 1,
-                  "child": [
-                    { "type": "Label", "text": "shared_data", "width": 120, "fontSize": 14, "fontColor": "#059669", "fontWeight": "500" },
-                    { "type": "Label", "text": "object", "width": 100, "fontSize": 14, "fontColor": "#6B7280" },
-                    { "type": "Label", "text": "ref_include_attr_shared_data_desc", "weight": 1, "fontSize": 14, "fontColor": "#374151", "lineHeight": 1.5 }
-                  ]
-                },
-                {
-                  "type": "View",
-                  "width": "matchParent",
-                  "padding": [16, 12],
-                  "orientation": "horizontal",
-                  "child": [
-                    { "type": "Label", "text": "binding_id", "width": 120, "fontSize": 14, "fontColor": "#059669", "fontWeight": "500" },
-                    { "type": "Label", "text": "string", "width": 100, "fontSize": 14, "fontColor": "#6B7280" },
-                    { "type": "Label", "text": "ref_include_attr_binding_id_desc", "weight": 1, "fontSize": 14, "fontColor": "#374151", "lineHeight": 1.5 }
-                  ]
-                }
-              ]
+              "headerClasses": ["components/include_attribute_table_header"],
+              "cellClasses": ["components/include_attribute_row"],
+              "items": "@{viewModel.includeAttributes}"
             },
             {
               "type": "Label",

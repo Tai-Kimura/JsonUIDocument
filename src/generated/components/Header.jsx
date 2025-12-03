@@ -16,6 +16,7 @@ export const Header = ({ viewModel }) => {
       <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={viewModel.onClickLearn}>{StringManager.currentLanguage.navLearn}</span>
       <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={viewModel.onClickReference}>{StringManager.currentLanguage.navReference}</span>
       <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={viewModel.onClickPlatforms}>{StringManager.currentLanguage.navPlatforms}</span>
+      <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={viewModel.onClickCLI}>{StringManager.currentLanguage.navCli}</span>
       <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={viewModel.onClickCommunity}>{StringManager.currentLanguage.navCommunity}</span>
       <span className="mt-0 mr-6 mb-0 ml-0 text-[#23272F] text-base font-medium cursor-pointer" onClick={viewModel.onClickGitHub}>GitHub</span>
       <select id="language_selector" className="h-[32px] mt-0 mr-4 mb-0 ml-0 border-0 border rounded-md px-3 py-2 bg-white cursor-pointer outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value={viewModel.currentLanguage} onChange={(e) => viewModel.onLanguageChange(e.target.value)}>
