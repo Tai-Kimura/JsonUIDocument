@@ -18,8 +18,8 @@ export default function RefScrollViewPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefScrollView viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefScrollView data={viewModel.data} />
     </>
   );
 }

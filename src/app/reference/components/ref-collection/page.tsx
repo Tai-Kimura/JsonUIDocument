@@ -18,8 +18,8 @@ export default function RefCollectionPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefCollection viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefCollection data={viewModel.data} />
     </>
   );
 }

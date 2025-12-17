@@ -5,7 +5,7 @@ import React from 'react';
 import { ComponentsSidebar } from '@/components/extensions/ComponentsSidebar';
 
 
-export const ComponentsSidebar = () => {
+export const ComponentsSidebar = ({ data }) => {
   return (
   <ComponentsSidebar id="components_sidebar" className="flex flex-col" />
   );

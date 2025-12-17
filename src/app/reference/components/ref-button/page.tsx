@@ -18,8 +18,8 @@ export default function RefButtonPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefButton viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefButton data={viewModel.data} />
     </>
   );
 }

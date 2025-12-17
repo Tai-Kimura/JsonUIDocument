@@ -18,8 +18,8 @@ export default function RefGradientViewPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefGradientView viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefGradientView data={viewModel.data} />
     </>
   );
 }

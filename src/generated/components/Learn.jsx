@@ -6,137 +6,130 @@ import { StringManager } from '@/generated/StringManager';
 import { CodeBlock } from '@/components/extensions/CodeBlock';
 
 
-export const Learn = ({ viewModel }) => {
+export const Learn = ({ data }) => {
   return (
   <div id="learn_page" className="w-full flex flex-col">
+    <div className="" />
     <div id="learn_hero" className="w-full py-12 px-6 bg-[#F6F7F9] flex flex-col items-center justify-center">
-      <span className="text-[#23272F] text-5xl font-bold text-center font-bold">{StringManager.currentLanguage.learnTitle}</span>
+      <span className="text-[#23272F] text-5xl font-bold text-center">{StringManager.currentLanguage.learnTitle}</span>
       <div className="h-[16px]" />
       <span className="text-[#5E687E] text-xl text-center">{StringManager.currentLanguage.learnSubtitle}</span>
     </div>
     <div id="learn_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-      <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.learnGettingStarted}</span>
+      <span className="text-[#087EA4] text-2xl font-bold">{StringManager.currentLanguage.learnGettingStarted}</span>
       <div className="h-[24px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickInstallation}>
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickInstallation}>
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnInstallation}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnInstallationDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickQuickStart}>
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickQuickStart}>
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnQuickStart}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnQuickStartDesc}</span>
         </div>
-        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickQuickStart}>
+        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickQuickStart}>
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnJsonBasics}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnJsonBasicsDesc}</span>
         </div>
       </div>
       <div className="h-[48px]" />
-      <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.learnComponents}</span>
+      <span className="text-[#087EA4] text-2xl font-bold">{StringManager.currentLanguage.learnComponents}</span>
       <div className="h-[24px]" />
       <div className="w-full flex flex-row items-stretch">
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickComponents}>
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickComponents}>
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnComponents}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnComponentsDesc}</span>
         </div>
-        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickStyling}>
+        <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickStyling}>
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStyling}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStylingDesc}</span>
         </div>
-        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickDataBinding}>
+        <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickDataBinding}>
           <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnDataBinding}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnDataBindingDesc}</span>
         </div>
       </div>
       <div className="h-[48px]" />
-      <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.learnTutorialTitle}</span>
+      <span className="text-[#087EA4] text-2xl font-bold">{StringManager.currentLanguage.learnTutorialTitle}</span>
       <div className="h-[8px]" />
       <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.learnTutorialSubtitle}</span>
       <div className="h-[24px]" />
-      <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
-          <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStep1Title}</span>
-          <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStep1Desc}</span>
-        </div>
-        <CodeBlock className="flex flex-col flex-[2]" file="basic_view.json" language="json" />
+      <div className="w-full flex flex-col">
+        <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStep1Title}</span>
+        <div className="h-[8px]" />
+        <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStep1Desc}</span>
+        <div className="h-[16px]" />
+        <CodeBlock className="flex flex-col w-full" file="basic_view.json" language="json" />
       </div>
       <div className="h-[32px]" />
-      <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
-          <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStep2Title}</span>
-          <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStep2Desc}</span>
-        </div>
-        <CodeBlock className="flex flex-col flex-[2]" file="button_example.json" language="json" />
+      <div className="w-full flex flex-col">
+        <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStep2Title}</span>
+        <div className="h-[8px]" />
+        <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStep2Desc}</span>
+        <div className="h-[16px]" />
+        <CodeBlock className="flex flex-col w-full" file="button_example.json" language="json" />
       </div>
       <div className="h-[32px]" />
-      <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
-          <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStep3Title}</span>
-          <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStep3Desc}</span>
-        </div>
-        <CodeBlock className="flex flex-col flex-[2]" file="data_binding.json" language="json" />
+      <div className="w-full flex flex-col">
+        <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStep3Title}</span>
+        <div className="h-[8px]" />
+        <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStep3Desc}</span>
+        <div className="h-[16px]" />
+        <CodeBlock className="flex flex-col w-full" file="data_binding.json" language="json" />
       </div>
       <div className="h-[48px]" />
-      <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.learnAdvanced}</span>
+      <span className="text-[#087EA4] text-2xl font-bold">{StringManager.currentLanguage.learnAdvanced}</span>
       <div className="h-[8px]" />
       <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.learnAdvancedSubtitle}</span>
       <div className="h-[24px]" />
-      <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
-          <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnIncludeTitle}</span>
-          <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnIncludeDesc}</span>
-        </div>
-        <CodeBlock className="flex flex-col flex-[2]" file="include_example.json" language="json" />
+      <div className="w-full flex flex-col">
+        <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnIncludeTitle}</span>
+        <div className="h-[8px]" />
+        <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnIncludeDesc}</span>
+        <div className="h-[16px]" />
+        <CodeBlock className="flex flex-col w-full" file="include_example.json" language="json" />
       </div>
       <div className="h-[32px]" />
-      <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
-          <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStylesTitle}</span>
-          <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStylesDesc}</span>
-        </div>
-        <CodeBlock className="flex flex-col flex-[2]" file="style_example.json" language="json" />
+      <div className="w-full flex flex-col">
+        <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnStylesTitle}</span>
+        <div className="h-[8px]" />
+        <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnStylesDesc}</span>
+        <div className="h-[16px]" />
+        <CodeBlock className="flex flex-col w-full" file="style_example.json" language="json" />
       </div>
       <div className="h-[32px]" />
-      <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
-          <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnLocalizationTitle}</span>
-          <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnLocalizationDesc}</span>
-        </div>
-        <CodeBlock className="flex flex-col flex-[2]" file="localization_example.json" language="json" />
+      <div className="w-full flex flex-col">
+        <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnLocalizationTitle}</span>
+        <div className="h-[8px]" />
+        <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnLocalizationDesc}</span>
+        <div className="h-[16px]" />
+        <CodeBlock className="flex flex-col w-full" file="localization_example.json" language="json" />
       </div>
       <div className="h-[48px]" />
-      <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.learnCollectionsTitle}</span>
+      <span className="text-[#087EA4] text-2xl font-bold">{StringManager.currentLanguage.learnCollectionsTitle}</span>
       <div className="h-[8px]" />
       <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.learnCollectionsSubtitle}</span>
       <div className="h-[24px]" />
-      <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
-          <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnCollectionTitle}</span>
-          <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnCollectionDesc}</span>
-        </div>
-        <CodeBlock className="flex flex-col flex-[2]" file="collection_example.json" language="json" />
+      <div className="w-full flex flex-col">
+        <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnCollectionTitle}</span>
+        <div className="h-[8px]" />
+        <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnCollectionDesc}</span>
+        <div className="h-[16px]" />
+        <CodeBlock className="flex flex-col w-full" file="collection_example.json" language="json" />
       </div>
       <div className="h-[32px]" />
-      <div className="w-full flex flex-row items-stretch">
-        <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
-          <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnFormTitle}</span>
-          <div className="h-[8px]" />
-          <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnFormDesc}</span>
-        </div>
-        <CodeBlock className="flex flex-col flex-[2]" file="form_example.json" language="json" />
+      <div className="w-full flex flex-col">
+        <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.learnFormTitle}</span>
+        <div className="h-[8px]" />
+        <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.learnFormDesc}</span>
+        <div className="h-[16px]" />
+        <CodeBlock className="flex flex-col w-full" file="form_example.json" language="json" />
       </div>
     </div>
   </div>

@@ -7,6 +7,17 @@ export class LearnSubPageViewModel {
     this.router = router;
   }
 
+  get data() {
+    return {
+      onClickInstallation: this.onClickInstallation,
+      onClickQuickStart: this.onClickQuickStart,
+      onClickComponents: this.onClickComponents,
+      onClickStyling: this.onClickStyling,
+      onClickDataBinding: this.onClickDataBinding,
+      onClickLearn: this.onClickLearn,
+    };
+  }
+
   onClickInstallation = () => {
     this.router.push("/learn/installation");
   };

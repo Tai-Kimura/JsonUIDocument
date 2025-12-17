@@ -18,8 +18,8 @@ export default function RefSwitchPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefSwitch viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefSwitch data={viewModel.data} />
     </>
   );
 }

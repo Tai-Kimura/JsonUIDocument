@@ -10,30 +10,31 @@ import RefAttributeTableHeader from './RefAttributeTableHeader';
 import RefAttributeRow from './RefAttributeRow';
 
 
-export const RefSegment = ({ viewModel }) => {
+export const RefSegment = ({ data }) => {
   return (
   <div id="ref_segment_page" className="w-full h-auto flex flex-row items-stretch">
+    <div className="" />
     <ReferenceSidebar className="flex flex-col" />
     <div id="ref_segment_scroll" className="w-full h-auto overflow-y-auto flex flex-col">
       <div id="ref_segment_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-        <span className="mb-4 text-[#23272F] text-[32px] font-bold font-bold">{StringManager.currentLanguage.refSegmentTitle}</span>
+        <span className="mb-4 text-[#23272F] text-[32px] font-bold">{StringManager.currentLanguage.refSegmentTitle}</span>
         <span className="mb-6 text-[#4B5563] text-base">{StringManager.currentLanguage.refSegmentDesc}</span>
         <div className="mb-8 flex flex-row items-stretch">
           <PlatformBadgeSwift />
         </div>
-        <span className="mb-4 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.compDetailPlatformSupport}</span>
+        <span className="mb-4 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.compDetailPlatformSupport}</span>
         <div className="mb-8 flex flex-col">
           <span className="mb-2 text-[#4B5563] text-sm">{StringManager.currentLanguage.compSegmentUikit}</span>
           <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.compSegmentSwiftui}</span>
         </div>
-        <span className="mb-4 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.compDetailAttributes}</span>
+        <span className="mb-4 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.compDetailAttributes}</span>
         <div className="w-full rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
           <RefAttributeTableHeader />
-          {viewModel.segmentAttributes?.map((item, index) => (
+          {data.segmentAttributes?.map((item, index) => (
             <RefAttributeRow key={index} data={item} />
           ))}
         </div>
-        <span className="mt-8 mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.compDetailBasicExample}</span>
+        <span className="mt-8 mb-3 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.compDetailBasicExample}</span>
         <CodeBlock className="flex flex-col" file="segment_example.json" language="json" showPreview={false} />
       </div>
     </div>

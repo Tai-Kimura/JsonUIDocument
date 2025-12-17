@@ -9,14 +9,15 @@ import ComponentSectionText from './ComponentSectionText';
 import ComponentSectionInput from './ComponentSectionInput';
 
 
-export const RefComponents = ({ viewModel }) => {
+export const RefComponents = ({ data }) => {
   return (
   <div id="ref_components_page" className="w-full h-auto flex flex-row items-stretch">
+    <div className="" />
     <ReferenceSidebar className="flex flex-col" />
     <div id="ref_components_scroll" className="w-full h-auto overflow-y-auto flex flex-col">
       <div id="ref_components_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
         <div id="ref_components_hero" className="w-full py-0 px-6 flex flex-col items-center justify-center">
-          <span className="text-[#23272F] text-5xl font-bold text-center font-bold">{StringManager.currentLanguage.componentsTitle}</span>
+          <span className="text-[#23272F] text-5xl font-bold text-center">{StringManager.currentLanguage.componentsTitle}</span>
           <div className="h-[16px]" />
           <span className="text-[#5E687E] text-xl text-center">{StringManager.currentLanguage.componentsSubtitle}</span>
         </div>

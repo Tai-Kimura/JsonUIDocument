@@ -1,4 +1,17 @@
 export class PlatformsViewModel {
+  constructor() {}
+
+  get data() {
+    return {
+      onClickSwiftDocs: this.onClickSwiftDocs,
+      onClickSwiftGitHub: this.onClickSwiftGitHub,
+      onClickKotlinDocs: this.onClickKotlinDocs,
+      onClickKotlinGitHub: this.onClickKotlinGitHub,
+      onClickReactDocs: this.onClickReactDocs,
+      onClickReactGitHub: this.onClickReactGitHub,
+    };
+  }
+
   // SwiftJsonUI
   onClickSwiftDocs = () => {
     window.open("https://github.com/Tai-Kimura/SwiftJsonUI#readme", "_blank");

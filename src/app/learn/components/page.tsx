@@ -14,8 +14,8 @@ export default function ComponentsPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <Components viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <Components data={viewModel.data} />
     </>
   );
 }

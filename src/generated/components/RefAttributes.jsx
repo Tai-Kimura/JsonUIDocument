@@ -8,59 +8,60 @@ import RefAttributeTableHeader from './RefAttributeTableHeader';
 import RefAttributeRow from './RefAttributeRow';
 
 
-export const RefAttributes = ({ viewModel }) => {
+export const RefAttributes = ({ data }) => {
   return (
   <div id="ref_attributes_page" className="w-full h-auto flex flex-row items-stretch">
+    <div className="" />
     <ReferenceSidebar className="flex flex-col" />
     <div id="ref_attributes_scroll" className="w-full h-auto overflow-y-auto flex flex-col">
       <div id="ref_attributes_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-        <span className="mb-2 text-[#23272F] text-[32px] font-bold font-bold">{StringManager.currentLanguage.refAttributes}</span>
+        <span className="mb-2 text-[#23272F] text-[32px] font-bold">{StringManager.currentLanguage.refAttributes}</span>
         <span className="mb-8 text-[#4B5563] text-base">{StringManager.currentLanguage.refAttributesOverview}</span>
-        <span className="mb-4 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refAttrCore}</span>
+        <span className="mb-4 text-[#23272F] text-2xl font-bold">{StringManager.currentLanguage.refAttrCore}</span>
         <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refAttrCoreDesc}</span>
         <div className="w-full mb-8 rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
           <RefAttributeTableHeader />
-          {viewModel.coreAttributes?.map((item, index) => (
+          {data.coreAttributes?.map((item, index) => (
             <RefAttributeRow key={index} data={item} />
           ))}
         </div>
-        <span className="mb-4 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refAttrLayout}</span>
+        <span className="mb-4 text-[#23272F] text-2xl font-bold">{StringManager.currentLanguage.refAttrLayout}</span>
         <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refAttrLayoutDesc}</span>
         <div className="w-full mb-8 rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
           <RefAttributeTableHeader />
-          {viewModel.layoutAttributes?.map((item, index) => (
+          {data.layoutAttributes?.map((item, index) => (
             <RefAttributeRow key={index} data={item} />
           ))}
         </div>
-        <span className="mb-4 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refAttrMargins}</span>
+        <span className="mb-4 text-[#23272F] text-2xl font-bold">{StringManager.currentLanguage.refAttrMargins}</span>
         <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refAttrMarginsDesc}</span>
         <div className="w-full mb-8 rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
           <RefAttributeTableHeader />
-          {viewModel.marginAttributes?.map((item, index) => (
+          {data.marginAttributes?.map((item, index) => (
             <RefAttributeRow key={index} data={item} />
           ))}
         </div>
-        <span className="mb-4 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refAttrStyling}</span>
+        <span className="mb-4 text-[#23272F] text-2xl font-bold">{StringManager.currentLanguage.refAttrStyling}</span>
         <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refAttrStylingDesc}</span>
         <div className="w-full mb-8 rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
           <RefAttributeTableHeader />
-          {viewModel.stylingAttributes?.map((item, index) => (
+          {data.stylingAttributes?.map((item, index) => (
             <RefAttributeRow key={index} data={item} />
           ))}
         </div>
-        <span className="mb-4 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refAttrInteraction}</span>
+        <span className="mb-4 text-[#23272F] text-2xl font-bold">{StringManager.currentLanguage.refAttrInteraction}</span>
         <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refAttrInteractionDesc}</span>
         <div className="w-full mb-8 rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
           <RefAttributeTableHeader />
-          {viewModel.interactionAttributes?.map((item, index) => (
+          {data.interactionAttributes?.map((item, index) => (
             <RefAttributeRow key={index} data={item} />
           ))}
         </div>
-        <span className="mb-4 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refAttrTypography}</span>
+        <span className="mb-4 text-[#23272F] text-2xl font-bold">{StringManager.currentLanguage.refAttrTypography}</span>
         <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refAttrTypographyDesc}</span>
         <div className="w-full rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
           <RefAttributeTableHeader />
-          {viewModel.typographyAttributes?.map((item, index) => (
+          {data.typographyAttributes?.map((item, index) => (
             <RefAttributeRow key={index} data={item} />
           ))}
         </div>

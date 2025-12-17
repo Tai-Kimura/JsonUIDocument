@@ -4,12 +4,15 @@
   "width": "matchParent",
   "orientation": "vertical",
   "child": [
-    { "data": [{ "class": "HomeViewModel", "name": "viewModel" }] },
+    {},
     {
       "type": "View",
       "id": "hero_section",
       "width": "matchParent",
-      "padding": [80, 24],
+      "padding": [
+        80,
+        24
+      ],
       "orientation": "vertical",
       "gravity": "center",
       "background": "#F6F7F9",
@@ -22,7 +25,9 @@
           "fontColor": "#087EA4",
           "textAlign": "Center"
         },
-        { "style": "spacer_16" },
+        {
+          "style": "spacer_16"
+        },
         {
           "type": "Label",
           "text": "hero_subtitle",
@@ -30,7 +35,9 @@
           "fontColor": "#5E687E",
           "textAlign": "Center"
         },
-        { "style": "spacer_32" },
+        {
+          "style": "spacer_32"
+        },
         {
           "type": "View",
           "orientation": "horizontal",
@@ -40,7 +47,7 @@
               "type": "Button",
               "style": "button_primary",
               "text": "btn_get_started",
-              "onClick": "@{viewModel.onClickGetStarted}"
+              "onClick": "@{onClickGetStarted}"
             },
             {
               "type": "View",
@@ -50,7 +57,7 @@
               "type": "Button",
               "style": "button_secondary",
               "text": "btn_api_reference",
-              "onClick": "@{viewModel.onClickApiReference}"
+              "onClick": "@{onClickApiReference}"
             }
           ]
         }
@@ -58,40 +65,474 @@
     },
     {
       "type": "View",
-      "id": "code_example_section",
+      "id": "philosophy_section",
       "width": "matchParent",
-      "padding": [64, 48],
+      "padding": [
+        64,
+        48
+      ],
       "orientation": "vertical",
       "background": "#FFFFFF",
       "child": [
         {
           "type": "Label",
-          "text": "code_example_title",
-          "fontSize": 32,
+          "text": "philosophy_title",
+          "fontSize": 36,
           "fontWeight": "bold",
           "fontColor": "#23272F",
           "textAlign": "Center"
         },
-        { "style": "spacer_8" },
+        {
+          "style": "spacer_8"
+        },
         {
           "type": "Label",
-          "text": "code_example_subtitle",
+          "text": "philosophy_subtitle",
           "fontSize": 18,
           "fontColor": "#5E687E",
           "textAlign": "Center"
         },
-        { "style": "spacer_32" },
+        {
+          "style": "spacer_48"
+        },
         {
           "type": "View",
           "orientation": "horizontal",
           "width": "matchParent",
-          "gravity": "center",
           "child": [
             {
-              "type": "CodeBlock",
-              "width": 800,
-              "file": "hello_world.json",
-              "language": "json"
+              "type": "View",
+              "style": "philosophy_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "margins": [
+                0,
+                12,
+                0,
+                0
+              ],
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "category_core_design",
+                  "width": "wrapContent",
+                  "fontSize": 10,
+                  "fontWeight": "semibold",
+                  "fontColor": "#FFFFFF",
+                  "background": "#3B82F6",
+                  "cornerRadius": 4,
+                  "padding": [
+                    4,
+                    8
+                  ]
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_declarative_title",
+                  "fontSize": 18,
+                  "fontWeight": "semibold",
+                  "fontColor": "#3B82F6"
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_declarative_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E",
+                  "lines": 0
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "style": "philosophy_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "margins": [
+                0,
+                12,
+                0,
+                0
+              ],
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "category_core_design",
+                  "width": "wrapContent",
+                  "fontSize": 10,
+                  "fontWeight": "semibold",
+                  "fontColor": "#FFFFFF",
+                  "background": "#3B82F6",
+                  "cornerRadius": 4,
+                  "padding": [
+                    4,
+                    8
+                  ]
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_separation_title",
+                  "fontSize": 18,
+                  "fontWeight": "semibold",
+                  "fontColor": "#3B82F6"
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_separation_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E",
+                  "lines": 0
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "style": "philosophy_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "category_core_design",
+                  "width": "wrapContent",
+                  "fontSize": 10,
+                  "fontWeight": "semibold",
+                  "fontColor": "#FFFFFF",
+                  "background": "#3B82F6",
+                  "cornerRadius": 4,
+                  "padding": [
+                    4,
+                    8
+                  ]
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_native_title",
+                  "fontSize": 18,
+                  "fontWeight": "semibold",
+                  "fontColor": "#3B82F6"
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_native_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E",
+                  "lines": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "style": "spacer_24"
+        },
+        {
+          "type": "View",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "child": [
+            {
+              "type": "View",
+              "style": "philosophy_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "margins": [
+                0,
+                12,
+                0,
+                0
+              ],
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "category_developer_focus",
+                  "width": "wrapContent",
+                  "fontSize": 10,
+                  "fontWeight": "semibold",
+                  "fontColor": "#FFFFFF",
+                  "background": "#10B981",
+                  "cornerRadius": 4,
+                  "padding": [
+                    4,
+                    8
+                  ]
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_consistency_title",
+                  "fontSize": 18,
+                  "fontWeight": "semibold",
+                  "fontColor": "#10B981"
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_consistency_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E",
+                  "lines": 0
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "style": "philosophy_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "margins": [
+                0,
+                12,
+                0,
+                0
+              ],
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "category_developer_focus",
+                  "width": "wrapContent",
+                  "fontSize": 10,
+                  "fontWeight": "semibold",
+                  "fontColor": "#FFFFFF",
+                  "background": "#10B981",
+                  "cornerRadius": 4,
+                  "padding": [
+                    4,
+                    8
+                  ]
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_tooling_title",
+                  "fontSize": 18,
+                  "fontWeight": "semibold",
+                  "fontColor": "#10B981"
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_tooling_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E",
+                  "lines": 0
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "style": "philosophy_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "category_developer_focus",
+                  "width": "wrapContent",
+                  "fontSize": 10,
+                  "fontWeight": "semibold",
+                  "fontColor": "#FFFFFF",
+                  "background": "#10B981",
+                  "cornerRadius": 4,
+                  "padding": [
+                    4,
+                    8
+                  ]
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_flexibility_title",
+                  "fontSize": 18,
+                  "fontWeight": "semibold",
+                  "fontColor": "#10B981"
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_flexibility_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E",
+                  "lines": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "style": "spacer_24"
+        },
+        {
+          "type": "View",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "child": [
+            {
+              "type": "View",
+              "style": "philosophy_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "margins": [
+                0,
+                12,
+                0,
+                0
+              ],
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "category_ai_driven",
+                  "width": "wrapContent",
+                  "fontSize": 10,
+                  "fontWeight": "semibold",
+                  "fontColor": "#FFFFFF",
+                  "background": "#8B5CF6",
+                  "cornerRadius": 4,
+                  "padding": [
+                    4,
+                    8
+                  ]
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_ai_agents_title",
+                  "fontSize": 18,
+                  "fontWeight": "semibold",
+                  "fontColor": "#8B5CF6"
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_ai_agents_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E",
+                  "lines": 0
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "style": "philosophy_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "margins": [
+                0,
+                12,
+                0,
+                0
+              ],
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "category_ai_driven",
+                  "width": "wrapContent",
+                  "fontSize": 10,
+                  "fontWeight": "semibold",
+                  "fontColor": "#FFFFFF",
+                  "background": "#8B5CF6",
+                  "cornerRadius": 4,
+                  "padding": [
+                    4,
+                    8
+                  ]
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_ai_validation_title",
+                  "fontSize": 18,
+                  "fontWeight": "semibold",
+                  "fontColor": "#8B5CF6"
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_ai_validation_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E",
+                  "lines": 0
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "style": "philosophy_card",
+              "weight": 1,
+              "orientation": "vertical",
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "category_ai_driven",
+                  "width": "wrapContent",
+                  "fontSize": 10,
+                  "fontWeight": "semibold",
+                  "fontColor": "#FFFFFF",
+                  "background": "#8B5CF6",
+                  "cornerRadius": 4,
+                  "padding": [
+                    4,
+                    8
+                  ]
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_ai_acceleration_title",
+                  "fontSize": 18,
+                  "fontWeight": "semibold",
+                  "fontColor": "#8B5CF6"
+                },
+                {
+                  "style": "spacer_12"
+                },
+                {
+                  "type": "Label",
+                  "text": "philosophy_ai_acceleration_desc",
+                  "fontSize": 14,
+                  "fontColor": "#5E687E",
+                  "lines": 0
+                }
+              ]
             }
           ]
         }
@@ -101,149 +542,34 @@
       "type": "View",
       "id": "platforms_section",
       "width": "matchParent",
-      "padding": [64, 24],
+      "padding": [
+        80,
+        24
+      ],
       "orientation": "vertical",
-      "background": "#23272F",
+      "gravity": "centerHorizontal",
       "child": [
         {
-          "type": "View",
-          "orientation": "horizontal",
-          "width": "matchParent",
-          "child": [
-            {
-              "type": "View",
-              "style": "platform_card",
-              "weight": 1,
-              "orientation": "vertical",
-              "margins": [0, 8, 0, 0],
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "platform_swift_title",
-                  "fontSize": 20,
-                  "fontWeight": "bold",
-                  "fontColor": "#FA7343"
-                },
-                { "style": "spacer_16" },
-                {
-                  "type": "Label",
-                  "text": "platform_swift_desc",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
-            },
-            {
-              "type": "View",
-              "style": "platform_card",
-              "weight": 1,
-              "orientation": "vertical",
-              "margins": [0, 8, 0, 0],
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "platform_kotlin_title",
-                  "fontSize": 20,
-                  "fontWeight": "bold",
-                  "fontColor": "#7F52FF"
-                },
-                { "style": "spacer_16" },
-                {
-                  "type": "Label",
-                  "text": "platform_kotlin_desc",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
-            },
-            {
-              "type": "View",
-              "style": "platform_card",
-              "weight": 1,
-              "orientation": "vertical",
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "platform_react_title",
-                  "fontSize": 20,
-                  "fontWeight": "bold",
-                  "fontColor": "#61DAFB"
-                },
-                { "style": "spacer_16" },
-                {
-                  "type": "Label",
-                  "text": "platform_react_desc",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "View",
-      "id": "features_section",
-      "width": "matchParent",
-      "padding": [64, 24],
-      "background": "#FFFFFF",
-      "orientation": "vertical",
-      "child": [
-        {
-          "type": "View",
-          "orientation": "horizontal",
-          "width": "matchParent",
-          "child": [
-            {
-              "type": "View",
-              "style": "feature_card",
-              "weight": 1,
-              "orientation": "vertical",
-              "margins": [0, 8, 0, 0],
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "feature_write_once",
-                  "fontSize": 18,
-                  "fontWeight": "semibold",
-                  "fontColor": "#23272F"
-                },
-                { "style": "spacer_16" },
-                {
-                  "type": "Label",
-                  "text": "feature_write_once_desc",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
-            },
-            {
-              "type": "View",
-              "style": "feature_card",
-              "weight": 1,
-              "margins": [0, 0, 8, 0],
-              "orientation": "vertical",
-              "child": [
-                {
-                  "type": "Label",
-                  "text": "feature_type_safe",
-                  "fontSize": 18,
-                  "fontWeight": "semibold",
-                  "fontColor": "#23272F"
-                },
-                { "style": "spacer_16" },
-                {
-                  "type": "Label",
-                  "text": "feature_type_safe_desc",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
-                }
-              ]
-            }
-          ]
+          "type": "Label",
+          "text": "platforms_title",
+          "fontSize": 32,
+          "fontWeight": "bold",
+          "fontColor": "#23272F",
+          "textAlign": "center"
         },
-        { "style": "spacer_24" },
+        {
+          "style": "spacer_12"
+        },
+        {
+          "type": "Label",
+          "text": "platforms_subtitle",
+          "fontSize": 16,
+          "fontColor": "#5E687E",
+          "textAlign": "center"
+        },
+        {
+          "style": "spacer_48"
+        },
         {
           "type": "View",
           "orientation": "horizontal",
@@ -251,46 +577,238 @@
           "child": [
             {
               "type": "View",
-              "style": "feature_card",
               "weight": 1,
               "orientation": "vertical",
-              "margins": [0, 8, 0, 0],
+              "margins": [
+                0,
+                12,
+                0,
+                0
+              ],
+              "cornerRadius": 16,
+              "background": "linear-gradient(135deg, #FA7343 0%, #FF9A6C 100%)",
+              "padding": 0,
+              "onClick": "@{onClickSwiftRepo}",
+              "canTap": true,
               "child": [
                 {
-                  "type": "Label",
-                  "text": "feature_hot_reload",
-                  "fontSize": 18,
-                  "fontWeight": "semibold",
-                  "fontColor": "#23272F"
-                },
-                { "style": "spacer_16" },
-                {
-                  "type": "Label",
-                  "text": "feature_hot_reload_desc",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
+                  "type": "View",
+                  "width": "matchParent",
+                  "padding": [
+                    24,
+                    24,
+                    16,
+                    24
+                  ],
+                  "orientation": "vertical",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "text": "🍎",
+                      "fontSize": 36
+                    },
+                    {
+                      "style": "spacer_16"
+                    },
+                    {
+                      "type": "Label",
+                      "text": "platform_swift_title",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "#FFFFFF"
+                    },
+                    {
+                      "style": "spacer_8"
+                    },
+                    {
+                      "type": "Label",
+                      "text": "platform_swift_desc",
+                      "fontSize": 14,
+                      "fontColor": "#FFFFFF"
+                    },
+                    {
+                      "style": "spacer_24"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "horizontal",
+                      "gravity": "centerVertical",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "text": "platforms_view_github",
+                          "fontSize": 14,
+                          "fontWeight": "semibold",
+                          "fontColor": "#FFFFFF"
+                        },
+                        {
+                          "style": "spacer_8"
+                        },
+                        {
+                          "type": "Label",
+                          "text": "→",
+                          "fontSize": 16,
+                          "fontColor": "#FFFFFF"
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             },
             {
               "type": "View",
-              "style": "feature_card",
               "weight": 1,
               "orientation": "vertical",
+              "margins": [
+                0,
+                12,
+                0,
+                0
+              ],
+              "cornerRadius": 16,
+              "background": "linear-gradient(135deg, #7F52FF 0%, #A78BFA 100%)",
+              "padding": 0,
+              "onClick": "@{onClickKotlinRepo}",
+              "canTap": true,
               "child": [
                 {
-                  "type": "Label",
-                  "text": "feature_data_binding",
-                  "fontSize": 18,
-                  "fontWeight": "semibold",
-                  "fontColor": "#23272F"
-                },
-                { "style": "spacer_16" },
+                  "type": "View",
+                  "width": "matchParent",
+                  "padding": [
+                    24,
+                    24,
+                    16,
+                    24
+                  ],
+                  "orientation": "vertical",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "text": "🤖",
+                      "fontSize": 36
+                    },
+                    {
+                      "style": "spacer_16"
+                    },
+                    {
+                      "type": "Label",
+                      "text": "platform_kotlin_title",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "#FFFFFF"
+                    },
+                    {
+                      "style": "spacer_8"
+                    },
+                    {
+                      "type": "Label",
+                      "text": "platform_kotlin_desc",
+                      "fontSize": 14,
+                      "fontColor": "#FFFFFF"
+                    },
+                    {
+                      "style": "spacer_24"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "horizontal",
+                      "gravity": "centerVertical",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "text": "platforms_view_github",
+                          "fontSize": 14,
+                          "fontWeight": "semibold",
+                          "fontColor": "#FFFFFF"
+                        },
+                        {
+                          "style": "spacer_8"
+                        },
+                        {
+                          "type": "Label",
+                          "text": "→",
+                          "fontSize": 16,
+                          "fontColor": "#FFFFFF"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "weight": 1,
+              "orientation": "vertical",
+              "cornerRadius": 16,
+              "background": "linear-gradient(135deg, #23272F 0%, #3B4252 100%)",
+              "padding": 0,
+              "onClick": "@{onClickReactRepo}",
+              "canTap": true,
+              "child": [
                 {
-                  "type": "Label",
-                  "text": "feature_data_binding_desc",
-                  "fontSize": 14,
-                  "fontColor": "#5E687E"
+                  "type": "View",
+                  "width": "matchParent",
+                  "padding": [
+                    24,
+                    24,
+                    16,
+                    24
+                  ],
+                  "orientation": "vertical",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "text": "⚛️",
+                      "fontSize": 36
+                    },
+                    {
+                      "style": "spacer_16"
+                    },
+                    {
+                      "type": "Label",
+                      "text": "platform_react_title",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "#61DAFB"
+                    },
+                    {
+                      "style": "spacer_8"
+                    },
+                    {
+                      "type": "Label",
+                      "text": "platform_react_desc",
+                      "fontSize": 14,
+                      "fontColor": "#FFFFFF"
+                    },
+                    {
+                      "style": "spacer_24"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "horizontal",
+                      "gravity": "centerVertical",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "text": "platforms_view_github",
+                          "fontSize": 14,
+                          "fontWeight": "semibold",
+                          "fontColor": "#61DAFB"
+                        },
+                        {
+                          "style": "spacer_8"
+                        },
+                        {
+                          "type": "Label",
+                          "text": "→",
+                          "fontSize": 16,
+                          "fontColor": "#61DAFB"
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }

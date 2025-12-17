@@ -21,8 +21,7 @@ export class RefButtonViewModel {
   constructor(
     router: AppRouterInstance,
     currentTab: number,
-    setCurrentTab: (tab: number) => void
-  ) {
+    setCurrentTab: (tab: number) => void) {
     this.router = router;
     this._currentTab = currentTab;
     this._setCurrentTab = setCurrentTab;
@@ -32,9 +31,20 @@ export class RefButtonViewModel {
     return this._currentTab;
   }
 
+
+  get data() {
+    return {
+      currentTab: this._currentTab,
+      setCurrentTab: this._setCurrentTab,
+      onTabChange: this.onTabChange,
+      buttonAttributes: this.buttonAttributes,
+    };
+  }
+
   onTabChange = (index: number) => {
     this._setCurrentTab(index);
   };
+
 
   get buttonAttributes(): RefAttributeData[] {
     return [

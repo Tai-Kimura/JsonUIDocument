@@ -4,7 +4,17 @@
   "orientation": "vertical",
   "width": "matchParent",
   "child": [
-    { "data": [{ "class": "RefAttributeData", "name": "data" }] },
+    { "data": [
+      { "name": "name", "class": "String" },
+      { "name": "uikitStatus", "class": "String" },
+      { "name": "swiftuiStatus", "class": "String" },
+      { "name": "composeStatus", "class": "String" },
+      { "name": "xmlStatus", "class": "String" },
+      { "name": "reactStatus", "class": "String" },
+      { "name": "type", "class": "String" },
+      { "name": "description", "class": "String" },
+      { "name": "dividerVisibility", "class": "String" }
+    ] },
     {
       "type": "View",
       "orientation": "horizontal",
@@ -13,7 +23,7 @@
       "child": [
         {
           "type": "Label",
-          "text": "@{data.name}",
+          "text": "@{name}",
           "fontSize": 13,
           "fontColor": "#1F2937",
           "font": "monospace",
@@ -28,7 +38,7 @@
         },
         {
           "type": "Label",
-          "text": "@{data.uikit ? '✅' : '❌'}",
+          "text": "@{uikitStatus}",
           "fontSize": 14,
           "weight": 1,
           "textAlign": "Center",
@@ -42,7 +52,7 @@
         },
         {
           "type": "Label",
-          "text": "@{data.swiftui ? '✅' : '❌'}",
+          "text": "@{swiftuiStatus}",
           "fontSize": 14,
           "weight": 1,
           "textAlign": "Center",
@@ -56,7 +66,7 @@
         },
         {
           "type": "Label",
-          "text": "@{data.compose ? '✅' : '❌'}",
+          "text": "@{composeStatus}",
           "fontSize": 14,
           "weight": 1,
           "textAlign": "Center",
@@ -70,7 +80,7 @@
         },
         {
           "type": "Label",
-          "text": "@{data.xml ? '✅' : '❌'}",
+          "text": "@{xmlStatus}",
           "fontSize": 14,
           "weight": 1,
           "textAlign": "Center",
@@ -84,7 +94,7 @@
         },
         {
           "type": "Label",
-          "text": "@{data.react ? '✅' : '❌'}",
+          "text": "@{reactStatus}",
           "fontSize": 14,
           "weight": 1,
           "textAlign": "Center",
@@ -98,7 +108,7 @@
         },
         {
           "type": "Label",
-          "text": "@{data.type}",
+          "text": "@{type}",
           "fontSize": 13,
           "fontColor": "#6B7280",
           "weight": 2,
@@ -112,7 +122,7 @@
         },
         {
           "type": "Label",
-          "text": "@{data.description}",
+          "text": "@{description}",
           "fontSize": 13,
           "fontColor": "#4B5563",
           "weight": 4,
@@ -125,7 +135,7 @@
       "width": "matchParent",
       "height": 1,
       "background": "#E5E7EB",
-      "visibility": "@{data.isLast ? 'gone' : 'visible'}"
+      "visibility": "@{dividerVisibility}"
     }
   ]
 }

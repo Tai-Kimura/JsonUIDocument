@@ -5,15 +5,15 @@ import React from 'react';
 import { StringManager } from '@/generated/StringManager';
 
 
-export const PartialAttributeTableHeader = () => {
+export const PartialAttributeTableHeader = ({ data }) => {
   return (
   <div id="partial_attribute_table_header" className="w-full flex flex-col">
     <div className="w-full py-0 px-4 bg-[#F9FAFB] flex flex-row items-stretch">
-      <span className="p-3 text-[#374151] text-[13px] font-bold flex-[2] font-bold">{StringManager.currentLanguage.refTableAttribute}</span>
+      <span className="p-3 text-[#374151] text-[13px] font-bold flex-[2]">{StringManager.currentLanguage.refTableAttribute}</span>
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
-      <span className="p-3 text-[#374151] text-[13px] font-bold flex-1 font-bold">{StringManager.currentLanguage.refTableType}</span>
+      <span className="p-3 text-[#374151] text-[13px] font-bold flex-1">{StringManager.currentLanguage.refTableType}</span>
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
-      <span className="p-3 text-[#374151] text-[13px] font-bold flex-[5] font-bold">{StringManager.currentLanguage.cliTableDescription}</span>
+      <span className="p-3 text-[#374151] text-[13px] font-bold flex-[5]">{StringManager.currentLanguage.cliTableDescription}</span>
     </div>
     <div className="w-full h-[1px] bg-[#E5E7EB]" />
   </div>

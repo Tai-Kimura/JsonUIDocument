@@ -5,8 +5,10 @@
   "height": "matchParent",
   "orientation": "horizontal",
   "child": [
-    { "data": [{ "class": "RefTableViewModel", "name": "viewModel" }] },
-    { "type": "ReferenceSidebar" },
+    {},
+    {
+      "type": "ReferenceSidebar"
+    },
     {
       "type": "ScrollView",
       "id": "ref_table_scroll",
@@ -17,7 +19,10 @@
           "type": "View",
           "id": "ref_table_content",
           "width": "matchParent",
-          "padding": [48, 24],
+          "padding": [
+            48,
+            24
+          ],
           "orientation": "vertical",
           "background": "#FFFFFF",
           "child": [
@@ -42,9 +47,16 @@
               "orientation": "horizontal",
               "bottomMargin": 32,
               "child": [
-                { "include": "components/platform_badge_swift" },
-                { "type": "View", "width": 8 },
-                { "include": "components/platform_badge_kotlin" }
+                {
+                  "include": "components/platform_badge_swift"
+                },
+                {
+                  "type": "View",
+                  "width": 8
+                },
+                {
+                  "include": "components/platform_badge_kotlin"
+                }
               ]
             },
             {
@@ -60,9 +72,26 @@
               "orientation": "vertical",
               "bottomMargin": 32,
               "child": [
-                { "type": "Label", "text": "comp_table_uikit", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 8 },
-                { "type": "Label", "text": "comp_table_swiftui", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 8 },
-                { "type": "Label", "text": "comp_table_compose", "fontSize": 14, "fontColor": "#4B5563" }
+                {
+                  "type": "Label",
+                  "text": "comp_table_uikit",
+                  "fontSize": 14,
+                  "fontColor": "#4B5563",
+                  "bottomMargin": 8
+                },
+                {
+                  "type": "Label",
+                  "text": "comp_table_swiftui",
+                  "fontSize": 14,
+                  "fontColor": "#4B5563",
+                  "bottomMargin": 8
+                },
+                {
+                  "type": "Label",
+                  "text": "comp_table_compose",
+                  "fontSize": 14,
+                  "fontColor": "#4B5563"
+                }
               ]
             },
             {
@@ -80,10 +109,14 @@
               "borderColor": "#E5E7EB",
               "cornerRadius": 8,
               "clipToBounds": true,
-              "columnCount": 1,
-              "headerClasses": ["components/ref_attribute_table_header"],
-              "cellClasses": ["components/ref_attribute_row"],
-              "items": "@{viewModel.tableAttributes}"
+              "columns": 1,
+              "headerClasses": [
+                "components/ref_attribute_table_header"
+              ],
+              "cellClasses": [
+                "components/ref_attribute_row"
+              ],
+              "items": "@{tableAttributes}"
             },
             {
               "type": "Label",

@@ -5,13 +5,13 @@ import React from 'react';
 import { StringManager } from '@/generated/StringManager';
 
 
-export const CliTableHeaderSubcommand = () => {
+export const CliTableHeaderSubcommand = ({ data }) => {
   return (
   <div id="cli_table_header_subcommand" className="w-full flex flex-col">
     <div className="w-full py-0 px-4 bg-[#F9FAFB] flex flex-row items-stretch">
-      <span className="p-3 text-[#374151] text-[13px] font-bold flex-[2] font-bold">{StringManager.currentLanguage.cliTableSubcommand}</span>
+      <span className="p-3 text-[#374151] text-[13px] font-bold flex-[2]">{StringManager.currentLanguage.cliTableSubcommand}</span>
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
-      <span className="p-3 text-[#374151] text-[13px] font-bold flex-[5] font-bold">{StringManager.currentLanguage.cliTableDescription}</span>
+      <span className="p-3 text-[#374151] text-[13px] font-bold flex-[5]">{StringManager.currentLanguage.cliTableDescription}</span>
     </div>
     <div className="w-full h-[1px] bg-[#E5E7EB]" />
   </div>

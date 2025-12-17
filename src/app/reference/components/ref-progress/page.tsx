@@ -18,8 +18,8 @@ export default function RefProgressPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefProgress viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefProgress data={viewModel.data} />
     </>
   );
 }

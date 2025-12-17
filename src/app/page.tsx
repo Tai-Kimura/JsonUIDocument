@@ -14,8 +14,8 @@ export default function HomePage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <Home viewModel={homeViewModel} />
+      <Header data={headerViewModel.data} />
+      <Home data={homeViewModel.data} />
     </>
   );
 }

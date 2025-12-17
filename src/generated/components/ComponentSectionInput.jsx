@@ -5,23 +5,24 @@ import React from 'react';
 import { StringManager } from '@/generated/StringManager';
 
 
-export const ComponentSectionInput = ({ viewModel }) => {
+export const ComponentSectionInput = ({ data }) => {
   return (
   <div className="w-full flex flex-col">
-    <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.componentsInputTitle}</span>
+    <div className="" />
+    <span className="text-[#087EA4] text-2xl font-bold">{StringManager.currentLanguage.componentsInputTitle}</span>
     <div className="h-[16px]" />
     <div className="w-full flex flex-row items-stretch">
-      <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickButtonDetail}>
+      <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickButtonDetail}>
         <span className="text-[#23272F] text-lg font-semibold">Button</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsButtonDesc}</span>
       </div>
-      <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickSwitchDetail}>
+      <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickSwitchDetail}>
         <span className="text-[#23272F] text-lg font-semibold">Switch</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsSwitchDesc}</span>
       </div>
-      <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickSliderDetail}>
+      <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickSliderDetail}>
         <span className="text-[#23272F] text-lg font-semibold">Slider</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsSliderDesc}</span>
@@ -29,12 +30,12 @@ export const ComponentSectionInput = ({ viewModel }) => {
     </div>
     <div className="h-[16px]" />
     <div className="w-full flex flex-row items-stretch">
-      <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickSelectBoxDetail}>
+      <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickSelectBoxDetail}>
         <span className="text-[#23272F] text-lg font-semibold">SelectBox</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsSelectboxDesc}</span>
       </div>
-      <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickRadioDetail}>
+      <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickRadioDetail}>
         <span className="text-[#23272F] text-lg font-semibold">Radio</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsRadioDesc}</span>

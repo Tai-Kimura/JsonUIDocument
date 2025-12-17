@@ -43,6 +43,21 @@ export class HeaderViewModel {
     }
   }
 
+  get data() {
+    return {
+      onClickHome: this.onClickHome,
+      onClickLearn: this.onClickLearn,
+      onClickReference: this.onClickReference,
+      onClickPlatforms: this.onClickPlatforms,
+      onClickCLI: this.onClickCLI,
+      onClickCommunity: this.onClickCommunity,
+      onClickGitHub: this.onClickGitHub,
+      currentLanguage: this.currentLanguage,
+      languageItems: this.languageItems,
+      onLanguageChange: this.onLanguageChange,
+    };
+  }
+
   onClickHome = () => {
     this.router.push("/");
   };
@@ -64,8 +79,7 @@ export class HeaderViewModel {
   };
 
   onClickCommunity = () => {
-    // TODO: Add community page
-    console.log("Community page coming soon");
+    this.router.push("/community");
   };
 
   onClickGitHub = () => {

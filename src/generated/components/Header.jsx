@@ -5,23 +5,24 @@ import React from 'react';
 import { StringManager } from '@/generated/StringManager';
 
 
-export const Header = ({ viewModel }) => {
+export const Header = ({ data }) => {
   return (
-  <div id="header" className="w-full h-[64px] py-0 px-6 bg-[#FFFFFF] flex flex-row items-stretch border border-[#E5E7EB] items-center justify-center">
-    <div className="flex flex-row items-stretch items-center justify-center">
-      <span id="logo" className="text-[#087EA4] text-2xl font-bold font-bold cursor-pointer" onClick={viewModel.onClickHome}>JsonUI</span>
+  <div id="header" className="w-full h-[64px] py-0 px-6 bg-[#FFFFFF] flex flex-row items-stretch border border-[#E5E7EB] items-center">
+    <div className="" />
+    <div className="flex flex-row items-stretch items-center">
+      <span id="logo" className="text-[#087EA4] text-2xl font-bold cursor-pointer" onClick={data.onClickHome}>JsonUI</span>
     </div>
     <div className="flex-1" />
-    <div className="flex flex-row items-stretch items-center justify-center">
-      <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={viewModel.onClickLearn}>{StringManager.currentLanguage.navLearn}</span>
-      <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={viewModel.onClickReference}>{StringManager.currentLanguage.navReference}</span>
-      <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={viewModel.onClickPlatforms}>{StringManager.currentLanguage.navPlatforms}</span>
-      <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={viewModel.onClickCLI}>{StringManager.currentLanguage.navCli}</span>
-      <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={viewModel.onClickCommunity}>{StringManager.currentLanguage.navCommunity}</span>
-      <span className="mt-0 mr-6 mb-0 ml-0 text-[#23272F] text-base font-medium cursor-pointer" onClick={viewModel.onClickGitHub}>GitHub</span>
-      <select id="language_selector" className="h-[32px] mt-0 mr-4 mb-0 ml-0 border-0 border rounded-md px-3 py-2 bg-white cursor-pointer outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value={viewModel.currentLanguage} onChange={(e) => viewModel.onLanguageChange(e.target.value)}>
-        {viewModel.languageItems.map((item) => (
-          <option key={item.value} value={item.value}>{item.text}</option>
+    <div className="flex flex-row items-stretch items-center">
+      <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={data.onClickLearn}>{StringManager.currentLanguage.navLearn}</span>
+      <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={data.onClickReference}>{StringManager.currentLanguage.navReference}</span>
+      <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={data.onClickPlatforms}>{StringManager.currentLanguage.navPlatforms}</span>
+      <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={data.onClickCLI}>{StringManager.currentLanguage.navCli}</span>
+      <span className="mt-0 mr-4 mb-0 ml-0 text-[#5E687E] text-base font-medium cursor-pointer" onClick={data.onClickCommunity}>{StringManager.currentLanguage.navCommunity}</span>
+      <span className="mt-0 mr-6 mb-0 ml-0 text-[#23272F] text-base font-medium cursor-pointer" onClick={data.onClickGitHub}>GitHub</span>
+      <select id="language_selector" className="h-[32px] mt-0 mr-4 mb-0 ml-0 border-0 border rounded-md px-3 py-2 bg-white cursor-pointer outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value={data.currentLanguage} onChange={(e) => data.onLanguageChange(e.target.value)}>
+        {data.languageItems?.map((item) => (
+          <option key={item.value || item.id} value={item.value || item.id}>{item.text || item.label}</option>
         ))}
       </select>
     </div>

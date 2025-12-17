@@ -2,10 +2,10 @@
 import React from 'react';
 
 
-export const PlatformBadgeSwift = () => {
+export const PlatformBadgeSwift = ({ data }) => {
   return (
   <div className="flex flex-col py-1.5 px-3 bg-[#FA7343] rounded">
-    <span className="text-[#FFFFFF] text-xs font-bold font-bold">Swift</span>
+    <span className="text-[#FFFFFF] text-xs font-bold">Swift</span>
   </div>
   );
 };

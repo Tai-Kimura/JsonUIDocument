@@ -12,7 +12,7 @@ export default function ReferencePage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
+      <Header data={headerViewModel.data} />
       <Reference />
     </>
   );

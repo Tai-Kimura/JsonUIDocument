@@ -18,8 +18,8 @@ export default function RefLabelPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefLabel viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefLabel data={viewModel.data} />
     </>
   );
 }

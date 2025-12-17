@@ -1,8 +1,12 @@
-import type { Metadata } from "next";
+"use client";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Footer from "@/generated/components/Footer";
 import LanguageProvider from "@/components/extensions/LanguageProvider";
+import { useRouter } from "next/navigation";
+import { useMemo } from "react";
+import { FooterViewModel } from "@/viewmodels/FooterViewModel";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,24 +18,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "JsonUI Documentation",
-  description: "JSON-driven UI framework for iOS, Android, and Web",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const router = useRouter();
+  const footerViewModel = useMemo(() => new FooterViewModel(router), [router]);
+
   return (
     <html lang="en">
+      <head>
+        <title>JsonUI Documentation</title>
+        <meta name="description" content="JSON-driven UI framework for iOS, Android, and Web" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <LanguageProvider>
           {children}
-          <Footer />
+          <Footer data={footerViewModel.data} />
         </LanguageProvider>
       </body>
     </html>

@@ -18,8 +18,8 @@ export default function RefCircleImagePage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefCircleImage viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefCircleImage data={viewModel.data} />
     </>
   );
 }

@@ -31,16 +31,33 @@ module RjuiTools
           classes << TailwindMapper.map_width(json['width'])
           classes << TailwindMapper.map_height(json['height'])
 
+          # Min/Max Width/Height constraints
+          classes << TailwindMapper.map_min_width(json['minWidth']) if json['minWidth']
+          classes << TailwindMapper.map_max_width(json['maxWidth']) if json['maxWidth']
+          classes << TailwindMapper.map_min_height(json['minHeight']) if json['minHeight']
+          classes << TailwindMapper.map_max_height(json['maxHeight']) if json['maxHeight']
+
           # Padding (array format)
           classes << TailwindMapper.map_padding(json['padding'] || json['paddings'])
 
           # Individual paddings (topPadding, bottomPadding, leftPadding, rightPadding)
+          # Also support paddingTop, paddingRight, paddingBottom, paddingLeft format
           classes << TailwindMapper.map_individual_paddings(
-            json['topPadding'],
-            json['rightPadding'],
-            json['bottomPadding'],
-            json['leftPadding']
+            json['topPadding'] || json['paddingTop'],
+            json['rightPadding'] || json['paddingRight'],
+            json['bottomPadding'] || json['paddingBottom'],
+            json['leftPadding'] || json['paddingLeft']
           )
+
+          # RTL-aware paddings (paddingStart, paddingEnd)
+          classes << TailwindMapper.map_rtl_paddings(
+            json['paddingStart'],
+            json['paddingEnd']
+          )
+
+          # Insets (alternative padding format)
+          classes << TailwindMapper.map_insets(json['insets']) if json['insets']
+          classes << TailwindMapper.map_inset_horizontal(json['insetHorizontal']) if json['insetHorizontal']
 
           # Margin (array format)
           classes << TailwindMapper.map_margin(json['margins'])
@@ -53,10 +70,19 @@ module RjuiTools
             json['leftMargin']
           )
 
-          # Background - check for dynamic binding
+          # RTL-aware margins (startMargin, endMargin)
+          classes << TailwindMapper.map_rtl_margins(
+            json['startMargin'],
+            json['endMargin']
+          )
+
+          # Background - check for dynamic binding or gradient
           if json['background']
             if has_binding?(json['background'])
               @dynamic_styles['backgroundColor'] = convert_binding(json['background'])
+            elsif json['background'].to_s.include?('gradient')
+              # CSS gradients must be inline styles
+              @dynamic_styles['background'] = "'#{json['background']}'"
             else
               classes << TailwindMapper.map_color(json['background'], 'bg')
             end
@@ -77,7 +103,13 @@ module RjuiTools
           # Font size
           classes << TailwindMapper.map_font_size(json['fontSize']) if json['fontSize']
 
-          # Font weight
+          # Font - can be weight name (bold, semibold) or font family (monospace)
+          if json['font']
+            font_class = TailwindMapper.map_font(json['font'])
+            classes << font_class if font_class && !font_class.empty?
+          end
+
+          # Font weight (fontWeight attribute takes precedence if both specified)
           classes << TailwindMapper.map_font_weight(json['fontWeight']) if json['fontWeight']
 
           # Text align
@@ -89,8 +121,18 @@ module RjuiTools
           # Shadow
           classes << TailwindMapper.map_shadow(json['shadow']) if json['shadow']
 
-          # Border
-          classes << TailwindMapper.map_border(json['borderWidth'], json['borderColor']) if json['borderWidth'] || json['borderColor']
+          # Border (static)
+          if json['borderWidth'] || json['borderColor'] || json['borderStyle']
+            # Check for dynamic binding on borderStyle
+            if json['borderStyle'] && has_binding?(json['borderStyle'])
+              # borderStyle with binding - handle dynamically
+              @dynamic_styles['borderStyle'] = convert_binding(json['borderStyle'])
+              # Still add static border width/color classes
+              classes << TailwindMapper.map_border(json['borderWidth'], json['borderColor'], nil)
+            else
+              classes << TailwindMapper.map_border(json['borderWidth'], json['borderColor'], json['borderStyle'])
+            end
+          end
 
           # Opacity/Alpha
           opacity = json['opacity'] || json['alpha']
@@ -105,6 +147,17 @@ module RjuiTools
             classes << 'hidden' unless json['visibility']
           end
 
+          # Disabled state
+          if json['enabled'] == false
+            classes << 'opacity-50'
+            classes << 'pointer-events-none'
+          end
+
+          # User interaction enabled
+          if json['userInteractionEnabled'] == false
+            classes << 'pointer-events-none'
+          end
+
           # Clip to bounds
           classes << TailwindMapper.map_overflow(json['clipToBounds']) if json['clipToBounds']
 
@@ -114,14 +167,26 @@ module RjuiTools
           # Flex grow (weight)
           classes << TailwindMapper.map_flex_grow(json['weight']) if json['weight']
 
-          # Gravity alignment
-          classes.concat(TailwindMapper.map_gravity(json['gravity'])) if json['gravity']
+          # Gravity alignment - pass orientation for correct flexbox mapping
+          classes.concat(TailwindMapper.map_gravity(json['gravity'], json['orientation'])) if json['gravity']
 
           # Direction (RTL/LTR)
           classes << TailwindMapper.map_direction(json['direction']) if json['direction']
 
           # Additional className from JSON
           classes << json['className'] if json['className']
+
+          # Offset (position adjustment) - handled as dynamic style
+          if json['offsetX'] || json['offsetY']
+            offset_x = json['offsetX'] || 0
+            offset_y = json['offsetY'] || 0
+            @dynamic_styles['transform'] = "'translate(#{offset_x}px, #{offset_y}px)'"
+          end
+
+          # Tint color (accent color for interactive elements)
+          if json['tintColor']
+            @dynamic_styles['accentColor'] = "'#{json['tintColor']}'"
+          end
 
           classes.compact.reject(&:empty?).join(' ')
         end
@@ -278,8 +343,12 @@ module RjuiTools
 
           # Check if it's a binding expression @{propName} or @{prop.name}
           if value.match?(/@\{[^}]+\}/)
-            # Convert @{propName} or @{prop.name} to {propName} or {prop.name}
-            converted = value.gsub(/@\{([^}]+)\}/, '{\1}')
+            # Convert @{propName} to {viewModel.data.propName}
+            # All properties are converted to viewModel.data.xxx format
+            converted = value.gsub(/@\{([^}]+)\}/) do |_match|
+              prop = $1
+              "{#{add_viewmodel_data_prefix(prop)}}"
+            end
             # Also escape any remaining literal braces (not part of binding expressions)
             return escape_jsx_braces_with_bindings(converted)
           end
@@ -349,84 +418,135 @@ module RjuiTools
           json['id'] || json['propertyName']
         end
 
-        # Build onClick attribute - converts @{handler} to {handler}
-        def build_onclick_attr
-          handler = json['onClick']
-          return '' unless handler
+        # Build data-testid attribute for testing
+        def build_testid_attr
+          test_id = json['testId']
+          return '' unless test_id
+          " data-testid=\"#{test_id}\""
+        end
 
-          if handler.start_with?('@{')
-            # Binding: @{handleClick} -> {handleClick}
-            " onClick={#{handler.gsub(/@\{|\}/, '')}}"
+        # Build tag attribute (as data-tag for reference)
+        def build_tag_attr
+          tag = json['tag']
+          return '' unless tag
+          " data-tag=\"#{tag}\""
+        end
+
+        # Build onClick attribute
+        # Rules:
+        # - onClick (camelCase) -> binding format only (@{functionName})
+        # - onclick (lowercase) -> selector format only (string)
+        # - { "action": "link", "url": "..." } -> opens URL in new tab
+        def build_onclick_attr
+          # Check onClick (camelCase) first - binding format only
+          if json['onClick']
+            handler = json['onClick']
+            if handler.is_a?(Hash)
+              # Action object: { "action": "link", "url": "..." }
+              if handler['action'] == 'link' && handler['url']
+                url = handler['url']
+                return " onClick={() => window.open('#{url}', '_blank')}"
+              else
+                return ''
+              end
+            elsif is_binding_format?(handler)
+              # Valid binding: @{handleClick} -> viewModel.data.handleClick
+              prop = handler.gsub(/@\{|\}/, '')
+              return " onClick={#{add_viewmodel_data_prefix(prop)}}"
+            else
+              # ERROR: onClick (camelCase) must use binding format
+              return " {/* ERROR: onClick requires binding format @{functionName} */}"
+            end
+          end
+
+          # Check onclick (lowercase) - selector format only
+          if json['onclick']
+            handler = json['onclick']
+            if is_binding_format?(handler)
+              # ERROR: onclick (lowercase) must use selector format
+              return " {/* ERROR: onclick requires selector format (string) */}"
+            else
+              # Valid selector: functionName -> data.functionName
+              return " onClick={data.#{handler}}"
+            end
+          end
+
+          ''
+        end
+
+        # Check if value is binding format (@{...})
+        def is_binding_format?(value)
+          value.is_a?(String) && value.start_with?('@{') && value.end_with?('}')
+        end
+
+        # Extract property from binding format
+        def extract_binding_value(value)
+          return nil unless is_binding_format?(value)
+          value[2...-1]
+        end
+
+        # Extract binding property and add viewModel.data. prefix
+        # This is the main method converters should use for binding values
+        def extract_binding_property(value)
+          prop = extract_binding_value(value)
+          add_viewmodel_data_prefix(prop)
+        end
+
+        # Extract raw binding value without prefix (for internal use or special cases)
+        def extract_raw_binding_property(value)
+          extract_binding_value(value)
+        end
+
+        # Add data. prefix to a property name for binding expressions
+        # All properties are converted to data.xxx format
+        def add_viewmodel_data_prefix(prop)
+          if prop.start_with?('data.')
+            # Already has data. prefix, use as-is
+            prop
+          elsif prop.start_with?('viewModel.data.')
+            # viewModel.data.xxx -> data.xxx
+            prop.sub('viewModel.data.', 'data.')
+          elsif prop.start_with?('viewModel.')
+            # viewModel.xxx -> data.xxx
+            "data.#{prop.sub('viewModel.', '')}"
           else
-            # Direct handler name
-            " onClick={#{handler}}"
+            # Add data. prefix for data properties
+            "data.#{prop}"
           end
         end
 
-        # Build visibility binding for conditional rendering (gone) or opacity (invisible)
-        # Returns: { type: :gone, condition: "..." } or { type: :invisible, condition: "...", invert: bool } or nil
+        # Build visibility binding for conditional rendering
+        # Only supports simple property binding like "@{isVisible}" - no ternary operators
+        # Returns: { type: :gone, condition: "..." } or nil
         def build_visibility_info
           visibility = json['visibility']
           return nil unless visibility && has_binding?(visibility)
 
           binding_expr = visibility.gsub(/@\{|\}/, '')
 
-          # Check for ternary patterns: condition ? 'value1' : 'value2'
-          # Supports both 'visible' and '.visible' formats
-          # Pattern: condition ? 'visible' : 'gone' or condition ? '.visible' : '.gone'
-          if binding_expr =~ /^(.+?)\s*\?\s*'\.?visible'\s*:\s*'\.?gone'\s*$/
-            { type: :gone, condition: $1.strip }
-          # Pattern: condition ? 'gone' : 'visible'
-          elsif binding_expr =~ /^(.+?)\s*\?\s*'\.?gone'\s*:\s*'\.?visible'\s*$/
-            { type: :gone, condition: "!#{$1.strip}" }
-          # Pattern: condition ? 'visible' : 'invisible'
-          elsif binding_expr =~ /^(.+?)\s*\?\s*'\.?visible'\s*:\s*'\.?invisible'\s*$/
-            { type: :invisible, condition: $1.strip, invert: true }
-          # Pattern: condition ? 'invisible' : 'visible'
-          elsif binding_expr =~ /^(.+?)\s*\?\s*'\.?invisible'\s*:\s*'\.?visible'\s*$/
-            { type: :invisible, condition: $1.strip, invert: false }
-          # Simple boolean variable like "viewModel.isVisible"
-          elsif binding_expr =~ /^[\w.]+$/
-            { type: :gone, condition: binding_expr }
+          # Only support simple property binding (no ternary operators / business logic)
+          if binding_expr =~ /^[\w.]+$/
+            { type: :gone, condition: add_viewmodel_data_prefix(binding_expr) }
           else
             nil
           end
         end
 
-        # Wrap JSX with visibility condition (for 'gone' type - conditional render)
+        # Wrap JSX with visibility condition (conditional render)
         def wrap_with_visibility(jsx, indent)
           vis_info = build_visibility_info
           return jsx unless vis_info
 
-          case vis_info[:type]
-          when :gone
-            <<~JSX.chomp
-              #{indent_str(indent)}{#{vis_info[:condition]} && (
-              #{jsx}
-              #{indent_str(indent)})}
-            JSX
-          when :invisible
-            # For invisible, we add opacity style instead of conditional rendering
-            # The opacity is handled in build_visibility_style
-            jsx
-          else
-            jsx
-          end
+          <<~JSX.chomp
+            #{indent_str(indent)}{#{vis_info[:condition]} && (
+            #{jsx}
+            #{indent_str(indent)})}
+          JSX
         end
 
-        # Build style for invisible visibility (opacity: 0)
+        # Build style for visibility (no longer supports invisible type)
         def build_visibility_style
-          vis_info = build_visibility_info
-          return nil unless vis_info && vis_info[:type] == :invisible
-
-          condition = vis_info[:condition]
-          if vis_info[:invert]
-            # condition ? 'visible' : 'invisible' -> opacity: condition ? 1 : 0
-            "opacity: #{condition} ? 1 : 0"
-          else
-            # condition ? 'invisible' : 'visible' -> opacity: condition ? 0 : 1
-            "opacity: #{condition} ? 0 : 1"
-          end
+          nil
         end
 
         # Get default value from config

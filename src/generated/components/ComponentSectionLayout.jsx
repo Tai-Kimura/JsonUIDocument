@@ -5,23 +5,24 @@ import React from 'react';
 import { StringManager } from '@/generated/StringManager';
 
 
-export const ComponentSectionLayout = ({ viewModel }) => {
+export const ComponentSectionLayout = ({ data }) => {
   return (
   <div className="w-full flex flex-col">
-    <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.componentsLayoutTitle}</span>
+    <div className="" />
+    <span className="text-[#087EA4] text-2xl font-bold">{StringManager.currentLanguage.componentsLayoutTitle}</span>
     <div className="h-[16px]" />
     <div className="w-full flex flex-row items-stretch">
-      <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickViewDetail}>
+      <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickViewDetail}>
         <span className="text-[#23272F] text-lg font-semibold">View</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsViewDesc}</span>
       </div>
-      <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickScrollViewDetail}>
+      <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickScrollViewDetail}>
         <span className="text-[#23272F] text-lg font-semibold">ScrollView</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsScrollDesc}</span>
       </div>
-      <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={viewModel.onClickCollectionDetail}>
+      <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1 cursor-pointer" onClick={data.onClickCollectionDetail}>
         <span className="text-[#23272F] text-lg font-semibold">Collection</span>
         <div className="h-[8px]" />
         <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.componentsCollectionDesc}</span>

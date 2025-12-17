@@ -4,12 +4,15 @@
   "width": "matchParent",
   "orientation": "vertical",
   "child": [
-    { "data": [{ "class": "ComponentsViewModel", "name": "viewModel" }] },
+    {},
     {
       "type": "View",
       "id": "components_hero",
       "width": "matchParent",
-      "padding": [48, 24],
+      "padding": [
+        48,
+        24
+      ],
       "orientation": "vertical",
       "gravity": "center",
       "background": "#F6F7F9",
@@ -22,7 +25,9 @@
           "fontColor": "#23272F",
           "textAlign": "Center"
         },
-        { "style": "spacer_16" },
+        {
+          "style": "spacer_16"
+        },
         {
           "type": "Label",
           "text": "components_subtitle",
@@ -36,16 +41,40 @@
       "type": "View",
       "id": "components_content",
       "width": "matchParent",
-      "padding": [48, 24],
+      "padding": [
+        48,
+        24
+      ],
       "orientation": "vertical",
       "background": "#FFFFFF",
       "child": [
-        { "include": "components/component_section_layout", "data": { "viewModel": "@{viewModel}" } },
-        { "style": "spacer_48" },
-        { "include": "components/component_section_text", "data": { "viewModel": "@{viewModel}" } },
-        { "style": "spacer_48" },
-        { "include": "components/component_section_input", "data": { "viewModel": "@{viewModel}" } },
-        { "style": "spacer_48" },
+        {
+          "include": "components/component_section_layout",
+          "data": {
+            "viewModel": "@{viewModel}"
+          }
+        },
+        {
+          "style": "spacer_48"
+        },
+        {
+          "include": "components/component_section_text",
+          "data": {
+            "viewModel": "@{viewModel}"
+          }
+        },
+        {
+          "style": "spacer_48"
+        },
+        {
+          "include": "components/component_section_input",
+          "data": {
+            "viewModel": "@{viewModel}"
+          }
+        },
+        {
+          "style": "spacer_48"
+        },
         {
           "type": "View",
           "orientation": "horizontal",
@@ -55,14 +84,17 @@
               "type": "Button",
               "style": "button_outline",
               "text": "components_prev",
-              "onClick": "@{viewModel.onClickQuickStart}"
+              "onClick": "@{onClickQuickStart}"
             },
-            { "type": "View", "width": 16 },
+            {
+              "type": "View",
+              "width": 16
+            },
             {
               "type": "Button",
               "style": "button_primary",
               "text": "components_next",
-              "onClick": "@{viewModel.onClickStyling}"
+              "onClick": "@{onClickStyling}"
             }
           ]
         }

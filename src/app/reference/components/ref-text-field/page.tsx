@@ -18,8 +18,8 @@ export default function RefTextFieldPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefTextField viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefTextField data={viewModel.data} />
     </>
   );
 }

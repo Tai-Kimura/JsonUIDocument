@@ -18,8 +18,8 @@ export default function RefSegmentPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefSegment viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefSegment data={viewModel.data} />
     </>
   );
 }

@@ -6,11 +6,14 @@
   "background": "#FFFFFF",
   "orientation": "horizontal",
   "gravity": "centerVertical",
-  "padding": [0, 24],
+  "padding": [
+    0,
+    24
+  ],
   "borderWidth": 1,
   "borderColor": "#E5E7EB",
   "child": [
-    { "data": [{ "class": "HeaderViewModel", "name": "viewModel" }] },
+    {},
     {
       "type": "View",
       "orientation": "horizontal",
@@ -23,7 +26,7 @@
           "fontSize": 24,
           "fontWeight": "bold",
           "fontColor": "#087EA4",
-          "onClick": "@{viewModel.onClickHome}"
+          "onClick": "@{onClickHome}"
         }
       ]
     },
@@ -40,36 +43,61 @@
           "type": "Label",
           "style": "nav_link",
           "text": "nav_learn",
-          "margins": [0, 16, 0, 0],
-          "onClick": "@{viewModel.onClickLearn}"
+          "margins": [
+            0,
+            16,
+            0,
+            0
+          ],
+          "onClick": "@{onClickLearn}"
         },
         {
           "type": "Label",
           "style": "nav_link",
           "text": "nav_reference",
-          "margins": [0, 16, 0, 0],
-          "onClick": "@{viewModel.onClickReference}"
+          "margins": [
+            0,
+            16,
+            0,
+            0
+          ],
+          "onClick": "@{onClickReference}"
         },
         {
           "type": "Label",
           "style": "nav_link",
           "text": "nav_platforms",
-          "margins": [0, 16, 0, 0],
-          "onClick": "@{viewModel.onClickPlatforms}"
+          "margins": [
+            0,
+            16,
+            0,
+            0
+          ],
+          "onClick": "@{onClickPlatforms}"
         },
         {
           "type": "Label",
           "style": "nav_link",
           "text": "nav_cli",
-          "margins": [0, 16, 0, 0],
-          "onClick": "@{viewModel.onClickCLI}"
+          "margins": [
+            0,
+            16,
+            0,
+            0
+          ],
+          "onClick": "@{onClickCLI}"
         },
         {
           "type": "Label",
           "style": "nav_link",
           "text": "nav_community",
-          "margins": [0, 16, 0, 0],
-          "onClick": "@{viewModel.onClickCommunity}"
+          "margins": [
+            0,
+            16,
+            0,
+            0
+          ],
+          "onClick": "@{onClickCommunity}"
         },
         {
           "type": "Label",
@@ -77,18 +105,28 @@
           "fontColor": "#23272F",
           "fontSize": 16,
           "fontWeight": "medium",
-          "margins": [0, 24, 0, 0],
-          "onClick": "@{viewModel.onClickGitHub}"
+          "margins": [
+            0,
+            24,
+            0,
+            0
+          ],
+          "onClick": "@{onClickGitHub}"
         },
         {
           "type": "SelectBox",
           "id": "language_selector",
           "height": 32,
-          "margins": [0, 16, 0, 0],
+          "margins": [
+            0,
+            16,
+            0,
+            0
+          ],
           "borderWidth": 0,
-          "items": "@{viewModel.languageItems}",
-          "selectedValue": "@{viewModel.currentLanguage}",
-          "onValueChanged": "@{viewModel.onLanguageChange}"
+          "items": "@{languageItems}",
+          "selectedValue": "@{currentLanguage}",
+          "onValueChanged": "@{onLanguageChange}"
         }
       ]
     }

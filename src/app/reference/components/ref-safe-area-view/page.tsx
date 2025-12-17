@@ -18,8 +18,8 @@ export default function RefSafeAreaViewPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefSafeAreaView viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefSafeAreaView data={viewModel.data} />
     </>
   );
 }

@@ -4,12 +4,15 @@
   "width": "matchParent",
   "orientation": "vertical",
   "child": [
-    { "data": [{ "class": "InstallationViewModel", "name": "viewModel" }] },
+    {},
     {
       "type": "View",
       "id": "installation_hero",
       "width": "matchParent",
-      "padding": [48, 24],
+      "padding": [
+        48,
+        24
+      ],
       "orientation": "vertical",
       "gravity": "center",
       "background": "#F6F7F9",
@@ -22,7 +25,9 @@
           "fontColor": "#23272F",
           "textAlign": "Center"
         },
-        { "style": "spacer_16" },
+        {
+          "style": "spacer_16"
+        },
         {
           "type": "Label",
           "text": "installation_subtitle",
@@ -36,23 +41,32 @@
       "type": "View",
       "id": "installation_content",
       "width": "matchParent",
-      "padding": [48, 24],
+      "padding": [
+        48,
+        24
+      ],
       "orientation": "vertical",
       "background": "#FFFFFF",
       "child": [
         {
           "type": "Segment",
           "id": "platform_tabs",
-          "items": ["Swift", "Kotlin", "React"],
-          "selectedIndex": "@{viewModel.currentTab}",
-          "onValueChanged": "@{viewModel.onTabChange}"
+          "items": [
+            "Swift",
+            "Kotlin",
+            "React"
+          ],
+          "selectedIndex": "@{currentTab}",
+          "onValueChanged": "@{onTabChange}"
         },
-        { "style": "spacer_24" },
+        {
+          "style": "spacer_24"
+        },
         {
           "type": "View",
           "id": "swift_content",
           "orientation": "vertical",
-          "visibility": "@{viewModel.currentTab === 0 ? 'visible' : 'gone'}",
+          "visibility": "@{showSwiftContent}",
           "child": [
             {
               "type": "Label",
@@ -61,7 +75,9 @@
               "fontWeight": "bold",
               "fontColor": "#FA7343"
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "Label",
               "text": "installation_swift_spm",
@@ -69,14 +85,18 @@
               "fontWeight": "semibold",
               "fontColor": "#23272F"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "CodeBlock",
               "file": "swift_spm.swift",
               "language": "swift",
               "showPreview": false
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "Label",
               "text": "installation_swift_cli",
@@ -84,7 +104,9 @@
               "fontWeight": "semibold",
               "fontColor": "#23272F"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "CodeBlock",
               "file": "swift_cli.sh",
@@ -97,7 +119,7 @@
           "type": "View",
           "id": "kotlin_content",
           "orientation": "vertical",
-          "visibility": "@{viewModel.currentTab === 1 ? 'visible' : 'gone'}",
+          "visibility": "@{showKotlinContent}",
           "child": [
             {
               "type": "Label",
@@ -106,7 +128,9 @@
               "fontWeight": "bold",
               "fontColor": "#7F52FF"
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "Label",
               "text": "installation_kotlin_gradle",
@@ -114,14 +138,18 @@
               "fontWeight": "semibold",
               "fontColor": "#23272F"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "CodeBlock",
               "file": "kotlin_gradle.kotlin",
               "language": "kotlin",
               "showPreview": false
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "Label",
               "text": "installation_kotlin_cli",
@@ -129,7 +157,9 @@
               "fontWeight": "semibold",
               "fontColor": "#23272F"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "CodeBlock",
               "file": "kotlin_cli.sh",
@@ -142,7 +172,7 @@
           "type": "View",
           "id": "react_content",
           "orientation": "vertical",
-          "visibility": "@{viewModel.currentTab === 2 ? 'visible' : 'gone'}",
+          "visibility": "@{showReactContent}",
           "child": [
             {
               "type": "Label",
@@ -151,7 +181,9 @@
               "fontWeight": "bold",
               "fontColor": "#61DAFB"
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "Label",
               "text": "installation_react_npm",
@@ -159,7 +191,9 @@
               "fontWeight": "semibold",
               "fontColor": "#23272F"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "CodeBlock",
               "file": "react_cli.sh",
@@ -168,7 +202,9 @@
             }
           ]
         },
-        { "style": "spacer_48" },
+        {
+          "style": "spacer_48"
+        },
         {
           "type": "View",
           "orientation": "horizontal",
@@ -178,7 +214,7 @@
               "type": "Button",
               "style": "button_primary",
               "text": "installation_next_quick_start",
-              "onClick": "@{viewModel.onClickQuickStart}"
+              "onClick": "@{onClickQuickStart}"
             }
           ]
         }

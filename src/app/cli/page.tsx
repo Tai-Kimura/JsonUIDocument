@@ -18,8 +18,8 @@ export default function CLIPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <Cli viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <Cli data={viewModel.data} />
     </>
   );
 }

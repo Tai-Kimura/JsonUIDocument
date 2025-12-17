@@ -14,8 +14,8 @@ export default function PlatformsPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <Platforms viewModel={platformsViewModel} />
+      <Header data={headerViewModel.data} />
+      <Platforms data={platformsViewModel.data} />
     </>
   );
 }

@@ -6,28 +6,29 @@ import { StringManager } from '@/generated/StringManager';
 import { CodeBlock } from '@/components/extensions/CodeBlock';
 
 
-export const Styling = ({ viewModel }) => {
+export const Styling = ({ data }) => {
   return (
   <div id="styling_page" className="w-full flex flex-col">
+    <div className="" />
     <div id="styling_hero" className="w-full py-12 px-6 bg-[#F6F7F9] flex flex-col items-center justify-center">
-      <span className="text-[#23272F] text-5xl font-bold text-center font-bold">{StringManager.currentLanguage.stylingTitle}</span>
+      <span className="text-[#23272F] text-5xl font-bold text-center">{StringManager.currentLanguage.stylingTitle}</span>
       <div className="h-[16px]" />
       <span className="text-[#5E687E] text-xl text-center">{StringManager.currentLanguage.stylingSubtitle}</span>
     </div>
     <div id="styling_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-      <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.stylingInlineTitle}</span>
+      <span className="text-[#087EA4] text-2xl font-bold">{StringManager.currentLanguage.stylingInlineTitle}</span>
       <div className="h-[8px]" />
       <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.stylingInlineDesc}</span>
       <div className="h-[16px]" />
       <CodeBlock className="flex flex-col" file="view_reference.json" language="json" />
       <div className="h-[48px]" />
-      <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.stylingTemplateTitle}</span>
+      <span className="text-[#087EA4] text-2xl font-bold">{StringManager.currentLanguage.stylingTemplateTitle}</span>
       <div className="h-[8px]" />
       <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.stylingTemplateDesc}</span>
       <div className="h-[16px]" />
       <CodeBlock className="flex flex-col" file="style_example.json" language="json" />
       <div className="h-[48px]" />
-      <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.stylingAttributesTitle}</span>
+      <span className="text-[#087EA4] text-2xl font-bold">{StringManager.currentLanguage.stylingAttributesTitle}</span>
       <div className="h-[16px]" />
       <div className="w-full flex flex-row items-stretch">
         <div className="mt-0 mr-4 mb-0 ml-0 flex flex-col flex-1">
@@ -48,9 +49,9 @@ export const Styling = ({ viewModel }) => {
       </div>
       <div className="h-[48px]" />
       <div className="flex flex-row items-stretch items-center justify-center">
-        <button className="cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickComponents}>{StringManager.currentLanguage.stylingPrev}</button>
+        <button className="py-3 px-6 bg-transparent rounded-lg text-[#087EA4] text-base font-semibold border border-[#087EA4] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderRadius: '8px' }} onClick={data.onClickComponents}>{StringManager.currentLanguage.stylingPrev}</button>
         <div className="w-[16px]" />
-        <button className="py-3 px-6 bg-[#087EA4] rounded-lg text-[#FFFFFF] text-base font-semibold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickDataBinding}>{StringManager.currentLanguage.stylingNext}</button>
+        <button className="py-3 px-6 bg-[#087EA4] rounded-lg text-[#FFFFFF] text-base font-semibold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderRadius: '8px' }} onClick={data.onClickDataBinding}>{StringManager.currentLanguage.stylingNext}</button>
       </div>
     </div>
   </div>

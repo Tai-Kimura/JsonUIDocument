@@ -18,8 +18,8 @@ export default function RefSelectBoxPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefSelectBox viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefSelectBox data={viewModel.data} />
     </>
   );
 }

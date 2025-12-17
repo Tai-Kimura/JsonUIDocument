@@ -14,8 +14,8 @@ export default function DataBindingPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <DataBinding viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <DataBinding data={viewModel.data} />
     </>
   );
 }

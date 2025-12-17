@@ -4,12 +4,15 @@
   "width": "matchParent",
   "orientation": "vertical",
   "child": [
-    { "data": [{ "class": "QuickStartViewModel", "name": "viewModel" }] },
+    {},
     {
       "type": "View",
       "id": "quick_start_hero",
       "width": "matchParent",
-      "padding": [48, 24],
+      "padding": [
+        48,
+        24
+      ],
       "orientation": "vertical",
       "gravity": "center",
       "background": "#F6F7F9",
@@ -22,7 +25,9 @@
           "fontColor": "#23272F",
           "textAlign": "Center"
         },
-        { "style": "spacer_16" },
+        {
+          "style": "spacer_16"
+        },
         {
           "type": "Label",
           "text": "quick_start_subtitle",
@@ -36,23 +41,32 @@
       "type": "View",
       "id": "quick_start_content",
       "width": "matchParent",
-      "padding": [48, 24],
+      "padding": [
+        48,
+        24
+      ],
       "orientation": "vertical",
       "background": "#FFFFFF",
       "child": [
         {
           "type": "Segment",
           "id": "platform_tabs",
-          "items": ["Swift", "Kotlin", "React"],
-          "selectedIndex": "@{viewModel.currentTab}",
-          "onValueChanged": "@{viewModel.onTabChange}"
+          "items": [
+            "Swift",
+            "Kotlin",
+            "React"
+          ],
+          "selectedIndex": "@{currentTab}",
+          "onValueChanged": "@{onTabChange}"
         },
-        { "style": "spacer_24" },
+        {
+          "style": "spacer_24"
+        },
         {
           "type": "View",
           "id": "swift_content",
           "orientation": "vertical",
-          "visibility": "@{viewModel.currentTab === 0 ? 'visible' : 'gone' }",
+          "visibility": "@{showSwiftContent}",
           "child": [
             {
               "type": "Label",
@@ -61,21 +75,27 @@
               "fontWeight": "bold",
               "fontColor": "#FA7343"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "Label",
               "text": "qs_swift_step1_desc",
               "fontSize": 16,
               "fontColor": "#5E687E"
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "CodeBlock",
               "file": "qs_swift_step1.sh",
               "language": "bash",
               "showPreview": false
             },
-            { "style": "spacer_24" },
+            {
+              "style": "spacer_24"
+            },
             {
               "type": "Label",
               "text": "qs_swift_step2_title",
@@ -83,21 +103,27 @@
               "fontWeight": "bold",
               "fontColor": "#FA7343"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "Label",
               "text": "qs_swift_step2_desc",
               "fontSize": 16,
               "fontColor": "#5E687E"
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "CodeBlock",
               "file": "qs_swift_step2.json",
               "language": "json",
               "showPreview": false
             },
-            { "style": "spacer_24" },
+            {
+              "style": "spacer_24"
+            },
             {
               "type": "Label",
               "text": "qs_swift_step3_title",
@@ -105,14 +131,18 @@
               "fontWeight": "bold",
               "fontColor": "#FA7343"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "Label",
               "text": "qs_swift_step3_desc",
               "fontSize": 16,
               "fontColor": "#5E687E"
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "CodeBlock",
               "file": "qs_swift_step3.sh",
@@ -125,7 +155,7 @@
           "type": "View",
           "id": "kotlin_content",
           "orientation": "vertical",
-          "visibility": "@{viewModel.currentTab === 1 ? 'visible' : 'gone' }",
+          "visibility": "@{showKotlinContent}",
           "child": [
             {
               "type": "Label",
@@ -134,21 +164,27 @@
               "fontWeight": "bold",
               "fontColor": "#7F52FF"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "Label",
               "text": "qs_kotlin_step1_desc",
               "fontSize": 16,
               "fontColor": "#5E687E"
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "CodeBlock",
               "file": "qs_kotlin_step1.sh",
               "language": "bash",
               "showPreview": false
             },
-            { "style": "spacer_24" },
+            {
+              "style": "spacer_24"
+            },
             {
               "type": "Label",
               "text": "qs_kotlin_step2_title",
@@ -156,21 +192,27 @@
               "fontWeight": "bold",
               "fontColor": "#7F52FF"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "Label",
               "text": "qs_kotlin_step2_desc",
               "fontSize": 16,
               "fontColor": "#5E687E"
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "CodeBlock",
               "file": "qs_kotlin_step2.json",
               "language": "json",
               "showPreview": false
             },
-            { "style": "spacer_24" },
+            {
+              "style": "spacer_24"
+            },
             {
               "type": "Label",
               "text": "qs_kotlin_step3_title",
@@ -178,14 +220,18 @@
               "fontWeight": "bold",
               "fontColor": "#7F52FF"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "Label",
               "text": "qs_kotlin_step3_desc",
               "fontSize": 16,
               "fontColor": "#5E687E"
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "CodeBlock",
               "file": "qs_kotlin_step3.sh",
@@ -198,7 +244,7 @@
           "type": "View",
           "id": "react_content",
           "orientation": "vertical",
-          "visibility": "@{viewModel.currentTab === 2 ? 'visible' : 'gone' }",
+          "visibility": "@{showReactContent}",
           "child": [
             {
               "type": "Label",
@@ -207,21 +253,27 @@
               "fontWeight": "bold",
               "fontColor": "#61DAFB"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "Label",
               "text": "qs_react_step1_desc",
               "fontSize": 16,
               "fontColor": "#5E687E"
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "CodeBlock",
               "file": "qs_react_step1.sh",
               "language": "bash",
               "showPreview": false
             },
-            { "style": "spacer_24" },
+            {
+              "style": "spacer_24"
+            },
             {
               "type": "Label",
               "text": "qs_react_step2_title",
@@ -229,21 +281,27 @@
               "fontWeight": "bold",
               "fontColor": "#61DAFB"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "Label",
               "text": "qs_react_step2_desc",
               "fontSize": 16,
               "fontColor": "#5E687E"
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "CodeBlock",
               "file": "qs_react_step2.json",
               "language": "json",
               "showPreview": false
             },
-            { "style": "spacer_24" },
+            {
+              "style": "spacer_24"
+            },
             {
               "type": "Label",
               "text": "qs_react_step3_title",
@@ -251,14 +309,18 @@
               "fontWeight": "bold",
               "fontColor": "#61DAFB"
             },
-            { "style": "spacer_8" },
+            {
+              "style": "spacer_8"
+            },
             {
               "type": "Label",
               "text": "qs_react_step3_desc",
               "fontSize": 16,
               "fontColor": "#5E687E"
             },
-            { "style": "spacer_16" },
+            {
+              "style": "spacer_16"
+            },
             {
               "type": "CodeBlock",
               "file": "qs_react_step3.sh",
@@ -267,7 +329,9 @@
             }
           ]
         },
-        { "style": "spacer_48" },
+        {
+          "style": "spacer_48"
+        },
         {
           "type": "View",
           "orientation": "horizontal",
@@ -277,14 +341,17 @@
               "type": "Button",
               "style": "button_outline",
               "text": "quick_start_prev",
-              "onClick": "@{viewModel.onClickInstallation}"
+              "onClick": "@{onClickInstallation}"
             },
-            { "type": "View", "width": 16 },
+            {
+              "type": "View",
+              "width": 16
+            },
             {
               "type": "Button",
               "style": "button_primary",
               "text": "quick_start_next",
-              "onClick": "@{viewModel.onClickComponents}"
+              "onClick": "@{onClickComponents}"
             }
           ]
         }

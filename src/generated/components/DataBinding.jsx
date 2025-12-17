@@ -6,51 +6,52 @@ import { StringManager } from '@/generated/StringManager';
 import { CodeBlock } from '@/components/extensions/CodeBlock';
 
 
-export const DataBinding = ({ viewModel }) => {
+export const DataBinding = ({ data }) => {
   return (
   <div id="data_binding_page" className="w-full flex flex-col">
+    <div className="" />
     <div id="data_binding_hero" className="w-full py-12 px-6 bg-[#F6F7F9] flex flex-col items-center justify-center">
-      <span className="text-[#23272F] text-5xl font-bold text-center font-bold">{StringManager.currentLanguage.dataBindingTitle}</span>
+      <span className="text-[#23272F] text-5xl font-bold text-center">{StringManager.currentLanguage.dataBindingTitle}</span>
       <div className="h-[16px]" />
       <span className="text-[#5E687E] text-xl text-center">{StringManager.currentLanguage.dataBindingSubtitle}</span>
     </div>
     <div id="data_binding_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-      <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.dataBindingBasicsTitle}</span>
+      <span className="text-[#087EA4] text-2xl font-bold">{StringManager.currentLanguage.dataBindingBasicsTitle}</span>
       <div className="h-[8px]" />
       <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.dataBindingBasicsDesc}</span>
       <div className="h-[16px]" />
       <CodeBlock className="flex flex-col" file="data_binding.json" language="json" />
       <div className="h-[48px]" />
-      <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.dataBindingSyntaxTitle}</span>
+      <span className="text-[#087EA4] text-2xl font-bold">{StringManager.currentLanguage.dataBindingSyntaxTitle}</span>
       <div className="h-[16px]" />
       <div className="w-full flex flex-row items-stretch">
         <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
-          <span className="text-[#087EA4] text-lg font-semibold">{property}</span>
+          <span className="text-[#087EA4] text-lg font-mono font-semibold">{StringManager.currentLanguage.dataBindingSyntaxProperty}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.dataBindingPropertyDesc}</span>
         </div>
         <div className="p-6 mt-0 mr-2 mb-0 ml-0 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
-          <span className="text-[#087EA4] text-lg font-semibold">{object.property}</span>
+          <span className="text-[#087EA4] text-lg font-mono font-semibold">{StringManager.currentLanguage.dataBindingSyntaxNested}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.dataBindingNestedDesc}</span>
         </div>
         <div className="p-6 bg-[#F6F7F9] rounded-xl flex flex-col border border-[#E5E7EB] flex-1">
-          <span className="text-[#087EA4] text-lg font-semibold">{item.property}</span>
+          <span className="text-[#087EA4] text-lg font-mono font-semibold">{StringManager.currentLanguage.dataBindingSyntaxItem}</span>
           <div className="h-[8px]" />
           <span className="text-[#5E687E] text-sm">{StringManager.currentLanguage.dataBindingItemDesc}</span>
         </div>
       </div>
       <div className="h-[48px]" />
-      <span className="text-[#087EA4] text-2xl font-bold font-bold">{StringManager.currentLanguage.dataBindingCollectionsTitle}</span>
+      <span className="text-[#087EA4] text-2xl font-bold">{StringManager.currentLanguage.dataBindingCollectionsTitle}</span>
       <div className="h-[8px]" />
       <span className="text-[#5E687E] text-base">{StringManager.currentLanguage.dataBindingCollectionsDesc}</span>
       <div className="h-[16px]" />
       <CodeBlock className="flex flex-col" file="collection_example.json" language="json" />
       <div className="h-[48px]" />
       <div className="flex flex-row items-stretch items-center justify-center">
-        <button className="cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickStyling}>{StringManager.currentLanguage.dataBindingPrev}</button>
+        <button className="py-3 px-6 bg-transparent rounded-lg text-[#087EA4] text-base font-semibold border border-[#087EA4] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderRadius: '8px' }} onClick={data.onClickStyling}>{StringManager.currentLanguage.dataBindingPrev}</button>
         <div className="w-[16px]" />
-        <button className="py-3 px-6 bg-[#087EA4] rounded-lg text-[#FFFFFF] text-base font-semibold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickLearn}>{StringManager.currentLanguage.dataBindingNext}</button>
+        <button className="py-3 px-6 bg-[#087EA4] rounded-lg text-[#FFFFFF] text-base font-semibold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderRadius: '8px' }} onClick={data.onClickLearn}>{StringManager.currentLanguage.dataBindingNext}</button>
       </div>
     </div>
   </div>

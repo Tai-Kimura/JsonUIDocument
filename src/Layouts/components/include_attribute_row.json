@@ -4,7 +4,12 @@
   "orientation": "vertical",
   "width": "matchParent",
   "child": [
-    { "data": [{ "class": "IncludeAttributeData", "name": "data" }] },
+    { "data": [
+      { "name": "name", "class": "String" },
+      { "name": "type", "class": "String" },
+      { "name": "description", "class": "String" },
+      { "name": "dividerVisibility", "class": "String" }
+    ] },
     {
       "type": "View",
       "orientation": "horizontal",
@@ -13,7 +18,7 @@
       "child": [
         {
           "type": "Label",
-          "text": "@{data.name}",
+          "text": "@{name}",
           "fontSize": 13,
           "fontColor": "#059669",
           "font": "monospace",
@@ -29,7 +34,7 @@
         },
         {
           "type": "Label",
-          "text": "@{data.type}",
+          "text": "@{type}",
           "fontSize": 13,
           "fontColor": "#6B7280",
           "weight": 1,
@@ -43,7 +48,7 @@
         },
         {
           "type": "Label",
-          "text": "@{data.description}",
+          "text": "@{description}",
           "fontSize": 13,
           "fontColor": "#374151",
           "weight": 5,
@@ -56,7 +61,7 @@
       "width": "matchParent",
       "height": 1,
       "background": "#E5E7EB",
-      "visibility": "@{data.isLast ? 'gone' : 'visible'}"
+      "visibility": "@{dividerVisibility}"
     }
   ]
 }

@@ -18,8 +18,8 @@ export default function QuickStartPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <QuickStart viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <QuickStart data={viewModel.data} />
     </>
   );
 }

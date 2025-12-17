@@ -5,8 +5,10 @@
   "height": "matchParent",
   "orientation": "horizontal",
   "child": [
-    { "data": [{ "class": "RefIndicatorViewModel", "name": "viewModel" }] },
-    { "type": "ReferenceSidebar" },
+    {},
+    {
+      "type": "ReferenceSidebar"
+    },
     {
       "type": "ScrollView",
       "id": "ref_indicator_scroll",
@@ -17,7 +19,10 @@
           "type": "View",
           "id": "ref_indicator_content",
           "width": "matchParent",
-          "padding": [48, 24],
+          "padding": [
+            48,
+            24
+          ],
           "orientation": "vertical",
           "background": "#FFFFFF",
           "child": [
@@ -42,7 +47,9 @@
               "orientation": "horizontal",
               "bottomMargin": 32,
               "child": [
-                { "include": "components/platform_badge_swift" }
+                {
+                  "include": "components/platform_badge_swift"
+                }
               ]
             },
             {
@@ -58,8 +65,19 @@
               "orientation": "vertical",
               "bottomMargin": 32,
               "child": [
-                { "type": "Label", "text": "comp_indicator_uikit", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 8 },
-                { "type": "Label", "text": "comp_indicator_swiftui", "fontSize": 14, "fontColor": "#4B5563" }
+                {
+                  "type": "Label",
+                  "text": "comp_indicator_uikit",
+                  "fontSize": 14,
+                  "fontColor": "#4B5563",
+                  "bottomMargin": 8
+                },
+                {
+                  "type": "Label",
+                  "text": "comp_indicator_swiftui",
+                  "fontSize": 14,
+                  "fontColor": "#4B5563"
+                }
               ]
             },
             {
@@ -77,10 +95,14 @@
               "borderColor": "#E5E7EB",
               "cornerRadius": 8,
               "clipToBounds": true,
-              "columnCount": 1,
-              "headerClasses": ["components/ref_attribute_table_header"],
-              "cellClasses": ["components/ref_attribute_row"],
-              "items": "@{viewModel.indicatorAttributes}"
+              "columns": 1,
+              "headerClasses": [
+                "components/ref_attribute_table_header"
+              ],
+              "cellClasses": [
+                "components/ref_attribute_row"
+              ],
+              "items": "@{indicatorAttributes}"
             },
             {
               "type": "Label",

@@ -12,13 +12,14 @@ import RefAttributeTableHeader from './RefAttributeTableHeader';
 import RefAttributeRow from './RefAttributeRow';
 
 
-export const RefImage = ({ viewModel }) => {
+export const RefImage = ({ data }) => {
   return (
   <div id="ref_image_page" className="w-full h-auto flex flex-row items-stretch">
+    <div className="" />
     <ReferenceSidebar className="flex flex-col" />
     <div id="ref_image_scroll" className="w-full h-auto overflow-y-auto flex flex-col">
       <div id="ref_image_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-        <span className="mb-4 text-[#23272F] text-[32px] font-bold font-bold">{StringManager.currentLanguage.refImageTitle}</span>
+        <span className="mb-4 text-[#23272F] text-[32px] font-bold">{StringManager.currentLanguage.refImageTitle}</span>
         <span className="mb-6 text-[#4B5563] text-base">{StringManager.currentLanguage.refImageDesc}</span>
         <div className="mb-8 flex flex-row items-stretch">
           <PlatformBadgeSwift />
@@ -27,7 +28,7 @@ export const RefImage = ({ viewModel }) => {
           <div className="w-[8px]" />
           <PlatformBadgeReact />
         </div>
-        <span className="mb-4 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.compDetailPlatformSupport}</span>
+        <span className="mb-4 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.compDetailPlatformSupport}</span>
         <div className="mb-8 flex flex-col">
           <span className="mb-2 text-[#4B5563] text-sm">{StringManager.currentLanguage.compImageUikit}</span>
           <span className="mb-2 text-[#4B5563] text-sm">{StringManager.currentLanguage.compImageSwiftui}</span>
@@ -35,14 +36,14 @@ export const RefImage = ({ viewModel }) => {
           <span className="mb-2 text-[#4B5563] text-sm">{StringManager.currentLanguage.compImageAndroidXml}</span>
           <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.compImageReact}</span>
         </div>
-        <span className="mb-4 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.compDetailAttributes}</span>
+        <span className="mb-4 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.compDetailAttributes}</span>
         <div className="w-full rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
           <RefAttributeTableHeader />
-          {viewModel.imageAttributes?.map((item, index) => (
+          {data.imageAttributes?.map((item, index) => (
             <RefAttributeRow key={index} data={item} />
           ))}
         </div>
-        <span className="mt-8 mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.compDetailBasicExample}</span>
+        <span className="mt-8 mb-3 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.compDetailBasicExample}</span>
         <CodeBlock className="flex flex-col" file="image_example.json" language="json" showPreview={false} />
       </div>
     </div>

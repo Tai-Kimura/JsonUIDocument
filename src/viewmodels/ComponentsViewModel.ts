@@ -7,6 +7,24 @@ export class ComponentsViewModel {
     this.router = router;
   }
 
+  get data() {
+    return {
+      onClickQuickStart: this.onClickQuickStart,
+      onClickStyling: this.onClickStyling,
+      onClickViewDetail: this.onClickViewDetail,
+      onClickScrollViewDetail: this.onClickScrollViewDetail,
+      onClickCollectionDetail: this.onClickCollectionDetail,
+      onClickLabelDetail: this.onClickLabelDetail,
+      onClickTextFieldDetail: this.onClickTextFieldDetail,
+      onClickTextViewDetail: this.onClickTextViewDetail,
+      onClickButtonDetail: this.onClickButtonDetail,
+      onClickSwitchDetail: this.onClickSwitchDetail,
+      onClickSliderDetail: this.onClickSliderDetail,
+      onClickSelectBoxDetail: this.onClickSelectBoxDetail,
+      onClickRadioDetail: this.onClickRadioDetail,
+    };
+  }
+
   // Navigation to other learn pages
   onClickQuickStart = () => {
     this.router.push("/learn/quick-start");

@@ -21,8 +21,7 @@ export class RefRadioViewModel {
   constructor(
     router: AppRouterInstance,
     currentTab: number,
-    setCurrentTab: (tab: number) => void
-  ) {
+    setCurrentTab: (tab: number) => void) {
     this.router = router;
     this._currentTab = currentTab;
     this._setCurrentTab = setCurrentTab;
@@ -32,9 +31,20 @@ export class RefRadioViewModel {
     return this._currentTab;
   }
 
+
+  get data() {
+    return {
+      currentTab: this._currentTab,
+      setCurrentTab: this._setCurrentTab,
+      onTabChange: this.onTabChange,
+      radioAttributes: this.radioAttributes,
+    };
+  }
+
   onTabChange = (index: number) => {
     this._setCurrentTab(index);
   };
+
 
   get radioAttributes(): RefAttributeData[] {
     return [

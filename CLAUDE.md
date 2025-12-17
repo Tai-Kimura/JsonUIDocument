@@ -1,5 +1,19 @@
 # JsonUIDocument Development Guide
 
+## Required Agent
+
+**IMPORTANT**: This project MUST use the `reactjsonui` agent for all development tasks.
+
+When working on this project, always use:
+```
+Task tool with subagent_type: "reactjsonui"
+```
+
+The reactjsonui agent will:
+- Validate JSON attributes against `attribute_definitions.json`
+- Ensure cross-platform compatibility with SwiftJsonUI/KotlinJsonUI
+- Follow proper ReactJsonUI conventions
+
 ## Documentation Reference
 
 When looking for information about JsonUI components, attributes, or features:

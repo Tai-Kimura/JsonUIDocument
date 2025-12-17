@@ -6,11 +6,11 @@ export const CliTableRow = ({ data }) => {
   return (
   <div id="cli_table_row_container" className="w-full flex flex-col">
     <div className="w-full py-0 px-4 flex flex-row items-stretch">
-      <span className="p-3 text-[#1F2937] text-[13px] flex-[2]">{data.name}</span>
+      <span className="p-3 text-[#1F2937] text-[13px] font-mono flex-[2]">{data.name}</span>
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
       <span className="p-3 text-[#4B5563] text-[13px] flex-[5]">{data.description}</span>
     </div>
-    {!data.isLast && (
+    {data.dividerVisibility && (
     <div className="w-full h-[1px] bg-[#E5E7EB]" />
     )}
   </div>

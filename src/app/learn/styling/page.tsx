@@ -14,8 +14,8 @@ export default function StylingPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <Styling viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <Styling data={viewModel.data} />
     </>
   );
 }

@@ -10,30 +10,31 @@ import RefAttributeTableHeader from './RefAttributeTableHeader';
 import RefAttributeRow from './RefAttributeRow';
 
 
-export const RefWeb = ({ viewModel }) => {
+export const RefWeb = ({ data }) => {
   return (
   <div id="ref_web_page" className="w-full h-auto flex flex-row items-stretch">
+    <div className="" />
     <ReferenceSidebar className="flex flex-col" />
     <div id="ref_web_scroll" className="w-full h-auto overflow-y-auto flex flex-col">
       <div id="ref_web_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-        <span className="mb-4 text-[#23272F] text-[32px] font-bold font-bold">{StringManager.currentLanguage.refWebTitle}</span>
+        <span className="mb-4 text-[#23272F] text-[32px] font-bold">{StringManager.currentLanguage.refWebTitle}</span>
         <span className="mb-6 text-[#4B5563] text-base">{StringManager.currentLanguage.refWebDesc}</span>
         <div className="mb-8 flex flex-row items-stretch">
           <PlatformBadgeSwift />
         </div>
-        <span className="mb-4 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.compDetailPlatformSupport}</span>
+        <span className="mb-4 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.compDetailPlatformSupport}</span>
         <div className="mb-8 flex flex-col">
           <span className="mb-2 text-[#4B5563] text-sm">{StringManager.currentLanguage.compWebUikit}</span>
           <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.compWebSwiftui}</span>
         </div>
-        <span className="mb-4 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.compDetailAttributes}</span>
+        <span className="mb-4 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.compDetailAttributes}</span>
         <div className="w-full rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
           <RefAttributeTableHeader />
-          {viewModel.webAttributes?.map((item, index) => (
+          {data.webAttributes?.map((item, index) => (
             <RefAttributeRow key={index} data={item} />
           ))}
         </div>
-        <span className="mt-8 mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.compDetailBasicExample}</span>
+        <span className="mt-8 mb-3 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.compDetailBasicExample}</span>
         <CodeBlock className="flex flex-col" file="web_example.json" language="json" showPreview={false} />
       </div>
     </div>

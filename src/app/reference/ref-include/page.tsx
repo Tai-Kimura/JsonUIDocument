@@ -18,8 +18,8 @@ export default function RefIncludePage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefInclude viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefInclude data={viewModel.data} />
     </>
   );
 }

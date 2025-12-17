@@ -18,8 +18,8 @@ export default function RefIndicatorPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefIndicator viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefIndicator data={viewModel.data} />
     </>
   );
 }

@@ -18,8 +18,8 @@ export default function RefDataBindingPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefDataBinding viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefDataBinding data={viewModel.data} />
     </>
   );
 }

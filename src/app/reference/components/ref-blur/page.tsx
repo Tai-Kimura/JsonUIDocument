@@ -18,8 +18,8 @@ export default function RefBlurPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefBlur viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefBlur data={viewModel.data} />
     </>
   );
 }

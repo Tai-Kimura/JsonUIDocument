@@ -18,8 +18,8 @@ export default function InstallationPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <Installation viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <Installation data={viewModel.data} />
     </>
   );
 }

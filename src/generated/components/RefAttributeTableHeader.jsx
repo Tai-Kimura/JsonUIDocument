@@ -2,25 +2,25 @@
 import React from 'react';
 
 
-export const RefAttributeTableHeader = () => {
+export const RefAttributeTableHeader = ({ data }) => {
   return (
   <div id="ref_attribute_table_header" className="w-full flex flex-col">
     <div className="w-full py-0 px-4 bg-[#F9FAFB] flex flex-row items-stretch">
-      <span className="p-3 text-[#374151] text-[13px] font-bold flex-[2] font-bold">Attribute</span>
+      <span className="p-3 text-[#374151] text-[13px] font-bold flex-[2]">Attribute</span>
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
-      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-1 font-bold">UIKit</span>
+      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-1">UIKit</span>
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
-      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-1 font-bold">SwiftUI</span>
+      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-1">SwiftUI</span>
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
-      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-1 font-bold">Compose</span>
+      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-1">Compose</span>
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
-      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-1 font-bold">XML</span>
+      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-1">XML</span>
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
-      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-1 font-bold">React</span>
+      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-1">React</span>
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
-      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-[2] font-bold">Type</span>
+      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-[2]">Type</span>
       <div className="w-[1px] h-auto bg-[#E5E7EB]" />
-      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-[4] font-bold">Description</span>
+      <span className="p-3 text-[#374151] text-[13px] font-bold text-center flex-[4]">Description</span>
     </div>
     <div className="w-full h-[1px] bg-[#E5E7EB]" />
   </div>

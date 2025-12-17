@@ -18,8 +18,8 @@ export default function RefSliderPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefSlider viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefSlider data={viewModel.data} />
     </>
   );
 }

@@ -18,8 +18,8 @@ export default function RefWebPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefWeb viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefWeb data={viewModel.data} />
     </>
   );
 }

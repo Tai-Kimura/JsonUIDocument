@@ -18,8 +18,8 @@ export default function RefEventsPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefEvents viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefEvents data={viewModel.data} />
     </>
   );
 }

@@ -6,15 +6,15 @@ import { StringManager } from '@/generated/StringManager';
 import { ReferenceSidebar } from '@/components/extensions/ReferenceSidebar';
 
 
-export const Reference = () => {
+export const Reference = ({ data }) => {
   return (
   <div id="reference_page" className="w-full h-auto flex flex-row items-stretch">
     <ReferenceSidebar className="flex flex-col" />
     <div id="reference_scroll" className="w-full h-auto overflow-y-auto flex flex-col">
       <div id="reference_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-        <span className="mb-2 text-[#23272F] text-[32px] font-bold font-bold">{StringManager.currentLanguage.refTitle}</span>
+        <span className="mb-2 text-[#23272F] text-[32px] font-bold">{StringManager.currentLanguage.refTitle}</span>
         <span className="mb-8 text-[#4B5563] text-base">{StringManager.currentLanguage.refSubtitle}</span>
-        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refComponents}</span>
+        <span className="mb-3 text-[#23272F] text-2xl font-bold">{StringManager.currentLanguage.refComponents}</span>
         <span className="mb-6 text-[#4B5563] text-sm">{StringManager.currentLanguage.refComponentsOverview}</span>
         <div className="w-full mb-8 flex flex-row items-stretch">
           <div className="mr-4 flex flex-col flex-1">
@@ -37,15 +37,15 @@ export const Reference = () => {
             <span className="text-[#4B5563] text-sm">• Slider</span>
           </div>
         </div>
-        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refAttributes}</span>
+        <span className="mb-3 text-[#23272F] text-2xl font-bold">{StringManager.currentLanguage.refAttributes}</span>
         <span className="mb-6 text-[#4B5563] text-sm">{StringManager.currentLanguage.refAttributesOverview}</span>
-        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refDataBinding}</span>
+        <span className="mb-3 text-[#23272F] text-2xl font-bold">{StringManager.currentLanguage.refDataBinding}</span>
         <span className="mb-6 text-[#4B5563] text-sm">{StringManager.currentLanguage.refDataBindingOverview}</span>
-        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refInclude}</span>
+        <span className="mb-3 text-[#23272F] text-2xl font-bold">{StringManager.currentLanguage.refInclude}</span>
         <span className="mb-6 text-[#4B5563] text-sm">{StringManager.currentLanguage.refIncludeOverview}</span>
-        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refStyles}</span>
+        <span className="mb-3 text-[#23272F] text-2xl font-bold">{StringManager.currentLanguage.refStyles}</span>
         <span className="mb-6 text-[#4B5563] text-sm">{StringManager.currentLanguage.refStylesOverview}</span>
-        <span className="mb-3 text-[#23272F] text-2xl font-bold font-bold">{StringManager.currentLanguage.refEvents}</span>
+        <span className="mb-3 text-[#23272F] text-2xl font-bold">{StringManager.currentLanguage.refEvents}</span>
         <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.refEventsOverview}</span>
       </div>
     </div>

@@ -2,10 +2,10 @@
 import React from 'react';
 
 
-export const PlatformBadgeKotlin = () => {
+export const PlatformBadgeKotlin = ({ data }) => {
   return (
   <div className="flex flex-col py-1.5 px-3 bg-[#7F52FF] rounded">
-    <span className="text-[#FFFFFF] text-xs font-bold font-bold">Kotlin</span>
+    <span className="text-[#FFFFFF] text-xs font-bold">Kotlin</span>
   </div>
   );
 };

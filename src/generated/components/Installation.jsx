@@ -6,24 +6,25 @@ import { StringManager } from '@/generated/StringManager';
 import { CodeBlock } from '@/components/extensions/CodeBlock';
 
 
-export const Installation = ({ viewModel }) => {
+export const Installation = ({ data }) => {
   return (
   <div id="installation_page" className="w-full flex flex-col">
+    <div className="" />
     <div id="installation_hero" className="w-full py-12 px-6 bg-[#F6F7F9] flex flex-col items-center justify-center">
-      <span className="text-[#23272F] text-5xl font-bold text-center font-bold">{StringManager.currentLanguage.installationTitle}</span>
+      <span className="text-[#23272F] text-5xl font-bold text-center">{StringManager.currentLanguage.installationTitle}</span>
       <div className="h-[16px]" />
       <span className="text-[#5E687E] text-xl text-center">{StringManager.currentLanguage.installationSubtitle}</span>
     </div>
     <div id="installation_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
       <div id="platform_tabs" className="w-full flex rounded-lg bg-gray-100 p-1">
-        <button key={0} className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${viewModel.currentTab === 0 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => viewModel.onTabChange(0)}>Swift</button>
-        <button key={1} className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${viewModel.currentTab === 1 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => viewModel.onTabChange(1)}>Kotlin</button>
-        <button key={2} className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${viewModel.currentTab === 2 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => viewModel.onTabChange(2)}>React</button>
+        <button key={0} className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${data.currentTab === 0 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => data.setCurrentTab(0)}>Swift</button>
+        <button key={1} className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${data.currentTab === 1 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => data.setCurrentTab(1)}>Kotlin</button>
+        <button key={2} className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${data.currentTab === 2 ? 'bg-white text-gray-900 shadow' : 'text-gray-500 hover:text-gray-700'}`} onClick={() => data.setCurrentTab(2)}>React</button>
       </div>
       <div className="h-[24px]" />
-      {viewModel.currentTab === 0 && (
+      {data.showSwiftContent && (
       <div id="swift_content" className="flex flex-col">
-        <span className="text-[#FA7343] text-[28px] font-bold font-bold">{StringManager.currentLanguage.installationSwiftTitle}</span>
+        <span className="text-[#FA7343] text-[28px] font-bold">{StringManager.currentLanguage.installationSwiftTitle}</span>
         <div className="h-[16px]" />
         <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.installationSwiftSpm}</span>
         <div className="h-[8px]" />
@@ -34,9 +35,9 @@ export const Installation = ({ viewModel }) => {
         <CodeBlock className="flex flex-col" file="swift_cli.sh" language="bash" showPreview={false} />
       </div>
       )}
-      {viewModel.currentTab === 1 && (
+      {data.showKotlinContent && (
       <div id="kotlin_content" className="flex flex-col">
-        <span className="text-[#7F52FF] text-[28px] font-bold font-bold">{StringManager.currentLanguage.installationKotlinTitle}</span>
+        <span className="text-[#7F52FF] text-[28px] font-bold">{StringManager.currentLanguage.installationKotlinTitle}</span>
         <div className="h-[16px]" />
         <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.installationKotlinGradle}</span>
         <div className="h-[8px]" />
@@ -47,9 +48,9 @@ export const Installation = ({ viewModel }) => {
         <CodeBlock className="flex flex-col" file="kotlin_cli.sh" language="bash" showPreview={false} />
       </div>
       )}
-      {viewModel.currentTab === 2 && (
+      {data.showReactContent && (
       <div id="react_content" className="flex flex-col">
-        <span className="text-[#61DAFB] text-[28px] font-bold font-bold">{StringManager.currentLanguage.installationReactTitle}</span>
+        <span className="text-[#61DAFB] text-[28px] font-bold">{StringManager.currentLanguage.installationReactTitle}</span>
         <div className="h-[16px]" />
         <span className="text-[#23272F] text-lg font-semibold">{StringManager.currentLanguage.installationReactNpm}</span>
         <div className="h-[8px]" />
@@ -58,7 +59,7 @@ export const Installation = ({ viewModel }) => {
       )}
       <div className="h-[48px]" />
       <div className="flex flex-row items-stretch items-center justify-center">
-        <button className="py-3 px-6 bg-[#087EA4] rounded-lg text-[#FFFFFF] text-base font-semibold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickQuickStart}>{StringManager.currentLanguage.installationNextQuickStart}</button>
+        <button className="py-3 px-6 bg-[#087EA4] rounded-lg text-[#FFFFFF] text-base font-semibold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderRadius: '8px' }} onClick={data.onClickQuickStart}>{StringManager.currentLanguage.installationNextQuickStart}</button>
       </div>
     </div>
   </div>

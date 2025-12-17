@@ -18,8 +18,8 @@ export default function RefTablePage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefTable viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefTable data={viewModel.data} />
     </>
   );
 }

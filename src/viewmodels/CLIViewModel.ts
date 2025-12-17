@@ -26,8 +26,41 @@ export class CLIViewModel {
     this._setCurrentTab = setCurrentTab;
   }
 
-  get currentTab(): number {
-    return this._currentTab;
+  get data() {
+    return {
+      currentTab: this._currentTab,
+      setCurrentTab: this._setCurrentTab,
+      onTabChange: this.onTabChange,
+      onClickLearn: this.onClickLearn,
+      onClickReference: this.onClickReference,
+      // Tab visibility
+      showSwiftContent: this._currentTab === 0,
+      showKotlinContent: this._currentTab === 1,
+      showReactContent: this._currentTab === 2,
+      // Swift CLI data
+      swiftInitOptions: this.swiftInitOptions,
+      swiftGenArgs: this.swiftGenArgs,
+      swiftGenOptions: this.swiftGenOptions,
+      swiftBuildOptions: this.swiftBuildOptions,
+      swiftWatchOptions: this.swiftWatchOptions,
+      swiftHotloadSubcommands: this.swiftHotloadSubcommands,
+      swiftHotloadOptions: this.swiftHotloadOptions,
+      swiftConvertArgs: this.swiftConvertArgs,
+      swiftConvertOptions: this.swiftConvertOptions,
+      swiftDestroyArgs: this.swiftDestroyArgs,
+      swiftDestroyOptions: this.swiftDestroyOptions,
+      swiftValidateOptions: this.swiftValidateOptions,
+      // Kotlin CLI data
+      kotlinInitOptions: this.kotlinInitOptions,
+      kotlinGenArgs: this.kotlinGenArgs,
+      kotlinGenOptions: this.kotlinGenOptions,
+      kotlinBuildOptions: this.kotlinBuildOptions,
+      kotlinHotloadSubcommands: this.kotlinHotloadSubcommands,
+      // React CLI data
+      reactGenArgs: this.reactGenArgs,
+      reactGenOptions: this.reactGenOptions,
+      reactHotloadSubcommands: this.reactHotloadSubcommands,
+    };
   }
 
   onTabChange = (index: number) => {
@@ -108,12 +141,6 @@ export class CLIViewModel {
     ];
   }
 
-  get swiftConvertSubcommands(): CLITableRowData[] {
-    return [
-      { name: "to-group", description: t("cli_swift_convert_togroup_desc") }
-    ];
-  }
-
   get swiftDestroyArgs(): CLITableRowData[] {
     return [
       { name: "TYPE", description: t("cli_swift_destroy_type_desc") },
@@ -124,12 +151,6 @@ export class CLIViewModel {
   get swiftDestroyOptions(): CLITableRowData[] {
     return [
       { name: "-f, --force", description: t("cli_swift_destroy_force_desc") }
-    ];
-  }
-
-  get swiftValidateArgs(): CLITableRowData[] {
-    return [
-      { name: "FILES", description: t("cli_swift_validate_files_desc") }
     ];
   }
 

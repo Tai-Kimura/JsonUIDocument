@@ -8,8 +8,7 @@ export class RefComponentsViewModel {
   constructor(
     router: AppRouterInstance,
     currentTab: number,
-    setCurrentTab: (tab: number) => void
-  ) {
+    setCurrentTab: (tab: number) => void) {
     this.router = router;
     this._currentTab = currentTab;
     this._setCurrentTab = setCurrentTab;
@@ -19,9 +18,30 @@ export class RefComponentsViewModel {
     return this._currentTab;
   }
 
+
+  get data() {
+    return {
+      currentTab: this._currentTab,
+      setCurrentTab: this._setCurrentTab,
+      onTabChange: this.onTabChange,
+      onClickViewDetail: this.onClickViewDetail,
+      onClickScrollViewDetail: this.onClickScrollViewDetail,
+      onClickCollectionDetail: this.onClickCollectionDetail,
+      onClickLabelDetail: this.onClickLabelDetail,
+      onClickTextFieldDetail: this.onClickTextFieldDetail,
+      onClickTextViewDetail: this.onClickTextViewDetail,
+      onClickButtonDetail: this.onClickButtonDetail,
+      onClickSwitchDetail: this.onClickSwitchDetail,
+      onClickSliderDetail: this.onClickSliderDetail,
+      onClickSelectBoxDetail: this.onClickSelectBoxDetail,
+      onClickRadioDetail: this.onClickRadioDetail,
+    };
+  }
+
   onTabChange = (index: number) => {
     this._setCurrentTab(index);
   };
+
 
   // Layout components - using same method names as ComponentsViewModel for shared components
   onClickViewDetail = () => {

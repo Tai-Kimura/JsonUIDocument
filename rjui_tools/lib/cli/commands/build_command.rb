@@ -4,7 +4,10 @@ require 'json'
 require 'fileutils'
 require_relative '../../core/config_manager'
 require_relative '../../core/logger'
+require_relative '../../core/attribute_validator'
+require_relative '../../core/binding_validator'
 require_relative '../../react/react_generator'
+require_relative '../../react/data_model_generator'
 
 module RjuiTools
   module CLI
@@ -13,6 +16,10 @@ module RjuiTools
         def initialize(args)
           @args = args
           @config = Core::ConfigManager.load_config
+          @validator = Core::AttributeValidator.new(:react)
+          @binding_validator = Core::BindingValidator.new
+          @all_warnings = []
+          @binding_warnings = []
         end
 
         def execute
@@ -28,6 +35,9 @@ module RjuiTools
 
           # Update StringManager from Strings directory
           update_string_manager
+
+          # Update Data models from JSON data sections
+          update_data_models
 
           json_files = Dir.glob(File.join(layouts_dir, '**', '*.json'))
 
@@ -45,6 +55,12 @@ module RjuiTools
               json_content = JSON.parse(File.read(json_file, encoding: 'UTF-8'))
               component_name = File.basename(json_file, '.json')
               component_name = to_pascal_case(component_name)
+
+              # Validate JSON attributes
+              validate_component(json_content, json_file)
+
+              # Validate binding expressions for business logic
+              validate_bindings(json_content, json_file)
 
               output = generator.generate(component_name, json_content)
 
@@ -64,6 +80,10 @@ module RjuiTools
             end
           end
 
+          # Print all collected warnings at the end
+          print_validation_summary
+          print_binding_warnings
+
           Core::Logger.success('Build completed!')
         end
 
@@ -71,6 +91,85 @@ module RjuiTools
 
         def to_pascal_case(string)
           string.split(/[-_]/).map(&:capitalize).join
+        end
+
+        # Validate component and its children recursively
+        # @param component [Hash] The component to validate
+        # @param file_path [String] The file path for error messages
+        # @param parent_orientation [String] The parent's orientation ('horizontal' or 'vertical')
+        def validate_component(component, file_path, parent_orientation = nil)
+          return unless component.is_a?(Hash)
+
+          # Skip style-only entries and data declarations
+          return if component.key?('style') && component.keys.size == 1
+          return if component.key?('data') && !component.key?('type')
+
+          if component['type']
+            warnings = @validator.validate(component, nil, parent_orientation)
+            warnings.each do |warning|
+              @all_warnings << { file: file_path, message: warning }
+            end
+          end
+
+          # Get this component's orientation for children validation
+          current_orientation = component['orientation']
+
+          # Validate children recursively
+          if component['child']
+            children = component['child'].is_a?(Array) ? component['child'] : [component['child']]
+            children.each { |child| validate_component(child, file_path, current_orientation) }
+          end
+        end
+
+        # Print validation summary at the end of build
+        def print_validation_summary
+          return if @all_warnings.empty?
+
+          puts
+          Core::Logger.warn("Validation warnings found: #{@all_warnings.size}")
+          puts
+
+          # Group warnings by file
+          grouped = @all_warnings.group_by { |w| w[:file] }
+          grouped.each do |file, warnings|
+            puts "\e[33m  #{file}:\e[0m"
+            warnings.each do |w|
+              puts "\e[33m    ⚠️  #{w[:message]}\e[0m"
+            end
+          end
+          puts
+        end
+
+        # Validate binding expressions for business logic
+        def validate_bindings(json_content, file_path)
+          file_name = File.basename(file_path)
+          warnings = @binding_validator.validate(json_content, file_name)
+          warnings.each do |warning|
+            @binding_warnings << warning
+          end
+        end
+
+        # Print binding warnings at the end of build
+        def print_binding_warnings
+          return if @binding_warnings.empty?
+
+          puts
+          Core::Logger.warn("Binding warnings found: #{@binding_warnings.size}")
+          puts "  Business logic detected in bindings. Move this logic to ViewModel."
+          puts
+
+          @binding_warnings.each do |warning|
+            puts "\e[33m  ⚠️  #{warning}\e[0m"
+          end
+          puts
+        end
+
+        def update_data_models
+          Core::Logger.info('Generating Data models...')
+          data_generator = React::DataModelGenerator.new
+          data_generator.update_data_models
+        rescue StandardError => e
+          Core::Logger.error("Error generating data models: #{e.message}")
         end
 
         def update_string_manager

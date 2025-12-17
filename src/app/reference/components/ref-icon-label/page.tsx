@@ -18,8 +18,8 @@ export default function RefIconLabelPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefIconLabel viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefIconLabel data={viewModel.data} />
     </>
   );
 }

@@ -15,6 +15,21 @@ export class QuickStartViewModel {
     this._setCurrentTab = setCurrentTab;
   }
 
+  get data() {
+    return {
+      currentTab: this._currentTab,
+      setCurrentTab: this._setCurrentTab,
+      onTabChange: this.onTabChange,
+      onClickInstallation: this.onClickInstallation,
+      onClickComponents: this.onClickComponents,
+      onClickLearn: this.onClickLearn,
+      // Tab visibility
+      showSwiftContent: this._currentTab === 0,
+      showKotlinContent: this._currentTab === 1,
+      showReactContent: this._currentTab === 2,
+    };
+  }
+
   get currentTab(): number {
     return this._currentTab;
   }

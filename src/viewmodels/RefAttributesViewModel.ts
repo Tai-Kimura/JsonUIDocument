@@ -21,8 +21,7 @@ export class RefAttributesViewModel {
   constructor(
     router: AppRouterInstance,
     currentTab: number,
-    setCurrentTab: (tab: number) => void
-  ) {
+    setCurrentTab: (tab: number) => void) {
     this.router = router;
     this._currentTab = currentTab;
     this._setCurrentTab = setCurrentTab;
@@ -32,9 +31,25 @@ export class RefAttributesViewModel {
     return this._currentTab;
   }
 
+
+  get data() {
+    return {
+      currentTab: this._currentTab,
+      setCurrentTab: this._setCurrentTab,
+      onTabChange: this.onTabChange,
+      coreAttributes: this.coreAttributes,
+      layoutAttributes: this.layoutAttributes,
+      marginAttributes: this.marginAttributes,
+      stylingAttributes: this.stylingAttributes,
+      interactionAttributes: this.interactionAttributes,
+      typographyAttributes: this.typographyAttributes,
+    };
+  }
+
   onTabChange = (index: number) => {
     this._setCurrentTab(index);
   };
+
 
   get coreAttributes(): RefAttributeData[] {
     return [

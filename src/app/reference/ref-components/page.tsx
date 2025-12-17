@@ -18,8 +18,8 @@ export default function RefComponentsPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefComponents viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefComponents data={viewModel.data} />
     </>
   );
 }

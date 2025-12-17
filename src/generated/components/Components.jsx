@@ -8,11 +8,12 @@ import ComponentSectionText from './ComponentSectionText';
 import ComponentSectionInput from './ComponentSectionInput';
 
 
-export const Components = ({ viewModel }) => {
+export const Components = ({ data }) => {
   return (
   <div id="components_page" className="w-full flex flex-col">
+    <div className="" />
     <div id="components_hero" className="w-full py-12 px-6 bg-[#F6F7F9] flex flex-col items-center justify-center">
-      <span className="text-[#23272F] text-5xl font-bold text-center font-bold">{StringManager.currentLanguage.componentsTitle}</span>
+      <span className="text-[#23272F] text-5xl font-bold text-center">{StringManager.currentLanguage.componentsTitle}</span>
       <div className="h-[16px]" />
       <span className="text-[#5E687E] text-xl text-center">{StringManager.currentLanguage.componentsSubtitle}</span>
     </div>
@@ -24,9 +25,9 @@ export const Components = ({ viewModel }) => {
       <ComponentSectionInput viewModel={viewModel} />
       <div className="h-[48px]" />
       <div className="flex flex-row items-stretch items-center justify-center">
-        <button className="cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickQuickStart}>{StringManager.currentLanguage.componentsPrev}</button>
+        <button className="py-3 px-6 bg-transparent rounded-lg text-[#087EA4] text-base font-semibold border border-[#087EA4] cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderRadius: '8px' }} onClick={data.onClickQuickStart}>{StringManager.currentLanguage.componentsPrev}</button>
         <div className="w-[16px]" />
-        <button className="py-3 px-6 bg-[#087EA4] rounded-lg text-[#FFFFFF] text-base font-semibold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" onClick={viewModel.onClickStyling}>{StringManager.currentLanguage.componentsNext}</button>
+        <button className="py-3 px-6 bg-[#087EA4] rounded-lg text-[#FFFFFF] text-base font-semibold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderRadius: '8px' }} onClick={data.onClickStyling}>{StringManager.currentLanguage.componentsNext}</button>
       </div>
     </div>
   </div>

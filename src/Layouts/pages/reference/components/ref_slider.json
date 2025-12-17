@@ -5,8 +5,10 @@
   "height": "matchParent",
   "orientation": "horizontal",
   "child": [
-    { "data": [{ "class": "RefSliderViewModel", "name": "viewModel" }] },
-    { "type": "ReferenceSidebar" },
+    {},
+    {
+      "type": "ReferenceSidebar"
+    },
     {
       "type": "ScrollView",
       "id": "ref_slider_scroll",
@@ -17,7 +19,10 @@
           "type": "View",
           "id": "ref_slider_content",
           "width": "matchParent",
-          "padding": [48, 24],
+          "padding": [
+            48,
+            24
+          ],
           "orientation": "vertical",
           "background": "#FFFFFF",
           "child": [
@@ -42,11 +47,23 @@
               "orientation": "horizontal",
               "bottomMargin": 32,
               "child": [
-                { "include": "components/platform_badge_swift" },
-                { "type": "View", "width": 8 },
-                { "include": "components/platform_badge_kotlin" },
-                { "type": "View", "width": 8 },
-                { "include": "components/platform_badge_react" }
+                {
+                  "include": "components/platform_badge_swift"
+                },
+                {
+                  "type": "View",
+                  "width": 8
+                },
+                {
+                  "include": "components/platform_badge_kotlin"
+                },
+                {
+                  "type": "View",
+                  "width": 8
+                },
+                {
+                  "include": "components/platform_badge_react"
+                }
               ]
             },
             {
@@ -62,11 +79,40 @@
               "orientation": "vertical",
               "bottomMargin": 32,
               "child": [
-                { "type": "Label", "text": "comp_slider_uikit", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 8 },
-                { "type": "Label", "text": "comp_slider_swiftui", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 8 },
-                { "type": "Label", "text": "comp_slider_compose", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 8 },
-                { "type": "Label", "text": "comp_slider_android_xml", "fontSize": 14, "fontColor": "#4B5563", "bottomMargin": 8 },
-                { "type": "Label", "text": "comp_slider_react", "fontSize": 14, "fontColor": "#4B5563" }
+                {
+                  "type": "Label",
+                  "text": "comp_slider_uikit",
+                  "fontSize": 14,
+                  "fontColor": "#4B5563",
+                  "bottomMargin": 8
+                },
+                {
+                  "type": "Label",
+                  "text": "comp_slider_swiftui",
+                  "fontSize": 14,
+                  "fontColor": "#4B5563",
+                  "bottomMargin": 8
+                },
+                {
+                  "type": "Label",
+                  "text": "comp_slider_compose",
+                  "fontSize": 14,
+                  "fontColor": "#4B5563",
+                  "bottomMargin": 8
+                },
+                {
+                  "type": "Label",
+                  "text": "comp_slider_android_xml",
+                  "fontSize": 14,
+                  "fontColor": "#4B5563",
+                  "bottomMargin": 8
+                },
+                {
+                  "type": "Label",
+                  "text": "comp_slider_react",
+                  "fontSize": 14,
+                  "fontColor": "#4B5563"
+                }
               ]
             },
             {
@@ -84,10 +130,14 @@
               "borderColor": "#E5E7EB",
               "cornerRadius": 8,
               "clipToBounds": true,
-              "columnCount": 1,
-              "headerClasses": ["components/ref_attribute_table_header"],
-              "cellClasses": ["components/ref_attribute_row"],
-              "items": "@{viewModel.sliderAttributes}"
+              "columns": 1,
+              "headerClasses": [
+                "components/ref_attribute_table_header"
+              ],
+              "cellClasses": [
+                "components/ref_attribute_row"
+              ],
+              "items": "@{sliderAttributes}"
             },
             {
               "type": "Label",

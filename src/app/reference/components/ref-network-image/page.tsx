@@ -18,8 +18,8 @@ export default function RefNetworkImagePage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefNetworkImage viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefNetworkImage data={viewModel.data} />
     </>
   );
 }

@@ -15,6 +15,20 @@ export class InstallationViewModel {
     this._setCurrentTab = setCurrentTab;
   }
 
+  get data() {
+    return {
+      currentTab: this._currentTab,
+      setCurrentTab: this._setCurrentTab,
+      onTabChange: this.onTabChange,
+      onClickQuickStart: this.onClickQuickStart,
+      onClickLearn: this.onClickLearn,
+      // Tab visibility
+      showSwiftContent: this._currentTab === 0,
+      showKotlinContent: this._currentTab === 1,
+      showReactContent: this._currentTab === 2,
+    };
+  }
+
   get currentTab(): number {
     return this._currentTab;
   }

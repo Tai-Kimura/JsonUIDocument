@@ -165,7 +165,7 @@ module RjuiTools
           when 'matchParent'
             'w-full'
           when 'wrapContent'
-            'w-auto'
+            'w-fit'
           when Numeric
             "w-[#{width}px]"
           else
@@ -178,7 +178,7 @@ module RjuiTools
           when 'matchParent'
             'h-auto'
           when 'wrapContent'
-            'h-auto'
+            'h-fit'
           when Numeric
             "h-[#{height}px]"
           else
@@ -236,7 +236,7 @@ module RjuiTools
           OPACITY_MAP[closest]
         end
 
-        def map_border(border_width, border_color, corner_radius = 0)
+        def map_border(border_width, border_color, border_style = nil)
           classes = []
 
           if border_width
@@ -251,7 +251,21 @@ module RjuiTools
           end
 
           classes << map_color(border_color, 'border') if border_color
+          classes << map_border_style(border_style) if border_style
           classes.compact.reject(&:empty?).join(' ')
+        end
+
+        def map_border_style(style)
+          case style&.downcase
+          when 'dashed'
+            'border-dashed'
+          when 'dotted'
+            'border-dotted'
+          when 'solid'
+            'border-solid'
+          else
+            ''
+          end
         end
 
         def map_font_weight(weight)
@@ -260,34 +274,102 @@ module RjuiTools
           FONT_WEIGHT_MAP[weight.to_s.downcase] || ''
         end
 
+        # Map font attribute - can be weight name or font family
+        def map_font(font)
+          return '' unless font
+
+          font_lower = font.to_s.downcase
+
+          # Weight names that should map to font-weight
+          weight_names = %w[bold semibold medium light thin extralight heavy black normal]
+          if weight_names.include?(font_lower)
+            return FONT_WEIGHT_MAP[font_lower] || ''
+          end
+
+          # Font family names
+          case font_lower
+          when 'monospace', 'mono'
+            'font-mono'
+          when 'sans', 'sans-serif'
+            'font-sans'
+          when 'serif'
+            'font-serif'
+          else
+            # Custom font - return empty, would need CSS custom font-family
+            ''
+          end
+        end
+
         def map_gap(spacing)
           return '' unless spacing
 
           "gap-#{closest_padding(spacing)}"
         end
 
-        def map_gravity(gravity)
+        # Map gravity attribute based on orientation
+        # Flexbox behavior:
+        # - flex-row (horizontal): items-* controls vertical alignment, justify-* controls horizontal alignment
+        # - flex-col (vertical): items-* controls horizontal alignment, justify-* controls vertical alignment
+        def map_gravity(gravity, orientation = nil)
           return [] unless gravity
 
           classes = []
           gravity_str = gravity.is_a?(Array) ? gravity.join('|') : gravity.to_s
+          is_horizontal = orientation&.downcase == 'horizontal'
 
-          # Horizontal alignment
-          if gravity_str.include?('center') || gravity_str.include?('centerHorizontal')
-            classes << 'items-center'
-          elsif gravity_str.include?('right')
-            classes << 'items-end'
-          elsif gravity_str.include?('left')
-            classes << 'items-start'
-          end
+          if is_horizontal
+            # orientation: "horizontal" (flex-row)
+            # items-* = vertical alignment, justify-* = horizontal alignment
 
-          # Vertical alignment
-          if gravity_str.include?('center') || gravity_str.include?('centerVertical')
-            classes << 'justify-center'
-          elsif gravity_str.include?('bottom')
-            classes << 'justify-end'
-          elsif gravity_str.include?('top')
-            classes << 'justify-start'
+            # Vertical alignment (cross-axis for flex-row)
+            if gravity_str.include?('centerVertical')
+              classes << 'items-center'
+            elsif gravity_str.include?('top')
+              classes << 'items-start'
+            elsif gravity_str.include?('bottom')
+              classes << 'items-end'
+            end
+
+            # Horizontal alignment (main-axis for flex-row)
+            if gravity_str.include?('centerHorizontal')
+              classes << 'justify-center'
+            elsif gravity_str.include?('left')
+              classes << 'justify-start'
+            elsif gravity_str.include?('right')
+              classes << 'justify-end'
+            end
+
+            # Handle "center" (both directions)
+            if gravity_str == 'center' || (gravity_str.include?('center') && !gravity_str.include?('centerVertical') && !gravity_str.include?('centerHorizontal'))
+              classes << 'items-center' unless classes.any? { |c| c.start_with?('items-') }
+              classes << 'justify-center' unless classes.any? { |c| c.start_with?('justify-') }
+            end
+          else
+            # orientation: "vertical" (flex-col) or not specified (default to vertical behavior)
+            # items-* = horizontal alignment, justify-* = vertical alignment
+
+            # Horizontal alignment (cross-axis for flex-col)
+            if gravity_str.include?('centerHorizontal') || gravity_str.include?('center')
+              classes << 'items-center'
+            elsif gravity_str.include?('right')
+              classes << 'items-end'
+            elsif gravity_str.include?('left')
+              classes << 'items-start'
+            end
+
+            # Vertical alignment (main-axis for flex-col)
+            if gravity_str.include?('centerVertical')
+              classes << 'justify-center'
+            elsif gravity_str.include?('bottom')
+              classes << 'justify-end'
+            elsif gravity_str.include?('top')
+              classes << 'justify-start'
+            end
+
+            # Handle "center" (both directions)
+            if gravity_str == 'center' && !classes.any? { |c| c.start_with?('justify-') }
+              classes << 'justify-center'
+            end
           end
 
           classes
@@ -334,6 +416,70 @@ module RjuiTools
           when 1 then 'flex-1'
           else "flex-[#{weight}]"
           end
+        end
+
+        # Min/Max Width/Height constraints
+        def map_min_width(value)
+          return '' unless value
+          case value
+          when 'matchParent' then 'min-w-full'
+          when Numeric then "min-w-[#{value}px]"
+          else ''
+          end
+        end
+
+        def map_max_width(value)
+          return '' unless value
+          case value
+          when 'matchParent' then 'max-w-full'
+          when Numeric then "max-w-[#{value}px]"
+          else ''
+          end
+        end
+
+        def map_min_height(value)
+          return '' unless value
+          case value
+          when 'matchParent' then 'min-h-full'
+          when Numeric then "min-h-[#{value}px]"
+          else ''
+          end
+        end
+
+        def map_max_height(value)
+          return '' unless value
+          case value
+          when 'matchParent' then 'max-h-full'
+          when Numeric then "max-h-[#{value}px]"
+          else ''
+          end
+        end
+
+        # RTL-aware paddings (paddingStart -> ps-, paddingEnd -> pe-)
+        def map_rtl_paddings(start_pad, end_pad)
+          classes = []
+          classes << "ps-#{closest_padding(start_pad)}" if start_pad
+          classes << "pe-#{closest_padding(end_pad)}" if end_pad
+          classes.join(' ')
+        end
+
+        # RTL-aware margins (startMargin -> ms-, endMargin -> me-)
+        def map_rtl_margins(start_margin, end_margin)
+          classes = []
+          classes << "ms-#{closest_padding(start_margin)}" if start_margin
+          classes << "me-#{closest_padding(end_margin)}" if end_margin
+          classes.join(' ')
+        end
+
+        # Insets (alternative padding format - same as padding array)
+        def map_insets(insets)
+          map_padding(insets)
+        end
+
+        # Inset horizontal
+        def map_inset_horizontal(value)
+          return '' unless value
+          "px-#{closest_padding(value)}"
         end
 
         private

@@ -7,21 +7,22 @@ import { ReferenceSidebar } from '@/components/extensions/ReferenceSidebar';
 import { CodeBlock } from '@/components/extensions/CodeBlock';
 
 
-export const RefStyles = ({ viewModel }) => {
+export const RefStyles = ({ data }) => {
   return (
   <div id="ref_styles_page" className="w-full h-auto flex flex-row items-stretch">
+    <div className="" />
     <ReferenceSidebar className="flex flex-col" />
     <div id="ref_styles_scroll" className="w-full h-auto overflow-y-auto flex flex-col">
       <div id="ref_styles_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-        <span className="mb-2 text-[#23272F] text-[32px] font-bold font-bold">{StringManager.currentLanguage.refStyles}</span>
+        <span className="mb-2 text-[#23272F] text-[32px] font-bold">{StringManager.currentLanguage.refStyles}</span>
         <span className="mb-8 text-[#4B5563] text-base">{StringManager.currentLanguage.refStylesOverview}</span>
-        <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refStylesDefinition}</span>
+        <span className="mb-3 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.refStylesDefinition}</span>
         <span className="mb-2 text-[#4B5563] text-sm">{StringManager.currentLanguage.refStylesFileStructure}</span>
-        <span className="mb-1 text-[#6B7280] text-[13px]">Styles/primary_button.json</span>
+        <span className="mb-1 text-[#6B7280] text-[13px] font-mono">Styles/primary_button.json</span>
         <CodeBlock className="flex flex-col mb-4" file="styles_primary_button.json" language="json" showPreview={false} />
-        <span className="mb-1 text-[#6B7280] text-[13px]">Styles/secondary_button.json</span>
+        <span className="mb-1 text-[#6B7280] text-[13px] font-mono">Styles/secondary_button.json</span>
         <CodeBlock className="flex flex-col mb-6" file="styles_secondary_button.json" language="json" showPreview={false} />
-        <span className="mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refStylesApplication}</span>
+        <span className="mb-3 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.refStylesApplication}</span>
         <CodeBlock className="flex flex-col" file="styles_usage.json" language="json" showPreview={false} />
       </div>
     </div>

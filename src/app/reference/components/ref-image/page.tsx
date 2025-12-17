@@ -18,8 +18,8 @@ export default function RefImagePage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefImage viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefImage data={viewModel.data} />
     </>
   );
 }

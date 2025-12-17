@@ -14,8 +14,8 @@ export default function LearnPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <Learn viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <Learn data={viewModel.data} />
     </>
   );
 }

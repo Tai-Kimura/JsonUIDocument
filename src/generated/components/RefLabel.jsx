@@ -14,13 +14,14 @@ import PartialAttributeTableHeader from './PartialAttributeTableHeader';
 import PartialAttributeRow from './PartialAttributeRow';
 
 
-export const RefLabel = ({ viewModel }) => {
+export const RefLabel = ({ data }) => {
   return (
   <div id="ref_label_page" className="w-full h-auto flex flex-row items-stretch">
+    <div className="" />
     <ReferenceSidebar className="flex flex-col" />
     <div id="ref_label_scroll" className="w-full h-auto overflow-y-auto flex flex-col">
       <div id="ref_label_content" className="w-full py-12 px-6 bg-[#FFFFFF] flex flex-col">
-        <span className="mb-4 text-[#23272F] text-[32px] font-bold font-bold">{StringManager.currentLanguage.refLabelTitle}</span>
+        <span className="mb-4 text-[#23272F] text-[32px] font-bold">{StringManager.currentLanguage.refLabelTitle}</span>
         <span className="mb-6 text-[#4B5563] text-base">{StringManager.currentLanguage.refLabelDesc}</span>
         <div className="mb-8 flex flex-row items-stretch">
           <PlatformBadgeSwift />
@@ -29,7 +30,7 @@ export const RefLabel = ({ viewModel }) => {
           <div className="w-[8px]" />
           <PlatformBadgeReact />
         </div>
-        <span className="mb-4 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.compDetailPlatformSupport}</span>
+        <span className="mb-4 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.compDetailPlatformSupport}</span>
         <div className="mb-8 flex flex-col">
           <span className="mb-2 text-[#4B5563] text-sm">{StringManager.currentLanguage.compLabelUikit}</span>
           <span className="mb-2 text-[#4B5563] text-sm">{StringManager.currentLanguage.compLabelSwiftui}</span>
@@ -37,20 +38,20 @@ export const RefLabel = ({ viewModel }) => {
           <span className="mb-2 text-[#4B5563] text-sm">{StringManager.currentLanguage.compLabelAndroidXml}</span>
           <span className="text-[#4B5563] text-sm">{StringManager.currentLanguage.compLabelReact}</span>
         </div>
-        <span className="mb-4 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.compDetailAttributes}</span>
+        <span className="mb-4 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.compDetailAttributes}</span>
         <div className="w-full rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
           <RefAttributeTableHeader />
-          {viewModel.labelAttributes?.map((item, index) => (
+          {data.labelAttributes?.map((item, index) => (
             <RefAttributeRow key={index} data={item} />
           ))}
         </div>
-        <span className="mt-8 mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.compDetailBasicExample}</span>
+        <span className="mt-8 mb-3 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.compDetailBasicExample}</span>
         <CodeBlock className="flex flex-col" file="label_example.json" language="json" showPreview={false} />
-        <span className="mt-8 mb-3 text-[#23272F] text-xl font-bold font-bold">{StringManager.currentLanguage.refLabelPartialAttributes}</span>
+        <span className="mt-8 mb-3 text-[#23272F] text-xl font-bold">{StringManager.currentLanguage.refLabelPartialAttributes}</span>
         <span className="mb-4 text-[#4B5563] text-sm">{StringManager.currentLanguage.refLabelPartialAttributesDesc}</span>
         <div className="w-full mb-6 rounded-lg border border-[#E5E7EB] overflow-hidden flex flex-col">
           <PartialAttributeTableHeader />
-          {viewModel.partialAttributes?.map((item, index) => (
+          {data.partialAttributes?.map((item, index) => (
             <PartialAttributeRow key={index} data={item} />
           ))}
         </div>

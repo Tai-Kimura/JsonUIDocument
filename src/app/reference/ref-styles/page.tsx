@@ -18,8 +18,8 @@ export default function RefStylesPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefStyles viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefStyles data={viewModel.data} />
     </>
   );
 }

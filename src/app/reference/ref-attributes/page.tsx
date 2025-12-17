@@ -18,8 +18,8 @@ export default function RefAttributesPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefAttributes viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefAttributes data={viewModel.data} />
     </>
   );
 }

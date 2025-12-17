@@ -18,8 +18,8 @@ export default function RefCheckPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefCheck viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefCheck data={viewModel.data} />
     </>
   );
 }

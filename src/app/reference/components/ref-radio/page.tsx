@@ -18,8 +18,8 @@ export default function RefRadioPage() {
 
   return (
     <>
-      <Header viewModel={headerViewModel} />
-      <RefRadio viewModel={viewModel} />
+      <Header data={headerViewModel.data} />
+      <RefRadio data={viewModel.data} />
     </>
   );
 }

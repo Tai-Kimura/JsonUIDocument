@@ -5,45 +5,46 @@ import React from 'react';
 import { StringManager } from '@/generated/StringManager';
 
 
-export const Footer = () => {
+export const Footer = ({ data }) => {
   return (
   <div id="footer" className="w-full py-12 px-6 bg-[#23272F] flex flex-col">
+    <div className="" />
     <div className="w-full flex flex-row items-stretch">
       <div className="flex flex-col flex-1">
         <span className="text-[#FFFFFF] text-base font-semibold">{StringManager.currentLanguage.navLearn}</span>
         <div className="h-[16px]" />
-        <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.learnGettingStarted}</span>
+        <span className="text-[#9CA3AF] text-sm cursor-pointer" onClick={data.onClickGettingStarted}>{StringManager.currentLanguage.learnGettingStarted}</span>
         <div className="h-[16px]" />
-        <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.learnQuickStart}</span>
+        <span className="text-[#9CA3AF] text-sm cursor-pointer" onClick={data.onClickQuickStart}>{StringManager.currentLanguage.learnQuickStart}</span>
         <div className="h-[16px]" />
-        <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.learnJsonBasics}</span>
+        <span className="text-[#9CA3AF] text-sm cursor-pointer" onClick={data.onClickJsonBasics}>{StringManager.currentLanguage.learnJsonBasics}</span>
       </div>
       <div className="flex flex-col flex-1">
         <span className="text-[#FFFFFF] text-base font-semibold">{StringManager.currentLanguage.navReference}</span>
         <div className="h-[16px]" />
-        <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.refComponents}</span>
+        <span className="text-[#9CA3AF] text-sm cursor-pointer" onClick={data.onClickRefComponents}>{StringManager.currentLanguage.refComponents}</span>
         <div className="h-[16px]" />
-        <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.refAttributes}</span>
+        <span className="text-[#9CA3AF] text-sm cursor-pointer" onClick={data.onClickRefAttributes}>{StringManager.currentLanguage.refAttributes}</span>
         <div className="h-[16px]" />
-        <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.refDataBinding}</span>
+        <span className="text-[#9CA3AF] text-sm cursor-pointer" onClick={data.onClickRefDataBinding}>{StringManager.currentLanguage.refDataBinding}</span>
       </div>
       <div className="flex flex-col flex-1">
         <span className="text-[#FFFFFF] text-base font-semibold">{StringManager.currentLanguage.navPlatforms}</span>
         <div className="h-[16px]" />
-        <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.platformSwiftTitle}</span>
+        <span className="text-[#9CA3AF] text-sm cursor-pointer" onClick={data.onClickSwift}>{StringManager.currentLanguage.platformSwiftTitle}</span>
         <div className="h-[16px]" />
-        <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.platformKotlinTitle}</span>
+        <span className="text-[#9CA3AF] text-sm cursor-pointer" onClick={data.onClickKotlin}>{StringManager.currentLanguage.platformKotlinTitle}</span>
         <div className="h-[16px]" />
-        <span className="text-[#9CA3AF] text-sm">{StringManager.currentLanguage.platformReactTitle}</span>
+        <span className="text-[#9CA3AF] text-sm cursor-pointer" onClick={data.onClickReact}>{StringManager.currentLanguage.platformReactTitle}</span>
       </div>
       <div className="flex flex-col flex-1">
         <span className="text-[#FFFFFF] text-base font-semibold">{StringManager.currentLanguage.navCommunity}</span>
         <div className="h-[16px]" />
-        <span className="text-[#9CA3AF] text-sm">GitHub</span>
+        <span className="text-[#9CA3AF] text-sm cursor-pointer" onClick={data.onClickGitHub}>GitHub</span>
         <div className="h-[16px]" />
-        <span className="text-[#9CA3AF] text-sm">Issues</span>
+        <span className="text-[#9CA3AF] text-sm cursor-pointer" onClick={data.onClickIssues}>Issues</span>
         <div className="h-[16px]" />
-        <span className="text-[#9CA3AF] text-sm">Discussions</span>
+        <span className="text-[#9CA3AF] text-sm cursor-pointer" onClick={data.onClickDiscussions}>Discussions</span>
       </div>
     </div>
     <div className="h-[32px]" />

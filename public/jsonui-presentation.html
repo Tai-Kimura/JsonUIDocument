@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JsonUI - プレゼンテーション</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #1a1a2e;
+      overflow: hidden;
+    }
+
+    .presentation {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      transform: translateX(100px);
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+
+    .slide.prev {
+      transform: translateX(-100px);
+    }
+
+    /* タイトルスライド */
+    .slide-title {
+      background: linear-gradient(135deg, #087EA4 0%, #149ECA 100%);
+    }
+
+    .slide-title h1 {
+      font-size: 120px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 30px;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .slide-title p {
+      font-size: 32px;
+      color: rgba(255,255,255,0.9);
+      text-align: center;
+      max-width: 800px;
+    }
+
+    /* 概要スライド */
+    .slide-overview {
+      background: linear-gradient(180deg, #F6F7F9 0%, #E8EAED 100%);
+    }
+
+    .slide-overview h2 {
+      font-size: 48px;
+      color: #23272F;
+      margin-bottom: 60px;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      max-width: 1200px;
+    }
+
+    .overview-card {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .overview-card .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .overview-card h3 {
+      font-size: 20px;
+      color: #23272F;
+      margin-bottom: 8px;
+    }
+
+    .overview-card p {
+      font-size: 14px;
+      color: #5E687E;
+    }
+
+    /* カテゴリスライド */
+    .slide-category {
+      padding: 80px;
+    }
+
+    .category-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 40px;
+    }
+
+    .slide-category h2 {
+      font-size: 56px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .slide-category .description {
+      font-size: 24px;
+      line-height: 1.8;
+      max-width: 900px;
+      text-align: center;
+      opacity: 0.9;
+    }
+
+    /* コア設計 */
+    .slide-core-design {
+      background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+    }
+
+    .slide-core-design .category-badge {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .slide-core-design h2,
+    .slide-core-design .description {
+      color: white;
+    }
+
+    /* 開発者重視 */
+    .slide-developer {
+      background: linear-gradient(135deg, #047857 0%, #10B981 100%);
+    }
+
+    .slide-developer .category-badge {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .slide-developer h2,
+    .slide-developer .description {
+      color: white;
+    }
+
+    /* AI駆動 */
+    .slide-ai {
+      background: linear-gradient(135deg, #6D28D9 0%, #8B5CF6 100%);
+    }
+
+    .slide-ai .category-badge {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .slide-ai h2,
+    .slide-ai .description {
+      color: white;
+    }
+
+    /* プラットフォームスライド */
+    .slide-platforms {
+      background: linear-gradient(180deg, #23272F 0%, #3B4252 100%);
+    }
+
+    .slide-platforms h2 {
+      font-size: 48px;
+      color: white;
+      margin-bottom: 60px;
+    }
+
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      max-width: 1200px;
+    }
+
+    .platform-card {
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .platform-card:hover {
+      transform: translateY(-10px);
+    }
+
+    .platform-card.swift {
+      background: linear-gradient(135deg, #FA7343 0%, #FF9A6C 100%);
+    }
+
+    .platform-card.kotlin {
+      background: linear-gradient(135deg, #7F52FF 0%, #A78BFA 100%);
+    }
+
+    .platform-card.react {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+      border: 2px solid #61DAFB;
+    }
+
+    .platform-card .icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .platform-card h3 {
+      font-size: 28px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .platform-card.react h3 {
+      color: #61DAFB;
+    }
+
+    .platform-card p {
+      font-size: 16px;
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* まとめスライド */
+    .slide-summary {
+      background: linear-gradient(135deg, #087EA4 0%, #149ECA 100%);
+    }
+
+    .slide-summary h2 {
+      font-size: 56px;
+      color: white;
+      margin-bottom: 50px;
+    }
+
+    .summary-points {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 800px;
+    }
+
+    .summary-point {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: rgba(255,255,255,0.15);
+      padding: 20px 30px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .summary-point .check {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #087EA4;
+      flex-shrink: 0;
+    }
+
+    .summary-point span {
+      font-size: 22px;
+      color: white;
+    }
+
+    /* ナビゲーション */
+    .nav-controls {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      z-index: 1000;
+    }
+
+    .nav-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.9);
+      color: #23272F;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .nav-btn:hover {
+      transform: scale(1.1);
+      background: white;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* スライド番号 */
+    .slide-counter {
+      position: fixed;
+      bottom: 50px;
+      right: 50px;
+      color: rgba(255,255,255,0.7);
+      font-size: 18px;
+      font-weight: 500;
+      z-index: 1000;
+    }
+
+    /* プログレスバー */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #087EA4, #10B981, #8B5CF6);
+      transition: width 0.3s ease;
+      z-index: 1000;
+    }
+
+    /* キーボードヒント */
+    .keyboard-hint {
+      position: fixed;
+      bottom: 50px;
+      left: 50px;
+      color: rgba(255,255,255,0.5);
+      font-size: 14px;
+      z-index: 1000;
+    }
+
+    .keyboard-hint kbd {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+      margin: 0 4px;
+    }
+
+    /* アイコン */
+    .feature-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      margin-bottom: 24px;
+    }
+
+    .feature-icon.blue {
+      background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+    }
+
+    .feature-icon.green {
+      background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+    }
+
+    .feature-icon.purple {
+      background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="presentation">
+    <!-- スライド 1: タイトル -->
+    <div class="slide slide-title active" data-slide="1">
+      <h1>JsonUI</h1>
+      <p>1つのJSON定義でiOS、Android、WebのネイティブUIを構築</p>
+    </div>
+
+    <!-- スライド 2: AI開発の現状 -->
+    <div class="slide slide-category" data-slide="2" style="background: linear-gradient(135deg, #1E3A5F 0%, #2563EB 100%);">
+      <span class="category-badge" style="background: rgba(255,255,255,0.2);">背景</span>
+      <h2 style="color: white; margin-bottom: 16px;">AI時代の開発スタイル</h2>
+      <div style="max-width: 900px; margin-top: 20px; padding-bottom: 80px;">
+        <div style="display: flex; gap: 30px; align-items: stretch;">
+          <div style="flex: 1; background: rgba(255,255,255,0.15); border-radius: 12px; padding: 20px; text-align: center;">
+            <div style="font-size: 36px; margin-bottom: 10px;">✅</div>
+            <div style="color: #34D399; font-size: 18px; font-weight: bold; margin-bottom: 8px;">単一プラットフォーム</div>
+            <div style="color: rgba(255,255,255,0.9); font-size: 14px; line-height: 1.5;">
+              AIを活用した開発は<br>もはや難しくない時代に
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; font-size: 28px; color: rgba(255,255,255,0.5);">→</div>
+          <div style="flex: 1; background: rgba(255,255,255,0.15); border-radius: 12px; padding: 20px; text-align: center;">
+            <div style="font-size: 36px; margin-bottom: 10px;">❓</div>
+            <div style="color: #FBBF24; font-size: 18px; font-weight: bold; margin-bottom: 8px;">複数プラットフォーム</div>
+            <div style="color: rgba(255,255,255,0.9); font-size: 14px; line-height: 1.5;">
+              同じ実装を異なる環境で<br>再現させるのはまだ困難
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; background: rgba(255,255,255,0.1); border-radius: 10px; padding: 14px 18px; border-left: 4px solid #FBBF24;">
+          <div style="color: #FBBF24; font-size: 14px; font-weight: bold; margin-bottom: 6px;">なぜ難しいのか？</div>
+          <div style="color: rgba(255,255,255,0.9); font-size: 14px; line-height: 1.6;">
+            AIはプラットフォームごとのベストプラクティスを解釈するため、設計や実装がバラバラになりがち
+          </div>
+        </div>
+        <div style="margin-top: 14px; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 16px 20px;">
+          <div style="color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 6px;">そこで注目されるのが...</div>
+          <div style="color: white; font-size: 18px; font-weight: bold;">マルチプラットフォームフレームワーク</div>
+          <div style="color: #FBBF24; font-size: 14px; margin-top: 6px;">しかし、既存のフレームワークにも課題が...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- スライド 3: 既存フレームワークの課題 -->
+    <div class="slide slide-category" data-slide="3" style="background: linear-gradient(135deg, #991B1B 0%, #DC2626 100%);">
+      <span class="category-badge" style="background: rgba(255,255,255,0.2);">課題</span>
+      <h2 style="color: white;">既存フレームワークの落とし穴</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 30px; max-width: 1000px;">
+        <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 24px; text-align: left;">
+          <div style="font-size: 24px; margin-bottom: 12px;">🔒</div>
+          <div style="color: white; font-size: 18px; font-weight: bold; margin-bottom: 8px;">Nativeコードとの共存が困難</div>
+          <div style="color: rgba(255,255,255,0.8); font-size: 14px; line-height: 1.6;">新しいOS機能が追加されるたびにフレームワークの対応を待つ必要がある</div>
+        </div>
+        <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 24px; text-align: left;">
+          <div style="font-size: 24px; margin-bottom: 12px;">📚</div>
+          <div style="color: white; font-size: 18px; font-weight: bold; margin-bottom: 8px;">フレームワーク固有の記述ルール</div>
+          <div style="color: rgba(255,255,255,0.8); font-size: 14px; line-height: 1.6;">独自の構文や設計パターンを一から学ぶ必要があり、学習コストが高い</div>
+        </div>
+        <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 24px; text-align: left;">
+          <div style="font-size: 24px; margin-bottom: 12px;">🔧</div>
+          <div style="color: white; font-size: 18px; font-weight: bold; margin-bottom: 8px;">拡張ライブラリの互換性問題</div>
+          <div style="color: rgba(255,255,255,0.8); font-size: 14px; line-height: 1.6;">サードパーティライブラリのバージョン管理や互換性維持が煩雑</div>
+        </div>
+        <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 24px; text-align: left;">
+          <div style="font-size: 24px; margin-bottom: 12px;">⚠️</div>
+          <div style="color: white; font-size: 18px; font-weight: bold; margin-bottom: 8px;">エラーが理解しづらい</div>
+          <div style="color: rgba(255,255,255,0.8); font-size: 14px; line-height: 1.6;">フレームワーク固有のエラーメッセージで、経験がないと原因特定が困難</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- スライド 4: 概要 -->
+    <div class="slide slide-overview" data-slide="4">
+      <h2>基本思想</h2>
+      <p style="font-size: 18px; color: #5E687E; margin-bottom: 20px; max-width: 900px; line-height: 1.8;">
+        これらの課題に何度もぶつかってきた開発者の実体験から生まれたライブラリ。<br>
+        <strong style="color: #087EA4;">開発時のボトルネックを根本から解消し、1エンジニアの作業効率を最大化する</strong>ことを目標に設計。
+      </p>
+      <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 30px;">
+        <div style="background: #DC2626; color: white; padding: 8px 16px; border-radius: 8px; font-size: 14px;">課題</div>
+        <div style="font-size: 24px; color: #5E687E;">→</div>
+        <div style="background: #087EA4; color: white; padding: 8px 16px; border-radius: 8px; font-size: 14px;">JsonUIで解決</div>
+      </div>
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="icon">🎨</div>
+          <h3>コア設計</h3>
+          <p>宣言的なUI定義、関心の分離、ネイティブパフォーマンス</p>
+        </div>
+        <div class="overview-card">
+          <div class="icon">👩‍💻</div>
+          <h3>開発者重視</h3>
+          <p>一貫性、優れたツーリング、柔軟なエスケープハッチ</p>
+        </div>
+        <div class="overview-card">
+          <div class="icon">🤖</div>
+          <h3>AI駆動</h3>
+          <p>プラットフォーム別エージェント、スマート検証、開発加速</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- スライド 5: 宣言的なUI定義 -->
+    <div class="slide slide-category slide-core-design" data-slide="5">
+      <span class="category-badge">コア設計</span>
+      <h2>宣言的なUI定義</h2>
+      <p class="description">
+        UIを「どう作るか」ではなく「何を表示するか」で記述。<br><br>
+        <strong style="font-size: 28px;">プラットフォームごとのUI構造の違いを<br>一切気にする必要がない</strong><br><br>
+        <span style="font-size: 20px; opacity: 0.85;">
+          iOS / Android / Web の差分はライブラリが吸収。<br>
+          デザイナーでもプラットフォーム固有の<br>
+          コーディングルールを知らずに実装できます。
+        </span>
+      </p>
+    </div>
+
+    <!-- スライド 6: プロジェクト構成 -->
+    <div class="slide slide-category slide-core-design" data-slide="6">
+      <span class="category-badge">コア設計</span>
+      <h2>明確なプロジェクト構成</h2>
+      <div style="display: flex; gap: 40px; margin-top: 20px;">
+        <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 30px; flex: 1;">
+          <div style="font-size: 18px; font-weight: bold; color: #60A5FA; margin-bottom: 20px;">📁 フォルダ構成</div>
+          <pre style="font-family: 'SF Mono', Monaco, monospace; font-size: 16px; color: white; line-height: 1.8; text-align: left;">
+YourApp/
+├── 📂 <span style="color: #60A5FA;">Layouts/</span>        <span style="opacity: 0.6;">← JSON定義</span>
+├── 📂 <span style="color: #60A5FA;">Styles/</span>         <span style="opacity: 0.6;">← スタイル定義</span>
+├── 📂 <span style="color: #34D399;">View/</span>           <span style="opacity: 0.6;">← 自動生成View</span>
+├── 📂 <span style="color: #FBBF24;">ViewModel/</span>      <span style="opacity: 0.6;">← ロジック（編集可）</span>
+└── 📂 <span style="color: #F87171;">Data/</span>           <span style="opacity: 0.6;">← 自動生成モデル</span></pre>
+        </div>
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+          <div style="background: rgba(96, 165, 250, 0.2); border-left: 4px solid #60A5FA; padding: 16px 20px; border-radius: 0 8px 8px 0; margin-bottom: 16px;">
+            <span style="color: #60A5FA; font-weight: bold;">デザイナー</span>
+            <span style="color: white; opacity: 0.9; margin-left: 12px;">→ Layouts / Styles</span>
+          </div>
+          <div style="background: rgba(251, 191, 36, 0.2); border-left: 4px solid #FBBF24; padding: 16px 20px; border-radius: 0 8px 8px 0; margin-bottom: 16px;">
+            <span style="color: #FBBF24; font-weight: bold;">エンジニア</span>
+            <span style="color: white; opacity: 0.9; margin-left: 12px;">→ ViewModel</span>
+          </div>
+          <div style="background: rgba(248, 113, 113, 0.2); border-left: 4px solid #F87171; padding: 16px 20px; border-radius: 0 8px 8px 0;">
+            <span style="color: #F87171; font-weight: bold;">自動生成</span>
+            <span style="color: white; opacity: 0.9; margin-left: 12px;">→ View / Data（編集不要）</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- スライド 7: 関心の分離 -->
+    <div class="slide slide-category slide-core-design" data-slide="7">
+      <span class="category-badge">コア設計</span>
+      <h2>UIとロジックの完全分離</h2>
+      <p class="description">
+        UI構造はJSONに、ビジネスロジックはViewModelに、<br>
+        スタイリングは別ファイルに完全分離。<br><br>
+        <strong style="font-size: 28px;">チーム開発で一切のコンフリクトが発生しない</strong><br><br>
+        <span style="font-size: 20px; opacity: 0.85;">
+          難しいロジックはベテランエンジニアに、簡単なロジックは新米エンジニアに、<br>
+          デザインの最終調整はデザイナーに — 柔軟な作業分担が可能
+        </span>
+      </p>
+    </div>
+
+    <!-- スライド 8: ネイティブパフォーマンス -->
+    <div class="slide slide-category slide-core-design" data-slide="8">
+      <span class="category-badge">コア設計</span>
+      <h2>ネイティブパフォーマンス</h2>
+      <p class="description">
+        開発時はDynamicComponentとホットリロードで即座にUI変更を確認。<br><br>
+        本番ビルドでは静的ネイティブコードを生成し、<br>
+        ランタイムオーバーヘッドゼロを実現。
+      </p>
+    </div>
+
+    <!-- スライド 9: プラットフォーム間の一貫性 -->
+    <div class="slide slide-category slide-developer" data-slide="9">
+      <span class="category-badge">開発者重視</span>
+      <h2>プラットフォーム間の一貫性</h2>
+      <p class="description">
+        1つのJSON定義でiOS、Android、Web全体で<br>
+        視覚的に一貫したUIを実現。<br><br>
+        <strong style="font-size: 28px;">プラットフォーム独自のUIも柔軟に対応</strong><br><br>
+        <span style="font-size: 20px; opacity: 0.85;">
+          JSONファイルを分割することで、<br>
+          プラットフォームごとの独自表現も自在に実装可能
+        </span>
+      </p>
+    </div>
+
+    <!-- スライド 10: 開発者体験を最優先 -->
+    <div class="slide slide-category slide-developer" data-slide="10">
+      <span class="category-badge">開発者重視</span>
+      <h2>開発者体験を最優先</h2>
+      <p class="description">
+        即座にフィードバックを得られるホットリロード、<br>
+        スキャフォールディング用のCLIツール、<br>
+        型安全のための静的コード生成。<br><br>
+        品質を犠牲にせず、より速く開発できます。
+      </p>
+    </div>
+
+    <!-- スライド 11: 必要に応じたエスケープハッチ -->
+    <div class="slide slide-category slide-developer" data-slide="11">
+      <span class="category-badge">開発者重視</span>
+      <h2>必要に応じたエスケープハッチ</h2>
+      <p class="description">
+        <strong style="font-size: 28px;">CLIで独自コンポーネントをJSONに組み込める</strong><br><br>
+        <span style="font-size: 20px; opacity: 0.85;">
+          新しいOS機能にフレームワークが追いついていなくても即時対応可能。<br>
+          自作のネイティブコンポーネントをConverterで登録すれば<br>
+          JSONから呼び出せるようになります。<br><br>
+          既存プロジェクトへの部分的な組み込みにも最適。
+        </span>
+      </p>
+    </div>
+
+    <!-- スライド 12: プラットフォーム別エージェント -->
+    <div class="slide slide-category slide-ai" data-slide="12">
+      <span class="category-badge">AI駆動</span>
+      <h2>AIが理解しやすい共通言語</h2>
+      <p class="description">
+        <strong style="font-size: 28px;">JSONという共通言語でAIが構造を即座に理解</strong><br><br>
+        <span style="font-size: 20px; opacity: 0.85;">
+          どのプロジェクトでも設計が統一されているため、<br>
+          AIへの指示がより明確・簡潔に。<br><br>
+          他のプラットフォームで実装した機能を移植する際も、<br>
+          簡潔な指示で混乱なく正確に実装できる
+        </span>
+      </p>
+    </div>
+
+    <!-- スライド 13: 作業別エージェント -->
+    <div class="slide slide-category slide-ai" data-slide="13">
+      <span class="category-badge">AI駆動</span>
+      <h2>作業別エージェント</h2>
+      <p class="description">
+        <strong style="font-size: 28px;">開発フェーズごとに専用AIエージェントを用意</strong><br><br>
+        <span style="font-size: 20px; opacity: 0.85;">
+          <strong>jsonui-setup</strong> — プロジェクト初期設定<br>
+          <strong>jsonui-generator</strong> — View/Component/Converterの生成<br>
+          <strong>jsonui-layout</strong> — JSONレイアウトの検証と最適化<br>
+          <strong>jsonui-data</strong> — JSONデータセクションの定義<br>
+          <strong>jsonui-viewmodel</strong> — ビジネスロジックの実装<br><br>
+          ビジネスロジックはUI実装と完全に分離されているため、<br>
+          プラットフォーム固有の知識が必要な場合も<br>
+          Swift/Kotlin等のExpertエージェントとスムーズに連携可能
+        </span>
+      </p>
+    </div>
+
+    <!-- スライド 14: エージェント連携フロー -->
+    <div class="slide slide-category slide-ai" data-slide="14">
+      <span class="category-badge">AI駆動</span>
+      <h2 style="color: white;">エージェント連携フロー</h2>
+      <div style="max-width: 950px; margin-top: 24px; padding-bottom: 60px;">
+        <div style="background: rgba(255,255,255,0.15); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+          <div style="color: white; font-size: 15px; font-weight: bold; margin-bottom: 10px;">メインエージェント（あなた）とオーケストレーターの対話</div>
+          <div style="display: flex; gap: 16px; justify-content: center; align-items: center; flex-wrap: wrap;">
+            <div style="background: #3B82F6; border-radius: 8px; padding: 10px 18px; font-size: 14px; color: white; font-weight: bold;">メインエージェント</div>
+            <div style="color: white; font-size: 24px;">⇄</div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="background: #A78BFA; border-radius: 8px; padding: 8px 14px; font-size: 13px; color: white;">swiftjsonui-swiftui</div>
+              <div style="background: #A78BFA; border-radius: 8px; padding: 8px 14px; font-size: 13px; color: white;">kotlinjsonui-compose</div>
+              <div style="background: #A78BFA; border-radius: 8px; padding: 8px 14px; font-size: 13px; color: white;">reactjsonui</div>
+            </div>
+          </div>
+          <div style="color: white; font-size: 13px; margin-top: 10px; text-align: center; opacity: 0.9;">対話を通じてオーケストレーターが適切なエージェントを順番に呼び出し</div>
+        </div>
+        <div style="text-align: center; font-size: 24px; color: white; margin: 8px 0;">↓</div>
+        <div style="background: rgba(255,255,255,0.15); border-radius: 12px; padding: 16px;">
+          <div style="color: white; font-size: 15px; font-weight: bold; margin-bottom: 14px;">新規View/機能の実装フロー（順番に実行）</div>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
+            <div style="background: #34D399; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: bold; color: #1a1a2e;">jsonui-generator</div>
+            <div style="color: white; font-size: 20px;">→</div>
+            <div style="background: #34D399; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: bold; color: #1a1a2e;">jsonui-layout</div>
+            <div style="color: white; font-size: 20px;">→</div>
+            <div style="background: #34D399; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: bold; color: #1a1a2e;">jsonui-data</div>
+            <div style="color: white; font-size: 20px;">→</div>
+            <div style="background: #34D399; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: bold; color: #1a1a2e;">jsonui-viewmodel</div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; text-align: center; font-size: 11px; color: white; opacity: 0.8;">
+            <div>View生成</div>
+            <div>JSON検証</div>
+            <div>データ定義</div>
+            <div>ロジック実装</div>
+          </div>
+        </div>
+        <div style="margin-top: 14px; text-align: center; color: white; font-size: 14px;">
+          統一されたフローで、どのプラットフォームでも同じ開発体験を実現
+        </div>
+      </div>
+    </div>
+
+    <!-- スライド 15: 開発の加速 -->
+    <div class="slide slide-category slide-ai" data-slide="15">
+      <span class="category-badge">AI駆動</span>
+      <h2>開発の加速</h2>
+      <p class="description">
+        AI-人間協調により、インテリジェントなコード生成、<br>
+        スキャフォールディング支援、<br>
+        文脈に応じたベストプラクティスガイドを通じて<br>
+        開発を加速。<br><br>
+        コード品質と一貫性を維持します。
+      </p>
+    </div>
+
+    <!-- スライド 16: プラットフォーム -->
+    <div class="slide slide-platforms" data-slide="16">
+      <h2>プラットフォームを選ぶ</h2>
+      <div class="platforms-grid">
+        <div class="platform-card swift">
+          <div class="icon">🍎</div>
+          <h3>SwiftJsonUI</h3>
+          <p>iOS/macOS<br>UIKit & SwiftUI対応</p>
+        </div>
+        <div class="platform-card kotlin">
+          <div class="icon">🤖</div>
+          <h3>KotlinJsonUI</h3>
+          <p>Android<br>Compose & XML対応</p>
+        </div>
+        <div class="platform-card react">
+          <div class="icon">⚛️</div>
+          <h3>ReactJsonUI</h3>
+          <p>Web<br>React & Tailwind対応</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- スライド 17: まとめ -->
+    <div class="slide slide-summary" data-slide="17">
+      <h2>JsonUIのメリット</h2>
+      <div class="summary-points">
+        <div class="summary-point">
+          <span class="check">✓</span>
+          <span>1つのJSON定義で3つのプラットフォームをカバー</span>
+        </div>
+        <div class="summary-point">
+          <span class="check">✓</span>
+          <span>UIとロジックの完全分離でチーム開発のコンフリクトゼロ</span>
+        </div>
+        <div class="summary-point">
+          <span class="check">✓</span>
+          <span>開発時はホットリロード、本番はネイティブパフォーマンス</span>
+        </div>
+        <div class="summary-point">
+          <span class="check">✓</span>
+          <span>AI駆動の開発支援で生産性を大幅に向上</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ナビゲーション -->
+  <div class="nav-controls">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()">←</button>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()">→</button>
+  </div>
+
+  <div class="slide-counter" id="slideCounter">1 / 17</div>
+  <div class="keyboard-hint">
+    <kbd>←</kbd> <kbd>→</kbd> または <kbd>Space</kbd> でナビゲート
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 17;
+
+    function showSlide(n) {
+      const slides = document.querySelectorAll('.slide');
+
+      if (n < 1) n = 1;
+      if (n > totalSlides) n = totalSlides;
+
+      slides.forEach((slide, index) => {
+        slide.classList.remove('active', 'prev');
+        if (index + 1 < n) {
+          slide.classList.add('prev');
+        }
+      });
+
+      slides[n - 1].classList.add('active');
+      currentSlide = n;
+
+      // Update counter
+      document.getElementById('slideCounter').textContent = `${n} / ${totalSlides}`;
+
+      // Update progress bar
+      const progress = ((n - 1) / (totalSlides - 1)) * 100;
+      document.getElementById('progressBar').style.width = `${progress}%`;
+
+      // Update button states
+      document.getElementById('prevBtn').disabled = (n === 1);
+      document.getElementById('nextBtn').disabled = (n === totalSlides);
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        showSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        showSlide(currentSlide - 1);
+      }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        showSlide(1);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        showSlide(totalSlides);
+      }
+    });
+
+    // Touch swipe support
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    document.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      const diff = touchStartX - touchEndX;
+
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+          nextSlide();
+        } else {
+          prevSlide();
+        }
+      }
+    }
+
+    // Initialize
+    showSlide(1);
+  </script>
+</body>
+</html>
