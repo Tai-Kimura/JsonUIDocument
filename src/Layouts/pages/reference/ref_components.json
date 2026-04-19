@@ -1,0 +1,92 @@
+{
+  "type": "View",
+  "id": "ref_components_page",
+  "width": "matchParent",
+  "height": "matchParent",
+  "orientation": "horizontal",
+  "child": [
+    {},
+    {
+      "type": "ReferenceSidebar"
+    },
+    {
+      "type": "ScrollView",
+      "id": "ref_components_scroll",
+      "width": "matchParent",
+      "height": "matchParent",
+      "child": [
+        {
+          "type": "View",
+          "id": "ref_components_content",
+          "width": "matchParent",
+          "padding": [
+            48,
+            24
+          ],
+          "orientation": "vertical",
+          "background": "#FFFFFF",
+          "child": [
+            {
+              "type": "View",
+              "id": "ref_components_hero",
+              "width": "matchParent",
+              "padding": [
+                0,
+                24
+              ],
+              "orientation": "vertical",
+              "gravity": "center",
+              "child": [
+                {
+                  "type": "Label",
+                  "text": "components_title",
+                  "fontSize": 48,
+                  "fontWeight": "bold",
+                  "fontColor": "#23272F",
+                  "textAlign": "Center"
+                },
+                {
+                  "style": "spacer_16"
+                },
+                {
+                  "type": "Label",
+                  "text": "components_subtitle",
+                  "fontSize": 20,
+                  "fontColor": "#5E687E",
+                  "textAlign": "Center"
+                }
+              ]
+            },
+            {
+              "style": "spacer_48"
+            },
+            {
+              "include": "components/component_section_layout",
+              "data": {
+                "viewModel": "@{viewModel}"
+              }
+            },
+            {
+              "style": "spacer_48"
+            },
+            {
+              "include": "components/component_section_text",
+              "data": {
+                "viewModel": "@{viewModel}"
+              }
+            },
+            {
+              "style": "spacer_48"
+            },
+            {
+              "include": "components/component_section_input",
+              "data": {
+                "viewModel": "@{viewModel}"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
