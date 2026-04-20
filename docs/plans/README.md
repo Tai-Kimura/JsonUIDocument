@@ -61,6 +61,7 @@
 | **15** | **`15-toolchain.md`** | **jui.config.json、`.jsonui-type-map.json`、`jsonui-doc-web`/`-ios`/`-android`、CI** |
 | 16 | `16-migration-and-rollout.md` | 既存削除 → jui init → フェーズ別ロールアウト |
 | **17** | **`17-spec-templates.md`** | **ページ種別ごとの spec テンプレート雛形集** |
+| **18** | **`18-content-plan-installation.md`** | **`/learn/installation` — agents + CLI + MCP のワンライナーインストール要件** |
 
 太字は本設計の大幅修正／新規ファイル。
 

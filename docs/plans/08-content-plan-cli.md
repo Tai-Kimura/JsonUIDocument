@@ -29,7 +29,7 @@
 ```
 /tools/cli
 ├── /tools/cli/overview                      CLI 全体像
-├── /tools/cli/install                       インストール（bootstrap / local）
+├── /tools/cli/install                       インストール（CLI のみ; agents/MCP もまとめて入れたい人は `/learn/installation` へ）
 ├── /tools/cli/jui                           jui (Python)
 │   ├── /tools/cli/jui/overview
 │   ├── /tools/cli/jui/init

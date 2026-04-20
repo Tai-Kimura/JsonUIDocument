@@ -93,19 +93,27 @@ JsonUI アプローチ:
 - **Spec Quality のみが変動要因**
 
 ### 3.3 `install`
-- Claude Code 用:
+
+ページ冒頭に `/learn/installation` への誘導バナー（Converter `InfoBanner` 想定）:
+
+> 初めての方は `/learn/installation` のワンライナーで agents + CLI + MCP を一括インストールできます。このページは「既に CLI/MCP を別手段で管理していて、agents だけ入れたい」人向けです。
+
+本文:
+
+- Claude Code 用（agents のみ）:
   ```bash
   curl -H "Cache-Control: no-cache" -sL \
     "https://raw.githubusercontent.com/Tai-Kimura/JsonUI-Agents-for-claude/main/install.sh?$(date +%s)" \
     | bash
   ```
-- Codex 用:
+- Codex 用（agents のみ）:
   ```bash
   curl -H "Cache-Control: no-cache" -sL \
     "https://raw.githubusercontent.com/Tai-Kimura/JsonUI-Agents-for-Codex/main/install.sh?$(date +%s)" \
     | bash
   ```
 - インストール後、`Read CLAUDE.md` または `Read AGENTS.md` で起動
+- ワンライナー（agents + CLI + MCP）の詳細は `18-content-plan-installation.md` / `/learn/installation` を参照
 
 ### 3.4 `claude/claude-md`
 - `CLAUDE.md` の役割: プロジェクトルールと workflow 選択の入口

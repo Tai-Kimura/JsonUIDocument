@@ -25,7 +25,7 @@
 /tools/mcp
 ├── /tools/mcp/overview                         MCP サーバーとは
 ├── /tools/mcp/why                              なぜ MCP が必要か（AI 差別化）
-├── /tools/mcp/install                          インストール手順
+├── /tools/mcp/install                          インストール手順（MCP のみ; agents/CLI もまとめて入れたい人は `/learn/installation` へ）
 ├── /tools/mcp/configure                        ~/.claude.json 設定
 ├── /tools/mcp/project-dir                      JUI_PROJECT_DIR の使い方
 ├── /tools/mcp/update                           アップデート
