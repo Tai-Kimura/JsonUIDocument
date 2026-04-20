@@ -1,1 +1,0 @@
-sjui_tools/bin/sjui g view HomeView --root

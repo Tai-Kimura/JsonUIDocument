@@ -1,1 +1,0 @@
-kjui_tools/bin/kjui g view HomeView --root
