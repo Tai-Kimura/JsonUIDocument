@@ -86,7 +86,7 @@
 
 - **Phase 0**: 設計レビュー、既存ファイル全削除（バックアップ不要）
 - **Phase 1**: jui プロジェクト足場（`jui init` + `jsonui-doc-web` セットアップ）
-- **Phase 2**: 共通 spec テンプレ一括生成、共通部品（Header / Sidebar / Footer / Breadcrumb / TOC）、独自 Converter（CodeBlock / NavLink / SearchModal / OpenApiViewer / Tabs / Prose / PlatformBadge 等）
+- **Phase 2**: 共通 spec テンプレ一括生成、共通部品（Header / Sidebar / Footer / Breadcrumb / TOC）、独自 Converter（`CodeBlock` / `TableOfContents` / `SearchModal` / `SearchTrigger` / `OpenApiViewer` / `JsonSchemaViewer` — いずれも `component_spec` 先行で `jui g converter --from <spec>`）
 - **Phase 3**: ライブラリ別コンテンツ（SwiftJsonUI / KotlinJsonUI / ReactJsonUI）
 - **Phase 4**: Tools（CLI / MCP / test-runner / Agents / Helper）
 - **Phase 5**: 概念 + 属性リファレンス自動生成 + **iOS/Android ショーケース**

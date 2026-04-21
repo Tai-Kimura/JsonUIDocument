@@ -109,12 +109,14 @@
 - 出力例: `ButtonConverter` → `<button className="...">...`
 
 ### 3.8 `converters/custom`
-- `rjui g converter MyCard` の挙動
-- 手順:
-  1. `rjui g converter MyCard --attributes "title:string,count:number"`
-  2. `lib/react/converters/extensions/my_card_converter.rb` 生成
-  3. `converter_mappings.rb` に登録
-  4. JSON 側で `{"type": "MyCard", "title": "..."}` と書ける
+- 推奨（spec-first）手順:
+  1. `docs/screens/json/components/my_card.component.json` を `mcp__jui-tools__doc_init_component` で生成し、`props.items[]` / `slots.items[]` を埋める
+  2. `mcp__jui-tools__doc_validate_component` で検証
+  3. `.jsonui-doc-rules.json` の `componentTypes.screen` に `MyCard` を追加
+  4. `rjui g converter --from my_card.component.json`（または `--all`）で Converter スタブ生成。`props.items[]` が自動的に attributes に、`slots.items[]` 非空が container 指定にマップされる
+  5. `converter_mappings.rb` に登録
+  6. JSON 側で `{"type": "MyCard", "title": "..."}` と書ける
+- 手書き `--attributes "title:string,..."` は非推奨。spec と converter の二重管理で食い違いが起きる
 - 既存サンプル: `custom_badge_converter.rb` / `test_card_converter.rb`
 
 ### 3.9 `viewmodels`
@@ -182,7 +184,7 @@
 本サイト自体が ReactJsonUI 実装であることを利用し、以下を**実サイトの「舞台裏」ページ**として `/platforms/react/dogfooding` に追加（上記の構成に加える）:
 
 - 本サイトで使っている Converter 一覧
-- 本サイトで定義したカスタム Converter（CodeBlock / NavLink / SearchModal / OpenApiViewer / Tabs / Prose）とその JSON 記法
+- 本サイトで定義したカスタム Converter（`CodeBlock` / `TableOfContents` / `SearchModal` / `SearchTrigger` / `OpenApiViewer` / `JsonSchemaViewer`）とその JSON 記法、および `component_spec` → `jui g converter --from <spec>` の spec-first ワークフロー（`02-tech-stack.md §6.1`）
 - GitHub リンク（`JsonUIDocument` リポジトリ自体）
 
 ## 7. 実装チェックリスト

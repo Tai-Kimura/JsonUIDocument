@@ -145,15 +145,10 @@ URL: `/reference/components/label`
               "child": [
                 { "type": "Label", "text": "@string/ref_platform_support", "style": "heading_3" },
                 {
-                  "type": "View",
+                  "type": "Collection",
+                  "items": "@{platformSupport}",
                   "orientation": "horizontal",
-                  "child": [
-                    { "type": "PlatformBadge", "platform": "uikit",   "supported": true },
-                    { "type": "PlatformBadge", "platform": "swiftui", "supported": true },
-                    { "type": "PlatformBadge", "platform": "compose", "supported": true },
-                    { "type": "PlatformBadge", "platform": "xml",     "supported": true },
-                    { "type": "PlatformBadge", "platform": "web",     "supported": true }
-                  ]
+                  "cellClasses": ["cells/platform_badge"]
                 }
               ]
             },
@@ -217,7 +212,8 @@ URL: `/reference/components/label`
 - `include "common/toc"` も `platforms: ["web"]` で Web 限定
 - `Collection` で属性一覧を表示。`cellClasses` と `sections` で `docs/screens/layouts/cells/attribute_row.json` を参照
 - `style: "heading_1"` 等は `docs/screens/styles/heading_1.json` を参照（`jui build` 配布時に各プラットフォームの Styles に展開）
-- `CodeBlock` / `PlatformBadge` は独自コンポーネント（`.jsonui-doc-rules.json` に登録済）
+- `CodeBlock` はライブラリ依存（Shiki）のため独自コンポーネント。`docs/screens/json/components/codeblock.component.json` で `props.items[]` / `slots.items[]` を定義し `.jsonui-doc-rules.json` に名前登録（spec-first。`02-tech-stack.md §6.1`）
+- プラットフォーム対応マトリクスは `Collection + cells/platform_badge`（ViewModel が `platformSupport: [PlatformSupport(name, supported)]` を公開）。カスタム `PlatformBadge` 型は作らない
 
 ---
 
@@ -235,8 +231,8 @@ URL: `/reference/components/label`
   "style": "site_header",
   "child": [
     {
-      "type": "NavLink",
-      "href": "/",
+      "type": "View",
+      "onClick": "onNavigateHome",
       "child": [{ "type": "Image", "src": "logo", "width": 32, "height": 32 }],
       "platforms": ["web"]
     },
@@ -258,6 +254,8 @@ URL: `/reference/components/label`
 
 ### 4.2 サイドバー（Web 専用）
 
+`Collection + cells/sidebar_link` のデータ駆動パターン。ViewModel がグループヘッダとリンク行を `[SidebarEntry]` として公開する（各行は `id` / `kind`（`group` | `link`）/ `labelKey` / `href?` / `isActive?`）。カスタム `NavLink` 型は作らない（`02-tech-stack.md §6.0`）。
+
 ```jsonc
 // docs/screens/layouts/common/sidebar_reference.json
 {
@@ -265,19 +263,45 @@ URL: `/reference/components/label`
   "type": "ScrollView",
   "width": 260,
   "child": [
-    { "type": "Label", "text": "@string/ref_containers", "style": "sidebar_group" },
-    { "type": "NavLink", "href": "/reference/components/view",       "text": "View" },
-    { "type": "NavLink", "href": "/reference/components/safe-area-view", "text": "SafeAreaView" },
-    { "type": "NavLink", "href": "/reference/components/scroll-view", "text": "ScrollView" },
-
-    { "type": "Label", "text": "@string/ref_text", "style": "sidebar_group" },
-    { "type": "NavLink", "href": "/reference/components/label",       "text": "Label",       "activeClass": "is-active" },
-    { "type": "NavLink", "href": "/reference/components/text-view",   "text": "TextView" }
+    {
+      "type": "Collection",
+      "items": "@{sidebarReference}",
+      "cellIdProperty": "id",
+      "cellClasses": ["cells/sidebar_link"]
+    }
   ]
 }
 ```
 
-`platforms: ["web"]` により、このファイル自体が `jui build` 時に iOS/Android にコピーされない。
+`cells/sidebar_link.json`（グループヘッダとリンクを `visibility` で分岐）:
+
+```jsonc
+{
+  "type": "View",
+  "child": [
+    {
+      "type": "Label",
+      "text": "@{labelKey}",
+      "style": "sidebar_group",
+      "visibility": "@{kind == 'group'}"
+    },
+    {
+      "type": "View",
+      "onClick": "onNavigate",
+      "visibility": "@{kind == 'link'}",
+      "child": [
+        {
+          "type": "Label",
+          "text": "@{labelKey}",
+          "style": "@{isActive ? 'sidebar_link_active' : 'sidebar_link'}"
+        }
+      ]
+    }
+  ]
+}
+```
+
+ViewModel が `currentPath` と照合して `isActive` を埋め、`onNavigate(item)` で `router.push(item.href)` する。`platforms: ["web"]` によりファイル自体が `jui build` 時に iOS/Android にコピーされない。
 
 ### 4.3 Collection セル
 

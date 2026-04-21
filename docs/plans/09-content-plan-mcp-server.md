@@ -364,7 +364,8 @@ ReactJsonUI 側の Converter を追加:
 
 - [ ] `jsonui-doc-web/public/openapi/mcp.yaml` と分割ファイルを手書きで作成（`docs/design.md` と `specs/` を参照）
 - [ ] `jsonui-doc-web/src/components/extensions/OpenApiViewer.tsx` 実装
-- [ ] Converter `OpenApiViewer` を `jui g converter OpenApiViewer --web-only` で登録
+- [ ] component_spec `docs/screens/json/components/open_api_viewer.component.json` 作成（spec-first。`02-tech-stack.md §6.1`）、`.jsonui-doc-rules.json` に名前登録（Web 専用）
+- [ ] Converter 生成: `jui g converter --from docs/screens/json/components/open_api_viewer.component.json`
 - [ ] `docs/screens/json/tools/mcp/**/*.spec.json` 約 42 枚（`jui g screen` 一括生成）
 - [ ] 各 spec に対し `jui g project --file ...`
 - [ ] `docs/screens/layouts/tools/mcp/**/*.json` 手作業で仕上げ

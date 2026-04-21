@@ -135,9 +135,9 @@
 
 ### 5.4 `jui generate converter`
 - サブモード:
-  - `jui g converter MyCard` — 直接指定
-  - `jui g converter --from my_card.component.json` — component spec 由来
-  - `jui g converter --all` — component spec 全処理
+  - `jui g converter --from my_card.component.json` — **推奨（spec-first）**。`props.items[]` が `--attributes`、`slots.items[]` 非空が `--container` に自動マップ
+  - `jui g converter --all` — 全 component_spec を一括処理
+  - `jui g converter MyCard` — 直接指定（旧互換／ドラフト用。`--attributes` を手書きする場合は spec と二重管理になるため production 非推奨）
 - 各プラットフォーム CLI (`sjui g converter`, `kjui g converter`, `rjui g converter`) を内部で呼び出す
 
 ### 5.5 `jui build`

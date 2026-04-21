@@ -191,6 +191,7 @@ Converter としては独自 `JsonSchemaViewer` を用意。実装は `react-jso
 - [ ] `docs/screens/layouts/common/sidebar_tools_testrunner.json`（`platforms: ["web"]`）
 - [ ] Strings `tools_testrunner_*`
 - [ ] `schemas/` 以下 4 本を `jsonui-doc-web/public/schemas/` にコピー
-- [ ] Converter `JsonSchemaViewer` を `jui g converter JsonSchemaViewer --web-only` で登録
+- [ ] component_spec `docs/screens/json/components/json_schema_viewer.component.json` 作成（spec-first。`02-tech-stack.md §6.1`）、`.jsonui-doc-rules.json` に名前登録（Web 専用）
+- [ ] Converter 生成: `jui g converter --from docs/screens/json/components/json_schema_viewer.component.json`
 - [ ] `ai-generation` ページから `/tools/agents/*` へリンク
 - [ ] `jsonui-test-runner-ios` リポジトリの空状態を「将来分離予定」と明記

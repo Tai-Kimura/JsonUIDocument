@@ -50,7 +50,7 @@ IA 上の位置: `Learn > Installation`（`01-information-architecture.md` line 
 
 > CLI が `~/.jsonui-cli/` にあるため、MCP の 4 層 fallback の 3 段目（home）が自動的に効きます。環境変数は不要。
 
-### 3.3 事前要件（`Collection`、PlatformBadge 付き）
+### 3.3 事前要件（`Collection` + `cells/platform_badge`）
 
 | 必須 | ツール | 備考 |
 |---|---|---|
@@ -174,12 +174,12 @@ rm -rf .claude CLAUDE.md
 
 ## 4. Converter 依存
 
-- `CodeBlock`（`bash` ハイライト + コピーボタン）
-- `PlatformBadge`（事前要件ごとに OS / ツール種別）
-- `Details` / `Collapse`（折りたたみ 3 箇所）
-- `Collection`（`cells/install_target_card.json`, `cells/prereq_row.json`, `cells/troubleshoot_row.json`）
+- `CodeBlock`（`bash` ハイライト + コピーボタン）— 唯一のカスタム Converter。`docs/screens/json/components/codeblock.component.json` 先行（`02-tech-stack.md §6.1`）
+- `Collection`（`cells/install_target_card.json` / `cells/prereq_row.json` / `cells/troubleshoot_row.json` / `cells/platform_badge.json`）
+- プラットフォームバッジは `cells/platform_badge`（標準 `Collection` 駆動）。カスタム `PlatformBadge` 型は作らない
+- 折りたたみ（3 箇所）は ViewModel `expandedIds: [String]` + `cells/troubleshoot_row` 側で `onClick="onToggleExpand"` を発火し、`visibility: "@{expandedIds contains id}"` で本文を出し入れ。カスタム `Details` / `Collapse` 型は作らない（`02-tech-stack.md §6.0`）
 
-これらは `07-content-plan-reactjsonui.md` / `15-toolchain.md` で全サイト共通の Converter として既に列挙されている範囲。追加の独自 Converter は不要。
+上記以外の独自 Converter は不要。
 
 ## 5. Strings 追加キー
 

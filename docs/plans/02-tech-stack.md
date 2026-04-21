@@ -77,7 +77,7 @@
 JsonUIDocument/
 ├── jui.config.json                # jui 設定
 ├── .jsonui-type-map.json          # 型マッピング（dataFlow で使用）
-├── .jsonui-doc-rules.json         # カスタムコンポーネント（CodeBlock, NavLink 等）
+├── .jsonui-doc-rules.json         # カスタムコンポーネントの名前ホワイトリスト（CodeBlock 等）。仕様は `docs/screens/json/components/*.component.json`
 ├── docs/
 │   ├── plans/                     # 本計画書（実装物ではない）
 │   └── screens/
@@ -251,7 +251,7 @@ MDX / Markdown ではなく、**spec + Layout JSON で記述**する。これが
 - `include` で `common/header`, `common/sidebar_learn`, `common/footer`, `common/breadcrumb`, `common/toc` を共通化
 - サイドバーと TOC は `platforms: ["web"]` で Web 限定（モバイルアプリでは別 UI）
 - `style: "heading_1"` は `docs/screens/styles/heading_1.json` を参照
-- `CodeBlock` は独自コンポーネント。`.jsonui-doc-rules.json` に登録
+- `CodeBlock` は独自コンポーネント。`docs/screens/json/components/codeblock.component.json` で `props.items[]` / `slots.items[]` を定義した上で `.jsonui-doc-rules.json` に名前登録する（spec-first。`6.1` 参照）
 
 ### 5.3 トップレベル TabView でセクション切替
 
@@ -274,7 +274,9 @@ TabView はモバイルで自然に下タブ UI、Web では上部タブ UI に 
 
 ## 6. 独自コンポーネント（doc-web 拡張）
 
-ドキュメントサイト特化コンポーネントは、**`.jsonui-doc-rules.json` に登録** + **rjui 側に Converter として実装**（ショーケース価値）。
+ドキュメントサイト特化コンポーネントは、**`component_spec` で契約を定義** → **`.jsonui-doc-rules.json` に名前登録** → **`jui g converter --from <spec>` で Converter 生成** の順で導入する（spec-first。順序を守らないと props 契約と生成物が食い違い、レンダリングが壊れる）。
+
+**判定基準**: その挙動が Layout の `View + onClick` / `style binding` / `Collection + cells/*` / ViewModel 公開状態だけで表現できるなら、**カスタムは作らない**。ライブラリ依存（Shiki / Redoc / FlexSearch / DOM スキャン等）が本当に必要なときだけカスタム化する。
 
 ```json
 {
@@ -282,16 +284,11 @@ TabView はモバイルで自然に下タブ UI、Web では上部タブ UI に 
     "componentTypes": {
       "screen": [
         "CodeBlock",
-        "NavLink",
         "TableOfContents",
         "SearchModal",
         "SearchTrigger",
-        "Tabs",
-        "TabPanel",
-        "Prose",
         "OpenApiViewer",
-        "JsonSchemaViewer",
-        "PlatformBadge"
+        "JsonSchemaViewer"
       ]
     }
   }
@@ -301,22 +298,32 @@ TabView はモバイルで自然に下タブ UI、Web では上部タブ UI に 
 | コンポーネント | 対応プラットフォーム | 実装方針 |
 |----|----|----|
 | `CodeBlock` | web / ios / android | Web: Shiki で SSG、iOS/Android: シンタックスハイライトライブラリまたは単色表示 |
-| `NavLink` | web 専用 | `href` / `activeClass` / Next.js `usePathname` |
 | `TableOfContents` | web 専用 | h1/h2 抽出、スクロール追従 |
-| `SearchModal` / `SearchTrigger` | web 専用 | `⌘K`、FlexSearch |
-| `Tabs` / `TabPanel` | web / ios / android | UI タブ（TabView とは別、同ページ内切替用） |
-| `Prose` | web / ios / android | リッチテキストのラッパ。Web では Tailwind `prose` クラス |
+| `SearchModal` / `SearchTrigger` | web 専用 | `⌘K` キャプチャ、FlexSearch |
 | `OpenApiViewer` | web 専用 | Redoc 埋め込み |
 | `JsonSchemaViewer` | web 専用 | jsonui-test-runner のスキーマ表示 |
-| `PlatformBadge` | web / ios / android | iOS/Android/Web バッジ |
 
 Web 専用コンポーネントは spec / Layout JSON で `platforms: ["web"]`（ファイル単位ホワイトリスト）を付け、iOS/Android ビルドへは配布されない。
 
-### 6.1 Converter の追加手順
+### 6.0 カスタム化しないもの（標準パターンで表現）
 
-1. `jui g converter CodeBlock` で各プラットフォームに Converter スタブ生成（Web は `rjui_tools/lib/react/converters/extensions/code_block_converter.rb`、iOS/Android も同様）
-2. 手実装（Web は Shiki 連携、iOS/Android は適切な表示）
-3. 短期: 本サイト内の拡張として保持／中期: ReactJsonUI / SwiftJsonUI / KotlinJsonUI 本体へコントリビュート
+| 要素 | 実装パターン |
+|----|----|
+| ナビゲーションリンク | `View onClick="onNavigate"` +（データ駆動なら）`Collection + cellClasses: ["cells/sidebar_link"]`。アクティブ判定は ViewModel が `currentPath` を公開し、Layout 側の `className`/`style` バインディングで切替 |
+| 同ページ内タブ切替 | ViewModel の `activeTab` + `displayLogic` / `visibility` バインディング（タブヘッダは `Collection + cells/tab_header`） |
+| リッチテキストラッパ | `View style="prose"`（`docs/screens/styles/prose.json` で Tailwind `prose` クラスを割当） |
+| プラットフォーム対応マトリクス | `Collection + cells/platform_badge`。セルは `Label` にスタイル条件バインディング |
+
+### 6.1 Converter の追加手順（spec-first）
+
+1. **`component_spec` を作成**: `mcp__jui-tools__doc_init_component` で `docs/screens/json/components/{name}.component.json` を生成し、`props.items[]`（camelCase name / spec type）と `slots.items[]`（非空 = container）を埋める
+2. **validate**: `mcp__jui-tools__doc_validate_component` でエラーを潰す
+3. **名前登録**: `.jsonui-doc-rules.json` の `rules.componentTypes.screen` に追加
+4. **Converter 生成**: `jui g converter --from docs/screens/json/components/{name}.component.json`（`--all` で全 spec を一括生成）。`props.items[]` が `--attributes` に、`slots.items[]` 非空が `--container` に自動マップされる
+5. **手実装**: 生成された Converter 本体（Web は `rjui_tools/lib/react/converters/extensions/*.rb`、iOS/Android も同様）にライブラリ連携コードを書く
+6. **配布方針**: 短期は本サイト内の拡張として保持／中期は ReactJsonUI / SwiftJsonUI / KotlinJsonUI 本体へコントリビュート
+
+> **`jui g converter --attributes a,b,c` のような手書き引数は使わない。** spec-driven path が `props.items[]` から自動生成するため、手書き引数はスペックと converter の二重管理になり破綻する（既知の事故経路）。
 
 ## 7. spec → Layout → build のコマンドフロー
 
@@ -355,16 +362,17 @@ cd jsonui-doc-web && npm run dev
 
 ドキュメントサイト要件のうち、rjui 標準 Converter で賄えないものは本サイト内 `jsonui-doc-web/src/components/extensions/` に React 実装を置き、`jui g converter` で全プラットフォーム対応の Converter を追加する。
 
-| 要件 | 現状 | 追加 Converter |
+| 要件 | 現状 | 対応方針 |
 |------|------|----------------|
-| コードブロック + ハイライト | 未対応 | `CodeBlock` |
-| ルーティング連動 NavLink | 弱い | `NavLink`（Web 専用） |
-| TOC 自動生成 | 未対応 | `TableOfContents`（Web 専用） |
-| 検索 UI | 未対応 | `SearchModal` / `SearchTrigger`（Web 専用） |
-| OpenAPI | 未対応 | `OpenApiViewer`（Web 専用） |
-| タブ切替（同ページ内） | TabView はあるが画面ルート用途 | `Tabs` / `TabPanel` |
-| リッチテキスト | Label 中心 | `Prose` |
-| JSON Schema 表示 | 未対応 | `JsonSchemaViewer`（Web 専用） |
+| コードブロック + ハイライト | 未対応（Shiki が必要） | 追加 Converter `CodeBlock` |
+| TOC 自動生成 | 未対応（DOM スキャンが必要） | 追加 Converter `TableOfContents`（Web 専用） |
+| 検索 UI | 未対応（⌘K + FlexSearch が必要） | 追加 Converter `SearchModal` / `SearchTrigger`（Web 専用） |
+| OpenAPI | 未対応（Redoc が必要） | 追加 Converter `OpenApiViewer`（Web 専用） |
+| JSON Schema 表示 | 未対応（スキーマレンダラが必要） | 追加 Converter `JsonSchemaViewer`（Web 専用） |
+| ルーティング連動ナビ（active highlight） | 弱い | **標準 `View + onClick` + ViewModel `currentPath` + `className` バインディング**（§6.0）。カスタム Converter は作らない |
+| タブ切替（同ページ内） | `TabView` が画面ルート用途 | **ViewModel `activeTab` + `visibility` バインディング**（§6.0）。タブヘッダは `Collection + cells/tab_header`。カスタム Converter は作らない |
+| リッチテキストラッパ | Label 中心 | **`View style="prose"`** でスタイルを割り当てる（`docs/screens/styles/prose.json`）。カスタム Converter は作らない |
+| プラットフォーム対応マトリクス | 標準で表現可能 | **`Collection + cells/platform_badge`**。カスタム Converter は作らない |
 
 中期的には上記 Converter を ReactJsonUI / SwiftJsonUI / KotlinJsonUI 本体にコントリビュートする。
 
@@ -433,7 +441,7 @@ cd jsonui-doc-web && npm run dev
    - `platform` キー（プラットフォーム別フォントサイズ等）
    - `dataFlow` / Repository（検索インデックス、ドキュメントメタデータ）
 3. **不足機能が明確化される**
-   - `CodeBlock`, `OpenApiViewer` 等を追加することで、JsonUI 本体にコントリビュートする価値が生まれる
+   - `CodeBlock`, `OpenApiViewer`, `TableOfContents`, `SearchModal`/`SearchTrigger`, `JsonSchemaViewer` 等を追加することで、JsonUI 本体にコントリビュートする価値が生まれる
 
 ## 12. 未確定事項（実装時に決める）
 

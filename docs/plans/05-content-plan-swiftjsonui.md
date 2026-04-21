@@ -154,45 +154,61 @@
 ## 4. サイドバー `docs/screens/layouts/common/sidebar_swift.json`
 
 **注意:** `platforms: ["web"]` 指定で Web のみに配布。
-文字列参照は `@string/...`、Tailwind クラスは `className` で直接指定（rjui 側）。
+
+`Collection + cells/sidebar_link` のデータ駆動パターン（`02b-jui-workflow.md §4.2` と共通）。ViewModel が `[SidebarEntry(id, kind, labelKey, href?, isActive?)]` を公開し、`kind` がグループヘッダ（`group`）とリンク（`link`）を区別する。カスタム `NavLink` 型は作らない（`02-tech-stack.md §6.0`）。
 
 ```json
 {
   "platforms": ["web"],
-  "type": "View",
+  "type": "ScrollView",
   "className": "flex flex-col gap-1",
   "child": [
-    { "type": "Label", "text": "@string/ref_swift_getting_started", "className": "font-bold mt-4" },
-    { "type": "NavLink", "href": "/platforms/swift/overview",       "text": "@string/ref_swift_overview" },
-    { "type": "NavLink", "href": "/platforms/swift/setup",          "text": "ref_swift_setup" },
-
-    { "type": "Label", "text": "ref_swift_uikit",    "className": "font-bold mt-4" },
-    { "type": "NavLink", "href": "/platforms/swift/uikit",                "text": "ref_swift_uikit_overview" },
-    { "type": "NavLink", "href": "/platforms/swift/uikit/viewcontroller", "text": "ref_swift_uikit_vc" },
-    { "type": "NavLink", "href": "/platforms/swift/uikit/binding",        "text": "ref_swift_uikit_binding" },
-    { "type": "NavLink", "href": "/platforms/swift/uikit/lifecycle",      "text": "ref_swift_uikit_lifecycle" },
-
-    { "type": "Label", "text": "ref_swift_swiftui",  "className": "font-bold mt-4" },
-    { "type": "NavLink", "href": "/platforms/swift/swiftui",                   "text": "ref_swift_swiftui_overview" },
-    { "type": "NavLink", "href": "/platforms/swift/swiftui/dynamic-view",      "text": "ref_swift_swiftui_dynamicview" },
-    { "type": "NavLink", "href": "/platforms/swift/swiftui/viewmodel",         "text": "ref_swift_swiftui_viewmodel" },
-    { "type": "NavLink", "href": "/platforms/swift/swiftui/binding",           "text": "ref_swift_swiftui_binding" },
-    { "type": "NavLink", "href": "/platforms/swift/swiftui/style-processor",   "text": "ref_swift_swiftui_style" },
-    { "type": "NavLink", "href": "/platforms/swift/swiftui/view-switcher",     "text": "ref_swift_swiftui_viewswitcher" },
-
-    { "type": "Label", "text": "ref_swift_runtime",  "className": "font-bold mt-4" },
-    { "type": "NavLink", "href": "/platforms/swift/hot-loader",          "text": "ref_swift_hotloader" },
-    { "type": "NavLink", "href": "/platforms/swift/dynamic-mode",        "text": "ref_swift_dynamicmode" },
-    { "type": "NavLink", "href": "/platforms/swift/developer-menu",      "text": "ref_swift_devmenu" },
-    { "type": "NavLink", "href": "/platforms/swift/keyboard-avoidance",  "text": "ref_swift_keyboardavoid" },
-
-    { "type": "Label", "text": "ref_swift_advanced",  "className": "font-bold mt-4" },
-    { "type": "NavLink", "href": "/platforms/swift/custom-components",  "text": "ref_swift_custom" },
-    { "type": "NavLink", "href": "/platforms/swift/coverage",           "text": "ref_swift_coverage" },
-    { "type": "NavLink", "href": "/platforms/swift/troubleshooting",    "text": "ref_swift_troubleshoot" }
+    {
+      "type": "Collection",
+      "items": "@{sidebarSwift}",
+      "cellIdProperty": "id",
+      "cellClasses": ["cells/sidebar_link"]
+    }
   ]
 }
 ```
+
+ViewModel 側の `sidebarSwift` 初期値（`SwiftSidebarRepository` / `UseCase` 経由で構築しても可）:
+
+```jsonc
+[
+  { "id": "group_getting_started", "kind": "group", "labelKey": "ref_swift_getting_started" },
+  { "id": "link_swift_overview",   "kind": "link",  "labelKey": "ref_swift_overview",       "href": "/platforms/swift/overview" },
+  { "id": "link_swift_setup",      "kind": "link",  "labelKey": "ref_swift_setup",          "href": "/platforms/swift/setup" },
+
+  { "id": "group_uikit", "kind": "group", "labelKey": "ref_swift_uikit" },
+  { "id": "link_swift_uikit_overview", "kind": "link", "labelKey": "ref_swift_uikit_overview", "href": "/platforms/swift/uikit" },
+  { "id": "link_swift_uikit_vc",       "kind": "link", "labelKey": "ref_swift_uikit_vc",       "href": "/platforms/swift/uikit/viewcontroller" },
+  { "id": "link_swift_uikit_binding",  "kind": "link", "labelKey": "ref_swift_uikit_binding",  "href": "/platforms/swift/uikit/binding" },
+  { "id": "link_swift_uikit_lifecycle","kind": "link", "labelKey": "ref_swift_uikit_lifecycle","href": "/platforms/swift/uikit/lifecycle" },
+
+  { "id": "group_swiftui", "kind": "group", "labelKey": "ref_swift_swiftui" },
+  { "id": "link_swift_swiftui_overview",     "kind": "link", "labelKey": "ref_swift_swiftui_overview",     "href": "/platforms/swift/swiftui" },
+  { "id": "link_swift_swiftui_dynamicview",  "kind": "link", "labelKey": "ref_swift_swiftui_dynamicview",  "href": "/platforms/swift/swiftui/dynamic-view" },
+  { "id": "link_swift_swiftui_viewmodel",    "kind": "link", "labelKey": "ref_swift_swiftui_viewmodel",    "href": "/platforms/swift/swiftui/viewmodel" },
+  { "id": "link_swift_swiftui_binding",      "kind": "link", "labelKey": "ref_swift_swiftui_binding",      "href": "/platforms/swift/swiftui/binding" },
+  { "id": "link_swift_swiftui_style",        "kind": "link", "labelKey": "ref_swift_swiftui_style",        "href": "/platforms/swift/swiftui/style-processor" },
+  { "id": "link_swift_swiftui_viewswitcher", "kind": "link", "labelKey": "ref_swift_swiftui_viewswitcher", "href": "/platforms/swift/swiftui/view-switcher" },
+
+  { "id": "group_runtime", "kind": "group", "labelKey": "ref_swift_runtime" },
+  { "id": "link_swift_hotloader",       "kind": "link", "labelKey": "ref_swift_hotloader",       "href": "/platforms/swift/hot-loader" },
+  { "id": "link_swift_dynamicmode",     "kind": "link", "labelKey": "ref_swift_dynamicmode",     "href": "/platforms/swift/dynamic-mode" },
+  { "id": "link_swift_devmenu",         "kind": "link", "labelKey": "ref_swift_devmenu",         "href": "/platforms/swift/developer-menu" },
+  { "id": "link_swift_keyboardavoid",   "kind": "link", "labelKey": "ref_swift_keyboardavoid",   "href": "/platforms/swift/keyboard-avoidance" },
+
+  { "id": "group_advanced", "kind": "group", "labelKey": "ref_swift_advanced" },
+  { "id": "link_swift_custom",       "kind": "link", "labelKey": "ref_swift_custom",       "href": "/platforms/swift/custom-components" },
+  { "id": "link_swift_coverage",     "kind": "link", "labelKey": "ref_swift_coverage",     "href": "/platforms/swift/coverage" },
+  { "id": "link_swift_troubleshoot", "kind": "link", "labelKey": "ref_swift_troubleshoot", "href": "/platforms/swift/troubleshooting" }
+]
+```
+
+ViewModel が `currentPath` と照合して各 link 行の `isActive` を埋める。クリック時は `onNavigate(item)` → `router.push(item.href)`（cell 側は `02b-jui-workflow.md §4.2` の `cells/sidebar_link` と同一）。
 
 ## 5. Strings 追加キー（例）
 

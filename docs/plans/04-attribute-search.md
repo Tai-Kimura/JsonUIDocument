@@ -288,7 +288,8 @@ async function main() {
 
 - [ ] `jsonui-doc-web/scripts/build-search-index.ts` 作成（属性 + 本サイト spec 対応）
 - [ ] `docs/data/i18n/attribute-ja.json` 整備（優先 100 属性）
-- [ ] 独自 Converter: `jui g converter SearchModal --web-only` / `jui g converter SearchTrigger --web-only`
+- [ ] 独自 component_spec: `docs/screens/json/components/search_modal.component.json` / `search_trigger.component.json`（spec-first。`02-tech-stack.md §6.1`）、`.jsonui-doc-rules.json` に名前登録（Web 専用）
+- [ ] Converter 生成: `jui g converter --from docs/screens/json/components/search_modal.component.json` / `--from .../search_trigger.component.json`（`--attributes` は使わない）
 - [ ] React 実装: `jsonui-doc-web/src/components/extensions/SearchModal.tsx` / `SearchTrigger.tsx`
 - [ ] `docs/screens/layouts/common/header.json` に `SearchTrigger`（`platforms: ["web"]`）
 - [ ] `docs/screens/layouts/common/search_modal.json`（`platforms: ["web"]`）
