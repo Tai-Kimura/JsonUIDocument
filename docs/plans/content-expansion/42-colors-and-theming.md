@@ -587,7 +587,7 @@ plans 33 / 34 / 35 の platform 本文は本プランの対象外（当該 plan 
 2. `jui sync_tool` が rjui_tools に themed ColorManager を配っているか（`rjui_tools/lib/core/resources/color_manager.rb` に mode 処理が入っているか）
 3. `docs/screens/layouts/Resources/colors.json` が themed 形式に migrate 済か（もしまだなら `jui build` 1 回で自動昇格）
 4. ReactJsonUI（consumer ランタイム）に `ColorModeProvider` / `useColorMode` が実装済か
-5. [42a-dark-mode-palette.md](42a-dark-mode-palette.md) の palette を反映した `colors.proposed.json` が既にあるか → 実装セッションで `colors.json` にリネーム
+5. [42a-dark-mode-palette.md](42a-dark-mode-palette.md) の palette が `docs/screens/layouts/Resources/colors.json` に landed 済か（初回 `jui build` 実施済）
 
 未完了なら本プランは着手しない。先に upstream 完了を待つ。
 

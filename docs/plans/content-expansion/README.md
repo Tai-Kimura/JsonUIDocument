@@ -76,7 +76,7 @@
 | # | ファイル | 対象 |
 |---|---------|------|
 | 42 | [`42-colors-and-theming.md`](42-colors-and-theming.md) | `/guides/theming` + `/reference/colors-json` 新設、既存記事への節追加 |
-| 42a | [`42a-dark-mode-palette.md`](42a-dark-mode-palette.md) | Dark mode パレット決定記録（Sumi × Cinnabar）、`docs/screens/layouts/Resources/colors.proposed.json` 作成済 |
+| 42a | [`42a-dark-mode-palette.md`](42a-dark-mode-palette.md) | Dark mode パレット決定記録（Sumi × Cinnabar）、`docs/screens/layouts/Resources/colors.json` に themed 形式で landed 済 |
 
 ---
 

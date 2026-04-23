@@ -8,6 +8,7 @@ require_relative '../../core/generated_marker'
 require_relative '../../core/logger'
 require_relative '../../core/attribute_validator'
 require_relative '../../core/binding_validator'
+require_relative '../../core/resources/color_manager'
 require_relative '../../react/react_generator'
 require_relative '../../react/style_loader'
 require_relative '../../core/layout_validator'
@@ -59,6 +60,13 @@ module RjuiTools
             Core::Logger.warn('No JSON layout files found')
             return
           end
+
+          # Extract hex colors from layout JSONs, auto-migrate legacy flat
+          # colors.json to themed schema, and (re)generate ColorManager.{ts,js}
+          # with dark/light/custom-mode support. Runs BEFORE the main generator
+          # loop so hex→key rewrites land in the JSON before component JSX
+          # emission.
+          update_color_manager(json_files, layouts_dir)
 
           # First pass: build component name -> subdir mapping
           component_paths = {}
@@ -359,6 +367,41 @@ module RjuiTools
           hook_generator.generate_hooks
         rescue StandardError => e
           Core::Logger.error("Error generating hooks: #{e.message}")
+        end
+
+        def update_color_manager(json_files, layouts_dir)
+          resources_dir = File.join(layouts_dir, 'Resources')
+          FileUtils.mkdir_p(resources_dir)
+
+          # The generator-emitted ColorManager lives alongside the other
+          # @generated files (StringManager, cellIdGenerator). Use the same
+          # directory so the import path `@/generated/ColorManager` resolves.
+          config = @config.merge('source_path' => Dir.pwd)
+          source_path = Dir.pwd
+
+          manager = Core::Resources::ColorManager.new(config, source_path, resources_dir)
+          manager.process_colors(json_files, json_files.size, 0, config)
+
+          ensure_use_color_mode_hook
+        rescue StandardError => e
+          Core::Logger.error("Error processing colors: #{e.message}")
+        end
+
+        # Copy the useColorMode React hook template to @/hooks/ so consumers
+        # can subscribe to ColorManager mode changes. Idempotent — skips if
+        # already present (consumers might have locally tweaked it).
+        def ensure_use_color_mode_hook
+          hooks_dir = @config['hooks_directory'] || 'src/hooks'
+          FileUtils.mkdir_p(hooks_dir)
+
+          target_path = File.join(hooks_dir, 'useColorMode.ts')
+          return if File.exist?(target_path)
+
+          template_path = File.join(File.dirname(__FILE__), '../../react/templates/use_color_mode.ts')
+          return unless File.exist?(template_path)
+
+          File.write(target_path, File.read(template_path))
+          Core::Logger.success("Created hook: #{target_path}")
         end
 
         def update_string_manager
