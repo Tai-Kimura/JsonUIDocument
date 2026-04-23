@@ -1,0 +1,104 @@
+{
+  "category": "style",
+  "description": {
+    "en": "Style attributes control visual appearance: background, borders, shadows, corners, and style presets.",
+    "ja": "style 属性はコンポーネントの見た目を制御する: 背景、ボーダー、シャドウ、角丸、スタイルプリセット。"
+  },
+  "attributes": {
+    "background": {
+      "summary": {
+        "en": "Background color. Accepts hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`, named colors, or `@color/token`. For gradients use the `gradient` attribute or GradientView.",
+        "ja": "背景色。hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`、色名、または `@color/token`。グラデーションは `gradient` 属性または GradientView を使う。"
+      }
+    },
+    "defaultBackground": {
+      "summary": {
+        "en": "Background color in the default (non-interactive) state. Base layer for the pressed / disabled overlays.",
+        "ja": "デフォルト（非操作）状態の背景色。押下・disabled オーバーレイの下地。"
+      }
+    },
+    "disabledBackground": {
+      "summary": {
+        "en": "Background color when `enabled: false`.",
+        "ja": "`enabled: false` のときの背景色。"
+      }
+    },
+    "highlightBackground": {
+      "summary": {
+        "en": "Background color shown when the component is highlighted (e.g., pressed).",
+        "ja": "ハイライト状態（押下など）の背景色。"
+      }
+    },
+    "tapBackground": {
+      "summary": {
+        "en": "Button-specific. Background color shown during tap-down. Reverts to `background` on release.",
+        "ja": "Button 専用。押下中に表示される背景色。解放で `background` に戻る。"
+      }
+    },
+    "cornerRadius": {
+      "summary": {
+        "en": "Rounded corners in pt/dp/px. Accepts a number (uniform) or array `[tl, tr, br, bl]` for per-corner control.",
+        "ja": "角丸半径（pt/dp/px）。数値（全辺同一）または配列 `[左上, 右上, 右下, 左下]` で角ごとに指定可。"
+      }
+    },
+    "borderColor": {
+      "summary": {
+        "en": "Border color. Requires `borderWidth` for the border to render.",
+        "ja": "ボーダー色。描画には `borderWidth` の指定が必要。"
+      }
+    },
+    "borderWidth": {
+      "summary": {
+        "en": "Border thickness in pt/dp/px.",
+        "ja": "ボーダーの太さ（pt/dp/px）。"
+      }
+    },
+    "borderStyle": {
+      "summary": {
+        "en": "`solid` / `dashed` / `dotted`. Web supports all; iOS/Android default is `solid`.",
+        "ja": "`solid` / `dashed` / `dotted`。Web は全対応、iOS/Android は既定 `solid`。"
+      }
+    },
+    "shadow": {
+      "summary": {
+        "en": "Drop shadow object: `{ color, offsetX, offsetY, radius, opacity }`. Applied to the entire View bounds.",
+        "ja": "ドロップシャドウのオブジェクト: `{ color, offsetX, offsetY, radius, opacity }`。View の全体境界に適用される。"
+      },
+      "platformDiff": {
+        "swift_uikit": "layer.shadowColor / shadowOffset / shadowRadius / shadowOpacity に分解してマップ。",
+        "swift_swiftui": ".shadow(color:, radius:, x:, y:) modifier。",
+        "kotlin_compose": "Modifier.shadow(elevation, shape)。offsetX/Y は限定サポート。",
+        "kotlin_xml": "elevation + outline provider が必要。",
+        "react": "CSS `box-shadow: Xpx Ypx radiuspx color` に変換。"
+      }
+    },
+    "clipToBounds": {
+      "summary": {
+        "en": "Boolean. When `true`, children that overflow the View are clipped.",
+        "ja": "Boolean。`true` で境界を超える子要素を切り取る。"
+      }
+    },
+    "tintColor": {
+      "summary": {
+        "en": "Color applied to tinted content (monochrome icons, progress tracks, switches). Specific component implementations decide what gets tinted.",
+        "ja": "tint 可能なコンテンツ（モノクロアイコン、progress の track、switch など）に適用される色。何が tint されるかはコンポーネント実装依存。"
+      }
+    },
+    "style": {
+      "summary": {
+        "en": "Preset style name. Defined in `docs/screens/styles/*.json`. Accepts a single name or array of names; later entries override earlier.",
+        "ja": "プリセットスタイル名。`docs/screens/styles/*.json` で定義。単一名または名前配列を受け付け、後出の値が前を上書き。"
+      },
+      "examples": [
+        { "language": "json", "code": "{ \"type\": \"Button\", \"style\": \"primary_button\" }" },
+        { "language": "json", "code": "{ \"type\": \"Button\", \"style\": [\"button_base\", \"button_primary\"] }" }
+      ]
+    },
+    "effectStyle": {
+      "summary": {
+        "en": "Visual effect preset. Used by Blur; platform-specific blur / material style value.",
+        "ja": "視覚効果のプリセット。Blur で使用、プラットフォーム固有のぼかし／マテリアルスタイル値。"
+      }
+    }
+  }
+}

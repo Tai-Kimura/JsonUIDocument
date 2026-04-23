@@ -1,0 +1,149 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "WritingYourFirstSpec",
+    "displayName": "Writing your first spec",
+    "description": "Task-focused guide: author a screen_spec.json end-to-end for a counter screen. Covers uiVariables, eventHandlers, displayLogic, customTypes, and how to validate + generate + verify. ~12-min read. Uses an inline 5-step structure (not a Collection) since each step builds on the last, plus a closing troubleshooting block.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "guides/writing-your-first-spec",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two follow-up guides at the bottom (Navigation guide, Testing guide)."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks with the static v1 catalog."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[WritingYourFirstSpecView] --> VM[WritingYourFirstSpecViewModel]\n    VM -- nextReadLinks --> VIEW\n    VIEW -- onNavigate(url) --> VM\n    VIEW -- onToggleLanguage --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_navigation -> /guides/navigation, next_testing -> /guides/testing) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the guides_writing_your_first_spec_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /guides, /guides/navigation, /guides/testing."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /guides/navigation and /guides/testing. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll to section anchor."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url) with the bound url."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is a spec-mapped guides URL or /guides",
+      "destination": "Target spec screen or tab",
+      "description": "v1 targets: /guides, /guides/navigation, /guides/testing. Upcoming targets render their page once the guide's spec lands."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/guides/writing-your-first-spec.json",
+      "description": "Guide layout: header / TOC / 5 numbered steps (each an inline View with a CodeBlock) / troubleshooting block / next-reads / footer."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/guides/WritingYourFirstSpecViewModel.ts",
+      "description": "Same shape as the concept essay VMs."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/guides/writing-your-first-spec/page.tsx",
+      "description": "Next.js route."
+    }
+  ],
+  "notes": [
+    "First live entry under the Guides tab. Flipping GUIDES_ENTRIES row 1 from 'upcoming' to 'live' in HomeViewModel is the final step.",
+    "Five numbered steps cover: (1) pick a name and a platform, (2) declare uiVariables, (3) declare eventHandlers, (4) declare customTypes, (5) validate and generate. Each step carries one CodeBlock showing exactly what to add.",
+    "The closing troubleshooting block is inline (not a Collection) — three common 'it didn't work' situations with symptom + cause + fix. Keeping it inline avoids the LearnArticleCard / TroubleshootRow cell overhead for a one-off appearance.",
+    "The guide's subject matter IS the framework's core flow (author spec → jui build → jui verify → iterate). Treating it as the Guides tab's keystone entry makes 'start here' obvious to a reader who already knows what JsonUI is but hasn't written one yet."
+  ]
+}

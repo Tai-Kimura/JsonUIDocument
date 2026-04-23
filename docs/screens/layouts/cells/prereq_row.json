@@ -1,0 +1,67 @@
+{
+  "type": "View",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "wrapContent",
+  "style": "card_surface",
+  "child": [
+    {
+      "data": [
+        { "name": "labelKey", "class": "String" },
+        { "name": "toolKey", "class": "String" },
+        { "name": "noteKey", "class": "String" },
+        { "name": "tierBadgeKey", "class": "String" },
+        { "name": "tierBadgeBackground", "class": "String" },
+        { "name": "tierBadgeColor", "class": "String" }
+      ]
+    },
+    {
+      "type": "View",
+      "orientation": "horizontal",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "child": [
+        {
+          "type": "Label",
+          "weight": 1,
+          "height": "wrapContent",
+          "fontSize": 15,
+          "fontWeight": "semibold",
+          "fontColor": "#0B1220",
+          "text": "@{toolKey}"
+        },
+        {
+          "type": "Label",
+          "width": "wrapContent",
+          "height": "wrapContent",
+          "paddings": [3, 10, 3, 10],
+          "fontSize": 11,
+          "fontWeight": "semibold",
+          "fontColor": "@{tierBadgeColor}",
+          "background": "@{tierBadgeBackground}",
+          "cornerRadius": 999,
+          "text": "@{tierBadgeKey}"
+        }
+      ]
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 8,
+      "fontSize": 13,
+      "fontWeight": "semibold",
+      "fontColor": "#2563EB",
+      "text": "@{labelKey}"
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 6,
+      "fontSize": 14,
+      "fontColor": "#475467",
+      "text": "@{noteKey}"
+    }
+  ]
+}

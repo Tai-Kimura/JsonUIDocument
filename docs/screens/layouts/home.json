@@ -1,0 +1,231 @@
+{
+  "type": "View",
+  "id": "home_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "featuredLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "platformCards",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "recentChanges",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onHeroInstallTap",
+          "class": "() -> Void"
+        },
+        {
+          "name": "onHeroAiAgentsTap",
+          "class": "() -> Void"
+        },
+        {
+          "name": "onHeroShowcaseTap",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "home_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "id": "home_hero",
+          "style": "hero_section",
+          "child": [
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#93C5FD",
+              "text": "hero_eyebrow"
+            },
+            {
+              "type": "Label",
+              "id": "home_hero_title",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 44,
+              "fontWeight": "bold",
+              "fontColor": "#F9FAFB",
+              "text": "hero_title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 18,
+              "fontColor": "#CBD5F5",
+              "text": "hero_subtitle"
+            },
+            {
+              "type": "View",
+              "id": "home_hero_ctas",
+              "orientation": "horizontal",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 28,
+              "spacing": 3,
+              "child": [
+                {
+                  "type": "Button",
+                  "id": "home_hero_cta_primary",
+                  "style": "primary_button",
+                  "text": "hero_cta_primary",
+                  "onClick": "@{onHeroInstallTap}"
+                },
+                {
+                  "type": "Button",
+                  "id": "home_hero_cta_secondary",
+                  "style": "ghost_button",
+                  "text": "hero_cta_secondary",
+                  "onClick": "@{onHeroAiAgentsTap}"
+                },
+                {
+                  "type": "Button",
+                  "id": "home_hero_cta_tertiary",
+                  "style": "ghost_button",
+                  "text": "hero_cta_tertiary",
+                  "onClick": "@{onHeroShowcaseTap}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "home_featured",
+          "style": "home_section",
+          "background": "#F9FAFB",
+          "child": [
+            {
+              "type": "Label",
+              "style": "section_heading",
+              "text": "featured_heading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Label",
+              "style": "section_subheading",
+              "text": "featured_subheading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Collection",
+              "id": "home_featured_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 32,
+              "columnCount": 3,
+              "lineSpacing": 24,
+              "itemSpacing": 24,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{featuredLinks}",
+              "cellIdProperty": "id",
+              "sections": [
+                {
+                  "cell": "cells/featured_card"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "home_platforms",
+          "style": "home_section",
+          "background": "#FFFFFF",
+          "child": [
+            {
+              "type": "Label",
+              "style": "section_heading",
+              "text": "platforms_heading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Label",
+              "style": "section_subheading",
+              "text": "platforms_subheading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Collection",
+              "id": "home_platforms_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 32,
+              "columnCount": 3,
+              "lineSpacing": 24,
+              "itemSpacing": 24,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{platformCards}",
+              "cellIdProperty": "id",
+              "sections": [
+                {
+                  "cell": "cells/platform_card"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "home_whats_new",
+          "style": "home_section",
+          "background": "#F9FAFB",
+          "child": [
+            {
+              "type": "Label",
+              "style": "section_heading",
+              "text": "whats_new_heading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Label",
+              "style": "section_subheading",
+              "text": "whats_new_subheading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Collection",
+              "id": "home_whats_new_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 32,
+              "columnCount": 3,
+              "lineSpacing": 24,
+              "itemSpacing": 24,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{recentChanges}",
+              "cellIdProperty": "id",
+              "sections": [
+                {
+                  "cell": "cells/changelog_card"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

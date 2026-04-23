@@ -1,0 +1,62 @@
+{
+  "type": "View",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "wrapContent",
+  "paddings": [20, 20, 20, 20],
+  "background": "#FFFFFF",
+  "cornerRadius": 12,
+  "borderWidth": 1,
+  "borderColor": "#E5E7EB",
+  "tapBackground": "#F3F4F6",
+  "onClick": "@{onTap}",
+  "child": [
+    {
+      "data": [
+        { "name": "date", "class": "String" },
+        { "name": "title", "class": "String" },
+        { "name": "blurb", "class": "String" },
+        { "name": "ctaLabel", "class": "String" },
+        { "name": "onTap", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Label",
+      "width": "wrapContent",
+      "height": "wrapContent",
+      "fontSize": 11,
+      "fontWeight": "semibold",
+      "fontColor": "#64748B",
+      "text": "@{date}"
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 8,
+      "fontSize": 18,
+      "fontWeight": "semibold",
+      "fontColor": "#0B1220",
+      "text": "@{title}"
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 8,
+      "fontSize": 13,
+      "fontColor": "#475467",
+      "text": "@{blurb}"
+    },
+    {
+      "type": "Label",
+      "width": "wrapContent",
+      "height": "wrapContent",
+      "topMargin": 12,
+      "fontSize": 13,
+      "fontWeight": "semibold",
+      "fontColor": "#2563EB",
+      "text": "@{ctaLabel}"
+    }
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "type": "View",
+  "id": "reference_components_radio_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "title",
+          "class": "String"
+        },
+        {
+          "name": "description",
+          "class": "String"
+        },
+        {
+          "name": "usage",
+          "class": "String"
+        },
+        {
+          "name": "aliasNotice",
+          "class": "String",
+          "defaultValue": ""
+        },
+        {
+          "name": "attributes",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "examples",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "relatedComponents",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateBack",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "View",
+      "id": "reference_components_radio_scroll",
+      "orientation": "vertical",
+      "width": "matchParent",
+      "weight": 1,
+      "paddings": [
+        24,
+        32,
+        24,
+        32
+      ],
+      "child": [
+        {
+          "type": "Label",
+          "id": "reference_components_radio_breadcrumb",
+          "width": "wrapContent",
+          "height": "wrapContent",
+          "fontSize": 13,
+          "fontWeight": "semibold",
+          "fontColor": "#64748B",
+          "tapBackground": "#F3F4F6",
+          "text": "Components",
+          "onClick": "@{onNavigateBack}"
+        },
+        {
+          "type": "Label",
+          "id": "reference_components_radio_title",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 16,
+          "fontSize": 40,
+          "fontWeight": "bold",
+          "fontColor": "#0B1220",
+          "text": "@{title}"
+        },
+        {
+          "type": "Label",
+          "id": "reference_components_radio_alias_notice",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 8,
+          "fontSize": 13,
+          "fontColor": "#6366F1",
+          "text": "@{aliasNotice}"
+        },
+        {
+          "type": "Label",
+          "id": "reference_components_radio_description",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 16,
+          "fontSize": 17,
+          "fontColor": "#475467",
+          "text": "@{description}"
+        },
+        {
+          "type": "Label",
+          "id": "reference_components_radio_usage",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 16,
+          "fontSize": 15,
+          "fontColor": "#475467",
+          "text": "@{usage}"
+        },
+        {
+          "type": "Label",
+          "id": "reference_components_radio_attrs_heading",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 32,
+          "fontSize": 22,
+          "fontWeight": "bold",
+          "fontColor": "#0B1220",
+          "text": "Attributes"
+        },
+        {
+          "type": "Collection",
+          "id": "reference_components_radio_attributes",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 12,
+          "items": "@{attributes}",
+          "cellIdProperty": "id",
+          "lazy": false,
+          "scrollEnabled": false,
+          "sections": [
+            {
+              "cell": "cells/reference_attribute_row"
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "id": "reference_components_radio_examples_heading",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 32,
+          "fontSize": 22,
+          "fontWeight": "bold",
+          "fontColor": "#0B1220",
+          "text": "Examples"
+        },
+        {
+          "type": "Collection",
+          "id": "reference_components_radio_examples",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 12,
+          "items": "@{examples}",
+          "cellIdProperty": "id",
+          "lazy": false,
+          "scrollEnabled": false,
+          "sections": [
+            {
+              "cell": "cells/reference_code_example"
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "id": "reference_components_radio_related_heading",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 32,
+          "fontSize": 22,
+          "fontWeight": "bold",
+          "fontColor": "#0B1220",
+          "text": "Related components"
+        },
+        {
+          "type": "Collection",
+          "id": "reference_components_radio_related",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 12,
+          "orientation": "horizontal",
+          "items": "@{relatedComponents}",
+          "cellIdProperty": "id",
+          "lazy": false,
+          "scrollEnabled": false,
+          "sections": [
+            {
+              "cell": "cells/reference_related_pill"
+            }
+          ]
+        },
+        {
+          "type": "Collection",
+          "id": "reference_components_radio_next",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 40,
+          "items": "@{nextReadLinks}",
+          "cellIdProperty": "id",
+          "lazy": false,
+          "scrollEnabled": false,
+          "sections": [
+            {
+              "cell": "cells/next_step_card"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_comment": "Auto-generated by scripts/build-attribute-reference.ts. Structure follows docs/plans/14-attribute-reference-generation.md."
+}

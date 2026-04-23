@@ -1,0 +1,299 @@
+{
+  "category": "layout",
+  "title": "Layout attributes",
+  "description": "Layout attributes define the size and axis behavior of a component. They apply to every component regardless of type.",
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_aspect_height",
+              "name": "aspectHeight",
+              "type": "number | binding",
+              "required": "",
+              "description": "Aspect ratio height (binding supported)",
+              "summary": "Height component of an aspect ratio pair.",
+              "relatedAttributes": [
+                "aspectWidth"
+              ],
+              "platform": "swift"
+            },
+            {
+              "id": "attr_aspect_width",
+              "name": "aspectWidth",
+              "type": "number | binding",
+              "required": "",
+              "description": "Aspect ratio width (binding supported)",
+              "summary": "Sets width as a multiplier of height. For `aspectWidth: 16`, `aspectHeight: 9` → 16:9 ratio. Use when you want ratio-based sizing.",
+              "relatedAttributes": [
+                "aspectHeight"
+              ],
+              "platform": "swift"
+            },
+            {
+              "id": "attr_compress_horizontal",
+              "name": "compressHorizontal",
+              "type": "string",
+              "required": "",
+              "description": "Horizontal compression resistance",
+              "summary": "iOS-only. Horizontal Compression Resistance Priority. Higher = more resistant to being compressed below intrinsic size.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_compress_vertical",
+              "name": "compressVertical",
+              "type": "string",
+              "required": "",
+              "description": "Vertical compression resistance",
+              "summary": "iOS-only. Vertical Compression Resistance Priority.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_frame",
+              "name": "frame",
+              "type": "object",
+              "required": "",
+              "description": "Frame configuration with width/height"
+            },
+            {
+              "id": "attr_height",
+              "name": "height",
+              "type": "number | enum(matchParent|wrapContent) | binding",
+              "required": "required",
+              "description": "Height (number, 'matchParent', 'wrapContent') - binding supported. Not required if weight is specified.",
+              "summary": "Size along the vertical axis. Same value semantics as `width`.",
+              "relatedAttributes": [
+                "width",
+                "minHeight",
+                "maxHeight",
+                "heightWeight",
+                "aspectHeight"
+              ]
+            },
+            {
+              "id": "attr_height_weight",
+              "name": "heightWeight",
+              "type": "number | binding",
+              "required": "",
+              "description": "Height weight for flexible layouts (binding supported)",
+              "summary": "Stretch factor limited to the vertical axis.",
+              "relatedAttributes": [
+                "weight",
+                "widthWeight"
+              ],
+              "platform": "swift"
+            },
+            {
+              "id": "attr_hug_horizontal",
+              "name": "hugHorizontal",
+              "type": "string",
+              "required": "",
+              "description": "Horizontal content hugging",
+              "summary": "iOS-only. Horizontal Content Hugging Priority. Higher = more resistant to being stretched.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_hug_vertical",
+              "name": "hugVertical",
+              "type": "string",
+              "required": "",
+              "description": "Vertical content hugging",
+              "summary": "iOS-only. Vertical Content Hugging Priority.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_max_height",
+              "name": "maxHeight",
+              "type": "number | binding",
+              "required": "",
+              "description": "Maximum height (binding supported)",
+              "summary": "Maximum height."
+            },
+            {
+              "id": "attr_max_height_weight",
+              "name": "maxHeightWeight",
+              "type": "number | binding",
+              "required": "",
+              "description": "Maximum height weight (binding supported)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_max_width",
+              "name": "maxWidth",
+              "type": "number | binding",
+              "required": "",
+              "description": "Maximum width (binding supported)",
+              "summary": "Maximum width in pt/dp/px. Useful on Web for capping content width on wide screens."
+            },
+            {
+              "id": "attr_max_width_weight",
+              "name": "maxWidthWeight",
+              "type": "number | binding",
+              "required": "",
+              "description": "Maximum width weight (binding supported)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_min_height",
+              "name": "minHeight",
+              "type": "number | binding",
+              "required": "",
+              "description": "Minimum height (binding supported)",
+              "summary": "Minimum height."
+            },
+            {
+              "id": "attr_min_height_weight",
+              "name": "minHeightWeight",
+              "type": "number | binding",
+              "required": "",
+              "description": "Minimum height weight (binding supported)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_min_width",
+              "name": "minWidth",
+              "type": "number | binding",
+              "required": "",
+              "description": "Minimum width (binding supported)",
+              "summary": "Minimum width in pt/dp/px. Prevents the component from shrinking below this value."
+            },
+            {
+              "id": "attr_min_width_weight",
+              "name": "minWidthWeight",
+              "type": "number | binding",
+              "required": "",
+              "description": "Minimum width weight (binding supported)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_rect",
+              "name": "rect",
+              "type": "array",
+              "required": "",
+              "description": "Direct frame [x, y, width, height]",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_weight",
+              "name": "weight",
+              "type": "number | string | binding",
+              "required": "",
+              "description": "Shorthand for widthWeight (binding supported)",
+              "summary": "Flexible stretch factor along the parent's main axis. In a horizontal View, a child with `weight: 1` fills remaining horizontal space.",
+              "platformDiff": {
+                "swift_swiftui": ".frame(maxWidth: .infinity) + layoutPriority。",
+                "kotlin_compose": "Modifier.weight(N)。",
+                "kotlin_xml": "android:layout_weight=\"N\"。",
+                "react": "CSS `flex: N`。"
+              },
+              "relatedAttributes": [
+                "widthWeight",
+                "heightWeight"
+              ]
+            },
+            {
+              "id": "attr_width",
+              "name": "width",
+              "type": "number | enum(matchParent|wrapContent) | binding",
+              "required": "required",
+              "description": "Width (number, 'matchParent', 'wrapContent') - binding supported. Not required if weight is specified.",
+              "summary": "Size along the horizontal axis. Accepts number (pt/dp/px), `matchParent`, `wrapContent`, or responsive object.",
+              "values": [
+                {
+                  "value": "matchParent",
+                  "description": "Fill the parent along this axis. Requires the parent to have a bounded size."
+                },
+                {
+                  "value": "wrapContent",
+                  "description": "Shrink to fit content. Cannot shrink below children's natural size."
+                },
+                {
+                  "value": "<number>",
+                  "description": "Fixed size in platform-native units (iOS pt / Android dp / Web px)."
+                },
+                {
+                  "value": "{ xs: ..., md: ..., lg: ... }",
+                  "description": "Responsive per breakpoint (Web only). See the responsive category."
+                }
+              ],
+              "examples": [
+                {
+                  "language": "json",
+                  "code": "{ \"type\": \"Button\", \"width\": 120, \"height\": 44 }"
+                },
+                {
+                  "language": "json",
+                  "code": "{ \"type\": \"Button\", \"width\": \"matchParent\", \"height\": 44 }"
+                },
+                {
+                  "language": "json",
+                  "code": "{ \"type\": \"Collection\", \"columnCount\": { \"xs\": 1, \"md\": 2, \"lg\": 3 } }"
+                }
+              ],
+              "platformDiff": {
+                "swift_uikit": "`matchParent` → AutoLayout `widthAnchor.constraint(equalTo: superview.widthAnchor)`。数値 → pt 固定。",
+                "swift_swiftui": "`matchParent` → `.frame(maxWidth: .infinity)`。数値 → `.frame(width: N)`。",
+                "kotlin_compose": "`matchParent` → `Modifier.fillMaxWidth()`。数値 → `Modifier.width(N.dp)`。",
+                "kotlin_xml": "`matchParent` → `android:layout_width=\"match_parent\"`。数値 → `Xdp`。",
+                "react": "`matchParent` → Tailwind `w-full`。数値 → arbitrary value `w-[Npx]`。"
+              },
+              "relatedAttributes": [
+                "height",
+                "minWidth",
+                "maxWidth",
+                "weight",
+                "widthWeight",
+                "aspectWidth"
+              ]
+            },
+            {
+              "id": "attr_width_weight",
+              "name": "widthWeight",
+              "type": "number | binding",
+              "required": "",
+              "description": "Width weight for flexible layouts (binding supported)",
+              "summary": "Stretch factor limited to the horizontal axis. Equivalent to `weight` inside a horizontal View.",
+              "relatedAttributes": [
+                "weight",
+                "heightWeight"
+              ],
+              "platform": "swift"
+            },
+            {
+              "id": "attr_wrap_content",
+              "name": "wrapContent",
+              "type": "boolean",
+              "required": "",
+              "description": "Wrap content",
+              "platform": "swift"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "breakpoints": null,
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_components",
+              "titleKey": "next_components_title",
+              "descriptionKey": "next_components_body",
+              "url": "/reference/components"
+            },
+            {
+              "id": "next_attributes_root",
+              "titleKey": "next_attributes_root_title",
+              "descriptionKey": "next_attributes_root_body",
+              "url": "/reference/attributes"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

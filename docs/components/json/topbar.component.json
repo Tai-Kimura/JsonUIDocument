@@ -1,0 +1,87 @@
+{
+  "type": "component_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "TopBar",
+    "displayName": "TopBar",
+    "description": "Site-wide sticky header. Renders as a 56px fixed bar at the viewport top containing (left→right): a hamburger button that is only visible under 1024px (fires onToggleMobileMenu), a brand mark linking to brandHref (usually '/'), a flexible spacer, the Search trigger instance (reuses the existing Search component), and a language toggle pill that fires onToggleLanguage. Component self-localizes its aria labels via StringManager; the language-toggle label flips between the two configured language display strings based on currentLanguage.",
+    "platforms": ["web"],
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23",
+    "category": "navigation"
+  },
+  "structure": {
+    "components": [
+      {
+        "type": "View",
+        "id": "topbar_root",
+        "description": "<header> element — the site top bar."
+      }
+    ],
+    "layout": {
+      "root": "topbar_root",
+      "children": []
+    }
+  },
+  "props": {
+    "items": [
+      {
+        "name": "brandLabel",
+        "type": "String",
+        "required": false,
+        "defaultValue": "chrome_brand_name",
+        "description": "Brand mark label. Passed through StringManager (snake_case key) so the chrome namespace localizes it."
+      },
+      {
+        "name": "brandHref",
+        "type": "String",
+        "required": false,
+        "defaultValue": "/",
+        "description": "Where the brand link navigates. Almost always '/' — exposed as a prop so a future embedded variant can point elsewhere."
+      },
+      {
+        "name": "currentLanguage",
+        "type": "String",
+        "required": true,
+        "description": "'en' or 'ja'. Drives the language toggle's display label (shows the OTHER language as an invitation to switch)."
+      }
+    ]
+  },
+  "stateManagement": { "states": [], "uiVariables": [], "eventHandlers": [], "displayLogic": [] },
+  "exposedEvents": [
+    {
+      "name": "onToggleLanguage",
+      "description": "Fires when the language toggle is tapped. Consumer calls StringManager.setLanguage and re-seeds all derived data."
+    },
+    {
+      "name": "onToggleMobileMenu",
+      "description": "Fires when the hamburger button is tapped (visible only on <1024px viewports). Consumer flips a mobileOpen flag that the Sidebar reads."
+    }
+  ],
+  "slots": { "items": [] },
+  "usage": {
+    "example": {
+      "layoutSnippet": "{\n  \"type\": \"TopBar\",\n  \"brandLabel\": \"chrome_brand_name\",\n  \"currentLanguage\": \"@{currentLanguage}\",\n  \"onToggleLanguage\": \"@{onToggleLanguage}\",\n  \"onToggleMobileMenu\": \"@{onToggleMobileMenu}\"\n}"
+    }
+  },
+  "dataFlow": {
+    "diagram": "flowchart LR\n    VM[ChromeViewModel] -- brandLabel/currentLanguage --> TopBar\n    TopBar -- onToggleLanguage --> VM\n    TopBar -- onToggleMobileMenu --> VM\n    TopBar --> Search[(Search component)]",
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": []
+  },
+  "notes": [
+    "The Search trigger inside the TopBar is the existing Search component. TopBar renders it without passing a placeholder so Search self-localizes against StringManager.getString('home_search_placeholder') (its built-in fallback).",
+    "Language toggle label: the VM passes currentLanguage; the component shows the OTHER language name as a prompt to switch. Localized copy for both labels lives in the chrome namespace (chrome_lang_toggle_label_en / _ja).",
+    "Component imports StringManager directly for aria labels (same pattern as Search). No aria-label prop is surfaced — callers should trust the component's internal localization.",
+    "Hamburger button visibility is CSS media-query driven (visible only under 1024px). No prop controls it.",
+    "The component sits at z-index 40 in the chrome stack. It renders above the sidebar (z-35) so brand + search + language remain clickable while the sidebar drawer is open on narrow viewports."
+  ],
+  "relatedFiles": [
+    { "type": "Component", "path": "docs/components/json/topbar.component.json",                                    "description": "This spec." },
+    { "type": "Converter", "path": "jsonui-doc-web/rjui_tools/lib/react/converters/extensions/topbar_converter.rb", "description": "Ruby converter; scaffolded via `jui g converter`, then hand-adjusted — same pattern as table_of_contents_converter.rb." },
+    { "type": "Component", "path": "jsonui-doc-web/src/components/extensions/TopBar.tsx",                           "description": "React implementation. Imports Search internally." },
+    { "type": "Component", "path": "jsonui-doc-web/src/components/extensions/Search.tsx",                           "description": "Site-wide Search, already spec-driven. Used internally by TopBar." }
+  ]
+}

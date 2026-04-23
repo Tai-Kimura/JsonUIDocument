@@ -1,0 +1,347 @@
+{
+  "type": "View",
+  "id": "learn_hello_world_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "breadcrumbItems",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "prerequisites",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "platformTabs",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "swiftSteps",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "kotlinSteps",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "reactSteps",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "nextSteps",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "swiftPanelVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "kotlinPanelVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "reactPanelVisibility",
+          "class": "String",
+          "defaultValue": "visible"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "learn_hello_world_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "id": "learn_hello_world_header",
+          "style": "page_header",
+          "child": [
+            {
+              "type": "View",
+              "orientation": "horizontal",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "Collection",
+                  "id": "learn_hello_world_breadcrumb",
+                  "weight": 1,
+                  "height": "wrapContent",
+                  "columnCount": 1,
+                  "itemSpacing": 8,
+                  "lineSpacing": 0,
+                  "layout": "flow",
+                  "lazy": false,
+                  "scrollEnabled": false,
+                  "items": "@{breadcrumbItems}",
+                  "cellIdProperty": "id",
+                  "sections": [
+                    {
+                      "cell": "cells/breadcrumb_item"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "id": "learn_hello_world_title",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "id": "learn_hello_world_lead",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 18,
+              "fontColor": "#475467",
+              "text": "lead"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "learn_hello_world_prereqs",
+          "style": "home_section",
+          "background": "#FFFFFF",
+          "child": [
+            {
+              "type": "Label",
+              "style": "section_heading",
+              "text": "prereq_heading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Label",
+              "style": "section_subheading",
+              "text": "prereq_subheading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Collection",
+              "id": "learn_hello_world_prereq_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 32,
+              "columnCount": 3,
+              "lineSpacing": 24,
+              "itemSpacing": 24,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{prerequisites}",
+              "cellIdProperty": "id",
+              "sections": [
+                {
+                  "cell": "cells/prerequisite_row"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "learn_hello_world_quickstart",
+          "style": "home_section",
+          "background": "#F9FAFB",
+          "child": [
+            {
+              "type": "Label",
+              "style": "section_heading",
+              "text": "quickstart_heading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Label",
+              "style": "section_subheading",
+              "text": "quickstart_subheading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Collection",
+              "id": "learn_hello_world_tab_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "columnCount": 3,
+              "lineSpacing": 12,
+              "itemSpacing": 12,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{platformTabs}",
+              "cellIdProperty": "id",
+              "sections": [
+                {
+                  "cell": "cells/tab_header"
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "platform_panel_swift",
+              "orientation": "vertical",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "visibility": "@{swiftPanelVisibility}",
+              "child": [
+                {
+                  "type": "Collection",
+                  "id": "learn_hello_world_swift_steps",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "columnCount": 1,
+                  "lineSpacing": 20,
+                  "itemSpacing": 20,
+                  "lazy": false,
+                  "scrollEnabled": false,
+                  "items": "@{swiftSteps}",
+                  "cellIdProperty": "id",
+                  "sections": [
+                    {
+                      "cell": "cells/quickstart_step"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "platform_panel_kotlin",
+              "orientation": "vertical",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "visibility": "@{kotlinPanelVisibility}",
+              "child": [
+                {
+                  "type": "Collection",
+                  "id": "learn_hello_world_kotlin_steps",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "columnCount": 1,
+                  "lineSpacing": 20,
+                  "itemSpacing": 20,
+                  "lazy": false,
+                  "scrollEnabled": false,
+                  "items": "@{kotlinSteps}",
+                  "cellIdProperty": "id",
+                  "sections": [
+                    {
+                      "cell": "cells/quickstart_step"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "platform_panel_react",
+              "orientation": "vertical",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "visibility": "@{reactPanelVisibility}",
+              "child": [
+                {
+                  "type": "Collection",
+                  "id": "learn_hello_world_react_steps",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "columnCount": 1,
+                  "lineSpacing": 20,
+                  "itemSpacing": 20,
+                  "lazy": false,
+                  "scrollEnabled": false,
+                  "items": "@{reactSteps}",
+                  "cellIdProperty": "id",
+                  "sections": [
+                    {
+                      "cell": "cells/quickstart_step"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "learn_hello_world_next",
+          "style": "home_section",
+          "background": "#FFFFFF",
+          "child": [
+            {
+              "type": "Label",
+              "style": "section_heading",
+              "text": "next_heading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Label",
+              "style": "section_subheading",
+              "text": "next_subheading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Collection",
+              "id": "learn_hello_world_next_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 32,
+              "columnCount": 3,
+              "lineSpacing": 24,
+              "itemSpacing": 24,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{nextSteps}",
+              "cellIdProperty": "id",
+              "sections": [
+                {
+                  "cell": "cells/next_step_card"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "learn_hello_world_footer",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            32,
+            32
+          ],
+          "background": "#0B1220",
+          "child": [
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "fontSize": 12,
+              "fontColor": "#94A3B8",
+              "text": "footer_copyright"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

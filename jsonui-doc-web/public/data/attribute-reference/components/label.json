@@ -1,0 +1,361 @@
+{
+  "component": "Label",
+  "kebab": "label",
+  "aliasOf": null,
+  "title": "Label",
+  "description": "Display component for rendering a single-line or multi-line text string. Label is read-only; use TextField or TextView for user input.",
+  "usage": "Use Label for all static or bound text: headings, body prose, form labels, list item titles, labels embedded in composite cells. Label does not handle taps — wrap it in a Button if the text should be interactive.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Minimum",
+              "language": "json",
+              "code": "{\n  \"type\": \"Label\",\n  \"text\": \"Hello, JsonUI\",\n  \"fontSize\": 16,\n  \"fontColor\": \"#111827\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "With binding",
+              "language": "json",
+              "code": "{\n  \"type\": \"Label\",\n  \"text\": \"@{greeting}\",\n  \"fontSize\": 18,\n  \"fontWeight\": \"bold\"\n}",
+              "note": "`greeting` must exist on the ViewModel as `String`.",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "Multi-line paragraph",
+              "language": "json",
+              "code": "{\n  \"type\": \"Label\",\n  \"text\": \"@{paragraph}\",\n  \"fontSize\": 14,\n  \"lines\": 0,\n  \"width\": \"matchParent\"\n}",
+              "note": "`lines: 0` means unlimited (default wrap).",
+              "required": ""
+            },
+            {
+              "id": "example_4",
+              "title": "Localized via @string",
+              "language": "json",
+              "code": "{\n  \"type\": \"Label\",\n  \"text\": \"@string/welcome_title\",\n  \"fontSize\": 28,\n  \"fontWeight\": \"bold\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_5",
+              "title": "Single-line ellipsis",
+              "language": "json",
+              "code": "{\n  \"type\": \"Label\",\n  \"text\": \"@{productName}\",\n  \"lines\": 1,\n  \"lineBreakMode\": \"Tail\",\n  \"width\": 200\n}",
+              "required": ""
+            },
+            {
+              "id": "example_6",
+              "title": "String interpolation",
+              "language": "json",
+              "code": "{\n  \"type\": \"Label\",\n  \"text\": \"Total: @{count} items\"\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_text",
+              "name": "text",
+              "type": "string | binding",
+              "required": "",
+              "description": "Text content (can be data binding, supports interpolation)",
+              "note": "Accepts literal string, `@{binding}`, `@string/key`, or mixed `\"Total: @{count}\"` interpolation. Unresolved bindings render as empty string in release builds."
+            },
+            {
+              "id": "attr_font_size",
+              "name": "fontSize",
+              "type": "number | binding",
+              "required": "",
+              "description": "Font size (can be data binding)"
+            },
+            {
+              "id": "attr_font_color",
+              "name": "fontColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Font color - hex string or color name from colors.json (can be data binding)",
+              "note": "Accepts hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`, named colors, or design tokens from `colors.json`. Alpha channel in `#RRGGBBAA` is supported on all platforms."
+            },
+            {
+              "id": "attr_font_weight",
+              "name": "fontWeight",
+              "type": "string | number",
+              "required": "",
+              "description": "Font weight (e.g., 'bold', 'semibold', '500', 600)",
+              "note": "String values (`bold`, `semibold`, `medium`, `light`, `heavy`) or numeric 100–900. Numeric values map to platform-nearest fonts."
+            },
+            {
+              "id": "attr_font_family",
+              "name": "fontFamily",
+              "type": "string | binding",
+              "required": "",
+              "description": "Font family name (e.g., 'Noto Sans JP'). Resolved via Configuration.Font.fontProvider or Font.custom(). Can coexist with font (weight) and fontSize."
+            },
+            {
+              "id": "attr_text_align",
+              "name": "textAlign",
+              "type": "string | binding",
+              "required": "",
+              "description": "Text alignment (binding supported)",
+              "note": "`Left` / `Center` / `Right` (both camelCase lowercase accepted). No `justify` on most platforms.",
+              "enumValues": [
+                "Left",
+                "Center",
+                "Right",
+                "left",
+                "center",
+                "right"
+              ]
+            },
+            {
+              "id": "attr_lines",
+              "name": "lines",
+              "type": "number | binding",
+              "required": "",
+              "description": "Maximum number of lines (0 for unlimited) (binding supported)",
+              "note": "`0` = unlimited (default wrap). Positive integer = max line count; further text is truncated per `lineBreakMode`."
+            },
+            {
+              "id": "attr_line_height",
+              "name": "lineHeight",
+              "type": "number",
+              "required": "",
+              "description": "Line height",
+              "note": "Currently React-only. On iOS / Android use `lineHeightMultiple` or `lineSpacing` instead.",
+              "platformDiff": {
+                "swift_uikit": "NSAttributedString の paragraphStyle.minimumLineHeight 経由で反映される。直接 lineHeight 属性は未サポート。",
+                "swift_swiftui": ".lineSpacing(...) modifier に変換。",
+                "kotlin_compose": "LineHeightStyle.Alignment.Center + TextStyle.lineHeight として適用。",
+                "kotlin_xml": "TextView の lineSpacingExtra にマップ。",
+                "react": "Tailwind の `leading-[Npx]` arbitrary value に変換。"
+              },
+              "platform": "react"
+            },
+            {
+              "id": "attr_line_break_mode",
+              "name": "lineBreakMode",
+              "type": "string",
+              "required": "",
+              "description": "Truncation mode",
+              "note": "`Char` / `Clip` / `Word` / `Head` / `Middle` / `Tail`. `Head` truncates start with leading ellipsis, `Tail` truncates end (most common), `Middle` shows both ends.",
+              "platformDiff": {
+                "kotlin_xml": "`Middle` は Android XML でネイティブ未サポートのため `Tail` に警告付きフォールバック。"
+              },
+              "enumValues": [
+                "Char",
+                "Clip",
+                "Word",
+                "Head",
+                "Middle",
+                "Tail"
+              ]
+            },
+            {
+              "id": "attr_line_height_multiple",
+              "name": "lineHeightMultiple",
+              "type": "number | binding",
+              "required": "",
+              "description": "Line height multiplier (binding supported)"
+            },
+            {
+              "id": "attr_line_spacing",
+              "name": "lineSpacing",
+              "type": "number | binding",
+              "required": "",
+              "description": "Line spacing (binding supported)"
+            },
+            {
+              "id": "attr_auto_shrink",
+              "name": "autoShrink",
+              "type": "boolean",
+              "required": "",
+              "description": "Enable auto-shrink",
+              "note": "Automatically shrinks font size to fit within bounds. Combined with `minimumScaleFactor` to bound the shrink ratio."
+            },
+            {
+              "id": "attr_minimum_scale_factor",
+              "name": "minimumScaleFactor",
+              "type": "number | binding",
+              "required": "",
+              "description": "Minimum scale factor for auto-shrink (binding supported)"
+            },
+            {
+              "id": "attr_hint",
+              "name": "hint",
+              "type": "string",
+              "required": "",
+              "description": "Placeholder text when empty (primary)",
+              "note": "Placeholder text shown when `text` is empty. Commonly paired with a bound `text` to show a fallback."
+            },
+            {
+              "id": "attr_hint_color",
+              "name": "hintColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Hint text color - hex string or color name from colors.json (binding supported)"
+            },
+            {
+              "id": "attr_linkable",
+              "name": "linkable",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Enable URL/phone detection",
+              "note": "When `true`, URLs, phone numbers, and emails in the text become tappable. Platform-specific link detection."
+            },
+            {
+              "id": "attr_underline",
+              "name": "underline",
+              "type": "boolean | object | array",
+              "required": "",
+              "description": "Underline styling (boolean for simple, object for styled)"
+            },
+            {
+              "id": "attr_strikethrough",
+              "name": "strikethrough",
+              "type": "boolean | object",
+              "required": "",
+              "description": "Strikethrough styling (boolean for simple, object for styled)"
+            },
+            {
+              "id": "attr_text_shadow",
+              "name": "textShadow",
+              "type": "string | object",
+              "required": "",
+              "description": "Text shadow configuration"
+            },
+            {
+              "id": "attr_text_transform",
+              "name": "textTransform",
+              "type": "string",
+              "required": "",
+              "description": "Text transformation",
+              "platform": "react",
+              "enumValues": [
+                "none",
+                "capitalize",
+                "uppercase",
+                "lowercase"
+              ]
+            },
+            {
+              "id": "attr_edge_inset",
+              "name": "edgeInset",
+              "type": "array | string",
+              "required": "",
+              "description": "Edge insets as array or pipe-separated string"
+            },
+            {
+              "id": "attr_font",
+              "name": "font",
+              "type": "string | binding",
+              "required": "",
+              "description": "Font name or 'bold' (can be data binding)"
+            },
+            {
+              "id": "attr_highlight_attributes",
+              "name": "highlightAttributes",
+              "type": "object",
+              "required": "",
+              "description": "Highlight styling attributes when selected"
+            },
+            {
+              "id": "attr_highlight_color",
+              "name": "highlightColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Font color when selected - hex string or color name from colors.json (binding supported)"
+            },
+            {
+              "id": "attr_hint_attributes",
+              "name": "hintAttributes",
+              "type": "object",
+              "required": "",
+              "description": "Hint text styling attributes"
+            },
+            {
+              "id": "attr_partial_attributes",
+              "name": "partialAttributes",
+              "type": "array",
+              "required": "",
+              "description": "Partial text styling"
+            },
+            {
+              "id": "attr_placeholder",
+              "name": "placeholder",
+              "type": "string",
+              "required": "",
+              "description": "Placeholder text when empty (alias for hint)"
+            },
+            {
+              "id": "attr_selected",
+              "name": "selected",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Selected state (binding supported)",
+              "platform": "swift"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_text_view",
+              "name": "TextView",
+              "url": "/reference/components/text-view"
+            },
+            {
+              "id": "related_icon_label",
+              "name": "IconLabel",
+              "url": "/reference/components/icon-label"
+            },
+            {
+              "id": "related_button",
+              "name": "Button",
+              "url": "/reference/components/button"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "component": "SelectBox",
+  "description": {
+    "en": "Picker for choosing one value from a discrete list, or a date/time picker when `datePickerMode` is set. Renders as native picker on iOS/Android, `<select>` on Web.",
+    "ja": "離散的な選択肢から 1 件を選ぶピッカー。`datePickerMode` 指定時は日付／時刻ピッカーになる。iOS/Android ではネイティブピッカー、Web では `<select>`。"
+  },
+  "usage": {
+    "en": "Use SelectBox when the option count is >= 5 or the options are long strings. For 2-4 short options prefer Segment. For date/time input, set `datePickerMode` to `date` / `time` / `dateAndTime`.",
+    "ja": "選択肢が 5 件以上、または各項目が長い場合に使う。2〜4 件の短い選択肢なら Segment。日付／時刻入力は `datePickerMode` に `date` / `time` / `dateAndTime` を指定。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Static options", "ja": "静的選択肢" },
+      "language": "json",
+      "code": "{\n  \"type\": \"SelectBox\",\n  \"selectedValue\": \"@{country}\",\n  \"items\": [\n    { \"label\": \"Japan\", \"value\": \"JP\" },\n    { \"label\": \"United States\", \"value\": \"US\" },\n    { \"label\": \"United Kingdom\", \"value\": \"UK\" }\n  ],\n  \"prompt\": \"@string/select_country\"\n}"
+    },
+    {
+      "title": { "en": "Bound options from ViewModel", "ja": "ViewModel 由来の選択肢" },
+      "language": "json",
+      "code": "{\n  \"type\": \"SelectBox\",\n  \"selectedValue\": \"@{selectedCategory}\",\n  \"items\": \"@{categoryOptions}\",\n  \"onValueChange\": \"@{onCategoryChanged}\"\n}"
+    },
+    {
+      "title": { "en": "Date picker", "ja": "日付ピッカー" },
+      "language": "json",
+      "code": "{\n  \"type\": \"SelectBox\",\n  \"datePickerMode\": \"date\",\n  \"selectedDate\": \"@{birthDate}\",\n  \"minimumDate\": \"1900-01-01\",\n  \"maximumDate\": \"2025-12-31\",\n  \"dateStringFormat\": \"yyyy-MM-dd\"\n}"
+    },
+    {
+      "title": { "en": "Multi-select", "ja": "複数選択" },
+      "language": "json",
+      "code": "{\n  \"type\": \"SelectBox\",\n  \"multiple\": true,\n  \"items\": \"@{tagOptions}\",\n  \"selectedValue\": \"@{selectedTags}\"\n}"
+    }
+  ],
+  "attributes": {
+    "items": {
+      "note": {
+        "en": "Array of `{ label, value }` objects, or bound to a ViewModel array. When `datePickerMode` is set, `items` is ignored in favor of date range attributes.",
+        "ja": "`{ label, value }` オブジェクトの配列、または ViewModel 配列にバインド。`datePickerMode` 指定時は `items` は無視され日付範囲属性が優先される。"
+      }
+    },
+    "selectedValue": {
+      "note": {
+        "en": "Two-way binding to the selected value (not label). Must match one of `items[].value`.",
+        "ja": "選択された**値**（ラベルではない）への two-way binding。`items[].value` のいずれかと一致する必要がある。"
+      }
+    },
+    "selectedIndex": {
+      "note": {
+        "en": "Alternative to `selectedValue`: two-way binding to the index position. Use when index is more meaningful than value.",
+        "ja": "`selectedValue` の代替：インデックス位置への two-way binding。インデックスが値より意味を持つ場合に使う。"
+      }
+    },
+    "selectedItem": {
+      "note": {
+        "en": "Two-way binding to the selected item object (the entire `{ label, value, ... }` entry). Prefer this for custom item schemas.",
+        "ja": "選択中のアイテムオブジェクト（`{ label, value, ... }` 全体）への two-way binding。カスタムアイテムスキーマで使う。"
+      }
+    },
+    "prompt": {
+      "note": {
+        "en": "Leading title displayed above options (iOS picker header / web `<option disabled>` first entry). Accepts `@string/key`.",
+        "ja": "選択肢の先頭に表示するタイトル（iOS ピッカーヘッダ / web `<option disabled>` 先頭）。`@string/key` 対応。"
+      }
+    },
+    "placeholder": {
+      "note": {
+        "en": "Shown when no selection has been made. Not part of `items`.",
+        "ja": "未選択時に表示。`items` には含まれない。"
+      }
+    },
+    "multiple": {
+      "note": {
+        "en": "Boolean. Enables multi-selection. On iOS / Android uses a checkmark list; on Web uses `<select multiple>`.",
+        "ja": "Boolean。複数選択を有効化。iOS / Android はチェックマーク付きリスト、Web は `<select multiple>`。"
+      }
+    },
+    "onValueChange": {
+      "note": {
+        "en": "Fires after the user confirms a selection. Receives the new value.",
+        "ja": "選択確定後に発火。新しい値を受け取る。"
+      }
+    },
+    "datePickerMode": {
+      "note": {
+        "en": "`date` / `time` / `dateAndTime` / `countDownTimer`. Switches SelectBox into date/time picker mode.",
+        "ja": "`date` / `time` / `dateAndTime` / `countDownTimer`。SelectBox を日付／時刻ピッカーモードに切り替える。"
+      }
+    },
+    "datePickerStyle": {
+      "note": {
+        "en": "iOS 14+. `compact` / `wheels` / `graphical` / `inline`. Controls the visual style of the date picker.",
+        "ja": "iOS 14+。`compact` / `wheels` / `graphical` / `inline`。日付ピッカーの見た目を制御。"
+      }
+    },
+    "minimumDate": {
+      "note": {
+        "en": "Earliest selectable date. ISO 8601 string or date binding. Use with `datePickerMode`.",
+        "ja": "選択可能な最早日付。ISO 8601 文字列または日付バインド。`datePickerMode` と併用。"
+      }
+    },
+    "maximumDate": {
+      "note": {
+        "en": "Latest selectable date.",
+        "ja": "選択可能な最遅日付。"
+      }
+    },
+    "minuteInterval": {
+      "note": {
+        "en": "Minute step size for time pickers (1, 5, 10, 15, 30, 60). Default 1.",
+        "ja": "時刻ピッカーの分ステップ（1, 5, 10, 15, 30, 60）。デフォルト 1。"
+      }
+    },
+    "dateStringFormat": {
+      "note": {
+        "en": "Format string for displayed date when the value is bound as a String. Uses Unicode date format patterns (`yyyy-MM-dd`, etc.).",
+        "ja": "値を String でバインドした場合の表示フォーマット文字列。Unicode 日付フォーマットパターン（`yyyy-MM-dd` 等）。"
+      }
+    },
+    "selectedDate": {
+      "note": {
+        "en": "Two-way binding to the picked date (Date object). Alternative to `selectedValue` when in date-picker mode.",
+        "ja": "選択された日付（Date オブジェクト）への two-way binding。日付ピッカーモード時の `selectedValue` 代替。"
+      }
+    }
+  },
+  "relatedComponents": ["Segment", "Radio"]
+}

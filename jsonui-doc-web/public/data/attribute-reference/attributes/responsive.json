@@ -1,0 +1,66 @@
+{
+  "category": "responsive",
+  "title": "Responsive attributes",
+  "description": "Responsive attributes adjust values based on viewport breakpoints or host platform. Breakpoints are configured in `jsonui-doc-web/tailwind.config.js`.",
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_responsive",
+              "name": "responsive",
+              "type": "object",
+              "required": "",
+              "description": "Size class overrides. Keys: compact, medium, regular, landscape, or hyphenated combos (e.g. regular-landscape). Values: object of attribute overrides for that size class.",
+              "summary": "Object whose keys are breakpoint names (`xs` / `sm` / `md` / `lg` / `xl`) and values are attribute overrides applied at that breakpoint and above. Merges into the base attributes.",
+              "examples": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Collection\",\n  \"columnCount\": 1,\n  \"responsive\": {\n    \"md\": { \"columnCount\": 2 },\n    \"lg\": { \"columnCount\": 3 },\n    \"xl\": { \"columnCount\": 4 }\n  }\n}"
+                }
+              ],
+              "platformDiff": {
+                "react": "CSS media queries + Tailwind breakpoints に変換される（jsonui-doc-web のみ対応）。",
+                "swift_uikit": "size class に応じた layout constraint 切替にマップ（実装依存）。",
+                "swift_swiftui": "`@Environment(\\.horizontalSizeClass)` での分岐に変換。",
+                "kotlin_compose": "`BoxWithConstraints` 内で条件分岐。",
+                "kotlin_xml": "`res/layout-<qualifier>/` のリソースで別 Layout を用意する方式に近い。"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "breakpoints": {
+    "_description": "Default breakpoints used by jsonui-doc-web. Override in `tailwind.config.js`.",
+    "xs": "0–479 px",
+    "sm": "480–767 px",
+    "md": "768–1023 px",
+    "lg": "1024–1279 px",
+    "xl": "1280 px+"
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_components",
+              "titleKey": "next_components_title",
+              "descriptionKey": "next_components_body",
+              "url": "/reference/components"
+            },
+            {
+              "id": "next_attributes_root",
+              "titleKey": "next_attributes_root_title",
+              "descriptionKey": "next_attributes_root_body",
+              "url": "/reference/attributes"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

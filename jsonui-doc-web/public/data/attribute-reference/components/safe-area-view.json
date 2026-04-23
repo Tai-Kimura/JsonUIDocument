@@ -1,0 +1,120 @@
+{
+  "component": "SafeAreaView",
+  "kebab": "safe-area-view",
+  "aliasOf": null,
+  "title": "SafeAreaView",
+  "description": "View that respects the host platform's safe area (notch, home indicator, status bar). Typically placed at the root of a screen.",
+  "usage": "Wrap the outermost content of each screen in SafeAreaView. Inside SafeAreaView, use regular View + ScrollView for normal layout.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Screen root",
+              "language": "json",
+              "code": "{\n  \"type\": \"SafeAreaView\",\n  \"child\": [\n    { \"include\": \"common/header\" },\n    { \"type\": \"ScrollView\", \"weight\": 1, \"child\": [ ] },\n    { \"include\": \"common/footer\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Respect only top + bottom",
+              "language": "json",
+              "code": "{\n  \"type\": \"SafeAreaView\",\n  \"safeAreaInsetPositions\": [\"top\", \"bottom\"],\n  \"child\": [\n    { \"type\": \"View\", \"child\": [ ] }\n  ]\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_child",
+              "name": "child",
+              "type": "array",
+              "required": "",
+              "description": "Child component(s)",
+              "note": "Same as View — array of child components. Usually contains a Header + main content + Footer structure."
+            },
+            {
+              "id": "attr_safe_area_inset_positions",
+              "name": "safeAreaInsetPositions",
+              "type": "array",
+              "required": "",
+              "description": "Safe area edges",
+              "note": "Array of edges to respect: `top` / `bottom` / `leading` / `trailing`. Omit to respect every edge (default)."
+            },
+            {
+              "id": "attr_orientation",
+              "name": "orientation",
+              "type": "string",
+              "required": "",
+              "description": "Stack orientation (default: zstack)",
+              "note": "Inherited from View. Defaults to `vertical`. SafeAreaView is almost always vertical.",
+              "enumValues": [
+                "horizontal",
+                "vertical"
+              ]
+            },
+            {
+              "id": "attr_children",
+              "name": "children",
+              "type": "array",
+              "required": "",
+              "description": "Child components (alias for child)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_view",
+              "name": "View",
+              "url": "/reference/components/view"
+            },
+            {
+              "id": "related_scroll_view",
+              "name": "ScrollView",
+              "url": "/reference/components/scroll-view"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "component": "GradientView",
+  "kebab": "gradient-view",
+  "aliasOf": null,
+  "title": "GradientView",
+  "description": "View with a linear gradient background. For simple 2-stop gradients, the `gradient` attribute on a regular View is sufficient — use GradientView when `locations` (multi-stop control) is needed.",
+  "usage": "Use GradientView for hero banners, card overlays, and any background needing 3+ color stops or precise stop positions. For flat colors, prefer `background` on a View.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Sunset 3-stop",
+              "language": "json",
+              "code": "{\n  \"type\": \"GradientView\",\n  \"gradient\": [\"#FBBF24\", \"#F59E0B\", \"#EF4444\"],\n  \"locations\": [0.0, 0.6, 1.0],\n  \"gradientDirection\": \"horizontal\",\n  \"width\": \"matchParent\",\n  \"height\": 120\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Vertical hero",
+              "language": "json",
+              "code": "{\n  \"type\": \"GradientView\",\n  \"gradient\": [\"#6366F1\", \"#8B5CF6\"],\n  \"gradientDirection\": \"vertical\",\n  \"width\": \"matchParent\",\n  \"height\": 200\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_gradient",
+              "name": "gradient",
+              "type": "array",
+              "required": "",
+              "description": "Gradient colors",
+              "note": "Array of 2+ color strings. Colors are distributed evenly unless `locations` is provided."
+            },
+            {
+              "id": "attr_gradient_direction",
+              "name": "gradientDirection",
+              "type": "string",
+              "required": "",
+              "description": "Gradient direction",
+              "note": "`horizontal` / `vertical` / `diagonal` or numeric degrees. Default `vertical`.",
+              "enumValues": [
+                "Vertical",
+                "Horizontal",
+                "Oblique"
+              ]
+            },
+            {
+              "id": "attr_locations",
+              "name": "locations",
+              "type": "array",
+              "required": "",
+              "description": "Color stop locations (0.0-1.0)",
+              "note": "Array of 0.0–1.0 values, same length as `gradient`. Each entry is the position where that color peaks."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_view",
+              "name": "View",
+              "url": "/reference/components/view"
+            },
+            {
+              "id": "related_blur",
+              "name": "Blur",
+              "url": "/reference/components/blur"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

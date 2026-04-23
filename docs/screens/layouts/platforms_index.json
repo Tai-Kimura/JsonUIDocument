@@ -1,0 +1,123 @@
+{
+  "type": "View",
+  "id": "platforms_index_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "articles",
+          "class": "CollectionDataSource"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "platforms_index_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "platforms_index_hero",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            40,
+            32,
+            40,
+            32
+          ],
+          "background": "#0B1220",
+          "child": [
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#93C5FD",
+              "text": "eyebrow"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#F9FAFB",
+              "text": "headline"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 16,
+              "fontColor": "#CBD5F5",
+              "text": "subcopy"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "platforms_index_catalog",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            40,
+            32,
+            40,
+            32
+          ],
+          "background": "#F9FAFB",
+          "child": [
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "fontSize": 22,
+              "fontWeight": "semibold",
+              "fontColor": "#0B1220",
+              "text": "catalog_heading"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 6,
+              "fontSize": 14,
+              "fontColor": "#475467",
+              "text": "catalog_subheading"
+            },
+            {
+              "type": "Collection",
+              "id": "platforms_index_articles_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 20,
+              "columnCount": 1,
+              "lineSpacing": 16,
+              "itemSpacing": 16,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{articles}",
+              "cellIdProperty": "id",
+              "sections": [
+                {
+                  "cell": "cells/learn_article_card"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

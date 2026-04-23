@@ -1,0 +1,169 @@
+{
+  "component": "Slider",
+  "kebab": "slider",
+  "aliasOf": null,
+  "title": "Slider",
+  "description": "Continuous numeric input over a defined range. Can be constrained to discrete values via `step`.",
+  "usage": "Use Slider for values where rough precision is acceptable (volume, brightness, opacity). For exact integers use a numeric TextField. For a range of two values, place two Sliders and keep their values consistent in the ViewModel.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Volume slider",
+              "language": "json",
+              "code": "{\n  \"type\": \"Slider\",\n  \"value\": \"@{volume}\",\n  \"minimum\": 0,\n  \"maximum\": 100,\n  \"step\": 1,\n  \"onValueChange\": \"@{onVolumeChanged}\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "With min/max images",
+              "language": "json",
+              "code": "{\n  \"type\": \"Slider\",\n  \"value\": \"@{brightness}\",\n  \"minimum\": 0,\n  \"maximum\": 1,\n  \"step\": 0.01,\n  \"minimumValueImage\": \"sun_small\",\n  \"maximumValueImage\": \"sun_large\"\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_value",
+              "name": "value",
+              "type": "number | binding",
+              "required": "",
+              "description": "Current value (binding for two-way)",
+              "note": "Two-way numeric binding.",
+              "bindingDirection": "two-way"
+            },
+            {
+              "id": "attr_tint_color",
+              "name": "tintColor",
+              "type": "string",
+              "required": "",
+              "description": "Tint color - hex string or color name from colors.json",
+              "note": "Color of the filled track (left of the thumb)."
+            },
+            {
+              "id": "attr_max_value",
+              "name": "maxValue",
+              "type": "number | binding",
+              "required": "",
+              "description": "Maximum value (binding supported)",
+              "note": "Alias for `maximum`."
+            },
+            {
+              "id": "attr_maximum",
+              "name": "maximum",
+              "type": "number | binding",
+              "required": "",
+              "description": "Maximum value (alias for maxValue) (binding supported)",
+              "note": "Inclusive upper bound. Default 1."
+            },
+            {
+              "id": "attr_maximum_value_image",
+              "name": "maximumValueImage",
+              "type": "string",
+              "required": "",
+              "description": "Image at maximum end",
+              "note": "Small image at the maximum end.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_min_value",
+              "name": "minValue",
+              "type": "number | binding",
+              "required": "",
+              "description": "Minimum value (binding supported)",
+              "note": "Alias for `minimum`."
+            },
+            {
+              "id": "attr_minimum",
+              "name": "minimum",
+              "type": "number | binding",
+              "required": "",
+              "description": "Minimum value (alias for minValue) (binding supported)",
+              "note": "Inclusive lower bound. Default 0."
+            },
+            {
+              "id": "attr_minimum_value_image",
+              "name": "minimumValueImage",
+              "type": "string",
+              "required": "",
+              "description": "Image at minimum end",
+              "note": "Small image shown at the minimum end (usually a small-amount glyph like 🔈).",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_value_change",
+              "name": "onValueChange",
+              "type": "binding",
+              "required": "",
+              "description": "Value change handler - binding only (@{functionName})",
+              "note": "Fires on drag release (or continuously during drag depending on platform)."
+            },
+            {
+              "id": "attr_step",
+              "name": "step",
+              "type": "number",
+              "required": "",
+              "description": "Step increment value",
+              "note": "Discrete step size. `0` means continuous. Defaults to `(maximum - minimum) / 100`.",
+              "platform": "react"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_progress",
+              "name": "Progress",
+              "url": "/reference/components/progress"
+            },
+            {
+              "id": "related_text_field",
+              "name": "TextField",
+              "url": "/reference/components/text-field"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "category": "layout",
+  "description": {
+    "en": "Layout attributes define the size and axis behavior of a component. They apply to every component regardless of type.",
+    "ja": "レイアウト属性はコンポーネントのサイズと軸方向の挙動を決める。コンポーネント種別によらず全てに適用される。"
+  },
+  "attributes": {
+    "width": {
+      "summary": {
+        "en": "Size along the horizontal axis. Accepts number (pt/dp/px), `matchParent`, `wrapContent`, or responsive object.",
+        "ja": "水平方向のサイズ。数値（pt/dp/px）、`matchParent`、`wrapContent`、またはレスポンシブオブジェクト。"
+      },
+      "values": [
+        {
+          "value": "matchParent",
+          "description": {
+            "en": "Fill the parent along this axis. Requires the parent to have a bounded size.",
+            "ja": "親のこの軸を満たす。親が有界サイズである必要あり。"
+          }
+        },
+        {
+          "value": "wrapContent",
+          "description": {
+            "en": "Shrink to fit content. Cannot shrink below children's natural size.",
+            "ja": "内容に合わせて縮む。子の自然サイズより小さくはならない。"
+          }
+        },
+        {
+          "value": "<number>",
+          "description": {
+            "en": "Fixed size in platform-native units (iOS pt / Android dp / Web px).",
+            "ja": "プラットフォームのネイティブ単位で固定サイズ。"
+          }
+        },
+        {
+          "value": "{ xs: ..., md: ..., lg: ... }",
+          "description": {
+            "en": "Responsive per breakpoint (Web only). See the responsive category.",
+            "ja": "ブレークポイント別にレスポンシブ指定（Web のみ）。responsive カテゴリを参照。"
+          }
+        }
+      ],
+      "examples": [
+        { "language": "json", "code": "{ \"type\": \"Button\", \"width\": 120, \"height\": 44 }" },
+        { "language": "json", "code": "{ \"type\": \"Button\", \"width\": \"matchParent\", \"height\": 44 }" },
+        { "language": "json", "code": "{ \"type\": \"Collection\", \"columnCount\": { \"xs\": 1, \"md\": 2, \"lg\": 3 } }" }
+      ],
+      "platformDiff": {
+        "swift_uikit": "`matchParent` → AutoLayout `widthAnchor.constraint(equalTo: superview.widthAnchor)`。数値 → pt 固定。",
+        "swift_swiftui": "`matchParent` → `.frame(maxWidth: .infinity)`。数値 → `.frame(width: N)`。",
+        "kotlin_compose": "`matchParent` → `Modifier.fillMaxWidth()`。数値 → `Modifier.width(N.dp)`。",
+        "kotlin_xml": "`matchParent` → `android:layout_width=\"match_parent\"`。数値 → `Xdp`。",
+        "react": "`matchParent` → Tailwind `w-full`。数値 → arbitrary value `w-[Npx]`。"
+      },
+      "relatedAttributes": ["height", "minWidth", "maxWidth", "weight", "widthWeight", "aspectWidth"]
+    },
+    "height": {
+      "summary": {
+        "en": "Size along the vertical axis. Same value semantics as `width`.",
+        "ja": "垂直方向のサイズ。値の意味論は `width` と同じ。"
+      },
+      "relatedAttributes": ["width", "minHeight", "maxHeight", "heightWeight", "aspectHeight"]
+    },
+    "weight": {
+      "summary": {
+        "en": "Flexible stretch factor along the parent's main axis. In a horizontal View, a child with `weight: 1` fills remaining horizontal space.",
+        "ja": "親の主軸方向に伸縮する因数。水平 View 内で `weight: 1` を持つ子が水平方向の残りを埋める。"
+      },
+      "platformDiff": {
+        "swift_swiftui": ".frame(maxWidth: .infinity) + layoutPriority。",
+        "kotlin_compose": "Modifier.weight(N)。",
+        "kotlin_xml": "android:layout_weight=\"N\"。",
+        "react": "CSS `flex: N`。"
+      },
+      "relatedAttributes": ["widthWeight", "heightWeight"]
+    },
+    "widthWeight": {
+      "summary": {
+        "en": "Stretch factor limited to the horizontal axis. Equivalent to `weight` inside a horizontal View.",
+        "ja": "水平軸限定の伸縮因数。horizontal View 内の `weight` と同等。"
+      },
+      "relatedAttributes": ["weight", "heightWeight"]
+    },
+    "heightWeight": {
+      "summary": {
+        "en": "Stretch factor limited to the vertical axis.",
+        "ja": "垂直軸限定の伸縮因数。"
+      },
+      "relatedAttributes": ["weight", "widthWeight"]
+    },
+    "minWidth": {
+      "summary": {
+        "en": "Minimum width in pt/dp/px. Prevents the component from shrinking below this value.",
+        "ja": "最小幅（pt/dp/px）。これより縮まないことを保証。"
+      }
+    },
+    "minHeight": {
+      "summary": { "en": "Minimum height.", "ja": "最小高さ。" }
+    },
+    "maxWidth": {
+      "summary": {
+        "en": "Maximum width in pt/dp/px. Useful on Web for capping content width on wide screens.",
+        "ja": "最大幅（pt/dp/px）。Web でワイドスクリーンのコンテンツ幅を制限するのに便利。"
+      }
+    },
+    "maxHeight": {
+      "summary": { "en": "Maximum height.", "ja": "最大高さ。" }
+    },
+    "aspectWidth": {
+      "summary": {
+        "en": "Sets width as a multiplier of height. For `aspectWidth: 16`, `aspectHeight: 9` → 16:9 ratio. Use when you want ratio-based sizing.",
+        "ja": "高さに対する幅の係数。`aspectWidth: 16`, `aspectHeight: 9` で 16:9 の比率。比率ベースのサイジングに使う。"
+      },
+      "relatedAttributes": ["aspectHeight"]
+    },
+    "aspectHeight": {
+      "summary": {
+        "en": "Height component of an aspect ratio pair.",
+        "ja": "アスペクト比ペアの高さ側の値。"
+      },
+      "relatedAttributes": ["aspectWidth"]
+    },
+    "hugHorizontal": {
+      "summary": {
+        "en": "iOS-only. Horizontal Content Hugging Priority. Higher = more resistant to being stretched.",
+        "ja": "iOS 専用。水平方向の Content Hugging Priority。大きいほど引き伸ばされにくい。"
+      }
+    },
+    "hugVertical": {
+      "summary": {
+        "en": "iOS-only. Vertical Content Hugging Priority.",
+        "ja": "iOS 専用。垂直方向の Content Hugging Priority。"
+      }
+    },
+    "compressHorizontal": {
+      "summary": {
+        "en": "iOS-only. Horizontal Compression Resistance Priority. Higher = more resistant to being compressed below intrinsic size.",
+        "ja": "iOS 専用。水平方向の Compression Resistance Priority。大きいほど固有サイズ未満への圧縮に抵抗する。"
+      }
+    },
+    "compressVertical": {
+      "summary": {
+        "en": "iOS-only. Vertical Compression Resistance Priority.",
+        "ja": "iOS 専用。垂直方向の Compression Resistance Priority。"
+      }
+    }
+  }
+}

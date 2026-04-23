@@ -1,0 +1,148 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "FirstScreen",
+    "displayName": "Your first screen",
+    "description": "Learn > build a real screen. Goes beyond hello-world: the reader constructs a three-section screen (Header / Hero / Collection) from scratch, wires it to a ViewModel, and ships a working example end-to-end. ~12-min read. Five sections plus closing trouble spots. Pairs with /learn/data-binding-basics (reader learns bindings first, then applies them in a real layout here).",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "learn/first-screen",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_guides -> /guides/writing-your-first-spec, next_data_binding -> /learn/data-binding-basics) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the learn_first_screen_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /guides/writing-your-first-spec, /learn/data-binding-basics."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /guides/writing-your-first-spec and /learn/data-binding-basics. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is spec-mapped",
+      "destination": "Target screen or tab",
+      "description": "v1: /, /guides/writing-your-first-spec, /learn/data-binding-basics."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/learn/first-screen.json",
+      "description": "Layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/learn/FirstScreenViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/learn/first-screen/page.tsx",
+      "description": "Page."
+    }
+  ],
+  "notes": [
+    "Fifth and final live entry under the Learn tab — flipping LEARN_ENTRIES row 3 (first-screen) to 'live' completes the tab.",
+    "Walkthrough builds a 'Recent Activity' screen: header (title + language toggle) + hero (welcome + CTA) + Collection (activity rows). Picks three parts that together exercise layout nesting, styles, a custom cell layout, and a CollectionDataSource binding.",
+    "Six CodeBlocks in total: (1) the spec with five uiVariables + three events + one customType, (2) the root layout JSON with header + hero + collection frames, (3) the activity_row cell, (4) the ViewModel seed, (5) the page route, (6) the final jui build + verify commands to ship."
+  ]
+}

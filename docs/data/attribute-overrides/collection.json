@@ -1,0 +1,135 @@
+{
+  "component": "Collection",
+  "description": {
+    "en": "Virtualized list/grid for dynamic arrays. Renders only visible items. Supports vertical/horizontal lists, multi-column grids, section headers, paging, and lazy loading.",
+    "ja": "動的配列を仮想化して描画するリスト／グリッド。可視範囲のみ描画。垂直／水平リスト、複数カラムグリッド、セクションヘッダ、ページング、遅延読み込みに対応。"
+  },
+  "usage": {
+    "en": "Use Collection for any list bound to a dynamic array (search results, feeds, product grids). Each row is rendered by a cell file referenced in `sections[].cell`.",
+    "ja": "動的配列にバインドされる任意のリスト（検索結果、フィード、商品グリッド）に使う。各行は `sections[].cell` で参照する cell ファイルが描画する。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Simple vertical list", "ja": "単純な垂直リスト" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{users}\",\n  \"cellIdProperty\": \"id\",\n  \"sections\": [ { \"cell\": \"cells/user_row\" } ]\n}"
+    },
+    {
+      "title": { "en": "2-column grid", "ja": "2 カラムグリッド" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{photos}\",\n  \"columnCount\": 2,\n  \"itemSpacing\": 8,\n  \"lineSpacing\": 8,\n  \"sections\": [ { \"cell\": \"cells/photo_card\" } ]\n}"
+    },
+    {
+      "title": { "en": "Sectioned with headers", "ja": "ヘッダ付きセクション" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{sectionedMessages}\",\n  \"headerClasses\": [\"cells/date_header\"],\n  \"cellClasses\": [\"cells/message_row\"],\n  \"sections\": [\n    {\n      \"header\": \"cells/date_header\",\n      \"cell\": \"cells/message_row\"\n    }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Horizontal carousel", "ja": "水平カルーセル" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{featuredProducts}\",\n  \"orientation\": \"horizontal\",\n  \"horizontalScroll\": true,\n  \"sections\": [ { \"cell\": \"cells/product_card\" } ]\n}"
+    },
+    {
+      "title": { "en": "Infinite scroll (load more)", "ja": "無限スクロール" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{articles}\",\n  \"onItemAppear\": \"@{onItemAppear}\",\n  \"sections\": [ { \"cell\": \"cells/article_row\" } ]\n}",
+      "note": {
+        "en": "The ViewModel inspects `onItemAppear` item index and triggers a fetch when within N rows of the end.",
+        "ja": "ViewModel 側で `onItemAppear` のインデックスを見て、末尾から N 行以内なら fetch を発火する。"
+      }
+    }
+  ],
+  "attributes": {
+    "items": {
+      "note": {
+        "en": "Bound to a ViewModel array. Each element must have a stable identifier (see `cellIdProperty`) for efficient reconciliation.",
+        "ja": "ViewModel の配列にバインド。各要素は安定した ID（`cellIdProperty` 参照）を持つ必要があり、これで差分更新される。"
+      }
+    },
+    "cellIdProperty": {
+      "note": {
+        "en": "Key name to use as the stable identifier. Defaults to `id`. Required for correct reordering animations and minimal re-renders.",
+        "ja": "安定 ID として使うキー名。デフォルト `id`。並び替えアニメーションと最小再描画のために必須。"
+      }
+    },
+    "sections": {
+      "note": {
+        "en": "Array of section definitions. Each has `cell` (required), plus optional `header` / `footer` / `itemsProperty`. For a flat single-section list, use one entry.",
+        "ja": "セクション定義の配列。`cell`（必須）に加え `header` / `footer` / `itemsProperty` が任意。フラットな単一セクションなら 1 要素でよい。"
+      }
+    },
+    "cellClasses": {
+      "note": {
+        "en": "Array of cell layout paths. Used when a section uses multiple cell types conditionally (e.g., sponsored vs organic).",
+        "ja": "cell レイアウトパスの配列。セクションが条件によって複数種の cell を使う場合（例: スポンサーと通常）に使う。"
+      }
+    },
+    "columnCount": {
+      "note": {
+        "en": "Default 1 (list). Accepts responsive object `{ xs: 1, md: 2, lg: 3 }` for breakpoint-based columns.",
+        "ja": "デフォルト 1（リスト）。`{ xs: 1, md: 2, lg: 3 }` オブジェクトでレスポンシブ指定可。"
+      }
+    },
+    "itemSpacing": {
+      "note": {
+        "en": "Cross-axis spacing between cells (between columns in a grid).",
+        "ja": "交差軸方向のセル間隔（グリッドではカラム間）。"
+      }
+    },
+    "lineSpacing": {
+      "note": {
+        "en": "Main-axis spacing between cells (between rows in a list).",
+        "ja": "主軸方向のセル間隔（リストでは行間）。"
+      }
+    },
+    "lazy": {
+      "note": {
+        "en": "`true` (default) enables virtualization (only visible rows are instantiated). `false` renders all rows at once — use only for short, known-bounded lists.",
+        "ja": "`true`（デフォルト）で仮想化（可視行のみ生成）。`false` は全行一括描画で、短くて長さ既知のリストのみに使う。"
+      }
+    },
+    "orientation": {
+      "note": {
+        "en": "`vertical` (default) / `horizontal`. Horizontal collections are typically carousels.",
+        "ja": "`vertical`（デフォルト）/ `horizontal`。水平 Collection は通常カルーセル用途。"
+      }
+    },
+    "paging": {
+      "note": {
+        "en": "`true` snaps to cell or page boundaries. Often combined with `columnCount: 1` + full-width cells for page-sized content.",
+        "ja": "`true` でセルまたはページ境界にスナップ。`columnCount: 1` + 全幅 cell と組み合わせてページ単位のコンテンツに使う。"
+      }
+    },
+    "onItemAppear": {
+      "note": {
+        "en": "Fired when a cell becomes visible. Use for analytics impressions or infinite-scroll triggers.",
+        "ja": "セルが可視になったとき発火。アナリティクスの impression や無限スクロールのトリガーに使う。"
+      }
+    },
+    "onPageChanged": {
+      "note": {
+        "en": "Fires when the current paged position changes. Only meaningful when `paging: true`.",
+        "ja": "paged 位置が変わったとき発火。`paging: true` のときのみ意味を持つ。"
+      }
+    },
+    "headerClasses": {
+      "note": {
+        "en": "Cell layout paths for section headers. Must match the number of sections that have headers.",
+        "ja": "セクションヘッダ用 cell レイアウトパス。ヘッダを持つセクション数と一致する必要がある。"
+      }
+    },
+    "footerClasses": {
+      "note": {
+        "en": "Cell layout paths for section footers.",
+        "ja": "セクションフッタ用 cell レイアウトパス。"
+      }
+    },
+    "keyboardAvoidance": {
+      "note": {
+        "en": "Same semantics as ScrollView — auto-scroll so the focused input is above the keyboard.",
+        "ja": "ScrollView と同じ。フォーカス中の入力要素がキーボード上に来るよう自動スクロール。"
+      }
+    }
+  },
+  "relatedComponents": ["ScrollView", "View"]
+}

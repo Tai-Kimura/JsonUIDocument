@@ -1,0 +1,304 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   Design tokens — the site-wide vocabulary.
+   ───────────────────────────────────────────────────────────────────────
+   These tokens are authored for the spec-driven chrome (coming in
+   design-overhaul-pc-first Phases 02–06) and any presentational polish
+   on the Search modal, 404, etc. Generated page bodies still hard-code
+   colors inside class names (spec-driven — out of our hands), so these
+   only matter for hand-written TSX that consumes them.
+   ========================================================================= */
+:root {
+  /* Ink + surfaces */
+  --color-ink:            #0B1220; /* page text, dark hero */
+  --color-ink-muted:      #475467; /* subcopy */
+  --color-ink-subtle:     #64748B; /* captions, keyboard labels */
+  --color-ink-faint:      #94A3B8; /* hint text */
+  --color-surface:        #FFFFFF; /* page body / card */
+  --color-surface-muted:  #F9FAFB; /* alternating section */
+  --color-surface-sunken: #F3F4F6; /* sidebar fill / hover */
+  --color-border:         #E5E7EB; /* page dividers */
+  --color-border-strong:  #D1D5DB; /* emphasized dividers */
+
+  /* Dark chrome palette (top bar will reuse once spec chrome lands) */
+  --color-chrome-fill:       #0B1220;
+  --color-chrome-fill-hover: #111827;
+  --color-chrome-border:     #1F2937;
+  --color-chrome-ink:        #F9FAFB;
+  --color-chrome-ink-muted:  #CBD5F5;
+  --color-chrome-ink-subtle: #94A3B8;
+
+  /* Accent */
+  --color-accent:       #2563EB;
+  --color-accent-hover: #1D4ED8;
+  --color-accent-ink:   #FFFFFF;
+  --color-accent-tint:  #EEF2FF;
+
+  /* Focus ring */
+  --color-focus: #60A5FA;
+
+  /* Layout sizes — the new spec-driven chrome will consume these. */
+  --chrome-topbar-height:    56px;
+  --chrome-sidebar-width:    272px;
+  --chrome-content-max:      1200px;
+  --chrome-content-body-max: 920px;
+
+  /* Type scale */
+  --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+  /* Legacy fg/bg kept so generated pages that reference them still resolve. */
+  --background: var(--color-surface-muted);
+  --foreground: var(--color-ink);
+}
+
+html,
+body {
+  height: 100%;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =========================================================================
+   Chrome layout — spec-driven Chrome (TopBar + Sidebar) is a sibling of
+   <main>; these rules reserve space so the page content isn't hidden
+   under the fixed chrome pieces and handle the mobile drawer fallback.
+   ========================================================================= */
+
+/* Page-content slot. Reserves space for the fixed TopBar (top padding) and
+   the persistent Sidebar (left padding). Under 1024px the sidebar hides. */
+.site-main {
+  padding-top: var(--chrome-topbar-height);
+  padding-left: var(--chrome-sidebar-width);
+  min-height: 100vh;
+  background: var(--color-surface-muted);
+  transition: padding-left 180ms ease;
+}
+
+@media (max-width: 1023px) {
+  .site-main {
+    padding-left: 0;
+  }
+}
+
+/* -- TopBar chrome -------------------------------------------------------- */
+.chrome-topbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: var(--chrome-topbar-height);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  background: rgba(11, 18, 32, 0.92);
+  backdrop-filter: saturate(180%) blur(10px);
+  -webkit-backdrop-filter: saturate(180%) blur(10px);
+  border-bottom: 1px solid var(--color-chrome-border);
+  color: var(--color-chrome-ink);
+}
+
+.chrome-topbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  color: var(--color-chrome-ink);
+  text-decoration: none;
+}
+
+.chrome-topbar__brand-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #60A5FA, var(--color-accent));
+}
+
+.chrome-topbar__brand-mark { line-height: 1; }
+
+.chrome-topbar__spacer { flex: 1 1 auto; }
+
+.chrome-topbar__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chrome-topbar__menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--color-chrome-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-chrome-ink);
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.chrome-topbar__menu-btn:hover { background: rgba(255, 255, 255, 0.08); }
+
+@media (max-width: 1023px) {
+  .chrome-topbar__menu-btn { display: inline-flex; }
+}
+
+.chrome-lang-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-chrome-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-chrome-ink);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.chrome-lang-btn:hover { background: rgba(255, 255, 255, 0.09); }
+
+/* -- Sidebar chrome ------------------------------------------------------- */
+.chrome-sidebar {
+  position: fixed;
+  top: var(--chrome-topbar-height);
+  left: 0;
+  width: var(--chrome-sidebar-width);
+  /* Explicit height so overflow-y:auto has a bounded container and the list
+     scrolls even when it overflows the viewport. `inset` shorthand was
+     inconsistent across browsers for computing height here. */
+  height: calc(100vh - var(--chrome-topbar-height));
+  max-height: calc(100vh - var(--chrome-topbar-height));
+  z-index: 35;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transition: transform 200ms ease;
+  /* Thin scrollbar styling that doesn't visually fight the content. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+.chrome-sidebar::-webkit-scrollbar { width: 10px; }
+.chrome-sidebar::-webkit-scrollbar-track { background: transparent; }
+.chrome-sidebar::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.chrome-sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-subtle);
+  background-clip: content-box;
+}
+
+.chrome-sidebar__inner {
+  padding: 16px 12px 40px;
+  /* Allow the inner list to grow naturally; the wrapper handles the scroll. */
+  min-height: 0;
+}
+
+.chrome-sidebar__section { margin-top: 4px; }
+
+.chrome-sidebar__section-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: var(--color-ink);
+  cursor: pointer;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: background-color 120ms ease;
+}
+
+.chrome-sidebar__section-header:hover { background: var(--color-surface-sunken); }
+
+.chrome-sidebar__section-icon {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  color: var(--color-ink-subtle);
+}
+
+.chrome-sidebar__section-label { flex: 1 1 auto; }
+
+.chrome-sidebar__section-chevron {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  color: var(--color-ink-subtle);
+  transition: transform 160ms ease;
+}
+
+.chrome-sidebar__section-chevron[data-open="false"] {
+  transform: rotate(-90deg);
+}
+
+.chrome-sidebar__list {
+  list-style: none;
+  margin: 2px 0 6px 22px;
+  padding: 0 0 0 12px;
+  border-left: 1px solid var(--color-border);
+}
+
+.chrome-sidebar__list[data-open="false"] { display: none; }
+
+.chrome-sidebar__link {
+  display: block;
+  padding: 6px 10px;
+  margin: 1px 0;
+  border-radius: 6px;
+  color: var(--color-ink-muted);
+  font-size: 13.5px;
+  line-height: 1.4;
+  text-decoration: none;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.chrome-sidebar__link:hover {
+  background: var(--color-surface-sunken);
+  color: var(--color-ink);
+}
+
+.chrome-sidebar__link[aria-current="page"] {
+  background: var(--color-accent-tint);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+@media (max-width: 1023px) {
+  .chrome-sidebar {
+    transform: translateX(-100%);
+    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.18);
+  }
+  .chrome-sidebar[data-mobile-open="true"] {
+    transform: translateX(0);
+  }
+}
+
+/* Focus styles — tighter than browser default, tuned for dark TopBar. */
+.chrome-topbar :focus-visible,
+.chrome-sidebar :focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}

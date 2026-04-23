@@ -1,0 +1,81 @@
+{
+  "type": "View",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "wrapContent",
+  "style": "card_surface",
+  "child": [
+    {
+      "data": [
+        { "name": "numberLabel", "class": "String" },
+        { "name": "titleKey", "class": "String" },
+        { "name": "instructionKey", "class": "String" },
+        { "name": "code", "class": "String", "defaultValue": "" },
+        { "name": "language", "class": "String", "defaultValue": "bash" },
+        { "name": "filename", "class": "String" },
+        { "name": "showLineNumbers", "class": "Bool", "defaultValue": false },
+        { "name": "codeVisibility", "class": "String", "defaultValue": "gone" }
+      ]
+    },
+    {
+      "type": "View",
+      "orientation": "horizontal",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "child": [
+        {
+          "type": "Label",
+          "width": "wrapContent",
+          "height": "wrapContent",
+          "paddings": [4, 12, 4, 12],
+          "fontSize": 13,
+          "fontWeight": "semibold",
+          "fontColor": "#FFFFFF",
+          "background": "#2563EB",
+          "cornerRadius": 999,
+          "text": "@{numberLabel}"
+        },
+        {
+          "type": "Label",
+          "weight": 1,
+          "height": "wrapContent",
+          "leftMargin": 12,
+          "fontSize": 20,
+          "fontWeight": "semibold",
+          "fontColor": "#0B1220",
+          "text": "@{titleKey}"
+        }
+      ]
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 8,
+      "fontSize": 15,
+      "fontColor": "#475467",
+      "text": "@{instructionKey}"
+    },
+    {
+      "type": "View",
+      "id": "quickstart_step_code_wrap",
+      "orientation": "vertical",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 12,
+      "visibility": "@{codeVisibility}",
+      "child": [
+        {
+          "type": "CodeBlock",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "code": "@{code}",
+          "language": "@{language}",
+          "filename": "@{filename}",
+          "showLineNumbers": "@{showLineNumbers}",
+          "copyable": true
+        }
+      ]
+    }
+  ]
+}

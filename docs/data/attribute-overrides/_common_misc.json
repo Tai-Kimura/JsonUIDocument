@@ -1,0 +1,87 @@
+{
+  "category": "misc",
+  "description": {
+    "en": "Identity, metadata, composition, and debug attributes that don't fit other categories.",
+    "ja": "他のカテゴリに属さない識別・メタデータ・合成・デバッグ系の属性。"
+  },
+  "attributes": {
+    "id": {
+      "summary": {
+        "en": "Unique identifier within the layout. Required for ViewModel references and test-runner selectors. Naming convention: `<screen>_<purpose>`.",
+        "ja": "Layout 内の一意識別子。ViewModel 参照とテストランナーの selector に必須。命名規則: `<screen>_<purpose>`。"
+      },
+      "examples": [
+        { "language": "json", "code": "{ \"type\": \"Button\", \"id\": \"login_submit_button\", \"text\": \"@string/submit\" }" }
+      ]
+    },
+    "testId": {
+      "summary": {
+        "en": "Test-only identifier separate from `id`. Use when the test selector should not affect runtime accessibility IDs.",
+        "ja": "`id` とは別のテスト専用識別子。ランタイムの accessibility ID に影響させたくないときに使う。"
+      }
+    },
+    "tag": {
+      "summary": {
+        "en": "Arbitrary marker string attached to the view. Useful for runtime debugging / analytics without polluting `id`.",
+        "ja": "view に付ける任意のマーカー文字列。`id` を汚さずに実行時デバッグ／アナリティクスに使う。"
+      }
+    },
+    "className": {
+      "summary": {
+        "en": "Web-only. Additional CSS class names appended to the generated element.",
+        "ja": "Web 専用。生成要素に追加される CSS クラス名。"
+      }
+    },
+    "type": {
+      "summary": {
+        "en": "The component type (`Label`, `Button`, `View`, ...). Required on every node. Not typically discussed as a user-facing attribute; listed here for completeness.",
+        "ja": "コンポーネント型（`Label`, `Button`, `View` など）。全ノードで必須。ユーザー向け属性としては通常議論されないが、網羅のためここに記載。"
+      }
+    },
+    "include": {
+      "summary": {
+        "en": "Reference to another Layout file, inlined at this position. Path is relative to the layouts root; no extension.",
+        "ja": "別の Layout ファイルを参照し、この位置にインライン展開。パスは layouts ルートからの相対、拡張子なし。"
+      },
+      "examples": [
+        { "language": "json", "code": "{ \"include\": \"common/header\" }" }
+      ]
+    },
+    "partial": {
+      "summary": {
+        "en": "Marks the file as a partial layout that is only usable via `include`. Prevents direct routing.",
+        "ja": "このファイルが `include` 経由でのみ使えるパーシャル Layout であることをマーク。直接ルーティングを防ぐ。"
+      }
+    },
+    "generatedBy": {
+      "summary": {
+        "en": "Set by the generator to identify the spec that produced this file. Do not edit by hand; it drives `jui verify`.",
+        "ja": "生成器がこのファイルを生んだ spec を記録するフィールド。手編集禁止、`jui verify` の根拠になる。"
+      }
+    },
+    "data": {
+      "summary": {
+        "en": "ViewModel data declarations (see binding category).",
+        "ja": "ViewModel データ宣言（binding カテゴリ参照）。"
+      }
+    },
+    "_comment": {
+      "summary": {
+        "en": "Free-form comment field. Ignored by the runtime; preserved by `jui verify`.",
+        "ja": "自由記述のコメントフィールド。ランタイムは無視、`jui verify` では保持される。"
+      }
+    },
+    "frame": {
+      "summary": {
+        "en": "Explicit `{ x, y, width, height }` rectangle. Used when absolute positioning is required (rare in JsonUI; prefer relative alignment).",
+        "ja": "明示的な `{ x, y, width, height }` 矩形。絶対位置指定が必要なとき使う（JsonUI では稀、相対配置を優先）。"
+      }
+    },
+    "rect": {
+      "summary": {
+        "en": "Alias for `frame`.",
+        "ja": "`frame` のエイリアス。"
+      }
+    }
+  }
+}

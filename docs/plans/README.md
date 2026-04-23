@@ -65,6 +65,15 @@
 
 太字は本設計の大幅修正／新規ファイル。
 
+### Phase 2: コンテンツ拡充ロードマップ（plans 19〜41 / `content-expansion/`）
+
+既存 plans 00〜18 は**設計・骨組み**まで。各記事の**具体的な本文・コードサンプル・クロスリンク**を記事単位で詳細化するのが plans 19〜41、全て `content-expansion/` サブディレクトリ配下。UI / レイアウト構造には触れない（デザイン改修中のため）。
+
+→ 詳細インデックス: [`content-expansion/README.md`](content-expansion/README.md)
+→ マスターロードマップ: [`content-expansion/19-content-expansion-roadmap.md`](content-expansion/19-content-expansion-roadmap.md)
+
+別セッションで処理する場合は `content-expansion/19-content-expansion-roadmap.md` → 目的の plan の順に読むこと。
+
 ---
 
 ## 読む順番（実装者向け）

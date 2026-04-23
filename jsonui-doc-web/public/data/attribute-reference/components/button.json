@@ -1,0 +1,234 @@
+{
+  "component": "Button",
+  "kebab": "button",
+  "aliasOf": null,
+  "title": "Button",
+  "description": "Interactive component that triggers a ViewModel event handler on tap. The visual is determined by `style` and child content; the tap target is always the full bounds.",
+  "usage": "Always bind `onClick` to a ViewModel event. Never put navigation or business logic inside the Button JSON itself — that belongs in the ViewModel handler. For purely decorative \"button-looking\" non-interactive elements, use a styled View instead.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Text-only",
+              "language": "json",
+              "code": "{\n  \"type\": \"Button\",\n  \"text\": \"@string/action_save\",\n  \"onClick\": \"@{onSave}\",\n  \"style\": \"primary_button\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Icon + Label composite",
+              "language": "json",
+              "code": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onFavorite}\",\n  \"child\": [\n    {\n      \"type\": \"IconLabel\",\n      \"iconName\": \"heart\",\n      \"iconPosition\": \"leading\",\n      \"text\": \"@string/favorite\",\n      \"fontSize\": 14\n    }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "Disabled state via binding",
+              "language": "json",
+              "code": "{\n  \"type\": \"Button\",\n  \"text\": \"@string/submit\",\n  \"onClick\": \"@{onSubmit}\",\n  \"enabled\": \"@{formValid}\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_4",
+              "title": "Loading spinner inside",
+              "language": "json",
+              "code": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onRefresh}\",\n  \"enabled\": \"@{!loading}\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"visibility\": \"@{loading ? 'visible' : 'gone'}\" },\n    { \"type\": \"Label\", \"text\": \"@string/refresh\", \"visibility\": \"@{loading ? 'gone' : 'visible'}\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_5",
+              "title": "Long-press handler",
+              "language": "json",
+              "code": "{\n  \"type\": \"Button\",\n  \"text\": \"@string/delete\",\n  \"onClick\": \"@{onDelete}\",\n  \"onLongClick\": \"@{onConfirmDelete}\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_6",
+              "title": "With image (iOS UIButton style)",
+              "language": "json",
+              "code": "{\n  \"type\": \"Button\",\n  \"image\": \"icon_share\",\n  \"text\": \"@string/share\",\n  \"onClick\": \"@{onShare}\"\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_text",
+              "name": "text",
+              "type": "string | binding",
+              "required": "",
+              "description": "Button text (can be data binding, supports interpolation)",
+              "note": "Supports `@{binding}` and `@string/key`. For composite content (icon + label), omit `text` and use a `child` array instead."
+            },
+            {
+              "id": "attr_font_size",
+              "name": "fontSize",
+              "type": "number",
+              "required": "",
+              "description": "Font size"
+            },
+            {
+              "id": "attr_font_color",
+              "name": "fontColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Font color - hex string or color name from colors.json (binding supported)"
+            },
+            {
+              "id": "attr_disabled_font_color",
+              "name": "disabledFontColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Font color when disabled - hex string or color name from colors.json (binding supported)",
+              "note": "Text color when `enabled` is `false`. If omitted, `fontColor` is dimmed to ~40% on most platforms."
+            },
+            {
+              "id": "attr_image",
+              "name": "image",
+              "type": "string",
+              "required": "",
+              "description": "Button image",
+              "note": "Button's own image attribute (iOS UIButton.imageView). For non-iOS platforms or complex icon layouts, prefer nesting an Image or IconLabel inside `child`."
+            },
+            {
+              "id": "attr_highlight_color",
+              "name": "highlightColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Highlight color - hex string or color name from colors.json (binding supported)",
+              "note": "Text / tint color during the pressed state. On Android spelled `hilightColor` (typo preserved for compatibility)."
+            },
+            {
+              "id": "attr_highlight_background",
+              "name": "highlightBackground",
+              "type": "string",
+              "required": "",
+              "description": "Background when highlighted - hex string or color name from colors.json"
+            },
+            {
+              "id": "attr_tap_background",
+              "name": "tapBackground",
+              "type": "string",
+              "required": "",
+              "description": "Background when tapped - hex string or color name from colors.json",
+              "note": "Background color shown while the button is being pressed. Provides immediate visual feedback on touch-down."
+            },
+            {
+              "id": "attr_button_type",
+              "name": "buttonType",
+              "type": "string",
+              "required": "",
+              "description": "HTML button type",
+              "note": "React-only. Maps to HTML `<button type=\"...\">`. Defaults to `button`; use `submit` inside a `<form>`.",
+              "platform": "react",
+              "enumValues": [
+                "button",
+                "submit",
+                "reset"
+              ]
+            },
+            {
+              "id": "attr_config",
+              "name": "config",
+              "type": "object",
+              "required": "",
+              "description": "Button configuration (iOS 15+)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_font",
+              "name": "font",
+              "type": "string",
+              "required": "",
+              "description": "Font name or 'bold'"
+            },
+            {
+              "id": "attr_font_weight",
+              "name": "fontWeight",
+              "type": "string | number | binding",
+              "required": "",
+              "description": "Font weight (e.g., 'bold', 'semibold', '500', 600, or binding)"
+            },
+            {
+              "id": "attr_hilight_color",
+              "name": "hilightColor",
+              "type": "string",
+              "required": "",
+              "description": "Highlight color - hex string or color name from colors.json (typo alias)"
+            },
+            {
+              "id": "attr_text_align",
+              "name": "textAlign",
+              "type": "string",
+              "required": "",
+              "description": "Text alignment",
+              "enumValues": [
+                "Left",
+                "Center",
+                "Right"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_icon_label",
+              "name": "IconLabel",
+              "url": "/reference/components/icon-label"
+            },
+            {
+              "id": "related_label",
+              "name": "Label",
+              "url": "/reference/components/label"
+            },
+            {
+              "id": "related_indicator",
+              "name": "Indicator",
+              "url": "/reference/components/indicator"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

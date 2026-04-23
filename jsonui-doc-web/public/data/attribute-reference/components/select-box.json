@@ -1,0 +1,386 @@
+{
+  "component": "SelectBox",
+  "kebab": "select-box",
+  "aliasOf": null,
+  "title": "SelectBox",
+  "description": "Picker for choosing one value from a discrete list, or a date/time picker when `datePickerMode` is set. Renders as native picker on iOS/Android, `<select>` on Web.",
+  "usage": "Use SelectBox when the option count is >= 5 or the options are long strings. For 2-4 short options prefer Segment. For date/time input, set `datePickerMode` to `date` / `time` / `dateAndTime`.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Static options",
+              "language": "json",
+              "code": "{\n  \"type\": \"SelectBox\",\n  \"selectedValue\": \"@{country}\",\n  \"items\": [\n    { \"label\": \"Japan\", \"value\": \"JP\" },\n    { \"label\": \"United States\", \"value\": \"US\" },\n    { \"label\": \"United Kingdom\", \"value\": \"UK\" }\n  ],\n  \"prompt\": \"@string/select_country\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Bound options from ViewModel",
+              "language": "json",
+              "code": "{\n  \"type\": \"SelectBox\",\n  \"selectedValue\": \"@{selectedCategory}\",\n  \"items\": \"@{categoryOptions}\",\n  \"onValueChange\": \"@{onCategoryChanged}\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "Date picker",
+              "language": "json",
+              "code": "{\n  \"type\": \"SelectBox\",\n  \"datePickerMode\": \"date\",\n  \"selectedDate\": \"@{birthDate}\",\n  \"minimumDate\": \"1900-01-01\",\n  \"maximumDate\": \"2025-12-31\",\n  \"dateStringFormat\": \"yyyy-MM-dd\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_4",
+              "title": "Multi-select",
+              "language": "json",
+              "code": "{\n  \"type\": \"SelectBox\",\n  \"multiple\": true,\n  \"items\": \"@{tagOptions}\",\n  \"selectedValue\": \"@{selectedTags}\"\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_text",
+              "name": "text",
+              "type": "string | binding",
+              "required": "",
+              "description": "Display text (binding supported)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_hint",
+              "name": "hint",
+              "type": "string",
+              "required": "",
+              "description": "Hint text (alias for prompt)"
+            },
+            {
+              "id": "attr_placeholder",
+              "name": "placeholder",
+              "type": "string",
+              "required": "",
+              "description": "Placeholder text (alias for prompt)",
+              "note": "Shown when no selection has been made. Not part of `items`."
+            },
+            {
+              "id": "attr_items",
+              "name": "items",
+              "type": "array | binding",
+              "required": "",
+              "description": "List of items for normal picker (can be template variable)",
+              "note": "Array of `{ label, value }` objects, or bound to a ViewModel array. When `datePickerMode` is set, `items` is ignored in favor of date range attributes."
+            },
+            {
+              "id": "attr_font_size",
+              "name": "fontSize",
+              "type": "number",
+              "required": "",
+              "description": "Font size"
+            },
+            {
+              "id": "attr_font_color",
+              "name": "fontColor",
+              "type": "string",
+              "required": "",
+              "description": "Font color - hex string or color name from colors.json"
+            },
+            {
+              "id": "attr_can_back",
+              "name": "canBack",
+              "type": "boolean",
+              "required": "",
+              "description": "Show back button",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_caret_attributes",
+              "name": "caretAttributes",
+              "type": "object",
+              "required": "",
+              "description": "Caret/arrow styling attributes",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_color_scheme",
+              "name": "colorScheme",
+              "type": "string",
+              "required": "",
+              "description": "Color scheme for native date picker icon visibility (set 'dark' for dark backgrounds)",
+              "platform": "react",
+              "enumValues": [
+                "light",
+                "dark"
+              ]
+            },
+            {
+              "id": "attr_date_picker_mode",
+              "name": "datePickerMode",
+              "type": "string",
+              "required": "",
+              "description": "Date picker mode",
+              "note": "`date` / `time` / `dateAndTime` / `countDownTimer`. Switches SelectBox into date/time picker mode.",
+              "enumValues": [
+                "date",
+                "time",
+                "datetime",
+                "dateAndTime",
+                "countDown"
+              ]
+            },
+            {
+              "id": "attr_date_picker_style",
+              "name": "datePickerStyle",
+              "type": "string",
+              "required": "",
+              "description": "Date picker style",
+              "note": "iOS 14+. `compact` / `wheels` / `graphical` / `inline`. Controls the visual style of the date picker.",
+              "enumValues": [
+                "automatic",
+                "wheel",
+                "wheels",
+                "compact",
+                "graphical",
+                "inline"
+              ]
+            },
+            {
+              "id": "attr_date_string_format",
+              "name": "dateStringFormat",
+              "type": "string",
+              "required": "",
+              "description": "Date string format",
+              "note": "Format string for displayed date when the value is bound as a String. Uses Unicode date format patterns (`yyyy-MM-dd`, etc.)."
+            },
+            {
+              "id": "attr_divider_attributes",
+              "name": "dividerAttributes",
+              "type": "object",
+              "required": "",
+              "description": "Divider styling attributes",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_font",
+              "name": "font",
+              "type": "string",
+              "required": "",
+              "description": "Font name"
+            },
+            {
+              "id": "attr_hint_color",
+              "name": "hintColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Hint text color - hex string or color name from colors.json (binding supported)"
+            },
+            {
+              "id": "attr_in_view",
+              "name": "inView",
+              "type": "string",
+              "required": "",
+              "description": "Display picker inside view",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_include_prompt_when_data_binding",
+              "name": "includePromptWhenDataBinding",
+              "type": "boolean",
+              "required": "",
+              "description": "Include prompt in binding",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_label_attributes",
+              "name": "labelAttributes",
+              "type": "object",
+              "required": "",
+              "description": "Label styling attributes"
+            },
+            {
+              "id": "attr_maximum_date",
+              "name": "maximumDate",
+              "type": "string | binding",
+              "required": "",
+              "description": "Maximum date (yyyy-MM-dd format, binding supported)",
+              "note": "Latest selectable date."
+            },
+            {
+              "id": "attr_minimum_date",
+              "name": "minimumDate",
+              "type": "string | binding",
+              "required": "",
+              "description": "Minimum date (yyyy-MM-dd format, binding supported)",
+              "note": "Earliest selectable date. ISO 8601 string or date binding. Use with `datePickerMode`."
+            },
+            {
+              "id": "attr_minute_interval",
+              "name": "minuteInterval",
+              "type": "number",
+              "required": "",
+              "description": "Minute interval for time picker",
+              "note": "Minute step size for time pickers (1, 5, 10, 15, 30, 60). Default 1.",
+              "enumValues": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                10,
+                12,
+                15,
+                20,
+                30
+              ]
+            },
+            {
+              "id": "attr_multiple",
+              "name": "multiple",
+              "type": "boolean",
+              "required": "",
+              "description": "Allow multiple selection",
+              "note": "Boolean. Enables multi-selection. On iOS / Android uses a checkmark list; on Web uses `<select multiple>`.",
+              "platform": "react"
+            },
+            {
+              "id": "attr_on_value_change",
+              "name": "onValueChange",
+              "type": "binding",
+              "required": "",
+              "description": "Value change handler - binding only (@{functionName})",
+              "note": "Fires after the user confirms a selection. Receives the new value."
+            },
+            {
+              "id": "attr_on_value_changed",
+              "name": "onValueChanged",
+              "type": "binding",
+              "required": "",
+              "description": "Value change handler (alias for onValueChange) - binding only (@{functionName})"
+            },
+            {
+              "id": "attr_prompt",
+              "name": "prompt",
+              "type": "string",
+              "required": "",
+              "description": "Prompt text (primary)",
+              "note": "Leading title displayed above options (iOS picker header / web `<option disabled>` first entry). Accepts `@string/key`."
+            },
+            {
+              "id": "attr_reference_view",
+              "name": "referenceView",
+              "type": "string",
+              "required": "",
+              "description": "Reference view for picker",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_select_item_type",
+              "name": "selectItemType",
+              "type": "string",
+              "required": "",
+              "description": "Select item type",
+              "enumValues": [
+                "Normal",
+                "Date"
+              ]
+            },
+            {
+              "id": "attr_selected_date",
+              "name": "selectedDate",
+              "type": "string | binding",
+              "required": "",
+              "description": "Initial selected date (yyyy-MM-dd format, two-way binding)",
+              "note": "Two-way binding to the picked date (Date object). Alternative to `selectedValue` when in date-picker mode."
+            },
+            {
+              "id": "attr_selected_index",
+              "name": "selectedIndex",
+              "type": "number | binding",
+              "required": "",
+              "description": "Initial selected index for normal picker (two-way binding)",
+              "note": "Alternative to `selectedValue`: two-way binding to the index position. Use when index is more meaningful than value.",
+              "bindingDirection": "two-way"
+            },
+            {
+              "id": "attr_selected_item",
+              "name": "selectedItem",
+              "type": "string | binding",
+              "required": "",
+              "description": "Selected item value (two-way binding)",
+              "note": "Two-way binding to the selected item object (the entire `{ label, value, ... }` entry). Prefer this for custom item schemas.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_selected_value",
+              "name": "selectedValue",
+              "type": "string | binding",
+              "required": "",
+              "description": "Selected value (binding for two-way)",
+              "note": "Two-way binding to the selected value (not label). Must match one of `items[].value`."
+            },
+            {
+              "id": "attr_size",
+              "name": "size",
+              "type": "number",
+              "required": "",
+              "description": "Number of visible options",
+              "platform": "react"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_segment",
+              "name": "Segment",
+              "url": "/reference/components/segment"
+            },
+            {
+              "id": "related_radio",
+              "name": "Radio",
+              "url": "/reference/components/radio"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

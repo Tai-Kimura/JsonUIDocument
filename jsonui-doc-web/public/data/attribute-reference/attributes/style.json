@@ -1,0 +1,174 @@
+{
+  "category": "style",
+  "title": "Style attributes",
+  "description": "Style attributes control visual appearance: background, borders, shadows, corners, and style presets.",
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_background",
+              "name": "background",
+              "type": "string | binding",
+              "required": "",
+              "description": "Background color - hex string (#RRGGBB or #RRGGBBAA) or color name from colors.json (can be data binding)",
+              "summary": "Background color. Accepts hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`, named colors, or `@color/token`. For gradients use the `gradient` attribute or GradientView."
+            },
+            {
+              "id": "attr_border_color",
+              "name": "borderColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Border color - hex string or color name from colors.json (binding supported)",
+              "summary": "Border color. Requires `borderWidth` for the border to render."
+            },
+            {
+              "id": "attr_border_style",
+              "name": "borderStyle",
+              "type": "string",
+              "required": "",
+              "description": "Border line style - solid (default), dashed, or dotted",
+              "summary": "`solid` / `dashed` / `dotted`. Web supports all; iOS/Android default is `solid`.",
+              "enumValues": [
+                "solid",
+                "dashed",
+                "dotted"
+              ]
+            },
+            {
+              "id": "attr_border_width",
+              "name": "borderWidth",
+              "type": "number | binding",
+              "required": "",
+              "description": "Border width (binding supported)",
+              "summary": "Border thickness in pt/dp/px."
+            },
+            {
+              "id": "attr_clip_to_bounds",
+              "name": "clipToBounds",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Whether to clip content to bounds (binding supported)",
+              "summary": "Boolean. When `true`, children that overflow the View are clipped."
+            },
+            {
+              "id": "attr_corner_radius",
+              "name": "cornerRadius",
+              "type": "number | binding",
+              "required": "",
+              "description": "Corner radius (can be data binding)",
+              "summary": "Rounded corners in pt/dp/px. Accepts a number (uniform) or array `[tl, tr, br, bl]` for per-corner control."
+            },
+            {
+              "id": "attr_default_background",
+              "name": "defaultBackground",
+              "type": "string | binding",
+              "required": "",
+              "description": "Default background color - hex string or color name from colors.json (binding supported)",
+              "summary": "Background color in the default (non-interactive) state. Base layer for the pressed / disabled overlays.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_disabled_background",
+              "name": "disabledBackground",
+              "type": "string | binding",
+              "required": "",
+              "description": "Background when disabled - hex string or color name from colors.json (binding supported)",
+              "summary": "Background color when `enabled: false`."
+            },
+            {
+              "id": "attr_effect_style",
+              "name": "effectStyle",
+              "type": "string",
+              "required": "",
+              "description": "Visual effect style",
+              "summary": "Visual effect preset. Used by Blur; platform-specific blur / material style value.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_highlight_background",
+              "name": "highlightBackground",
+              "type": "string | binding",
+              "required": "",
+              "description": "Background color when highlighted - hex string or color name from colors.json (binding supported)",
+              "summary": "Background color shown when the component is highlighted (e.g., pressed)."
+            },
+            {
+              "id": "attr_shadow",
+              "name": "shadow",
+              "type": "string | object",
+              "required": "",
+              "description": "Shadow configuration (string 'color|offsetX|offsetY|opacity|radius' or object)",
+              "summary": "Drop shadow object: `{ color, offsetX, offsetY, radius, opacity }`. Applied to the entire View bounds.",
+              "platformDiff": {
+                "swift_uikit": "layer.shadowColor / shadowOffset / shadowRadius / shadowOpacity に分解してマップ。",
+                "swift_swiftui": ".shadow(color:, radius:, x:, y:) modifier。",
+                "kotlin_compose": "Modifier.shadow(elevation, shape)。offsetX/Y は限定サポート。",
+                "kotlin_xml": "elevation + outline provider が必要。",
+                "react": "CSS `box-shadow: Xpx Ypx radiuspx color` に変換。"
+              }
+            },
+            {
+              "id": "attr_style",
+              "name": "style",
+              "type": "string",
+              "required": "",
+              "description": "Style file name (without extension)",
+              "summary": "Preset style name. Defined in `docs/screens/styles/*.json`. Accepts a single name or array of names; later entries override earlier.",
+              "examples": [
+                {
+                  "language": "json",
+                  "code": "{ \"type\": \"Button\", \"style\": \"primary_button\" }"
+                },
+                {
+                  "language": "json",
+                  "code": "{ \"type\": \"Button\", \"style\": [\"button_base\", \"button_primary\"] }"
+                }
+              ]
+            },
+            {
+              "id": "attr_tap_background",
+              "name": "tapBackground",
+              "type": "string | binding",
+              "required": "",
+              "description": "Background color when tapped - hex string or color name from colors.json (binding supported)",
+              "summary": "Button-specific. Background color shown during tap-down. Reverts to `background` on release."
+            },
+            {
+              "id": "attr_tint_color",
+              "name": "tintColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Tint color - hex string or color name from colors.json (binding supported)",
+              "summary": "Color applied to tinted content (monochrome icons, progress tracks, switches). Specific component implementations decide what gets tinted."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "breakpoints": null,
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_components",
+              "titleKey": "next_components_title",
+              "descriptionKey": "next_components_body",
+              "url": "/reference/components"
+            },
+            {
+              "id": "next_attributes_root",
+              "titleKey": "next_attributes_root_title",
+              "descriptionKey": "next_attributes_root_body",
+              "url": "/reference/attributes"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "component": "TabView",
+  "kebab": "tab-view",
+  "aliasOf": null,
+  "title": "TabView",
+  "description": "Tab bar with multiple pages. Each tab's content is a separate child view; only the active tab's content is in the foreground.",
+  "usage": "Use TabView for top-level screen switching where users expect a persistent bar (iOS bottom, Android Material top). Do not nest TabViews — use a sidebar or segmented control for secondary navigation.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "3-tab bottom bar",
+              "language": "json",
+              "code": "{\n  \"type\": \"TabView\",\n  \"selectedIndex\": \"@{activeTab}\",\n  \"tabs\": [\n    { \"label\": \"@string/home\", \"icon\": \"house\", \"include\": \"screens/home\" },\n    { \"label\": \"@string/search\", \"icon\": \"magnifyingglass\", \"include\": \"screens/search\" },\n    { \"label\": \"@string/profile\", \"icon\": \"person\", \"include\": \"screens/profile\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Labels hidden (icon-only)",
+              "language": "json",
+              "code": "{\n  \"type\": \"TabView\",\n  \"selectedIndex\": \"@{tabIndex}\",\n  \"showLabels\": false,\n  \"tabs\": [\n    { \"icon\": \"house\", \"include\": \"screens/home\" },\n    { \"icon\": \"gearshape\", \"include\": \"screens/settings\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "Custom tint with on-change handler",
+              "language": "json",
+              "code": "{\n  \"type\": \"TabView\",\n  \"selectedIndex\": \"@{tabIndex}\",\n  \"tintColor\": \"#2563EB\",\n  \"unselectedColor\": \"#9CA3AF\",\n  \"tabBarBackground\": \"#FFFFFF\",\n  \"onTabChange\": \"@{onTabChanged}\",\n  \"tabs\": [ ]\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_tabs",
+              "name": "tabs",
+              "type": "array",
+              "required": "required",
+              "description": "Array of tab configurations",
+              "note": "Array of tab definitions: `{ label, icon, include }`. `label` supports `@string/key`. `icon` resolves per platform (SF Symbol / Material / lucide). `include` is a layout file path loaded lazily."
+            },
+            {
+              "id": "attr_selected_index",
+              "name": "selectedIndex",
+              "type": "number | binding",
+              "required": "",
+              "description": "Currently selected tab index (binding for two-way)",
+              "note": "Two-way Int binding. Writes back on tab tap.",
+              "bindingDirection": "two-way"
+            },
+            {
+              "id": "attr_on_tab_change",
+              "name": "onTabChange",
+              "type": "binding",
+              "required": "",
+              "description": "Tab change handler - binding only (@{functionName})",
+              "note": "Called after `selectedIndex` updates. Use for analytics or conditional data prefetch."
+            },
+            {
+              "id": "attr_show_labels",
+              "name": "showLabels",
+              "type": "boolean",
+              "required": "",
+              "description": "Whether to show tab labels (default: true)",
+              "note": "Boolean. When `false`, only icons render."
+            },
+            {
+              "id": "attr_tint_color",
+              "name": "tintColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Selected tab tint color - hex string or color name from colors.json (binding supported)",
+              "note": "Selected tab tint (icon + label). Accepts hex or color token."
+            },
+            {
+              "id": "attr_unselected_color",
+              "name": "unselectedColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Unselected tab color - hex string or color name from colors.json (binding supported)",
+              "note": "Unselected tab color. Defaults to 60% of tintColor."
+            },
+            {
+              "id": "attr_tab_bar_background",
+              "name": "tabBarBackground",
+              "type": "string | binding",
+              "required": "",
+              "description": "Tab bar background color - hex string or color name from colors.json (binding supported)",
+              "note": "Background color of the tab bar itself. For translucent bars (iOS default), leave undefined."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_view",
+              "name": "View",
+              "url": "/reference/components/view"
+            },
+            {
+              "id": "related_scroll_view",
+              "name": "ScrollView",
+              "url": "/reference/components/scroll-view"
+            },
+            {
+              "id": "related_collection",
+              "name": "Collection",
+              "url": "/reference/components/collection"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,202 @@
+{
+  "component": "Image",
+  "kebab": "image",
+  "aliasOf": null,
+  "title": "Image",
+  "description": "Bundled/local image display. Reads from the app's resource bundle (asset catalog on iOS, `res/drawable` on Android, `public/` on Web).",
+  "usage": "Use Image for static assets (icons, logos, backgrounds). For remote URLs use NetworkImage. For SF Symbols / Material Icons as font glyphs use IconLabel.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Minimum (by name)",
+              "language": "json",
+              "code": "{\n  \"type\": \"Image\",\n  \"srcName\": \"logo\",\n  \"width\": 120,\n  \"height\": 32\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Aspect-fill hero",
+              "language": "json",
+              "code": "{\n  \"type\": \"Image\",\n  \"srcName\": \"hero_banner\",\n  \"width\": \"matchParent\",\n  \"height\": 200,\n  \"contentMode\": \"aspectFill\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "Template / tinted icon",
+              "language": "json",
+              "code": "{\n  \"type\": \"Image\",\n  \"srcName\": \"icon_close\",\n  \"width\": 24,\n  \"height\": 24,\n  \"renderingMode\": \"template\",\n  \"tintColor\": \"#FFFFFF\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_4",
+              "title": "With accessibility alt",
+              "language": "json",
+              "code": "{\n  \"type\": \"Image\",\n  \"srcName\": \"chart_summary\",\n  \"alt\": \"@string/chart_summary_alt\",\n  \"width\": 320,\n  \"height\": 200\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_src_name",
+              "name": "srcName",
+              "type": "string | binding",
+              "required": "",
+              "description": "Image source name (alias, can be data binding)",
+              "note": "Asset name (no extension). Resolved per platform: iOS asset catalog / Android `@drawable/<name>` / Web `/images/<name>.{png,svg,webp}`.",
+              "platformDiff": {
+                "swift_uikit": "Asset Catalog の image 名。`@1x/@2x/@3x` 自動解決。",
+                "swift_swiftui": "同上（`Image(\"name\")`）。",
+                "kotlin_compose": "`painterResource(R.drawable.<name>)` に解決。",
+                "kotlin_xml": "`@drawable/<name>`。",
+                "react": "`/images/<name>.{png,svg,webp}` を解決。`public/images/` 配下に配置。"
+              }
+            },
+            {
+              "id": "attr_src",
+              "name": "src",
+              "type": "string | binding",
+              "required": "",
+              "description": "Image source name (can be data binding)",
+              "note": "Alternative to `srcName` — full path string. On Web this maps directly to `<img src>`."
+            },
+            {
+              "id": "attr_content_mode",
+              "name": "contentMode",
+              "type": "string | binding",
+              "required": "",
+              "description": "Content mode (binding supported)",
+              "note": "`aspectFit` / `aspectFill` / `fill` / `center`. Determines how the image fits into declared width/height.",
+              "enumValues": [
+                "fit",
+                "fill",
+                "center",
+                "top",
+                "bottom",
+                "left",
+                "right",
+                "AspectFill",
+                "AspectFit",
+                "Center",
+                "ScaleToFill",
+                "Top",
+                "Bottom",
+                "Left",
+                "Right"
+              ]
+            },
+            {
+              "id": "attr_rendering_mode",
+              "name": "renderingMode",
+              "type": "string",
+              "required": "",
+              "description": "Rendering mode",
+              "note": "`original` / `template`. `template` enables tint color (monochrome glyph coloring).",
+              "enumValues": [
+                "original",
+                "template"
+              ]
+            },
+            {
+              "id": "attr_alt",
+              "name": "alt",
+              "type": "string",
+              "required": "",
+              "description": "Alt text for accessibility",
+              "note": "Accessibility description. Spoken by screen readers (VoiceOver / TalkBack). For decorative images, use an empty string or omit.",
+              "platform": "react"
+            },
+            {
+              "id": "attr_highlight_src_name",
+              "name": "highlightSrcName",
+              "type": "string | binding",
+              "required": "",
+              "description": "Highlight image source name (binding supported)",
+              "note": "Optional image shown when the parent is a pressed Button. Pair with `srcName` to define the normal / pressed pair.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_highlight_src",
+              "name": "highlightSrc",
+              "type": "string | binding",
+              "required": "",
+              "description": "Image when highlighted (binding supported)"
+            },
+            {
+              "id": "attr_loading",
+              "name": "loading",
+              "type": "string",
+              "required": "",
+              "description": "Loading behavior",
+              "note": "Web-only. `eager` / `lazy`. Maps to HTML `<img loading>`. Default `lazy`.",
+              "platform": "react",
+              "enumValues": [
+                "lazy",
+                "eager"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_network_image",
+              "name": "NetworkImage",
+              "url": "/reference/components/network-image"
+            },
+            {
+              "id": "related_icon_label",
+              "name": "IconLabel",
+              "url": "/reference/components/icon-label"
+            },
+            {
+              "id": "related_circle_view",
+              "name": "CircleView",
+              "url": "/reference/components/circle-view"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

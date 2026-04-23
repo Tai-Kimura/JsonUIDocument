@@ -1,0 +1,73 @@
+{
+  "component": "TabView",
+  "description": {
+    "en": "Tab bar with multiple pages. Each tab's content is a separate child view; only the active tab's content is in the foreground.",
+    "ja": "複数ページを持つタブバー。各タブは独立した子 View を持ち、アクティブなタブのみ前面表示される。"
+  },
+  "usage": {
+    "en": "Use TabView for top-level screen switching where users expect a persistent bar (iOS bottom, Android Material top). Do not nest TabViews — use a sidebar or segmented control for secondary navigation.",
+    "ja": "ユーザーが常設タブバーを期待する最上位画面切替に使う（iOS はボトム、Android Material はトップ）。TabView のネストは避け、二次ナビはサイドバーや Segment を使う。"
+  },
+  "examples": [
+    {
+      "title": { "en": "3-tab bottom bar", "ja": "3 タブのボトムバー" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TabView\",\n  \"selectedIndex\": \"@{activeTab}\",\n  \"tabs\": [\n    { \"label\": \"@string/home\", \"icon\": \"house\", \"include\": \"screens/home\" },\n    { \"label\": \"@string/search\", \"icon\": \"magnifyingglass\", \"include\": \"screens/search\" },\n    { \"label\": \"@string/profile\", \"icon\": \"person\", \"include\": \"screens/profile\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Labels hidden (icon-only)", "ja": "ラベル非表示（アイコンのみ）" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TabView\",\n  \"selectedIndex\": \"@{tabIndex}\",\n  \"showLabels\": false,\n  \"tabs\": [\n    { \"icon\": \"house\", \"include\": \"screens/home\" },\n    { \"icon\": \"gearshape\", \"include\": \"screens/settings\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Custom tint with on-change handler", "ja": "カスタム tint + 変更ハンドラ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TabView\",\n  \"selectedIndex\": \"@{tabIndex}\",\n  \"tintColor\": \"#2563EB\",\n  \"unselectedColor\": \"#9CA3AF\",\n  \"tabBarBackground\": \"#FFFFFF\",\n  \"onTabChange\": \"@{onTabChanged}\",\n  \"tabs\": [ ]\n}"
+    }
+  ],
+  "attributes": {
+    "selectedIndex": {
+      "note": {
+        "en": "Two-way Int binding. Writes back on tab tap.",
+        "ja": "Int の two-way binding。タブタップで書き戻される。"
+      }
+    },
+    "tabs": {
+      "note": {
+        "en": "Array of tab definitions: `{ label, icon, include }`. `label` supports `@string/key`. `icon` resolves per platform (SF Symbol / Material / lucide). `include` is a layout file path loaded lazily.",
+        "ja": "タブ定義の配列: `{ label, icon, include }`。`label` は `@string/key` 対応。`icon` はプラットフォーム別に解決（SF Symbol / Material / lucide）。`include` は遅延読み込みされる layout ファイルパス。"
+      }
+    },
+    "showLabels": {
+      "note": {
+        "en": "Boolean. When `false`, only icons render.",
+        "ja": "Boolean。`false` でアイコンのみ描画。"
+      }
+    },
+    "tintColor": {
+      "note": {
+        "en": "Selected tab tint (icon + label). Accepts hex or color token.",
+        "ja": "選択中タブの tint（アイコン + ラベル）。hex または color token。"
+      }
+    },
+    "unselectedColor": {
+      "note": {
+        "en": "Unselected tab color. Defaults to 60% of tintColor.",
+        "ja": "非選択タブ色。デフォルトは tintColor の 60%。"
+      }
+    },
+    "tabBarBackground": {
+      "note": {
+        "en": "Background color of the tab bar itself. For translucent bars (iOS default), leave undefined.",
+        "ja": "タブバー本体の背景色。iOS の半透明バー（デフォルト）にしたい場合は未指定。"
+      }
+    },
+    "onTabChange": {
+      "note": {
+        "en": "Called after `selectedIndex` updates. Use for analytics or conditional data prefetch.",
+        "ja": "`selectedIndex` 更新後に呼ばれる。アナリティクスや条件付きプリフェッチに使う。"
+      }
+    }
+  },
+  "relatedComponents": ["View", "ScrollView", "Collection"]
+}

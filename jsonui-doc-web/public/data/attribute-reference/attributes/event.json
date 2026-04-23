@@ -1,0 +1,118 @@
+{
+  "category": "event",
+  "title": "Event attributes",
+  "description": "Event attributes bind user interactions to ViewModel methods. All are optional; their omission disables the corresponding interaction.",
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_events",
+              "name": "events",
+              "type": "object",
+              "required": "",
+              "description": "Complex event handlers",
+              "summary": "Batch-declare multiple event handlers in one object. Alternative to individual `onClick` / `onLongPress` attributes for readability.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_appear",
+              "name": "onAppear",
+              "type": "string",
+              "required": "",
+              "description": "Lifecycle callback when view appears (SwiftUI/Compose only)",
+              "summary": "Fired when the component becomes visible (mount / re-mount). Useful for analytics and lazy data fetching."
+            },
+            {
+              "id": "attr_on_click",
+              "name": "onClick",
+              "type": "binding",
+              "required": "",
+              "description": "Click handler (camelCase) - binding only (@{functionName})",
+              "summary": "Tap / click. Fires on single tap after gesture recognition (≈0–50 ms). Required on Button for interactivity.",
+              "examples": [
+                {
+                  "language": "json",
+                  "code": "{ \"type\": \"Button\", \"onClick\": \"@{onSave}\" }"
+                }
+              ]
+            },
+            {
+              "id": "attr_on_disappear",
+              "name": "onDisappear",
+              "type": "string",
+              "required": "",
+              "description": "Lifecycle callback when view disappears (SwiftUI/Compose only)",
+              "summary": "Fired when the component is unmounted."
+            },
+            {
+              "id": "attr_on_long_press",
+              "name": "onLongPress",
+              "type": "binding",
+              "required": "",
+              "description": "Long press gesture handler (camelCase) - binding only (@{functionName})",
+              "summary": "Long-press event. Default threshold: iOS 500 ms / Android 500 ms / Web 600 ms."
+            },
+            {
+              "id": "attr_on_pan",
+              "name": "onPan",
+              "type": "binding",
+              "required": "",
+              "description": "Pan gesture handler (camelCase) - binding only (@{functionName})",
+              "summary": "Pan gesture (drag) events. Receives a vector `{ dx, dy }` per frame."
+            },
+            {
+              "id": "attr_on_pinch",
+              "name": "onPinch",
+              "type": "binding",
+              "required": "",
+              "description": "Pinch gesture handler (camelCase) - binding only (@{functionName})",
+              "summary": "Pinch gesture (two-finger zoom). Receives a `scale` factor per frame."
+            },
+            {
+              "id": "attr_onclick",
+              "name": "onclick",
+              "type": "string | array",
+              "required": "",
+              "description": "Click handler function name (selector-based, lowercase) - string only, no binding",
+              "summary": "Lowercase alias for `onClick` (HTML-style)."
+            },
+            {
+              "id": "attr_scripts",
+              "name": "scripts",
+              "type": "array",
+              "required": "",
+              "description": "Script definitions",
+              "summary": "Inline scripts that run on specific lifecycle events (e.g., `onMount`). Use sparingly — prefer ViewModel event handlers.",
+              "platform": "swift"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "breakpoints": null,
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_components",
+              "titleKey": "next_components_title",
+              "descriptionKey": "next_components_body",
+              "url": "/reference/components"
+            },
+            {
+              "id": "next_attributes_root",
+              "titleKey": "next_attributes_root_title",
+              "descriptionKey": "next_attributes_root_body",
+              "url": "/reference/attributes"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

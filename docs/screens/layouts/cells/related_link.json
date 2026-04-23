@@ -1,0 +1,36 @@
+{
+  "type": "View",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "wrapContent",
+  "style": "card_surface",
+  "tapBackground": "#F3F4F6",
+  "onClick": "@{onNavigate}",
+  "child": [
+    {
+      "data": [
+        { "name": "labelKey", "class": "String" },
+        { "name": "url", "class": "String" },
+        { "name": "onNavigate", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "fontSize": 16,
+      "fontWeight": "semibold",
+      "fontColor": "#0B1220",
+      "text": "@{labelKey}"
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 8,
+      "fontSize": 13,
+      "fontColor": "#2563EB",
+      "text": "@{url}"
+    }
+  ]
+}

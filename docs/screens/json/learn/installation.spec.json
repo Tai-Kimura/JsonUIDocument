@@ -1,0 +1,384 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "LearnInstallation",
+    "displayName": "Installation",
+    "description": "Learn > Installation. The one-line bootstrap page. A beginner (audience A) must be able to install the CLI, the MCP server, and the agent pack into Claude Code with a single curl command and reach a working environment in three steps. Page is one vertical ScrollView containing: hero + primary CTA CodeBlock, 'what gets installed' Collection (3 InstallTargetCard rows), prerequisites Collection (5 PrereqRow rows), three static inline steps (each with a CodeBlock), verify Collection (3 VerifyRow rows), four expandable detail sections (partial update / custom path / individual install / uninstall), troubleshooting Collection (6 TroubleshootRow rows, each individually expandable), and related-links Collection (5 RelatedLink rows) plus a 'next: /learn/hello-world' CTA. No custom Collapse / Details / PlatformBadge component types are introduced; all expand/collapse behaviour rides on a single uiVariable `expandedIds: [String]` plus display logic that derives per-section visibility strings.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "learn/installation",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "installTargets",
+        "type": "[InstallTargetCard]",
+        "initial": "[]",
+        "description": "Three 'what gets installed' cards rendered below the hero CTA (CLI / MCP / Agents). Seeded by onAppear from the static v1 catalog."
+      },
+      {
+        "name": "prerequisites",
+        "type": "[PrereqRow]",
+        "initial": "[]",
+        "description": "Five prerequisite rows (git+curl, Node.js >= 20, npm, Ruby >= 2.7, Python 3 >= 3.10) with a required/optional tier. Seeded by onAppear."
+      },
+      {
+        "name": "verifyRows",
+        "type": "[VerifyRow]",
+        "initial": "[]",
+        "description": "Three post-install verification rows (shell `jui --help`, MCP `search_components`, `Read CLAUDE.md` -> conductor). Seeded by onAppear."
+      },
+      {
+        "name": "troubleshootRows",
+        "type": "[TroubleshootRow]",
+        "initial": "[]",
+        "description": "Six troubleshooting rows; each row is individually expandable via onToggleExpand(row.id) so the cause+fix block is hidden until the user opens it. Seeded by onAppear."
+      },
+      {
+        "name": "relatedLinks",
+        "type": "[RelatedLink]",
+        "initial": "[]",
+        "description": "Five related-link rows at the bottom of the page (/tools/cli, /tools/mcp, /tools/agents, /learn/hello-world, /tools/mcp/tools/get-data-source). Seeded by onAppear."
+      },
+      {
+        "name": "expandedIds",
+        "type": "[String]",
+        "initial": "[]",
+        "description": "Canonical expand/collapse state for every expandable surface on this page. Contents: zero or more of the four section ids ('partial_update', 'custom_path', 'individual_install', 'uninstall') and any number of TroubleshootRow ids. onToggleExpand(id) toggles membership. The layout binds per-row visibility via `@{expandedIds contains id}` inside the TroubleshootRow cell, and the ViewModel exposes per-section derived visibility strings (see displayLogic) for the four section bodies. This is the canonical pattern for expandable sections in this project — future screens should reuse it rather than introducing custom Collapse / Details component types."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Populate installTargets (3), prerequisites (5), verifyRows (3), troubleshootRows (6), and relatedLinks (5) from the static v1 catalog. Every user-visible string is an @string/learn_installation_* key so localization flows through StringManager."
+      },
+      {
+        "name": "onToggleExpand",
+        "params": [
+          {
+            "name": "id",
+            "type": "String"
+          }
+        ],
+        "description": "Toggle membership of `id` in `expandedIds`. Wired from the four section-level expander headers (ids 'partial_update', 'custom_path', 'individual_install', 'uninstall') and from each TroubleshootRow cell (onClick binds the row's own id). Because `expandedIds` is an array, multiple sections can be open simultaneously."
+      },
+      {
+        "name": "onCopyCode",
+        "params": [
+          {
+            "name": "code",
+            "type": "String"
+          }
+        ],
+        "description": "Optional analytics hook invoked when a CodeBlock's copy button fires. Not wired in v1 (copying itself is built into the CodeBlock converter). Declared here so future analytics work can bind to a stable handler name."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Handle taps on a RelatedLink card and on the 'next: /learn/hello-world' CTA at the bottom of the page. The bound URL is supplied per row by Collection binding (RelatedLink.url) or statically by the CTA button."
+      }
+    ],
+    "displayLogic": [
+      {
+        "condition": "expandedIds contains 'partial_update'",
+        "effects": [
+          {
+            "element": "installation_partial_update_body",
+            "state": "visible",
+            "variableName": "partialUpdateBodyVisibility"
+          }
+        ]
+      },
+      {
+        "condition": "expandedIds contains 'custom_path'",
+        "effects": [
+          {
+            "element": "installation_custom_path_body",
+            "state": "visible",
+            "variableName": "customPathBodyVisibility"
+          }
+        ]
+      },
+      {
+        "condition": "expandedIds contains 'individual_install'",
+        "effects": [
+          {
+            "element": "installation_individual_install_body",
+            "state": "visible",
+            "variableName": "individualInstallBodyVisibility"
+          }
+        ]
+      },
+      {
+        "condition": "expandedIds contains 'uninstall'",
+        "effects": [
+          {
+            "element": "installation_uninstall_body",
+            "state": "visible",
+            "variableName": "uninstallBodyVisibility"
+          }
+        ]
+      }
+    ]
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[LearnInstallationView] --> VM[LearnInstallationViewModel]\n    VM -- installTargets --> VIEW\n    VM -- prerequisites --> VIEW\n    VM -- verifyRows --> VIEW\n    VM -- troubleshootRows --> VIEW\n    VM -- relatedLinks --> VIEW\n    VM -- partialUpdateBodyVisibility --> VIEW\n    VM -- customPathBodyVisibility --> VIEW\n    VM -- individualInstallBodyVisibility --> VIEW\n    VM -- uninstallBodyVisibility --> VIEW\n    VIEW -- onAppear --> VM\n    VIEW -- onToggleExpand(id) --> VM\n    VIEW -- onCopyCode(code) --> VM\n    VIEW -- onNavigate(url) --> VM",
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed installTargets (3 cards), prerequisites (5 rows), verifyRows (3 commands), troubleshootRows (6 rows built from TROUBLESHOOT_ROW_DEFS), and relatedLinks (5 rows) from module-scope static catalogs. Every user-visible string is resolved via this.s() which wraps StringManager.getString with the learn_installation_ prefix. The four derived *BodyVisibility strings are computed from the private _expandedIds Set by sectionVisibilityFromExpandedIds(); onAppear pushes them alongside the collections. Private helpers prereqRow / relatedLink / buildTroubleshootRows live in the VM body — they are implementation detail, not public contract."
+        },
+        {
+          "name": "onToggleExpand",
+          "params": [{ "name": "id", "type": "String" }],
+          "description": "Flip membership of id in the private _expandedIds Set. Then (a) re-hydrate troubleshootRows so each cell's rowVisibility flag reflects the new state, (b) re-derive the four section-level *BodyVisibility strings via sectionVisibilityFromExpandedIds, and (c) push both in a single updateData call. Called from the four section headers AND from each TroubleshootRow cell — the single handler covers both surface types because expandedIds is a flat Set keyed by id."
+        },
+        {
+          "name": "onCopyCode",
+          "params": [{ "name": "code", "type": "String" }],
+          "description": "Optional analytics hook invoked when a CodeBlock's copy button fires. Not wired in v1 (copying itself is built into the CodeBlock converter). Declared here so future analytics can bind to a stable method name."
+        },
+        {
+          "name": "onNavigate",
+          "params": [{ "name": "url", "type": "String" }],
+          "description": "router.push(url). Funnels RelatedLink taps + the 'next: Hello World' CTA (wired as onNavigateHelloWorld). Every destination is listed in transitions; the method is agnostic to which surface fired."
+        }
+      ],
+      "vars": [
+        { "name": "installTargets",                "type": "Array(InstallTargetCard)",  "observable": true, "description": "3 'what gets installed' cards (CLI / MCP / Agents)." },
+        { "name": "prerequisites",                 "type": "Array(PrereqRow)",          "observable": true, "description": "5 prerequisite rows with required/optional tier." },
+        { "name": "verifyRows",                    "type": "Array(VerifyRow)",          "observable": true, "description": "3 post-install verification rows." },
+        { "name": "troubleshootRows",              "type": "Array(TroubleshootRow)",    "observable": true, "description": "6 expandable troubleshooting rows; each carries its own rowVisibility derived from _expandedIds." },
+        { "name": "relatedLinks",                  "type": "Array(RelatedLink)",        "observable": true, "description": "5 related-link cards at the bottom." },
+        { "name": "partialUpdateBodyVisibility",   "type": "String",                    "observable": true, "description": "Derived from _expandedIds (displayLogic target)." },
+        { "name": "customPathBodyVisibility",      "type": "String",                    "observable": true, "description": "Derived from _expandedIds." },
+        { "name": "individualInstallBodyVisibility","type": "String",                   "observable": true, "description": "Derived from _expandedIds." },
+        { "name": "uninstallBodyVisibility",       "type": "String",                    "observable": true, "description": "Derived from _expandedIds." }
+      ]
+    },
+    "customTypes": [
+      {
+        "name": "InstallTargetCard",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "locationKey",
+            "type": "String"
+          },
+          {
+            "name": "bodyKey",
+            "type": "String"
+          },
+          {
+            "name": "iconName",
+            "type": "String"
+          }
+        ]
+      },
+      {
+        "name": "PrereqRow",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "labelKey",
+            "type": "String"
+          },
+          {
+            "name": "toolKey",
+            "type": "String"
+          },
+          {
+            "name": "requiredTier",
+            "type": "String"
+          },
+          {
+            "name": "noteKey",
+            "type": "String"
+          }
+        ]
+      },
+      {
+        "name": "VerifyRow",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "commandKey",
+            "type": "String"
+          },
+          {
+            "name": "expectKey",
+            "type": "String"
+          }
+        ]
+      },
+      {
+        "name": "TroubleshootRow",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "symptomKey",
+            "type": "String"
+          },
+          {
+            "name": "causeKey",
+            "type": "String"
+          },
+          {
+            "name": "fixKey",
+            "type": "String"
+          }
+        ]
+      },
+      {
+        "name": "RelatedLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "labelKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap the hero CTA copy button",
+      "processing": "Copy is handled inside the CodeBlock converter itself. The optional onCopyCode(code) hook is not wired in v1; copying does not depend on it."
+    },
+    {
+      "action": "Expand or collapse a detail section (Partial update / Custom path / Individual install / Uninstall)",
+      "processing": "The section header's onClick invokes onToggleExpand(id) with one of 'partial_update', 'custom_path', 'individual_install', 'uninstall'. The ViewModel toggles membership in expandedIds; the corresponding displayLogic entry flips the matching *BodyVisibility string, which the layout binds as the section body's visibility."
+    },
+    {
+      "action": "Expand or collapse a troubleshooting row",
+      "processing": "Each TroubleshootRow cell's onClick invokes onToggleExpand(row.id). The cell itself binds its cause+fix body's visibility to `@{expandedIds contains id}`, so row-level expansion does not require per-row displayLogic entries."
+    },
+    {
+      "action": "Tap a Related link row",
+      "processing": "onNavigate(url) is invoked with the bound RelatedLink.url from the Collection row."
+    },
+    {
+      "action": "Tap the 'next: Hello World' CTA",
+      "processing": "onNavigate('/learn/hello-world') is invoked."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is any spec-mapped URL",
+      "destination": "Target spec screen resolved from url",
+      "description": "Client-side navigation via router.push(url). Expected v1 destinations from this page: /tools/cli, /tools/mcp, /tools/agents, /learn/hello-world, /tools/mcp/tools/get-data-source."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/learn/installation.json",
+      "description": "Installation layout. Single ScrollView at the root: hero + CTA CodeBlock, 'what gets installed' Collection (cells/install_target_card), prerequisites Collection (cells/prereq_row), three static inline steps each carrying a CodeBlock, verify Collection (cells/verify_row), four expandable detail-section Views whose body visibility is bound to partialUpdateBodyVisibility / customPathBodyVisibility / individualInstallBodyVisibility / uninstallBodyVisibility, troubleshooting Collection (cells/troubleshoot_row), related-links Collection (cells/related_link), and a 'next: Hello World' CTA."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/learn/installation/cells/install_target_card.json",
+      "description": "InstallTargetCard cell layout. Props: id, titleKey, locationKey, bodyKey, iconName."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/learn/installation/cells/prereq_row.json",
+      "description": "PrereqRow cell layout. Props: id, labelKey, toolKey, requiredTier ('required' | 'optional'), noteKey."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/learn/installation/cells/verify_row.json",
+      "description": "VerifyRow cell layout. Props: id, commandKey, expectKey."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/learn/installation/cells/troubleshoot_row.json",
+      "description": "TroubleshootRow cell layout. Props: id, symptomKey, causeKey, fixKey. Cell is self-expanding: its cause+fix body binds visibility to `@{expandedIds contains id}`, and its header onClick invokes onToggleExpand(id)."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/learn/installation/cells/related_link.json",
+      "description": "RelatedLink cell layout. Props: id, labelKey, url. Row onClick invokes onNavigate(url)."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/LearnInstallationViewModel.ts",
+      "description": "Generated by jui g project. Exposes currentLanguage, installTargets, prerequisites, verifyRows, troubleshootRows, relatedLinks, expandedIds, and the four derived *BodyVisibility strings; implements onAppear / onToggleExpand / onCopyCode / onNavigate / onToggleLanguage."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/learn/installation/page.tsx",
+      "description": "Next.js App Router page. Dynamic-imports the generated LearnInstallationView (thin wrapper; navigation lives in jsonui-navigation-web)."
+    },
+    {
+      "type": "Model",
+      "path": "jsonui-doc-web/src/models/InstallTargetCard.ts",
+      "description": "Generated TypeScript types for InstallTargetCard and the four other custom types declared in dataFlow.customTypes (PrereqRow, VerifyRow, TroubleshootRow, RelatedLink)."
+    },
+    {
+      "type": "Component",
+      "path": "docs/components/json/codeblock.component.json",
+      "description": "The only custom component type referenced (already authored and whitelisted). Used for the hero CTA, the three inline step code samples, the update-idempotent reminder (section 3.6), the three partial-update snippets, the custom-path env snippet, the three individual-install commands, and the uninstall snippet."
+    }
+  ],
+  "notes": [
+    "Content source of truth: docs/plans/18-content-plan-installation.md. Every section id, string prefix, card count, and Collection used in this spec maps back to a numbered subsection of plan 18.",
+    "NO new custom component types are introduced. Plan 18 §4 is explicit: Collapse / Details / PlatformBadge are NOT custom types in this project. The only custom type referenced by this screen is CodeBlock (already authored at docs/components/json/codeblock.component.json and whitelisted in .jsonui-doc-rules.json).",
+    "Expandable sections use a single canonical pattern: uiVariable `expandedIds: [String]` + eventHandler `onToggleExpand(id)` + displayLogic entries that derive per-section `*BodyVisibility` strings. TroubleshootRow uses the same expandedIds but handles its own visibility inside the cell via `@{expandedIds contains id}`, so individual troubleshoot rows do NOT require dedicated displayLogic entries. Future screens should copy this pattern rather than inventing new component types.",
+    "The three main install steps (plan 18 §3.4) are NOT a Collection — they are three static inline Views in the layout, each wrapping a CodeBlock with fixed content. The implementer must hand-author them in the Layout JSON rather than binding them to a uiVariable.",
+    "The hero CTA CodeBlock's `code` string (the bootstrap curl one-liner from plan 18 §3.1) is a layout literal, not a ViewModel binding — the one-liner never changes at runtime. The step 2 PATH snippet (plan 18 §3.4) and the idempotent-reinstall snippet (plan 18 §3.6) are likewise layout literals. The four expandable-section bodies (partial update / custom path / individual install / uninstall) are also layout-literal CodeBlocks living inside the section body Views whose visibility is toggled by expandedIds.",
+    "Strings prefix `learn_installation_*`. The spec enumerates WHICH strings exist via the titleKey / locationKey / bodyKey / labelKey / toolKey / noteKey / commandKey / expectKey / symptomKey / causeKey / fixKey fields on the five custom types (and via @string/... refs in the layout for the hero headline / subcopy / step titles / section headers / CTA button labels). The CONTENTS of those strings live in the ViewModel's v1 seeding (implementer's job) and in docs/screens/layouts/Resources/strings.json.",
+    "Phase-2 screenshots (plan 18 §6) are deferred. The spec does not declare any screenshot-related uiVariables or custom types.",
+    "The home hero CTA currently navigates to /learn/hello-world; the implementer for this page is expected to rewire the home hero CTA to /learn/installation per plan 18 §8. That change belongs to the home screen's Layout (not this spec).",
+    "Standard components + CodeBlock only. No TabView (this page sits inside one of the home TabView tabs — single root ScrollView per plan 18 §3 structure)."
+  ]
+}

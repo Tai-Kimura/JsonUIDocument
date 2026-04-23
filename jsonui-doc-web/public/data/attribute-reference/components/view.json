@@ -1,0 +1,290 @@
+{
+  "component": "View",
+  "kebab": "view",
+  "aliasOf": null,
+  "title": "View",
+  "description": "Generic container that arranges child components vertically or horizontally. The most-used component — every JsonUI screen has a View at the root of each layout segment.",
+  "usage": "Use View whenever you need to group multiple components. Choose `orientation` (vertical/horizontal). For scrollable content use ScrollView; for dynamic lists use Collection.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Vertical stack",
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/title\", \"fontSize\": 24 },\n    { \"type\": \"Label\", \"text\": \"@string/subtitle\", \"fontSize\": 16 },\n    { \"type\": \"Button\", \"text\": \"@string/action\", \"onClick\": \"@{onAction}\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Horizontal with weight",
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"horizontal\",\n  \"child\": [\n    { \"type\": \"Image\", \"source\": \"avatar\", \"width\": 40, \"height\": 40 },\n    { \"type\": \"Label\", \"text\": \"@{userName}\", \"weight\": 1 },\n    { \"type\": \"Label\", \"text\": \"@{timestamp}\", \"fontColor\": \"#9CA3AF\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "Card with background and corners",
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"background\": \"#F3F4F6\",\n  \"cornerRadius\": 12,\n  \"paddings\": [16, 16, 16, 16],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/card_body\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_4",
+              "title": "Conditional show/hide",
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{hasError ? 'visible' : 'gone'}\",\n  \"background\": \"#FEE2E2\",\n  \"paddings\": [12, 12, 12, 12],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@{errorMessage}\", \"fontColor\": \"#991B1B\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_5",
+              "title": "Linear gradient background",
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"gradient\": [\"#6366F1\", \"#8B5CF6\"],\n  \"gradientDirection\": \"vertical\",\n  \"paddings\": [24, 24, 24, 24]\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_orientation",
+              "name": "orientation",
+              "type": "string",
+              "required": "",
+              "description": "Stack orientation (default: zstack)",
+              "note": "`vertical` (default) / `horizontal`. Switches child layout axis. For grid layouts use Collection with `columnCount`.",
+              "enumValues": [
+                "horizontal",
+                "vertical"
+              ]
+            },
+            {
+              "id": "attr_direction",
+              "name": "direction",
+              "type": "string",
+              "required": "",
+              "description": "Layout direction",
+              "enumValues": [
+                "topToBottom",
+                "bottomToTop",
+                "leftToRight",
+                "rightToLeft",
+                "none"
+              ]
+            },
+            {
+              "id": "attr_child",
+              "name": "child",
+              "type": "array",
+              "required": "",
+              "description": "Child component(s)",
+              "note": "Array of child components. Order determines layout order. For dynamic repetition from a bound array, use Collection instead of `child`."
+            },
+            {
+              "id": "attr_alignment",
+              "name": "alignment",
+              "type": "string",
+              "required": "",
+              "description": "Child alignment",
+              "note": "Cross-axis alignment. For vertical orientation: `left` / `center` / `right`. For horizontal: `top` / `center` / `bottom`."
+            },
+            {
+              "id": "attr_distribution",
+              "name": "distribution",
+              "type": "string",
+              "required": "",
+              "description": "Child distribution mode for stacks",
+              "note": "Main-axis distribution. `start` / `center` / `end` / `spaceBetween` / `spaceAround` / `spaceEvenly`. Controls gap and edge behavior for children.",
+              "enumValues": [
+                "fill",
+                "fillEqually",
+                "equalSpacing",
+                "equalCentering"
+              ]
+            },
+            {
+              "id": "attr_spacing",
+              "name": "spacing",
+              "type": "number | binding",
+              "required": "",
+              "description": "Space between children (binding supported)",
+              "note": "Fixed gap between children along the main axis. Simpler alternative to using `distribution: spaceBetween`."
+            },
+            {
+              "id": "attr_flex_wrap",
+              "name": "flexWrap",
+              "type": "string",
+              "required": "",
+              "description": "Flex wrap behavior",
+              "note": "Horizontal orientation only. `true` wraps overflow onto subsequent rows. Maps to CSS flex-wrap on Web.",
+              "platform": "react",
+              "enumValues": [
+                "nowrap",
+                "wrap",
+                "wrap-reverse"
+              ]
+            },
+            {
+              "id": "attr_gradient",
+              "name": "gradient",
+              "type": "array",
+              "required": "",
+              "description": "Gradient colors",
+              "note": "Array of 2+ color strings. Use `gradientDirection` to control direction. For multi-stop or radial gradients, use a dedicated GradientView.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_gradient_direction",
+              "name": "gradientDirection",
+              "type": "string",
+              "required": "",
+              "description": "Gradient direction",
+              "note": "`horizontal` / `vertical` / `diagonal` or numeric degrees. Default `vertical`.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_locations",
+              "name": "locations",
+              "type": "array",
+              "required": "",
+              "description": "Gradient color stop locations",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_draggable",
+              "name": "draggable",
+              "type": "boolean",
+              "required": "",
+              "description": "Make this view draggable",
+              "note": "Enables drag-and-drop. Used with the `onDragStart` / `onDragEnter` / `onDragOver` / `onDragLeave` / `onDrop` handlers.",
+              "platform": "react"
+            },
+            {
+              "id": "attr_on_drag_start",
+              "name": "onDragStart",
+              "type": "binding",
+              "required": "",
+              "description": "Handler called when drag starts - @{handlerName}",
+              "platform": "react"
+            },
+            {
+              "id": "attr_on_drag_enter",
+              "name": "onDragEnter",
+              "type": "binding",
+              "required": "",
+              "description": "Handler called when a dragged item enters this view - @{handlerName}",
+              "platform": "react"
+            },
+            {
+              "id": "attr_on_drag_over",
+              "name": "onDragOver",
+              "type": "binding",
+              "required": "",
+              "description": "Handler called while a dragged item hovers over this view - @{handlerName}",
+              "platform": "react"
+            },
+            {
+              "id": "attr_on_drag_leave",
+              "name": "onDragLeave",
+              "type": "binding",
+              "required": "",
+              "description": "Handler called when a dragged item leaves this view - @{handlerName}",
+              "platform": "react"
+            },
+            {
+              "id": "attr_on_drop",
+              "name": "onDrop",
+              "type": "binding",
+              "required": "",
+              "description": "Handler called when an item is dropped onto this view - @{handlerName}",
+              "platform": "react"
+            },
+            {
+              "id": "attr_safe_area_inset_positions",
+              "name": "safeAreaInsetPositions",
+              "type": "array",
+              "required": "",
+              "description": "Safe area inset positions (SafeAreaView only)"
+            },
+            {
+              "id": "attr_children",
+              "name": "children",
+              "type": "array",
+              "required": "",
+              "description": "Child components (alias for child)"
+            },
+            {
+              "id": "attr_highlighted",
+              "name": "highlighted",
+              "type": "boolean",
+              "required": "",
+              "description": "View highlighted state"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_safe_area_view",
+              "name": "SafeAreaView",
+              "url": "/reference/components/safe-area-view"
+            },
+            {
+              "id": "related_scroll_view",
+              "name": "ScrollView",
+              "url": "/reference/components/scroll-view"
+            },
+            {
+              "id": "related_collection",
+              "name": "Collection",
+              "url": "/reference/components/collection"
+            },
+            {
+              "id": "related_gradient_view",
+              "name": "GradientView",
+              "url": "/reference/components/gradient-view"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

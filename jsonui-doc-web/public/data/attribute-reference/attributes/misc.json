@@ -1,0 +1,117 @@
+{
+  "category": "misc",
+  "title": "Misc attributes",
+  "description": "Identity, metadata, composition, and debug attributes that don't fit other categories.",
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_class_name",
+              "name": "className",
+              "type": "string",
+              "required": "",
+              "description": "Custom CSS class name",
+              "summary": "Web-only. Additional CSS class names appended to the generated element.",
+              "platform": "react"
+            },
+            {
+              "id": "attr_generated_by",
+              "name": "generatedBy",
+              "type": "string",
+              "required": "",
+              "description": "AI generation command that created this component (metadata only, not rendered)",
+              "summary": "Set by the generator to identify the spec that produced this file. Do not edit by hand; it drives `jui verify`."
+            },
+            {
+              "id": "attr_id",
+              "name": "id",
+              "type": "string",
+              "required": "",
+              "description": "Unique identifier for the component",
+              "summary": "Unique identifier within the layout. Required for ViewModel references and test-runner selectors. Naming convention: `<screen>_<purpose>`.",
+              "examples": [
+                {
+                  "language": "json",
+                  "code": "{ \"type\": \"Button\", \"id\": \"login_submit_button\", \"text\": \"@string/submit\" }"
+                }
+              ]
+            },
+            {
+              "id": "attr_include",
+              "name": "include",
+              "type": "string",
+              "required": "",
+              "description": "Include another JSON layout (filename without extension)",
+              "summary": "Reference to another Layout file, inlined at this position. Path is relative to the layouts root; no extension.",
+              "examples": [
+                {
+                  "language": "json",
+                  "code": "{ \"include\": \"common/header\" }"
+                }
+              ]
+            },
+            {
+              "id": "attr_partial",
+              "name": "partial",
+              "type": "boolean",
+              "required": "",
+              "description": "Marks this file as a partial/include template. Partials are not standalone views and will not generate Data models.",
+              "summary": "Marks the file as a partial layout that is only usable via `include`. Prevents direct routing."
+            },
+            {
+              "id": "attr_tag",
+              "name": "tag",
+              "type": "number | binding",
+              "required": "",
+              "description": "View tag for identification (binding supported)",
+              "summary": "Arbitrary marker string attached to the view. Useful for runtime debugging / analytics without polluting `id`.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_test_id",
+              "name": "testId",
+              "type": "string",
+              "required": "",
+              "description": "Test ID for testing (data-testid)",
+              "summary": "Test-only identifier separate from `id`. Use when the test selector should not affect runtime accessibility IDs.",
+              "platform": "react"
+            },
+            {
+              "id": "attr_type",
+              "name": "type",
+              "type": "string",
+              "required": "required",
+              "description": "Component type",
+              "summary": "The component type (`Label`, `Button`, `View`, ...). Required on every node. Not typically discussed as a user-facing attribute; listed here for completeness."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "breakpoints": null,
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_components",
+              "titleKey": "next_components_title",
+              "descriptionKey": "next_components_body",
+              "url": "/reference/components"
+            },
+            {
+              "id": "next_attributes_root",
+              "titleKey": "next_attributes_root_title",
+              "descriptionKey": "next_attributes_root_body",
+              "url": "/reference/attributes"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

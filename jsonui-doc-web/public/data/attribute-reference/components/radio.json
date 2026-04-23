@@ -1,0 +1,181 @@
+{
+  "component": "Radio",
+  "kebab": "radio",
+  "aliasOf": null,
+  "title": "Radio",
+  "description": "Mutually exclusive selection within a group. Behaves as a standalone radio button; grouping is established via shared `group` attribute.",
+  "usage": "Use Radio when 2–5 options must all be visible simultaneously and mutually exclusive. For 6+ options use SelectBox. All Radios with the same `group` automatically exclude each other.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "3-option group",
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"S\", \"checked\": \"@{size == 'S'}\", \"label\": \"@string/small\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"M\", \"checked\": \"@{size == 'M'}\", \"label\": \"@string/medium\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"L\", \"checked\": \"@{size == 'L'}\", \"label\": \"@string/large\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Custom icons",
+              "language": "json",
+              "code": "{\n  \"type\": \"Radio\",\n  \"group\": \"option\",\n  \"value\": \"a\",\n  \"icon\": \"radio_off\",\n  \"selectedIcon\": \"radio_on\",\n  \"label\": \"Option A\"\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_text",
+              "name": "text",
+              "type": "string | binding",
+              "required": "",
+              "description": "Radio label (alias, can be data binding)"
+            },
+            {
+              "id": "attr_value",
+              "name": "value",
+              "type": "any",
+              "required": "",
+              "description": "Associated value when selected",
+              "note": "The value this Radio represents when selected. Bind `selectedValue` on the parent (or the ViewModel) to track which value is chosen."
+            },
+            {
+              "id": "attr_checked",
+              "name": "checked",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Initial checked state (can be binding)",
+              "note": "Boolean binding. Usually derived: `@{selectedValue == 'M'}`. Tapping sets all other Radios in the same `group` to `false`."
+            },
+            {
+              "id": "attr_icon",
+              "name": "icon",
+              "type": "string",
+              "required": "",
+              "description": "Icon name for normal state",
+              "note": "Unselected icon image name. Defaults to the platform standard radio-off glyph."
+            },
+            {
+              "id": "attr_font_size",
+              "name": "fontSize",
+              "type": "number | binding",
+              "required": "",
+              "description": "Font size (binding supported)"
+            },
+            {
+              "id": "attr_font_color",
+              "name": "fontColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Text color - hex string or color name from colors.json (binding supported)"
+            },
+            {
+              "id": "attr_spacing",
+              "name": "spacing",
+              "type": "number | binding",
+              "required": "",
+              "description": "Space between icon and text (binding supported)",
+              "note": "Gap between the icon and the label (pt/dp/px). Default 8."
+            },
+            {
+              "id": "attr_font",
+              "name": "font",
+              "type": "string | binding",
+              "required": "",
+              "description": "Font name (binding supported)"
+            },
+            {
+              "id": "attr_group",
+              "name": "group",
+              "type": "string",
+              "required": "required",
+              "description": "Radio group name",
+              "note": "String identifier. All Radios with the same `group` within the same parent View form a mutually-exclusive set."
+            },
+            {
+              "id": "attr_label",
+              "name": "label",
+              "type": "string | binding",
+              "required": "",
+              "description": "Radio label (can be data binding)",
+              "note": "Inline label rendered to the right of the radio icon. For custom label layout, omit `label` and wrap Radio + Label in a horizontal View."
+            },
+            {
+              "id": "attr_selected_icon",
+              "name": "selectedIcon",
+              "type": "string",
+              "required": "",
+              "description": "Selected icon name",
+              "note": "Selected icon image name. Defaults to the platform standard radio-on glyph."
+            },
+            {
+              "id": "attr_selected_icon",
+              "name": "selected_icon",
+              "type": "string",
+              "required": "",
+              "description": "Selected icon name (underscore alias)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_segment",
+              "name": "Segment",
+              "url": "/reference/components/segment"
+            },
+            {
+              "id": "related_select_box",
+              "name": "SelectBox",
+              "url": "/reference/components/select-box"
+            },
+            {
+              "id": "related_check_box",
+              "name": "CheckBox",
+              "url": "/reference/components/check-box"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

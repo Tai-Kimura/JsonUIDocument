@@ -1,0 +1,259 @@
+{
+  "category": "alignment",
+  "title": "Alignment attributes",
+  "description": "Alignment attributes control where a component sits within its parent and how siblings are positioned relative to it. Most are inherited from Android's RelativeLayout vocabulary and apply inside Views that use a relative positioning mode.",
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_align_bottom",
+              "name": "alignBottom",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Align to parent bottom (binding supported)",
+              "summary": "Aligns bottom edges."
+            },
+            {
+              "id": "attr_align_bottom_of_view",
+              "name": "alignBottomOfView",
+              "type": "string",
+              "required": "",
+              "description": "Align above specified view ID",
+              "summary": "Places this view directly below the referenced sibling."
+            },
+            {
+              "id": "attr_align_bottom_view",
+              "name": "alignBottomView",
+              "type": "string",
+              "required": "",
+              "description": "Align bottom edge with specified view",
+              "summary": "Aligns bottom edges to a sibling."
+            },
+            {
+              "id": "attr_align_center_horizontal_view",
+              "name": "alignCenterHorizontalView",
+              "type": "string",
+              "required": "",
+              "description": "Align horizontal center with specified view",
+              "summary": "Centers this view horizontally within a sibling's horizontal bounds."
+            },
+            {
+              "id": "attr_align_center_vertical_view",
+              "name": "alignCenterVerticalView",
+              "type": "string",
+              "required": "",
+              "description": "Align vertical center with specified view",
+              "summary": "Centers this view vertically within a sibling's vertical bounds."
+            },
+            {
+              "id": "attr_align_left",
+              "name": "alignLeft",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Align to parent left (binding supported)",
+              "summary": "Aligns left edges."
+            },
+            {
+              "id": "attr_align_left_of_view",
+              "name": "alignLeftOfView",
+              "type": "string",
+              "required": "",
+              "description": "Align to right of specified view ID",
+              "summary": "Places this view directly to the left of the referenced sibling."
+            },
+            {
+              "id": "attr_align_left_view",
+              "name": "alignLeftView",
+              "type": "string",
+              "required": "",
+              "description": "Align left edge with specified view",
+              "summary": "Aligns left edges to a sibling."
+            },
+            {
+              "id": "attr_align_right",
+              "name": "alignRight",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Align to parent right (binding supported)",
+              "summary": "Aligns right edges."
+            },
+            {
+              "id": "attr_align_right_of_view",
+              "name": "alignRightOfView",
+              "type": "string",
+              "required": "",
+              "description": "Align to left of specified view ID",
+              "summary": "Places this view directly to the right of the referenced sibling."
+            },
+            {
+              "id": "attr_align_right_view",
+              "name": "alignRightView",
+              "type": "string",
+              "required": "",
+              "description": "Align right edge with specified view",
+              "summary": "Aligns right edges to a sibling."
+            },
+            {
+              "id": "attr_align_top",
+              "name": "alignTop",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Align to parent top (binding supported)",
+              "summary": "Boolean. Aligns this view's top edge to its parent's top edge."
+            },
+            {
+              "id": "attr_align_top_of_view",
+              "name": "alignTopOfView",
+              "type": "string",
+              "required": "",
+              "description": "Align below specified view ID",
+              "summary": "Places this view directly above the referenced sibling (this view's bottom = sibling's top)."
+            },
+            {
+              "id": "attr_align_top_view",
+              "name": "alignTopView",
+              "type": "string",
+              "required": "",
+              "description": "Align top edge with specified view",
+              "summary": "Aligns this view's top to the top of a sibling View identified by ID. Value is the sibling's id string.",
+              "relatedAttributes": [
+                "alignBottomView",
+                "alignLeftView",
+                "alignRightView",
+                "toView"
+              ]
+            },
+            {
+              "id": "attr_center_horizontal",
+              "name": "centerHorizontal",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Center horizontally in parent (binding supported)",
+              "summary": "Boolean. Centers horizontally in the parent."
+            },
+            {
+              "id": "attr_center_in_parent",
+              "name": "centerInParent",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Center both horizontally and vertically (binding supported)",
+              "summary": "Boolean. When `true`, centers both horizontally and vertically within the parent."
+            },
+            {
+              "id": "attr_center_vertical",
+              "name": "centerVertical",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Center vertically in parent (binding supported)",
+              "summary": "Boolean. Centers vertically in the parent."
+            },
+            {
+              "id": "attr_gravity",
+              "name": "gravity",
+              "type": "string | array",
+              "required": "",
+              "description": "Content gravity/alignment",
+              "summary": "`left` / `center` / `right` / `top` / `bottom` / `center_horizontal` / `center_vertical` / `center_in_parent`. For a vertical View, horizontal gravity aligns children; for horizontal, vertical gravity aligns children.",
+              "platformDiff": {
+                "kotlin_xml": "android:gravity に直接マップ。",
+                "kotlin_compose": "`Modifier.align(Alignment.<value>)` に変換。",
+                "swift_swiftui": "HStack/VStack の alignment パラメータにマップ。",
+                "react": "Tailwind の `justify-*` / `items-*` クラスに変換。"
+              },
+              "enumValues": [
+                "top",
+                "bottom",
+                "centerVertical",
+                "left",
+                "right",
+                "centerHorizontal",
+                "center"
+              ]
+            },
+            {
+              "id": "attr_index_above",
+              "name": "indexAbove",
+              "type": "string",
+              "required": "",
+              "description": "Place above specified view ID",
+              "summary": "Places this view visually above (higher z-index than) the referenced sibling."
+            },
+            {
+              "id": "attr_index_below",
+              "name": "indexBelow",
+              "type": "string",
+              "required": "",
+              "description": "Place below specified view ID",
+              "summary": "Places this view visually below the referenced sibling."
+            },
+            {
+              "id": "attr_key_bottom_view",
+              "name": "keyBottomView",
+              "type": "string",
+              "required": "",
+              "description": "Key bottom view ID",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_key_left_view",
+              "name": "keyLeftView",
+              "type": "string",
+              "required": "",
+              "description": "Key left view ID",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_key_right_view",
+              "name": "keyRightView",
+              "type": "string",
+              "required": "",
+              "description": "Key right view ID",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_key_top_view",
+              "name": "keyTopView",
+              "type": "string",
+              "required": "",
+              "description": "Key top view ID",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_to_view",
+              "name": "toView",
+              "type": "string",
+              "required": "",
+              "description": "Relative layout target view",
+              "platform": "swift"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "breakpoints": null,
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_components",
+              "titleKey": "next_components_title",
+              "descriptionKey": "next_components_body",
+              "url": "/reference/components"
+            },
+            {
+              "id": "next_attributes_root",
+              "titleKey": "next_attributes_root_title",
+              "descriptionKey": "next_attributes_root_body",
+              "url": "/reference/attributes"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

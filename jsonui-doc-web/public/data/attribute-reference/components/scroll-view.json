@@ -1,0 +1,267 @@
+{
+  "component": "ScrollView",
+  "kebab": "scroll-view",
+  "aliasOf": null,
+  "title": "ScrollView",
+  "description": "Vertically (default) or horizontally scrollable container. Children that exceed the visible bounds become scrollable.",
+  "usage": "Use ScrollView for static-sized content that may overflow (forms, long articles, long card stacks). For large dynamic lists use Collection — it virtualizes.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Vertical scroll",
+              "language": "json",
+              "code": "{\n  \"type\": \"ScrollView\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Horizontal carousel without indicators",
+              "language": "json",
+              "code": "{\n  \"type\": \"ScrollView\",\n  \"orientation\": \"horizontal\",\n  \"showsHorizontalScrollIndicator\": false,\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"horizontal\", \"child\": [ ] }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "Paging per screen",
+              "language": "json",
+              "code": "{\n  \"type\": \"ScrollView\",\n  \"orientation\": \"horizontal\",\n  \"paging\": true,\n  \"child\": [\n    { \"type\": \"View\", \"width\": \"matchParent\" },\n    { \"type\": \"View\", \"width\": \"matchParent\" },\n    { \"type\": \"View\", \"width\": \"matchParent\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_4",
+              "title": "Form with keyboard avoidance",
+              "language": "json",
+              "code": "{\n  \"type\": \"ScrollView\",\n  \"keyboardAvoidance\": true,\n  \"keyboardDismissMode\": \"interactive\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_orientation",
+              "name": "orientation",
+              "type": "string",
+              "required": "",
+              "description": "Scroll orientation",
+              "note": "`vertical` (default) / `horizontal`. For both-axis scrolling, nest two ScrollViews.",
+              "enumValues": [
+                "horizontal",
+                "vertical"
+              ]
+            },
+            {
+              "id": "attr_paging",
+              "name": "paging",
+              "type": "boolean",
+              "required": "",
+              "description": "Enable paging",
+              "note": "`true` snaps to child boundaries (each child = one page). Usually paired with children sized to the parent."
+            },
+            {
+              "id": "attr_scroll_enabled",
+              "name": "scrollEnabled",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Enable scrolling (binding supported)",
+              "note": "Boolean. When `false`, ScrollView acts as a plain View. Useful when scroll behavior is conditional."
+            },
+            {
+              "id": "attr_bounces",
+              "name": "bounces",
+              "type": "boolean",
+              "required": "",
+              "description": "Enable bounce effect",
+              "note": "iOS-specific bounce behavior at scroll edges. Default `true`. Set `false` to remove the rubber-band effect."
+            },
+            {
+              "id": "attr_keyboard_avoidance",
+              "name": "keyboardAvoidance",
+              "type": "boolean",
+              "required": "",
+              "description": "Enable keyboard avoidance",
+              "note": "Boolean. When `true`, the ScrollView auto-scrolls so the focused TextField is above the keyboard.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_keyboard_dismiss_mode",
+              "name": "keyboardDismissMode",
+              "type": "string",
+              "required": "",
+              "description": "Keyboard dismiss mode",
+              "note": "`none` / `onDrag` / `interactive`. Controls when the keyboard dismisses during scroll. `interactive` follows iOS Messages-style dismiss."
+            },
+            {
+              "id": "attr_shows_vertical_scroll_indicator",
+              "name": "showsVerticalScrollIndicator",
+              "type": "boolean",
+              "required": "",
+              "description": "Show vertical indicator",
+              "note": "Boolean. On iOS SwiftUI, hiding requires iOS 16+ (earlier versions ignore the setting)."
+            },
+            {
+              "id": "attr_shows_horizontal_scroll_indicator",
+              "name": "showsHorizontalScrollIndicator",
+              "type": "boolean",
+              "required": "",
+              "description": "Show horizontal indicator"
+            },
+            {
+              "id": "attr_content_inset_adjustment_behavior",
+              "name": "contentInsetAdjustmentBehavior",
+              "type": "string",
+              "required": "",
+              "description": "Content inset adjustment",
+              "note": "iOS-only. `automatic` / `never` / `scrollableAxes` / `always`. Controls whether safe area insets affect content inset.",
+              "enumValues": [
+                "never",
+                "always",
+                "automatic",
+                "scrollableAxes"
+              ]
+            },
+            {
+              "id": "attr_indicator_style",
+              "name": "indicatorStyle",
+              "type": "string",
+              "required": "",
+              "description": "Scroll indicator style",
+              "note": "iOS-only. `default` / `black` / `white`. Scroll indicator color.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_min_zoom",
+              "name": "minZoom",
+              "type": "number | binding",
+              "required": "",
+              "description": "Minimum zoom scale (binding supported)"
+            },
+            {
+              "id": "attr_max_zoom",
+              "name": "maxZoom",
+              "type": "number | binding",
+              "required": "",
+              "description": "Maximum zoom scale (binding supported)"
+            },
+            {
+              "id": "attr_child",
+              "name": "child",
+              "type": "array",
+              "required": "",
+              "description": "Child component(s)"
+            },
+            {
+              "id": "attr_children",
+              "name": "children",
+              "type": "array",
+              "required": "",
+              "description": "Child components"
+            },
+            {
+              "id": "attr_content_offset",
+              "name": "contentOffset",
+              "type": "array",
+              "required": "",
+              "description": "Initial offset [x, y]",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_content_size",
+              "name": "contentSize",
+              "type": "array",
+              "required": "",
+              "description": "Content size [width, height]",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_deceleration_rate",
+              "name": "decelerationRate",
+              "type": "string",
+              "required": "",
+              "description": "Deceleration rate",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_scroll_behavior",
+              "name": "scrollBehavior",
+              "type": "string",
+              "required": "",
+              "description": "Scroll behavior animation",
+              "platform": "react",
+              "enumValues": [
+                "auto",
+                "smooth"
+              ]
+            },
+            {
+              "id": "attr_scrolls_to_top",
+              "name": "scrollsToTop",
+              "type": "boolean",
+              "required": "",
+              "description": "Scroll to top on status bar tap",
+              "platform": "swift"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_collection",
+              "name": "Collection",
+              "url": "/reference/components/collection"
+            },
+            {
+              "id": "related_view",
+              "name": "View",
+              "url": "/reference/components/view"
+            },
+            {
+              "id": "related_safe_area_view",
+              "name": "SafeAreaView",
+              "url": "/reference/components/safe-area-view"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "type": "screen",
+  "source": {
+    "layout": "docs/screens/layouts/learn/installation.json",
+    "document": "docs/screens/json/learn/installation.spec.json"
+  },
+  "metadata": {
+    "name": "Learn > Installation screen",
+    "description": "Verifies the one-line-bootstrap installation page: hero + CTA CodeBlock, 3 install-target cards, 5 prereq rows (required/optional tiers), three static install steps with CodeBlocks, four expandable detail sections (partial update / custom path / individual install / uninstall), six individually-expandable troubleshoot rows, five related-link rows, the 'next: Hello World' CTA, and the header language toggle. Every assertion traces back to a section of learn/installation.spec.json.",
+    "generatedAt": "2026-04-23T00:00:00Z",
+    "generatedBy": "jsonui-test",
+    "tags": ["learn", "installation", "smoke", "web"],
+    "group": ["01_learn"]
+  },
+  "platform": "web",
+  "cases": [
+    {
+      "name": "renders_hero",
+      "description": "On mount the hero headline (learn_installation_title bound to 'headline' key -> 'Install JsonUI in one line') is visible, and the hero CTA CodeBlock renders with the bootstrap curl one-liner. Traces to the layout's header View + hero CTA CodeBlock (literal code per spec notes). Text narrowing is used for the code body because CodeBlock elements have no stable per-instance DOM id.",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_root", "timeout": 5000 },
+        { "assert": "visible", "id": "learn_installation_scroll" },
+        { "assert": "visible", "id": "learn_installation_header" },
+        { "assert": "visible", "id": "learn_installation_title" },
+        { "assert": "text", "id": "learn_installation_title", "contains": "Install JsonUI in one line" },
+        { "assert": "visible", "id": "learn_installation_subcopy" },
+        { "assert": "visible", "id": "learn_installation_cta_wrap" },
+        { "assert": "text", "id": "learn_installation_cta_wrap", "contains": "curl -fsSL" }
+      ]
+    },
+    {
+      "name": "renders_three_install_target_cards",
+      "description": "The 'what gets installed' Collection renders exactly 3 InstallTargetCard cells seeded by onAppear: jsonui-cli / jsonui-mcp-server / Agents + Skills + Rules. Each card's title is resolved via StringManager (card_cli_title / card_mcp_title / card_agents_title). Traces to stateManagement.uiVariables.installTargets and the spec notes 'installTargets count = 3'. Per-cell ids are not guaranteed stable, so we assert by the titles rendered inside the parent Collection.",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_targets_collection", "timeout": 5000 },
+        { "assert": "visible", "id": "learn_installation_targets_collection" },
+        { "assert": "text", "id": "learn_installation_targets_collection", "contains": "jsonui-cli" },
+        { "assert": "text", "id": "learn_installation_targets_collection", "contains": "jsonui-mcp-server" },
+        { "assert": "text", "id": "learn_installation_targets_collection", "contains": "Agents + Skills + Rules" }
+      ]
+    },
+    {
+      "name": "renders_five_prereq_rows",
+      "description": "The prerequisites Collection renders 5 PrereqRow cells (git+curl, Node.js >= 20, npm, Ruby >= 2.7, Python 3 >= 3.10). The cell layout shows a tier badge (REQUIRED / OPTIONAL) resolved from prereq_required_badge / prereq_optional_badge; at least one of each tier is present in the v1 catalog (git/node/npm required; ruby/python optional). Traces to stateManagement.uiVariables.prerequisites and the spec's PrereqRow custom type (requiredTier). Text narrowing via the parent Collection id because cells have no guaranteed DOM ids.",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_prereq_collection", "timeout": 5000 },
+        { "assert": "visible", "id": "learn_installation_prereq_collection" },
+        { "assert": "text", "id": "learn_installation_prereq_collection", "contains": "git and curl" },
+        { "assert": "text", "id": "learn_installation_prereq_collection", "contains": "Node.js" },
+        { "assert": "text", "id": "learn_installation_prereq_collection", "contains": "npm" },
+        { "assert": "text", "id": "learn_installation_prereq_collection", "contains": "Ruby" },
+        { "assert": "text", "id": "learn_installation_prereq_collection", "contains": "Python 3" },
+        { "assert": "text", "id": "learn_installation_prereq_collection", "contains": "REQUIRED" },
+        { "assert": "text", "id": "learn_installation_prereq_collection", "contains": "OPTIONAL" }
+      ]
+    },
+    {
+      "name": "renders_three_steps_with_code",
+      "description": "The three static inline step Views (step_1 / step_2 / step_3) each render their number badge + title + body + a CodeBlock. Step 2's CodeBlock carries the zshrc PATH snippet containing '~/.jsonui-cli/sjui_tools/bin'; step 3's CodeBlock carries the literal 'Read CLAUDE.md' prompt. Traces to the spec notes (steps are static inline Views in the layout, not a Collection) and to the exact code literals the spec declares.",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_step_1", "timeout": 5000 },
+        { "assert": "visible", "id": "learn_installation_step_1" },
+        { "assert": "text", "id": "learn_installation_step_1", "contains": "Run the one-liner" },
+        { "assert": "text", "id": "learn_installation_step_1", "contains": "curl -fsSL" },
+        { "assert": "visible", "id": "learn_installation_step_2" },
+        { "assert": "text", "id": "learn_installation_step_2", "contains": "Add PATH lines" },
+        { "assert": "text", "id": "learn_installation_step_2", "contains": "~/.jsonui-cli/sjui_tools/bin" },
+        { "assert": "visible", "id": "learn_installation_step_3" },
+        { "assert": "text", "id": "learn_installation_step_3", "contains": "Restart Claude Code" },
+        { "assert": "text", "id": "learn_installation_step_3", "contains": "Read CLAUDE.md" }
+      ]
+    },
+    {
+      "name": "partial_update_section_expands_on_tap",
+      "description": "On mount partialUpdateBodyVisibility defaults to 'gone' (expandedIds is empty), so installation_partial_update_body is absent from the DOM. Tapping the Partial update header (by its spec-resolved title 'Partial update (advanced)') invokes onTogglePartialUpdate -> onToggleExpand('partial_update'), which adds the id to expandedIds; the displayLogic entry flips partialUpdateBodyVisibility='visible' and the body mounts with its 'partial_update_body' copy and the partial-update CodeBlock. Traces to stateManagement.displayLogic[partial_update] and stateManagement.uiVariables.expandedIds.",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_partial_update", "timeout": 5000 },
+        { "assert": "notVisible", "id": "installation_partial_update_body" },
+        { "action": "tap", "id": "learn_installation_partial_update", "text": "Partial update" },
+        { "action": "waitFor", "id": "installation_partial_update_body", "timeout": 5000 },
+        { "assert": "visible", "id": "installation_partial_update_body" },
+        { "assert": "text", "id": "installation_partial_update_body", "contains": "JSONUI_BOOTSTRAP_STEPS" }
+      ]
+    },
+    {
+      "name": "custom_path_section_expands_on_tap",
+      "description": "Mirror of the partial-update case for the Custom install paths section. Default customPathBodyVisibility='gone' so installation_custom_path_body is not in the DOM; tapping the header invokes onToggleCustomPath -> onToggleExpand('custom_path'), flipping customPathBodyVisibility='visible'. The body's 'custom_path_body' copy and the JSONUI_CLI_DIR/JSONUI_MCP_DIR CodeBlock render. Traces to stateManagement.displayLogic[custom_path].",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_custom_path", "timeout": 5000 },
+        { "assert": "notVisible", "id": "installation_custom_path_body" },
+        { "action": "tap", "id": "learn_installation_custom_path", "text": "Custom install paths" },
+        { "action": "waitFor", "id": "installation_custom_path_body", "timeout": 5000 },
+        { "assert": "visible", "id": "installation_custom_path_body" },
+        { "assert": "text", "id": "installation_custom_path_body", "contains": "JSONUI_CLI_DIR" }
+      ]
+    },
+    {
+      "name": "individual_install_section_expands_on_tap",
+      "description": "Mirror of the partial-update case for the Install components individually section. Default individualInstallBodyVisibility='gone'; tapping the header invokes onToggleIndividualInstall -> onToggleExpand('individual_install'), which flips individualInstallBodyVisibility='visible' and mounts the body with its per-component curl snippets. Traces to stateManagement.displayLogic[individual_install].",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_individual", "timeout": 5000 },
+        { "assert": "notVisible", "id": "installation_individual_install_body" },
+        { "action": "tap", "id": "learn_installation_individual", "text": "Install components individually" },
+        { "action": "waitFor", "id": "installation_individual_install_body", "timeout": 5000 },
+        { "assert": "visible", "id": "installation_individual_install_body" },
+        { "assert": "text", "id": "installation_individual_install_body", "contains": "jsonui-cli/main/installer/bootstrap.sh" }
+      ]
+    },
+    {
+      "name": "uninstall_section_expands_on_tap",
+      "description": "Mirror of the partial-update case for the Uninstall section. Default uninstallBodyVisibility='gone'; tapping the header invokes onToggleUninstall -> onToggleExpand('uninstall'), which flips uninstallBodyVisibility='visible' and mounts the body with its removal commands (jsonui-mcp-server uninstall.sh / rm -rf ~/.jsonui-cli / rm -rf .claude CLAUDE.md). Traces to stateManagement.displayLogic[uninstall].",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_uninstall", "timeout": 5000 },
+        { "assert": "notVisible", "id": "installation_uninstall_body" },
+        { "action": "tap", "id": "learn_installation_uninstall", "text": "Uninstall" },
+        { "action": "waitFor", "id": "installation_uninstall_body", "timeout": 5000 },
+        { "assert": "visible", "id": "installation_uninstall_body" },
+        { "assert": "text", "id": "installation_uninstall_body", "contains": "uninstall.sh" }
+      ]
+    },
+    {
+      "name": "troubleshoot_rows_expand_individually",
+      "description": "Each TroubleshootRow cell uses onClick -> onToggleExpand(row.id) and binds its cause+fix body's visibility via its own rowVisibility prop (computed by the VM from expandedIds). Tapping one row's symptom expands only that row. Tapping a second row expands it too (both are open simultaneously because expandedIds is a Set). Tapping the first row's symptom again removes it from expandedIds, collapsing only that row while the second stays open. This exercises the Set semantics of expandedIds and the self-contained cell-level toggle pattern described in the spec notes. Text narrowing is used throughout because troubleshoot cells share the same cells/troubleshoot_row layout and have no stable per-instance DOM id.",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_trouble_collection", "timeout": 5000 },
+        { "assert": "visible", "id": "learn_installation_trouble_collection" },
+        { "assert": "text", "id": "learn_installation_trouble_collection", "contains": "jui: command not found" },
+        { "assert": "text", "id": "learn_installation_trouble_collection", "contains": "curl fails or returns 404" },
+        { "action": "tap", "id": "learn_installation_trouble_collection", "text": "jui: command not found" },
+        { "assert": "text", "id": "learn_installation_trouble_collection", "contains": "source ~/.zshrc" },
+        { "action": "tap", "id": "learn_installation_trouble_collection", "text": "curl fails or returns 404" },
+        { "assert": "text", "id": "learn_installation_trouble_collection", "contains": "source ~/.zshrc" },
+        { "assert": "text", "id": "learn_installation_trouble_collection", "contains": "Wait ~5 minutes" },
+        { "action": "tap", "id": "learn_installation_trouble_collection", "text": "jui: command not found" },
+        { "assert": "text", "id": "learn_installation_trouble_collection", "contains": "Wait ~5 minutes" }
+      ]
+    },
+    {
+      "name": "related_links_render_five_rows",
+      "description": "The related-links Collection renders exactly 5 RelatedLink cells seeded by onAppear. Each cell includes a Label bound to the cell's url field, so the five spec-declared URLs (/tools/cli, /tools/mcp, /tools/agents, /learn/hello-world, /tools/mcp/tools/get-data-source) all appear inside the Collection's rendered subtree. Traces to stateManagement.uiVariables.relatedLinks and the spec's transitions ('v1 destinations from this page').",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_related_collection", "timeout": 5000 },
+        { "assert": "visible", "id": "learn_installation_related_collection" },
+        { "assert": "text", "id": "learn_installation_related_collection", "contains": "/tools/cli" },
+        { "assert": "text", "id": "learn_installation_related_collection", "contains": "/tools/mcp" },
+        { "assert": "text", "id": "learn_installation_related_collection", "contains": "/tools/agents" },
+        { "assert": "text", "id": "learn_installation_related_collection", "contains": "/learn/hello-world" },
+        { "assert": "text", "id": "learn_installation_related_collection", "contains": "/tools/mcp/tools/get-data-source" }
+      ]
+    },
+    {
+      "name": "related_link_tap_navigates",
+      "description": "Tapping the /tools/cli related-link row invokes the cell's onClick -> onNavigate('/tools/cli') -> router.push('/tools/cli'). The Installation tree unmounts (the /tools/cli route currently returns Next.js's 404 page, so the root is replaced rather than augmented). Asserting that learn_installation_root is no longer visible captures the navigation intent independent of whether the destination page exists yet. Traces to stateManagement.eventHandlers.onNavigate and transitions.trigger='onNavigate(url)'. Text narrowing is used because related-link cells share the same cell layout and have no stable per-instance DOM id.",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_related_collection", "timeout": 5000 },
+        { "action": "tap", "id": "learn_installation_related_collection", "text": "/tools/cli" },
+        { "assert": "notVisible", "id": "learn_installation_root" }
+      ]
+    },
+    {
+      "name": "next_cta_navigates_to_hello_world",
+      "description": "Tapping learn_installation_next_cta invokes onNavigateHelloWorld, wired by initializeEventHandlers to () => this.onNavigate('/learn/hello-world') -> router.push('/learn/hello-world'). The Installation tree unmounts in favour of the Hello World page, so learn_installation_root is no longer visible. Traces to stateManagement.eventHandlers.onNavigate and userActions 'Tap the next: Hello World CTA'.",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_next_cta", "timeout": 5000 },
+        { "action": "tap", "id": "learn_installation_next_cta" },
+        { "assert": "notVisible", "id": "learn_installation_root" }
+      ]
+    },
+    {
+      "name": "toc_renders_and_localizes",
+      "description": "The TableOfContents inside learn_installation_toc_wrap renders its title ('On this page') and at least two canonical section labels (Prerequisites / Troubleshooting) seeded by the VM from TOC_ROW_DEFS. Toggling language flips the title to 'このページ' and 'Prerequisites' to '前提条件' — proving that tocTitle and tocItems[].label flow through StringManager on the language change. Traces to stateManagement.uiVariables.tocTitle + tocItems and to the spec's on-page TableOfContents contract.",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_toc_wrap", "timeout": 5000 },
+        { "assert": "visible", "id": "learn_installation_toc_wrap" },
+        { "assert": "text", "id": "learn_installation_toc_wrap", "contains": "On this page" },
+        { "assert": "text", "id": "learn_installation_toc_wrap", "contains": "Prerequisites" },
+        { "assert": "text", "id": "learn_installation_toc_wrap", "contains": "Troubleshooting" },
+        { "action": "tap", "id": "learn_installation_lang_toggle" },
+        { "assert": "text", "id": "learn_installation_toc_wrap", "contains": "このページ" },
+        { "assert": "text", "id": "learn_installation_toc_wrap", "contains": "前提条件" }
+      ]
+    },
+    {
+      "name": "language_toggle_re_seeds",
+      "description": "StringManager.language defaults to 'en' on first render, so learn_installation_title resolves to the English headline 'Install JsonUI in one line'. Tapping learn_installation_lang_toggle invokes onToggleLanguage, which flips StringManager to 'ja' and calls onAppear() again; every @string-bound Label re-resolves in Japanese. The title flips to its ja copy ('JsonUI をワンライナーで導入'), which contains the distinctive 'ワンライナー' fragment. This implicitly verifies that onToggleLanguage -> StringManager.setLanguage('ja') -> onAppear() re-seeds every Collection in the new language. Traces to stateManagement.eventHandlers.onToggleLanguage and stateManagement.uiVariables.currentLanguage plus userActions 'Toggle language'.",
+      "steps": [
+        { "action": "waitFor", "id": "learn_installation_lang_toggle", "timeout": 5000 },
+        { "assert": "text", "id": "learn_installation_title", "contains": "Install JsonUI in one line" },
+        { "action": "tap", "id": "learn_installation_lang_toggle" },
+        { "assert": "text", "id": "learn_installation_title", "contains": "ワンライナー" }
+      ]
+    }
+  ]
+}

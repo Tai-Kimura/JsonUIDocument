@@ -1,0 +1,148 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "DataBinding",
+    "displayName": "Data binding as contract",
+    "description": "Essay: why @{variable} is not a template expression but a typed binding to a ViewModel field. Four H2 sections covering the syntax, type-checking, one-way flow, and the 'no logic in layout' rule. ~4-min read.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "concepts/data-binding",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two follow-up essays at the bottom."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[DataBindingView] --> VM[DataBindingViewModel]\n    VM -- nextReadLinks --> VIEW",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_why_spec_first -> /concepts/why-spec-first, next_viewmodel -> /concepts/viewmodel-owned-state) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the concepts_data_binding_ namespace prefix, so the strings.json keys loaded are concepts_data_binding_next_why_spec_first_title / _description and concepts_data_binding_next_viewmodel_title / _description."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped concept URLs enumerated in transitions: /concepts, /concepts/viewmodel-owned-state, /concepts/why-spec-first."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /concepts/why-spec-first and /concepts/viewmodel-owned-state. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll. No VM."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url) with the bound url."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is a spec-mapped concept URL or /concepts",
+      "destination": "Target spec screen or tab",
+      "description": "v1 destinations: /concepts, /concepts/viewmodel-owned-state, /concepts/why-spec-first."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/concepts/data-binding.json",
+      "description": "Essay layout with 4 sections + next-reads."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/concepts/DataBindingViewModel.ts",
+      "description": "Same shape as WhySpecFirstViewModel."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/concepts/data-binding/page.tsx",
+      "description": "Next.js route."
+    }
+  ],
+  "notes": [
+    "Second live essay under Concepts. Flipping CONCEPTS_ENTRIES row 4 (data-binding) from 'upcoming' to 'live' in HomeViewModel is the last step.",
+    "One short CodeBlock illustrates the valid binding forms side-by-side with an example of what is NOT allowed (no ternary, no method calls).",
+    "The closing next-reads point at WhySpecFirst (back) and ViewModel-owned state (upcoming sibling)."
+  ]
+}

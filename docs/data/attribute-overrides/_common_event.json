@@ -1,0 +1,66 @@
+{
+  "category": "event",
+  "description": {
+    "en": "Event attributes bind user interactions to ViewModel methods. All are optional; their omission disables the corresponding interaction.",
+    "ja": "イベント属性はユーザー操作を ViewModel のメソッドにバインドする。全て任意、省略すれば該当操作は無効。"
+  },
+  "attributes": {
+    "onClick": {
+      "summary": {
+        "en": "Tap / click. Fires on single tap after gesture recognition (≈0–50 ms). Required on Button for interactivity.",
+        "ja": "タップ／クリック。ジェスチャ認識後（約 0〜50ms）、シングルタップで発火。Button では必須。"
+      },
+      "examples": [
+        { "language": "json", "code": "{ \"type\": \"Button\", \"onClick\": \"@{onSave}\" }" }
+      ]
+    },
+    "onclick": {
+      "summary": {
+        "en": "Lowercase alias for `onClick` (HTML-style).",
+        "ja": "`onClick` の小文字エイリアス（HTML 風）。"
+      }
+    },
+    "onLongPress": {
+      "summary": {
+        "en": "Long-press event. Default threshold: iOS 500 ms / Android 500 ms / Web 600 ms.",
+        "ja": "長押しイベント。既定閾値は iOS 500ms / Android 500ms / Web 600ms。"
+      }
+    },
+    "onAppear": {
+      "summary": {
+        "en": "Fired when the component becomes visible (mount / re-mount). Useful for analytics and lazy data fetching.",
+        "ja": "コンポーネントが可視になったとき（マウント／再マウント時）に発火。アナリティクスや遅延データ取得に有用。"
+      }
+    },
+    "onDisappear": {
+      "summary": {
+        "en": "Fired when the component is unmounted.",
+        "ja": "コンポーネントがアンマウントされたとき発火。"
+      }
+    },
+    "onPan": {
+      "summary": {
+        "en": "Pan gesture (drag) events. Receives a vector `{ dx, dy }` per frame.",
+        "ja": "パンジェスチャ（ドラッグ）イベント。フレームごとに `{ dx, dy }` を受け取る。"
+      }
+    },
+    "onPinch": {
+      "summary": {
+        "en": "Pinch gesture (two-finger zoom). Receives a `scale` factor per frame.",
+        "ja": "ピンチジェスチャ（2 本指ズーム）。フレームごとに `scale` 係数を受け取る。"
+      }
+    },
+    "events": {
+      "summary": {
+        "en": "Batch-declare multiple event handlers in one object. Alternative to individual `onClick` / `onLongPress` attributes for readability.",
+        "ja": "複数のイベントハンドラを 1 オブジェクトでまとめて宣言。個別の `onClick` / `onLongPress` より読みやすいとき使う。"
+      }
+    },
+    "scripts": {
+      "summary": {
+        "en": "Inline scripts that run on specific lifecycle events (e.g., `onMount`). Use sparingly — prefer ViewModel event handlers.",
+        "ja": "特定のライフサイクルイベント（例: `onMount`）で実行されるインラインスクリプト。控えめに使い、通常は ViewModel のイベントハンドラを優先する。"
+      }
+    }
+  }
+}

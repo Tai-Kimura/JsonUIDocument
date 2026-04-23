@@ -1,0 +1,713 @@
+{
+  "_description": "Seed data for /reference/cli-commands. Expanded incrementally per plan 25. Initial seed covers `jui` subcommands; sjui/kjui/rjui/jsonui-test/jsonui-doc to be added in subsequent sessions.",
+  "_schemaVersion": "1.0",
+
+  "binaries": [
+    {
+      "name": "jui",
+      "language": "Python",
+      "purpose": {
+        "en": "Unified generator / verifier / orchestrator for JsonUI. Cross-platform.",
+        "ja": "JsonUI の統合ジェネレータ／検証／オーケストレータ。クロスプラットフォーム。"
+      },
+      "platforms": ["all"]
+    },
+    {
+      "name": "sjui",
+      "language": "Ruby",
+      "purpose": {
+        "en": "SwiftJsonUI development CLI (iOS).",
+        "ja": "SwiftJsonUI 開発 CLI（iOS）。"
+      },
+      "platforms": ["ios"]
+    },
+    {
+      "name": "kjui",
+      "language": "Ruby",
+      "purpose": {
+        "en": "KotlinJsonUI development CLI (Android).",
+        "ja": "KotlinJsonUI 開発 CLI（Android）。"
+      },
+      "platforms": ["android"]
+    },
+    {
+      "name": "rjui",
+      "language": "Ruby",
+      "purpose": {
+        "en": "ReactJsonUI development CLI (Web).",
+        "ja": "ReactJsonUI 開発 CLI（Web）。"
+      },
+      "platforms": ["web"]
+    },
+    {
+      "name": "jsonui-test",
+      "language": "Python",
+      "purpose": {
+        "en": "Test file validator and generator. Cross-platform.",
+        "ja": "テストファイル検証・生成ツール。クロスプラットフォーム。"
+      },
+      "platforms": ["all"]
+    },
+    {
+      "name": "jsonui-doc",
+      "language": "Python",
+      "purpose": {
+        "en": "Documentation generator for specs and components.",
+        "ja": "spec / component のドキュメント生成ツール。"
+      },
+      "platforms": ["all"]
+    }
+  ],
+
+  "commands": [
+    {
+      "binary": "jui",
+      "command": "init",
+      "synopsis": "jui init [--platforms <list>] [--project-name <name>]",
+      "purpose": {
+        "en": "Initialize a new JsonUI project in the current directory. Creates jui.config.json, platform scaffolding, and .jsonui-type-map.json.",
+        "ja": "カレントディレクトリに新しい JsonUI プロジェクトを初期化。jui.config.json、プラットフォーム足場、.jsonui-type-map.json を作成。"
+      },
+      "options": [
+        {
+          "name": "--platforms",
+          "type": "comma-separated",
+          "default": "web",
+          "description": {
+            "en": "Target platforms: `web` / `ios` / `android`.",
+            "ja": "対象プラットフォーム: `web` / `ios` / `android`。"
+          }
+        },
+        {
+          "name": "--project-name",
+          "type": "string",
+          "default": "basename of cwd",
+          "description": {
+            "en": "Project identifier.",
+            "ja": "プロジェクト識別子。"
+          }
+        },
+        {
+          "name": "--overwrite",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Overwrite existing config files.",
+            "ja": "既存の設定ファイルを上書き。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui init --platforms web,ios --project-name myapp\n✓ Created jui.config.json\n✓ Created .jsonui-type-map.json\n✓ Initialized jsonui-doc-web/\n✓ Initialized jsonui-doc-ios/"
+        }
+      ],
+      "seeAlso": ["jui g screen", "jui g project"]
+    },
+    {
+      "binary": "jui",
+      "command": "g project",
+      "aliases": ["generate project"],
+      "synopsis": "jui g project [--file <spec>] [--platforms <list>]",
+      "purpose": {
+        "en": "Generate Layout JSON + ViewModel stubs from one or all screen specs.",
+        "ja": "単一または全ての画面 spec から Layout JSON + ViewModel スタブを生成。"
+      },
+      "options": [
+        {
+          "name": "--file",
+          "type": "path",
+          "default": "all specs",
+          "description": {
+            "en": "Single spec file path. If omitted, processes every spec under specDir.",
+            "ja": "単一 spec ファイルのパス。省略時は specDir 配下の全 spec が対象。"
+          }
+        },
+        {
+          "name": "--platforms",
+          "type": "comma-separated",
+          "default": "from config",
+          "description": {
+            "en": "Override target platforms for this run.",
+            "ja": "今回の実行における対象プラットフォームを上書き。"
+          }
+        },
+        {
+          "name": "--force",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Overwrite hand-edited Layout files that bear the @generated marker.",
+            "ja": "@generated マーカー付きで手編集された Layout を上書き。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui g project --file docs/screens/json/learn/hello-world.spec.json\n✓ Generated docs/screens/layouts/learn/hello-world.json\n✓ Generated viewmodels: LearnHelloWorldViewModel.{ts,swift,kt}"
+        }
+      ],
+      "seeAlso": ["jui build", "jui verify"]
+    },
+    {
+      "binary": "jui",
+      "command": "g screen",
+      "aliases": ["generate screen"],
+      "synopsis": "jui g screen --name <Name> [--route <path>]",
+      "purpose": {
+        "en": "Create a new screen spec skeleton plus empty Layout + ViewModel stubs. Interactive prompts fill in metadata.",
+        "ja": "新規画面の spec 雛形 + 空 Layout + ViewModel スタブを作成。メタデータは対話プロンプトで入力。"
+      },
+      "options": [
+        {
+          "name": "--name",
+          "type": "string",
+          "required": true,
+          "description": {
+            "en": "PascalCase screen name (becomes ViewModel class name).",
+            "ja": "PascalCase の画面名（ViewModel クラス名になる）。"
+          }
+        },
+        {
+          "name": "--route",
+          "type": "string",
+          "default": "auto-derived",
+          "description": {
+            "en": "URL path for the screen. If omitted, derived from --name.",
+            "ja": "画面の URL パス。省略時は --name から導出。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui g screen --name UserProfile --route /user/profile\n? Display name: User Profile\n? Description: Show user's profile and edit actions\n✓ Created docs/screens/json/user/profile.spec.json"
+        }
+      ],
+      "seeAlso": ["jui g project"]
+    },
+    {
+      "binary": "jui",
+      "command": "g converter",
+      "aliases": ["generate converter"],
+      "synopsis": "jui g converter --from <component-spec>",
+      "purpose": {
+        "en": "Create a custom component converter (Ruby source) from a component spec. Used for reusable UI widgets.",
+        "ja": "component spec からカスタムコンポーネント converter（Ruby）を生成。再利用可能な UI ウィジェットに使う。"
+      },
+      "options": [
+        {
+          "name": "--from",
+          "type": "path",
+          "required": true,
+          "description": {
+            "en": "Path to the component spec file.",
+            "ja": "component spec ファイルのパス。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui g converter --from docs/screens/json/components/codeblock.component.json\n✓ Generated rjui_tools/lib/converters/codeblock_converter.rb\n✓ Generated sjui_tools/lib/converters/codeblock_converter.rb\n✓ Generated kjui_tools/lib/converters/codeblock_converter.rb"
+        }
+      ],
+      "seeAlso": ["jui g project"]
+    },
+    {
+      "binary": "jui",
+      "command": "build",
+      "synopsis": "jui build [--platforms <list>] [--watch]",
+      "purpose": {
+        "en": "Build the project for all configured platforms. Outputs validated, optimized artifacts. Must pass with zero warnings (JsonUI invariant #1).",
+        "ja": "設定済み全プラットフォーム向けにビルド。検証済み・最適化された成果物を出力。警告ゼロで通過必須（JsonUI 不変条件 #1）。"
+      },
+      "options": [
+        {
+          "name": "--platforms",
+          "type": "comma-separated",
+          "default": "from config",
+          "description": { "en": "Override", "ja": "上書き指定" }
+        },
+        {
+          "name": "--watch",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Rebuild on file change.",
+            "ja": "ファイル変更時に再ビルド。"
+          }
+        },
+        {
+          "name": "--verbose",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Detailed per-file log.",
+            "ja": "ファイルごとの詳細ログ。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui build\n✓ Built jsonui-doc-web (44 layouts, 0 warnings)\n✓ Built jsonui-doc-ios (44 layouts, 0 warnings)"
+        }
+      ],
+      "seeAlso": ["jui verify"]
+    },
+    {
+      "binary": "jui",
+      "command": "verify",
+      "synopsis": "jui verify [--fail-on-diff] [--quiet]",
+      "purpose": {
+        "en": "Verify that no hand-edited @generated files drift from the spec. Core guard for JsonUI invariant #2.",
+        "ja": "@generated ファイルの手作業編集が spec から乖離していないか検証。JsonUI 不変条件 #2 の中核ガード。"
+      },
+      "options": [
+        {
+          "name": "--fail-on-diff",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Exit non-zero if drift is detected. Use in CI.",
+            "ja": "drift 検出時に non-zero で終了。CI で使う。"
+          }
+        },
+        {
+          "name": "--quiet",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Suppress per-file log; show only summary.",
+            "ja": "ファイルごとのログを抑制し、サマリのみ表示。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui verify --fail-on-diff\n✓ All 44 layouts match their specs"
+        }
+      ],
+      "seeAlso": ["jui build"]
+    },
+    {
+      "binary": "jui",
+      "command": "migrate-layouts",
+      "synopsis": "jui migrate-layouts --from <old-version>",
+      "purpose": {
+        "en": "One-shot migration for breaking changes between JsonUI versions. Applies AST transforms to all Layout JSON files.",
+        "ja": "JsonUI バージョン間の破壊的変更に対する一括移行。全 Layout JSON に AST 変換を適用。"
+      },
+      "options": [
+        {
+          "name": "--from",
+          "type": "string",
+          "required": true,
+          "description": {
+            "en": "Previous version to migrate from (e.g. `1.x`).",
+            "ja": "移行元のバージョン（例: `1.x`）。"
+          }
+        }
+      ],
+      "examples": [],
+      "seeAlso": ["jui sync-tool"]
+    },
+    {
+      "binary": "jui",
+      "command": "sync-tool",
+      "synopsis": "jui sync-tool [<tool-name>]",
+      "purpose": {
+        "en": "Pull latest versions of rjui_tools / sjui_tools / kjui_tools from upstream. Used after library bug fixes are released.",
+        "ja": "rjui_tools / sjui_tools / kjui_tools を upstream から最新化。ライブラリバグ修正後に使う。"
+      },
+      "options": [
+        {
+          "name": "<tool-name>",
+          "type": "positional",
+          "default": "all",
+          "description": {
+            "en": "Specific tool to sync. If omitted, all are updated.",
+            "ja": "同期する個別ツール。省略時は全て更新。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui sync-tool\n✓ Synced rjui_tools to latest main\n✓ Synced sjui_tools to latest main\n✓ Synced kjui_tools to latest main"
+        }
+      ],
+      "seeAlso": ["jui migrate-layouts"]
+    }
+    ,
+    {
+      "binary": "sjui",
+      "command": "init",
+      "synopsis": "sjui init",
+      "purpose": {
+        "en": "Add the SwiftJsonUI extension to the current iOS project. Creates sjui.config.json and installs scaffolding.",
+        "ja": "現在の iOS プロジェクトに SwiftJsonUI 拡張を追加。sjui.config.json を作成し、scaffold を配置。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": ["sjui setup", "sjui generate"]
+    },
+    {
+      "binary": "sjui",
+      "command": "setup",
+      "synopsis": "sjui setup",
+      "purpose": {
+        "en": "Resolve CocoaPods / SPM dependencies and configure Hot Loader. Run once after `sjui init`.",
+        "ja": "CocoaPods / SPM 依存を解決し、Hot Loader を設定。`sjui init` の後に 1 回実行。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": ["sjui hotload"]
+    },
+    {
+      "binary": "sjui",
+      "command": "generate",
+      "aliases": ["g"],
+      "synopsis": "sjui generate <type> <name>",
+      "purpose": {
+        "en": "Scaffold a new view / view-controller / cell / style. `<type>` = `view` / `viewcontroller` / `cell` / `style`.",
+        "ja": "view / view-controller / cell / style の scaffold を生成。`<type>` = `view` / `viewcontroller` / `cell` / `style`。"
+      },
+      "options": [
+        {
+          "name": "<type>",
+          "type": "positional",
+          "required": true,
+          "description": {
+            "en": "`view` / `viewcontroller` / `cell` / `style`.",
+            "ja": "`view` / `viewcontroller` / `cell` / `style`。"
+          }
+        },
+        {
+          "name": "<name>",
+          "type": "positional",
+          "required": true,
+          "description": { "en": "PascalCase name.", "ja": "PascalCase 名。" }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ sjui generate view HomeView\n✓ Created Layouts/home_view.json\n✓ Created ViewControllers/HomeViewController.swift"
+        }
+      ],
+      "seeAlso": ["sjui destroy"]
+    },
+    {
+      "binary": "sjui",
+      "command": "destroy",
+      "synopsis": "sjui destroy <type> <name>",
+      "purpose": {
+        "en": "Remove files previously created by `sjui generate`. Inverse of `generate`.",
+        "ja": "`sjui generate` で作成されたファイルを削除。`generate` の逆操作。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": ["sjui generate"]
+    },
+    {
+      "binary": "sjui",
+      "command": "build",
+      "synopsis": "sjui build",
+      "purpose": {
+        "en": "xcodebuild wrapper that first runs JsonUI pre-processing (strings merge, asset expansion).",
+        "ja": "JsonUI の前処理（strings マージ、asset 展開）を実行してから xcodebuild を呼ぶラッパ。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": ["jui build"]
+    },
+    {
+      "binary": "sjui",
+      "command": "convert",
+      "synopsis": "sjui convert <layout.json>",
+      "purpose": {
+        "en": "Convert a single Layout JSON to Swift source code. Useful for inspecting Dynamic Mode output.",
+        "ja": "単一 Layout JSON を Swift ソースに変換。Dynamic Mode 出力の確認に便利。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": ["sjui validate"]
+    },
+    {
+      "binary": "sjui",
+      "command": "validate",
+      "synopsis": "sjui validate",
+      "purpose": {
+        "en": "Validate all Layout JSON files against the SwiftJsonUI attribute schema.",
+        "ja": "全 Layout JSON を SwiftJsonUI の属性スキーマで検証。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": ["jui verify"]
+    },
+    {
+      "binary": "sjui",
+      "command": "watch",
+      "synopsis": "sjui watch",
+      "purpose": {
+        "en": "File watcher. On layout / string / style change, regenerates Swift code and pushes to the Hot Loader.",
+        "ja": "ファイル監視。layout / strings / style 変更時に Swift コードを再生成し Hot Loader に送信。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": ["sjui hotload"]
+    },
+    {
+      "binary": "sjui",
+      "command": "hotload",
+      "synopsis": "sjui hotload [start|stop|status]",
+      "purpose": {
+        "en": "Control the local Hot Loader WebSocket server. `start` / `stop` / `status` subcommands.",
+        "ja": "ローカル Hot Loader WebSocket サーバーを制御。`start` / `stop` / `status` のサブコマンド。"
+      },
+      "options": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ sjui hotload start\nHot Loader server running on ws://localhost:8080"
+        }
+      ],
+      "seeAlso": ["sjui watch"]
+    },
+
+    {
+      "binary": "kjui",
+      "command": "init",
+      "synopsis": "kjui init",
+      "purpose": {
+        "en": "Add the KotlinJsonUI extension to the current Gradle project. Creates kjui.config.json.",
+        "ja": "現在の Gradle プロジェクトに KotlinJsonUI 拡張を追加。kjui.config.json を作成。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": ["kjui setup"]
+    },
+    {
+      "binary": "kjui",
+      "command": "setup",
+      "synopsis": "kjui setup",
+      "purpose": {
+        "en": "Resolve Gradle dependencies and configure Navigation.",
+        "ja": "Gradle 依存を解決し、Navigation を設定。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": []
+    },
+    {
+      "binary": "kjui",
+      "command": "generate",
+      "aliases": ["g"],
+      "synopsis": "kjui generate <type> <name>",
+      "purpose": {
+        "en": "Scaffold a fragment / activity / view / cell / style.",
+        "ja": "fragment / activity / view / cell / style の scaffold を生成。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": ["kjui destroy", "kjui generate-xml"]
+    },
+    {
+      "binary": "kjui",
+      "command": "generate-xml",
+      "synopsis": "kjui generate-xml <layout.json>",
+      "purpose": {
+        "en": "Convert a Layout JSON to Android XML (for projects not using Compose).",
+        "ja": "Layout JSON を Android XML に変換（Compose を使わないプロジェクト向け）。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": []
+    },
+    {
+      "binary": "kjui",
+      "command": "watch",
+      "synopsis": "kjui watch",
+      "purpose": {
+        "en": "File watcher. Regenerates Kotlin code and pushes to the Hot Loader.",
+        "ja": "ファイル監視。Kotlin コードを再生成し Hot Loader に送信。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": []
+    },
+
+    {
+      "binary": "rjui",
+      "command": "init",
+      "synopsis": "rjui init",
+      "purpose": {
+        "en": "Add the ReactJsonUI extension to the current Next.js project. Creates rjui.config.json.",
+        "ja": "現在の Next.js プロジェクトに ReactJsonUI 拡張を追加。rjui.config.json を作成。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": ["rjui setup"]
+    },
+    {
+      "binary": "rjui",
+      "command": "setup",
+      "synopsis": "rjui setup",
+      "purpose": {
+        "en": "Configure Tailwind CSS and integrate ReactJsonUI runtime.",
+        "ja": "Tailwind CSS を設定し、ReactJsonUI ランタイムを統合。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": []
+    },
+    {
+      "binary": "rjui",
+      "command": "generate",
+      "aliases": ["g"],
+      "synopsis": "rjui generate <type> <name>",
+      "purpose": {
+        "en": "Scaffold a page / component / cell / viewmodel.",
+        "ja": "page / component / cell / viewmodel の scaffold を生成。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": []
+    },
+    {
+      "binary": "rjui",
+      "command": "dev",
+      "synopsis": "rjui dev",
+      "purpose": {
+        "en": "Start the Next.js dev server alongside rjui file watcher. Combines `next dev` with JsonUI HMR.",
+        "ja": "Next.js dev サーバーと rjui ファイル監視を同時起動。`next dev` と JsonUI HMR を組合わせる。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": []
+    },
+
+    {
+      "binary": "jsonui-test",
+      "command": "validate",
+      "synopsis": "jsonui-test validate <path>",
+      "purpose": {
+        "en": "Validate test JSON files (schema, reference integrity, element ID existence).",
+        "ja": "テスト JSON ファイル検証（スキーマ、参照整合性、要素 ID の存在）。"
+      },
+      "options": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-test validate tests/\n✓ 12 screen tests valid\n✓ 3 flow tests valid"
+        }
+      ],
+      "seeAlso": ["jsonui-test run"]
+    },
+    {
+      "binary": "jsonui-test",
+      "command": "generate",
+      "synopsis": "jsonui-test generate <screen|flow|action> <name>",
+      "purpose": {
+        "en": "Create a skeleton test file from a screen spec or flow definition.",
+        "ja": "screen spec または flow 定義からテストファイル雛形を生成。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": ["jsonui-test validate"]
+    },
+    {
+      "binary": "jsonui-test",
+      "command": "run",
+      "synopsis": "jsonui-test run [--driver <driver>] [<spec>]",
+      "purpose": {
+        "en": "Run tests against the specified driver. `--driver` = `web` (Playwright) / `ios` (XCUITest) / `android` (UIAutomator).",
+        "ja": "指定 driver でテストを実行。`--driver` = `web`（Playwright）/ `ios`（XCUITest）/ `android`（UIAutomator）。"
+      },
+      "options": [
+        {
+          "name": "--driver",
+          "type": "string",
+          "required": true,
+          "description": {
+            "en": "`web` / `ios` / `android`.",
+            "ja": "`web` / `ios` / `android`。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-test run --driver web --spec tests/screens/hello-world.test.json"
+        }
+      ],
+      "seeAlso": ["jsonui-test validate"]
+    },
+
+    {
+      "binary": "jsonui-doc",
+      "command": "init",
+      "synopsis": "jsonui-doc init <project>",
+      "purpose": {
+        "en": "Initialize a JsonUI documentation site at the given path.",
+        "ja": "指定パスに JsonUI ドキュメントサイトを初期化。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": []
+    },
+    {
+      "binary": "jsonui-doc",
+      "command": "generate spec",
+      "synopsis": "jsonui-doc generate spec <spec-file>",
+      "purpose": {
+        "en": "Generate an HTML document from a screen spec.",
+        "ja": "screen spec から HTML 文書を生成。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": ["jsonui-doc validate spec"]
+    },
+    {
+      "binary": "jsonui-doc",
+      "command": "generate component",
+      "synopsis": "jsonui-doc generate component <component-spec>",
+      "purpose": {
+        "en": "Generate an HTML document from a component spec.",
+        "ja": "component spec から HTML 文書を生成。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": []
+    },
+    {
+      "binary": "jsonui-doc",
+      "command": "validate spec",
+      "synopsis": "jsonui-doc validate spec <spec-file>",
+      "purpose": {
+        "en": "Verify that a spec and its generated HTML document are in sync.",
+        "ja": "spec と生成 HTML 文書の整合性を検証。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": ["jsonui-doc generate spec"]
+    },
+    {
+      "binary": "jsonui-doc",
+      "command": "rules",
+      "synopsis": "jsonui-doc rules <init|show>",
+      "purpose": {
+        "en": "Manage project-local documentation rules. `init` creates `.jsonui-doc-rules.json`; `show` prints the effective ruleset.",
+        "ja": "プロジェクトローカルの doc ルールを管理。`init` で `.jsonui-doc-rules.json` を作成、`show` で有効ルールを表示。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": []
+    }
+  ]
+}

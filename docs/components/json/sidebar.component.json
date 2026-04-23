@@ -1,0 +1,112 @@
+{
+  "type": "component_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "Sidebar",
+    "displayName": "Sidebar",
+    "description": "Site-wide left-rail navigation. Renders a persistent vertical column that lists every documentation route grouped by category (Learn / Guides / Concepts / Reference / Platforms / Tools). Each section is a collapsible group with a leading category icon (rendered via the standard `Image` type against docs/screens/images/icon_<sectionId>.svg); under the header an `<ul>` of links where each row carries aria-current='page' when the row URL matches the active route. Consumer (Chrome screen ViewModel) seeds the items catalog, owns the collapse state, and handles the toggle / link-tap events. Component stays presentational — it renders what it's given and fires events; all state lives outside.",
+    "platforms": ["web"],
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23",
+    "category": "navigation"
+  },
+  "structure": {
+    "components": [
+      {
+        "type": "View",
+        "id": "sidebar_root",
+        "description": "<aside> element — the sidebar column."
+      }
+    ],
+    "layout": {
+      "root": "sidebar_root",
+      "children": []
+    }
+  },
+  "props": {
+    "items": [
+      {
+        "name": "items",
+        "type": "Array(SidebarSection)",
+        "required": true,
+        "description": "Ordered list of nav sections. Each section is a SidebarSection with id, label, iconName, and a list of entries. The consumer seeds this from a static catalog keyed by URL."
+      },
+      {
+        "name": "activeUrl",
+        "type": "String",
+        "required": true,
+        "description": "Current route pathname (e.g. '/learn/installation'). The component marks the row whose url matches with aria-current='page' and an accent styling."
+      },
+      {
+        "name": "collapsedIds",
+        "type": "Array(String)",
+        "required": true,
+        "description": "Ids of sections currently collapsed. Sections not in this list render expanded. Default: empty (all expanded)."
+      },
+      {
+        "name": "mobileOpen",
+        "type": "Bool",
+        "required": false,
+        "defaultValue": false,
+        "description": "Under 1024px viewports the sidebar is hidden by default; flip this to true to slide it in as a drawer. CSS handles the transform; the component sets data-mobile-open accordingly."
+      }
+    ]
+  },
+  "stateManagement": { "states": [], "uiVariables": [], "eventHandlers": [], "displayLogic": [] },
+  "exposedEvents": [
+    {
+      "name": "onToggleSection",
+      "params": [{ "name": "id", "type": "String" }],
+      "description": "Fires when a section header is tapped. Consumer toggles membership of id in its collapsedIds state."
+    },
+    {
+      "name": "onLinkTap",
+      "params": [{ "name": "url", "type": "String" }],
+      "description": "Fires after a navigation link is clicked. No preventDefault — the underlying <a> still navigates. Consumer uses this to close the mobile drawer on tap."
+    }
+  ],
+  "slots": { "items": [] },
+  "usage": {
+    "example": {
+      "layoutSnippet": "{\n  \"type\": \"Sidebar\",\n  \"items\": \"@{navItems}\",\n  \"activeUrl\": \"@{activeUrl}\",\n  \"collapsedIds\": \"@{collapsedIds}\",\n  \"mobileOpen\": \"@{mobileOpen}\",\n  \"onToggleSection\": \"@{onToggleSection}\",\n  \"onLinkTap\": \"@{onLinkTap}\"\n}"
+    }
+  },
+  "dataFlow": {
+    "diagram": "flowchart LR\n    VM[ChromeViewModel] -- items/activeUrl/collapsedIds/mobileOpen --> Sidebar\n    Sidebar -- onToggleSection(id) --> VM\n    Sidebar -- onLinkTap(url) --> VM",
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "SidebarSection",
+        "properties": [
+          { "name": "id",       "type": "String", "description": "Stable section id ('learn', 'guides', 'concepts', 'reference', 'platforms', 'tools'). Also matches the icon basename: iconName='learn' → /images/icon_learn.svg." },
+          { "name": "label",    "type": "String", "description": "Display label (already resolved through StringManager by the VM)." },
+          { "name": "iconName", "type": "String", "description": "SVG basename under docs/screens/images/ WITHOUT the icon_ prefix. Component prepends internally." },
+          { "name": "entries",  "type": "Array(SidebarEntry)", "description": "Per-row children." }
+        ]
+      },
+      {
+        "name": "SidebarEntry",
+        "properties": [
+          { "name": "id",    "type": "String", "description": "Row key." },
+          { "name": "label", "type": "String", "description": "Localized title (resolved by VM, not by the component)." },
+          { "name": "url",   "type": "String", "description": "Navigation target; must match a Next.js App Router route." }
+        ]
+      }
+    ]
+  },
+  "notes": [
+    "Icon rendering uses CSS `mask-image: url(/images/icon_<iconName>.svg); background-color: currentColor` so the active / inactive icon colour can flip via CSS `color`. Direct <img> would ignore currentColor.",
+    "Component self-localizes the outer `aria-label` via StringManager.getString('chrome_sidebar_aria_label') — no prop needed. Consumers can override via the standard aria-label pass-through if desired.",
+    "All state is external. Component does NOT read localStorage, does NOT persist anything. Persistence is the ChromeViewModel's concern.",
+    "Responsive behavior is CSS-driven. Under 1024px the sidebar translates off-screen by default; setting mobileOpen=true slides it in. Consumer triggers this via the top-bar menu button.",
+    "Every prop must be bound (`@{name}`). Array + String + Bool + event props all flow through the standard rjui binding pipeline."
+  ],
+  "relatedFiles": [
+    { "type": "Component", "path": "docs/components/json/sidebar.component.json",                                    "description": "This spec." },
+    { "type": "Converter", "path": "jsonui-doc-web/rjui_tools/lib/react/converters/extensions/sidebar_converter.rb", "description": "Ruby converter; scaffolded via `jui g converter`, then hand-adjusted for add_viewmodel_data_prefix and event-prop emission (mirror the table_of_contents_converter.rb pattern)." },
+    { "type": "Component", "path": "jsonui-doc-web/src/components/extensions/Sidebar.tsx",                           "description": "React implementation." },
+    { "type": "Assets",    "path": "docs/screens/images/icon_<id>.svg",                                              "description": "12 SVG icons. The 6 needed by this component: icon_learn, icon_guides, icon_concepts, icon_reference, icon_platforms, icon_tools." }
+  ]
+}

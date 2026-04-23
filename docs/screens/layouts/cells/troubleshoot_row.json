@@ -1,0 +1,76 @@
+{
+  "type": "View",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "wrapContent",
+  "style": "card_surface",
+  "child": [
+    {
+      "data": [
+        { "name": "symptomKey", "class": "String" },
+        { "name": "causeKey", "class": "String" },
+        { "name": "fixKey", "class": "String" },
+        { "name": "rowVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "indicatorKey", "class": "String", "defaultValue": "▸" },
+        { "name": "onToggle", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "View",
+      "orientation": "horizontal",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "tapBackground": "#F3F4F6",
+      "onClick": "@{onToggle}",
+      "child": [
+        {
+          "type": "Label",
+          "width": "wrapContent",
+          "height": "wrapContent",
+          "rightMargin": 8,
+          "fontSize": 14,
+          "fontWeight": "semibold",
+          "fontColor": "#2563EB",
+          "text": "@{indicatorKey}"
+        },
+        {
+          "type": "Label",
+          "weight": 1,
+          "height": "wrapContent",
+          "fontSize": 15,
+          "fontWeight": "semibold",
+          "fontColor": "#0B1220",
+          "text": "@{symptomKey}"
+        }
+      ]
+    },
+    {
+      "type": "View",
+      "orientation": "vertical",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 10,
+      "visibility": "@{rowVisibility}",
+      "child": [
+        {
+          "type": "Label",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "fontSize": 13,
+          "fontColor": "#475467",
+          "text": "@{causeKey}"
+        },
+        {
+          "type": "Label",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 6,
+          "fontSize": 14,
+          "fontWeight": "semibold",
+          "fontColor": "#0B1220",
+          "text": "@{fixKey}"
+        }
+      ]
+    }
+  ]
+}

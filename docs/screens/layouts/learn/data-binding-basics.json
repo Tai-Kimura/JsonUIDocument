@@ -1,0 +1,528 @@
+{
+  "type": "View",
+  "id": "learn_data_binding_basics_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateLearn",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "learn_data_binding_basics_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "learn_data_binding_basics_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            24,
+            32
+          ],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateLearn}",
+              "text": "breadcrumb",
+              "width": "wrapContent"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "#475467",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "#64748B",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "learn_data_binding_basics_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "learn_data_binding_basics_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_skeleton",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_skeleton_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_skeleton_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// counter.spec.json (minimum)\n{\n  \"metadata\": { \"name\": \"Counter\", \"platforms\": [\"web\"], \"layoutFile\": \"counter\" },\n  \"stateManagement\": {\n    \"uiVariables\": [\n      { \"name\": \"count\", \"type\": \"Int\", \"initial\": \"0\" },\n      { \"name\": \"statusVisibility\", \"type\": \"String\", \"initial\": \"\\\"gone\\\"\" }\n    ],\n    \"eventHandlers\": [\n      { \"name\": \"onIncrement\" },\n      { \"name\": \"onDecrement\" }\n    ]\n  }\n}",
+                      "language": "json",
+                      "filename": "counter.spec.json",
+                      "showLineNumbers": true,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_value",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_value_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_value_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// docs/screens/layouts/counter.json\n{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Label\", \"fontSize\": 48, \"text\": \"@{count}\" }\n  ]\n}",
+                      "language": "json",
+                      "filename": "counter.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_vis",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_vis_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_vis_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// Add a second label that appears only when count > 0\n{\n  \"type\": \"Label\",\n  \"fontSize\": 18,\n  \"fontColor\": \"#2563EB\",\n  \"visibility\": \"@{statusVisibility}\",\n  \"text\": \"status_ok\"\n}\n\n// In the ViewModel:\n// statusVisibility = count > 0 ? 'visible' : 'gone'\n// recomputed on every onIncrement / onDecrement.",
+                      "language": "text",
+                      "filename": "layout + VM excerpt",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_event",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_event_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_event_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// Two buttons, each bound to a ViewModel event\n{\n  \"type\": \"View\",\n  \"orientation\": \"horizontal\",\n  \"child\": [\n    { \"type\": \"Button\", \"text\": \"btn_minus\", \"onClick\": \"@{onDecrement}\" },\n    { \"type\": \"Button\", \"text\": \"btn_plus\",  \"onClick\": \"@{onIncrement}\" }\n  ]\n}",
+                      "language": "json",
+                      "filename": "layout excerpt",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_trouble",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_trouble_heading"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "trouble_1_symptom"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 4,
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "trouble_1_fix"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "trouble_2_symptom"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 4,
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "trouble_2_fix"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "trouble_3_symptom"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 4,
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "trouble_3_fix"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "learn_data_binding_basics_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    32,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "#0B1220",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "#F9FAFB",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "learn_data_binding_basics_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 2,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/next_step_card"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "learn_data_binding_basics_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "#0B1220",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "#94A3B8",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "learn_data_binding_basics_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [
+                24,
+                16,
+                24,
+                16
+              ],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "learn_data_binding_basics_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    0,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        {
+                          "id": "toc_skeleton",
+                          "label": "toc_row_skeleton",
+                          "anchor": "section_skeleton",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_value",
+                          "label": "toc_row_value",
+                          "anchor": "section_value",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_vis",
+                          "label": "toc_row_vis",
+                          "anchor": "section_vis",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_event",
+                          "label": "toc_row_event",
+                          "anchor": "section_event",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_trouble",
+                          "label": "toc_row_trouble",
+                          "anchor": "section_trouble",
+                          "level": 1
+                        }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

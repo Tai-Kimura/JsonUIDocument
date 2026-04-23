@@ -1,0 +1,120 @@
+{
+  "category": "binding",
+  "title": "Binding attributes",
+  "description": "Binding attributes link JSON values to ViewModel state via the `@{...}` syntax. Three kinds: value binding, string resolution, and event binding.",
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_bind",
+              "name": "bind",
+              "type": "string | object",
+              "required": "",
+              "description": "Data binding expression (alias)",
+              "summary": "Alias for `binding`."
+            },
+            {
+              "id": "attr_binding",
+              "name": "binding",
+              "type": "string | object",
+              "required": "",
+              "description": "Data binding expression",
+              "summary": "Explicit binding declaration for attributes that do not use the `@{...}` inline syntax. Rarely used directly — most binding happens via `@{...}` in attribute values."
+            },
+            {
+              "id": "attr_binding_script",
+              "name": "bindingScript",
+              "type": "string",
+              "required": "",
+              "description": "Custom Swift binding code",
+              "summary": "Inline JavaScript expression evaluated against the ViewModel. Use for complex derived values where `@{...}` is not expressive enough. Prefer `computed` in the spec's `stateManagement`.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_binding_group",
+              "name": "binding_group",
+              "type": "string | array",
+              "required": "",
+              "description": "Groups related bindings for batch updates (can be array for multiple groups)",
+              "summary": "Groups multiple bindings so they re-evaluate together. Use when several attributes on the same element should update atomically."
+            },
+            {
+              "id": "attr_binding_id",
+              "name": "binding_id",
+              "type": "string",
+              "required": "",
+              "description": "Binding ID",
+              "summary": "Stable identifier for a specific binding. Used by the Hot Loader to route targeted updates to the right element.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_data",
+              "name": "data",
+              "type": "array",
+              "required": "",
+              "description": "Data model definitions for binding",
+              "summary": "Declares the ViewModel properties this Layout segment expects. Appears at the top of a Layout as `{ \"data\": [...] }`.",
+              "examples": [
+                {
+                  "language": "json",
+                  "code": "{ \"data\": [\n  { \"name\": \"userName\", \"class\": \"String\", \"defaultValue\": \"\" },\n  { \"name\": \"onTap\", \"class\": \"() -> Void\" }\n] }"
+                }
+              ]
+            },
+            {
+              "id": "attr_property_name",
+              "name": "propertyName",
+              "type": "string",
+              "required": "",
+              "description": "Property name for binding",
+              "summary": "Specifies the ViewModel property name that this element's value binding writes to. Sometimes required for custom components whose attribute-to-property mapping isn't automatic.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_shared_data",
+              "name": "shared_data",
+              "type": "object",
+              "required": "",
+              "description": "Data passed to included components",
+              "summary": "Declares data shared with parent screens. Used in include'd partials to propagate state upward."
+            },
+            {
+              "id": "attr_variables",
+              "name": "variables",
+              "type": "object",
+              "required": "",
+              "description": "Variables for include",
+              "summary": "Alternative to `data`: compact local variable declarations. Used in cell layouts that receive item data via `@{item.*}`.",
+              "platform": "swift"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "breakpoints": null,
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_components",
+              "titleKey": "next_components_title",
+              "descriptionKey": "next_components_body",
+              "url": "/reference/components"
+            },
+            {
+              "id": "next_attributes_root",
+              "titleKey": "next_attributes_root_title",
+              "descriptionKey": "next_attributes_root_body",
+              "url": "/reference/attributes"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

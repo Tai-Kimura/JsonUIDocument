@@ -1,0 +1,1082 @@
+{
+  "type": "View",
+  "id": "learn_installation_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "installTargets",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "prerequisites",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "verifyRows",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "troubleshootRows",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "relatedLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "partialUpdateBodyVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "customPathBodyVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "individualInstallBodyVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "uninstallBodyVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "onTogglePartialUpdate",
+          "class": "() -> Void"
+        },
+        {
+          "name": "onToggleCustomPath",
+          "class": "() -> Void"
+        },
+        {
+          "name": "onToggleIndividualInstall",
+          "class": "() -> Void"
+        },
+        {
+          "name": "onToggleUninstall",
+          "class": "() -> Void"
+        },
+        {
+          "name": "onNavigateHelloWorld",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "learn_installation_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "id": "learn_installation_header",
+          "style": "page_header",
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "text": "eyebrow",
+              "width": "wrapContent"
+            },
+            {
+              "type": "Label",
+              "id": "learn_installation_title",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "headline"
+            },
+            {
+              "type": "Label",
+              "id": "learn_installation_subcopy",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 18,
+              "fontColor": "#475467",
+              "text": "subcopy"
+            },
+            {
+              "type": "View",
+              "id": "learn_installation_cta_wrap",
+              "orientation": "vertical",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "child": [
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "code": "curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/JsonUI-Agents-for-claude/main/installer/bootstrap.sh | bash",
+                  "language": "bash",
+                  "filename": "shell",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "learn_installation_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "learn_installation_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "id": "learn_installation_targets",
+                  "style": "home_section",
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "style": "section_heading",
+                      "text": "targets_heading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "Label",
+                      "style": "section_subheading",
+                      "text": "targets_subheading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "learn_installation_targets_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 24,
+                      "columnCount": 3,
+                      "lineSpacing": 24,
+                      "itemSpacing": 24,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{installTargets}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/install_target_card"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 13,
+                      "fontColor": "#475467",
+                      "text": "targets_footnote"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "learn_installation_prereqs",
+                  "style": "home_section",
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "style": "section_heading",
+                      "text": "prereq_heading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "Label",
+                      "style": "section_subheading",
+                      "text": "prereq_subheading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "learn_installation_prereq_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 24,
+                      "columnCount": 1,
+                      "lineSpacing": 12,
+                      "itemSpacing": 12,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{prerequisites}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/prereq_row"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "learn_installation_steps",
+                  "style": "home_section",
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "style": "section_heading",
+                      "text": "steps_heading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "Label",
+                      "style": "section_subheading",
+                      "text": "steps_subheading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "View",
+                      "id": "learn_installation_step_1",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 24,
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "child": [
+                            {
+                              "type": "Label",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                4,
+                                12,
+                                4,
+                                12
+                              ],
+                              "fontSize": 13,
+                              "fontWeight": "semibold",
+                              "fontColor": "#FFFFFF",
+                              "background": "#2563EB",
+                              "cornerRadius": 999,
+                              "text": "step1_number"
+                            },
+                            {
+                              "type": "Label",
+                              "weight": 1,
+                              "height": "wrapContent",
+                              "leftMargin": 12,
+                              "fontSize": 20,
+                              "fontWeight": "semibold",
+                              "fontColor": "#0B1220",
+                              "text": "step1_title"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 8,
+                          "fontSize": 15,
+                          "fontColor": "#475467",
+                          "text": "step1_body"
+                        },
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "code": "curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/JsonUI-Agents-for-claude/main/installer/bootstrap.sh | bash",
+                          "language": "bash",
+                          "filename": "shell",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "learn_installation_step_2",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "child": [
+                            {
+                              "type": "Label",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                4,
+                                12,
+                                4,
+                                12
+                              ],
+                              "fontSize": 13,
+                              "fontWeight": "semibold",
+                              "fontColor": "#FFFFFF",
+                              "background": "#2563EB",
+                              "cornerRadius": 999,
+                              "text": "step2_number"
+                            },
+                            {
+                              "type": "Label",
+                              "weight": 1,
+                              "height": "wrapContent",
+                              "leftMargin": 12,
+                              "fontSize": 20,
+                              "fontWeight": "semibold",
+                              "fontColor": "#0B1220",
+                              "text": "step2_title"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 8,
+                          "fontSize": 15,
+                          "fontColor": "#475467",
+                          "text": "step2_body"
+                        },
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "code": "cat >> ~/.zshrc <<'EOF'\n# JsonUI CLI Tools\nexport PATH=\"$HOME/.jsonui-cli/sjui_tools/bin:$PATH\"\nexport PATH=\"$HOME/.jsonui-cli/kjui_tools/bin:$PATH\"\nexport PATH=\"$HOME/.jsonui-cli/rjui_tools/bin:$PATH\"\nEOF\nsource ~/.zshrc",
+                          "language": "bash",
+                          "filename": "~/.zshrc",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "learn_installation_step_3",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "child": [
+                            {
+                              "type": "Label",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                4,
+                                12,
+                                4,
+                                12
+                              ],
+                              "fontSize": 13,
+                              "fontWeight": "semibold",
+                              "fontColor": "#FFFFFF",
+                              "background": "#2563EB",
+                              "cornerRadius": 999,
+                              "text": "step3_number"
+                            },
+                            {
+                              "type": "Label",
+                              "weight": 1,
+                              "height": "wrapContent",
+                              "leftMargin": 12,
+                              "fontSize": 20,
+                              "fontWeight": "semibold",
+                              "fontColor": "#0B1220",
+                              "text": "step3_title"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 8,
+                          "fontSize": 15,
+                          "fontColor": "#475467",
+                          "text": "step3_body"
+                        },
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "code": "Read CLAUDE.md",
+                          "language": "text",
+                          "filename": "Claude Code prompt",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "learn_installation_verify",
+                  "style": "home_section",
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "style": "section_heading",
+                      "text": "verify_heading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "Label",
+                      "style": "section_subheading",
+                      "text": "verify_subheading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "learn_installation_verify_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 24,
+                      "columnCount": 1,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{verifyRows}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/verify_row"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "learn_installation_update",
+                  "style": "home_section",
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "style": "section_heading",
+                      "text": "update_heading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "Label",
+                      "style": "section_subheading",
+                      "text": "update_subheading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "View",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "code": "curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/JsonUI-Agents-for-claude/main/installer/bootstrap.sh | bash",
+                          "language": "bash",
+                          "filename": "shell",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "fontSize": 13,
+                          "fontColor": "#475467",
+                          "text": "update_note"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "learn_installation_partial_update",
+                  "style": "home_section",
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "View",
+                      "orientation": "horizontal",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "tapBackground": "#E5E7EB",
+                      "onClick": "@{onTogglePartialUpdate}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "weight": 1,
+                          "height": "wrapContent",
+                          "fontSize": 22,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "partial_update_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "wrapContent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "#2563EB",
+                          "text": "expand_indicator"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "installation_partial_update_body",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "visibility": "@{partialUpdateBodyVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "partial_update_body"
+                        },
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "code": "# Agents only\ncurl -fsSL https://raw.githubusercontent.com/Tai-Kimura/JsonUI-Agents-for-claude/main/installer/bootstrap.sh | \\\n  JSONUI_BOOTSTRAP_STEPS=\"agents\" bash\n\n# CLI + MCP only (leaves the project untouched)\nJSONUI_BOOTSTRAP_STEPS=\"cli,mcp\" bash <(curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/JsonUI-Agents-for-claude/main/installer/bootstrap.sh)",
+                          "language": "bash",
+                          "filename": "shell",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 10,
+                          "fontSize": 13,
+                          "fontColor": "#475467",
+                          "text": "partial_update_footnote"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "learn_installation_custom_path",
+                  "style": "home_section",
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "View",
+                      "orientation": "horizontal",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "tapBackground": "#E5E7EB",
+                      "onClick": "@{onToggleCustomPath}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "weight": 1,
+                          "height": "wrapContent",
+                          "fontSize": 22,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "custom_path_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "wrapContent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "#2563EB",
+                          "text": "expand_indicator"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "installation_custom_path_body",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "visibility": "@{customPathBodyVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "custom_path_body"
+                        },
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "code": "# Install everything under /opt/jsonui\nexport JSONUI_CLI_DIR=/opt/jsonui/cli\nexport JSONUI_MCP_DIR=/opt/jsonui/mcp\ncurl -fsSL https://raw.githubusercontent.com/Tai-Kimura/JsonUI-Agents-for-claude/main/installer/bootstrap.sh | bash",
+                          "language": "bash",
+                          "filename": "shell",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 10,
+                          "fontSize": 13,
+                          "fontColor": "#475467",
+                          "text": "custom_path_vars"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 8,
+                          "fontSize": 13,
+                          "fontColor": "#475467",
+                          "text": "custom_path_note"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "learn_installation_individual",
+                  "style": "home_section",
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "View",
+                      "orientation": "horizontal",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "tapBackground": "#E5E7EB",
+                      "onClick": "@{onToggleIndividualInstall}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "weight": 1,
+                          "height": "wrapContent",
+                          "fontSize": 22,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "individual_install_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "wrapContent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "#2563EB",
+                          "text": "expand_indicator"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "installation_individual_install_body",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "visibility": "@{individualInstallBodyVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "individual_install_body"
+                        },
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "code": "# CLI only\ncurl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-cli/main/installer/bootstrap.sh | bash\n\n# MCP only\ncurl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-mcp-server/main/install.sh | bash\n\n# Agents only\ncurl -fsSL https://raw.githubusercontent.com/Tai-Kimura/JsonUI-Agents-for-claude/main/install.sh | bash",
+                          "language": "bash",
+                          "filename": "shell",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "learn_installation_uninstall",
+                  "style": "home_section",
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "View",
+                      "orientation": "horizontal",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "tapBackground": "#E5E7EB",
+                      "onClick": "@{onToggleUninstall}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "weight": 1,
+                          "height": "wrapContent",
+                          "fontSize": 22,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "uninstall_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "wrapContent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "#2563EB",
+                          "text": "expand_indicator"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "installation_uninstall_body",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "visibility": "@{uninstallBodyVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "uninstall_body"
+                        },
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "code": "# MCP entry + extension\nbash ~/.jsonui-mcp-server/uninstall.sh\nrm -rf ~/.jsonui-mcp-server\n\n# CLI\nrm -rf ~/.jsonui-cli\n# Then remove the PATH lines from ~/.zshrc by hand.\n\n# Agents (from the project)\nrm -rf .claude CLAUDE.md",
+                          "language": "bash",
+                          "filename": "shell",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "learn_installation_trouble",
+                  "style": "home_section",
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "style": "section_heading",
+                      "text": "trouble_heading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "Label",
+                      "style": "section_subheading",
+                      "text": "trouble_subheading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "learn_installation_trouble_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 24,
+                      "columnCount": 1,
+                      "lineSpacing": 12,
+                      "itemSpacing": 12,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{troubleshootRows}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/troubleshoot_row"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "learn_installation_related",
+                  "style": "home_section",
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "style": "section_heading",
+                      "text": "related_heading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "Label",
+                      "style": "section_subheading",
+                      "text": "related_subheading",
+                      "width": "matchParent"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "learn_installation_related_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 24,
+                      "columnCount": 1,
+                      "lineSpacing": 12,
+                      "itemSpacing": 12,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{relatedLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/related_link"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "learn_installation_next",
+                  "style": "home_section",
+                  "background": "#0B1220",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 28,
+                      "fontWeight": "bold",
+                      "fontColor": "#F9FAFB",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 15,
+                      "fontColor": "#CBD5F5",
+                      "text": "next_subheading"
+                    },
+                    {
+                      "type": "Button",
+                      "id": "learn_installation_next_cta",
+                      "style": "primary_button",
+                      "topMargin": 20,
+                      "text": "next_cta",
+                      "onClick": "@{onNavigateHelloWorld}"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "learn_installation_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "#0B1220",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "#94A3B8",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "learn_installation_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [
+                24,
+                16,
+                24,
+                16
+              ],
+              "child": [
+                {
+                  "type": "View",
+                  "id": "learn_installation_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    24,
+                    24,
+                    24
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        {
+                          "id": "toc_targets",
+                          "label": "toc_label_targets",
+                          "anchor": "learn_installation_targets",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_prereqs",
+                          "label": "toc_label_prereqs",
+                          "anchor": "learn_installation_prereqs",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_steps",
+                          "label": "toc_label_steps",
+                          "anchor": "learn_installation_steps",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_verify",
+                          "label": "toc_label_verify",
+                          "anchor": "learn_installation_verify",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_update",
+                          "label": "toc_label_update",
+                          "anchor": "learn_installation_update",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_partial_update",
+                          "label": "toc_label_partial_update",
+                          "anchor": "learn_installation_partial_update",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_custom_path",
+                          "label": "toc_label_custom_path",
+                          "anchor": "learn_installation_custom_path",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_individual",
+                          "label": "toc_label_individual",
+                          "anchor": "learn_installation_individual",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_uninstall",
+                          "label": "toc_label_uninstall",
+                          "anchor": "learn_installation_uninstall",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_trouble",
+                          "label": "toc_label_trouble",
+                          "anchor": "learn_installation_trouble",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_related",
+                          "label": "toc_label_related",
+                          "anchor": "learn_installation_related",
+                          "level": 1
+                        }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

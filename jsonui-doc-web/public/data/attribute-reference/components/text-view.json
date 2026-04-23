@@ -1,0 +1,433 @@
+{
+  "component": "TextView",
+  "kebab": "text-view",
+  "aliasOf": null,
+  "title": "TextView",
+  "description": "Multi-line text input for long-form user-entered strings (comments, descriptions, messages). Grows vertically with content unless constrained by `height`.",
+  "usage": "Use TextView when expected input exceeds one line. For messaging UI, pair with a fixed-height container and a Scroll.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Auto-growing multi-line",
+              "language": "json",
+              "code": "{\n  \"type\": \"TextView\",\n  \"text\": \"@{description}\",\n  \"hint\": \"@string/description_placeholder\",\n  \"width\": \"matchParent\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Character counter",
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"TextView\", \"text\": \"@{bio}\", \"maxLength\": 160 },\n    { \"type\": \"Label\", \"text\": \"@{bio.length}/160\", \"fontSize\": 12, \"fontColor\": \"#9CA3AF\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "Fixed height (internal scroll)",
+              "language": "json",
+              "code": "{\n  \"type\": \"TextView\",\n  \"text\": \"@{longText}\",\n  \"width\": \"matchParent\",\n  \"height\": 200\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_text",
+              "name": "text",
+              "type": "string | binding",
+              "required": "",
+              "description": "Text content (binding for two-way)",
+              "note": "Two-way. Same semantics as TextField.text. Multi-line input preserves newlines.",
+              "bindingDirection": "two-way"
+            },
+            {
+              "id": "attr_hint",
+              "name": "hint",
+              "type": "string",
+              "required": "",
+              "description": "Placeholder text (primary)",
+              "note": "Placeholder shown while empty. Supports multi-line hints."
+            },
+            {
+              "id": "attr_max_length",
+              "name": "maxLength",
+              "type": "number",
+              "required": "",
+              "description": "Maximum input length",
+              "note": "Positive integer; enforced platform-side. Characters beyond limit are silently dropped.",
+              "platform": "react"
+            },
+            {
+              "id": "attr_font_size",
+              "name": "fontSize",
+              "type": "number | binding",
+              "required": "",
+              "description": "Font size (binding supported)"
+            },
+            {
+              "id": "attr_font_color",
+              "name": "fontColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Font color - hex string or color name from colors.json (binding supported)"
+            },
+            {
+              "id": "attr_text_align",
+              "name": "textAlign",
+              "type": "string",
+              "required": "",
+              "description": "Text alignment",
+              "enumValues": [
+                "Left",
+                "Center",
+                "Right",
+                "left",
+                "center",
+                "right"
+              ]
+            },
+            {
+              "id": "attr_allows_editing_text_attributes",
+              "name": "allowsEditingTextAttributes",
+              "type": "boolean",
+              "required": "",
+              "description": "Allow editing text attributes",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_cols",
+              "name": "cols",
+              "type": "number",
+              "required": "",
+              "description": "Number of visible columns",
+              "platform": "react"
+            },
+            {
+              "id": "attr_container_inset",
+              "name": "containerInset",
+              "type": "number | array",
+              "required": "",
+              "description": "Container inset"
+            },
+            {
+              "id": "attr_data_detector_types",
+              "name": "dataDetectorTypes",
+              "type": "string",
+              "required": "",
+              "description": "Data detector types",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_disabled_background",
+              "name": "disabledBackground",
+              "type": "string",
+              "required": "",
+              "description": "Background color when disabled - hex string or color name from colors.json",
+              "platform": "react"
+            },
+            {
+              "id": "attr_editable",
+              "name": "editable",
+              "type": "boolean",
+              "required": "",
+              "description": "Enable/disable editing"
+            },
+            {
+              "id": "attr_flexible",
+              "name": "flexible",
+              "type": "boolean",
+              "required": "",
+              "description": "Enable flexible height"
+            },
+            {
+              "id": "attr_font",
+              "name": "font",
+              "type": "string | binding",
+              "required": "",
+              "description": "Font name or 'bold' (binding supported)"
+            },
+            {
+              "id": "attr_font_family",
+              "name": "fontFamily",
+              "type": "string | binding",
+              "required": "",
+              "description": "Font family name (e.g., Noto Sans JP). Resolved via Configuration.Font.fontProvider."
+            },
+            {
+              "id": "attr_hide_on_focused",
+              "name": "hideOnFocused",
+              "type": "boolean",
+              "required": "",
+              "description": "Hide placeholder when focused"
+            },
+            {
+              "id": "attr_hint_attributes",
+              "name": "hintAttributes",
+              "type": "object",
+              "required": "",
+              "description": "Hint styling attributes"
+            },
+            {
+              "id": "attr_hint_color",
+              "name": "hintColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Placeholder color - hex string or color name from colors.json (binding supported)"
+            },
+            {
+              "id": "attr_hint_font",
+              "name": "hintFont",
+              "type": "string",
+              "required": "",
+              "description": "Placeholder font"
+            },
+            {
+              "id": "attr_hint_font_size",
+              "name": "hintFontSize",
+              "type": "number",
+              "required": "",
+              "description": "Placeholder font size"
+            },
+            {
+              "id": "attr_hint_line_height_multiple",
+              "name": "hintLineHeightMultiple",
+              "type": "number",
+              "required": "",
+              "description": "Placeholder line height multiplier"
+            },
+            {
+              "id": "attr_input",
+              "name": "input",
+              "type": "string",
+              "required": "",
+              "description": "Input type (includes 'allphabet' typo for backward compatibility)",
+              "enumValues": [
+                "default",
+                "alphabet",
+                "allphabet",
+                "email",
+                "number",
+                "phone",
+                "url",
+                "password",
+                "decimal"
+              ]
+            },
+            {
+              "id": "attr_keyboard_type",
+              "name": "keyboardType",
+              "type": "string",
+              "required": "",
+              "description": "Keyboard type"
+            },
+            {
+              "id": "attr_line_break_mode",
+              "name": "lineBreakMode",
+              "type": "string",
+              "required": "",
+              "description": "Line break mode"
+            },
+            {
+              "id": "attr_on_begin_editing",
+              "name": "onBeginEditing",
+              "type": "string",
+              "required": "",
+              "description": "Begin editing event handler",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_change_selection",
+              "name": "onChangeSelection",
+              "type": "string",
+              "required": "",
+              "description": "Selection change event handler",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_end_editing",
+              "name": "onEndEditing",
+              "type": "string",
+              "required": "",
+              "description": "End editing event handler",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_should_begin_editing",
+              "name": "onShouldBeginEditing",
+              "type": "string",
+              "required": "",
+              "description": "Should begin editing event handler (return true to allow)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_should_change_text",
+              "name": "onShouldChangeText",
+              "type": "string",
+              "required": "",
+              "description": "Should change text event handler (return true to allow)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_should_end_editing",
+              "name": "onShouldEndEditing",
+              "type": "string",
+              "required": "",
+              "description": "Should end editing event handler (return true to allow)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_text_change",
+              "name": "onTextChange",
+              "type": "string",
+              "required": "",
+              "description": "Text change event selector"
+            },
+            {
+              "id": "attr_pattern",
+              "name": "pattern",
+              "type": "string",
+              "required": "",
+              "description": "Input validation pattern",
+              "platform": "react"
+            },
+            {
+              "id": "attr_placeholder",
+              "name": "placeholder",
+              "type": "string",
+              "required": "",
+              "description": "Placeholder text (alias for hint)"
+            },
+            {
+              "id": "attr_required",
+              "name": "required",
+              "type": "boolean",
+              "required": "",
+              "description": "Required field validation",
+              "platform": "react"
+            },
+            {
+              "id": "attr_resize",
+              "name": "resize",
+              "type": "string",
+              "required": "",
+              "description": "Resize behavior",
+              "platform": "react",
+              "enumValues": [
+                "none",
+                "both",
+                "horizontal",
+                "vertical"
+              ]
+            },
+            {
+              "id": "attr_return_key_type",
+              "name": "returnKeyType",
+              "type": "string",
+              "required": "",
+              "description": "Return key type",
+              "enumValues": [
+                "Done",
+                "Go",
+                "Next",
+                "Return",
+                "Search",
+                "Send",
+                "Continue",
+                "Join",
+                "Route",
+                "Yahoo",
+                "Google"
+              ]
+            },
+            {
+              "id": "attr_rows",
+              "name": "rows",
+              "type": "number",
+              "required": "",
+              "description": "Number of visible rows",
+              "platform": "react"
+            },
+            {
+              "id": "attr_scroll_enabled",
+              "name": "scrollEnabled",
+              "type": "boolean",
+              "required": "",
+              "description": "Enable/disable scrolling"
+            },
+            {
+              "id": "attr_selectable",
+              "name": "selectable",
+              "type": "boolean",
+              "required": "",
+              "description": "Whether text is selectable",
+              "platform": "react"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_text_field",
+              "name": "TextField",
+              "url": "/reference/components/text-field"
+            },
+            {
+              "id": "related_edit_text",
+              "name": "EditText",
+              "url": "/reference/components/edit-text"
+            },
+            {
+              "id": "related_input",
+              "name": "Input",
+              "url": "/reference/components/input"
+            },
+            {
+              "id": "related_label",
+              "name": "Label",
+              "url": "/reference/components/label"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

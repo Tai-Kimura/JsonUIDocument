@@ -1,0 +1,149 @@
+{
+  "category": "state",
+  "title": "State attributes",
+  "description": "State attributes control visibility, interaction, and opacity. Most are Boolean; `visibility` is tri-state.",
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_alpha",
+              "name": "alpha",
+              "type": "number | binding",
+              "required": "",
+              "description": "Opacity (0-1) - can be data binding",
+              "summary": "0.0–1.0. Translucency. `alpha: 0` is visually hidden but still receives touches — use `visibility` to disable entirely.",
+              "relatedAttributes": [
+                "opacity"
+              ]
+            },
+            {
+              "id": "attr_can_tap",
+              "name": "canTap",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Whether component is tappable (binding supported)",
+              "summary": "Boolean. When `false`, `onClick` handlers are not invoked. Use to disable interaction without visual change."
+            },
+            {
+              "id": "attr_confirmation_dialog",
+              "name": "confirmationDialog",
+              "type": "object",
+              "required": "",
+              "description": "Confirmation dialog configuration (iOS 15+)",
+              "summary": "If set to an object with `title` / `message` / `confirmText`, shows a native confirm dialog before the `onClick` handler fires.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_enabled",
+              "name": "enabled",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Whether component is enabled (can be data binding)",
+              "summary": "Boolean. When `false`, the component ignores user interaction and applies its disabled styling (dimmed / desaturated)."
+            },
+            {
+              "id": "attr_hidden",
+              "name": "hidden",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Whether component is hidden (can be data binding)",
+              "summary": "Shorthand for `visibility: 'gone'`. Boolean-valued. Deprecated for new code — prefer explicit `visibility`."
+            },
+            {
+              "id": "attr_opacity",
+              "name": "opacity",
+              "type": "number | binding",
+              "required": "",
+              "description": "Opacity (0-1), alias for alpha - can be data binding",
+              "summary": "Alias for `alpha` (CSS-style naming)."
+            },
+            {
+              "id": "attr_touch_disabled_state",
+              "name": "touchDisabledState",
+              "type": "string",
+              "required": "",
+              "description": "Touch disable mode",
+              "summary": "Disables touch when the component is in a specified state (e.g., while an animation runs).",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_touch_enabled_view_ids",
+              "name": "touchEnabledViewIds",
+              "type": "array",
+              "required": "",
+              "description": "IDs of enabled views",
+              "summary": "Array of sibling IDs that remain tappable even when this view blocks touches (e.g., for a dimming overlay that should not block specific buttons).",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_user_interaction_enabled",
+              "name": "userInteractionEnabled",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Enable user interaction (binding supported)",
+              "summary": "iOS-style alias for `canTap`."
+            },
+            {
+              "id": "attr_visibility",
+              "name": "visibility",
+              "type": "string | binding",
+              "required": "",
+              "description": "View visibility state (can be data binding)",
+              "summary": "`visible` / `invisible` / `gone`. `invisible` preserves space; `gone` removes from layout entirely.",
+              "values": [
+                {
+                  "value": "visible",
+                  "description": "Default. Rendered normally."
+                },
+                {
+                  "value": "invisible",
+                  "description": "Not rendered but occupies space (acts as an invisible placeholder)."
+                },
+                {
+                  "value": "gone",
+                  "description": "Not rendered and does not occupy space. Siblings shift to fill."
+                }
+              ],
+              "examples": [
+                {
+                  "language": "json",
+                  "code": "{ \"type\": \"View\", \"visibility\": \"@{hasError ? 'visible' : 'gone'}\" }"
+                }
+              ],
+              "enumValues": [
+                "visible",
+                "invisible",
+                "gone"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "breakpoints": null,
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_components",
+              "titleKey": "next_components_title",
+              "descriptionKey": "next_components_body",
+              "url": "/reference/components"
+            },
+            {
+              "id": "next_attributes_root",
+              "titleKey": "next_attributes_root_title",
+              "descriptionKey": "next_attributes_root_body",
+              "url": "/reference/attributes"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

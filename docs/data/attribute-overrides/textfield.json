@@ -1,0 +1,125 @@
+{
+  "component": "TextField",
+  "description": {
+    "en": "Single-line text input for short user-entered strings. For multi-line input use TextView. For secure input toggle `secure: true`.",
+    "ja": "短い文字列を受け取る単一行の入力フィールド。複数行は TextView を使う。パスワード入力は `secure: true` を指定。"
+  },
+  "usage": {
+    "en": "TextField owns its text state via two-way binding. The ViewModel declares the property as mutable (`@Published var text: String` on iOS / `MutableStateFlow<String>` on Android / plain mutable on web). TextField writes back through the bound property on every commit.",
+    "ja": "TextField は two-way binding で自身の text 状態を保持する。ViewModel 側で mutable プロパティ（iOS なら `@Published var text: String`、Android なら `MutableStateFlow<String>`、Web は通常の mutable）を宣言すると、確定ごとに書き戻される。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Minimum two-way binding", "ja": "最小の two-way binding" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TextField\",\n  \"text\": \"@{email}\",\n  \"hint\": \"@string/email_placeholder\",\n  \"contentType\": \"emailAddress\",\n  \"width\": \"matchParent\"\n}"
+    },
+    {
+      "title": { "en": "With validation error", "ja": "バリデーションエラー表示付き" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    {\n      \"type\": \"TextField\",\n      \"text\": \"@{email}\",\n      \"hint\": \"@string/email_placeholder\",\n      \"contentType\": \"emailAddress\",\n      \"onTextChange\": \"@{onEmailChanged}\"\n    },\n    {\n      \"type\": \"Label\",\n      \"text\": \"@{emailError}\",\n      \"visibility\": \"@{emailError != null && emailError != ''}\",\n      \"fontColor\": \"#EF4444\",\n      \"fontSize\": 12\n    }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Password", "ja": "パスワード" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TextField\",\n  \"text\": \"@{password}\",\n  \"secure\": true,\n  \"contentType\": \"password\",\n  \"hint\": \"@string/password_placeholder\"\n}"
+    },
+    {
+      "title": { "en": "Numeric with max length", "ja": "数値入力・最大文字数付き" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TextField\",\n  \"text\": \"@{age}\",\n  \"pattern\": \"^[0-9]*$\",\n  \"maxLength\": 3,\n  \"hint\": \"18\"\n}"
+    },
+    {
+      "title": { "en": "Submit on return", "ja": "リターンキーで送信" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TextField\",\n  \"text\": \"@{query}\",\n  \"hint\": \"@string/search_placeholder\",\n  \"returnKeyType\": \"search\",\n  \"onShouldReturn\": \"@{onSubmitSearch}\"\n}"
+    }
+  ],
+  "attributes": {
+    "text": {
+      "note": {
+        "en": "Always two-way. Must bind to a mutable ViewModel property. Use `onTextChange` for non-binding side effects.",
+        "ja": "常に two-way。ViewModel の mutable プロパティにバインドする必要がある。binding 以外の副作用が必要なら `onTextChange` を使う。"
+      }
+    },
+    "contentType": {
+      "note": {
+        "en": "Hints the keyboard / autofill behavior. Common values: `emailAddress`, `password`, `username`, `telephoneNumber`, `URL`, `fullStreetAddress`, `postalCode`, `creditCardNumber`. Maps to `UITextContentType` on iOS, `inputType` on Android, `autocomplete` on Web.",
+        "ja": "キーボードと自動入力の挙動ヒント。主な値: `emailAddress`, `password`, `username`, `telephoneNumber`, `URL`, `fullStreetAddress`, `postalCode`, `creditCardNumber`。iOS では `UITextContentType`、Android では `inputType`、Web では `autocomplete` にマップ。"
+      }
+    },
+    "secure": {
+      "note": {
+        "en": "Boolean. When `true`, characters are obscured. Required for password fields. Pair with `contentType: 'password'` for autofill.",
+        "ja": "Boolean。`true` で入力文字を伏せ字に。パスワードには必須。自動入力のために `contentType: 'password'` と併用する。"
+      }
+    },
+    "maxLength": {
+      "note": {
+        "en": "Positive integer. Enforced at platform level; paste beyond limit is truncated silently.",
+        "ja": "正の整数。プラットフォーム側で強制される。超過ペーストは silent に切り詰められる。"
+      }
+    },
+    "hint": {
+      "note": {
+        "en": "Placeholder shown when empty. Accepts `@string/key`. Color controlled by `hintColor`.",
+        "ja": "空欄時に表示するプレースホルダ。`@string/key` 対応。色は `hintColor` で制御。"
+      }
+    },
+    "returnKeyType": {
+      "note": {
+        "en": "`default` / `go` / `done` / `next` / `send` / `search`. Affects the keyboard's return-key label. Maps to `enterkeyhint` on Web.",
+        "ja": "`default` / `go` / `done` / `next` / `send` / `search`。キーボードのリターンキー表記を変える。Web では `enterkeyhint` にマップ。"
+      }
+    },
+    "onShouldReturn": {
+      "note": {
+        "en": "Handler fired when user presses return/enter. Return value controls whether the field resigns focus (Swift convention).",
+        "ja": "リターン／エンター押下時に発火。戻り値でフォーカスを離すか制御（Swift 流）。"
+      }
+    },
+    "onTextChange": {
+      "note": {
+        "en": "Fires on every keystroke with the new value. Use sparingly — for two-way binding the `text` attribute already syncs; use `onTextChange` only when additional side effects (validation, debounced search) are needed.",
+        "ja": "キー入力ごとに新しい値で発火。`text` の two-way binding で既に同期されるため、バリデーションや debounce 検索など追加の副作用が必要なときのみ使う。"
+      }
+    },
+    "onFocus": {
+      "note": {
+        "en": "Focus gained. Fires before first keystroke.",
+        "ja": "フォーカス取得時。最初のキー入力より前に発火。"
+      }
+    },
+    "onBlur": {
+      "note": {
+        "en": "Focus lost. Good place to run validation.",
+        "ja": "フォーカス離脱時。バリデーション実行に適している。"
+      }
+    },
+    "nextFocus": {
+      "note": {
+        "en": "ID of the next TextField to focus when user taps `next` key. Enables keyboard-driven form traversal without tapping each field.",
+        "ja": "`next` キー押下で次にフォーカスする TextField の ID。各フィールドをタップせずキーボードだけでフォーム移動できる。"
+      }
+    },
+    "pattern": {
+      "note": {
+        "en": "Regex string. Input is restricted to matching characters on commit. Use in combination with `maxLength` for strict format fields.",
+        "ja": "正規表現文字列。確定時に適合文字のみ許可。厳格なフォーマットには `maxLength` と併用する。"
+      }
+    },
+    "required": {
+      "note": {
+        "en": "Boolean. When `true`, web forms mark the field as required (HTML `required` attribute). Not enforced at runtime on native platforms — ViewModel must validate.",
+        "ja": "Boolean。`true` で web フォームでは HTML `required` 属性を付与。ネイティブでは実行時強制されないため ViewModel で検証する。"
+      }
+    },
+    "keyboardAppearance": {
+      "note": {
+        "en": "iOS-specific. `default` / `dark` / `light` — controls keyboard tint on iOS.",
+        "ja": "iOS 固有。`default` / `dark` / `light` — iOS のキーボード色を制御。"
+      }
+    }
+  },
+  "relatedComponents": ["TextView", "EditText", "Input", "Label"]
+}

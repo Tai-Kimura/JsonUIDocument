@@ -1,0 +1,90 @@
+{
+  "component": "ScrollView",
+  "description": {
+    "en": "Vertically (default) or horizontally scrollable container. Children that exceed the visible bounds become scrollable.",
+    "ja": "垂直（デフォルト）または水平にスクロール可能なコンテナ。可視領域を超えた子要素がスクロール対象になる。"
+  },
+  "usage": {
+    "en": "Use ScrollView for static-sized content that may overflow (forms, long articles, long card stacks). For large dynamic lists use Collection — it virtualizes.",
+    "ja": "オーバーフローする可能性のある静的コンテンツ（フォーム、長文、長いカードスタック）に使う。大量の動的リストは仮想化される Collection を使う。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Vertical scroll", "ja": "垂直スクロール" },
+      "language": "json",
+      "code": "{\n  \"type\": \"ScrollView\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Horizontal carousel without indicators", "ja": "水平カルーセル・スクロールバー非表示" },
+      "language": "json",
+      "code": "{\n  \"type\": \"ScrollView\",\n  \"orientation\": \"horizontal\",\n  \"showsHorizontalScrollIndicator\": false,\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"horizontal\", \"child\": [ ] }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Paging per screen", "ja": "画面単位のスナップ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"ScrollView\",\n  \"orientation\": \"horizontal\",\n  \"paging\": true,\n  \"child\": [\n    { \"type\": \"View\", \"width\": \"matchParent\" },\n    { \"type\": \"View\", \"width\": \"matchParent\" },\n    { \"type\": \"View\", \"width\": \"matchParent\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Form with keyboard avoidance", "ja": "キーボード回避を有効にしたフォーム" },
+      "language": "json",
+      "code": "{\n  \"type\": \"ScrollView\",\n  \"keyboardAvoidance\": true,\n  \"keyboardDismissMode\": \"interactive\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}"
+    }
+  ],
+  "attributes": {
+    "orientation": {
+      "note": {
+        "en": "`vertical` (default) / `horizontal`. For both-axis scrolling, nest two ScrollViews.",
+        "ja": "`vertical`（デフォルト）/ `horizontal`。両軸スクロールは 2 つの ScrollView をネスト。"
+      }
+    },
+    "paging": {
+      "note": {
+        "en": "`true` snaps to child boundaries (each child = one page). Usually paired with children sized to the parent.",
+        "ja": "`true` で子要素境界にスナップ（子要素 1 つ = 1 ページ）。通常は子要素を親サイズに揃える。"
+      }
+    },
+    "scrollEnabled": {
+      "note": {
+        "en": "Boolean. When `false`, ScrollView acts as a plain View. Useful when scroll behavior is conditional.",
+        "ja": "Boolean。`false` で通常の View として振る舞う。スクロール挙動を条件付きで変えたいときに使う。"
+      }
+    },
+    "bounces": {
+      "note": {
+        "en": "iOS-specific bounce behavior at scroll edges. Default `true`. Set `false` to remove the rubber-band effect.",
+        "ja": "iOS 固有のスクロール端バウンス挙動。デフォルト `true`。ラバーバンド効果を消すには `false`。"
+      }
+    },
+    "keyboardAvoidance": {
+      "note": {
+        "en": "Boolean. When `true`, the ScrollView auto-scrolls so the focused TextField is above the keyboard.",
+        "ja": "Boolean。`true` でフォーカス中の TextField がキーボードの上に来るよう自動スクロール。"
+      }
+    },
+    "keyboardDismissMode": {
+      "note": {
+        "en": "`none` / `onDrag` / `interactive`. Controls when the keyboard dismisses during scroll. `interactive` follows iOS Messages-style dismiss.",
+        "ja": "`none` / `onDrag` / `interactive`。スクロール中のキーボード閉じ挙動を制御。`interactive` は iOS メッセージアプリ風の挙動。"
+      }
+    },
+    "showsVerticalScrollIndicator": {
+      "note": {
+        "en": "Boolean. On iOS SwiftUI, hiding requires iOS 16+ (earlier versions ignore the setting).",
+        "ja": "Boolean。iOS SwiftUI で非表示にするには iOS 16+ が必要（それ以前は無視される）。"
+      }
+    },
+    "contentInsetAdjustmentBehavior": {
+      "note": {
+        "en": "iOS-only. `automatic` / `never` / `scrollableAxes` / `always`. Controls whether safe area insets affect content inset.",
+        "ja": "iOS 専用。`automatic` / `never` / `scrollableAxes` / `always`。セーフエリアの inset をコンテンツに反映するかを制御。"
+      }
+    },
+    "indicatorStyle": {
+      "note": {
+        "en": "iOS-only. `default` / `black` / `white`. Scroll indicator color.",
+        "ja": "iOS 専用。`default` / `black` / `white`。スクロールバーの色。"
+      }
+    }
+  },
+  "relatedComponents": ["Collection", "View", "SafeAreaView"]
+}

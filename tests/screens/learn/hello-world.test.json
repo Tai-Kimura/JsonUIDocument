@@ -1,0 +1,90 @@
+{
+  "type": "screen",
+  "source": {
+    "layout": "docs/screens/layouts/learn/hello-world.json",
+    "document": "docs/screens/json/learn/hello-world.spec.json"
+  },
+  "metadata": {
+    "name": "Learn > Hello World screen",
+    "description": "Verifies the five-minute first-screen tutorial: breadcrumb + title + lead, prerequisites collection, inline platform tab switcher (T6 pattern) with default activeTab='react', three platform panels whose visibility is driven by displayLogic, next-steps collection, and the language toggle. Every assertion traces back to a section of learn/hello-world.spec.json.",
+    "generatedAt": "2026-04-22T00:00:00Z",
+    "generatedBy": "jsonui-test",
+    "tags": ["learn", "hello-world", "smoke", "web"],
+    "group": ["01_learn"]
+  },
+  "platform": "web",
+  "cases": [
+    {
+      "name": "initial_display",
+      "description": "On load the breadcrumb + title + lead, prerequisites collection, platform tab collection, next-steps collection, and footer render. Default activeTab = 'react' per stateManagement.uiVariables, so displayLogic flips reactPanelVisibility='visible' while swift/kotlin panels stay 'gone' (absent from DOM). Traces to structure components in the layout, stateManagement.uiVariables.activeTab.initial='react', and stateManagement.displayLogic (platform_panel_react visible, platform_panel_swift/kotlin hidden).",
+      "steps": [
+        { "action": "waitFor", "id": "learn_hello_world_root", "timeout": 5000 },
+        { "assert": "visible", "id": "learn_hello_world_scroll" },
+        { "assert": "visible", "id": "learn_hello_world_header" },
+        { "assert": "visible", "id": "learn_hello_world_breadcrumb" },
+        { "assert": "visible", "id": "learn_hello_world_lang_toggle" },
+        { "assert": "visible", "id": "learn_hello_world_title" },
+        { "assert": "text",    "id": "learn_hello_world_title", "contains": "Hello, JsonUI" },
+        { "assert": "visible", "id": "learn_hello_world_lead" },
+        { "assert": "visible", "id": "learn_hello_world_prereqs" },
+        { "assert": "visible", "id": "learn_hello_world_prereq_collection" },
+        { "assert": "visible", "id": "learn_hello_world_quickstart" },
+        { "assert": "visible", "id": "learn_hello_world_tab_collection" },
+        { "assert": "visible", "id": "platform_panel_react" },
+        { "assert": "visible", "id": "learn_hello_world_react_steps" },
+        { "assert": "notVisible", "id": "platform_panel_swift" },
+        { "assert": "notVisible", "id": "platform_panel_kotlin" },
+        { "assert": "visible", "id": "learn_hello_world_next" },
+        { "assert": "visible", "id": "learn_hello_world_next_collection" },
+        { "assert": "visible", "id": "learn_hello_world_footer" }
+      ]
+    },
+    {
+      "name": "tap_swift_tab_shows_swift_panel",
+      "description": "Tapping the Swift / SwiftUI tab within the tab collection invokes onSelectTab('swift'). The VM sets activeTab='swift' and panelVisibilityFor flips swiftPanelVisibility='visible' while react/kotlin stay 'gone'. Generated JSX only renders a panel when visibility !== 'gone', so platform_panel_swift enters the DOM and platform_panel_react leaves it. Traces to stateManagement.eventHandlers.onSelectTab and stateManagement.displayLogic (activeTab == 'swift' -> platform_panel_swift visible). Text narrowing is used in the absence of per-cell DOM ids (known limitation: rjui-collection-cell-id-binding).",
+      "steps": [
+        { "action": "waitFor", "id": "learn_hello_world_tab_collection", "timeout": 5000 },
+        { "assert": "visible", "id": "platform_panel_react" },
+        { "action": "tap", "id": "learn_hello_world_tab_collection", "text": "Swift / SwiftUI" },
+        { "action": "waitFor", "id": "platform_panel_swift", "timeout": 5000 },
+        { "assert": "visible", "id": "platform_panel_swift" },
+        { "assert": "visible", "id": "learn_hello_world_swift_steps" },
+        { "assert": "notVisible", "id": "platform_panel_react" },
+        { "assert": "notVisible", "id": "platform_panel_kotlin" }
+      ]
+    },
+    {
+      "name": "tap_kotlin_tab_shows_kotlin_panel",
+      "description": "Tapping the Kotlin / Compose tab invokes onSelectTab('kotlin'). The displayLogic entry for activeTab == 'kotlin' flips kotlinPanelVisibility='visible'; swift/react stay 'gone'. Traces to stateManagement.eventHandlers.onSelectTab and stateManagement.displayLogic (activeTab == 'kotlin' -> platform_panel_kotlin visible). Text narrowing used for the same reason as the Swift case.",
+      "steps": [
+        { "action": "waitFor", "id": "learn_hello_world_tab_collection", "timeout": 5000 },
+        { "assert": "visible", "id": "platform_panel_react" },
+        { "action": "tap", "id": "learn_hello_world_tab_collection", "text": "Kotlin / Compose" },
+        { "action": "waitFor", "id": "platform_panel_kotlin", "timeout": 5000 },
+        { "assert": "visible", "id": "platform_panel_kotlin" },
+        { "assert": "visible", "id": "learn_hello_world_kotlin_steps" },
+        { "assert": "notVisible", "id": "platform_panel_react" },
+        { "assert": "notVisible", "id": "platform_panel_swift" }
+      ]
+    },
+    {
+      "name": "tap_language_toggle_flips_en_to_ja",
+      "description": "StringManager.language defaults to 'en' on first render. Tapping learn_hello_world_lang_toggle invokes onToggleLanguage, which flips StringManager to 'ja' and re-seeds onAppear -> currentLanguage='ja'. The rendered title label switches from the English copy ('Hello, JsonUI — in five minutes') to the Japanese copy ('Hello, JsonUI を5分で'). Traces to stateManagement.eventHandlers.onToggleLanguage and stateManagement.uiVariables.currentLanguage, plus userActions 'Toggle language'.",
+      "steps": [
+        { "action": "waitFor", "id": "learn_hello_world_lang_toggle", "timeout": 5000 },
+        { "assert": "text", "id": "learn_hello_world_title", "contains": "Hello, JsonUI — in five minutes" },
+        { "action": "tap", "id": "learn_hello_world_lang_toggle" },
+        { "assert": "text", "id": "learn_hello_world_title", "contains": "5分" }
+      ]
+    },
+    {
+      "name": "tap_next_step_navigates_away",
+      "description": "Tapping the first next-step card ('Data binding basics') invokes its onClick -> onNavigate('/learn/data-binding-basics'), which calls router.push. The Hello World tree unmounts (the /learn/data-binding-basics route currently returns Next.js's 404 page, so the card's root is replaced rather than augmented). Asserting that learn_hello_world_root is no longer visible captures the navigation intent independent of whether the destination page exists yet. Traces to stateManagement.eventHandlers.onNavigate and transitions.trigger='onNavigate(url)'. Text narrowing used because next-step cards have no per-cell DOM ids (known limitation: rjui-collection-cell-id-binding).",
+      "steps": [
+        { "action": "waitFor", "id": "learn_hello_world_next_collection", "timeout": 5000 },
+        { "action": "tap", "id": "learn_hello_world_next_collection", "text": "Data binding basics" },
+        { "assert": "notVisible", "id": "learn_hello_world_root" }
+      ]
+    }
+  ]
+}

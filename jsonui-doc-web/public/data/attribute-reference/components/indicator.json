@@ -1,0 +1,115 @@
+{
+  "component": "Indicator",
+  "kebab": "indicator",
+  "aliasOf": null,
+  "title": "Indicator",
+  "description": "Activity spinner for indefinite, short-duration waits (loading, network fetching). Always animated; has no progress value.",
+  "usage": "Use Indicator to signal 'something is happening' when you don't know the duration. For progress percent use Progress. Combine with `visibility` binding to show only while loading.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Inline spinner",
+              "language": "json",
+              "code": "{\n  \"type\": \"Indicator\",\n  \"indicatorStyle\": \"medium\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Conditional display",
+              "language": "json",
+              "code": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "Full-screen overlay",
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_color",
+              "name": "color",
+              "type": "string | binding",
+              "required": "",
+              "description": "Indicator color - hex string or color name from colors.json (binding supported)",
+              "note": "Spinner stroke color. Defaults to the current theme's accent / tint color."
+            },
+            {
+              "id": "attr_hides_when_stopped",
+              "name": "hidesWhenStopped",
+              "type": "boolean",
+              "required": "",
+              "description": "Hide when stopped",
+              "note": "Boolean. When `true`, the Indicator hides itself when not animating. Default `true`."
+            },
+            {
+              "id": "attr_indicator_style",
+              "name": "indicatorStyle",
+              "type": "string",
+              "required": "",
+              "description": "Indicator style",
+              "note": "`small` / `medium` / `large`. iOS UIActivityIndicatorView.Style. Controls the diameter.",
+              "enumValues": [
+                "medium",
+                "large"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_progress",
+              "name": "Progress",
+              "url": "/reference/components/progress"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

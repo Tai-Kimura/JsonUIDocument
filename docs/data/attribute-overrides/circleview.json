@@ -1,0 +1,63 @@
+{
+  "component": "CircleView",
+  "description": {
+    "en": "Circular container. Equivalent to a View with `cornerRadius: width/2` and clipping, but guarantees a perfect circle regardless of aspect.",
+    "ja": "円形コンテナ。`cornerRadius: width/2` を指定した View と等価だが、アスペクト比に関わらず真円を保証する。"
+  },
+  "usage": {
+    "en": "Use CircleView for avatars, badges, and circular icons. Always specify equal `width` and `height` (or just `width`; height auto-matches).",
+    "ja": "アバター、バッジ、円形アイコンに使う。`width` と `height` を同値にする（`width` のみ指定で height が自動一致）。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Avatar", "ja": "アバター" },
+      "language": "json",
+      "code": "{\n  \"type\": \"CircleView\",\n  \"width\": 48,\n  \"height\": 48,\n  \"child\": [\n    { \"type\": \"NetworkImage\", \"url\": \"@{user.avatarUrl}\", \"width\": 48, \"height\": 48, \"contentMode\": \"aspectFill\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Unread count badge", "ja": "未読数バッジ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"CircleView\",\n  \"width\": 24,\n  \"height\": 24,\n  \"background\": \"#EF4444\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@{unreadCount}\", \"fontColor\": \"#FFFFFF\", \"fontSize\": 12, \"gravity\": \"center\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Colored status dot", "ja": "色付きステータスドット" },
+      "language": "json",
+      "code": "{\n  \"type\": \"CircleView\",\n  \"width\": 10,\n  \"height\": 10,\n  \"background\": \"@{statusColor}\"\n}"
+    }
+  ],
+  "attributes": {
+    "child": {
+      "note": {
+        "en": "Children are clipped to the circular bounds. For an image avatar, size the Image to match the CircleView and set contentMode to `aspectFill`.",
+        "ja": "子要素は円形境界で切り取られる。画像アバターでは Image を CircleView と同サイズにし、contentMode を `aspectFill` にする。"
+      }
+    },
+    "children": {
+      "note": {
+        "en": "Alias for `child`.",
+        "ja": "`child` のエイリアス。"
+      }
+    }
+  },
+  "commonAttributes": {
+    "width": {
+      "note": {
+        "en": "Also sets `height` if omitted. Must be a fixed numeric value (no `matchParent` / `wrapContent`).",
+        "ja": "`height` 未指定時は `height` も自動設定。数値指定必須（`matchParent` / `wrapContent` 不可）。"
+      }
+    },
+    "background": {
+      "note": {
+        "en": "Hex, color name, or token. For gradient circles, nest a GradientView inside.",
+        "ja": "hex、色名、またはトークン。グラデーションの円なら GradientView をネストする。"
+      }
+    },
+    "borderWidth": {
+      "note": {
+        "en": "Border is rendered on the circle's edge, not as a rectangular frame.",
+        "ja": "border は矩形ではなく円周上に描画される。"
+      }
+    }
+  },
+  "relatedComponents": ["View", "Image", "NetworkImage"]
+}

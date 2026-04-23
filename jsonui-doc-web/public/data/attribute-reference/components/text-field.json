@@ -1,0 +1,587 @@
+{
+  "component": "TextField",
+  "kebab": "text-field",
+  "aliasOf": null,
+  "title": "TextField",
+  "description": "Single-line text input for short user-entered strings. For multi-line input use TextView. For secure input toggle `secure: true`.",
+  "usage": "TextField owns its text state via two-way binding. The ViewModel declares the property as mutable (`@Published var text: String` on iOS / `MutableStateFlow<String>` on Android / plain mutable on web). TextField writes back through the bound property on every commit.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Minimum two-way binding",
+              "language": "json",
+              "code": "{\n  \"type\": \"TextField\",\n  \"text\": \"@{email}\",\n  \"hint\": \"@string/email_placeholder\",\n  \"contentType\": \"emailAddress\",\n  \"width\": \"matchParent\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "With validation error",
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    {\n      \"type\": \"TextField\",\n      \"text\": \"@{email}\",\n      \"hint\": \"@string/email_placeholder\",\n      \"contentType\": \"emailAddress\",\n      \"onTextChange\": \"@{onEmailChanged}\"\n    },\n    {\n      \"type\": \"Label\",\n      \"text\": \"@{emailError}\",\n      \"visibility\": \"@{emailError != null && emailError != ''}\",\n      \"fontColor\": \"#EF4444\",\n      \"fontSize\": 12\n    }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "Password",
+              "language": "json",
+              "code": "{\n  \"type\": \"TextField\",\n  \"text\": \"@{password}\",\n  \"secure\": true,\n  \"contentType\": \"password\",\n  \"hint\": \"@string/password_placeholder\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_4",
+              "title": "Numeric with max length",
+              "language": "json",
+              "code": "{\n  \"type\": \"TextField\",\n  \"text\": \"@{age}\",\n  \"pattern\": \"^[0-9]*$\",\n  \"maxLength\": 3,\n  \"hint\": \"18\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_5",
+              "title": "Submit on return",
+              "language": "json",
+              "code": "{\n  \"type\": \"TextField\",\n  \"text\": \"@{query}\",\n  \"hint\": \"@string/search_placeholder\",\n  \"returnKeyType\": \"search\",\n  \"onShouldReturn\": \"@{onSubmitSearch}\"\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_text",
+              "name": "text",
+              "type": "string | binding",
+              "required": "",
+              "description": "Text content (binding for two-way)",
+              "note": "Always two-way. Must bind to a mutable ViewModel property. Use `onTextChange` for non-binding side effects.",
+              "bindingDirection": "two-way"
+            },
+            {
+              "id": "attr_hint",
+              "name": "hint",
+              "type": "string",
+              "required": "",
+              "description": "Placeholder text (primary)",
+              "note": "Placeholder shown when empty. Accepts `@string/key`. Color controlled by `hintColor`."
+            },
+            {
+              "id": "attr_content_type",
+              "name": "contentType",
+              "type": "string | binding",
+              "required": "",
+              "description": "Content type for autofill (binding supported)",
+              "note": "Hints the keyboard / autofill behavior. Common values: `emailAddress`, `password`, `username`, `telephoneNumber`, `URL`, `fullStreetAddress`, `postalCode`, `creditCardNumber`. Maps to `UITextContentType` on iOS, `inputType` on Android, `autocomplete` on Web."
+            },
+            {
+              "id": "attr_secure",
+              "name": "secure",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Secure text entry for passwords (can be data binding)",
+              "note": "Boolean. When `true`, characters are obscured. Required for password fields. Pair with `contentType: 'password'` for autofill."
+            },
+            {
+              "id": "attr_max_length",
+              "name": "maxLength",
+              "type": "number",
+              "required": "",
+              "description": "Maximum input length",
+              "note": "Positive integer. Enforced at platform level; paste beyond limit is truncated silently."
+            },
+            {
+              "id": "attr_pattern",
+              "name": "pattern",
+              "type": "string",
+              "required": "",
+              "description": "Input validation pattern",
+              "note": "Regex string. Input is restricted to matching characters on commit. Use in combination with `maxLength` for strict format fields.",
+              "platform": "react"
+            },
+            {
+              "id": "attr_required",
+              "name": "required",
+              "type": "boolean",
+              "required": "",
+              "description": "Required field validation",
+              "note": "Boolean. When `true`, web forms mark the field as required (HTML `required` attribute). Not enforced at runtime on native platforms — ViewModel must validate.",
+              "platform": "react"
+            },
+            {
+              "id": "attr_return_key_type",
+              "name": "returnKeyType",
+              "type": "string",
+              "required": "",
+              "description": "Return key type",
+              "note": "`default` / `go` / `done` / `next` / `send` / `search`. Affects the keyboard's return-key label. Maps to `enterkeyhint` on Web.",
+              "enumValues": [
+                "Done",
+                "Go",
+                "Next",
+                "Return",
+                "Search",
+                "Send",
+                "Continue",
+                "Join",
+                "Route",
+                "Yahoo",
+                "Google"
+              ]
+            },
+            {
+              "id": "attr_on_should_return",
+              "name": "onShouldReturn",
+              "type": "string",
+              "required": "",
+              "description": "Should return event handler (return true to allow)",
+              "note": "Handler fired when user presses return/enter. Return value controls whether the field resigns focus (Swift convention).",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_text_change",
+              "name": "onTextChange",
+              "type": "string",
+              "required": "",
+              "description": "Text change event handler",
+              "note": "Fires on every keystroke with the new value. Use sparingly — for two-way binding the `text` attribute already syncs; use `onTextChange` only when additional side effects (validation, debounced search) are needed."
+            },
+            {
+              "id": "attr_on_focus",
+              "name": "onFocus",
+              "type": "string",
+              "required": "",
+              "description": "Focus event handler",
+              "note": "Focus gained. Fires before first keystroke."
+            },
+            {
+              "id": "attr_on_blur",
+              "name": "onBlur",
+              "type": "string",
+              "required": "",
+              "description": "Blur event handler",
+              "note": "Focus lost. Good place to run validation."
+            },
+            {
+              "id": "attr_on_begin_editing",
+              "name": "onBeginEditing",
+              "type": "string",
+              "required": "",
+              "description": "Begin editing event handler"
+            },
+            {
+              "id": "attr_on_end_editing",
+              "name": "onEndEditing",
+              "type": "string",
+              "required": "",
+              "description": "End editing event handler"
+            },
+            {
+              "id": "attr_next_focus",
+              "name": "nextFocus",
+              "type": "string",
+              "required": "",
+              "description": "ID of the next field to focus on submit (for focus chain)",
+              "note": "ID of the next TextField to focus when user taps `next` key. Enables keyboard-driven form traversal without tapping each field."
+            },
+            {
+              "id": "attr_font_size",
+              "name": "fontSize",
+              "type": "number | binding",
+              "required": "",
+              "description": "Font size (binding supported)"
+            },
+            {
+              "id": "attr_font_color",
+              "name": "fontColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Font color - hex string or color name from colors.json (binding supported)"
+            },
+            {
+              "id": "attr_hint_color",
+              "name": "hintColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Placeholder color - hex string or color name from colors.json (binding supported)"
+            },
+            {
+              "id": "attr_text_align",
+              "name": "textAlign",
+              "type": "string",
+              "required": "",
+              "description": "Text alignment",
+              "enumValues": [
+                "Left",
+                "Center",
+                "Right",
+                "left",
+                "center",
+                "right"
+              ]
+            },
+            {
+              "id": "attr_keyboard_appearance",
+              "name": "keyboardAppearance",
+              "type": "string",
+              "required": "",
+              "description": "Keyboard appearance: dark, light",
+              "note": "iOS-specific. `default` / `dark` / `light` — controls keyboard tint on iOS."
+            },
+            {
+              "id": "attr_autocapitalization_type",
+              "name": "autocapitalizationType",
+              "type": "string",
+              "required": "",
+              "description": "Auto-capitalization type"
+            },
+            {
+              "id": "attr_autocorrection_type",
+              "name": "autocorrectionType",
+              "type": "string",
+              "required": "",
+              "description": "Auto-correction type"
+            },
+            {
+              "id": "attr_spell_checking_type",
+              "name": "spellCheckingType",
+              "type": "string",
+              "required": "",
+              "description": "Spell checking type",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_accessory_background",
+              "name": "accessoryBackground",
+              "type": "string",
+              "required": "",
+              "description": "Input accessory background - hex string or color name from colors.json"
+            },
+            {
+              "id": "attr_accessory_corner_radius",
+              "name": "accessoryCornerRadius",
+              "type": "number",
+              "required": "",
+              "description": "Accessory corner radius",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_accessory_text_color",
+              "name": "accessoryTextColor",
+              "type": "string",
+              "required": "",
+              "description": "Input accessory text color - hex string or color name from colors.json"
+            },
+            {
+              "id": "attr_apply_liquid_glass",
+              "name": "applyLiquidGlass",
+              "type": "boolean",
+              "required": "",
+              "description": "Apply liquid glass effect",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_border_style",
+              "name": "borderStyle",
+              "type": "string",
+              "required": "",
+              "description": "Border style",
+              "enumValues": [
+                "none",
+                "line",
+                "bezel",
+                "roundedRect",
+                "RoundedRect",
+                "Line",
+                "Bezel"
+              ]
+            },
+            {
+              "id": "attr_caret_attributes",
+              "name": "caretAttributes",
+              "type": "object",
+              "required": "",
+              "description": "Caret styling attributes (fontColor for cursor color)"
+            },
+            {
+              "id": "attr_clear_button_mode",
+              "name": "clearButtonMode",
+              "type": "string",
+              "required": "",
+              "description": "Clear button mode",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_disabled_background",
+              "name": "disabledBackground",
+              "type": "string",
+              "required": "",
+              "description": "Background color when disabled - hex string or color name from colors.json",
+              "platform": "react"
+            },
+            {
+              "id": "attr_done_text",
+              "name": "doneText",
+              "type": "string",
+              "required": "",
+              "description": "Done button text"
+            },
+            {
+              "id": "attr_field_padding",
+              "name": "fieldPadding",
+              "type": "number",
+              "required": "",
+              "description": "Field padding"
+            },
+            {
+              "id": "attr_font",
+              "name": "font",
+              "type": "string | binding",
+              "required": "",
+              "description": "Font name or 'bold' (binding supported)"
+            },
+            {
+              "id": "attr_font_family",
+              "name": "fontFamily",
+              "type": "string | binding",
+              "required": "",
+              "description": "Font family name (e.g., Noto Sans JP). Resolved via Configuration.Font.fontProvider."
+            },
+            {
+              "id": "attr_glass_effect_style",
+              "name": "glassEffectStyle",
+              "type": "string",
+              "required": "",
+              "description": "Glass effect style",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_has_container",
+              "name": "hasContainer",
+              "type": "boolean",
+              "required": "",
+              "description": "Has container view",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_hint_attributes",
+              "name": "hintAttributes",
+              "type": "object",
+              "required": "",
+              "description": "Hint text attributes (font, color, etc.)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_hint_font",
+              "name": "hintFont",
+              "type": "string",
+              "required": "",
+              "description": "Placeholder font"
+            },
+            {
+              "id": "attr_hint_font_size",
+              "name": "hintFontSize",
+              "type": "number",
+              "required": "",
+              "description": "Placeholder font size"
+            },
+            {
+              "id": "attr_input",
+              "name": "input",
+              "type": "string",
+              "required": "",
+              "description": "Input type (includes 'allphabet' typo for backward compatibility)",
+              "enumValues": [
+                "default",
+                "alphabet",
+                "allphabet",
+                "email",
+                "number",
+                "phone",
+                "url",
+                "password",
+                "decimal"
+              ]
+            },
+            {
+              "id": "attr_left_view",
+              "name": "leftView",
+              "type": "object",
+              "required": "",
+              "description": "Left view configuration",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_left_view_mode",
+              "name": "leftViewMode",
+              "type": "string",
+              "required": "",
+              "description": "Left view display mode",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_change_selection",
+              "name": "onChangeSelection",
+              "type": "string",
+              "required": "",
+              "description": "Selection change event handler",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_delete_backward",
+              "name": "onDeleteBackward",
+              "type": "string",
+              "required": "",
+              "description": "Delete backward (backspace) event handler",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_should_begin_editing",
+              "name": "onShouldBeginEditing",
+              "type": "string",
+              "required": "",
+              "description": "Should begin editing event handler (return true to allow)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_should_change_characters",
+              "name": "onShouldChangeCharacters",
+              "type": "string",
+              "required": "",
+              "description": "Should change characters event handler (return true to allow)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_should_clear",
+              "name": "onShouldClear",
+              "type": "string",
+              "required": "",
+              "description": "Should clear event handler (return true to allow)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_on_should_end_editing",
+              "name": "onShouldEndEditing",
+              "type": "string",
+              "required": "",
+              "description": "Should end editing event handler (return true to allow)",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_placeholder",
+              "name": "placeholder",
+              "type": "string",
+              "required": "",
+              "description": "Placeholder text (alias for hint)"
+            },
+            {
+              "id": "attr_right_view",
+              "name": "rightView",
+              "type": "object",
+              "required": "",
+              "description": "Right view configuration",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_right_view_mode",
+              "name": "rightViewMode",
+              "type": "string",
+              "required": "",
+              "description": "Right view display mode",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_text_padding_left",
+              "name": "textPaddingLeft",
+              "type": "number",
+              "required": "",
+              "description": "Text padding left"
+            },
+            {
+              "id": "attr_text_padding_right",
+              "name": "textPaddingRight",
+              "type": "number",
+              "required": "",
+              "description": "Text padding right",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_text_vertical_align",
+              "name": "textVerticalAlign",
+              "type": "string",
+              "required": "",
+              "description": "Text vertical alignment",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_tint_color",
+              "name": "tintColor",
+              "type": "string",
+              "required": "",
+              "description": "Cursor/caret color - hex string or color name from colors.json"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_text_view",
+              "name": "TextView",
+              "url": "/reference/components/text-view"
+            },
+            {
+              "id": "related_edit_text",
+              "name": "EditText",
+              "url": "/reference/components/edit-text"
+            },
+            {
+              "id": "related_input",
+              "name": "Input",
+              "url": "/reference/components/input"
+            },
+            {
+              "id": "related_label",
+              "name": "Label",
+              "url": "/reference/components/label"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

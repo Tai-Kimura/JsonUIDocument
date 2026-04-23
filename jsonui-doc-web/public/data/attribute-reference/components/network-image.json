@@ -1,0 +1,204 @@
+{
+  "component": "NetworkImage",
+  "kebab": "network-image",
+  "aliasOf": null,
+  "title": "NetworkImage",
+  "description": "Image loaded from a URL with automatic caching, placeholder, and error handling.",
+  "usage": "Use NetworkImage for all user-generated or CDN-hosted images. Always provide `placeholder` or `defaultImage` — the first frame is always the placeholder.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Avatar with default",
+              "language": "json",
+              "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{user.avatarUrl}\",\n  \"defaultImage\": \"avatar_default\",\n  \"errorImage\": \"avatar_error\",\n  \"width\": 48,\n  \"height\": 48,\n  \"cornerRadius\": 24\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Full-bleed with loading state",
+              "language": "json",
+              "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{post.imageUrl}\",\n  \"loadingImage\": \"image_skeleton\",\n  \"width\": \"matchParent\",\n  \"height\": 240,\n  \"contentMode\": \"aspectFill\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "With cache policy",
+              "language": "json",
+              "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{productImageUrl}\",\n  \"cachePolicy\": \"both\",\n  \"timeout\": 10,\n  \"width\": 200,\n  \"height\": 200\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_url",
+              "name": "url",
+              "type": "string | binding",
+              "required": "",
+              "description": "Image URL (alias, can be data binding)",
+              "note": "Absolute or protocol-relative URL. Empty/null shows `defaultImage` (or `placeholder` if set). Changes trigger re-download (cache-aware)."
+            },
+            {
+              "id": "attr_default_image",
+              "name": "defaultImage",
+              "type": "string",
+              "required": "",
+              "description": "Default image name",
+              "note": "Local image shown when `url` is empty, null, or resolves to a placeholder-eligible state. Prefer over `placeholder` for consistency."
+            },
+            {
+              "id": "attr_loading_image",
+              "name": "loadingImage",
+              "type": "string",
+              "required": "",
+              "description": "Loading image name",
+              "note": "Local image shown during the fetch. Skeletons and shimmer PNGs work well here."
+            },
+            {
+              "id": "attr_error_image",
+              "name": "errorImage",
+              "type": "string",
+              "required": "",
+              "description": "Error image name",
+              "note": "Displayed on fetch failure (4xx, 5xx, network error). Defaults to `defaultImage` if omitted."
+            },
+            {
+              "id": "attr_placeholder",
+              "name": "placeholder",
+              "type": "string",
+              "required": "",
+              "description": "Placeholder image name (alias for hint)",
+              "note": "Alias for `loadingImage`. Kept for compatibility; prefer `loadingImage` + `defaultImage` split."
+            },
+            {
+              "id": "attr_content_mode",
+              "name": "contentMode",
+              "type": "string | binding",
+              "required": "",
+              "description": "Content mode (binding supported)",
+              "note": "Same as Image.contentMode — `aspectFit` / `aspectFill` / `fill` / `center`.",
+              "enumValues": [
+                "fit",
+                "fill",
+                "center",
+                "top",
+                "bottom",
+                "left",
+                "right",
+                "AspectFill",
+                "AspectFit",
+                "Center"
+              ]
+            },
+            {
+              "id": "attr_cache_policy",
+              "name": "cachePolicy",
+              "type": "string",
+              "required": "",
+              "description": "Cache policy",
+              "note": "`memory` / `disk` / `both` (default) / `none`. `disk` persists across app launches.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_timeout",
+              "name": "timeout",
+              "type": "number",
+              "required": "",
+              "description": "Download timeout in seconds",
+              "note": "Fetch timeout in seconds. Default 30. On timeout, `errorImage` is shown.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_hint",
+              "name": "hint",
+              "type": "string",
+              "required": "",
+              "description": "Placeholder image name (primary)"
+            },
+            {
+              "id": "attr_alt",
+              "name": "alt",
+              "type": "string",
+              "required": "",
+              "description": "Alt text for accessibility",
+              "platform": "react"
+            },
+            {
+              "id": "attr_loading",
+              "name": "loading",
+              "type": "string",
+              "required": "",
+              "description": "Loading behavior",
+              "platform": "react",
+              "enumValues": [
+                "lazy",
+                "eager"
+              ]
+            },
+            {
+              "id": "attr_src",
+              "name": "src",
+              "type": "string | binding",
+              "required": "",
+              "description": "Image URL (can be data binding)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_image",
+              "name": "Image",
+              "url": "/reference/components/image"
+            },
+            {
+              "id": "related_indicator",
+              "name": "Indicator",
+              "url": "/reference/components/indicator"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

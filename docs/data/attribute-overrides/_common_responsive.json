@@ -1,0 +1,49 @@
+{
+  "category": "responsive",
+  "description": {
+    "en": "Responsive attributes adjust values based on viewport breakpoints or host platform. Breakpoints are configured in `jsonui-doc-web/tailwind.config.js`.",
+    "ja": "レスポンシブ属性はビューポートのブレークポイントやホストプラットフォームに応じて値を変える。ブレークポイントは `jsonui-doc-web/tailwind.config.js` で設定する。"
+  },
+  "attributes": {
+    "platforms": {
+      "summary": {
+        "en": "Array of platforms this component should render on: `ios` / `android` / `web`. Omitting the component entirely if the current platform is not in the list.",
+        "ja": "このコンポーネントを描画すべきプラットフォーム配列: `ios` / `android` / `web`。現プラットフォームが含まれなければコンポーネントは完全に省略される。"
+      },
+      "examples": [
+        { "language": "json", "code": "{ \"include\": \"common/sidebar\", \"platforms\": [\"web\"] }" },
+        { "language": "json", "code": "{ \"type\": \"Image\", \"srcName\": \"ios_screenshot\", \"platforms\": [\"ios\"] }" }
+      ]
+    },
+    "responsive": {
+      "summary": {
+        "en": "Object whose keys are breakpoint names (`xs` / `sm` / `md` / `lg` / `xl`) and values are attribute overrides applied at that breakpoint and above. Merges into the base attributes.",
+        "ja": "キーがブレークポイント名（`xs` / `sm` / `md` / `lg` / `xl`）、値が当該ブレークポイント以上で適用される属性上書きのオブジェクト。ベース属性にマージされる。"
+      },
+      "examples": [
+        {
+          "language": "json",
+          "code": "{\n  \"type\": \"Collection\",\n  \"columnCount\": 1,\n  \"responsive\": {\n    \"md\": { \"columnCount\": 2 },\n    \"lg\": { \"columnCount\": 3 },\n    \"xl\": { \"columnCount\": 4 }\n  }\n}"
+        }
+      ],
+      "platformDiff": {
+        "react": "CSS media queries + Tailwind breakpoints に変換される（jsonui-doc-web のみ対応）。",
+        "swift_uikit": "size class に応じた layout constraint 切替にマップ（実装依存）。",
+        "swift_swiftui": "`@Environment(\\.horizontalSizeClass)` での分岐に変換。",
+        "kotlin_compose": "`BoxWithConstraints` 内で条件分岐。",
+        "kotlin_xml": "`res/layout-<qualifier>/` のリソースで別 Layout を用意する方式に近い。"
+      }
+    }
+  },
+  "breakpoints": {
+    "_description": {
+      "en": "Default breakpoints used by jsonui-doc-web. Override in `tailwind.config.js`.",
+      "ja": "jsonui-doc-web のデフォルトブレークポイント。`tailwind.config.js` で上書き可能。"
+    },
+    "xs": "0–479 px",
+    "sm": "480–767 px",
+    "md": "768–1023 px",
+    "lg": "1024–1279 px",
+    "xl": "1280 px+"
+  }
+}

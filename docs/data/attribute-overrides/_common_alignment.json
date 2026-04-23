@@ -1,0 +1,106 @@
+{
+  "category": "alignment",
+  "description": {
+    "en": "Alignment attributes control where a component sits within its parent and how siblings are positioned relative to it. Most are inherited from Android's RelativeLayout vocabulary and apply inside Views that use a relative positioning mode.",
+    "ja": "配置属性はコンポーネントが親のどこに置かれるか、兄弟要素がその要素に対してどう配置されるかを制御する。多くは Android の RelativeLayout 由来で、相対位置指定モードの View 内で有効。"
+  },
+  "attributes": {
+    "gravity": {
+      "summary": {
+        "en": "`left` / `center` / `right` / `top` / `bottom` / `center_horizontal` / `center_vertical` / `center_in_parent`. For a vertical View, horizontal gravity aligns children; for horizontal, vertical gravity aligns children.",
+        "ja": "`left` / `center` / `right` / `top` / `bottom` / `center_horizontal` / `center_vertical` / `center_in_parent`。vertical View では水平方向の揃え、horizontal View では垂直方向の揃えを制御。"
+      },
+      "platformDiff": {
+        "kotlin_xml": "android:gravity に直接マップ。",
+        "kotlin_compose": "`Modifier.align(Alignment.<value>)` に変換。",
+        "swift_swiftui": "HStack/VStack の alignment パラメータにマップ。",
+        "react": "Tailwind の `justify-*` / `items-*` クラスに変換。"
+      }
+    },
+    "centerInParent": {
+      "summary": {
+        "en": "Boolean. When `true`, centers both horizontally and vertically within the parent.",
+        "ja": "Boolean。`true` で親の中央（水平・垂直とも）に配置。"
+      }
+    },
+    "centerHorizontal": {
+      "summary": {
+        "en": "Boolean. Centers horizontally in the parent.",
+        "ja": "Boolean。親内で水平中央揃え。"
+      }
+    },
+    "centerVertical": {
+      "summary": {
+        "en": "Boolean. Centers vertically in the parent.",
+        "ja": "Boolean。親内で垂直中央揃え。"
+      }
+    },
+    "alignTop": {
+      "summary": {
+        "en": "Boolean. Aligns this view's top edge to its parent's top edge.",
+        "ja": "Boolean。この View の上端を親の上端に揃える。"
+      }
+    },
+    "alignBottom": { "summary": { "en": "Aligns bottom edges.", "ja": "下端同士を揃える。" } },
+    "alignLeft": { "summary": { "en": "Aligns left edges.", "ja": "左端同士を揃える。" } },
+    "alignRight": { "summary": { "en": "Aligns right edges.", "ja": "右端同士を揃える。" } },
+    "alignTopView": {
+      "summary": {
+        "en": "Aligns this view's top to the top of a sibling View identified by ID. Value is the sibling's id string.",
+        "ja": "この View の上端を、ID で指定した兄弟 View の上端に揃える。値は兄弟の id 文字列。"
+      },
+      "relatedAttributes": ["alignBottomView", "alignLeftView", "alignRightView", "toView"]
+    },
+    "alignBottomView": { "summary": { "en": "Aligns bottom edges to a sibling.", "ja": "下端を兄弟の下端に揃える。" } },
+    "alignLeftView": { "summary": { "en": "Aligns left edges to a sibling.", "ja": "左端を兄弟の左端に揃える。" } },
+    "alignRightView": { "summary": { "en": "Aligns right edges to a sibling.", "ja": "右端を兄弟の右端に揃える。" } },
+    "alignTopOfView": {
+      "summary": {
+        "en": "Places this view directly above the referenced sibling (this view's bottom = sibling's top).",
+        "ja": "指定した兄弟の直上にこの View を配置（この下端 = 兄弟の上端）。"
+      }
+    },
+    "alignBottomOfView": {
+      "summary": {
+        "en": "Places this view directly below the referenced sibling.",
+        "ja": "指定した兄弟の直下にこの View を配置。"
+      }
+    },
+    "alignLeftOfView": {
+      "summary": {
+        "en": "Places this view directly to the left of the referenced sibling.",
+        "ja": "指定した兄弟の直左にこの View を配置。"
+      }
+    },
+    "alignRightOfView": {
+      "summary": {
+        "en": "Places this view directly to the right of the referenced sibling.",
+        "ja": "指定した兄弟の直右にこの View を配置。"
+      }
+    },
+    "alignCenterHorizontalView": {
+      "summary": {
+        "en": "Centers this view horizontally within a sibling's horizontal bounds.",
+        "ja": "兄弟の水平範囲内でこの View を水平中央揃え。"
+      }
+    },
+    "alignCenterVerticalView": {
+      "summary": {
+        "en": "Centers this view vertically within a sibling's vertical bounds.",
+        "ja": "兄弟の垂直範囲内でこの View を垂直中央揃え。"
+      }
+    },
+    "indexAbove": {
+      "summary": {
+        "en": "Places this view visually above (higher z-index than) the referenced sibling.",
+        "ja": "指定した兄弟より視覚的に前面（z-index 大）に配置。"
+      }
+    },
+    "indexBelow": {
+      "summary": {
+        "en": "Places this view visually below the referenced sibling.",
+        "ja": "指定した兄弟より視覚的に背面に配置。"
+      }
+    }
+  }
+}

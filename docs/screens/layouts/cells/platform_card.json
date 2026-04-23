@@ -1,0 +1,66 @@
+{
+  "type": "View",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "wrapContent",
+  "paddings": [24, 24, 24, 24],
+  "background": "#FFFFFF",
+  "cornerRadius": 16,
+  "borderWidth": 1,
+  "borderColor": "#E5E7EB",
+  "tapBackground": "#F3F4F6",
+  "onClick": "@{onNavigate}",
+  "child": [
+    {
+      "data": [
+        { "name": "platform", "class": "String" },
+        { "name": "titleKey", "class": "String" },
+        { "name": "descriptionKey", "class": "String" },
+        { "name": "url", "class": "String" },
+        { "name": "accentColor", "class": "Color" },
+        { "name": "onNavigate", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Label",
+      "width": "wrapContent",
+      "height": "wrapContent",
+      "paddings": [4, 10, 4, 10],
+      "fontSize": 12,
+      "fontWeight": "semibold",
+      "fontColor": "#FFFFFF",
+      "background": "@{accentColor}",
+      "cornerRadius": 999,
+      "text": "@{platform}"
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 12,
+      "fontSize": 20,
+      "fontWeight": "semibold",
+      "fontColor": "#0B1220",
+      "text": "@{titleKey}"
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 8,
+      "fontSize": 15,
+      "fontColor": "#475467",
+      "text": "@{descriptionKey}"
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 16,
+      "fontSize": 14,
+      "fontWeight": "semibold",
+      "fontColor": "#2563EB",
+      "text": "@{url}"
+    }
+  ]
+}

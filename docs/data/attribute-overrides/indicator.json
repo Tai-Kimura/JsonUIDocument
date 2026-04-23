@@ -1,0 +1,49 @@
+{
+  "component": "Indicator",
+  "description": {
+    "en": "Activity spinner for indefinite, short-duration waits (loading, network fetching). Always animated; has no progress value.",
+    "ja": "不定・短時間の待機用スピナー（ローディング、ネットワーク取得）。常にアニメーション、進捗値なし。"
+  },
+  "usage": {
+    "en": "Use Indicator to signal 'something is happening' when you don't know the duration. For progress percent use Progress. Combine with `visibility` binding to show only while loading.",
+    "ja": "所要時間不明で「何かが進行中」だと示したいときに使う。進捗 % が分かるなら Progress。`visibility` binding と組み合わせてロード中のみ表示する。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Inline spinner", "ja": "インラインスピナー" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Indicator\",\n  \"indicatorStyle\": \"medium\"\n}"
+    },
+    {
+      "title": { "en": "Conditional display", "ja": "条件付き表示" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}"
+    },
+    {
+      "title": { "en": "Full-screen overlay", "ja": "全画面オーバーレイ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}"
+    }
+  ],
+  "attributes": {
+    "color": {
+      "note": {
+        "en": "Spinner stroke color. Defaults to the current theme's accent / tint color.",
+        "ja": "スピナーの線色。省略時は現テーマの accent / tint 色。"
+      }
+    },
+    "indicatorStyle": {
+      "note": {
+        "en": "`small` / `medium` / `large`. iOS UIActivityIndicatorView.Style. Controls the diameter.",
+        "ja": "`small` / `medium` / `large`。iOS UIActivityIndicatorView.Style。直径を決める。"
+      }
+    },
+    "hidesWhenStopped": {
+      "note": {
+        "en": "Boolean. When `true`, the Indicator hides itself when not animating. Default `true`.",
+        "ja": "Boolean。`true` でアニメーション停止中は自身を非表示にする。デフォルト `true`。"
+      }
+    }
+  },
+  "relatedComponents": ["Progress"]
+}

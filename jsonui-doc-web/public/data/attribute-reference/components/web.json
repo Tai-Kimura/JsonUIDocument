@@ -1,0 +1,137 @@
+{
+  "component": "Web",
+  "kebab": "web",
+  "aliasOf": null,
+  "title": "Web",
+  "description": "Embedded web content via WKWebView (iOS), WebView (Android), `<iframe>` (Web). Used for embedded maps, third-party widgets, HTML previews.",
+  "usage": "Use Web only when native components cannot achieve the goal. Prefer native for performance, security, and consistent UX. For untrusted URLs always set `sandbox` (web) and review the iOS / Android equivalents.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Embed URL",
+              "language": "json",
+              "code": "{\n  \"type\": \"Web\",\n  \"url\": \"https://www.example.com/embed/@{placeId}\",\n  \"width\": \"matchParent\",\n  \"height\": 300\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Inline HTML",
+              "language": "json",
+              "code": "{\n  \"type\": \"Web\",\n  \"html\": \"<h1>Hello</h1><p>Inline HTML content.</p>\",\n  \"width\": \"matchParent\",\n  \"height\": 200\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "Sandboxed third-party widget (Web)",
+              "language": "json",
+              "code": "{\n  \"type\": \"Web\",\n  \"url\": \"@{thirdPartyWidgetUrl}\",\n  \"sandbox\": \"allow-scripts allow-same-origin\",\n  \"allow\": \"clipboard-write; fullscreen\",\n  \"width\": \"matchParent\",\n  \"height\": 400\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_url",
+              "name": "url",
+              "type": "string | binding",
+              "required": "",
+              "description": "Web page URL (can be data binding)",
+              "note": "Absolute URL. Changes trigger navigation. Use `html` for inline content instead."
+            },
+            {
+              "id": "attr_allow",
+              "name": "allow",
+              "type": "string",
+              "required": "",
+              "description": "Iframe allow attribute for feature policy",
+              "note": "Web-only (iframe `allow` attribute). Grants permissions like `camera`, `microphone`, `fullscreen`, `clipboard-write`.",
+              "platform": "react"
+            },
+            {
+              "id": "attr_allows_back_forward_navigation_gestures",
+              "name": "allowsBackForwardNavigationGestures",
+              "type": "boolean",
+              "required": "",
+              "description": "Enable swipe navigation",
+              "note": "iOS WKWebView. When `true`, horizontal-swipe navigation between history entries is enabled."
+            },
+            {
+              "id": "attr_allows_link_preview",
+              "name": "allowsLinkPreview",
+              "type": "boolean",
+              "required": "",
+              "description": "Enable link preview",
+              "note": "iOS WKWebView. 3D Touch / long-press link preview."
+            },
+            {
+              "id": "attr_html",
+              "name": "html",
+              "type": "string",
+              "required": "",
+              "description": "HTML content",
+              "note": "Inline HTML string. Useful for rendering Markdown-to-HTML output or previews."
+            },
+            {
+              "id": "attr_sandbox",
+              "name": "sandbox",
+              "type": "string",
+              "required": "",
+              "description": "Iframe sandbox attribute",
+              "note": "Web-only (maps to iframe `sandbox` attribute). Space-separated tokens: `allow-scripts` / `allow-same-origin` / `allow-forms` / `allow-popups` etc. Omit for maximum restriction.",
+              "platform": "react"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_view",
+              "name": "View",
+              "url": "/reference/components/view"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

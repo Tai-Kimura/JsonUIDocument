@@ -1,0 +1,143 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "Chrome",
+    "displayName": "Site chrome",
+    "description": "Site-wide chrome composition: mounts the TopBar (sticky header with brand, Search, language toggle, mobile-menu button) and the Sidebar (persistent left rail grouping every documentation route into 6 collapsible category sections). Not a page — rendered by the Next.js RootLayout as a sibling of {children}. The ViewModel owns the static nav catalog, the per-section collapse state, the mobile-drawer open flag, and the active-route mirror that comes from Next.js's usePathname().",
+    "platforms": ["web"],
+    "layoutFile": "chrome",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": { "components": [], "layout": {}, "collection": null, "tabView": null },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "navItems",
+        "type": "[SidebarSection]",
+        "initial": "[]",
+        "description": "Ordered nav catalog — six SidebarSection entries (learn / guides / concepts / reference / platforms / tools). Seeded by onAppear from the module-scope NAV_CATALOG constant; each entry's label + every row's label is pre-resolved through StringManager so the Sidebar component receives display-ready strings."
+      },
+      {
+        "name": "activeUrl",
+        "type": "String",
+        "initial": "",
+        "description": "Mirror of the current route. Set by the Chrome wrapper via onRouteChange(pathname) whenever Next.js's usePathname() changes. Drives the aria-current='page' highlight on the matching Sidebar row."
+      },
+      {
+        "name": "collapsedIds",
+        "type": "[String]",
+        "initial": "[]",
+        "description": "Section ids currently collapsed. onToggleSection flips membership. onRouteChange auto-removes the containing section so the user always sees the current route's siblings without an extra click."
+      },
+      {
+        "name": "mobileOpen",
+        "type": "Bool",
+        "initial": "false",
+        "description": "Mobile drawer open flag. True on viewports <1024px when the user has tapped the top-bar menu button. Tapping any Sidebar link (onLinkTap) and tapping Escape both flip it back to false."
+      },
+      {
+        "name": "currentLanguage",
+        "type": "String",
+        "initial": "en",
+        "description": "Mirror of StringManager.language. Drives the TopBar's language-toggle display label (shows the OTHER language as an invitation to switch). Re-seeded inside onAppear on every language toggle so the chrome re-localizes in lockstep with generated pages."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Build navItems from NAV_CATALOG, pre-resolving each section.label and each entry.label through StringManager with the chrome_nav_<id>_label and screen-specific title keys. Also seed currentLanguage from StringManager.language."
+      },
+      {
+        "name": "onRouteChange",
+        "params": [{ "name": "url", "type": "String" }],
+        "description": "Mirror the current Next.js pathname into activeUrl. Additionally auto-expand the containing section (remove its id from collapsedIds) so the user immediately sees the current route highlighted inside an open section — no manual expansion required."
+      },
+      {
+        "name": "onToggleSection",
+        "params": [{ "name": "id", "type": "String" }],
+        "description": "Toggle membership of id in collapsedIds. Fired by the Sidebar when the user taps a section header."
+      },
+      {
+        "name": "onToggleMobileMenu",
+        "description": "Flip mobileOpen. Fired by the TopBar's hamburger button, which CSS media-queries hide on wide viewports."
+      },
+      {
+        "name": "onToggleLanguage",
+        "description": "Flip StringManager.language between the configured languages, then re-run onAppear so every cached label re-resolves. Also dispatches a 'chrome:languagechange' CustomEvent so already-rendered generated pages can listen + force-refresh if they cache their own labels."
+      },
+      {
+        "name": "onLinkTap",
+        "params": [{ "name": "url", "type": "String" }],
+        "description": "Invoked by the Sidebar after a link is clicked — NO preventDefault, the <a> still navigates. On mobile viewports, flips mobileOpen to false so the drawer closes as the next page mounts."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[ChromeView] --> VM[ChromeViewModel]\n    VM -- navItems --> VIEW\n    VM -- activeUrl --> VIEW\n    VM -- collapsedIds --> VIEW\n    VM -- mobileOpen --> VIEW\n    VM -- currentLanguage --> VIEW\n    VIEW -- onAppear --> VM\n    VIEW -- onRouteChange(url) --> VM\n    VIEW -- onToggleSection(id) --> VM\n    VIEW -- onToggleMobileMenu --> VM\n    VIEW -- onToggleLanguage --> VM\n    VIEW -- onLinkTap(url) --> VM",
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "viewModel": {
+      "methods": [
+        { "name": "onAppear",           "description": "Seed navItems from the module-scope NAV_CATALOG constant (6 sections × N entries each, read from the same catalog arrays HomeViewModel uses). Resolve every section.label via StringManager.getString('chrome_nav_<id>_label') and every entry.label via StringManager.getString(entry.titleKey). Also mirror StringManager.language into currentLanguage." },
+        { "name": "onRouteChange",      "params": [{ "name": "url", "type": "String" }], "description": "Update activeUrl and auto-expand the containing section. Called from the ChromeWrapper's useEffect when usePathname() changes — this is the only public method NOT bound in the layout's data block." },
+        { "name": "onToggleSection",    "params": [{ "name": "id", "type": "String" }], "description": "Toggle id's membership in collapsedIds. Pure state update." },
+        { "name": "onToggleMobileMenu", "description": "Flip mobileOpen. Pure state update." },
+        { "name": "onToggleLanguage",   "description": "StringManager.setLanguage(next) → onAppear() for re-seed → dispatchEvent(new CustomEvent('chrome:languagechange')). The dispatchEvent lets already-mounted generated pages (which cache their string reads per-render) hook a listener and force a re-render if they need to." },
+        { "name": "onLinkTap",          "params": [{ "name": "url", "type": "String" }], "description": "If mobileOpen is true, flip it to false — closes the drawer as the next page mounts. No preventDefault, no router.push (Next.js <Link> handles navigation)." }
+      ],
+      "vars": [
+        { "name": "navItems",        "type": "Array(SidebarSection)", "observable": true,  "description": "Nav catalog, seeded in onAppear, re-seeded on language toggle." },
+        { "name": "activeUrl",       "type": "String",                "observable": true,  "description": "Current route; ChromeWrapper pushes it via onRouteChange." },
+        { "name": "collapsedIds",    "type": "Array(String)",         "observable": true,  "description": "Collapsed section ids." },
+        { "name": "mobileOpen",      "type": "Bool",                  "observable": true,  "description": "Mobile drawer open flag." },
+        { "name": "currentLanguage", "type": "String",                "observable": true,  "description": "Mirror of StringManager.language." }
+      ]
+    },
+    "customTypes": [
+      {
+        "name": "SidebarSection",
+        "properties": [
+          { "name": "id",       "type": "String" },
+          { "name": "label",    "type": "String" },
+          { "name": "iconName", "type": "String" },
+          { "name": "entries",  "type": "[SidebarEntry]" }
+        ]
+      },
+      {
+        "name": "SidebarEntry",
+        "properties": [
+          { "name": "id",    "type": "String" },
+          { "name": "label", "type": "String" },
+          { "name": "url",   "type": "String" }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    { "action": "Tap a section header",       "processing": "onToggleSection(id) — flip membership in collapsedIds." },
+    { "action": "Tap a nav link",             "processing": "Next.js <Link> navigates. Chrome fires onLinkTap(url); on mobile, drawer closes." },
+    { "action": "Tap the hamburger",          "processing": "onToggleMobileMenu — flip mobileOpen." },
+    { "action": "Tap the language toggle",    "processing": "onToggleLanguage — StringManager.setLanguage + re-seed + dispatch 'chrome:languagechange'." },
+    { "action": "Type ⌘+K (anywhere)",        "processing": "Search modal opens; unrelated to chrome state." }
+  ],
+  "validation": { "clientSide": [], "serverSide": [] },
+  "transitions": [],
+  "relatedFiles": [
+    { "type": "Layout",    "path": "docs/screens/layouts/chrome.json",                                  "description": "Chrome layout composing TopBar + Sidebar." },
+    { "type": "Component", "path": "docs/components/json/topbar.component.json",                        "description": "TopBar custom component spec." },
+    { "type": "Component", "path": "docs/components/json/sidebar.component.json",                      "description": "Sidebar custom component spec." },
+    { "type": "ViewModel", "path": "jsonui-doc-web/src/viewmodels/ChromeViewModel.ts",                 "description": "Hand-written VM body with the NAV_CATALOG constant." },
+    { "type": "Wrapper",   "path": "jsonui-doc-web/src/components/chrome/ChromeMount.tsx",             "description": "Client wrapper that instantiates the VM via the generated hook, bridges usePathname() into onRouteChange, and mounts the generated Chrome component." },
+    { "type": "View",      "path": "jsonui-doc-web/src/app/layout.tsx",                                "description": "Next.js RootLayout — mounts ChromeMount as a sibling of {children}." }
+  ],
+  "notes": [
+    "Not a page: no src/app/chrome/page.tsx. The generated Chrome.tsx is consumed ONLY by ChromeMount, which RootLayout renders site-wide.",
+    "The layout never renders a 'slot' for page content. RootLayout places {children} beside the generated Chrome; CSS in globals.css reserves topbar/sidebar space via padding on .site-main.",
+    "onRouteChange is the only public method on the VM that is NOT surfaced as a layout data binding — it is called only from the ChromeWrapper via the generated hook."
+  ]
+}

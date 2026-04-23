@@ -1,0 +1,152 @@
+{
+  "component": "Progress",
+  "kebab": "progress",
+  "aliasOf": null,
+  "title": "Progress",
+  "description": "Linear or circular progress indicator. Set `progress` (0.0–1.0) for determinate progress.",
+  "usage": "Use Progress for multi-second tasks where the user benefits from seeing elapsed fraction (upload, import, export). For brief (<1 s) waits or unknown duration, use Indicator.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Upload progress",
+              "language": "json",
+              "code": "{\n  \"type\": \"Progress\",\n  \"progress\": \"@{uploadProgress}\",\n  \"tintColor\": \"#2563EB\"\n}",
+              "note": "`uploadProgress` is a Double in 0.0–1.0.",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Circular style",
+              "language": "json",
+              "code": "{\n  \"type\": \"Progress\",\n  \"progressViewStyle\": \"circular\",\n  \"progress\": \"@{progress}\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "With track color",
+              "language": "json",
+              "code": "{\n  \"type\": \"Progress\",\n  \"progress\": \"@{loaded / total}\",\n  \"progressTintColor\": \"#10B981\",\n  \"trackTintColor\": \"#E5E7EB\"\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_tint_color",
+              "name": "tintColor",
+              "type": "string",
+              "required": "",
+              "description": "Tint color - hex string or color name from colors.json",
+              "note": "Shorthand that sets `progressTintColor` if the specific attribute is not provided."
+            },
+            {
+              "id": "attr_progress",
+              "name": "progress",
+              "type": "number | binding",
+              "required": "",
+              "description": "Progress value (0-1, can be binding)",
+              "note": "Numeric 0.0–1.0. Smoothly interpolates on change. For indeterminate progress, use Indicator instead."
+            },
+            {
+              "id": "attr_progress_image",
+              "name": "progressImage",
+              "type": "string",
+              "required": "",
+              "description": "Custom progress image",
+              "note": "iOS-only. Stretchable image used in place of a solid progress tint.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_progress_tint_color",
+              "name": "progressTintColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Progress portion color - hex string or color name from colors.json (binding supported)",
+              "note": "Color of the filled portion."
+            },
+            {
+              "id": "attr_progress_view_style",
+              "name": "progressViewStyle",
+              "type": "string",
+              "required": "",
+              "description": "Progress view style: default, bar",
+              "note": "`linear` (default) or `circular`.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_track_image",
+              "name": "trackImage",
+              "type": "string",
+              "required": "",
+              "description": "Custom track image",
+              "note": "iOS-only. Stretchable image used for the track.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_track_tint_color",
+              "name": "trackTintColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Track portion color - hex string or color name from colors.json (binding supported)",
+              "note": "Color of the unfilled (background) portion."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_indicator",
+              "name": "Indicator",
+              "url": "/reference/components/indicator"
+            },
+            {
+              "id": "related_slider",
+              "name": "Slider",
+              "url": "/reference/components/slider"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

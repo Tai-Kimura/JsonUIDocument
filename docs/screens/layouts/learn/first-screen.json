@@ -1,0 +1,507 @@
+{
+  "type": "View",
+  "id": "learn_first_screen_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateLearn",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "learn_first_screen_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "learn_first_screen_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            24,
+            32
+          ],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateLearn}",
+              "text": "breadcrumb",
+              "width": "wrapContent"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "#475467",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "#64748B",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "learn_first_screen_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "learn_first_screen_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_shape",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_shape_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_shape_body"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_spec",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_spec_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_spec_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "{\n  \"metadata\": { \"name\": \"RecentActivity\", \"platforms\": [\"web\"], \"layoutFile\": \"recent-activity\" },\n  \"stateManagement\": {\n    \"uiVariables\": [\n      { \"name\": \"welcomeKey\",   \"type\": \"String\",                \"initial\": \"\\\"\\\"\" },\n      { \"name\": \"taglineKey\",   \"type\": \"String\",                \"initial\": \"\\\"\\\"\" },\n      { \"name\": \"activities\",   \"type\": \"CollectionDataSource\",   \"initial\": \"null\" },\n      { \"name\": \"emptyVisibility\", \"type\": \"String\",              \"initial\": \"\\\"gone\\\"\" }\n    ],\n    \"eventHandlers\": [\n      { \"name\": \"onAppear\" },\n      { \"name\": \"onRefresh\" },\n      { \"name\": \"onSelectActivity\", \"params\": [{ \"name\": \"id\", \"type\": \"String\" }] }\n    ],\n    \"displayLogic\": []\n  },\n  \"dataFlow\": {\n    \"customTypes\": [\n      {\n        \"name\": \"ActivityRow\",\n        \"properties\": [\n          { \"name\": \"id\",        \"type\": \"String\" },\n          { \"name\": \"titleKey\",  \"type\": \"String\" },\n          { \"name\": \"detailKey\", \"type\": \"String\" },\n          { \"name\": \"occurredAt\",\"type\": \"Date\" }\n        ]\n      }\n    ]\n  }\n}",
+                      "language": "json",
+                      "filename": "recent-activity.spec.json",
+                      "showLineNumbers": true,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_layout",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_layout_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_layout_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"horizontal\", \"paddings\": [16, 24, 16, 24], \"background\": \"#0B1220\", \"child\": [\n      { \"type\": \"Label\", \"weight\": 1, \"fontSize\": 20, \"fontWeight\": \"semibold\", \"fontColor\": \"#F9FAFB\", \"text\": \"header_title\" },\n      { \"type\": \"Button\", \"style\": \"lang_toggle_button\", \"text\": \"lang_toggle\", \"onClick\": \"@{onToggleLanguage}\" }\n    ]},\n    { \"type\": \"View\", \"style\": \"hero_section\", \"child\": [\n      { \"type\": \"Label\", \"fontSize\": 32, \"fontWeight\": \"bold\", \"fontColor\": \"#F9FAFB\", \"text\": \"@{welcomeKey}\" },\n      { \"type\": \"Label\", \"fontSize\": 15, \"fontColor\": \"#CBD5F5\", \"text\": \"@{taglineKey}\", \"topMargin\": 8 },\n      { \"type\": \"Button\", \"style\": \"primary_button\", \"text\": \"refresh\", \"onClick\": \"@{onRefresh}\", \"topMargin\": 16 }\n    ]},\n    { \"type\": \"Collection\", \"items\": \"@{activities}\", \"cellIdProperty\": \"id\",\n      \"lineSpacing\": 12, \"itemSpacing\": 12,\n      \"sections\": [ { \"cell\": \"cells/activity_row\" } ] },\n    { \"type\": \"Label\", \"visibility\": \"@{emptyVisibility}\", \"text\": \"empty_state\" }\n  ]\n}",
+                      "language": "json",
+                      "filename": "recent-activity.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_cell",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_cell_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_cell_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"style\": \"card_surface\",\n  \"child\": [\n    { \"data\": [\n      { \"name\": \"titleKey\",  \"class\": \"String\" },\n      { \"name\": \"detailKey\", \"class\": \"String\" },\n      { \"name\": \"url\",       \"class\": \"String\" },\n      { \"name\": \"onNavigate\",\"class\": \"() -> Void\" }\n    ]},\n    { \"type\": \"Label\", \"fontSize\": 16, \"fontWeight\": \"semibold\", \"fontColor\": \"#0B1220\", \"text\": \"@{titleKey}\" },\n    { \"type\": \"Label\", \"topMargin\": 4, \"fontSize\": 14, \"fontColor\": \"#475467\", \"text\": \"@{detailKey}\" }\n  ]\n}",
+                      "language": "json",
+                      "filename": "cells/activity_row.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_wire",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_wire_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_wire_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "export class RecentActivityViewModel {\n  // ... standard init boilerplate (mirror HelloWorldViewModel) ...\n\n  onAppear = () => {\n    const rows: ActivityRow[] = [\n      { id: \"a1\", titleKey: s(\"row_1_title\"), detailKey: s(\"row_1_detail\"), occurredAt: new Date() },\n      { id: \"a2\", titleKey: s(\"row_2_title\"), detailKey: s(\"row_2_detail\"), occurredAt: new Date() },\n    ];\n    this.updateData({\n      welcomeKey: s(\"welcome\"),\n      taglineKey: s(\"tagline\"),\n      activities: this.asCollection(rows),\n      emptyVisibility: rows.length === 0 ? \"visible\" : \"gone\",\n    });\n  };\n\n  onRefresh = () => this.onAppear();\n  onSelectActivity = (id: string) => this.router.push(`/activity/${id}`);\n}",
+                      "language": "typescript",
+                      "filename": "RecentActivityViewModel.ts (excerpt)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_ship",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_ship_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_ship_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "# Generate Layout + ViewModel base from the spec.\njui generate project --file recent-activity.spec.json\n\n# Keep rebuilding while you fill in the details.\njui build --watch\n\n# Before you commit, prove the layout has not drifted.\njui verify --fail-on-diff\n\n# Ship it.\ngit add docs/screens/ jsonui-doc-web/src/\ngit commit -m 'feat(activity): recent activity screen'",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "learn_first_screen_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    32,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "#0B1220",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "#F9FAFB",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "learn_first_screen_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 2,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/next_step_card"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "learn_first_screen_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "#0B1220",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "#94A3B8",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "learn_first_screen_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [
+                24,
+                16,
+                24,
+                16
+              ],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "learn_first_screen_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    0,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        {
+                          "id": "toc_shape",
+                          "label": "toc_row_shape",
+                          "anchor": "section_shape",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_spec",
+                          "label": "toc_row_spec",
+                          "anchor": "section_spec",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_layout",
+                          "label": "toc_row_layout",
+                          "anchor": "section_layout",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_cell",
+                          "label": "toc_row_cell",
+                          "anchor": "section_cell",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_wire",
+                          "label": "toc_row_wire",
+                          "anchor": "section_wire",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_ship",
+                          "label": "toc_row_ship",
+                          "anchor": "section_ship",
+                          "level": 1
+                        }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

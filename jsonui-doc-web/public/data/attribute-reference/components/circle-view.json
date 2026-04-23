@@ -1,0 +1,115 @@
+{
+  "component": "CircleView",
+  "kebab": "circle-view",
+  "aliasOf": null,
+  "title": "CircleView",
+  "description": "Circular container. Equivalent to a View with `cornerRadius: width/2` and clipping, but guarantees a perfect circle regardless of aspect.",
+  "usage": "Use CircleView for avatars, badges, and circular icons. Always specify equal `width` and `height` (or just `width`; height auto-matches).",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Avatar",
+              "language": "json",
+              "code": "{\n  \"type\": \"CircleView\",\n  \"width\": 48,\n  \"height\": 48,\n  \"child\": [\n    { \"type\": \"NetworkImage\", \"url\": \"@{user.avatarUrl}\", \"width\": 48, \"height\": 48, \"contentMode\": \"aspectFill\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Unread count badge",
+              "language": "json",
+              "code": "{\n  \"type\": \"CircleView\",\n  \"width\": 24,\n  \"height\": 24,\n  \"background\": \"#EF4444\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@{unreadCount}\", \"fontColor\": \"#FFFFFF\", \"fontSize\": 12, \"gravity\": \"center\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "Colored status dot",
+              "language": "json",
+              "code": "{\n  \"type\": \"CircleView\",\n  \"width\": 10,\n  \"height\": 10,\n  \"background\": \"@{statusColor}\"\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_child",
+              "name": "child",
+              "type": "array",
+              "required": "",
+              "description": "Child component(s)",
+              "note": "Children are clipped to the circular bounds. For an image avatar, size the Image to match the CircleView and set contentMode to `aspectFill`.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_children",
+              "name": "children",
+              "type": "array",
+              "required": "",
+              "description": "Child components (alias for child)",
+              "note": "Alias for `child`.",
+              "platform": "swift"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_view",
+              "name": "View",
+              "url": "/reference/components/view"
+            },
+            {
+              "id": "related_image",
+              "name": "Image",
+              "url": "/reference/components/image"
+            },
+            {
+              "id": "related_network_image",
+              "name": "NetworkImage",
+              "url": "/reference/components/network-image"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

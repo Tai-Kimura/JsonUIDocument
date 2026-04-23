@@ -1,0 +1,407 @@
+{
+  "component": "Collection",
+  "kebab": "collection",
+  "aliasOf": null,
+  "title": "Collection",
+  "description": "Virtualized list/grid for dynamic arrays. Renders only visible items. Supports vertical/horizontal lists, multi-column grids, section headers, paging, and lazy loading.",
+  "usage": "Use Collection for any list bound to a dynamic array (search results, feeds, product grids). Each row is rendered by a cell file referenced in `sections[].cell`.",
+  "aliasNotice": null,
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Simple vertical list",
+              "language": "json",
+              "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{users}\",\n  \"cellIdProperty\": \"id\",\n  \"sections\": [ { \"cell\": \"cells/user_row\" } ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "2-column grid",
+              "language": "json",
+              "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{photos}\",\n  \"columnCount\": 2,\n  \"itemSpacing\": 8,\n  \"lineSpacing\": 8,\n  \"sections\": [ { \"cell\": \"cells/photo_card\" } ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "title": "Sectioned with headers",
+              "language": "json",
+              "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{sectionedMessages}\",\n  \"headerClasses\": [\"cells/date_header\"],\n  \"cellClasses\": [\"cells/message_row\"],\n  \"sections\": [\n    {\n      \"header\": \"cells/date_header\",\n      \"cell\": \"cells/message_row\"\n    }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_4",
+              "title": "Horizontal carousel",
+              "language": "json",
+              "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{featuredProducts}\",\n  \"orientation\": \"horizontal\",\n  \"horizontalScroll\": true,\n  \"sections\": [ { \"cell\": \"cells/product_card\" } ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_5",
+              "title": "Infinite scroll (load more)",
+              "language": "json",
+              "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{articles}\",\n  \"onItemAppear\": \"@{onItemAppear}\",\n  \"sections\": [ { \"cell\": \"cells/article_row\" } ]\n}",
+              "note": "The ViewModel inspects `onItemAppear` item index and triggers a fetch when within N rows of the end.",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_items",
+              "name": "items",
+              "type": "array | binding",
+              "required": "",
+              "description": "Data source binding",
+              "note": "Bound to a ViewModel array. Each element must have a stable identifier (see `cellIdProperty`) for efficient reconciliation."
+            },
+            {
+              "id": "attr_cell_id_property",
+              "name": "cellIdProperty",
+              "type": "string",
+              "required": "",
+              "description": "Cell data property key to use as unique ID for ForEach identity. When set, scrollTo uses String type instead of Int.",
+              "note": "Key name to use as the stable identifier. Defaults to `id`. Required for correct reordering animations and minimal re-renders."
+            },
+            {
+              "id": "attr_sections",
+              "name": "sections",
+              "type": "array",
+              "required": "",
+              "description": "Section-based configuration",
+              "note": "Array of section definitions. Each has `cell` (required), plus optional `header` / `footer` / `itemsProperty`. For a flat single-section list, use one entry."
+            },
+            {
+              "id": "attr_cell_classes",
+              "name": "cellClasses",
+              "type": "array",
+              "required": "",
+              "description": "Cell class definitions",
+              "note": "Array of cell layout paths. Used when a section uses multiple cell types conditionally (e.g., sponsored vs organic)."
+            },
+            {
+              "id": "attr_header_classes",
+              "name": "headerClasses",
+              "type": "array",
+              "required": "",
+              "description": "Header class definitions",
+              "note": "Cell layout paths for section headers. Must match the number of sections that have headers."
+            },
+            {
+              "id": "attr_footer_classes",
+              "name": "footerClasses",
+              "type": "array",
+              "required": "",
+              "description": "Footer class definitions",
+              "note": "Cell layout paths for section footers."
+            },
+            {
+              "id": "attr_column_count",
+              "name": "columnCount",
+              "type": "number",
+              "required": "",
+              "description": "Number of columns for CSS grid",
+              "note": "Default 1 (list). Accepts responsive object `{ xs: 1, md: 2, lg: 3 }` for breakpoint-based columns.",
+              "platform": "react"
+            },
+            {
+              "id": "attr_columns",
+              "name": "columns",
+              "type": "number",
+              "required": "",
+              "description": "Number of columns"
+            },
+            {
+              "id": "attr_column_spacing",
+              "name": "columnSpacing",
+              "type": "number",
+              "required": "",
+              "description": "Spacing between columns"
+            },
+            {
+              "id": "attr_item_spacing",
+              "name": "itemSpacing",
+              "type": "number",
+              "required": "",
+              "description": "Spacing between items (used for both grid spacing and list item spacing)",
+              "note": "Cross-axis spacing between cells (between columns in a grid)."
+            },
+            {
+              "id": "attr_line_spacing",
+              "name": "lineSpacing",
+              "type": "number",
+              "required": "",
+              "description": "Spacing between rows",
+              "note": "Main-axis spacing between cells (between rows in a list)."
+            },
+            {
+              "id": "attr_orientation",
+              "name": "orientation",
+              "type": "string",
+              "required": "",
+              "description": "Scroll orientation (horizontal or vertical)",
+              "note": "`vertical` (default) / `horizontal`. Horizontal collections are typically carousels.",
+              "enumValues": [
+                "horizontal",
+                "vertical"
+              ]
+            },
+            {
+              "id": "attr_horizontal_scroll",
+              "name": "horizontalScroll",
+              "type": "boolean",
+              "required": "",
+              "description": "Enable horizontal scroll"
+            },
+            {
+              "id": "attr_lazy",
+              "name": "lazy",
+              "type": "boolean",
+              "required": "",
+              "description": "Whether to use a lazy (virtualized) container. true (default): LazyVStack/LazyColumn/LazyVerticalGrid etc. with internal scrolling. false: render all items eagerly inside a plain VStack/Column (SwiftUI) or Column (Compose) or div (React) with NO scroll container — use when the Collection is nested inside an already-scrollable parent. Sticky headers and paging require lazy: true.",
+              "note": "`true` (default) enables virtualization (only visible rows are instantiated). `false` renders all rows at once — use only for short, known-bounded lists."
+            },
+            {
+              "id": "attr_paging",
+              "name": "paging",
+              "type": "boolean",
+              "required": "",
+              "description": "Enable paging",
+              "note": "`true` snaps to cell or page boundaries. Often combined with `columnCount: 1` + full-width cells for page-sized content."
+            },
+            {
+              "id": "attr_scroll_enabled",
+              "name": "scrollEnabled",
+              "type": "boolean | binding",
+              "required": "",
+              "description": "Enable/disable scrolling (binding supported)"
+            },
+            {
+              "id": "attr_on_item_appear",
+              "name": "onItemAppear",
+              "type": "callback",
+              "required": "",
+              "description": "Called with the cell index (Int) when a cell appears on screen. Use for pagination by checking index against total count in ViewModel.",
+              "note": "Fired when a cell becomes visible. Use for analytics impressions or infinite-scroll triggers."
+            },
+            {
+              "id": "attr_on_page_changed",
+              "name": "onPageChanged",
+              "type": "callback",
+              "required": "",
+              "description": "Called with the new page index (Int) when the user swipes to a different page",
+              "note": "Fires when the current paged position changes. Only meaningful when `paging: true`."
+            },
+            {
+              "id": "attr_keyboard_avoidance",
+              "name": "keyboardAvoidance",
+              "type": "boolean",
+              "required": "",
+              "description": "Enable keyboard avoidance",
+              "note": "Same semantics as ScrollView — auto-scroll so the focused input is above the keyboard.",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_shows_horizontal_scroll_indicator",
+              "name": "showsHorizontalScrollIndicator",
+              "type": "boolean",
+              "required": "",
+              "description": "Show horizontal indicator"
+            },
+            {
+              "id": "attr_shows_vertical_scroll_indicator",
+              "name": "showsVerticalScrollIndicator",
+              "type": "boolean",
+              "required": "",
+              "description": "Show vertical indicator"
+            },
+            {
+              "id": "attr_auto_change_tracking_id",
+              "name": "autoChangeTrackingId",
+              "type": "boolean",
+              "required": "",
+              "description": "When true (and cellIdProperty is set), the library auto-computes each cellId as '<primary>_<hash>' so differential updates work without a manual hashForCell helper. If cellIdProperty is missing, the build emits a warning and cells fall back to index-based identity."
+            },
+            {
+              "id": "attr_content_inset_adjustment_behavior",
+              "name": "contentInsetAdjustmentBehavior",
+              "type": "string",
+              "required": "",
+              "description": "Content inset adjustment"
+            },
+            {
+              "id": "attr_content_insets",
+              "name": "contentInsets",
+              "type": "array | string",
+              "required": "",
+              "description": "Content insets"
+            },
+            {
+              "id": "attr_current_page",
+              "name": "currentPage",
+              "type": "binding",
+              "required": "",
+              "description": "Current page index for paging collections (binding supported)"
+            },
+            {
+              "id": "attr_default_scroll_anchor",
+              "name": "defaultScrollAnchor",
+              "type": "string",
+              "required": "",
+              "description": "Initial scroll position anchor (iOS 17+). Sets where the scroll view starts.",
+              "enumValues": [
+                "top",
+                "center",
+                "bottom"
+              ]
+            },
+            {
+              "id": "attr_inset_horizontal",
+              "name": "insetHorizontal",
+              "type": "number",
+              "required": "",
+              "description": "Horizontal inset"
+            },
+            {
+              "id": "attr_inset_vertical",
+              "name": "insetVertical",
+              "type": "number",
+              "required": "",
+              "description": "Vertical inset"
+            },
+            {
+              "id": "attr_insets",
+              "name": "insets",
+              "type": "array | string",
+              "required": "",
+              "description": "Content insets"
+            },
+            {
+              "id": "attr_item_weight",
+              "name": "itemWeight",
+              "type": "number",
+              "required": "",
+              "description": "Item sizing weight"
+            },
+            {
+              "id": "attr_layout",
+              "name": "layout",
+              "type": "string",
+              "required": "",
+              "description": "Layout type (flow: wrapping layout, LeftAligned: left-aligned wrapping)",
+              "enumValues": [
+                "vertical",
+                "horizontal",
+                "flow",
+                "Flow",
+                "LeftAligned",
+                "leftAligned"
+              ]
+            },
+            {
+              "id": "attr_reverse_layout",
+              "name": "reverseLayout",
+              "type": "boolean",
+              "required": "",
+              "description": "Reverse the layout direction of the Collection grid. When true, section order in the generated code is also reversed so that JSON definition order (index 0 first) matches the visual top-to-bottom order on iOS (which does not support reverseLayout). Compose's reverseLayout then flips the entire list so index 0 appears at the bottom."
+            },
+            {
+              "id": "attr_scroll_anchor",
+              "name": "scrollAnchor",
+              "type": "string",
+              "required": "",
+              "description": "Anchor point for scroll target (default: bottom)",
+              "enumValues": [
+                "top",
+                "center",
+                "bottom"
+              ]
+            },
+            {
+              "id": "attr_scroll_animated",
+              "name": "scrollAnimated",
+              "type": "boolean",
+              "required": "",
+              "description": "Whether scrollTo uses animation (default: true)"
+            },
+            {
+              "id": "attr_scroll_to",
+              "name": "scrollTo",
+              "type": "binding",
+              "required": "",
+              "description": "PassthroughSubject<Int, Never> for programmatic scrolling to cell index"
+            },
+            {
+              "id": "attr_set_target_as_data_source",
+              "name": "setTargetAsDataSource",
+              "type": "boolean",
+              "required": "",
+              "description": "Set target as data source",
+              "platform": "swift"
+            },
+            {
+              "id": "attr_set_target_as_delegate",
+              "name": "setTargetAsDelegate",
+              "type": "boolean",
+              "required": "",
+              "description": "Set target as delegate",
+              "platform": "swift"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_scroll_view",
+              "name": "ScrollView",
+              "url": "/reference/components/scroll-view"
+            },
+            {
+              "id": "related_view",
+              "name": "View",
+              "url": "/reference/components/view"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

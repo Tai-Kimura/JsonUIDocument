@@ -1,0 +1,127 @@
+{
+  "component": "EditText",
+  "kebab": "edit-text",
+  "aliasOf": "TextField",
+  "title": "EditText",
+  "description": "Android-native naming alias for TextField. Identical runtime behavior; exists to preserve attribute-name familiarity for Android engineers migrating from XML `EditText`.",
+  "usage": "Prefer TextField in new cross-platform code. Use EditText when porting existing Android XML layouts verbatim.",
+  "aliasNotice": "Alias of TextField. Identical runtime behavior.",
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "title": "Android XML migration example",
+              "language": "xml",
+              "code": "<EditText\n  android:id=\"@+id/phone\"\n  android:hint=\"@string/phone_hint\"\n  android:inputType=\"phone\"\n  android:maxLength=\"11\"/>",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "title": "Same in JsonUI",
+              "language": "json",
+              "code": "{\n  \"type\": \"EditText\",\n  \"id\": \"phone\",\n  \"text\": \"@{phone}\",\n  \"hint\": \"@string/phone_hint\",\n  \"inputType\": \"phone\",\n  \"maxLength\": 11\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_text",
+              "name": "text",
+              "type": "string | binding",
+              "required": "",
+              "description": "Text content (binding for two-way)",
+              "bindingDirection": "two-way"
+            },
+            {
+              "id": "attr_hint",
+              "name": "hint",
+              "type": "string",
+              "required": "",
+              "description": "Placeholder text (primary)"
+            },
+            {
+              "id": "attr_placeholder",
+              "name": "placeholder",
+              "type": "string",
+              "required": "",
+              "description": "Placeholder text (alias for hint)"
+            },
+            {
+              "id": "attr_hint_color",
+              "name": "hintColor",
+              "type": "string | binding",
+              "required": "",
+              "description": "Placeholder color - hex string or color name from colors.json (binding supported)"
+            },
+            {
+              "id": "attr_input_type",
+              "name": "inputType",
+              "type": "string",
+              "required": "",
+              "description": "Input type for Android",
+              "note": "Android-style. `text` / `number` / `phone` / `email` / `password` / `textMultiLine`. Maps to TextField's `contentType` internally."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_text_field",
+              "name": "TextField",
+              "url": "/reference/components/text-field"
+            },
+            {
+              "id": "related_text_view",
+              "name": "TextView",
+              "url": "/reference/components/text-view"
+            },
+            {
+              "id": "related_input",
+              "name": "Input",
+              "url": "/reference/components/input"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": "next_attributes_title",
+              "descriptionKey": "next_attributes_body",
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": "next_custom_components_title",
+              "descriptionKey": "next_custom_components_body",
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

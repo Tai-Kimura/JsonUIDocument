@@ -1,0 +1,92 @@
+{
+  "type": "View",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "wrapContent",
+  "style": "card_surface",
+  "tapBackground": "#F3F4F6",
+  "onClick": "@{onNavigate}",
+  "child": [
+    {
+      "data": [
+        { "name": "titleKey", "class": "String" },
+        { "name": "descriptionKey", "class": "String" },
+        { "name": "readTimeKey", "class": "String" },
+        { "name": "statusKey", "class": "String" },
+        { "name": "statusBackground", "class": "String" },
+        { "name": "statusColor", "class": "String" },
+        { "name": "cardOpacity", "class": "Number", "defaultValue": 1 },
+        { "name": "url", "class": "String" },
+        { "name": "onNavigate", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "View",
+      "orientation": "horizontal",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "alpha": "@{cardOpacity}",
+      "child": [
+        {
+          "type": "Label",
+          "weight": 1,
+          "height": "wrapContent",
+          "fontSize": 18,
+          "fontWeight": "semibold",
+          "fontColor": "#0B1220",
+          "text": "@{titleKey}"
+        },
+        {
+          "type": "Label",
+          "width": "wrapContent",
+          "height": "wrapContent",
+          "paddings": [3, 10, 3, 10],
+          "fontSize": 11,
+          "fontWeight": "semibold",
+          "fontColor": "@{statusColor}",
+          "background": "@{statusBackground}",
+          "cornerRadius": 999,
+          "text": "@{statusKey}"
+        }
+      ]
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 8,
+      "fontSize": 14,
+      "fontColor": "#475467",
+      "text": "@{descriptionKey}",
+      "alpha": "@{cardOpacity}"
+    },
+    {
+      "type": "View",
+      "orientation": "horizontal",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 10,
+      "child": [
+        {
+          "type": "Label",
+          "weight": 1,
+          "height": "wrapContent",
+          "fontSize": 12,
+          "fontColor": "#64748B",
+          "text": "@{readTimeKey}",
+          "alpha": "@{cardOpacity}"
+        },
+        {
+          "type": "Label",
+          "width": "wrapContent",
+          "height": "wrapContent",
+          "fontSize": 13,
+          "fontWeight": "semibold",
+          "fontColor": "#2563EB",
+          "text": "@{url}",
+          "alpha": "@{cardOpacity}"
+        }
+      ]
+    }
+  ]
+}

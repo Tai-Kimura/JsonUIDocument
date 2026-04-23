@@ -1,0 +1,121 @@
+{
+  "component": "View",
+  "description": {
+    "en": "Generic container that arranges child components vertically or horizontally. The most-used component — every JsonUI screen has a View at the root of each layout segment.",
+    "ja": "子要素を垂直または水平に並べる汎用コンテナ。最も多用され、あらゆる JsonUI 画面の各セクションのルートに存在する。"
+  },
+  "usage": {
+    "en": "Use View whenever you need to group multiple components. Choose `orientation` (vertical/horizontal). For scrollable content use ScrollView; for dynamic lists use Collection.",
+    "ja": "複数の要素をまとめたいとき常に使う。`orientation` で方向を決める（vertical / horizontal）。スクロールが必要なら ScrollView、動的リストなら Collection を使う。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Vertical stack", "ja": "垂直スタック" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/title\", \"fontSize\": 24 },\n    { \"type\": \"Label\", \"text\": \"@string/subtitle\", \"fontSize\": 16 },\n    { \"type\": \"Button\", \"text\": \"@string/action\", \"onClick\": \"@{onAction}\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Horizontal with weight", "ja": "水平 + weight で中央を伸ばす" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"horizontal\",\n  \"child\": [\n    { \"type\": \"Image\", \"source\": \"avatar\", \"width\": 40, \"height\": 40 },\n    { \"type\": \"Label\", \"text\": \"@{userName}\", \"weight\": 1 },\n    { \"type\": \"Label\", \"text\": \"@{timestamp}\", \"fontColor\": \"#9CA3AF\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Card with background and corners", "ja": "背景色 + 角丸のカード" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"background\": \"#F3F4F6\",\n  \"cornerRadius\": 12,\n  \"paddings\": [16, 16, 16, 16],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/card_body\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Conditional show/hide", "ja": "条件付き表示" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{hasError ? 'visible' : 'gone'}\",\n  \"background\": \"#FEE2E2\",\n  \"paddings\": [12, 12, 12, 12],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@{errorMessage}\", \"fontColor\": \"#991B1B\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Linear gradient background", "ja": "線形グラデーション背景" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"gradient\": [\"#6366F1\", \"#8B5CF6\"],\n  \"gradientDirection\": \"vertical\",\n  \"paddings\": [24, 24, 24, 24]\n}"
+    }
+  ],
+  "attributes": {
+    "orientation": {
+      "note": {
+        "en": "`vertical` (default) / `horizontal`. Switches child layout axis. For grid layouts use Collection with `columnCount`.",
+        "ja": "`vertical`（デフォルト）/ `horizontal`。子要素の配置軸を決める。グリッドは Collection に `columnCount` を指定。"
+      }
+    },
+    "child": {
+      "note": {
+        "en": "Array of child components. Order determines layout order. For dynamic repetition from a bound array, use Collection instead of `child`.",
+        "ja": "子要素の配列。順序がレイアウト順序を決定。バインドされた配列からの動的繰り返しは `child` ではなく Collection を使う。"
+      }
+    },
+    "alignment": {
+      "note": {
+        "en": "Cross-axis alignment. For vertical orientation: `left` / `center` / `right`. For horizontal: `top` / `center` / `bottom`.",
+        "ja": "交差軸方向の揃え。vertical では `left` / `center` / `right`、horizontal では `top` / `center` / `bottom`。"
+      }
+    },
+    "distribution": {
+      "note": {
+        "en": "Main-axis distribution. `start` / `center` / `end` / `spaceBetween` / `spaceAround` / `spaceEvenly`. Controls gap and edge behavior for children.",
+        "ja": "主軸方向の配分。`start` / `center` / `end` / `spaceBetween` / `spaceAround` / `spaceEvenly`。子要素間のギャップと端の挙動を制御。"
+      }
+    },
+    "spacing": {
+      "note": {
+        "en": "Fixed gap between children along the main axis. Simpler alternative to using `distribution: spaceBetween`.",
+        "ja": "主軸方向の子要素間の固定ギャップ。`distribution: spaceBetween` より単純な指定。"
+      }
+    },
+    "gradient": {
+      "note": {
+        "en": "Array of 2+ color strings. Use `gradientDirection` to control direction. For multi-stop or radial gradients, use a dedicated GradientView.",
+        "ja": "2 色以上の配列。方向は `gradientDirection` で指定。多段 stop や放射状グラデは GradientView を使う。"
+      }
+    },
+    "gradientDirection": {
+      "note": {
+        "en": "`horizontal` / `vertical` / `diagonal` or numeric degrees. Default `vertical`.",
+        "ja": "`horizontal` / `vertical` / `diagonal` または度数。デフォルト `vertical`。"
+      }
+    },
+    "flexWrap": {
+      "note": {
+        "en": "Horizontal orientation only. `true` wraps overflow onto subsequent rows. Maps to CSS flex-wrap on Web.",
+        "ja": "horizontal のみ。`true` で溢れた子を次行に折り返す。Web では CSS flex-wrap にマップ。"
+      }
+    },
+    "draggable": {
+      "note": {
+        "en": "Enables drag-and-drop. Used with the `onDragStart` / `onDragEnter` / `onDragOver` / `onDragLeave` / `onDrop` handlers.",
+        "ja": "ドラッグ&ドロップを有効化。`onDragStart` / `onDragEnter` / `onDragOver` / `onDragLeave` / `onDrop` ハンドラと組み合わせて使う。"
+      }
+    }
+  },
+  "commonAttributes": {
+    "background": {
+      "note": {
+        "en": "Hex string, color name, or @color/token. For gradients use the `gradient` attribute or GradientView.",
+        "ja": "hex 文字列、色名、または @color/token。グラデーションは `gradient` 属性または GradientView を使う。"
+      }
+    },
+    "cornerRadius": {
+      "note": {
+        "en": "Number (uniform) or array `[tl, tr, br, bl]` for per-corner control.",
+        "ja": "数値（全辺同一）または配列 `[左上, 右上, 右下, 左下]` で角ごとに指定。"
+      }
+    },
+    "borderColor": {
+      "note": {
+        "en": "Required together with `borderWidth` for a visible border.",
+        "ja": "border を表示するには `borderWidth` と両方指定が必要。"
+      }
+    },
+    "clipToBounds": {
+      "note": {
+        "en": "Boolean. When `true`, children that overflow the View are clipped. Required when child content has corners larger than the parent.",
+        "ja": "Boolean。`true` で境界を超える子を切り取る。子のコンテンツが親より大きい角丸を持つ場合に必要。"
+      }
+    }
+  },
+  "relatedComponents": ["SafeAreaView", "ScrollView", "Collection", "GradientView"]
+}

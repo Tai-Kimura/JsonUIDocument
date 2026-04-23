@@ -1,0 +1,170 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "Cli",
+    "displayName": "jsonui-cli",
+    "description": "Tools > CLI overview. Six sub-CLIs under one install: jui (orchestrator) + sjui / kjui / rjui (per-platform builders) + jsonui-test + jsonui-doc. ~10-min read. Companion to /tools/agents and /tools/mcp — the CLIs are what the MCP tools and agents ultimately delegate to for heavy lifting.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "tools/cli",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "cliRows",
+        "type": "[CliRow]",
+        "initial": "[]",
+        "description": "Six sub-CLI entries (jui / sjui / kjui / rjui / jsonui-test / jsonui-doc). Each carries name + role + one-line description."
+      },
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards: Agents + MCP server."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed cliRows + nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[CliView] --> VM[CliViewModel]\n    VM -- cliRows --> VIEW\n    VM -- nextReadLinks --> VIEW\n    VIEW -- onNavigate(url) --> VM",
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed cliRows + nextReadLinks from module-scope catalogs. cliRows carries 6 CLI entries (jui / sjui / kjui / rjui / jsonui-test / jsonui-doc) with nameKey / roleKey / bodyKey keys under the tools_cli_ prefix, all pre-resolved via StringManager. nextReadLinks points to /tools/agents and /tools/mcp."
+        },
+        {
+          "name": "onNavigate",
+          "params": [{ "name": "url", "type": "String" }],
+          "description": "router.push(url). Hit by NextReadLink card taps; cliRows are informational, no per-row nav."
+        }
+      ],
+      "vars": [
+        { "name": "cliRows",       "type": "Array(CliRow)",       "observable": true, "description": "6-row CLI catalog, seeded once per mount." },
+        { "name": "nextReadLinks", "type": "Array(NextReadLink)", "observable": true, "description": "2 closing cards." }
+      ]
+    },
+    "customTypes": [
+      {
+        "name": "CliRow",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "nameKey",
+            "type": "String"
+          },
+          {
+            "name": "roleKey",
+            "type": "String"
+          },
+          {
+            "name": "bodyKey",
+            "type": "String"
+          }
+        ]
+      },
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is a spec-mapped tools URL or /",
+      "destination": "Target spec screen or tab",
+      "description": "v1 destinations: /, /tools/agents, /tools/mcp."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/tools/cli.json",
+      "description": "CLI overview layout."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/cli_row.json",
+      "description": "Sub-CLI card with name / role pill / description paragraph."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/tools/CliViewModel.ts",
+      "description": "Seeds the six-CLI catalog + nextReadLinks."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/tools/cli/page.tsx",
+      "description": "Next.js route."
+    }
+  ],
+  "notes": [
+    "Third live entry under the Tools tab. Flipping TOOLS_ENTRIES row 1 (cli) from 'upcoming' to 'live' in HomeViewModel finishes the task.",
+    "Sub-CLI row is a richer cell than agent_row / mcp_tool_row because the per-tool role is a full sentence (not a short one-liner). Keeping it separate avoids forcing agent_row to grow."
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "component": "IconLabel",
+  "description": {
+    "en": "Label with a leading or trailing icon glyph. Used for button labels with icons, menu items, section rows with chevrons, and status indicators.",
+    "ja": "先頭または末尾にアイコングリフを持つラベル。アイコン付きボタン、メニュー項目、山形矢印付きセクション行、ステータス表示に使う。"
+  },
+  "usage": {
+    "en": "Prefer IconLabel over manually composing View + Image + Label when the icon is a font glyph (SF Symbols, Material Icons, lucide). For raster images use a horizontal View + Image + Label instead.",
+    "ja": "フォントグリフ（SF Symbols / Material Icons / lucide）がアイコンの場合は View + Image + Label を手組みするより IconLabel を優先。ラスター画像の場合は水平 View + Image + Label を使う。"
+  },
+  "examples": [
+    {
+      "title": { "en": "SF Symbol star", "ja": "SF Symbol の star" },
+      "language": "json",
+      "code": "{\n  \"type\": \"IconLabel\",\n  \"iconName\": \"star.fill\",\n  \"iconPosition\": \"leading\",\n  \"text\": \"Favorite\",\n  \"fontSize\": 14,\n  \"fontColor\": \"#F59E0B\"\n}"
+    },
+    {
+      "title": { "en": "Trailing chevron row", "ja": "末尾に山形矢印" },
+      "language": "json",
+      "code": "{\n  \"type\": \"IconLabel\",\n  \"text\": \"@{sectionTitle}\",\n  \"iconName\": \"chevron.right\",\n  \"iconPosition\": \"trailing\",\n  \"iconSize\": 12,\n  \"fontSize\": 16\n}"
+    },
+    {
+      "title": { "en": "Localized label with icon", "ja": "多言語ラベル + アイコン" },
+      "language": "json",
+      "code": "{\n  \"type\": \"IconLabel\",\n  \"iconName\": \"favorite\",\n  \"iconPosition\": \"leading\",\n  \"text\": \"@string/favorite\",\n  \"fontSize\": 14\n}"
+    }
+  ],
+  "attributes": {
+    "iconName": {
+      "note": {
+        "en": "Platform-dependent icon set. iOS → SF Symbols; Android Compose → Material Icons; React → lucide-react. Cross-platform name mapping is documented at /guides/icon-name-mapping.",
+        "ja": "プラットフォーム別アイコンセット。iOS は SF Symbols、Android Compose は Material Icons、React は lucide-react。クロスプラットフォーム命名対応は /guides/icon-name-mapping 参照。"
+      },
+      "platformDiff": {
+        "swift_uikit": "SF Symbol 名。未定義シンボル指定時は警告後に空画像表示。",
+        "swift_swiftui": "同上（`Image(systemName:)`）。",
+        "kotlin_compose": "Material Icons 名（`Icons.Filled.<Name>`）。カスタムアイコンは `R.drawable.<name>` にフォールバック。",
+        "kotlin_xml": "`R.drawable.<name>` に直接解決。",
+        "react": "lucide-react アイコン名（kebab-case）。他ライブラリ対応は converter 拡張が必要。"
+      }
+    },
+    "iconPosition": {
+      "note": {
+        "en": "`leading` / `trailing`. RTL languages flip automatically on iOS and Android; on React the container `dir` attribute controls the flip.",
+        "ja": "`leading` / `trailing`。RTL 言語では iOS と Android は自動反転、React は親の `dir` 属性で制御。"
+      }
+    },
+    "iconSize": {
+      "note": {
+        "en": "Point/dp/px size. If omitted, defaults to fontSize × 1.2.",
+        "ja": "pt/dp/px 単位。省略時は fontSize × 1.2 が使われる。"
+      }
+    },
+    "iconColor": {
+      "note": {
+        "en": "Separate from `fontColor`. If omitted, icon inherits `fontColor`.",
+        "ja": "`fontColor` とは別に指定可能。省略時は `fontColor` を継承。"
+      }
+    }
+  },
+  "relatedComponents": ["Label", "Button", "Image"]
+}

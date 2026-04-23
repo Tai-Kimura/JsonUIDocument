@@ -1,0 +1,77 @@
+{
+  "component": "Progress",
+  "description": {
+    "en": "Linear or circular progress indicator. Set `progress` (0.0–1.0) for determinate progress.",
+    "ja": "線形または円形の進捗インジケータ。`progress`（0.0〜1.0）を指定すると確定進捗になる。"
+  },
+  "usage": {
+    "en": "Use Progress for multi-second tasks where the user benefits from seeing elapsed fraction (upload, import, export). For brief (<1 s) waits or unknown duration, use Indicator.",
+    "ja": "数秒以上かかり進捗率を示すと有益なタスク（アップロード、インポート、エクスポート）に使う。1 秒未満の短い待機や所要時間不明なら Indicator を使う。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Upload progress", "ja": "アップロード進捗" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Progress\",\n  \"progress\": \"@{uploadProgress}\",\n  \"tintColor\": \"#2563EB\"\n}",
+      "note": {
+        "en": "`uploadProgress` is a Double in 0.0–1.0.",
+        "ja": "`uploadProgress` は 0.0〜1.0 の Double。"
+      }
+    },
+    {
+      "title": { "en": "Circular style", "ja": "円形スタイル" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Progress\",\n  \"progressViewStyle\": \"circular\",\n  \"progress\": \"@{progress}\"\n}"
+    },
+    {
+      "title": { "en": "With track color", "ja": "track 色指定" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Progress\",\n  \"progress\": \"@{loaded / total}\",\n  \"progressTintColor\": \"#10B981\",\n  \"trackTintColor\": \"#E5E7EB\"\n}"
+    }
+  ],
+  "attributes": {
+    "progress": {
+      "note": {
+        "en": "Numeric 0.0–1.0. Smoothly interpolates on change. For indeterminate progress, use Indicator instead.",
+        "ja": "0.0〜1.0 の数値。変化時は滑らかに補間される。不定進捗は Indicator を使う。"
+      }
+    },
+    "progressViewStyle": {
+      "note": {
+        "en": "`linear` (default) or `circular`.",
+        "ja": "`linear`（デフォルト）または `circular`。"
+      }
+    },
+    "progressTintColor": {
+      "note": {
+        "en": "Color of the filled portion.",
+        "ja": "進捗部分の色。"
+      }
+    },
+    "trackTintColor": {
+      "note": {
+        "en": "Color of the unfilled (background) portion.",
+        "ja": "未進捗（背景）部分の色。"
+      }
+    },
+    "tintColor": {
+      "note": {
+        "en": "Shorthand that sets `progressTintColor` if the specific attribute is not provided.",
+        "ja": "`progressTintColor` が未指定のときに使われるショートハンド。"
+      }
+    },
+    "progressImage": {
+      "note": {
+        "en": "iOS-only. Stretchable image used in place of a solid progress tint.",
+        "ja": "iOS 専用。進捗色の代わりに伸縮する画像を使う。"
+      }
+    },
+    "trackImage": {
+      "note": {
+        "en": "iOS-only. Stretchable image used for the track.",
+        "ja": "iOS 専用。track 用の伸縮画像。"
+      }
+    }
+  },
+  "relatedComponents": ["Indicator", "Slider"]
+}
