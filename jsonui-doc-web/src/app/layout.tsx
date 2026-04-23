@@ -11,6 +11,14 @@ export const metadata: Metadata = {
   title: "JsonUI — Declarative cross-platform UI",
   description:
     "Author screens once in JSON. JsonUI generates SwiftUI, Compose, and React with ViewModels, bindings, and localization built in.",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   openGraph: {
     title: "JsonUI — Declarative cross-platform UI",
     description:

@@ -236,16 +236,16 @@ export class HelloWorldViewModel {
 
     const swiftSteps: QuickstartStepCell[] = [
       this.stepWithCode("swift-1", "1", "step_install_title", "step_install_instruction", installOneLiner, "bash", "shell", false),
-      this.stepWithCode("swift-2", "2", "step_init_swift_title", "step_init_swift_instruction", "sjui init my-app --swiftui\ncd my-app", "bash", "shell", false),
+      this.stepWithCode("swift-2", "2", "step_init_swift_title", "step_init_swift_instruction", "cd my-app\nsjui init --mode swiftui", "bash", "shell", false),
       this.stepWithCode("swift-3", "3", "step_author_title", "step_author_instruction", sampleHomeLayout, "json", "docs/screens/layouts/home.json", true),
       this.stepWithCode("swift-4", "4", "step_viewmodel_swift_title", "step_viewmodel_swift_instruction", sampleSwiftViewModel, "swift", "HomeViewModel.swift", true),
-      this.stepWithCode("swift-5", "5", "step_build_swift_title", "step_build_swift_instruction", "sjui build\nopen MyApp.xcodeproj\n# In Xcode: ⌘R to run the simulator", "bash", "shell", false),
+      this.stepWithCode("swift-5", "5", "step_build_swift_title", "step_build_swift_instruction", "sjui build\nopen my-app.xcodeproj\n# In Xcode: ⌘R to run the simulator", "bash", "shell", false),
       this.stepWithoutCode("swift-6", "6", "step_see_title", "step_see_instruction"),
     ];
 
     const kotlinSteps: QuickstartStepCell[] = [
       this.stepWithCode("kotlin-1", "1", "step_install_title", "step_install_instruction", installOneLiner, "bash", "shell", false),
-      this.stepWithCode("kotlin-2", "2", "step_init_kotlin_title", "step_init_kotlin_instruction", "kjui init my-app --compose\ncd my-app", "bash", "shell", false),
+      this.stepWithCode("kotlin-2", "2", "step_init_kotlin_title", "step_init_kotlin_instruction", "cd my-app\nkjui init --mode compose", "bash", "shell", false),
       this.stepWithCode("kotlin-3", "3", "step_author_title", "step_author_instruction", sampleHomeLayout, "json", "docs/screens/layouts/home.json", true),
       this.stepWithCode("kotlin-4", "4", "step_viewmodel_kotlin_title", "step_viewmodel_kotlin_instruction", sampleKotlinViewModel, "kotlin", "HomeViewModel.kt", true),
       this.stepWithCode("kotlin-5", "5", "step_build_kotlin_title", "step_build_kotlin_instruction", "kjui build\n./gradlew installDebug\n# Open Android Studio and press Run", "bash", "shell", false),
@@ -254,7 +254,7 @@ export class HelloWorldViewModel {
 
     const reactSteps: QuickstartStepCell[] = [
       this.stepWithCode("react-1", "1", "step_install_title", "step_install_instruction", installOneLiner, "bash", "shell", false),
-      this.stepWithCode("react-2", "2", "step_init_react_title", "step_init_react_instruction", "rjui init my-app\ncd my-app\nnpm install", "bash", "shell", false),
+      this.stepWithCode("react-2", "2", "step_init_react_title", "step_init_react_instruction", "npx create-next-app@latest my-app --ts --tailwind --app --eslint --src-dir\ncd my-app\nrjui init", "bash", "shell", false),
       this.stepWithCode("react-3", "3", "step_author_title", "step_author_instruction", sampleHomeLayout, "json", "docs/screens/layouts/home.json", true),
       this.stepWithCode("react-4", "4", "step_viewmodel_react_title", "step_viewmodel_react_instruction", sampleReactViewModel, "typescript", "src/viewmodels/HomeViewModel.ts", true),
       this.stepWithCode("react-5", "5", "step_build_react_title", "step_build_react_instruction", "rjui build\nnpm run dev\n# Open http://localhost:3000", "bash", "shell", false),

@@ -98,7 +98,14 @@ export const TopBar: React.FC<TopBarProps> = ({
       </button>
 
       <Link href={brandHref} className="chrome-topbar__brand">
-        <span className="chrome-topbar__brand-dot" aria-hidden="true" />
+        <img
+          src="/favicon.svg"
+          width={22}
+          height={22}
+          alt=""
+          aria-hidden="true"
+          className="chrome-topbar__brand-icon"
+        />
         <span className="chrome-topbar__brand-mark">{brandText}</span>
       </Link>
 

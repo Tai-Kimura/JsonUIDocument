@@ -271,72 +271,72 @@
       "ja": "React / Next.js"
     },
     "step_install_title": {
-      "en": "1. Install JsonUI",
-      "ja": "1. JsonUI をインストール"
+      "en": "Install JsonUI",
+      "ja": "JsonUI をインストール"
     },
     "step_install_instruction": {
       "en": "Run the one-liner below. It installs jsonui-cli, the MCP server, and the Claude Code agent bundle into your home directory, adds three binaries to PATH, and registers the MCP with Claude Code. When it finishes, restart your shell so the new PATH entries take effect.",
       "ja": "下のワンライナーを実行。jsonui-cli、MCP サーバー、Claude Code エージェント一式をホームディレクトリに入れ、3 つの CLI バイナリを PATH に追加し、MCP を Claude Code に登録します。完了後はシェルを再起動して PATH を反映させてください。"
     },
     "step_init_swift_title": {
-      "en": "2. Scaffold a SwiftUI project",
-      "ja": "2. SwiftUI プロジェクトを生成"
+      "en": "Create an Xcode project",
+      "ja": "Xcode プロジェクトを作成"
     },
     "step_init_swift_instruction": {
-      "en": "Creates my-app/ with a SwiftUI target, a sample layout under docs/screens/layouts/, a starter ViewModel, and an Xcode project you can run immediately. The --swiftui flag wires in SwiftJsonUI in SwiftUI mode; drop it for UIKit.",
-      "ja": "my-app/ 以下に SwiftUI ターゲット、docs/screens/layouts/ のサンプルレイアウト、スターター ViewModel、すぐ走る Xcode プロジェクトを生成します。--swiftui フラグで SwiftJsonUI を SwiftUI モードで配線。UIKit の場合は外してください。"
+      "en": "Xcode doesn't ship a CLI for creating iOS app projects, so this step is a one-time GUI action. Open Xcode → File > New > Project > iOS > App. Set Product Name to `my-app`, Interface to `SwiftUI`, Language to `Swift`. Save it somewhere your terminal can `cd` into. Then run `sjui init --mode swiftui` inside the project to write `sjui.config.json`.",
+      "ja": "Xcode は iOS アプリプロジェクトを作る公式 CLI を提供していないので、この step だけは GUI 操作です。Xcode で File > New > Project > iOS > App を選択。Product Name: `my-app`、Interface: `SwiftUI`、Language: `Swift`。ターミナルから `cd` できる場所に保存し、プロジェクト内で `sjui init --mode swiftui` を実行して `sjui.config.json` を書き込みます。"
     },
     "step_init_kotlin_title": {
-      "en": "2. Scaffold a Compose project",
-      "ja": "2. Compose プロジェクトを生成"
+      "en": "Create an Android Studio project",
+      "ja": "Android Studio プロジェクトを作成"
     },
     "step_init_kotlin_instruction": {
-      "en": "Creates my-app/ as an Android Compose module with a sample layout under docs/screens/layouts/, a starter ViewModel, and Gradle scripts pre-wired to KotlinJsonUI. The --compose flag opts into Compose mode; drop it for the XML path.",
-      "ja": "my-app/ を Android Compose モジュールとして生成し、docs/screens/layouts/ にサンプルレイアウト、スターター ViewModel、KotlinJsonUI 配線済みの Gradle を用意します。--compose で Compose モード。XML モードの場合は外してください。"
+      "en": "Open Android Studio → New Project > Empty Activity (Phone and Tablet). Set Name to `my-app`, Language to `Kotlin`, Build configuration language to `Kotlin DSL`. Then `cd` into the project and run `kjui init --mode compose` to write `kjui.config.json`.",
+      "ja": "Android Studio で New Project > Empty Activity (Phone and Tablet) を選択。Name: `my-app`、Language: `Kotlin`、Build configuration language: `Kotlin DSL`。ターミナルでプロジェクトに `cd` し、`kjui init --mode compose` を実行して `kjui.config.json` を書き込みます。"
     },
     "step_init_react_title": {
-      "en": "2. Scaffold a Next.js project",
-      "ja": "2. Next.js プロジェクトを生成"
+      "en": "Create a Next.js project",
+      "ja": "Next.js プロジェクトを作成"
     },
     "step_init_react_instruction": {
-      "en": "Creates my-app/ as a Next.js App Router project with Tailwind, TypeScript, and ReactJsonUI pre-configured. Also writes docs/screens/layouts/home.json (cross-platform layout) and src/viewmodels/HomeViewModel.ts (TypeScript VM). Run npm install to fetch dependencies.",
-      "ja": "my-app/ を Next.js App Router プロジェクトとして生成し、Tailwind・TypeScript・ReactJsonUI を設定済みで配置。docs/screens/layouts/home.json（クロスプラットフォームレイアウト）と src/viewmodels/HomeViewModel.ts（TypeScript VM）も書き込みます。npm install で依存を取得してください。"
+      "en": "Scaffold a Next.js App Router project with `create-next-app`, then run `rjui init` inside it to create the Layouts / Styles / Generated directories, register the StringManager, and install built-in components.",
+      "ja": "`create-next-app` で Next.js App Router プロジェクトを作成し、その中で `rjui init` を実行。Layouts / Styles / Generated ディレクトリの作成、StringManager 登録、built-in コンポーネントの設置まで自動で行います。"
     },
     "step_author_title": {
-      "en": "3. Author home.json",
-      "ja": "3. home.json を書く"
+      "en": "Author home.json",
+      "ja": "home.json を書く"
     },
     "step_author_instruction": {
       "en": "This one JSON is the whole UI — it compiles to SwiftUI (or UIKit) on iOS, Compose (or XML) on Android, and React on web. The `data` block at the top declares what the ViewModel must expose: `message` (bound to a Label), `tapCount` (bound inside another Label via string interpolation), and `onTap` (bound to the Button's onClick).",
       "ja": "この JSON が UI の全て — iOS では SwiftUI（または UIKit）、Android では Compose（または XML）、Web では React にコンパイルされます。冒頭の `data` ブロックは ViewModel が公開すべき項目を宣言: `message`（Label にバインド）、`tapCount`（文字列補間で別の Label に）、`onTap`（Button の onClick にバインド）。"
     },
     "step_build_swift_title": {
-      "en": "5. Build and run",
-      "ja": "5. ビルドして実行"
+      "en": "Build and run",
+      "ja": "ビルドして実行"
     },
     "step_build_swift_instruction": {
       "en": "sjui build regenerates Swift code from the layout + VM, then xcodebuild compiles the app. Opening MyApp.xcodeproj lets you press ⌘R to launch the iOS Simulator. The first build takes ~30s; incremental rebuilds run in under 2s via Hot Loader.",
       "ja": "sjui build がレイアウト + VM から Swift コードを再生成し、xcodebuild がアプリをコンパイル。MyApp.xcodeproj を開き ⌘R で iOS Simulator を起動します。初回ビルドは約 30 秒、Hot Loader 経由の差分ビルドは 2 秒未満。"
     },
     "step_build_kotlin_title": {
-      "en": "5. Build and run",
-      "ja": "5. ビルドして実行"
+      "en": "Build and run",
+      "ja": "ビルドして実行"
     },
     "step_build_kotlin_instruction": {
       "en": "kjui build regenerates Kotlin + Compose code, then Gradle installs the APK onto the attached device or emulator. Open Android Studio and hit Run to deploy. Hot Loader syncs layout changes without a rebuild after the first run.",
       "ja": "kjui build が Kotlin + Compose コードを再生成し、Gradle が APK をデバイス／エミュレータにインストール。Android Studio を開き Run で起動します。初回以降は Hot Loader がレイアウト変更を再ビルドなしで反映します。"
     },
     "step_build_react_title": {
-      "en": "5. Build and run",
-      "ja": "5. ビルドして実行"
+      "en": "Build and run",
+      "ja": "ビルドして実行"
     },
     "step_build_react_instruction": {
       "en": "rjui build regenerates the TypeScript components from the layout, then `npm run dev` starts Next.js with Fast Refresh. Open http://localhost:3000 and your changes live-reload as you edit home.json or the ViewModel.",
       "ja": "rjui build がレイアウトから TypeScript コンポーネントを再生成し、`npm run dev` が Next.js を Fast Refresh 付きで起動。http://localhost:3000 にアクセスすれば home.json や ViewModel の編集がライブリロードされます。"
     },
     "step_see_title": {
-      "en": "6. Confirm it works",
-      "ja": "6. 動作を確認"
+      "en": "Confirm it works",
+      "ja": "動作を確認"
     },
     "step_see_instruction": {
       "en": "You should see a centered \"Hello, JsonUI!\" with \"Tapped 0 times\" below it and a blue \"Tap me\" button. Each tap increments the counter. If the button does nothing: check the `onTap` binding and verify the ViewModel method name matches the `data` block entry exactly.",
@@ -379,24 +379,24 @@
       "ja": "(c) JsonUI — このドキュメントもJsonUI自身で作られています。"
     },
     "step_viewmodel_swift_title": {
-      "en": "4. Wire the ViewModel (Swift)",
-      "ja": "4. ViewModel を繋ぐ（Swift）"
+      "en": "Wire the ViewModel (Swift)",
+      "ja": "ViewModel を繋ぐ（Swift）"
     },
     "step_viewmodel_swift_instruction": {
       "en": "Create HomeViewModel.swift as an ObservableObject. Match the `data` block one-to-one: two @Published properties for `message` and `tapCount`, and a method `onTap` that increments the count. SwiftJsonUI subscribes to @Published updates and re-renders the Label automatically.",
       "ja": "HomeViewModel.swift を ObservableObject として作成。`data` ブロックと 1:1 対応: @Published プロパティを `message` と `tapCount` に、メソッド `onTap` でカウントを増やすだけ。SwiftJsonUI が @Published を購読し Label を自動再描画します。"
     },
     "step_viewmodel_kotlin_title": {
-      "en": "4. Wire the ViewModel (Kotlin)",
-      "ja": "4. ViewModel を繋ぐ（Kotlin）"
+      "en": "Wire the ViewModel (Kotlin)",
+      "ja": "ViewModel を繋ぐ（Kotlin）"
     },
     "step_viewmodel_kotlin_instruction": {
       "en": "Create HomeViewModel.kt extending Android ViewModel. Expose StateFlow<String> for `message` and StateFlow<Int> for `tapCount`. `onTap` updates the flow via `.update { it + 1 }`. Compose collects the flow with collectAsStateWithLifecycle and re-composes on change.",
       "ja": "HomeViewModel.kt を Android ViewModel を継承して作成。`message` は StateFlow<String>、`tapCount` は StateFlow<Int> で公開。`onTap` は `.update { it + 1 }` で流します。Compose は collectAsStateWithLifecycle で購読し変更時に再コンポーズします。"
     },
     "step_viewmodel_react_title": {
-      "en": "4. Wire the ViewModel (TypeScript)",
-      "ja": "4. ViewModel を繋ぐ（TypeScript）"
+      "en": "Wire the ViewModel (TypeScript)",
+      "ja": "ViewModel を繋ぐ（TypeScript）"
     },
     "step_viewmodel_react_instruction": {
       "en": "Create HomeViewModel.ts extending ReactJsonUI's ViewModel base. Public plain fields (`message`, `tapCount`) mirror the `data` block. `onTap` bumps `tapCount` and calls `this.notify()` to trigger the hook to re-render. No hooks-in-class juggling required.",
