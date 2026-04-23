@@ -26,10 +26,12 @@ module RjuiTools
             id_attr = extract_id ? %( id="#{extract_id}") : ''
 
             props = []
-            emit_string_prop(props, 'brandLabel',       json['brandLabel'])
-            emit_string_prop(props, 'brandHref',        json['brandHref'])
-            emit_string_prop(props, 'currentLanguage',  json['currentLanguage'])
-            emit_event_prop(props,  'onToggleLanguage', json['onToggleLanguage'])
+            emit_string_prop(props, 'brandLabel',        json['brandLabel'])
+            emit_string_prop(props, 'brandHref',         json['brandHref'])
+            emit_string_prop(props, 'currentLanguage',   json['currentLanguage'])
+            emit_string_prop(props, 'currentColorMode',  json['currentColorMode'])
+            emit_event_prop(props,  'onToggleLanguage',  json['onToggleLanguage'])
+            emit_event_prop(props,  'onToggleColorMode', json['onToggleColorMode'])
             emit_event_prop(props,  'onToggleMobileMenu', json['onToggleMobileMenu'])
 
             props_str = props.empty? ? '' : " #{props.join(' ')}"

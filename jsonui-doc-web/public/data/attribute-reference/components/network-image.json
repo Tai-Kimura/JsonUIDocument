@@ -3,9 +3,1080 @@
   "kebab": "network-image",
   "aliasOf": null,
   "title": "NetworkImage",
-  "description": "Image loaded from a URL with automatic caching, placeholder, and error handling.",
-  "usage": "Use NetworkImage for all user-generated or CDN-hosted images. Always provide `placeholder` or `defaultImage` — the first frame is always the placeholder.",
+  "description": {
+    "en": "Image loaded from a URL with automatic caching, placeholder, and error handling.",
+    "ja": "URL から自動ロードされる画像。キャッシュ・プレースホルダ・エラー時フォールバックを備える。"
+  },
+  "usage": {
+    "en": "Use NetworkImage for all user-generated or CDN-hosted images. Always provide `placeholder` or `defaultImage` — the first frame is always the placeholder.",
+    "ja": "ユーザー生成や CDN ホストの画像すべてに使う。最初のフレームは必ずプレースホルダになるため、`placeholder` または `defaultImage` を常に指定する。"
+  },
   "aliasNotice": null,
+  "kicker": "Component · Reference",
+  "kickerParentLabel": "Components",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "platform_ios",
+              "label": "iOS",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_android",
+              "label": "Android",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_web",
+              "label": "Web",
+              "fontColor": "var(--color-ink)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "visible",
+  "aliasCalloutVisibility": "gone",
+  "aliasLinkUrl": "",
+  "canonicalCode": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{user.avatarUrl}\",\n  \"defaultImage\": \"avatar_default\",\n  \"errorImage\": \"avatar_error\",\n  \"width\": 48,\n  \"height\": 48,\n  \"cornerRadius\": 24\n}",
+  "canonicalLanguage": "json",
+  "statRequired": "0",
+  "statOptional": "12",
+  "statEvents": "0",
+  "statRequiredText": {
+    "en": "0 required",
+    "ja": "必須 0"
+  },
+  "statOptionalText": {
+    "en": "12 optional",
+    "ja": "任意 12"
+  },
+  "statEventsText": {
+    "en": "0 events",
+    "ja": "イベント 0"
+  },
+  "usageVisibility": "visible",
+  "attributeCategories": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "cat_common",
+              "label": {
+                "en": "Common",
+                "ja": "共通"
+              },
+              "anchorUrl": "#section-common"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributesCommon": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_url",
+              "name": "url",
+              "anchorId": "attr-url",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image URL (alias, binding supported).",
+                "ja": "画像の URL（`src` のエイリアス、binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Absolute or protocol-relative URL. Empty/null shows `defaultImage` (or `placeholder` if set). Changes trigger re-download (cache-aware).",
+                "ja": "絶対 URL または protocol-relative URL。空／null では `defaultImage`（未設定なら `placeholder`）を表示。変更時は再ダウンロード（キャッシュ参照あり）。"
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_defaultImage",
+              "name": "defaultImage",
+              "anchorId": "attr-defaultImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Default image name.",
+                "ja": "デフォルトで表示する画像名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Local image shown when `url` is empty, null, or resolves to a placeholder-eligible state. Prefer over `placeholder` for consistency.",
+                "ja": "`url` が空・null・プレースホルダ相当の状態のとき表示するローカル画像。一貫性のため `placeholder` よりこちらを優先。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_loadingImage",
+              "name": "loadingImage",
+              "anchorId": "attr-loadingImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Loading image name.",
+                "ja": "ロード中に表示する画像名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Local image shown during the fetch. Skeletons and shimmer PNGs work well here.",
+                "ja": "fetch 中に表示するローカル画像。スケルトン画像や shimmer の PNG を使うとよい。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_errorImage",
+              "name": "errorImage",
+              "anchorId": "attr-errorImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Error image name.",
+                "ja": "ロード失敗時に表示する画像名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Displayed on fetch failure (4xx, 5xx, network error). Defaults to `defaultImage` if omitted.",
+                "ja": "fetch 失敗時（4xx / 5xx / ネットワークエラー）に表示。省略時は `defaultImage` を使う。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_placeholder",
+              "name": "placeholder",
+              "anchorId": "attr-placeholder",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Placeholder image name (alias for hint).",
+                "ja": "プレースホルダ（`hint` のエイリアス）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Alias for `loadingImage`. Kept for compatibility; prefer `loadingImage` + `defaultImage` split.",
+                "ja": "`loadingImage` のエイリアス。互換のために残存。`loadingImage` + `defaultImage` の分離指定を推奨。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_contentMode",
+              "name": "contentMode",
+              "anchorId": "attr-contentMode",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "fit",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "fill",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "center",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "top",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_4",
+                          "label": "bottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_5",
+                          "label": "left",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_6",
+                          "label": "right",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_7",
+                          "label": "AspectFill",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_8",
+                          "label": "AspectFit",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_9",
+                          "label": "Center",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Content mode (binding supported).",
+                "ja": "画像のコンテントモード。`aspectFit` / `aspectFill` / `scaleToFill` など（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Same as Image.contentMode — `aspectFit` / `aspectFill` / `fill` / `center`.",
+                "ja": "Image.contentMode と同じ。`aspectFit` / `aspectFill` / `fill` / `center`。"
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_cachePolicy",
+              "name": "cachePolicy",
+              "anchorId": "attr-cachePolicy",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Cache policy.",
+                "ja": "キャッシュポリシー。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`memory` / `disk` / `both` (default) / `none`. `disk` persists across app launches.",
+                "ja": "`memory` / `disk` / `both`（デフォルト）/ `none`。`disk` はアプリ再起動後も保持。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_timeout",
+              "name": "timeout",
+              "anchorId": "attr-timeout",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Download timeout in seconds.",
+                "ja": "ダウンロードのタイムアウト（秒）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Fetch timeout in seconds. Default 30. On timeout, `errorImage` is shown.",
+                "ja": "fetch タイムアウト（秒）。デフォルト 30。タイムアウト時は `errorImage` が表示される。"
+              },
+              "type": "number",
+              "required": ""
+            },
+            {
+              "id": "attr_hint",
+              "name": "hint",
+              "anchorId": "attr-hint",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Placeholder text when empty (primary).",
+                "ja": "空のときに表示されるプレースホルダ文字列。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_alt",
+              "name": "alt",
+              "anchorId": "attr-alt",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Alt text for accessibility.",
+                "ja": "スクリーンリーダー用の代替テキスト。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_loading",
+              "name": "loading",
+              "anchorId": "attr-loading",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "lazy",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "eager",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Loading behavior.",
+                "ja": "ロードストラテジ（`lazy` / `eager`）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_src",
+              "name": "src",
+              "anchorId": "attr-src",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image URL (binding supported).",
+                "ja": "画像の URL（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | binding",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupCommonVisibility": "visible",
+  "attributesStyle": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStyleVisibility": "gone",
+  "attributesLayout": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupLayoutVisibility": "gone",
+  "attributesSpacing": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupSpacingVisibility": "gone",
+  "attributesAlignment": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupAlignmentVisibility": "gone",
+  "attributesState": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStateVisibility": "gone",
+  "attributesBinding": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupBindingVisibility": "gone",
+  "attributesEvent": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupEventVisibility": "gone",
+  "attributesResponsive": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupResponsiveVisibility": "gone",
+  "attributesMisc": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupMiscVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_glance",
+      "label": {
+        "en": "At a glance",
+        "ja": "概要"
+      },
+      "anchor": "section-glance",
+      "level": 1
+    },
+    {
+      "id": "toc_common",
+      "label": {
+        "en": "Common",
+        "ja": "共通"
+      },
+      "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_examples",
+      "label": {
+        "en": "Examples",
+        "ja": "例"
+      },
+      "anchor": "section-examples",
+      "level": 1
+    },
+    {
+      "id": "toc_related",
+      "label": {
+        "en": "Related",
+        "ja": "関連"
+      },
+      "anchor": "section-related",
+      "level": 1
+    }
+  ],
   "examples": {
     "sections": [
       {
@@ -13,21 +1084,129 @@
           "data": [
             {
               "id": "example_1",
-              "title": "Avatar with default",
+              "anchorId": "example-1",
+              "title": {
+                "en": "Avatar with default",
+                "ja": "デフォルト画像付きアバター"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{user.avatarUrl}\",\n  \"defaultImage\": \"avatar_default\",\n  \"errorImage\": \"avatar_error\",\n  \"width\": 48,\n  \"height\": 48,\n  \"cornerRadius\": 24\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{user.avatarUrl}\",\n  \"defaultImage\": \"avatar_default\",\n  \"errorImage\": \"avatar_error\",\n  \"width\": 48,\n  \"height\": 48,\n  \"cornerRadius\": 24\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{user.avatarUrl}\",\n  \"defaultImage\": \"avatar_default\",\n  \"errorImage\": \"avatar_error\",\n  \"width\": 48,\n  \"height\": 48,\n  \"cornerRadius\": 24\n}",
               "required": ""
             },
             {
               "id": "example_2",
-              "title": "Full-bleed with loading state",
+              "anchorId": "example-2",
+              "title": {
+                "en": "Full-bleed with loading state",
+                "ja": "ロード中インジケータ付きの全幅画像"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{post.imageUrl}\",\n  \"loadingImage\": \"image_skeleton\",\n  \"width\": \"matchParent\",\n  \"height\": 240,\n  \"contentMode\": \"aspectFill\"\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{post.imageUrl}\",\n  \"loadingImage\": \"image_skeleton\",\n  \"width\": \"matchParent\",\n  \"height\": 240,\n  \"contentMode\": \"aspectFill\"\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{post.imageUrl}\",\n  \"loadingImage\": \"image_skeleton\",\n  \"width\": \"matchParent\",\n  \"height\": 240,\n  \"contentMode\": \"aspectFill\"\n}",
               "required": ""
             },
             {
               "id": "example_3",
-              "title": "With cache policy",
+              "anchorId": "example-3",
+              "title": {
+                "en": "With cache policy",
+                "ja": "キャッシュポリシー指定"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{productImageUrl}\",\n  \"cachePolicy\": \"both\",\n  \"timeout\": 10,\n  \"width\": 200,\n  \"height\": 200\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{productImageUrl}\",\n  \"cachePolicy\": \"both\",\n  \"timeout\": 10,\n  \"width\": 200,\n  \"height\": 200\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{productImageUrl}\",\n  \"cachePolicy\": \"both\",\n  \"timeout\": 10,\n  \"width\": 200,\n  \"height\": 200\n}",
               "required": ""
@@ -45,114 +1224,862 @@
             {
               "id": "attr_url",
               "name": "url",
+              "anchorId": "attr-url",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image URL (alias, binding supported).",
+                "ja": "画像の URL（`src` のエイリアス、binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Absolute or protocol-relative URL. Empty/null shows `defaultImage` (or `placeholder` if set). Changes trigger re-download (cache-aware).",
+                "ja": "絶対 URL または protocol-relative URL。空／null では `defaultImage`（未設定なら `placeholder`）を表示。変更時は再ダウンロード（キャッシュ参照あり）。"
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Image URL (alias, can be data binding)",
-              "note": "Absolute or protocol-relative URL. Empty/null shows `defaultImage` (or `placeholder` if set). Changes trigger re-download (cache-aware)."
+              "required": ""
             },
             {
-              "id": "attr_default_image",
+              "id": "attr_defaultImage",
               "name": "defaultImage",
+              "anchorId": "attr-defaultImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Default image name.",
+                "ja": "デフォルトで表示する画像名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Local image shown when `url` is empty, null, or resolves to a placeholder-eligible state. Prefer over `placeholder` for consistency.",
+                "ja": "`url` が空・null・プレースホルダ相当の状態のとき表示するローカル画像。一貫性のため `placeholder` よりこちらを優先。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Default image name",
-              "note": "Local image shown when `url` is empty, null, or resolves to a placeholder-eligible state. Prefer over `placeholder` for consistency."
+              "required": ""
             },
             {
-              "id": "attr_loading_image",
+              "id": "attr_loadingImage",
               "name": "loadingImage",
+              "anchorId": "attr-loadingImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Loading image name.",
+                "ja": "ロード中に表示する画像名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Local image shown during the fetch. Skeletons and shimmer PNGs work well here.",
+                "ja": "fetch 中に表示するローカル画像。スケルトン画像や shimmer の PNG を使うとよい。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Loading image name",
-              "note": "Local image shown during the fetch. Skeletons and shimmer PNGs work well here."
+              "required": ""
             },
             {
-              "id": "attr_error_image",
+              "id": "attr_errorImage",
               "name": "errorImage",
+              "anchorId": "attr-errorImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Error image name.",
+                "ja": "ロード失敗時に表示する画像名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Displayed on fetch failure (4xx, 5xx, network error). Defaults to `defaultImage` if omitted.",
+                "ja": "fetch 失敗時（4xx / 5xx / ネットワークエラー）に表示。省略時は `defaultImage` を使う。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Error image name",
-              "note": "Displayed on fetch failure (4xx, 5xx, network error). Defaults to `defaultImage` if omitted."
+              "required": ""
             },
             {
               "id": "attr_placeholder",
               "name": "placeholder",
+              "anchorId": "attr-placeholder",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Placeholder image name (alias for hint).",
+                "ja": "プレースホルダ（`hint` のエイリアス）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Alias for `loadingImage`. Kept for compatibility; prefer `loadingImage` + `defaultImage` split.",
+                "ja": "`loadingImage` のエイリアス。互換のために残存。`loadingImage` + `defaultImage` の分離指定を推奨。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Placeholder image name (alias for hint)",
-              "note": "Alias for `loadingImage`. Kept for compatibility; prefer `loadingImage` + `defaultImage` split."
+              "required": ""
             },
             {
-              "id": "attr_content_mode",
+              "id": "attr_contentMode",
               "name": "contentMode",
+              "anchorId": "attr-contentMode",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "fit",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "fill",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "center",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "top",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_4",
+                          "label": "bottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_5",
+                          "label": "left",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_6",
+                          "label": "right",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_7",
+                          "label": "AspectFill",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_8",
+                          "label": "AspectFit",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_9",
+                          "label": "Center",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Content mode (binding supported).",
+                "ja": "画像のコンテントモード。`aspectFit` / `aspectFill` / `scaleToFill` など（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Same as Image.contentMode — `aspectFit` / `aspectFill` / `fill` / `center`.",
+                "ja": "Image.contentMode と同じ。`aspectFit` / `aspectFill` / `fill` / `center`。"
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Content mode (binding supported)",
-              "note": "Same as Image.contentMode — `aspectFit` / `aspectFill` / `fill` / `center`.",
-              "enumValues": [
-                "fit",
-                "fill",
-                "center",
-                "top",
-                "bottom",
-                "left",
-                "right",
-                "AspectFill",
-                "AspectFit",
-                "Center"
-              ]
+              "required": ""
             },
             {
-              "id": "attr_cache_policy",
+              "id": "attr_cachePolicy",
               "name": "cachePolicy",
+              "anchorId": "attr-cachePolicy",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Cache policy.",
+                "ja": "キャッシュポリシー。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`memory` / `disk` / `both` (default) / `none`. `disk` persists across app launches.",
+                "ja": "`memory` / `disk` / `both`（デフォルト）/ `none`。`disk` はアプリ再起動後も保持。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Cache policy",
-              "note": "`memory` / `disk` / `both` (default) / `none`. `disk` persists across app launches.",
-              "platform": "swift"
+              "required": ""
             },
             {
               "id": "attr_timeout",
               "name": "timeout",
+              "anchorId": "attr-timeout",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Download timeout in seconds.",
+                "ja": "ダウンロードのタイムアウト（秒）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Fetch timeout in seconds. Default 30. On timeout, `errorImage` is shown.",
+                "ja": "fetch タイムアウト（秒）。デフォルト 30。タイムアウト時は `errorImage` が表示される。"
+              },
               "type": "number",
-              "required": "",
-              "description": "Download timeout in seconds",
-              "note": "Fetch timeout in seconds. Default 30. On timeout, `errorImage` is shown.",
-              "platform": "swift"
+              "required": ""
             },
             {
               "id": "attr_hint",
               "name": "hint",
+              "anchorId": "attr-hint",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Placeholder text when empty (primary).",
+                "ja": "空のときに表示されるプレースホルダ文字列。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Placeholder image name (primary)"
+              "required": ""
             },
             {
               "id": "attr_alt",
               "name": "alt",
+              "anchorId": "attr-alt",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Alt text for accessibility.",
+                "ja": "スクリーンリーダー用の代替テキスト。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Alt text for accessibility",
-              "platform": "react"
+              "required": ""
             },
             {
               "id": "attr_loading",
               "name": "loading",
+              "anchorId": "attr-loading",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "lazy",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "eager",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Loading behavior.",
+                "ja": "ロードストラテジ（`lazy` / `eager`）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Loading behavior",
-              "platform": "react",
-              "enumValues": [
-                "lazy",
-                "eager"
-              ]
+              "required": ""
             },
             {
               "id": "attr_src",
               "name": "src",
+              "anchorId": "attr-src",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image URL (binding supported).",
+                "ja": "画像の URL（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Image URL (can be data binding)"
+              "required": ""
             }
           ]
         }
@@ -167,11 +2094,13 @@
             {
               "id": "related_image",
               "name": "Image",
+              "hint": "",
               "url": "/reference/components/image"
             },
             {
               "id": "related_indicator",
               "name": "Indicator",
+              "hint": "",
               "url": "/reference/components/indicator"
             }
           ]
@@ -186,14 +2115,26 @@
           "data": [
             {
               "id": "next_attributes",
-              "titleKey": "next_attributes_title",
-              "descriptionKey": "next_attributes_body",
+              "titleKey": {
+                "en": "Attribute reference",
+                "ja": "属性リファレンス"
+              },
+              "descriptionKey": {
+                "en": "Every common attribute in one place — width / padding / binding / events grouped by category.",
+                "ja": "共通属性を 1 箇所にまとめたリファレンス。width / padding / binding / event などカテゴリ別に整理。"
+              },
               "url": "/reference/attributes"
             },
             {
               "id": "next_custom_components",
-              "titleKey": "next_custom_components_title",
-              "descriptionKey": "next_custom_components_body",
+              "titleKey": {
+                "en": "Building a custom component",
+                "ja": "カスタムコンポーネントを作る"
+              },
+              "descriptionKey": {
+                "en": "Extend JsonUI with your own components (spec → converter → React/Swift/Kotlin).",
+                "ja": "spec → converter → React/Swift/Kotlin で JsonUI を独自拡張する手順。"
+              },
               "url": "/guides/custom-components"
             }
           ]

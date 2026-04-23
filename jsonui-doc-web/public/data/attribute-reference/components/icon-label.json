@@ -3,9 +3,961 @@
   "kebab": "icon-label",
   "aliasOf": null,
   "title": "IconLabel",
-  "description": "Label with a leading or trailing icon glyph. Used for button labels with icons, menu items, section rows with chevrons, and status indicators.",
-  "usage": "Prefer IconLabel over manually composing View + Image + Label when the icon is a font glyph (SF Symbols, Material Icons, lucide). For raster images use a horizontal View + Image + Label instead.",
+  "description": {
+    "en": "Label with a leading or trailing icon glyph. Used for button labels with icons, menu items, section rows with chevrons, and status indicators.",
+    "ja": "先頭または末尾にアイコングリフを持つラベル。アイコン付きボタン、メニュー項目、山形矢印付きセクション行、ステータス表示に使う。"
+  },
+  "usage": {
+    "en": "Prefer IconLabel over manually composing View + Image + Label when the icon is a font glyph (SF Symbols, Material Icons, lucide). For raster images use a horizontal View + Image + Label instead.",
+    "ja": "フォントグリフ（SF Symbols / Material Icons / lucide）がアイコンの場合は View + Image + Label を手組みするより IconLabel を優先。ラスター画像の場合は水平 View + Image + Label を使う。"
+  },
   "aliasNotice": null,
+  "kicker": "Component · Reference",
+  "kickerParentLabel": "Components",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "platform_ios",
+              "label": "iOS",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_android",
+              "label": "Android",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_web",
+              "label": "Web",
+              "fontColor": "var(--color-ink)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "visible",
+  "aliasCalloutVisibility": "gone",
+  "aliasLinkUrl": "",
+  "canonicalCode": "{\n  \"type\": \"IconLabel\",\n  \"iconName\": \"star.fill\",\n  \"iconPosition\": \"leading\",\n  \"text\": \"Favorite\",\n  \"fontSize\": 14,\n  \"fontColor\": \"#F59E0B\"\n}",
+  "canonicalLanguage": "json",
+  "statRequired": "0",
+  "statOptional": "11",
+  "statEvents": "0",
+  "statRequiredText": {
+    "en": "0 required",
+    "ja": "必須 0"
+  },
+  "statOptionalText": {
+    "en": "11 optional",
+    "ja": "任意 11"
+  },
+  "statEventsText": {
+    "en": "0 events",
+    "ja": "イベント 0"
+  },
+  "usageVisibility": "visible",
+  "attributeCategories": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "cat_common",
+              "label": {
+                "en": "Common",
+                "ja": "共通"
+              },
+              "anchorUrl": "#section-common"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributesCommon": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_text",
+              "name": "text",
+              "anchorId": "attr-text",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Text content (binding supported, supports interpolation).",
+                "ja": "表示するテキスト。`@{binding}` と `\"合計: @{count}\"` のような補間をサポート。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_selected",
+              "name": "selected",
+              "anchorId": "attr-selected",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Selected state (binding supported).",
+                "ja": "選択状態（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_iconPosition",
+              "name": "iconPosition",
+              "anchorId": "attr-iconPosition",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "Left",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "Right",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "Top",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "Bottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Icon position relative to text.",
+                "ja": "アイコンのテキストに対する位置（`leading` / `trailing`）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`leading` / `trailing`. RTL languages flip automatically on iOS and Android; on React the container `dir` attribute controls the flip.",
+                "ja": "`leading` / `trailing`。RTL 言語では iOS と Android は自動反転、React は親の `dir` 属性で制御。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_fontSize",
+              "name": "fontSize",
+              "anchorId": "attr-fontSize",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Font size (binding supported).",
+                "ja": "フォントサイズ（数値、binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number",
+              "required": ""
+            },
+            {
+              "id": "attr_fontColor",
+              "name": "fontColor",
+              "anchorId": "attr-fontColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Font color — hex string or color name from colors.json (binding supported).",
+                "ja": "フォント色。hex 文字列または `colors.json` のトークン名（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_font",
+              "name": "font",
+              "anchorId": "attr-font",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Font name or 'bold' (binding supported).",
+                "ja": "フォント名または `bold` の省略指定（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_iconMargin",
+              "name": "iconMargin",
+              "anchorId": "attr-iconMargin",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Icon-text spacing.",
+                "ja": "アイコンとテキストの間隔。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number",
+              "required": ""
+            },
+            {
+              "id": "attr_icon_off",
+              "name": "icon_off",
+              "anchorId": "attr-icon_off",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Normal icon.",
+                "ja": "通常状態のアイコン。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_icon_on",
+              "name": "icon_on",
+              "anchorId": "attr-icon_on",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Selected icon.",
+                "ja": "選択状態のアイコン。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_selectedFontColor",
+              "name": "selectedFontColor",
+              "anchorId": "attr-selectedFontColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Selected text color — hex string or color name from colors.json.",
+                "ja": "選択時のテキスト色。hex または `colors.json` のトークン名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_textShadow",
+              "name": "textShadow",
+              "anchorId": "attr-textShadow",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Text shadow configuration.",
+                "ja": "テキストの影（ドロップシャドウ）の設定。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupCommonVisibility": "visible",
+  "attributesStyle": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStyleVisibility": "gone",
+  "attributesLayout": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupLayoutVisibility": "gone",
+  "attributesSpacing": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupSpacingVisibility": "gone",
+  "attributesAlignment": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupAlignmentVisibility": "gone",
+  "attributesState": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStateVisibility": "gone",
+  "attributesBinding": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupBindingVisibility": "gone",
+  "attributesEvent": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupEventVisibility": "gone",
+  "attributesResponsive": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupResponsiveVisibility": "gone",
+  "attributesMisc": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupMiscVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_glance",
+      "label": {
+        "en": "At a glance",
+        "ja": "概要"
+      },
+      "anchor": "section-glance",
+      "level": 1
+    },
+    {
+      "id": "toc_common",
+      "label": {
+        "en": "Common",
+        "ja": "共通"
+      },
+      "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_examples",
+      "label": {
+        "en": "Examples",
+        "ja": "例"
+      },
+      "anchor": "section-examples",
+      "level": 1
+    },
+    {
+      "id": "toc_related",
+      "label": {
+        "en": "Related",
+        "ja": "関連"
+      },
+      "anchor": "section-related",
+      "level": 1
+    }
+  ],
   "examples": {
     "sections": [
       {
@@ -13,21 +965,129 @@
           "data": [
             {
               "id": "example_1",
-              "title": "SF Symbol star",
+              "anchorId": "example-1",
+              "title": {
+                "en": "SF Symbol star",
+                "ja": "SF Symbol の star"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"IconLabel\",\n  \"iconName\": \"star.fill\",\n  \"iconPosition\": \"leading\",\n  \"text\": \"Favorite\",\n  \"fontSize\": 14,\n  \"fontColor\": \"#F59E0B\"\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"IconLabel\",\n  \"iconName\": \"star.fill\",\n  \"iconPosition\": \"leading\",\n  \"text\": \"Favorite\",\n  \"fontSize\": 14,\n  \"fontColor\": \"#F59E0B\"\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"IconLabel\",\n  \"iconName\": \"star.fill\",\n  \"iconPosition\": \"leading\",\n  \"text\": \"Favorite\",\n  \"fontSize\": 14,\n  \"fontColor\": \"#F59E0B\"\n}",
               "required": ""
             },
             {
               "id": "example_2",
-              "title": "Trailing chevron row",
+              "anchorId": "example-2",
+              "title": {
+                "en": "Trailing chevron row",
+                "ja": "末尾に山形矢印"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"IconLabel\",\n  \"text\": \"@{sectionTitle}\",\n  \"iconName\": \"chevron.right\",\n  \"iconPosition\": \"trailing\",\n  \"iconSize\": 12,\n  \"fontSize\": 16\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"IconLabel\",\n  \"text\": \"@{sectionTitle}\",\n  \"iconName\": \"chevron.right\",\n  \"iconPosition\": \"trailing\",\n  \"iconSize\": 12,\n  \"fontSize\": 16\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"IconLabel\",\n  \"text\": \"@{sectionTitle}\",\n  \"iconName\": \"chevron.right\",\n  \"iconPosition\": \"trailing\",\n  \"iconSize\": 12,\n  \"fontSize\": 16\n}",
               "required": ""
             },
             {
               "id": "example_3",
-              "title": "Localized label with icon",
+              "anchorId": "example-3",
+              "title": {
+                "en": "Localized label with icon",
+                "ja": "多言語ラベル + アイコン"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"IconLabel\",\n  \"iconName\": \"favorite\",\n  \"iconPosition\": \"leading\",\n  \"text\": \"@string/favorite\",\n  \"fontSize\": 14\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"IconLabel\",\n  \"iconName\": \"favorite\",\n  \"iconPosition\": \"leading\",\n  \"text\": \"@string/favorite\",\n  \"fontSize\": 14\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"IconLabel\",\n  \"iconName\": \"favorite\",\n  \"iconPosition\": \"leading\",\n  \"text\": \"@string/favorite\",\n  \"fontSize\": 14\n}",
               "required": ""
@@ -45,87 +1105,743 @@
             {
               "id": "attr_text",
               "name": "text",
+              "anchorId": "attr-text",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Text content (binding supported, supports interpolation).",
+                "ja": "表示するテキスト。`@{binding}` と `\"合計: @{count}\"` のような補間をサポート。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Label text (can be data binding)"
+              "required": ""
             },
             {
               "id": "attr_selected",
               "name": "selected",
+              "anchorId": "attr-selected",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Selected state (binding supported).",
+                "ja": "選択状態（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean | binding",
-              "required": "",
-              "description": "Selected state (binding supported)",
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_icon_position",
+              "id": "attr_iconPosition",
               "name": "iconPosition",
+              "anchorId": "attr-iconPosition",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "Left",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "Right",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "Top",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "Bottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Icon position relative to text.",
+                "ja": "アイコンのテキストに対する位置（`leading` / `trailing`）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`leading` / `trailing`. RTL languages flip automatically on iOS and Android; on React the container `dir` attribute controls the flip.",
+                "ja": "`leading` / `trailing`。RTL 言語では iOS と Android は自動反転、React は親の `dir` 属性で制御。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Icon position relative to text",
-              "note": "`leading` / `trailing`. RTL languages flip automatically on iOS and Android; on React the container `dir` attribute controls the flip.",
-              "enumValues": [
-                "Left",
-                "Right",
-                "Top",
-                "Bottom"
-              ]
+              "required": ""
             },
             {
-              "id": "attr_font_size",
+              "id": "attr_fontSize",
               "name": "fontSize",
+              "anchorId": "attr-fontSize",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Font size (binding supported).",
+                "ja": "フォントサイズ（数値、binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number",
-              "required": "",
-              "description": "Font size"
+              "required": ""
             },
             {
-              "id": "attr_font_color",
+              "id": "attr_fontColor",
               "name": "fontColor",
+              "anchorId": "attr-fontColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Font color — hex string or color name from colors.json (binding supported).",
+                "ja": "フォント色。hex 文字列または `colors.json` のトークン名（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Text color - hex string or color name from colors.json"
+              "required": ""
             },
             {
               "id": "attr_font",
               "name": "font",
+              "anchorId": "attr-font",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Font name or 'bold' (binding supported).",
+                "ja": "フォント名または `bold` の省略指定（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Font name"
+              "required": ""
             },
             {
-              "id": "attr_icon_margin",
+              "id": "attr_iconMargin",
               "name": "iconMargin",
+              "anchorId": "attr-iconMargin",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Icon-text spacing.",
+                "ja": "アイコンとテキストの間隔。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number",
-              "required": "",
-              "description": "Icon-text spacing"
+              "required": ""
             },
             {
               "id": "attr_icon_off",
               "name": "icon_off",
+              "anchorId": "attr-icon_off",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Normal icon.",
+                "ja": "通常状態のアイコン。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Normal icon"
+              "required": ""
             },
             {
               "id": "attr_icon_on",
               "name": "icon_on",
+              "anchorId": "attr-icon_on",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Selected icon.",
+                "ja": "選択状態のアイコン。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Selected icon"
+              "required": ""
             },
             {
-              "id": "attr_selected_font_color",
+              "id": "attr_selectedFontColor",
               "name": "selectedFontColor",
+              "anchorId": "attr-selectedFontColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Selected text color — hex string or color name from colors.json.",
+                "ja": "選択時のテキスト色。hex または `colors.json` のトークン名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Selected text color - hex string or color name from colors.json"
+              "required": ""
             },
             {
-              "id": "attr_text_shadow",
+              "id": "attr_textShadow",
               "name": "textShadow",
+              "anchorId": "attr-textShadow",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Text shadow configuration.",
+                "ja": "テキストの影（ドロップシャドウ）の設定。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Text shadow"
+              "required": ""
             }
           ]
         }
@@ -140,16 +1856,19 @@
             {
               "id": "related_label",
               "name": "Label",
+              "hint": "",
               "url": "/reference/components/label"
             },
             {
               "id": "related_button",
               "name": "Button",
+              "hint": "",
               "url": "/reference/components/button"
             },
             {
               "id": "related_image",
               "name": "Image",
+              "hint": "",
               "url": "/reference/components/image"
             }
           ]
@@ -164,14 +1883,26 @@
           "data": [
             {
               "id": "next_attributes",
-              "titleKey": "next_attributes_title",
-              "descriptionKey": "next_attributes_body",
+              "titleKey": {
+                "en": "Attribute reference",
+                "ja": "属性リファレンス"
+              },
+              "descriptionKey": {
+                "en": "Every common attribute in one place — width / padding / binding / events grouped by category.",
+                "ja": "共通属性を 1 箇所にまとめたリファレンス。width / padding / binding / event などカテゴリ別に整理。"
+              },
               "url": "/reference/attributes"
             },
             {
               "id": "next_custom_components",
-              "titleKey": "next_custom_components_title",
-              "descriptionKey": "next_custom_components_body",
+              "titleKey": {
+                "en": "Building a custom component",
+                "ja": "カスタムコンポーネントを作る"
+              },
+              "descriptionKey": {
+                "en": "Extend JsonUI with your own components (spec → converter → React/Swift/Kotlin).",
+                "ja": "spec → converter → React/Swift/Kotlin で JsonUI を独自拡張する手順。"
+              },
               "url": "/guides/custom-components"
             }
           ]

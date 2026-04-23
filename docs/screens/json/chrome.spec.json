@@ -43,6 +43,12 @@
         "type": "String",
         "initial": "en",
         "description": "Mirror of StringManager.language. Drives the TopBar's language-toggle display label (shows the OTHER language as an invitation to switch). Re-seeded inside onAppear on every language toggle so the chrome re-localizes in lockstep with generated pages."
+      },
+      {
+        "name": "currentColorMode",
+        "type": "String",
+        "initial": "light",
+        "description": "Mirror of ColorManager.currentMode. Drives the TopBar's theme-toggle icon (sun when the current mode is 'light', moon when 'dark'). Seeded from ColorManager at construction and re-synced via ColorManager.subscribe() whenever the mode changes (manual toggle or prefers-color-scheme media query)."
       }
     ],
     "eventHandlers": [
@@ -69,6 +75,10 @@
         "description": "Flip StringManager.language between the configured languages, then re-run onAppear so every cached label re-resolves. Also dispatches a 'chrome:languagechange' CustomEvent so already-rendered generated pages can listen + force-refresh if they cache their own labels."
       },
       {
+        "name": "onToggleColorMode",
+        "description": "Flip ColorManager.currentMode between 'light' and 'dark' and disable followSystemMode so the manual choice sticks. ColorManager.subscribe notifies the VM to re-seed currentColorMode, which re-renders the toggle icon."
+      },
+      {
         "name": "onLinkTap",
         "params": [{ "name": "url", "type": "String" }],
         "description": "Invoked by the Sidebar after a link is clicked — NO preventDefault, the <a> still navigates. On mobile viewports, flips mobileOpen to false so the drawer closes as the next page mounts."
@@ -83,19 +93,21 @@
     "apiEndpoints": [],
     "viewModel": {
       "methods": [
-        { "name": "onAppear",           "description": "Seed navItems from the module-scope NAV_CATALOG constant (6 sections × N entries each, read from the same catalog arrays HomeViewModel uses). Resolve every section.label via StringManager.getString('chrome_nav_<id>_label') and every entry.label via StringManager.getString(entry.titleKey). Also mirror StringManager.language into currentLanguage." },
+        { "name": "onAppear",           "description": "Seed navItems from the module-scope NAV_CATALOG constant. Resolve every section.label via StringManager.getString('chrome_nav_<id>_label') and every entry.label via StringManager.getString(entry.titleKey). Also mirror StringManager.language into currentLanguage and ColorManager.currentMode into currentColorMode." },
         { "name": "onRouteChange",      "params": [{ "name": "url", "type": "String" }], "description": "Update activeUrl and auto-expand the containing section. Called from the ChromeWrapper's useEffect when usePathname() changes — this is the only public method NOT bound in the layout's data block." },
         { "name": "onToggleSection",    "params": [{ "name": "id", "type": "String" }], "description": "Toggle id's membership in collapsedIds. Pure state update." },
         { "name": "onToggleMobileMenu", "description": "Flip mobileOpen. Pure state update." },
         { "name": "onToggleLanguage",   "description": "StringManager.setLanguage(next) → onAppear() for re-seed → dispatchEvent(new CustomEvent('chrome:languagechange')). The dispatchEvent lets already-mounted generated pages (which cache their string reads per-render) hook a listener and force a re-render if they need to." },
+        { "name": "onToggleColorMode",  "description": "Set ColorManager.followSystemMode = false, then ColorManager.setMode(current === 'dark' ? 'light' : 'dark'). The VM subscribes to ColorManager in the constructor, so setMode triggers a notify → the listener re-seeds currentColorMode → React re-renders the toggle icon." },
         { "name": "onLinkTap",          "params": [{ "name": "url", "type": "String" }], "description": "If mobileOpen is true, flip it to false — closes the drawer as the next page mounts. No preventDefault, no router.push (Next.js <Link> handles navigation)." }
       ],
       "vars": [
-        { "name": "navItems",        "type": "Array(SidebarSection)", "observable": true,  "description": "Nav catalog, seeded in onAppear, re-seeded on language toggle." },
-        { "name": "activeUrl",       "type": "String",                "observable": true,  "description": "Current route; ChromeWrapper pushes it via onRouteChange." },
-        { "name": "collapsedIds",    "type": "Array(String)",         "observable": true,  "description": "Collapsed section ids." },
-        { "name": "mobileOpen",      "type": "Bool",                  "observable": true,  "description": "Mobile drawer open flag." },
-        { "name": "currentLanguage", "type": "String",                "observable": true,  "description": "Mirror of StringManager.language." }
+        { "name": "navItems",         "type": "Array(SidebarSection)", "observable": true,  "description": "Nav catalog, seeded in onAppear, re-seeded on language toggle." },
+        { "name": "activeUrl",        "type": "String",                "observable": true,  "description": "Current route; ChromeWrapper pushes it via onRouteChange." },
+        { "name": "collapsedIds",     "type": "Array(String)",         "observable": true,  "description": "Collapsed section ids." },
+        { "name": "mobileOpen",       "type": "Bool",                  "observable": true,  "description": "Mobile drawer open flag." },
+        { "name": "currentLanguage",  "type": "String",                "observable": true,  "description": "Mirror of StringManager.language." },
+        { "name": "currentColorMode", "type": "String",                "observable": true,  "description": "Mirror of ColorManager.currentMode, 'light' or 'dark'." }
       ]
     },
     "customTypes": [
@@ -123,6 +135,7 @@
     { "action": "Tap a nav link",             "processing": "Next.js <Link> navigates. Chrome fires onLinkTap(url); on mobile, drawer closes." },
     { "action": "Tap the hamburger",          "processing": "onToggleMobileMenu — flip mobileOpen." },
     { "action": "Tap the language toggle",    "processing": "onToggleLanguage — StringManager.setLanguage + re-seed + dispatch 'chrome:languagechange'." },
+    { "action": "Tap the theme toggle",       "processing": "onToggleColorMode — ColorManager.setMode flips light↔dark, subscribe callback re-seeds currentColorMode." },
     { "action": "Type ⌘+K (anywhere)",        "processing": "Search modal opens; unrelated to chrome state." }
   ],
   "validation": { "clientSide": [], "serverSide": [] },

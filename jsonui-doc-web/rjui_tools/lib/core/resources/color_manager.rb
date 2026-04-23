@@ -613,9 +613,17 @@ module RjuiTools
           end
           lines << ''
 
-          # Raw snake_case maps (for `color(key)` lookups that need the original
-          # key name from colors.json).
-          lines << 'const _rawPalettes = Object.freeze({'
+          # Raw snake_case maps (for `color(key)` lookups that need the
+          # original key name from colors.json).
+          #
+          # Under `tsconfig strict: true`, `Object.freeze({literal})` infers
+          # each palette as a tight readonly type with no string index
+          # signature — so `_rawPalettes[mode][key]` (where `key: string`)
+          # errors with TS7053. Declare an explicit loose index type on the
+          # outer const for TS so string-keyed lookups stay legal while the
+          # literal hex values are preserved at runtime.
+          palette_type = typescript ? ': Record<string, Readonly<Record<string, string | undefined>>>' : ''
+          lines << "const _rawPalettes#{palette_type} = Object.freeze({"
           @modes.each do |mode|
             palette = merged_palettes[mode] || {}
             lines << "  #{js_string_or_ident(mode)}: Object.freeze({"

@@ -1,232 +1,1990 @@
 {
   "category": "alignment",
   "title": "Alignment attributes",
-  "description": "Alignment attributes control where a component sits within its parent and how siblings are positioned relative to it. Most are inherited from Android's RelativeLayout vocabulary and apply inside Views that use a relative positioning mode.",
+  "description": {
+    "en": "Alignment attributes control where a component sits within its parent and how siblings are positioned relative to it. Most are inherited from Android's RelativeLayout vocabulary and apply inside Views that use a relative positioning mode.",
+    "ja": "配置属性はコンポーネントが親のどこに置かれるか、兄弟要素がその要素に対してどう配置されるかを制御する。多くは Android の RelativeLayout 由来で、相対位置指定モードの View 内で有効。"
+  },
+  "kicker": "Attribute category · Reference",
+  "kickerParentLabel": "Attributes",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "gone",
+  "aliasCalloutVisibility": "gone",
+  "aliasOf": null,
+  "aliasLinkUrl": "",
+  "aliasNotice": null,
+  "overviewRows": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "overview_alignBottom",
+              "name": "alignBottom",
+              "type": "boolean | binding",
+              "summary": {
+                "en": "Aligns bottom edges.",
+                "ja": "下端同士を揃える。"
+              },
+              "anchorUrl": "#attr-alignBottom"
+            },
+            {
+              "id": "overview_alignBottomOfView",
+              "name": "alignBottomOfView",
+              "type": "string",
+              "summary": {
+                "en": "Places this view directly below the referenced sibling.",
+                "ja": "指定した兄弟の直下にこの View を配置。"
+              },
+              "anchorUrl": "#attr-alignBottomOfView"
+            },
+            {
+              "id": "overview_alignBottomView",
+              "name": "alignBottomView",
+              "type": "string",
+              "summary": {
+                "en": "Aligns bottom edges to a sibling.",
+                "ja": "下端を兄弟の下端に揃える。"
+              },
+              "anchorUrl": "#attr-alignBottomView"
+            },
+            {
+              "id": "overview_alignCenterHorizontalView",
+              "name": "alignCenterHorizontalView",
+              "type": "string",
+              "summary": {
+                "en": "Centers this view horizontally within a sibling's horizontal bounds.",
+                "ja": "兄弟の水平範囲内でこの View を水平中央揃え。"
+              },
+              "anchorUrl": "#attr-alignCenterHorizontalView"
+            },
+            {
+              "id": "overview_alignCenterVerticalView",
+              "name": "alignCenterVerticalView",
+              "type": "string",
+              "summary": {
+                "en": "Centers this view vertically within a sibling's vertical bounds.",
+                "ja": "兄弟の垂直範囲内でこの View を垂直中央揃え。"
+              },
+              "anchorUrl": "#attr-alignCenterVerticalView"
+            },
+            {
+              "id": "overview_alignLeft",
+              "name": "alignLeft",
+              "type": "boolean | binding",
+              "summary": {
+                "en": "Aligns left edges.",
+                "ja": "左端同士を揃える。"
+              },
+              "anchorUrl": "#attr-alignLeft"
+            },
+            {
+              "id": "overview_alignLeftOfView",
+              "name": "alignLeftOfView",
+              "type": "string",
+              "summary": {
+                "en": "Places this view directly to the left of the referenced sibling.",
+                "ja": "指定した兄弟の直左にこの View を配置。"
+              },
+              "anchorUrl": "#attr-alignLeftOfView"
+            },
+            {
+              "id": "overview_alignLeftView",
+              "name": "alignLeftView",
+              "type": "string",
+              "summary": {
+                "en": "Aligns left edges to a sibling.",
+                "ja": "左端を兄弟の左端に揃える。"
+              },
+              "anchorUrl": "#attr-alignLeftView"
+            },
+            {
+              "id": "overview_alignRight",
+              "name": "alignRight",
+              "type": "boolean | binding",
+              "summary": {
+                "en": "Aligns right edges.",
+                "ja": "右端同士を揃える。"
+              },
+              "anchorUrl": "#attr-alignRight"
+            },
+            {
+              "id": "overview_alignRightOfView",
+              "name": "alignRightOfView",
+              "type": "string",
+              "summary": {
+                "en": "Places this view directly to the right of the referenced sibling.",
+                "ja": "指定した兄弟の直右にこの View を配置。"
+              },
+              "anchorUrl": "#attr-alignRightOfView"
+            },
+            {
+              "id": "overview_alignRightView",
+              "name": "alignRightView",
+              "type": "string",
+              "summary": {
+                "en": "Aligns right edges to a sibling.",
+                "ja": "右端を兄弟の右端に揃える。"
+              },
+              "anchorUrl": "#attr-alignRightView"
+            },
+            {
+              "id": "overview_alignTop",
+              "name": "alignTop",
+              "type": "boolean | binding",
+              "summary": {
+                "en": "Boolean. Aligns this view's top edge to its parent's top edge.",
+                "ja": "Boolean。この View の上端を親の上端に揃える。"
+              },
+              "anchorUrl": "#attr-alignTop"
+            },
+            {
+              "id": "overview_alignTopOfView",
+              "name": "alignTopOfView",
+              "type": "string",
+              "summary": {
+                "en": "Places this view directly above the referenced sibling (this view's bottom = sibling's top).",
+                "ja": "指定した兄弟の直上にこの View を配置（この下端 = 兄弟の上端）。"
+              },
+              "anchorUrl": "#attr-alignTopOfView"
+            },
+            {
+              "id": "overview_alignTopView",
+              "name": "alignTopView",
+              "type": "string",
+              "summary": {
+                "en": "Aligns this view's top to the top of a sibling View identified by ID. Value is the sibling's id s…",
+                "ja": "この View の上端を、ID で指定した兄弟 View の上端に揃える。値は兄弟の id 文字列。"
+              },
+              "anchorUrl": "#attr-alignTopView"
+            },
+            {
+              "id": "overview_centerHorizontal",
+              "name": "centerHorizontal",
+              "type": "boolean | binding",
+              "summary": {
+                "en": "Boolean. Centers horizontally in the parent.",
+                "ja": "Boolean。親内で水平中央揃え。"
+              },
+              "anchorUrl": "#attr-centerHorizontal"
+            },
+            {
+              "id": "overview_centerInParent",
+              "name": "centerInParent",
+              "type": "boolean | binding",
+              "summary": {
+                "en": "Boolean. When `true`, centers both horizontally and vertically within the parent.",
+                "ja": "Boolean。`true` で親の中央（水平・垂直とも）に配置。"
+              },
+              "anchorUrl": "#attr-centerInParent"
+            },
+            {
+              "id": "overview_centerVertical",
+              "name": "centerVertical",
+              "type": "boolean | binding",
+              "summary": {
+                "en": "Boolean. Centers vertically in the parent.",
+                "ja": "Boolean。親内で垂直中央揃え。"
+              },
+              "anchorUrl": "#attr-centerVertical"
+            },
+            {
+              "id": "overview_gravity",
+              "name": "gravity",
+              "type": "string | array",
+              "summary": {
+                "en": "`left` / `center` / `right` / `top` / `bottom` / `center_horizontal` / `center_vertical` / `cente…",
+                "ja": "`left` / `center` / `right` / `top` / `bottom` / `center_horizontal` / `center_vertical` / `cente…"
+              },
+              "anchorUrl": "#attr-gravity"
+            },
+            {
+              "id": "overview_indexAbove",
+              "name": "indexAbove",
+              "type": "string",
+              "summary": {
+                "en": "Places this view visually above (higher z-index than) the referenced sibling.",
+                "ja": "指定した兄弟より視覚的に前面（z-index 大）に配置。"
+              },
+              "anchorUrl": "#attr-indexAbove"
+            },
+            {
+              "id": "overview_indexBelow",
+              "name": "indexBelow",
+              "type": "string",
+              "summary": {
+                "en": "Places this view visually below the referenced sibling.",
+                "ja": "指定した兄弟より視覚的に背面に配置。"
+              },
+              "anchorUrl": "#attr-indexBelow"
+            },
+            {
+              "id": "overview_keyBottomView",
+              "name": "keyBottomView",
+              "type": "string",
+              "summary": "Key bottom view ID",
+              "anchorUrl": "#attr-keyBottomView"
+            },
+            {
+              "id": "overview_keyLeftView",
+              "name": "keyLeftView",
+              "type": "string",
+              "summary": "Key left view ID",
+              "anchorUrl": "#attr-keyLeftView"
+            },
+            {
+              "id": "overview_keyRightView",
+              "name": "keyRightView",
+              "type": "string",
+              "summary": "Key right view ID",
+              "anchorUrl": "#attr-keyRightView"
+            },
+            {
+              "id": "overview_keyTopView",
+              "name": "keyTopView",
+              "type": "string",
+              "summary": "Key top view ID",
+              "anchorUrl": "#attr-keyTopView"
+            },
+            {
+              "id": "overview_toView",
+              "name": "toView",
+              "type": "string",
+              "summary": "Relative layout target view",
+              "anchorUrl": "#attr-toView"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subgroups": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "subgroupsVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_overview",
+      "label": {
+        "en": "Overview",
+        "ja": "概要"
+      },
+      "anchor": "section-overview",
+      "level": 1
+    },
+    {
+      "id": "toc_detail",
+      "label": {
+        "en": "Attributes",
+        "ja": "属性"
+      },
+      "anchor": "section-detail",
+      "level": 1
+    },
+    {
+      "id": "toc_next",
+      "label": {
+        "en": "Next reads",
+        "ja": "次に読む"
+      },
+      "anchor": "section-next",
+      "level": 1
+    }
+  ],
   "attributes": {
     "sections": [
       {
         "cells": {
           "data": [
             {
-              "id": "attr_align_bottom",
+              "id": "attr_alignBottom",
               "name": "alignBottom",
+              "anchorId": "attr-alignBottom",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Aligns bottom edges.",
+                "ja": "下端同士を揃える。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean | binding",
-              "required": "",
-              "description": "Align to parent bottom (binding supported)",
-              "summary": "Aligns bottom edges."
+              "required": ""
             },
             {
-              "id": "attr_align_bottom_of_view",
+              "id": "attr_alignBottomOfView",
               "name": "alignBottomOfView",
+              "anchorId": "attr-alignBottomOfView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Places this view directly below the referenced sibling.",
+                "ja": "指定した兄弟の直下にこの View を配置。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Align above specified view ID",
-              "summary": "Places this view directly below the referenced sibling."
+              "required": ""
             },
             {
-              "id": "attr_align_bottom_view",
+              "id": "attr_alignBottomView",
               "name": "alignBottomView",
+              "anchorId": "attr-alignBottomView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Aligns bottom edges to a sibling.",
+                "ja": "下端を兄弟の下端に揃える。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Align bottom edge with specified view",
-              "summary": "Aligns bottom edges to a sibling."
+              "required": ""
             },
             {
-              "id": "attr_align_center_horizontal_view",
+              "id": "attr_alignCenterHorizontalView",
               "name": "alignCenterHorizontalView",
+              "anchorId": "attr-alignCenterHorizontalView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Centers this view horizontally within a sibling's horizontal bounds.",
+                "ja": "兄弟の水平範囲内でこの View を水平中央揃え。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Align horizontal center with specified view",
-              "summary": "Centers this view horizontally within a sibling's horizontal bounds."
+              "required": ""
             },
             {
-              "id": "attr_align_center_vertical_view",
+              "id": "attr_alignCenterVerticalView",
               "name": "alignCenterVerticalView",
+              "anchorId": "attr-alignCenterVerticalView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Centers this view vertically within a sibling's vertical bounds.",
+                "ja": "兄弟の垂直範囲内でこの View を垂直中央揃え。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Align vertical center with specified view",
-              "summary": "Centers this view vertically within a sibling's vertical bounds."
+              "required": ""
             },
             {
-              "id": "attr_align_left",
+              "id": "attr_alignLeft",
               "name": "alignLeft",
+              "anchorId": "attr-alignLeft",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Aligns left edges.",
+                "ja": "左端同士を揃える。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean | binding",
-              "required": "",
-              "description": "Align to parent left (binding supported)",
-              "summary": "Aligns left edges."
+              "required": ""
             },
             {
-              "id": "attr_align_left_of_view",
+              "id": "attr_alignLeftOfView",
               "name": "alignLeftOfView",
+              "anchorId": "attr-alignLeftOfView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Places this view directly to the left of the referenced sibling.",
+                "ja": "指定した兄弟の直左にこの View を配置。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Align to right of specified view ID",
-              "summary": "Places this view directly to the left of the referenced sibling."
+              "required": ""
             },
             {
-              "id": "attr_align_left_view",
+              "id": "attr_alignLeftView",
               "name": "alignLeftView",
+              "anchorId": "attr-alignLeftView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Aligns left edges to a sibling.",
+                "ja": "左端を兄弟の左端に揃える。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Align left edge with specified view",
-              "summary": "Aligns left edges to a sibling."
+              "required": ""
             },
             {
-              "id": "attr_align_right",
+              "id": "attr_alignRight",
               "name": "alignRight",
+              "anchorId": "attr-alignRight",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Aligns right edges.",
+                "ja": "右端同士を揃える。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean | binding",
-              "required": "",
-              "description": "Align to parent right (binding supported)",
-              "summary": "Aligns right edges."
+              "required": ""
             },
             {
-              "id": "attr_align_right_of_view",
+              "id": "attr_alignRightOfView",
               "name": "alignRightOfView",
+              "anchorId": "attr-alignRightOfView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Places this view directly to the right of the referenced sibling.",
+                "ja": "指定した兄弟の直右にこの View を配置。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Align to left of specified view ID",
-              "summary": "Places this view directly to the right of the referenced sibling."
+              "required": ""
             },
             {
-              "id": "attr_align_right_view",
+              "id": "attr_alignRightView",
               "name": "alignRightView",
+              "anchorId": "attr-alignRightView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Aligns right edges to a sibling.",
+                "ja": "右端を兄弟の右端に揃える。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Align right edge with specified view",
-              "summary": "Aligns right edges to a sibling."
+              "required": ""
             },
             {
-              "id": "attr_align_top",
+              "id": "attr_alignTop",
               "name": "alignTop",
+              "anchorId": "attr-alignTop",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Boolean. Aligns this view's top edge to its parent's top edge.",
+                "ja": "Boolean。この View の上端を親の上端に揃える。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean | binding",
-              "required": "",
-              "description": "Align to parent top (binding supported)",
-              "summary": "Boolean. Aligns this view's top edge to its parent's top edge."
+              "required": ""
             },
             {
-              "id": "attr_align_top_of_view",
+              "id": "attr_alignTopOfView",
               "name": "alignTopOfView",
+              "anchorId": "attr-alignTopOfView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Places this view directly above the referenced sibling (this view's bottom = sibling's top).",
+                "ja": "指定した兄弟の直上にこの View を配置（この下端 = 兄弟の上端）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Align below specified view ID",
-              "summary": "Places this view directly above the referenced sibling (this view's bottom = sibling's top)."
+              "required": ""
             },
             {
-              "id": "attr_align_top_view",
+              "id": "attr_alignTopView",
               "name": "alignTopView",
+              "anchorId": "attr-alignTopView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Aligns this view's top to the top of a sibling View identified by ID. Value is the sibling's id string.",
+                "ja": "この View の上端を、ID で指定した兄弟 View の上端に揃える。値は兄弟の id 文字列。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Align top edge with specified view",
-              "summary": "Aligns this view's top to the top of a sibling View identified by ID. Value is the sibling's id string.",
-              "relatedAttributes": [
-                "alignBottomView",
-                "alignLeftView",
-                "alignRightView",
-                "toView"
-              ]
+              "required": ""
             },
             {
-              "id": "attr_center_horizontal",
+              "id": "attr_centerHorizontal",
               "name": "centerHorizontal",
+              "anchorId": "attr-centerHorizontal",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Boolean. Centers horizontally in the parent.",
+                "ja": "Boolean。親内で水平中央揃え。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean | binding",
-              "required": "",
-              "description": "Center horizontally in parent (binding supported)",
-              "summary": "Boolean. Centers horizontally in the parent."
+              "required": ""
             },
             {
-              "id": "attr_center_in_parent",
+              "id": "attr_centerInParent",
               "name": "centerInParent",
+              "anchorId": "attr-centerInParent",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Boolean. When `true`, centers both horizontally and vertically within the parent.",
+                "ja": "Boolean。`true` で親の中央（水平・垂直とも）に配置。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean | binding",
-              "required": "",
-              "description": "Center both horizontally and vertically (binding supported)",
-              "summary": "Boolean. When `true`, centers both horizontally and vertically within the parent."
+              "required": ""
             },
             {
-              "id": "attr_center_vertical",
+              "id": "attr_centerVertical",
               "name": "centerVertical",
+              "anchorId": "attr-centerVertical",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Boolean. Centers vertically in the parent.",
+                "ja": "Boolean。親内で垂直中央揃え。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean | binding",
-              "required": "",
-              "description": "Center vertically in parent (binding supported)",
-              "summary": "Boolean. Centers vertically in the parent."
+              "required": ""
             },
             {
               "id": "attr_gravity",
               "name": "gravity",
-              "type": "string | array",
-              "required": "",
-              "description": "Content gravity/alignment",
-              "summary": "`left` / `center` / `right` / `top` / `bottom` / `center_horizontal` / `center_vertical` / `center_in_parent`. For a vertical View, horizontal gravity aligns children; for horizontal, vertical gravity aligns children.",
-              "platformDiff": {
-                "kotlin_xml": "android:gravity に直接マップ。",
-                "kotlin_compose": "`Modifier.align(Alignment.<value>)` に変換。",
-                "swift_swiftui": "HStack/VStack の alignment パラメータにマップ。",
-                "react": "Tailwind の `justify-*` / `items-*` クラスに変換。"
+              "anchorId": "attr-gravity",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
-              "enumValues": [
-                "top",
-                "bottom",
-                "centerVertical",
-                "left",
-                "right",
-                "centerHorizontal",
-                "center"
-              ]
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "top",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "bottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "centerVertical",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "left",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_4",
+                          "label": "right",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_5",
+                          "label": "centerHorizontal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_6",
+                          "label": "center",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "`left` / `center` / `right` / `top` / `bottom` / `center_horizontal` / `center_vertical` / `center_in_parent`. For a vertical View, horizontal gravity aligns children; for horizontal, vertical gravity aligns children.",
+                "ja": "`left` / `center` / `right` / `top` / `bottom` / `center_horizontal` / `center_vertical` / `center_in_parent`。vertical View では水平方向の揃え、horizontal View では垂直方向の揃えを制御。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | array",
+              "required": ""
             },
             {
-              "id": "attr_index_above",
+              "id": "attr_indexAbove",
               "name": "indexAbove",
+              "anchorId": "attr-indexAbove",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Places this view visually above (higher z-index than) the referenced sibling.",
+                "ja": "指定した兄弟より視覚的に前面（z-index 大）に配置。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Place above specified view ID",
-              "summary": "Places this view visually above (higher z-index than) the referenced sibling."
+              "required": ""
             },
             {
-              "id": "attr_index_below",
+              "id": "attr_indexBelow",
               "name": "indexBelow",
+              "anchorId": "attr-indexBelow",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Places this view visually below the referenced sibling.",
+                "ja": "指定した兄弟より視覚的に背面に配置。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Place below specified view ID",
-              "summary": "Places this view visually below the referenced sibling."
+              "required": ""
             },
             {
-              "id": "attr_key_bottom_view",
+              "id": "attr_keyBottomView",
               "name": "keyBottomView",
-              "type": "string",
-              "required": "",
+              "anchorId": "attr-keyBottomView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
               "description": "Key bottom view ID",
-              "platform": "swift"
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
             },
             {
-              "id": "attr_key_left_view",
+              "id": "attr_keyLeftView",
               "name": "keyLeftView",
-              "type": "string",
-              "required": "",
+              "anchorId": "attr-keyLeftView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
               "description": "Key left view ID",
-              "platform": "swift"
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
             },
             {
-              "id": "attr_key_right_view",
+              "id": "attr_keyRightView",
               "name": "keyRightView",
-              "type": "string",
-              "required": "",
+              "anchorId": "attr-keyRightView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
               "description": "Key right view ID",
-              "platform": "swift"
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
             },
             {
-              "id": "attr_key_top_view",
+              "id": "attr_keyTopView",
               "name": "keyTopView",
-              "type": "string",
-              "required": "",
+              "anchorId": "attr-keyTopView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
               "description": "Key top view ID",
-              "platform": "swift"
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
             },
             {
-              "id": "attr_to_view",
+              "id": "attr_toView",
               "name": "toView",
-              "type": "string",
-              "required": "",
+              "anchorId": "attr-toView",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
               "description": "Relative layout target view",
-              "platform": "swift"
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
             }
           ]
         }
@@ -241,14 +1999,26 @@
           "data": [
             {
               "id": "next_components",
-              "titleKey": "next_components_title",
-              "descriptionKey": "next_components_body",
+              "titleKey": {
+                "en": "Component reference",
+                "ja": "コンポーネントリファレンス"
+              },
+              "descriptionKey": {
+                "en": "The full 28-component catalog with type signatures, examples, and platform support.",
+                "ja": "28 コンポーネントの全カタログ。型・例・プラットフォーム対応を収録。"
+              },
               "url": "/reference/components"
             },
             {
               "id": "next_attributes_root",
-              "titleKey": "next_attributes_root_title",
-              "descriptionKey": "next_attributes_root_body",
+              "titleKey": {
+                "en": "All attribute categories",
+                "ja": "属性カテゴリ一覧"
+              },
+              "descriptionKey": {
+                "en": "Back to the full list of attribute categories (Layout, Style, Binding, Event, ...).",
+                "ja": "属性カテゴリ全一覧に戻る（Layout / Style / Binding / Event など）。"
+              },
               "url": "/reference/attributes"
             }
           ]

@@ -1,7 +1,85 @@
 {
   "category": "responsive",
   "title": "Responsive attributes",
-  "description": "Responsive attributes adjust values based on viewport breakpoints or host platform. Breakpoints are configured in `jsonui-doc-web/tailwind.config.js`.",
+  "description": {
+    "en": "Responsive attributes adjust values based on viewport breakpoints or host platform. Breakpoints are configured in `jsonui-doc-web/tailwind.config.js`.",
+    "ja": "レスポンシブ属性はビューポートのブレークポイントやホストプラットフォームに応じて値を変える。ブレークポイントは `jsonui-doc-web/tailwind.config.js` で設定する。"
+  },
+  "kicker": "Attribute category · Reference",
+  "kickerParentLabel": "Attributes",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "gone",
+  "aliasCalloutVisibility": "gone",
+  "aliasOf": null,
+  "aliasLinkUrl": "",
+  "aliasNotice": null,
+  "overviewRows": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "overview_responsive",
+              "name": "responsive",
+              "type": "object",
+              "summary": {
+                "en": "Object whose keys are breakpoint names (`xs` / `sm` / `md` / `lg` / `xl`) and values are attribut…",
+                "ja": "キーがブレークポイント名（`xs` / `sm` / `md` / `lg` / `xl`）、値が当該ブレークポイント以上で適用される属性上書きのオブジェクト。ベース属性にマージされる。"
+              },
+              "anchorUrl": "#attr-responsive"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subgroups": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "subgroupsVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_overview",
+      "label": {
+        "en": "Overview",
+        "ja": "概要"
+      },
+      "anchor": "section-overview",
+      "level": 1
+    },
+    {
+      "id": "toc_detail",
+      "label": {
+        "en": "Attributes",
+        "ja": "属性"
+      },
+      "anchor": "section-detail",
+      "level": 1
+    },
+    {
+      "id": "toc_next",
+      "label": {
+        "en": "Next reads",
+        "ja": "次に読む"
+      },
+      "anchor": "section-next",
+      "level": 1
+    }
+  ],
   "attributes": {
     "sections": [
       {
@@ -10,23 +88,66 @@
             {
               "id": "attr_responsive",
               "name": "responsive",
+              "anchorId": "attr-responsive",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Object whose keys are breakpoint names (`xs` / `sm` / `md` / `lg` / `xl`) and values are attribute overrides applied at that breakpoint and above. Merges into the base attributes.",
+                "ja": "キーがブレークポイント名（`xs` / `sm` / `md` / `lg` / `xl`）、値が当該ブレークポイント以上で適用される属性上書きのオブジェクト。ベース属性にマージされる。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "object",
-              "required": "",
-              "description": "Size class overrides. Keys: compact, medium, regular, landscape, or hyphenated combos (e.g. regular-landscape). Values: object of attribute overrides for that size class.",
-              "summary": "Object whose keys are breakpoint names (`xs` / `sm` / `md` / `lg` / `xl`) and values are attribute overrides applied at that breakpoint and above. Merges into the base attributes.",
-              "examples": [
-                {
-                  "language": "json",
-                  "code": "{\n  \"type\": \"Collection\",\n  \"columnCount\": 1,\n  \"responsive\": {\n    \"md\": { \"columnCount\": 2 },\n    \"lg\": { \"columnCount\": 3 },\n    \"xl\": { \"columnCount\": 4 }\n  }\n}"
-                }
-              ],
-              "platformDiff": {
-                "react": "CSS media queries + Tailwind breakpoints に変換される（jsonui-doc-web のみ対応）。",
-                "swift_uikit": "size class に応じた layout constraint 切替にマップ（実装依存）。",
-                "swift_swiftui": "`@Environment(\\.horizontalSizeClass)` での分岐に変換。",
-                "kotlin_compose": "`BoxWithConstraints` 内で条件分岐。",
-                "kotlin_xml": "`res/layout-<qualifier>/` のリソースで別 Layout を用意する方式に近い。"
-              }
+              "required": ""
             }
           ]
         }
@@ -34,7 +155,10 @@
     ]
   },
   "breakpoints": {
-    "_description": "Default breakpoints used by jsonui-doc-web. Override in `tailwind.config.js`.",
+    "_description": {
+      "en": "Default breakpoints used by jsonui-doc-web. Override in `tailwind.config.js`.",
+      "ja": "jsonui-doc-web のデフォルトブレークポイント。`tailwind.config.js` で上書き可能。"
+    },
     "xs": "0–479 px",
     "sm": "480–767 px",
     "md": "768–1023 px",
@@ -48,14 +172,26 @@
           "data": [
             {
               "id": "next_components",
-              "titleKey": "next_components_title",
-              "descriptionKey": "next_components_body",
+              "titleKey": {
+                "en": "Component reference",
+                "ja": "コンポーネントリファレンス"
+              },
+              "descriptionKey": {
+                "en": "The full 28-component catalog with type signatures, examples, and platform support.",
+                "ja": "28 コンポーネントの全カタログ。型・例・プラットフォーム対応を収録。"
+              },
               "url": "/reference/components"
             },
             {
               "id": "next_attributes_root",
-              "titleKey": "next_attributes_root_title",
-              "descriptionKey": "next_attributes_root_body",
+              "titleKey": {
+                "en": "All attribute categories",
+                "ja": "属性カテゴリ一覧"
+              },
+              "descriptionKey": {
+                "en": "Back to the full list of attribute categories (Layout, Style, Binding, Event, ...).",
+                "ja": "属性カテゴリ全一覧に戻る（Layout / Style / Binding / Event など）。"
+              },
               "url": "/reference/attributes"
             }
           ]

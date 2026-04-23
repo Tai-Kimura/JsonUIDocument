@@ -52,12 +52,18 @@ module RjuiTools
           else
             classes << TailwindMapper.map_width(json['width'])
           end
-          # matchParent height handling:
-          # - ZStack child (absolute): use h-full (flex-1 doesn't work with absolute)
-          # - Flex child: use flex-1 (h-full overflows when siblings exist)
+          # matchParent height handling (axis-aware):
+          # - ZStack child (absolute): use h-full — flex-1 doesn't apply
+          # - flex-row parent (height is CROSS axis): use self-stretch —
+          #   flex-1 would grow the main (horizontal) axis and hijack width
+          #   from fixed-size siblings like a 3px accent bar
+          # - flex-col parent or unknown (height is MAIN axis): use flex-1 —
+          #   h-full overflows when siblings exist, flex-1 fills the gap
           if json['height'] == 'matchParent' && !json['weight']
             if json['_overlay']
               classes << 'h-full'
+            elsif json['_parent_orientation'] == 'horizontal'
+              classes << 'self-stretch'
             else
               classes << 'flex-1'
             end
@@ -348,11 +354,18 @@ module RjuiTools
           # Normalize to array (support both single object and array)
           child_array = child_data.is_a?(Array) ? child_data : [child_data]
 
+          # Propagate parent orientation so children know whether their own
+          # `height: matchParent` / `width: matchParent` is a main-axis or
+          # cross-axis instruction. Same pattern as `_overlay` injection in
+          # ViewConverter.
+          parent_orientation = json['orientation']
+
           child_array.filter_map do |child|
             # Skip data-only elements (they define props, not rendered content)
             next nil if data_only_element?(child)
 
-            converter = create_converter_for_child(child)
+            annotated = parent_orientation ? child.merge('_parent_orientation' => parent_orientation) : child
+            converter = create_converter_for_child(annotated)
             converter.convert(indent + 2)
           end.join("\n")
         end

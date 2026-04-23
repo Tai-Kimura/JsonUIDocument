@@ -15,16 +15,18 @@ interface CatalogCell {
 
 interface NextReadCell extends CatalogCell {}
 
-const CATEGORY_CATALOG: Array<{ slug: string; name: string; description: string }> = [
-  { slug: "layout",     name: "Layout",     description: "Size and axis behavior: width / height / weight / aspectRatio." },
-  { slug: "spacing",    name: "Spacing",    description: "Inner (padding) and outer (margin) empty space around components." },
-  { slug: "alignment",  name: "Alignment",  description: "Where a component sits within its parent and relative to siblings." },
-  { slug: "state",      name: "State",      description: "Visibility, enabled / alpha, and interaction gate attributes." },
-  { slug: "binding",    name: "Binding",    description: "@{}, @string/, @event — connect JSON to ViewModel fields." },
-  { slug: "event",      name: "Event",      description: "onClick / onLongPress / onAppear — bind user interactions to the ViewModel." },
-  { slug: "style",      name: "Style",      description: "Background / border / cornerRadius / shadow and style preset." },
-  { slug: "responsive", name: "Responsive", description: "platforms filter and breakpoint-specific overrides." },
-  { slug: "misc",       name: "Misc",       description: "Identity / include / partial and other meta attributes." },
+// Bilingual — onAppear picks `en` or `ja` based on StringManager.language.
+// JA copy mirrors docs/data/attribute-overrides/_common_<slug>.json descriptions.
+const CATEGORY_CATALOG: Array<{ slug: string; name: string; en: string; ja: string }> = [
+  { slug: "layout",     name: "Layout",     en: "Size and axis behavior: width / height / weight / aspectRatio.",                     ja: "レイアウト属性はコンポーネントのサイズと軸方向の挙動を決める。コンポーネント種別によらず全てに適用される。" },
+  { slug: "spacing",    name: "Spacing",    en: "Inner (padding) and outer (margin) empty space around components.",                  ja: "スペーシング属性はコンポーネントの周囲と内側の余白を制御する。margin は外側、padding は内側。" },
+  { slug: "alignment",  name: "Alignment",  en: "Where a component sits within its parent and relative to siblings.",                 ja: "配置属性はコンポーネントが親のどこに置かれるか、兄弟要素がその要素に対してどう配置されるかを制御する。多くは Android の RelativeLayout 由来で、相対位置指定モードの View 内で有効。" },
+  { slug: "state",      name: "State",      en: "Visibility, enabled / alpha, and interaction gate attributes.",                      ja: "状態属性は可視性、インタラクション、不透明度を制御する。ほとんどが Boolean、`visibility` のみ三値。" },
+  { slug: "binding",    name: "Binding",    en: "@{}, @string/, @event — connect JSON to ViewModel fields.",                          ja: "Binding 属性は `@{...}` 構文で JSON 値と ViewModel の状態を繋ぐ。値 binding、文字列解決、イベント binding の 3 種類がある。" },
+  { slug: "event",      name: "Event",      en: "onClick / onLongPress / onAppear — bind user interactions to the ViewModel.",        ja: "イベント属性はユーザー操作を ViewModel のメソッドにバインドする。全て任意、省略すれば該当操作は無効。" },
+  { slug: "style",      name: "Style",      en: "Background / border / cornerRadius / shadow and style preset.",                      ja: "style 属性はコンポーネントの見た目を制御する: 背景、ボーダー、シャドウ、角丸、スタイルプリセット。" },
+  { slug: "responsive", name: "Responsive", en: "platforms filter and breakpoint-specific overrides.",                                 ja: "レスポンシブ属性はビューポートのブレークポイントやホストプラットフォームに応じて値を変える。ブレークポイントは `jsonui-doc-web/tailwind.config.js` で設定する。" },
+  { slug: "misc",       name: "Misc",       en: "Identity / include / partial and other meta attributes.",                            ja: "他のカテゴリに属さない識別・メタデータ・合成・デバッグ系の属性。" },
 ];
 
 export class AttributesViewModel {
@@ -61,12 +63,13 @@ export class AttributesViewModel {
   };
 
   onAppear = () => {
+    const lang = StringManager.language === "ja" ? "ja" : "en";
     const catalog: CatalogCell[] = CATEGORY_CATALOG.map((c) => {
       const url = `/reference/attributes/${c.slug}`;
       return {
         id: `cat_${c.slug}`,
         titleKey: c.name,
-        descriptionKey: c.description,
+        descriptionKey: lang === "ja" ? c.ja : c.en,
         url,
         onNavigate: () => this.navigate(url),
       };

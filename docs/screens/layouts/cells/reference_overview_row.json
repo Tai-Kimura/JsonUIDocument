@@ -1,0 +1,64 @@
+{
+  "type": "View",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "wrapContent",
+  "tapBackground": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        { "name": "name", "class": "String" },
+        { "name": "type", "class": "String" },
+        { "name": "summary", "class": "String" },
+        { "name": "onClick", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "View",
+      "orientation": "horizontal",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "paddings": [10, 12, 10, 12],
+      "child": [
+        {
+          "type": "Label",
+          "width": 180,
+          "height": "wrapContent",
+          "fontSize": 13,
+          "fontFamily": "monospace",
+          "fontWeight": "semibold",
+          "fontColor": "#0B1220",
+          "onClick": "@{onClick}",
+          "text": "@{name}"
+        },
+        {
+          "type": "Label",
+          "width": 180,
+          "height": "wrapContent",
+          "leftMargin": 12,
+          "fontSize": 12,
+          "fontFamily": "monospace",
+          "fontColor": "#6366F1",
+          "text": "@{type}"
+        },
+        {
+          "type": "Label",
+          "height": "wrapContent",
+          "weight": 1,
+          "leftMargin": 12,
+          "fontSize": 13,
+          "lineHeightMultiple": 1.5,
+          "fontColor": "#475467",
+          "text": "@{summary}"
+        }
+      ]
+    },
+    {
+      "type": "View",
+      "width": "matchParent",
+      "height": 1,
+      "background": "#E5E7EB"
+    }
+  ],
+  "_comment": "Overview-row cell for attribute category pages. See docs/plans/reference-detail-redesign/03-attribute-category-layout.md §1. borderBottomWidth not supported — 1px divider emitted as a sibling View."
+}

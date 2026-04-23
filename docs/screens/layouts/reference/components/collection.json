@@ -4,7 +4,7 @@
   "orientation": "vertical",
   "width": "matchParent",
   "height": "matchParent",
-  "background": "#F9FAFB",
+  "background": "surface_muted",
   "child": [
     {
       "data": [
@@ -17,8 +17,28 @@
           "class": "String"
         },
         {
-          "name": "usage",
-          "class": "String"
+          "name": "kicker",
+          "class": "String",
+          "defaultValue": "Component · Reference"
+        },
+        {
+          "name": "kickerParentLabel",
+          "class": "String",
+          "defaultValue": "Components"
+        },
+        {
+          "name": "badges",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "copyTypeVisibility",
+          "class": "String",
+          "defaultValue": "visible"
+        },
+        {
+          "name": "aliasCalloutVisibility",
+          "class": "String",
+          "defaultValue": "gone"
         },
         {
           "name": "aliasNotice",
@@ -26,8 +46,141 @@
           "defaultValue": ""
         },
         {
-          "name": "attributes",
+          "name": "onCopyTypeName",
+          "class": "() -> Void"
+        },
+        {
+          "name": "onNavigateBreadcrumb",
+          "class": "() -> Void"
+        },
+        {
+          "name": "canonicalCode",
+          "class": "String",
+          "defaultValue": ""
+        },
+        {
+          "name": "canonicalLanguage",
+          "class": "String",
+          "defaultValue": "json"
+        },
+        {
+          "name": "statRequiredText",
+          "class": "String",
+          "defaultValue": "0 required"
+        },
+        {
+          "name": "statOptionalText",
+          "class": "String",
+          "defaultValue": "0 optional"
+        },
+        {
+          "name": "statEventsText",
+          "class": "String",
+          "defaultValue": "0 events"
+        },
+        {
+          "name": "usage",
+          "class": "String",
+          "defaultValue": ""
+        },
+        {
+          "name": "usageVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "attributeCategories",
           "class": "CollectionDataSource"
+        },
+        {
+          "name": "attributesCommon",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "attributesStyle",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "attributesLayout",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "attributesSpacing",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "attributesAlignment",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "attributesState",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "attributesBinding",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "attributesEvent",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "attributesResponsive",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "attributesMisc",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "groupCommonVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "groupStyleVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "groupLayoutVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "groupSpacingVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "groupAlignmentVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "groupStateVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "groupBindingVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "groupEventVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "groupResponsiveVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "groupMiscVisibility",
+          "class": "String",
+          "defaultValue": "gone"
         },
         {
           "name": "examples",
@@ -42,8 +195,8 @@
           "class": "CollectionDataSource"
         },
         {
-          "name": "onNavigateBack",
-          "class": "() -> Void"
+          "name": "tocEntries",
+          "class": "Array"
         }
       ]
     },
@@ -61,158 +214,856 @@
       ],
       "child": [
         {
-          "type": "Label",
-          "id": "reference_components_collection_breadcrumb",
-          "width": "wrapContent",
-          "height": "wrapContent",
-          "fontSize": 13,
-          "fontWeight": "semibold",
-          "fontColor": "#64748B",
-          "tapBackground": "#F3F4F6",
-          "text": "Components",
-          "onClick": "@{onNavigateBack}"
-        },
-        {
-          "type": "Label",
-          "id": "reference_components_collection_title",
+          "type": "View",
+          "id": "reference_components_collection_page_header",
+          "orientation": "vertical",
           "width": "matchParent",
           "height": "wrapContent",
-          "topMargin": 16,
-          "fontSize": 40,
-          "fontWeight": "bold",
-          "fontColor": "#0B1220",
-          "text": "@{title}"
+          "paddings": [
+            24,
+            0,
+            24,
+            0
+          ],
+          "child": [
+            {
+              "type": "View",
+              "id": "reference_components_collection_page_header_kicker_row",
+              "orientation": "horizontal",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "Label",
+                  "id": "reference_components_collection_page_header_kicker",
+                  "height": "wrapContent",
+                  "weight": 1,
+                  "fontSize": 11,
+                  "fontWeight": "semibold",
+                  "fontColor": "ink_subtle",
+                  "text": "@{kicker}"
+                },
+                {
+                  "type": "Collection",
+                  "id": "reference_components_collection_page_header_badges",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "orientation": "horizontal",
+                  "items": "@{badges}",
+                  "cellIdProperty": "id",
+                  "lazy": false,
+                  "scrollEnabled": false,
+                  "sections": [
+                    {
+                      "cell": "cells/reference_platform_badge"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "reference_components_collection_page_header_breadcrumb_row",
+              "orientation": "horizontal",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "child": [
+                {
+                  "type": "Label",
+                  "id": "reference_components_collection_page_header_breadcrumb_parent",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "fontSize": 13,
+                  "fontWeight": "semibold",
+                  "fontColor": "accent_link",
+                  "tapBackground": "surface_sunken",
+                  "onClick": "@{onNavigateBreadcrumb}",
+                  "text": "@{kickerParentLabel}"
+                },
+                {
+                  "type": "Label",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "leftMargin": 8,
+                  "rightMargin": 8,
+                  "fontSize": 13,
+                  "fontColor": "ink_faint",
+                  "text": "›"
+                },
+                {
+                  "type": "Label",
+                  "id": "reference_components_collection_page_header_breadcrumb_current",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "fontSize": 13,
+                  "fontColor": "ink",
+                  "text": "@{title}"
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "reference_components_collection_page_header_title_row",
+              "orientation": "horizontal",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "child": [
+                {
+                  "type": "Label",
+                  "id": "reference_components_collection_page_header_title",
+                  "height": "wrapContent",
+                  "weight": 1,
+                  "fontSize": 36,
+                  "fontWeight": "bold",
+                  "fontColor": "ink",
+                  "text": "@{title}"
+                },
+                {
+                  "type": "Button",
+                  "id": "reference_components_collection_page_header_copy_type",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "visibility": "@{copyTypeVisibility}",
+                  "paddings": [
+                    6,
+                    10,
+                    6,
+                    10
+                  ],
+                  "background": "surface_sunken",
+                  "cornerRadius": 6,
+                  "fontSize": 12,
+                  "fontColor": "ink",
+                  "text": "reference_detail_copy_type",
+                  "onClick": "@{onCopyTypeName}"
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "reference_components_collection_page_header_alias_callout",
+              "orientation": "horizontal",
+              "width": "wrapContent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "paddings": [
+                8,
+                12,
+                8,
+                12
+              ],
+              "background": "accent_tint",
+              "cornerRadius": 8,
+              "visibility": "@{aliasCalloutVisibility}",
+              "child": [
+                {
+                  "type": "Label",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "fontSize": 13,
+                  "fontColor": "accent_secondary_strong",
+                  "text": "→"
+                },
+                {
+                  "type": "Label",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "leftMargin": 8,
+                  "fontSize": 13,
+                  "fontWeight": "semibold",
+                  "fontColor": "accent_secondary_strong",
+                  "text": "@{aliasNotice}"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "id": "reference_components_collection_page_header_description",
+              "width": "matchParent",
+              "maxWidth": 920,
+              "height": "wrapContent",
+              "topMargin": 20,
+              "fontSize": 17,
+              "lineHeightMultiple": 1.55,
+              "fontColor": "ink_muted",
+              "text": "@{description}"
+            }
+          ]
         },
         {
-          "type": "Label",
-          "id": "reference_components_collection_alias_notice",
+          "type": "View",
+          "id": "reference_components_collection_content_with_rail",
+          "orientation": "horizontal",
           "width": "matchParent",
           "height": "wrapContent",
           "topMargin": 8,
-          "fontSize": 13,
-          "fontColor": "#6366F1",
-          "text": "@{aliasNotice}"
-        },
-        {
-          "type": "Label",
-          "id": "reference_components_collection_description",
-          "width": "matchParent",
-          "height": "wrapContent",
-          "topMargin": 16,
-          "fontSize": 17,
-          "fontColor": "#475467",
-          "text": "@{description}"
-        },
-        {
-          "type": "Label",
-          "id": "reference_components_collection_usage",
-          "width": "matchParent",
-          "height": "wrapContent",
-          "topMargin": 16,
-          "fontSize": 15,
-          "fontColor": "#475467",
-          "text": "@{usage}"
-        },
-        {
-          "type": "Label",
-          "id": "reference_components_collection_attrs_heading",
-          "width": "matchParent",
-          "height": "wrapContent",
-          "topMargin": 32,
-          "fontSize": 22,
-          "fontWeight": "bold",
-          "fontColor": "#0B1220",
-          "text": "Attributes"
-        },
-        {
-          "type": "Collection",
-          "id": "reference_components_collection_attributes",
-          "width": "matchParent",
-          "height": "wrapContent",
-          "topMargin": 12,
-          "items": "@{attributes}",
-          "cellIdProperty": "id",
-          "lazy": false,
-          "scrollEnabled": false,
-          "sections": [
+          "child": [
             {
-              "cell": "cells/reference_attribute_row"
-            }
-          ]
-        },
-        {
-          "type": "Label",
-          "id": "reference_components_collection_examples_heading",
-          "width": "matchParent",
-          "height": "wrapContent",
-          "topMargin": 32,
-          "fontSize": 22,
-          "fontWeight": "bold",
-          "fontColor": "#0B1220",
-          "text": "Examples"
-        },
-        {
-          "type": "Collection",
-          "id": "reference_components_collection_examples",
-          "width": "matchParent",
-          "height": "wrapContent",
-          "topMargin": 12,
-          "items": "@{examples}",
-          "cellIdProperty": "id",
-          "lazy": false,
-          "scrollEnabled": false,
-          "sections": [
+              "type": "View",
+              "id": "reference_components_collection_column_body",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "id": "section-glance",
+                  "orientation": "vertical",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 28,
+                  "paddings": [
+                    20,
+                    20,
+                    20,
+                    20
+                  ],
+                  "background": "surface",
+                  "cornerRadius": 10,
+                  "borderColor": "border",
+                  "borderWidth": 1,
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 11,
+                      "fontWeight": "semibold",
+                      "fontColor": "ink_subtle",
+                      "text": "reference_detail_eyebrow_glance"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "id": "reference_components_collection_glance_code",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "@{canonicalCode}",
+                      "language": "@{canonicalLanguage}",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "View",
+                      "id": "reference_components_collection_glance_stats",
+                      "orientation": "horizontal",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 14,
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "wrapContent",
+                          "height": "wrapContent",
+                          "paddings": [
+                            3,
+                            8,
+                            3,
+                            8
+                          ],
+                          "background": "surface_sunken",
+                          "cornerRadius": 4,
+                          "fontSize": 11,
+                          "fontFamily": "monospace",
+                          "fontColor": "ink",
+                          "text": "@{statRequiredText}"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "wrapContent",
+                          "height": "wrapContent",
+                          "leftMargin": 8,
+                          "paddings": [
+                            3,
+                            8,
+                            3,
+                            8
+                          ],
+                          "background": "surface_sunken",
+                          "cornerRadius": 4,
+                          "fontSize": 11,
+                          "fontFamily": "monospace",
+                          "fontColor": "ink",
+                          "text": "@{statOptionalText}"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "wrapContent",
+                          "height": "wrapContent",
+                          "leftMargin": 8,
+                          "paddings": [
+                            3,
+                            8,
+                            3,
+                            8
+                          ],
+                          "background": "surface_sunken",
+                          "cornerRadius": 4,
+                          "fontSize": 11,
+                          "fontFamily": "monospace",
+                          "fontColor": "ink",
+                          "text": "@{statEventsText}"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "section-usage",
+                  "orientation": "vertical",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 32,
+                  "visibility": "@{usageVisibility}",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 11,
+                      "fontWeight": "semibold",
+                      "fontColor": "ink_subtle",
+                      "text": "reference_detail_eyebrow_usage"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "maxWidth": 920,
+                      "height": "wrapContent",
+                      "topMargin": 8,
+                      "fontSize": 15,
+                      "lineHeightMultiple": 1.55,
+                      "fontColor": "ink_muted",
+                      "text": "@{usage}"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "section-attributes",
+                  "orientation": "vertical",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 32,
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 11,
+                      "fontWeight": "semibold",
+                      "fontColor": "ink_subtle",
+                      "text": "reference_detail_eyebrow_attributes"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "reference_components_collection_category_chips",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "orientation": "horizontal",
+                      "items": "@{attributeCategories}",
+                      "cellIdProperty": "id",
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "sections": [
+                        {
+                          "cell": "cells/reference_category_chip"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "section-common",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 28,
+                      "visibility": "@{groupCommonVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "reference_detail_category_common"
+                        },
+                        {
+                          "type": "Collection",
+                          "id": "reference_components_collection_group_common_list",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "items": "@{attributesCommon}",
+                          "cellIdProperty": "id",
+                          "lazy": false,
+                          "scrollEnabled": false,
+                          "sections": [
+                            {
+                              "cell": "cells/reference_attribute_row"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "section-style",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 28,
+                      "visibility": "@{groupStyleVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "reference_detail_category_style"
+                        },
+                        {
+                          "type": "Collection",
+                          "id": "reference_components_collection_group_style_list",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "items": "@{attributesStyle}",
+                          "cellIdProperty": "id",
+                          "lazy": false,
+                          "scrollEnabled": false,
+                          "sections": [
+                            {
+                              "cell": "cells/reference_attribute_row"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "section-layout",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 28,
+                      "visibility": "@{groupLayoutVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "reference_detail_category_layout"
+                        },
+                        {
+                          "type": "Collection",
+                          "id": "reference_components_collection_group_layout_list",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "items": "@{attributesLayout}",
+                          "cellIdProperty": "id",
+                          "lazy": false,
+                          "scrollEnabled": false,
+                          "sections": [
+                            {
+                              "cell": "cells/reference_attribute_row"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "section-spacing",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 28,
+                      "visibility": "@{groupSpacingVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "reference_detail_category_spacing"
+                        },
+                        {
+                          "type": "Collection",
+                          "id": "reference_components_collection_group_spacing_list",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "items": "@{attributesSpacing}",
+                          "cellIdProperty": "id",
+                          "lazy": false,
+                          "scrollEnabled": false,
+                          "sections": [
+                            {
+                              "cell": "cells/reference_attribute_row"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "section-alignment",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 28,
+                      "visibility": "@{groupAlignmentVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "reference_detail_category_alignment"
+                        },
+                        {
+                          "type": "Collection",
+                          "id": "reference_components_collection_group_alignment_list",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "items": "@{attributesAlignment}",
+                          "cellIdProperty": "id",
+                          "lazy": false,
+                          "scrollEnabled": false,
+                          "sections": [
+                            {
+                              "cell": "cells/reference_attribute_row"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "section-state",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 28,
+                      "visibility": "@{groupStateVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "reference_detail_category_state"
+                        },
+                        {
+                          "type": "Collection",
+                          "id": "reference_components_collection_group_state_list",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "items": "@{attributesState}",
+                          "cellIdProperty": "id",
+                          "lazy": false,
+                          "scrollEnabled": false,
+                          "sections": [
+                            {
+                              "cell": "cells/reference_attribute_row"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "section-binding",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 28,
+                      "visibility": "@{groupBindingVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "reference_detail_category_binding"
+                        },
+                        {
+                          "type": "Collection",
+                          "id": "reference_components_collection_group_binding_list",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "items": "@{attributesBinding}",
+                          "cellIdProperty": "id",
+                          "lazy": false,
+                          "scrollEnabled": false,
+                          "sections": [
+                            {
+                              "cell": "cells/reference_attribute_row"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "section-event",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 28,
+                      "visibility": "@{groupEventVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "reference_detail_category_event"
+                        },
+                        {
+                          "type": "Collection",
+                          "id": "reference_components_collection_group_event_list",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "items": "@{attributesEvent}",
+                          "cellIdProperty": "id",
+                          "lazy": false,
+                          "scrollEnabled": false,
+                          "sections": [
+                            {
+                              "cell": "cells/reference_attribute_row"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "section-responsive",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 28,
+                      "visibility": "@{groupResponsiveVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "reference_detail_category_responsive"
+                        },
+                        {
+                          "type": "Collection",
+                          "id": "reference_components_collection_group_responsive_list",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "items": "@{attributesResponsive}",
+                          "cellIdProperty": "id",
+                          "lazy": false,
+                          "scrollEnabled": false,
+                          "sections": [
+                            {
+                              "cell": "cells/reference_attribute_row"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "section-misc",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 28,
+                      "visibility": "@{groupMiscVisibility}",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 18,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "reference_detail_category_misc"
+                        },
+                        {
+                          "type": "Collection",
+                          "id": "reference_components_collection_group_misc_list",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 12,
+                          "items": "@{attributesMisc}",
+                          "cellIdProperty": "id",
+                          "lazy": false,
+                          "scrollEnabled": false,
+                          "sections": [
+                            {
+                              "cell": "cells/reference_attribute_row"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "section-examples",
+                  "orientation": "vertical",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 32,
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 11,
+                      "fontWeight": "semibold",
+                      "fontColor": "ink_subtle",
+                      "text": "reference_detail_eyebrow_examples"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "reference_components_collection_examples",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "items": "@{examples}",
+                      "cellIdProperty": "id",
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "sections": [
+                        {
+                          "cell": "cells/reference_code_example"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "section-related",
+                  "orientation": "vertical",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 32,
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 11,
+                      "fontWeight": "semibold",
+                      "fontColor": "ink_subtle",
+                      "text": "reference_detail_eyebrow_related"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "reference_components_collection_related",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "items": "@{relatedComponents}",
+                      "cellIdProperty": "id",
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "sections": [
+                        {
+                          "cell": "cells/reference_related_pill"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "id": "section-next",
+                  "orientation": "vertical",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 40,
+                  "child": [
+                    {
+                      "type": "Collection",
+                      "id": "reference_components_collection_next",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "sections": [
+                        {
+                          "cell": "cells/next_step_card"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
             {
-              "cell": "cells/reference_code_example"
-            }
-          ]
-        },
-        {
-          "type": "Label",
-          "id": "reference_components_collection_related_heading",
-          "width": "matchParent",
-          "height": "wrapContent",
-          "topMargin": 32,
-          "fontSize": 22,
-          "fontWeight": "bold",
-          "fontColor": "#0B1220",
-          "text": "Related components"
-        },
-        {
-          "type": "Collection",
-          "id": "reference_components_collection_related",
-          "width": "matchParent",
-          "height": "wrapContent",
-          "topMargin": 12,
-          "orientation": "horizontal",
-          "items": "@{relatedComponents}",
-          "cellIdProperty": "id",
-          "lazy": false,
-          "scrollEnabled": false,
-          "sections": [
-            {
-              "cell": "cells/reference_related_pill"
-            }
-          ]
-        },
-        {
-          "type": "Collection",
-          "id": "reference_components_collection_next",
-          "width": "matchParent",
-          "height": "wrapContent",
-          "topMargin": 40,
-          "items": "@{nextReadLinks}",
-          "cellIdProperty": "id",
-          "lazy": false,
-          "scrollEnabled": false,
-          "sections": [
-            {
-              "cell": "cells/next_step_card"
+              "type": "View",
+              "id": "reference_components_collection_column_rail",
+              "orientation": "vertical",
+              "width": 240,
+              "height": "wrapContent",
+              "leftMargin": 32,
+              "paddings": [
+                28,
+                0,
+                0,
+                0
+              ],
+              "child": [
+                {
+                  "type": "TableOfContents",
+                  "id": "reference_components_collection_toc",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "items": "@{tocEntries}",
+                  "sticky": true,
+                  "stickyOffset": 80,
+                  "maxDepth": 1
+                }
+              ]
             }
           ]
         }
       ]
     }
   ],
-  "_comment": "Auto-generated by scripts/build-attribute-reference.ts. Structure follows docs/plans/14-attribute-reference-generation.md."
+  "_comment": "Auto-generated by scripts/build-attribute-reference.ts. Structure follows docs/plans/reference-detail-redesign/01-shared-page-header.md and 02-component-detail-layout.md."
 }

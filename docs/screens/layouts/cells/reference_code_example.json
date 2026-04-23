@@ -3,17 +3,18 @@
   "orientation": "vertical",
   "width": "matchParent",
   "height": "wrapContent",
+  "topMargin": 16,
   "paddings": [
-    16,
-    16,
-    16,
-    16
+    18,
+    20,
+    18,
+    20
   ],
-  "topMargin": 8,
   "background": "#FFFFFF",
-  "cornerRadius": 8,
+  "cornerRadius": 10,
   "borderColor": "#E5E7EB",
   "borderWidth": 1,
+  "id": "@{anchorId}",
   "child": [
     {
       "data": [
@@ -22,35 +23,186 @@
           "class": "String"
         },
         {
-          "name": "language",
-          "class": "String"
+          "name": "anchorId",
+          "class": "String",
+          "defaultValue": ""
         },
         {
-          "name": "code",
-          "class": "String"
+          "name": "description",
+          "class": "String",
+          "defaultValue": ""
+        },
+        {
+          "name": "descriptionVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "filePath",
+          "class": "String",
+          "defaultValue": ""
+        },
+        {
+          "name": "filePathVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "tabs",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "tabsVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "languagePill",
+          "class": "String",
+          "defaultValue": "json"
+        },
+        {
+          "name": "languagePillVisibility",
+          "class": "String",
+          "defaultValue": "visible"
+        },
+        {
+          "name": "activeLanguage",
+          "class": "String",
+          "defaultValue": "json"
+        },
+        {
+          "name": "activeCode",
+          "class": "String",
+          "defaultValue": ""
         },
         {
           "name": "note",
           "class": "String",
           "defaultValue": ""
+        },
+        {
+          "name": "noteVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "onCopy",
+          "class": "() -> Void"
+        },
+        {
+          "name": "onSelectTab",
+          "class": "(String) -> Void"
         }
       ]
     },
     {
       "type": "View",
+      "id": "code_example_header",
       "orientation": "horizontal",
       "width": "matchParent",
       "height": "wrapContent",
       "child": [
         {
-          "type": "Label",
+          "type": "View",
+          "orientation": "vertical",
           "height": "wrapContent",
           "weight": 1,
-          "fontSize": 14,
-          "fontWeight": "semibold",
-          "fontColor": "#0B1220",
-          "text": "@{title}"
+          "child": [
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "fontSize": 15,
+              "fontWeight": "semibold",
+              "fontColor": "#0B1220",
+              "text": "@{title}"
+            },
+            {
+              "type": "Label",
+              "id": "code_example_file_path",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 4,
+              "visibility": "@{filePathVisibility}",
+              "fontSize": 12,
+              "fontFamily": "monospace",
+              "fontColor": "#64748B",
+              "text": "@{filePath}"
+            }
+          ]
         },
+        {
+          "type": "Button",
+          "id": "code_example_copy_btn",
+          "width": "wrapContent",
+          "height": "wrapContent",
+          "paddings": [
+            5,
+            10,
+            5,
+            10
+          ],
+          "background": "#F3F4F6",
+          "cornerRadius": 6,
+          "fontSize": 12,
+          "fontColor": "#0B1220",
+          "text": "Copy",
+          "onClick": "@{onCopy}"
+        }
+      ]
+    },
+    {
+      "type": "Label",
+      "id": "code_example_description",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 8,
+      "visibility": "@{descriptionVisibility}",
+      "fontSize": 13,
+      "lineHeightMultiple": 1.5,
+      "fontColor": "#475467",
+      "text": "@{description}"
+    },
+    {
+      "type": "View",
+      "id": "code_example_tabs_wrap",
+      "orientation": "horizontal",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 12,
+      "visibility": "@{tabsVisibility}",
+      "child": [
+        {
+          "type": "Collection",
+          "id": "code_example_tabs",
+          "width": "wrapContent",
+          "height": "wrapContent",
+          "orientation": "horizontal",
+          "items": "@{tabs}",
+          "cellIdProperty": "id",
+          "lazy": false,
+          "scrollEnabled": false,
+          "shared_data": {
+            "onSelectTab": "@{onSelectTab}"
+          },
+          "sections": [
+            {
+              "cell": "cells/reference_code_tab"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "View",
+      "id": "code_example_language_pill_wrap",
+      "orientation": "horizontal",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 12,
+      "visibility": "@{languagePillVisibility}",
+      "child": [
         {
           "type": "Label",
           "width": "wrapContent",
@@ -66,37 +218,124 @@
           "fontSize": 11,
           "fontFamily": "monospace",
           "fontColor": "#4F46E5",
-          "text": "@{language}"
+          "text": "@{languagePill}"
         }
       ]
     },
     {
-      "type": "Label",
+      "type": "View",
+      "id": "code_example_window",
+      "orientation": "vertical",
       "width": "matchParent",
       "height": "wrapContent",
-      "topMargin": 8,
-      "paddings": [
-        12,
-        12,
-        12,
-        12
-      ],
+      "topMargin": 12,
       "background": "#0F172A",
-      "fontFamily": "monospace",
-      "fontSize": 13,
-      "fontColor": "#F9FAFB",
-      "cornerRadius": 6,
-      "text": "@{code}"
+      "cornerRadius": 8,
+      "child": [
+        {
+          "type": "View",
+          "id": "code_example_window_chrome",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            8,
+            12,
+            8,
+            12
+          ],
+          "child": [
+            {
+              "type": "View",
+              "width": 10,
+              "height": 10,
+              "cornerRadius": 5,
+              "background": "#EF4444"
+            },
+            {
+              "type": "View",
+              "width": 10,
+              "height": 10,
+              "cornerRadius": 5,
+              "leftMargin": 6,
+              "background": "#F59E0B"
+            },
+            {
+              "type": "View",
+              "width": 10,
+              "height": 10,
+              "cornerRadius": 5,
+              "leftMargin": 6,
+              "background": "#10B981"
+            },
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "weight": 1,
+              "leftMargin": 12,
+              "fontSize": 11,
+              "fontFamily": "monospace",
+              "fontColor": "#94A3B8",
+              "text": "@{activeLanguage}"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "code_example_window_divider",
+          "width": "matchParent",
+          "height": 1,
+          "background": "#1E293B"
+        },
+        {
+          "type": "CodeBlock",
+          "id": "code_example_block",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "code": "@{activeCode}",
+          "language": "@{activeLanguage}",
+          "showLineNumbers": false,
+          "copyable": false
+        }
+      ]
     },
     {
-      "type": "Label",
+      "type": "View",
+      "id": "code_example_note",
+      "orientation": "horizontal",
       "width": "matchParent",
       "height": "wrapContent",
-      "topMargin": 8,
-      "fontSize": 12,
-      "fontColor": "#64748B",
-      "text": "@{note}"
+      "topMargin": 12,
+      "paddings": [
+        10,
+        12,
+        10,
+        12
+      ],
+      "background": "#EEF2FF",
+      "cornerRadius": 6,
+      "visibility": "@{noteVisibility}",
+      "child": [
+        {
+          "type": "Label",
+          "width": "wrapContent",
+          "height": "wrapContent",
+          "fontSize": 12,
+          "fontWeight": "semibold",
+          "fontColor": "#4F46E5",
+          "text": "ⓘ"
+        },
+        {
+          "type": "Label",
+          "height": "wrapContent",
+          "weight": 1,
+          "leftMargin": 8,
+          "fontSize": 13,
+          "lineHeightMultiple": 1.5,
+          "fontColor": "#4F46E5",
+          "text": "@{note}"
+        }
+      ]
     }
-  ],
-  "_comment": "Auto-scaffolded by scripts/build-attribute-reference.ts. Hand-edit or replace during design pass."
+  ]
 }

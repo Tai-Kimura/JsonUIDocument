@@ -3,9 +3,431 @@
   "kebab": "gradient-view",
   "aliasOf": null,
   "title": "GradientView",
-  "description": "View with a linear gradient background. For simple 2-stop gradients, the `gradient` attribute on a regular View is sufficient — use GradientView when `locations` (multi-stop control) is needed.",
-  "usage": "Use GradientView for hero banners, card overlays, and any background needing 3+ color stops or precise stop positions. For flat colors, prefer `background` on a View.",
+  "description": {
+    "en": "View with a linear gradient background. For simple 2-stop gradients, the `gradient` attribute on a regular View is sufficient — use GradientView when `locations` (multi-stop control) is needed.",
+    "ja": "線形グラデーション背景を持つ View。2 色の単純なグラデーションなら通常の View の `gradient` 属性で十分、`locations`（多段 stop 制御）が必要なときに GradientView を使う。"
+  },
+  "usage": {
+    "en": "Use GradientView for hero banners, card overlays, and any background needing 3+ color stops or precise stop positions. For flat colors, prefer `background` on a View.",
+    "ja": "ヒーローバナー、カードオーバーレイ、3 色以上の stop や精密な位置指定が必要な背景に使う。単色背景は View の `background` を使う。"
+  },
   "aliasNotice": null,
+  "kicker": "Component · Reference",
+  "kickerParentLabel": "Components",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "platform_ios",
+              "label": "iOS",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_android",
+              "label": "Android",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_web",
+              "label": "Web",
+              "fontColor": "var(--color-ink)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "visible",
+  "aliasCalloutVisibility": "gone",
+  "aliasLinkUrl": "",
+  "canonicalCode": "{\n  \"type\": \"GradientView\",\n  \"gradient\": [\"#FBBF24\", \"#F59E0B\", \"#EF4444\"],\n  \"locations\": [0.0, 0.6, 1.0],\n  \"gradientDirection\": \"horizontal\",\n  \"width\": \"matchParent\",\n  \"height\": 120\n}",
+  "canonicalLanguage": "json",
+  "statRequired": "0",
+  "statOptional": "3",
+  "statEvents": "0",
+  "statRequiredText": {
+    "en": "0 required",
+    "ja": "必須 0"
+  },
+  "statOptionalText": {
+    "en": "3 optional",
+    "ja": "任意 3"
+  },
+  "statEventsText": {
+    "en": "0 events",
+    "ja": "イベント 0"
+  },
+  "usageVisibility": "visible",
+  "attributeCategories": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "cat_common",
+              "label": {
+                "en": "Common",
+                "ja": "共通"
+              },
+              "anchorUrl": "#section-common"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributesCommon": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_gradient",
+              "name": "gradient",
+              "anchorId": "attr-gradient",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Gradient colors.",
+                "ja": "グラデーションの色配列。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Array of 2+ color strings. Colors are distributed evenly unless `locations` is provided.",
+                "ja": "2 色以上の配列。`locations` 未指定で均等配分。"
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_gradientDirection",
+              "name": "gradientDirection",
+              "anchorId": "attr-gradientDirection",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "Vertical",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "Horizontal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "Oblique",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Gradient direction.",
+                "ja": "グラデーションの方向。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`horizontal` / `vertical` / `diagonal` or numeric degrees. Default `vertical`.",
+                "ja": "`horizontal` / `vertical` / `diagonal` または度数。デフォルト `vertical`。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_locations",
+              "name": "locations",
+              "anchorId": "attr-locations",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Gradient color stop locations.",
+                "ja": "グラデーション色の停止位置（0.0〜1.0 の配列）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Array of 0.0–1.0 values, same length as `gradient`. Each entry is the position where that color peaks.",
+                "ja": "0.0〜1.0 の配列、`gradient` と同じ長さ。各 stop はその色がピークとなる位置。"
+              },
+              "type": "array",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupCommonVisibility": "visible",
+  "attributesStyle": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStyleVisibility": "gone",
+  "attributesLayout": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupLayoutVisibility": "gone",
+  "attributesSpacing": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupSpacingVisibility": "gone",
+  "attributesAlignment": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupAlignmentVisibility": "gone",
+  "attributesState": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStateVisibility": "gone",
+  "attributesBinding": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupBindingVisibility": "gone",
+  "attributesEvent": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupEventVisibility": "gone",
+  "attributesResponsive": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupResponsiveVisibility": "gone",
+  "attributesMisc": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupMiscVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_glance",
+      "label": {
+        "en": "At a glance",
+        "ja": "概要"
+      },
+      "anchor": "section-glance",
+      "level": 1
+    },
+    {
+      "id": "toc_common",
+      "label": {
+        "en": "Common",
+        "ja": "共通"
+      },
+      "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_examples",
+      "label": {
+        "en": "Examples",
+        "ja": "例"
+      },
+      "anchor": "section-examples",
+      "level": 1
+    },
+    {
+      "id": "toc_related",
+      "label": {
+        "en": "Related",
+        "ja": "関連"
+      },
+      "anchor": "section-related",
+      "level": 1
+    }
+  ],
   "examples": {
     "sections": [
       {
@@ -13,14 +435,86 @@
           "data": [
             {
               "id": "example_1",
-              "title": "Sunset 3-stop",
+              "anchorId": "example-1",
+              "title": {
+                "en": "Sunset 3-stop",
+                "ja": "3 色のサンセット"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"GradientView\",\n  \"gradient\": [\"#FBBF24\", \"#F59E0B\", \"#EF4444\"],\n  \"locations\": [0.0, 0.6, 1.0],\n  \"gradientDirection\": \"horizontal\",\n  \"width\": \"matchParent\",\n  \"height\": 120\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"GradientView\",\n  \"gradient\": [\"#FBBF24\", \"#F59E0B\", \"#EF4444\"],\n  \"locations\": [0.0, 0.6, 1.0],\n  \"gradientDirection\": \"horizontal\",\n  \"width\": \"matchParent\",\n  \"height\": 120\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"GradientView\",\n  \"gradient\": [\"#FBBF24\", \"#F59E0B\", \"#EF4444\"],\n  \"locations\": [0.0, 0.6, 1.0],\n  \"gradientDirection\": \"horizontal\",\n  \"width\": \"matchParent\",\n  \"height\": 120\n}",
               "required": ""
             },
             {
               "id": "example_2",
-              "title": "Vertical hero",
+              "anchorId": "example-2",
+              "title": {
+                "en": "Vertical hero",
+                "ja": "垂直ヒーロー"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"GradientView\",\n  \"gradient\": [\"#6366F1\", \"#8B5CF6\"],\n  \"gradientDirection\": \"vertical\",\n  \"width\": \"matchParent\",\n  \"height\": 200\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"GradientView\",\n  \"gradient\": [\"#6366F1\", \"#8B5CF6\"],\n  \"gradientDirection\": \"vertical\",\n  \"width\": \"matchParent\",\n  \"height\": 200\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"GradientView\",\n  \"gradient\": [\"#6366F1\", \"#8B5CF6\"],\n  \"gradientDirection\": \"vertical\",\n  \"width\": \"matchParent\",\n  \"height\": 200\n}",
               "required": ""
@@ -38,31 +532,213 @@
             {
               "id": "attr_gradient",
               "name": "gradient",
+              "anchorId": "attr-gradient",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Gradient colors.",
+                "ja": "グラデーションの色配列。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Array of 2+ color strings. Colors are distributed evenly unless `locations` is provided.",
+                "ja": "2 色以上の配列。`locations` 未指定で均等配分。"
+              },
               "type": "array",
-              "required": "",
-              "description": "Gradient colors",
-              "note": "Array of 2+ color strings. Colors are distributed evenly unless `locations` is provided."
+              "required": ""
             },
             {
-              "id": "attr_gradient_direction",
+              "id": "attr_gradientDirection",
               "name": "gradientDirection",
+              "anchorId": "attr-gradientDirection",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "Vertical",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "Horizontal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "Oblique",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Gradient direction.",
+                "ja": "グラデーションの方向。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`horizontal` / `vertical` / `diagonal` or numeric degrees. Default `vertical`.",
+                "ja": "`horizontal` / `vertical` / `diagonal` または度数。デフォルト `vertical`。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Gradient direction",
-              "note": "`horizontal` / `vertical` / `diagonal` or numeric degrees. Default `vertical`.",
-              "enumValues": [
-                "Vertical",
-                "Horizontal",
-                "Oblique"
-              ]
+              "required": ""
             },
             {
               "id": "attr_locations",
               "name": "locations",
+              "anchorId": "attr-locations",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Gradient color stop locations.",
+                "ja": "グラデーション色の停止位置（0.0〜1.0 の配列）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Array of 0.0–1.0 values, same length as `gradient`. Each entry is the position where that color peaks.",
+                "ja": "0.0〜1.0 の配列、`gradient` と同じ長さ。各 stop はその色がピークとなる位置。"
+              },
               "type": "array",
-              "required": "",
-              "description": "Color stop locations (0.0-1.0)",
-              "note": "Array of 0.0–1.0 values, same length as `gradient`. Each entry is the position where that color peaks."
+              "required": ""
             }
           ]
         }
@@ -77,11 +753,13 @@
             {
               "id": "related_view",
               "name": "View",
+              "hint": "",
               "url": "/reference/components/view"
             },
             {
               "id": "related_blur",
               "name": "Blur",
+              "hint": "",
               "url": "/reference/components/blur"
             }
           ]
@@ -96,14 +774,26 @@
           "data": [
             {
               "id": "next_attributes",
-              "titleKey": "next_attributes_title",
-              "descriptionKey": "next_attributes_body",
+              "titleKey": {
+                "en": "Attribute reference",
+                "ja": "属性リファレンス"
+              },
+              "descriptionKey": {
+                "en": "Every common attribute in one place — width / padding / binding / events grouped by category.",
+                "ja": "共通属性を 1 箇所にまとめたリファレンス。width / padding / binding / event などカテゴリ別に整理。"
+              },
               "url": "/reference/attributes"
             },
             {
               "id": "next_custom_components",
-              "titleKey": "next_custom_components_title",
-              "descriptionKey": "next_custom_components_body",
+              "titleKey": {
+                "en": "Building a custom component",
+                "ja": "カスタムコンポーネントを作る"
+              },
+              "descriptionKey": {
+                "en": "Extend JsonUI with your own components (spec → converter → React/Swift/Kotlin).",
+                "ja": "spec → converter → React/Swift/Kotlin で JsonUI を独自拡張する手順。"
+              },
               "url": "/guides/custom-components"
             }
           ]

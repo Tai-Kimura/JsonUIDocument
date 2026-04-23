@@ -41,6 +41,9 @@ interface PrerequisiteCell {
 interface TabHeaderCell {
   id: string;
   labelKey: string;
+  bgColor: string;
+  fgColor: string;
+  borderColor: string;
   onSelect: () => void;
 }
 
@@ -67,7 +70,7 @@ export class HelloWorldViewModel {
   // State not bound in the layout: activeTab drives the per-platform panel
   // visibility (derived fields swiftPanelVisibility/etc. ARE in the data
   // block); currentLanguage triggers re-seed on language toggle.
-  private _activeTab: string = "react";
+  private _activeTab: string = "swift";
 
   get data(): HelloWorldData {
     return this._getData();
@@ -142,23 +145,7 @@ export class HelloWorldViewModel {
       },
     ];
 
-    const platformTabs: TabHeaderCell[] = [
-      {
-        id: "swift",
-        labelKey: this.s("tab_swift"),
-        onSelect: () => this.onSelectTab("swift"),
-      },
-      {
-        id: "kotlin",
-        labelKey: this.s("tab_kotlin"),
-        onSelect: () => this.onSelectTab("kotlin"),
-      },
-      {
-        id: "react",
-        labelKey: this.s("tab_react"),
-        onSelect: () => this.onSelectTab("react"),
-      },
-    ];
+    const platformTabs: TabHeaderCell[] = this.buildPlatformTabs(this._activeTab);
 
     const installOneLiner =
       "curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/JsonUI-Agents-for-claude/main/installer/bootstrap.sh | bash";
@@ -316,8 +303,28 @@ export class HelloWorldViewModel {
   onSelectTab = (id: string): void => {
     this._activeTab = id;
     this.updateData({
+      platformTabs: this.asCollection(this.buildPlatformTabs(id)),
       ...this.panelVisibilityFor(id),
     });
+  };
+
+  private buildPlatformTabs = (activeId: string): TabHeaderCell[] => {
+    const make = (id: string, labelKey: string): TabHeaderCell => {
+      const isActive = id === activeId;
+      return {
+        id,
+        labelKey,
+        bgColor: isActive ? "var(--color-accent)" : "var(--color-surface)",
+        fgColor: isActive ? "var(--color-accent_ink)" : "var(--color-ink)",
+        borderColor: isActive ? "var(--color-accent)" : "var(--color-border)",
+        onSelect: () => this.onSelectTab(id),
+      };
+    };
+    return [
+      make("swift", this.s("tab_swift")),
+      make("kotlin", this.s("tab_kotlin")),
+      make("react", this.s("tab_react")),
+    ];
   };
 
   /**

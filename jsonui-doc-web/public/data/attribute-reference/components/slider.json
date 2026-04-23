@@ -3,9 +3,926 @@
   "kebab": "slider",
   "aliasOf": null,
   "title": "Slider",
-  "description": "Continuous numeric input over a defined range. Can be constrained to discrete values via `step`.",
-  "usage": "Use Slider for values where rough precision is acceptable (volume, brightness, opacity). For exact integers use a numeric TextField. For a range of two values, place two Sliders and keep their values consistent in the ViewModel.",
+  "description": {
+    "en": "Continuous numeric input over a defined range. Can be constrained to discrete values via `step`.",
+    "ja": "指定範囲の連続数値入力。`step` で離散値にもできる。"
+  },
+  "usage": {
+    "en": "Use Slider for values where rough precision is acceptable (volume, brightness, opacity). For exact integers use a numeric TextField. For a range of two values, place two Sliders and keep their values consistent in the ViewModel.",
+    "ja": "大まかな精度で十分な値（音量・輝度・不透明度）に使う。厳密な整数入力なら数値 TextField を使う。範囲指定には 2 つの Slider を並べ、ViewModel で値を整合させる。"
+  },
   "aliasNotice": null,
+  "kicker": "Component · Reference",
+  "kickerParentLabel": "Components",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "platform_ios",
+              "label": "iOS",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_android",
+              "label": "Android",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_web",
+              "label": "Web",
+              "fontColor": "var(--color-ink)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "visible",
+  "aliasCalloutVisibility": "gone",
+  "aliasLinkUrl": "",
+  "canonicalCode": "{\n  \"type\": \"Slider\",\n  \"value\": \"@{volume}\",\n  \"minimum\": 0,\n  \"maximum\": 100,\n  \"step\": 1,\n  \"onValueChange\": \"@{onVolumeChanged}\"\n}",
+  "canonicalLanguage": "json",
+  "statRequired": "0",
+  "statOptional": "10",
+  "statEvents": "1",
+  "statRequiredText": {
+    "en": "0 required",
+    "ja": "必須 0"
+  },
+  "statOptionalText": {
+    "en": "10 optional",
+    "ja": "任意 10"
+  },
+  "statEventsText": {
+    "en": "1 events",
+    "ja": "イベント 1"
+  },
+  "usageVisibility": "visible",
+  "attributeCategories": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "cat_common",
+              "label": {
+                "en": "Common",
+                "ja": "共通"
+              },
+              "anchorUrl": "#section-common"
+            },
+            {
+              "id": "cat_style",
+              "label": {
+                "en": "Style",
+                "ja": "スタイル"
+              },
+              "anchorUrl": "#section-style"
+            },
+            {
+              "id": "cat_event",
+              "label": {
+                "en": "Event",
+                "ja": "イベント"
+              },
+              "anchorUrl": "#section-event"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributesCommon": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_value",
+              "name": "value",
+              "anchorId": "attr-value",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Switch state alias (binding for two-way).",
+                "ja": "スイッチ状態の値（双方向 binding）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Two-way numeric binding.",
+                "ja": "数値の two-way binding。"
+              },
+              "type": "number | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_maxValue",
+              "name": "maxValue",
+              "anchorId": "attr-maxValue",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Maximum value (binding supported).",
+                "ja": "最大値（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Alias for `maximum`.",
+                "ja": "`maximum` のエイリアス。"
+              },
+              "type": "number | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_maximum",
+              "name": "maximum",
+              "anchorId": "attr-maximum",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Maximum value (alias for maxValue) (binding supported).",
+                "ja": "最大値（`maxValue` のエイリアス）。binding 可。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Inclusive upper bound. Default 1.",
+                "ja": "端点を含む上限。デフォルト 1。"
+              },
+              "type": "number | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_maximumValueImage",
+              "name": "maximumValueImage",
+              "anchorId": "attr-maximumValueImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image at maximum end.",
+                "ja": "最大値側に表示する画像。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Small image at the maximum end.",
+                "ja": "最大端の小画像。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_minValue",
+              "name": "minValue",
+              "anchorId": "attr-minValue",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Minimum value (binding supported).",
+                "ja": "最小値（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Alias for `minimum`.",
+                "ja": "`minimum` のエイリアス。"
+              },
+              "type": "number | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_minimum",
+              "name": "minimum",
+              "anchorId": "attr-minimum",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Minimum value (alias for minValue) (binding supported).",
+                "ja": "最小値（`minValue` のエイリアス）。binding 可。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Inclusive lower bound. Default 0.",
+                "ja": "端点を含む下限。デフォルト 0。"
+              },
+              "type": "number | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_minimumValueImage",
+              "name": "minimumValueImage",
+              "anchorId": "attr-minimumValueImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image at minimum end.",
+                "ja": "最小値側に表示する画像。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Small image shown at the minimum end (usually a small-amount glyph like 🔈).",
+                "ja": "最小端に表示する小画像（通常は「少量」を示すグリフ）。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_step",
+              "name": "step",
+              "anchorId": "attr-step",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Step increment value.",
+                "ja": "値の増分ステップ。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Discrete step size. `0` means continuous. Defaults to `(maximum - minimum) / 100`.",
+                "ja": "離散ステップサイズ。`0` で連続値。デフォルトは `(maximum - minimum) / 100`。"
+              },
+              "type": "number",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupCommonVisibility": "visible",
+  "attributesStyle": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_tintColor",
+              "name": "tintColor",
+              "anchorId": "attr-tintColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Tint color — hex string or color name from colors.json (alias).",
+                "ja": "tint 色（`tint` のエイリアス）。hex または `colors.json` のトークン名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Color of the filled track (left of the thumb).",
+                "ja": "thumb より左側の track 色。"
+              },
+              "type": "string",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupStyleVisibility": "visible",
+  "attributesLayout": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupLayoutVisibility": "gone",
+  "attributesSpacing": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupSpacingVisibility": "gone",
+  "attributesAlignment": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupAlignmentVisibility": "gone",
+  "attributesState": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStateVisibility": "gone",
+  "attributesBinding": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupBindingVisibility": "gone",
+  "attributesEvent": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_onValueChange",
+              "name": "onValueChange",
+              "anchorId": "attr-onValueChange",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Value change handler — binding only (@{functionName}).",
+                "ja": "値変更時のイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Fires on drag release (or continuously during drag depending on platform).",
+                "ja": "ドラッグ解放時に発火（プラットフォームによってはドラッグ中も発火）。"
+              },
+              "type": "binding",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupEventVisibility": "visible",
+  "attributesResponsive": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupResponsiveVisibility": "gone",
+  "attributesMisc": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupMiscVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_glance",
+      "label": {
+        "en": "At a glance",
+        "ja": "概要"
+      },
+      "anchor": "section-glance",
+      "level": 1
+    },
+    {
+      "id": "toc_common",
+      "label": {
+        "en": "Common",
+        "ja": "共通"
+      },
+      "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_style",
+      "label": {
+        "en": "Style",
+        "ja": "スタイル"
+      },
+      "anchor": "section-style",
+      "level": 1
+    },
+    {
+      "id": "toc_event",
+      "label": {
+        "en": "Event",
+        "ja": "イベント"
+      },
+      "anchor": "section-event",
+      "level": 1
+    },
+    {
+      "id": "toc_examples",
+      "label": {
+        "en": "Examples",
+        "ja": "例"
+      },
+      "anchor": "section-examples",
+      "level": 1
+    },
+    {
+      "id": "toc_related",
+      "label": {
+        "en": "Related",
+        "ja": "関連"
+      },
+      "anchor": "section-related",
+      "level": 1
+    }
+  ],
   "examples": {
     "sections": [
       {
@@ -13,14 +930,86 @@
           "data": [
             {
               "id": "example_1",
-              "title": "Volume slider",
+              "anchorId": "example-1",
+              "title": {
+                "en": "Volume slider",
+                "ja": "音量スライダー"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"Slider\",\n  \"value\": \"@{volume}\",\n  \"minimum\": 0,\n  \"maximum\": 100,\n  \"step\": 1,\n  \"onValueChange\": \"@{onVolumeChanged}\"\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Slider\",\n  \"value\": \"@{volume}\",\n  \"minimum\": 0,\n  \"maximum\": 100,\n  \"step\": 1,\n  \"onValueChange\": \"@{onVolumeChanged}\"\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"Slider\",\n  \"value\": \"@{volume}\",\n  \"minimum\": 0,\n  \"maximum\": 100,\n  \"step\": 1,\n  \"onValueChange\": \"@{onVolumeChanged}\"\n}",
               "required": ""
             },
             {
               "id": "example_2",
-              "title": "With min/max images",
+              "anchorId": "example-2",
+              "title": {
+                "en": "With min/max images",
+                "ja": "両端にアイコン"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"Slider\",\n  \"value\": \"@{brightness}\",\n  \"minimum\": 0,\n  \"maximum\": 1,\n  \"step\": 0.01,\n  \"minimumValueImage\": \"sun_small\",\n  \"maximumValueImage\": \"sun_large\"\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Slider\",\n  \"value\": \"@{brightness}\",\n  \"minimum\": 0,\n  \"maximum\": 1,\n  \"step\": 0.01,\n  \"minimumValueImage\": \"sun_small\",\n  \"maximumValueImage\": \"sun_large\"\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"Slider\",\n  \"value\": \"@{brightness}\",\n  \"minimum\": 0,\n  \"maximum\": 1,\n  \"step\": 0.01,\n  \"minimumValueImage\": \"sun_small\",\n  \"maximumValueImage\": \"sun_large\"\n}",
               "required": ""
@@ -38,86 +1027,672 @@
             {
               "id": "attr_value",
               "name": "value",
+              "anchorId": "attr-value",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Switch state alias (binding for two-way).",
+                "ja": "スイッチ状態の値（双方向 binding）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Two-way numeric binding.",
+                "ja": "数値の two-way binding。"
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Current value (binding for two-way)",
-              "note": "Two-way numeric binding.",
-              "bindingDirection": "two-way"
+              "required": ""
             },
             {
-              "id": "attr_tint_color",
+              "id": "attr_tintColor",
               "name": "tintColor",
+              "anchorId": "attr-tintColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Tint color — hex string or color name from colors.json (alias).",
+                "ja": "tint 色（`tint` のエイリアス）。hex または `colors.json` のトークン名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Color of the filled track (left of the thumb).",
+                "ja": "thumb より左側の track 色。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Tint color - hex string or color name from colors.json",
-              "note": "Color of the filled track (left of the thumb)."
+              "required": ""
             },
             {
-              "id": "attr_max_value",
+              "id": "attr_maxValue",
               "name": "maxValue",
+              "anchorId": "attr-maxValue",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Maximum value (binding supported).",
+                "ja": "最大値（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Alias for `maximum`.",
+                "ja": "`maximum` のエイリアス。"
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Maximum value (binding supported)",
-              "note": "Alias for `maximum`."
+              "required": ""
             },
             {
               "id": "attr_maximum",
               "name": "maximum",
+              "anchorId": "attr-maximum",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Maximum value (alias for maxValue) (binding supported).",
+                "ja": "最大値（`maxValue` のエイリアス）。binding 可。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Inclusive upper bound. Default 1.",
+                "ja": "端点を含む上限。デフォルト 1。"
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Maximum value (alias for maxValue) (binding supported)",
-              "note": "Inclusive upper bound. Default 1."
+              "required": ""
             },
             {
-              "id": "attr_maximum_value_image",
+              "id": "attr_maximumValueImage",
               "name": "maximumValueImage",
+              "anchorId": "attr-maximumValueImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image at maximum end.",
+                "ja": "最大値側に表示する画像。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Small image at the maximum end.",
+                "ja": "最大端の小画像。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Image at maximum end",
-              "note": "Small image at the maximum end.",
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_min_value",
+              "id": "attr_minValue",
               "name": "minValue",
+              "anchorId": "attr-minValue",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Minimum value (binding supported).",
+                "ja": "最小値（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Alias for `minimum`.",
+                "ja": "`minimum` のエイリアス。"
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Minimum value (binding supported)",
-              "note": "Alias for `minimum`."
+              "required": ""
             },
             {
               "id": "attr_minimum",
               "name": "minimum",
+              "anchorId": "attr-minimum",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Minimum value (alias for minValue) (binding supported).",
+                "ja": "最小値（`minValue` のエイリアス）。binding 可。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Inclusive lower bound. Default 0.",
+                "ja": "端点を含む下限。デフォルト 0。"
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Minimum value (alias for minValue) (binding supported)",
-              "note": "Inclusive lower bound. Default 0."
+              "required": ""
             },
             {
-              "id": "attr_minimum_value_image",
+              "id": "attr_minimumValueImage",
               "name": "minimumValueImage",
+              "anchorId": "attr-minimumValueImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image at minimum end.",
+                "ja": "最小値側に表示する画像。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Small image shown at the minimum end (usually a small-amount glyph like 🔈).",
+                "ja": "最小端に表示する小画像（通常は「少量」を示すグリフ）。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Image at minimum end",
-              "note": "Small image shown at the minimum end (usually a small-amount glyph like 🔈).",
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_on_value_change",
+              "id": "attr_onValueChange",
               "name": "onValueChange",
+              "anchorId": "attr-onValueChange",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Value change handler — binding only (@{functionName}).",
+                "ja": "値変更時のイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Fires on drag release (or continuously during drag depending on platform).",
+                "ja": "ドラッグ解放時に発火（プラットフォームによってはドラッグ中も発火）。"
+              },
               "type": "binding",
-              "required": "",
-              "description": "Value change handler - binding only (@{functionName})",
-              "note": "Fires on drag release (or continuously during drag depending on platform)."
+              "required": ""
             },
             {
               "id": "attr_step",
               "name": "step",
+              "anchorId": "attr-step",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Step increment value.",
+                "ja": "値の増分ステップ。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Discrete step size. `0` means continuous. Defaults to `(maximum - minimum) / 100`.",
+                "ja": "離散ステップサイズ。`0` で連続値。デフォルトは `(maximum - minimum) / 100`。"
+              },
               "type": "number",
-              "required": "",
-              "description": "Step increment value",
-              "note": "Discrete step size. `0` means continuous. Defaults to `(maximum - minimum) / 100`.",
-              "platform": "react"
+              "required": ""
             }
           ]
         }
@@ -132,11 +1707,13 @@
             {
               "id": "related_progress",
               "name": "Progress",
+              "hint": "",
               "url": "/reference/components/progress"
             },
             {
               "id": "related_text_field",
               "name": "TextField",
+              "hint": "",
               "url": "/reference/components/text-field"
             }
           ]
@@ -151,14 +1728,26 @@
           "data": [
             {
               "id": "next_attributes",
-              "titleKey": "next_attributes_title",
-              "descriptionKey": "next_attributes_body",
+              "titleKey": {
+                "en": "Attribute reference",
+                "ja": "属性リファレンス"
+              },
+              "descriptionKey": {
+                "en": "Every common attribute in one place — width / padding / binding / events grouped by category.",
+                "ja": "共通属性を 1 箇所にまとめたリファレンス。width / padding / binding / event などカテゴリ別に整理。"
+              },
               "url": "/reference/attributes"
             },
             {
               "id": "next_custom_components",
-              "titleKey": "next_custom_components_title",
-              "descriptionKey": "next_custom_components_body",
+              "titleKey": {
+                "en": "Building a custom component",
+                "ja": "カスタムコンポーネントを作る"
+              },
+              "descriptionKey": {
+                "en": "Extend JsonUI with your own components (spec → converter → React/Swift/Kotlin).",
+                "ja": "spec → converter → React/Swift/Kotlin で JsonUI を独自拡張する手順。"
+              },
               "url": "/guides/custom-components"
             }
           ]

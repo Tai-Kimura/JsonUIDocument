@@ -44,6 +44,13 @@
         "type": "String",
         "required": true,
         "description": "'en' or 'ja'. Drives the language toggle's display label (shows the OTHER language as an invitation to switch)."
+      },
+      {
+        "name": "currentColorMode",
+        "type": "String",
+        "required": false,
+        "defaultValue": "light",
+        "description": "Current ColorManager mode — 'light' or 'dark'. Drives which icon (sun / moon) shows on the theme toggle button. If omitted the component defaults to 'light' for SSR safety."
       }
     ]
   },
@@ -52,6 +59,10 @@
     {
       "name": "onToggleLanguage",
       "description": "Fires when the language toggle is tapped. Consumer calls StringManager.setLanguage and re-seeds all derived data."
+    },
+    {
+      "name": "onToggleColorMode",
+      "description": "Fires when the theme toggle is tapped. Consumer calls ColorManager.setMode(next) to flip the palette."
     },
     {
       "name": "onToggleMobileMenu",

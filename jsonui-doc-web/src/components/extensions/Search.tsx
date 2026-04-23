@@ -309,7 +309,7 @@ export const Search: React.FC<SearchProps> = ({
   );
 
   const triggerClass = [
-    "inline-flex items-center gap-2 h-9 pl-3 pr-2 rounded-lg border border-[#374151] bg-[#111827] hover:bg-[#1F2937] text-[#CBD5F5] text-[13px] transition-colors cursor-pointer",
+    "inline-flex items-center gap-2 h-9 pl-3 pr-2 rounded-lg border border-border_strong bg-chrome_fill_hover hover:bg-chrome_border text-chrome_ink_muted text-[13px] transition-colors cursor-pointer",
     className ?? "",
   ]
     .filter(Boolean)
@@ -349,7 +349,7 @@ export const Search: React.FC<SearchProps> = ({
         </svg>
         <span className="flex-1 text-left">{resolvedPlaceholder}</span>
         {shortcutPill && (
-          <kbd className="ml-2 rounded px-1.5 py-0.5 text-[11px] font-mono bg-[#0B1220] border border-[#374151] text-[#64748B]">
+          <kbd className="ml-2 rounded px-1.5 py-0.5 text-[11px] font-mono bg-ink border border-border_strong text-ink_subtle">
             {shortcutPill}
           </kbd>
         )}
@@ -362,17 +362,17 @@ export const Search: React.FC<SearchProps> = ({
             data-search-modal
           >
             <div
-              className="w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col"
+              className="w-full max-w-2xl bg-surface rounded-xl shadow-2xl overflow-hidden flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center gap-3 px-4 py-3 border-b border-[#E5E7EB]">
+              <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#64748B"
+                  stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -387,13 +387,13 @@ export const Search: React.FC<SearchProps> = ({
                   placeholder={resolvedPlaceholder}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="flex-1 outline-none text-base text-[#0B1220] placeholder:text-[#94A3B8]"
+                  className="flex-1 outline-none text-base text-ink placeholder:text-ink_faint"
                   aria-label={resolvedPlaceholder}
                 />
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="text-[11px] font-mono text-[#64748B] border border-[#E5E7EB] rounded px-1.5 py-0.5 hover:bg-[#F3F4F6]"
+                  className="text-[11px] font-mono text-ink_subtle border border-border rounded px-1.5 py-0.5 hover:bg-surface_sunken"
                   aria-label={StringManager.getString("search_close_aria_label")}
                 >
                   {StringManager.getString("search_close_button")}
@@ -401,23 +401,23 @@ export const Search: React.FC<SearchProps> = ({
               </div>
               <div className="max-h-[60vh] overflow-y-auto" role="presentation">
                 {loading && (
-                  <div className="px-4 py-6 text-sm text-[#64748B]">
+                  <div className="px-4 py-6 text-sm text-ink_subtle">
                     {StringManager.getString("search_loading")}
                   </div>
                 )}
                 {!loading && query.trim() && results.length === 0 && (
-                  <div className="px-4 py-6 text-sm text-[#64748B]">
+                  <div className="px-4 py-6 text-sm text-ink_subtle">
                     {StringManager.getString("search_no_results")}
                   </div>
                 )}
                 {!loading && displayed.length > 0 && (
                   <>
                     {!query.trim() && (
-                      <div className="px-4 pt-3 pb-1 text-[11px] font-semibold tracking-wide uppercase text-[#64748B]">
+                      <div className="px-4 pt-3 pb-1 text-[11px] font-semibold tracking-wide uppercase text-ink_subtle">
                         {StringManager.getString("search_popular_heading")}
                       </div>
                     )}
-                    <ul className="divide-y divide-[#E5E7EB]" role="listbox">
+                    <ul className="divide-y divide-border" role="listbox">
                       {displayed.map((entry, i) => {
                         const active = i === activeIndex;
                         return (
@@ -431,20 +431,20 @@ export const Search: React.FC<SearchProps> = ({
                               aria-selected={active}
                               className={[
                                 "w-full text-left px-4 py-3 transition-colors",
-                                active ? "bg-[#EEF2FF]" : "hover:bg-[#F3F4F6]",
+                                active ? "bg-accent_tint" : "hover:bg-surface_sunken",
                               ].join(" ")}
                               onClick={() => handlePick(entry.url)}
                               onMouseEnter={() => setActiveIndex(i)}
                             >
-                              <div className="text-[15px] font-semibold text-[#0B1220]">
+                              <div className="text-[15px] font-semibold text-ink">
                                 {entry.title[locale]}
                               </div>
                               {entry.lead && (
-                                <div className="mt-0.5 text-[13px] text-[#475467] line-clamp-2">
+                                <div className="mt-0.5 text-[13px] text-ink_muted line-clamp-2">
                                   {entry.lead[locale]}
                                 </div>
                               )}
-                              <div className="mt-1 text-[11px] font-mono text-[#64748B]">
+                              <div className="mt-1 text-[11px] font-mono text-ink_subtle">
                                 {entry.url}
                               </div>
                             </button>
@@ -453,7 +453,7 @@ export const Search: React.FC<SearchProps> = ({
                       })}
                     </ul>
                     {!query.trim() && index && (
-                      <div className="px-4 py-2 text-[11px] text-[#94A3B8] border-t border-[#F3F4F6]">
+                      <div className="px-4 py-2 text-[11px] text-ink_faint border-t border-surface_sunken">
                         {StringManager.getString("search_index_hint_tpl").replace(
                           "{count}",
                           String(index.entries.length),
@@ -463,18 +463,18 @@ export const Search: React.FC<SearchProps> = ({
                   </>
                 )}
               </div>
-              <div className="flex items-center gap-4 px-4 py-2 border-t border-[#E5E7EB] bg-[#F9FAFB] text-[11px] text-[#64748B]">
+              <div className="flex items-center gap-4 px-4 py-2 border-t border-border bg-surface_muted text-[11px] text-ink_subtle">
                 <span className="inline-flex items-center gap-1">
-                  <kbd className="font-mono rounded border border-[#E5E7EB] bg-white px-1">↑</kbd>
-                  <kbd className="font-mono rounded border border-[#E5E7EB] bg-white px-1">↓</kbd>
+                  <kbd className="font-mono rounded border border-border bg-surface px-1">↑</kbd>
+                  <kbd className="font-mono rounded border border-border bg-surface px-1">↓</kbd>
                   {StringManager.getString("search_keyboard_navigate")}
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <kbd className="font-mono rounded border border-[#E5E7EB] bg-white px-1">↵</kbd>
+                  <kbd className="font-mono rounded border border-border bg-surface px-1">↵</kbd>
                   {StringManager.getString("search_keyboard_select")}
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <kbd className="font-mono rounded border border-[#E5E7EB] bg-white px-1">esc</kbd>
+                  <kbd className="font-mono rounded border border-border bg-surface px-1">esc</kbd>
                   {StringManager.getString("search_keyboard_close")}
                 </span>
               </div>

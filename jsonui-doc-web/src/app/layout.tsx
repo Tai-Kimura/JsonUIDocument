@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import { ChromeMount } from "@/components/chrome/ChromeMount";
+import { LanguageReloader } from "@/components/chrome/LanguageReloader";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jsonui.dev";
 
@@ -53,7 +54,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ChromeMount />
-        <main className="site-main">{children}</main>
+        <main className="site-main">
+          <LanguageReloader>{children}</LanguageReloader>
+        </main>
       </body>
     </html>
   );

@@ -49,8 +49,15 @@ export interface TocItem {
 }
 
 export interface TableOfContentsProps {
-  /** Ordered list of TocItem entries. Required. */
-  items: TocItem[];
+  /**
+   * Ordered list of TocItem entries. Structurally this is a `TocItem[]`, but
+   * the layout-JSON generator's `class: "Array"` data-block entries widen to
+   * `any[] | undefined` in the TSX surface (items={data.xxx}) — the runtime
+   * shape is what matters here. Accept widened types so consumers don't need
+   * a manual cast; the component still treats missing/empty arrays as a
+   * no-op.
+   */
+  items?: TocItem[] | any[];
   /** Optional heading above the list. */
   title?: string;
   /** Sticky to viewport. Default: true. */
@@ -65,6 +72,8 @@ export interface TableOfContentsProps {
   onSelect?: (anchor: string) => void;
   /** Pass-through from the rjui layout. */
   className?: string;
+  /** DOM id emitted by the layout generator (used as a stable anchor). */
+  id?: string;
 }
 
 const DEFAULT_STICKY_OFFSET = 80;
@@ -79,9 +88,10 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
   maxDepth = DEFAULT_MAX_DEPTH,
   onSelect,
   className,
+  id,
 }) => {
   const visibleItems = useMemo(
-    () => items.filter((item) => (item.level ?? 1) <= maxDepth),
+    () => (items ?? []).filter((item: TocItem) => (item.level ?? 1) <= maxDepth),
     [items, maxDepth],
   );
 
@@ -150,12 +160,18 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
   if (visibleItems.length === 0) return null;
 
   const stickyClasses = sticky
-    ? "lg:sticky lg:self-start"
+    ? "lg:sticky lg:self-start lg:overflow-y-auto"
     : "";
-  const stickyStyle = sticky ? { top: `${stickyOffset}px` } : undefined;
+  const stickyStyle = sticky
+    ? {
+        top: `${stickyOffset}px`,
+        maxHeight: `calc(100vh - ${stickyOffset}px - 1rem)`,
+      }
+    : undefined;
 
   return (
     <nav
+      id={id}
       aria-label={title ?? StringManager.getString("search_toc_aria_label")}
       className={[
         "w-full max-w-[260px] py-2",
@@ -167,11 +183,11 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
       style={stickyStyle}
     >
       {title && (
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#64748B]">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink_subtle">
           {title}
         </p>
       )}
-      <ul className="flex flex-col gap-1 border-l border-[#E5E7EB]">
+      <ul className="flex flex-col gap-1 border-l border-border">
         {visibleItems.map((item) => {
           const level = item.level ?? 1;
           const isActive = active === item.anchor;
@@ -184,8 +200,8 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
                   "block border-l-2 py-1 pr-2 text-[13px] leading-snug transition-colors",
                   level === 2 ? "pl-8" : "pl-4",
                   isActive
-                    ? "border-[#2563EB] text-[#0B1220] font-semibold"
-                    : "border-transparent text-[#475467] hover:text-[#0B1220] hover:border-[#CBD5F5]",
+                    ? "border-accent_marker text-ink font-semibold"
+                    : "border-transparent text-ink_muted hover:text-ink hover:border-border_strong",
                 ].join(" ")}
                 aria-current={isActive ? "true" : undefined}
               >

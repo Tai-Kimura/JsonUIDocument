@@ -1,7 +1,215 @@
 {
   "category": "style",
   "title": "Style attributes",
-  "description": "Style attributes control visual appearance: background, borders, shadows, corners, and style presets.",
+  "description": {
+    "en": "Style attributes control visual appearance: background, borders, shadows, corners, and style presets.",
+    "ja": "style 属性はコンポーネントの見た目を制御する: 背景、ボーダー、シャドウ、角丸、スタイルプリセット。"
+  },
+  "kicker": "Attribute category · Reference",
+  "kickerParentLabel": "Attributes",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "gone",
+  "aliasCalloutVisibility": "gone",
+  "aliasOf": null,
+  "aliasLinkUrl": "",
+  "aliasNotice": null,
+  "overviewRows": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "overview_background",
+              "name": "background",
+              "type": "string | binding",
+              "summary": {
+                "en": "Background color. Accepts hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`, named colors, or `@color/token`. For …",
+                "ja": "背景色。hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`、色名、または `@color/token`。グラデーションは `gradient` 属性または GradientView…"
+              },
+              "anchorUrl": "#attr-background"
+            },
+            {
+              "id": "overview_borderColor",
+              "name": "borderColor",
+              "type": "string | binding",
+              "summary": {
+                "en": "Border color. Requires `borderWidth` for the border to render.",
+                "ja": "ボーダー色。描画には `borderWidth` の指定が必要。"
+              },
+              "anchorUrl": "#attr-borderColor"
+            },
+            {
+              "id": "overview_borderStyle",
+              "name": "borderStyle",
+              "type": "string",
+              "summary": {
+                "en": "`solid` / `dashed` / `dotted`. Web supports all; iOS/Android default is `solid`.",
+                "ja": "`solid` / `dashed` / `dotted`。Web は全対応、iOS/Android は既定 `solid`。"
+              },
+              "anchorUrl": "#attr-borderStyle"
+            },
+            {
+              "id": "overview_borderWidth",
+              "name": "borderWidth",
+              "type": "number | binding",
+              "summary": {
+                "en": "Border thickness in pt/dp/px.",
+                "ja": "ボーダーの太さ（pt/dp/px）。"
+              },
+              "anchorUrl": "#attr-borderWidth"
+            },
+            {
+              "id": "overview_clipToBounds",
+              "name": "clipToBounds",
+              "type": "boolean | binding",
+              "summary": {
+                "en": "Boolean. When `true`, children that overflow the View are clipped.",
+                "ja": "Boolean。`true` で境界を超える子要素を切り取る。"
+              },
+              "anchorUrl": "#attr-clipToBounds"
+            },
+            {
+              "id": "overview_cornerRadius",
+              "name": "cornerRadius",
+              "type": "number | binding",
+              "summary": {
+                "en": "Rounded corners in pt/dp/px. Accepts a number (uniform) or array `[tl, tr, br, bl]` for per-corne…",
+                "ja": "角丸半径（pt/dp/px）。数値（全辺同一）または配列 `[左上, 右上, 右下, 左下]` で角ごとに指定可。"
+              },
+              "anchorUrl": "#attr-cornerRadius"
+            },
+            {
+              "id": "overview_defaultBackground",
+              "name": "defaultBackground",
+              "type": "string | binding",
+              "summary": {
+                "en": "Background color in the default (non-interactive) state. Base layer for the pressed / disabled ov…",
+                "ja": "デフォルト（非操作）状態の背景色。押下・disabled オーバーレイの下地。"
+              },
+              "anchorUrl": "#attr-defaultBackground"
+            },
+            {
+              "id": "overview_disabledBackground",
+              "name": "disabledBackground",
+              "type": "string | binding",
+              "summary": {
+                "en": "Background color when `enabled: false`.",
+                "ja": "`enabled: false` のときの背景色。"
+              },
+              "anchorUrl": "#attr-disabledBackground"
+            },
+            {
+              "id": "overview_effectStyle",
+              "name": "effectStyle",
+              "type": "string",
+              "summary": {
+                "en": "Visual effect preset. Used by Blur; platform-specific blur / material style value.",
+                "ja": "視覚効果のプリセット。Blur で使用、プラットフォーム固有のぼかし／マテリアルスタイル値。"
+              },
+              "anchorUrl": "#attr-effectStyle"
+            },
+            {
+              "id": "overview_highlightBackground",
+              "name": "highlightBackground",
+              "type": "string | binding",
+              "summary": {
+                "en": "Background color shown when the component is highlighted (e.g., pressed).",
+                "ja": "ハイライト状態（押下など）の背景色。"
+              },
+              "anchorUrl": "#attr-highlightBackground"
+            },
+            {
+              "id": "overview_shadow",
+              "name": "shadow",
+              "type": "string | object",
+              "summary": {
+                "en": "Drop shadow object: `{ color, offsetX, offsetY, radius, opacity }`. Applied to the entire View bo…",
+                "ja": "ドロップシャドウのオブジェクト: `{ color, offsetX, offsetY, radius, opacity }`。View の全体境界に適用される。"
+              },
+              "anchorUrl": "#attr-shadow"
+            },
+            {
+              "id": "overview_style",
+              "name": "style",
+              "type": "string",
+              "summary": {
+                "en": "Preset style name. Defined in `docs/screens/styles/*.json`. Accepts a single name or array of nam…",
+                "ja": "プリセットスタイル名。`docs/screens/styles/*.json` で定義。単一名または名前配列を受け付け、後出の値が前を上書き。"
+              },
+              "anchorUrl": "#attr-style"
+            },
+            {
+              "id": "overview_tapBackground",
+              "name": "tapBackground",
+              "type": "string | binding",
+              "summary": {
+                "en": "Button-specific. Background color shown during tap-down. Reverts to `background` on release.",
+                "ja": "Button 専用。押下中に表示される背景色。解放で `background` に戻る。"
+              },
+              "anchorUrl": "#attr-tapBackground"
+            },
+            {
+              "id": "overview_tintColor",
+              "name": "tintColor",
+              "type": "string | binding",
+              "summary": {
+                "en": "Color applied to tinted content (monochrome icons, progress tracks, switches). Specific component…",
+                "ja": "tint 可能なコンテンツ（モノクロアイコン、progress の track、switch など）に適用される色。何が tint されるかはコンポーネント実装依存。"
+              },
+              "anchorUrl": "#attr-tintColor"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subgroups": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "subgroupsVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_overview",
+      "label": {
+        "en": "Overview",
+        "ja": "概要"
+      },
+      "anchor": "section-overview",
+      "level": 1
+    },
+    {
+      "id": "toc_detail",
+      "label": {
+        "en": "Attributes",
+        "ja": "属性"
+      },
+      "anchor": "section-detail",
+      "level": 1
+    },
+    {
+      "id": "toc_next",
+      "label": {
+        "en": "Next reads",
+        "ja": "次に読む"
+      },
+      "anchor": "section-next",
+      "level": 1
+    }
+  ],
   "attributes": {
     "sections": [
       {
@@ -10,138 +218,983 @@
             {
               "id": "attr_background",
               "name": "background",
+              "anchorId": "attr-background",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Background color. Accepts hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`, named colors, or `@color/token`. For gradients use the `gradient` attribute or GradientView.",
+                "ja": "背景色。hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`、色名、または `@color/token`。グラデーションは `gradient` 属性または GradientView を使う。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Background color - hex string (#RRGGBB or #RRGGBBAA) or color name from colors.json (can be data binding)",
-              "summary": "Background color. Accepts hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`, named colors, or `@color/token`. For gradients use the `gradient` attribute or GradientView."
+              "required": ""
             },
             {
-              "id": "attr_border_color",
+              "id": "attr_borderColor",
               "name": "borderColor",
+              "anchorId": "attr-borderColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Border color. Requires `borderWidth` for the border to render.",
+                "ja": "ボーダー色。描画には `borderWidth` の指定が必要。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Border color - hex string or color name from colors.json (binding supported)",
-              "summary": "Border color. Requires `borderWidth` for the border to render."
+              "required": ""
             },
             {
-              "id": "attr_border_style",
+              "id": "attr_borderStyle",
               "name": "borderStyle",
+              "anchorId": "attr-borderStyle",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "solid",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "dashed",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "dotted",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "`solid` / `dashed` / `dotted`. Web supports all; iOS/Android default is `solid`.",
+                "ja": "`solid` / `dashed` / `dotted`。Web は全対応、iOS/Android は既定 `solid`。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Border line style - solid (default), dashed, or dotted",
-              "summary": "`solid` / `dashed` / `dotted`. Web supports all; iOS/Android default is `solid`.",
-              "enumValues": [
-                "solid",
-                "dashed",
-                "dotted"
-              ]
+              "required": ""
             },
             {
-              "id": "attr_border_width",
+              "id": "attr_borderWidth",
               "name": "borderWidth",
+              "anchorId": "attr-borderWidth",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Border thickness in pt/dp/px.",
+                "ja": "ボーダーの太さ（pt/dp/px）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Border width (binding supported)",
-              "summary": "Border thickness in pt/dp/px."
+              "required": ""
             },
             {
-              "id": "attr_clip_to_bounds",
+              "id": "attr_clipToBounds",
               "name": "clipToBounds",
+              "anchorId": "attr-clipToBounds",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Boolean. When `true`, children that overflow the View are clipped.",
+                "ja": "Boolean。`true` で境界を超える子要素を切り取る。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean | binding",
-              "required": "",
-              "description": "Whether to clip content to bounds (binding supported)",
-              "summary": "Boolean. When `true`, children that overflow the View are clipped."
+              "required": ""
             },
             {
-              "id": "attr_corner_radius",
+              "id": "attr_cornerRadius",
               "name": "cornerRadius",
+              "anchorId": "attr-cornerRadius",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Rounded corners in pt/dp/px. Accepts a number (uniform) or array `[tl, tr, br, bl]` for per-corner control.",
+                "ja": "角丸半径（pt/dp/px）。数値（全辺同一）または配列 `[左上, 右上, 右下, 左下]` で角ごとに指定可。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Corner radius (can be data binding)",
-              "summary": "Rounded corners in pt/dp/px. Accepts a number (uniform) or array `[tl, tr, br, bl]` for per-corner control."
+              "required": ""
             },
             {
-              "id": "attr_default_background",
+              "id": "attr_defaultBackground",
               "name": "defaultBackground",
+              "anchorId": "attr-defaultBackground",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Background color in the default (non-interactive) state. Base layer for the pressed / disabled overlays.",
+                "ja": "デフォルト（非操作）状態の背景色。押下・disabled オーバーレイの下地。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Default background color - hex string or color name from colors.json (binding supported)",
-              "summary": "Background color in the default (non-interactive) state. Base layer for the pressed / disabled overlays.",
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_disabled_background",
+              "id": "attr_disabledBackground",
               "name": "disabledBackground",
+              "anchorId": "attr-disabledBackground",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Background color when `enabled: false`.",
+                "ja": "`enabled: false` のときの背景色。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Background when disabled - hex string or color name from colors.json (binding supported)",
-              "summary": "Background color when `enabled: false`."
+              "required": ""
             },
             {
-              "id": "attr_effect_style",
+              "id": "attr_effectStyle",
               "name": "effectStyle",
+              "anchorId": "attr-effectStyle",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Visual effect preset. Used by Blur; platform-specific blur / material style value.",
+                "ja": "視覚効果のプリセット。Blur で使用、プラットフォーム固有のぼかし／マテリアルスタイル値。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Visual effect style",
-              "summary": "Visual effect preset. Used by Blur; platform-specific blur / material style value.",
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_highlight_background",
+              "id": "attr_highlightBackground",
               "name": "highlightBackground",
+              "anchorId": "attr-highlightBackground",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Background color shown when the component is highlighted (e.g., pressed).",
+                "ja": "ハイライト状態（押下など）の背景色。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Background color when highlighted - hex string or color name from colors.json (binding supported)",
-              "summary": "Background color shown when the component is highlighted (e.g., pressed)."
+              "required": ""
             },
             {
               "id": "attr_shadow",
               "name": "shadow",
+              "anchorId": "attr-shadow",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Drop shadow object: `{ color, offsetX, offsetY, radius, opacity }`. Applied to the entire View bounds.",
+                "ja": "ドロップシャドウのオブジェクト: `{ color, offsetX, offsetY, radius, opacity }`。View の全体境界に適用される。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | object",
-              "required": "",
-              "description": "Shadow configuration (string 'color|offsetX|offsetY|opacity|radius' or object)",
-              "summary": "Drop shadow object: `{ color, offsetX, offsetY, radius, opacity }`. Applied to the entire View bounds.",
-              "platformDiff": {
-                "swift_uikit": "layer.shadowColor / shadowOffset / shadowRadius / shadowOpacity に分解してマップ。",
-                "swift_swiftui": ".shadow(color:, radius:, x:, y:) modifier。",
-                "kotlin_compose": "Modifier.shadow(elevation, shape)。offsetX/Y は限定サポート。",
-                "kotlin_xml": "elevation + outline provider が必要。",
-                "react": "CSS `box-shadow: Xpx Ypx radiuspx color` に変換。"
-              }
+              "required": ""
             },
             {
               "id": "attr_style",
               "name": "style",
+              "anchorId": "attr-style",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Preset style name. Defined in `docs/screens/styles/*.json`. Accepts a single name or array of names; later entries override earlier.",
+                "ja": "プリセットスタイル名。`docs/screens/styles/*.json` で定義。単一名または名前配列を受け付け、後出の値が前を上書き。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Style file name (without extension)",
-              "summary": "Preset style name. Defined in `docs/screens/styles/*.json`. Accepts a single name or array of names; later entries override earlier.",
-              "examples": [
-                {
-                  "language": "json",
-                  "code": "{ \"type\": \"Button\", \"style\": \"primary_button\" }"
-                },
-                {
-                  "language": "json",
-                  "code": "{ \"type\": \"Button\", \"style\": [\"button_base\", \"button_primary\"] }"
-                }
-              ]
+              "required": ""
             },
             {
-              "id": "attr_tap_background",
+              "id": "attr_tapBackground",
               "name": "tapBackground",
+              "anchorId": "attr-tapBackground",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Button-specific. Background color shown during tap-down. Reverts to `background` on release.",
+                "ja": "Button 専用。押下中に表示される背景色。解放で `background` に戻る。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Background color when tapped - hex string or color name from colors.json (binding supported)",
-              "summary": "Button-specific. Background color shown during tap-down. Reverts to `background` on release."
+              "required": ""
             },
             {
-              "id": "attr_tint_color",
+              "id": "attr_tintColor",
               "name": "tintColor",
+              "anchorId": "attr-tintColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Color applied to tinted content (monochrome icons, progress tracks, switches). Specific component implementations decide what gets tinted.",
+                "ja": "tint 可能なコンテンツ（モノクロアイコン、progress の track、switch など）に適用される色。何が tint されるかはコンポーネント実装依存。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Tint color - hex string or color name from colors.json (binding supported)",
-              "summary": "Color applied to tinted content (monochrome icons, progress tracks, switches). Specific component implementations decide what gets tinted."
+              "required": ""
             }
           ]
         }
@@ -156,14 +1209,26 @@
           "data": [
             {
               "id": "next_components",
-              "titleKey": "next_components_title",
-              "descriptionKey": "next_components_body",
+              "titleKey": {
+                "en": "Component reference",
+                "ja": "コンポーネントリファレンス"
+              },
+              "descriptionKey": {
+                "en": "The full 28-component catalog with type signatures, examples, and platform support.",
+                "ja": "28 コンポーネントの全カタログ。型・例・プラットフォーム対応を収録。"
+              },
               "url": "/reference/components"
             },
             {
               "id": "next_attributes_root",
-              "titleKey": "next_attributes_root_title",
-              "descriptionKey": "next_attributes_root_body",
+              "titleKey": {
+                "en": "All attribute categories",
+                "ja": "属性カテゴリ一覧"
+              },
+              "descriptionKey": {
+                "en": "Back to the full list of attribute categories (Layout, Style, Binding, Event, ...).",
+                "ja": "属性カテゴリ全一覧に戻る（Layout / Style / Binding / Event など）。"
+              },
               "url": "/reference/attributes"
             }
           ]

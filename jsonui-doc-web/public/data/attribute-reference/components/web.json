@@ -3,9 +3,610 @@
   "kebab": "web",
   "aliasOf": null,
   "title": "Web",
-  "description": "Embedded web content via WKWebView (iOS), WebView (Android), `<iframe>` (Web). Used for embedded maps, third-party widgets, HTML previews.",
-  "usage": "Use Web only when native components cannot achieve the goal. Prefer native for performance, security, and consistent UX. For untrusted URLs always set `sandbox` (web) and review the iOS / Android equivalents.",
+  "description": {
+    "en": "Embedded web content via WKWebView (iOS), WebView (Android), `<iframe>` (Web). Used for embedded maps, third-party widgets, HTML previews.",
+    "ja": "WKWebView（iOS）／WebView（Android）／`<iframe>`（Web）による埋め込み Web コンテンツ。埋め込み地図、サードパーティウィジェット、HTML プレビューなどに使う。"
+  },
+  "usage": {
+    "en": "Use Web only when native components cannot achieve the goal. Prefer native for performance, security, and consistent UX. For untrusted URLs always set `sandbox` (web) and review the iOS / Android equivalents.",
+    "ja": "ネイティブコンポーネントで実現不可能なときのみ使う。パフォーマンス・セキュリティ・UX 一貫性のためネイティブを優先。信頼できない URL には常に `sandbox`（web）を設定し、iOS / Android の同等設定も見直す。"
+  },
   "aliasNotice": null,
+  "kicker": "Component · Reference",
+  "kickerParentLabel": "Components",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "platform_ios",
+              "label": "iOS",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_android",
+              "label": "Android",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_web",
+              "label": "Web",
+              "fontColor": "var(--color-ink)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "visible",
+  "aliasCalloutVisibility": "gone",
+  "aliasLinkUrl": "",
+  "canonicalCode": "{\n  \"type\": \"Web\",\n  \"url\": \"https://www.example.com/embed/@{placeId}\",\n  \"width\": \"matchParent\",\n  \"height\": 300\n}",
+  "canonicalLanguage": "json",
+  "statRequired": "0",
+  "statOptional": "6",
+  "statEvents": "0",
+  "statRequiredText": {
+    "en": "0 required",
+    "ja": "必須 0"
+  },
+  "statOptionalText": {
+    "en": "6 optional",
+    "ja": "任意 6"
+  },
+  "statEventsText": {
+    "en": "0 events",
+    "ja": "イベント 0"
+  },
+  "usageVisibility": "visible",
+  "attributeCategories": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "cat_common",
+              "label": {
+                "en": "Common",
+                "ja": "共通"
+              },
+              "anchorUrl": "#section-common"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributesCommon": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_url",
+              "name": "url",
+              "anchorId": "attr-url",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image URL (alias, binding supported).",
+                "ja": "画像の URL（`src` のエイリアス、binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Absolute URL. Changes trigger navigation. Use `html` for inline content instead.",
+                "ja": "絶対 URL。変更で遷移発生。インライン HTML は `html` を使う。"
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_allow",
+              "name": "allow",
+              "anchorId": "attr-allow",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Iframe allow attribute for feature policy.",
+                "ja": "iframe の `allow` 属性（Feature Policy）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Web-only (iframe `allow` attribute). Grants permissions like `camera`, `microphone`, `fullscreen`, `clipboard-write`.",
+                "ja": "Web 専用（iframe `allow` 属性）。`camera`, `microphone`, `fullscreen`, `clipboard-write` などの権限付与。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_allowsBackForwardNavigationGestures",
+              "name": "allowsBackForwardNavigationGestures",
+              "anchorId": "attr-allowsBackForwardNavigationGestures",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable swipe navigation.",
+                "ja": "スワイプでの戻る／進むナビを有効化。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "iOS WKWebView. When `true`, horizontal-swipe navigation between history entries is enabled.",
+                "ja": "iOS WKWebView。`true` で履歴間の水平スワイプナビゲーションを有効化。"
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_allowsLinkPreview",
+              "name": "allowsLinkPreview",
+              "anchorId": "attr-allowsLinkPreview",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable link preview.",
+                "ja": "リンクプレビューを有効化。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "iOS WKWebView. 3D Touch / long-press link preview.",
+                "ja": "iOS WKWebView。3D Touch / 長押しでのリンクプレビュー。"
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_html",
+              "name": "html",
+              "anchorId": "attr-html",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "HTML content.",
+                "ja": "HTML コンテンツ。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Inline HTML string. Useful for rendering Markdown-to-HTML output or previews.",
+                "ja": "インライン HTML 文字列。Markdown→HTML 変換結果やプレビュー描画に便利。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_sandbox",
+              "name": "sandbox",
+              "anchorId": "attr-sandbox",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Iframe sandbox attribute.",
+                "ja": "iframe の `sandbox` 属性。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Web-only (maps to iframe `sandbox` attribute). Space-separated tokens: `allow-scripts` / `allow-same-origin` / `allow-forms` / `allow-popups` etc. Omit for maximum restriction.",
+                "ja": "Web 専用（iframe `sandbox` 属性にマップ）。スペース区切りトークン: `allow-scripts` / `allow-same-origin` / `allow-forms` / `allow-popups` など。省略で最大制限。"
+              },
+              "type": "string",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupCommonVisibility": "visible",
+  "attributesStyle": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStyleVisibility": "gone",
+  "attributesLayout": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupLayoutVisibility": "gone",
+  "attributesSpacing": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupSpacingVisibility": "gone",
+  "attributesAlignment": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupAlignmentVisibility": "gone",
+  "attributesState": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStateVisibility": "gone",
+  "attributesBinding": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupBindingVisibility": "gone",
+  "attributesEvent": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupEventVisibility": "gone",
+  "attributesResponsive": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupResponsiveVisibility": "gone",
+  "attributesMisc": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupMiscVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_glance",
+      "label": {
+        "en": "At a glance",
+        "ja": "概要"
+      },
+      "anchor": "section-glance",
+      "level": 1
+    },
+    {
+      "id": "toc_common",
+      "label": {
+        "en": "Common",
+        "ja": "共通"
+      },
+      "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_examples",
+      "label": {
+        "en": "Examples",
+        "ja": "例"
+      },
+      "anchor": "section-examples",
+      "level": 1
+    },
+    {
+      "id": "toc_related",
+      "label": {
+        "en": "Related",
+        "ja": "関連"
+      },
+      "anchor": "section-related",
+      "level": 1
+    }
+  ],
   "examples": {
     "sections": [
       {
@@ -13,21 +614,129 @@
           "data": [
             {
               "id": "example_1",
-              "title": "Embed URL",
+              "anchorId": "example-1",
+              "title": {
+                "en": "Embed URL",
+                "ja": "URL を埋め込み"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"Web\",\n  \"url\": \"https://www.example.com/embed/@{placeId}\",\n  \"width\": \"matchParent\",\n  \"height\": 300\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Web\",\n  \"url\": \"https://www.example.com/embed/@{placeId}\",\n  \"width\": \"matchParent\",\n  \"height\": 300\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"Web\",\n  \"url\": \"https://www.example.com/embed/@{placeId}\",\n  \"width\": \"matchParent\",\n  \"height\": 300\n}",
               "required": ""
             },
             {
               "id": "example_2",
-              "title": "Inline HTML",
+              "anchorId": "example-2",
+              "title": {
+                "en": "Inline HTML",
+                "ja": "インライン HTML"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"Web\",\n  \"html\": \"<h1>Hello</h1><p>Inline HTML content.</p>\",\n  \"width\": \"matchParent\",\n  \"height\": 200\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Web\",\n  \"html\": \"<h1>Hello</h1><p>Inline HTML content.</p>\",\n  \"width\": \"matchParent\",\n  \"height\": 200\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"Web\",\n  \"html\": \"<h1>Hello</h1><p>Inline HTML content.</p>\",\n  \"width\": \"matchParent\",\n  \"height\": 200\n}",
               "required": ""
             },
             {
               "id": "example_3",
-              "title": "Sandboxed third-party widget (Web)",
+              "anchorId": "example-3",
+              "title": {
+                "en": "Sandboxed third-party widget (Web)",
+                "ja": "sandbox 付き第三者ウィジェット（Web）"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"Web\",\n  \"url\": \"@{thirdPartyWidgetUrl}\",\n  \"sandbox\": \"allow-scripts allow-same-origin\",\n  \"allow\": \"clipboard-write; fullscreen\",\n  \"width\": \"matchParent\",\n  \"height\": 400\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Web\",\n  \"url\": \"@{thirdPartyWidgetUrl}\",\n  \"sandbox\": \"allow-scripts allow-same-origin\",\n  \"allow\": \"clipboard-write; fullscreen\",\n  \"width\": \"matchParent\",\n  \"height\": 400\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"Web\",\n  \"url\": \"@{thirdPartyWidgetUrl}\",\n  \"sandbox\": \"allow-scripts allow-same-origin\",\n  \"allow\": \"clipboard-write; fullscreen\",\n  \"width\": \"matchParent\",\n  \"height\": 400\n}",
               "required": ""
@@ -45,52 +754,392 @@
             {
               "id": "attr_url",
               "name": "url",
+              "anchorId": "attr-url",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image URL (alias, binding supported).",
+                "ja": "画像の URL（`src` のエイリアス、binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Absolute URL. Changes trigger navigation. Use `html` for inline content instead.",
+                "ja": "絶対 URL。変更で遷移発生。インライン HTML は `html` を使う。"
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Web page URL (can be data binding)",
-              "note": "Absolute URL. Changes trigger navigation. Use `html` for inline content instead."
+              "required": ""
             },
             {
               "id": "attr_allow",
               "name": "allow",
+              "anchorId": "attr-allow",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Iframe allow attribute for feature policy.",
+                "ja": "iframe の `allow` 属性（Feature Policy）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Web-only (iframe `allow` attribute). Grants permissions like `camera`, `microphone`, `fullscreen`, `clipboard-write`.",
+                "ja": "Web 専用（iframe `allow` 属性）。`camera`, `microphone`, `fullscreen`, `clipboard-write` などの権限付与。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Iframe allow attribute for feature policy",
-              "note": "Web-only (iframe `allow` attribute). Grants permissions like `camera`, `microphone`, `fullscreen`, `clipboard-write`.",
-              "platform": "react"
+              "required": ""
             },
             {
-              "id": "attr_allows_back_forward_navigation_gestures",
+              "id": "attr_allowsBackForwardNavigationGestures",
               "name": "allowsBackForwardNavigationGestures",
+              "anchorId": "attr-allowsBackForwardNavigationGestures",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable swipe navigation.",
+                "ja": "スワイプでの戻る／進むナビを有効化。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "iOS WKWebView. When `true`, horizontal-swipe navigation between history entries is enabled.",
+                "ja": "iOS WKWebView。`true` で履歴間の水平スワイプナビゲーションを有効化。"
+              },
               "type": "boolean",
-              "required": "",
-              "description": "Enable swipe navigation",
-              "note": "iOS WKWebView. When `true`, horizontal-swipe navigation between history entries is enabled."
+              "required": ""
             },
             {
-              "id": "attr_allows_link_preview",
+              "id": "attr_allowsLinkPreview",
               "name": "allowsLinkPreview",
+              "anchorId": "attr-allowsLinkPreview",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable link preview.",
+                "ja": "リンクプレビューを有効化。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "iOS WKWebView. 3D Touch / long-press link preview.",
+                "ja": "iOS WKWebView。3D Touch / 長押しでのリンクプレビュー。"
+              },
               "type": "boolean",
-              "required": "",
-              "description": "Enable link preview",
-              "note": "iOS WKWebView. 3D Touch / long-press link preview."
+              "required": ""
             },
             {
               "id": "attr_html",
               "name": "html",
+              "anchorId": "attr-html",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "HTML content.",
+                "ja": "HTML コンテンツ。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Inline HTML string. Useful for rendering Markdown-to-HTML output or previews.",
+                "ja": "インライン HTML 文字列。Markdown→HTML 変換結果やプレビュー描画に便利。"
+              },
               "type": "string",
-              "required": "",
-              "description": "HTML content",
-              "note": "Inline HTML string. Useful for rendering Markdown-to-HTML output or previews."
+              "required": ""
             },
             {
               "id": "attr_sandbox",
               "name": "sandbox",
+              "anchorId": "attr-sandbox",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Iframe sandbox attribute.",
+                "ja": "iframe の `sandbox` 属性。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Web-only (maps to iframe `sandbox` attribute). Space-separated tokens: `allow-scripts` / `allow-same-origin` / `allow-forms` / `allow-popups` etc. Omit for maximum restriction.",
+                "ja": "Web 専用（iframe `sandbox` 属性にマップ）。スペース区切りトークン: `allow-scripts` / `allow-same-origin` / `allow-forms` / `allow-popups` など。省略で最大制限。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Iframe sandbox attribute",
-              "note": "Web-only (maps to iframe `sandbox` attribute). Space-separated tokens: `allow-scripts` / `allow-same-origin` / `allow-forms` / `allow-popups` etc. Omit for maximum restriction.",
-              "platform": "react"
+              "required": ""
             }
           ]
         }
@@ -105,6 +1154,7 @@
             {
               "id": "related_view",
               "name": "View",
+              "hint": "",
               "url": "/reference/components/view"
             }
           ]
@@ -119,14 +1169,26 @@
           "data": [
             {
               "id": "next_attributes",
-              "titleKey": "next_attributes_title",
-              "descriptionKey": "next_attributes_body",
+              "titleKey": {
+                "en": "Attribute reference",
+                "ja": "属性リファレンス"
+              },
+              "descriptionKey": {
+                "en": "Every common attribute in one place — width / padding / binding / events grouped by category.",
+                "ja": "共通属性を 1 箇所にまとめたリファレンス。width / padding / binding / event などカテゴリ別に整理。"
+              },
               "url": "/reference/attributes"
             },
             {
               "id": "next_custom_components",
-              "titleKey": "next_custom_components_title",
-              "descriptionKey": "next_custom_components_body",
+              "titleKey": {
+                "en": "Building a custom component",
+                "ja": "カスタムコンポーネントを作る"
+              },
+              "descriptionKey": {
+                "en": "Extend JsonUI with your own components (spec → converter → React/Swift/Kotlin).",
+                "ja": "spec → converter → React/Swift/Kotlin で JsonUI を独自拡張する手順。"
+              },
               "url": "/guides/custom-components"
             }
           ]

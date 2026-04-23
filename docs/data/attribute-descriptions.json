@@ -1,0 +1,1009 @@
+{
+  "_description": "Shared bilingual attribute descriptions. When an attribute's name appears here, the build script prefers the Lang2 entry over attribute_definitions.json's English-only `description`. Add entries as reference pages are audited — an unlisted attribute falls back to English. Hand-authored.",
+  "_consumed_by": "jsonui-doc-web/scripts/build-attribute-reference.ts — merge helpers (mergeComponent / mergeCategory) read this file at startup.",
+
+  "text": {
+    "en": "Text content (binding supported, supports interpolation).",
+    "ja": "表示するテキスト。`@{binding}` と `\"合計: @{count}\"` のような補間をサポート。"
+  },
+  "fontSize": {
+    "en": "Font size (binding supported).",
+    "ja": "フォントサイズ（数値、binding 可）。"
+  },
+  "fontColor": {
+    "en": "Font color — hex string or color name from colors.json (binding supported).",
+    "ja": "フォント色。hex 文字列または `colors.json` のトークン名（binding 可）。"
+  },
+  "fontWeight": {
+    "en": "Font weight (e.g., 'bold', 'semibold', '500', 600, or binding).",
+    "ja": "フォントウェイト。`bold` / `semibold` / `medium` / `light` / `heavy` の文字列、または 100〜900 の数値（binding 可）。"
+  },
+  "fontFamily": {
+    "en": "Font family name (e.g., 'Noto Sans JP'). Resolved via Configuration.Font.fontProvider.",
+    "ja": "フォントファミリ名（例: `Noto Sans JP`）。`Configuration.Font.fontProvider` または `Font.custom()` で解決される。"
+  },
+  "font": {
+    "en": "Font name or 'bold' (binding supported).",
+    "ja": "フォント名または `bold` の省略指定（binding 可）。"
+  },
+  "textAlign": {
+    "en": "Text alignment (binding supported).",
+    "ja": "テキスト水平方向の寄せ。`Left` / `Center` / `Right`（binding 可）。"
+  },
+  "textVerticalAlign": {
+    "en": "Text vertical alignment.",
+    "ja": "テキストの垂直方向の寄せ。`Top` / `Center` / `Bottom`。"
+  },
+  "lines": {
+    "en": "Maximum number of lines (0 for unlimited) (binding supported).",
+    "ja": "最大行数。`0` で無制限（binding 可）。"
+  },
+  "lineHeight": {
+    "en": "Line height.",
+    "ja": "行の高さ（px）。React のみ対応、iOS/Android では `lineHeightMultiple` / `lineSpacing` を使う。"
+  },
+  "lineHeightMultiple": {
+    "en": "Line height multiplier (binding supported).",
+    "ja": "行高の倍率（1.0 = フォントサイズ通り、1.4 = 40% 増）。"
+  },
+  "lineSpacing": {
+    "en": "Spacing between rows.",
+    "ja": "行間スペース（px）。"
+  },
+  "lineBreakMode": {
+    "en": "Line break mode.",
+    "ja": "行の切り詰めモード。`Char` / `Clip` / `Word` / `Head` / `Middle` / `Tail`。"
+  },
+  "autoShrink": {
+    "en": "Enable auto-shrink.",
+    "ja": "幅不足時にフォントを自動縮小するか。"
+  },
+  "minimumScaleFactor": {
+    "en": "Minimum scale factor for auto-shrink (binding supported).",
+    "ja": "自動縮小時の最小スケール倍率（0.0〜1.0）。"
+  },
+  "underline": {
+    "en": "Underline styling (boolean for simple, object for styled).",
+    "ja": "下線スタイル。`true` で単純な下線、オブジェクトでスタイル指定。"
+  },
+  "strikethrough": {
+    "en": "Strikethrough styling (boolean for simple, object for styled).",
+    "ja": "取り消し線スタイル。`true` で単純、オブジェクトでスタイル指定。"
+  },
+  "textShadow": {
+    "en": "Text shadow configuration.",
+    "ja": "テキストの影（ドロップシャドウ）の設定。"
+  },
+  "textTransform": {
+    "en": "Text transformation.",
+    "ja": "テキスト変換。`uppercase` / `lowercase` / `capitalize`。"
+  },
+  "selectable": {
+    "en": "Whether text is selectable.",
+    "ja": "テキストをユーザーが選択できるか。"
+  },
+  "linkable": {
+    "en": "Enable URL/phone detection.",
+    "ja": "URL・電話番号を自動検出してリンク化する。"
+  },
+  "edgeInset": {
+    "en": "Edge insets as array or pipe-separated string.",
+    "ja": "テキストの内側余白。配列または `top|left|bottom|right` 形式の文字列。"
+  },
+  "hint": {
+    "en": "Placeholder text when empty (primary).",
+    "ja": "空のときに表示されるプレースホルダ文字列。"
+  },
+  "hintColor": {
+    "en": "Placeholder color — hex string or color name from colors.json (binding supported).",
+    "ja": "プレースホルダ文字色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "hintFont": {
+    "en": "Placeholder font.",
+    "ja": "プレースホルダのフォント名。"
+  },
+  "hintFontSize": {
+    "en": "Placeholder font size.",
+    "ja": "プレースホルダのフォントサイズ。"
+  },
+  "hintAttributes": {
+    "en": "Hint styling attributes.",
+    "ja": "プレースホルダに適用するスタイル属性オブジェクト。"
+  },
+  "hintLineHeightMultiple": {
+    "en": "Placeholder line height multiplier.",
+    "ja": "プレースホルダの行高倍率。"
+  },
+  "hideOnFocused": {
+    "en": "Hide placeholder when focused.",
+    "ja": "フォーカス時にプレースホルダを非表示にする。"
+  },
+  "placeholder": {
+    "en": "Placeholder image name (alias for hint).",
+    "ja": "プレースホルダ（`hint` のエイリアス）。"
+  },
+  "prompt": {
+    "en": "Prompt text (primary).",
+    "ja": "ピッカーなどに表示するプロンプト文字列。"
+  },
+  "highlightColor": {
+    "en": "Highlight color — hex string or color name from colors.json (binding supported).",
+    "ja": "ハイライト時の色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "hilightColor": {
+    "en": "Highlight color — hex string or color name from colors.json (typo alias).",
+    "ja": "ハイライト色（`highlightColor` のタイポ互換エイリアス）。"
+  },
+  "highlightAttributes": {
+    "en": "Highlight styling attributes when selected.",
+    "ja": "選択時に適用するハイライトスタイル属性。"
+  },
+  "disabledFontColor": {
+    "en": "Font color when disabled — hex string or color name from colors.json (binding supported).",
+    "ja": "無効時のフォント色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "tapBackground": {
+    "en": "Background when tapped — hex string or color name from colors.json.",
+    "ja": "タップ中（押下時）の背景色。hex または `colors.json` のトークン名。"
+  },
+  "highlightBackground": {
+    "en": "Background when highlighted — hex string or color name from colors.json.",
+    "ja": "ハイライト時の背景色。hex または `colors.json` のトークン名。"
+  },
+  "disabledBackground": {
+    "en": "Background color when disabled — hex string or color name from colors.json.",
+    "ja": "無効時の背景色。hex または `colors.json` のトークン名。"
+  },
+  "selected": {
+    "en": "Selected state (binding supported).",
+    "ja": "選択状態（binding 可）。"
+  },
+  "highlighted": {
+    "en": "View highlighted state.",
+    "ja": "View のハイライト状態。"
+  },
+  "enabled": {
+    "en": "Whether enabled (binding supported).",
+    "ja": "操作可能かどうか（binding 可）。`false` でタップ無効＋ disabled スタイル。"
+  },
+  "onClick": {
+    "en": "Tap handler — binding only (@{functionName}).",
+    "ja": "タップイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+  },
+  "onLongClick": {
+    "en": "Long-press handler — binding only (@{functionName}).",
+    "ja": "長押しイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+  },
+  "onBlur": {
+    "en": "Blur event handler.",
+    "ja": "フォーカスが外れたときのイベントハンドラ。"
+  },
+  "onFocus": {
+    "en": "Focus event handler.",
+    "ja": "フォーカスが当たったときのイベントハンドラ。"
+  },
+  "onBeginEditing": {
+    "en": "Begin editing event handler.",
+    "ja": "編集開始時のイベントハンドラ。"
+  },
+  "onEndEditing": {
+    "en": "End editing event handler.",
+    "ja": "編集終了時のイベントハンドラ。"
+  },
+  "onTextChange": {
+    "en": "Text change event selector.",
+    "ja": "テキスト変更時のイベントハンドラ。"
+  },
+  "onValueChange": {
+    "en": "Value change handler — binding only (@{functionName}).",
+    "ja": "値変更時のイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+  },
+  "onValueChanged": {
+    "en": "Value change handler (alias for onValueChange) — binding only (@{functionName}).",
+    "ja": "値変更時のイベントハンドラ（`onValueChange` のエイリアス）。binding のみ。"
+  },
+  "onTabChange": {
+    "en": "Tab change handler — binding only (@{functionName}).",
+    "ja": "タブ切替時のイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+  },
+  "onToggle": {
+    "en": "Toggle handler function.",
+    "ja": "トグル切替時のイベントハンドラ。"
+  },
+  "onPageChanged": {
+    "en": "Called with the new page index (Int) when the user swipes to a different page.",
+    "ja": "ページングで別ページにスワイプしたときに、新しいページインデックス（Int）を引数に呼ばれる。"
+  },
+  "onItemAppear": {
+    "en": "Called with the cell index (Int) when a cell appears on screen. Use for pagination by checking index against total count in ViewModel.",
+    "ja": "セルが画面に現れたときにインデックス（Int）引数で呼ばれる。ViewModel で総件数と比較してページネーションに使う。"
+  },
+  "src": {
+    "en": "Image URL (binding supported).",
+    "ja": "画像の URL（binding 可）。"
+  },
+  "srcName": {
+    "en": "Image source name (alias, binding supported).",
+    "ja": "画像ソース名（`src` のエイリアス、binding 可）。"
+  },
+  "url": {
+    "en": "Image URL (alias, binding supported).",
+    "ja": "画像の URL（`src` のエイリアス、binding 可）。"
+  },
+  "alt": {
+    "en": "Alt text for accessibility.",
+    "ja": "スクリーンリーダー用の代替テキスト。"
+  },
+  "contentMode": {
+    "en": "Content mode (binding supported).",
+    "ja": "画像のコンテントモード。`aspectFit` / `aspectFill` / `scaleToFill` など（binding 可）。"
+  },
+  "renderingMode": {
+    "en": "Rendering mode.",
+    "ja": "画像のレンダリングモード（テンプレート／原画など）。"
+  },
+  "resize": {
+    "en": "Resize behavior.",
+    "ja": "画像のリサイズ挙動。"
+  },
+  "loading": {
+    "en": "Loading behavior.",
+    "ja": "ロードストラテジ（`lazy` / `eager`）。"
+  },
+  "loadingImage": {
+    "en": "Loading image name.",
+    "ja": "ロード中に表示する画像名。"
+  },
+  "errorImage": {
+    "en": "Error image name.",
+    "ja": "ロード失敗時に表示する画像名。"
+  },
+  "defaultImage": {
+    "en": "Default image name.",
+    "ja": "デフォルトで表示する画像名。"
+  },
+  "highlightSrc": {
+    "en": "Image when highlighted (binding supported).",
+    "ja": "ハイライト時の画像ソース（binding 可）。"
+  },
+  "highlightSrcName": {
+    "en": "Highlight image source name (binding supported).",
+    "ja": "ハイライト時の画像ソース名（binding 可）。"
+  },
+  "icon": {
+    "en": "Icon name.",
+    "ja": "アイコン名。"
+  },
+  "icon_off": {
+    "en": "Normal icon.",
+    "ja": "通常状態のアイコン。"
+  },
+  "icon_on": {
+    "en": "Selected icon.",
+    "ja": "選択状態のアイコン。"
+  },
+  "onSrc": {
+    "en": "Image source for checked state.",
+    "ja": "チェック状態の画像ソース。"
+  },
+  "selectedIcon": {
+    "en": "Selected icon name.",
+    "ja": "選択時のアイコン名。"
+  },
+  "selected_icon": {
+    "en": "Selected icon name (underscore alias).",
+    "ja": "選択時のアイコン名（スネークケースのエイリアス）。"
+  },
+  "iconMargin": {
+    "en": "Icon-text spacing.",
+    "ja": "アイコンとテキストの間隔。"
+  },
+  "iconPosition": {
+    "en": "Icon position relative to text.",
+    "ja": "アイコンのテキストに対する位置（`leading` / `trailing`）。"
+  },
+  "image": {
+    "en": "Button image.",
+    "ja": "ボタン画像。"
+  },
+  "label": {
+    "en": "Check label text (binding supported).",
+    "ja": "ラベルテキスト（binding 可）。"
+  },
+  "buttonType": {
+    "en": "HTML button type.",
+    "ja": "HTML の `<button type=\"...\">`（`button` / `submit` / `reset`）。React 専用。"
+  },
+  "checked": {
+    "en": "Switch state alias (binding for two-way).",
+    "ja": "チェック状態（双方向 binding）。`isOn` / `value` のエイリアス。"
+  },
+  "isOn": {
+    "en": "Switch state (binding for two-way).",
+    "ja": "スイッチ状態（双方向 binding）。"
+  },
+  "value": {
+    "en": "Switch state alias (binding for two-way).",
+    "ja": "スイッチ状態の値（双方向 binding）。"
+  },
+  "secure": {
+    "en": "Secure text entry for passwords (binding supported).",
+    "ja": "パスワード入力（文字を伏せる）（binding 可）。"
+  },
+  "maxLength": {
+    "en": "Maximum input length.",
+    "ja": "入力可能な最大文字数。"
+  },
+  "pattern": {
+    "en": "Input validation pattern.",
+    "ja": "入力検証用の正規表現パターン。"
+  },
+  "required": {
+    "en": "Required field validation.",
+    "ja": "必須フィールドのバリデーション。"
+  },
+  "editable": {
+    "en": "Enable/disable editing.",
+    "ja": "編集可能かどうか。"
+  },
+  "clearButtonMode": {
+    "en": "Clear button mode.",
+    "ja": "クリアボタンの表示モード。"
+  },
+  "returnKeyType": {
+    "en": "Return key type.",
+    "ja": "ソフトウェアキーボードのリターンキーの種類（`done` / `go` / `next` など）。"
+  },
+  "keyboardType": {
+    "en": "Keyboard type.",
+    "ja": "キーボード種別（`default` / `email` / `number` など）。"
+  },
+  "keyboardAppearance": {
+    "en": "Keyboard appearance: dark, light.",
+    "ja": "キーボードの外観（`light` / `dark`）。iOS のみ。"
+  },
+  "autocorrectionType": {
+    "en": "Auto-correction type.",
+    "ja": "自動校正の有効・無効。"
+  },
+  "autocapitalizationType": {
+    "en": "Auto-capitalization type.",
+    "ja": "自動大文字化のタイプ。"
+  },
+  "spellCheckingType": {
+    "en": "Spell checking type.",
+    "ja": "スペルチェックのタイプ。"
+  },
+  "contentType": {
+    "en": "Content type for autofill (binding supported).",
+    "ja": "オートフィル用のコンテンツタイプ（binding 可）。"
+  },
+  "input": {
+    "en": "Input type (includes 'allphabet' typo for backward compatibility).",
+    "ja": "入力タイプ。"
+  },
+  "inputType": {
+    "en": "Input type for Android.",
+    "ja": "Android 向け入力タイプ。"
+  },
+  "child": {
+    "en": "Child component(s).",
+    "ja": "子コンポーネント（単体または配列）。"
+  },
+  "children": {
+    "en": "Child components.",
+    "ja": "子コンポーネントの配列。"
+  },
+  "orientation": {
+    "en": "Scroll orientation.",
+    "ja": "レイアウト方向。`vertical` / `horizontal`。"
+  },
+  "spacing": {
+    "en": "Space between children (binding supported).",
+    "ja": "子要素間のスペース（binding 可）。"
+  },
+  "alignment": {
+    "en": "Child alignment.",
+    "ja": "子要素の配置。"
+  },
+  "distribution": {
+    "en": "Child distribution mode for stacks.",
+    "ja": "スタック内での子要素の配分モード。"
+  },
+  "direction": {
+    "en": "Layout direction.",
+    "ja": "レイアウト方向。"
+  },
+  "columns": {
+    "en": "Number of columns.",
+    "ja": "カラム数。"
+  },
+  "cols": {
+    "en": "Number of visible columns.",
+    "ja": "表示カラム数。"
+  },
+  "rows": {
+    "en": "Number of visible rows.",
+    "ja": "表示行数。"
+  },
+  "columnCount": {
+    "en": "Number of columns for CSS grid.",
+    "ja": "CSS Grid のカラム数。"
+  },
+  "columnSpacing": {
+    "en": "Spacing between columns.",
+    "ja": "カラム間のスペース。"
+  },
+  "itemSpacing": {
+    "en": "Spacing between items (used for both grid spacing and list item spacing).",
+    "ja": "アイテム間のスペース（グリッド間隔・リスト間隔の両方に使う）。"
+  },
+  "items": {
+    "en": "List of items for normal picker (binding supported).",
+    "ja": "アイテム配列。通常ピッカーの選択肢など（binding 可）。"
+  },
+  "tabs": {
+    "en": "Array of tab configurations.",
+    "ja": "タブ設定の配列。"
+  },
+  "sections": {
+    "en": "Section-based configuration.",
+    "ja": "セクションベースの設定。"
+  },
+  "cellClasses": {
+    "en": "Cell class definitions.",
+    "ja": "セルクラスの定義。"
+  },
+  "headerClasses": {
+    "en": "Header class definitions.",
+    "ja": "ヘッダクラスの定義。"
+  },
+  "footerClasses": {
+    "en": "Footer class definitions.",
+    "ja": "フッタクラスの定義。"
+  },
+  "cellIdProperty": {
+    "en": "Cell data property key to use as unique ID for ForEach identity. When set, scrollTo uses String type instead of Int.",
+    "ja": "ForEach の identity に使うデータフィールド名。指定時は `scrollTo` の型が Int から String になる。"
+  },
+  "autoChangeTrackingId": {
+    "en": "When true (and cellIdProperty is set), the library auto-computes each cellId as '<primary>_<hash>' so differential updates work without a manual hashForCell helper. If cellIdProperty is missing, the build emits a warning and cells fall back to index-based identity.",
+    "ja": "`true`（かつ `cellIdProperty` 指定時）で `<primary>_<hash>` 形式の cellId を自動計算し、差分更新を hashForCell なしで動かす。`cellIdProperty` 未指定時は build warning が出てインデックスベース identity にフォールバック。"
+  },
+  "lazy": {
+    "en": "Whether to use a lazy (virtualized) container. true (default): LazyVStack/LazyColumn/LazyVerticalGrid etc. with internal scrolling. false: render all items eagerly inside a plain VStack/Column (SwiftUI) or Column (Compose) or div (React) with NO scroll container — use when the Collection is nested inside an already-scrollable parent. Sticky headers and paging require lazy: true.",
+    "ja": "仮想化コンテナを使うか。`true`（デフォルト）で LazyVStack/LazyColumn 等＋内部スクロール。`false` で VStack/Column/div に即時描画し、スクロール owner を持たない（親がスクロール済の場合に使う）。sticky header・paging は `lazy: true` 必須。"
+  },
+  "paging": {
+    "en": "Enable paging.",
+    "ja": "ページングを有効化する。"
+  },
+  "horizontalScroll": {
+    "en": "Enable horizontal scroll.",
+    "ja": "水平スクロールを有効化する。"
+  },
+  "scrollEnabled": {
+    "en": "Enable scrolling (binding supported).",
+    "ja": "スクロール可否（binding 可）。"
+  },
+  "showsHorizontalScrollIndicator": {
+    "en": "Show horizontal indicator.",
+    "ja": "水平スクロールインジケータの表示。"
+  },
+  "showsVerticalScrollIndicator": {
+    "en": "Show vertical indicator.",
+    "ja": "垂直スクロールインジケータの表示。"
+  },
+  "bounces": {
+    "en": "Enable bounce effect.",
+    "ja": "端でのバウンスエフェクトを有効化する。"
+  },
+  "decelerationRate": {
+    "en": "Deceleration rate.",
+    "ja": "スクロール減速レート。"
+  },
+  "scrollBehavior": {
+    "en": "Scroll behavior animation.",
+    "ja": "スクロールアニメーションの挙動。"
+  },
+  "scrollTo": {
+    "en": "PassthroughSubject<Int, Never> for programmatic scrolling to cell index.",
+    "ja": "セルインデックスへプログラム的にスクロールするためのパスルー。"
+  },
+  "scrollAnchor": {
+    "en": "Anchor point for scroll target (default: bottom).",
+    "ja": "スクロール時のアンカー位置（既定値: bottom）。"
+  },
+  "scrollAnimated": {
+    "en": "Whether scrollTo uses animation (default: true).",
+    "ja": "`scrollTo` でアニメーションを使うか（既定値: true）。"
+  },
+  "scrollsToTop": {
+    "en": "Scroll to top on status bar tap.",
+    "ja": "ステータスバータップで最上部にスクロールする。"
+  },
+  "contentOffset": {
+    "en": "Initial offset [x, y].",
+    "ja": "初期スクロール位置 `[x, y]`。"
+  },
+  "contentSize": {
+    "en": "Content size [width, height].",
+    "ja": "コンテンツサイズ `[width, height]`。"
+  },
+  "contentInsets": {
+    "en": "Content insets.",
+    "ja": "コンテンツの内側余白。"
+  },
+  "contentInsetAdjustmentBehavior": {
+    "en": "Content inset adjustment.",
+    "ja": "コンテンツインセットの自動調整挙動。"
+  },
+  "insets": {
+    "en": "Content insets.",
+    "ja": "コンテンツインセット。"
+  },
+  "insetHorizontal": {
+    "en": "Horizontal inset.",
+    "ja": "水平方向のインセット。"
+  },
+  "insetVertical": {
+    "en": "Vertical inset.",
+    "ja": "垂直方向のインセット。"
+  },
+  "containerInset": {
+    "en": "Container inset.",
+    "ja": "コンテナインセット。"
+  },
+  "flexWrap": {
+    "en": "Flex wrap behavior.",
+    "ja": "Flex の折り返し挙動。"
+  },
+  "flexible": {
+    "en": "Enable flexible height.",
+    "ja": "フレキシブルな高さを有効化。"
+  },
+  "reverseLayout": {
+    "en": "Reverse the layout direction of the Collection grid. When true, section order in the generated code is also reversed so that JSON definition order (index 0 first) matches the visual top-to-bottom order on iOS (which does not support reverseLayout). Compose's reverseLayout then flips the entire list so index 0 appears at the bottom.",
+    "ja": "Collection グリッドのレイアウト方向を反転。`true` で JSON の定義順（index 0 が先）が iOS の視覚順（reverseLayout 非対応）と揃う。Compose の reverseLayout はリスト全体を反転し index 0 が最下段に来る。"
+  },
+  "defaultScrollAnchor": {
+    "en": "Initial scroll position anchor (iOS 17+). Sets where the scroll view starts.",
+    "ja": "初期スクロール位置アンカー（iOS 17+）。"
+  },
+  "currentPage": {
+    "en": "Current page index for paging collections (binding supported).",
+    "ja": "ページングコレクションの現在ページインデックス（binding 可）。"
+  },
+  "gradient": {
+    "en": "Gradient colors.",
+    "ja": "グラデーションの色配列。"
+  },
+  "gradientDirection": {
+    "en": "Gradient direction.",
+    "ja": "グラデーションの方向。"
+  },
+  "locations": {
+    "en": "Gradient color stop locations.",
+    "ja": "グラデーション色の停止位置（0.0〜1.0 の配列）。"
+  },
+  "color": {
+    "en": "Indicator color — hex string or color name from colors.json (binding supported).",
+    "ja": "インジケータ色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "tint": {
+    "en": "Tint color — hex string or color name from colors.json (binding supported).",
+    "ja": "tint 色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "tintColor": {
+    "en": "Tint color — hex string or color name from colors.json (alias).",
+    "ja": "tint 色（`tint` のエイリアス）。hex または `colors.json` のトークン名。"
+  },
+  "onTintColor": {
+    "en": "Track color when on — hex string or color name from colors.json.",
+    "ja": "ON 状態のトラック色。hex または `colors.json` のトークン名。"
+  },
+  "offTintColor": {
+    "en": "Off tint color — hex string or color name from colors.json (binding supported).",
+    "ja": "OFF 状態の tint 色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "thumbTintColor": {
+    "en": "Thumb tint color — hex string or color name from colors.json (binding supported).",
+    "ja": "サム（つまみ）の tint 色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "trackTintColor": {
+    "en": "Track portion color — hex string or color name from colors.json (binding supported).",
+    "ja": "トラック部分の色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "progressTintColor": {
+    "en": "Progress portion color — hex string or color name from colors.json (binding supported).",
+    "ja": "進捗部分の色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "selectedColor": {
+    "en": "Selected state color — hex string or color name from colors.json (binding supported).",
+    "ja": "選択状態の色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "unselectedColor": {
+    "en": "Unselected tab color — hex string or color name from colors.json (binding supported).",
+    "ja": "未選択タブの色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "normalColor": {
+    "en": "Normal state color — hex string or color name from colors.json (binding supported).",
+    "ja": "通常状態の色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "selectedFontColor": {
+    "en": "Selected text color — hex string or color name from colors.json.",
+    "ja": "選択時のテキスト色。hex または `colors.json` のトークン名。"
+  },
+  "tabBarBackground": {
+    "en": "Tab bar background color — hex string or color name from colors.json (binding supported).",
+    "ja": "タブバーの背景色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "progress": {
+    "en": "Progress value (0-1, binding supported).",
+    "ja": "進捗値（0.0〜1.0、binding 可）。"
+  },
+  "progressImage": {
+    "en": "Custom progress image.",
+    "ja": "カスタムの進捗画像。"
+  },
+  "trackImage": {
+    "en": "Custom track image.",
+    "ja": "カスタムのトラック画像。"
+  },
+  "progressViewStyle": {
+    "en": "Progress view style: default, bar.",
+    "ja": "進捗ビューのスタイル（`default` / `bar`）。"
+  },
+  "step": {
+    "en": "Step increment value.",
+    "ja": "値の増分ステップ。"
+  },
+  "minimum": {
+    "en": "Minimum value (alias for minValue) (binding supported).",
+    "ja": "最小値（`minValue` のエイリアス）。binding 可。"
+  },
+  "maximum": {
+    "en": "Maximum value (alias for maxValue) (binding supported).",
+    "ja": "最大値（`maxValue` のエイリアス）。binding 可。"
+  },
+  "minValue": {
+    "en": "Minimum value (binding supported).",
+    "ja": "最小値（binding 可）。"
+  },
+  "maxValue": {
+    "en": "Maximum value (binding supported).",
+    "ja": "最大値（binding 可）。"
+  },
+  "minimumValueImage": {
+    "en": "Image at minimum end.",
+    "ja": "最小値側に表示する画像。"
+  },
+  "maximumValueImage": {
+    "en": "Image at maximum end.",
+    "ja": "最大値側に表示する画像。"
+  },
+  "datePickerMode": {
+    "en": "Date picker mode.",
+    "ja": "日付ピッカーモード（`date` / `time` / `dateAndTime` / `countDownTimer`）。"
+  },
+  "datePickerStyle": {
+    "en": "Date picker style.",
+    "ja": "日付ピッカーの見た目。"
+  },
+  "dateStringFormat": {
+    "en": "Date string format.",
+    "ja": "日付フォーマット（iOS の `DateFormatter` 構文）。"
+  },
+  "minimumDate": {
+    "en": "Minimum date (yyyy-MM-dd format, binding supported).",
+    "ja": "選択可能な最小日付（`yyyy-MM-dd` 形式、binding 可）。"
+  },
+  "maximumDate": {
+    "en": "Maximum date (yyyy-MM-dd format, binding supported).",
+    "ja": "選択可能な最大日付（`yyyy-MM-dd` 形式、binding 可）。"
+  },
+  "selectedDate": {
+    "en": "Initial selected date (yyyy-MM-dd format, two-way binding).",
+    "ja": "初期選択日付（`yyyy-MM-dd` 形式、双方向 binding）。"
+  },
+  "selectedIndex": {
+    "en": "Initial selected index for normal picker (two-way binding).",
+    "ja": "通常ピッカーの初期選択インデックス（双方向 binding）。"
+  },
+  "selectedItem": {
+    "en": "Selected item value (two-way binding).",
+    "ja": "選択アイテムの値（双方向 binding）。"
+  },
+  "selectedValue": {
+    "en": "Selected value (binding for two-way).",
+    "ja": "選択値（双方向 binding）。"
+  },
+  "minuteInterval": {
+    "en": "Minute interval for time picker.",
+    "ja": "時刻ピッカーの分間隔。"
+  },
+  "inView": {
+    "en": "Display picker inside view.",
+    "ja": "ピッカーを View 内にインライン表示する。"
+  },
+  "includePromptWhenDataBinding": {
+    "en": "Include prompt in binding.",
+    "ja": "データバインディング時にプロンプトを含める。"
+  },
+  "referenceView": {
+    "en": "Reference view for picker.",
+    "ja": "ピッカーの参照 View。"
+  },
+  "selectItemType": {
+    "en": "Select item type.",
+    "ja": "選択アイテムのタイプ。"
+  },
+  "multiple": {
+    "en": "Allow multiple selection.",
+    "ja": "複数選択を許可。"
+  },
+  "size": {
+    "en": "Number of visible options.",
+    "ja": "同時に表示する選択肢数。"
+  },
+  "showLabels": {
+    "en": "Whether to show tab labels (default: true).",
+    "ja": "タブラベルを表示するか（既定値: true）。"
+  },
+  "setTargetAsDataSource": {
+    "en": "Set target as data source.",
+    "ja": "ターゲットをデータソースとして設定する。"
+  },
+  "setTargetAsDelegate": {
+    "en": "Set target as delegate.",
+    "ja": "ターゲットを delegate として設定する。"
+  },
+  "apportionsSegmentWidthsByContent": {
+    "en": "Size segments by content.",
+    "ja": "セグメント幅を中身のコンテンツ幅に合わせる。"
+  },
+  "momentary": {
+    "en": "Momentary selection mode.",
+    "ja": "momentary 選択モード。"
+  },
+  "group": {
+    "en": "Radio group name.",
+    "ja": "Radio のグループ名。"
+  },
+  "bind": {
+    "en": "Two-way binding @{variable}.",
+    "ja": "双方向 binding（`@{変数名}`）。"
+  },
+  "nextFocus": {
+    "en": "ID of the next field to focus on submit (for focus chain).",
+    "ja": "次にフォーカスするフィールドの ID（フォーカスチェーン用）。"
+  },
+  "fieldPadding": {
+    "en": "Field padding.",
+    "ja": "フィールドの内側余白。"
+  },
+  "draggable": {
+    "en": "Make this view draggable.",
+    "ja": "この View をドラッグ可能にする。"
+  },
+  "onDragStart": {
+    "en": "Handler called when drag starts — @{handlerName}.",
+    "ja": "ドラッグ開始時に呼ばれるハンドラ（`@{ハンドラ名}`）。"
+  },
+  "onDragEnter": {
+    "en": "Handler called when a dragged item enters this view — @{handlerName}.",
+    "ja": "ドラッグ要素がこの View に入ったときに呼ばれるハンドラ（`@{ハンドラ名}`）。"
+  },
+  "onDragLeave": {
+    "en": "Handler called when a dragged item leaves this view — @{handlerName}.",
+    "ja": "ドラッグ要素がこの View から離れたときに呼ばれるハンドラ（`@{ハンドラ名}`）。"
+  },
+  "onDragOver": {
+    "en": "Handler called while a dragged item hovers over this view — @{handlerName}.",
+    "ja": "ドラッグ要素がこの View の上にある間呼ばれ続けるハンドラ（`@{ハンドラ名}`）。"
+  },
+  "onDrop": {
+    "en": "Handler called when an item is dropped onto this view — @{handlerName}.",
+    "ja": "ドロップされたときに呼ばれるハンドラ（`@{ハンドラ名}`）。"
+  },
+  "onBlur": {
+    "en": "Blur event handler.",
+    "ja": "フォーカスが外れたときのハンドラ。"
+  },
+  "onChangeSelection": {
+    "en": "Selection change event handler.",
+    "ja": "選択範囲変更時のハンドラ。"
+  },
+  "onDeleteBackward": {
+    "en": "Delete backward (backspace) event handler.",
+    "ja": "バックスペース押下時のハンドラ。"
+  },
+  "onShouldBeginEditing": {
+    "en": "Should begin editing event handler (return true to allow).",
+    "ja": "編集開始可否を返すハンドラ（true で許可）。"
+  },
+  "onShouldChangeCharacters": {
+    "en": "Should change characters event handler (return true to allow).",
+    "ja": "文字変更可否を返すハンドラ（true で許可）。"
+  },
+  "onShouldChangeText": {
+    "en": "Should change text event handler (return true to allow).",
+    "ja": "テキスト変更可否を返すハンドラ（true で許可）。"
+  },
+  "onShouldClear": {
+    "en": "Should clear event handler (return true to allow).",
+    "ja": "クリア可否を返すハンドラ（true で許可）。"
+  },
+  "onShouldEndEditing": {
+    "en": "Should end editing event handler (return true to allow).",
+    "ja": "編集終了可否を返すハンドラ（true で許可）。"
+  },
+  "onShouldReturn": {
+    "en": "Should return event handler (return true to allow).",
+    "ja": "Return キー押下時の可否を返すハンドラ（true で許可）。"
+  },
+  "borderStyle": {
+    "en": "Border style.",
+    "ja": "ボーダースタイル。"
+  },
+  "hasContainer": {
+    "en": "Has container view.",
+    "ja": "コンテナ View を持つかどうか。"
+  },
+  "config": {
+    "en": "Button configuration (iOS 15+).",
+    "ja": "Button 設定（iOS 15+）。"
+  },
+  "applyLiquidGlass": {
+    "en": "Apply liquid glass effect.",
+    "ja": "liquid glass エフェクトを適用する。"
+  },
+  "glassEffectStyle": {
+    "en": "Glass effect style.",
+    "ja": "glass エフェクトのスタイル。"
+  },
+  "effectStyle": {
+    "en": "Blur effect style.",
+    "ja": "ブラーエフェクトのスタイル。"
+  },
+  "html": {
+    "en": "HTML content.",
+    "ja": "HTML コンテンツ。"
+  },
+  "sandbox": {
+    "en": "Iframe sandbox attribute.",
+    "ja": "iframe の `sandbox` 属性。"
+  },
+  "allow": {
+    "en": "Iframe allow attribute for feature policy.",
+    "ja": "iframe の `allow` 属性（Feature Policy）。"
+  },
+  "cachePolicy": {
+    "en": "Cache policy.",
+    "ja": "キャッシュポリシー。"
+  },
+  "timeout": {
+    "en": "Download timeout in seconds.",
+    "ja": "ダウンロードのタイムアウト（秒）。"
+  },
+  "allowsBackForwardNavigationGestures": {
+    "en": "Enable swipe navigation.",
+    "ja": "スワイプでの戻る／進むナビを有効化。"
+  },
+  "allowsLinkPreview": {
+    "en": "Enable link preview.",
+    "ja": "リンクプレビューを有効化。"
+  },
+  "allowsEditingTextAttributes": {
+    "en": "Allow editing text attributes.",
+    "ja": "テキスト属性の編集を許可する。"
+  },
+  "canBack": {
+    "en": "Show back button.",
+    "ja": "戻るボタンを表示する。"
+  },
+  "colorScheme": {
+    "en": "Color scheme for native date picker icon visibility (set 'dark' for dark backgrounds).",
+    "ja": "ネイティブ日付ピッカーのアイコン可視性のためのカラースキーム（暗背景では `dark` を指定）。"
+  },
+  "dataDetectorTypes": {
+    "en": "Data detector types.",
+    "ja": "データ自動検出タイプ。"
+  },
+  "hidesWhenStopped": {
+    "en": "Hide when stopped.",
+    "ja": "停止時に非表示にする。"
+  },
+  "indicatorStyle": {
+    "en": "Scroll indicator style.",
+    "ja": "スクロールインジケータのスタイル。"
+  },
+  "minZoom": {
+    "en": "Minimum zoom scale (binding supported).",
+    "ja": "最小ズーム倍率（binding 可）。"
+  },
+  "maxZoom": {
+    "en": "Maximum zoom scale (binding supported).",
+    "ja": "最大ズーム倍率（binding 可）。"
+  },
+  "itemWeight": {
+    "en": "Item sizing weight.",
+    "ja": "アイテムのサイズ比率。"
+  },
+  "doneText": {
+    "en": "Done button text.",
+    "ja": "完了ボタンの文字列。"
+  },
+  "keyboardDismissMode": {
+    "en": "Keyboard dismiss mode.",
+    "ja": "キーボードを閉じるモード。"
+  },
+  "keyboardAvoidance": {
+    "en": "Enable keyboard avoidance.",
+    "ja": "キーボード回避を有効化する。"
+  },
+  "safeAreaInsetPositions": {
+    "en": "Safe area edges.",
+    "ja": "セーフエリアインセット対象エッジ。"
+  },
+  "layout": {
+    "en": "Layout type (flow: wrapping layout, LeftAligned: left-aligned wrapping).",
+    "ja": "レイアウトタイプ（`flow`: 折返し、`LeftAligned`: 左寄せ折返し）。"
+  },
+  "caretAttributes": {
+    "en": "Caret/arrow styling attributes.",
+    "ja": "キャレット／矢印のスタイル属性。"
+  },
+  "dividerAttributes": {
+    "en": "Divider styling attributes.",
+    "ja": "区切り線のスタイル属性。"
+  },
+  "partialAttributes": {
+    "en": "Partial text styling.",
+    "ja": "部分テキストのスタイル属性。"
+  },
+  "labelAttributes": {
+    "en": "Label styling for Toggle.",
+    "ja": "Toggle のラベルスタイル属性。"
+  },
+  "leftView": {
+    "en": "Left view configuration.",
+    "ja": "左側 View の設定。"
+  },
+  "leftViewMode": {
+    "en": "Left view display mode.",
+    "ja": "左側 View の表示モード。"
+  },
+  "rightView": {
+    "en": "Right view configuration.",
+    "ja": "右側 View の設定。"
+  },
+  "rightViewMode": {
+    "en": "Right view display mode.",
+    "ja": "右側 View の表示モード。"
+  },
+  "textPaddingLeft": {
+    "en": "Text padding left.",
+    "ja": "テキストの左 padding。"
+  },
+  "textPaddingRight": {
+    "en": "Text padding right.",
+    "ja": "テキストの右 padding。"
+  },
+  "accessoryBackground": {
+    "en": "Input accessory background — hex string or color name from colors.json.",
+    "ja": "入力アクセサリ背景色。hex または `colors.json` のトークン名。"
+  },
+  "accessoryTextColor": {
+    "en": "Input accessory text color — hex string or color name from colors.json.",
+    "ja": "入力アクセサリのテキスト色。hex または `colors.json` のトークン名。"
+  },
+  "accessoryCornerRadius": {
+    "en": "Accessory corner radius.",
+    "ja": "アクセサリの角丸半径。"
+  },
+  "valueChange": {
+    "en": "Value change event.",
+    "ja": "値変更イベント。"
+  }
+}

@@ -3,9 +3,431 @@
   "kebab": "indicator",
   "aliasOf": null,
   "title": "Indicator",
-  "description": "Activity spinner for indefinite, short-duration waits (loading, network fetching). Always animated; has no progress value.",
-  "usage": "Use Indicator to signal 'something is happening' when you don't know the duration. For progress percent use Progress. Combine with `visibility` binding to show only while loading.",
+  "description": {
+    "en": "Activity spinner for indefinite, short-duration waits (loading, network fetching). Always animated; has no progress value.",
+    "ja": "不定・短時間の待機用スピナー（ローディング、ネットワーク取得）。常にアニメーション、進捗値なし。"
+  },
+  "usage": {
+    "en": "Use Indicator to signal 'something is happening' when you don't know the duration. For progress percent use Progress. Combine with `visibility` binding to show only while loading.",
+    "ja": "所要時間不明で「何かが進行中」だと示したいときに使う。進捗 % が分かるなら Progress。`visibility` binding と組み合わせてロード中のみ表示する。"
+  },
   "aliasNotice": null,
+  "kicker": "Component · Reference",
+  "kickerParentLabel": "Components",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "platform_ios",
+              "label": "iOS",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_android",
+              "label": "Android",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_web",
+              "label": "Web",
+              "fontColor": "var(--color-ink)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "visible",
+  "aliasCalloutVisibility": "gone",
+  "aliasLinkUrl": "",
+  "canonicalCode": "{\n  \"type\": \"Indicator\",\n  \"indicatorStyle\": \"medium\"\n}",
+  "canonicalLanguage": "json",
+  "statRequired": "0",
+  "statOptional": "3",
+  "statEvents": "0",
+  "statRequiredText": {
+    "en": "0 required",
+    "ja": "必須 0"
+  },
+  "statOptionalText": {
+    "en": "3 optional",
+    "ja": "任意 3"
+  },
+  "statEventsText": {
+    "en": "0 events",
+    "ja": "イベント 0"
+  },
+  "usageVisibility": "visible",
+  "attributeCategories": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "cat_common",
+              "label": {
+                "en": "Common",
+                "ja": "共通"
+              },
+              "anchorUrl": "#section-common"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributesCommon": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_color",
+              "name": "color",
+              "anchorId": "attr-color",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Indicator color — hex string or color name from colors.json (binding supported).",
+                "ja": "インジケータ色。hex または `colors.json` のトークン名（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Spinner stroke color. Defaults to the current theme's accent / tint color.",
+                "ja": "スピナーの線色。省略時は現テーマの accent / tint 色。"
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_hidesWhenStopped",
+              "name": "hidesWhenStopped",
+              "anchorId": "attr-hidesWhenStopped",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Hide when stopped.",
+                "ja": "停止時に非表示にする。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Boolean. When `true`, the Indicator hides itself when not animating. Default `true`.",
+                "ja": "Boolean。`true` でアニメーション停止中は自身を非表示にする。デフォルト `true`。"
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_indicatorStyle",
+              "name": "indicatorStyle",
+              "anchorId": "attr-indicatorStyle",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "medium",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "large",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Scroll indicator style.",
+                "ja": "スクロールインジケータのスタイル。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`small` / `medium` / `large`. iOS UIActivityIndicatorView.Style. Controls the diameter.",
+                "ja": "`small` / `medium` / `large`。iOS UIActivityIndicatorView.Style。直径を決める。"
+              },
+              "type": "string",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupCommonVisibility": "visible",
+  "attributesStyle": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStyleVisibility": "gone",
+  "attributesLayout": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupLayoutVisibility": "gone",
+  "attributesSpacing": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupSpacingVisibility": "gone",
+  "attributesAlignment": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupAlignmentVisibility": "gone",
+  "attributesState": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStateVisibility": "gone",
+  "attributesBinding": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupBindingVisibility": "gone",
+  "attributesEvent": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupEventVisibility": "gone",
+  "attributesResponsive": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupResponsiveVisibility": "gone",
+  "attributesMisc": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupMiscVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_glance",
+      "label": {
+        "en": "At a glance",
+        "ja": "概要"
+      },
+      "anchor": "section-glance",
+      "level": 1
+    },
+    {
+      "id": "toc_common",
+      "label": {
+        "en": "Common",
+        "ja": "共通"
+      },
+      "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_examples",
+      "label": {
+        "en": "Examples",
+        "ja": "例"
+      },
+      "anchor": "section-examples",
+      "level": 1
+    },
+    {
+      "id": "toc_related",
+      "label": {
+        "en": "Related",
+        "ja": "関連"
+      },
+      "anchor": "section-related",
+      "level": 1
+    }
+  ],
   "examples": {
     "sections": [
       {
@@ -13,21 +435,129 @@
           "data": [
             {
               "id": "example_1",
-              "title": "Inline spinner",
+              "anchorId": "example-1",
+              "title": {
+                "en": "Inline spinner",
+                "ja": "インラインスピナー"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"Indicator\",\n  \"indicatorStyle\": \"medium\"\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Indicator\",\n  \"indicatorStyle\": \"medium\"\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"Indicator\",\n  \"indicatorStyle\": \"medium\"\n}",
               "required": ""
             },
             {
               "id": "example_2",
-              "title": "Conditional display",
+              "anchorId": "example-2",
+              "title": {
+                "en": "Conditional display",
+                "ja": "条件付き表示"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}",
               "required": ""
             },
             {
               "id": "example_3",
-              "title": "Full-screen overlay",
+              "anchorId": "example-3",
+              "title": {
+                "en": "Full-screen overlay",
+                "ja": "全画面オーバーレイ"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}",
               "required": ""
@@ -45,30 +575,213 @@
             {
               "id": "attr_color",
               "name": "color",
+              "anchorId": "attr-color",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Indicator color — hex string or color name from colors.json (binding supported).",
+                "ja": "インジケータ色。hex または `colors.json` のトークン名（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Spinner stroke color. Defaults to the current theme's accent / tint color.",
+                "ja": "スピナーの線色。省略時は現テーマの accent / tint 色。"
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Indicator color - hex string or color name from colors.json (binding supported)",
-              "note": "Spinner stroke color. Defaults to the current theme's accent / tint color."
+              "required": ""
             },
             {
-              "id": "attr_hides_when_stopped",
+              "id": "attr_hidesWhenStopped",
               "name": "hidesWhenStopped",
+              "anchorId": "attr-hidesWhenStopped",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Hide when stopped.",
+                "ja": "停止時に非表示にする。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Boolean. When `true`, the Indicator hides itself when not animating. Default `true`.",
+                "ja": "Boolean。`true` でアニメーション停止中は自身を非表示にする。デフォルト `true`。"
+              },
               "type": "boolean",
-              "required": "",
-              "description": "Hide when stopped",
-              "note": "Boolean. When `true`, the Indicator hides itself when not animating. Default `true`."
+              "required": ""
             },
             {
-              "id": "attr_indicator_style",
+              "id": "attr_indicatorStyle",
               "name": "indicatorStyle",
+              "anchorId": "attr-indicatorStyle",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "medium",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "large",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Scroll indicator style.",
+                "ja": "スクロールインジケータのスタイル。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`small` / `medium` / `large`. iOS UIActivityIndicatorView.Style. Controls the diameter.",
+                "ja": "`small` / `medium` / `large`。iOS UIActivityIndicatorView.Style。直径を決める。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Indicator style",
-              "note": "`small` / `medium` / `large`. iOS UIActivityIndicatorView.Style. Controls the diameter.",
-              "enumValues": [
-                "medium",
-                "large"
-              ]
+              "required": ""
             }
           ]
         }
@@ -83,6 +796,7 @@
             {
               "id": "related_progress",
               "name": "Progress",
+              "hint": "",
               "url": "/reference/components/progress"
             }
           ]
@@ -97,14 +811,26 @@
           "data": [
             {
               "id": "next_attributes",
-              "titleKey": "next_attributes_title",
-              "descriptionKey": "next_attributes_body",
+              "titleKey": {
+                "en": "Attribute reference",
+                "ja": "属性リファレンス"
+              },
+              "descriptionKey": {
+                "en": "Every common attribute in one place — width / padding / binding / events grouped by category.",
+                "ja": "共通属性を 1 箇所にまとめたリファレンス。width / padding / binding / event などカテゴリ別に整理。"
+              },
               "url": "/reference/attributes"
             },
             {
               "id": "next_custom_components",
-              "titleKey": "next_custom_components_title",
-              "descriptionKey": "next_custom_components_body",
+              "titleKey": {
+                "en": "Building a custom component",
+                "ja": "カスタムコンポーネントを作る"
+              },
+              "descriptionKey": {
+                "en": "Extend JsonUI with your own components (spec → converter → React/Swift/Kotlin).",
+                "ja": "spec → converter → React/Swift/Kotlin で JsonUI を独自拡張する手順。"
+              },
               "url": "/guides/custom-components"
             }
           ]

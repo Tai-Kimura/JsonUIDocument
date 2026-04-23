@@ -52,6 +52,22 @@ export function ChromeMount() {
     vmRef.current?.onRouteChange(pathname);
   }, [pathname]);
 
+  // Defer the first ColorManager read until after hydration so SSR and
+  // client first-render agree on `currentColorMode: "light"`. The VM then
+  // flips to the real current mode + subscribes for future changes.
+  useEffect(() => {
+    return vmRef.current?.mountColorMode();
+  }, []);
+
+  // Mirror the VM's current color mode onto <html data-color-mode>. The
+  // [data-color-mode="dark"] rule in globals.css swaps every --color-*
+  // token, which in turn flips every Tailwind class generated from the
+  // layout JSONs (bg-surface, text-ink, etc.) without regenerating any
+  // markup.
+  useEffect(() => {
+    document.documentElement.dataset.colorMode = data.currentColorMode;
+  }, [data.currentColorMode]);
+
   return <GeneratedChrome data={data} />;
 }
 

@@ -1,44 +1,180 @@
 @import "tailwindcss";
 
 /* =========================================================================
-   Design tokens — the site-wide vocabulary.
+   Design tokens — the site-wide palette.
    ───────────────────────────────────────────────────────────────────────
-   These tokens are authored for the spec-driven chrome (coming in
-   design-overhaul-pc-first Phases 02–06) and any presentational polish
-   on the Search modal, 404, etc. Generated page bodies still hard-code
-   colors inside class names (spec-driven — out of our hands), so these
-   only matter for hand-written TSX that consumes them.
+   @theme block registers each token with Tailwind 4 so Tailwind classes
+   like `bg-surface`, `text-ink_muted`, `border-accent` resolve to
+   `var(--color-<name>)`. Naming matches colors.json (snake_case keys) so
+   the generated Layout JSON → TSX pipeline speaks the same vocabulary.
+
+   The [data-color-mode="dark"] override flips the same token names to
+   the dark palette — ChromeMount sets that attribute on <html> from
+   ColorManager.currentMode, so a single root-level attribute swap
+   re-themes every Tailwind class + every hand-written rule below.
    ========================================================================= */
-:root {
-  /* Ink + surfaces */
-  --color-ink:            #0B1220; /* page text, dark hero */
-  --color-ink-muted:      #475467; /* subcopy */
-  --color-ink-subtle:     #64748B; /* captions, keyboard labels */
-  --color-ink-faint:      #94A3B8; /* hint text */
-  --color-surface:        #FFFFFF; /* page body / card */
-  --color-surface-muted:  #F9FAFB; /* alternating section */
-  --color-surface-sunken: #F3F4F6; /* sidebar fill / hover */
-  --color-border:         #E5E7EB; /* page dividers */
-  --color-border-strong:  #D1D5DB; /* emphasized dividers */
+@theme {
+  /* Ink */
+  --color-ink:                     #0B1220;
+  --color-ink_muted:               #475467;
+  --color-ink_subtle:              #64748B;
+  --color-ink_faint:               #94A3B8;
 
-  /* Dark chrome palette (top bar will reuse once spec chrome lands) */
-  --color-chrome-fill:       #0B1220;
-  --color-chrome-fill-hover: #111827;
-  --color-chrome-border:     #1F2937;
-  --color-chrome-ink:        #F9FAFB;
-  --color-chrome-ink-muted:  #CBD5F5;
-  --color-chrome-ink-subtle: #94A3B8;
+  /* Surfaces */
+  --color-surface:                 #FFFFFF;
+  --color-surface_muted:           #F9FAFB;
+  --color-surface_sunken:          #F3F4F6;
 
-  /* Accent */
-  --color-accent:       #2563EB;
-  --color-accent-hover: #1D4ED8;
-  --color-accent-ink:   #FFFFFF;
-  --color-accent-tint:  #EEF2FF;
+  /* Borders */
+  --color-border:                  #E5E7EB;
+  --color-border_strong:           #D1D5DB;
+
+  /* Accent (brand blue) */
+  --color-accent:                  #2563EB;
+  --color-accent_hover:            #1D4ED8;
+  --color-accent_ink:              #FFFFFF;
+  --color-accent_link:             #2563EB;
+  --color-accent_marker:           #2563EB;
+  --color-accent_tint:             #EEF2FF;
+  --color-accent_tap:              #EFF6FF;
+
+  /* Accent secondary (indigo) */
+  --color-accent_secondary:        #6366F1;
+  --color-accent_secondary_strong: #4F46E5;
+  --color-accent_secondary_tint:   #E0E7FF;
+
+  /* Cinnabar (朱) — danger / emphasis */
+  --color-danger:                  #DC2626;
+  --color-danger_ink:              #FFFFFF;
+  --color-emphasis:                #E11D48;
 
   /* Focus ring */
-  --color-focus: #60A5FA;
+  --color-focus:                   #60A5FA;
 
-  /* Layout sizes — the new spec-driven chrome will consume these. */
+  /* Chrome (topbar + sidebar) */
+  --color-chrome_fill:             #0B1220;
+  --color-chrome_fill_hover:       #111827;
+  --color-chrome_border:           #1F2937;
+  --color-chrome_ink:              #F9FAFB;
+  --color-chrome_ink_muted:        #CBD5F5;
+  --color-chrome_ink_subtle:       #94A3B8;
+
+  /* CodeBlock */
+  --color-code_bg:                 #F8FAFC;
+  --color-code_border:             #E5E7EB;
+  --color-code_surface:            #0F172A;
+  --color-code_surface_raised:     #1E293B;
+
+  /* Traffic lights (macOS-window dots in CodeExample — mode-invariant) */
+  --color-traffic_red:             #EF4444;
+  --color-traffic_yellow:          #F59E0B;
+  --color-traffic_green:           #10B981;
+
+  /* Status chips — badge bg + fg pairs for required / deprecated labels */
+  --color-danger_chip_bg:          #FEE2E2;
+  --color-danger_chip_fg:          #B91C1C;
+  --color-warning_chip_bg:         #FEF3C7;
+  --color-warning_chip_fg:         #92400E;
+
+  /* Type-chip families — reference attribute row "string | number | binding"
+     chip backgrounds. Number / binding / boolean / neutral reuse existing
+     tokens (warning, accent_tint/secondary_strong, surface_sunken/ink). */
+  --color-chip_string_bg:          #DCFCE7;
+  --color-chip_string_fg:          #15803D;
+  --color-chip_string_key_bg:      #FAE8FF;
+  --color-chip_string_key_fg:      #86198F;
+  --color-chip_event_bg:           #FFE4E6;
+  --color-chip_event_fg:           #9F1239;
+
+  /* Legacy + constants */
+  --color-eyebrow:                 #93C5FD;
+  --color-transparent:             #00000000;
+  --color-pure_white:              #FFFFFF;
+  --color-pure_black:              #000000;
+}
+
+/* Dark-mode override. ChromeMount sets html[data-color-mode="dark"] from
+   ColorManager post-hydration; every Tailwind class that resolved to a
+   light token now picks up the dark value through CSS variable cascade. */
+[data-color-mode="dark"] {
+  --color-ink:                     #F6F5F1;
+  --color-ink_muted:               #D1CFC7;
+  --color-ink_subtle:              #9E9B92;
+  --color-ink_faint:               #6A6760;
+
+  --color-surface:                 #16161A;
+  --color-surface_muted:           #0E0E10;
+  --color-surface_sunken:          #1F1F24;
+
+  --color-border:                  #27272D;
+  --color-border_strong:           #3A3A42;
+
+  --color-accent:                  #D4A574;
+  --color-accent_hover:            #C79060;
+  --color-accent_ink:              #1A1612;
+  --color-accent_link:             #D4A574;
+  --color-accent_marker:           #D4A574;
+  --color-accent_tint:             #2B2418;
+  --color-accent_tap:              #3D2F1A;
+
+  --color-accent_secondary:        #C89266;
+  --color-accent_secondary_strong: #E0A870;
+  --color-accent_secondary_tint:   #2E2418;
+
+  --color-danger:                  #F43F5E;
+  --color-danger_ink:              #FFFFFF;
+  --color-emphasis:                #FB7185;
+
+  --color-focus:                   #67E8F9;
+
+  --color-chrome_fill:             #16161A;
+  --color-chrome_fill_hover:       #1F1F24;
+  --color-chrome_border:           #2F2F36;
+  --color-chrome_ink:              #F6F5F1;
+  --color-chrome_ink_muted:        #D1CFC7;
+  --color-chrome_ink_subtle:       #9E9B92;
+
+  --color-code_bg:                 #0B0B0D;
+  --color-code_border:             #27272D;
+  --color-code_surface:            #080A10;
+  --color-code_surface_raised:     #16161A;
+
+  --color-danger_chip_bg:          #5F1C1C;
+  --color-danger_chip_fg:          #FCA5A5;
+  --color-warning_chip_bg:         #5E4A1C;
+  --color-warning_chip_fg:         #FCD34D;
+
+  --color-chip_string_bg:          #052E16;
+  --color-chip_string_fg:          #86EFAC;
+  --color-chip_string_key_bg:      #4A044E;
+  --color-chip_string_key_fg:      #E879F9;
+  --color-chip_event_bg:           #4C0519;
+  --color-chip_event_fg:           #FDA4AF;
+
+  --color-eyebrow:                 #E0A870;
+}
+
+:root {
+  /* Legacy kebab-case aliases kept so existing hand-authored rules below
+     (e.g. .chrome-topbar { background: var(--color-chrome-fill) }) keep
+     working without a global find/replace. Each aliases the underscore
+     @theme token so dark-mode override still reaches them. */
+  --color-ink-muted:         var(--color-ink_muted);
+  --color-ink-subtle:        var(--color-ink_subtle);
+  --color-ink-faint:         var(--color-ink_faint);
+  --color-surface-muted:     var(--color-surface_muted);
+  --color-surface-sunken:    var(--color-surface_sunken);
+  --color-border-strong:     var(--color-border_strong);
+  --color-accent-tint:       var(--color-accent_tint);
+  --color-accent-link:       var(--color-accent_link);
+  --color-chrome-fill:       var(--color-chrome_fill);
+  --color-chrome-fill-hover: var(--color-chrome_fill_hover);
+  --color-chrome-border:     var(--color-chrome_border);
+  --color-chrome-ink:        var(--color-chrome_ink);
+  --color-chrome-ink-muted:  var(--color-chrome_ink_muted);
+  --color-chrome-ink-subtle: var(--color-chrome_ink_subtle);
+
+  /* Layout sizes */
   --chrome-topbar-height:    56px;
   --chrome-sidebar-width:    272px;
   --chrome-content-max:      1200px;
@@ -48,8 +184,8 @@
   --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 
-  /* Legacy fg/bg kept so generated pages that reference them still resolve. */
-  --background: var(--color-surface-muted);
+  /* Legacy fg/bg */
+  --background: var(--color-surface_muted);
   --foreground: var(--color-ink);
 }
 
@@ -95,7 +231,7 @@ body {
   align-items: center;
   gap: 16px;
   padding: 0 24px;
-  background: rgba(11, 18, 32, 0.92);
+  background: var(--color-chrome-fill);
   backdrop-filter: saturate(180%) blur(10px);
   -webkit-backdrop-filter: saturate(180%) blur(10px);
   border-bottom: 1px solid var(--color-chrome-border);
@@ -167,6 +303,22 @@ body {
 }
 
 .chrome-lang-btn:hover { background: rgba(255, 255, 255, 0.09); }
+
+.chrome-theme-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--color-chrome-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-chrome-ink);
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.chrome-theme-btn:hover { background: rgba(255, 255, 255, 0.09); }
 
 /* -- Sidebar chrome ------------------------------------------------------- */
 .chrome-sidebar {
@@ -281,7 +433,7 @@ body {
 
 .chrome-sidebar__link[aria-current="page"] {
   background: var(--color-accent-tint);
-  color: var(--color-accent);
+  color: var(--color-accent-link);
   font-weight: 600;
 }
 
@@ -295,10 +447,58 @@ body {
   }
 }
 
+/* Right-rail ToC sticky support — rjui layout JSON emits h-fit on the rail
+   column + toc wrap, collapsing the sticky element's containing block so
+   `position: sticky` has no range to slide. Override on lg+ so the rail
+   stretches to the flex-row height (cross-axis stretch on content_with_rail),
+   then toc_wrap grows to fill rail_column's main axis. !important needed
+   because Tailwind's `.h-fit` utility has equal specificity. */
+@media (min-width: 1024px) {
+  /* rail_column is a flex-row child — stretch to row height. */
+  [id$="_rail_column"] {
+    align-self: stretch !important;
+    height: auto !important;
+  }
+  /* toc_wrap is a flex-col child of rail_column — grow to fill main axis. */
+  [id$="_toc_wrap"] {
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0;
+  }
+  /* Force the inner <nav> sticky — class-based `lg:sticky` may be racing
+     with a `position: relative/static` from some utility conflict. Belt-
+     and-braces: also apply sticky here on the direct child <nav> of
+     toc_wrap. */
+  [id$="_toc_wrap"] > nav {
+    position: sticky !important;
+    top: 80px !important;
+  }
+
+  /* rjui emits `overflow-y-auto` on the page-scroll div but in practice
+     the element auto-sizes to content (flex-1 inside an auto-height root),
+     so the WINDOW scrolls — not this div. `overflow-y: auto` still
+     establishes a scroll container, which sticky uses as its anchor;
+     sticky then never activates because its "scroll" ancestor never
+     actually scrolls. Force visible so sticky walks up to the window. */
+  [id$="_scroll"] {
+    overflow-y: visible !important;
+  }
+}
+
 /* Focus styles — tighter than browser default, tuned for dark TopBar. */
 .chrome-topbar :focus-visible,
 .chrome-sidebar :focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
   border-radius: 6px;
+}
+
+/* Reserve space for the 56px top bar when anchor-scrolling into the reference
+   detail pages. Keeps #attr-text / #example-1 / #section-common jumps from
+   landing behind the fixed chrome. */
+[id^="attr-"],
+[id^="example-"],
+[id^="section-"],
+[id^="subgroup-"] {
+  scroll-margin-top: 72px;
 }

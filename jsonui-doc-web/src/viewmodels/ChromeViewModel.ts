@@ -16,6 +16,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { ChromeData } from "@/generated/data/ChromeData";
 import { ChromeViewModelBase } from "@/generated/viewmodels/ChromeViewModelBase";
 import { StringManager } from "@/generated/StringManager";
+import { ColorManager, ColorMode } from "@/generated/ColorManager";
 
 interface SidebarEntry {
   id: string;
@@ -109,6 +110,8 @@ const NAV_CATALOG: ReadonlyArray<{
 ];
 
 export class ChromeViewModel extends ChromeViewModelBase {
+  private _colorModeUnsubscribe: (() => void) | null = null;
+
   constructor(
     router: AppRouterInstance,
     getData: () => ChromeData,
@@ -117,6 +120,11 @@ export class ChromeViewModel extends ChromeViewModelBase {
     super(router, getData, setData);
     this.initializeEventHandlers();
     this.onAppear();
+    // Note: do NOT touch ColorManager here — it's a client-only singleton
+    // whose currentMode depends on prefers-color-scheme, which resolves to a
+    // different value on the client than on the server. Reading it during
+    // VM construction would produce a hydration mismatch. ChromeMount calls
+    // mountColorMode() from a useEffect instead.
   }
 
   protected initializeEventHandlers = () => {
@@ -124,8 +132,23 @@ export class ChromeViewModel extends ChromeViewModelBase {
       onToggleSection: this.onToggleSection as unknown as () => void,
       onToggleMobileMenu: this.onToggleMobileMenu,
       onToggleLanguage: this.onToggleLanguage,
+      onToggleColorMode: this.onToggleColorMode,
       onLinkTap: this.onLinkTap as unknown as () => void,
     });
+  };
+
+  // Attach the ColorManager subscription and do the first sync from a post-
+  // mount useEffect — deferring avoids the SSR/client hydration mismatch
+  // described in the constructor.
+  mountColorMode = (): (() => void) => {
+    this.updateData({ currentColorMode: ColorManager.currentMode });
+    this._colorModeUnsubscribe = ColorManager.subscribe(() => {
+      this.updateData({ currentColorMode: ColorManager.currentMode });
+    });
+    return () => {
+      this._colorModeUnsubscribe?.();
+      this._colorModeUnsubscribe = null;
+    };
   };
 
   onAppear = (): void => {
@@ -163,6 +186,16 @@ export class ChromeViewModel extends ChromeViewModelBase {
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("chrome:languagechange"));
     }
+  };
+
+  // Flip ColorManager between light and dark. Opting out of followSystemMode
+  // here is intentional: once the user expresses a preference, we stop
+  // tracking the OS until they next reload with no stored choice.
+  onToggleColorMode = (): void => {
+    ColorManager.followSystemMode = false;
+    const next: ColorMode =
+      ColorManager.currentMode === "dark" ? "light" : "dark";
+    ColorManager.setMode(next);
   };
 
   onLinkTap = (_url: string): void => {

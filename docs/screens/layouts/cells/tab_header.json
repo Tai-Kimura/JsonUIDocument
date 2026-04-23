@@ -3,18 +3,21 @@
   "width": "matchParent",
   "height": "wrapContent",
   "paddings": [12, 16, 12, 16],
-  "background": "#FFFFFF",
+  "background": "@{bgColor}",
   "fontSize": 15,
   "fontWeight": "semibold",
-  "fontColor": "#0B1220",
+  "fontColor": "@{fgColor}",
   "cornerRadius": 10,
-  "borderWidth": 1,
-  "borderColor": "#E5E7EB",
-  "tapBackground": "#EFF6FF",
+  "borderWidth": 2,
+  "borderColor": "@{borderColor}",
+  "tapBackground": "accent_tap",
   "child": [
     {
       "data": [
         { "name": "labelKey", "class": "String" },
+        { "name": "bgColor", "class": "String", "defaultValue": "var(--color-surface)" },
+        { "name": "fgColor", "class": "String", "defaultValue": "var(--color-ink)" },
+        { "name": "borderColor", "class": "String", "defaultValue": "var(--color-border)" },
         { "name": "onSelect", "class": "() -> Void" }
       ]
     }

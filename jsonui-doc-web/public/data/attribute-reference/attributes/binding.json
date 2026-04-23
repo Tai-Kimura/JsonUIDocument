@@ -1,7 +1,165 @@
 {
   "category": "binding",
   "title": "Binding attributes",
-  "description": "Binding attributes link JSON values to ViewModel state via the `@{...}` syntax. Three kinds: value binding, string resolution, and event binding.",
+  "description": {
+    "en": "Binding attributes link JSON values to ViewModel state via the `@{...}` syntax. Three kinds: value binding, string resolution, and event binding.",
+    "ja": "Binding 属性は `@{...}` 構文で JSON 値と ViewModel の状態を繋ぐ。値 binding、文字列解決、イベント binding の 3 種類がある。"
+  },
+  "kicker": "Attribute category · Reference",
+  "kickerParentLabel": "Attributes",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "gone",
+  "aliasCalloutVisibility": "gone",
+  "aliasOf": null,
+  "aliasLinkUrl": "",
+  "aliasNotice": null,
+  "overviewRows": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "overview_bind",
+              "name": "bind",
+              "type": "string | object",
+              "summary": {
+                "en": "Alias for `binding`.",
+                "ja": "`binding` のエイリアス。"
+              },
+              "anchorUrl": "#attr-bind"
+            },
+            {
+              "id": "overview_binding",
+              "name": "binding",
+              "type": "string | object",
+              "summary": {
+                "en": "Explicit binding declaration for attributes that do not use the `@{...}` inline syntax. Rarely us…",
+                "ja": "`@{...}` 構文を使わない属性に対する明示的 binding 宣言。直接使われることは稀 — 通常は属性値内の `@{...}` で binding する。"
+              },
+              "anchorUrl": "#attr-binding"
+            },
+            {
+              "id": "overview_bindingScript",
+              "name": "bindingScript",
+              "type": "string",
+              "summary": {
+                "en": "Inline JavaScript expression evaluated against the ViewModel. Use for complex derived values wher…",
+                "ja": "ViewModel に対して評価されるインライン JavaScript 式。`@{...}` では表現しきれない複雑な導出値に使う。spec の `stateManagement.compute…"
+              },
+              "anchorUrl": "#attr-bindingScript"
+            },
+            {
+              "id": "overview_binding_group",
+              "name": "binding_group",
+              "type": "string | array",
+              "summary": {
+                "en": "Groups multiple bindings so they re-evaluate together. Use when several attributes on the same el…",
+                "ja": "複数の binding をまとめて再評価させる。同一要素の複数属性をアトミックに更新したいときに使う。"
+              },
+              "anchorUrl": "#attr-binding_group"
+            },
+            {
+              "id": "overview_binding_id",
+              "name": "binding_id",
+              "type": "string",
+              "summary": {
+                "en": "Stable identifier for a specific binding. Used by the Hot Loader to route targeted updates to the…",
+                "ja": "特定の binding の安定識別子。Hot Loader が更新を適切な要素に振り分けるのに使う。"
+              },
+              "anchorUrl": "#attr-binding_id"
+            },
+            {
+              "id": "overview_data",
+              "name": "data",
+              "type": "array",
+              "summary": {
+                "en": "Declares the ViewModel properties this Layout segment expects. Appears at the top of a Layout as …",
+                "ja": "この Layout セグメントが ViewModel に期待するプロパティを宣言。Layout 先頭に `{ \"data\": [...] }` として現れる。"
+              },
+              "anchorUrl": "#attr-data"
+            },
+            {
+              "id": "overview_propertyName",
+              "name": "propertyName",
+              "type": "string",
+              "summary": {
+                "en": "Specifies the ViewModel property name that this element's value binding writes to. Sometimes requ…",
+                "ja": "この要素の値 binding が書き戻す ViewModel プロパティ名を指定。属性-プロパティのマッピングが自動でないカスタムコンポーネントで必要になる。"
+              },
+              "anchorUrl": "#attr-propertyName"
+            },
+            {
+              "id": "overview_shared_data",
+              "name": "shared_data",
+              "type": "object",
+              "summary": {
+                "en": "Declares data shared with parent screens. Used in include'd partials to propagate state upward.",
+                "ja": "親画面と共有するデータを宣言。include された部分 Layout から状態を上位に伝搬させるのに使う。"
+              },
+              "anchorUrl": "#attr-shared_data"
+            },
+            {
+              "id": "overview_variables",
+              "name": "variables",
+              "type": "object",
+              "summary": {
+                "en": "Alternative to `data`: compact local variable declarations. Used in cell layouts that receive ite…",
+                "ja": "`data` の代替: コンパクトなローカル変数宣言。`@{item.*}` で item データを受ける cell レイアウトで使う。"
+              },
+              "anchorUrl": "#attr-variables"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subgroups": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "subgroupsVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_overview",
+      "label": {
+        "en": "Overview",
+        "ja": "概要"
+      },
+      "anchor": "section-overview",
+      "level": 1
+    },
+    {
+      "id": "toc_detail",
+      "label": {
+        "en": "Attributes",
+        "ja": "属性"
+      },
+      "anchor": "section-detail",
+      "level": 1
+    },
+    {
+      "id": "toc_next",
+      "label": {
+        "en": "Next reads",
+        "ja": "次に読む"
+      },
+      "anchor": "section-next",
+      "level": 1
+    }
+  ],
   "attributes": {
     "sections": [
       {
@@ -10,84 +168,596 @@
             {
               "id": "attr_bind",
               "name": "bind",
+              "anchorId": "attr-bind",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Alias for `binding`.",
+                "ja": "`binding` のエイリアス。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | object",
-              "required": "",
-              "description": "Data binding expression (alias)",
-              "summary": "Alias for `binding`."
+              "required": ""
             },
             {
               "id": "attr_binding",
               "name": "binding",
+              "anchorId": "attr-binding",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Explicit binding declaration for attributes that do not use the `@{...}` inline syntax. Rarely used directly — most binding happens via `@{...}` in attribute values.",
+                "ja": "`@{...}` 構文を使わない属性に対する明示的 binding 宣言。直接使われることは稀 — 通常は属性値内の `@{...}` で binding する。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | object",
-              "required": "",
-              "description": "Data binding expression",
-              "summary": "Explicit binding declaration for attributes that do not use the `@{...}` inline syntax. Rarely used directly — most binding happens via `@{...}` in attribute values."
+              "required": ""
             },
             {
-              "id": "attr_binding_script",
+              "id": "attr_bindingScript",
               "name": "bindingScript",
+              "anchorId": "attr-bindingScript",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Inline JavaScript expression evaluated against the ViewModel. Use for complex derived values where `@{...}` is not expressive enough. Prefer `computed` in the spec's `stateManagement`.",
+                "ja": "ViewModel に対して評価されるインライン JavaScript 式。`@{...}` では表現しきれない複雑な導出値に使う。spec の `stateManagement.computed` を優先。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Custom Swift binding code",
-              "summary": "Inline JavaScript expression evaluated against the ViewModel. Use for complex derived values where `@{...}` is not expressive enough. Prefer `computed` in the spec's `stateManagement`.",
-              "platform": "swift"
+              "required": ""
             },
             {
               "id": "attr_binding_group",
               "name": "binding_group",
+              "anchorId": "attr-binding_group",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Groups multiple bindings so they re-evaluate together. Use when several attributes on the same element should update atomically.",
+                "ja": "複数の binding をまとめて再評価させる。同一要素の複数属性をアトミックに更新したいときに使う。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | array",
-              "required": "",
-              "description": "Groups related bindings for batch updates (can be array for multiple groups)",
-              "summary": "Groups multiple bindings so they re-evaluate together. Use when several attributes on the same element should update atomically."
+              "required": ""
             },
             {
               "id": "attr_binding_id",
               "name": "binding_id",
+              "anchorId": "attr-binding_id",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Stable identifier for a specific binding. Used by the Hot Loader to route targeted updates to the right element.",
+                "ja": "特定の binding の安定識別子。Hot Loader が更新を適切な要素に振り分けるのに使う。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Binding ID",
-              "summary": "Stable identifier for a specific binding. Used by the Hot Loader to route targeted updates to the right element.",
-              "platform": "swift"
+              "required": ""
             },
             {
               "id": "attr_data",
               "name": "data",
+              "anchorId": "attr-data",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Declares the ViewModel properties this Layout segment expects. Appears at the top of a Layout as `{ \"data\": [...] }`.",
+                "ja": "この Layout セグメントが ViewModel に期待するプロパティを宣言。Layout 先頭に `{ \"data\": [...] }` として現れる。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "array",
-              "required": "",
-              "description": "Data model definitions for binding",
-              "summary": "Declares the ViewModel properties this Layout segment expects. Appears at the top of a Layout as `{ \"data\": [...] }`.",
-              "examples": [
-                {
-                  "language": "json",
-                  "code": "{ \"data\": [\n  { \"name\": \"userName\", \"class\": \"String\", \"defaultValue\": \"\" },\n  { \"name\": \"onTap\", \"class\": \"() -> Void\" }\n] }"
-                }
-              ]
+              "required": ""
             },
             {
-              "id": "attr_property_name",
+              "id": "attr_propertyName",
               "name": "propertyName",
+              "anchorId": "attr-propertyName",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Specifies the ViewModel property name that this element's value binding writes to. Sometimes required for custom components whose attribute-to-property mapping isn't automatic.",
+                "ja": "この要素の値 binding が書き戻す ViewModel プロパティ名を指定。属性-プロパティのマッピングが自動でないカスタムコンポーネントで必要になる。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Property name for binding",
-              "summary": "Specifies the ViewModel property name that this element's value binding writes to. Sometimes required for custom components whose attribute-to-property mapping isn't automatic.",
-              "platform": "swift"
+              "required": ""
             },
             {
               "id": "attr_shared_data",
               "name": "shared_data",
+              "anchorId": "attr-shared_data",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Declares data shared with parent screens. Used in include'd partials to propagate state upward.",
+                "ja": "親画面と共有するデータを宣言。include された部分 Layout から状態を上位に伝搬させるのに使う。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "object",
-              "required": "",
-              "description": "Data passed to included components",
-              "summary": "Declares data shared with parent screens. Used in include'd partials to propagate state upward."
+              "required": ""
             },
             {
               "id": "attr_variables",
               "name": "variables",
+              "anchorId": "attr-variables",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Alternative to `data`: compact local variable declarations. Used in cell layouts that receive item data via `@{item.*}`.",
+                "ja": "`data` の代替: コンパクトなローカル変数宣言。`@{item.*}` で item データを受ける cell レイアウトで使う。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "object",
-              "required": "",
-              "description": "Variables for include",
-              "summary": "Alternative to `data`: compact local variable declarations. Used in cell layouts that receive item data via `@{item.*}`.",
-              "platform": "swift"
+              "required": ""
             }
           ]
         }
@@ -102,14 +772,26 @@
           "data": [
             {
               "id": "next_components",
-              "titleKey": "next_components_title",
-              "descriptionKey": "next_components_body",
+              "titleKey": {
+                "en": "Component reference",
+                "ja": "コンポーネントリファレンス"
+              },
+              "descriptionKey": {
+                "en": "The full 28-component catalog with type signatures, examples, and platform support.",
+                "ja": "28 コンポーネントの全カタログ。型・例・プラットフォーム対応を収録。"
+              },
               "url": "/reference/components"
             },
             {
               "id": "next_attributes_root",
-              "titleKey": "next_attributes_root_title",
-              "descriptionKey": "next_attributes_root_body",
+              "titleKey": {
+                "en": "All attribute categories",
+                "ja": "属性カテゴリ一覧"
+              },
+              "descriptionKey": {
+                "en": "Back to the full list of attribute categories (Layout, Style, Binding, Event, ...).",
+                "ja": "属性カテゴリ全一覧に戻る（Layout / Style / Binding / Event など）。"
+              },
               "url": "/reference/attributes"
             }
           ]

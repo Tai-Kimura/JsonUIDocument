@@ -1,7 +1,175 @@
 {
   "category": "state",
   "title": "State attributes",
-  "description": "State attributes control visibility, interaction, and opacity. Most are Boolean; `visibility` is tri-state.",
+  "description": {
+    "en": "State attributes control visibility, interaction, and opacity. Most are Boolean; `visibility` is tri-state.",
+    "ja": "状態属性は可視性、インタラクション、不透明度を制御する。ほとんどが Boolean、`visibility` のみ三値。"
+  },
+  "kicker": "Attribute category · Reference",
+  "kickerParentLabel": "Attributes",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "gone",
+  "aliasCalloutVisibility": "gone",
+  "aliasOf": null,
+  "aliasLinkUrl": "",
+  "aliasNotice": null,
+  "overviewRows": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "overview_alpha",
+              "name": "alpha",
+              "type": "number | binding",
+              "summary": {
+                "en": "0.0–1.0. Translucency. `alpha: 0` is visually hidden but still receives touches — use `visibility…",
+                "ja": "0.0〜1.0。不透明度。`alpha: 0` は見えなくても touch は受け付ける。完全無効化には `visibility` を使う。"
+              },
+              "anchorUrl": "#attr-alpha"
+            },
+            {
+              "id": "overview_canTap",
+              "name": "canTap",
+              "type": "boolean | binding",
+              "summary": {
+                "en": "Boolean. When `false`, `onClick` handlers are not invoked. Use to disable interaction without vis…",
+                "ja": "Boolean。`false` で `onClick` ハンドラが呼ばれない。見た目を変えず操作のみ無効化したいときに使う。"
+              },
+              "anchorUrl": "#attr-canTap"
+            },
+            {
+              "id": "overview_confirmationDialog",
+              "name": "confirmationDialog",
+              "type": "object",
+              "summary": {
+                "en": "If set to an object with `title` / `message` / `confirmText`, shows a native confirm dialog befor…",
+                "ja": "`title` / `message` / `confirmText` を含むオブジェクトを指定すると、`onClick` 実行前にネイティブ確認ダイアログを表示。"
+              },
+              "anchorUrl": "#attr-confirmationDialog"
+            },
+            {
+              "id": "overview_enabled",
+              "name": "enabled",
+              "type": "boolean | binding",
+              "summary": {
+                "en": "Boolean. When `false`, the component ignores user interaction and applies its disabled styling (d…",
+                "ja": "Boolean。`false` でユーザー操作を無視し、disabled スタイル（減光／彩度低下）が適用される。"
+              },
+              "anchorUrl": "#attr-enabled"
+            },
+            {
+              "id": "overview_hidden",
+              "name": "hidden",
+              "type": "boolean | binding",
+              "summary": {
+                "en": "Shorthand for `visibility: 'gone'`. Boolean-valued. Deprecated for new code — prefer explicit `vi…",
+                "ja": "`visibility: 'gone'` のショートハンド。Boolean 値。新規コードでは非推奨、明示的な `visibility` を使う。"
+              },
+              "anchorUrl": "#attr-hidden"
+            },
+            {
+              "id": "overview_opacity",
+              "name": "opacity",
+              "type": "number | binding",
+              "summary": {
+                "en": "Alias for `alpha` (CSS-style naming).",
+                "ja": "`alpha` のエイリアス（CSS 風命名）。"
+              },
+              "anchorUrl": "#attr-opacity"
+            },
+            {
+              "id": "overview_touchDisabledState",
+              "name": "touchDisabledState",
+              "type": "string",
+              "summary": {
+                "en": "Disables touch when the component is in a specified state (e.g., while an animation runs).",
+                "ja": "指定状態（例: アニメーション中）のときタッチを無効化。"
+              },
+              "anchorUrl": "#attr-touchDisabledState"
+            },
+            {
+              "id": "overview_touchEnabledViewIds",
+              "name": "touchEnabledViewIds",
+              "type": "array",
+              "summary": {
+                "en": "Array of sibling IDs that remain tappable even when this view blocks touches (e.g., for a dimming…",
+                "ja": "この View がタッチを遮っている状況でも、タップを通す兄弟 View の ID 配列（例: 特定ボタンをブロックしない減光オーバーレイ）。"
+              },
+              "anchorUrl": "#attr-touchEnabledViewIds"
+            },
+            {
+              "id": "overview_userInteractionEnabled",
+              "name": "userInteractionEnabled",
+              "type": "boolean | binding",
+              "summary": {
+                "en": "iOS-style alias for `canTap`.",
+                "ja": "`canTap` の iOS 風エイリアス。"
+              },
+              "anchorUrl": "#attr-userInteractionEnabled"
+            },
+            {
+              "id": "overview_visibility",
+              "name": "visibility",
+              "type": "string | binding",
+              "summary": {
+                "en": "`visible` / `invisible` / `gone`. `invisible` preserves space; `gone` removes from layout entirely.",
+                "ja": "`visible` / `invisible` / `gone`。`invisible` はスペースを確保して非表示、`gone` はレイアウトから完全除外。"
+              },
+              "anchorUrl": "#attr-visibility"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subgroups": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "subgroupsVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_overview",
+      "label": {
+        "en": "Overview",
+        "ja": "概要"
+      },
+      "anchor": "section-overview",
+      "level": 1
+    },
+    {
+      "id": "toc_detail",
+      "label": {
+        "en": "Attributes",
+        "ja": "属性"
+      },
+      "anchor": "section-detail",
+      "level": 1
+    },
+    {
+      "id": "toc_next",
+      "label": {
+        "en": "Next reads",
+        "ja": "次に読む"
+      },
+      "anchor": "section-next",
+      "level": 1
+    }
+  ],
   "attributes": {
     "sections": [
       {
@@ -10,113 +178,703 @@
             {
               "id": "attr_alpha",
               "name": "alpha",
+              "anchorId": "attr-alpha",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "0.0–1.0. Translucency. `alpha: 0` is visually hidden but still receives touches — use `visibility` to disable entirely.",
+                "ja": "0.0〜1.0。不透明度。`alpha: 0` は見えなくても touch は受け付ける。完全無効化には `visibility` を使う。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Opacity (0-1) - can be data binding",
-              "summary": "0.0–1.0. Translucency. `alpha: 0` is visually hidden but still receives touches — use `visibility` to disable entirely.",
-              "relatedAttributes": [
-                "opacity"
-              ]
+              "required": ""
             },
             {
-              "id": "attr_can_tap",
+              "id": "attr_canTap",
               "name": "canTap",
+              "anchorId": "attr-canTap",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Boolean. When `false`, `onClick` handlers are not invoked. Use to disable interaction without visual change.",
+                "ja": "Boolean。`false` で `onClick` ハンドラが呼ばれない。見た目を変えず操作のみ無効化したいときに使う。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean | binding",
-              "required": "",
-              "description": "Whether component is tappable (binding supported)",
-              "summary": "Boolean. When `false`, `onClick` handlers are not invoked. Use to disable interaction without visual change."
+              "required": ""
             },
             {
-              "id": "attr_confirmation_dialog",
+              "id": "attr_confirmationDialog",
               "name": "confirmationDialog",
+              "anchorId": "attr-confirmationDialog",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "If set to an object with `title` / `message` / `confirmText`, shows a native confirm dialog before the `onClick` handler fires.",
+                "ja": "`title` / `message` / `confirmText` を含むオブジェクトを指定すると、`onClick` 実行前にネイティブ確認ダイアログを表示。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "object",
-              "required": "",
-              "description": "Confirmation dialog configuration (iOS 15+)",
-              "summary": "If set to an object with `title` / `message` / `confirmText`, shows a native confirm dialog before the `onClick` handler fires.",
-              "platform": "swift"
+              "required": ""
             },
             {
               "id": "attr_enabled",
               "name": "enabled",
+              "anchorId": "attr-enabled",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Boolean. When `false`, the component ignores user interaction and applies its disabled styling (dimmed / desaturated).",
+                "ja": "Boolean。`false` でユーザー操作を無視し、disabled スタイル（減光／彩度低下）が適用される。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean | binding",
-              "required": "",
-              "description": "Whether component is enabled (can be data binding)",
-              "summary": "Boolean. When `false`, the component ignores user interaction and applies its disabled styling (dimmed / desaturated)."
+              "required": ""
             },
             {
               "id": "attr_hidden",
               "name": "hidden",
+              "anchorId": "attr-hidden",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Shorthand for `visibility: 'gone'`. Boolean-valued. Deprecated for new code — prefer explicit `visibility`.",
+                "ja": "`visibility: 'gone'` のショートハンド。Boolean 値。新規コードでは非推奨、明示的な `visibility` を使う。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean | binding",
-              "required": "",
-              "description": "Whether component is hidden (can be data binding)",
-              "summary": "Shorthand for `visibility: 'gone'`. Boolean-valued. Deprecated for new code — prefer explicit `visibility`."
+              "required": ""
             },
             {
               "id": "attr_opacity",
               "name": "opacity",
+              "anchorId": "attr-opacity",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Alias for `alpha` (CSS-style naming).",
+                "ja": "`alpha` のエイリアス（CSS 風命名）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Opacity (0-1), alias for alpha - can be data binding",
-              "summary": "Alias for `alpha` (CSS-style naming)."
+              "required": ""
             },
             {
-              "id": "attr_touch_disabled_state",
+              "id": "attr_touchDisabledState",
               "name": "touchDisabledState",
+              "anchorId": "attr-touchDisabledState",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Disables touch when the component is in a specified state (e.g., while an animation runs).",
+                "ja": "指定状態（例: アニメーション中）のときタッチを無効化。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Touch disable mode",
-              "summary": "Disables touch when the component is in a specified state (e.g., while an animation runs).",
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_touch_enabled_view_ids",
+              "id": "attr_touchEnabledViewIds",
               "name": "touchEnabledViewIds",
+              "anchorId": "attr-touchEnabledViewIds",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Array of sibling IDs that remain tappable even when this view blocks touches (e.g., for a dimming overlay that should not block specific buttons).",
+                "ja": "この View がタッチを遮っている状況でも、タップを通す兄弟 View の ID 配列（例: 特定ボタンをブロックしない減光オーバーレイ）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "array",
-              "required": "",
-              "description": "IDs of enabled views",
-              "summary": "Array of sibling IDs that remain tappable even when this view blocks touches (e.g., for a dimming overlay that should not block specific buttons).",
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_user_interaction_enabled",
+              "id": "attr_userInteractionEnabled",
               "name": "userInteractionEnabled",
+              "anchorId": "attr-userInteractionEnabled",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "iOS-style alias for `canTap`.",
+                "ja": "`canTap` の iOS 風エイリアス。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean | binding",
-              "required": "",
-              "description": "Enable user interaction (binding supported)",
-              "summary": "iOS-style alias for `canTap`."
+              "required": ""
             },
             {
               "id": "attr_visibility",
               "name": "visibility",
+              "anchorId": "attr-visibility",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "visible",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "invisible",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "gone",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "`visible` / `invisible` / `gone`. `invisible` preserves space; `gone` removes from layout entirely.",
+                "ja": "`visible` / `invisible` / `gone`。`invisible` はスペースを確保して非表示、`gone` はレイアウトから完全除外。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "View visibility state (can be data binding)",
-              "summary": "`visible` / `invisible` / `gone`. `invisible` preserves space; `gone` removes from layout entirely.",
-              "values": [
-                {
-                  "value": "visible",
-                  "description": "Default. Rendered normally."
-                },
-                {
-                  "value": "invisible",
-                  "description": "Not rendered but occupies space (acts as an invisible placeholder)."
-                },
-                {
-                  "value": "gone",
-                  "description": "Not rendered and does not occupy space. Siblings shift to fill."
-                }
-              ],
-              "examples": [
-                {
-                  "language": "json",
-                  "code": "{ \"type\": \"View\", \"visibility\": \"@{hasError ? 'visible' : 'gone'}\" }"
-                }
-              ],
-              "enumValues": [
-                "visible",
-                "invisible",
-                "gone"
-              ]
+              "required": ""
             }
           ]
         }
@@ -131,14 +889,26 @@
           "data": [
             {
               "id": "next_components",
-              "titleKey": "next_components_title",
-              "descriptionKey": "next_components_body",
+              "titleKey": {
+                "en": "Component reference",
+                "ja": "コンポーネントリファレンス"
+              },
+              "descriptionKey": {
+                "en": "The full 28-component catalog with type signatures, examples, and platform support.",
+                "ja": "28 コンポーネントの全カタログ。型・例・プラットフォーム対応を収録。"
+              },
               "url": "/reference/components"
             },
             {
               "id": "next_attributes_root",
-              "titleKey": "next_attributes_root_title",
-              "descriptionKey": "next_attributes_root_body",
+              "titleKey": {
+                "en": "All attribute categories",
+                "ja": "属性カテゴリ一覧"
+              },
+              "descriptionKey": {
+                "en": "Back to the full list of attribute categories (Layout, Style, Binding, Event, ...).",
+                "ja": "属性カテゴリ全一覧に戻る（Layout / Style / Binding / Event など）。"
+              },
               "url": "/reference/attributes"
             }
           ]

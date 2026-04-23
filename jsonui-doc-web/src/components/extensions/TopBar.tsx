@@ -19,7 +19,9 @@ export interface TopBarProps {
   brandLabel?: string;
   brandHref?: string;
   currentLanguage: string;
+  currentColorMode?: string;
   onToggleLanguage?: () => void;
+  onToggleColorMode?: () => void;
   onToggleMobileMenu?: () => void;
   className?: string;
   id?: string;
@@ -29,7 +31,9 @@ export const TopBar: React.FC<TopBarProps> = ({
   brandLabel,
   brandHref = "/",
   currentLanguage,
+  currentColorMode = "light",
   onToggleLanguage,
+  onToggleColorMode,
   onToggleMobileMenu,
   className,
   id,
@@ -48,6 +52,19 @@ export const TopBar: React.FC<TopBarProps> = ({
     currentLanguage === "ja"
       ? StringManager.getString("chrome_lang_toggle_label_ja") || "English"
       : StringManager.getString("chrome_lang_toggle_label_en") || "日本語";
+
+  // Theme toggle: show the icon of the mode the user will switch INTO.
+  // When currentColorMode is 'dark', render sun (clicking goes to light).
+  const themeIconHref =
+    currentColorMode === "dark"
+      ? "/images/icon_theme_light.svg"
+      : "/images/icon_theme_dark.svg";
+  const themeAriaLabel =
+    currentColorMode === "dark"
+      ? StringManager.getString("chrome_theme_toggle_to_light_aria_label") ||
+        "Switch to light mode"
+      : StringManager.getString("chrome_theme_toggle_to_dark_aria_label") ||
+        "Switch to dark mode";
 
   return (
     <header
@@ -113,6 +130,31 @@ export const TopBar: React.FC<TopBarProps> = ({
             aria-hidden="true"
           />
           {toggleLabel}
+        </button>
+        <button
+          type="button"
+          className="chrome-theme-btn"
+          onClick={() => onToggleColorMode?.()}
+          aria-label={themeAriaLabel}
+          data-color-mode={currentColorMode}
+        >
+          <span
+            style={{
+              display: "inline-block",
+              width: 16,
+              height: 16,
+              maskImage: `url(${themeIconHref})`,
+              WebkitMaskImage: `url(${themeIconHref})`,
+              maskRepeat: "no-repeat",
+              WebkitMaskRepeat: "no-repeat",
+              maskSize: "contain",
+              WebkitMaskSize: "contain",
+              maskPosition: "center",
+              WebkitMaskPosition: "center",
+              backgroundColor: "currentColor",
+            }}
+            aria-hidden="true"
+          />
         </button>
       </div>
     </header>

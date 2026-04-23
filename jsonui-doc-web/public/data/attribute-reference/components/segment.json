@@ -3,9 +3,850 @@
   "kebab": "segment",
   "aliasOf": null,
   "title": "Segment",
-  "description": "Segmented control — mutually exclusive horizontal button group. Shows 2–5 options at a time.",
-  "usage": "Use when options are short (1–2 words) and all visible at once benefits the user (filters, toggles). Beyond 5 options use SelectBox. For one-shot action button bars (not selection), set `momentary: true`.",
+  "description": {
+    "en": "Segmented control — mutually exclusive horizontal button group. Shows 2–5 options at a time.",
+    "ja": "排他的な水平ボタングループ。同時に 2〜5 件の選択肢を表示する。"
+  },
+  "usage": {
+    "en": "Use when options are short (1–2 words) and all visible at once benefits the user (filters, toggles). Beyond 5 options use SelectBox. For one-shot action button bars (not selection), set `momentary: true`.",
+    "ja": "選択肢が短く（1〜2 語）、同時に全て見える方が有益な場合（フィルタ、トグル）に使う。6 件以上なら SelectBox。選択ではなくアクションバーとして使う場合は `momentary: true`。"
+  },
   "aliasNotice": null,
+  "kicker": "Component · Reference",
+  "kickerParentLabel": "Components",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "platform_ios",
+              "label": "iOS",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_android",
+              "label": "Android",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_web",
+              "label": "Web",
+              "fontColor": "var(--color-ink)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "visible",
+  "aliasCalloutVisibility": "gone",
+  "aliasLinkUrl": "",
+  "canonicalCode": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{filterIndex}\",\n  \"items\": [\n    { \"label\": \"@string/all\", \"value\": \"all\" },\n    { \"label\": \"@string/active\", \"value\": \"active\" },\n    { \"label\": \"@string/done\", \"value\": \"done\" }\n  ],\n  \"onValueChange\": \"@{onFilterChanged}\"\n}",
+  "canonicalLanguage": "json",
+  "statRequired": "1",
+  "statOptional": "8",
+  "statEvents": "1",
+  "statRequiredText": {
+    "en": "1 required",
+    "ja": "必須 1"
+  },
+  "statOptionalText": {
+    "en": "8 optional",
+    "ja": "任意 8"
+  },
+  "statEventsText": {
+    "en": "1 events",
+    "ja": "イベント 1"
+  },
+  "usageVisibility": "visible",
+  "attributeCategories": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "cat_common",
+              "label": {
+                "en": "Common",
+                "ja": "共通"
+              },
+              "anchorUrl": "#section-common"
+            },
+            {
+              "id": "cat_style",
+              "label": {
+                "en": "Style",
+                "ja": "スタイル"
+              },
+              "anchorUrl": "#section-style"
+            },
+            {
+              "id": "cat_event",
+              "label": {
+                "en": "Event",
+                "ja": "イベント"
+              },
+              "anchorUrl": "#section-event"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributesCommon": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_items",
+              "name": "items",
+              "anchorId": "attr-items",
+              "requiredChipText": "required",
+              "requiredChipVisibility": "visible",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-danger)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "List of items for normal picker (binding supported).",
+                "ja": "アイテム配列。通常ピッカーの選択肢など（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Array of `{ label?, icon?, value }`. At least `label` or `icon` is required per entry.",
+                "ja": "`{ label?, icon?, value }` の配列。各エントリで `label` または `icon` のいずれかが必須。"
+              },
+              "type": "array",
+              "required": "required"
+            },
+            {
+              "id": "attr_apportionsSegmentWidthsByContent",
+              "name": "apportionsSegmentWidthsByContent",
+              "anchorId": "attr-apportionsSegmentWidthsByContent",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Size segments by content.",
+                "ja": "セグメント幅を中身のコンテンツ幅に合わせる。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "iOS UISegmentedControl attribute. When `true`, each segment sizes to its content; when `false`, all segments are equal width.",
+                "ja": "iOS UISegmentedControl の属性。`true` で各セグメントが内容に合わせ、`false` で全セグメント等幅。"
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_momentary",
+              "name": "momentary",
+              "anchorId": "attr-momentary",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Momentary selection mode.",
+                "ja": "momentary 選択モード。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Boolean. When `true`, segments act like action buttons (no persistent selected state). Default `false`.",
+                "ja": "Boolean。`true` で各セグメントがアクションボタンとして振る舞う（永続的な選択状態なし）。デフォルト `false`。"
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_normalColor",
+              "name": "normalColor",
+              "anchorId": "attr-normalColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Normal state color — hex string or color name from colors.json (binding supported).",
+                "ja": "通常状態の色。hex または `colors.json` のトークン名（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Text color for unselected segments.",
+                "ja": "非選択セグメントのテキスト色。"
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_selectedColor",
+              "name": "selectedColor",
+              "anchorId": "attr-selectedColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Selected state color — hex string or color name from colors.json (binding supported).",
+                "ja": "選択状態の色。hex または `colors.json` のトークン名（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Text color when selected. Defaults to contrast of `tintColor`.",
+                "ja": "選択中のテキスト色。省略時は `tintColor` のコントラスト色。"
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_selectedIndex",
+              "name": "selectedIndex",
+              "anchorId": "attr-selectedIndex",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Initial selected index for normal picker (two-way binding).",
+                "ja": "通常ピッカーの初期選択インデックス（双方向 binding）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Two-way Int binding. `-1` means nothing selected (in `momentary` mode, always `-1` between taps).",
+                "ja": "Int の two-way binding。`-1` で未選択（`momentary` モードでは連打間は常に `-1`）。"
+              },
+              "type": "number | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_valueChange",
+              "name": "valueChange",
+              "anchorId": "attr-valueChange",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Value change event.",
+                "ja": "値変更イベント。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupCommonVisibility": "visible",
+  "attributesStyle": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_tintColor",
+              "name": "tintColor",
+              "anchorId": "attr-tintColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Tint color — hex string or color name from colors.json (alias).",
+                "ja": "tint 色（`tint` のエイリアス）。hex または `colors.json` のトークン名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Primary color for selected segment background and text.",
+                "ja": "選択中セグメントの背景とテキスト色。"
+              },
+              "type": "string",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupStyleVisibility": "visible",
+  "attributesLayout": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupLayoutVisibility": "gone",
+  "attributesSpacing": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupSpacingVisibility": "gone",
+  "attributesAlignment": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupAlignmentVisibility": "gone",
+  "attributesState": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStateVisibility": "gone",
+  "attributesBinding": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupBindingVisibility": "gone",
+  "attributesEvent": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_onValueChange",
+              "name": "onValueChange",
+              "anchorId": "attr-onValueChange",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Value change handler — binding only (@{functionName}).",
+                "ja": "値変更時のイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Fires with the new selected value (not index).",
+                "ja": "新しい選択値（インデックスではなく）を引数に発火。"
+              },
+              "type": "binding",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupEventVisibility": "visible",
+  "attributesResponsive": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupResponsiveVisibility": "gone",
+  "attributesMisc": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupMiscVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_glance",
+      "label": {
+        "en": "At a glance",
+        "ja": "概要"
+      },
+      "anchor": "section-glance",
+      "level": 1
+    },
+    {
+      "id": "toc_common",
+      "label": {
+        "en": "Common",
+        "ja": "共通"
+      },
+      "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_style",
+      "label": {
+        "en": "Style",
+        "ja": "スタイル"
+      },
+      "anchor": "section-style",
+      "level": 1
+    },
+    {
+      "id": "toc_event",
+      "label": {
+        "en": "Event",
+        "ja": "イベント"
+      },
+      "anchor": "section-event",
+      "level": 1
+    },
+    {
+      "id": "toc_examples",
+      "label": {
+        "en": "Examples",
+        "ja": "例"
+      },
+      "anchor": "section-examples",
+      "level": 1
+    },
+    {
+      "id": "toc_related",
+      "label": {
+        "en": "Related",
+        "ja": "関連"
+      },
+      "anchor": "section-related",
+      "level": 1
+    }
+  ],
   "examples": {
     "sections": [
       {
@@ -13,21 +854,129 @@
           "data": [
             {
               "id": "example_1",
-              "title": "Filter segment",
+              "anchorId": "example-1",
+              "title": {
+                "en": "Filter segment",
+                "ja": "フィルタセグメント"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{filterIndex}\",\n  \"items\": [\n    { \"label\": \"@string/all\", \"value\": \"all\" },\n    { \"label\": \"@string/active\", \"value\": \"active\" },\n    { \"label\": \"@string/done\", \"value\": \"done\" }\n  ],\n  \"onValueChange\": \"@{onFilterChanged}\"\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{filterIndex}\",\n  \"items\": [\n    { \"label\": \"@string/all\", \"value\": \"all\" },\n    { \"label\": \"@string/active\", \"value\": \"active\" },\n    { \"label\": \"@string/done\", \"value\": \"done\" }\n  ],\n  \"onValueChange\": \"@{onFilterChanged}\"\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{filterIndex}\",\n  \"items\": [\n    { \"label\": \"@string/all\", \"value\": \"all\" },\n    { \"label\": \"@string/active\", \"value\": \"active\" },\n    { \"label\": \"@string/done\", \"value\": \"done\" }\n  ],\n  \"onValueChange\": \"@{onFilterChanged}\"\n}",
               "required": ""
             },
             {
               "id": "example_2",
-              "title": "Icon-only segment",
+              "anchorId": "example-2",
+              "title": {
+                "en": "Icon-only segment",
+                "ja": "アイコンのみセグメント"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{viewModeIndex}\",\n  \"items\": [\n    { \"icon\": \"list.bullet\", \"value\": \"list\" },\n    { \"icon\": \"square.grid.2x2\", \"value\": \"grid\" }\n  ]\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{viewModeIndex}\",\n  \"items\": [\n    { \"icon\": \"list.bullet\", \"value\": \"list\" },\n    { \"icon\": \"square.grid.2x2\", \"value\": \"grid\" }\n  ]\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{viewModeIndex}\",\n  \"items\": [\n    { \"icon\": \"list.bullet\", \"value\": \"list\" },\n    { \"icon\": \"square.grid.2x2\", \"value\": \"grid\" }\n  ]\n}",
               "required": ""
             },
             {
               "id": "example_3",
-              "title": "Momentary (action bar)",
+              "anchorId": "example-3",
+              "title": {
+                "en": "Momentary (action bar)",
+                "ja": "momentary（アクションバー）"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"Segment\",\n  \"momentary\": true,\n  \"items\": [\n    { \"label\": \"B\", \"value\": \"bold\" },\n    { \"label\": \"I\", \"value\": \"italic\" },\n    { \"label\": \"U\", \"value\": \"underline\" }\n  ],\n  \"onValueChange\": \"@{onFormat}\"\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Segment\",\n  \"momentary\": true,\n  \"items\": [\n    { \"label\": \"B\", \"value\": \"bold\" },\n    { \"label\": \"I\", \"value\": \"italic\" },\n    { \"label\": \"U\", \"value\": \"underline\" }\n  ],\n  \"onValueChange\": \"@{onFormat}\"\n}"
+                }
+              ],
               "language": "json",
               "code": "{\n  \"type\": \"Segment\",\n  \"momentary\": true,\n  \"items\": [\n    { \"label\": \"B\", \"value\": \"bold\" },\n    { \"label\": \"I\", \"value\": \"italic\" },\n    { \"label\": \"U\", \"value\": \"underline\" }\n  ],\n  \"onValueChange\": \"@{onFormat}\"\n}",
               "required": ""
@@ -45,76 +994,596 @@
             {
               "id": "attr_items",
               "name": "items",
+              "anchorId": "attr-items",
+              "requiredChipText": "required",
+              "requiredChipVisibility": "visible",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-danger)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "List of items for normal picker (binding supported).",
+                "ja": "アイテム配列。通常ピッカーの選択肢など（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Array of `{ label?, icon?, value }`. At least `label` or `icon` is required per entry.",
+                "ja": "`{ label?, icon?, value }` の配列。各エントリで `label` または `icon` のいずれかが必須。"
+              },
               "type": "array",
-              "required": "required",
-              "description": "Segment items array",
-              "note": "Array of `{ label?, icon?, value }`. At least `label` or `icon` is required per entry."
+              "required": "required"
             },
             {
-              "id": "attr_tint_color",
+              "id": "attr_tintColor",
               "name": "tintColor",
+              "anchorId": "attr-tintColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Tint color — hex string or color name from colors.json (alias).",
+                "ja": "tint 色（`tint` のエイリアス）。hex または `colors.json` のトークン名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Primary color for selected segment background and text.",
+                "ja": "選択中セグメントの背景とテキスト色。"
+              },
               "type": "string",
-              "required": "",
-              "description": "Tint color - hex string or color name from colors.json",
-              "note": "Primary color for selected segment background and text."
+              "required": ""
             },
             {
-              "id": "attr_apportions_segment_widths_by_content",
+              "id": "attr_apportionsSegmentWidthsByContent",
               "name": "apportionsSegmentWidthsByContent",
+              "anchorId": "attr-apportionsSegmentWidthsByContent",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Size segments by content.",
+                "ja": "セグメント幅を中身のコンテンツ幅に合わせる。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "iOS UISegmentedControl attribute. When `true`, each segment sizes to its content; when `false`, all segments are equal width.",
+                "ja": "iOS UISegmentedControl の属性。`true` で各セグメントが内容に合わせ、`false` で全セグメント等幅。"
+              },
               "type": "boolean",
-              "required": "",
-              "description": "Size segments by content",
-              "note": "iOS UISegmentedControl attribute. When `true`, each segment sizes to its content; when `false`, all segments are equal width.",
-              "platform": "swift"
+              "required": ""
             },
             {
               "id": "attr_momentary",
               "name": "momentary",
+              "anchorId": "attr-momentary",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Momentary selection mode.",
+                "ja": "momentary 選択モード。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Boolean. When `true`, segments act like action buttons (no persistent selected state). Default `false`.",
+                "ja": "Boolean。`true` で各セグメントがアクションボタンとして振る舞う（永続的な選択状態なし）。デフォルト `false`。"
+              },
               "type": "boolean",
-              "required": "",
-              "description": "Momentary selection mode",
-              "note": "Boolean. When `true`, segments act like action buttons (no persistent selected state). Default `false`.",
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_normal_color",
+              "id": "attr_normalColor",
               "name": "normalColor",
+              "anchorId": "attr-normalColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Normal state color — hex string or color name from colors.json (binding supported).",
+                "ja": "通常状態の色。hex または `colors.json` のトークン名（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Text color for unselected segments.",
+                "ja": "非選択セグメントのテキスト色。"
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Normal state color - hex string or color name from colors.json (binding supported)",
-              "note": "Text color for unselected segments."
+              "required": ""
             },
             {
-              "id": "attr_on_value_change",
+              "id": "attr_onValueChange",
               "name": "onValueChange",
+              "anchorId": "attr-onValueChange",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Value change handler — binding only (@{functionName}).",
+                "ja": "値変更時のイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Fires with the new selected value (not index).",
+                "ja": "新しい選択値（インデックスではなく）を引数に発火。"
+              },
               "type": "binding",
-              "required": "",
-              "description": "Value change handler - binding only (@{functionName})",
-              "note": "Fires with the new selected value (not index)."
+              "required": ""
             },
             {
-              "id": "attr_selected_color",
+              "id": "attr_selectedColor",
               "name": "selectedColor",
+              "anchorId": "attr-selectedColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Selected state color — hex string or color name from colors.json (binding supported).",
+                "ja": "選択状態の色。hex または `colors.json` のトークン名（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Text color when selected. Defaults to contrast of `tintColor`.",
+                "ja": "選択中のテキスト色。省略時は `tintColor` のコントラスト色。"
+              },
               "type": "string | binding",
-              "required": "",
-              "description": "Selected state color - hex string or color name from colors.json (binding supported)",
-              "note": "Text color when selected. Defaults to contrast of `tintColor`."
+              "required": ""
             },
             {
-              "id": "attr_selected_index",
+              "id": "attr_selectedIndex",
               "name": "selectedIndex",
+              "anchorId": "attr-selectedIndex",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Initial selected index for normal picker (two-way binding).",
+                "ja": "通常ピッカーの初期選択インデックス（双方向 binding）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Two-way Int binding. `-1` means nothing selected (in `momentary` mode, always `-1` between taps).",
+                "ja": "Int の two-way binding。`-1` で未選択（`momentary` モードでは連打間は常に `-1`）。"
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Initially selected index (binding for two-way)",
-              "note": "Two-way Int binding. `-1` means nothing selected (in `momentary` mode, always `-1` between taps).",
-              "bindingDirection": "two-way"
+              "required": ""
             },
             {
-              "id": "attr_value_change",
+              "id": "attr_valueChange",
               "name": "valueChange",
+              "anchorId": "attr-valueChange",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Value change event.",
+                "ja": "値変更イベント。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Value change event"
+              "required": ""
             }
           ]
         }
@@ -129,11 +1598,13 @@
             {
               "id": "related_select_box",
               "name": "SelectBox",
+              "hint": "",
               "url": "/reference/components/select-box"
             },
             {
               "id": "related_radio",
               "name": "Radio",
+              "hint": "",
               "url": "/reference/components/radio"
             }
           ]
@@ -148,14 +1619,26 @@
           "data": [
             {
               "id": "next_attributes",
-              "titleKey": "next_attributes_title",
-              "descriptionKey": "next_attributes_body",
+              "titleKey": {
+                "en": "Attribute reference",
+                "ja": "属性リファレンス"
+              },
+              "descriptionKey": {
+                "en": "Every common attribute in one place — width / padding / binding / events grouped by category.",
+                "ja": "共通属性を 1 箇所にまとめたリファレンス。width / padding / binding / event などカテゴリ別に整理。"
+              },
               "url": "/reference/attributes"
             },
             {
               "id": "next_custom_components",
-              "titleKey": "next_custom_components_title",
-              "descriptionKey": "next_custom_components_body",
+              "titleKey": {
+                "en": "Building a custom component",
+                "ja": "カスタムコンポーネントを作る"
+              },
+              "descriptionKey": {
+                "en": "Extend JsonUI with your own components (spec → converter → React/Swift/Kotlin).",
+                "ja": "spec → converter → React/Swift/Kotlin で JsonUI を独自拡張する手順。"
+              },
               "url": "/guides/custom-components"
             }
           ]

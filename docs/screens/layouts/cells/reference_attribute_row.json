@@ -1,102 +1,358 @@
 {
   "type": "View",
-  "orientation": "vertical",
+  "orientation": "horizontal",
   "width": "matchParent",
   "height": "wrapContent",
-  "paddings": [
-    16,
-    16,
-    16,
-    16
-  ],
-  "topMargin": 8,
+  "topMargin": 10,
   "background": "#FFFFFF",
-  "cornerRadius": 8,
+  "cornerRadius": 10,
   "borderColor": "#E5E7EB",
   "borderWidth": 1,
+  "id": "@{anchorId}",
+  "_comment": "Plan 04 §'Target anatomy': left 3px vertical accent bar signals required (danger) / deprecated (traffic_yellow) / default (border) state. Relies on rjui bug rjui-horizontal-matchparent-height-flex1 being fixed (height:matchParent in horizontal parent → self-stretch, not flex-1).",
   "child": [
     {
       "data": [
-        {
-          "name": "name",
-          "class": "String"
-        },
-        {
-          "name": "type",
-          "class": "String"
-        },
-        {
-          "name": "required",
-          "class": "String",
-          "defaultValue": ""
-        },
-        {
-          "name": "description",
-          "class": "String"
-        },
-        {
-          "name": "note",
-          "class": "String",
-          "defaultValue": ""
-        }
+        { "name": "name", "class": "String" },
+        { "name": "anchorId", "class": "String", "defaultValue": "" },
+        { "name": "typeChips", "class": "CollectionDataSource" },
+        { "name": "requiredChipText", "class": "String", "defaultValue": "" },
+        { "name": "requiredChipVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "deprecatedChipVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "accentBarColor", "class": "String", "defaultValue": "#E5E7EB" },
+        { "name": "description", "class": "String", "defaultValue": "" },
+        { "name": "defaultChipText", "class": "String", "defaultValue": "" },
+        { "name": "defaultChipVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "enumChips", "class": "CollectionDataSource" },
+        { "name": "enumChipsVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "aliasChips", "class": "CollectionDataSource" },
+        { "name": "aliasChipsVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "platformMatrixVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "platformIosLabel", "class": "String", "defaultValue": "" },
+        { "name": "platformAndroidLabel", "class": "String", "defaultValue": "" },
+        { "name": "platformWebLabel", "class": "String", "defaultValue": "" },
+        { "name": "note", "class": "String", "defaultValue": "" },
+        { "name": "noteVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "nameFontColor", "class": "String", "defaultValue": "#0B1220" }
       ]
     },
     {
       "type": "View",
-      "orientation": "horizontal",
-      "width": "matchParent",
+      "id": "attribute_row_accent_bar",
+      "width": 3,
+      "height": "matchParent",
+      "background": "@{accentBarColor}"
+    },
+    {
+      "type": "View",
+      "orientation": "vertical",
       "height": "wrapContent",
+      "weight": 1,
+      "paddings": [14, 16, 14, 16],
       "child": [
         {
-          "type": "Label",
-          "width": "wrapContent",
+          "type": "View",
+          "id": "attribute_row_header",
+          "orientation": "horizontal",
+          "width": "matchParent",
           "height": "wrapContent",
+          "child": [
+            {
+              "type": "Label",
+              "id": "attribute_row_name",
+              "width": "wrapContent",
+              "height": "wrapContent",
+              "fontSize": 14,
+              "fontFamily": "monospace",
+              "fontWeight": "semibold",
+              "fontColor": "@{nameFontColor}",
+              "text": "@{name}"
+            },
+            {
+              "type": "Collection",
+              "id": "attribute_row_type_chips",
+              "width": "wrapContent",
+              "height": "wrapContent",
+              "leftMargin": 12,
+              "orientation": "horizontal",
+              "items": "@{typeChips}",
+              "cellIdProperty": "id",
+              "lazy": false,
+              "scrollEnabled": false,
+              "sections": [
+                { "cell": "cells/reference_type_chip" }
+              ]
+            },
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "weight": 1,
+              "text": " "
+            },
+            {
+              "type": "Label",
+              "id": "attribute_row_required_chip",
+              "width": "wrapContent",
+              "height": "wrapContent",
+              "visibility": "@{requiredChipVisibility}",
+              "paddings": [3, 8, 3, 8],
+              "background": "#FEE2E2",
+              "cornerRadius": 4,
+              "fontSize": 11,
+              "fontWeight": "semibold",
+              "fontColor": "#B91C1C",
+              "text": "@{requiredChipText}"
+            },
+            {
+              "type": "Label",
+              "id": "attribute_row_deprecated_chip",
+              "width": "wrapContent",
+              "height": "wrapContent",
+              "leftMargin": 6,
+              "visibility": "@{deprecatedChipVisibility}",
+              "paddings": [3, 8, 3, 8],
+              "background": "#FEF3C7",
+              "cornerRadius": 4,
+              "fontSize": 11,
+              "fontWeight": "semibold",
+              "fontColor": "#92400E",
+              "text": "deprecated"
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "id": "attribute_row_description",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 8,
           "fontSize": 14,
-          "fontFamily": "monospace",
-          "fontWeight": "semibold",
-          "fontColor": "#0B1220",
-          "text": "@{name}"
+          "lineHeightMultiple": 1.5,
+          "fontColor": "#475467",
+          "text": "@{description}"
         },
         {
-          "type": "Label",
-          "width": "wrapContent",
+          "type": "View",
+          "id": "attribute_row_meta_row",
+          "orientation": "horizontal",
+          "width": "matchParent",
           "height": "wrapContent",
-          "leftMargin": 12,
-          "fontSize": 12,
-          "fontColor": "#6366F1",
-          "fontFamily": "monospace",
-          "text": "@{type}"
+          "topMargin": 10,
+          "child": [
+            {
+              "type": "Label",
+              "id": "attribute_row_default_chip",
+              "width": "wrapContent",
+              "height": "wrapContent",
+              "visibility": "@{defaultChipVisibility}",
+              "paddings": [3, 8, 3, 8],
+              "background": "#F3F4F6",
+              "cornerRadius": 4,
+              "fontSize": 11,
+              "fontFamily": "monospace",
+              "fontColor": "#0B1220",
+              "text": "@{defaultChipText}"
+            },
+            {
+              "type": "View",
+              "id": "attribute_row_enum_chips_wrap",
+              "orientation": "horizontal",
+              "width": "wrapContent",
+              "height": "wrapContent",
+              "visibility": "@{enumChipsVisibility}",
+              "leftMargin": 8,
+              "child": [
+                {
+                  "type": "Label",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "fontSize": 11,
+                  "fontColor": "#64748B",
+                  "text": "values:"
+                },
+                {
+                  "type": "Collection",
+                  "id": "attribute_row_enum_chips",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "leftMargin": 6,
+                  "orientation": "horizontal",
+                  "items": "@{enumChips}",
+                  "cellIdProperty": "id",
+                  "lazy": false,
+                  "scrollEnabled": false,
+                  "sections": [
+                    { "cell": "cells/reference_type_chip" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "attribute_row_alias_chips_wrap",
+              "orientation": "horizontal",
+              "width": "wrapContent",
+              "height": "wrapContent",
+              "visibility": "@{aliasChipsVisibility}",
+              "leftMargin": 8,
+              "child": [
+                {
+                  "type": "Label",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "fontSize": 11,
+                  "fontColor": "#64748B",
+                  "text": "aliases:"
+                },
+                {
+                  "type": "Collection",
+                  "id": "attribute_row_alias_chips",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "leftMargin": 6,
+                  "orientation": "horizontal",
+                  "items": "@{aliasChips}",
+                  "cellIdProperty": "id",
+                  "lazy": false,
+                  "scrollEnabled": false,
+                  "sections": [
+                    { "cell": "cells/reference_type_chip" }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
-          "type": "Label",
-          "width": "wrapContent",
+          "type": "View",
+          "id": "attribute_row_platform_matrix",
+          "orientation": "horizontal",
+          "width": "matchParent",
           "height": "wrapContent",
-          "leftMargin": 12,
-          "fontSize": 11,
-          "fontWeight": "semibold",
-          "fontColor": "#DC2626",
-          "text": "@{required}"
+          "topMargin": 12,
+          "paddings": [10, 12, 10, 12],
+          "background": "#F9FAFB",
+          "cornerRadius": 6,
+          "borderColor": "#E5E7EB",
+          "borderWidth": 1,
+          "visibility": "@{platformMatrixVisibility}",
+          "child": [
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "height": "wrapContent",
+              "weight": 1,
+              "child": [
+                {
+                  "type": "Label",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "fontSize": 10,
+                  "fontWeight": "semibold",
+                  "fontColor": "#64748B",
+                  "text": "iOS"
+                },
+                {
+                  "type": "Label",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 4,
+                  "fontSize": 12,
+                  "fontColor": "#0B1220",
+                  "text": "@{platformIosLabel}"
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "height": "wrapContent",
+              "weight": 1,
+              "leftMargin": 12,
+              "child": [
+                {
+                  "type": "Label",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "fontSize": 10,
+                  "fontWeight": "semibold",
+                  "fontColor": "#64748B",
+                  "text": "ANDROID"
+                },
+                {
+                  "type": "Label",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 4,
+                  "fontSize": 12,
+                  "fontColor": "#0B1220",
+                  "text": "@{platformAndroidLabel}"
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "height": "wrapContent",
+              "weight": 1,
+              "leftMargin": 12,
+              "child": [
+                {
+                  "type": "Label",
+                  "width": "wrapContent",
+                  "height": "wrapContent",
+                  "fontSize": 10,
+                  "fontWeight": "semibold",
+                  "fontColor": "#64748B",
+                  "text": "WEB"
+                },
+                {
+                  "type": "Label",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 4,
+                  "fontSize": 12,
+                  "fontColor": "#0B1220",
+                  "text": "@{platformWebLabel}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "attribute_row_note",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 12,
+          "paddings": [10, 12, 10, 12],
+          "background": "#EEF2FF",
+          "cornerRadius": 6,
+          "visibility": "@{noteVisibility}",
+          "child": [
+            {
+              "type": "Label",
+              "width": "wrapContent",
+              "height": "wrapContent",
+              "fontSize": 12,
+              "fontWeight": "semibold",
+              "fontColor": "#4F46E5",
+              "text": "ⓘ"
+            },
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "weight": 1,
+              "leftMargin": 8,
+              "fontSize": 13,
+              "lineHeightMultiple": 1.5,
+              "fontColor": "#4F46E5",
+              "text": "@{note}"
+            }
+          ]
         }
       ]
-    },
-    {
-      "type": "Label",
-      "width": "matchParent",
-      "height": "wrapContent",
-      "topMargin": 8,
-      "fontSize": 14,
-      "fontColor": "#475467",
-      "text": "@{description}"
-    },
-    {
-      "type": "Label",
-      "width": "matchParent",
-      "height": "wrapContent",
-      "topMargin": 8,
-      "fontSize": 13,
-      "fontColor": "#64748B",
-      "text": "@{note}"
     }
-  ],
-  "_comment": "Auto-scaffolded by scripts/build-attribute-reference.ts. Hand-edit or replace during design pass."
+  ]
 }

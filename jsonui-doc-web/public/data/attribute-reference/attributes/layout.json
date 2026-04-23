@@ -1,272 +1,1773 @@
 {
   "category": "layout",
   "title": "Layout attributes",
-  "description": "Layout attributes define the size and axis behavior of a component. They apply to every component regardless of type.",
+  "description": {
+    "en": "Layout attributes define the size and axis behavior of a component. They apply to every component regardless of type.",
+    "ja": "レイアウト属性はコンポーネントのサイズと軸方向の挙動を決める。コンポーネント種別によらず全てに適用される。"
+  },
+  "kicker": "Attribute category · Reference",
+  "kickerParentLabel": "Attributes",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "gone",
+  "aliasCalloutVisibility": "gone",
+  "aliasOf": null,
+  "aliasLinkUrl": "",
+  "aliasNotice": null,
+  "overviewRows": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "overview_aspectHeight",
+              "name": "aspectHeight",
+              "type": "number | binding",
+              "summary": {
+                "en": "Height component of an aspect ratio pair.",
+                "ja": "アスペクト比ペアの高さ側の値。"
+              },
+              "anchorUrl": "#attr-aspectHeight"
+            },
+            {
+              "id": "overview_aspectWidth",
+              "name": "aspectWidth",
+              "type": "number | binding",
+              "summary": {
+                "en": "Sets width as a multiplier of height. For `aspectWidth: 16`, `aspectHeight: 9` → 16:9 ratio. Use …",
+                "ja": "高さに対する幅の係数。`aspectWidth: 16`, `aspectHeight: 9` で 16:9 の比率。比率ベースのサイジングに使う。"
+              },
+              "anchorUrl": "#attr-aspectWidth"
+            },
+            {
+              "id": "overview_compressHorizontal",
+              "name": "compressHorizontal",
+              "type": "string",
+              "summary": {
+                "en": "iOS-only. Horizontal Compression Resistance Priority. Higher = more resistant to being compressed…",
+                "ja": "iOS 専用。水平方向の Compression Resistance Priority。大きいほど固有サイズ未満への圧縮に抵抗する。"
+              },
+              "anchorUrl": "#attr-compressHorizontal"
+            },
+            {
+              "id": "overview_compressVertical",
+              "name": "compressVertical",
+              "type": "string",
+              "summary": {
+                "en": "iOS-only. Vertical Compression Resistance Priority.",
+                "ja": "iOS 専用。垂直方向の Compression Resistance Priority。"
+              },
+              "anchorUrl": "#attr-compressVertical"
+            },
+            {
+              "id": "overview_frame",
+              "name": "frame",
+              "type": "object",
+              "summary": "Frame configuration with width/height",
+              "anchorUrl": "#attr-frame"
+            },
+            {
+              "id": "overview_height",
+              "name": "height",
+              "type": "number | enum(matchParent|wrapContent) | binding",
+              "summary": {
+                "en": "Size along the vertical axis. Same value semantics as `width`.",
+                "ja": "垂直方向のサイズ。値の意味論は `width` と同じ。"
+              },
+              "anchorUrl": "#attr-height"
+            },
+            {
+              "id": "overview_heightWeight",
+              "name": "heightWeight",
+              "type": "number | binding",
+              "summary": {
+                "en": "Stretch factor limited to the vertical axis.",
+                "ja": "垂直軸限定の伸縮因数。"
+              },
+              "anchorUrl": "#attr-heightWeight"
+            },
+            {
+              "id": "overview_hugHorizontal",
+              "name": "hugHorizontal",
+              "type": "string",
+              "summary": {
+                "en": "iOS-only. Horizontal Content Hugging Priority. Higher = more resistant to being stretched.",
+                "ja": "iOS 専用。水平方向の Content Hugging Priority。大きいほど引き伸ばされにくい。"
+              },
+              "anchorUrl": "#attr-hugHorizontal"
+            },
+            {
+              "id": "overview_hugVertical",
+              "name": "hugVertical",
+              "type": "string",
+              "summary": {
+                "en": "iOS-only. Vertical Content Hugging Priority.",
+                "ja": "iOS 専用。垂直方向の Content Hugging Priority。"
+              },
+              "anchorUrl": "#attr-hugVertical"
+            },
+            {
+              "id": "overview_maxHeight",
+              "name": "maxHeight",
+              "type": "number | binding",
+              "summary": {
+                "en": "Maximum height.",
+                "ja": "最大高さ。"
+              },
+              "anchorUrl": "#attr-maxHeight"
+            },
+            {
+              "id": "overview_maxHeightWeight",
+              "name": "maxHeightWeight",
+              "type": "number | binding",
+              "summary": "Maximum height weight (binding supported)",
+              "anchorUrl": "#attr-maxHeightWeight"
+            },
+            {
+              "id": "overview_maxWidth",
+              "name": "maxWidth",
+              "type": "number | binding",
+              "summary": {
+                "en": "Maximum width in pt/dp/px. Useful on Web for capping content width on wide screens.",
+                "ja": "最大幅（pt/dp/px）。Web でワイドスクリーンのコンテンツ幅を制限するのに便利。"
+              },
+              "anchorUrl": "#attr-maxWidth"
+            },
+            {
+              "id": "overview_maxWidthWeight",
+              "name": "maxWidthWeight",
+              "type": "number | binding",
+              "summary": "Maximum width weight (binding supported)",
+              "anchorUrl": "#attr-maxWidthWeight"
+            },
+            {
+              "id": "overview_minHeight",
+              "name": "minHeight",
+              "type": "number | binding",
+              "summary": {
+                "en": "Minimum height.",
+                "ja": "最小高さ。"
+              },
+              "anchorUrl": "#attr-minHeight"
+            },
+            {
+              "id": "overview_minHeightWeight",
+              "name": "minHeightWeight",
+              "type": "number | binding",
+              "summary": "Minimum height weight (binding supported)",
+              "anchorUrl": "#attr-minHeightWeight"
+            },
+            {
+              "id": "overview_minWidth",
+              "name": "minWidth",
+              "type": "number | binding",
+              "summary": {
+                "en": "Minimum width in pt/dp/px. Prevents the component from shrinking below this value.",
+                "ja": "最小幅（pt/dp/px）。これより縮まないことを保証。"
+              },
+              "anchorUrl": "#attr-minWidth"
+            },
+            {
+              "id": "overview_minWidthWeight",
+              "name": "minWidthWeight",
+              "type": "number | binding",
+              "summary": "Minimum width weight (binding supported)",
+              "anchorUrl": "#attr-minWidthWeight"
+            },
+            {
+              "id": "overview_rect",
+              "name": "rect",
+              "type": "array",
+              "summary": "Direct frame [x, y, width, height]",
+              "anchorUrl": "#attr-rect"
+            },
+            {
+              "id": "overview_weight",
+              "name": "weight",
+              "type": "number | string | binding",
+              "summary": {
+                "en": "Flexible stretch factor along the parent's main axis. In a horizontal View, a child with `weight:…",
+                "ja": "親の主軸方向に伸縮する因数。水平 View 内で `weight: 1` を持つ子が水平方向の残りを埋める。"
+              },
+              "anchorUrl": "#attr-weight"
+            },
+            {
+              "id": "overview_width",
+              "name": "width",
+              "type": "number | enum(matchParent|wrapContent) | binding",
+              "summary": {
+                "en": "Size along the horizontal axis. Accepts number (pt/dp/px), `matchParent`, `wrapContent`, or respo…",
+                "ja": "水平方向のサイズ。数値（pt/dp/px）、`matchParent`、`wrapContent`、またはレスポンシブオブジェクト。"
+              },
+              "anchorUrl": "#attr-width"
+            },
+            {
+              "id": "overview_widthWeight",
+              "name": "widthWeight",
+              "type": "number | binding",
+              "summary": {
+                "en": "Stretch factor limited to the horizontal axis. Equivalent to `weight` inside a horizontal View.",
+                "ja": "水平軸限定の伸縮因数。horizontal View 内の `weight` と同等。"
+              },
+              "anchorUrl": "#attr-widthWeight"
+            },
+            {
+              "id": "overview_wrapContent",
+              "name": "wrapContent",
+              "type": "boolean",
+              "summary": "Wrap content",
+              "anchorUrl": "#attr-wrapContent"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subgroups": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "subgroupsVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_overview",
+      "label": {
+        "en": "Overview",
+        "ja": "概要"
+      },
+      "anchor": "section-overview",
+      "level": 1
+    },
+    {
+      "id": "toc_detail",
+      "label": {
+        "en": "Attributes",
+        "ja": "属性"
+      },
+      "anchor": "section-detail",
+      "level": 1
+    },
+    {
+      "id": "toc_next",
+      "label": {
+        "en": "Next reads",
+        "ja": "次に読む"
+      },
+      "anchor": "section-next",
+      "level": 1
+    }
+  ],
   "attributes": {
     "sections": [
       {
         "cells": {
           "data": [
             {
-              "id": "attr_aspect_height",
+              "id": "attr_aspectHeight",
               "name": "aspectHeight",
+              "anchorId": "attr-aspectHeight",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Height component of an aspect ratio pair.",
+                "ja": "アスペクト比ペアの高さ側の値。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Aspect ratio height (binding supported)",
-              "summary": "Height component of an aspect ratio pair.",
-              "relatedAttributes": [
-                "aspectWidth"
-              ],
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_aspect_width",
+              "id": "attr_aspectWidth",
               "name": "aspectWidth",
+              "anchorId": "attr-aspectWidth",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Sets width as a multiplier of height. For `aspectWidth: 16`, `aspectHeight: 9` → 16:9 ratio. Use when you want ratio-based sizing.",
+                "ja": "高さに対する幅の係数。`aspectWidth: 16`, `aspectHeight: 9` で 16:9 の比率。比率ベースのサイジングに使う。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Aspect ratio width (binding supported)",
-              "summary": "Sets width as a multiplier of height. For `aspectWidth: 16`, `aspectHeight: 9` → 16:9 ratio. Use when you want ratio-based sizing.",
-              "relatedAttributes": [
-                "aspectHeight"
-              ],
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_compress_horizontal",
+              "id": "attr_compressHorizontal",
               "name": "compressHorizontal",
+              "anchorId": "attr-compressHorizontal",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "iOS-only. Horizontal Compression Resistance Priority. Higher = more resistant to being compressed below intrinsic size.",
+                "ja": "iOS 専用。水平方向の Compression Resistance Priority。大きいほど固有サイズ未満への圧縮に抵抗する。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Horizontal compression resistance",
-              "summary": "iOS-only. Horizontal Compression Resistance Priority. Higher = more resistant to being compressed below intrinsic size.",
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_compress_vertical",
+              "id": "attr_compressVertical",
               "name": "compressVertical",
+              "anchorId": "attr-compressVertical",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "iOS-only. Vertical Compression Resistance Priority.",
+                "ja": "iOS 専用。垂直方向の Compression Resistance Priority。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Vertical compression resistance",
-              "summary": "iOS-only. Vertical Compression Resistance Priority.",
-              "platform": "swift"
+              "required": ""
             },
             {
               "id": "attr_frame",
               "name": "frame",
+              "anchorId": "attr-frame",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Frame configuration with width/height",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "object",
-              "required": "",
-              "description": "Frame configuration with width/height"
+              "required": ""
             },
             {
               "id": "attr_height",
               "name": "height",
+              "anchorId": "attr-height",
+              "requiredChipText": "required",
+              "requiredChipVisibility": "visible",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-danger)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "enum(matchParent|wrapContent)",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "tc_2",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Size along the vertical axis. Same value semantics as `width`.",
+                "ja": "垂直方向のサイズ。値の意味論は `width` と同じ。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | enum(matchParent|wrapContent) | binding",
-              "required": "required",
-              "description": "Height (number, 'matchParent', 'wrapContent') - binding supported. Not required if weight is specified.",
-              "summary": "Size along the vertical axis. Same value semantics as `width`.",
-              "relatedAttributes": [
-                "width",
-                "minHeight",
-                "maxHeight",
-                "heightWeight",
-                "aspectHeight"
-              ]
+              "required": "required"
             },
             {
-              "id": "attr_height_weight",
+              "id": "attr_heightWeight",
               "name": "heightWeight",
+              "anchorId": "attr-heightWeight",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Stretch factor limited to the vertical axis.",
+                "ja": "垂直軸限定の伸縮因数。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Height weight for flexible layouts (binding supported)",
-              "summary": "Stretch factor limited to the vertical axis.",
-              "relatedAttributes": [
-                "weight",
-                "widthWeight"
-              ],
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_hug_horizontal",
+              "id": "attr_hugHorizontal",
               "name": "hugHorizontal",
+              "anchorId": "attr-hugHorizontal",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "iOS-only. Horizontal Content Hugging Priority. Higher = more resistant to being stretched.",
+                "ja": "iOS 専用。水平方向の Content Hugging Priority。大きいほど引き伸ばされにくい。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Horizontal content hugging",
-              "summary": "iOS-only. Horizontal Content Hugging Priority. Higher = more resistant to being stretched.",
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_hug_vertical",
+              "id": "attr_hugVertical",
               "name": "hugVertical",
+              "anchorId": "attr-hugVertical",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "iOS-only. Vertical Content Hugging Priority.",
+                "ja": "iOS 専用。垂直方向の Content Hugging Priority。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Vertical content hugging",
-              "summary": "iOS-only. Vertical Content Hugging Priority.",
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_max_height",
+              "id": "attr_maxHeight",
               "name": "maxHeight",
+              "anchorId": "attr-maxHeight",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Maximum height.",
+                "ja": "最大高さ。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Maximum height (binding supported)",
-              "summary": "Maximum height."
+              "required": ""
             },
             {
-              "id": "attr_max_height_weight",
+              "id": "attr_maxHeightWeight",
               "name": "maxHeightWeight",
-              "type": "number | binding",
-              "required": "",
+              "anchorId": "attr-maxHeightWeight",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
               "description": "Maximum height weight (binding supported)",
-              "platform": "swift"
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number | binding",
+              "required": ""
             },
             {
-              "id": "attr_max_width",
+              "id": "attr_maxWidth",
               "name": "maxWidth",
+              "anchorId": "attr-maxWidth",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Maximum width in pt/dp/px. Useful on Web for capping content width on wide screens.",
+                "ja": "最大幅（pt/dp/px）。Web でワイドスクリーンのコンテンツ幅を制限するのに便利。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Maximum width (binding supported)",
-              "summary": "Maximum width in pt/dp/px. Useful on Web for capping content width on wide screens."
+              "required": ""
             },
             {
-              "id": "attr_max_width_weight",
+              "id": "attr_maxWidthWeight",
               "name": "maxWidthWeight",
-              "type": "number | binding",
-              "required": "",
+              "anchorId": "attr-maxWidthWeight",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
               "description": "Maximum width weight (binding supported)",
-              "platform": "swift"
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number | binding",
+              "required": ""
             },
             {
-              "id": "attr_min_height",
+              "id": "attr_minHeight",
               "name": "minHeight",
+              "anchorId": "attr-minHeight",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Minimum height.",
+                "ja": "最小高さ。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Minimum height (binding supported)",
-              "summary": "Minimum height."
+              "required": ""
             },
             {
-              "id": "attr_min_height_weight",
+              "id": "attr_minHeightWeight",
               "name": "minHeightWeight",
-              "type": "number | binding",
-              "required": "",
+              "anchorId": "attr-minHeightWeight",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
               "description": "Minimum height weight (binding supported)",
-              "platform": "swift"
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number | binding",
+              "required": ""
             },
             {
-              "id": "attr_min_width",
+              "id": "attr_minWidth",
               "name": "minWidth",
+              "anchorId": "attr-minWidth",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Minimum width in pt/dp/px. Prevents the component from shrinking below this value.",
+                "ja": "最小幅（pt/dp/px）。これより縮まないことを保証。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Minimum width (binding supported)",
-              "summary": "Minimum width in pt/dp/px. Prevents the component from shrinking below this value."
+              "required": ""
             },
             {
-              "id": "attr_min_width_weight",
+              "id": "attr_minWidthWeight",
               "name": "minWidthWeight",
-              "type": "number | binding",
-              "required": "",
+              "anchorId": "attr-minWidthWeight",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
               "description": "Minimum width weight (binding supported)",
-              "platform": "swift"
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number | binding",
+              "required": ""
             },
             {
               "id": "attr_rect",
               "name": "rect",
-              "type": "array",
-              "required": "",
+              "anchorId": "attr-rect",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
               "description": "Direct frame [x, y, width, height]",
-              "platform": "swift"
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
             },
             {
               "id": "attr_weight",
               "name": "weight",
-              "type": "number | string | binding",
-              "required": "",
-              "description": "Shorthand for widthWeight (binding supported)",
-              "summary": "Flexible stretch factor along the parent's main axis. In a horizontal View, a child with `weight: 1` fills remaining horizontal space.",
-              "platformDiff": {
-                "swift_swiftui": ".frame(maxWidth: .infinity) + layoutPriority。",
-                "kotlin_compose": "Modifier.weight(N)。",
-                "kotlin_xml": "android:layout_weight=\"N\"。",
-                "react": "CSS `flex: N`。"
+              "anchorId": "attr-weight",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_2",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
-              "relatedAttributes": [
-                "widthWeight",
-                "heightWeight"
-              ]
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Flexible stretch factor along the parent's main axis. In a horizontal View, a child with `weight: 1` fills remaining horizontal space.",
+                "ja": "親の主軸方向に伸縮する因数。水平 View 内で `weight: 1` を持つ子が水平方向の残りを埋める。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number | string | binding",
+              "required": ""
             },
             {
               "id": "attr_width",
               "name": "width",
-              "type": "number | enum(matchParent|wrapContent) | binding",
-              "required": "required",
-              "description": "Width (number, 'matchParent', 'wrapContent') - binding supported. Not required if weight is specified.",
-              "summary": "Size along the horizontal axis. Accepts number (pt/dp/px), `matchParent`, `wrapContent`, or responsive object.",
-              "values": [
-                {
-                  "value": "matchParent",
-                  "description": "Fill the parent along this axis. Requires the parent to have a bounded size."
-                },
-                {
-                  "value": "wrapContent",
-                  "description": "Shrink to fit content. Cannot shrink below children's natural size."
-                },
-                {
-                  "value": "<number>",
-                  "description": "Fixed size in platform-native units (iOS pt / Android dp / Web px)."
-                },
-                {
-                  "value": "{ xs: ..., md: ..., lg: ... }",
-                  "description": "Responsive per breakpoint (Web only). See the responsive category."
-                }
-              ],
-              "examples": [
-                {
-                  "language": "json",
-                  "code": "{ \"type\": \"Button\", \"width\": 120, \"height\": 44 }"
-                },
-                {
-                  "language": "json",
-                  "code": "{ \"type\": \"Button\", \"width\": \"matchParent\", \"height\": 44 }"
-                },
-                {
-                  "language": "json",
-                  "code": "{ \"type\": \"Collection\", \"columnCount\": { \"xs\": 1, \"md\": 2, \"lg\": 3 } }"
-                }
-              ],
-              "platformDiff": {
-                "swift_uikit": "`matchParent` → AutoLayout `widthAnchor.constraint(equalTo: superview.widthAnchor)`。数値 → pt 固定。",
-                "swift_swiftui": "`matchParent` → `.frame(maxWidth: .infinity)`。数値 → `.frame(width: N)`。",
-                "kotlin_compose": "`matchParent` → `Modifier.fillMaxWidth()`。数値 → `Modifier.width(N.dp)`。",
-                "kotlin_xml": "`matchParent` → `android:layout_width=\"match_parent\"`。数値 → `Xdp`。",
-                "react": "`matchParent` → Tailwind `w-full`。数値 → arbitrary value `w-[Npx]`。"
+              "anchorId": "attr-width",
+              "requiredChipText": "required",
+              "requiredChipVisibility": "visible",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-danger)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "enum(matchParent|wrapContent)",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "tc_2",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
-              "relatedAttributes": [
-                "height",
-                "minWidth",
-                "maxWidth",
-                "weight",
-                "widthWeight",
-                "aspectWidth"
-              ]
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Size along the horizontal axis. Accepts number (pt/dp/px), `matchParent`, `wrapContent`, or responsive object.",
+                "ja": "水平方向のサイズ。数値（pt/dp/px）、`matchParent`、`wrapContent`、またはレスポンシブオブジェクト。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number | enum(matchParent|wrapContent) | binding",
+              "required": "required"
             },
             {
-              "id": "attr_width_weight",
+              "id": "attr_widthWeight",
               "name": "widthWeight",
+              "anchorId": "attr-widthWeight",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Stretch factor limited to the horizontal axis. Equivalent to `weight` inside a horizontal View.",
+                "ja": "水平軸限定の伸縮因数。horizontal View 内の `weight` と同等。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "Width weight for flexible layouts (binding supported)",
-              "summary": "Stretch factor limited to the horizontal axis. Equivalent to `weight` inside a horizontal View.",
-              "relatedAttributes": [
-                "weight",
-                "heightWeight"
-              ],
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_wrap_content",
+              "id": "attr_wrapContent",
               "name": "wrapContent",
-              "type": "boolean",
-              "required": "",
+              "anchorId": "attr-wrapContent",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
               "description": "Wrap content",
-              "platform": "swift"
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean",
+              "required": ""
             }
           ]
         }
@@ -281,14 +1782,26 @@
           "data": [
             {
               "id": "next_components",
-              "titleKey": "next_components_title",
-              "descriptionKey": "next_components_body",
+              "titleKey": {
+                "en": "Component reference",
+                "ja": "コンポーネントリファレンス"
+              },
+              "descriptionKey": {
+                "en": "The full 28-component catalog with type signatures, examples, and platform support.",
+                "ja": "28 コンポーネントの全カタログ。型・例・プラットフォーム対応を収録。"
+              },
               "url": "/reference/components"
             },
             {
               "id": "next_attributes_root",
-              "titleKey": "next_attributes_root_title",
-              "descriptionKey": "next_attributes_root_body",
+              "titleKey": {
+                "en": "All attribute categories",
+                "ja": "属性カテゴリ一覧"
+              },
+              "descriptionKey": {
+                "en": "Back to the full list of attribute categories (Layout, Style, Binding, Event, ...).",
+                "ja": "属性カテゴリ全一覧に戻る（Layout / Style / Binding / Event など）。"
+              },
               "url": "/reference/attributes"
             }
           ]

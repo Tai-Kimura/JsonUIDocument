@@ -1,90 +1,677 @@
 {
   "category": "misc",
   "title": "Misc attributes",
-  "description": "Identity, metadata, composition, and debug attributes that don't fit other categories.",
+  "description": {
+    "en": "Identity, metadata, composition, and debug attributes that don't fit other categories.",
+    "ja": "他のカテゴリに属さない識別・メタデータ・合成・デバッグ系の属性。"
+  },
+  "kicker": "Attribute category · Reference",
+  "kickerParentLabel": "Attributes",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "gone",
+  "aliasCalloutVisibility": "gone",
+  "aliasOf": null,
+  "aliasLinkUrl": "",
+  "aliasNotice": null,
+  "overviewRows": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "overview_className",
+              "name": "className",
+              "type": "string",
+              "summary": {
+                "en": "Web-only. Additional CSS class names appended to the generated element.",
+                "ja": "Web 専用。生成要素に追加される CSS クラス名。"
+              },
+              "anchorUrl": "#attr-className"
+            },
+            {
+              "id": "overview_generatedBy",
+              "name": "generatedBy",
+              "type": "string",
+              "summary": {
+                "en": "Set by the generator to identify the spec that produced this file. Do not edit by hand; it drives…",
+                "ja": "生成器がこのファイルを生んだ spec を記録するフィールド。手編集禁止、`jui verify` の根拠になる。"
+              },
+              "anchorUrl": "#attr-generatedBy"
+            },
+            {
+              "id": "overview_id",
+              "name": "id",
+              "type": "string",
+              "summary": {
+                "en": "Unique identifier within the layout. Required for ViewModel references and test-runner selectors.…",
+                "ja": "Layout 内の一意識別子。ViewModel 参照とテストランナーの selector に必須。命名規則: `<screen>_<purpose>`。"
+              },
+              "anchorUrl": "#attr-id"
+            },
+            {
+              "id": "overview_include",
+              "name": "include",
+              "type": "string",
+              "summary": {
+                "en": "Reference to another Layout file, inlined at this position. Path is relative to the layouts root;…",
+                "ja": "別の Layout ファイルを参照し、この位置にインライン展開。パスは layouts ルートからの相対、拡張子なし。"
+              },
+              "anchorUrl": "#attr-include"
+            },
+            {
+              "id": "overview_partial",
+              "name": "partial",
+              "type": "boolean",
+              "summary": {
+                "en": "Marks the file as a partial layout that is only usable via `include`. Prevents direct routing.",
+                "ja": "このファイルが `include` 経由でのみ使えるパーシャル Layout であることをマーク。直接ルーティングを防ぐ。"
+              },
+              "anchorUrl": "#attr-partial"
+            },
+            {
+              "id": "overview_tag",
+              "name": "tag",
+              "type": "number | binding",
+              "summary": {
+                "en": "Arbitrary marker string attached to the view. Useful for runtime debugging / analytics without po…",
+                "ja": "view に付ける任意のマーカー文字列。`id` を汚さずに実行時デバッグ／アナリティクスに使う。"
+              },
+              "anchorUrl": "#attr-tag"
+            },
+            {
+              "id": "overview_testId",
+              "name": "testId",
+              "type": "string",
+              "summary": {
+                "en": "Test-only identifier separate from `id`. Use when the test selector should not affect runtime acc…",
+                "ja": "`id` とは別のテスト専用識別子。ランタイムの accessibility ID に影響させたくないときに使う。"
+              },
+              "anchorUrl": "#attr-testId"
+            },
+            {
+              "id": "overview_type",
+              "name": "type",
+              "type": "string",
+              "summary": {
+                "en": "The component type (`Label`, `Button`, `View`, ...). Required on every node. Not typically discus…",
+                "ja": "コンポーネント型（`Label`, `Button`, `View` など）。全ノードで必須。ユーザー向け属性としては通常議論されないが、網羅のためここに記載。"
+              },
+              "anchorUrl": "#attr-type"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subgroups": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "subgroupsVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_overview",
+      "label": {
+        "en": "Overview",
+        "ja": "概要"
+      },
+      "anchor": "section-overview",
+      "level": 1
+    },
+    {
+      "id": "toc_detail",
+      "label": {
+        "en": "Attributes",
+        "ja": "属性"
+      },
+      "anchor": "section-detail",
+      "level": 1
+    },
+    {
+      "id": "toc_next",
+      "label": {
+        "en": "Next reads",
+        "ja": "次に読む"
+      },
+      "anchor": "section-next",
+      "level": 1
+    }
+  ],
   "attributes": {
     "sections": [
       {
         "cells": {
           "data": [
             {
-              "id": "attr_class_name",
+              "id": "attr_className",
               "name": "className",
+              "anchorId": "attr-className",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Web-only. Additional CSS class names appended to the generated element.",
+                "ja": "Web 専用。生成要素に追加される CSS クラス名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Custom CSS class name",
-              "summary": "Web-only. Additional CSS class names appended to the generated element.",
-              "platform": "react"
+              "required": ""
             },
             {
-              "id": "attr_generated_by",
+              "id": "attr_generatedBy",
               "name": "generatedBy",
+              "anchorId": "attr-generatedBy",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Set by the generator to identify the spec that produced this file. Do not edit by hand; it drives `jui verify`.",
+                "ja": "生成器がこのファイルを生んだ spec を記録するフィールド。手編集禁止、`jui verify` の根拠になる。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "AI generation command that created this component (metadata only, not rendered)",
-              "summary": "Set by the generator to identify the spec that produced this file. Do not edit by hand; it drives `jui verify`."
+              "required": ""
             },
             {
               "id": "attr_id",
               "name": "id",
+              "anchorId": "attr-id",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Unique identifier within the layout. Required for ViewModel references and test-runner selectors. Naming convention: `<screen>_<purpose>`.",
+                "ja": "Layout 内の一意識別子。ViewModel 参照とテストランナーの selector に必須。命名規則: `<screen>_<purpose>`。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Unique identifier for the component",
-              "summary": "Unique identifier within the layout. Required for ViewModel references and test-runner selectors. Naming convention: `<screen>_<purpose>`.",
-              "examples": [
-                {
-                  "language": "json",
-                  "code": "{ \"type\": \"Button\", \"id\": \"login_submit_button\", \"text\": \"@string/submit\" }"
-                }
-              ]
+              "required": ""
             },
             {
               "id": "attr_include",
               "name": "include",
+              "anchorId": "attr-include",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Reference to another Layout file, inlined at this position. Path is relative to the layouts root; no extension.",
+                "ja": "別の Layout ファイルを参照し、この位置にインライン展開。パスは layouts ルートからの相対、拡張子なし。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Include another JSON layout (filename without extension)",
-              "summary": "Reference to another Layout file, inlined at this position. Path is relative to the layouts root; no extension.",
-              "examples": [
-                {
-                  "language": "json",
-                  "code": "{ \"include\": \"common/header\" }"
-                }
-              ]
+              "required": ""
             },
             {
               "id": "attr_partial",
               "name": "partial",
+              "anchorId": "attr-partial",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Marks the file as a partial layout that is only usable via `include`. Prevents direct routing.",
+                "ja": "このファイルが `include` 経由でのみ使えるパーシャル Layout であることをマーク。直接ルーティングを防ぐ。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "boolean",
-              "required": "",
-              "description": "Marks this file as a partial/include template. Partials are not standalone views and will not generate Data models.",
-              "summary": "Marks the file as a partial layout that is only usable via `include`. Prevents direct routing."
+              "required": ""
             },
             {
               "id": "attr_tag",
               "name": "tag",
+              "anchorId": "attr-tag",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Arbitrary marker string attached to the view. Useful for runtime debugging / analytics without polluting `id`.",
+                "ja": "view に付ける任意のマーカー文字列。`id` を汚さずに実行時デバッグ／アナリティクスに使う。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "number | binding",
-              "required": "",
-              "description": "View tag for identification (binding supported)",
-              "summary": "Arbitrary marker string attached to the view. Useful for runtime debugging / analytics without polluting `id`.",
-              "platform": "swift"
+              "required": ""
             },
             {
-              "id": "attr_test_id",
+              "id": "attr_testId",
               "name": "testId",
+              "anchorId": "attr-testId",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Test-only identifier separate from `id`. Use when the test selector should not affect runtime accessibility IDs.",
+                "ja": "`id` とは別のテスト専用識別子。ランタイムの accessibility ID に影響させたくないときに使う。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "",
-              "description": "Test ID for testing (data-testid)",
-              "summary": "Test-only identifier separate from `id`. Use when the test selector should not affect runtime accessibility IDs.",
-              "platform": "react"
+              "required": ""
             },
             {
               "id": "attr_type",
               "name": "type",
+              "anchorId": "attr-type",
+              "requiredChipText": "required",
+              "requiredChipVisibility": "visible",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-danger)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "The component type (`Label`, `Button`, `View`, ...). Required on every node. Not typically discussed as a user-facing attribute; listed here for completeness.",
+                "ja": "コンポーネント型（`Label`, `Button`, `View` など）。全ノードで必須。ユーザー向け属性としては通常議論されないが、網羅のためここに記載。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
               "type": "string",
-              "required": "required",
-              "description": "Component type",
-              "summary": "The component type (`Label`, `Button`, `View`, ...). Required on every node. Not typically discussed as a user-facing attribute; listed here for completeness."
+              "required": "required"
             }
           ]
         }
@@ -99,14 +686,26 @@
           "data": [
             {
               "id": "next_components",
-              "titleKey": "next_components_title",
-              "descriptionKey": "next_components_body",
+              "titleKey": {
+                "en": "Component reference",
+                "ja": "コンポーネントリファレンス"
+              },
+              "descriptionKey": {
+                "en": "The full 28-component catalog with type signatures, examples, and platform support.",
+                "ja": "28 コンポーネントの全カタログ。型・例・プラットフォーム対応を収録。"
+              },
               "url": "/reference/components"
             },
             {
               "id": "next_attributes_root",
-              "titleKey": "next_attributes_root_title",
-              "descriptionKey": "next_attributes_root_body",
+              "titleKey": {
+                "en": "All attribute categories",
+                "ja": "属性カテゴリ一覧"
+              },
+              "descriptionKey": {
+                "en": "Back to the full list of attribute categories (Layout, Style, Binding, Event, ...).",
+                "ja": "属性カテゴリ全一覧に戻る（Layout / Style / Binding / Event など）。"
+              },
               "url": "/reference/attributes"
             }
           ]
