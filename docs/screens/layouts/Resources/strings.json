@@ -6054,6 +6054,108 @@
       "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
     }
   },
+  "spec_custom_types": {
+    "breadcrumb": {
+      "en": "← Split overview",
+      "ja": "← Split overview"
+    },
+    "title": {
+      "en": "Custom types",
+      "ja": "独自型"
+    },
+    "lead": {
+      "en": "Pattern 4 of spec splitting, in detail. Declare reusable row / entry shapes once inside `dataFlow.customTypes` and reference them by name (`[ActivityRow]`) from any `uiVariables` or VM var. A lighter-weight DRY knob than splitting into sub-specs — the unit of reuse here is the *type shape*, not a slice of state.",
+      "ja": "spec 分割パターン 4 の詳細版。共通の行 / entry 型を `dataFlow.customTypes` に 1 度だけ宣言し、任意の `uiVariables` や VM vars から `[ActivityRow]` のように名前で参照します。sub-spec まで分割するより軽量な DRY 手段 — ここで再利用する単位は *型の形* であって状態のスライスではありません。"
+    },
+    "read_time": {
+      "en": "~9 min read",
+      "ja": "約 9 分"
+    },
+    "section_why_heading": {
+      "en": "Why declare custom types",
+      "ja": "独自型を宣言する意義"
+    },
+    "section_why_body": {
+      "en": "JSON isn't a typed language, but the spec is. Every `uiVariables` / `vars` entry has a `type` string, and the generator treats that string as a contract — it will fail to emit a hand-written VM that breaks it. For primitives (`String`, `Int`) that's already enough; for row / entry shapes you'd otherwise inline an anonymous record literal everywhere they appear. Promoting them to `dataFlow.customTypes` gives the shape a *name*, a single declaration site, and referencability from the VM contract, userActions, and (with one more step) other specs.",
+      "ja": "JSON は型付き言語ではありませんが spec は型付きです。`uiVariables` / `vars` の各エントリは `type` 文字列を持ち、ジェネレータはそれを契約として扱う — 契約を破る手書き VM は emit に失敗します。プリミティブ（`String` / `Int`）ならこれで十分、行 / entry 型は本来インラインで匿名レコードリテラルを繰り返すことになります。`dataFlow.customTypes` に昇格させれば、形に *名前* が付き、宣言箇所が 1 つに集約され、VM の契約 / userActions / さらに 1 ステップ加えて他 spec からも参照可能になります。"
+    },
+    "section_declare_heading": {
+      "en": "Declaring a type",
+      "ja": "型の宣言"
+    },
+    "section_declare_body": {
+      "en": "Each entry in `dataFlow.customTypes[]` has a `name` and a `properties` array of `{ name, type }`. The same `type` vocabulary that `uiVariables` uses is available here — primitives, optionals (`T?`), arrays (`[T]`), closures (`(A) -> B`), and references to other customTypes by name. After a type is declared you can use `[ActivityRow]` / `ActivityRow?` / `Map(String, ActivityRow)` anywhere a `type:` string is expected.",
+      "ja": "`dataFlow.customTypes[]` の各エントリは `name` と `properties` 配列（`{ name, type }`）を持ちます。`uiVariables` が使う `type` 語彙と同じものが使える — プリミティブ / オプショナル（`T?`）/ 配列（`[T]`）/ クロージャ（`(A) -> B`）/ 他 customTypes への名前参照。型を宣言した後は、`type:` 文字列を期待する場所ならどこでも `[ActivityRow]` / `ActivityRow?` / `Map(String, ActivityRow)` が使えます。"
+    },
+    "section_types_heading": {
+      "en": "The type vocabulary",
+      "ja": "使える型語彙"
+    },
+    "section_types_body": {
+      "en": "The cheat sheet below lists the canonical forms the validator / generator recognize. Anything not on this list has to be wrapped in a customType or registered in `.jsonui-type-map.json`. Nesting works as expected — `[Map(String, ActivityRow)]?` is legal and means 'optional array of string-keyed ActivityRow maps'.",
+      "ja": "下のチートシートが validator / ジェネレータが認識する正規形の一覧。このリストに無いものは customType でラップするか `.jsonui-type-map.json` に登録する必要があります。ネストは想定通りに動き — `[Map(String, ActivityRow)]?` は合法で、「String キーの ActivityRow マップの配列のオプショナル」を意味します。"
+    },
+    "section_sharing_heading": {
+      "en": "Sharing types across specs",
+      "ja": "spec 間で型を共有する"
+    },
+    "section_sharing_body": {
+      "en": "By default a customType is visible only inside the spec that declares it. To share it with other specs, register it in `.jsonui-type-map.json` at the repo root — each entry records the declaring spec, the class name the generator should use, and per-platform import hints. Once registered, any other spec can reference the type by name without redeclaring the properties, and the generator wires up the correct import on each platform.",
+      "ja": "既定では customType は宣言した spec の中だけで可視。他 spec と共有するにはリポジトリ root の `.jsonui-type-map.json` に登録します — 各エントリは宣言元 spec / ジェネレータが使うクラス名 / プラットフォーム別の import ヒントを記録。登録後は他の spec がプロパティを再宣言せずに名前で参照でき、ジェネレータが各プラットフォームで正しい import を配線。"
+    },
+    "section_platform_heading": {
+      "en": "What the generator emits",
+      "ja": "ジェネレータが emit するもの"
+    },
+    "section_platform_body": {
+      "en": "Each customType becomes a platform-native shape at build time. On iOS the generator emits a `struct ActivityRow { … }`. On Android it becomes a `data class ActivityRow(...)`. On web it's a TypeScript `interface ActivityRow { … }` plus a `createActivityRow()` factory for default values. The emitted files land in each platform's generated data directory (`jsonui-doc-web/src/generated/data/ActivityRowData.ts` on web). If the type is registered in `.jsonui-type-map.json` with an external `import`, the generator emits an import of the external class instead of declaring its own.",
+      "ja": "各 customType はビルド時にプラットフォームネイティブな形に変換されます。iOS では `struct ActivityRow { … }` を emit、Android では `data class ActivityRow(...)`、web では TypeScript の `interface ActivityRow { … }` + `createActivityRow()` デフォルト値ファクトリ。emit 先は各プラットフォームの生成 data ディレクトリ（web なら `jsonui-doc-web/src/generated/data/ActivityRowData.ts`）。`.jsonui-type-map.json` に外部 `import` 付きで登録されていれば、自前宣言の代わりに外部クラスの import を emit。"
+    },
+    "section_examples_heading": {
+      "en": "Live examples on this site",
+      "ja": "本サイトの稼働例"
+    },
+    "section_examples_body": {
+      "en": "Most screens on this site use at least one customType. `NextReadLink` — the 4-field row shape that backs every 'Keep going' section at the bottom of an article — is declared in a dozen spec files. `ActivityRow` is the row model in `/learn/first-screen`. `QuickstartStep` is the per-step shape in `/learn/hello-world` with six fields and two optionals. All three stay spec-local (not in the type map) because each is only used inside its owning spec; the patterns below show you when to promote one to the repo-wide type map.",
+      "ja": "本サイトのほとんどの画面は少なくとも 1 つの customType を使用。`NextReadLink`（記事末尾 'Keep going' セクションの 4 フィールド行モデル）は十数本の spec ファイルで宣言されています。`ActivityRow` は `/learn/first-screen` の行モデル、`QuickstartStep` は `/learn/hello-world` のステップごとの形で 6 フィールド + 2 optional。いずれも spec ローカルに留まっており（type map には入っていない）、各自宣言元の spec 内だけで使われるから。下のパターンがいつ repo 横断の type map に昇格すべきかを示します。"
+    },
+    "section_when_not_heading": {
+      "en": "When NOT to use customTypes",
+      "ja": "customTypes を使わない方がよい場合"
+    },
+    "section_when_not_body": {
+      "en": "Two anti-patterns. (1) Declaring a customType for a shape used in exactly one spot — the anonymous record keeps reading better. The break-even is 3+ reuse sites or a shape with 4+ properties. (2) Using the type map to share state across screens — that's the Pattern 2 (parent + sub) problem wearing a different hat. Custom types share *shape*; state slices are different instances and belong in their own sub-specs or repositories.",
+      "ja": "2 つの anti-pattern。(1) 1 箇所でしか使わない形を customType にする — 匿名レコードのままの方が読みやすい。break-even は 3+ の再利用箇所、もしくは 4+ プロパティを持つ形。(2) 画面間で状態を共有するために type map を使う — それはパターン 2（parent + sub）の問題が別の顔をしているだけ。customTypes は *形* を共有する手段で、状態のスライスは別インスタンスなので sub-spec か repository が正解。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_subheading": {
+      "en": "Four patterns down, one to go — cellClasses.",
+      "ja": "4 パターン終了、残り 1 つ — cellClasses。"
+    },
+    "next_component_spec_title": {
+      "en": "Component specs",
+      "ja": "コンポーネント spec"
+    },
+    "next_component_spec_description": {
+      "en": "Pattern 3 — extract reusable custom UI into its own component_spec.json.",
+      "ja": "パターン 3 — 再利用カスタム UI を component_spec.json に切り出す。"
+    },
+    "next_cell_classes_title": {
+      "en": "Collection cell classes",
+      "ja": "Collection セルクラス"
+    },
+    "next_cell_classes_description": {
+      "en": "Pattern 5 — hoist each Collection cell layout into its own file under docs/screens/layouts/cells/.",
+      "ja": "パターン 5 — Collection の各セルレイアウトを docs/screens/layouts/cells/ 配下のファイルに切り出す。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    }
+  },
   "reference_detail": {
     "eyebrow_glance": {
       "en": "AT A GLANCE",

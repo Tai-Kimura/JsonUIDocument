@@ -1,0 +1,158 @@
+{
+  "type": "View",
+  "id": "spec_custom_types_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_muted",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks",  "class": "CollectionDataSource" },
+        { "name": "onNavigateSpec", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "spec_custom_types_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_custom_types_header",
+          "style": "page_header",
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateSpec}",
+              "text": "breadcrumb"
+            },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 36, "fontWeight": "bold", "fontColor": "#0B1220", "text": "title" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 17, "fontColor": "#475467", "text": "lead" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 13, "fontColor": "#64748B", "text": "read_time" }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_custom_types_body",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View", "orientation": "vertical", "id": "section_why", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_why_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_why_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_declare", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_declare_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_declare_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "// dataFlow.customTypes — declare once at the top of the spec, then\n// reference by name from anywhere in uiVariables / VM vars / other types.\n{\n  \"dataFlow\": {\n    \"customTypes\": [\n      {\n        \"name\": \"ActivityRow\",\n        \"properties\": [\n          { \"name\": \"id\",        \"type\": \"String\" },\n          { \"name\": \"title\",     \"type\": \"String\" },\n          { \"name\": \"timestamp\", \"type\": \"Date\" },\n          { \"name\": \"url\",       \"type\": \"String?\"      },   // optional\n          { \"name\": \"onTap\",     \"type\": \"() -> Void\" }      // event callback\n        ]\n      }\n    ]\n  },\n  \"stateManagement\": {\n    \"uiVariables\": [\n      { \"name\": \"rows\", \"type\": \"[ActivityRow]\", \"initial\": \"[]\" }\n    ]\n  }\n}",
+                  "language": "json", "filename": "dataFlow.customTypes", "showLineNumbers": false, "copyable": true
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_types", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_types_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_types_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "Type syntax supported in `type:` fields\n-------\nString                primitive\nInt / Double / Bool   primitives (Double is the floating-point form)\nDate                  ISO-8601 timestamp\nVoid                  the no-value type (return of fire-and-forget closures)\nData                  opaque binary payload\nURL                   URL / Uri (string under the hood, typed on the runtime)\n\n[T]                   array of T\nMap(K, V)             dictionary / hash\nT?                    optional T (allowed to be null / nil / undefined)\n\n(A, B) -> Void        closure taking A + B, returning nothing (event callback)\n(A)    -> B           closure taking A, returning B\n\nAsyncThrowingStream<T, E>   typed async iterator (iOS-flavoured; platform-mapped)\n\n<CustomName>          reference to a customTypes entry by name\n[<CustomName>]        array of that custom type\n[<CustomName>]?        optional array of that custom type\n\nMost combinations nest as expected: `[Map(String, ActivityRow)]?`, etc.",
+                  "language": "text", "filename": "type syntax cheatsheet", "showLineNumbers": false, "copyable": false
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_sharing", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_sharing_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_sharing_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "// .jsonui-type-map.json (at the repo root) — cross-spec type registry.\n// Register any customType you want to share; once registered, another\n// spec can reference it by name without redeclaring.\n{\n  \"version\": \"1.0\",\n  \"types\": {\n    \"ActivityRow\": {\n      \"declaredIn\":   \"docs/screens/json/learn/first-screen.spec.json\",\n      \"class\":        \"ActivityRow\",\n      \"imports\": {\n        \"swift\":  [\"CommonDomain\"],                // Swift Package / framework\n        \"kotlin\": [\"com.example.app.domain\"],       // Kotlin package\n        \"web\":    { \"from\": \"@/models/ActivityRow\" } // TS import path\n      }\n    }\n  }\n}\n\n// Spec B (/learn/archive.spec.json) — references ActivityRow by name.\n// No customTypes entry needed; the registry resolves it.\n{\n  \"stateManagement\": {\n    \"uiVariables\": [\n      { \"name\": \"archived\", \"type\": \"[ActivityRow]\", \"initial\": \"[]\" }\n    ]\n  }\n}",
+                  "language": "json", "filename": ".jsonui-type-map.json", "showLineNumbers": false, "copyable": true
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_platform", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_platform_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_platform_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_examples", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_examples_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_examples_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_when_not", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_when_not_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_when_not_body",    "width": "matchParent" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_custom_types_next",
+          "style": "home_section",
+          "background": "chrome_fill",
+          "child": [
+            { "type": "Label", "style": "section_heading",    "text": "next_heading",    "width": "matchParent", "fontColor": "chrome_ink" },
+            { "type": "Label", "style": "section_subheading", "text": "next_subheading", "width": "matchParent", "fontColor": "chrome_ink" },
+            {
+              "type": "Collection",
+              "id": "spec_custom_types_next_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "columnCount": 2,
+              "lineSpacing": 16,
+              "itemSpacing": 16,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{nextReadLinks}",
+              "cellIdProperty": "id",
+              "sections": [
+                { "cell": "cells/next_step_card" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "spec_custom_types_footer",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 32, 32],
+          "background": "chrome_fill",
+          "child": [
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 12, "fontColor": "#94A3B8", "text": "footer_copyright" }
+          ]
+        }
+      ]
+    }
+  ]
+}
