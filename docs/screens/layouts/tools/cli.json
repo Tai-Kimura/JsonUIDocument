@@ -167,7 +167,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 16,
-                      "code": "# Every workflow starts at jui. It reads jui.config.json and\n# fans out to the right platform-specific builder.\n\njui init my-project                 # scaffold fresh project\njui generate project --file X.spec  # scaffold Layout + VM + hook\njui build --watch                   # regenerate on change\njui verify --fail-on-diff           # drift gate\njui sync_tool                       # pull latest from ~/.jsonui-cli\njui build --platform web            # single-platform build",
+                      "code": "# Every workflow starts at jui. It reads jui.config.json and\n# fans out to the right platform-specific builder.\n\njui init --project-name my-app \\\n         --ios ios --android android --web web    # scaffold fresh project\njui generate project --file X.spec.json            # scaffold Layout + VM + hook\njui build                                          # regenerate all platforms\njui build --platform web                           # single-platform build\njui hotload listen                                 # live-reload (iOS + Android)\njui verify --fail-on-diff                          # drift gate\njui sync_tool                                      # pull latest from ~/.jsonui-cli",
                       "language": "bash",
                       "filename": "jui cheat sheet",
                       "showLineNumbers": false,

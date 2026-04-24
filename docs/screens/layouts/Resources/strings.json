@@ -1775,24 +1775,24 @@
       "ja": "Web: Next.js dev"
     },
     "section_web_body": {
-      "en": "On web, hot reload is the least interesting because Next.js already does everything. `rjui build --watch` regenerates TSX whenever a JSON file changes; Next.js's dev server picks up the TSX diff and HMR-pushes the new component to the open tab. No custom runtime, no network fetch — the generator output is what the browser loads.",
-      "ja": "Web では最も単純です。Next.js がほぼ全部やってくれる。`rjui build --watch` は JSON の変更を監視して TSX を再生成し、Next.js の dev server が TSX の差分を検知して開いているタブに HMR push する。カスタムランタイムもネットワーク fetch もない — ジェネレータの出力がそのままブラウザに読み込まれます。"
+      "en": "Web is the simplest case: `jui hotload listen` is deliberately out of scope for web because Next.js already does everything on its own. Run `npm run dev` and edit a Layout JSON — rjui regenerates the TSX as part of your normal `jui build` loop, and Next.js's dev server picks up the TSX diff and HMR-pushes the new component to the open tab. No custom runtime, no network fetch, no additional watcher process.",
+      "ja": "Web は一番シンプルなケース: `jui hotload listen` は意図的に Web 対象外 — Next.js が既に自力でライブリロードを実現しているからです。`npm run dev` を起動して Layout JSON を編集すると、rjui は通常の `jui build` ループの中で TSX を再生成し、Next.js の dev server が TSX の差分を検知して HMR push する。カスタムランタイムもネットワーク fetch も追加の watcher プロセスも不要。"
     },
     "section_ios_heading": {
       "en": "iOS: SwiftJsonUI Dynamic mode",
       "ja": "iOS: SwiftJsonUI Dynamic mode"
     },
     "section_ios_body": {
-      "en": "The iOS app, when built with Dynamic mode enabled, does not bake the Layout JSON into the binary. Instead it fetches the JSON from a dev server on the author's machine at screen-mount time. When `sjui build --watch` writes a new JSON file, the next time the simulator navigates to that screen (or receives a push-style refresh), it pulls the new JSON and re-renders. Release builds flip Dynamic mode off and revert to compiled SwiftUI, so production is unaffected.",
-      "ja": "iOS アプリは Dynamic mode 有効でビルドすると Layout JSON をバイナリに埋め込まず、画面マウント時に開発者マシン上の dev server から JSON を fetch します。`sjui build --watch` が新しい JSON を書き出すと、次にシミュレータがその画面に遷移した時（または push 形式の reload 通知を受けた時）に新 JSON を取りに行き再描画する。リリースビルドでは Dynamic mode が off になりコンパイル済み SwiftUI に戻るので、本番には影響なし。"
+      "en": "The iOS app, when built with Dynamic mode enabled, does not bake the Layout JSON into the binary. Instead it fetches the JSON from a `jui hotload listen` server on the author's machine at screen-mount time and subscribes to WebSocket push notifications for subsequent edits. When the server detects a change under `docs/screens/layouts/`, it resolves style includes + applies iOS-specific filtering and pushes the flat JSON over `ws://host:8081/ws`; the simulator picks up the change and re-renders without a rebuild. Release builds flip Dynamic mode off and revert to compiled SwiftUI, so production is unaffected.",
+      "ja": "iOS アプリは Dynamic mode 有効でビルドすると Layout JSON をバイナリに埋め込まず、画面マウント時に開発者マシン上の `jui hotload listen` サーバーから JSON を fetch し、以降の編集は WebSocket push で購読します。サーバーが `docs/screens/layouts/` の変更を検知すると、style include を解決し iOS 向けフィルタを適用した上で flat JSON を `ws://host:8081/ws` 経由で push。シミュレータは再ビルドなしに変更を反映します。リリースビルドでは Dynamic mode が off になりコンパイル済み SwiftUI に戻るので、本番には影響なし。"
     },
     "section_android_heading": {
       "en": "Android: KotlinJsonUI Dynamic mode",
       "ja": "Android: KotlinJsonUI Dynamic mode"
     },
     "section_android_body": {
-      "en": "Android does the same thing Swift does, with the same shape. `kjui build --watch` keeps the Layout JSON fresh, the app's Dynamic mode runtime fetches on screen mount, and Compose re-runs its declarative pipeline with the new spec. The Compose runtime's incremental re-render machinery does most of the work — swapping a single Label's text takes a single recomposition, not a full screen teardown.",
-      "ja": "Android は Swift と同じ形で同じことをします。`kjui build --watch` が Layout JSON を最新に保ち、アプリの Dynamic mode ランタイムが画面マウント時に fetch、Compose が新しい spec で declarative パイプラインを再実行する。Compose の incremental 再描画機構がほぼ全ての仕事をしてくれる — Label 1 個の text を差し替えるのは 1 回の recomposition だけで、画面全体の teardown は走らない。"
+      "en": "Android works through the *same* `jui hotload listen` process the iOS tab describes — one server serves both platforms, distinguishing them via a WebSocket handshake (`{ platform: 'android' }`) and per-path HTTP routes (`/android/layout/*`). The app's Dynamic mode runtime fetches on screen mount, subscribes to layout_changed events, and lets Compose re-run its declarative pipeline with the new spec. The Compose runtime's incremental re-render machinery does the rest — swapping a single Label's text takes a single recomposition, not a full screen teardown.",
+      "ja": "Android は iOS タブで紹介したのと *同じ* `jui hotload listen` プロセスを共有します — 1 サーバーが両プラットフォームを捌き、WebSocket の handshake (`{ platform: 'android' }`) と HTTP パス (`/android/layout/*`) で区別します。アプリの Dynamic mode ランタイムは画面マウント時に fetch し、layout_changed イベントを購読。Compose は新しい spec で declarative パイプラインを再実行する。Compose の incremental 再描画機構が残りの仕事をこなす — Label 1 個の text を差し替えるのは 1 回の recomposition だけで、画面全体の teardown は走らない。"
     },
     "section_why_heading": {
       "en": "Why it matters",
@@ -2819,8 +2819,8 @@
       "ja": "Web"
     },
     "cli_rjui_body": {
-      "en": "ReactJsonUI builder. Generates Next.js + React + Tailwind code from Layout JSON. Powers this documentation site: rjui build --watch is what turns a JSON edit into an HMR push in the browser.",
-      "ja": "ReactJsonUI 用 builder。Layout JSON から Next.js + React + Tailwind のコードを生成。このドキュメントサイト自体を駆動しています: rjui build --watch が JSON の編集をブラウザの HMR push に変える仕組み。"
+      "en": "ReactJsonUI builder. Generates Next.js + React + Tailwind code from Layout JSON, invoked as part of `jui build --platform web` (or plain `jui build`). Powers this documentation site: the regenerated TSX is what Next.js HMR pushes into the open browser tab when you edit a JSON file.",
+      "ja": "ReactJsonUI 用 builder。Layout JSON から Next.js + React + Tailwind のコードを生成し、`jui build --platform web`（または単なる `jui build`）の一部として呼び出されます。このドキュメントサイト自体を駆動しています: JSON を編集すると再生成された TSX が Next.js HMR 経由でブラウザタブに push されます。"
     },
     "cli_jsonui_test_name": {
       "en": "jsonui-test",
@@ -3789,8 +3789,8 @@
       "ja": "得られるもの"
     },
     "section_get_body": {
-      "en": "The sjui build step reads your Layout JSON + ViewModel and emits Swift files that would pass code review at any iOS shop. You get the Xcode project layout you already know, your own types, your own imports — the generator just removes the 'write the view three times' tax. Dual-mode output means every screen compiles for both SwiftUI and UIKit; you pick the host per screen, the generator does the rest.",
-      "ja": "sjui build は Layout JSON + ViewModel を読み、どの iOS 現場のコードレビューも通るような Swift ファイルを emit します。慣れた Xcode プロジェクト構造・自前の型・自前の import はそのまま — ジェネレータは「View を 3 回書くコスト」を消すだけです。デュアルモード出力により、各画面を SwiftUI と UIKit の両方でコンパイルできます。ホストは画面単位で選び、残りはジェネレータが処理します。"
+      "en": "`jui build` delegates Swift generation to sjui, which reads your Layout JSON + ViewModel and emits Swift files that would pass code review at any iOS shop. You get the Xcode project layout you already know, your own types, your own imports — the generator just removes the 'write the view three times' tax. Dual-mode output means every screen compiles for both SwiftUI and UIKit; you pick the host per screen, the generator does the rest.",
+      "ja": "`jui build` は Swift の生成を sjui に委譲します — sjui が Layout JSON + ViewModel を読み、どの iOS 現場のコードレビューも通るような Swift ファイルを emit します。慣れた Xcode プロジェクト構造・自前の型・自前の import はそのまま — ジェネレータは「View を 3 回書くコスト」を消すだけです。デュアルモード出力により、各画面を SwiftUI と UIKit の両方でコンパイルできます。ホストは画面単位で選び、残りはジェネレータが処理します。"
     },
     "section_dual_heading": {
       "en": "SwiftUI + UIKit output",
@@ -3805,8 +3805,8 @@
       "ja": "Dynamic mode"
     },
     "section_dynamic_body": {
-      "en": "Dev-only: the app does not bake Layout JSON into the binary. It fetches the JSON from a local server on mount, so `sjui build --watch` updates the simulator the moment you save. A physical device can point at your Mac's IP and do the same thing, which is how most iOS devs first experience 'web-style hot reload on a phone'. Release builds flip Dynamic mode off; production ships compiled SwiftUI with no network hop.",
-      "ja": "開発専用: アプリは Layout JSON をバイナリに埋め込まず、マウント時にローカルサーバから fetch します。`sjui build --watch` が保存の瞬間にシミュレータを更新する仕組み。実機でも Mac の IP を指定すれば同じことができる — 多くの iOS 開発者が初めて「実機で Web 的な hot reload」を体験する経路です。リリースビルドでは Dynamic mode が off になり、本番はコンパイル済み SwiftUI で動きネットワークホップはありません。"
+      "en": "Dev-only: the app does not bake Layout JSON into the binary. It fetches the JSON from the unified `jui hotload listen` server on mount, so the simulator updates the moment you save a layout. A physical device can point at your Mac's IP and do the same thing — that's how most iOS devs first experience 'web-style hot reload on a phone'. The same server also handles Android, so a single listener covers both mobile targets. Release builds flip Dynamic mode off; production ships compiled SwiftUI with no network hop.",
+      "ja": "開発専用: アプリは Layout JSON をバイナリに埋め込まず、マウント時に統合された `jui hotload listen` サーバーから fetch します。Layout を保存した瞬間にシミュレータが更新される。実機でも Mac の IP を指定すれば同じことができる — 多くの iOS 開発者が初めて「実機で Web 的な hot reload」を体験する経路です。同じサーバーが Android も捌くので、1 listener で両モバイルターゲットをカバー。リリースビルドでは Dynamic mode が off になり、本番はコンパイル済み SwiftUI で動きネットワークホップはありません。"
     },
     "section_prod_heading": {
       "en": "Production caveats",
@@ -3883,8 +3883,8 @@
       "ja": "得られるもの"
     },
     "section_get_body": {
-      "en": "kjui build reads the spec and emits Kotlin files ready to drop into a Gradle module. Your Activity / Fragment / Compose Navigation setup stays yours; kjui generates the screen composables and the ViewModel base classes, leaving the app shell and integration points alone. Output compiles to the same bytecode any Android Studio build would produce.",
-      "ja": "kjui build は spec を読んで Gradle モジュールにそのまま入る Kotlin ファイルを emit します。Activity / Fragment / Compose Navigation のセットアップはあなたの持ち物のまま。kjui は画面の composable と ViewModel ベースクラスを生成し、アプリのシェルと統合ポイントには手を出しません。出力は Android Studio が生成するのと同じバイトコードにコンパイルされます。"
+      "en": "`jui build` delegates Kotlin generation to kjui, which reads the spec and emits Kotlin files ready to drop into a Gradle module. Your Activity / Fragment / Compose Navigation setup stays yours; kjui generates the screen composables and the ViewModel base classes, leaving the app shell and integration points alone. Output compiles to the same bytecode any Android Studio build would produce.",
+      "ja": "`jui build` は Kotlin の生成を kjui に委譲します — kjui が spec を読んで Gradle モジュールにそのまま入る Kotlin ファイルを emit します。Activity / Fragment / Compose Navigation のセットアップはあなたの持ち物のまま。kjui は画面の composable と ViewModel ベースクラスを生成し、アプリのシェルと統合ポイントには手を出しません。出力は Android Studio が生成するのと同じバイトコードにコンパイルされます。"
     },
     "section_dual_heading": {
       "en": "Compose + XML output",
@@ -3899,8 +3899,8 @@
       "ja": "Dynamic mode"
     },
     "section_dynamic_body": {
-      "en": "Same story as iOS: the app in debug fetches Layout JSON from a dev server at screen mount; `kjui build --watch` updates the target on save. Coroutine scopes carry over cleanly because the ViewModel base is coroutine-first; you rarely need to worry about where the work runs. Release builds bake the JSON into the APK and switch the runtime to the compiled path.",
-      "ja": "iOS と同じ: debug ビルドはマウント時に dev server から Layout JSON を fetch、`kjui build --watch` が保存のたびにターゲットを更新。ViewModel ベースがコルーチン前提なので scope の受け渡しは綺麗 — どこで仕事が動くかを気にする場面はほぼありません。リリースビルドでは JSON を APK に焼き込み、ランタイムはコンパイル済み経路に切り替わります。"
+      "en": "Same story as iOS — and literally the same server: the app in debug fetches Layout JSON from `jui hotload listen` at screen mount, and the listener pushes layout_changed events on save. The server distinguishes Android from iOS via a WebSocket handshake (`{ platform: 'android' }`) and per-path HTTP routes (`/android/layout/*`); one process covers both mobile targets. Coroutine scopes carry over cleanly because the ViewModel base is coroutine-first, so you rarely need to worry about where the work runs. Release builds bake the JSON into the APK and switch the runtime to the compiled path.",
+      "ja": "iOS と同じ — 文字通り同じサーバーを使います: debug ビルドはマウント時に `jui hotload listen` から Layout JSON を fetch、保存のたびに layout_changed イベントが push されます。サーバーは WebSocket の handshake (`{ platform: 'android' }`) と HTTP パス (`/android/layout/*`) で iOS と Android を区別し、1 プロセスで両モバイルターゲットをカバー。ViewModel ベースがコルーチン前提なので scope の受け渡しは綺麗 — どこで仕事が動くかを気にする場面はほぼありません。リリースビルドでは JSON を APK に焼き込み、ランタイムはコンパイル済み経路に切り替わります。"
     },
     "section_prod_heading": {
       "en": "Production caveats",
@@ -3977,8 +3977,8 @@
       "ja": "得られるもの"
     },
     "section_get_body": {
-      "en": "rjui build emits plain React TSX that Next.js compiles and serves. No custom runtime, no bundler plugins beyond what you already have — if Next.js can build it, it is already in your pipeline. The output has a boring generated-file header, imports StringManager for i18n, and looks like TSX anyone on your team could have written; it is just produced deterministically from the Layout JSON.",
-      "ja": "rjui build は素の React TSX を emit し、Next.js がそれをコンパイルして配信します。カスタムランタイムも既存にないバンドラプラグインも不要 — Next.js がビルドできるならあなたのパイプラインには既にあります。出力は退屈な生成ファイルヘッダー付き、i18n のために StringManager を import し、チームの誰が書いてもおかしくない TSX に見える — ただ Layout JSON から決定論的に生成されるだけです。"
+      "en": "`jui build` delegates web generation to rjui, which emits plain React TSX that Next.js compiles and serves. No custom runtime, no bundler plugins beyond what you already have — if Next.js can build it, it is already in your pipeline. The output has a boring generated-file header, imports StringManager for i18n, and looks like TSX anyone on your team could have written; it is just produced deterministically from the Layout JSON.",
+      "ja": "`jui build` は Web の生成を rjui に委譲します — rjui が素の React TSX を emit し、Next.js がそれをコンパイルして配信します。カスタムランタイムも既存にないバンドラプラグインも不要 — Next.js がビルドできるならあなたのパイプラインには既にあります。出力は退屈な生成ファイルヘッダー付き、i18n のために StringManager を import し、チームの誰が書いてもおかしくない TSX に見える — ただ Layout JSON から決定論的に生成されるだけです。"
     },
     "section_next_heading": {
       "en": "Next.js integration",
@@ -4059,12 +4059,68 @@
       "ja": "画面遷移"
     },
     "lead": {
-      "en": "Wire onNavigate in the ViewModel to each platform's router: Next.js App Router on web, NavigationStack / UINavigationController on iOS, Jetpack Compose Navigation / XML NavGraph on Android. The spec declares the destinations once; this guide tells you how each platform plugs in.",
-      "ja": "ViewModel の onNavigate を各プラットフォームのルーター — Web は Next.js App Router、iOS は NavigationStack / UINavigationController、Android は Jetpack Compose Navigation / XML NavGraph — に接続する。spec が遷移先を 1 度宣言すれば、あとは各プラットフォームの接続だけ。"
+      "en": "Navigation in JsonUI is a platform-external contract: the spec declares intent (transitions + onNavigate method), the generator emits a typed callback stub in the Data interface, and every platform's router layer — Route enum, NavigationStack, NavHost, Next.js page.tsx — is hand-written. This guide shows the contract, what the generator actually emits (spoiler: not much), and how to wire the routers yourself on each platform.",
+      "ja": "JsonUI のナビゲーションはプラットフォーム外の契約です: spec は intent (transitions + onNavigate メソッド) を宣言、ジェネレータは Data interface に型付き callback stub を出力、そして各プラットフォームの router 層 — Route enum / NavigationStack / NavHost / Next.js page.tsx — は全て手書きです。このガイドでは契約、ジェネレータが実際に出すもの (結論: ほぼ何も)、各プラットフォームでの router 配線方法を示します。"
     },
     "read_time": {
-      "en": "~10 min read",
-      "ja": "約 10 分"
+      "en": "~16 min read",
+      "ja": "約 16 分"
+    },
+    "section_contract_heading": {
+      "en": "1. The contract (spec layer)",
+      "ja": "1. 契約 (spec 層)"
+    },
+    "section_contract_body": {
+      "en": "Three fields in the spec together describe navigation. userActions[] names the human-facing action and its processing. transitions[] captures the routing graph: trigger, condition, destination, description. dataFlow.viewModel.methods[] declares onNavigate(url: String) as the universal funnel. All three are platform-agnostic — the `url` string is opaque to the spec and gets resolved to a concrete destination by each platform's router. There is no iOS-only or Android-only knob here.",
+      "ja": "spec の 3 フィールドが合わさってナビゲーションを表現します。userActions[] は人視点の操作と処理を命名、transitions[] はルーティンググラフ (trigger / condition / destination / description) を捕捉、dataFlow.viewModel.methods[] は onNavigate(url: String) を全体の funnel として宣言。3 つ全てがプラットフォーム非依存 — `url` 文字列は spec 視点では opaque で、各プラットフォームの router が具体的な遷移先に解決します。iOS 専用 / Android 専用の専用フィールドはありません。"
+    },
+    "section_gen_output_heading": {
+      "en": "2. What the generator actually writes",
+      "ja": "2. ジェネレータが実際に書くもの"
+    },
+    "section_gen_output_body": {
+      "en": "This is the most commonly misunderstood part: `jui generate project` does NOT write navigation code. It writes three small things — a typed callback slot in the Data interface, a Route enum sketch under src/types/ (Web only), and a ViewModelBase that accepts a router instance via its constructor — and stops there. Route enums, NavigationStack configurations, NavHost definitions, URL-to-destination mappings: all hand-written.",
+      "ja": "最も誤解されやすいポイント: `jui generate project` はナビゲーションコードを書きません。生成するのは 3 点のみ — Data interface の型付き callback スロット、Web 限定で src/types/ 配下の Route enum スケッチ、コンストラクタで router インスタンスを受け取る ViewModelBase — それで終わりです。Route enum、NavigationStack 設定、NavHost 定義、URL → 遷移先のマッピング、これらは全て手書きです。"
+    },
+    "section_gen_output_bullet_warn": {
+      "en": "• Mental model: the generator hands you a typed hole (onNavigate?: (url: string) => void). You bring the router. Do not look for auto-generated routing tables — they do not exist.",
+      "ja": "• メンタルモデル: ジェネレータは型付きの穴 (onNavigate?: (url: string) => void) だけ用意します。router はあなたが持ち込む。自動生成のルーティングテーブルを探しても無駄です — 存在しません。"
+    },
+    "section_sheets_heading": {
+      "en": "6. Sheets, modals, tabs, back",
+      "ja": "6. Sheet / modal / tab / back"
+    },
+    "section_sheets_body": {
+      "en": "Beyond the basic push, each platform has its own idioms for non-stack navigation. These never show up in the spec explicitly — they are a function of how you resolve the `url` string in the router layer.",
+      "ja": "基本の push 以外では、各プラットフォームが独自の非スタック系ナビゲーションイディオムを持ちます。これらは spec には明示的に現れません — router 層で `url` 文字列をどう解決するかの関数です。"
+    },
+    "section_sheets_bullet_sheet": {
+      "en": "• Sheet: Web uses an overlay React component or a dedicated /modal/* route. iOS uses .sheet(isPresented:) in SwiftUI or UIViewController.present(_:animated:) in UIKit. Android uses ModalBottomSheet in Compose or BottomSheetDialogFragment in XML.",
+      "ja": "• Sheet: Web はオーバーレイ React コンポーネントまたは専用の /modal/* route。iOS は SwiftUI の .sheet(isPresented:) または UIKit の UIViewController.present(_:animated:)。Android は Compose の ModalBottomSheet または XML の BottomSheetDialogFragment。"
+    },
+    "section_sheets_bullet_modal": {
+      "en": "• Full modal: Web uses a dedicated route (eg /modal/confirm). iOS uses .fullScreenCover() in SwiftUI or modal presentation in UIKit. Android uses Dialog(onDismissRequest:) in Compose or DialogFragment.",
+      "ja": "• フル modal: Web は専用 route (例 /modal/confirm)。iOS は SwiftUI の .fullScreenCover() または UIKit の modal presentation。Android は Compose の Dialog(onDismissRequest:) または DialogFragment。"
+    },
+    "section_sheets_bullet_tabs": {
+      "en": "• Tabs: Web typically uses URL-based tabs (/section/tab-a, /section/tab-b). iOS uses SwiftUI TabView or UITabBarController. Android uses TabRow + HorizontalPager in Compose or TabLayout + ViewPager2 in XML.",
+      "ja": "• Tab: Web は URL ベース (/section/tab-a, /section/tab-b)。iOS は SwiftUI の TabView または UITabBarController。Android は Compose の TabRow + HorizontalPager または XML の TabLayout + ViewPager2。"
+    },
+    "section_sheets_bullet_back": {
+      "en": "• Back: Web uses the browser back button or router.back(). iOS pops the NavigationStack automatically on back-swipe or can be driven via path manipulation. Android's NavController pops automatically on hardware/gesture back.",
+      "ja": "• Back: Web はブラウザの戻るボタンまたは router.back()。iOS は戻るスワイプで NavigationStack が自動 pop、または path 操作で駆動。Android の NavController はハードウェア/ジェスチャ back で自動 pop。"
+    },
+    "toc_row_contract": {
+      "en": "1. The contract",
+      "ja": "1. 契約"
+    },
+    "toc_row_gen_output": {
+      "en": "2. What the generator writes",
+      "ja": "2. ジェネレータの出力"
+    },
+    "toc_row_sheets": {
+      "en": "6. Sheets / modals / tabs / back",
+      "ja": "6. Sheet / modal / tab / back"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -4083,28 +4139,28 @@
       "ja": "spec の transitions 配列は trigger (通常 onNavigate(url) のようなイベント) / condition / destination / 短い説明を列挙します。プラットフォーム固有の記述はなし — 「first-screen spec に push する」がプラットフォーム非依存の契約。ジェネレータは各プラットフォームでエージェントが埋める router 呼び出し stub を出力します。"
     },
     "section_web_heading": {
-      "en": "Web: Next.js App Router",
-      "ja": "Web: Next.js App Router"
+      "en": "3. Wiring the Web router (Next.js App Router)",
+      "ja": "3. Web router の配線 (Next.js App Router)"
     },
     "section_web_body": {
-      "en": "useRouter() from 'next/navigation'. The ViewModel holds router as an AppRouterInstance; onNavigate(url) calls router.push(url). That is the entirety of the web integration. File-based routing means each destination already has a page.tsx — if the URL resolves, the user lands.",
-      "ja": "'next/navigation' からの useRouter()。ViewModel は router を AppRouterInstance として保持し、onNavigate(url) は router.push(url) を呼ぶだけ。Web 側統合はこれで終了。ファイルベースルーティングなので各遷移先には既に page.tsx があり、URL が解決すれば遷移成立。"
+      "en": "The Web side assumes Next.js App Router — the Data interface's onNavigate slot expects the router from next/navigation. Pattern: read useRouter() in the page.tsx, pass it into the hand-written ViewModel, implement onNavigate as router.push(url). URL is opaque to the spec; file-based routing under src/app/ does the resolution.",
+      "ja": "Web 側は Next.js App Router 前提 — Data interface の onNavigate スロットは next/navigation の router を期待します。パターン: page.tsx で useRouter() を読み、手書き ViewModel に渡し、onNavigate を router.push(url) として実装。URL は spec 視点では opaque、src/app/ 配下のファイルベースルーティングが解決を担います。"
     },
     "section_ios_heading": {
-      "en": "iOS: NavigationStack / UIKit",
-      "ja": "iOS: NavigationStack / UIKit"
+      "en": "4. Wiring iOS (SwiftUI NavigationStack)",
+      "ja": "4. iOS の配線 (SwiftUI NavigationStack)"
     },
     "section_ios_body": {
-      "en": "SwiftUI mode: push a typed Route enum onto the NavigationStack. UIKit mode: pushViewController on the active UINavigationController. The jsonui-navigation-ios agent picks the right idiom from the screen's choose of SwiftUI vs UIKit and writes the dispatch table — you do not maintain it by hand.",
-      "ja": "SwiftUI モード: 型付き Route enum を NavigationStack に push。UIKit モード: 現行 UINavigationController で pushViewController。jsonui-navigation-ios エージェントが画面ごとの SwiftUI / UIKit 選択を見てイディオムを選び、dispatch table を書く — 手で保守しません。"
+      "en": "For SwiftUI, define a typed Route enum, hold the navigation path as @State, and branch on Route in .navigationDestination(for:). onNavigate(url) maps url strings into Route cases and appends to the path. The UIKit alternative is a UINavigationController with pushViewController calls — same idea, different API. Neither form is generated.",
+      "ja": "SwiftUI なら、型付き Route enum を定義、navigation path を @State で保持、.navigationDestination(for:) で Route に分岐。onNavigate(url) は url 文字列を Route case にマップして path に append。UIKit 代替は UINavigationController の pushViewController — 同じアイデア、異なる API。どちらもジェネレータ生成ではありません。"
     },
     "section_android_heading": {
-      "en": "Android: Compose Navigation / NavGraph",
-      "ja": "Android: Compose Navigation / NavGraph"
+      "en": "5. Wiring Android (Compose Navigation)",
+      "ja": "5. Android の配線 (Compose Navigation)"
     },
     "section_android_body": {
-      "en": "Compose mode: NavHostController.navigate(route). XML mode: NavController + action IDs from the NavGraph XML. jsonui-navigation-android handles both — you spec the destination, it emits the platform-specific navigation call.",
-      "ja": "Compose モード: NavHostController.navigate(route)。XML モード: NavController + NavGraph XML の action ID 参照。jsonui-navigation-android が両方を扱う — 遷移先を spec で宣言すれば、プラットフォーム固有の navigation 呼び出しを emit してくれます。"
+      "en": "For Compose, define a sealed Route class, host screens in a NavHost with composable(Route.Foo.path) { … } entries, and wire onNavigate to navController.navigate(url). XML NavGraph + Fragment is the alternative — same concept using action IDs generated from navigation/*.xml. Safe Args plugin (optional) gives you type-safe argument passing in XML mode.",
+      "ja": "Compose なら、sealed Route class を定義、composable(Route.Foo.path) { … } エントリ付き NavHost で画面をホスト、onNavigate を navController.navigate(url) に配線。XML NavGraph + Fragment が代替 — navigation/*.xml から生成される action ID を使う同じコンセプト。Safe Args プラグイン (任意) は XML モードで型安全な引数渡しを提供します。"
     },
     "next_spec_first_title": {
       "en": "Writing your first spec",
@@ -4131,16 +4187,16 @@
       "ja": "スペックが宣言すること"
     },
     "toc_row_web": {
-      "en": "Web: Next.js App Router",
-      "ja": "Web: Next.js App Router"
+      "en": "3. Web router",
+      "ja": "3. Web router"
     },
     "toc_row_ios": {
-      "en": "iOS: NavigationStack / UIKit",
-      "ja": "iOS: NavigationStack / UIKit"
+      "en": "4. iOS NavigationStack",
+      "ja": "4. iOS NavigationStack"
     },
     "toc_row_android": {
-      "en": "Android: Compose Navigation / NavGraph",
-      "ja": "Android: Compose Navigation / NavGraph"
+      "en": "5. Android Compose Navigation",
+      "ja": "5. Android Compose Navigation"
     }
   },
   "guides_testing": {

@@ -242,7 +242,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 16,
-                      "code": "# .github/workflows/e2e.yml excerpt\njobs:\n  web-e2e:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: rjui build\n      - run: npx next start &\n      - run: jsonui-test run --platform web --base http://localhost:3000",
+                      "code": "# .github/workflows/e2e.yml excerpt\njobs:\n  web-e2e:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: jui build --platform web\n      - run: jui verify --fail-on-diff --platform web\n      - run: npx next start &\n      - run: jsonui-test run --platform web --base http://localhost:3000",
                       "language": "yaml",
                       "filename": ".github/workflows/e2e.yml",
                       "showLineNumbers": false,
