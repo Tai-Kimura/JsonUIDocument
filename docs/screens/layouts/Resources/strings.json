@@ -6274,6 +6274,100 @@
       "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
     }
   },
+  "spec_validation_and_drift": {
+    "breadcrumb": {
+      "en": "← Split overview",
+      "ja": "← Split overview"
+    },
+    "title": {
+      "en": "Validation + drift detection",
+      "ja": "検証と drift 検出"
+    },
+    "lead": {
+      "en": "Two tools guard specs, and they check different things. `jsonui-doc validate spec` checks the spec file on its own — schema, required fields, cross-references inside the spec. `jui verify` checks drift — whether the on-disk Layout JSON / data section / custom-type registrations match what the current spec would generate. Run both in CI; the combination is what keeps a spec honest end-to-end.",
+      "ja": "spec を守るツールは 2 つあり、それぞれ異なるものを検査します。`jsonui-doc validate spec` は spec ファイル単体を検査 — schema、必須フィールド、spec 内部の相互参照。`jui verify` は drift を検査 — 現 spec が生成するであろうものと、ディスク上の Layout JSON / data セクション / 独自型登録が一致しているか。CI では両方走らせる、それが spec を end-to-end で健全に保つ組み合わせ。"
+    },
+    "read_time": {
+      "en": "~8 min read",
+      "ja": "約 8 分"
+    },
+    "section_jobs_heading": {
+      "en": "Two tools, two jobs",
+      "ja": "2 つのツール、2 つの役割"
+    },
+    "section_jobs_body": {
+      "en": "`jsonui-doc validate spec` is the spec-side linter. It loads one spec file, walks the schema, and reports shape violations (required `metadata.name` missing, malformed `stateManagement.displayLogic` predicate, unknown `type` value, cross-references that don't resolve inside the same spec). It does not read the Layout JSON or the generated code. `jui verify` is the drift detector. It loads every spec in the project, runs it through `LayoutGenerator` to produce what the Layout JSON *should* look like, and compares tree-by-tree to the Layout JSON actually on disk. It also flags `data[]` entries present in the real Layout but missing from `spec.uiVariables`, and custom types referenced in the spec but not registered in `.jsonui-type-map.json`. The two tools are independent commands — neither calls the other — and CI should run validate first (fail fast on schema bugs) then verify (catch drift once the shape is known-good).",
+      "ja": "`jsonui-doc validate spec` は spec 側の linter。spec ファイルを 1 つ読み込み、schema を walk し、形の違反を報告する（`metadata.name` の欠落、`stateManagement.displayLogic` の predicate 不正、未知の `type` 値、同一 spec 内で解決できない cross-reference など）。Layout JSON や生成コードは読まない。`jui verify` は drift 検出器。プロジェクト内の全 spec を読み、`LayoutGenerator` に通して「本来あるべき Layout JSON の姿」を生成し、ディスク上の Layout JSON と tree 単位で比較する。実 Layout に存在するが `spec.uiVariables` に無い `data[]` エントリ、spec に参照されているが `.jsonui-type-map.json` に未登録の独自型も合わせて flag する。2 つは独立コマンド — 互いを呼び出さない — CI では validate 先行（schema バグで fail-fast）→ verify（形が正なら drift を拾う）の順で回すのが定石。"
+    },
+    "section_validate_heading": {
+      "en": "What `jsonui-doc validate spec` checks",
+      "ja": "`jsonui-doc validate spec` が検査するもの"
+    },
+    "section_validate_body": {
+      "en": "The validator (`document_tools/.../spec_doc/validator.py`, `SpecValidator` class) dispatches on the top-level `type` field: `screen_spec` / `screen_parent_spec` / `screen_sub_spec` / `component_spec` each have a different required-field set. Inside each, it validates `metadata` (name PascalCase, required description, platforms list), `structure` (component ids unique, `decorativeElements` / `wrapperViews` well-formed, `collection.items` is a valid binding), `stateManagement` (state / uiVariable names match the rules pattern, eventHandler names unique, displayLogic predicates parse), `dataFlow` (viewModel methods/vars consistent, mermaid diagram parses, repositories/useCases return types present), and `userActions` / `transitions` / `validation` / `relatedFiles`. The last step, `_validate_cross_references`, walks the already-validated spec looking for internal references that don't resolve (a transition pointing at an undefined screen, a customType referenced in uiVariables but not declared in `dataFlow.customTypes`).",
+      "ja": "validator（`document_tools/.../spec_doc/validator.py` の `SpecValidator` クラス）はトップレベル `type` で分岐 — `screen_spec` / `screen_parent_spec` / `screen_sub_spec` / `component_spec` でそれぞれ必須フィールドが異なる。各 type 内では `metadata`（name は PascalCase、description 必須、platforms 配列）、`structure`（component id がユニーク、`decorativeElements` / `wrapperViews` の形、`collection.items` が妥当な binding）、`stateManagement`（state / uiVariable 名が rules パターンに一致、eventHandler 名がユニーク、displayLogic predicate が parse 可能）、`dataFlow`（viewModel メソッド / vars の整合、mermaid 図の parse、repositories / useCases の返り値型）、および `userActions` / `transitions` / `validation` / `relatedFiles` を検査する。最後に `_validate_cross_references` が通過済み spec を walk し、解決できない内部参照を探す（未定義画面を指す transition、uiVariables で参照されているが `dataFlow.customTypes` に宣言のない customType など）。"
+    },
+    "section_verify_heading": {
+      "en": "What `jui verify` checks",
+      "ja": "`jui verify` が検査するもの"
+    },
+    "section_verify_body": {
+      "en": "Three layers. **(1) Layout drift.** For every spec, `LayoutGenerator.generate(screen_spec)` produces the Layout tree the spec would emit today, and `ViewDiffChecker.compare(generated, actual)` walks both trees node-by-node. Diffs are reported per-screen. Specs whose `metadata.layoutFile` points at a Layout with no inline `structure.components` are skipped — that's `layoutFile` mode from [`/spec/layout-file`](/spec/layout-file), and generating an empty stub for them would produce a guaranteed false diff. **(2) Data-section orphans.** After the tree compare, `_diff_data_section` scans the actual Layout's `data[]` for entries not declared in the generated `data[]` (i.e., not in `spec.uiVariables` and not derived from `displayLogic` / `collection` / `tabView`). Any orphan is flagged as a WARNING with name + class — you either add it to `stateManagement.uiVariables` or remove it from the Layout. **(3) Unregistered custom types.** `_collect_custom_type_refs` walks every type field in the spec (uiVariables, VM method params / returns / vars, repository & useCase signatures) and yields each PascalCase identifier that isn't a stdlib primitive. If that identifier isn't registered in `.jsonui-type-map.json`, it gets flagged so you can add a type-map entry (class + imports). `--fail-on-diff` exits non-zero on layer 1 or 2; layer 3 is WARNING only.",
+      "ja": "検査は 3 層。**(1) Layout drift。** 各 spec について `LayoutGenerator.generate(screen_spec)` が「今 spec が emit するはずの Layout tree」を生成、`ViewDiffChecker.compare(generated, actual)` が両 tree を node 単位で walk。diff は screen ごとに報告。`metadata.layoutFile` が指す Layout に inline `structure.components` が無い spec は skip — これが [`/spec/layout-file`](/spec/layout-file) の layoutFile モードで、空の stub を生成すると確実に false diff になるため。**(2) Data セクション orphan。** tree 比較後、`_diff_data_section` が実 Layout の `data[]` から「生成後の `data[]` に無い」エントリを洗い出す（すなわち `spec.uiVariables` に無く、`displayLogic` / `collection` / `tabView` からも派生しないもの）。orphan は name + class 付きで WARNING、 `stateManagement.uiVariables` に追加するか Layout から削るかを迫られる。**(3) 未登録の独自型。** `_collect_custom_type_refs` が spec の全型フィールド（uiVariables、VM メソッドの params / returns / vars、repository / useCase のシグネチャ）を walk し、stdlib プリミティブでない PascalCase 識別子を yield。`.jsonui-type-map.json` に未登録なら flag、type-map エントリ（class + imports）を追加できる。`--fail-on-diff` は 1 層目か 2 層目で非 0 exit、3 層目は WARNING のみ。"
+    },
+    "section_errors_heading": {
+      "en": "Reading the error messages",
+      "ja": "エラーメッセージの読み方"
+    },
+    "section_errors_body": {
+      "en": "Both tools emit `path: message` pairs where *path* is the spec-internal address of the offending field and *message* is the rule that tripped. For validate, paths look like `metadata.name` / `structure.components[2].id` / `dataFlow.viewModel.methods.loadEntries.returnType` — dotted + indexed, rooted at the spec top. For verify, paths include the screen stem and the tree address within the Layout: `login.spec.root.child[1].child[0]` means the Login screen, top-level View's second child, first child of that. When two values appear (`expected … / actual …`), expected is spec-driven (what `LayoutGenerator` emitted) and actual is what's on disk. The fix is almost always on the Layout side (regenerate with `jui build`) unless the spec itself needs to change, in which case update the spec and rerun both tools. For orphans (`data.foo (Int)`), the choice is add-to-spec or remove-from-Layout — no middle ground. For unregistered types, the printed JSON snippet is ready to paste into `.jsonui-type-map.json`; edit the `imports` array to point at the right Swift module / TS path.",
+      "ja": "両ツールとも `path: message` のペアを出力、*path* は問題フィールドの spec 内部アドレス、*message* は違反したルール。validate の path は `metadata.name` / `structure.components[2].id` / `dataFlow.viewModel.methods.loadEntries.returnType` のようにドット + index、spec のトップを根とする。verify の path は screen stem と Layout 内の tree アドレスを含む：`login.spec.root.child[1].child[0]` は Login 画面、トップレベル View の 2 番目の子、その最初の子を指す。2 値出る場合（`expected … / actual …`）、expected が spec 由来（`LayoutGenerator` が emit したもの）、actual がディスク上のもの。修正はほぼ常に Layout 側（`jui build` で再生成）、spec 自体を変えるべきなら spec を更新して両ツール再実行。orphan（`data.foo (Int)`）は spec に足すか Layout から消すかの 2 択、中間なし。未登録型の場合、出力される JSON スニペットはそのまま `.jsonui-type-map.json` に貼れるので、`imports` 配列を正しい Swift モジュール / TS パスに向ける。"
+    },
+    "section_crossref_heading": {
+      "en": "Cross-reference checks (parent ↔ sub, customTypes)",
+      "ja": "相互参照チェック（parent ↔ sub、customTypes）"
+    },
+    "section_crossref_body": {
+      "en": "Cross-reference checks live on both sides of the fence. Validate-side: `_validate_sub_specs` walks a `screen_parent_spec`'s `subSpecs` array, confirming each `{file, name}` entry points at a file that exists and whose `type` is `screen_sub_spec`, and `_parent_spec_has_layout_file` is consulted so subs can legally omit `structure.components` when the parent already supplies `metadata.layoutFile`. Each sub spec is also loaded and its `metadata.parentSpec` cross-checked against the parent's filename. Verify-side: `ParentSpecMerger` collects parent + sub pairs into a single merged spec before generation, and skips sub specs as standalone entries (they're already subsumed by the parent). Custom-type cross-reference lands on the validator's `_validate_cross_references`: any identifier used in a `type` field that isn't a stdlib primitive, not declared in the local `dataFlow.customTypes`, and not registered in `.jsonui-type-map.json` is flagged — you either declare it locally, register it globally, or rename it to a primitive.",
+      "ja": "相互参照チェックは両側にある。validate 側：`_validate_sub_specs` が `screen_parent_spec` の `subSpecs` 配列を walk、各 `{file, name}` エントリが実在し `type` が `screen_sub_spec` であることを確認、`_parent_spec_has_layout_file` も参照されて「parent が `metadata.layoutFile` を提供していれば sub は `structure.components` を省略可」のルールが適用される。各 sub spec もロードされ、`metadata.parentSpec` が parent のファイル名と突き合わされる。verify 側：`ParentSpecMerger` が parent + sub のペアを生成前に merge 後の単一 spec に束ね、sub spec 単体は（parent に吸収済みなので）独立エントリとして skip される。独自型の cross-reference は validator の `_validate_cross_references` に着地：`type` フィールドで使われているが stdlib プリミティブでなく、ローカル `dataFlow.customTypes` にも宣言されず、`.jsonui-type-map.json` にも未登録の識別子は flag される — ローカル宣言、グローバル登録、プリミティブへのリネームのいずれかが必要。"
+    },
+    "section_ci_heading": {
+      "en": "CI integration",
+      "ja": "CI への組み込み"
+    },
+    "section_ci_body": {
+      "en": "The recommended order in CI is validate → verify → build → unit tests. Validate runs first because a malformed spec will crash `LayoutGenerator`, and the resulting traceback is much harder to read than a validator message. Verify runs next with `--fail-on-diff` so any un-regenerated Layout blocks the merge. `jui build` only runs after verify is clean — building on a drifted Layout is legal but hides the drift from the reviewer. Keep the jobs separate so CI's summary line reads `validate ✔ / verify ✔ / build ✔ / test ✔` rather than a single opaque `all-checks ✔`; when one breaks, the bucket name tells you instantly where to look. Caching-wise, validate and verify are Python-only so they share the same setup; `jui build` + tests need Node (for `rjui_tools`) / Ruby (for `sjui_tools`) / Gradle (for `kjui_tools`) depending on target platform.",
+      "ja": "CI での推奨順序は validate → verify → build → 単体テスト。validate が先頭なのは、壊れた spec は `LayoutGenerator` が落ちてスタックトレースが出る — validator メッセージよりはるかに読みにくい — から。次に verify を `--fail-on-diff` で回し、再生成されていない Layout は merge を止める。`jui build` は verify clean の後にだけ走る — drift 済み Layout の上で build するのは合法だが、drift をレビュアーから隠してしまう。ジョブは分けたまま、CI のサマリ行が `all-checks ✔` の 1 行不透明ではなく `validate ✔ / verify ✔ / build ✔ / test ✔` になるようにする：壊れたときバケット名が一目で示してくれる。キャッシュ面では validate と verify は Python のみなのでセットアップを共有できる；`jui build` + テストはターゲットプラットフォーム次第で Node（`rjui_tools`）/ Ruby（`sjui_tools`）/ Gradle（`kjui_tools`）が必要。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_subheading": {
+      "en": "That closes the Spec section. Head back to the map to re-read any pattern, or jump to the test-runner docs for the next layer of CI automation.",
+      "ja": "これで Spec セクションは一巡。マップに戻って任意のパターンを読み返すか、CI 自動化の次の層として test-runner ドキュメントに進むか。"
+    },
+    "next_split_overview_title": {
+      "en": "Five ways to split a spec",
+      "ja": "spec を分割する 5 つの方法"
+    },
+    "next_split_overview_description": {
+      "en": "Back to the map article with the picker cheat sheet.",
+      "ja": "picker チートシート付きのマップ記事に戻る。"
+    },
+    "next_test_runner_title": {
+      "en": "Test runner",
+      "ja": "テストランナー"
+    },
+    "next_test_runner_description": {
+      "en": "Spec-driven integration tests — the layer above drift detection, and a natural CI companion to `jui verify`.",
+      "ja": "spec 駆動の統合テスト — drift 検出の上位層、`jui verify` と組み合わせる自然な CI 伴走者。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    }
+  },
   "reference_detail": {
     "eyebrow_glance": {
       "en": "AT A GLANCE",

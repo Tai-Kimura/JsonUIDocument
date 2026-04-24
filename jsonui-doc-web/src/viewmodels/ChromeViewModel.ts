@@ -80,6 +80,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "component-spec",  titleKey: "spec_component_spec_title",  url: "/spec/component-spec" },
       { id: "custom-types",    titleKey: "spec_custom_types_title",    url: "/spec/custom-types" },
       { id: "cell-classes",    titleKey: "spec_cell_classes_title",    url: "/spec/cell-classes" },
+      { id: "validation-and-drift", titleKey: "spec_validation_and_drift_title", url: "/spec/validation-and-drift" },
     ],
   },
   {

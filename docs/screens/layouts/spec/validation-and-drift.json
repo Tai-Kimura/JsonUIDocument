@@ -1,0 +1,151 @@
+{
+  "type": "View",
+  "id": "spec_validation_and_drift_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_muted",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks",  "class": "CollectionDataSource" },
+        { "name": "onNavigateSpec", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "spec_validation_and_drift_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_validation_and_drift_header",
+          "style": "page_header",
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateSpec}",
+              "text": "breadcrumb"
+            },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 36, "fontWeight": "bold", "fontColor": "#0B1220", "text": "title" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 17, "fontColor": "#475467", "text": "lead" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 13, "fontColor": "#64748B", "text": "read_time" }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_validation_and_drift_body",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View", "orientation": "vertical", "id": "section_jobs", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_jobs_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_jobs_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_validate", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_validate_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_validate_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "$ jsonui-doc validate spec docs/screens/json/learn/hello-world.spec.json\n\nValidating docs/screens/json/learn/hello-world.spec.json\n  type:    screen_spec\n  version: 1.0\n\n✗ 3 error(s), 1 warning(s)\n\n  ERROR   metadata.platforms\n          required — got missing; expected non-empty list of\n          \"ios\" / \"android\" / \"web\"\n\n  ERROR   structure.components[2].id\n          duplicate — already used by structure.components[0].id\n          (\"learn_hello_world_header\")\n\n  ERROR   dataFlow.viewModel.methods.onSelectTab.params[0].type\n          \"string\" — did you mean \"String\"? Type names are\n          case-sensitive and use the stdlib capitalisation.\n\n  WARN    transitions[0].destination\n          references \"GuidesHome\" which does not appear as a screen\n          in any validated spec in this project.\n\nExit code: 1",
+                  "language": "text", "filename": "jsonui-doc validate spec output", "showLineNumbers": false, "copyable": false
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_verify", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_verify_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_verify_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "$ jui verify --fail-on-diff\n\n# Layout drift (layer 1)\n─────────────────────────────────────────────────────────\nscreen: learn/hello-world            ✔ no drift\nscreen: learn/installation           ✔ no drift\nscreen: learn/first-screen           ✗ drift detected\n    at  first-screen.spec.root.child[1].child[0]\n    expected  { \"type\": \"Label\", \"fontSize\": 18, \"text\": \"lead\" }\n    actual    { \"type\": \"Label\", \"fontSize\": 16, \"text\": \"lead\" }\n\nSkipped (layout authored externally):\n- chrome.spec -> chrome.json\n\n# Data-section orphans (layer 2)\n─────────────────────────────────────────────────────────\nWARNING: 1 data-section entries not declared in spec.uiVariables\n   across 1 Layout JSON file(s):\n- learn/first-screen:\n    - data.scrollOffset (Int)\n  → add each missing entry to stateManagement.uiVariables\n    (or remove it from the Layout JSON's data section).\n\n# Unregistered custom types (layer 3, warnings only)\n─────────────────────────────────────────────────────────\nWARNING: 1 custom type(s) referenced but not registered in TypeMapper.\n   Add entries to `.jsonui-type-map.json`:\n```json\n{\n  \"types\": {\n    \"EntryRow\": { \"class\": \"EntryRow\", \"imports\": [] }\n  }\n}\n```\n  Usage locations:\n  - EntryRow: first-screen.spec:uiVariables.entries\n\nExit code: 1   (layer 1 or 2 triggered --fail-on-diff)",
+                  "language": "text", "filename": "jui verify --fail-on-diff output", "showLineNumbers": false, "copyable": false
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_errors", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_errors_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_errors_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_crossref", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_crossref_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_crossref_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_ci", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_ci_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_ci_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "# .github/workflows/spec-guard.yml — recommended staging of checks.\n# Each bucket fails fast, so CI's summary line reads\n#   validate ✔ / verify ✔ / build ✔ / test ✔\n# rather than a single opaque all-checks ✔.\n\nname: spec-guard\non: [pull_request]\n\njobs:\n  validate:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with: { python-version: '3.12' }\n      - run: pip install jsonui-doc\n      - run: jsonui-doc validate spec docs/screens/json/**/*.spec.json\n\n  verify:\n    needs: validate\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with: { python-version: '3.12' }\n      - run: pip install jsonui-cli\n      - run: jui verify --fail-on-diff\n\n  build:\n    needs: verify\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with: { node-version: '20' }\n      - run: jui build\n\n  test:\n    needs: build\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: jsonui-test run",
+                  "language": "yaml", "filename": ".github/workflows/spec-guard.yml", "showLineNumbers": false, "copyable": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_validation_and_drift_next",
+          "style": "home_section",
+          "background": "chrome_fill",
+          "child": [
+            { "type": "Label", "style": "section_heading",    "text": "next_heading",    "width": "matchParent", "fontColor": "chrome_ink" },
+            { "type": "Label", "style": "section_subheading", "text": "next_subheading", "width": "matchParent", "fontColor": "chrome_ink" },
+            {
+              "type": "Collection",
+              "id": "spec_validation_and_drift_next_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "columnCount": 2,
+              "lineSpacing": 16,
+              "itemSpacing": 16,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{nextReadLinks}",
+              "cellIdProperty": "id",
+              "sections": [
+                { "cell": "cells/next_step_card" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "spec_validation_and_drift_footer",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 32, 32],
+          "background": "chrome_fill",
+          "child": [
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 12, "fontColor": "#94A3B8", "text": "footer_copyright" }
+          ]
+        }
+      ]
+    }
+  ]
+}
