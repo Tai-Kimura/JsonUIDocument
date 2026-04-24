@@ -416,11 +416,17 @@ module RjuiTools
           return '' unless weight
 
           w = weight.to_i
-          case w
-          when 0 then 'flex-none'
-          when 1 then 'flex-1'
-          else "flex-[#{w}]"
-          end
+          base = case w
+                 when 0 then 'flex-none'
+                 when 1 then 'flex-1'
+                 else "flex-[#{w}]"
+                 end
+          # `flex-1` / `flex-[N]` children need `min-w-0 min-h-0` so the
+          # CSS default `min-*-size: auto` doesn't let long descendants
+          # (long <pre>, prose, etc.) push the flex container past the
+          # intended weight slice. `flex-none` opts out of growth entirely
+          # and doesn't need the tweak.
+          w == 0 ? base : "#{base} min-w-0 min-h-0"
         end
 
         # Min/Max Width/Height constraints

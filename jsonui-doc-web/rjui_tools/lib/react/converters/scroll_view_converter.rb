@@ -37,11 +37,21 @@ module RjuiTools
           orientation = json['orientation']
           horizontal_scroll = json['horizontalScroll']
 
+          # scrollMode: "window" opts out of emitting `overflow-y-auto` /
+          # `overflow-x-auto`. Rationale: on web, an inner-scroll container
+          # establishes a `position: sticky` ancestry anchor even when the
+          # container isn't actually bounded and the window does the
+          # scrolling — sticky descendants end up waiting for a container
+          # that never scrolls. Setting `scrollMode: "window"` lets authors
+          # keep the ScrollView node for iOS/Android semantics while letting
+          # the browser's window scroll naturally on web.
+          window_mode = json['scrollMode'] == 'window'
+
           if horizontal_scroll || orientation == 'horizontal'
-            classes << 'overflow-x-auto'
+            classes << 'overflow-x-auto' unless window_mode
             classes << 'flex flex-row' unless json['orientation']
           else
-            classes << 'overflow-y-auto'
+            classes << 'overflow-y-auto' unless window_mode
             classes << 'flex flex-col' unless json['orientation']
           end
 
@@ -53,8 +63,9 @@ module RjuiTools
             classes << 'scrollbar-hide'
           end
 
-          # Scroll snap (paging)
-          if json['paging']
+          # Scroll snap (paging) — only meaningful when this div actually
+          # scrolls, so skip for window-mode.
+          if json['paging'] && !window_mode
             if horizontal_scroll || orientation == 'horizontal'
               classes << 'snap-x snap-mandatory'
             else
@@ -62,8 +73,10 @@ module RjuiTools
             end
           end
 
-          # Scroll enabled
-          if json['scrollEnabled'] == false
+          # Scroll enabled — same gate as above; window-mode lets the page
+          # scroll regardless, and emitting overflow-hidden would actively
+          # clip the rail.
+          if json['scrollEnabled'] == false && !window_mode
             classes << 'overflow-hidden'
             classes.reject! { |c| c.start_with?('overflow-x-auto', 'overflow-y-auto') }
           end

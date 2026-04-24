@@ -65,7 +65,12 @@ module RjuiTools
             elsif json['_parent_orientation'] == 'horizontal'
               classes << 'self-stretch'
             else
-              classes << 'flex-1'
+              # Pair flex-1 with min-w-0 / min-h-0 for the same reason
+              # TailwindMapper.map_flex_grow does it for weight-bearing
+              # siblings: the CSS default `min-*-size: auto` lets long
+              # descendants (long <pre>, prose) push the flex container
+              # past its intended main-axis slice.
+              classes << 'flex-1 min-w-0 min-h-0'
             end
           else
             classes << TailwindMapper.map_height(json['height'])

@@ -8,12 +8,10 @@
 //
 // To refresh the snapshot:
 //   jsonui-doc generate spec docs/screens/json/learn/hello-world.spec.json \
-//     -o /tmp/hello-world-sample.html --format html \
-//     --layouts-dir docs/screens/layouts
-// The explicit --layouts-dir is a workaround for the jsonui-cli bug
-// "doc-structure-auto-detect-layouts-dir-fails" (/Users/like-a-rolling_stone/
-// resource/jsonui-cli/docs/bugs/), without which the
-// <section id="structure"> block is emitted empty.
+//     -o /tmp/hello-world-sample.html --format html
+// layouts_directory auto-detects from jui.config.json, so --layouts-dir is
+// not needed — the <section id="structure"> block is populated with the
+// imported Layout JSON tree automatically.
 // Then re-run the agent pipeline that re-materializes this file, or paste
 // the file contents verbatim into RAW_HTML (remembering to escape ` and ${).
 //
