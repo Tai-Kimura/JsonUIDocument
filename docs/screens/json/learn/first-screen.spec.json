@@ -26,12 +26,36 @@
         "type": "[NextReadLink]",
         "initial": "[]",
         "description": "Two closing cards."
+      },
+      {
+        "name": "codeTabs",
+        "type": "[TabHeaderCell]",
+        "initial": "[]",
+        "description": "Three-platform tab row for the ViewModel section (Swift / Kotlin / TypeScript). Active state drives background + foreground + border color on each tab via the shared cells/tab_header cell."
+      },
+      {
+        "name": "swiftCodeVisibility",
+        "type": "String",
+        "initial": "\"visible\"",
+        "description": "visible/gone toggle for the Swift code panel. Derived from activeCodeTab === 'swift'. Initial is 'visible' because swift is the default active tab."
+      },
+      {
+        "name": "kotlinCodeVisibility",
+        "type": "String",
+        "initial": "\"gone\"",
+        "description": "visible/gone toggle for the Kotlin code panel. Derived from activeCodeTab === 'kotlin'."
+      },
+      {
+        "name": "typescriptCodeVisibility",
+        "type": "String",
+        "initial": "\"gone\"",
+        "description": "visible/gone toggle for the TypeScript code panel. Derived from activeCodeTab === 'typescript'."
       }
     ],
     "eventHandlers": [
       {
         "name": "onAppear",
-        "description": "Seed nextReadLinks."
+        "description": "Seed nextReadLinks + codeTabs + initial panel visibilities."
       },
       {
         "name": "onNavigate",
@@ -42,6 +66,16 @@
           }
         ],
         "description": "Client-side navigation."
+      },
+      {
+        "name": "onSelectCodeTab",
+        "params": [
+          {
+            "name": "id",
+            "type": "String"
+          }
+        ],
+        "description": "Switch the Swift / Kotlin / TypeScript tab under the ViewModel section. Updates activeCodeTab plus the three *CodeVisibility strings derived from it, same pattern as LearnHelloWorldViewModel.onSelectTab."
       }
     ],
     "displayLogic": []
@@ -71,6 +105,30 @@
           "type": "Array(NextReadLink)",
           "observable": true,
           "description": "Two closing 'read next' cards pointing at /guides/writing-your-first-spec and /learn/data-binding-basics. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        },
+        {
+          "name": "codeTabs",
+          "type": "Array(TabHeaderCell)",
+          "observable": true,
+          "description": "Three-platform tab row for the ViewModel section. Rebuilt whenever activeCodeTab changes so the active tab picks up the accent palette and the inactive tabs return to the neutral surface palette."
+        },
+        {
+          "name": "swiftCodeVisibility",
+          "type": "String",
+          "observable": true,
+          "description": "Derived — 'visible' when activeCodeTab === 'swift', else 'gone'. Drives the Swift CodeBlock's visibility binding."
+        },
+        {
+          "name": "kotlinCodeVisibility",
+          "type": "String",
+          "observable": true,
+          "description": "Derived — 'visible' when activeCodeTab === 'kotlin', else 'gone'."
+        },
+        {
+          "name": "typescriptCodeVisibility",
+          "type": "String",
+          "observable": true,
+          "description": "Derived — 'visible' when activeCodeTab === 'typescript', else 'gone'."
         }
       ]
     },
@@ -98,6 +156,35 @@
             "type": "String"
           }
         ]
+      },
+      {
+        "name": "TabHeaderCell",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "labelKey",
+            "type": "String"
+          },
+          {
+            "name": "bgColor",
+            "type": "String"
+          },
+          {
+            "name": "fgColor",
+            "type": "String"
+          },
+          {
+            "name": "borderColor",
+            "type": "String"
+          },
+          {
+            "name": "onSelect",
+            "type": "() -> Void"
+          }
+        ]
       }
     ]
   },
@@ -109,6 +196,10 @@
     {
       "action": "Tap a NextReadLink card",
       "processing": "onNavigate(url)."
+    },
+    {
+      "action": "Tap a Swift / Kotlin / TypeScript tab under 'Wire the ViewModel'",
+      "processing": "onSelectCodeTab(id) — flips activeCodeTab and derives swiftCodeVisibility / kotlinCodeVisibility / typescriptCodeVisibility."
     }
   ],
   "validation": {
@@ -143,6 +234,7 @@
   "notes": [
     "Fifth and final live entry under the Learn tab — flipping LEARN_ENTRIES row 3 (first-screen) to 'live' completes the tab.",
     "Walkthrough builds a 'Recent Activity' screen: header (title + language toggle) + hero (welcome + CTA) + Collection (activity rows). Picks three parts that together exercise layout nesting, styles, a custom cell layout, and a CollectionDataSource binding.",
-    "Six CodeBlocks in total: (1) the spec with five uiVariables + three events + one customType, (2) the root layout JSON with header + hero + collection frames, (3) the activity_row cell, (4) the ViewModel seed, (5) the page route, (6) the final jui build + verify commands to ship."
+    "The ViewModel section (section_wire) is a 3-platform tabbed view — Swift / Kotlin / TypeScript — so the walkthrough shows the same onAppear contract across iOS (SwiftJsonUI), Android (KotlinJsonUI), and Web (ReactJsonUI). Tabs use the same cells/tab_header pattern as LearnHelloWorld. Reference implementations for the tutorial examples live under whisky-find-agent's DrinkingHistoryList screen (client/whisky-find-agent-{ios,android,web}).",
+    "Eight CodeBlocks in total: (1) the spec with uiVariables + events + customType (platforms: ios + android + web), (2) the root layout JSON with header + hero + collection frames, (3) the activity_row cell, (4–6) the Swift / Kotlin / TypeScript ViewModel seed (one per platform, toggled by codeTabs), (7) the page route, (8) the final jui build + verify commands to ship."
   ]
 }

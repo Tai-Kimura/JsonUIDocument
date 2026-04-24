@@ -15,6 +15,25 @@
         {
           "name": "onNavigateLearn",
           "class": "() -> Void"
+        },
+        {
+          "name": "codeTabs",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "swiftCodeVisibility",
+          "class": "String",
+          "defaultValue": "visible"
+        },
+        {
+          "name": "kotlinCodeVisibility",
+          "class": "String",
+          "defaultValue": "gone"
+        },
+        {
+          "name": "typescriptCodeVisibility",
+          "class": "String",
+          "defaultValue": "gone"
         }
       ]
     },
@@ -163,7 +182,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 16,
-                      "code": "{\n  \"metadata\": { \"name\": \"RecentActivity\", \"platforms\": [\"web\"], \"layoutFile\": \"recent-activity\" },\n  \"stateManagement\": {\n    \"uiVariables\": [\n      { \"name\": \"welcomeKey\",   \"type\": \"String\",                \"initial\": \"\\\"\\\"\" },\n      { \"name\": \"taglineKey\",   \"type\": \"String\",                \"initial\": \"\\\"\\\"\" },\n      { \"name\": \"activities\",   \"type\": \"CollectionDataSource\",   \"initial\": \"null\" },\n      { \"name\": \"emptyVisibility\", \"type\": \"String\",              \"initial\": \"\\\"gone\\\"\" }\n    ],\n    \"eventHandlers\": [\n      { \"name\": \"onAppear\" },\n      { \"name\": \"onRefresh\" },\n      { \"name\": \"onSelectActivity\", \"params\": [{ \"name\": \"id\", \"type\": \"String\" }] }\n    ],\n    \"displayLogic\": []\n  },\n  \"dataFlow\": {\n    \"customTypes\": [\n      {\n        \"name\": \"ActivityRow\",\n        \"properties\": [\n          { \"name\": \"id\",        \"type\": \"String\" },\n          { \"name\": \"titleKey\",  \"type\": \"String\" },\n          { \"name\": \"detailKey\", \"type\": \"String\" },\n          { \"name\": \"occurredAt\",\"type\": \"Date\" }\n        ]\n      }\n    ]\n  }\n}",
+                      "code": "{\n  \"metadata\": { \"name\": \"RecentActivity\", \"platforms\": [\"ios\", \"android\", \"web\"], \"layoutFile\": \"recent-activity\" },\n  \"stateManagement\": {\n    \"uiVariables\": [\n      { \"name\": \"welcomeKey\",   \"type\": \"String\",                \"initial\": \"\\\"\\\"\" },\n      { \"name\": \"taglineKey\",   \"type\": \"String\",                \"initial\": \"\\\"\\\"\" },\n      { \"name\": \"activities\",   \"type\": \"CollectionDataSource\",   \"initial\": \"null\" },\n      { \"name\": \"emptyVisibility\", \"type\": \"String\",              \"initial\": \"\\\"gone\\\"\" }\n    ],\n    \"eventHandlers\": [\n      { \"name\": \"onAppear\" },\n      { \"name\": \"onRefresh\" },\n      { \"name\": \"onSelectActivity\", \"params\": [{ \"name\": \"id\", \"type\": \"String\" }] }\n    ],\n    \"displayLogic\": []\n  },\n  \"dataFlow\": {\n    \"customTypes\": [\n      {\n        \"name\": \"ActivityRow\",\n        \"properties\": [\n          { \"name\": \"id\",        \"type\": \"String\" },\n          { \"name\": \"titleKey\",  \"type\": \"String\" },\n          { \"name\": \"detailKey\", \"type\": \"String\" },\n          { \"name\": \"occurredAt\",\"type\": \"Date\" }\n        ]\n      }\n    ]\n  }\n}",
                       "language": "json",
                       "filename": "recent-activity.spec.json",
                       "showLineNumbers": true,
@@ -291,16 +310,60 @@
                       "topMargin": 12,
                       "fontSize": 16,
                       "fontColor": "#475467",
-                      "text": "section_wire_body"
+                      "text": "section_wire_body_platforms"
                     },
                     {
-                      "type": "CodeBlock",
+                      "type": "Collection",
+                      "id": "section_wire_tabs",
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 16,
-                      "code": "export class RecentActivityViewModel {\n  // ... standard init boilerplate (mirror HelloWorldViewModel) ...\n\n  onAppear = () => {\n    const rows: ActivityRow[] = [\n      { id: \"a1\", titleKey: s(\"row_1_title\"), detailKey: s(\"row_1_detail\"), occurredAt: new Date() },\n      { id: \"a2\", titleKey: s(\"row_2_title\"), detailKey: s(\"row_2_detail\"), occurredAt: new Date() },\n    ];\n    this.updateData({\n      welcomeKey: s(\"welcome\"),\n      taglineKey: s(\"tagline\"),\n      activities: this.asCollection(rows),\n      emptyVisibility: rows.length === 0 ? \"visible\" : \"gone\",\n    });\n  };\n\n  onRefresh = () => this.onAppear();\n  onSelectActivity = (id: string) => this.router.push(`/activity/${id}`);\n}",
+                      "columnCount": 3,
+                      "items": "@{codeTabs}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/tab_header"
+                        }
+                      ],
+                      "lineSpacing": 0,
+                      "itemSpacing": 8,
+                      "lazy": false,
+                      "scrollEnabled": false
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "visibility": "@{swiftCodeVisibility}",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "import Foundation\nimport SwiftJsonUI\n\nclass RecentActivityViewModel: ObservableObject, RecentActivityViewModelProtocol {\n    let jsonFileName = \"recent_activity\"\n\n    @Published var data = RecentActivityData()\n    @Published var navigateToDetail: String? = nil\n\n    func onAppear() {\n        data.welcomeKey = StringManager.get(\"recent_activity_welcome\")\n        data.taglineKey = StringManager.get(\"recent_activity_tagline\")\n\n        let rows: [[String: Any]] = [\n            [\n                \"cellId\": \"a1\",\n                \"titleKey\": StringManager.get(\"recent_activity_row_1_title\"),\n                \"detailKey\": StringManager.get(\"recent_activity_row_1_detail\"),\n                \"onCellTap\": { [weak self] in self?.navigateToDetail = \"a1\" } as () -> Void,\n            ],\n            [\n                \"cellId\": \"a2\",\n                \"titleKey\": StringManager.get(\"recent_activity_row_2_title\"),\n                \"detailKey\": StringManager.get(\"recent_activity_row_2_detail\"),\n                \"onCellTap\": { [weak self] in self?.navigateToDetail = \"a2\" } as () -> Void,\n            ],\n        ]\n\n        var ds = CollectionDataSource()\n        var section = CollectionDataSection()\n        section.setCells(viewName: \"ActivityRowCellView\", data: rows)\n        ds.addSection(section)\n        data.activities = ds\n        data.emptyVisibility = rows.isEmpty ? \"visible\" : \"gone\"\n    }\n\n    func onRefresh() { onAppear() }\n}",
+                      "language": "swift",
+                      "filename": "RecentActivityViewModel.swift",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "visibility": "@{kotlinCodeVisibility}",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "package com.example.recent_activity.viewmodels\n\nimport android.app.Application\nimport androidx.lifecycle.AndroidViewModel\nimport com.example.recent_activity.R\nimport com.example.recent_activity.data.RecentActivityData\nimport com.kotlinjsonui.data.CollectionDataSection\nimport com.kotlinjsonui.data.CollectionDataSource\nimport dagger.hilt.android.lifecycle.HiltViewModel\nimport javax.inject.Inject\nimport kotlinx.coroutines.flow.MutableStateFlow\nimport kotlinx.coroutines.flow.StateFlow\nimport kotlinx.coroutines.flow.asStateFlow\nimport kotlinx.coroutines.flow.update\n\n@HiltViewModel\nclass RecentActivityViewModel @Inject constructor(\n    application: Application,\n) : AndroidViewModel(application) {\n    val jsonFileName = \"recent_activity\"\n\n    private val _data = MutableStateFlow(RecentActivityData())\n    val data: StateFlow<RecentActivityData> = _data.asStateFlow()\n\n    private val _navigateToDetail = MutableStateFlow<String?>(null)\n    val navigateToDetail: StateFlow<String?> = _navigateToDetail.asStateFlow()\n\n    fun onAppear() {\n        val ctx = getApplication<Application>()\n        val rows: List<Map<String, Any>> = listOf(\n            mapOf(\n                \"cellId\" to \"a1\",\n                \"titleKey\" to ctx.getString(R.string.recent_activity_row_1_title),\n                \"detailKey\" to ctx.getString(R.string.recent_activity_row_1_detail),\n                \"onCellTap\" to { _navigateToDetail.value = \"a1\" } as () -> Unit,\n            ),\n            mapOf(\n                \"cellId\" to \"a2\",\n                \"titleKey\" to ctx.getString(R.string.recent_activity_row_2_title),\n                \"detailKey\" to ctx.getString(R.string.recent_activity_row_2_detail),\n                \"onCellTap\" to { _navigateToDetail.value = \"a2\" } as () -> Unit,\n            ),\n        )\n        val section = CollectionDataSection(\n            cells = CollectionDataSection.CellData(viewName = \"ActivityRowCellView\", data = rows),\n        )\n        _data.update { it.copy(\n            welcomeKey = ctx.getString(R.string.recent_activity_welcome),\n            taglineKey = ctx.getString(R.string.recent_activity_tagline),\n            activities = CollectionDataSource(sections = listOf(section)),\n            emptyVisibility = if (rows.isEmpty()) \"visible\" else \"gone\",\n        ) }\n    }\n\n    fun onRefresh() = onAppear()\n}",
+                      "language": "kotlin",
+                      "filename": "RecentActivityViewModel.kt",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "visibility": "@{typescriptCodeVisibility}",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "import { AppRouterInstance } from \"next/dist/shared/lib/app-router-context.shared-runtime\";\nimport { RecentActivityData } from \"@/generated/data/RecentActivityData\";\nimport { RecentActivityViewModelBase } from \"@/generated/viewmodels/RecentActivityViewModelBase\";\nimport { StringManager } from \"@/generated/StringManager\";\n\ninterface ActivityRow {\n  id: string;\n  titleKey: string;\n  detailKey: string;\n  onCellTap: () => void;\n}\n\nexport class RecentActivityViewModel extends RecentActivityViewModelBase {\n  constructor(\n    router: AppRouterInstance,\n    getData: () => RecentActivityData,\n    setData: (data: RecentActivityData | ((prev: RecentActivityData) => RecentActivityData)) => void,\n  ) {\n    super(router, getData, setData);\n    this.onAppear();\n  }\n\n  onAppear = () => {\n    const rows: ActivityRow[] = [\n      {\n        id: \"a1\",\n        titleKey: this.s(\"row_1_title\"),\n        detailKey: this.s(\"row_1_detail\"),\n        onCellTap: () => this.router.push(\"/activity/a1\"),\n      },\n      {\n        id: \"a2\",\n        titleKey: this.s(\"row_2_title\"),\n        detailKey: this.s(\"row_2_detail\"),\n        onCellTap: () => this.router.push(\"/activity/a2\"),\n      },\n    ];\n\n    this.updateData({\n      welcomeKey: this.s(\"welcome\"),\n      taglineKey: this.s(\"tagline\"),\n      activities: this.asCollection(rows),\n      emptyVisibility: rows.length === 0 ? \"visible\" : \"gone\",\n    });\n  };\n\n  onRefresh = () => this.onAppear();\n\n  private s = (key: string) => StringManager.getString(`recent_activity_${key}`);\n}",
                       "language": "typescript",
-                      "filename": "RecentActivityViewModel.ts (excerpt)",
+                      "filename": "RecentActivityViewModel.ts",
                       "showLineNumbers": false,
                       "copyable": true
                     }
