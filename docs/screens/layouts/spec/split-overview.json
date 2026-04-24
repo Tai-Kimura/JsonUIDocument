@@ -1,0 +1,192 @@
+{
+  "type": "View",
+  "id": "spec_split_overview_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_muted",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks",  "class": "CollectionDataSource" },
+        { "name": "onNavigateSpec", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "spec_split_overview_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_split_overview_header",
+          "style": "page_header",
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateSpec}",
+              "text": "breadcrumb"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "#475467",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "#64748B",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_split_overview_body",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_why_split",
+              "style": "home_section",
+              "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_why_split_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_why_split_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_pattern_layout_file",
+              "style": "home_section",
+              "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_pattern_layout_file_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_pattern_layout_file_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_pattern_parent_sub",
+              "style": "home_section",
+              "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_pattern_parent_sub_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_pattern_parent_sub_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_pattern_component_spec",
+              "style": "home_section",
+              "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_pattern_component_spec_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_pattern_component_spec_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_pattern_custom_types",
+              "style": "home_section",
+              "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_pattern_custom_types_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_pattern_custom_types_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_pattern_cell_classes",
+              "style": "home_section",
+              "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_pattern_cell_classes_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_pattern_cell_classes_body",    "width": "matchParent" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_split_overview_next",
+          "style": "home_section",
+          "background": "chrome_fill",
+          "child": [
+            { "type": "Label", "style": "section_heading",    "text": "next_heading",    "width": "matchParent", "fontColor": "chrome_ink" },
+            { "type": "Label", "style": "section_subheading", "text": "next_subheading", "width": "matchParent", "fontColor": "chrome_ink" },
+            {
+              "type": "Collection",
+              "id": "spec_split_overview_next_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "columnCount": 2,
+              "lineSpacing": 16,
+              "itemSpacing": 16,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{nextReadLinks}",
+              "cellIdProperty": "id",
+              "sections": [
+                { "cell": "cells/next_step_card" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "spec_split_overview_footer",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 32, 32],
+          "background": "chrome_fill",
+          "child": [
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "fontSize": 12,
+              "fontColor": "#94A3B8",
+              "text": "footer_copyright"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

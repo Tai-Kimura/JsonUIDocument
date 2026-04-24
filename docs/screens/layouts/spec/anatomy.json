@@ -1,0 +1,181 @@
+{
+  "type": "View",
+  "id": "spec_anatomy_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_muted",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks",    "class": "CollectionDataSource" },
+        { "name": "onNavigateSpec",   "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "spec_anatomy_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_anatomy_header",
+          "style": "page_header",
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateSpec}",
+              "text": "breadcrumb"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "#475467",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "#64748B",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_anatomy_body",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_top_level",
+              "style": "home_section",
+              "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_top_level_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_top_level_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_metadata",
+              "style": "home_section",
+              "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_metadata_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_metadata_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_state",
+              "style": "home_section",
+              "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_state_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_state_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_dataflow",
+              "style": "home_section",
+              "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_dataflow_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_dataflow_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_structure",
+              "style": "home_section",
+              "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_structure_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_structure_body",    "width": "matchParent" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_anatomy_next",
+          "style": "home_section",
+          "background": "chrome_fill",
+          "child": [
+            { "type": "Label", "style": "section_heading",    "text": "next_heading",    "width": "matchParent", "fontColor": "chrome_ink" },
+            { "type": "Label", "style": "section_subheading", "text": "next_subheading", "width": "matchParent", "fontColor": "chrome_ink" },
+            {
+              "type": "Collection",
+              "id": "spec_anatomy_next_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "columnCount": 2,
+              "lineSpacing": 16,
+              "itemSpacing": 16,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{nextReadLinks}",
+              "cellIdProperty": "id",
+              "sections": [
+                { "cell": "cells/next_step_card" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "spec_anatomy_footer",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 32, 32],
+          "background": "chrome_fill",
+          "child": [
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "fontSize": 12,
+              "fontColor": "#94A3B8",
+              "text": "footer_copyright"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -39,7 +39,7 @@ interface SidebarSection {
  * stays purely presentational.
  */
 const NAV_CATALOG: ReadonlyArray<{
-  id: "learn" | "guides" | "concepts" | "reference" | "platforms" | "tools";
+  id: "learn" | "concepts" | "spec" | "guides" | "reference" | "platforms" | "tools";
   iconName: string;
   entries: ReadonlyArray<{ id: string; titleKey: string; url: string }>;
 }> = [
@@ -55,17 +55,6 @@ const NAV_CATALOG: ReadonlyArray<{
     ],
   },
   {
-    id: "guides",
-    iconName: "guides",
-    entries: [
-      { id: "writing-your-first-spec", titleKey: "guides_writing_your_first_spec_title", url: "/guides/writing-your-first-spec" },
-      { id: "navigation",              titleKey: "guides_navigation_title",              url: "/guides/navigation" },
-      { id: "testing",                 titleKey: "guides_testing_title",                 url: "/guides/testing" },
-      { id: "localization",            titleKey: "guides_localization_title",            url: "/guides/localization" },
-      { id: "custom-components",       titleKey: "guides_custom_components_title",       url: "/guides/custom-components" },
-    ],
-  },
-  {
     id: "concepts",
     iconName: "concepts",
     entries: [
@@ -74,6 +63,30 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "viewmodel-owned-state", titleKey: "concepts_viewmodel_owned_state_title", url: "/concepts/viewmodel-owned-state" },
       { id: "data-binding",          titleKey: "concepts_data_binding_title",          url: "/concepts/data-binding" },
       { id: "hot-reload",            titleKey: "concepts_hot_reload_title",            url: "/concepts/hot-reload" },
+    ],
+  },
+  {
+    // Spec section — dedicated to "how to write a spec", with a focus on
+    // split mechanics (parent/sub, layoutFile, component_spec, customTypes,
+    // cellClasses). Sits between Concepts (design intent) and Guides
+    // (task-focused how-tos) per docs/plans/spec-authoring-deep-dive.md Q1.
+    id: "spec",
+    iconName: "spec",
+    entries: [
+      { id: "anatomy",        titleKey: "spec_anatomy_title",        url: "/spec/anatomy" },
+      { id: "split-overview", titleKey: "spec_split_overview_title", url: "/spec/split-overview" },
+    ],
+  },
+  {
+    id: "guides",
+    iconName: "guides",
+    entries: [
+      { id: "writing-your-first-spec", titleKey: "guides_writing_your_first_spec_title", url: "/guides/writing-your-first-spec" },
+      { id: "writing-layouts",         titleKey: "guides_writing_layouts_title",         url: "/guides/writing-layouts" },
+      { id: "navigation",              titleKey: "guides_navigation_title",              url: "/guides/navigation" },
+      { id: "testing",                 titleKey: "guides_testing_title",                 url: "/guides/testing" },
+      { id: "localization",            titleKey: "guides_localization_title",            url: "/guides/localization" },
+      { id: "custom-components",       titleKey: "guides_custom_components_title",       url: "/guides/custom-components" },
     ],
   },
   {

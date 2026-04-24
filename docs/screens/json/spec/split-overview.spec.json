@@ -1,0 +1,116 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "SpecSplitOverview",
+    "displayName": "Five ways to split a spec",
+    "description": "Map article for the five spec-splitting patterns — layoutFile extraction, parent + sub spec, component_spec, customTypes, cellClasses. Comparison table + decision flowchart. v1 lands as a scaffold under docs/plans/spec-authoring-deep-dive.md Phase 1; per-pattern detail articles land in Phase 2.",
+    "platforms": ["web"],
+    "layoutFile": "spec/split-overview",
+    "createdAt": "2026-04-24",
+    "updatedAt": "2026-04-24"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Follow-up cards pointing at the per-pattern detail articles (anchored to anatomy + the Phase 2 detail articles once they land)."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [{ "name": "url", "type": "String" }],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[SpecSplitOverviewView] --> VM[SpecSplitOverviewViewModel]\n    VM -- nextReadLinks --> VIEW",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog. Each row's titleKey / descriptionKey resolves through StringManager with the spec_split_overview_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [{ "name": "url", "type": "String" }],
+          "description": "router.push(url). Destinations: /spec/anatomy, /guides/writing-your-first-spec."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          { "name": "id",             "type": "String" },
+          { "name": "titleKey",       "type": "String" },
+          { "name": "descriptionKey", "type": "String" },
+          { "name": "url",            "type": "String" }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url) with the bound url."
+    }
+  ],
+  "validation": { "clientSide": [], "serverSide": [] },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is /spec/anatomy or /guides/writing-your-first-spec",
+      "destination": "Target spec screen",
+      "description": "v1 destinations: /spec/anatomy, /guides/writing-your-first-spec. Phase 2 adds /spec/parent-sub-spec, /spec/layout-file, /spec/component-spec, /spec/custom-types, /spec/cell-classes."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/spec/split-overview.json",
+      "description": "Map article — 5-pattern comparison table + decision flow."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/spec/SplitOverviewViewModel.ts",
+      "description": "Same shape as concepts essay VMs."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/spec/split-overview/page.tsx",
+      "description": "Next.js route."
+    }
+  ],
+  "notes": [
+    "Second article under the new Spec section (docs/plans/spec-authoring-deep-dive.md).",
+    "v1 scaffold: intro + 5 pattern sections + next-reads. Per-pattern detail (parent-sub-spec, layout-file, component-spec, custom-types, cell-classes) becomes its own article in Phase 2."
+  ]
+}

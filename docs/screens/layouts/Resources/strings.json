@@ -2016,6 +2016,14 @@
       "en": "Keep going",
       "ja": "さらに進む"
     },
+    "next_writing_layouts_title": {
+      "en": "Writing layouts",
+      "ja": "レイアウトを書く"
+    },
+    "next_writing_layouts_description": {
+      "en": "Styles, includes, Collections, bindings — the idioms worth knowing.",
+      "ja": "style / include / Collection / binding — 押さえておきたい定型。"
+    },
     "next_navigation_title": {
       "en": "Navigation between screens",
       "ja": "画面遷移"
@@ -4203,6 +4211,210 @@
       "ja": "5. Android Compose Navigation"
     }
   },
+  "guides_writing_layouts": {
+    "breadcrumb": {
+      "en": "← Guides",
+      "ja": "← Guides"
+    },
+    "title": {
+      "en": "Writing layouts",
+      "ja": "レイアウトを書く"
+    },
+    "lead": {
+      "en": "Layout JSON is the single biggest file family you author in a JsonUI project, and a handful of idioms make it much easier to read. The same JSON ships to iOS (SwiftUI / UIKit), Android (Compose / XML), and Web (React) — each platform's generator projects it into native code, but the vocabulary you author in is one. This guide walks the cross-platform essentials: how styles get shared, how sub-layouts are reused via include, how Collection cells and sections work, the @{binding} and visibility story, and the pitfalls every first-time layout author trips over.",
+      "ja": "Layout JSON は JsonUI プロジェクトで最も多く手書きするファイル群です。同じ JSON が iOS (SwiftUI / UIKit) / Android (Compose / XML) / Web (React) の 3 プラットフォームに配信され、各プラットフォームのジェネレータがネイティブコードに投影しますが、書く側の語彙は 1 つです。このガイドではプラットフォーム共通の要点を一通り扱います: style の共有方法、include による sub-layout 再利用、Collection の cell / section、@{binding} と visibility、そして初回の layout 著者が必ず一度はハマるポイント。"
+    },
+    "read_time": {
+      "en": "~18 min read",
+      "ja": "約 18 分"
+    },
+    "next_heading": {
+      "en": "Keep reading",
+      "ja": "次に読む"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    },
+    "section_where_heading": {
+      "en": "1. Orient yourself",
+      "ja": "1. ファイルの位置を把握する"
+    },
+    "section_where_body": {
+      "en": "Four locations matter when you author a layout. The primary layout JSON you edit; the cells/ directory with the reusable row layouts a Collection points at; the styles/ directory with shareable attribute bundles; and strings.json with the translations that layouts reference by key. All four live under docs/screens/ — the project root is where jui build reads from, and each platform gets a copy distributed to its own tree.",
+      "ja": "layout を書くとき、関係する場所は 4 つです。編集対象の layout 本体 JSON、Collection が参照する再利用可能な行 layout が並ぶ cells/ ディレクトリ、共有する属性束を置く styles/ ディレクトリ、layout が key 参照する翻訳を持つ strings.json。4 つ全て docs/screens/ 配下にあり、プロジェクトルートが jui build の読み取り元、各プラットフォームには build 時に distribute されます。"
+    },
+    "section_style_heading": {
+      "en": "2. Style definitions"
+,
+      "ja": "2. Style 定義"
+    },
+    "section_style_body": {
+      "en": "A style is a plain JSON file under docs/screens/styles/ that carries component attributes you want to share — colors, paddings, font weights, rounded corners — without copying them into every Label or Button. Attach it with the 'style' attribute by file name (no path, no extension). At build time each platform's generator deep-merges the style into the component; on any attribute collision, the value you wrote inline on the component wins, so you can override a shared style on one specific screen without editing the style file. The rule holds whether the target is React, SwiftUI / UIKit, or Compose / XML.",
+      "ja": "style は docs/screens/styles/ に置く普通の JSON ファイルで、複数の Label や Button に毎回コピーしたくない属性（色 / paddings / font weight / cornerRadius など）をまとめたものです。適用は component 側に 'style' 属性を書くだけ（拡張子もパスも不要、ファイル名のみ）。ビルド時には各プラットフォームのジェネレータが component へ deep merge し、属性が衝突したときは component 側の inline 値が勝つので、共有 style を触らずに 1 画面だけ上書きできます。このルールはターゲットが React / SwiftUI (UIKit) / Compose (XML) のいずれでも共通です。"
+    },
+    "section_style_note_inheritance": {
+      "en": "• Style files are flat — there is no 'extends' or 'parent' mechanism. If you want composed behaviour, wrap the component in a View that carries the outer style and put the inner style on the child.",
+      "ja": "• style ファイルは flat です — 'extends' や 'parent' の仕組みはありません。合成したいときは component を View でラップし、外側に親 style、内側の child に 子 style を割り当てる形にします。"
+    },
+    "section_style_note_type": {
+      "en": "• If the style file declares a 'type' and the component also does, the component's type wins. This lets a style file name itself a Button without preventing a View from picking it up (the type is treated as a hint, not a constraint).",
+      "ja": "• style ファイルが 'type' を宣言していても、component 側の 'type' が勝ちます。これにより、style が自分を Button と名乗っていても View が同じ style を参照できます（type はヒント扱いで強制されない）。"
+    },
+    "section_include_heading": {
+      "en": "3. Include (sub-layout reuse)"
+,
+      "ja": "3. include — sub-layout の再利用"
+    },
+    "section_include_body": {
+      "en": "When a piece of UI repeats across screens without being data-driven — a back button, a compact brand lockup, a footer disclaimer — write it once under layouts/ and reference it via the 'include' attribute. Each platform's generator emits a reusable unit in its native idiom — a React component on Web, a SwiftUI View struct (or a UIView subclass in UIKit) on iOS, a Composable function (or an Android View) on Android — named after the file (path/to/main_menu → MainMenu), and passes any shared_data / data fields on the include as props. This is distinct from Collection cells, which multiply one cell layout across rows driven by a data array; include is for single-insertion reuse.",
+      "ja": "画面をまたいで繰り返すが「データ配列で駆動するわけではない」UI 片 — 戻るボタン / ブランドロック / フッター文言など — は layouts/ に一度書いて 'include' 属性で参照します。各プラットフォームのジェネレータはネイティブのイディオムで再利用単位を emit します — Web なら React コンポーネント、iOS なら SwiftUI View struct (または UIKit の UIView サブクラス)、Android なら Composable 関数 (または Android View)。いずれもファイル名 (path/to/main_menu → MainMenu) にちなんだ名前が付き、include に書いた shared_data / data は props として渡されます。Collection の cell とは別物: cell は「データ配列で cell layout を複数回展開」するもの、include は「1 箇所に 1 度だけ差し込む」用途です。"
+    },
+    "section_include_note_depth": {
+      "en": "• include is one level deep — the included file's contents are not scanned for further 'include' directives at emit time. Keep sub-layouts simple and self-contained.",
+      "ja": "• include は 1 段のみ — 被 include ファイル内の 'include' はさらに辿られません。sub-layout はシンプルで自己完結させてください。"
+    },
+    "section_collection_basic_heading": {
+      "en": "4. Collection basics (single cell type)",
+      "ja": "4. Collection の基本 (単一 cell type)"
+    },
+    "section_collection_basic_body": {
+      "en": "A Collection renders a list or grid of cells driven by a data source. Three attributes are non-negotiable: items binds a CollectionDataSource from the ViewModel, cellIdProperty names the row field used as a React key (without it the key falls back to the array index, which breaks diffing on reorders), and sections declares the cell layout path for each section. Everything else tunes the visual form — orientation, columnCount, lineSpacing / itemSpacing, lazy, scrollEnabled.",
+      "ja": "Collection はデータソースに駆動されて cell のリストやグリッドを描画します。必須属性は 3 つ: items は ViewModel の CollectionDataSource を bind、cellIdProperty は React key として使う行のプロパティ名 (未指定だと配列 index フォールバックとなり、並び替え時に diff が壊れる)、sections は各 section の cell layout パスを宣言。それ以外は見た目のチューニング — orientation / columnCount / lineSpacing / itemSpacing / lazy / scrollEnabled。"
+    },
+    "section_collection_basic_attrs_heading": {
+      "en": "Layout attributes worth knowing",
+      "ja": "押さえておきたい layout 属性"
+    },
+    "section_collection_basic_bullet_orientation": {
+      "en": "• orientation — 'vertical' (default) stacks rows top-to-bottom; 'horizontal' lines cells up in a row (common for chip strips and tab bars).",
+      "ja": "• orientation — 'vertical' (既定) は行を縦に積む。'horizontal' は cell を横並びに (chip ストリップやタブバーでよく使う)。"
+    },
+    "section_collection_basic_bullet_columncount": {
+      "en": "• columnCount — integer > 1 turns the Collection into a grid of that many columns.",
+      "ja": "• columnCount — 1 より大きい整数でグリッド化、指定列数で並ぶ。"
+    },
+    "section_collection_basic_bullet_spacing": {
+      "en": "• lineSpacing / itemSpacing — gap between rows (vertical) and between cells in a row (horizontal). You can also set spacing as a single-value fallback for both.",
+      "ja": "• lineSpacing / itemSpacing — 行間 (縦方向) と 1 行内の cell 間 (横方向) の gap。両方を同値で設定するなら spacing 一本で代用可能。"
+    },
+    "section_collection_basic_bullet_lazy": {
+      "en": "• lazy — when false, the Collection does not scroll itself and expects the parent container to handle scroll. Set to false inside a page-level Scroll (the common case) and to true when the Collection is the only scrollable surface.",
+      "ja": "• lazy — false の場合、Collection 自身はスクロールせず親 Scroll に任せる。ページ全体が Scroll で包まれている通常ケースでは false、Collection 自身が唯一のスクロール面なら true。"
+    },
+    "section_collection_basic_bullet_scrollEnabled": {
+      "en": "• scrollEnabled — false removes the overflow classes entirely; useful when the Collection should size to its content exactly.",
+      "ja": "• scrollEnabled — false で overflow クラスが付かない。Collection がコンテンツぴったりに伸びてほしいときに有用。"
+    },
+    "section_collection_basic_cell_body": {
+      "en": "On the cell side, the layout starts with a 'data' block that declares the shape of the row the parent will pass in. rjui reads this block and emits a TypeScript interface (cell name + Data suffix), so the cell's Label bindings and the ViewModel's row construction stay type-aligned. You populate the data in the ViewModel and call CollectionDataSource.setCells(sectionIndex, rows); React renders one cell component per row using cellIdProperty for the key.",
+      "ja": "cell 側の layout は 'data' ブロックから始まり、親から受け取る行のデータ形状を宣言します。rjui はこれを読んで TypeScript interface (cell 名 + Data suffix) を emit するので、cell の Label binding と ViewModel 側の行生成が型で揃います。ViewModel 側で data を詰めて CollectionDataSource.setCells(sectionIndex, rows) を呼ぶと、React は cellIdProperty を key として行ごとに cell コンポーネントを描画します。"
+    },
+    "section_collection_multi_heading": {
+      "en": "5. Collection multi-section (mixed cell types)",
+      "ja": "5. Collection multi-section (異なる cell type を混ぜる)"
+    },
+    "section_collection_multi_body": {
+      "en": "One section = one cell type. rjui cannot pick the cell layout dynamically per row. So to render, say, a featured card followed by a list of plain rows on the same Collection, declare two sections with their own cell: path, and have the ViewModel write to each section's cells array independently. The same applies to chat logs (user cell vs assistant cell), or a reference page that shows a summary row then a list of attribute rows.",
+      "ja": "1 section = 1 cell type。rjui は行ごとに cell layout を動的選択する機能を持ちません。1 つの Collection に「featured card + 通常行の並び」を並べたいなら、section を 2 つ宣言し、それぞれ独自の cell: パスを持たせ、ViewModel が各 section の cells 配列へ独立に書き込みます。チャットログ (user cell + assistant cell) や「サマリ行 + 属性行の並び」といったリファレンスページも同じ設計。"
+    },
+    "section_collection_multi_tip": {
+      "en": "• Tip: when a Collection has multiple sections, the item row that ships from the ViewModel must already be partitioned by section — Section 0 gets rows that fit its cell, Section 1 gets rows that fit its. Do not try to mix types in one section's cells array.",
+      "ja": "• Tip: multi-section の Collection では、ViewModel から送る行データは section ごとに分割済みである必要があります — Section 0 にはその cell に合う行だけ、Section 1 にはそれ用の行だけ。1 つの section の cells 配列に異なる type を混ぜないこと。"
+    },
+    "section_binding_heading": {
+      "en": "6. Binding and visibility",
+      "ja": "6. Binding と visibility"
+    },
+    "section_binding_body": {
+      "en": "Anywhere in a layout a string attribute value starts with @{name}, rjui treats it as a binding that resolves at render time from the ViewModel's data. Beyond text, the most commonly bound attribute is visibility, which accepts three values with different DOM consequences. Knowing which one you want prevents a whole class of layout bugs.",
+      "ja": "layout のどこでも属性値が @{name} で始まっていれば、rjui はそれを ViewModel の data から描画時に解決する binding として扱います。テキスト以外で最もよく bind されるのは visibility で、値は 3 種類あり DOM への効果が違います。どれを選ぶかで 1 種類分のバグカテゴリが丸ごと回避できます。"
+    },
+    "section_binding_bullet_visible": {
+      "en": "• 'visible' — the default; the element renders normally and occupies its space.",
+      "ja": "• 'visible' — 既定。要素は通常どおり描画され、スペースも占める。"
+    },
+    "section_binding_bullet_invisible": {
+      "en": "• 'invisible' — maps to CSS visibility: hidden; the element is not painted but still occupies its space (useful when you want a placeholder to preserve alignment).",
+      "ja": "• 'invisible' — CSS の visibility: hidden に対応。描画されないがスペースは残る (プレースホルダとして整列を保ちたいときに有用)。"
+    },
+    "section_binding_bullet_gone": {
+      "en": "• 'gone' — rjui emits a conditional render, so the element leaves the DOM entirely and its space collapses. Use this when neighbouring elements should close the gap.",
+      "ja": "• 'gone' — rjui は条件付き render を emit するので、要素は DOM から完全に消え、そのスペースも潰れる。周囲の要素に詰めてほしいときはこれ。"
+    },
+    "section_pitfalls_heading": {
+      "en": "7. Common pitfalls",
+      "ja": "7. よくあるハマりどころ"
+    },
+    "section_pitfalls_body": {
+      "en": "A short list of layout surprises that catch almost everyone once. None of these are rjui bugs; they're direct consequences of the flex translation layer, so knowing them is the fix.",
+      "ja": "layout を書いていると誰もが 1 度は引っかかる挙動の短いリスト。rjui のバグではなく、flex への変換層から直接派生する挙動なので、知っていれば対処できます。"
+    },
+    "section_pitfalls_bullet_weight": {
+      "en": "• weight vs matchParent in flex-row: inside a horizontal View, height: 'matchParent' translates to self-stretch (the cross-axis), not flex-1 (main-axis grow). If you want a child to expand horizontally to fill its siblings, write weight: 1 — matchParent will not do it.",
+      "ja": "• flex-row の中の weight と matchParent: horizontal View の中で height: 'matchParent' は self-stretch (cross axis) に変換され、flex-1 (main axis 伸ばし) にはならない。水平方向に子要素を兄弟と一緒に広げたいなら weight: 1 を使う — matchParent では伸びません。"
+    },
+    "section_pitfalls_bullet_topmargin": {
+      "en": "• topMargin is orientation-agnostic: it always maps to margin-top. In a horizontal View that means it adds space above the element, not between it and its left neighbour. Use leftMargin (or the parent's itemSpacing) for sibling gaps in a row.",
+      "ja": "• topMargin は orientation 非依存: 常に margin-top に変換されます。horizontal View では「要素の上方向にスペースを足す」ことになり、「左の兄弟との間隔」には効かない。行内の兄弟間隔には leftMargin (または親の itemSpacing) を使う。"
+    },
+    "section_pitfalls_bullet_visibility": {
+      "en": "• 'gone' removes DOM, 'invisible' keeps DOM: a sibling that depends on a conditional element's space preservation must read 'invisible', not 'gone'. Choosing 'gone' when you wanted 'invisible' quietly collapses alignment; choosing 'invisible' when you wanted 'gone' leaves an empty gap.",
+      "ja": "• 'gone' は DOM ごと消す / 'invisible' は DOM を残す: 条件付き要素のスペースに依存する兄弟があるなら 'invisible' を選ぶ。'gone' を誤って選ぶと整列が静かに崩れ、'invisible' を誤って選ぶと空隙が残る。"
+    },
+    "section_pitfalls_bullet_overlay": {
+      "en": "• _overlay is internal: you will see it in @generated React output but you never write it by hand. If you need absolute positioning, use zIndex as a number — rjui's TailwindMapper maps it to z-10 / z-20 / etc. The absolute-positioning intent is inferred from context, not declared.",
+      "ja": "• _overlay は internal: @generated React の出力で見かけることはあるが、手書きしてはいけない属性です。絶対配置が必要なときは zIndex を数値で書く — rjui の TailwindMapper が z-10 / z-20 等に変換します。絶対配置の意図はコンテキストから推論されるもので、直接宣言するものではありません。"
+    },
+    "next_custom_components_title": {
+      "en": "Building a custom component",
+      "ja": "カスタムコンポーネントを作る"
+    },
+    "next_custom_components_description": {
+      "en": "Package a recurring layout pattern behind a single spec.",
+      "ja": "繰り返し出てくる layout パターンを 1 つの spec の裏に包む。"
+    },
+    "next_first_spec_title": {
+      "en": "Writing your first spec",
+      "ja": "spec を書く"
+    },
+    "next_first_spec_description": {
+      "en": "Spec drives the Data shape that layouts bind to.",
+      "ja": "spec が layout が bind する Data 形状を決める。"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページ"
+    },
+    "toc_row_where": {
+      "en": "1. Orient yourself",
+      "ja": "1. ファイルの位置"
+    },
+    "toc_row_style": {
+      "en": "2. Style definitions",
+      "ja": "2. Style 定義"
+    },
+    "toc_row_include": {
+      "en": "3. Include",
+      "ja": "3. include"
+    },
+    "toc_row_collection_basic": {
+      "en": "4. Collection basics",
+      "ja": "4. Collection の基本"
+    },
+    "toc_row_collection_multi": {
+      "en": "5. Multi-section Collection",
+      "ja": "5. Multi-section"
+    },
+    "toc_row_binding": {
+      "en": "6. Binding & visibility",
+      "ja": "6. Binding と visibility"
+    },
+    "toc_row_pitfalls": {
+      "en": "7. Pitfalls",
+      "ja": "7. ハマりどころ"
+    }
+  },
   "guides_testing": {
     "breadcrumb": {
       "en": "← Guides",
@@ -4660,6 +4872,14 @@
     "section_type_map_body": {
       "en": "Two different files, two different jobs, one common confusion. .jsonui-type-map.json maps custom data types (TypeScript interfaces / Swift structs / Kotlin data classes) across platforms — things like NextReadLink or ReferenceAttributeRow. .jsonui-doc-rules.json registers custom UI component types — things like CodeBlock or TableOfContents. A 'Unregistered custom types' warning from jui verify points at the type-map; an 'Invalid component type' error points at the doc-rules. Learn to read the error string and you will reach for the right file first time.",
       "ja": "別ファイル・別役割・共通の混同源。.jsonui-type-map.json はカスタムデータ型 (TypeScript interface / Swift struct / Kotlin data class) の platform 間マッピング — NextReadLink や ReferenceAttributeRow のような型です。.jsonui-doc-rules.json は custom UI コンポーネント型の whitelist — CodeBlock や TableOfContents のような要素です。jui verify の 'Unregistered custom types' 警告は type-map の話、'Invalid component type' エラーは doc-rules の話。エラー文言を読み分けられれば、正しいファイルに一発で手が伸びます。"
+    },
+    "next_writing_layouts_title": {
+      "en": "Writing layouts",
+      "ja": "レイアウトを書く"
+    },
+    "next_writing_layouts_description": {
+      "en": "The layout idioms that let a custom component land gracefully.",
+      "ja": "custom component が綺麗に収まるための layout 定型を押さえる。"
     },
     "next_spec_first_title": {
       "en": "Writing your first spec",
@@ -5339,6 +5559,10 @@
       "en": "Concepts",
       "ja": "コンセプト"
     },
+    "nav_spec_label": {
+      "en": "Spec",
+      "ja": "spec"
+    },
     "nav_reference_label": {
       "en": "Reference",
       "ja": "リファレンス"
@@ -5350,6 +5574,187 @@
     "nav_tools_label": {
       "en": "Tools",
       "ja": "ツール"
+    }
+  },
+  "spec_anatomy": {
+    "breadcrumb": {
+      "en": "← Spec",
+      "ja": "← Spec"
+    },
+    "title": {
+      "en": "The anatomy of a screen spec",
+      "ja": "screen spec の全体像"
+    },
+    "lead": {
+      "en": "A field-by-field walk through screen_spec.json — every top-level section, what it declares, and how it cross-references the others. v1 lands as a scaffold; each section's prose + CodeBlocks expand in the next Phase of docs/plans/spec-authoring-deep-dive.md.",
+      "ja": "screen_spec.json をフィールド単位で一周します。各 top-level セクションが何を宣言するか、他セクションとどう繋がるか。v1 は scaffold として着地し、各セクションの prose + CodeBlock は docs/plans/spec-authoring-deep-dive.md の次 Phase で埋めます。"
+    },
+    "read_time": {
+      "en": "~10 min read",
+      "ja": "約 10 分"
+    },
+    "section_top_level_heading": {
+      "en": "Top-level shape",
+      "ja": "トップレベルの形"
+    },
+    "section_top_level_body": {
+      "en": "type, version, metadata, structure, stateManagement, dataFlow, userActions, validation, transitions, relatedFiles, notes. Required vs optional and how each top-level key's scope partitions the rest of the file.",
+      "ja": "type / version / metadata / structure / stateManagement / dataFlow / userActions / validation / transitions / relatedFiles / notes。必須と任意の区別と、各キーが残りのファイルをどう区切るか。"
+    },
+    "section_metadata_heading": {
+      "en": "metadata",
+      "ja": "metadata"
+    },
+    "section_metadata_body": {
+      "en": "name (PascalCase), displayName, description, platforms, layoutFile, parentSpec, createdAt, updatedAt. The parts every spec declares up front and why each one matters to the generator and the site index.",
+      "ja": "name（PascalCase）、displayName、description、platforms、layoutFile、parentSpec、createdAt / updatedAt。どの spec も最初に宣言する要素と、それぞれがジェネレータ／サイトインデックスにとってなぜ重要か。"
+    },
+    "section_state_heading": {
+      "en": "stateManagement",
+      "ja": "stateManagement"
+    },
+    "section_state_body": {
+      "en": "states, uiVariables, eventHandlers, displayLogic. How each slot differs in lifecycle (persistent vs re-seeded vs derived) and where the boundary between 'view state' and 'ViewModel state' lives.",
+      "ja": "states / uiVariables / eventHandlers / displayLogic。各スロットのライフサイクル差分（永続 / 再 seed / 派生）と、「View 側の状態」と「ViewModel 側の状態」の境界がどこにあるか。"
+    },
+    "section_dataflow_heading": {
+      "en": "dataFlow",
+      "ja": "dataFlow"
+    },
+    "section_dataflow_body": {
+      "en": "diagram (Mermaid), viewModel (methods + vars), customTypes, repositories, useCases, apiEndpoints. How the ViewModel public contract is declared, and how customTypes let you hoist shared row shapes across specs.",
+      "ja": "diagram（Mermaid）、viewModel（methods + vars）、customTypes、repositories、useCases、apiEndpoints。ViewModel の公開契約をどう宣言するか、customTypes で共通の行モデルをどう複数 spec に跨って持ち出すか。"
+    },
+    "section_structure_heading": {
+      "en": "structure",
+      "ja": "structure"
+    },
+    "section_structure_body": {
+      "en": "components, layout, collection, tabView, decorativeElements, wrapperViews, customComponents. Why most of these are empty when metadata.layoutFile is set (auto-imported from the referenced Layout JSON) and when to populate them by hand.",
+      "ja": "components / layout / collection / tabView / decorativeElements / wrapperViews / customComponents。metadata.layoutFile を指定するとなぜこれらが空でよいか（参照先 Layout JSON から自動取り込み）、手で埋めるべきはどんな時か。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_subheading": {
+      "en": "The writer-facing tour above lays the ground. The two articles below take you into splitting decisions and the task-focused end-to-end flow.",
+      "ja": "上が writer 向けの概観。下の 2 本は「分割の判断」と「1 spec を end-to-end で書く」に進みます。"
+    },
+    "next_split_overview_title": {
+      "en": "Five ways to split a spec",
+      "ja": "spec を分割する 5 つの方法"
+    },
+    "next_split_overview_description": {
+      "en": "Map article — layoutFile, parent + sub, component_spec, customTypes, cellClasses. Compare, pick the right one for your screen.",
+      "ja": "マップ記事 — layoutFile / parent + sub / component_spec / customTypes / cellClasses を一覧比較し、画面に合う分割を選ぶ。"
+    },
+    "next_writing_your_first_spec_title": {
+      "en": "Writing your first spec",
+      "ja": "最初の spec を書く"
+    },
+    "next_writing_your_first_spec_description": {
+      "en": "Task-focused 10-step guide: author a screen_spec.json end-to-end for a counter screen.",
+      "ja": "タスク特化の 10 ステップ: カウンター画面の screen_spec.json を end-to-end で書く。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    }
+  },
+  "spec_split_overview": {
+    "breadcrumb": {
+      "en": "← Spec",
+      "ja": "← Spec"
+    },
+    "title": {
+      "en": "Five ways to split a spec",
+      "ja": "spec を分割する 5 つの方法"
+    },
+    "lead": {
+      "en": "A single screen_spec.json is fine until the file passes 300 lines, or until two screens need to share the same shape. This article is the map: five established split patterns, what each one buys you, and how to pick. v1 lands as a scaffold; per-pattern detail articles land in Phase 2 of docs/plans/spec-authoring-deep-dive.md.",
+      "ja": "screen_spec.json 1 枚で完結するのは 300 行を超えない間、もしくは共通化する画面が現れるまで。本記事はマップ: 既存の 5 分割パターン、それぞれが何を解決するか、どう選ぶかを示します。v1 は scaffold で着地し、各パターンの詳細記事は docs/plans/spec-authoring-deep-dive.md の Phase 2 で別記事として追加されます。"
+    },
+    "read_time": {
+      "en": "~7 min read",
+      "ja": "約 7 分"
+    },
+    "section_why_split_heading": {
+      "en": "Why split at all",
+      "ja": "そもそもなぜ分けるか"
+    },
+    "section_why_split_body": {
+      "en": "Three triggers drive a split: (1) the file grows past reviewability, (2) two screens need the same shape, (3) a custom UI keeps reappearing across pages. Before reaching for a pattern, ask which trigger is in play — the right split differs for each.",
+      "ja": "分割を正当化するトリガは 3 つ: (1) ファイルがレビュー可能な長さを超える、(2) 2 画面で同じ形が必要、(3) カスタム UI が複数ページで繰り返される。パターンを選ぶ前に、どのトリガが引かれたかを見極めるのが先決です。"
+    },
+    "section_pattern_layout_file_heading": {
+      "en": "Pattern 1 — layoutFile extraction",
+      "ja": "パターン 1 — layoutFile 抽出"
+    },
+    "section_pattern_layout_file_body": {
+      "en": "Separate the visual tree into docs/screens/layouts/<path>.json and point at it from metadata.layoutFile. The spec stays focused on contract + data; the layout is free to grow. layout_importer auto-imports the tree into structure.components at generate-time, so the standalone spec still validates.",
+      "ja": "視覚ツリーを docs/screens/layouts/<path>.json に分離し、spec からは metadata.layoutFile で参照します。spec は契約 + データに集中し、Layout は自由に育てられる。layout_importer が生成時に structure.components に自動取り込みするため、単体 spec の検証も通ります。"
+    },
+    "section_pattern_parent_sub_heading": {
+      "en": "Pattern 2 — parent + sub spec",
+      "ja": "パターン 2 — 親 spec + 子 spec"
+    },
+    "section_pattern_parent_sub_body": {
+      "en": "Same screen, multiple spec files. type: 'screen_parent_spec' declares subSpecs[], each child uses type: 'screen_sub_spec' + metadata.parentSpec to inherit structure/layoutFile from the parent while declaring its own slice of stateManagement. Fits screens with 20+ state variables where reviewers want to split ownership per region.",
+      "ja": "同じ画面を複数の spec ファイルに分ける。親は type: 'screen_parent_spec' + subSpecs[]、子は type: 'screen_sub_spec' + metadata.parentSpec で親の structure / layoutFile を継承しつつ、自分の stateManagement のスライスだけを宣言する。状態 20+ で領域ごとにレビュー分担したい画面に合う。"
+    },
+    "section_pattern_component_spec_heading": {
+      "en": "Pattern 3 — component_spec"
+    ,
+      "ja": "パターン 3 — component_spec"
+    },
+    "section_pattern_component_spec_body": {
+      "en": "Re-usable custom UI (CodeBlock, TableOfContents, Chart, …) gets its own component_spec.json under docs/components/json/. Screens reference it through structure.customComponents. The generator emits a platform-native component; the spec is the contract both the screen and the custom converter compile against.",
+      "ja": "再利用するカスタム UI（CodeBlock / TableOfContents / Chart …）は docs/components/json/ 配下に自前の component_spec.json を持つ。画面 spec は structure.customComponents 経由で参照し、ジェネレータがプラットフォームネイティブなコンポーネントを emit する。spec は screen 側と custom converter 側の両方がビルド時に従う共通契約。"
+    },
+    "section_pattern_custom_types_heading": {
+      "en": "Pattern 4 — customTypes",
+      "ja": "パターン 4 — customTypes"
+    },
+    "section_pattern_custom_types_body": {
+      "en": "Declare shared row / entry shapes in dataFlow.customTypes and reference them by name (e.g. [ActivityRow]) across uiVariables / VM vars — optionally in multiple specs once the name is registered in .jsonui-type-map.json. Keeps type shapes DRY without forcing a full sub-spec split.",
+      "ja": "共通の行 / entry 型を dataFlow.customTypes に宣言し、uiVariables / VM vars で `[ActivityRow]` のように名前参照する。.jsonui-type-map.json に登録すれば複数 spec 跨ぎでも使える。sub-spec まで分割せずに型だけ DRY にできる。"
+    },
+    "section_pattern_cell_classes_heading": {
+      "en": "Pattern 5 — cellClasses",
+      "ja": "パターン 5 — cellClasses"
+    },
+    "section_pattern_cell_classes_body": {
+      "en": "When a Collection needs more than one cell layout, hoist each cell into docs/screens/layouts/cells/*.json and reference them from structure.collection.cellClasses[]. sections[].cell picks which cell to render per section. The same cell can now be reused by any Collection across the site.",
+      "ja": "Collection が複数のセルレイアウトを必要とする場合、各セルを docs/screens/layouts/cells/*.json に切り出し、structure.collection.cellClasses[] から参照する。sections[].cell がセクションごとのセルを選ぶ。同じセルはサイト内の任意の Collection から再利用可能になる。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_subheading": {
+      "en": "Pick the split that fits, then dive into the field-level anatomy or the end-to-end writing flow.",
+      "ja": "適した分割を選んだら、フィールドレベルの全体像、もしくは end-to-end の書き方フローへ進みます。"
+    },
+    "next_anatomy_title": {
+      "en": "The anatomy of a screen spec",
+      "ja": "screen spec の全体像"
+    },
+    "next_anatomy_description": {
+      "en": "Field-by-field dictionary of screen_spec.json — every top-level section and how it cross-references the others.",
+      "ja": "screen_spec.json のフィールド辞書。各 top-level セクションと、それらの相互参照を扱います。"
+    },
+    "next_writing_your_first_spec_title": {
+      "en": "Writing your first spec",
+      "ja": "最初の spec を書く"
+    },
+    "next_writing_your_first_spec_description": {
+      "en": "Task-focused 10-step guide: author a screen_spec.json end-to-end for a counter screen.",
+      "ja": "タスク特化の 10 ステップ: カウンター画面の screen_spec.json を end-to-end で書く。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
     }
   },
   "reference_detail": {
