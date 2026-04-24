@@ -685,8 +685,8 @@
       "ja": "アンインストール"
     },
     "uninstall_body": {
-      "en": "Remove each component with the matching command. The MCP entry in ~/.claude.json is cleared by its own uninstall script; the PATH lines in ~/.zshrc need to be removed by hand.",
-      "ja": "対応するコマンドで各コンポーネントを削除します。~/.claude.json の MCP エントリは uninstall スクリプトが片づけます。~/.zshrc の PATH 行は手動で削除してください。"
+      "en": "There is no unified uninstaller — bootstrap is install-only. MCP is the one component with its own `uninstall.sh` (it clears the entry from `~/.claude.json` and deletes `~/.jsonui-mcp-server` in one pass). CLI and Agents have no scripts: for CLI, pip-uninstall the three editable package registrations before removing the install dir; for Agents, delete only the specific files the installer wrote under `~/.claude/` — never the whole directory, which is your Claude Code user config and holds other projects' settings. The PATH block added to `~/.zshrc` by the installer has to be removed by hand.",
+      "ja": "統合 uninstaller はありません — bootstrap は install only。自前の `uninstall.sh` を持っているのは MCP だけで、`~/.claude.json` のエントリ削除と `~/.jsonui-mcp-server` ディレクトリの撤去までまとめて面倒を見てくれます。CLI と Agents は専用スクリプトなし: CLI は pip editable 登録 3 つを先に剥がしてからインストール先を削除、Agents は installer が `~/.claude/` 下に置いた **個別ファイルだけ**を削除します（`~/.claude` 全体を消すと Claude Code のユーザ設定と他プロジェクトの設定まで飛ぶので絶対にしないでください）。bootstrap が `~/.zshrc` に追加した PATH ブロックは手動削除です。"
     },
     "trouble_heading": {
       "en": "Troubleshooting",

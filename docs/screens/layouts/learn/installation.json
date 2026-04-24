@@ -820,7 +820,7 @@
                           "width": "matchParent",
                           "height": "wrapContent",
                           "topMargin": 12,
-                          "code": "# MCP entry + extension\nbash ~/.jsonui-mcp-server/uninstall.sh\nrm -rf ~/.jsonui-mcp-server\n\n# CLI\nrm -rf ~/.jsonui-cli\n# Then remove the PATH lines from ~/.zshrc by hand.\n\n# Agents (from the project)\nrm -rf .claude",
+                          "code": "# 1. MCP — the only component shipping its own uninstaller.\n#    Clears the ~/.claude.json entry AND removes ~/.jsonui-mcp-server.\nbash ~/.jsonui-mcp-server/uninstall.sh\n\n# 2. CLI — pip-uninstall the 3 editable registrations, THEN remove the dir.\n#    (Skipping pip uninstall leaves dangling editable records that break\n#    the next install.)\npip3 uninstall -y jui_cli jsonui-test-cli jsonui-doc-cli 2>/dev/null || true\nrm -rf ~/.jsonui-cli\n\n# 3. PATH — the installer never touches ~/.zshrc automatically.\n#    It printed the block and asked you to paste it; remove those lines by hand.\n\n# 4. Agents — DO NOT `rm -rf .claude`. That directory is Claude Code's\n#    user config (other projects' agents, skills, MCP entries, settings).\n#    Remove only the files the installer added:\nrm -f  .claude/jsonui-workflow.md\nrm -rf .claude/jsonui-rules/\nrm -f  .claude/agents/jsonui-*.md\nrm -rf .claude/skills/jsonui-*/\n\n# 5. Restart Claude Code so the removed MCP entry takes effect.",
                           "language": "bash",
                           "filename": "shell",
                           "showLineNumbers": false,
