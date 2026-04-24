@@ -20,7 +20,12 @@
 
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+
+import { StringManager } from "@/generated/StringManager";
+
+const LANGUAGE_STORAGE_KEY = "jsonui-language";
 
 interface Props {
   children: React.ReactNode;
@@ -28,15 +33,33 @@ interface Props {
 
 export function LanguageReloader({ children }: Props) {
   const [version, setVersion] = useState(0);
+  const pathname = usePathname();
 
+  // On first client mount, restore the stored language (if any) and force a
+  // remount so subtrees re-render with the live StringManager state. SSR
+  // always renders with the 'en' default (no localStorage on the server),
+  // so the initial DOM is English; if the user had previously toggled to
+  // another language, this bumps the remount key so generated components
+  // re-read StringManager.currentLanguage.
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (saved && saved !== StringManager.language) {
+      StringManager.setLanguage(saved);
+      setVersion((v) => v + 1);
+      window.dispatchEvent(new CustomEvent("chrome:languagechange"));
+    }
     const handler = () => setVersion((v) => v + 1);
     window.addEventListener("chrome:languagechange", handler);
     return () => window.removeEventListener("chrome:languagechange", handler);
   }, []);
 
+  // Key on pathname too so a client-side navigation into a page that was
+  // pre-rendered at build time (English) re-mounts under the current
+  // StringManager state — otherwise the hydrated English DOM persists until
+  // the user next toggles the language.
   return (
-    <div key={version} style={{ display: "contents" }}>
+    <div key={`${version}-${pathname}`} style={{ display: "contents" }}>
       {children}
     </div>
   );

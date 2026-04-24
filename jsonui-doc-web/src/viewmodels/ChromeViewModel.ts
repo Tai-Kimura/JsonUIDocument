@@ -185,6 +185,7 @@ export class ChromeViewModel extends ChromeViewModelBase {
     StringManager.setLanguage(next);
     this.onAppear();
     if (typeof window !== "undefined") {
+      window.localStorage.setItem("jsonui-language", next);
       window.dispatchEvent(new CustomEvent("chrome:languagechange"));
     }
   };
