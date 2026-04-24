@@ -1,0 +1,591 @@
+{
+  "type": "View",
+  "id": "tools_doc_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        { "name": "commandInitRows", "class": "CollectionDataSource" },
+        { "name": "commandValidateRows", "class": "CollectionDataSource" },
+        { "name": "commandGenerateRows", "class": "CollectionDataSource" },
+        { "name": "commandFigmaRows", "class": "CollectionDataSource" },
+        { "name": "figmaThrottleRows", "class": "CollectionDataSource" },
+        { "name": "sampleTabs", "class": "CollectionDataSource" },
+        { "name": "nextReadLinks", "class": "CollectionDataSource" },
+        { "name": "helloWorldSpecJson", "class": "String", "defaultValue": "" },
+        { "name": "jsonSamplePanelVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "htmlSamplePanelVisibility", "class": "String", "defaultValue": "visible" },
+        { "name": "onNavigateTools", "class": "() -> Void" },
+        { "name": "onNavigateSampleLive", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "tools_doc_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "tools_doc_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 24, 32],
+          "child": [
+            {
+              "type": "Label",
+              "width": "wrapContent",
+              "height": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateTools}",
+              "text": "breadcrumb"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "#475467",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "#64748B",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "tools_doc_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "tools_doc_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_overview",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_overview_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_overview_body"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_when",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_when_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_when_body"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_commands",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_commands_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_commands_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 24,
+                      "fontSize": 18,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_init_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "tools_doc_init_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "columnCount": 1,
+                      "lineSpacing": 12,
+                      "itemSpacing": 12,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{commandInitRows}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/command_row" }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 24,
+                      "fontSize": 18,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_validate_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "tools_doc_validate_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "columnCount": 1,
+                      "lineSpacing": 12,
+                      "itemSpacing": 12,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{commandValidateRows}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/command_row" }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 24,
+                      "fontSize": 18,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_generate_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "tools_doc_generate_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "columnCount": 1,
+                      "lineSpacing": 12,
+                      "itemSpacing": 12,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{commandGenerateRows}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/command_row" }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 24,
+                      "fontSize": 18,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_figma_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "tools_doc_figma_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "columnCount": 1,
+                      "lineSpacing": 12,
+                      "itemSpacing": 12,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{commandFigmaRows}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/command_row" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_throttle",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_throttle_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_throttle_body"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "tools_doc_throttle_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 1,
+                      "lineSpacing": 10,
+                      "itemSpacing": 10,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{figmaThrottleRows}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/figma_throttle_row" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_layout",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_layout_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_layout_body"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_mcp",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_mcp_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_mcp_body"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_sample",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_sample_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_sample_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "wrapContent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontWeight": "semibold",
+                      "fontColor": "accent_link",
+                      "tapBackground": "#EFF6FF",
+                      "text": "sample_view_live",
+                      "onClick": "@{onNavigateSampleLive}"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "tools_doc_sample_tabs",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 2,
+                      "lineSpacing": 12,
+                      "itemSpacing": 12,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{sampleTabs}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/tab_header" }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "sample_panel_json",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "visibility": "@{jsonSamplePanelVisibility}",
+                      "child": [
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "code": "@{helloWorldSpecJson}",
+                          "language": "json",
+                          "filename": "docs/screens/json/learn/hello-world.spec.json",
+                          "showLineNumbers": true,
+                          "copyable": true,
+                          "maxHeight": 800
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "sample_panel_html",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "visibility": "@{htmlSamplePanelVisibility}",
+                      "child": [
+                        {
+                          "type": "DocSamplePreview",
+                          "width": "matchParent",
+                          "height": "wrapContent"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "tools_doc_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [32, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "chrome_ink",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "tools_doc_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 2,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": false,
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/next_step_card" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "tools_doc_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "#94A3B8",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "tools_doc_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [24, 16, 24, 16],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "tools_doc_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 0, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "stickyOffset": 80,
+                      "items": [
+                        { "id": "toc_overview", "label": "toc_row_overview", "anchor": "section_overview", "level": 1 },
+                        { "id": "toc_when", "label": "toc_row_when", "anchor": "section_when", "level": 1 },
+                        { "id": "toc_commands", "label": "toc_row_commands", "anchor": "section_commands", "level": 1 },
+                        { "id": "toc_throttle", "label": "toc_row_throttle", "anchor": "section_throttle", "level": 1 },
+                        { "id": "toc_layout", "label": "toc_row_layout", "anchor": "section_layout", "level": 1 },
+                        { "id": "toc_mcp", "label": "toc_row_mcp", "anchor": "section_mcp", "level": 1 },
+                        { "id": "toc_sample", "label": "toc_row_sample", "anchor": "section_sample", "level": 1 }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,307 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "Doc",
+    "displayName": "jsonui-doc",
+    "description": "Tools > jsonui-doc (DOC GEN) overview. The Python CLI that generates HTML / Markdown / Mermaid / test adapters / Figma-as-HTML from JsonUI screen specs, component specs, test JSON files, and Figma API responses. 13 subcommands across four groups (init / validate / generate / figma). Companion to /tools/cli and /tools/mcp — the doc_generate_* MCP tools are thin wrappers that delegate here, and the /reference HTML pages on this site are produced by the same binary.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "tools/doc",
+    "createdAt": "2026-04-24",
+    "updatedAt": "2026-04-24"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "commandInitRows",
+        "type": "[CommandRow]",
+        "initial": "[]",
+        "description": "2 entries: `init spec`, `init component`. Each CommandRow carries name + description + key flags (-d, -o, -c). Seeded by onAppear from a module-scope static catalog."
+      },
+      {
+        "name": "commandValidateRows",
+        "type": "[CommandRow]",
+        "initial": "[]",
+        "description": "2 entries: `validate spec`, `validate component`. Rows rendered inside the 'validate' Collection."
+      },
+      {
+        "name": "commandGenerateRows",
+        "type": "[CommandRow]",
+        "initial": "[]",
+        "description": "6 entries: `generate html`, `generate mermaid`, `generate adapter`, `generate doc`, `generate spec`, `generate component`. The largest group — where most day-to-day invocations land."
+      },
+      {
+        "name": "commandFigmaRows",
+        "type": "[CommandRow]",
+        "initial": "[]",
+        "description": "2 entries: `figma fetch`, `figma images`. Throttling-sensitive; see figmaThrottleRows below for the companion plan table."
+      },
+      {
+        "name": "figmaThrottleRows",
+        "type": "[FigmaThrottleRow]",
+        "initial": "[]",
+        "description": "4 rows mirroring the Figma plan throttling table from document_tools/README.md (starter 10 req/min ~12s, pro 15 req/min ~8s, org 20 req/min ~6s, enterprise unlimited / no throttle). Static; never mutated after onAppear."
+      },
+      {
+        "name": "sampleTabs",
+        "type": "[TabHeaderCell]",
+        "initial": "[]",
+        "description": "2 T6-pattern tab headers for the live-sample section: 'Spec JSON' (id='json') and 'Generated HTML' (id='html'). Initial render defaults to id='html' active. Rebuilt on every onSelectSampleTab call by buildSampleTabs(activeId) so the active row carries accent bgColor/fgColor/borderColor and the inactive row carries the surface palette — exactly the same pattern hello-world's buildPlatformTabs uses for the Swift/Kotlin/React switcher."
+      },
+      {
+        "name": "helloWorldSpecJson",
+        "type": "String",
+        "initial": "",
+        "description": "Literal JSON text of docs/screens/json/learn/hello-world.spec.json, inlined at author time as a module-scope constant and read into the VM from onAppear. Rendered inside a CodeBlock (language='json') on the 'Spec JSON' tab. Seeded once; never mutated."
+      },
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "2 closing cards: /tools/mcp (the MCP server, whose doc_generate_* tools wrap this CLI) and /reference/cli-commands (the broader CLI reference)."
+      },
+      {
+        "name": "activeSampleTab",
+        "type": "String",
+        "initial": "html",
+        "description": "Id of the currently selected live-sample tab ('json' | 'html'). Defaults to 'html' so a first-time visitor sees the generated preview (the more visually immediate output), with the raw spec one click away. Drives displayLogic for the two sample-panel visibility variables and is fed into buildSampleTabs on each toggle. Matches the naming pattern LearnHelloWorldViewModel uses for `activeTab`."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed all seven public uiVariables (commandInitRows / commandValidateRows / commandGenerateRows / commandFigmaRows / figmaThrottleRows / nextReadLinks / helloWorldSpecJson) from module-scope static catalogs, then call buildSampleTabs('html') to populate sampleTabs. All user-visible command/flag descriptions resolve through StringManager with the tools_doc_ prefix."
+      },
+      {
+        "name": "onSelectSampleTab",
+        "params": [
+          {
+            "name": "id",
+            "type": "String"
+          }
+        ],
+        "description": "T6-pattern tab toggle. Sets activeSampleTab to the tapped TabHeaderCell.id ('json' | 'html'), then re-invokes buildSampleTabs(id) to refresh sampleTabs so the clicked row picks up the active palette and the other row reverts to the inactive palette. displayLogic's *SamplePanelVisibility vars are derived from activeSampleTab so exactly one sample panel is visible at a time."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation. Bound to the 'View this page live →' link above the sample tabs (target: /learn/hello-world) and to each NextReadLink card's onClick via Collection row binding."
+      }
+    ],
+    "displayLogic": [
+      {
+        "condition": "activeSampleTab == 'json'",
+        "effects": [
+          {
+            "element": "sample_panel_json",
+            "state": "visible",
+            "variableName": "jsonSamplePanelVisibility"
+          }
+        ]
+      },
+      {
+        "condition": "activeSampleTab == 'html'",
+        "effects": [
+          {
+            "element": "sample_panel_html",
+            "state": "visible",
+            "variableName": "htmlSamplePanelVisibility"
+          }
+        ]
+      }
+    ]
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[DocView] --> VM[DocViewModel]\n    VM -- commandInitRows --> VIEW\n    VM -- commandValidateRows --> VIEW\n    VM -- commandGenerateRows --> VIEW\n    VM -- commandFigmaRows --> VIEW\n    VM -- figmaThrottleRows --> VIEW\n    VM -- sampleTabs --> VIEW\n    VM -- helloWorldSpecJson --> VIEW\n    VM -- nextReadLinks --> VIEW\n    VM -- activeSampleTab --> VIEW\n    VIEW -- onAppear --> VM\n    VIEW -- onSelectSampleTab(id) --> VM\n    VIEW -- onNavigate(url) --> VM",
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed every public observable from module-scope catalogs: commandInitRows (2), commandValidateRows (2), commandGenerateRows (6), commandFigmaRows (2), figmaThrottleRows (4 plan rows), nextReadLinks (2 cards), helloWorldSpecJson (the literal learn/hello-world spec JSON, pasted as a template literal constant). Every string field on every row type is a tools_doc_ prefixed key pre-resolved via StringManager. Finally calls buildSampleTabs('html') to populate sampleTabs and leaves activeSampleTab at its 'html' initial value."
+        },
+        {
+          "name": "onSelectSampleTab",
+          "params": [{ "name": "id", "type": "String" }],
+          "description": "Set `activeSampleTab` to the tapped TabHeaderCell.id, then assign `sampleTabs = buildSampleTabs(id)` so the active/inactive palettes swap without a full re-seed. displayLogic derives jsonSamplePanelVisibility / htmlSamplePanelVisibility from activeSampleTab; the VM does not set those — the generated component does via the layout's visibility bindings."
+        },
+        {
+          "name": "onNavigate",
+          "params": [{ "name": "url", "type": "String" }],
+          "description": "router.push(url). Bound to the 'View this page live' CTA (target: /learn/hello-world) and to each NextReadLink card."
+        },
+        {
+          "name": "buildSampleTabs",
+          "params": [{ "name": "activeId", "type": "String" }],
+          "description": "Helper that returns [TabHeaderCell] with exactly 2 entries (id='json' / id='html'). For the row whose id === activeId it sets bgColor: 'var(--color-accent)', fgColor: 'var(--color-on-accent)', borderColor: 'var(--color-accent)'; for the other row it sets bgColor: 'var(--color-surface)', fgColor: 'var(--color-ink)', borderColor: 'var(--color-border)'. Each row's onSelect is wired to () => this.onSelectSampleTab(id). Mirrors LearnHelloWorldViewModel.buildPlatformTabs exactly so a maintainer who has read one has read both."
+        }
+      ],
+      "vars": [
+        { "name": "commandInitRows",     "type": "Array(CommandRow)",       "observable": true, "description": "2-row init catalog (`init spec`, `init component`)." },
+        { "name": "commandValidateRows", "type": "Array(CommandRow)",       "observable": true, "description": "2-row validate catalog (`validate spec`, `validate component`)." },
+        { "name": "commandGenerateRows", "type": "Array(CommandRow)",       "observable": true, "description": "6-row generate catalog (`generate html` / `mermaid` / `adapter` / `doc` / `spec` / `component`)." },
+        { "name": "commandFigmaRows",    "type": "Array(CommandRow)",       "observable": true, "description": "2-row figma catalog (`figma fetch`, `figma images`)." },
+        { "name": "figmaThrottleRows",   "type": "Array(FigmaThrottleRow)", "observable": true, "description": "4-row throttle table (starter / pro / org / enterprise)." },
+        { "name": "sampleTabs",          "type": "Array(TabHeaderCell)",    "observable": true, "description": "2-row tab header for the live-sample section, rebuilt on every selection." },
+        { "name": "helloWorldSpecJson",  "type": "String",                  "observable": true, "description": "Literal JSON text of the hello-world spec, displayed in a CodeBlock on the 'Spec JSON' tab." },
+        { "name": "nextReadLinks",       "type": "Array(NextReadLink)",     "observable": true, "description": "2 closing cards (/tools/mcp, /reference/cli-commands)." },
+        { "name": "activeSampleTab",    "type": "String",                  "observable": true, "description": "Currently visible sample tab id; 'html' by default." },
+        { "name": "jsonSamplePanelVisibility", "type": "String",            "observable": true, "description": "Derived visibility from displayLogic; set by the layout's binding, not the VM." },
+        { "name": "htmlSamplePanelVisibility", "type": "String",            "observable": true, "description": "Same as above — mirrors activeSampleTab == 'html'." }
+      ]
+    },
+    "customTypes": [
+      {
+        "name": "CommandRow",
+        "properties": [
+          { "name": "id",             "type": "String" },
+          { "name": "commandKey",     "type": "String" },
+          { "name": "descriptionKey", "type": "String" },
+          { "name": "flagsKey",       "type": "String" }
+        ]
+      },
+      {
+        "name": "FigmaThrottleRow",
+        "properties": [
+          { "name": "id",        "type": "String" },
+          { "name": "planKey",   "type": "String" },
+          { "name": "limitKey",  "type": "String" },
+          { "name": "intervalKey", "type": "String" }
+        ]
+      },
+      {
+        "name": "TabHeaderCell",
+        "properties": [
+          { "name": "id",          "type": "String" },
+          { "name": "labelKey",    "type": "String" },
+          { "name": "bgColor",     "type": "String" },
+          { "name": "fgColor",     "type": "String" },
+          { "name": "borderColor", "type": "String" },
+          { "name": "onSelect",    "type": "(() -> Void)?" }
+        ]
+      },
+      {
+        "name": "NextReadLink",
+        "properties": [
+          { "name": "id",             "type": "String" },
+          { "name": "titleKey",       "type": "String" },
+          { "name": "descriptionKey", "type": "String" },
+          { "name": "url",            "type": "String" }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a command row",
+      "processing": "No handler — informational cards, no per-row nav. Flag syntax is shown inline."
+    },
+    {
+      "action": "Tap a sample tab ('Spec JSON' / 'Generated HTML')",
+      "processing": "onSelectSampleTab(id) is invoked with the bound TabHeaderCell.id. VM sets activeSampleTab and rebuilds sampleTabs; displayLogic flips the matching sample_panel_* visibility."
+    },
+    {
+      "action": "Tap the 'View this page live →' link",
+      "processing": "onNavigate('/learn/hello-world') — the page whose spec is being previewed."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url) with the bound card url (/tools/mcp or /reference/cli-commands)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is a spec-mapped URL",
+      "destination": "Target spec screen",
+      "description": "v1 destinations: /learn/hello-world, /tools/mcp, /reference/cli-commands."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/tools/doc.json",
+      "description": "jsonui-doc overview layout. Single Scroll root hosting the breadcrumb, title, lead, four command Collections (init / validate / generate / figma), the Figma throttle table Collection, the live-sample tab switcher with a 'View this page live' link, the two sample panels (CodeBlock + DocSamplePreview), and the NextReadLinks Collection."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/command_row.json",
+      "description": "Cell layout for a single CommandRow: command name (monospace), description paragraph, and a flags line (muted, small). Shared across all four command Collections on this page."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/figma_throttle_row.json",
+      "description": "Cell layout for one FigmaThrottleRow: plan pill + tier-1 limit + request interval. Informational, no onClick."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/tab_header.json",
+      "description": "Reused from /learn/hello-world. Button-style tab header driven by bgColor / fgColor / borderColor bindings that buildSampleTabs toggles per active id."
+    },
+    {
+      "type": "Component",
+      "path": "docs/components/json/codeblock.component.json",
+      "description": "Renders the literal spec JSON on the 'Spec JSON' tab (language='json')."
+    },
+    {
+      "type": "Component",
+      "path": "docs/components/json/doc-sample-preview.component.json",
+      "description": "Renders the hand-pasted generated-HTML snapshot inside a sandboxed iframe on the 'Generated HTML' tab. Zero props; see that spec for the snapshot-refresh procedure."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/tools/DocViewModel.ts",
+      "description": "Hand-written VM body that seeds every observable in onAppear, implements buildSampleTabs(activeId) with the same palette-swap logic as LearnHelloWorldViewModel.buildPlatformTabs, and routes onNavigate through the Next.js router."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/tools/doc/page.tsx",
+      "description": "Next.js route that dynamic-imports the generated DocView."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/components/extensions/DocSamplePreview.tsx",
+      "description": "Web extension that owns the RAW_HTML string constant (pasted from a local `jsonui-doc generate spec` run against hello-world.spec.json) and renders it inside a sandboxed iframe."
+    }
+  ],
+  "notes": [
+    "Fourth live entry under the Tools tab (after cli / mcp / test-runner). Flipping the TOOLS_ENTRIES 'doc' row from 'upcoming' to 'live' in HomeViewModel is the last step to surface this page alongside its siblings.",
+    "Source of truth for command copy — /Users/like-a-rolling_stone/resource/jsonui-cli/document_tools/README.md. The 13-subcommand catalog is summarized in four Collections (2 init + 2 validate + 6 generate + 2 figma = 12 rows). The aliases column (e.g. 'i spec', 'g mermaid') is omitted from v1 to keep rows one-line; if readers ask for it, add an aliasKey field to CommandRow in a follow-up.",
+    "Grouped into four Collections rather than one long list because the user-provided spec requested a 4-way categorical split (init / validate / generate / figma). Each Collection gets its own heading above it in the layout; no per-group expand/collapse state is needed (all rows always visible).",
+    "Figma throttle table — faithful mirror of the README table (starter 10 req/min ~12s, pro 15 ~8s, org 20 ~6s, enterprise unlimited / no throttle). Encoded as 4 FigmaThrottleRows because those three columns don't fit CommandRow's shape and because readers asked about rate limits often enough to deserve its own visual block.",
+    "File-layout convention (specs/ / components/ / tests/ / figma/ / html/ with auto-discovery from screens/ and flows/) is described in the body copy under a dedicated section heading; no row catalog needed for it — it's prose.",
+    "MCP wiring — the doc_generate_spec / doc_generate_component / doc_generate_html tools on /tools/mcp are called out in the overview section as thin wrappers over this CLI. The mcp.spec.json and strings.json entries for those tools are updated in the same cross-link pass.",
+    "Live sample pattern mirrors /learn/hello-world exactly: T6 inline tab switcher (activeTab: String + Collection of TabHeaderCell + cellClasses: ['cells/tab_header']) inside a root Scroll, not a root TabView. The VM's buildSampleTabs(activeId) method has the same shape as buildPlatformTabs — swap the active-row palette, wire onSelect to the corresponding handler. Re-reading one implementation is enough to maintain the other.",
+    "sampleTabs.initial is '[]' not the pre-built palette because buildSampleTabs is called at the end of onAppear — doing it inline in the initial value would mean the VM's palette helper runs before StringManager is ready.",
+    "The initial active tab is 'html' (Generated HTML) because a reader new to the site benefits more from seeing the visual output first; the JSON view is one click away and the CodeBlock's copy button is on that tab.",
+    "DocSamplePreview is a new custom component authored alongside this spec (see /tools/doc/doc-sample-preview.component.json). It was registered in .jsonui-doc-rules.json componentTypes.screen as part of this same define pass so validation accepts the screen spec's reference.",
+    "helloWorldSpecJson is seeded as a literal template-literal string in DocViewModel.ts — the VM does not read the file at runtime. That means any change to learn/hello-world.spec.json requires a manual re-paste in DocViewModel.ts AND a manual regeneration of RAW_HTML inside DocSamplePreview.tsx. This coupling is deliberate: both artifacts are static snapshots of a stable reference fixture, and `jui verify` will surface drift if any generated Layout stops matching its spec.",
+    "All user-visible strings flow through @string/tools_doc_* keys into Resources/strings.json for en+ja. No paragraph exceeds ~100 chars in v1 so docs/content/{en,ja}/ is not needed.",
+    "Cross-links seeded by this same define pass: (1) strings.json tools_cli.cli_jsonui_doc_body appended with 'See /tools/doc for full reference.' en+ja; (2) strings.json tools_mcp.tool_doc_generate_{spec,component,html}_role appended with '(wraps jsonui-doc CLI — see /tools/doc)' en+ja; (3) NAV_CATALOG 'tools' section in jsonui-doc-web/src/viewmodels/ChromeViewModel.ts received a new entry { id: 'doc', titleKey: 'tools_doc_title', url: '/tools/doc' }.",
+    "onSelectSampleTab was added to .jsonui-doc-rules.json eventHandlers.allowedNames during this define pass."
+  ]
+}

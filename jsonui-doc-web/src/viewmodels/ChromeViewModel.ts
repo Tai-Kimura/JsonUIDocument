@@ -102,6 +102,7 @@ const NAV_CATALOG: ReadonlyArray<{
     entries: [
       { id: "cli",         titleKey: "tools_cli_title",         url: "/tools/cli" },
       { id: "mcp",         titleKey: "tools_mcp_title",         url: "/tools/mcp" },
+      { id: "doc",         titleKey: "tools_doc_title",         url: "/tools/doc" },
       { id: "test-runner", titleKey: "tools_test_runner_title", url: "/tools/test-runner" },
       { id: "agents",      titleKey: "tools_agents_title",      url: "/tools/agents" },
       { id: "helper",      titleKey: "tools_helper_title",      url: "/tools/helper" },

@@ -13,6 +13,7 @@ module RjuiTools
           'Search' => 'SearchConverter',
           'Sidebar' => 'SidebarConverter',
           'TopBar' => 'TopBarConverter',
+          'DocSamplePreview' => 'DocSamplePreviewConverter',
         }.freeze
       end
     end

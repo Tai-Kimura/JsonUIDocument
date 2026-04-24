@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doc - jsonui-doc</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --code-bg: #f1f5f9;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 { color: var(--text-color); margin-bottom: 1.5rem; font-size: 2rem; }
+        h2 { color: var(--text-color); margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); }
+        h3 { color: var(--text-color); margin: 1.5rem 0 0.75rem; }
+        h4 { color: #64748b; margin: 1rem 0 0.5rem; }
+        section { margin-bottom: 2rem; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:hover { background: #f8fafc; }
+        code { background: var(--code-bg); padding: 0.2em 0.4em; border-radius: 4px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9em; }
+        pre { background: var(--code-bg); padding: 1rem; border-radius: 8px; overflow-x: auto; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9em; line-height: 1.5; }
+        .meta-table { width: auto; }
+        .meta-table th { background: transparent; border: none; padding: 0.25rem 1rem 0.25rem 0; }
+        .meta-table td { border: none; padding: 0.25rem 0; }
+        .component-type { background: var(--bg-color); color: var(--text-color); padding: 0.2em 0.5em; border-radius: 4px; font-size: 0.85em; border: 1px solid var(--border-color); }
+        .platform-badge { display: inline-block; padding: 0.15em 0.5em; margin-right: 0.25em; border-radius: 3px; font-size: 0.75em; font-weight: 600; }
+        .platform-ios { background: #dbeafe; color: #1e40af; }
+        .platform-android { background: #dcfce7; color: #166534; }
+        .platform-web { background: #fef3c7; color: #92400e; }
+        .platform-override { opacity: 0.75; font-style: italic; }
+        /* ViewModel / event-handler collapsible sections */
+        details.vm-section { margin: 1rem 0; }
+        details.vm-section > summary {
+            cursor: pointer;
+            font-size: 1.15em;
+            font-weight: 600;
+            padding: 0.4rem 0.5rem;
+            border-left: 3px solid var(--border-color);
+            background: var(--code-bg);
+            border-radius: 0 4px 4px 0;
+            user-select: none;
+            margin-bottom: 0.5rem;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4em;
+        }
+        details.vm-section > summary::-webkit-details-marker { display: none; }
+        details.vm-section > summary::before {
+            content: "\25B6";
+            font-size: 0.75em;
+            transition: transform 0.15s ease;
+            display: inline-block;
+            color: var(--text-color);
+            opacity: 0.5;
+        }
+        details.vm-section[open] > summary::before {
+            transform: rotate(90deg);
+        }
+        details.vm-section > summary:hover { border-left-color: #3b82f6; }
+        .count-badge {
+            display: inline-block;
+            padding: 0.1em 0.55em;
+            border-radius: 10px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.78em;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            margin-left: auto;
+        }
+        .flag-chip {
+            display: inline-block;
+            padding: 0.1em 0.45em;
+            margin-right: 0.25em;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-weight: 500;
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        .flag-observable { background: #ede9fe; color: #5b21b6; border-color: #ddd6fe; }
+        .flag-optional   { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .flag-readonly   { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+        .section-intro   { color: #64748b; font-size: 0.9em; margin: 0.25rem 0 0.5rem; }
+        .layout-tree { background: #1e293b; color: #e2e8f0; padding: 1.5rem; }
+        .display-logic { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        .notes { color: #64748b; font-style: italic; margin-top: 0.5rem; }
+        .http-method { padding: 0.2em 0.5em; border-radius: 4px; font-weight: 600; font-size: 0.85em; }
+        .method-get { background: #22c55e; color: white; }
+        .method-post { background: #3b82f6; color: white; }
+        .method-put { background: #f59e0b; color: white; }
+        .method-patch { background: #8b5cf6; color: white; }
+        .method-delete { background: #ef4444; color: white; }
+        .json { background: #1e293b; color: #e2e8f0; }
+        .mermaid { background: white; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin: 1rem 0; }
+        ul { margin: 0.5rem 0; padding-left: 1.5rem; }
+        li { margin: 0.25rem 0; }
+        .custom-component-name { background: #fef3c7; color: #92400e; padding: 0.2em 0.5em; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
+        .component-link { color: var(--primary-color); text-decoration: none; }
+        .component-link:hover { text-decoration: underline; }
+        .swatch { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .swatch > i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.15); background-clip: padding-box; flex-shrink: 0; }
+        .swatch > code { background: var(--code-bg); padding: 0.1em 0.35em; font-size: 0.85em; }
+        .swatch-hex { color: #64748b; font-family: 'SF Mono', Monaco, monospace; font-size: 0.8em; }
+        .style-rows { display: flex; flex-direction: column; gap: 0.2rem; }
+        .style-row { display: flex; gap: 0.5rem; align-items: flex-start; line-height: 1.5; flex-wrap: wrap; }
+        .style-key { color: #64748b; font-weight: 600; font-size: 0.7rem; min-width: 56px; text-transform: uppercase; letter-spacing: 0.04em; padding-top: 0.15rem; flex-shrink: 0; }
+        .style-lbl { color: #94a3b8; font-size: 0.75rem; margin-right: 2px; }
+        .bind-cell { display: flex; flex-direction: column; gap: 3px; font-size: 0.8rem; line-height: 1.6; }
+        .bind-badge { display: inline-block; padding: 0 0.4em; border-radius: 3px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; vertical-align: baseline; }
+        .bind-event { background: #fef3c7; color: #92400e; }
+        .bind-data { background: #dbeafe; color: #1e40af; }
+        .tree-table-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1.5rem 0 0.5rem; }
+        .tree-table-header h3 { margin: 0; }
+        .tree-controls button { font: inherit; font-size: 0.8rem; padding: 0.25em 0.75em; margin-left: 0.4rem; border: 1px solid var(--border-color); background: white; color: var(--text-color); border-radius: 4px; cursor: pointer; }
+        .tree-controls button:hover { background: var(--bg-color); border-color: #94a3b8; }
+        .tree-col { white-space: nowrap; }
+        .tree-indent { display: inline-block; vertical-align: middle; }
+        .tree-toggle { display: inline-block; width: 16px; text-align: center; cursor: pointer; color: #64748b; font-size: 0.7em; transition: transform 0.15s ease; user-select: none; margin-right: 4px; }
+        .tree-toggle:hover { color: var(--primary-color); }
+        .tree-toggle.expanded { transform: rotate(90deg); }
+        .tree-spacer { display: inline-block; width: 16px; margin-right: 4px; }
+        tr.tree-group > td { background: #f8fafc; font-weight: 600; }
+        tr.tree-group .tree-group-name { color: var(--text-color); }
+        tr.tree-group .tree-group-count { display: inline-block; margin-left: 0.4rem; padding: 0.05em 0.5em; background: var(--border-color); color: #475569; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
+        
+    </style>
+</head>
+<body>
+
+<div class="container">
+<h1>Doc - jsonui-doc</h1>
+<section id="overview">
+<h2>Overview</h2>
+<p>Tools &gt; jsonui-doc (DOC GEN) overview. The Python CLI that generates HTML / Markdown / Mermaid / test adapters / Figma-as-HTML from JsonUI screen specs, component specs, test JSON files, and Figma API responses. 13 subcommands across four groups (init / validate / generate / figma). Companion to /tools/cli and /tools/mcp — the doc_generate_* MCP tools are thin wrappers that delegate here, and the /reference HTML pages on this site are produced by the same binary.</p>
+<table class="meta-table">
+<tr><th>Created</th><td>2026-04-24</td></tr>
+<tr><th>Updated</th><td>2026-04-24</td></tr>
+</table>
+</section>
+<section id="structure">
+<h2>Screen Structure</h2>
+</section>
+<section id="dataflow">
+<h2>Data Flow</h2>
+<pre class="mermaid">
+flowchart TD
+    VIEW[DocView] --> VM[DocViewModel]
+    VM -- commandInitRows --> VIEW
+    VM -- commandValidateRows --> VIEW
+    VM -- commandGenerateRows --> VIEW
+    VM -- commandFigmaRows --> VIEW
+    VM -- figmaThrottleRows --> VIEW
+    VM -- sampleTabs --> VIEW
+    VM -- helloWorldSpecJson --> VIEW
+    VM -- nextReadLinks --> VIEW
+    VM -- activeSampleTab --> VIEW
+    VIEW -- onAppear --> VM
+    VIEW -- onSelectSampleTab(id) --> VM
+    VIEW -- onNavigate(url) --> VM
+</pre>
+<h3>ViewModel</h3>
+<details class="vm-section" open><summary class="vm-section-header">Methods <span class="count-badge">4</span></summary>
+<table>
+<thead><tr><th>Signature</th><th>Platforms</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>onAppear()</code></td><td><em title="Imported into all platforms">all</em></td><td>Seed every public observable from module-scope catalogs: commandInitRows (2), commandValidateRows (2), commandGenerateRows (6), commandFigmaRows (2), figmaThrottleRows (4 plan rows), nextReadLinks (2 cards), helloWorldSpecJson (the literal learn/hello-world spec JSON, pasted as a template literal constant). Every string field on every row type is a tools_doc_ prefixed key pre-resolved via StringManager. Finally calls buildSampleTabs(&#x27;html&#x27;) to populate sampleTabs and leaves activeSampleTab at its &#x27;html&#x27; initial value.</td></tr>
+<tr><td><code>onSelectSampleTab(id: String)</code></td><td><em title="Imported into all platforms">all</em></td><td>Set `activeSampleTab` to the tapped TabHeaderCell.id, then assign `sampleTabs = buildSampleTabs(id)` so the active/inactive palettes swap without a full re-seed. displayLogic derives jsonSamplePanelVisibility / htmlSamplePanelVisibility from activeSampleTab; the VM does not set those — the generated component does via the layout&#x27;s visibility bindings.</td></tr>
+<tr><td><code>onNavigate(url: String)</code></td><td><em title="Imported into all platforms">all</em></td><td>router.push(url). Bound to the &#x27;View this page live&#x27; CTA (target: /learn/hello-world) and to each NextReadLink card.</td></tr>
+<tr><td><code>buildSampleTabs(activeId: String)</code></td><td><em title="Imported into all platforms">all</em></td><td>Helper that returns [TabHeaderCell] with exactly 2 entries (id=&#x27;json&#x27; / id=&#x27;html&#x27;). For the row whose id === activeId it sets bgColor: &#x27;var(--color-accent)&#x27;, fgColor: &#x27;var(--color-on-accent)&#x27;, borderColor: &#x27;var(--color-accent)&#x27;; for the other row it sets bgColor: &#x27;var(--color-surface)&#x27;, fgColor: &#x27;var(--color-ink)&#x27;, borderColor: &#x27;var(--color-border)&#x27;. Each row&#x27;s onSelect is wired to () =&gt; this.onSelectSampleTab(id). Mirrors LearnHelloWorldViewModel.buildPlatformTabs exactly so a maintainer who has read one has read both.</td></tr>
+</tbody></table>
+</details>
+<details class="vm-section" open><summary class="vm-section-header">Vars <span class="count-badge">11</span></summary>
+<table>
+<thead><tr><th>Declaration</th><th>Flags</th><th>Platforms</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>var commandInitRows: Array(CommandRow)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>2-row init catalog (`init spec`, `init component`).</td></tr>
+<tr><td><code>var commandValidateRows: Array(CommandRow)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>2-row validate catalog (`validate spec`, `validate component`).</td></tr>
+<tr><td><code>var commandGenerateRows: Array(CommandRow)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>6-row generate catalog (`generate html` / `mermaid` / `adapter` / `doc` / `spec` / `component`).</td></tr>
+<tr><td><code>var commandFigmaRows: Array(CommandRow)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>2-row figma catalog (`figma fetch`, `figma images`).</td></tr>
+<tr><td><code>var figmaThrottleRows: Array(FigmaThrottleRow)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>4-row throttle table (starter / pro / org / enterprise).</td></tr>
+<tr><td><code>var sampleTabs: Array(TabHeaderCell)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>2-row tab header for the live-sample section, rebuilt on every selection.</td></tr>
+<tr><td><code>var helloWorldSpecJson: String</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Literal JSON text of the hello-world spec, displayed in a CodeBlock on the &#x27;Spec JSON&#x27; tab.</td></tr>
+<tr><td><code>var nextReadLinks: Array(NextReadLink)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>2 closing cards (/tools/mcp, /reference/cli-commands).</td></tr>
+<tr><td><code>var activeSampleTab: String</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Currently visible sample tab id; &#x27;html&#x27; by default.</td></tr>
+<tr><td><code>var jsonSamplePanelVisibility: String</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Derived visibility from displayLogic; set by the layout&#x27;s binding, not the VM.</td></tr>
+<tr><td><code>var htmlSamplePanelVisibility: String</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Same as above — mirrors activeSampleTab == &#x27;html&#x27;.</td></tr>
+</tbody></table>
+</details>
+</section>
+<section id="state">
+<h2>State Management</h2>
+<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">9</span></summary>
+<table>
+<thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>commandInitRows</code></td><td>[CommandRow]</td><td>2 entries: `init spec`, `init component`. Each CommandRow carries name + description + key flags (-d, -o, -c). Seeded by onAppear from a module-scope static catalog.</td><td>-</td></tr>
+<tr><td><code>commandValidateRows</code></td><td>[CommandRow]</td><td>2 entries: `validate spec`, `validate component`. Rows rendered inside the &#x27;validate&#x27; Collection.</td><td>-</td></tr>
+<tr><td><code>commandGenerateRows</code></td><td>[CommandRow]</td><td>6 entries: `generate html`, `generate mermaid`, `generate adapter`, `generate doc`, `generate spec`, `generate component`. The largest group — where most day-to-day invocations land.</td><td>-</td></tr>
+<tr><td><code>commandFigmaRows</code></td><td>[CommandRow]</td><td>2 entries: `figma fetch`, `figma images`. Throttling-sensitive; see figmaThrottleRows below for the companion plan table.</td><td>-</td></tr>
+<tr><td><code>figmaThrottleRows</code></td><td>[FigmaThrottleRow]</td><td>4 rows mirroring the Figma plan throttling table from document_tools/README.md (starter 10 req/min ~12s, pro 15 req/min ~8s, org 20 req/min ~6s, enterprise unlimited / no throttle). Static; never mutated after onAppear.</td><td>-</td></tr>
+<tr><td><code>sampleTabs</code></td><td>[TabHeaderCell]</td><td>2 T6-pattern tab headers for the live-sample section: &#x27;Spec JSON&#x27; (id=&#x27;json&#x27;) and &#x27;Generated HTML&#x27; (id=&#x27;html&#x27;). Initial render defaults to id=&#x27;html&#x27; active. Rebuilt on every onSelectSampleTab call by buildSampleTabs(activeId) so the active row carries accent bgColor/fgColor/borderColor and the inactive row carries the surface palette — exactly the same pattern hello-world&#x27;s buildPlatformTabs uses for the Swift/Kotlin/React switcher.</td><td>-</td></tr>
+<tr><td><code>helloWorldSpecJson</code></td><td>String</td><td>Literal JSON text of docs/screens/json/learn/hello-world.spec.json, inlined at author time as a module-scope constant and read into the VM from onAppear. Rendered inside a CodeBlock (language=&#x27;json&#x27;) on the &#x27;Spec JSON&#x27; tab. Seeded once; never mutated.</td><td>-</td></tr>
+<tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td>2 closing cards: /tools/mcp (the MCP server, whose doc_generate_* tools wrap this CLI) and /reference/cli-commands (the broader CLI reference).</td><td>-</td></tr>
+<tr><td><code>activeSampleTab</code></td><td>String</td><td>Id of the currently selected live-sample tab (&#x27;json&#x27; | &#x27;html&#x27;). Defaults to &#x27;html&#x27; so a first-time visitor sees the generated preview (the more visually immediate output), with the raw spec one click away. Drives displayLogic for the two sample-panel visibility variables and is fed into buildSampleTabs on each toggle. Matches the naming pattern LearnHelloWorldViewModel uses for `activeTab`.</td><td>-</td></tr>
+</tbody></table>
+</details>
+<details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">3</span></summary>
+<p class="section-intro">Handlers kept inside the View layer. ViewModel public API lives under <code>dataFlow.viewModel</code>.</p>
+<table>
+<thead><tr><th>Handler</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>onAppear</code></td><td>Seed all seven public uiVariables (commandInitRows / commandValidateRows / commandGenerateRows / commandFigmaRows / figmaThrottleRows / nextReadLinks / helloWorldSpecJson) from module-scope static catalogs, then call buildSampleTabs(&#x27;html&#x27;) to populate sampleTabs. All user-visible command/flag descriptions resolve through StringManager with the tools_doc_ prefix.</td><td>-</td></tr>
+<tr><td><code>onSelectSampleTab</code></td><td>T6-pattern tab toggle. Sets activeSampleTab to the tapped TabHeaderCell.id (&#x27;json&#x27; | &#x27;html&#x27;), then re-invokes buildSampleTabs(id) to refresh sampleTabs so the clicked row picks up the active palette and the other row reverts to the inactive palette. displayLogic&#x27;s *SamplePanelVisibility vars are derived from activeSampleTab so exactly one sample panel is visible at a time.</td><td>-</td></tr>
+<tr><td><code>onNavigate</code></td><td>Client-side navigation. Bound to the &#x27;View this page live →&#x27; link above the sample tabs (target: /learn/hello-world) and to each NextReadLink card&#x27;s onClick via Collection row binding.</td><td>-</td></tr>
+</tbody></table>
+</details>
+<h3>Display Logic</h3>
+<pre class="display-logic">
+activeSampleTab == &#x27;json&#x27;:
+  - sample_panel_json: visible [variable: jsonSamplePanelVisibility]
+
+activeSampleTab == &#x27;html&#x27;:
+  - sample_panel_html: visible [variable: htmlSamplePanelVisibility]
+
+</pre>
+</section>
+<section id="actions">
+<h2>User Actions</h2>
+<table>
+<thead><tr><th>Action</th><th>Processing</th><th>Destination</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Tap a TOC entry</td><td>TOC-internal scroll.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap a command row</td><td>No handler — informational cards, no per-row nav. Flag syntax is shown inline.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap a sample tab (&#x27;Spec JSON&#x27; / &#x27;Generated HTML&#x27;)</td><td>onSelectSampleTab(id) is invoked with the bound TabHeaderCell.id. VM sets activeSampleTab and rebuilds sampleTabs; displayLogic flips the matching sample_panel_* visibility.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap the &#x27;View this page live →&#x27; link</td><td>onNavigate(&#x27;/learn/hello-world&#x27;) — the page whose spec is being previewed.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap a NextReadLink card</td><td>onNavigate(url) with the bound card url (/tools/mcp or /reference/cli-commands).</td><td>-</td><td>-</td></tr>
+</tbody></table>
+</section>
+<section id="validation">
+<h2>Validation</h2>
+</section>
+<section id="transitions">
+<h2>Transitions</h2>
+<table>
+<thead><tr><th>Condition</th><th>Destination</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>url is a spec-mapped URL</td><td>Target spec screen</td><td>-</td></tr>
+</tbody></table>
+</section>
+<section id="files">
+<div class="tree-wrapper" data-initial-depth="0">
+<div class="tree-table-header">
+<h2>Related Files</h2>
+<div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
+</div>
+<table class="tree-table">
+<thead><tr><th>Type</th><th>File Path</th><th>Notes</th></tr></thead>
+<tbody>
+<tr class="tree-group" data-row-id="1" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">Layout</span><span class="tree-group-count">4</span></td></tr>
+<tr data-row-id="1-1" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/tools/doc.json</code></td><td>jsonui-doc overview layout. Single Scroll root hosting the breadcrumb, title, lead, four command Collections (init / validate / generate / figma), the Figma throttle table Collection, the live-sample tab switcher with a &#x27;View this page live&#x27; link, the two sample panels (CodeBlock + DocSamplePreview), and the NextReadLinks Collection.</td></tr>
+<tr data-row-id="1-2" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/cells/command_row.json</code></td><td>Cell layout for a single CommandRow: command name (monospace), description paragraph, and a flags line (muted, small). Shared across all four command Collections on this page.</td></tr>
+<tr data-row-id="1-3" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/cells/figma_throttle_row.json</code></td><td>Cell layout for one FigmaThrottleRow: plan pill + tier-1 limit + request interval. Informational, no onClick.</td></tr>
+<tr data-row-id="1-4" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/cells/tab_header.json</code></td><td>Reused from /learn/hello-world. Button-style tab header driven by bgColor / fgColor / borderColor bindings that buildSampleTabs toggles per active id.</td></tr>
+<tr class="tree-group" data-row-id="2" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">Component</span><span class="tree-group-count">2</span></td></tr>
+<tr data-row-id="2-1" data-parent-id="2"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Component</code></td><td><code>docs/components/json/codeblock.component.json</code></td><td>Renders the literal spec JSON on the &#x27;Spec JSON&#x27; tab (language=&#x27;json&#x27;).</td></tr>
+<tr data-row-id="2-2" data-parent-id="2"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Component</code></td><td><code>docs/components/json/doc-sample-preview.component.json</code></td><td>Renders the hand-pasted generated-HTML snapshot inside a sandboxed iframe on the &#x27;Generated HTML&#x27; tab. Zero props; see that spec for the snapshot-refresh procedure.</td></tr>
+<tr class="tree-group" data-row-id="3" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">ViewModel</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="3-1" data-parent-id="3"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>ViewModel</code></td><td><code>jsonui-doc-web/src/viewmodels/tools/DocViewModel.ts</code></td><td>Hand-written VM body that seeds every observable in onAppear, implements buildSampleTabs(activeId) with the same palette-swap logic as LearnHelloWorldViewModel.buildPlatformTabs, and routes onNavigate through the Next.js router.</td></tr>
+<tr class="tree-group" data-row-id="4" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">View</span><span class="tree-group-count">2</span></td></tr>
+<tr data-row-id="4-1" data-parent-id="4"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>View</code></td><td><code>jsonui-doc-web/src/app/tools/doc/page.tsx</code></td><td>Next.js route that dynamic-imports the generated DocView.</td></tr>
+<tr data-row-id="4-2" data-parent-id="4"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>View</code></td><td><code>jsonui-doc-web/src/components/extensions/DocSamplePreview.tsx</code></td><td>Web extension that owns the RAW_HTML string constant (pasted from a local `jsonui-doc generate spec` run against hello-world.spec.json) and renders it inside a sandboxed iframe.</td></tr>
+</tbody></table>
+</div>
+</section>
+<section id="notes">
+<h2>Notes</h2>
+<ul>
+<li>Fourth live entry under the Tools tab (after cli / mcp / test-runner). Flipping the TOOLS_ENTRIES &#x27;doc&#x27; row from &#x27;upcoming&#x27; to &#x27;live&#x27; in HomeViewModel is the last step to surface this page alongside its siblings.</li>
+<li>Source of truth for command copy — /Users/like-a-rolling_stone/resource/jsonui-cli/document_tools/README.md. The 13-subcommand catalog is summarized in four Collections (2 init + 2 validate + 6 generate + 2 figma = 12 rows). The aliases column (e.g. &#x27;i spec&#x27;, &#x27;g mermaid&#x27;) is omitted from v1 to keep rows one-line; if readers ask for it, add an aliasKey field to CommandRow in a follow-up.</li>
+<li>Grouped into four Collections rather than one long list because the user-provided spec requested a 4-way categorical split (init / validate / generate / figma). Each Collection gets its own heading above it in the layout; no per-group expand/collapse state is needed (all rows always visible).</li>
+<li>Figma throttle table — faithful mirror of the README table (starter 10 req/min ~12s, pro 15 ~8s, org 20 ~6s, enterprise unlimited / no throttle). Encoded as 4 FigmaThrottleRows because those three columns don&#x27;t fit CommandRow&#x27;s shape and because readers asked about rate limits often enough to deserve its own visual block.</li>
+<li>File-layout convention (specs/ / components/ / tests/ / figma/ / html/ with auto-discovery from screens/ and flows/) is described in the body copy under a dedicated section heading; no row catalog needed for it — it&#x27;s prose.</li>
+<li>MCP wiring — the doc_generate_spec / doc_generate_component / doc_generate_html tools on /tools/mcp are called out in the overview section as thin wrappers over this CLI. The mcp.spec.json and strings.json entries for those tools are updated in the same cross-link pass.</li>
+<li>Live sample pattern mirrors /learn/hello-world exactly: T6 inline tab switcher (activeTab: String + Collection of TabHeaderCell + cellClasses: [&#x27;cells/tab_header&#x27;]) inside a root Scroll, not a root TabView. The VM&#x27;s buildSampleTabs(activeId) method has the same shape as buildPlatformTabs — swap the active-row palette, wire onSelect to the corresponding handler. Re-reading one implementation is enough to maintain the other.</li>
+<li>sampleTabs.initial is &#x27;[]&#x27; not the pre-built palette because buildSampleTabs is called at the end of onAppear — doing it inline in the initial value would mean the VM&#x27;s palette helper runs before StringManager is ready.</li>
+<li>The initial active tab is &#x27;html&#x27; (Generated HTML) because a reader new to the site benefits more from seeing the visual output first; the JSON view is one click away and the CodeBlock&#x27;s copy button is on that tab.</li>
+<li>DocSamplePreview is a new custom component authored alongside this spec (see /tools/doc/doc-sample-preview.component.json). It was registered in .jsonui-doc-rules.json componentTypes.screen as part of this same define pass so validation accepts the screen spec&#x27;s reference.</li>
+<li>helloWorldSpecJson is seeded as a literal template-literal string in DocViewModel.ts — the VM does not read the file at runtime. That means any change to learn/hello-world.spec.json requires a manual re-paste in DocViewModel.ts AND a manual regeneration of RAW_HTML inside DocSamplePreview.tsx. This coupling is deliberate: both artifacts are static snapshots of a stable reference fixture, and `jui verify` will surface drift if any generated Layout stops matching its spec.</li>
+<li>All user-visible strings flow through @string/tools_doc_* keys into Resources/strings.json for en+ja. No paragraph exceeds ~100 chars in v1 so docs/content/{en,ja}/ is not needed.</li>
+<li>Cross-links seeded by this same define pass: (1) strings.json tools_cli.cli_jsonui_doc_body appended with &#x27;See /tools/doc for full reference.&#x27; en+ja; (2) strings.json tools_mcp.tool_doc_generate_{spec,component,html}_role appended with &#x27;(wraps jsonui-doc CLI — see /tools/doc)&#x27; en+ja; (3) NAV_CATALOG &#x27;tools&#x27; section in jsonui-doc-web/src/viewmodels/ChromeViewModel.ts received a new entry { id: &#x27;doc&#x27;, titleKey: &#x27;tools_doc_title&#x27;, url: &#x27;/tools/doc&#x27; }.</li>
+<li>onSelectSampleTab was added to .jsonui-doc-rules.json eventHandlers.allowedNames during this define pass.</li>
+</ul>
+</section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+
+
+<script>
+(function() {
+  function initWrapper(wrapper) {
+    const table = wrapper.querySelector('table.tree-table');
+    if (!table) return;
+    const expanded = new Set();
+    const initialDepth = parseInt(wrapper.dataset.initialDepth || '2', 10);
+    function rowById(id) { return table.querySelector('tr[data-row-id="' + id + '"]'); }
+    function visible(tr) {
+      let pid = tr.dataset.parentId;
+      while (pid) {
+        if (!expanded.has(pid)) return false;
+        const p = rowById(pid);
+        pid = p ? p.dataset.parentId : null;
+      }
+      return true;
+    }
+    function apply() {
+      table.querySelectorAll('tr[data-parent-id]').forEach(tr => {
+        tr.style.display = visible(tr) ? '' : 'none';
+      });
+    }
+    function updateChevrons() {
+      table.querySelectorAll('tr[data-has-children] .tree-toggle').forEach(t => {
+        const id = t.closest('tr').dataset.rowId;
+        t.classList.toggle('expanded', expanded.has(id));
+      });
+    }
+    function expandAll() {
+      table.querySelectorAll('tr[data-has-children]').forEach(tr => expanded.add(tr.dataset.rowId));
+      apply(); updateChevrons();
+    }
+    function collapseAll() { expanded.clear(); apply(); updateChevrons(); }
+    // Initial: expand rows whose depth is < initialDepth (row-id dashes < initialDepth)
+    table.querySelectorAll('tr[data-has-children]').forEach(tr => {
+      const depth = (tr.dataset.rowId.match(/-/g) || []).length;
+      if (depth < initialDepth) expanded.add(tr.dataset.rowId);
+    });
+    table.querySelectorAll('tr[data-has-children] .tree-toggle').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = btn.closest('tr').dataset.rowId;
+        if (expanded.has(id)) expanded.delete(id); else expanded.add(id);
+        apply(); updateChevrons();
+      });
+    });
+    wrapper.querySelectorAll('.tree-expand-all').forEach(b => b.addEventListener('click', expandAll));
+    wrapper.querySelectorAll('.tree-collapse-all').forEach(b => b.addEventListener('click', collapseAll));
+    apply(); updateChevrons();
+  }
+  function init() {
+    document.querySelectorAll('.tree-wrapper').forEach(initWrapper);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>
