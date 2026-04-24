@@ -409,8 +409,12 @@ export class InstallationViewModel {
       tierBadgeKey: this.s(
         isRequired ? "prereq_required_badge" : "prereq_optional_badge",
       ),
-      tierBadgeBackground: isRequired ? "#2563EB" : "#E0E7FF",
-      tierBadgeColor: isRequired ? "#FFFFFF" : "#0B1220",
+      tierBadgeBackground: isRequired
+        ? "var(--color-danger)"
+        : "var(--color-surface_muted)",
+      tierBadgeColor: isRequired
+        ? "var(--color-danger_ink)"
+        : "var(--color-ink_muted)",
     };
   };
 
