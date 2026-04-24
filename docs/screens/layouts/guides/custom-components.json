@@ -95,7 +95,7 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_spec_first",
+                  "id": "section_why",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -113,7 +113,7 @@
                       "fontSize": 26,
                       "fontWeight": "bold",
                       "fontColor": "#0B1220",
-                      "text": "section_spec_first_heading"
+                      "text": "section_why_heading"
                     },
                     {
                       "type": "Label",
@@ -122,14 +122,14 @@
                       "topMargin": 12,
                       "fontSize": 16,
                       "fontColor": "#475467",
-                      "text": "section_spec_first_body"
+                      "text": "section_why_body"
                     }
                   ]
                 },
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_whitelist",
+                  "id": "section_spec",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -147,7 +147,7 @@
                       "fontSize": 26,
                       "fontWeight": "bold",
                       "fontColor": "#0B1220",
-                      "text": "section_whitelist_heading"
+                      "text": "section_spec_heading"
                     },
                     {
                       "type": "Label",
@@ -156,7 +156,119 @@
                       "topMargin": 12,
                       "fontSize": 16,
                       "fontColor": "#475467",
-                      "text": "section_whitelist_body"
+                      "text": "section_spec_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "{\n  \"type\": \"component_spec\",\n  \"version\": \"1.0\",\n  \"metadata\": {\n    \"name\": \"Badge\",\n    \"displayName\": \"Badge\",\n    \"category\": \"Display\",\n    \"platforms\": [\"web\", \"ios\", \"android\"]\n  },\n  \"props\": {\n    \"items\": [\n      { \"name\": \"text\",  \"type\": \"String\", \"description\": \"Visible text.\" },\n      { \"name\": \"color\", \"type\": \"String\", \"defaultValue\": \"neutral\",\n        \"description\": \"Semantic color key (neutral / success / warn / danger).\" }\n    ]\n  },\n  \"slots\": { \"items\": [] },\n  \"structure\": { \"components\": [], \"layout\": {} }\n}",
+                      "language": "json",
+                      "filename": "docs/components/json/badge.component.json",
+                      "showLineNumbers": true,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "# Scaffold a skeleton\njui doc init component --name Badge\n\n# Validate the shape\njui doc validate component --file docs/components/json/badge.component.json",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_project",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_project_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_project_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "{\n  \"rules\": {\n    \"componentTypes\": {\n      \"screen\": [\n        \"CodeBlock\",\n        \"TableOfContents\",\n        \"Search\",\n        \"Badge\"\n      ]\n    }\n  }\n}",
+                      "language": "json",
+                      "filename": ".jsonui-doc-rules.json (excerpt)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_platform",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_platform_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_platform_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "# jsonui-doc-web/rjui_tools/lib/react/converters/extensions/converter_mappings.rb\nmodule SjuiTools\n  module React\n    module Converters\n      module Extensions\n        CONVERTER_MAPPINGS = {\n          'CodeBlock'       => 'CodeBlockConverter',\n          'TableOfContents' => 'TableOfContentsConverter',\n          'Search'          => 'SearchConverter',\n          'Badge'           => 'BadgeConverter',   # scaffold appends this line\n        }.freeze\n      end\n    end\n  end\nend",
+                      "language": "ruby",
+                      "filename": "converter_mappings.rb",
+                      "showLineNumbers": false,
+                      "copyable": true
                     }
                   ]
                 },
@@ -191,6 +303,44 @@
                       "fontSize": 16,
                       "fontColor": "#475467",
                       "text": "section_scaffold_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "jui generate converter --from docs/components/json/badge.component.json",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_scaffold_bullet_converter"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_scaffold_bullet_attr"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_scaffold_bullet_mappings"
                     }
                   ]
                 },
@@ -225,6 +375,87 @@
                       "fontSize": 16,
                       "fontColor": "#475467",
                       "text": "section_handedit_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_handedit_bullet_you"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_handedit_bullet_scaffold"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_handedit_bullet_regenerated"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_handedit_bullet_generated"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_type_map",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_type_map_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_type_map_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// .jsonui-type-map.json — cross-platform custom DATA types\n{\n  \"version\": \"1.0\",\n  \"types\": {\n    \"NextReadLink\": { \"class\": \"NextReadLink\" },\n    \"ReferenceAttributeRow\": { \"class\": \"ReferenceAttributeRow\" }\n  }\n}\n\n// .jsonui-doc-rules.json — custom UI COMPONENT whitelist\n{\n  \"rules\": {\n    \"componentTypes\": {\n      \"screen\": [\"CodeBlock\", \"TableOfContents\", \"Search\", \"Badge\"]\n    }\n  }\n}",
+                      "language": "json",
+                      "filename": "the two files side-by-side",
+                      "showLineNumbers": false,
+                      "copyable": true
                     }
                   ]
                 },
@@ -334,15 +565,27 @@
                       "maxDepth": 1,
                       "items": [
                         {
-                          "id": "toc_spec_first",
-                          "label": "toc_row_spec_first",
-                          "anchor": "section_spec_first",
+                          "id": "toc_why",
+                          "label": "toc_row_why",
+                          "anchor": "section_why",
                           "level": 1
                         },
                         {
-                          "id": "toc_whitelist",
-                          "label": "toc_row_whitelist",
-                          "anchor": "section_whitelist",
+                          "id": "toc_spec",
+                          "label": "toc_row_spec",
+                          "anchor": "section_spec",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_project",
+                          "label": "toc_row_project",
+                          "anchor": "section_project",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_platform",
+                          "label": "toc_row_platform",
+                          "anchor": "section_platform",
                           "level": 1
                         },
                         {
@@ -355,6 +598,12 @@
                           "id": "toc_handedit",
                           "label": "toc_row_handedit",
                           "anchor": "section_handedit",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_type_map",
+                          "label": "toc_row_type_map",
+                          "anchor": "section_type_map",
                           "level": 1
                         }
                       ],

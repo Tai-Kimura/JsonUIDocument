@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `Building a custom component — JsonUI`,
-  description: `Core JsonUI ships ~28 components; most real apps need one or two custom ones. This guide authors CodeBlock from scratch: spec first, then \`jui g converter…`,
+  description: `Authoring a custom component in JsonUI is a three-layer contract — spec, project whitelist, platform converter — plus a scaffold and a hand-editable component…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

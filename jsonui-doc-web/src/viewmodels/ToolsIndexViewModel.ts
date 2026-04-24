@@ -20,6 +20,8 @@ interface ArticleCell {
   statusColor: string;
   cardOpacity: number;
   url: string;
+  platforms: string;
+  platformsVisibility: "visible" | "gone";
   onNavigate: () => void;
 }
 
@@ -66,6 +68,8 @@ export class ToolsIndexViewModel {
       statusColor: "#166534",
       cardOpacity: 1,
       url: e.url,
+      platforms: "",
+      platformsVisibility: "gone",
       onNavigate: () => this.navigate(e.url),
     }));
     this.updateData({

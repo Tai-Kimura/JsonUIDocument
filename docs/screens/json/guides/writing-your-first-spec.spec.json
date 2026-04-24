@@ -4,13 +4,13 @@
   "metadata": {
     "name": "WritingYourFirstSpec",
     "displayName": "Writing your first spec",
-    "description": "Task-focused guide: author a screen_spec.json end-to-end for a counter screen. Covers uiVariables, eventHandlers, displayLogic, customTypes, and how to validate + generate + verify. ~12-min read. Uses an inline 5-step structure (not a Collection) since each step builds on the last, plus a closing troubleshooting block.",
+    "description": "Task-focused guide: author a screen_spec.json end-to-end for a counter screen. Covers uiVariables, eventHandlers, displayLogic, customTypes, and how to validate + generate + build + verify. ~15-min read. Uses an inline step structure (step 0 setup, steps 1-4 author, steps 5a/5b/5c for validate/generate/build-verify, step 6 hand-edit boundaries) plus a closing troubleshooting block with six common symptoms.",
     "platforms": [
       "web"
     ],
     "layoutFile": "guides/writing-your-first-spec",
     "createdAt": "2026-04-23",
-    "updatedAt": "2026-04-23"
+    "updatedAt": "2026-04-24"
   },
   "structure": {
     "components": [],
@@ -142,8 +142,9 @@
   ],
   "notes": [
     "First live entry under the Guides tab. Flipping GUIDES_ENTRIES row 1 from 'upcoming' to 'live' in HomeViewModel is the final step.",
-    "Five numbered steps cover: (1) pick a name and a platform, (2) declare uiVariables, (3) declare eventHandlers, (4) declare customTypes, (5) validate and generate. Each step carries one CodeBlock showing exactly what to add.",
-    "The closing troubleshooting block is inline (not a Collection) — three common 'it didn't work' situations with symptom + cause + fix. Keeping it inline avoids the LearnArticleCard / TroubleshootRow cell overhead for a one-off appearance.",
-    "The guide's subject matter IS the framework's core flow (author spec → jui build → jui verify → iterate). Treating it as the Guides tab's keystone entry makes 'start here' obvious to a reader who already knows what JsonUI is but hasn't written one yet."
+    "Ten numbered steps cover: (0) prep / read a neighbour spec, (1) name + platform + PascalCase, (2) uiVariables + free-form initial literal, (3) eventHandlers + onX pattern, (4) customTypes, (5a) jui doc validate spec sub-command, (5b) jui generate project incl. --dry-run / --web-only and hand-edit protection, (5c) jui build + jui verify --fail-on-diff with three drift kinds (structural / orphan data / unregistered custom types), (6) @generated vs hand-written file tree. Each carries one CodeBlock.",
+    "The closing troubleshooting block is inline (not a Collection) — six common 'it didn't work' situations with symptom + cause + fix, each pointing at the actual validator / verify error string.",
+    "The guide's subject matter IS the framework's core flow (author spec → jui doc validate → jui generate → jui build → jui verify → iterate). Treating it as the Guides tab's keystone entry makes 'start here' obvious to a reader who already knows what JsonUI is but hasn't written one yet.",
+    "Deprecated strings: step5_heading / step5_body / toc_row_step5 remain in strings.json as unreferenced dead entries to minimise cross-session merge risk. Removing them is safe once the guides-deepening batch merges."
   ]
 }

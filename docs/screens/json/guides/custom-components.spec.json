@@ -4,13 +4,13 @@
   "metadata": {
     "name": "CustomComponents",
     "displayName": "Building a custom component",
-    "description": "Guides > Building a custom component. Task-focused walk-through. Four sections + TOC + next-reads. Generated via /tmp/gen-guides.js.",
+    "description": "Guides > Building a custom component. Task-focused walk-through of the three-layer registration chain (spec → .jsonui-doc-rules.json → per-platform converter_mappings.rb) plus scaffold outputs, hand-edit boundaries, and the type-map vs doc-rules distinction. Seven sections + TOC + next-reads. Uses CodeBlock (the docs site's own custom component) as the running exemplar.",
     "platforms": [
       "web"
     ],
     "layoutFile": "guides/custom-components",
     "createdAt": "2026-04-23",
-    "updatedAt": "2026-04-23"
+    "updatedAt": "2026-04-24"
   },
   "structure": {
     "components": [],
@@ -142,6 +142,8 @@
   ],
   "notes": [
     "Live Guides entry. Flip GUIDES_ENTRIES row for 'custom-components' to 'live' in HomeViewModel when shipping.",
-    "Essay-shape guide — same template as the concept essays. Four sections + TOC + next-reads."
+    "Seven sections: (1) why spec-first / 79873ec plan, (2) component_spec.json shape with CodeBlock examples + init/validate commands, (3) .jsonui-doc-rules.json whitelist with excerpt, (4) per-platform converter_mappings.rb with Ruby excerpt, (5) jui generate converter outputs (3 bullets per-file explaining what each file is), (6) hand-edit boundaries (4 bullets: you / scaffold-once / overwritten / @generated), (7) .jsonui-type-map.json ≠ component whitelist (side-by-side CodeBlock).",
+    "Running exemplar: CodeBlock, the docs site's own custom component. Its converter lives at jsonui-doc-web/rjui_tools/lib/react/converters/extensions/code_block_converter.rb, its attribute defs at the adjacent attribute_definitions/CodeBlock.json, its spec at docs/components/json/codeblock.component.json.",
+    "Deprecated strings: section_spec_first_* / section_whitelist_* / toc_row_spec_first / toc_row_whitelist remain in strings.json as unreferenced dead entries to minimise cross-session merge risk. Removing them is safe once the guides-deepening batch merges."
   ]
 }

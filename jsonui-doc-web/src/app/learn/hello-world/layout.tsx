@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 // render time; we only override title + description so the site-wide
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
-  title: `Hello, JsonUI — in five minutes — JsonUI`,
-  description: `Install the CLI, scaffold a project, and render text on screen. Pick your stack and follow the five steps below.`,
+  title: `Hello, JsonUI — your first screen in five minutes — JsonUI`,
+  description: `Install the CLI, scaffold a project, \`jui init\`, author one JSON, \`jui build\` + \`jui verify\`, then wire a platform-specific ViewModel and run. Five…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

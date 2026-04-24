@@ -4,13 +4,13 @@
   "metadata": {
     "name": "Testing",
     "displayName": "Writing screen tests",
-    "description": "Guides > Writing screen tests. Task-focused walk-through. Four sections + TOC + next-reads. Generated via /tmp/gen-guides.js.",
+    "description": "Guides > Writing screen tests. Seven sections + TOC + next-reads. Corrects two factual errors from the earlier draft: there is no `jui test` command (the CLI is `jsonui-test` from the separate jsonui-test-runner package), and the runner invocation is not `jsonui-test run --platform web --base …`. Walks where tests live, screen vs flow test anatomy with real JSON, the full action/assert DSL from the runtime schemas, the three drivers (XCUITest / Espresso / Playwright), the jsonui-test CLI sub-commands, and CI wiring (no shipped harness).",
     "platforms": [
       "web"
     ],
     "layoutFile": "guides/testing",
     "createdAt": "2026-04-23",
-    "updatedAt": "2026-04-23"
+    "updatedAt": "2026-04-24"
   },
   "structure": {
     "components": [],
@@ -142,6 +142,8 @@
   ],
   "notes": [
     "Live Guides entry. Flip GUIDES_ENTRIES row for 'testing' to 'live' in HomeViewModel when shipping.",
-    "Essay-shape guide — same template as the concept essays. Four sections + TOC + next-reads."
+    "Seven sections: (1) where tests live (tree excerpt), (2) screen test anatomy with real JSON, (3) flow test anatomy with real JSON (sources + checkpoints + screen discriminator), (4) action/assert DSL as 2 bullets sourced from schemas/actions.schema.json, (5) drivers bullets (XCUITest / Espresso / Playwright + native test runners), (6) jsonui-test CLI (install / validate / generate sub-commands), (7) CI with GitHub Actions YAML excerpt.",
+    "Corrects prior false claims: no `jui test` CLI exists, CLI is `jsonui-test` from jsonui-test-runner; no `jsonui-test run --platform web --base http://localhost:3000` syntax — the real CLI has `validate` and `generate test|description|doc|html` sub-commands.",
+    "Deprecated strings: section_runner_* / toc_row_runner remain in strings.json as unreferenced dead entries to minimise cross-session merge risk."
   ]
 }

@@ -17,6 +17,8 @@
         { "name": "statusColor", "class": "String" },
         { "name": "cardOpacity", "class": "Number", "defaultValue": 1 },
         { "name": "url", "class": "String" },
+        { "name": "platforms", "class": "String", "defaultValue": "" },
+        { "name": "platformsVisibility", "class": "String", "defaultValue": "gone" },
         { "name": "onNavigate", "class": "() -> Void" }
       ]
     },
@@ -47,6 +49,20 @@
           "background": "@{statusBackground}",
           "cornerRadius": 999,
           "text": "@{statusKey}"
+        },
+        {
+          "type": "Label",
+          "width": "wrapContent",
+          "height": "wrapContent",
+          "leftMargin": 6,
+          "paddings": [3, 10, 3, 10],
+          "fontSize": 11,
+          "fontWeight": "semibold",
+          "fontColor": "#475467",
+          "background": "#E5E7EB",
+          "cornerRadius": 999,
+          "text": "@{platforms}",
+          "visibility": "@{platformsVisibility}"
         }
       ]
     },

@@ -22,11 +22,20 @@ interface SidebarSection {
   entries: SidebarEntry[];
 }
 
+type PlatformCode = "ios" | "android" | "web";
+
 interface SidebarEntry {
   id: string;
   label: string;
   url: string;
+  platforms?: PlatformCode[];
 }
+
+const PLATFORM_LABEL_KEY: Record<PlatformCode, string> = {
+  ios: "chrome_sidebar_platform_ios",
+  android: "chrome_sidebar_platform_android",
+  web: "chrome_sidebar_platform_web",
+};
 
 export interface SidebarProps {
   items: SidebarSection[];
@@ -113,6 +122,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 {section.entries.map((entry) => {
                   const active = activeUrl === entry.url;
+                  const platforms = entry.platforms;
                   return (
                     <li key={entry.id}>
                       <Link
@@ -121,7 +131,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         aria-current={active ? "page" : undefined}
                         onClick={() => onLinkTap?.(entry.url)}
                       >
-                        {entry.label}
+                        <span className="chrome-sidebar__link-label">
+                          {entry.label}
+                        </span>
+                        {platforms && platforms.length > 0 ? (
+                          <span
+                            className="chrome-sidebar__platforms"
+                            aria-hidden="false"
+                          >
+                            {platforms.map((p) => (
+                              <span
+                                key={p}
+                                className="chrome-sidebar__platform-pill"
+                                data-platform={p}
+                              >
+                                {StringManager.getString(PLATFORM_LABEL_KEY[p])}
+                              </span>
+                            ))}
+                          </span>
+                        ) : null}
                       </Link>
                     </li>
                   );

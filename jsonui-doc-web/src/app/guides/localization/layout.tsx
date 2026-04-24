@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `Adding a new language — JsonUI`,
-  description: `One strings.json, three platforms, any number of locales. Add en + ja + your new locale side by side; StringManager auto-resolves per-file and the generator…`,
+  description: `One strings.json feeds three different output shapes: a Swift StringManager struct, an Android strings.xml resource tree, and a reactive TypeScript…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

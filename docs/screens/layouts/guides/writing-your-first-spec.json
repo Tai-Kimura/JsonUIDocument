@@ -95,6 +95,51 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
+                  "id": "section_step0",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "step0_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "step0_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "# Is this a JsonUI project?\ncat jui.config.json\n\n# What specs already exist?\nfind docs/screens/json -name \"*.spec.json\" | head\n\n# Look at one for shape reference\ncat docs/screens/json/learn/hello-world.spec.json",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
                   "id": "section_step1",
                   "width": "matchParent",
                   "height": "wrapContent",
@@ -275,7 +320,7 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_step5",
+                  "id": "section_step5a",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -293,7 +338,7 @@
                       "fontSize": 26,
                       "fontWeight": "bold",
                       "fontColor": "#0B1220",
-                      "text": "step5_heading"
+                      "text": "step5a_heading"
                     },
                     {
                       "type": "Label",
@@ -302,16 +347,178 @@
                       "topMargin": 12,
                       "fontSize": 16,
                       "fontColor": "#475467",
-                      "text": "step5_body"
+                      "text": "step5a_body"
                     },
                     {
                       "type": "CodeBlock",
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 16,
-                      "code": "# Validate the spec shape\njui doc validate-spec docs/screens/json/counter.spec.json\n\n# Generate Layout + ViewModelBase + hook\njui generate project --file counter.spec.json\n\n# Keep everything in sync as you edit\njui build --watch\n\n# Before you commit — prove Layout matches spec\njui verify --fail-on-diff",
+                      "code": "# Validate the spec's shape\njui doc validate spec --file docs/screens/json/counter.spec.json\n\n# Exit 0 = ok. Exit 1 = a list of violations.\n# Component specs use a different sub-command:\njui doc validate component --file docs/components/json/badge.component.json",
                       "language": "bash",
                       "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_step5b",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "step5b_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "step5b_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "# Scaffold all platforms' layout + base + hook\njui generate project --file docs/screens/json/counter.spec.json\n\n# Preview without writing\njui generate project --file docs/screens/json/counter.spec.json --dry-run\n\n# Target a single platform\njui generate project --file docs/screens/json/counter.spec.json --web-only",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_step5c",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "step5c_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "step5c_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "# Rebuild Layouts / Styles / Resources / ViewModelBase across platforms\njui build\n\n# Refuse to let drift escape into a PR\njui verify --fail-on-diff\n\n# Diagnose a single spec with the diff detail\njui verify --file docs/screens/json/counter.spec.json --detail",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "step5c_bullet_structural"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "step5c_bullet_orphan"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "step5c_bullet_unregistered"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_step6",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "step6_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "step6_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "docs/\n  screens/\n    json/\n      counter.spec.json            ← you\n    layouts/\n      counter.json                  ← @generated — do not edit\n      Resources/\n        strings.json                ← you (both en and ja)\njsonui-doc-web/src/\n  generated/                        ← @generated — do not edit\n    viewmodels/CounterViewModelBase.ts\n    hooks/useCounterViewModel.ts\n    data/CounterData.ts\n    StringManager.ts\n  viewmodels/                       ← you\n    CounterViewModel.ts\n  app/counter/                      ← you\n    page.tsx",
+                      "language": "text",
+                      "filename": "tree",
                       "showLineNumbers": false,
                       "copyable": true
                     }
@@ -329,7 +536,7 @@
                     24,
                     32
                   ],
-                  "background": "#FFFFFF",
+                  "background": "#F9FAFB",
                   "child": [
                     {
                       "type": "Label",
@@ -418,6 +625,87 @@
                           "fontSize": 14,
                           "fontColor": "#475467",
                           "text": "trouble_3_fix"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "trouble_4_symptom"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 4,
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "trouble_4_fix"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "trouble_5_symptom"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 4,
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "trouble_5_fix"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "trouble_6_symptom"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 4,
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "trouble_6_fix"
                         }
                       ]
                     }
@@ -529,6 +817,12 @@
                       "maxDepth": 1,
                       "items": [
                         {
+                          "id": "toc_step0",
+                          "label": "toc_row_step0",
+                          "anchor": "section_step0",
+                          "level": 1
+                        },
+                        {
                           "id": "toc_step1",
                           "label": "toc_row_step1",
                           "anchor": "section_step1",
@@ -553,9 +847,27 @@
                           "level": 1
                         },
                         {
-                          "id": "toc_step5",
-                          "label": "toc_row_step5",
-                          "anchor": "section_step5",
+                          "id": "toc_step5a",
+                          "label": "toc_row_step5a",
+                          "anchor": "section_step5a",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_step5b",
+                          "label": "toc_row_step5b",
+                          "anchor": "section_step5b",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_step5c",
+                          "label": "toc_row_step5c",
+                          "anchor": "section_step5c",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_step6",
+                          "label": "toc_row_step6",
+                          "anchor": "section_step6",
                           "level": 1
                         },
                         {

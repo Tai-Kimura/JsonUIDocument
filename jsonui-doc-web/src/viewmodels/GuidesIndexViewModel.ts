@@ -20,15 +20,19 @@ interface ArticleCell {
   statusColor: string;
   cardOpacity: number;
   url: string;
+  platforms: string;
+  platformsVisibility: "visible" | "gone";
   onNavigate: () => void;
 }
 
-const CATALOG: ReadonlyArray<{ id: string; url: string; titleKey: string }> = [
+const CATALOG: ReadonlyArray<{ id: string; url: string; titleKey: string; platforms?: string }> = [
   { id: "writing-your-first-spec", url: "/guides/writing-your-first-spec", titleKey: "guides_writing_your_first_spec_title" },
+  { id: "writing-layouts", url: "/guides/writing-layouts", titleKey: "guides_writing_layouts_title" },
   { id: "navigation", url: "/guides/navigation", titleKey: "guides_navigation_title" },
   { id: "testing", url: "/guides/testing", titleKey: "guides_testing_title" },
   { id: "localization", url: "/guides/localization", titleKey: "guides_localization_title" },
-  { id: "custom-components", url: "/guides/custom-components", titleKey: "guides_custom_components_title" }
+  { id: "custom-components", url: "/guides/custom-components", titleKey: "guides_custom_components_title" },
+  { id: "developer-menu", url: "/guides/developer-menu", titleKey: "guides_developer_menu_title", platforms: "iOS · Android" }
 ];
 
 export class GuidesIndexViewModel {
@@ -66,6 +70,8 @@ export class GuidesIndexViewModel {
       statusColor: "#166534",
       cardOpacity: 1,
       url: e.url,
+      platforms: e.platforms ?? "",
+      platformsVisibility: e.platforms ? "visible" : "gone",
       onNavigate: () => this.navigate(e.url),
     }));
     this.updateData({

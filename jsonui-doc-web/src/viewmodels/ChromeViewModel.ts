@@ -18,10 +18,13 @@ import { ChromeViewModelBase } from "@/generated/viewmodels/ChromeViewModelBase"
 import { StringManager } from "@/generated/StringManager";
 import { ColorManager, ColorMode } from "@/generated/ColorManager";
 
+type PlatformCode = "ios" | "android" | "web";
+
 interface SidebarEntry {
   id: string;
   label: string;
   url: string;
+  platforms?: PlatformCode[];
 }
 
 interface SidebarSection {
@@ -41,7 +44,7 @@ interface SidebarSection {
 const NAV_CATALOG: ReadonlyArray<{
   id: "learn" | "concepts" | "spec" | "guides" | "reference" | "platforms" | "tools";
   iconName: string;
-  entries: ReadonlyArray<{ id: string; titleKey: string; url: string }>;
+  entries: ReadonlyArray<{ id: string; titleKey: string; url: string; platforms?: PlatformCode[] }>;
 }> = [
   {
     id: "learn",
@@ -93,6 +96,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "testing",                 titleKey: "guides_testing_title",                 url: "/guides/testing" },
       { id: "localization",            titleKey: "guides_localization_title",            url: "/guides/localization" },
       { id: "custom-components",       titleKey: "guides_custom_components_title",       url: "/guides/custom-components" },
+      { id: "developer-menu",          titleKey: "guides_developer_menu_title",          url: "/guides/developer-menu", platforms: ["ios", "android"] },
     ],
   },
   {
@@ -234,6 +238,7 @@ export class ChromeViewModel extends ChromeViewModelBase {
         id: e.id,
         label: StringManager.getString(e.titleKey),
         url: e.url,
+        ...(e.platforms ? { platforms: [...e.platforms] } : {}),
       })),
     }));
   };

@@ -1,5 +1,5 @@
 {
-  "_comment": "Unified attribute definitions for JsonUI (Swift/Kotlin/React). Binding format: @{propertyName}. When `type` includes \"binding\", an optional `binding_direction` field declares how the MCP should label the binding: \"two-way\" means the component writes back to the binding (e.g. TextField.text); omit the field (or set \"read-only\") for values that only flow view ← model.",
+  "_comment": "Unified attribute definitions for JsonUI (Swift/Kotlin/React). Binding format: @{propertyName}. When `type` includes \"binding\", an optional `binding_direction` field declares how the MCP should label the binding: \"two-way\" means the component writes back to the binding (e.g. TextField.text); omit the field (or set \"read-only\") for values that only flow view ← model. Optional extended fields per attribute: `aliases` (array of alternate names treated as synonyms for this canonical attribute; validator expands these at load time), `deprecated` (boolean; validator emits a warning when the attribute is used), `deprecation_note` (string appended to the warning to explain the replacement or limitation).",
   "common": {
     "_comment": "Common attributes shared across all components",
     "id": {
@@ -239,7 +239,10 @@
       ],
       "min": 0,
       "max": 1,
-      "description": "Opacity (0-1), alias for alpha - can be data binding"
+      "description": "Opacity (0-1), alias for alpha - can be data binding",
+      "aliases": [
+        "alpha"
+      ]
     },
     "responsive": {
       "type": "object",
@@ -568,19 +571,31 @@
     },
     "alignTopOfView": {
       "type": "string",
-      "description": "Align below specified view ID"
+      "description": "Align below specified view ID",
+      "aliases": [
+        "alignTopView"
+      ]
     },
     "alignBottomOfView": {
       "type": "string",
-      "description": "Align above specified view ID"
+      "description": "Align above specified view ID",
+      "aliases": [
+        "alignBottomView"
+      ]
     },
     "alignLeftOfView": {
       "type": "string",
-      "description": "Align to right of specified view ID"
+      "description": "Align to right of specified view ID",
+      "aliases": [
+        "alignLeftView"
+      ]
     },
     "alignRightOfView": {
       "type": "string",
-      "description": "Align to left of specified view ID"
+      "description": "Align to left of specified view ID",
+      "aliases": [
+        "alignRightView"
+      ]
     },
     "alignTopView": {
       "type": "string",
@@ -663,7 +678,12 @@
     },
     "onLongPress": {
       "type": "binding",
-      "description": "Long press gesture handler (camelCase) - binding only (@{functionName})"
+      "description": "Long press gesture handler (camelCase) - binding only (@{functionName})",
+      "binding_direction": "one-way",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
     },
     "onPan": {
       "type": "binding",
@@ -975,6 +995,87 @@
           }
         }
       }
+    },
+    "alignment": {
+      "type": "string",
+      "enum": [
+        "topLeading",
+        "top",
+        "topTrailing",
+        "leading",
+        "center",
+        "trailing",
+        "bottomLeading",
+        "bottom",
+        "bottomTrailing"
+      ],
+      "description": "String alternative to numeric gravity. Resolves to SwiftUI Alignment / Compose Arrangement+Alignment.",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
+    },
+    "distribution": {
+      "type": "string",
+      "enum": [
+        "fill",
+        "fillEqually",
+        "equalSpacing",
+        "equalCentering"
+      ],
+      "description": "Child distribution for orientation-bearing containers. SwiftUI: Spacer/weight synthesis; Compose: Arrangement.",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
+    },
+    "minStartMargin": {
+      "type": "number",
+      "description": "Min margin constraint (SwiftUI dynamic layout).",
+      "platform": "swift",
+      "mode": "swiftui"
+    },
+    "maxStartMargin": {
+      "type": "number",
+      "description": "Max margin constraint (SwiftUI dynamic layout).",
+      "platform": "swift",
+      "mode": "swiftui"
+    },
+    "minEndMargin": {
+      "type": "number",
+      "description": "Min margin constraint (SwiftUI dynamic layout).",
+      "platform": "swift",
+      "mode": "swiftui"
+    },
+    "maxEndMargin": {
+      "type": "number",
+      "description": "Max margin constraint (SwiftUI dynamic layout).",
+      "platform": "swift",
+      "mode": "swiftui"
+    },
+    "idealWidth": {
+      "type": "number",
+      "description": "SwiftUI .frame(idealWidth:) hint for layout system.",
+      "platform": "swift",
+      "mode": "swiftui"
+    },
+    "idealHeight": {
+      "type": "number",
+      "description": "SwiftUI .frame(idealHeight:) hint.",
+      "platform": "swift",
+      "mode": "swiftui"
+    },
+    "widthRaw": {
+      "type": "string",
+      "description": "Debug: original width string before parsing. Dynamic-only; not emitted to static code.",
+      "platform": "swift",
+      "mode": "dynamic-only"
+    },
+    "heightRaw": {
+      "type": "string",
+      "description": "Debug: original height string before parsing. Dynamic-only; not emitted to static code.",
+      "platform": "swift",
+      "mode": "dynamic-only"
     }
   },
   "Label": {
@@ -1101,7 +1202,9 @@
         "array",
         "string"
       ],
-      "description": "Edge insets as array or pipe-separated string"
+      "description": "Edge insets as array or pipe-separated string",
+      "deprecated": true,
+      "deprecation_note": "Compose Text has no edgeInset; use padding* instead."
     },
     "underline": {
       "type": [
@@ -1370,15 +1473,21 @@
         "string",
         "binding"
       ],
-      "description": "Placeholder color - hex string or color name from colors.json (binding supported)"
+      "description": "Placeholder color - hex string or color name from colors.json (binding supported)",
+      "deprecated": true,
+      "deprecation_note": "SwiftUI TextField placeholder cannot be color-styled."
     },
     "hintFont": {
       "type": "string",
-      "description": "Placeholder font"
+      "description": "Placeholder font",
+      "deprecated": true,
+      "deprecation_note": "SwiftUI TextField placeholder cannot be custom-font-styled."
     },
     "hintFontSize": {
       "type": "number",
-      "description": "Placeholder font size"
+      "description": "Placeholder font size",
+      "deprecated": true,
+      "deprecation_note": "SwiftUI TextField placeholder cannot be custom-size-styled."
     },
     "hintAttributes": {
       "type": "object",
@@ -1476,11 +1585,15 @@
         "boolean",
         "binding"
       ],
-      "description": "Secure text entry for passwords (can be data binding)"
+      "description": "Secure text entry for passwords (can be data binding)",
+      "platform": "swift",
+      "mode": "swiftui"
     },
     "fieldPadding": {
       "type": "number",
-      "description": "Field padding"
+      "description": "Field padding",
+      "platform": "swift",
+      "mode": "swiftui"
     },
     "textPaddingLeft": {
       "type": "number",
@@ -1496,7 +1609,9 @@
       "type": "boolean",
       "description": "Has container view",
       "platform": "swift",
-      "mode": "uikit"
+      "mode": "uikit",
+      "deprecated": true,
+      "deprecation_note": "hasContainer is a UIKit-only behavior."
     },
     "textVerticalAlign": {
       "type": "string",
@@ -1524,15 +1639,21 @@
     },
     "accessoryBackground": {
       "type": "string",
-      "description": "Input accessory background - hex string or color name from colors.json"
+      "description": "Input accessory background - hex string or color name from colors.json",
+      "platform": "swift",
+      "mode": "swiftui"
     },
     "accessoryTextColor": {
       "type": "string",
-      "description": "Input accessory text color - hex string or color name from colors.json"
+      "description": "Input accessory text color - hex string or color name from colors.json",
+      "platform": "swift",
+      "mode": "swiftui"
     },
     "doneText": {
       "type": "string",
-      "description": "Done button text"
+      "description": "Done button text",
+      "platform": "swift",
+      "mode": "swiftui"
     },
     "tintColor": {
       "type": "string",
@@ -1546,7 +1667,9 @@
           "type": "string",
           "description": "Caret color - hex string or color name from colors.json"
         }
-      }
+      },
+      "deprecated": true,
+      "deprecation_note": "SwiftUI cannot style the caret (iOS 17 has partial .tint API)."
     },
     "onTextChange": {
       "type": "string",
@@ -1563,11 +1686,15 @@
     "spellCheckingType": {
       "type": "string",
       "description": "Spell checking type",
-      "platform": "swift"
+      "platform": "swift",
+      "deprecated": true,
+      "deprecation_note": "Compose does not expose spell-checking control."
     },
     "keyboardAppearance": {
       "type": "string",
-      "description": "Keyboard appearance: dark, light"
+      "description": "Keyboard appearance: dark, light",
+      "deprecated": true,
+      "deprecation_note": "Compose keyboard appearance is system-controlled."
     },
     "clearButtonMode": {
       "type": "string",
@@ -1685,6 +1812,18 @@
       "type": "string",
       "description": "Background color when disabled - hex string or color name from colors.json",
       "platform": "react"
+    },
+    "hideOnFocused": {
+      "type": "boolean",
+      "description": "Hide other elements while the field is focused.",
+      "platform": "swift",
+      "mode": "swiftui"
+    },
+    "placeholderColor": {
+      "type": "string",
+      "description": "Deprecated on swift.",
+      "deprecated": true,
+      "deprecation_note": "SwiftUI TextField placeholder cannot be color-styled."
     }
   },
   "TextView": {
@@ -1928,6 +2067,12 @@
       "type": "string",
       "description": "Background color when disabled - hex string or color name from colors.json",
       "platform": "react"
+    },
+    "edgeInset": {
+      "type": "string",
+      "description": "Deprecated on kotlin.",
+      "deprecated": true,
+      "deprecation_note": "Compose Text has no edgeInset; use padding* instead."
     }
   },
   "EditText": {
@@ -2022,7 +2167,10 @@
         "string",
         "binding"
       ],
-      "description": "Highlight color - hex string or color name from colors.json (binding supported)"
+      "description": "Highlight color - hex string or color name from colors.json (binding supported)",
+      "aliases": [
+        "hilightColor"
+      ]
     },
     "hilightColor": {
       "type": "string",
@@ -2030,7 +2178,10 @@
     },
     "tapBackground": {
       "type": "string",
-      "description": "Background when tapped - hex string or color name from colors.json"
+      "description": "Background when tapped - hex string or color name from colors.json",
+      "aliases": [
+        "highlightBackground"
+      ]
     },
     "highlightBackground": {
       "type": "string",
@@ -2094,7 +2245,9 @@
         "string",
         "binding"
       ],
-      "description": "Image when highlighted (binding supported)"
+      "description": "Image when highlighted (binding supported)",
+      "platform": "swift",
+      "mode": "swiftui"
     },
     "highlightSrcName": {
       "type": [
@@ -2135,7 +2288,11 @@
         "original",
         "template"
       ],
-      "description": "Rendering mode"
+      "description": "Rendering mode",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
     },
     "alt": {
       "type": "string",
@@ -2150,6 +2307,46 @@
       ],
       "description": "Loading behavior",
       "platform": "react"
+    },
+    "loadingImage": {
+      "type": "string",
+      "description": "Placeholder shown while the main image loads.",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
+    },
+    "errorImage": {
+      "type": "string",
+      "description": "Fallback image on load error.",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
+    },
+    "canTap": {
+      "type": "boolean",
+      "description": "Enable tap gesture independent of onClick.",
+      "platform": "swift",
+      "mode": "swiftui"
+    },
+    "systemIcon": {
+      "type": "boolean",
+      "description": "Interpret `src` as an SF Symbol name.",
+      "platform": "swift",
+      "mode": "swiftui"
+    },
+    "maxZoom": {
+      "type": "number",
+      "description": "Pinch-zoom upper bound.",
+      "platform": "swift",
+      "mode": "swiftui"
+    },
+    "minZoom": {
+      "type": "number",
+      "description": "Pinch-zoom lower bound.",
+      "platform": "swift",
+      "mode": "swiftui"
     }
   },
   "NetworkImage": {
@@ -2181,11 +2378,19 @@
     },
     "errorImage": {
       "type": "string",
-      "description": "Error image name"
+      "description": "Error image name",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
     },
     "loadingImage": {
       "type": "string",
-      "description": "Loading image name"
+      "description": "Loading image name",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
     },
     "contentMode": {
       "type": [
@@ -2231,6 +2436,12 @@
       ],
       "description": "Loading behavior",
       "platform": "react"
+    },
+    "headers": {
+      "type": "object",
+      "description": "HTTP headers for the image request (Coil ImageRequest.Builder.addHeader).",
+      "platform": "kotlin",
+      "mode": "compose"
     }
   },
   "SelectBox": {
@@ -2650,7 +2861,25 @@
           "type": "string",
           "description": "Font color - hex string or color name from colors.json"
         }
-      }
+      },
+      "platform": "kotlin",
+      "mode": "compose"
+    },
+    "labelPosition": {
+      "type": "string",
+      "enum": [
+        "leading",
+        "trailing"
+      ],
+      "description": "Label position relative to the Switch.",
+      "platform": "kotlin",
+      "mode": "compose"
+    },
+    "trackTintColor": {
+      "type": "string",
+      "description": "Deprecated on swift.",
+      "deprecated": true,
+      "deprecation_note": "SwiftUI Toggle uses unified tint only."
     }
   },
   "Toggle": {
@@ -2751,7 +2980,25 @@
           "type": "string",
           "description": "Font color - hex string or color name from colors.json"
         }
-      }
+      },
+      "platform": "kotlin",
+      "mode": "compose"
+    },
+    "labelPosition": {
+      "type": "string",
+      "enum": [
+        "leading",
+        "trailing"
+      ],
+      "description": "Label position relative to the Switch.",
+      "platform": "kotlin",
+      "mode": "compose"
+    },
+    "trackTintColor": {
+      "type": "string",
+      "description": "Deprecated on swift.",
+      "deprecated": true,
+      "deprecation_note": "SwiftUI Toggle uses unified tint only."
     }
   },
   "Segment": {
@@ -2777,14 +3024,18 @@
         "string",
         "binding"
       ],
-      "description": "Normal state color - hex string or color name from colors.json (binding supported)"
+      "description": "Normal state color - hex string or color name from colors.json (binding supported)",
+      "platform": "swift",
+      "mode": "swiftui"
     },
     "selectedColor": {
       "type": [
         "string",
         "binding"
       ],
-      "description": "Selected state color - hex string or color name from colors.json (binding supported)"
+      "description": "Selected state color - hex string or color name from colors.json (binding supported)",
+      "platform": "swift",
+      "mode": "swiftui"
     },
     "valueChange": {
       "type": "string",
@@ -2828,7 +3079,11 @@
         "number",
         "binding"
       ],
-      "description": "Minimum value (alias for minValue) (binding supported)"
+      "description": "Minimum value (alias for minValue) (binding supported)",
+      "aliases": [
+        "minimumValue",
+        "minValue"
+      ]
     },
     "maxValue": {
       "type": [
@@ -2842,7 +3097,11 @@
         "number",
         "binding"
       ],
-      "description": "Maximum value (alias for maxValue) (binding supported)"
+      "description": "Maximum value (alias for maxValue) (binding supported)",
+      "aliases": [
+        "maximumValue",
+        "maxValue"
+      ]
     },
     "tintColor": {
       "type": "string",
@@ -2850,7 +3109,10 @@
     },
     "onValueChange": {
       "type": "binding",
-      "description": "Value change handler - binding only (@{functionName})"
+      "description": "Value change handler - binding only (@{functionName})",
+      "aliases": [
+        "onValueChanged"
+      ]
     },
     "minimumValueImage": {
       "type": "string",
@@ -2868,6 +3130,18 @@
       "type": "number",
       "description": "Step increment value",
       "platform": "react"
+    },
+    "progressTintColor": {
+      "type": "string",
+      "description": "Deprecated on swift.",
+      "deprecated": true,
+      "deprecation_note": "SwiftUI Slider uses unified tint only."
+    },
+    "trackTintColor": {
+      "type": "string",
+      "description": "Deprecated on swift.",
+      "deprecated": true,
+      "deprecation_note": "SwiftUI Slider uses unified tint only."
     }
   },
   "Progress": {
@@ -2915,6 +3189,28 @@
       "description": "Custom track image",
       "platform": "swift",
       "mode": "uikit"
+    },
+    "hidesWhenStopped": {
+      "type": "boolean",
+      "description": "ActivityIndicator: auto-hide when stopped.",
+      "platform": "swift",
+      "mode": "swiftui"
+    },
+    "indicatorStyle": {
+      "type": "string",
+      "enum": [
+        "medium",
+        "large"
+      ],
+      "description": "ActivityIndicator size style.",
+      "platform": "swift",
+      "mode": "swiftui"
+    },
+    "color": {
+      "type": "color",
+      "description": "ActivityIndicator color, distinct from tintColor for historical reasons.",
+      "platform": "swift",
+      "mode": "swiftui"
     }
   },
   "View": {
@@ -3088,6 +3384,14 @@
         "vertical"
       ],
       "description": "Scroll orientation"
+    },
+    "scrollMode": {
+      "type": "string",
+      "enum": [
+        "inner",
+        "window"
+      ],
+      "description": "Where the scroll happens. 'inner' (default, iOS/Android-style): the ScrollView div itself gets overflow-y-auto and scrolls internally — requires a bounded-height ancestor on web to actually activate. 'window' (web-only escape hatch): skip the overflow class so the page/window scrolls naturally; fixes position:sticky descendants that would otherwise be anchored to a never-scrolling inner container. iOS/Android ignore this attribute (UIScrollView always scrolls internally)."
     },
     "showsHorizontalScrollIndicator": {
       "type": "boolean",
@@ -3264,7 +3568,9 @@
         "array",
         "string"
       ],
-      "description": "Content insets"
+      "description": "Content insets",
+      "platform": "swift",
+      "mode": "swiftui"
     },
     "contentInsetAdjustmentBehavior": {
       "type": "string",
@@ -3272,7 +3578,9 @@
     },
     "itemWeight": {
       "type": "number",
-      "description": "Item sizing weight"
+      "description": "Item sizing weight",
+      "platform": "swift",
+      "mode": "swiftui"
     },
     "showsHorizontalScrollIndicator": {
       "type": "boolean",
@@ -3395,6 +3703,35 @@
     "onPageChanged": {
       "type": "callback",
       "description": "Called with the new page index (Int) when the user swipes to a different page"
+    },
+    "containerInset": {
+      "type": "array",
+      "description": "Container-level insets applied outside of individual cells.",
+      "platform": "swift",
+      "mode": "swiftui"
+    },
+    "sectionSticky": {
+      "type": "boolean",
+      "description": "When true, section headers stick using LazyColumn.stickyHeader (Compose).",
+      "platform": "kotlin",
+      "mode": "compose"
+    },
+    "onValueChange": {
+      "type": [
+        "string",
+        "binding"
+      ],
+      "binding_direction": "one-way",
+      "description": "Collection page/selection change handler. Canonical; prefer over onPageChanged.",
+      "platform": [
+        "swift",
+        "kotlin",
+        "react"
+      ],
+      "aliases": [
+        "onValueChanged",
+        "onPageChanged"
+      ]
     }
   },
   "Radio": {
@@ -3419,11 +3756,19 @@
     },
     "icon": {
       "type": "string",
-      "description": "Icon name for normal state"
+      "description": "Icon name for normal state",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
     },
     "selectedIcon": {
       "type": "string",
-      "description": "Selected icon name"
+      "description": "Selected icon name",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
     },
     "selected_icon": {
       "type": "string",
@@ -3467,6 +3812,38 @@
         "binding"
       ],
       "description": "Space between icon and text (binding supported)"
+    },
+    "checkedColor": {
+      "type": "color",
+      "description": "Color when checked.",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
+    },
+    "uncheckedColor": {
+      "type": "color",
+      "description": "Color when unchecked.",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
+    },
+    "iconSize": {
+      "type": "number",
+      "description": "Icon size (pt / dp).",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
+    },
+    "iconColor": {
+      "type": "color",
+      "description": "Icon tint color.",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
     }
   },
   "CheckBox": {
@@ -3509,7 +3886,11 @@
     },
     "icon": {
       "type": "string",
-      "description": "Icon name for unchecked state"
+      "description": "Icon name for unchecked state",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
     },
     "src": {
       "type": "string",
@@ -3517,7 +3898,11 @@
     },
     "selectedIcon": {
       "type": "string",
-      "description": "Selected icon name"
+      "description": "Selected icon name",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
     },
     "onSrc": {
       "type": "string",
@@ -3565,6 +3950,38 @@
     "onValueChange": {
       "type": "binding",
       "description": "Value change handler - binding only (@{functionName})"
+    },
+    "checkedColor": {
+      "type": "color",
+      "description": "Color when checked.",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
+    },
+    "uncheckedColor": {
+      "type": "color",
+      "description": "Color when unchecked.",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
+    },
+    "iconSize": {
+      "type": "number",
+      "description": "Icon size (pt / dp).",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
+    },
+    "iconColor": {
+      "type": "color",
+      "description": "Icon tint color.",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
     }
   },
   "Check": {
@@ -3607,7 +4024,11 @@
     },
     "icon": {
       "type": "string",
-      "description": "Icon name for unchecked state"
+      "description": "Icon name for unchecked state",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
     },
     "src": {
       "type": "string",
@@ -3615,7 +4036,11 @@
     },
     "selectedIcon": {
       "type": "string",
-      "description": "Selected icon name"
+      "description": "Selected icon name",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
     },
     "onSrc": {
       "type": "string",
@@ -3659,6 +4084,38 @@
     "onValueChange": {
       "type": "binding",
       "description": "Value change handler - binding only (@{functionName})"
+    },
+    "checkedColor": {
+      "type": "color",
+      "description": "Color when checked.",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
+    },
+    "uncheckedColor": {
+      "type": "color",
+      "description": "Color when unchecked.",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
+    },
+    "iconSize": {
+      "type": "number",
+      "description": "Icon size (pt / dp).",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
+    },
+    "iconColor": {
+      "type": "color",
+      "description": "Icon tint color.",
+      "platform": [
+        "swift",
+        "kotlin"
+      ]
     }
   },
   "Indicator": {
@@ -3668,18 +4125,24 @@
         "medium",
         "large"
       ],
-      "description": "Indicator style"
+      "description": "Indicator style",
+      "platform": "swift",
+      "mode": "swiftui"
     },
     "color": {
       "type": [
         "string",
         "binding"
       ],
-      "description": "Indicator color - hex string or color name from colors.json (binding supported)"
+      "description": "Indicator color - hex string or color name from colors.json (binding supported)",
+      "platform": "swift",
+      "mode": "swiftui"
     },
     "hidesWhenStopped": {
       "type": "boolean",
-      "description": "Hide when stopped"
+      "description": "Hide when stopped",
+      "platform": "swift",
+      "mode": "swiftui"
     }
   },
   "GradientView": {
@@ -3843,7 +4306,10 @@
         "binding"
       ],
       "description": "Currently selected tab index (binding for two-way)",
-      "binding_direction": "two-way"
+      "binding_direction": "two-way",
+      "aliases": [
+        "selectedTabIndex"
+      ]
     },
     "tabs": {
       "type": "array",
@@ -3918,6 +4384,23 @@
     "onTabChange": {
       "type": "binding",
       "description": "Tab change handler - binding only (@{functionName})"
+    },
+    "onValueChange": {
+      "type": [
+        "string",
+        "binding"
+      ],
+      "binding_direction": "one-way",
+      "description": "Tab/page selection change handler. Canonical; prefer over onTabChange/onPageChanged.",
+      "platform": [
+        "swift",
+        "kotlin",
+        "react"
+      ],
+      "aliases": [
+        "onTabChange",
+        "onPageChanged"
+      ]
     }
   }
 }

@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `Writing screen tests — JsonUI`,
-  description: `JSON tests drive your real app. Author tests/screens/*.test.json files, run them with the jsonui-test runner, and assert layout + navigation + state on…`,
+  description: `JsonUI tests are JSON files — same language as your layouts. One file describes a screen or a flow, and a per-platform driver (XCUITest for iOS, Espresso for…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

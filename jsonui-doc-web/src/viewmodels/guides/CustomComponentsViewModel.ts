@@ -50,18 +50,18 @@ export class CustomComponentsViewModel {
 
     const nextReads: NextReadCell[] = [
       {
+        id: "next_writing_layouts",
+        titleKey: this.s("next_writing_layouts_title"),
+        descriptionKey: this.s("next_writing_layouts_description"),
+        url: "/guides/writing-layouts",
+        onNavigate: () => this.navigate("/guides/writing-layouts"),
+      },
+      {
         id: "next_spec_first",
         titleKey: this.s("next_spec_first_title"),
         descriptionKey: this.s("next_spec_first_description"),
         url: "/guides/writing-your-first-spec",
         onNavigate: () => this.navigate("/guides/writing-your-first-spec"),
-      },
-      {
-        id: "next_concepts_spec",
-        titleKey: this.s("next_concepts_spec_title"),
-        descriptionKey: this.s("next_concepts_spec_description"),
-        url: "/concepts/why-spec-first",
-        onNavigate: () => this.navigate("/concepts/why-spec-first"),
       },
     ];
 

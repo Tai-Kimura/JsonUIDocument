@@ -4,13 +4,13 @@
   "metadata": {
     "name": "Localization",
     "displayName": "Adding a new language",
-    "description": "Guides > Adding a new language. Task-focused walk-through. Four sections + TOC + next-reads. Generated via /tmp/gen-guides.js.",
+    "description": "Guides > Adding a new language. Six sections + TOC + next-reads. Corrects two factual errors from the earlier draft: there is no `jui localize` CLI (it's all `jui build`), and Android does NOT get a StringManager.kt (it emits res/values[-lang]/strings.xml natively). Walks the bilingual shape, namespace derivation, per-platform output asymmetry, Web-only reactive language switching, the 5 mechanical steps to add a locale, and current limits (no plurals, no pseudo-loc, %@/%s interpolation auto-convert).",
     "platforms": [
       "web"
     ],
     "layoutFile": "guides/localization",
     "createdAt": "2026-04-23",
-    "updatedAt": "2026-04-23"
+    "updatedAt": "2026-04-24"
   },
   "structure": {
     "components": [],
@@ -142,6 +142,8 @@
   ],
   "notes": [
     "Live Guides entry. Flip GUIDES_ENTRIES row for 'localization' to 'live' in HomeViewModel when shipping.",
-    "Essay-shape guide — same template as the concept essays. Four sections + TOC + next-reads."
+    "Six sections: (1) bilingual shape with JSON excerpt, (2) namespace naming rules with derivation table, (3) per-platform output (iOS StringManager.swift + Localizable.strings, Android strings.xml only — NO StringManager.kt, Web StringManager.ts), (4) Web-only reactive setLanguage with real TS toggle example, (5) five-step locale addition with JSON + bash excerpts per step, (6) limits (no plurals / no pseudo-loc / %@ ↔ %s auto-convert).",
+    "Corrects prior false claims: 'jui localize' CLI does not exist (localisation is part of jui build), 'No per-platform .strings / strings.xml maintenance' misstates Android reality, 'whole screen re-renders on setLanguage' is true for Web only.",
+    "Deprecated strings: section_add_* / section_scale_* / toc_row_add / toc_row_scale remain in strings.json as unreferenced dead entries to minimise cross-session merge risk."
   ]
 }

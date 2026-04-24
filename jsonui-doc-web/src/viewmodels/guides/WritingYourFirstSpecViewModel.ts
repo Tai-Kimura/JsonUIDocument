@@ -60,18 +60,18 @@ export class WritingYourFirstSpecViewModel {
 
     const nextReads: NextReadCell[] = [
       {
+        id: "next_writing_layouts",
+        titleKey: this.s("next_writing_layouts_title"),
+        descriptionKey: this.s("next_writing_layouts_description"),
+        url: "/guides/writing-layouts",
+        onNavigate: () => this.navigate("/guides/writing-layouts"),
+      },
+      {
         id: "next_navigation",
         titleKey: this.s("next_navigation_title"),
         descriptionKey: this.s("next_navigation_description"),
         url: "/guides/navigation",
         onNavigate: () => this.navigate("/guides/navigation"),
-      },
-      {
-        id: "next_testing",
-        titleKey: this.s("next_testing_title"),
-        descriptionKey: this.s("next_testing_description"),
-        url: "/guides/testing",
-        onNavigate: () => this.navigate("/guides/testing"),
       },
       {
         id: "next_spec",

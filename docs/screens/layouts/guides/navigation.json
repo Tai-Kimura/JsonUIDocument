@@ -95,7 +95,7 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_spec",
+                  "id": "section_contract",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -113,7 +113,7 @@
                       "fontSize": 26,
                       "fontWeight": "bold",
                       "fontColor": "#0B1220",
-                      "text": "section_spec_heading"
+                      "text": "section_contract_heading"
                     },
                     {
                       "type": "Label",
@@ -122,7 +122,72 @@
                       "topMargin": 12,
                       "fontSize": 16,
                       "fontColor": "#475467",
-                      "text": "section_spec_body"
+                      "text": "section_contract_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "\"stateManagement\": {\n  \"eventHandlers\": [\n    { \"name\": \"onSubmit\", \"description\": \"Validate + navigate to /thanks.\" }\n  ]\n},\n\"userActions\": [\n  { \"action\": \"Tap submit button\", \"processing\": \"onSubmit() then onNavigate('/thanks').\" }\n],\n\"transitions\": [\n  { \"trigger\": \"onNavigate(url)\", \"condition\": \"url === '/thanks'\", \"destination\": \"ThanksScreen\" }\n],\n\"dataFlow\": {\n  \"viewModel\": {\n    \"methods\": [\n      { \"name\": \"onNavigate\", \"params\": [{\"name\": \"url\", \"type\": \"String\"}],\n        \"description\": \"Router.push(url). URL is opaque to spec.\" }\n    ]\n  }\n}",
+                      "language": "json",
+                      "filename": "screen_spec.json (excerpt)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_gen_output",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_gen_output_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_gen_output_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "[Web]   src/generated/data/<Screen>Data.ts              ← onNavigate?: (url: string) => void slot\n        src/generated/viewmodels/<Screen>ViewModelBase.ts ← constructor takes router\n[iOS]   <Screen>View.swift (UIKit) / .swift (SwiftUI)   ← layout shell, no Navigation\n[Android] <Screen>Screen.kt (Compose) / Fragment.kt (XML) ← layout shell, no Navigation\n\n(Route enum / NavHost / NavigationStack / router.push — all hand-written)",
+                      "language": "text",
+                      "filename": "what jui generate project writes",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_gen_output_bullet_warn"
                     }
                   ]
                 },
@@ -138,7 +203,7 @@
                     24,
                     32
                   ],
-                  "background": "#FFFFFF",
+                  "background": "#F9FAFB",
                   "child": [
                     {
                       "type": "Label",
@@ -157,6 +222,28 @@
                       "fontSize": 16,
                       "fontColor": "#475467",
                       "text": "section_web_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// src/viewmodels/CounterViewModel.ts  — hand-written\nimport type { AppRouterInstance } from \"next/dist/shared/lib/app-router-context.shared-runtime\";\nimport { CounterViewModelBase } from \"@/generated/viewmodels/CounterViewModelBase\";\n\nexport class CounterViewModel extends CounterViewModelBase {\n  constructor(private router: AppRouterInstance) { super(); }\n\n  protected initializeEventHandlers() {\n    this.updateData({\n      onNavigate: (url: string) => this.router.push(url),\n      onSubmit:   () => this.router.push(\"/thanks\"),\n    });\n  }\n}",
+                      "language": "typescript",
+                      "filename": "src/viewmodels/CounterViewModel.ts",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "// src/app/counter/page.tsx — hand-written\n\"use client\";\nimport { useRouter } from \"next/navigation\";\nimport { useCounterViewModel } from \"@/generated/hooks/useCounterViewModel\";\nimport { CounterViewModel } from \"@/viewmodels/CounterViewModel\";\nimport CounterLayout from \"@/Layouts/counter.json\";\n\nexport default function CounterPage() {\n  const router = useRouter();\n  const { data } = useCounterViewModel(() => new CounterViewModel(router));\n  return <LayoutRenderer layout={CounterLayout} data={data} />;\n}",
+                      "language": "typescript",
+                      "filename": "src/app/counter/page.tsx",
+                      "showLineNumbers": false,
+                      "copyable": true
                     }
                   ]
                 },
@@ -172,7 +259,7 @@
                     24,
                     32
                   ],
-                  "background": "#F9FAFB",
+                  "background": "#FFFFFF",
                   "child": [
                     {
                       "type": "Label",
@@ -191,6 +278,17 @@
                       "fontSize": 16,
                       "fontColor": "#475467",
                       "text": "section_ios_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// hand-written — AppRouter.swift\nenum Route: Hashable {\n    case counter\n    case thanks\n    case settings\n}\n\nstruct AppView: View {\n    @State private var path: [Route] = []\n    var body: some View {\n        NavigationStack(path: $path) {\n            CounterView(onNavigate: { url in\n                switch url {\n                case \"/thanks\": path.append(.thanks)\n                default: break\n                }\n            })\n            .navigationDestination(for: Route.self) { route in\n                switch route {\n                case .counter:  CounterView(onNavigate: { _ in })\n                case .thanks:   ThanksView()\n                case .settings: SettingsView()\n                }\n            }\n        }\n    }\n}",
+                      "language": "swift",
+                      "filename": "AppRouter.swift (hand-written)",
+                      "showLineNumbers": false,
+                      "copyable": true
                     }
                   ]
                 },
@@ -206,7 +304,7 @@
                     24,
                     32
                   ],
-                  "background": "#FFFFFF",
+                  "background": "#F9FAFB",
                   "child": [
                     {
                       "type": "Label",
@@ -225,6 +323,87 @@
                       "fontSize": 16,
                       "fontColor": "#475467",
                       "text": "section_android_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// hand-written — AppNav.kt\nsealed class Route(val path: String) {\n    object Counter  : Route(\"counter\")\n    object Thanks   : Route(\"thanks\")\n    object Settings : Route(\"settings\")\n}\n\n@Composable\nfun AppNav() {\n    val nav = rememberNavController()\n    NavHost(nav, startDestination = Route.Counter.path) {\n        composable(Route.Counter.path) {\n            CounterScreen(onNavigate = { url -> nav.navigate(url.trimStart('/')) })\n        }\n        composable(Route.Thanks.path)   { ThanksScreen() }\n        composable(Route.Settings.path) { SettingsScreen() }\n    }\n}",
+                      "language": "kotlin",
+                      "filename": "AppNav.kt (hand-written)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_sheets",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_sheets_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_sheets_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_sheets_bullet_sheet"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_sheets_bullet_modal"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_sheets_bullet_tabs"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_sheets_bullet_back"
                     }
                   ]
                 },
@@ -334,9 +513,15 @@
                       "maxDepth": 1,
                       "items": [
                         {
-                          "id": "toc_spec",
-                          "label": "toc_row_spec",
-                          "anchor": "section_spec",
+                          "id": "toc_contract",
+                          "label": "toc_row_contract",
+                          "anchor": "section_contract",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_gen_output",
+                          "label": "toc_row_gen_output",
+                          "anchor": "section_gen_output",
                           "level": 1
                         },
                         {
@@ -355,6 +540,12 @@
                           "id": "toc_android",
                           "label": "toc_row_android",
                           "anchor": "section_android",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_sheets",
+                          "label": "toc_row_sheets",
+                          "anchor": "section_sheets",
                           "level": 1
                         }
                       ],

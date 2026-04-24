@@ -123,13 +123,24 @@
                       "fontSize": 16,
                       "fontColor": "#475467",
                       "text": "section_shape_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "{\n  \"home\": {\n    \"hero_title\": {\n      \"en\": \"One spec. Native iOS, Android, and Web.\",\n      \"ja\": \"ひとつの仕様で、iOS・Android・Webを描く。\"\n    },\n    \"hero_cta_primary\": {\n      \"en\": \"Install in one line\",\n      \"ja\": \"ワンライナーで導入\"\n    }\n  },\n  \"cells_agent_row\": {\n    \"placeholder_response_empty\": \"Response will appear here.\"\n  }\n}",
+                      "language": "json",
+                      "filename": "docs/screens/layouts/Resources/strings.json (excerpt)",
+                      "showLineNumbers": false,
+                      "copyable": true
                     }
                   ]
                 },
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_add",
+                  "id": "section_naming",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -147,7 +158,7 @@
                       "fontSize": 26,
                       "fontWeight": "bold",
                       "fontColor": "#0B1220",
-                      "text": "section_add_heading"
+                      "text": "section_naming_heading"
                     },
                     {
                       "type": "Label",
@@ -156,7 +167,101 @@
                       "topMargin": 12,
                       "fontSize": 16,
                       "fontColor": "#475467",
-                      "text": "section_add_body"
+                      "text": "section_naming_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "layout file                        →  namespace\n─────────────────────────────────────────────────\nhome.json                          →  home\nlearn/hello-world.json             →  learn_hello_world\ncells/agent_row.json               →  cells_agent_row\nguides/localization.json           →  guides_localization",
+                      "language": "text",
+                      "filename": "namespace derivation",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_platforms",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_platforms_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_platforms_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_platforms_bullet_ios"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_platforms_bullet_android"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_platforms_bullet_web"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// Web — src/generated/StringManager.ts (@generated)\nconst strings = {\n  en: { home_hero_title: \"One spec. Native iOS, Android, and Web.\" },\n  ja: { home_hero_title: \"ひとつの仕様で、iOS・Android・Webを描く。\" },\n};\n// usage\nStringManager.currentLanguage.homeHeroTitle;",
+                      "language": "typescript",
+                      "filename": "StringManager.ts (excerpt)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "<!-- Android — res/values-ja/strings.xml (@generated) -->\n<resources>\n    <string name=\"home_hero_title\">ひとつの仕様で、iOS・Android・Webを描く。</string>\n</resources>",
+                      "language": "xml",
+                      "filename": "strings.xml (excerpt)",
+                      "showLineNumbers": false,
+                      "copyable": true
                     }
                   ]
                 },
@@ -172,7 +277,7 @@
                     24,
                     32
                   ],
-                  "background": "#F9FAFB",
+                  "background": "#FFFFFF",
                   "child": [
                     {
                       "type": "Label",
@@ -191,13 +296,136 @@
                       "fontSize": 16,
                       "fontColor": "#475467",
                       "text": "section_runtime_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "\"use client\";\nimport { StringManager } from \"@/generated/StringManager\";\nimport { useRouter } from \"next/navigation\";\n\nexport function LanguageToggle() {\n  const router = useRouter();\n  return (\n    <button onClick={() => {\n      const next = StringManager.language === \"ja\" ? \"en\" : \"ja\";\n      StringManager.setLanguage(next);\n      router.refresh();\n    }}>\n      {StringManager.language === \"ja\" ? \"EN\" : \"JA\"}\n    </button>\n  );\n}",
+                      "language": "typescript",
+                      "filename": "Web language toggle (hand-written)",
+                      "showLineNumbers": false,
+                      "copyable": true
                     }
                   ]
                 },
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_scale",
+                  "id": "section_new_lang",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_new_lang_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_new_lang_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_new_lang_step1"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 8,
+                      "code": "{\n  \"home\": {\n    \"hero_title\": {\n      \"en\": \"One spec.\",\n      \"ja\": \"ひとつの仕様で。\",\n      \"ko\": \"하나의 사양.\"\n    }\n  }\n}",
+                      "language": "json",
+                      "filename": "① strings.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_new_lang_step2"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 8,
+                      "code": "{ \"languages\": [\"en\", \"ja\", \"ko\"], \"default_language\": \"en\" }",
+                      "language": "json",
+                      "filename": "② jui.config.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_new_lang_step3"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 8,
+                      "code": "jui build\n# → ja.lproj/ and ko.lproj/ appear for iOS\n# → res/values-ja/ and res/values-ko/ for Android\n# → StringManager.ts gets a `ko` branch",
+                      "language": "bash",
+                      "filename": "③ shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_new_lang_step4"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_new_lang_step5"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_limits",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -215,7 +443,7 @@
                       "fontSize": 26,
                       "fontWeight": "bold",
                       "fontColor": "#0B1220",
-                      "text": "section_scale_heading"
+                      "text": "section_limits_heading"
                     },
                     {
                       "type": "Label",
@@ -224,7 +452,34 @@
                       "topMargin": 12,
                       "fontSize": 16,
                       "fontColor": "#475467",
-                      "text": "section_scale_body"
+                      "text": "section_limits_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_limits_bullet_plurals"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_limits_bullet_interpolation"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_limits_bullet_pseudo"
                     }
                   ]
                 },
@@ -340,9 +595,15 @@
                           "level": 1
                         },
                         {
-                          "id": "toc_add",
-                          "label": "toc_row_add",
-                          "anchor": "section_add",
+                          "id": "toc_naming",
+                          "label": "toc_row_naming",
+                          "anchor": "section_naming",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_platforms",
+                          "label": "toc_row_platforms",
+                          "anchor": "section_platforms",
                           "level": 1
                         },
                         {
@@ -352,9 +613,15 @@
                           "level": 1
                         },
                         {
-                          "id": "toc_scale",
-                          "label": "toc_row_scale",
-                          "anchor": "section_scale",
+                          "id": "toc_new_lang",
+                          "label": "toc_row_new_lang",
+                          "anchor": "section_new_lang",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_limits",
+                          "label": "toc_row_limits",
+                          "anchor": "section_limits",
                           "level": 1
                         }
                       ],

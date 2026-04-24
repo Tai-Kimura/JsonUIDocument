@@ -7,7 +7,7 @@
     "description": "Site-wide left-rail navigation. Renders a persistent vertical column that lists every documentation route grouped by category (Learn / Guides / Concepts / Reference / Platforms / Tools). Each section is a collapsible group with a leading category icon (rendered via the standard `Image` type against docs/screens/images/icon_<sectionId>.svg); under the header an `<ul>` of links where each row carries aria-current='page' when the row URL matches the active route. Consumer (Chrome screen ViewModel) seeds the items catalog, owns the collapse state, and handles the toggle / link-tap events. Component stays presentational — it renders what it's given and fires events; all state lives outside.",
     "platforms": ["web"],
     "createdAt": "2026-04-23",
-    "updatedAt": "2026-04-23",
+    "updatedAt": "2026-04-24",
     "category": "navigation"
   },
   "structure": {
@@ -89,9 +89,10 @@
       {
         "name": "SidebarEntry",
         "properties": [
-          { "name": "id",    "type": "String", "description": "Row key." },
-          { "name": "label", "type": "String", "description": "Localized title (resolved by VM, not by the component)." },
-          { "name": "url",   "type": "String", "description": "Navigation target; must match a Next.js App Router route." }
+          { "name": "id",        "type": "String", "description": "Row key." },
+          { "name": "label",     "type": "String", "description": "Localized title (resolved by VM, not by the component)." },
+          { "name": "url",       "type": "String", "description": "Navigation target; must match a Next.js App Router route." },
+          { "name": "platforms", "type": "Array(String)", "description": "Optional platform scope. When set to a subset of 'ios'|'android'|'web', the row renders small trailing pills (e.g. iOS / Android) to warn readers the page is platform-specific. Omit (undefined) for cross-platform content — no pills render. Component treats missing as undefined; do not pass empty [] unless you explicitly want a no-pill render signalling 'no platforms'." }
         ]
       }
     ]
@@ -101,7 +102,8 @@
     "Component self-localizes the outer `aria-label` via StringManager.getString('chrome_sidebar_aria_label') — no prop needed. Consumers can override via the standard aria-label pass-through if desired.",
     "All state is external. Component does NOT read localStorage, does NOT persist anything. Persistence is the ChromeViewModel's concern.",
     "Responsive behavior is CSS-driven. Under 1024px the sidebar translates off-screen by default; setting mobileOpen=true slides it in. Consumer triggers this via the top-bar menu button.",
-    "Every prop must be bound (`@{name}`). Array + String + Bool + event props all flow through the standard rjui binding pipeline."
+    "Every prop must be bound (`@{name}`). Array + String + Bool + event props all flow through the standard rjui binding pipeline.",
+    "Entry-level `platforms` is optional and backward-compatible. When absent, rows render the way they always have (no pills). Pill labels are resolved through StringManager keys `sidebar_platform_ios` / `sidebar_platform_android` / `sidebar_platform_web` so they localize with the rest of the UI."
   ],
   "relatedFiles": [
     { "type": "Component", "path": "docs/components/json/sidebar.component.json",                                    "description": "This spec." },

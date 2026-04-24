@@ -4241,6 +4241,14 @@
     "toc_row_android": {
       "en": "5. Android Compose Navigation",
       "ja": "5. Android Compose Navigation"
+    },
+    "next_developer_menu_title": {
+      "en": "Developer menu",
+      "ja": "開発メニュー"
+    },
+    "next_developer_menu_description": {
+      "en": "Wrap your iOS / Android app root in DeveloperMenuContainer to jump between screens and hot-reload the JSON you just authored.",
+      "ja": "iOS / Android アプリの root を DeveloperMenuContainer で包むと、画面間のジャンプと今書いた JSON のホットリロードができます。"
     }
   },
   "guides_writing_layouts": {
@@ -4443,6 +4451,236 @@
     "toc_row_pitfalls": {
       "en": "7. Pitfalls",
       "ja": "7. ハマりどころ"
+    },
+    "next_developer_menu_title": {
+      "en": "Developer menu",
+      "ja": "開発メニュー"
+    },
+    "next_developer_menu_description": {
+      "en": "The DEBUG-only container that puts Dynamic Mode behind a long-press and hot-reloads the JSON you just authored. iOS + Android.",
+      "ja": "DEBUG ビルドだけで有効な container。長押しで Dynamic Mode を切り替え、今書いた JSON をホットリロードします。iOS + Android 向け。"
+    }
+  },
+  "guides_developer_menu": {
+    "breadcrumb": {
+      "en": "← Guides",
+      "ja": "← Guides"
+    },
+    "title": {
+      "en": "Developer menu",
+      "ja": "開発メニュー"
+    },
+    "lead": {
+      "en": "DeveloperMenuContainer is a DEBUG-only wrapper shipped with SwiftJsonUI and KotlinJsonUI. You put it around your app's root content, and in DEBUG builds it exposes two gestures: double-tap opens a sheet listing every screen so you can jump to any one of them; long-press toggles Dynamic Mode, which makes the app hot-reload Layout JSON from a running `jui hotload listen`. In Release builds — or when you pass enabled: false — the container vanishes and your content renders plain. This guide shows how to wire it up on iOS and on Android (ReactJsonUI has no equivalent, so the Web side of your app stays unchanged).",
+      "ja": "DeveloperMenuContainer は SwiftJsonUI と KotlinJsonUI に同梱された DEBUG 専用のラッパです。アプリのルートコンテンツを包むと、DEBUG ビルドでは 2 つのジェスチャが有効になります: ダブルタップで全画面一覧のシートが開きどの画面にもジャンプでき、長押しで Dynamic Mode を ON/OFF 切り替えでき、ON の時は `jui hotload listen` が配信する Layout JSON をアプリがホットリロードします。Release ビルド、もしくは enabled: false を渡した時は container が透過し content がそのまま描画されます。本ガイドでは iOS と Android で組み込む手順を示します（ReactJsonUI には等価物が無いため Web 側の実装は変わりません）。"
+    },
+    "read_time": {
+      "en": "~10 min read",
+      "ja": "約 10 分"
+    },
+    "next_heading": {
+      "en": "Keep reading",
+      "ja": "次に読む"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの目次"
+    },
+    "toc_row_overview": {
+      "en": "1. What it is",
+      "ja": "1. 何であるか"
+    },
+    "toc_row_conform": {
+      "en": "2. Conform your Screen enum",
+      "ja": "2. Screen enum を準拠させる"
+    },
+    "toc_row_ios": {
+      "en": "3. iOS — wrap the WindowGroup body",
+      "ja": "3. iOS — WindowGroup の body を包む"
+    },
+    "toc_row_android": {
+      "en": "4. Android — wrap setContent",
+      "ja": "4. Android — setContent を包む"
+    },
+    "toc_row_dynamic_mode": {
+      "en": "5. Dynamic Mode toggle",
+      "ja": "5. Dynamic Mode の切替"
+    },
+    "toc_row_release": {
+      "en": "6. Release builds & the enabled flag",
+      "ja": "6. Release ビルドと enabled フラグ"
+    },
+    "toc_row_pitfalls": {
+      "en": "7. Pitfalls",
+      "ja": "7. ハマりどころ"
+    },
+    "section_overview_heading": {
+      "en": "1. What it is",
+      "ja": "1. 何であるか"
+    },
+    "section_overview_body": {
+      "en": "DeveloperMenuContainer is a thin wrapper that you put around your app's root UI. In DEBUG it attaches two gestures and renders a small overlay when either fires; in Release it's a plain passthrough with zero runtime cost. You give it three things: the currently-shown screen, the list of screens your app can render, and a content closure that knows how to build a screen from that enum value. The library takes it from there.",
+      "ja": "DeveloperMenuContainer はアプリ root の UI を包む薄いラッパです。DEBUG ビルドでは 2 つのジェスチャをアタッチし、発火時に小さなオーバーレイを描画します。Release ビルドでは単なる passthrough で、実行時コストはゼロです。渡すものは 3 つ: 現在表示中の画面、アプリが描画できる画面の一覧、そしてその enum 値から画面を組み立てる content closure です。残りはライブラリがやります。"
+    },
+    "section_overview_bullet_doubletap": {
+      "en": "• Double tap → opens a sheet (iOS) or dialog (Android) listing every screen from `screens`. Picking a row sets `currentScreen` to that value.",
+      "ja": "• ダブルタップ → iOS ではシート、Android ではダイアログが開き、`screens` に渡した全画面が一覧されます。行をタップすると `currentScreen` がその値にセットされます。"
+    },
+    "section_overview_bullet_longpress": {
+      "en": "• Long press (≥ 0.5s) → toggles Dynamic Mode. Snackbar confirms the new state. With Dynamic Mode ON, the running app reloads Layout JSON from `jui hotload listen` as you edit it.",
+      "ja": "• 長押し（0.5 秒以上） → Dynamic Mode をトグル。Snackbar で現在状態を通知します。Dynamic Mode が ON のとき、起動中のアプリは `jui hotload listen` から配信される Layout JSON を編集するたびにリロードします。"
+    },
+    "section_overview_bullet_release": {
+      "en": "• Release builds never show the sheet, never listen for gestures, never allocate overlay state — the container becomes a direct call to your content closure.",
+      "ja": "• Release ビルドではシートもジェスチャも描画せず、オーバーレイの state も一切確保しません。container は content closure の直接呼び出しに退化します。"
+    },
+    "section_overview_bullet_platforms": {
+      "en": "• iOS (SwiftJsonUI, SwiftUI) and Android (KotlinJsonUI, Jetpack Compose) ship a container. ReactJsonUI does not. If you want a screen-switcher on the web app, you'd build it yourself — but hot-reload on the web is handled by Next.js's own dev server, so the motivation is weaker.",
+      "ja": "• iOS (SwiftJsonUI, SwiftUI) と Android (KotlinJsonUI, Jetpack Compose) に container が同梱されています。ReactJsonUI には同梱されていません。Web アプリで画面切替が欲しいなら自分で作ることになりますが、Web 側のホットリロードは Next.js の dev server で完結するので動機は弱いです。"
+    },
+    "section_conform_heading": {
+      "en": "2. Conform your Screen enum to DeveloperScreen",
+      "ja": "2. Screen enum を DeveloperScreen に準拠させる"
+    },
+    "section_conform_body": {
+      "en": "The container is generic over a `Screen` type. You declare an enum listing every screen your app can render and conform it to DeveloperScreen — a tiny protocol (iOS) / interface (Android) with one property that returns a human-readable label. The label is what the sheet / dialog shows next to the currently-selected marker.",
+      "ja": "container は `Screen` 型でジェネリック化されています。アプリが描画する全画面を列挙した enum を作り、DeveloperScreen に準拠させます。DeveloperScreen は iOS では protocol、Android では interface で、人間可読なラベルを返す 1 プロパティだけを要求します。このラベルが、現在選択中のマーカーの隣にシート/ダイアログが表示する文字列です。"
+    },
+    "section_conform_bullet_ios": {
+      "en": "• iOS — `protocol DeveloperScreen: Hashable { var name: String { get } }`. The Hashable conformance is automatic for any enum with raw-value cases; just implement `name` (returning `rawValue` is usually fine).",
+      "ja": "• iOS — `protocol DeveloperScreen: Hashable { var name: String { get } }`。rawValue を持つ enum なら Hashable は自動。`name` を実装します（`rawValue` を返すだけで大体充分）。"
+    },
+    "section_conform_bullet_android": {
+      "en": "• Android — `interface DeveloperScreen { val displayName: String }`. Kotlin enum classes already support equals/hashCode via identity, so there's nothing extra to implement beyond `displayName` — `this.name` (the enum constant's own name) is the usual choice.",
+      "ja": "• Android — `interface DeveloperScreen { val displayName: String }`。Kotlin の enum class は identity ベースで equals / hashCode を既に備えているので、`displayName` 以外の実装は不要です。通常は `this.name`（enum 定数そのものの名前）を返します。"
+    },
+    "section_ios_heading": {
+      "en": "3. iOS — wrap the WindowGroup body",
+      "ja": "3. iOS — WindowGroup の body を包む"
+    },
+    "section_ios_body": {
+      "en": "The iOS container wants a SwiftUI.Binding for `currentScreen`, the full `screens` array, an `enabled` flag, and a content closure that switches on the current value. You hold the current screen as @State on your App struct and pass `$currentScreen` in; anything in your view tree can assign a new screen back to that @State and the UI swaps accordingly.",
+      "ja": "iOS の container は `currentScreen` の SwiftUI.Binding、`screens` 配列全体、`enabled` フラグ、そして現在値を switch で分岐する content closure を要求します。App struct に @State で currentScreen を持ち、`$currentScreen` を渡します。ビュー階層のどこからでも新しい画面を @State に代入すれば、UI がそれに合わせて切り替わります。"
+    },
+    "section_ios_bullet_allcases": {
+      "en": "• Use `CaseIterable` on your enum and pass `Screen.allCases` — the sheet shows rows in `allCases` order.",
+      "ja": "• enum に `CaseIterable` を付けて `Screen.allCases` を渡します — シートの行順は `allCases` の順番になります。"
+    },
+    "section_ios_bullet_binding": {
+      "en": "• `$currentScreen` is a two-way Binding. When the developer sheet assigns a new value to it, SwiftUI re-invokes your content closure with the new enum case. No additional state plumbing needed.",
+      "ja": "• `$currentScreen` は双方向 Binding です。developer sheet が新しい値を代入すると、SwiftUI が content closure を新しい enum ケースで再実行します。追加の state 引き回しは不要。"
+    },
+    "section_ios_bullet_exhaustive": {
+      "en": "• Your switch inside the content closure must be exhaustive. Swift does not allow `@unknown default` on your own enum, so add an explicit `default:` if you'd rather not hand-cover every case.",
+      "ja": "• content closure 内の switch は網羅的でなければなりません。Swift では自作 enum に `@unknown default` は使えないので、全ケースを手で書きたくないときは明示的に `default:` を書きます。"
+    },
+    "section_android_heading": {
+      "en": "4. Android — wrap setContent",
+      "ja": "4. Android — setContent を包む"
+    },
+    "section_android_body": {
+      "en": "On Android the container has the same three inputs but a different shape: `currentScreen` is a plain value (not a delegate), and you pass `onScreenChange: (T) -> Unit` as a callback instead of a Binding. The idiomatic pattern is to derive `currentScreen` from the NavController's backstack entry and, inside `onScreenChange`, call `navController.navigate(...)` so the Compose navigation system stays the single source of truth for what's on screen. The content slot receives the enum value you just derived, but you usually ignore it and mount a NavHost that renders based on the backstack directly.",
+      "ja": "Android では container の入力は同じ 3 つですが shape が違います: `currentScreen` は単なる値（delegate ではなく）で、Binding の代わりに `onScreenChange: (T) -> Unit` コールバックを渡します。常套パターンは NavController の backstack entry から `currentScreen` を派生させ、`onScreenChange` の中で `navController.navigate(...)` を呼ぶことです。これで Compose ナビゲーションが「いま表示中の画面」の single source of truth になります。content slot には今派生した enum 値が入りますが、通常は無視して backstack から直接描画する NavHost をマウントします。"
+    },
+    "section_android_bullet_entries": {
+      "en": "• `Screen.entries` is the Kotlin 1.9+ API. On older compilers, use `Screen.values().toList()` instead.",
+      "ja": "• `Screen.entries` は Kotlin 1.9 以降の API。古いコンパイラでは代わりに `Screen.values().toList()` を使います。"
+    },
+    "section_android_bullet_popupto": {
+      "en": "• `popUpTo(...) { inclusive = ... }` after navigate() controls how much of the backstack survives each dev-menu jump. Typical choice: pop up to the top-level screen so the backstack doesn't grow without bound while QA-ing screens.",
+      "ja": "• navigate() に続く `popUpTo(...) { inclusive = ... }` で、dev-menu ジャンプのたびに backstack をどこまで残すかを制御します。QA 中に backstack が無限に積み上がらないよう、ルートクラスの画面まで pop するのが典型です。"
+    },
+    "section_android_bullet_buildconfig": {
+      "en": "• Pass `enabled = BuildConfig.DEBUG` explicitly. The library has its own debug check, but routing through your project's BuildConfig gives you a second guarantee and an easy place to add Stage / QA overrides later.",
+      "ja": "• `enabled = BuildConfig.DEBUG` を明示的に渡します。ライブラリ側にも debug 判定はありますが、プロジェクトの BuildConfig を通すことで二重ガードになり、後で Stage / QA ビルドで挙動を差し替える入口にもなります。"
+    },
+    "section_dynamic_mode_heading": {
+      "en": "5. Dynamic Mode toggle",
+      "ja": "5. Dynamic Mode の切替"
+    },
+    "section_dynamic_mode_body": {
+      "en": "Long-press the container and Dynamic Mode flips. On iOS the flag lives on `ViewSwitcher.shared.isDynamic` and the container listens via @ObservedObject; on Android it's a StateFlow on `DynamicModeManager.isDynamicModeEnabled` that the container collects. In both cases, flipping the flag forces a re-mount of the content subtree so hot-reloaded Layout JSON takes effect immediately. You normally don't touch these managers directly; the only time you do is in your App / MainActivity setup to seed the initial state and opt in to hot-reload.",
+      "ja": "container を長押しすると Dynamic Mode がトグルします。iOS では `ViewSwitcher.shared.isDynamic` にフラグがあり、container は @ObservedObject で購読します。Android では `DynamicModeManager.isDynamicModeEnabled` の StateFlow を container が collect します。どちらの場合もフラグを切り替えると content サブツリーが再マウントされ、ホットリロードされた Layout JSON が即座に反映されます。通常これらのマネージャを直接触ることはなく、App / MainActivity のセットアップで初期値を与え hot-reload に opt in するときだけです。"
+    },
+    "section_dynamic_mode_bullet_toggle": {
+      "en": "• The toggle is always available on long-press in DEBUG. You can also programmatically flip it from your setup code (see the CodeBlock) — useful if you want Dynamic Mode on for a specific QA build.",
+      "ja": "• DEBUG では長押しでいつでもトグルできます。起動時コードからプログラマティックに切り替えることもできます（CodeBlock 参照）。特定の QA ビルドで Dynamic Mode を常時 ON にしたいときに便利です。"
+    },
+    "section_dynamic_mode_bullet_hotload": {
+      "en": "• Dynamic Mode ON is the switch that lets `jui hotload listen` push updated Layout JSON into the running app. The CLI and the container don't know about each other directly — the ViewSwitcher / DynamicModeManager flag is the rendezvous.",
+      "ja": "• Dynamic Mode が ON のときだけ `jui hotload listen` で配信される Layout JSON が起動中のアプリに反映されます。CLI と container は直接連携せず、ViewSwitcher / DynamicModeManager のフラグが待ち合わせ場所になります。"
+    },
+    "section_dynamic_mode_bullet_error": {
+      "en": "• A parse error in the JSON you just saved will log to stdout (iOS) / Logcat (Android). The UI stays on the previously-valid layout rather than blanking — Dynamic Mode is best-effort, not strict.",
+      "ja": "• 保存直後の JSON に構文エラーがあると stdout (iOS) / Logcat (Android) にログが出ます。UI は blank にならず、直前の有効な layout を表示し続けます — Dynamic Mode は best-effort で strict ではありません。"
+    },
+    "section_release_heading": {
+      "en": "6. Release builds and the enabled flag",
+      "ja": "6. Release ビルドと enabled フラグ"
+    },
+    "section_release_body": {
+      "en": "The container has two layers of Release-build safety. First, the library itself guards all of the developer features behind a DEBUG check. Second, the `enabled` prop lets you disable the container at call-site even in DEBUG (useful when you want the developer menu off for screen recordings, on TestFlight / internal-release builds, or when a sub-flow uses its own long-press gesture). Always pass the flag explicitly — don't rely on the library default.",
+      "ja": "container には Release ビルドでの安全装置が 2 層あります。1 つ目はライブラリ側: developer 機能はすべて DEBUG 判定で囲まれています。2 つ目は `enabled` prop: DEBUG ビルドでも呼び出し側で container を無効化できます（画面録画中に dev メニューを切りたい、TestFlight / internal-release ビルドで切りたい、特定のサブフローが独自の長押しを使う、等のとき便利）。ライブラリのデフォルトに依存せず、常に明示的に渡しましょう。"
+    },
+    "section_release_bullet_ios": {
+      "en": "• iOS — the entire DeveloperMenuContainer body is inside `#if DEBUG`. Release builds compile down to a single `content(currentScreen)` call with zero overhead and zero stored state.",
+      "ja": "• iOS — DeveloperMenuContainer の body 全体が `#if DEBUG` の中にあります。Release ビルドでは単一の `content(currentScreen)` 呼び出しまで退化し、オーバーヘッドも保持される state もゼロです。"
+    },
+    "section_release_bullet_android": {
+      "en": "• Android — DynamicModeManager exposes `isDynamicModeAvailable` as a StateFlow. In Release builds this stays false and the container returns early with just the content, skipping every gesture / overlay block.",
+      "ja": "• Android — DynamicModeManager は `isDynamicModeAvailable` を StateFlow として公開しています。Release ビルドでは false のままで、container は early return して content だけを描画し、ジェスチャ / オーバーレイのブロックを全てスキップします。"
+    },
+    "section_release_bullet_warning": {
+      "en": "• Forgetting `enabled = BuildConfig.DEBUG` on Android is the most common way a production build ships with a working screen selector. iOS catches this via `#if DEBUG` in the library; Android trusts you. Double-check this in your CI.",
+      "ja": "• Android で `enabled = BuildConfig.DEBUG` を忘れると、本番ビルドに動作する画面セレクタが残るリスクがあります。iOS はライブラリの `#if DEBUG` で自動的に守られますが、Android は呼び出し側を信頼します。CI でここを必ずチェックしてください。"
+    },
+    "section_pitfalls_heading": {
+      "en": "7. Pitfalls",
+      "ja": "7. ハマりどころ"
+    },
+    "section_pitfalls_body": {
+      "en": "Most trouble with DeveloperMenuContainer traces to one of these five places — all of which are spotted easily in the Swift / Kotlin compiler output or in a 30-second manual test.",
+      "ja": "DeveloperMenuContainer 周りのトラブルはほぼ必ず以下 5 箇所のどれかに帰結します。Swift / Kotlin のコンパイラ出力か、30 秒の手動テストで簡単に見つかります。"
+    },
+    "section_pitfalls_bullet_exhaustive": {
+      "en": "• Non-exhaustive switch in the iOS content closure — Swift won't compile, but the error points at the closure and not the cause. If you add a new screen to the enum, remember to add a case in the App struct's switch too.",
+      "ja": "• iOS の content closure で switch が非網羅 — Swift のコンパイルエラーになりますが、原因が closure ではなく switch そのものであることが分かりにくいエラーが出ます。enum に画面を追加したら App struct 側の switch にも必ず case を追加する癖をつけます。"
+    },
+    "section_pitfalls_bullet_dualstate": {
+      "en": "• On Android, holding `currentScreen` as a mutable local and hand-mutating it alongside `navController.navigate(...)` creates two sources of truth. Derive it from the backstack (`currentBackStackEntryFlow` → route → `NavRoutes.toScreen(route)`) and drive changes exclusively through the NavController.",
+      "ja": "• Android で `currentScreen` を mutable なローカルに持って `navController.navigate(...)` と並行して手動で書き換えると、source of truth が 2 つになります。backstack から派生（`currentBackStackEntryFlow` → route → `NavRoutes.toScreen(route)`）し、変更は NavController だけで駆動します。"
+    },
+    "section_pitfalls_bullet_buildconfig": {
+      "en": "• Passing `enabled = true` unconditionally on Android — the library still has its own debug check, but a raw `true` is easy to miss in code review. Prefer `enabled = BuildConfig.DEBUG` everywhere.",
+      "ja": "• Android で `enabled = true` をそのまま渡す — ライブラリ側にも debug 判定はありますが、生の `true` はコードレビューで見落とされやすい形です。常に `enabled = BuildConfig.DEBUG` を使いましょう。"
+    },
+    "section_pitfalls_bullet_gesture": {
+      "en": "• A child view inside the content closure that uses its own long-press gesture (context menus, draggable items) — on iOS the container uses `.simultaneousGesture` so both fire, which can register Dynamic Mode toggles you didn't intend. Either disable the container on that subflow with `enabled: false`, or give the child's long-press a shorter `minimumDuration` so it eats the event first.",
+      "ja": "• content closure 内の子ビューが独自の長押しジェスチャを使っている（コンテキストメニューやドラッグ可能アイテム）— iOS では container が `.simultaneousGesture` を使っているので両方発火し、意図しない Dynamic Mode トグルが起きる可能性があります。そのサブフローでは `enabled: false` で container を無効化するか、子の長押しを短い `minimumDuration` にして先に event を拾わせます。"
+    },
+    "section_pitfalls_bullet_displayName": {
+      "en": "• Returning an empty string from `name` (iOS) / `displayName` (Android) — the sheet still renders the row, but it's a blank, unclickable-looking tap target. Always return a human-readable label; the enum's `rawValue` (Swift) or `this.name` (Kotlin) is the quickest default.",
+      "ja": "• `name` (iOS) / `displayName` (Android) が空文字 — シートは行を描画しますが、見た目上クリック不能に見える blank なタップターゲットになります。必ず人間可読な文字列を返します。enum の `rawValue`（Swift）や `this.name`（Kotlin）が最も手早いデフォルトです。"
+    },
+    "next_navigation_title": {
+      "en": "Navigation",
+      "ja": "Navigation"
+    },
+    "next_navigation_description": {
+      "en": "The nav stack the DeveloperMenuContainer hooks into. Cross-platform userActions + transitions — iOS NavigationStack, Android NavController, React Router.",
+      "ja": "DeveloperMenuContainer が乗る navigation スタック側の章。プラットフォーム横断の userActions + transitions — iOS NavigationStack / Android NavController / React Router を扱います。"
+    },
+    "next_writing_layouts_title": {
+      "en": "Writing layouts",
+      "ja": "レイアウトを書く"
+    },
+    "next_writing_layouts_description": {
+      "en": "The JSON that Dynamic Mode hot-reloads — styles, include, Collection, visibility, pitfalls.",
+      "ja": "Dynamic Mode がホットリロードする JSON 側の章 — styles / include / Collection / visibility / pitfalls。"
     }
   },
   "guides_testing": {
@@ -5551,6 +5789,18 @@
     "sidebar_aria_label": {
       "en": "Documentation navigation",
       "ja": "ドキュメントナビゲーション"
+    },
+    "sidebar_platform_ios": {
+      "en": "iOS",
+      "ja": "iOS"
+    },
+    "sidebar_platform_android": {
+      "en": "Android",
+      "ja": "Android"
+    },
+    "sidebar_platform_web": {
+      "en": "Web",
+      "ja": "Web"
     },
     "collapse_aria_label": {
       "en": "Collapse section",

@@ -4,13 +4,13 @@
   "metadata": {
     "name": "Navigation",
     "displayName": "Navigation between screens",
-    "description": "Guides > Navigation between screens. Task-focused walk-through. Four sections + TOC + next-reads. Generated via /tmp/gen-guides.js.",
+    "description": "Guides > Navigation between screens. Six sections + TOC + next-reads. Corrects the implicit false claim that the generator writes navigation code — it does not. Walks the spec-side contract (userActions + transitions + onNavigate method with JSON example), what the generator actually emits (Data interface callback slot + VM Base constructor that takes router, nothing else), then real hand-written wiring code for Web (Next.js App Router with TS snippets for VM + page.tsx), iOS (SwiftUI NavigationStack with Route enum), Android (Compose NavHost with sealed Route class), plus sheets/modals/tabs/back cheat sheet across all three platforms.",
     "platforms": [
       "web"
     ],
     "layoutFile": "guides/navigation",
     "createdAt": "2026-04-23",
-    "updatedAt": "2026-04-23"
+    "updatedAt": "2026-04-24"
   },
   "structure": {
     "components": [],
@@ -142,6 +142,8 @@
   ],
   "notes": [
     "Live Guides entry. Flip GUIDES_ENTRIES row for 'navigation' to 'live' in HomeViewModel when shipping.",
-    "Essay-shape guide — same template as the concept essays. Four sections + TOC + next-reads."
+    "Six sections: (1) contract (userActions + transitions + onNavigate method, JSON snippet), (2) what the generator actually writes (text tree + callout bullet — the 'generator does NOT emit Route enum / NavHost' point), (3) Web router wiring (TS VM + TS page.tsx hand-written snippets), (4) iOS SwiftUI NavigationStack with Route enum hand-written snippet, (5) Android Compose NavHost with sealed Route class hand-written snippet, (6) sheet / full-modal / tabs / back 4-way bullet cheat-sheet across platforms.",
+    "Corrects prior implicit false claim that the generator writes navigation code or that jsonui-navigation-ios/android agents 'emit the platform-specific navigation call' — those agents assist authoring, but the code lands as hand-written VM impl / Route enums / NavHost definitions, not @generated.",
+    "Deprecated strings: section_spec_* and toc_row_spec remain in strings.json as unreferenced dead entries to minimise cross-session merge risk (section_contract is the new equivalent)."
   ]
 }

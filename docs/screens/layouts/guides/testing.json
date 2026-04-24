@@ -123,6 +123,107 @@
                       "fontSize": 16,
                       "fontColor": "#475467",
                       "text": "section_where_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "tests/\n  screens/\n    home.test.json\n    learn/hello-world.test.json       ← screen test\n  flows/\n    login-to-profile.test.json        ← flow test\n  descriptions/\n    home.description.json             ← optional richer docs",
+                      "language": "text",
+                      "filename": "tests/ layout",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_screen",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_screen_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_screen_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "{\n  \"type\": \"screen\",\n  \"source\": { \"layout\": \"layouts/counter.json\" },\n  \"metadata\": { \"name\": \"Counter — increment flow\", \"tags\": [\"smoke\"] },\n  \"platform\": \"web\",\n  \"initialState\": { \"viewModel\": { \"count\": 0 } },\n  \"cases\": [\n    {\n      \"name\": \"increment once shows 1\",\n      \"steps\": [\n        { \"assert\": \"text\", \"id\": \"counter_value\", \"equals\": \"0\" },\n        { \"tap\": \"counter_increment_btn\" },\n        { \"assert\": \"text\", \"id\": \"counter_value\", \"equals\": \"1\" }\n      ]\n    }\n  ]\n}",
+                      "language": "json",
+                      "filename": "tests/screens/counter.test.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_flow",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_flow_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_flow_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "{\n  \"type\": \"flow\",\n  \"sources\": [\n    { \"alias\": \"login\", \"layout\": \"layouts/login.json\" },\n    { \"alias\": \"home\",  \"layout\": \"layouts/home.json\" }\n  ],\n  \"metadata\": { \"name\": \"Login → Home happy path\" },\n  \"platform\": \"web\",\n  \"initialState\": { \"screen\": \"login\", \"viewModels\": { \"login\": {} } },\n  \"cases\": [\n    {\n      \"name\": \"logs in and lands on home\",\n      \"steps\": [\n        { \"screen\": \"login\", \"input\": \"email_field\",    \"value\": \"demo@example.com\" },\n        { \"screen\": \"login\", \"input\": \"password_field\", \"value\": \"hunter2\" },\n        { \"screen\": \"login\", \"tap\": \"submit_btn\" },\n        { \"screen\": \"home\",  \"waitFor\": \"home_header\" },\n        { \"checkpoint\": \"arrived_home\", \"screenshot\": true }\n      ]\n    }\n  ]\n}",
+                      "language": "json",
+                      "filename": "tests/flows/login-to-home.test.json",
+                      "showLineNumbers": false,
+                      "copyable": true
                     }
                   ]
                 },
@@ -157,13 +258,31 @@
                       "fontSize": 16,
                       "fontColor": "#475467",
                       "text": "section_dsl_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_dsl_bullet_actions"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_dsl_bullet_asserts"
                     }
                   ]
                 },
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_runner",
+                  "id": "section_drivers",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -181,7 +300,7 @@
                       "fontSize": 26,
                       "fontWeight": "bold",
                       "fontColor": "#0B1220",
-                      "text": "section_runner_heading"
+                      "text": "section_drivers_heading"
                     },
                     {
                       "type": "Label",
@@ -190,7 +309,95 @@
                       "topMargin": 12,
                       "fontSize": 16,
                       "fontColor": "#475467",
-                      "text": "section_runner_body"
+                      "text": "section_drivers_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_drivers_bullet_ios"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_drivers_bullet_android"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_drivers_bullet_web"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_cli",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_cli_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_cli_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_cli_bullet_install"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_cli_bullet_validate"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_cli_bullet_generate"
                     }
                   ]
                 },
@@ -206,7 +413,7 @@
                     24,
                     32
                   ],
-                  "background": "#FFFFFF",
+                  "background": "#F9FAFB",
                   "child": [
                     {
                       "type": "Label",
@@ -225,6 +432,26 @@
                       "fontSize": 16,
                       "fontColor": "#475467",
                       "text": "section_ci_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_ci_bullet_example"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "# .github/workflows/test.yml (web shard)\n- name: Validate test schemas\n  run: jsonui-test validate tests/\n- name: Run Playwright tests\n  working-directory: jsonui-doc-web\n  run: |\n    npx playwright install --with-deps\n    npx playwright test",
+                      "language": "yaml",
+                      "filename": "GitHub Actions excerpt",
+                      "showLineNumbers": false,
+                      "copyable": true
                     }
                   ]
                 },
@@ -340,15 +567,33 @@
                           "level": 1
                         },
                         {
+                          "id": "toc_screen",
+                          "label": "toc_row_screen",
+                          "anchor": "section_screen",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_flow",
+                          "label": "toc_row_flow",
+                          "anchor": "section_flow",
+                          "level": 1
+                        },
+                        {
                           "id": "toc_dsl",
                           "label": "toc_row_dsl",
                           "anchor": "section_dsl",
                           "level": 1
                         },
                         {
-                          "id": "toc_runner",
-                          "label": "toc_row_runner",
-                          "anchor": "section_runner",
+                          "id": "toc_drivers",
+                          "label": "toc_row_drivers",
+                          "anchor": "section_drivers",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_cli",
+                          "label": "toc_row_cli",
+                          "anchor": "section_cli",
                           "level": 1
                         },
                         {

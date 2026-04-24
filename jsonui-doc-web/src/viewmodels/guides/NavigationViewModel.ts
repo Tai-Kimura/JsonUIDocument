@@ -57,11 +57,11 @@ export class NavigationViewModel {
         onNavigate: () => this.navigate("/guides/writing-your-first-spec"),
       },
       {
-        id: "next_testing",
-        titleKey: this.s("next_testing_title"),
-        descriptionKey: this.s("next_testing_description"),
-        url: "/guides/testing",
-        onNavigate: () => this.navigate("/guides/testing"),
+        id: "next_developer_menu",
+        titleKey: this.s("next_developer_menu_title"),
+        descriptionKey: this.s("next_developer_menu_description"),
+        url: "/guides/developer-menu",
+        onNavigate: () => this.navigate("/guides/developer-menu"),
       },
     ];
 
