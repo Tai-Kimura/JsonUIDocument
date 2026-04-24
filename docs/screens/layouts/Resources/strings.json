@@ -1485,44 +1485,44 @@
       "ja": "契約としてのデータバインディング"
     },
     "lead": {
-      "en": "@{variable} is not a template expression — it is a typed binding to a ViewModel field. No logic in the layout, ever. Here is what that means in practice.",
-      "ja": "@{variable} はテンプレート式ではなく、ViewModel フィールドへの型付きバインディングです。Layout にロジックは一切書きません。何を意味するかを具体的に解説します。"
+      "en": "`@{variable}` is how a layout JSON names a field on its ViewModel. What the field holds, how strongly it is type-checked, and whether the widget can write back into it depends on the platform and on the widget — the Layout JSON stays the same across all three.",
+      "ja": "`@{variable}` は Layout JSON から ViewModel のフィールドを指し示す書式。フィールドが持つ値・型チェックの厳しさ・widget から書き戻せるかはプラットフォームと widget の組み合わせで変わる — Layout JSON 自体は 3 プラットフォームで同じ。"
     },
     "read_time": {
       "en": "~4 min read",
       "ja": "約 4 分"
     },
     "section_syntax_heading": {
-      "en": "The syntax",
-      "ja": "構文"
+      "en": "Where bindings live",
+      "ja": "バインディングが置ける場所"
     },
     "section_syntax_body": {
-      "en": "Three places use bindings: attribute values that render text or styles, the visibility attribute, and event callbacks. In every case the form is @{name} where name resolves to a ViewModel field.",
-      "ja": "binding が使われる場所は 3 箇所: テキストやスタイルを描画する属性、visibility 属性、イベントコールバック。どの場所でも @{name} という形式で、name は ViewModel のフィールドに解決されます。"
+      "en": "Bindings are not limited to text. Any attribute value that is not a layout primitive (`type`, `orientation`, `style` name) can be bound to a ViewModel field. Group the real uses into five families — text (Label `text`, TextField `hint`), style (colors, opacity, fontWeight, borderWidth), layout (width, height, `visibility` — which is a `String` enum `'visible' | 'invisible' | 'gone'`, not a Bool), events (`onClick`, `onTextChange`, `onValueChanged`, `onPageChanged`), and collection / resource (`items` on a Collection, `src` on a NetworkImage, `currentPage` on a pager).",
+      "ja": "バインディングはテキストに限りません。`type` / `orientation` / `style` 名のような Layout プリミティブ以外のほぼ全ての属性値に `@{…}` を置けます。実用上は 5 グループ: **text**（Label の `text`、TextField の `hint` など）・**style**（色・opacity・fontWeight・borderWidth など）・**layout**（width / height / `visibility`。ただし `visibility` は Bool ではなく `'visible' | 'invisible' | 'gone'` の String enum）・**event**（`onClick` / `onTextChange` / `onValueChanged` / `onPageChanged` など）・**collection / resource**（Collection の `items`、NetworkImage の `src`、ページャの `currentPage` など）。"
     },
     "section_typed_heading": {
-      "en": "It is typed",
-      "ja": "型がある"
+      "en": "How typing works per platform",
+      "ja": "型チェックはプラットフォームで違う"
     },
     "section_typed_body": {
-      "en": "The ViewModel field that @{count} resolves to has a TypeScript / Kotlin / Swift type. Binding it to a numeric attribute that expects Int but declaring it String in the ViewModel fails at build time — `jui verify` catches the mismatch before anyone notices it in the browser. Bindings are not strings handed to a template engine at runtime; they are compiled references.",
-      "ja": "@{count} が解決する ViewModel フィールドには TypeScript / Kotlin / Swift の型があります。Int を期待する属性に String 型のフィールドを binding すればビルド時に失敗 — `jui verify` がブラウザで気付く前に捕まえます。binding は実行時のテンプレートエンジンに渡される文字列ではなく、コンパイル時に解決される型付きの参照です。"
+      "en": "`@{count}` resolves to the `count` field on the ViewModel, but what 'typed binding' actually means differs per target. On Android, `jui build` emits Android DataBinding expressions (`@{data.count}`) and the kapt annotation processor type-checks them at `./gradlew assemble` — a Bool bound to `Label.text` fails the build. On Web, the converter emits `{data.count}` JSX and the `FooData` TypeScript interface generated alongside lets `tsc` catch type mismatches at `next build`. On iOS, bindings resolve at runtime via reflection — type errors surface as blank labels and console warnings, not build failures. `jui verify --fail-on-diff` is a structural-drift check (generated Layout vs spec); it does not validate binding types.",
+      "ja": "`@{count}` は ViewModel の `count` フィールドを指しますが、「型付きバインディング」の実体はターゲットごとに変わります。Android では `jui build` が Android DataBinding 式 (`@{data.count}`) を吐き、kapt annotation processor が `./gradlew assemble` 時に型を検査 — Bool を `Label.text` に bind するとビルドが落ちます。Web はコンバータが `{data.count}` の JSX を生成し、併せて作られる `FooData` TypeScript interface を通じて `tsc` が `next build` 時に型不一致を検出。iOS はランタイムで reflection 経由に解決 — 型エラーは空のラベルとコンソール warning として顕在化し、ビルドは通ります。`jui verify --fail-on-diff` は spec と Layout の構造 drift だけを検査するコマンドで、バインディングの型検証は行いません。"
     },
     "section_oneway_heading": {
-      "en": "One-way only",
-      "ja": "一方向のみ"
+      "en": "Read-only bindings vs two-way form bindings",
+      "ja": "read-only なバインディングと、双方向になるフォーム入力"
     },
     "section_oneway_body": {
-      "en": "Data flows ViewModel → Layout. There is no two-way binding. When the user types into an input, the layout calls an event (onChange) with the new value; the ViewModel decides whether to accept it, transform it, reject it, and only then the field updates. This is the same discipline Elm and Redux taught; JsonUI just makes it the framework's default.",
-      "ja": "データは ViewModel → Layout の一方向。双方向 binding はありません。ユーザーが入力したら Layout は新しい値を onChange イベントで通知するだけ、ViewModel が受理・変換・却下を判断してから初めてフィールドが更新されます。Elm や Redux が教えてくれた規律を、JsonUI はフレームワーク既定にしているだけです。"
+      "en": "Non-input attributes — `Label.text`, `visibility`, `src`, colors, sizes, `items` — are read-only. The widget has no write-back path; the VM pushes, the view displays. Form inputs are different: `TextField`, `EditText`, `Input`, `CheckBox`, `Switch`, `Toggle`, `Slider`, `SelectBox`, `Segment`. The author writes `text: '@{email}'` + (optional) `onTextChange: '@{onEmailChange}'` — looking one-way — but the generator emits platform-native two-way machinery underneath: SwiftUI `$binding` on iOS, a `LaunchedEffect` that calls `viewModel.updateData(...)` on Android, a controlled input with auto-generated `onChange` on Web. The VM field updates on every keystroke, before the author's handler runs. The handler is a notification hook, not a gate. To reject or transform user input, don't treat the callback as a guard — let the field update, then snap it back to the corrected value inside the handler; the same binding re-renders the input with the corrected text.",
+      "ja": "入力 widget 以外の属性 — `Label.text` / `visibility` / `src` / 色 / サイズ / `items` — は read-only。widget に書き戻しのパスが存在しないので VM が push、view は表示のみ。フォーム入力はこれと別枠: `TextField` / `EditText` / `Input` / `CheckBox` / `Switch` / `Toggle` / `Slider` / `SelectBox` / `Segment`。author は `text: '@{email}'` +（省略可）`onTextChange: '@{onEmailChange}'` を書いて見た目は一方向だが、generator がプラットフォーム native の双方向機構を裏で吐く — iOS は SwiftUI の `$binding`、Android は `LaunchedEffect` 内で `viewModel.updateData(...)` を呼ぶ、Web は controlled input + 自動生成された `onChange`。VM のフィールドはキー入力のたびに、author のハンドラが走る前に更新される。ハンドラは通知フックであってゲートではない。拒否や変換をしたいときはコールバックをガードと考えず、フィールドは一旦更新させてハンドラ内で正しい値に snap back — 同じバインディングが再描画を走らせて input が修正済みテキストで更新される。"
     },
     "section_no_logic_heading": {
-      "en": "No logic in layout",
-      "ja": "Layout にロジックなし"
+      "en": "No expressions in `@{…}`",
+      "ja": "`@{…}` の中に式は書けない"
     },
     "section_no_logic_body": {
-      "en": "You cannot write @{count > 0 ? 'some' : 'none'} or @{formatName(user)}. Those belong in the ViewModel as derived read-only getters. This keeps three things honest: the layout reviewer doesn't have to read code to understand rendering; the cross-platform generator doesn't have to parse an expression grammar; and tests can assert against the derived value directly instead of re-implementing the expression.",
-      "ja": "@{count > 0 ? 'some' : 'none'} や @{formatName(user)} は書けません。そういう派生値は ViewModel に読み取り専用 getter として置きます。これで 3 つが正直に保たれる: レイアウトレビュワーは描画理解にコードを読まなくていい、クロスプラットフォーム generator は式文法を parse しなくていい、テストは式を再実装せず派生値を直接アサートできる。"
+      "en": "The grammar inside `@{…}` is deliberately small: simple property (`@{displayName}`), dot-path (`@{user.profile.handle}`), array index (`@{items[0]}`), action binding (`@{onSubmit}`), and cell-scoped `@{data.prop}` inside `cells/*.json`. That is the entire grammar. Ternaries, comparisons (`===`, `<`, `>`), arithmetic (`+`, `*`, `%`), logical operators (`&&`, `||`), and function or method calls are rejected — rjui's `binding_validator.rb` catches them with actionable warnings. If you need a derived value, compute it in the ViewModel as a getter and bind the getter: `get countLabel(): string { return this.count > 0 ? this.s('some') : this.s('none'); }` → `{ \"text\": \"@{countLabel}\" }`. Path-ascent (`@{^parentProp}`) and relative navigation (`@{../sibling}`) are not part of the grammar — pass values down explicitly through cell data blocks instead. Note: the validator currently runs only on rjui; iOS and Android accept malformed bindings quietly and fail at runtime.",
+      "ja": "`@{…}` 内の文法は意図的に小さく保たれています: 単純なプロパティ (`@{displayName}`)・ドットパス (`@{user.profile.handle}`)・配列インデックス (`@{items[0]}`)・アクションバインディング (`@{onSubmit}`)・cell スコープの `@{data.prop}`（`cells/*.json` 用）。この 5 種類だけ。三項演算子・比較 (`===` / `<` / `>`)・算術 (`+` / `*` / `%`)・論理演算子 (`&&` / `||`)・関数/メソッド呼び出しは全て拒否 — rjui の `binding_validator.rb` が実行可能な警告付きで検出します。派生値が必要なら ViewModel の getter として計算し、そのバインディングを介して使うのが正解: `get countLabel(): string { return this.count > 0 ? this.s('some') : this.s('none'); }` → `{ \"text\": \"@{countLabel}\" }`。`@{^parentProp}` の親参照・`@{../sibling}` の相対ナビゲーションも文法にない — cell の data ブロック経由で明示的に値を降ろすのが正解。注: validator は現状 **rjui のみ** が走る、iOS と Android は malformed binding を静かに受け入れてランタイムで失敗する。"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -1553,20 +1553,20 @@
       "ja": "このページ"
     },
     "toc_row_syntax": {
-      "en": "The syntax",
-      "ja": "シンタックス"
+      "en": "Where bindings live",
+      "ja": "置ける場所"
     },
     "toc_row_typed": {
-      "en": "It is typed",
-      "ja": "型付き"
+      "en": "Typing per platform",
+      "ja": "プラットフォーム別の型付け"
     },
     "toc_row_oneway": {
-      "en": "One-way only",
-      "ja": "一方向のみ"
+      "en": "Read-only vs two-way",
+      "ja": "read-only と双方向"
     },
     "toc_row_no_logic": {
-      "en": "No logic in layout",
-      "ja": "レイアウトにロジックを持たせない"
+      "en": "No expressions",
+      "ja": "式は書けない"
     }
   },
   "concepts_one_layout_json": {
@@ -4277,8 +4277,7 @@
       "ja": "layout を書くとき、関係する場所は 4 つです。編集対象の layout 本体 JSON、Collection が参照する再利用可能な行 layout が並ぶ cells/ ディレクトリ、共有する属性束を置く styles/ ディレクトリ、layout が key 参照する翻訳を持つ strings.json。4 つ全て docs/screens/ 配下にあり、プロジェクトルートが jui build の読み取り元、各プラットフォームには build 時に distribute されます。"
     },
     "section_style_heading": {
-      "en": "2. Style definitions"
-,
+      "en": "2. Style definitions",
       "ja": "2. Style 定義"
     },
     "section_style_body": {
@@ -4294,8 +4293,7 @@
       "ja": "• style ファイルが 'type' を宣言していても、component 側の 'type' が勝ちます。これにより、style が自分を Button と名乗っていても View が同じ style を参照できます（type はヒント扱いで強制されない）。"
     },
     "section_include_heading": {
-      "en": "3. Include (sub-layout reuse)"
-,
+      "en": "3. Include (sub-layout reuse)",
       "ja": "3. include — sub-layout の再利用"
     },
     "section_include_body": {
@@ -4481,8 +4479,7 @@
       "ja": "プロジェクトルートの tests/ 配下、種別ごとに分けます。Screen test は tests/screens/ (layout 1 枚につき 1 ファイル、layout のパス構造をミラー)。Flow test は tests/flows/ (ユーザジャーニー 1 つにつき 1 ファイル)。説明を厚めに書きたい場合は tests/descriptions/ を作り、test ファイルの descriptionFile フィールドからリンクします。"
     },
     "section_screen_heading": {
-      "en": "2. Screen test anatomy"
-,
+      "en": "2. Screen test anatomy",
       "ja": "2. Screen test の構造"
     },
     "section_screen_body": {
@@ -4490,8 +4487,7 @@
       "ja": "screen test は `source.layout` ポインタが 1 つ、`metadata` (name + tags)、任意の `initialState.viewModel`、`cases[]` 配列で構成されます。各 case は `name` と `steps[]`。steps は action (tap / input / scroll …) と assert (visible / text / count / state …) が交互に並びます。case は小さく保ち、「何を証明しているか」が名前から分かる粒度で。"
     },
     "section_flow_heading": {
-      "en": "3. Flow test anatomy"
-,
+      "en": "3. Flow test anatomy",
       "ja": "3. Flow test の構造"
     },
     "section_flow_body": {
@@ -4499,8 +4495,7 @@
       "ja": "flow test は複数画面にまたがります。`sources[]` で各 layout を alias 付きで登録し、`initialState.screen` で開始画面を指定、各 step には `screen` 判別子を載せて runner にどの画面での操作か伝えます。`checkpoints[]` で遷移の節目を名付け (`screenshot: true` 併用可)、レビュワーがフローの転換点を目で追えるようにします。"
     },
     "section_dsl_heading": {
-      "en": "4. The action and assert DSL"
-,
+      "en": "4. The action and assert DSL",
       "ja": "4. action と assert の DSL"
     },
     "section_dsl_body": {
@@ -4516,8 +4511,7 @@
       "ja": "• Asserts: visible / notVisible (id)、enabled / disabled (id)、text (id + equals または contains)、count (id + equals)、state (dot-notation パス + equals — VM の observable を読む)。"
     },
     "section_drivers_heading": {
-      "en": "5. The drivers"
-,
+      "en": "5. The drivers",
       "ja": "5. ドライバ"
     },
     "section_drivers_body": {
@@ -4537,8 +4531,7 @@
       "ja": "• Web — Playwright。id → DOM データ属性にマップ。`npx playwright test` で実行 (web プロジェクトに Playwright をインストール済みの状態)。"
     },
     "section_cli_heading": {
-      "en": "6. The jsonui-test CLI"
-,
+      "en": "6. The jsonui-test CLI",
       "ja": "6. jsonui-test CLI"
     },
     "section_cli_body": {
@@ -4558,8 +4551,7 @@
       "ja": "• skeleton 生成: `jsonui-test generate test screen --layout …` / `generate test flow --name …`。doc 生成: `generate doc <file> --format html|md` / `generate html tests/` (ディレクトリ → HTML index)。"
     },
     "section_ci_heading": {
-      "en": "7. In CI"
-,
+      "en": "7. In CI",
       "ja": "7. CI での運用"
     },
     "section_ci_body": {
@@ -4665,8 +4657,7 @@
       "ja": "namespace 名は layout ファイルパスから自動派生: スラッシュとハイフンはアンダースコアに変換されます。`home.json` → `home`、`learn/hello-world.json` → `learn_hello_world`、`cells/agent_row.json` → `cells_agent_row`。各 namespace 内の key は snake_case。`jui build` は layout の text / hint / placeholder / label / prompt 属性から文字列 literal を自動抽出して投入します。手動追加も可能です。"
     },
     "section_platforms_heading": {
-      "en": "3. What each platform emits"
-,
+      "en": "3. What each platform emits",
       "ja": "3. 各プラットフォームの出力"
     },
     "section_platforms_body": {
@@ -4686,8 +4677,7 @@
       "ja": "• Web: src/generated/StringManager.ts (language テーブル上の camelCase proxy を持つ singleton)。アクセス: StringManager.currentLanguage.homeHeroTitle。"
     },
     "section_runtime_heading": {
-      "en": "4. Runtime language switching"
-,
+      "en": "4. Runtime language switching",
       "ja": "4. ランタイムの言語切替"
     },
     "section_runtime_body": {
@@ -4723,8 +4713,7 @@
       "ja": "⑤ Web のみ: StringManager.setLanguage('ko') を呼ぶ言語切替 UI を追加。iOS/Android は OS レベルの言語変更で切り替わり、次回起動時に反映されます。"
     },
     "section_limits_heading": {
-      "en": "6. Limits and asymmetries"
-,
+      "en": "6. Limits and asymmetries",
       "ja": "6. 制限と非対称性"
     },
     "section_limits_body": {

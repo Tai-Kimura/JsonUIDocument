@@ -131,10 +131,10 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 16,
-                      "code": "// Binding a label to a ViewModel field\n{ \"type\": \"Label\", \"text\": \"@{userName}\" }\n\n// Binding a visibility state\n{ \"type\": \"View\", \"visibility\": \"@{panelVisibility}\" }\n\n// Binding an event handler\n{ \"type\": \"Button\", \"onClick\": \"@{onSubmit}\" }",
+                      "code": "// 1. TEXT — Label text, TextField hint, CodeBlock filename, etc.\n{ \"type\": \"Label\",     \"text\": \"@{greeting}\" }\n{ \"type\": \"TextField\", \"hint\": \"@{placeholder}\" }\n\n// 2. STYLE — colors, opacity, fontWeight, borders\n{ \"type\": \"View\",  \"background\": \"@{cardBg}\", \"opacity\":     \"@{fadeAlpha}\" }\n{ \"type\": \"Label\", \"fontColor\":  \"@{status}\", \"fontWeight\":  \"@{emphasis}\"  }\n\n// 3. LAYOUT — sizes, visibility (String enum, NOT Bool)\n{ \"type\": \"View\", \"width\":      \"@{panelWidth}\" }\n{ \"type\": \"View\", \"visibility\": \"@{panelVisibility}\" }   // \"visible\" | \"invisible\" | \"gone\"\n\n// 4. EVENT handlers — onClick, onTextChange, onValueChanged, onPageChanged, ...\n{ \"type\": \"Button\",    \"onClick\":       \"@{onSubmit}\" }\n{ \"type\": \"TextField\", \"onTextChange\":  \"@{onEmailChange}\" }\n\n// 5. COLLECTION / RESOURCE — items, src, currentPage, ...\n{ \"type\": \"Collection\",   \"items\":       \"@{bars}\" }\n{ \"type\": \"NetworkImage\", \"src\":         \"@{coverUrl}\" }\n{ \"type\": \"TabView\",      \"currentPage\": \"@{activeTab}\" }",
                       "language": "json",
-                      "filename": "layout.json",
-                      "showLineNumbers": true,
+                      "filename": "five families of bindings",
+                      "showLineNumbers": false,
                       "copyable": true
                     }
                   ]
@@ -176,11 +176,11 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 16,
-                      "code": "// spec declares the contract\n{\n  \"uiVariables\": [\n    { \"name\": \"count\",       \"type\": \"Int\",    \"initial\": \"0\" },\n    { \"name\": \"username\",    \"type\": \"String\", \"initial\": \"''\" },\n    { \"name\": \"isSubmitting\",\"type\": \"Bool\",   \"initial\": \"false\" }\n  ]\n}\n\n// ✓ Types match — build passes.\n{ \"type\": \"Label\",  \"text\":       \"@{count}\" }        // Int   → Label.text (auto-cast)\n{ \"type\": \"Button\", \"enabled\":    \"@{!isSubmitting}\" } // Bool  → Button.enabled\n\n// ✗ Types mismatch — jui build fails.\n{ \"type\": \"Label\",  \"visibility\": \"@{count}\" }        // Int   → visibility expects String\n{ \"type\": \"Button\", \"text\":       \"@{isSubmitting}\" } // Bool  → Button.text expects String",
+                      "code": "// The SAME `@{count}` resolves differently per target.\n\n// ANDROID — compile-time check via DataBinding annotation processor.\n//   Generated XML:   android:text=\"@{data.count}\"\n//   Bool → Label.text fails at `./gradlew assemble`.\n\n// WEB — compile-time check via TypeScript + generated FooData interface.\n//   Generated JSX:   {data.count}\n//   Bool → Label.text fails at `next build` (tsc error).\n\n// iOS — runtime reflection via SwiftJsonUI.\n//   Generated SwiftUI: Text(\"\\\\(data.count)\")\n//   Bool → Label.text: blank label + console warning; build still succeeds.\n\n// `jui verify --fail-on-diff` is a STRUCTURAL drift check only\n// (generated Layout tree vs spec). It does NOT type-check bindings.",
                       "language": "text",
-                      "filename": "typed binding check",
+                      "filename": "per-platform typing",
                       "showLineNumbers": false,
-                      "copyable": false
+                      "copyable": true
                     }
                   ]
                 },
@@ -221,11 +221,11 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 16,
-                      "code": "// User types into a TextField — data flows UP through an event handler,\n// NOT through a two-way binding.\n//\n// Layout — no bidirectional magic:\n{\n  \"type\": \"TextField\",\n  \"text\": \"@{username}\",                 // VM → Layout (display)\n  \"onChange\": \"@{onUsernameChanged}\"      // Layout → VM (via method call)\n}\n\n// ViewModel — explicit setter:\nonUsernameChanged = (next: string) => {\n  this.updateData({ username: next });     // setState; no cycles, no loops.\n};",
+                      "code": "// NON-INPUT attributes are read-only. The view has no write-back path.\n{ \"type\": \"Label\", \"text\": \"@{greeting}\" }               // VM pushes; view displays.\n\n// FORM INPUTS emit platform-native TWO-WAY machinery automatically.\n// The author still writes the familiar pair — it LOOKS one-way:\n{\n  \"type\": \"TextField\",\n  \"text\":         \"@{email}\",\n  \"onTextChange\": \"@{onEmailChange}\"     // optional — fires AFTER the field updated\n}\n\n// Under the hood the generator emits:\n//   iOS:     TextField(..., text: $data.email)                 // SwiftUI $binding\n//   Android: LaunchedEffect { viewModel.updateData(email=new) } // Compose LaunchedEffect\n//   Web:     <input value={data.email}\n//                   onChange={(e) => data.onEmailChange?.(e.target.value)} />\n\n// The VM field updates on every keystroke — BEFORE the handler runs.\n// To reject / trim / transform, do NOT treat the callback as a gate —\n// let the field update, then snap it back to the corrected value:\nonEmailChange = (next: string) => {\n  const cleaned = next.trim().slice(0, 128);\n  this.updateData({ email: cleaned });   // same binding re-renders the input\n};\n\n// Cross-platform callback signatures:\n//   iOS:     (oldValue: String, newValue: String) -> Void\n//   Android: (newValue: String) -> Unit\n//   Web:     (newValue: string) => void",
                       "language": "text",
-                      "filename": "one-way with callback",
+                      "filename": "form inputs are two-way under the hood",
                       "showLineNumbers": false,
-                      "copyable": false
+                      "copyable": true
                     }
                   ]
                 },
@@ -266,9 +266,9 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 16,
-                      "code": "// ✗ Not allowed\n{ \"text\": \"@{count > 0 ? 'some' : 'none'}\" }\n{ \"text\": \"@{formatName(user)}\" }\n{ \"text\": \"@{user.name.toUpperCase()}\" }\n\n// ✓ Instead, derive in ViewModel\n// ViewModel:\n//   get displayCount() -> String { count > 0 ? s('some') : s('none') }\n// Layout:\n//   { \"text\": \"@{displayCount}\" }",
+                      "code": "// ALLOWED grammar — exactly five forms:\n{ \"text\":    \"@{displayName}\" }          // simple property\n{ \"text\":    \"@{user.profile.handle}\" }  // dot-path\n{ \"text\":    \"@{items[0]}\" }             // array index\n{ \"onClick\": \"@{onSubmit}\" }             // action binding\n{ \"text\":    \"@{data.title}\" }           // cell-scoped (inside cells/*.json)\n\n// REJECTED — rjui's binding_validator.rb catches these with actionable warnings.\n{ \"text\": \"@{count > 0 ? 'some' : 'none'}\" }   // ternary\n{ \"text\": \"@{formatName(user)}\" }               // function call\n{ \"text\": \"@{user.name.toUpperCase()}\" }        // method call\n{ \"text\": \"@{a + b}\" }                          // arithmetic\n{ \"text\": \"@{isReady && isValid}\" }             // logical\n\n// Also not in the grammar:\n{ \"text\": \"@{^parentProp}\" }   // no path-ascent\n{ \"text\": \"@{../sibling}\" }    // no relative navigation\n\n// For derived values, compute in the ViewModel and bind the getter:\n//   get countLabel(): string { return this.count > 0 ? this.s('some') : this.s('none'); }\n//   { \"text\": \"@{countLabel}\" }\n\n// Note: validator runs on rjui only.\n// iOS and Android currently accept malformed bindings and fail at runtime.",
                       "language": "text",
-                      "filename": "invalid vs valid",
+                      "filename": "allowed grammar + rejected expressions",
                       "showLineNumbers": false,
                       "copyable": true
                     }
