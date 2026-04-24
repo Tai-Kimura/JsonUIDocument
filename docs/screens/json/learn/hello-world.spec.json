@@ -34,10 +34,16 @@
         "description": "Three required-tool rows (Node, macOS or JDK, a browser) rendered above the platform tabs. Seeded by onAppear."
       },
       {
+        "name": "commonSteps",
+        "type": "[QuickstartStep]",
+        "initial": "[]",
+        "description": "Steps that are identical across Swift / Kotlin / React: install the CLI, create a platform project (prose-only pointer), run `jui init` with the right flag, author the layout, `jui build` + `jui verify --fail-on-diff`. Rendered above the platform tabs so readers only see platform-specific commands once they pick their stack."
+      },
+      {
         "name": "platformTabs",
         "type": "[PlatformTab]",
         "initial": "[]",
-        "description": "Tab-header data for the inline platform switcher. Exactly three entries: Swift / Kotlin / React. Each entry carries its own ordered [QuickstartStep] list, keeping the Layout JSON free of platform-conditional branching except at the activeTab level."
+        "description": "Tab-header data for the inline platform switcher. Exactly three entries: Swift / Kotlin / React. Each entry carries its own ordered [QuickstartStep] list of *platform-specific* steps only (ViewModel wiring + running the app + live-reload via `jui hotload listen` for mobile); the common install / init / author / build steps live in `commonSteps`."
       },
       {
         "name": "activeTab",
@@ -55,7 +61,7 @@
     "eventHandlers": [
       {
         "name": "onAppear",
-        "description": "Populate breadcrumbItems, prerequisites, platformTabs (with their QuickstartStep lists), and nextSteps with the static v1 catalog. All user-visible strings inside those catalogs are @string/... keys so localization flows through StringManager."
+        "description": "Populate breadcrumbItems, prerequisites, commonSteps (5 cross-platform steps: install / create-platform / jui init / author / build+verify), platformTabs (each with a short platform-specific [QuickstartStep] list covering VM + run + live-reload), and nextSteps with the static v1 catalog. All user-visible strings inside those catalogs are @string/... keys so localization flows through StringManager."
       },
       {
         "name": "onSelectTab",
@@ -120,7 +126,7 @@
       "methods": [
         {
           "name": "onAppear",
-          "description": "Seed breadcrumbItems (2 rows: Learn › Hello World), prerequisites (3 required tools), platformTabs (Swift / Kotlin / React — each with its own ordered [QuickstartStep] list), and nextSteps (2–3 follow-up cards) from module-scope static catalogs. Every string is resolved through StringManager with the learn_hello_world_ prefix. activeTab is left at its initial 'react' value."
+          "description": "Seed breadcrumbItems (2 rows: Learn › Hello World), prerequisites (3 required tools), commonSteps (5 cross-platform steps rendered above the tab switcher), platformTabs (Swift / Kotlin / React — each with a short platform-specific [QuickstartStep] list for VM + run + live-reload), and nextSteps (2–3 follow-up cards) from module-scope static catalogs. Every string is resolved through StringManager with the learn_hello_world_ prefix. activeTab is left at its initial 'react' value."
         },
         {
           "name": "onSelectTab",
@@ -136,7 +142,8 @@
       "vars": [
         { "name": "breadcrumbItems",         "type": "Array(BreadcrumbItem)", "observable": true, "description": "2-row breadcrumb." },
         { "name": "prerequisites",           "type": "Array(Prerequisite)",   "observable": true, "description": "3 required-tool rows rendered above the tabs." },
-        { "name": "platformTabs",            "type": "Array(PlatformTab)",    "observable": true, "description": "3 tab-header rows; each owns its own steps list." },
+        { "name": "commonSteps",             "type": "Array(QuickstartStep)", "observable": true, "description": "5 cross-platform steps rendered above the platform tabs." },
+        { "name": "platformTabs",            "type": "Array(PlatformTab)",    "observable": true, "description": "3 tab-header rows; each owns its own *platform-specific* steps list (ViewModel + run + live-reload)." },
         { "name": "activeTab",               "type": "String",                "observable": true, "description": "Currently visible tab id. Defaults to 'react' (the web-shipping platform)." },
         { "name": "nextSteps",               "type": "Array(NextStepLink)",   "observable": true, "description": "2–3 follow-up tutorial cards below the platform panels." },
         { "name": "swiftPanelVisibility",    "type": "String",                "observable": true, "description": "Derived visibility from displayLogic; set by the layout's binding, not the VM." },

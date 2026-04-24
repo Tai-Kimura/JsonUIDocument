@@ -343,7 +343,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 16,
-                      "code": "# Generate Layout + ViewModel base from the spec.\njui generate project --file recent-activity.spec.json\n\n# Keep rebuilding while you fill in the details.\njui build --watch\n\n# Before you commit, prove the layout has not drifted.\njui verify --fail-on-diff\n\n# Ship it.\ngit add docs/screens/ jsonui-doc-web/src/\ngit commit -m 'feat(activity): recent activity screen'",
+                      "code": "# Generate Layout + ViewModel base from the spec.\njui generate project --file recent-activity.spec.json\n\n# Build the platforms after each hand-edit iteration.\njui build\n\n# Live-reload while you iterate on the layout (iOS + Android only).\n# Web reloads automatically via npm run dev / Next.js HMR.\njui hotload listen\n\n# Before you commit, prove spec ↔ generated has not drifted.\njui verify --fail-on-diff\n\n# Ship it.\ngit add docs/screens/ jsonui-doc-web/src/\ngit commit -m 'feat(activity): recent activity screen'",
                       "language": "bash",
                       "filename": "shell",
                       "showLineNumbers": false,

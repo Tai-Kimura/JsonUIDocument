@@ -17,6 +17,10 @@
           "class": "CollectionDataSource"
         },
         {
+          "name": "commonSteps",
+          "class": "CollectionDataSource"
+        },
+        {
           "name": "platformTabs",
           "class": "CollectionDataSource"
         },
@@ -172,11 +176,50 @@
               "width": "matchParent"
             },
             {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "fontSize": 14,
+              "fontWeight": "semibold",
+              "fontColor": "#475467",
+              "text": "common_steps_eyebrow"
+            },
+            {
+              "type": "Collection",
+              "id": "learn_hello_world_common_steps",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "columnCount": 1,
+              "lineSpacing": 20,
+              "itemSpacing": 20,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{commonSteps}",
+              "cellIdProperty": "id",
+              "sections": [
+                {
+                  "cell": "cells/quickstart_step"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 32,
+              "fontSize": 14,
+              "fontWeight": "semibold",
+              "fontColor": "#475467",
+              "text": "platform_steps_eyebrow"
+            },
+            {
               "type": "Collection",
               "id": "learn_hello_world_tab_collection",
               "width": "matchParent",
               "height": "wrapContent",
-              "topMargin": 24,
+              "topMargin": 12,
               "columnCount": 3,
               "lineSpacing": 12,
               "itemSpacing": 12,

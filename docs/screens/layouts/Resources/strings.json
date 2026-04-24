@@ -194,14 +194,6 @@
     }
   },
   "learn_hello_world": {
-    "meta_title": {
-      "en": "Hello, JsonUI — Learn",
-      "ja": "Hello, JsonUI — ラーン"
-    },
-    "breadcrumb_separator": {
-      "en": "/",
-      "ja": "/"
-    },
     "bc_learn": {
       "en": "Learn",
       "ja": "ラーン"
@@ -215,24 +207,24 @@
       "ja": "Hello, JsonUI — 5分で最初の画面を動かす"
     },
     "lead": {
-      "en": "Install the CLI, scaffold a project, author one JSON, wire a ViewModel, and run. The same six steps work for Swift, Kotlin, and React — pick your stack and go.",
-      "ja": "CLI をインストールし、プロジェクトを作り、JSON を 1 枚書き、ViewModel を繋いで実行する。Swift・Kotlin・React のいずれも同じ 6 ステップで動きます。"
+      "en": "Install the CLI, scaffold a project, `jui init`, author one JSON, `jui build` + `jui verify`, then wire a platform-specific ViewModel and run. Five cross-platform steps + three per-platform — Swift, Kotlin, and React share the same foundation.",
+      "ja": "CLI をインストールし、プロジェクトを作り、`jui init`、JSON を 1 枚書き、`jui build` + `jui verify`、そしてプラットフォームごとの ViewModel を繋いで実行する。共通 5 ステップ + プラットフォーム別 3 ステップで、Swift・Kotlin・React は同じ土台を共有します。"
     },
     "prereq_heading": {
       "en": "Before you start",
       "ja": "はじめる前に"
     },
     "prereq_subheading": {
-      "en": "Three small requirements. The installer handles Claude Code, MCP server, agents, and the three platform CLIs (sjui / kjui / rjui).",
-      "ja": "これだけあれば OK。インストーラが Claude Code、MCP サーバー、エージェント、3 つのプラットフォーム CLI（sjui / kjui / rjui）をまとめて入れます。"
+      "en": "Three small requirements. The installer handles the `jui` CLI, MCP server, agents, and the per-platform CLIs (sjui / kjui / rjui) that `jui` delegates to internally.",
+      "ja": "これだけあれば OK。インストーラが `jui` CLI、MCP サーバー、エージェント、そして `jui` が内部で委譲する各プラットフォーム CLI（sjui / kjui / rjui）をまとめて入れます。"
     },
     "prereq_node_title": {
       "en": "Node.js 20 or newer",
       "ja": "Node.js 20 以降"
     },
     "prereq_node_description": {
-      "en": "Node 20+ (LTS) drives the MCP server and every rjui build. Older versions are untested. `nvm install 20` is the fastest path.",
-      "ja": "MCP サーバーと rjui ビルドが動作する最小バージョン。Node 20 未満は未検証です。`nvm install 20` が最速。"
+      "en": "Node 20+ (LTS) drives the MCP server and the web-platform build that `jui build` delegates to. Older versions are untested. `nvm install 20` is the fastest path.",
+      "ja": "MCP サーバーと、`jui build` が委譲する web プラットフォームビルドが動作する最小バージョン。Node 20 未満は未検証です。`nvm install 20` が最速。"
     },
     "prereq_git_title": {
       "en": "git and curl",
@@ -255,8 +247,16 @@
       "ja": "最初の画面"
     },
     "quickstart_subheading": {
-      "en": "Pick a platform. Each tab walks the same six steps with platform-specific commands and code. Switch tabs anytime — the tabs stay in sync.",
-      "ja": "プラットフォームを選ぶと、同じ 6 ステップがそのプラットフォーム固有のコマンドとコードで展開されます。途中でタブを切り替えても進捗は共通です。"
+      "en": "Five cross-platform steps run the same regardless of stack; the last three (wire the ViewModel, run the app, live-reload) pick up once you choose Swift, Kotlin, or React. Switch tabs anytime — your progress stays in sync.",
+      "ja": "最初の 5 ステップは Swift / Kotlin / React 共通。最後の 3 ステップ（ViewModel 実装、起動、ライブリロード）でプラットフォームを選んで分岐します。途中でタブを切り替えても進捗は共通です。"
+    },
+    "common_steps_eyebrow": {
+      "en": "COMMON — works for any platform",
+      "ja": "共通ステップ — どのプラットフォームでも同じ"
+    },
+    "platform_steps_eyebrow": {
+      "en": "PLATFORM-SPECIFIC — pick your stack",
+      "ja": "プラットフォーム固有 — 使う技術を選ぶ"
     },
     "tab_swift": {
       "en": "Swift / SwiftUI",
@@ -275,32 +275,56 @@
       "ja": "JsonUI をインストール"
     },
     "step_install_instruction": {
-      "en": "Run the one-liner below. It installs jsonui-cli, the MCP server, and the Claude Code agent bundle into your home directory, adds three binaries to PATH, and registers the MCP with Claude Code. When it finishes, restart your shell so the new PATH entries take effect.",
-      "ja": "下のワンライナーを実行。jsonui-cli、MCP サーバー、Claude Code エージェント一式をホームディレクトリに入れ、3 つの CLI バイナリを PATH に追加し、MCP を Claude Code に登録します。完了後はシェルを再起動して PATH を反映させてください。"
+      "en": "Run the one-liner below. It installs jsonui-cli, the MCP server, and the Claude Code agent bundle into your home directory, prints six PATH lines to add (jui / docs / tests + sjui / kjui / rjui), and registers the MCP with Claude Code. Paste the PATH block into your shell rc file and reload so the new entries take effect.",
+      "ja": "下のワンライナーを実行。jsonui-cli、MCP サーバー、Claude Code エージェント一式をホームディレクトリに入れ、6 行の PATH 追加スニペット（jui / docs / tests + sjui / kjui / rjui）を表示し、MCP を Claude Code に登録します。PATH ブロックをシェル rc に貼り付けて再読み込みしてください。"
     },
-    "step_init_swift_title": {
-      "en": "Create an Xcode project",
-      "ja": "Xcode プロジェクトを作成"
+    "step_create_platform_title": {
+      "en": "Create your platform project(s)",
+      "ja": "プラットフォームプロジェクトを作成"
     },
-    "step_init_swift_instruction": {
-      "en": "Xcode doesn't ship a CLI for creating iOS app projects, so this step is a one-time GUI action. Open Xcode → File > New > Project > iOS > App. Set Product Name to `my-app`, Interface to `SwiftUI`, Language to `Swift`. Save it somewhere your terminal can `cd` into. Then run `sjui init --mode swiftui` inside the project to write `sjui.config.json`.",
-      "ja": "Xcode は iOS アプリプロジェクトを作る公式 CLI を提供していないので、この step だけは GUI 操作です。Xcode で File > New > Project > iOS > App を選択。Product Name: `my-app`、Interface: `SwiftUI`、Language: `Swift`。ターミナルから `cd` できる場所に保存し、プロジェクト内で `sjui init --mode swiftui` を実行して `sjui.config.json` を書き込みます。"
+    "step_create_platform_instruction": {
+      "en": "Make a workspace directory, then scaffold one or more platform projects inside it: `./ios/` via Xcode (File > New > Project > iOS > App, SwiftUI + Swift, Product Name `MyApp`), `./android/` via Android Studio (New Project > Empty Activity, Kotlin + Compose, package `com.example.myapp`), or `./web/` via `npx create-next-app@latest web --ts --tailwind --app --eslint --src-dir`. Pick whichever platforms you'll be targeting — you can add more later by re-running `jui init`.",
+      "ja": "ワークスペースディレクトリを作り、その中にプラットフォームプロジェクトを配置: `./ios/` は Xcode (File > New > Project > iOS > App、SwiftUI + Swift、Product Name `MyApp`)、`./android/` は Android Studio (New Project > Empty Activity、Kotlin + Compose、package `com.example.myapp`)、`./web/` は `npx create-next-app@latest web --ts --tailwind --app --eslint --src-dir` で作成します。必要なプラットフォームだけ選んでください。後から `jui init` を再実行すれば追加できます。"
     },
-    "step_init_kotlin_title": {
-      "en": "Create an Android Studio project",
-      "ja": "Android Studio プロジェクトを作成"
+    "step_jui_init_title": {
+      "en": "Run `jui init`",
+      "ja": "`jui init` を実行"
     },
-    "step_init_kotlin_instruction": {
-      "en": "Open Android Studio → New Project > Empty Activity (Phone and Tablet). Set Name to `my-app`, Language to `Kotlin`, Build configuration language to `Kotlin DSL`. Then `cd` into the project and run `kjui init --mode compose` to write `kjui.config.json`.",
-      "ja": "Android Studio で New Project > Empty Activity (Phone and Tablet) を選択。Name: `my-app`、Language: `Kotlin`、Build configuration language: `Kotlin DSL`。ターミナルでプロジェクトに `cd` し、`kjui init --mode compose` を実行して `kjui.config.json` を書き込みます。"
+    "step_jui_init_instruction": {
+      "en": "From the workspace root, run `jui init` with the flag(s) for the platform(s) you created. This writes `jui.config.json`, seeds `docs/screens/{json,layouts,styles}/` and `docs/screens/layouts/Resources/`, and delegates per-platform init to `sjui init` / `kjui init` / `rjui init` under the hood. You never call those tools directly — `jui` is the only CLI you need to remember.",
+      "ja": "ワークスペース root で `jui init` を実行します。作成したプラットフォームのフラグだけ渡してください。`jui.config.json` と `docs/screens/{json,layouts,styles}/` / `docs/screens/layouts/Resources/` が作成され、プラットフォーム固有の init (`sjui init` / `kjui init` / `rjui init`) は内部で委譲されます。ユーザーが直接それらを叩く必要はなく、覚えるのは `jui` だけで OK。"
     },
-    "step_init_react_title": {
-      "en": "Create a Next.js project",
-      "ja": "Next.js プロジェクトを作成"
+    "step_build_verify_title": {
+      "en": "Build and verify",
+      "ja": "ビルドと検証"
     },
-    "step_init_react_instruction": {
-      "en": "Scaffold a Next.js App Router project with `create-next-app`, then run `rjui init` inside it to create the Layouts / Styles / Generated directories, register the StringManager, and install built-in components.",
-      "ja": "`create-next-app` で Next.js App Router プロジェクトを作成し、その中で `rjui init` を実行。Layouts / Styles / Generated ディレクトリの作成、StringManager 登録、built-in コンポーネントの設置まで自動で行います。"
+    "step_build_verify_instruction": {
+      "en": "`jui build` distributes `docs/screens/layouts/` to every configured platform and regenerates the platform-specific sources (Swift Data structs + ViewModel protocols, Kotlin Data classes + ViewModel protocols, TypeScript Data interfaces + generated views / hooks). `jui verify --fail-on-diff` then confirms the generated output matches the spec with no drift — a green verify means your Layout JSON and spec agree on every field, type, and binding.",
+      "ja": "`jui build` は `docs/screens/layouts/` を設定済みの全プラットフォームに配布し、各プラットフォーム固有のソース（Swift: Data 構造体 + ViewModel protocol、Kotlin: Data クラス + ViewModel protocol、TypeScript: Data インターフェイス + 生成ビュー / hook）を再生成します。続く `jui verify --fail-on-diff` は生成物と spec が drift していないかを検証します — verify が緑なら Layout JSON と spec が全フィールド / 型 / binding で整合していることが保証されます。"
+    },
+    "step_run_swift_title": {
+      "en": "Run the iOS app",
+      "ja": "iOS アプリを実行"
+    },
+    "step_run_swift_instruction": {
+      "en": "Open `ios/MyApp.xcodeproj` in Xcode and press ⌘R to launch the simulator — Xcode compiles the Swift that `jui build` produced. For layout live-reload, run `jui hotload listen` in a separate terminal: it watches `docs/screens/layouts/` and pushes the merged, iOS-filtered JSON over WebSocket to the running app. No rebuild needed for layout-only changes.",
+      "ja": "`ios/MyApp.xcodeproj` を Xcode で開き、⌘R でシミュレータを起動すると、Xcode が `jui build` で生成された Swift をコンパイルします。レイアウトのライブリロードには別ターミナルで `jui hotload listen` を実行してください — `docs/screens/layouts/` を watch し、style マージ + iOS 向けフィルタ済みの JSON を WebSocket で実機 / シミュレータに push します。レイアウトだけの変更なら再ビルド不要。"
+    },
+    "step_run_kotlin_title": {
+      "en": "Run the Android app",
+      "ja": "Android アプリを実行"
+    },
+    "step_run_kotlin_instruction": {
+      "en": "Run `cd android && ./gradlew installDebug` to install the APK on the attached device or emulator, or press Run in Android Studio. For layout live-reload, run `jui hotload listen` in a separate terminal — the same server that serves the iOS app also serves Android, so you can run both platforms side-by-side without a second listener. No rebuild needed for layout-only changes.",
+      "ja": "`cd android && ./gradlew installDebug` で APK を接続デバイス / エミュレータにインストール、または Android Studio で Run を押下。レイアウトのライブリロードには別ターミナルで `jui hotload listen` を実行してください — iOS と同じサーバーが Android にも配信するので、1 listener で両プラットフォームを同時に起動できます。レイアウトだけの変更なら再ビルド不要。"
+    },
+    "step_run_react_title": {
+      "en": "Run the web app",
+      "ja": "Web アプリを実行"
+    },
+    "step_run_react_instruction": {
+      "en": "Run `cd web && npm run dev` to start Next.js with Fast Refresh on http://localhost:3000. The web platform is deliberately **not** a `jui hotload` target — Next.js / Vite's built-in HMR already re-runs the build and reloads the browser on layout changes, so a dedicated hotload protocol would be redundant. Just keep `npm run dev` running as you edit `home.json` or the ViewModel.",
+      "ja": "`cd web && npm run dev` で Next.js を Fast Refresh 付きで起動し http://localhost:3000 にアクセス。Web は意図的に `jui hotload` の対象外です — Next.js / Vite の組み込み HMR がレイアウト変更時にビルドを再実行しブラウザを自動リロードするため、専用の hotload protocol は冗長です。`home.json` や ViewModel を編集する間、`npm run dev` を起動したままで OK。"
     },
     "step_author_title": {
       "en": "Author home.json",
@@ -309,30 +333,6 @@
     "step_author_instruction": {
       "en": "This one JSON is the whole UI — it compiles to SwiftUI (or UIKit) on iOS, Compose (or XML) on Android, and React on web. The `data` block at the top declares what the ViewModel must expose: `message` (bound to a Label), `tapCount` (bound inside another Label via string interpolation), and `onTap` (bound to the Button's onClick).",
       "ja": "この JSON が UI の全て — iOS では SwiftUI（または UIKit）、Android では Compose（または XML）、Web では React にコンパイルされます。冒頭の `data` ブロックは ViewModel が公開すべき項目を宣言: `message`（Label にバインド）、`tapCount`（文字列補間で別の Label に）、`onTap`（Button の onClick にバインド）。"
-    },
-    "step_build_swift_title": {
-      "en": "Build and run",
-      "ja": "ビルドして実行"
-    },
-    "step_build_swift_instruction": {
-      "en": "sjui build regenerates Swift code from the layout + VM, then xcodebuild compiles the app. Opening MyApp.xcodeproj lets you press ⌘R to launch the iOS Simulator. The first build takes ~30s; incremental rebuilds run in under 2s via Hot Loader.",
-      "ja": "sjui build がレイアウト + VM から Swift コードを再生成し、xcodebuild がアプリをコンパイル。MyApp.xcodeproj を開き ⌘R で iOS Simulator を起動します。初回ビルドは約 30 秒、Hot Loader 経由の差分ビルドは 2 秒未満。"
-    },
-    "step_build_kotlin_title": {
-      "en": "Build and run",
-      "ja": "ビルドして実行"
-    },
-    "step_build_kotlin_instruction": {
-      "en": "kjui build regenerates Kotlin + Compose code, then Gradle installs the APK onto the attached device or emulator. Open Android Studio and hit Run to deploy. Hot Loader syncs layout changes without a rebuild after the first run.",
-      "ja": "kjui build が Kotlin + Compose コードを再生成し、Gradle が APK をデバイス／エミュレータにインストール。Android Studio を開き Run で起動します。初回以降は Hot Loader がレイアウト変更を再ビルドなしで反映します。"
-    },
-    "step_build_react_title": {
-      "en": "Build and run",
-      "ja": "ビルドして実行"
-    },
-    "step_build_react_instruction": {
-      "en": "rjui build regenerates the TypeScript components from the layout, then `npm run dev` starts Next.js with Fast Refresh. Open http://localhost:3000 and your changes live-reload as you edit home.json or the ViewModel.",
-      "ja": "rjui build がレイアウトから TypeScript コンポーネントを再生成し、`npm run dev` が Next.js を Fast Refresh 付きで起動。http://localhost:3000 にアクセスすれば home.json や ViewModel の編集がライブリロードされます。"
     },
     "step_see_title": {
       "en": "Confirm it works",
@@ -355,8 +355,8 @@
       "ja": "データバインディング入門"
     },
     "next_data_binding_description": {
-      "en": "Go beyond `message` and `tapCount`. Learn the @{} / @string/ / @event() syntaxes, one-way vs two-way binding, computed properties, and conditional visibility — with runnable examples.",
-      "ja": "`message` と `tapCount` の先へ。@{} / @string/ / @event() の構文、one-way と two-way の違い、computed プロパティ、条件付き表示 — すべて動くサンプル付きで解説。"
+      "en": "Go beyond `message` and `tapCount`. Learn how `@{identifier}` works for both value bindings and event bindings, one-way vs two-way binding, computed properties, and conditional visibility — with runnable examples.",
+      "ja": "`message` と `tapCount` の先へ。value binding と event binding を兼ねる `@{identifier}` の仕組み、one-way と two-way の違い、computed プロパティ、条件付き表示 — すべて動くサンプル付きで解説。"
     },
     "next_first_screen_title": {
       "en": "Build your first screen",
@@ -383,24 +383,24 @@
       "ja": "ViewModel を繋ぐ（Swift）"
     },
     "step_viewmodel_swift_instruction": {
-      "en": "Create HomeViewModel.swift as an ObservableObject. Match the `data` block one-to-one: two @Published properties for `message` and `tapCount`, and a method `onTap` that increments the count. SwiftJsonUI subscribes to @Published updates and re-renders the Label automatically.",
-      "ja": "HomeViewModel.swift を ObservableObject として作成。`data` ブロックと 1:1 対応: @Published プロパティを `message` と `tapCount` に、メソッド `onTap` でカウントを増やすだけ。SwiftJsonUI が @Published を購読し Label を自動再描画します。"
+      "en": "Create `HomeViewModel.swift` as an `ObservableObject` that conforms to the generated `HomeViewModelProtocol`. State lives in a single `@Published var data: HomeData` — the generated `HomeData` struct mirrors the layout's `data` block, so `message`, `tapCount`, and `onTap` are already fields on it. Wire `data.onTap` to a closure inside `setupActionHandlers()` (called from `init`) that mutates `data.tapCount`. SwiftJsonUI observes the published `data` struct and re-renders the Label automatically.",
+      "ja": "`HomeViewModel.swift` を `ObservableObject` として作成し、`jui build` が生成する `HomeViewModelProtocol` に準拠させます。状態は単一の `@Published var data: HomeData` に集約 — 生成された `HomeData` 構造体はレイアウトの `data` ブロックを 1:1 で反映しており、`message` / `tapCount` / `onTap` はすでにそのプロパティです。`init` から呼ぶ `setupActionHandlers()` で `data.onTap` に `data.tapCount` を更新するクロージャを配線します。SwiftJsonUI が @Published の変化を購読して Label を自動再描画します。"
     },
     "step_viewmodel_kotlin_title": {
       "en": "Wire the ViewModel (Kotlin)",
       "ja": "ViewModel を繋ぐ（Kotlin）"
     },
     "step_viewmodel_kotlin_instruction": {
-      "en": "Create HomeViewModel.kt extending Android ViewModel. Expose StateFlow<String> for `message` and StateFlow<Int> for `tapCount`. `onTap` updates the flow via `.update { it + 1 }`. Compose collects the flow with collectAsStateWithLifecycle and re-composes on change.",
-      "ja": "HomeViewModel.kt を Android ViewModel を継承して作成。`message` は StateFlow<String>、`tapCount` は StateFlow<Int> で公開。`onTap` は `.update { it + 1 }` で流します。Compose は collectAsStateWithLifecycle で購読し変更時に再コンポーズします。"
+      "en": "Create `HomeViewModel.kt` as a `@HiltViewModel`-annotated `AndroidViewModel` that conforms to the generated `HomeViewModelProtocol`. State lives in a single `MutableStateFlow<HomeData>` (exposed as `StateFlow<HomeData>`) — the generated `HomeData` class mirrors the layout's `data` block, so `message`, `tapCount`, and `onTap` are already fields. Inside `setupActionHandlers()` (called from `init {}`), attach an `onTap` lambda that calls `_data.update { it.copy(tapCount = it.tapCount + 1) }`. Compose collects the flow via `collectAsStateWithLifecycle` and re-composes on change.",
+      "ja": "`HomeViewModel.kt` を `@HiltViewModel` 付きの `AndroidViewModel` として作成し、`jui build` が生成する `HomeViewModelProtocol` に準拠させます。状態は単一の `MutableStateFlow<HomeData>`（公開は `StateFlow<HomeData>`）に集約 — 生成された `HomeData` クラスはレイアウトの `data` ブロックを 1:1 で反映しており、`message` / `tapCount` / `onTap` はすでにそのフィールドです。`init {}` から呼ぶ `setupActionHandlers()` で `onTap` ラムダを `_data.update { it.copy(tapCount = it.tapCount + 1) }` に配線します。Compose は `collectAsStateWithLifecycle` で流れを購読し、変化時に再コンポーズします。"
     },
     "step_viewmodel_react_title": {
       "en": "Wire the ViewModel (TypeScript)",
       "ja": "ViewModel を繋ぐ（TypeScript）"
     },
     "step_viewmodel_react_instruction": {
-      "en": "Create HomeViewModel.ts extending ReactJsonUI's ViewModel base. Public plain fields (`message`, `tapCount`) mirror the `data` block. `onTap` bumps `tapCount` and calls `this.notify()` to trigger the hook to re-render. No hooks-in-class juggling required.",
-      "ja": "HomeViewModel.ts を ReactJsonUI の ViewModel 基底クラスを継承して作成。public フィールド（`message`, `tapCount`）が `data` ブロックに対応。`onTap` は `tapCount` を増やして `this.notify()` を呼び、hook が再レンダーします。class 内での hook 操作は不要。"
+      "en": "Create `HomeViewModel.ts` as a plain class whose constructor takes `(router, getData, setData)` — no base class to extend. State lives in the companion `HomeData` interface generated by `jui build`, read through `this.data` and updated through `this.updateData({...})` or `this._setData((prev) => ...)`. Seed the initial values (including wiring `onTap` to a handler) inside `onAppear()`, called from the constructor. A companion hook in `src/generated/hooks/` wires `(router, getData, setData)` up on the page.",
+      "ja": "`HomeViewModel.ts` はプレーンなクラスとして作成 — 基底クラスを継承する必要はありません。constructor が `(router, getData, setData)` を受け取り、状態は `jui build` が生成する `HomeData` インターフェイスに住みます。`this.data` で読み、`this.updateData({...})` または `this._setData((prev) => ...)` で更新します。初期値の seed（`onTap` をハンドラに配線するなど）は constructor から呼ばれる `onAppear()` で行います。ページ側では `src/generated/hooks/` に生成された hook が `(router, getData, setData)` を配線します。"
     }
   },
   "learn_installation": {
@@ -461,8 +461,8 @@
       "ja": "~/.jsonui-mcp-server/ と ~/.claude.json"
     },
     "card_mcp_body": {
-      "en": "29 MCP tools (Groups A/B/C/D: 7/6/7/9) with runtime-sync so the attribute schema is always current.",
-      "ja": "29 の MCP ツール（Group A 7 / B 6 / C 7 / D 9）。runtime-sync で常に最新の attribute スキーマを参照します。"
+      "en": "30 MCP tools (jui 8 / doc 9 / spec 7 / context 6) with runtime-sync so the attribute schema is always current.",
+      "ja": "30 の MCP ツール（jui 8 / doc 9 / spec 7 / context 6）。runtime-sync で常に最新の attribute スキーマを参照します。"
     },
     "card_agents_title": {
       "en": "Agents + Skills + Rules",
@@ -557,8 +557,8 @@
       "ja": "3 ステップで動く環境に"
     },
     "steps_subheading": {
-      "en": "Run one command, add three PATH lines, restart Claude Code. That is the whole install.",
-      "ja": "ワンライナーを実行し、PATH を 3 行追記し、Claude Code を再起動。これだけです。"
+      "en": "Run one command, add six PATH lines, restart Claude Code. That is the whole install.",
+      "ja": "ワンライナーを実行し、PATH を 6 行追記し、Claude Code を再起動。これだけです。"
     },
     "step1_number": {
       "en": "1",
@@ -593,8 +593,8 @@
       "ja": "Claude Code を再起動して合言葉を伝える"
     },
     "step3_body": {
-      "en": "Completely restart Claude Code, open your project, and tell it to read CLAUDE.md. The conductor agent will come up with the New work / Modify / Investigate / Backend menu.",
-      "ja": "Claude Code を完全に再起動し、プロジェクトを開いて CLAUDE.md を読ませてください。conductor エージェントが New work / Modify / Investigate / Backend のメニューで応答します。"
+      "en": "Completely restart Claude Code and open your project. The SessionStart hook fires the conductor automatically — or invoke /jsonui at any time. The conductor greets you with the New work / Modify / Investigate / Backend menu.",
+      "ja": "Claude Code を完全に再起動してプロジェクトを開きます。SessionStart フックが conductor を自動で起動します（任意のタイミングで /jsonui を呼び出すのも OK）。conductor が New work / Modify / Investigate / Backend のメニューで応答します。"
     },
     "verify_heading": {
       "en": "Verify it works",
@@ -617,8 +617,8 @@
       "ja": "Claude Code で"
     },
     "verify_mcp_expect": {
-      "en": "→ expect search_components to fire and return 28 components.",
-      "ja": "→ search_components が呼ばれ、28 コンポーネントが返れば OK です。"
+      "en": "→ expect search_components to fire and return 27 components.",
+      "ja": "→ search_components が呼ばれ、27 コンポーネントが返れば OK です。"
     },
     "verify_conductor_command_caption": {
       "en": "In Claude Code",
@@ -1857,36 +1857,44 @@
       "ja": "spec を書く"
     },
     "lead": {
-      "en": "A hands-on walk-through of a complete screen_spec.json. We will author a Counter screen from scratch — five steps, one file, one command per step. By the end you will have a spec the generator can turn into Layout JSON, a ViewModelBase, and a navigation stub.",
-      "ja": "screen_spec.json を一通り書くハンズオン。Counter 画面を spec からゼロで作っていきます。5 ステップ、1 ファイル、各ステップにつき 1 コマンド。最後にはジェネレータが Layout JSON / ViewModelBase / ナビゲーション stub を出せる状態になります。"
+      "en": "A hands-on walk-through of a complete screen_spec.json. We will author a Counter screen from scratch — check your setup, declare state and handlers, then run the validate / generate / build / verify loop that keeps spec and layout in sync. By the end you will have a spec the generator can turn into Layout JSON and a ViewModelBase — plus a clear sense of which files are yours and which are @generated.",
+      "ja": "screen_spec.json を一通り書くハンズオン。Counter 画面を spec からゼロで作っていきます — セットアップ確認から始め、state と handler を宣言し、spec と layout を同期させる validate / generate / build / verify ループを回します。最後にはジェネレータが Layout JSON と ViewModelBase を出せる状態になり、かつ「どのファイルが自分のもので、どのファイルが @generated か」の感覚も身に付きます。"
     },
     "read_time": {
-      "en": "~12 min read",
-      "ja": "約 12 分"
+      "en": "~15 min read",
+      "ja": "約 15 分"
+    },
+    "step0_heading": {
+      "en": "0. Before you start",
+      "ja": "0. はじめる前に"
+    },
+    "step0_body": {
+      "en": "This guide assumes you are inside an existing JsonUI project — one where jui init has already run and docs/screens/json/ exists. Before writing a new spec, it is worth reading one or two of the specs already in the tree. That is how every real spec in this repo got written: copy a neighbour, then change what needs changing.",
+      "ja": "このガイドは既存の JsonUI プロジェクトの中にいる前提です — jui init が既に走っていて docs/screens/json/ が存在する状態。新しい spec を書く前に、ツリー内の既存 spec を 1〜2 個眺めておく価値があります。このリポジトリの実 spec は全部そうやって書かれました: 隣のファイルをコピーして、違う部分だけ直す。"
     },
     "step1_heading": {
       "en": "1. Name and platform",
       "ja": "1. 名前とプラットフォーム"
     },
     "step1_body": {
-      "en": "Create an empty spec at docs/screens/json/counter.spec.json. metadata.name is the PascalCase component name the generator will produce. metadata.platforms declares which platforms this screen targets — a single-platform doc site is ['web'] here, but the spec is platform-agnostic by design. metadata.layoutFile is the layout filename (without .json) relative to the layouts root.",
-      "ja": "docs/screens/json/counter.spec.json を新規作成。metadata.name はジェネレータが出力する PascalCase のコンポーネント名。metadata.platforms はこの画面のターゲットプラットフォーム — 単一 Web のドキュメントサイトなら ['web'] ですが、spec 自体はプラットフォーム非依存です。metadata.layoutFile は layouts root 相対の layout ファイル名（.json なし）。"
+      "en": "Create an empty spec at docs/screens/json/counter.spec.json. metadata.name is the PascalCase component name the generator will produce — the validator rejects anything else (counter or counter_screen both fail fast). metadata.platforms declares which platforms this screen targets — a single-platform doc site is ['web'] here, but the spec is platform-agnostic by design. metadata.layoutFile is the layout filename (without .json) relative to the layouts root.",
+      "ja": "docs/screens/json/counter.spec.json を新規作成。metadata.name はジェネレータが出力する PascalCase のコンポーネント名 — validator は PascalCase 以外を弾きます (counter や counter_screen は即エラー)。metadata.platforms はこの画面のターゲットプラットフォーム — 単一 Web のドキュメントサイトなら ['web'] ですが、spec 自体はプラットフォーム非依存です。metadata.layoutFile は layouts root 相対の layout ファイル名（.json なし）。"
     },
     "step2_heading": {
       "en": "2. Declare uiVariables",
       "ja": "2. uiVariables を宣言する"
     },
     "step2_body": {
-      "en": "uiVariables are the ViewModel fields the Layout can bind to via @{name}. Each entry gets a name, a type, and an initial value. Types can be any built-in (Int / String / Bool / Date / etc.) or any customType declared in dataFlow (Step 4). Initial values are written as source code for the target platform; for strings, escape the quotes (\\\"neutral\\\").",
-      "ja": "uiVariables は Layout が @{name} で bind できる ViewModel フィールド。各エントリは name / type / initial。type は組み込み型 (Int / String / Bool / Date など) か dataFlow で宣言した customType (Step 4)。initial はターゲットプラットフォーム用のソースコード形式で書く — 文字列はクォートをエスケープ (\\\"neutral\\\")。"
+      "en": "uiVariables are the ViewModel fields the Layout can bind to via @{name}. Each entry gets a name, a type, and an initial value. Types can be any built-in (Int / String / Bool / Date / etc.) or any customType declared in dataFlow (Step 4). Initial values are written as source code for the target platform; for strings, escape the quotes (\\\"neutral\\\"). Note: initial is a free-form string — the validator does not type-check it, the generator pastes it verbatim into the target language.",
+      "ja": "uiVariables は Layout が @{name} で bind できる ViewModel フィールド。各エントリは name / type / initial。type は組み込み型 (Int / String / Bool / Date など) か dataFlow で宣言した customType (Step 4)。initial はターゲットプラットフォーム用のソースコード形式で書く — 文字列はクォートをエスケープ (\\\"neutral\\\")。注意: initial は自由記述文字列で、validator は型チェックしません。ジェネレータはそのままソースコードにペーストします。"
     },
     "step3_heading": {
       "en": "3. Declare eventHandlers",
       "ja": "3. eventHandlers を宣言する"
     },
     "step3_body": {
-      "en": "eventHandlers are the methods the Layout can invoke via onClick / onChange / onAppear / etc. A handler entry is a name + optional params + a one-line description. The description is the contract between you and the implementer — it tells whoever writes the ViewModel body what each method is supposed to do, in prose the generator will not parse but that reviewers will read.",
-      "ja": "eventHandlers は Layout が onClick / onChange / onAppear などで呼び出すメソッド。エントリは name + オプションの params + 1 行の description。description はあなたと実装者との契約 — ViewModel body を書く人にメソッドが何をすべきかを散文で伝えます。ジェネレータは parse しませんが、レビュワーが読みます。"
+      "en": "eventHandlers are the methods the Layout can invoke via onClick / onChange / onAppear / etc. A handler entry is a name + optional params + a one-line description. The description is the contract between you and the implementer — it tells whoever writes the ViewModel body what each method is supposed to do, in prose the generator will not parse but that reviewers will read. Handler names must match the onX… pattern (onAppear, onSubmit, onCountDidChange) — the validator rejects anything else, making this the most common first-time mistake.",
+      "ja": "eventHandlers は Layout が onClick / onChange / onAppear などで呼び出すメソッド。エントリは name + オプションの params + 1 行の description。description はあなたと実装者との契約 — ViewModel body を書く人にメソッドが何をすべきかを散文で伝えます。ジェネレータは parse しませんが、レビュワーが読みます。ハンドラー名は onX… パターン (onAppear, onSubmit, onCountDidChange) にマッチする必要があり、validator が弾きます — 初心者がよくハマるポイントです。"
     },
     "step4_heading": {
       "en": "4. Declare customTypes",
@@ -1903,6 +1911,50 @@
     "step5_body": {
       "en": "Validate the spec shape, generate the project artifacts, keep rebuilding while you iterate, and finally verify that the hand-edited Layout has not drifted away from the spec. This is the loop you will run dozens of times a day — the four commands below are the whole cycle.",
       "ja": "spec の shape を検証し、プロジェクト成果物を生成し、反復中は常に再ビルドし、最後に手書きの Layout が spec からドリフトしていないことを確認する。これを 1 日に何十回も回します — 以下の 4 コマンドがそのサイクル全体です。"
+    },
+    "step5a_heading": {
+      "en": "5a. Validate",
+      "ja": "5a. 検証"
+    },
+    "step5a_body": {
+      "en": "Before spending time on generation, run the schema validator. jui doc validate has two sub-commands: spec (for screen_spec.json files) and component (for component_spec.json files under docs/components/). Exit code 0 means the spec's shape is good enough to hand to the generator; exit 1 lists every violation.",
+      "ja": "生成に時間を割く前に、まず schema validator を走らせます。jui doc validate には spec (screen_spec.json 用) と component (docs/components/ 配下の component_spec.json 用) の 2 つのサブコマンドがあります。exit 0 なら shape はジェネレータに渡せる状態、exit 1 なら違反を列挙します。"
+    },
+    "step5b_heading": {
+      "en": "5b. Generate",
+      "ja": "5b. 生成"
+    },
+    "step5b_body": {
+      "en": "Once validate passes, scaffold the per-platform artifacts. The generator writes four kinds of files and is careful about which ones it will overwrite: Layout JSON and *Base stubs get replaced every run, but the hand-authored implementation files (ViewModel, Repository, UseCase) are created only once and then protected. Use --dry-run the first time to see what it would touch without writing anything.",
+      "ja": "validate が通ったら、各プラットフォーム用の成果物を scaffold します。ジェネレータは 4 系統のファイルを書き出し、どれを上書きするかを使い分けます: Layout JSON と *Base stub は毎回上書き、手書き実装ファイル (ViewModel / Repository / UseCase) は初回のみ作成され、以後は保護されます。初回は --dry-run で「何が書かれるか」だけ確認するのが安全です。"
+    },
+    "step5c_heading": {
+      "en": "5c. Build + verify",
+      "ja": "5c. Build + verify"
+    },
+    "step5c_body": {
+      "en": "Rebuild after every spec edit; verify before every commit. jui build regenerates Layouts / Styles / Resources and syncs the per-platform ViewModelBase files. jui verify --fail-on-diff compares the spec with what is actually on disk and refuses to let hidden drift escape into a PR. Verify looks at three independent kinds of drift:",
+      "ja": "spec を編集したら毎回 build、commit 前に毎回 verify。jui build は Layouts / Styles / Resources を再生成し、各プラットフォームの ViewModelBase ファイルを同期します。jui verify --fail-on-diff は spec とディスク上の実ファイルを比較し、隠れたドリフトが PR に紛れ込むのを防ぎます。verify は 3 系統の独立したドリフトを見ます:"
+    },
+    "step5c_bullet_structural": {
+      "en": "• Structural — the components / layout tree in the spec no longer matches the Layout JSON.",
+      "ja": "• Structural — spec の components / layout ツリーが Layout JSON と一致しない。"
+    },
+    "step5c_bullet_orphan": {
+      "en": "• Orphan data — Layout JSON has data fields with no matching uiVariables / eventHandlers declaration in the spec.",
+      "ja": "• Orphan data — Layout JSON の data フィールドに対応する uiVariables / eventHandlers 宣言が spec に無い。"
+    },
+    "step5c_bullet_unregistered": {
+      "en": "• Unregistered custom types — a type referenced in the spec is not registered in .jsonui-type-map.json.",
+      "ja": "• Unregistered custom types — spec が参照している型が .jsonui-type-map.json に登録されていない。"
+    },
+    "step6_heading": {
+      "en": "6. Know which files are yours",
+      "ja": "6. どのファイルが自分のものか把握する"
+    },
+    "step6_body": {
+      "en": "The generator and hand-written code live in the same tree but follow opposite rules. The short version: anything under /generated/ is @generated and will be overwritten on the next build — edit the spec or the Layout JSON instead. Everything under src/viewmodels/ and src/app/ is yours. Anything with the @generated banner at the top of the file is off-limits.",
+      "ja": "ジェネレータ生成物と手書きコードは同じツリーに同居しますが、ルールは正反対です。要するに: /generated/ 配下は全て @generated で次回 build で上書きされる — spec か Layout JSON を編集してください。src/viewmodels/ と src/app/ 配下は自分のもの。ファイル先頭に @generated バナーがあるものは触らない、が原則です。"
     },
     "trouble_heading": {
       "en": "Troubleshooting",
@@ -1931,6 +1983,30 @@
     "trouble_3_fix": {
       "en": "Check the diff report: it lists the field that drifted. Two cases: (a) you edited a generated field by hand — either revert the edit or update the spec to describe the new reality; (b) the spec gained a field the generator does not yet implement — file an issue and, if urgent, pin the spec to what the generator supports today. Verify is an integrity check, not an obstacle to work around.",
       "ja": "diff レポートを見る: ドリフトしたフィールドが列挙されます。ケースは 2 つ: (a) 生成フィールドを手で編集した — 編集を戻すか、spec を新しい実態に合わせて更新する。(b) spec にジェネレータ未対応のフィールドを追加した — issue を立て、急ぎなら spec をジェネレータが今サポートする範囲に留める。verify は整合性チェックであって、回避すべき障害物ではありません。"
+    },
+    "trouble_4_symptom": {
+      "en": "jui generate project says 'Invalid component type: Card'.",
+      "ja": "jui generate project が 'Invalid component type: Card' を返す。"
+    },
+    "trouble_4_fix": {
+      "en": "The built-in type list is fixed (View / Label / Button / Collection / TabView / …). If 'Card' is a custom component, author it first at docs/components/json/card.component.json and add 'Card' to .jsonui-doc-rules.json → rules.componentTypes.screen. Custom components are spec-first in JsonUI — no spec means no type.",
+      "ja": "組み込み型リストは固定 (View / Label / Button / Collection / TabView / …)。'Card' が custom component なら先に docs/components/json/card.component.json で spec を書き、.jsonui-doc-rules.json の rules.componentTypes.screen に 'Card' を追加します。JsonUI の custom component は spec-first — spec が無ければ type として使えません。"
+    },
+    "trouble_5_symptom": {
+      "en": "jui verify reports 'Orphan data: onSubmit not declared in uiVariables'.",
+      "ja": "jui verify が 'Orphan data: onSubmit not declared in uiVariables' を報告する。"
+    },
+    "trouble_5_fix": {
+      "en": "Layout JSON has a data entry the spec does not know about. Pick one: add the field to stateManagement.uiVariables (or eventHandlers, if it is a handler) in the spec, or delete the hand-edited data entry from the Layout JSON and let jui build regenerate it. Do not ignore the warning — verify is the only thing that catches generated/hand-written divergence.",
+      "ja": "Layout JSON に、spec が把握していない data エントリがあります。どちらか選ぶ: spec 側の stateManagement.uiVariables (handler なら eventHandlers) にフィールドを追加するか、Layout JSON の手編集 data エントリを削除して jui build に再生成させる。警告は無視しないこと — verify は生成物と手書きの乖離を検知できる唯一の仕組みです。"
+    },
+    "trouble_6_symptom": {
+      "en": "Metadata fails validate with 'Name must be PascalCase' or 'ID must be snake_case'.",
+      "ja": "validate が 'Name must be PascalCase' や 'ID must be snake_case' で失敗する。"
+    },
+    "trouble_6_fix": {
+      "en": "metadata.name is PascalCase (Counter, LoginForm). Component id fields are snake_case (login_submit_btn, counter_value). uiVariables.name is camelCase (isLoading, currentUser). The validator enforces all three — the fix is mechanical, but it catches typos early.",
+      "ja": "metadata.name は PascalCase (Counter, LoginForm)。コンポーネントの id は snake_case (login_submit_btn, counter_value)。uiVariables.name は camelCase (isLoading, currentUser)。validator は 3 つとも強制します — 機械的な修正で済みますが、typo を早めに潰せます。"
     },
     "next_heading": {
       "en": "Keep going",
@@ -1979,6 +2055,26 @@
     "toc_row_step5": {
       "en": "5. Validate + generate",
       "ja": "5. 検証と生成"
+    },
+    "toc_row_step0": {
+      "en": "0. Before you start",
+      "ja": "0. はじめる前に"
+    },
+    "toc_row_step5a": {
+      "en": "5a. Validate",
+      "ja": "5a. 検証"
+    },
+    "toc_row_step5b": {
+      "en": "5b. Generate",
+      "ja": "5b. 生成"
+    },
+    "toc_row_step5c": {
+      "en": "5c. Build + verify",
+      "ja": "5c. Build + verify"
+    },
+    "toc_row_step6": {
+      "en": "6. Know which files are yours",
+      "ja": "6. 自分のファイルを把握"
     },
     "toc_row_trouble": {
       "en": "Troubleshooting",
@@ -2449,8 +2545,8 @@
       "ja": "C"
     },
     "tool_doc_generate_spec_role": {
-      "en": "Emit an HTML doc page for a screen spec.",
-      "ja": "Emit an HTML doc page for a screen spec."
+      "en": "Emit an HTML doc page for a screen spec. (wraps jsonui-doc CLI — see /tools/doc)",
+      "ja": "Emit an HTML doc page for a screen spec.（jsonui-doc CLI のラッパー — /tools/doc を参照）"
     },
     "tool_doc_generate_component_name": {
       "en": "doc_generate_component",
@@ -2461,8 +2557,8 @@
       "ja": "C"
     },
     "tool_doc_generate_component_role": {
-      "en": "Emit an HTML doc page for a component spec.",
-      "ja": "Emit an HTML doc page for a component spec."
+      "en": "Emit an HTML doc page for a component spec. (wraps jsonui-doc CLI — see /tools/doc)",
+      "ja": "Emit an HTML doc page for a component spec.（jsonui-doc CLI のラッパー — /tools/doc を参照）"
     },
     "tool_doc_generate_html_name": {
       "en": "doc_generate_html",
@@ -2473,8 +2569,8 @@
       "ja": "C"
     },
     "tool_doc_generate_html_role": {
-      "en": "Bulk-generate HTML docs across specs.",
-      "ja": "Bulk-generate HTML docs across specs."
+      "en": "Bulk-generate HTML docs across specs. (wraps jsonui-doc CLI — see /tools/doc)",
+      "ja": "Bulk-generate HTML docs across specs.（jsonui-doc CLI のラッパー — /tools/doc を参照）"
     },
     "tool_jui_generate_project_name": {
       "en": "jui_generate_project",
@@ -2747,8 +2843,8 @@
       "ja": "DOC GEN"
     },
     "cli_jsonui_doc_body": {
-      "en": "Generates HTML documentation from screen / component specs. Used by /reference pages and anywhere a spec needs a human-readable companion view. Also powers doc_generate_* MCP tools.",
-      "ja": "screen / component spec から HTML ドキュメントを生成。/reference ページや、spec に人間向けコンパニオンビューが欲しい場所で使用。doc_generate_* MCP ツール群の裏側もこれ。"
+      "en": "Generates HTML documentation from screen / component specs. Used by /reference pages and anywhere a spec needs a human-readable companion view. Also powers doc_generate_* MCP tools. See /tools/doc for full reference.",
+      "ja": "screen / component spec から HTML ドキュメントを生成。/reference ページや、spec に人間向けコンパニオンビューが欲しい場所で使用。doc_generate_* MCP ツール群の裏側もこれ。詳細は /tools/doc を参照してください。"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -2793,6 +2889,356 @@
     "toc_row_exit": {
       "en": "Exit codes + CI",
       "ja": "Exit code と CI"
+    }
+  },
+  "tools_doc": {
+    "breadcrumb": {
+      "en": "← Tools",
+      "ja": "← Tools"
+    },
+    "title": {
+      "en": "jsonui-doc",
+      "ja": "jsonui-doc"
+    },
+    "lead": {
+      "en": "The DOC GEN sub-CLI. Python tool that generates HTML, Markdown, Mermaid diagrams, per-platform test adapters, and Figma-as-HTML from JsonUI screen specs, component specs, test JSON files, and Figma API responses. 13 subcommands across four groups: init / validate / generate / figma. The doc_generate_* MCP tools and the /reference HTML pages on this very site are produced by this binary.",
+      "ja": "DOC GEN サブ CLI。JsonUI の screen spec / component spec / test JSON / Figma API レスポンスから、HTML・Markdown・Mermaid・プラットフォーム別テストアダプタ・Figma-as-HTML を生成する Python ツール。13 サブコマンドを 4 グループ(init / validate / generate / figma)に分類。doc_generate_* MCP ツールも、このサイトの /reference HTML ページも、すべてこのバイナリが生成しています。"
+    },
+    "read_time": {
+      "en": "~10 min read",
+      "ja": "約 10 分"
+    },
+    "section_overview_heading": {
+      "en": "What jsonui-doc is",
+      "ja": "jsonui-doc とは"
+    },
+    "section_overview_body": {
+      "en": "The fifth of the six sub-CLIs under a single jsonui-cli install. Unlike the platform builders (sjui / kjui / rjui) that turn Layout JSON into native code, jsonui-doc turns specs, test files, and Figma exports into human-readable HTML and Markdown. It is the CLI behind every /reference page, every stakeholder preview link, and every doc_generate_* MCP tool call.",
+      "ja": "jsonui-cli ワンインストールに同梱される 6 サブ CLI のうちの 5 番目。プラットフォーム builder(sjui / kjui / rjui)が Layout JSON をネイティブコードに変換するのに対し、jsonui-doc は spec / test / Figma エクスポートを人間が読める HTML・Markdown に変換します。/reference ページ、ステークホルダー向けプレビューリンク、doc_generate_* MCP ツールの裏側はすべてこの CLI です。"
+    },
+    "section_when_heading": {
+      "en": "When to reach for it",
+      "ja": "使いどころ"
+    },
+    "section_when_body": {
+      "en": "Four recurring scenarios. (1) Publish human-readable mirrors of screen and component specs for stakeholders who do not read JSON. (2) Produce end-to-end test documentation and platform-specific adapter code from a single tests/ tree. (3) Mirror a Figma file as HTML with a sidebar navigation for asynchronous design review. (4) As the backend for MCP doc_generate_* calls — agents delegate here rather than regenerating HTML themselves.",
+      "ja": "典型的な 4 シナリオ。(1) JSON を読まないステークホルダー向けに、screen / component spec の人間向けミラーを公開する。(2) tests/ 配下の JSON から E2E テストドキュメントとプラットフォーム別アダプタコードを同時に生成する。(3) Figma ファイルをサイドバーナビゲーション付き HTML にミラーしてデザインレビューを非同期で回す。(4) MCP doc_generate_* ツールのバックエンドとして — エージェントは HTML を自前で再生成せず、このバイナリに委譲する。"
+    },
+    "section_commands_heading": {
+      "en": "Commands by category",
+      "ja": "カテゴリ別コマンド"
+    },
+    "section_commands_body": {
+      "en": "Four groups totaling 13 subcommands. init and validate lift the spec lifecycle; generate is the largest group and the one day-to-day work lands in; figma covers the two-step 'fetch then images' flow with plan-aware throttling to avoid 429s.",
+      "ja": "4 グループ・計 13 サブコマンド。init / validate が spec ライフサイクルの入り口。generate は最大グループで日常作業のほぼ全てがここ。figma は『fetch して images』の 2 ステップフローを、プラン別スロットリングで HTTP 429 を避けつつ実行します。"
+    },
+    "section_init_heading": {
+      "en": "init",
+      "ja": "init"
+    },
+    "section_validate_heading": {
+      "en": "validate",
+      "ja": "validate"
+    },
+    "section_generate_heading": {
+      "en": "generate",
+      "ja": "generate"
+    },
+    "section_figma_heading": {
+      "en": "figma",
+      "ja": "figma"
+    },
+    "cmd_init_spec_name": {
+      "en": "init spec",
+      "ja": "init spec"
+    },
+    "cmd_init_spec_description": {
+      "en": "Create a new screen spec template under specs/ (or a custom directory).",
+      "ja": "新しい screen spec テンプレートを specs/ 配下(または任意ディレクトリ)に作成。"
+    },
+    "cmd_init_spec_flags": {
+      "en": "-d <display name>   -o <output dir>",
+      "ja": "-d <表示名>   -o <出力ディレクトリ>"
+    },
+    "cmd_init_component_name": {
+      "en": "init component",
+      "ja": "init component"
+    },
+    "cmd_init_component_description": {
+      "en": "Create a new component spec template under components/ (or a custom directory).",
+      "ja": "新しい component spec テンプレートを components/ 配下(または任意ディレクトリ)に作成。"
+    },
+    "cmd_init_component_flags": {
+      "en": "-c <category>   -d <display name>   -o <output dir>",
+      "ja": "-c <カテゴリ>   -d <表示名>   -o <出力ディレクトリ>"
+    },
+    "cmd_validate_spec_name": {
+      "en": "validate spec",
+      "ja": "validate spec"
+    },
+    "cmd_validate_spec_description": {
+      "en": "Validate a screen spec JSON file against the screen_spec schema and the project's custom rules.",
+      "ja": "screen spec JSON を screen_spec スキーマとプロジェクト固有のカスタムルールで検証。"
+    },
+    "cmd_validate_spec_flags": {
+      "en": "(positional: path to .spec.json)",
+      "ja": "(位置引数: .spec.json へのパス)"
+    },
+    "cmd_validate_component_name": {
+      "en": "validate component",
+      "ja": "validate component"
+    },
+    "cmd_validate_component_description": {
+      "en": "Validate a component spec JSON file against the component_spec schema.",
+      "ja": "component spec JSON を component_spec スキーマで検証。"
+    },
+    "cmd_validate_component_flags": {
+      "en": "(positional: path to .component.json)",
+      "ja": "(位置引数: .component.json へのパス)"
+    },
+    "cmd_generate_html_name": {
+      "en": "generate html",
+      "ja": "generate html"
+    },
+    "cmd_generate_html_description": {
+      "en": "Generate an HTML directory with index from a tests/ tree, auto-discovering specs/, components/, figma/, and -d docs directories.",
+      "ja": "tests/ ツリーから index 付きの HTML ディレクトリを生成。specs/ / components/ / figma/ / -d 指定した docs ディレクトリを自動検出。"
+    },
+    "cmd_generate_html_flags": {
+      "en": "-o <out dir>   -d <extra docs dir>   -fig <figma dir>",
+      "ja": "-o <出力ディレクトリ>   -d <追加 docs ディレクトリ>   -fig <figma ディレクトリ>"
+    },
+    "cmd_generate_mermaid_name": {
+      "en": "generate mermaid",
+      "ja": "generate mermaid"
+    },
+    "cmd_generate_mermaid_description": {
+      "en": "Emit a Mermaid flow diagram from a tests/ tree. Prints to stdout, or writes HTML when -o is set.",
+      "ja": "tests/ ツリーから Mermaid フロー図を生成。stdout 出力、または -o 指定で HTML として書き出し。"
+    },
+    "cmd_generate_mermaid_flags": {
+      "en": "-o <out html>",
+      "ja": "-o <出力 html>"
+    },
+    "cmd_generate_adapter_name": {
+      "en": "generate adapter",
+      "ja": "generate adapter"
+    },
+    "cmd_generate_adapter_description": {
+      "en": "Generate a platform-specific test adapter (ios / android / web) targeting the project test tree.",
+      "ja": "プラットフォーム別(ios / android / web)のテストアダプタを生成。"
+    },
+    "cmd_generate_adapter_flags": {
+      "en": "<platform>   -o <out dir>   -n <project name>",
+      "ja": "<プラットフォーム>   -o <出力ディレクトリ>   -n <プロジェクト名>"
+    },
+    "cmd_generate_doc_name": {
+      "en": "generate doc",
+      "ja": "generate doc"
+    },
+    "cmd_generate_doc_description": {
+      "en": "Generate markdown (default) or HTML from a single .test.json file.",
+      "ja": "単一の .test.json ファイルから Markdown(既定)または HTML を生成。"
+    },
+    "cmd_generate_doc_flags": {
+      "en": "-f <file>   -o <out>   --format html|markdown",
+      "ja": "-f <ファイル>   -o <出力>   --format html|markdown"
+    },
+    "cmd_generate_spec_name": {
+      "en": "generate spec",
+      "ja": "generate spec"
+    },
+    "cmd_generate_spec_description": {
+      "en": "Generate HTML or Markdown from a screen spec file, or in batch mode from a directory of .spec.json files.",
+      "ja": "screen spec ファイル 1 つ、または .spec.json を含むディレクトリ一括から HTML / Markdown を生成。"
+    },
+    "cmd_generate_spec_flags": {
+      "en": "<file-or-dir>   -o <out>   --format html|markdown",
+      "ja": "<ファイル or ディレクトリ>   -o <出力>   --format html|markdown"
+    },
+    "cmd_generate_component_name": {
+      "en": "generate component",
+      "ja": "generate component"
+    },
+    "cmd_generate_component_description": {
+      "en": "Generate HTML or Markdown from a component spec file, or in batch mode from a directory of .component.json files.",
+      "ja": "component spec ファイル 1 つ、または .component.json を含むディレクトリ一括から HTML / Markdown を生成。"
+    },
+    "cmd_generate_component_flags": {
+      "en": "<file-or-dir>   -o <out>   --format html|markdown",
+      "ja": "<ファイル or ディレクトリ>   -o <出力>   --format html|markdown"
+    },
+    "cmd_figma_fetch_name": {
+      "en": "figma fetch",
+      "ja": "figma fetch"
+    },
+    "cmd_figma_fetch_description": {
+      "en": "Fetch a Figma file's JSON via the REST API, optionally downloading fills and vector renders. Supports URL parsing, interactive page selection, and node-id targeting.",
+      "ja": "Figma ファイルの JSON を REST API で取得。オプションで fill 画像・ベクターレンダリングもダウンロード。URL パース・インタラクティブなページ選択・node-id 指定にも対応。"
+    },
+    "cmd_figma_fetch_flags": {
+      "en": "--url <figma url>   --node-ids <id…>   --images   --plan starter|pro|org|enterprise   --depth <n>   -o <out>   -t <token>",
+      "ja": "--url <figma url>   --node-ids <id…>   --images   --plan starter|pro|org|enterprise   --depth <n>   -o <出力>   -t <トークン>"
+    },
+    "cmd_figma_images_name": {
+      "en": "figma images",
+      "ja": "figma images"
+    },
+    "cmd_figma_images_description": {
+      "en": "Download images for a previously-fetched Figma JSON file, reusing the plan-aware throttle logic.",
+      "ja": "取得済みの Figma JSON に対して画像だけを追加ダウンロード。プラン別スロットリングを再利用。"
+    },
+    "cmd_figma_images_flags": {
+      "en": "-k <file key>   --plan starter|pro|org|enterprise   -t <token>",
+      "ja": "-k <ファイルキー>   --plan starter|pro|org|enterprise   -t <トークン>"
+    },
+    "section_throttle_heading": {
+      "en": "Figma API throttle (Tier 1)",
+      "ja": "Figma API スロットリング(Tier 1)"
+    },
+    "section_throttle_body": {
+      "en": "Image downloads use 50 % of each plan's rate limit to leave headroom. On HTTP 429 the CLI honours Retry-After and retries automatically. Enterprise bypasses throttling entirely.",
+      "ja": "画像ダウンロードは各プランのレート制限の 50% を消費し、余裕を残します。HTTP 429 時は Retry-After を尊重して自動再試行。enterprise はスロットリング無し。"
+    },
+    "throttle_starter_plan": {
+      "en": "starter (default)",
+      "ja": "starter(既定)"
+    },
+    "throttle_starter_limit": {
+      "en": "10 req/min",
+      "ja": "10 req/min"
+    },
+    "throttle_starter_interval": {
+      "en": "~12 s",
+      "ja": "約 12 秒"
+    },
+    "throttle_pro_plan": {
+      "en": "pro",
+      "ja": "pro"
+    },
+    "throttle_pro_limit": {
+      "en": "15 req/min",
+      "ja": "15 req/min"
+    },
+    "throttle_pro_interval": {
+      "en": "~8 s",
+      "ja": "約 8 秒"
+    },
+    "throttle_org_plan": {
+      "en": "org",
+      "ja": "org"
+    },
+    "throttle_org_limit": {
+      "en": "20 req/min",
+      "ja": "20 req/min"
+    },
+    "throttle_org_interval": {
+      "en": "~6 s",
+      "ja": "約 6 秒"
+    },
+    "throttle_enterprise_plan": {
+      "en": "enterprise",
+      "ja": "enterprise"
+    },
+    "throttle_enterprise_limit": {
+      "en": "Unlimited",
+      "ja": "無制限"
+    },
+    "throttle_enterprise_interval": {
+      "en": "No throttle",
+      "ja": "スロットリング無し"
+    },
+    "section_layout_heading": {
+      "en": "File layout convention",
+      "ja": "ファイルレイアウト規約"
+    },
+    "section_layout_body": {
+      "en": "jsonui-doc auto-discovers specs/, components/, tests/, figma/, and html/. Test files under screens/ and flows/ are picked up for generate html / mermaid, -d directories bring OpenAPI or Markdown in, and images land in figma/images/ with a manifest in figma/images.json. The same tree structure is what the MCP wrappers and test adapters assume.",
+      "ja": "jsonui-doc は specs/ / components/ / tests/ / figma/ / html/ を自動検出。screens/ と flows/ のテストファイルは generate html / mermaid で拾われ、-d ディレクトリからは OpenAPI や Markdown が取り込まれ、画像は figma/images/ 配下に配置されて figma/images.json にマニフェストが書かれます。同じツリー構造を MCP ラッパーとテストアダプタも前提にしています。"
+    },
+    "section_mcp_heading": {
+      "en": "MCP wiring",
+      "ja": "MCP との接続"
+    },
+    "section_mcp_body": {
+      "en": "The doc_generate_spec / doc_generate_component / doc_generate_html MCP tools are thin wrappers that shell out to this CLI. Anything you can do from the command line works identically when called from an agent — same filesystem conventions, same exit codes, same output.",
+      "ja": "MCP の doc_generate_spec / doc_generate_component / doc_generate_html は、この CLI に shell-out する薄いラッパーです。コマンドラインでできることはエージェント経由でも同じ — ファイルシステム規約も exit コードも出力も完全一致。"
+    },
+    "section_sample_heading": {
+      "en": "Live sample",
+      "ja": "動く例"
+    },
+    "section_sample_body": {
+      "en": "Below is the spec we used for the Hello World tutorial, and what `jsonui-doc generate spec` produces from it. Both tabs are static snapshots — the JSON view is the literal file contents, the HTML view is a hand-pasted snapshot of a recent CLI run. Run it yourself locally and you'll get the same bytes.",
+      "ja": "以下は Hello World チュートリアルで使用している spec と、それを `jsonui-doc generate spec` に通した出力。どちらのタブも静的スナップショット — JSON はファイルの生内容、HTML は直近の CLI 実行結果を手貼りしたもの。ローカルで同じコマンドを叩けば同じバイトが得られます。"
+    },
+    "sample_view_live": {
+      "en": "View this page live → /learn/hello-world",
+      "ja": "実際のページを見る → /learn/hello-world"
+    },
+    "sample_tab_json": {
+      "en": "Spec JSON",
+      "ja": "Spec JSON"
+    },
+    "sample_tab_html": {
+      "en": "Generated HTML",
+      "ja": "生成された HTML"
+    },
+    "next_heading": {
+      "en": "Keep reading",
+      "ja": "次に読む"
+    },
+    "next_mcp_title": {
+      "en": "jsonui-mcp-server",
+      "ja": "jsonui-mcp-server"
+    },
+    "next_mcp_description": {
+      "en": "The MCP tools that wrap jsonui-doc — how agents call the DOC GEN path.",
+      "ja": "jsonui-doc をラップする MCP ツール群 — エージェントが DOC GEN 経路を呼ぶ仕組み。"
+    },
+    "next_cli_reference_title": {
+      "en": "CLI commands reference",
+      "ja": "CLI コマンドリファレンス"
+    },
+    "next_cli_reference_description": {
+      "en": "Full reference for every jui / sjui / kjui / rjui / jsonui-test / jsonui-doc subcommand.",
+      "ja": "jui / sjui / kjui / rjui / jsonui-test / jsonui-doc すべてのサブコマンドの完全リファレンス。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページ"
+    },
+    "toc_row_overview": {
+      "en": "What jsonui-doc is",
+      "ja": "jsonui-doc とは"
+    },
+    "toc_row_when": {
+      "en": "When to reach for it",
+      "ja": "使いどころ"
+    },
+    "toc_row_commands": {
+      "en": "Commands by category",
+      "ja": "カテゴリ別コマンド"
+    },
+    "toc_row_throttle": {
+      "en": "Figma API throttle",
+      "ja": "Figma API スロットリング"
+    },
+    "toc_row_layout": {
+      "en": "File layout convention",
+      "ja": "ファイルレイアウト規約"
+    },
+    "toc_row_mcp": {
+      "en": "MCP wiring",
+      "ja": "MCP との接続"
+    },
+    "toc_row_sample": {
+      "en": "Live sample",
+      "ja": "動く例"
     }
   },
   "tools_test_runner": {
@@ -3233,8 +3679,8 @@
       "ja": "spec を書く"
     },
     "section_spec_body": {
-      "en": "Five uiVariables cover everything: two strings for the hero copy, a CollectionDataSource for the rows, a visibility string for the empty state, plus the standard currentLanguage elsewhere. Three event handlers: onAppear to seed, onRefresh to reload, and onSelectActivity(id) to navigate. One customType, ActivityRow, describes what a row carries. Validate with `jui doc validate-spec` before moving on.",
-      "ja": "uiVariables は 5 つで十分: ヒーローテキスト 2 つの String、行を載せる CollectionDataSource、空状態 visibility の String、加えて通常の currentLanguage が別にあるだけ。イベントは 3 つ: onAppear で seed、onRefresh で再読込、onSelectActivity(id) で遷移。customType は ActivityRow 1 つで行の中身を記述。次に進む前に `jui doc validate-spec` で検証してください。"
+      "en": "Five uiVariables cover everything: two strings for the hero copy, a CollectionDataSource for the rows, a visibility string for the empty state, plus the standard currentLanguage elsewhere. Three event handlers: onAppear to seed, onRefresh to reload, and onSelectActivity(id) to navigate. One customType, ActivityRow, describes what a row carries. `jui verify --fail-on-diff` validates the spec and catches spec ↔ generated drift in one pass — run it before moving on.",
+      "ja": "uiVariables は 5 つで十分: ヒーローテキスト 2 つの String、行を載せる CollectionDataSource、空状態 visibility の String、加えて通常の currentLanguage が別にあるだけ。イベントは 3 つ: onAppear で seed、onRefresh で再読込、onSelectActivity(id) で遷移。customType は ActivityRow 1 つで行の中身を記述。`jui verify --fail-on-diff` が spec の検証と spec ↔ 生成物の drift 検出を 1 コマンドで兼ねるので、次に進む前に実行してください。"
     },
     "section_layout_heading": {
       "en": "Compose the layout",
@@ -3265,8 +3711,8 @@
       "ja": "ShipIt"
     },
     "section_ship_body": {
-      "en": "`jui generate project --file recent-activity.spec.json` produces the skeleton Layout + ViewModel base. You fill in the hand-authored halves, run `jui build --watch` while iterating, and close with `jui verify --fail-on-diff` before committing. The commit contains only the spec, the hand-authored layout + cell, the hand-authored ViewModel + page route — everything else is regenerated and gitignored. That's a full screen.",
-      "ja": "`jui generate project --file recent-activity.spec.json` で Layout + ViewModel ベースの雛形が出ます。手書き部分を埋めて、反復中は `jui build --watch`、コミット前に `jui verify --fail-on-diff` で drift を閉じる。コミットに入るのは spec・手書き layout + cell・手書き ViewModel + page route だけ — 残りは再生成 + gitignore 対象。これで画面 1 枚がそろいました。"
+      "en": "`jui generate project --file recent-activity.spec.json` produces the skeleton Layout + ViewModel base. You fill in the hand-authored halves, run `jui build` after each iteration, use `jui hotload listen` to live-reload iOS + Android while you iterate on the layout (web reloads automatically via `npm run dev`), and close with `jui verify --fail-on-diff` before committing. The commit contains only the spec, the hand-authored layout + cell, the hand-authored ViewModel + page route — everything else is regenerated and gitignored. That's a full screen.",
+      "ja": "`jui generate project --file recent-activity.spec.json` で Layout + ViewModel ベースの雛形が出ます。手書き部分を埋めて、反復のたびに `jui build`、レイアウト編集中は `jui hotload listen` で iOS + Android をライブリロード（Web は `npm run dev` が自動でリロード）、コミット前に `jui verify --fail-on-diff` で drift を閉じる。コミットに入るのは spec・手書き layout + cell・手書き ViewModel + page route だけ — 残りは再生成 + gitignore 対象。これで画面 1 枚がそろいました。"
     },
     "next_heading": {
       "en": "Keep going",
@@ -3707,12 +4153,12 @@
       "ja": "画面テストを書く"
     },
     "lead": {
-      "en": "JSON tests drive your real app. Author tests/screens/*.test.json files, run them with the jsonui-test runner, and assert layout + navigation + state on whichever platform you target. This guide walks the v1 authoring loop end-to-end.",
-      "ja": "JSON でテストを書き、実アプリを駆動する。tests/screens/*.test.json を書いて jsonui-test ランナーで実行し、layout / navigation / state をターゲットプラットフォームでアサートする。この記事は v1 authoring ループを端から端まで辿ります。"
+      "en": "JsonUI tests are JSON files — same language as your layouts. One file describes a screen or a flow, and a per-platform driver (XCUITest for iOS, Espresso for Android, Playwright for Web) executes it. The CLI is jsonui-test, shipped by a separate package (jsonui-test-runner) — there is no `jui test` command. This guide covers the real shape of tests, the action/assert DSL, and the invocation flow.",
+      "ja": "JsonUI のテストは JSON ファイルです — layout と同じ言語。1 ファイルが screen または flow を記述し、プラットフォーム別 driver (iOS: XCUITest, Android: Espresso, Web: Playwright) が実行します。CLI は jsonui-test で、別パッケージ (jsonui-test-runner) から提供されます — `jui test` コマンドは存在しません。このガイドでは実際のテスト形式、action/assert DSL、実行フローを扱います。"
     },
     "read_time": {
-      "en": "~8 min read",
-      "ja": "約 8 分"
+      "en": "~14 min read",
+      "ja": "約 14 分"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -3723,36 +4169,102 @@
       "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
     },
     "section_where_heading": {
-      "en": "Where tests live",
-      "ja": "テストの置き場所"
+      "en": "1. Where tests live",
+      "ja": "1. テストの置き場所"
     },
     "section_where_body": {
-      "en": "tests/screens/<screen-path>.test.json. One file per screen. Cases array inside. The runner auto-discovers everything under tests/screens/. Keep the file adjacent to the screen spec (same path minus the extension) so the relationship is obvious to every reviewer.",
-      "ja": "tests/screens/<screen-path>.test.json。画面 1 枚につき 1 ファイル、中身は cases 配列。ランナーは tests/screens/ 配下を自動走査します。spec と同じパス構造で（拡張子を抜いただけで）並べると、レビュワーに関係性が一目で伝わります。"
+      "en": "Under tests/ at the project root, split by type. Screen tests live in tests/screens/ (one file per layout, mirroring the layout path). Flow tests live in tests/flows/ (one file per user journey). Optional richer docs go in tests/descriptions/ and are linked from the test via the descriptionFile field.",
+      "ja": "プロジェクトルートの tests/ 配下、種別ごとに分けます。Screen test は tests/screens/ (layout 1 枚につき 1 ファイル、layout のパス構造をミラー)。Flow test は tests/flows/ (ユーザジャーニー 1 つにつき 1 ファイル)。説明を厚めに書きたい場合は tests/descriptions/ を作り、test ファイルの descriptionFile フィールドからリンクします。"
+    },
+    "section_screen_heading": {
+      "en": "2. Screen test anatomy"
+,
+      "ja": "2. Screen test の構造"
+    },
+    "section_screen_body": {
+      "en": "A screen test has one `source.layout` pointer, `metadata` (name + tags), an optional `initialState.viewModel`, and a `cases[]` array. Each case has a `name` and a `steps[]` array. Steps alternate action steps (tap, input, scroll, ...) and assert steps (visible, text, count, state, ...). Keep cases small and named for what they prove.",
+      "ja": "screen test は `source.layout` ポインタが 1 つ、`metadata` (name + tags)、任意の `initialState.viewModel`、`cases[]` 配列で構成されます。各 case は `name` と `steps[]`。steps は action (tap / input / scroll …) と assert (visible / text / count / state …) が交互に並びます。case は小さく保ち、「何を証明しているか」が名前から分かる粒度で。"
+    },
+    "section_flow_heading": {
+      "en": "3. Flow test anatomy"
+,
+      "ja": "3. Flow test の構造"
+    },
+    "section_flow_body": {
+      "en": "A flow test spans multiple screens. `sources[]` registers each layout with an alias, `initialState.screen` names the starting screen, and steps carry a `screen` discriminator so the runner knows where each interaction happens. `checkpoints[]` names inflection points (optionally with `screenshot: true`) so a reviewer can see where the flow transitioned.",
+      "ja": "flow test は複数画面にまたがります。`sources[]` で各 layout を alias 付きで登録し、`initialState.screen` で開始画面を指定、各 step には `screen` 判別子を載せて runner にどの画面での操作か伝えます。`checkpoints[]` で遷移の節目を名付け (`screenshot: true` 併用可)、レビュワーがフローの転換点を目で追えるようにします。"
     },
     "section_dsl_heading": {
-      "en": "The lookup / interact / assert DSL",
-      "ja": "lookup / interact / assert DSL"
+      "en": "4. The action and assert DSL"
+,
+      "ja": "4. action と assert の DSL"
     },
     "section_dsl_body": {
-      "en": "Three verb shapes. Lookup finds a node (by id, text, role). Interact does something (tap, type, scroll). Assert checks something (visible, notVisible, contains, equals). Each case is a sequence of those. Keep individual cases small and named descriptively — a reader should understand what a case proves from its name alone.",
-      "ja": "動詞は 3 形。Lookup はノード検索 (id / text / role)、Interact は操作 (tap / type / scroll)、Assert は検証 (visible / notVisible / contains / equals)。各ケースはこれらの列。1 ケースを小さく保ち名前を記述的に — 読者はケース名だけで何を証明しているか理解できるべき。"
+      "en": "Two schemas, both defined in jsonui-test-runner/schemas/. Every step is either an action (does something) or an assert (checks something). No 'lookup' verb — identifying the target is part of each step's parameters.",
+      "ja": "2 つの schema、いずれも jsonui-test-runner/schemas/ に定義されています。各 step は action (操作) か assert (検証) のどちらか。'lookup' 動詞はありません — 対象の特定は各 step のパラメータの一部です。"
     },
-    "section_runner_heading": {
-      "en": "Running the tests",
-      "ja": "テストの実行"
+    "section_dsl_bullet_actions": {
+      "en": "• Actions: tap (id or text), doubleTap, longPress (optional duration), input (value required), clear, scroll (direction required), swipe, waitFor / waitForAny, wait (duration), back, screenshot (name), alertTap, selectOption, tapItem (collection cell), selectTab.",
+      "ja": "• Actions: tap (id または text)、doubleTap、longPress (optional duration)、input (value 必須)、clear、scroll (direction 必須)、swipe、waitFor / waitForAny、wait (duration)、back、screenshot (name)、alertTap、selectOption、tapItem (collection cell)、selectTab。"
     },
-    "section_runner_body": {
-      "en": "`jsonui-test run --platform web --base http://localhost:3000` against a live Next.js dev server. For iOS / Android you spawn the simulator / emulator and point the runner at the resulting driver port. Non-zero exit on any failure so CI fails loud; per-platform drivers translate the DSL into their native test-automation idiom.",
-      "ja": "`jsonui-test run --platform web --base http://localhost:3000` を動いている Next.js dev server に向けて実行。iOS / Android はシミュレータ・エミュレータを立ち上げ、ランナーをドライバポートに向ける。失敗時は非 0 exit なので CI が声を上げて落ちる設計。プラットフォーム別ドライバが DSL をネイティブテスト自動化イディオムに翻訳します。"
+    "section_dsl_bullet_asserts": {
+      "en": "• Asserts: visible / notVisible (id), enabled / disabled (id), text (id + equals or contains), count (id + equals), state (path in dot-notation + equals — reads the VM observable).",
+      "ja": "• Asserts: visible / notVisible (id)、enabled / disabled (id)、text (id + equals または contains)、count (id + equals)、state (dot-notation パス + equals — VM の observable を読む)。"
+    },
+    "section_drivers_heading": {
+      "en": "5. The drivers"
+,
+      "ja": "5. ドライバ"
+    },
+    "section_drivers_body": {
+      "en": "The same .test.json runs on three very different runtimes. Each driver maps layout `id` attributes onto the native platform's test-automation identifier, then executes the steps. No shared runner binary — each driver is invoked via its native build system.",
+      "ja": "同じ .test.json が 3 つの異なるランタイムで実行されます。各 driver は layout の `id` 属性をそのプラットフォームのテスト自動化識別子にマップし、steps を実行します。共通ランナーバイナリはありません — 各 driver はそのネイティブビルドシステムから起動します。"
+    },
+    "section_drivers_bullet_ios": {
+      "en": "• iOS — XCUITest. id → accessibilityIdentifier. Run via `xcodebuild test` or Xcode GUI.",
+      "ja": "• iOS — XCUITest。id → accessibilityIdentifier にマップ。`xcodebuild test` または Xcode GUI で実行。"
+    },
+    "section_drivers_bullet_android": {
+      "en": "• Android — Espresso + UI Automator. id → contentDescription. Run via `./gradlew connectedAndroidTest` or Firebase Test Lab.",
+      "ja": "• Android — Espresso + UI Automator。id → contentDescription にマップ。`./gradlew connectedAndroidTest` または Firebase Test Lab で実行。"
+    },
+    "section_drivers_bullet_web": {
+      "en": "• Web — Playwright. id → DOM data attribute. Run via `npx playwright test` (with Playwright installed in the web project).",
+      "ja": "• Web — Playwright。id → DOM データ属性にマップ。`npx playwright test` で実行 (web プロジェクトに Playwright をインストール済みの状態)。"
+    },
+    "section_cli_heading": {
+      "en": "6. The jsonui-test CLI"
+,
+      "ja": "6. jsonui-test CLI"
+    },
+    "section_cli_body": {
+      "en": "jsonui-test is a separate Python package — not part of `jui`. Install it once via the bootstrap script. The CLI handles validation and scaffolding; actually running tests happens via the platform driver above.",
+      "ja": "jsonui-test は独立した Python パッケージで、`jui` の一部ではありません。bootstrap スクリプトで 1 度インストールすればよい。CLI は validation と scaffolding を担当し、実行そのものは上記の platform driver が行います。"
+    },
+    "section_cli_bullet_install": {
+      "en": "• Install: curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-test-runner/main/test_tools/installer/bootstrap.sh | bash (requires Python 3.10+).",
+      "ja": "• インストール: curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-test-runner/main/test_tools/installer/bootstrap.sh | bash (Python 3.10+ 必須)。"
+    },
+    "section_cli_bullet_validate": {
+      "en": "• Validate: `jsonui-test validate tests/screens/counter.test.json` (exit 0 = pass, 1 = schema violation). Also accepts directories: `jsonui-test validate tests/`.",
+      "ja": "• Validate: `jsonui-test validate tests/screens/counter.test.json` (exit 0 = 成功、1 = schema 違反)。ディレクトリも渡せる: `jsonui-test validate tests/`。"
+    },
+    "section_cli_bullet_generate": {
+      "en": "• Generate skeleton: `jsonui-test generate test screen --layout …` / `generate test flow --name …`. Generate docs: `generate doc <file> --format html|md` / `generate html tests/` (directory → HTML index).",
+      "ja": "• skeleton 生成: `jsonui-test generate test screen --layout …` / `generate test flow --name …`。doc 生成: `generate doc <file> --format html|md` / `generate html tests/` (ディレクトリ → HTML index)。"
     },
     "section_ci_heading": {
-      "en": "In CI",
-      "ja": "CI での運用"
+      "en": "7. In CI"
+,
+      "ja": "7. CI での運用"
     },
     "section_ci_body": {
-      "en": "Shard by platform. Web shards run in under a minute on any Linux runner with a headless browser. iOS needs macOS + simulators; Android needs Linux + emulators (or Firebase Test Lab). Keep per-shard wall-clock under 10 minutes — split long flows into multiple cases instead of growing a single case.",
-      "ja": "プラットフォームごとに shard を分ける。Web shard はヘッドレスブラウザ付き Linux ランナーで 1 分以内。iOS は macOS + シミュレータ、Android は Linux + エミュレータ（または Firebase Test Lab）が必要。1 shard の wall-clock を 10 分以内に保つ — 長いフローは 1 ケースを伸ばすのではなく複数ケースに分割します。"
+      "en": "No GitHub Actions harness is shipped — you wire the three platforms yourself. The minimum safety net is `jsonui-test validate tests/` as a schema gate before any driver runs. Sharding by platform keeps wall-clock reasonable: Web shards usually finish in under a minute, iOS and Android shards depend on simulator / emulator boot time.",
+      "ja": "GitHub Actions harness は同梱しません — 3 プラットフォームを自分で配線します。最低限の安全網は driver 実行前の `jsonui-test validate tests/` schema ゲート。プラットフォーム毎に shard 分割すると wall-clock が現実的に: Web shard は通常 1 分以内、iOS と Android はシミュレータ/エミュレータ起動時間次第。"
+    },
+    "section_ci_bullet_example": {
+      "en": "• Example (Web): a GitHub Actions step that runs `jsonui-test validate tests/` first, then `npx playwright install --with-deps` + `npx playwright test` inside jsonui-doc-web.",
+      "ja": "• 例 (Web): GitHub Actions で `jsonui-test validate tests/` を最初に走らせ、その後 jsonui-doc-web 内で `npx playwright install --with-deps` + `npx playwright test` を実行する step を書く。"
     },
     "next_test_runner_title": {
       "en": "jsonui-test-runner",
@@ -3775,20 +4287,36 @@
       "ja": "このページ"
     },
     "toc_row_where": {
-      "en": "Where tests live",
-      "ja": "テストの配置場所"
+      "en": "1. Where tests live",
+      "ja": "1. テストの置き場所"
+    },
+    "toc_row_screen": {
+      "en": "2. Screen test anatomy",
+      "ja": "2. Screen test の構造"
+    },
+    "toc_row_flow": {
+      "en": "3. Flow test anatomy",
+      "ja": "3. Flow test の構造"
     },
     "toc_row_dsl": {
-      "en": "The lookup / interact / assert DSL",
-      "ja": "lookup / interact / assert DSL"
+      "en": "4. Action & assert DSL",
+      "ja": "4. Action と assert の DSL"
+    },
+    "toc_row_drivers": {
+      "en": "5. The drivers",
+      "ja": "5. ドライバ"
+    },
+    "toc_row_cli": {
+      "en": "6. jsonui-test CLI",
+      "ja": "6. jsonui-test CLI"
+    },
+    "toc_row_ci": {
+      "en": "7. In CI",
+      "ja": "7. CI での運用"
     },
     "toc_row_runner": {
       "en": "Running the tests",
       "ja": "テストの実行"
-    },
-    "toc_row_ci": {
-      "en": "In CI",
-      "ja": "CI での実行"
     }
   },
   "guides_localization": {
@@ -3801,12 +4329,12 @@
       "ja": "言語を追加する"
     },
     "lead": {
-      "en": "One strings.json, three platforms, any number of locales. Add en + ja + your new locale side by side; StringManager auto-resolves per-file and the generator propagates to Swift / Kotlin / React string tables on the next build. No per-platform .strings / strings.xml maintenance.",
-      "ja": "1 つの strings.json、3 プラットフォーム、任意の locale 数。en + ja + 追加したい locale を並べて書くと、StringManager がファイル単位で解決し、次の build でジェネレータが Swift / Kotlin / React の文字列テーブルに展開します。プラットフォームごとの .strings / strings.xml 保守は不要。"
+      "en": "One strings.json feeds three different output shapes: a Swift StringManager struct, an Android strings.xml resource tree, and a reactive TypeScript StringManager singleton. There is no standalone `jui localize` command — it is all handled by `jui build`'s resource distribution step. This guide covers the real asymmetries between platforms and the five mechanical steps for adding a new locale.",
+      "ja": "1 つの strings.json が 3 つの異なる出力形式に展開されます: Swift の StringManager struct、Android の strings.xml リソースツリー、そして reactive な TypeScript StringManager singleton。独立した `jui localize` コマンドは存在せず、全て `jui build` の resource distribution 工程で処理されます。このガイドではプラットフォーム間の実際の非対称性と、新 locale 追加のための 5 つの機械的ステップを扱います。"
     },
     "read_time": {
-      "en": "~6 min read",
-      "ja": "約 6 分"
+      "en": "~12 min read",
+      "ja": "約 12 分"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -3817,36 +4345,99 @@
       "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
     },
     "section_shape_heading": {
-      "en": "The strings.json shape",
-      "ja": "strings.json の形"
+      "en": "1. The bilingual shape",
+      "ja": "1. bilingual 形式"
     },
     "section_shape_body": {
-      "en": "Top level is namespace (one per screen). Each namespace holds key → { en: '...', ja: '...', <new>: '...' }. A plain string value means 'use this for every locale'. The object form lets you pin per-locale copy and gracefully fall back to en when a locale is missing.",
-      "ja": "最上位が namespace（画面ごと 1 つ）。各 namespace は key → { en: '...', ja: '...', <new>: '...' } を持つ。プレーンな文字列値は「全 locale 共通」、オブジェクト形式は locale 別 copy を固定しつつ、未定義 locale では en にフォールバックします。"
+      "en": "strings.json is a two-level JSON: the outer key is a screen namespace, the inner key is a snake_case string name, and the value is either a { en, ja, … } object or a plain string (used as fallback for every locale). The multi-language object form is what the generators look for — a plain string is a 'not yet translated' placeholder.",
+      "ja": "strings.json は 2 階層の JSON: 外側 key が screen namespace、内側 key が snake_case の文字列名、値は { en, ja, … } オブジェクトまたは平文字列（全 locale 共通のフォールバック）。多言語オブジェクト形式がジェネレータのターゲット — 平文字列は「未翻訳」プレースホルダ扱いです。"
     },
-    "section_add_heading": {
-      "en": "Add the locale",
-      "ja": "locale を追加する"
+    "section_naming_heading": {
+      "en": "2. How namespaces are named",
+      "ja": "2. namespace の命名規則"
     },
-    "section_add_body": {
-      "en": "Pick a BCP-47 code (fr, de, zh-Hans, …). For each string you want translated, add a third key on the existing object. Keys without your locale fall through to en at runtime; there is no 'missing translation' red flag, which is deliberate — ship progressively, do not block on a complete pass.",
-      "ja": "BCP-47 コード（fr / de / zh-Hans など）を決める。翻訳したい文字列それぞれに、既存オブジェクトへ 3 番目の key を追加。新 locale を持たない key は実行時に en にフォールバック — 「翻訳未完」を赤く警告する機構は意図的に存在しません。段階的にリリースし、完全網羅を待ってブロックしないため。"
+    "section_naming_body": {
+      "en": "Namespace names are derived automatically from the layout file path: slashes become underscores, hyphens become underscores. `home.json` → namespace `home`. `learn/hello-world.json` → `learn_hello_world`. `cells/agent_row.json` → `cells_agent_row`. Keys within a namespace are snake_case. `jui build` auto-extracts string literals from layout text / hint / placeholder / label / prompt properties and inserts them; you can also add keys by hand.",
+      "ja": "namespace 名は layout ファイルパスから自動派生: スラッシュとハイフンはアンダースコアに変換されます。`home.json` → `home`、`learn/hello-world.json` → `learn_hello_world`、`cells/agent_row.json` → `cells_agent_row`。各 namespace 内の key は snake_case。`jui build` は layout の text / hint / placeholder / label / prompt 属性から文字列 literal を自動抽出して投入します。手動追加も可能です。"
+    },
+    "section_platforms_heading": {
+      "en": "3. What each platform emits"
+,
+      "ja": "3. 各プラットフォームの出力"
+    },
+    "section_platforms_body": {
+      "en": "Build time produces three different files from the same source — this is the most frequently misunderstood part of JsonUI localisation. Do not assume Android has a StringManager.kt; it does not.",
+      "ja": "同じ source から build 時に 3 つの異なるファイルが出ます — JsonUI のローカライゼーションで最も誤解されやすい部分です。Android には StringManager.kt が無い、と覚えておいてください。"
+    },
+    "section_platforms_bullet_ios": {
+      "en": "• iOS: ResourceManager/StringManager.swift (nested struct, snake_case → camelCase functions) + Localizable.strings per locale. Access: StringManager.Home.heroTitle().",
+      "ja": "• iOS: ResourceManager/StringManager.swift (ネストした struct、snake_case → camelCase 関数) + locale ごとの Localizable.strings。アクセス: StringManager.Home.heroTitle()。"
+    },
+    "section_platforms_bullet_android": {
+      "en": "• Android: res/values/strings.xml + res/values-ja/strings.xml (no StringManager.kt — kjui intentionally disables it, the native R.string API is used instead). Access: context.getString(R.string.home_hero_title).",
+      "ja": "• Android: res/values/strings.xml + res/values-ja/strings.xml (StringManager.kt は生成されません — kjui は意図的に無効化、ネイティブ R.string API を使います)。アクセス: context.getString(R.string.home_hero_title)。"
+    },
+    "section_platforms_bullet_web": {
+      "en": "• Web: src/generated/StringManager.ts (singleton with a camelCase proxy over the language tables). Access: StringManager.currentLanguage.homeHeroTitle.",
+      "ja": "• Web: src/generated/StringManager.ts (language テーブル上の camelCase proxy を持つ singleton)。アクセス: StringManager.currentLanguage.homeHeroTitle。"
     },
     "section_runtime_heading": {
-      "en": "Picking the locale at runtime",
-      "ja": "ランタイムでの locale 選択"
+      "en": "4. Runtime language switching"
+,
+      "ja": "4. ランタイムの言語切替"
     },
     "section_runtime_body": {
-      "en": "StringManager has one setLanguage(locale) method. Call it in a language-toggle handler and the whole screen re-renders; call it once at app start based on the device locale to set the default. No per-component opt-in, no context providers to wire up.",
-      "ja": "StringManager の setLanguage(locale) メソッドを呼ぶだけ。言語切替ハンドラで呼べば画面全体が再描画、アプリ起動時にデバイス locale から 1 回呼べば既定値として設定される。コンポーネントごとの opt-in も context provider 接続も不要。"
+      "en": "Reactive language switching is Web-only. `StringManager.setLanguage(locale)` mutates the singleton and Next.js re-renders consuming components. On iOS and Android, StringManager has no setLanguage API — the device locale is the source of truth, picked up via Settings > General > Language on iOS and Settings > System > Languages on Android. In-app toggles on mobile require hand-written code (Locale.preferredLanguages on iOS, AppCompatDelegate.setApplicationLocales() on Android).",
+      "ja": "リアクティブな言語切替は Web 専用です。`StringManager.setLanguage(locale)` が singleton を書き換え、Next.js が消費コンポーネントを再描画します。iOS と Android の StringManager には setLanguage API が無く、デバイス locale が source of truth — iOS は設定 > 一般 > 言語と地域、Android は設定 > システム > 言語から取得されます。アプリ内トグルをモバイルで実装するには手書きコードが必要（iOS は Locale.preferredLanguages、Android は AppCompatDelegate.setApplicationLocales()）。"
     },
-    "section_scale_heading": {
-      "en": "Scaling past two locales",
-      "ja": "3 言語以上にスケールする"
+    "section_new_lang_heading": {
+      "en": "5. Adding a new locale (five steps)",
+      "ja": "5. 新 locale を追加する (5 ステップ)"
     },
-    "section_scale_body": {
-      "en": "Past three or four locales you will want tooling around the strings file itself — translation memory, a spreadsheet export, a reviewer workflow. None of that lives in jsonui; we intentionally stop at the runtime resolution. Plug in whatever translation pipeline your team already has, and feed the output back as JSON. The data shape is a boring key/value map by design.",
-      "ja": "3 言語〜4 言語を超えたら、strings ファイル自体にツールが欲しくなります — translation memory / スプレッドシート export / レビュワーワークフロー。これらは jsonui には含めません。意図的にランタイム解決だけを担当し、あとはチームが既に持っている翻訳パイプラインを繋いで JSON を吐き戻せばよい形にしてある。データ形式は退屈な key/value map です — そう設計しています。"
+    "section_new_lang_body": {
+      "en": "All mechanical, no schema updates. Pick a BCP-47 code (fr, de, zh-Hans, ko, …) and:",
+      "ja": "機械的な作業のみ、schema 更新は不要です。BCP-47 コード (fr / de / zh-Hans / ko …) を決めて以下を実行:"
+    },
+    "section_new_lang_step1": {
+      "en": "① Add the locale to each object in strings.json. Plain-string keys fall through to their existing value at runtime, so you only add the third key where translation actually exists.",
+      "ja": "① strings.json の各オブジェクトに新 locale を追加。平文字列の key は既存値にフォールバックするので、実際に翻訳した箇所だけ 3 番目の key を足します。"
+    },
+    "section_new_lang_step2": {
+      "en": "② Add the code to languages[] in the platform configs (jui.config.json / sjui.config.json / kjui.config.json / rjui.config.json) so the generators know to produce the locale's output files.",
+      "ja": "② 各プラットフォームの config (jui.config.json / sjui.config.json / kjui.config.json / rjui.config.json) の languages[] にコードを追加。これでジェネレータが locale 用の出力ファイルを作ります。"
+    },
+    "section_new_lang_step3": {
+      "en": "③ Run jui build. iOS gets a new ko.lproj/Localizable.strings, Android gets res/values-ko/strings.xml, Web's StringManager.ts gets a ko branch in its strings object.",
+      "ja": "③ jui build を実行。iOS に ko.lproj/Localizable.strings、Android に res/values-ko/strings.xml、Web の StringManager.ts の strings object に ko ブランチが追加されます。"
+    },
+    "section_new_lang_step4": {
+      "en": "④ iOS only: open Xcode → Project > Info > Localizations and add the language there once. Android and Web pick up the new files automatically, no IDE action needed.",
+      "ja": "④ iOS のみ: Xcode > Project > Info > Localizations で新言語を 1 回追加します。Android と Web は新ファイルを自動認識するので IDE 側の作業は不要です。"
+    },
+    "section_new_lang_step5": {
+      "en": "⑤ Web only: expose a language toggle that calls StringManager.setLanguage('ko'). On iOS and Android this would happen via OS-level language change; the app will refresh on next launch.",
+      "ja": "⑤ Web のみ: StringManager.setLanguage('ko') を呼ぶ言語切替 UI を追加。iOS/Android は OS レベルの言語変更で切り替わり、次回起動時に反映されます。"
+    },
+    "section_limits_heading": {
+      "en": "6. Limits and asymmetries"
+,
+      "ja": "6. 制限と非対称性"
+    },
+    "section_limits_body": {
+      "en": "A few things JsonUI localisation does not do today — know them up front so you don't spend time looking for them.",
+      "ja": "JsonUI の localisation が現時点で対応していない機能。「無いこと」を先に知っておくと、探し回る時間を減らせます。"
+    },
+    "section_limits_bullet_plurals": {
+      "en": "• Plurals: no ICU MessageFormat rules. Define separate keys per form (item_singular / items_plural) and switch in the ViewModel.",
+      "ja": "• Plurals: ICU MessageFormat の plural ルールは未対応。単数/複数で別 key を定義し (item_singular / items_plural)、ViewModel 側で切り替えます。"
+    },
+    "section_limits_bullet_interpolation": {
+      "en": "• Interpolation: iOS uses %@, Android uses %s — the build auto-converts between them, and positional specifiers (%1$@ / %1$s) are supported. Web strings are literal; no format engine is bundled.",
+      "ja": "• Interpolation: iOS は %@、Android は %s — build が相互変換し、positional 指定子 (%1$@ / %1$s) も対応。Web は literal で format エンジンは同梱しません。"
+    },
+    "section_limits_bullet_pseudo": {
+      "en": "• Pseudo-localisation: no tool for auto-wrapping keys with brackets to surface missing translations. Reviewers are expected to catch missing locales in code review.",
+      "ja": "• Pseudo-localisation: key を角括弧で包んで未翻訳を可視化するツールはありません。未翻訳の検知はコードレビューで担保する想定です。"
     },
     "next_spec_first_title": {
       "en": "Writing your first spec",
@@ -3869,16 +4460,32 @@
       "ja": "このページ"
     },
     "toc_row_shape": {
-      "en": "The strings.json shape",
-      "ja": "strings.json の構造"
+      "en": "1. The bilingual shape",
+      "ja": "1. bilingual 形式"
+    },
+    "toc_row_naming": {
+      "en": "2. Namespace naming",
+      "ja": "2. namespace 命名"
+    },
+    "toc_row_platforms": {
+      "en": "3. What each platform emits",
+      "ja": "3. 各プラットフォームの出力"
+    },
+    "toc_row_runtime": {
+      "en": "4. Runtime switching",
+      "ja": "4. ランタイム切替"
+    },
+    "toc_row_new_lang": {
+      "en": "5. Adding a new locale",
+      "ja": "5. 新 locale を追加"
+    },
+    "toc_row_limits": {
+      "en": "6. Limits",
+      "ja": "6. 制限"
     },
     "toc_row_add": {
       "en": "Add the locale",
       "ja": "ロケールを追加"
-    },
-    "toc_row_runtime": {
-      "en": "Picking the locale at runtime",
-      "ja": "実行時のロケール選択"
     },
     "toc_row_scale": {
       "en": "Scaling past two locales",
@@ -3895,12 +4502,12 @@
       "ja": "カスタムコンポーネントを作る"
     },
     "lead": {
-      "en": "Core JsonUI ships ~28 components; most real apps need one or two custom ones. This guide authors CodeBlock from scratch: spec first, then `jui g converter --from spec`, then hand-edit the converter + render component. The same five-step flow applies to any custom component on any platform.",
-      "ja": "JsonUI core は約 28 コンポーネントを提供し、多くのアプリは 1〜2 個カスタムが必要になります。この記事は CodeBlock をゼロから作成します: spec 先行 → `jui g converter --from spec` → converter と描画コンポーネントを手書きで埋める。同じ 5 ステップがどのプラットフォームのどのカスタムコンポーネントにも適用できます。"
+      "en": "Authoring a custom component in JsonUI is a three-layer contract — spec, project whitelist, platform converter — plus a scaffold and a hand-editable component body. This guide walks the full chain using the docs site's own CodeBlock component as the running example, so every file path is one you can open.",
+      "ja": "JsonUI で custom component を作るのは 3 層の契約 (spec / project whitelist / platform converter) + scaffold + 手書き本体の構成。このガイドは docs サイト自身の CodeBlock component を題材に、全ファイルパスを実在物で辿ります。"
     },
     "read_time": {
-      "en": "~15 min read",
-      "ja": "約 15 分"
+      "en": "~20 min read",
+      "ja": "約 20 分"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -3910,37 +4517,89 @@
       "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
       "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
     },
-    "section_spec_first_heading": {
-      "en": "Spec first",
-      "ja": "まず spec"
+    "section_why_heading": {
+      "en": "1. Why spec-first",
+      "ja": "1. なぜ spec-first か"
     },
-    "section_spec_first_body": {
-      "en": "docs/components/json/<name>.component.json declares the component's attribute contract. List every prop (name, type, required, default, description), every event, and an 'allowed slots' section if it can contain children. Validate with doc_validate_component before moving on — this file is the contract the agent and the reviewer both read.",
-      "ja": "docs/components/json/<name>.component.json にコンポーネントの attribute 契約を宣言します。全 prop (name / type / required / default / description)、全 event、子要素を持てるなら 'allowed slots' を列挙。次に進む前に doc_validate_component で検証 — このファイルがエージェントとレビュワーの両方が読む契約になります。"
+    "section_why_body": {
+      "en": "JsonUI used to allow a 'standard pattern custom' shortcut where you could author a converter directly without a spec. That mode was removed in April 2026 because it caused three-platform type drift, made the docs site unable to auto-document components, and let half-finished components leak into production. Today every custom component starts with a spec at docs/components/json/<name>.component.json — validated before anything else runs, then projected into each platform by the scaffold.",
+      "ja": "JsonUI は以前、spec なしで converter を直接書く 'standard pattern custom' ショートカットがありました。2026 年 4 月に廃止 — 3 プラットフォーム間の型ドリフトを生み、docs サイトが自動ドキュメント化できず、未完成コンポーネントが本番に漏れる原因になっていたためです。現在は全ての custom component が docs/components/json/<name>.component.json の spec から始まり、何より先にそれを validate し、そこから scaffold で各 platform に投影します。"
     },
-    "section_whitelist_heading": {
-      "en": "Register in the whitelist",
-      "ja": "whitelist に登録する"
+    "section_spec_heading": {
+      "en": "2. The component spec",
+      "ja": "2. コンポーネント spec"
     },
-    "section_whitelist_body": {
-      "en": ".jsonui-doc-rules.json carries a componentTypes.screen whitelist. Add your component's name; without the entry the layout validator rejects your Layout JSON. This is a soft guard — the generator never accidentally picks up half-authored components — not a hard security boundary.",
-      "ja": ".jsonui-doc-rules.json には componentTypes.screen の whitelist があります。コンポーネント名を追加してください — エントリがなければ Layout バリデータが Layout JSON を却下します。これは「作りかけコンポーネントをジェネレータが拾わないための」ソフトガードであって、強固なセキュリティ境界ではありません。"
+    "section_spec_body": {
+      "en": "The spec lists every prop (name, type, default, description), every exposed event, and — if it can contain children — the allowed slots. `jui doc init component --name Foo` scaffolds a skeleton; `jui doc validate component --file …` confirms the shape. One file, three readers: MCP agents consume it to plan work, the docs generator renders it to the reference page, the scaffolder emits the converter from it. Keep it honest — there is no second source of truth.",
+      "ja": "spec は全 prop (name, type, default, description) と露出イベント、子を持てるなら allowed slots を列挙します。`jui doc init component --name Foo` で skeleton を生成、`jui doc validate component --file …` で shape を確認。1 ファイルに 3 人の読者: MCP エージェントは作業計画に、docs ジェネレータは reference ページ描画に、scaffolder は converter 生成に使います。これ以外に source of truth は無いので、正直に保ってください。"
+    },
+    "section_project_heading": {
+      "en": "3. Register with the project",
+      "ja": "3. プロジェクトに登録する"
+    },
+    "section_project_body": {
+      "en": "Once the spec validates, add the component's type name to .jsonui-doc-rules.json → rules.componentTypes.screen. This whitelist is enforced by the Layout JSON validator; an unregistered type fails with 'Invalid component type: X'. It is also the source of truth the docs site uses to auto-enumerate 'available custom components' on the reference page, which is how CodeBlock, TableOfContents, and Search show up there.",
+      "ja": "spec が validate を通ったら、.jsonui-doc-rules.json の rules.componentTypes.screen にコンポーネント型名を追加します。この whitelist は Layout JSON validator が強制し、未登録の型は 'Invalid component type: X' で落ちます。reference ページが 'available custom components' を自動列挙する時も、この whitelist が source of truth — CodeBlock / TableOfContents / Search が reference に載っているのはこれ経由です。"
+    },
+    "section_platform_heading": {
+      "en": "4. Register with each platform",
+      "ja": "4. 各プラットフォームに登録する"
+    },
+    "section_platform_body": {
+      "en": "Each platform keeps its own converter registry. The scaffold appends one line for you, but knowing the map makes debugging easier: Web → rjui_tools/lib/react/converters/extensions/converter_mappings.rb, iOS → sjui_tools/lib/swiftui/views/extensions/converter_mappings.rb, Android → kjui_tools/lib/compose/components/extensions/component_mappings.rb. The key in each Hash is the spec's type name (must match exactly); the value is the converter class name. If the Hash is missing your entry, the type reaches the layout validator and fails there — not at build time.",
+      "ja": "各プラットフォームは独自の converter registry を持ちます。scaffold が 1 行追記してくれますが、対応関係を知っておくと debug が楽: Web → rjui_tools/lib/react/converters/extensions/converter_mappings.rb、iOS → sjui_tools/lib/swiftui/views/extensions/converter_mappings.rb、Android → kjui_tools/lib/compose/components/extensions/component_mappings.rb。各 Hash の key は spec の type 名 (完全一致必須)、value は converter クラス名。Hash にエントリが無いと、型は layout validator で落ちます — build 時ではなく validate 時に。"
     },
     "section_scaffold_heading": {
-      "en": "Scaffold via jui g converter",
-      "ja": "jui g converter で scaffold"
+      "en": "5. What the scaffold writes",
+      "ja": "5. scaffold が書くもの"
     },
     "section_scaffold_body": {
-      "en": "`jui g converter --from docs/components/json/<name>.component.json` produces three files: the converter under rjui_tools/lib/react/converters/extensions/, the attribute-def sidecar under that folder's attribute_definitions/, and the React component under src/components/extensions/. The converter is the build-time translator from Layout JSON to JSX; the component is the runtime.",
-      "ja": "`jui g converter --from docs/components/json/<name>.component.json` は 3 ファイルを出力: rjui_tools/lib/react/converters/extensions/ 直下の converter、同フォルダの attribute_definitions/ 配下の attribute-def sidecar、src/components/extensions/ 配下の React コンポーネント。converter はビルド時に Layout JSON から JSX へ翻訳する役、React コンポーネントはランタイム。"
+      "en": "`jui generate converter --from docs/components/json/<name>.component.json` writes nine files total — three per platform. Re-running the scaffold is safe: the converter file is protected from overwrite once it exists; only attribute_definitions and the mappings entry are touched. Each platform gets three artifacts, all living under that platform's extensions/ directory:",
+      "ja": "`jui generate converter --from docs/components/json/<name>.component.json` は合計 9 ファイルを書きます — プラットフォーム毎に 3 ファイル。scaffold 再実行は安全: converter ファイルは一度存在すると上書き保護され、attribute_definitions と mappings エントリのみ触られます。各プラットフォームは 3 つの成果物を受け取り、それぞれの extensions/ ディレクトリ配下に配置されます:"
+    },
+    "section_scaffold_bullet_converter": {
+      "en": "• <name>_converter.rb — the build-time translator (Layout JSON → JSX / Compose / SwiftUI). Hand-edit this for custom binding, class-name construction, child-node handling.",
+      "ja": "• <name>_converter.rb — ビルド時トランスレータ (Layout JSON → JSX / Compose / SwiftUI)。カスタム binding、class 名構築、子ノード処理はここを手編集。"
+    },
+    "section_scaffold_bullet_attr": {
+      "en": "• attribute_definitions/<Name>.json — declares which props the converter recognises. Regenerated from the spec on every run. Treat as read-only.",
+      "ja": "• attribute_definitions/<Name>.json — converter が認識する prop を宣言。spec から毎回再生成されます。読み取り専用として扱う。"
+    },
+    "section_scaffold_bullet_mappings": {
+      "en": "• converter_mappings.rb — the per-platform Hash that makes the type name resolvable. Scaffold appends one line; existing entries are never touched.",
+      "ja": "• converter_mappings.rb — プラットフォーム毎の Hash で、type 名を解決可能にします。scaffold は 1 行追記、既存エントリは触らない。"
     },
     "section_handedit_heading": {
-      "en": "Hand-edit the two halves",
-      "ja": "2 つを手書きで埋める"
+      "en": "6. Hand-edit boundaries",
+      "ja": "6. 手編集の境界"
     },
     "section_handedit_body": {
-      "en": "The converter needs one change per prop: route the @{binding} branch through add_viewmodel_data_prefix so it becomes data.<name>, not a bare identifier. The React component needs the real rendering — Shiki for syntax highlighting, an IntersectionObserver for TOC scroll-spy, etc. Both halves are checked into the repo; re-running jui g converter never overwrites them because only the scaffold is regenerated, not the hand-edited extensions.",
-      "ja": "converter は prop ごとに 1 箇所修正が必要: @{binding} 分岐を add_viewmodel_data_prefix 経由にして data.<name> に解決させる（bare 識別子にしない）。React コンポーネントは本物の描画ロジック — シンタックスハイライトなら Shiki、TOC の scroll-spy なら IntersectionObserver など。両方ともリポジトリに入れる対象で、jui g converter を再実行しても scaffold しか再生成されないので手書き部分は上書きされません。"
+      "en": "Which files survive a re-scaffold, which get overwritten, and which you never touch. This is the map most first-time authors wish they had printed on their wall:",
+      "ja": "再 scaffold で保護されるファイル、上書きされるファイル、絶対に触ってはいけないファイルの地図。custom component を初めて書く人がみんな欲しがるチートシートです:"
+    },
+    "section_handedit_bullet_you": {
+      "en": "• You own: <name>.component.json, .jsonui-doc-rules.json, <name>_converter.rb, the Swift / Kotlin / TSX component impl under src/components/.",
+      "ja": "• あなたが書く: <name>.component.json, .jsonui-doc-rules.json, <name>_converter.rb, src/components/ 配下の Swift / Kotlin / TSX コンポーネント実装。"
+    },
+    "section_handedit_bullet_scaffold": {
+      "en": "• Scaffold writes once, you maintain: converter_mappings.rb (scaffold appends; reordering or removing is OK).",
+      "ja": "• scaffold が初回のみ書く、以後あなた管理: converter_mappings.rb (scaffold は追記のみ、並べ替えや削除は OK)。"
+    },
+    "section_handedit_bullet_regenerated": {
+      "en": "• Overwritten every run: attribute_definitions/<Name>.json. Change the spec, not this file.",
+      "ja": "• 毎回上書き: attribute_definitions/<Name>.json。変更は spec 側で、このファイルは触らない。"
+    },
+    "section_handedit_bullet_generated": {
+      "en": "• Never touch (@generated banner): Layout JSON, ViewModelBase, Hook, Data interface, StringManager. All regenerated on every jui build.",
+      "ja": "• 絶対に触らない (@generated バナー付き): Layout JSON, ViewModelBase, Hook, Data interface, StringManager。全部 jui build のたびに再生成されます。"
+    },
+    "section_type_map_heading": {
+      "en": "7. .jsonui-type-map.json ≠ component whitelist",
+      "ja": "7. .jsonui-type-map.json ≠ コンポーネント whitelist"
+    },
+    "section_type_map_body": {
+      "en": "Two different files, two different jobs, one common confusion. .jsonui-type-map.json maps custom data types (TypeScript interfaces / Swift structs / Kotlin data classes) across platforms — things like NextReadLink or ReferenceAttributeRow. .jsonui-doc-rules.json registers custom UI component types — things like CodeBlock or TableOfContents. A 'Unregistered custom types' warning from jui verify points at the type-map; an 'Invalid component type' error points at the doc-rules. Learn to read the error string and you will reach for the right file first time.",
+      "ja": "別ファイル・別役割・共通の混同源。.jsonui-type-map.json はカスタムデータ型 (TypeScript interface / Swift struct / Kotlin data class) の platform 間マッピング — NextReadLink や ReferenceAttributeRow のような型です。.jsonui-doc-rules.json は custom UI コンポーネント型の whitelist — CodeBlock や TableOfContents のような要素です。jui verify の 'Unregistered custom types' 警告は type-map の話、'Invalid component type' エラーは doc-rules の話。エラー文言を読み分けられれば、正しいファイルに一発で手が伸びます。"
     },
     "next_spec_first_title": {
       "en": "Writing your first spec",
@@ -3962,6 +4621,34 @@
       "en": "On this page",
       "ja": "このページ"
     },
+    "toc_row_why": {
+      "en": "1. Why spec-first",
+      "ja": "1. なぜ spec-first か"
+    },
+    "toc_row_spec": {
+      "en": "2. Component spec",
+      "ja": "2. コンポーネント spec"
+    },
+    "toc_row_project": {
+      "en": "3. Register with project",
+      "ja": "3. プロジェクトに登録"
+    },
+    "toc_row_platform": {
+      "en": "4. Register with platforms",
+      "ja": "4. 各プラットフォームに登録"
+    },
+    "toc_row_scaffold": {
+      "en": "5. What the scaffold writes",
+      "ja": "5. scaffold が書くもの"
+    },
+    "toc_row_handedit": {
+      "en": "6. Hand-edit boundaries",
+      "ja": "6. 手編集の境界"
+    },
+    "toc_row_type_map": {
+      "en": "7. type-map ≠ whitelist",
+      "ja": "7. type-map ≠ whitelist"
+    },
     "toc_row_spec_first": {
       "en": "Spec first",
       "ja": "スペック先行"
@@ -3969,14 +4656,6 @@
     "toc_row_whitelist": {
       "en": "Register in the whitelist",
       "ja": "ホワイトリストに登録"
-    },
-    "toc_row_scaffold": {
-      "en": "Scaffold via jui g converter",
-      "ja": "jui g converter で雛形生成"
-    },
-    "toc_row_handedit": {
-      "en": "Hand-edit the two halves",
-      "ja": "2 つのファイルを手修正"
     }
   },
   "reference_attributes": {
@@ -4614,26 +5293,89 @@
     }
   },
   "reference_detail": {
-    "eyebrow_glance": { "en": "AT A GLANCE", "ja": "概要" },
-    "eyebrow_usage": { "en": "USAGE", "ja": "使いどころ" },
-    "eyebrow_attributes": { "en": "ATTRIBUTES", "ja": "属性" },
-    "eyebrow_examples": { "en": "EXAMPLES", "ja": "例" },
-    "eyebrow_related": { "en": "RELATED COMPONENTS", "ja": "関連コンポーネント" },
-    "eyebrow_overview": { "en": "OVERVIEW", "ja": "概要" },
-    "eyebrow_detail": { "en": "DETAIL", "ja": "詳細" },
-    "header_name": { "en": "NAME", "ja": "属性名" },
-    "header_type": { "en": "TYPE", "ja": "型" },
-    "header_summary": { "en": "SUMMARY", "ja": "概要" },
-    "copy_type": { "en": "copy type", "ja": "type をコピー" },
-    "category_common":     { "en": "Common",     "ja": "共通" },
-    "category_style":      { "en": "Style",      "ja": "スタイル" },
-    "category_layout":     { "en": "Layout",     "ja": "レイアウト" },
-    "category_spacing":    { "en": "Spacing",    "ja": "スペーシング" },
-    "category_alignment":  { "en": "Alignment",  "ja": "配置" },
-    "category_state":      { "en": "State",      "ja": "状態" },
-    "category_binding":    { "en": "Binding",    "ja": "バインディング" },
-    "category_event":      { "en": "Event",      "ja": "イベント" },
-    "category_responsive": { "en": "Responsive", "ja": "レスポンシブ" },
-    "category_misc":       { "en": "Misc",       "ja": "その他" }
+    "eyebrow_glance": {
+      "en": "AT A GLANCE",
+      "ja": "概要"
+    },
+    "eyebrow_usage": {
+      "en": "USAGE",
+      "ja": "使いどころ"
+    },
+    "eyebrow_attributes": {
+      "en": "ATTRIBUTES",
+      "ja": "属性"
+    },
+    "eyebrow_examples": {
+      "en": "EXAMPLES",
+      "ja": "例"
+    },
+    "eyebrow_related": {
+      "en": "RELATED COMPONENTS",
+      "ja": "関連コンポーネント"
+    },
+    "eyebrow_overview": {
+      "en": "OVERVIEW",
+      "ja": "概要"
+    },
+    "eyebrow_detail": {
+      "en": "DETAIL",
+      "ja": "詳細"
+    },
+    "header_name": {
+      "en": "NAME",
+      "ja": "属性名"
+    },
+    "header_type": {
+      "en": "TYPE",
+      "ja": "型"
+    },
+    "header_summary": {
+      "en": "SUMMARY",
+      "ja": "概要"
+    },
+    "copy_type": {
+      "en": "copy type",
+      "ja": "type をコピー"
+    },
+    "category_common": {
+      "en": "Common",
+      "ja": "共通"
+    },
+    "category_style": {
+      "en": "Style",
+      "ja": "スタイル"
+    },
+    "category_layout": {
+      "en": "Layout",
+      "ja": "レイアウト"
+    },
+    "category_spacing": {
+      "en": "Spacing",
+      "ja": "スペーシング"
+    },
+    "category_alignment": {
+      "en": "Alignment",
+      "ja": "配置"
+    },
+    "category_state": {
+      "en": "State",
+      "ja": "状態"
+    },
+    "category_binding": {
+      "en": "Binding",
+      "ja": "バインディング"
+    },
+    "category_event": {
+      "en": "Event",
+      "ja": "イベント"
+    },
+    "category_responsive": {
+      "en": "Responsive",
+      "ja": "レスポンシブ"
+    },
+    "category_misc": {
+      "en": "Misc",
+      "ja": "その他"
+    }
   }
 }

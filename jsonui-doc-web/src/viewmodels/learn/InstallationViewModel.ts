@@ -266,7 +266,7 @@ export class InstallationViewModel {
         id: "verify_conductor",
         commandKey: this.s("verify_conductor_command_caption"),
         expectKey: this.s("verify_conductor_expect"),
-        command: "Read CLAUDE.md",
+        command: "/jsonui",
         language: "text",
       },
     ];
