@@ -5764,6 +5764,100 @@
       "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
     }
   },
+  "spec_layout_file": {
+    "breadcrumb": {
+      "en": "← Split overview",
+      "ja": "← Split overview"
+    },
+    "title": {
+      "en": "Separating the layout file",
+      "ja": "Layout ファイルの分離"
+    },
+    "lead": {
+      "en": "Pattern 1 of spec splitting, in detail. Move the visual tree out of the spec into a sibling Layout JSON, point `metadata.layoutFile` at it, and let `layout_importer` stitch the two back together at generate time. This is the most common split pattern on the site and the easiest starting point.",
+      "ja": "spec 分割パターン 1 の詳細版。視覚ツリーを spec から隣の Layout JSON に移し、`metadata.layoutFile` で参照し、生成時に `layout_importer` が再結合する流れを扱います。本サイト最多採用の分割パターンで、最初に試す候補。"
+    },
+    "read_time": {
+      "en": "~8 min read",
+      "ja": "約 8 分"
+    },
+    "section_why_heading": {
+      "en": "Why separate the layout",
+      "ja": "なぜ Layout を分けるか"
+    },
+    "section_why_body": {
+      "en": "A spec file mixes three different kinds of content — the contract (uiVariables, eventHandlers), the data flow (customTypes, viewModel), and the visual tree (structure.layout). Each kind has a different reviewer: designers for the tree, platform engineers for the VM, product for the copy. Keeping them in one file forces every change to go through one merge queue and one PR; splitting the layout into its own file lets the designer iterate on the tree without touching the contract.",
+      "ja": "spec ファイルは本来 3 種の異なるコンテンツを持ちます — 契約（uiVariables / eventHandlers）、データフロー（customTypes / viewModel）、視覚ツリー（structure.layout）。それぞれ別のレビュアー — ツリーはデザイナー、VM はプラットフォームエンジニア、コピーはプロダクト。1 ファイルに混ぜると全変更が同じ merge queue と PR を通る。Layout を別ファイルに切り出すと、デザイナーが契約に触らずにツリーを反復できます。"
+    },
+    "section_declare_heading": {
+      "en": "Declaring it",
+      "ja": "宣言のしかた"
+    },
+    "section_declare_body": {
+      "en": "Set `metadata.layoutFile` to a path relative to `docs/screens/layouts/` (the `.json` extension is optional). Leave `structure.components` and `structure.layout` empty — the validator does not require them when a `layoutFile` is set, and the importer will populate them from the referenced file. The pair below is a realistic minimum.",
+      "ja": "`metadata.layoutFile` に `docs/screens/layouts/` 基準の相対パスを書きます（`.json` 拡張子は任意）。`structure.components` と `structure.layout` は空のまま — `layoutFile` を指定した spec には validator も強制しないし、importer が参照先から埋めてくれます。下はリアリスティックな最小ペア。"
+    },
+    "section_resolution_heading": {
+      "en": "How paths resolve",
+      "ja": "パス解決のルール"
+    },
+    "section_resolution_body": {
+      "en": "The importer joins `layouts_directory` (from `jui.config.json`, default `docs/screens/layouts`) with the `layoutFile` string. Nested paths work — this site uses `learn/hello-world`, `concepts/data-binding`, `spec/split-overview`, and so on. Missing files fail at generate time, not build time, so `jui verify --fail-on-diff` catches typos in CI.",
+      "ja": "importer は `jui.config.json` の `layouts_directory`（既定 `docs/screens/layouts`）と `layoutFile` 文字列を結合します。ネストパス対応 — 本サイトも `learn/hello-world` / `concepts/data-binding` / `spec/split-overview` の形で使用中。ファイル欠落は build 時ではなく generate 時にエラー、`jui verify --fail-on-diff` が CI で typo を捕まえます。"
+    },
+    "section_importer_heading": {
+      "en": "What layout_importer does",
+      "ja": "layout_importer は何をするか"
+    },
+    "section_importer_body": {
+      "en": "`layout_importer` is a generate-time pass inside the jsonui-doc CLI. It reads the Layout JSON, walks the tree, and rewrites the spec in memory so every downstream generator sees a fully-populated `structure`. The *file on disk* is not mutated — the split stays clean, the enriched spec exists only for the duration of the render.",
+      "ja": "`layout_importer` は jsonui-doc CLI 内の生成時パス。Layout JSON を読み、tree を walk し、spec をメモリ上で書き換えて、下流の全ジェネレータには `structure` が埋まった状態で見せます。*ディスク上のファイル* は触らない — 分割はクリーンなまま、拡張された spec はレンダリング中だけ存在。"
+    },
+    "section_sharing_heading": {
+      "en": "Sharing one Layout across specs",
+      "ja": "1 つの Layout を複数 spec で共有"
+    },
+    "section_sharing_body": {
+      "en": "Two specs can point at the same `layoutFile`. Use this for language editions (en / ja dashboards rendering the same tree with different seeded strings), for A/B copy experiments, or for temporary dual-specs during a rename. Each spec still has its own contract; only the visual tree is shared.",
+      "ja": "2 つの spec が同じ `layoutFile` を指すことができます。言語版（en / ja ダッシュボードが同じツリーを異なる文字列で描画）、A/B コピー実験、リネーム中の一時的な dual-spec などに有効。各 spec は自前の契約を持ち、視覚ツリーだけが共有される構図。"
+    },
+    "section_dir_heading": {
+      "en": "Directory conventions",
+      "ja": "ディレクトリ規約"
+    },
+    "section_dir_body": {
+      "en": "Specs live under `docs/screens/json/`, Layouts under `docs/screens/layouts/`, styles under `docs/screens/styles/`, reusable cells under `docs/screens/layouts/cells/`, and component specs (Pattern 3) under `docs/components/json/`. `jui init` seeds these directories on first run; `jui.config.json` lets you override any of them if your repo has a different convention.",
+      "ja": "spec は `docs/screens/json/`、Layout は `docs/screens/layouts/`、style は `docs/screens/styles/`、再利用 cell は `docs/screens/layouts/cells/`、component spec（パターン 3）は `docs/components/json/` に住みます。`jui init` が初回実行時にこれらのディレクトリを seed、`jui.config.json` でリポジトリ独自の規約へ上書き可能。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_subheading": {
+      "en": "One pattern down, four to go. Head back to the overview for the map, or dive into the next detail article.",
+      "ja": "1 パターン終了、残り 4 つ。マップへ戻るか、次の詳細記事に進んでください。"
+    },
+    "next_split_overview_title": {
+      "en": "Five ways to split a spec",
+      "ja": "spec を分割する 5 つの方法"
+    },
+    "next_split_overview_description": {
+      "en": "The map article. Jump back for the other four patterns and the picker cheat sheet.",
+      "ja": "マップ記事。他 4 パターンの比較と選択チートシートに戻る。"
+    },
+    "next_parent_sub_spec_title": {
+      "en": "Parent + sub specs",
+      "ja": "親 spec + 子 spec"
+    },
+    "next_parent_sub_spec_description": {
+      "en": "Pattern 2 — split one screen into multiple spec files by region of state.",
+      "ja": "パターン 2 — 1 画面を状態の領域ごとに複数 spec ファイルへ分ける。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    }
+  },
   "reference_detail": {
     "eyebrow_glance": {
       "en": "AT A GLANCE",
