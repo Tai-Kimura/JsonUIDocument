@@ -1,0 +1,156 @@
+{
+  "type": "View",
+  "id": "spec_parent_sub_spec_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_muted",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks",  "class": "CollectionDataSource" },
+        { "name": "onNavigateSpec", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "spec_parent_sub_spec_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_parent_sub_spec_header",
+          "style": "page_header",
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateSpec}",
+              "text": "breadcrumb"
+            },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 36, "fontWeight": "bold", "fontColor": "#0B1220", "text": "title" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 17, "fontColor": "#475467", "text": "lead" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 13, "fontColor": "#64748B", "text": "read_time" }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_parent_sub_spec_body",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View", "orientation": "vertical", "id": "section_when", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_when_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_when_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_parent", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_parent_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_parent_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "// home.spec.json — the parent. Owns layoutFile, customTypes, and the\n// sub-spec roster. Every field here is inherited by the children.\n{\n  \"type\":    \"screen_parent_spec\",\n  \"version\": \"1.0\",\n  \"metadata\": {\n    \"name\":        \"Home\",\n    \"displayName\": \"Home\",\n    \"description\": \"Home dashboard (feed + notifications + recent activity).\",\n    \"platforms\":   [\"ios\", \"android\", \"web\"],\n    \"layoutFile\":  \"home\"                     // shared visual tree\n  },\n  \"structure\":   { \"components\": [], \"layout\": {} },\n  \"dataFlow\":    {\n    \"customTypes\": [                             // shared across all subs\n      { \"name\": \"FeedRow\", \"properties\": [ /* … */ ] }\n    ]\n  },\n  \"subSpecs\": [                                  // every child listed here\n    { \"file\": \"home/feed.spec.json\",          \"name\": \"HomeFeed\" },\n    { \"file\": \"home/notifications.spec.json\", \"name\": \"HomeNotifications\" },\n    { \"file\": \"home/recent.spec.json\",        \"name\": \"HomeRecent\" }\n  ]\n}",
+                  "language": "json", "filename": "home.spec.json (parent)", "showLineNumbers": false, "copyable": true
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_sub", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_sub_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_sub_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "// home/feed.spec.json — one sub. Only declares state + handlers for its\n// own region; layoutFile and customTypes are inherited via parentSpec.\n{\n  \"type\":    \"screen_sub_spec\",\n  \"version\": \"1.0\",\n  \"metadata\": {\n    \"name\":        \"HomeFeed\",\n    \"description\": \"Feed region — posts Collection + refresh button.\",\n    \"parentSpec\":  \"../home.spec.json\"         // relative to this file\n  },\n  \"stateManagement\": {\n    \"uiVariables\": [\n      { \"name\": \"feedRows\",    \"type\": \"[FeedRow]\", \"initial\": \"[]\" },\n      { \"name\": \"isRefreshing\", \"type\": \"Bool\",     \"initial\": \"false\" }\n    ],\n    \"eventHandlers\": [\n      { \"name\": \"onRefreshFeed\" },\n      { \"name\": \"onSelectPost\", \"params\": [{ \"name\": \"id\", \"type\": \"String\" }] }\n    ]\n  }\n}",
+                  "language": "json", "filename": "home/feed.spec.json (sub)", "showLineNumbers": false, "copyable": true
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_inherited", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_inherited_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_inherited_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "Inheritance and authority — what parent provides, what each sub owns:\n\nField                                             Parent  Sub     Notes\n-----                                             ------  ---     -----\nmetadata.layoutFile                               ✓       –       sub does NOT redeclare it\nmetadata.platforms                                ✓       –       sub inherits platform list\ndataFlow.customTypes                              ✓       +       sub can ADD types; name clashes are errors\nstructure.components / structure.layout           ✓       –       auto-imported from parent's Layout JSON\nstateManagement.uiVariables                       –       ✓       each sub declares its own slice\nstateManagement.eventHandlers                     –       ✓       each sub owns its handlers\nstateManagement.displayLogic                      –       ✓       each sub wires its own element ids\ndataFlow.viewModel.methods + vars                 –       ✓       each sub's ViewModel is its own class\nuserActions / transitions / relatedFiles / notes  –       ✓       per-sub; nothing is merged\n\nValidator rule (validator.py:_parent_spec_has_layout_file): a sub-spec may\nomit structure.components when its parentSpec declares a layoutFile — the\nstandalone validator tolerates the gap.",
+                  "language": "text", "filename": "inheritance table", "showLineNumbers": false, "copyable": false
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_merge", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_merge_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_merge_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "// What `jui build` does with a parent + sub group:\n//\n// 1. Read home.spec.json      → discover subSpecs[] roster\n// 2. For each sub:\n//      a. Read sub spec         → validate against screen_sub_spec schema\n//      b. Resolve parentSpec    → inherit layoutFile + customTypes + platforms\n//      c. Merge into a virtual full-screen spec (parent's structure + sub's state)\n//      d. Run layout_importer on the merged spec (see /spec/layout-file)\n//      e. Generate per-platform VM class named after metadata.name (HomeFeed, …)\n// 3. Generate one <ScreenName>.tsx / .swift / .kt per sub — same Layout file,\n//    different ViewModel class bound in.\n//\n// The parent itself does not produce a standalone VM — it's a composition spec.\n// Apps render the screen by mounting the parent's Layout and deciding which\n// sub's ViewModel to bind per region (parent-driven composition).",
+                  "language": "text", "filename": "jui build merge flow", "showLineNumbers": false, "copyable": false
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_antipatterns", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_antipatterns_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_antipatterns_body",    "width": "matchParent" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_parent_sub_spec_next",
+          "style": "home_section",
+          "background": "chrome_fill",
+          "child": [
+            { "type": "Label", "style": "section_heading",    "text": "next_heading",    "width": "matchParent", "fontColor": "chrome_ink" },
+            { "type": "Label", "style": "section_subheading", "text": "next_subheading", "width": "matchParent", "fontColor": "chrome_ink" },
+            {
+              "type": "Collection",
+              "id": "spec_parent_sub_spec_next_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "columnCount": 2,
+              "lineSpacing": 16,
+              "itemSpacing": 16,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{nextReadLinks}",
+              "cellIdProperty": "id",
+              "sections": [
+                { "cell": "cells/next_step_card" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "spec_parent_sub_spec_footer",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 32, 32],
+          "background": "chrome_fill",
+          "child": [
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 12, "fontColor": "#94A3B8", "text": "footer_copyright" }
+          ]
+        }
+      ]
+    }
+  ]
+}

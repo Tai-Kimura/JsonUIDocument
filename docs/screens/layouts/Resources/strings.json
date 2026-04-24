@@ -5858,6 +5858,100 @@
       "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
     }
   },
+  "spec_parent_sub_spec": {
+    "breadcrumb": {
+      "en": "← Split overview",
+      "ja": "← Split overview"
+    },
+    "title": {
+      "en": "Parent + sub specs",
+      "ja": "親 spec + 子 spec"
+    },
+    "lead": {
+      "en": "Pattern 2 of spec splitting, in detail. One screen, multiple spec files — the parent owns the visual tree and the shared types, and each sub owns a slice of state for one region of the screen. Fits dashboards and settings pages where 20+ state variables partition cleanly per area.",
+      "ja": "spec 分割パターン 2 の詳細版。1 画面を複数の spec ファイルに分ける — 親が視覚ツリーと共通型を持ち、子が画面の 1 領域の状態を所有する構造です。20+ 個の状態が領域ごとに綺麗に分かれる dashboard や設定画面に向きます。"
+    },
+    "read_time": {
+      "en": "~12 min read",
+      "ja": "約 12 分"
+    },
+    "section_when_heading": {
+      "en": "When this pattern pays off",
+      "ja": "このパターンが効くとき"
+    },
+    "section_when_body": {
+      "en": "Reach for parent + sub when one screen has (a) 20+ state variables, (b) those variables partition cleanly by region (feed state, notifications state, activity state), and (c) you want per-region code review — a feed team reviewing feed.spec.json without pulling in the notifications team. Don't reach for it to reduce file size alone (that's Pattern 1, layoutFile extraction) or to share shapes across screens (Pattern 4, customTypes).",
+      "ja": "parent + sub が効くのは (a) 1 画面の状態変数が 20+ 個、(b) その変数群が領域（feed の状態、notifications の状態、activity の状態）ごとに綺麗に分かれ、(c) 領域ごとのコードレビューをしたい — feed チームが notifications チームを巻き込まずに feed.spec.json をレビューしたい、というケース。単にファイルサイズを減らしたいだけならパターン 1（layoutFile 抽出）が、画面を跨ぐ形の共有がしたいならパターン 4（customTypes）が適切。"
+    },
+    "section_parent_heading": {
+      "en": "The parent spec",
+      "ja": "親 spec"
+    },
+    "section_parent_body": {
+      "en": "`type: 'screen_parent_spec'` changes the shape. Required top-level fields become `type` / `version` / `metadata` / `subSpecs` — `structure` is optional (auto-imported when `metadata.layoutFile` is set) and `stateManagement` is absent by design (state lives in the subs). `subSpecs[]` is the roster: each entry is `{ file, name }` where `file` is a relative path to the sub-spec on disk and `name` should match the child's `metadata.name`.",
+      "ja": "`type: 'screen_parent_spec'` で形が変わります。必須トップレベルは `type` / `version` / `metadata` / `subSpecs` — `structure` は任意（`metadata.layoutFile` 指定時に自動取り込み）、`stateManagement` は設計上不在（状態は子側で持つ）。`subSpecs[]` はロスター: 各 entry は `{ file, name }` で、`file` は子 spec へのディスク上の相対パス、`name` は子の `metadata.name` と一致させます。"
+    },
+    "section_sub_heading": {
+      "en": "The sub spec",
+      "ja": "子 spec"
+    },
+    "section_sub_body": {
+      "en": "`type: 'screen_sub_spec'` + `metadata.parentSpec` pointing at the parent. Relative paths are resolved from the sub-spec's own directory — the `../home.spec.json` form below is typical. Each sub carries its own `stateManagement.uiVariables`, `stateManagement.eventHandlers`, `dataFlow.viewModel`, `userActions`, and `transitions`. The generator emits a separate ViewModel class per sub, named after `metadata.name`.",
+      "ja": "`type: 'screen_sub_spec'` + 親を指す `metadata.parentSpec`。相対パスは子 spec 自身のディレクトリ基準なので、下例の `../home.spec.json` が典型パターン。各子は自身の `stateManagement.uiVariables` / `stateManagement.eventHandlers` / `dataFlow.viewModel` / `userActions` / `transitions` を持ちます。ジェネレータは子ごとに別 ViewModel クラスを emit し、名前は `metadata.name` に従います。"
+    },
+    "section_inherited_heading": {
+      "en": "Inherited vs owned",
+      "ja": "継承されるもの vs 子が所有するもの"
+    },
+    "section_inherited_body": {
+      "en": "The validator (`document_tools/.../validator.py:_parent_spec_has_layout_file`) enforces exactly one inheritance rule today: a sub-spec may omit `structure.components` if its parent declares a `metadata.layoutFile`. Everything else is either inherited at merge time (parent's layoutFile, customTypes, platforms) or owned by the sub (its own stateManagement slice). The table below is the ground truth.",
+      "ja": "validator（`document_tools/.../validator.py:_parent_spec_has_layout_file`）が今強制するのは 1 つの継承ルール — 親が `metadata.layoutFile` を宣言していれば、子は `structure.components` を省略してよい、という規約。それ以外はマージ時に親から継承される（親の layoutFile / customTypes / platforms）か、子が自前で所有するか（stateManagement のスライス）のどちらか。下の表が事実関係の正本。"
+    },
+    "section_merge_heading": {
+      "en": "What jui build does",
+      "ja": "jui build の動き"
+    },
+    "section_merge_body": {
+      "en": "At build time, the parent's `subSpecs[]` roster drives the per-sub merge: each sub is stitched into a virtual full-screen spec (parent's structure + sub's state), `layout_importer` runs on that merged shape, and the generator emits one ViewModel class per sub. The parent itself doesn't produce a runnable VM — it's a composition spec. Apps render the screen by mounting the parent's Layout and deciding which sub's VM to bind per region.",
+      "ja": "build 時、親の `subSpecs[]` ロスターが子ごとのマージを駆動します: 各子は仮想の full-screen spec に綴じられ（親の structure + 子の state）、その上で `layout_importer` が動き、ジェネレータが子ごとの ViewModel クラスを emit する。親自体は実行可能な VM を生成しない — 合成用の spec です。アプリ側は親の Layout をマウントし、領域ごとにどの子 VM を bind するかを決めます。"
+    },
+    "section_antipatterns_heading": {
+      "en": "When NOT to use it",
+      "ja": "使わない方がよい場合"
+    },
+    "section_antipatterns_body": {
+      "en": "Three anti-patterns. (1) Over-splitting: five+ subs rarely ships — the merge queue becomes the bottleneck instead of the file. Two or three subs is the sweet spot. (2) Using it to share a Layout between screens — that's Pattern 1 (two specs referencing the same `layoutFile`), not parent + sub. (3) Using it to share a type across screens — that's Pattern 4 (`dataFlow.customTypes` + `.jsonui-type-map.json`). Parent + sub only makes sense when the thing you're splitting is the *state of a single screen*.",
+      "ja": "3 つの anti-pattern。(1) 過剰分割: 子が 5 個以上になるケースは実運用が辛くなる — ファイルの代わりに merge queue がボトルネックになる。2〜3 子が sweet spot。(2) 画面間で Layout を共有したいからという理由で使う — それはパターン 1（2 つの spec が同じ `layoutFile` を指す）で、parent + sub ではない。(3) 画面間で型を共有したいから使う — それはパターン 4（`dataFlow.customTypes` + `.jsonui-type-map.json`）。parent + sub が意味を持つのは、分けたい対象が *単一画面の状態* であるときだけ。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_subheading": {
+      "en": "Two patterns covered; three to go.",
+      "ja": "2 パターン終了、残り 3 つ。"
+    },
+    "next_layout_file_title": {
+      "en": "Separating the layout file",
+      "ja": "Layout ファイルの分離"
+    },
+    "next_layout_file_description": {
+      "en": "Pattern 1 — the most common split. Move the visual tree out of the spec and into a Layout JSON.",
+      "ja": "パターン 1 — 最頻の分割。視覚ツリーを spec から Layout JSON に切り出す。"
+    },
+    "next_component_spec_title": {
+      "en": "Component specs",
+      "ja": "コンポーネント spec"
+    },
+    "next_component_spec_description": {
+      "en": "Pattern 3 — extract reusable custom UI (CodeBlock, Chart, …) into its own component_spec.json.",
+      "ja": "パターン 3 — 再利用カスタム UI（CodeBlock / Chart …）を component_spec.json に切り出す。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    }
+  },
   "reference_detail": {
     "eyebrow_glance": {
       "en": "AT A GLANCE",
