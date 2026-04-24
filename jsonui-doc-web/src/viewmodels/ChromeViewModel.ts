@@ -79,6 +79,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "parent-sub-spec", titleKey: "spec_parent_sub_spec_title", url: "/spec/parent-sub-spec" },
       { id: "component-spec",  titleKey: "spec_component_spec_title",  url: "/spec/component-spec" },
       { id: "custom-types",    titleKey: "spec_custom_types_title",    url: "/spec/custom-types" },
+      { id: "cell-classes",    titleKey: "spec_cell_classes_title",    url: "/spec/cell-classes" },
     ],
   },
   {

@@ -6156,6 +6156,108 @@
       "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
     }
   },
+  "spec_cell_classes": {
+    "breadcrumb": {
+      "en": "← Split overview",
+      "ja": "← Split overview"
+    },
+    "title": {
+      "en": "Collection cell classes",
+      "ja": "Collection セルクラス"
+    },
+    "lead": {
+      "en": "Pattern 5 of spec splitting, in detail. When a Collection needs more than one cell layout, or when the same cell shape shows up in two or more Collections, hoist each cell into `docs/screens/layouts/cells/<name>.json` and reference it by path. `jui build` inlines the referenced cell at generate time and emits one typed component per cell.",
+      "ja": "spec 分割パターン 5 の詳細版。Collection が複数のセルレイアウトを必要とするとき、あるいは同じセル形が 2 つ以上の Collection に出てくるときは、各セルを `docs/screens/layouts/cells/<name>.json` に切り出してパス参照します。`jui build` が生成時に参照先のセルを inline 展開し、セルごとに型付きコンポーネントを emit。"
+    },
+    "read_time": {
+      "en": "~7 min read",
+      "ja": "約 7 分"
+    },
+    "section_why_heading": {
+      "en": "Why hoist cells out",
+      "ja": "なぜセルを切り出すか"
+    },
+    "section_why_body": {
+      "en": "Two triggers. (1) A Collection needs to interleave different cell shapes — a feed that mixes post cards with ad slots, a settings screen that mixes toggle rows with stepper rows. You can't express 'different cell per section' without a ref, so the cells have to live somewhere. (2) The same cell shape shows up in multiple Collections across the site — `next_step_card` is used at the bottom of almost every article here. Promoting it once lets every Collection reuse the same generated component and the same Data type.",
+      "ja": "トリガは 2 つ。(1) Collection が異なるセル形を交互に並べる必要がある — 投稿カードと広告スロットが混在するフィード、トグル行とステッパー行が混在する設定画面など。「セクションごとに異なるセル」はセル参照なしでは表現できないので、セルはどこかに置く必要がある。(2) 同じセル形がサイト内の複数 Collection で使われる — 本サイトの `next_step_card` はほぼ全記事の末尾に出てくる。1 度切り出せば全 Collection が同じ生成コンポーネントと同じ Data 型を再利用できる。"
+    },
+    "section_shape_heading": {
+      "en": "The shape",
+      "ja": "形"
+    },
+    "section_shape_body": {
+      "en": "A Collection's `sections[]` is an array — each entry declares `cell` (a path ref like `\"cells/feed_card\"`) plus the binding for `items`. The cell layout itself is a standalone Layout JSON with its own data block declaring the props the cell takes. At generate time the cell tree is inlined and a typed cell component is emitted, so the call site treats the cell like any other View.",
+      "ja": "Collection の `sections[]` は配列で、各エントリが `cell`（`\"cells/feed_card\"` のようなパス参照）と `items` の binding を宣言します。セルレイアウト自体は独立した Layout JSON で、セルが取る prop を宣言する自身の data block を持つ。生成時にセル tree が inline され、型付きセルコンポーネントが emit されるので、呼び出し側は他の View と同じようにセルを扱える。"
+    },
+    "section_refs_heading": {
+      "en": "Reference forms + directory layout",
+      "ja": "参照の書き方とディレクトリ配置"
+    },
+    "section_refs_body": {
+      "en": "The cell ref is a path relative to the layouts directory (`docs/screens/layouts/` by default). The `.json` suffix is optional. Nested subdirectories work too. The convention on this site — which is not mandatory but is followed by every cell — is `docs/screens/layouts/cells/<kebab_name>.json`, one file per cell shape. 28 cells live there today; grep the source for `\"cell\": \"cells/<name>\"` to find reuse sites for any of them.",
+      "ja": "セル参照はレイアウトディレクトリ（既定で `docs/screens/layouts/`）からの相対パス。`.json` 拡張子は任意、ネストしたサブディレクトリも可。本サイトの規約（強制ではないが全セルがこれを踏襲）は `docs/screens/layouts/cells/<kebab_name>.json`、形 1 つにつき 1 ファイル。現在 28 セルが稼働中で、ソースを `\"cell\": \"cells/<name>\"` で grep すると任意のセルの再利用箇所を洗い出せる。"
+    },
+    "section_expand_heading": {
+      "en": "What gets inlined at generate time",
+      "ja": "生成時にインライン展開されるもの"
+    },
+    "section_expand_body": {
+      "en": "`layout_importer._expand_collection_refs` walks the spec, finds every Collection, resolves each `sections[].cell` ref, reads the cell Layout JSON, and inlines the tree under `structure.collection._resolvedCells[<ref>]`. Bindings referenced in the cell become the cell's own `uiVariables`. The generator emits a typed cell component per referenced cell plus a per-cell Data type (on web: `src/generated/components/cells/NextStepCard.tsx` + `src/generated/data/NextStepCardData.ts`), and the screen's Collection renders those typed cells at the call site.",
+      "ja": "`layout_importer._expand_collection_refs` が spec を walk し、全 Collection を見つけ、各 `sections[].cell` 参照を解決し、セル Layout JSON を読み、tree を `structure.collection._resolvedCells[<ref>]` に inline。セル内で参照される binding はセル自身の `uiVariables` になる。ジェネレータは参照されたセルごとに型付きセルコンポーネント + セル用 Data 型を emit（web なら `src/generated/components/cells/NextStepCard.tsx` + `src/generated/data/NextStepCardData.ts`）、画面側の Collection はその型付きセルを呼び出し箇所でレンダリング。"
+    },
+    "section_cellclasses_heading": {
+      "en": "structure.collection.cellClasses",
+      "ja": "structure.collection.cellClasses"
+    },
+    "section_cellclasses_body": {
+      "en": "For screens whose top-level is a Collection (not a regular View containing a Collection), the spec's `structure.collection` slot becomes the screen's backbone. `cellClasses` lists every cell ref the Collection might use, and `sections[]` picks one per section at render time. For most screens on this site the Collection is nested inside a regular View and the cell refs live directly in the sections without a top-level `cellClasses` declaration — either form is valid, and the top-level `cellClasses` field is an affordance for screen-is-a-Collection layouts.",
+      "ja": "画面のトップレベルが Collection（通常の View の中に Collection が入っているのではなく）の場合、spec の `structure.collection` スロットが画面の背骨になります。`cellClasses` は Collection が使う可能性のある全セル参照を列挙、`sections[]` がレンダリング時にどれを使うかを選ぶ。本サイトのほとんどの画面は Collection が通常 View の中にネストされ、セル参照はトップレベル `cellClasses` 宣言なしで sections に直接書かれる — どちらも有効で、トップレベル `cellClasses` フィールドは「画面 = Collection」のレイアウト用の補助。"
+    },
+    "section_examples_heading": {
+      "en": "Live examples on this site",
+      "ja": "本サイトの稼働例"
+    },
+    "section_examples_body": {
+      "en": "The most-reused cell on this site is `next_step_card` — the 2-column card that sits under every article's 'Keep going' heading, pointing readers at the next article. `prereq_row` appears in `/learn/installation` and `/learn/hello-world`, `quickstart_step` in `/learn/hello-world` (three platform tabs each with their own steps), `tab_header` everywhere a platform tab switcher shows up. Single-use cells are fine too — `figma_throttle_row` on `/tools/doc` isn't reused anywhere, but lives in `cells/` so it compiles the same way as every other cell.",
+      "ja": "本サイトでもっとも再利用されているセルは `next_step_card` — 全記事の 'Keep going' 見出しの下に並ぶ 2 カラムのカードで、読者を次の記事へ誘導する。`prereq_row` は `/learn/installation` と `/learn/hello-world` の 2 箇所で使われ、`quickstart_step` は `/learn/hello-world`（プラットフォーム 3 タブがそれぞれ独自の step を持つ）、`tab_header` はプラットフォームタブ切替が出るあらゆる場所で使われている。単発のセルも OK — `/tools/doc` の `figma_throttle_row` はどこでも再利用されていないが、他のセルと同じ方式でコンパイルされるから `cells/` に置かれている。"
+    },
+    "section_when_not_heading": {
+      "en": "When NOT to hoist",
+      "ja": "切り出さない方がよい場合"
+    },
+    "section_when_not_body": {
+      "en": "Two anti-patterns. (1) A one-off cell whose body is three Labels — the ceremony (separate file + separate Data type + typed component) outweighs the reuse benefit. Keep it inline inside the parent Layout JSON. (2) Trying to share behaviour (a tap handler, a state machine) by hoisting cells — cells share *shape*, not behaviour. Behaviour lives in the ViewModel; the cell takes closures as props and the parent VM supplies them. If what you want to share is the behaviour, reach for Pattern 3 (component_spec) or Pattern 4 (customTypes) instead.",
+      "ja": "2 つの anti-pattern。(1) body が Label 3 つの単発セル — 儀式（別ファイル + 別 Data 型 + 型付きコンポーネント）のコストが再利用のメリットを上回る。親の Layout JSON 内に inline のまま残す。(2) セルを切り出して *挙動*（タップハンドラ / ステートマシン）を共有しようとする — セルは *形* を共有するもので、挙動ではない。挙動は ViewModel に住み、セルはクロージャを prop として受け取り、親 VM がそれを供給する。共有したいのが挙動なら、パターン 3（component_spec）かパターン 4（customTypes）が正解。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_subheading": {
+      "en": "All five patterns covered. Head back to the overview for the picker cheat sheet, or revisit any pattern you want to drill into further.",
+      "ja": "5 パターン全走破。マップに戻って picker チートシートを見るか、掘り下げたい特定のパターンに戻るか、自由に。"
+    },
+    "next_custom_types_title": {
+      "en": "Custom types",
+      "ja": "独自型"
+    },
+    "next_custom_types_description": {
+      "en": "Pattern 4 — declare shared row / entry shapes once in dataFlow.customTypes.",
+      "ja": "パターン 4 — 共通の行 / entry 型を dataFlow.customTypes に 1 度宣言する。"
+    },
+    "next_split_overview_title": {
+      "en": "Five ways to split a spec",
+      "ja": "spec を分割する 5 つの方法"
+    },
+    "next_split_overview_description": {
+      "en": "Back to the map article with the picker cheat sheet.",
+      "ja": "picker チートシート付きのマップ記事に戻る。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    }
+  },
   "reference_detail": {
     "eyebrow_glance": {
       "en": "AT A GLANCE",

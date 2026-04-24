@@ -1,0 +1,158 @@
+{
+  "type": "View",
+  "id": "spec_cell_classes_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_muted",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks",  "class": "CollectionDataSource" },
+        { "name": "onNavigateSpec", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "spec_cell_classes_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_cell_classes_header",
+          "style": "page_header",
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateSpec}",
+              "text": "breadcrumb"
+            },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 36, "fontWeight": "bold", "fontColor": "#0B1220", "text": "title" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 17, "fontColor": "#475467", "text": "lead" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 13, "fontColor": "#64748B", "text": "read_time" }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_cell_classes_body",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View", "orientation": "vertical", "id": "section_why", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_why_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_why_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_shape", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_shape_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_shape_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "// A Collection that renders two different cells — feed_card for posts,\n// ad_slot every Nth row — driven by sections[].cell.\n{\n  \"type\": \"Collection\",\n  \"id\":   \"feed_collection\",\n  \"items\": \"@{rows}\",\n  \"cellIdProperty\": \"id\",\n  \"sections\": [\n    { \"cell\": \"cells/feed_card\", \"items\": \"@{posts}\" },\n    { \"cell\": \"cells/ad_slot\",   \"items\": \"@{ads}\" }\n  ]\n}\n\n// The two referenced cells live as their own Layout JSON files.\n// docs/screens/layouts/cells/feed_card.json:\n{\n  \"type\": \"View\", \"orientation\": \"vertical\",\n  \"child\": [\n    { \"data\": [\n        { \"name\": \"titleKey\", \"class\": \"String\" },\n        { \"name\": \"bodyKey\",  \"class\": \"String\" },\n        { \"name\": \"onTap\",    \"class\": \"() -> Void\" }\n    ]},\n    { \"type\": \"Label\",  \"text\": \"@{titleKey}\", \"fontSize\": 18 },\n    { \"type\": \"Label\",  \"text\": \"@{bodyKey}\",  \"fontSize\": 14, \"fontColor\": \"#475467\" },\n    { \"type\": \"Button\", \"text\": \"Open\", \"onClick\": \"@{onTap}\" }\n  ]\n}",
+                  "language": "json", "filename": "Collection + cell layouts", "showLineNumbers": false, "copyable": true
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_refs", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_refs_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_refs_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "Cell reference forms\n--------------------\n\"cells/feed_card\"              path under docs/screens/layouts/ (preferred)\n\"cells/feed_card.json\"         same — the .json suffix is optional\n\"learn/hello-world/tab\"        nested subdirectory; also valid\n\nWhere cells live\n----------------\ndocs/screens/layouts/\n└── cells/                     ← by convention, reusable cells sit here\n    ├── next_step_card.json    ← appears at the bottom of every article on this site\n    ├── prereq_row.json         ← used by /learn/installation and /learn/hello-world\n    ├── quickstart_step.json    ← used by /learn/hello-world\n    ├── tab_header.json         ← used everywhere a platform tab switcher shows up\n    └── verify_row.json         ← /learn/installation's 3-row verify table\n\n28 cells live under docs/screens/layouts/cells/ today. Grep the site for\n`\"cell\": \"cells/<name>\"` to find reuse sites.",
+                  "language": "text", "filename": "ref forms + on-disk location", "showLineNumbers": false, "copyable": false
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_expand", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_expand_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_expand_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "# What layout_importer does for Collection cell references at generate time\n# (see document_tools/.../layout_importer.py:_expand_collection_refs):\n\n1. Walk the enriched spec looking for Collection nodes\n2. For each `sections[].cell` entry, resolve the path under layouts_directory\n   and read the cell Layout JSON\n3. Inline the cell tree under structure.collection._resolvedCells[<ref>]\n   (keyed by the ref string so the same cell referenced twice is inlined once)\n4. Harvest every binding (@{...}) the cell references as its own uiVariables\n   on the cell data block — these become the cell's prop shape\n5. The generator emits one <CellName>.tsx / .swift / .kt per cell, plus a\n   <CellName>Data type for the inlined prop shape (web: src/generated/data/\n   NextStepCardData.ts for next_step_card)\n\nResult: the screen spec references cells by path; the runtime gets real,\ntyped components. No duplication, and each cell is testable in isolation.",
+                  "language": "text", "filename": "expand flow", "showLineNumbers": false, "copyable": false
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_cellclasses", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_cellclasses_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_cellclasses_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_examples", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_examples_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_examples_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_when_not", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_when_not_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_when_not_body",    "width": "matchParent" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_cell_classes_next",
+          "style": "home_section",
+          "background": "chrome_fill",
+          "child": [
+            { "type": "Label", "style": "section_heading",    "text": "next_heading",    "width": "matchParent", "fontColor": "chrome_ink" },
+            { "type": "Label", "style": "section_subheading", "text": "next_subheading", "width": "matchParent", "fontColor": "chrome_ink" },
+            {
+              "type": "Collection",
+              "id": "spec_cell_classes_next_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "columnCount": 2,
+              "lineSpacing": 16,
+              "itemSpacing": 16,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{nextReadLinks}",
+              "cellIdProperty": "id",
+              "sections": [
+                { "cell": "cells/next_step_card" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "spec_cell_classes_footer",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 32, 32],
+          "background": "chrome_fill",
+          "child": [
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 12, "fontColor": "#94A3B8", "text": "footer_copyright" }
+          ]
+        }
+      ]
+    }
+  ]
+}
