@@ -276,6 +276,12 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
     "text-sm",
     "font-mono",
     "overflow-hidden",
+    // Prevent long code lines from pushing the wrapper past its flex-parent
+    // width. Without `min-w-0` a flex child defaults to min-width:auto, which
+    // lets the inner <pre> dictate the outer width and pushes sibling content
+    // off-screen (seen on /tools/doc's JSON sample tab).
+    "min-w-0",
+    "max-w-full",
     className,
   ]
     .filter(Boolean)
