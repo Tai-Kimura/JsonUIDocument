@@ -77,6 +77,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "split-overview", titleKey: "spec_split_overview_title", url: "/spec/split-overview" },
       { id: "layout-file",     titleKey: "spec_layout_file_title",      url: "/spec/layout-file" },
       { id: "parent-sub-spec", titleKey: "spec_parent_sub_spec_title", url: "/spec/parent-sub-spec" },
+      { id: "component-spec",  titleKey: "spec_component_spec_title",  url: "/spec/component-spec" },
     ],
   },
   {

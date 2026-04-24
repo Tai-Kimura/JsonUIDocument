@@ -5952,6 +5952,108 @@
       "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
     }
   },
+  "spec_component_spec": {
+    "breadcrumb": {
+      "en": "← Split overview",
+      "ja": "← Split overview"
+    },
+    "title": {
+      "en": "Component specs",
+      "ja": "コンポーネント spec"
+    },
+    "lead": {
+      "en": "Pattern 3 of spec splitting, in detail. When a custom UI shows up on two or more screens, extract its contract into `docs/components/json/<name>.component.json`. Screens import it through `structure.customComponents`; the generator emits a platform-native component per target. This site ships five of these today — CodeBlock, Sidebar, TableOfContents, TopBar, and DocSamplePreview — and the same pattern scales to dozens.",
+      "ja": "spec 分割パターン 3 の詳細版。2 画面以上で使うカスタム UI が現れたら、その契約を `docs/components/json/<name>.component.json` に切り出します。画面側は `structure.customComponents` でインポートし、ジェネレータがプラットフォームごとのネイティブコンポーネントを emit。本サイトは現時点で 5 つ（CodeBlock / Sidebar / TableOfContents / TopBar / DocSamplePreview）をこの方式で提供中で、同じパターンが数十規模まで拡張できます。"
+    },
+    "read_time": {
+      "en": "~10 min read",
+      "ja": "約 10 分"
+    },
+    "section_when_heading": {
+      "en": "When to extract",
+      "ja": "切り出すタイミング"
+    },
+    "section_when_body": {
+      "en": "The trigger is repetition across screens, not size. A 50-line inline View that only appears on one screen stays inline. A 30-line chart shape that shows up on three dashboards belongs in a component_spec. The break-even rule of thumb: two reuses pay for the spec + converter pair; three reuses make it obviously worth it. If it's still a one-off, stay with inline.",
+      "ja": "トリガーはサイズではなく *画面跨ぎの繰り返し*。1 画面でしか出てこない 50 行の inline View は inline のまま残す。3 つのダッシュボードに出てくる 30 行のチャート形は component_spec 行き。目安: 2 回の再利用で spec + converter のコスト回収、3 回で明らかに得、というバランス。単発なら inline の方が読みやすい。"
+    },
+    "section_shape_heading": {
+      "en": "The spec shape",
+      "ja": "spec の形"
+    },
+    "section_shape_body": {
+      "en": "`type: 'component_spec'`, a `metadata` block (name, category, description), a `props` map that declares the public API (type + required / default / enum / description per prop), an optional `slots` map for named children, and a `platformMapping` block that tells each platform's converter where to emit the implementation. Event props (functions) live in `props` too — their `type` carries the signature.",
+      "ja": "`type: 'component_spec'` と `metadata`（name / category / description）、公開 API を宣言する `props` マップ（各 prop に型 + required / default / enum / description）、任意の `slots` マップ（名前付き子要素）、そして `platformMapping` ブロック（各プラットフォームの converter にどこに実装を emit するか伝える）。イベント prop（関数型）も `props` に入れ、シグネチャを `type` に書きます。"
+    },
+    "section_placement_heading": {
+      "en": "Where things live on disk",
+      "ja": "ディスク上の配置"
+    },
+    "section_placement_body": {
+      "en": "The spec goes in `docs/components/json/<name>.component.json` — authored, committed, the single source of truth. The emitted implementation lives in each platform root's `extensions/` directory (`jsonui-doc-web/src/components/extensions/Chart.tsx` on web, for example). After the one-time scaffold the implementation file is hand-edited — the converter is what turns the Layout JSON reference into a call site against it.",
+      "ja": "spec は `docs/components/json/<name>.component.json` に配置 — これが authored / commit 対象の single source of truth。emit された実装は各プラットフォーム root の `extensions/` ディレクトリ配下（web なら `jsonui-doc-web/src/components/extensions/Chart.tsx`）。初回 scaffold 以降、実装ファイルは手で編集し続ける — converter は Layout JSON の参照を実装へのコールサイトに変換する役割。"
+    },
+    "section_reference_heading": {
+      "en": "Referencing from a screen",
+      "ja": "画面からの参照"
+    },
+    "section_reference_body": {
+      "en": "Two steps. (1) Add the component to `structure.customComponents` in the screen spec with `{ name, ref }` — the `ref` is the path to the component_spec.json. (2) Use it in the Layout JSON as if it were a built-in View type: the prop names come straight from the component_spec's `props` map. Bind values with `@{…}`, pass static props inline, and wire events with `@{handler}` just like a built-in.",
+      "ja": "手順は 2 つ。(1) 画面 spec の `structure.customComponents` に `{ name, ref }` を追加（`ref` は component_spec.json へのパス）。(2) Layout JSON では built-in の View タイプと同じように使い、prop 名は component_spec の `props` マップそのまま。値は `@{…}` で bind、静的 prop は inline、イベントは built-in と同様 `@{handler}` で配線。"
+    },
+    "section_emit_heading": {
+      "en": "Scaffolding the implementation",
+      "ja": "実装の scaffold"
+    },
+    "section_emit_body": {
+      "en": "`rjui g converter <Name>` (web) / `sjui g converter <Name>` (iOS) / `kjui g converter <Name>` (Android) creates two files per platform: a converter `.rb` file under `rjui_tools/lib/react/converters/extensions/` (or the Swift / Kotlin equivalent) that translates the Layout JSON reference into a platform call site, and a stub implementation file under the platform's `extensions/` directory. The stub is the starting point — you edit it by hand; the converter is the machine-readable glue.",
+      "ja": "`rjui g converter <Name>`（web）/ `sjui g converter <Name>`（iOS）/ `kjui g converter <Name>`（Android）で、プラットフォームごとに 2 つのファイルが生成されます: `rjui_tools/lib/react/converters/extensions/` 配下（Swift / Kotlin は同等の場所）の converter `.rb` ファイルが Layout JSON の参照をプラットフォームのコールサイトに変換し、プラットフォームの `extensions/` 配下に実装の stub が置かれます。stub が出発点で、そこから手で編集する — converter は機械可読の接着層。"
+    },
+    "section_examples_heading": {
+      "en": "Live examples on this site",
+      "ja": "本サイトの稼働例"
+    },
+    "section_examples_body": {
+      "en": "Five component specs ship today: `codeblock.component.json` (the syntax-highlighted code snippet you're reading this next to), `doc-sample-preview.component.json` (the iframe wrapper on `/tools/doc`), `search.component.json`, `sidebar.component.json`, `tableofcontents.component.json`, and `topbar.component.json`. `codeblock` is the richest — copy button, line numbers, highlight lines, theme — and a good read if you want a real, non-trivial example to start from.",
+      "ja": "現在 5 つの component spec が稼働中: `codeblock.component.json`（今読んでいる記事の横に並ぶ syntax highlight 付きコードスニペット）、`doc-sample-preview.component.json`（`/tools/doc` の iframe ラッパー）、`search.component.json`、`sidebar.component.json`、`tableofcontents.component.json`、`topbar.component.json`。`codeblock` が最も充実した例（コピー / 行番号 / ハイライト / テーマ対応）で、実際の non-trivial な題材として読むのに最適。"
+    },
+    "section_when_not_heading": {
+      "en": "When NOT to extract",
+      "ja": "切り出さない方がよい場合"
+    },
+    "section_when_not_body": {
+      "en": "Two anti-patterns. (1) Extracting a one-off View just because it's long — readers have to jump to another file for something they'll only ever see once. (2) Extracting a composition of built-ins that doesn't need platform-native code — if you can express it in Layout JSON alone, that's Pattern 1 (a shared Layout JSON) or Pattern 5 (a reusable cell), not a component_spec. component_spec is for things that need *code*, not *structure*, to be reusable.",
+      "ja": "2 つの anti-pattern。(1) 単発の View を単に長いからという理由で切り出す — 読者が 1 度しか見ない物のために別ファイルに飛ばされる。(2) built-in の組み合わせで済む合成を切り出す — Layout JSON だけで表現できるなら、それはパターン 1（共有 Layout JSON）かパターン 5（再利用セル）で対応すべきで、component_spec の出番ではない。component_spec は *コード* を必要とするものの共通化であって、*構造* の共通化ではない。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_subheading": {
+      "en": "Three patterns down, two to go — customTypes and cellClasses.",
+      "ja": "3 パターン終了、残り 2 つ — customTypes と cellClasses。"
+    },
+    "next_parent_sub_spec_title": {
+      "en": "Parent + sub specs",
+      "ja": "親 spec + 子 spec"
+    },
+    "next_parent_sub_spec_description": {
+      "en": "Pattern 2 — split one screen into multiple spec files by region of state.",
+      "ja": "パターン 2 — 1 画面を状態の領域ごとに複数 spec ファイルへ分ける。"
+    },
+    "next_custom_types_title": {
+      "en": "Custom types",
+      "ja": "独自型"
+    },
+    "next_custom_types_description": {
+      "en": "Pattern 4 — declare shared row / entry shapes once in dataFlow.customTypes, reference by name across specs.",
+      "ja": "パターン 4 — 共通の行 / entry 型を dataFlow.customTypes に 1 度宣言し、複数 spec から名前参照する。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    }
+  },
   "reference_detail": {
     "eyebrow_glance": {
       "en": "AT A GLANCE",

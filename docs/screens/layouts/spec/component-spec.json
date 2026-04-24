@@ -1,0 +1,163 @@
+{
+  "type": "View",
+  "id": "spec_component_spec_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_muted",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks",  "class": "CollectionDataSource" },
+        { "name": "onNavigateSpec", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "spec_component_spec_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_component_spec_header",
+          "style": "page_header",
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateSpec}",
+              "text": "breadcrumb"
+            },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 36, "fontWeight": "bold", "fontColor": "#0B1220", "text": "title" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 17, "fontColor": "#475467", "text": "lead" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 13, "fontColor": "#64748B", "text": "read_time" }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_component_spec_body",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View", "orientation": "vertical", "id": "section_when", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_when_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_when_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_shape", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_shape_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_shape_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "// docs/components/json/chart.component.json\n{\n  \"type\":    \"component_spec\",\n  \"version\": \"1.0\",\n  \"metadata\": {\n    \"name\":        \"Chart\",\n    \"category\":    \"display\",             // one of: display, input, container, overlay\n    \"description\": \"Line / bar chart for time-series metrics.\"\n  },\n  \"props\": {\n    \"data\":    { \"type\": \"[ChartPoint]\", \"required\": true,\n                  \"description\": \"Points sorted by x.\" },\n    \"kind\":    { \"type\": \"String\",       \"default\":  \"line\",\n                  \"enum\":   [\"line\", \"bar\", \"area\"] },\n    \"height\":  { \"type\": \"Int\",          \"default\":  240 },\n    \"onPointTap\": { \"type\": \"(ChartPoint) -> Void\" }    // event prop\n  },\n  \"slots\": {                                            // optional — named children\n    \"legend\": { \"type\": \"View?\", \"description\": \"Rendered above the chart.\" }\n  },\n  \"platformMapping\": {                                  // generator hints\n    \"web\":     { \"emit\": \"extensions/Chart.tsx\",     \"tagName\": \"Chart\" },\n    \"ios\":     { \"emit\": \"Views/Chart.swift\",         \"tagName\": \"Chart\" },\n    \"android\": { \"emit\": \"ui/Chart.kt\",              \"tagName\": \"Chart\" }\n  }\n}",
+                  "language": "json", "filename": "component_spec shape", "showLineNumbers": false, "copyable": true
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_placement", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_placement_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_placement_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "docs/\n└── components/\n    └── json/                          ← authored component specs live here\n        ├── chart.component.json\n        ├── codeblock.component.json    ← ships today\n        ├── doc-sample-preview.component.json\n        ├── search.component.json\n        ├── sidebar.component.json\n        ├── tableofcontents.component.json\n        └── topbar.component.json\n\njsonui-doc-web/\n└── src/\n    └── components/\n        └── extensions/                 ← hand-authored component implementations\n            ├── CodeBlock.tsx            ← emitted once, edited by hand thereafter\n            ├── DocSamplePreview.tsx\n            └── Chart.tsx                ← (would live here after `jui g converter`)",
+                  "language": "text", "filename": "on-disk placement", "showLineNumbers": false, "copyable": false
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_reference", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_reference_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_reference_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "// Any screen spec imports a component by adding it to\n// structure.customComponents and then using it in the Layout JSON.\n\n// analytics.spec.json — references the Chart component.\n{\n  \"metadata\":  { \"name\": \"Analytics\", \"layoutFile\": \"analytics\" },\n  \"structure\": {\n    \"customComponents\": [\n      {\n        \"name\": \"Chart\",\n        \"ref\":  \"docs/components/json/chart.component.json\"\n      }\n    ]\n  }\n}\n\n// docs/screens/layouts/analytics.json — uses the component like any other View type.\n{\n  \"type\": \"View\", \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\":   \"Chart\",\n      \"width\":  \"matchParent\",\n      \"height\": 260,\n      \"data\":   \"@{metricsPoints}\",       // prop binding\n      \"kind\":   \"area\",                    // static prop\n      \"onPointTap\": \"@{onSelectPoint}\"     // event binding\n    }\n  ]\n}",
+                  "language": "json", "filename": "screen spec + Layout usage", "showLineNumbers": false, "copyable": true
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_emit", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_emit_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_emit_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                  "code": "# One-time: scaffold the platform-native component skeleton from the spec.\n# Generates one converter + one component impl per target platform.\n\n# Web — emits jsonui-doc-web/src/components/extensions/Chart.tsx\n#         and jsonui-doc-web/rjui_tools/lib/react/converters/extensions/chart_converter.rb\nrjui g converter Chart\n\n# iOS — equivalent for Swift\nsjui g converter Chart\n\n# Android\nkjui g converter Chart\n\n# After scaffolding you edit the component body by hand (the converter is\n# the machine-readable translator from Layout JSON → platform source).\n# The component_spec.json remains the single source of truth for props,\n# slots, and events that the converter compiles against.",
+                  "language": "bash", "filename": "one-time scaffold", "showLineNumbers": false, "copyable": true
+                }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_examples", "style": "home_section", "background": "surface_muted",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_examples_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_examples_body",    "width": "matchParent" }
+              ]
+            },
+            {
+              "type": "View", "orientation": "vertical", "id": "section_when_not", "style": "home_section", "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_when_not_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_when_not_body",    "width": "matchParent" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_component_spec_next",
+          "style": "home_section",
+          "background": "chrome_fill",
+          "child": [
+            { "type": "Label", "style": "section_heading",    "text": "next_heading",    "width": "matchParent", "fontColor": "chrome_ink" },
+            { "type": "Label", "style": "section_subheading", "text": "next_subheading", "width": "matchParent", "fontColor": "chrome_ink" },
+            {
+              "type": "Collection",
+              "id": "spec_component_spec_next_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "columnCount": 2,
+              "lineSpacing": 16,
+              "itemSpacing": 16,
+              "lazy": false,
+              "scrollEnabled": false,
+              "items": "@{nextReadLinks}",
+              "cellIdProperty": "id",
+              "sections": [
+                { "cell": "cells/next_step_card" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "spec_component_spec_footer",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 32, 32],
+          "background": "chrome_fill",
+          "child": [
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 12, "fontColor": "#94A3B8", "text": "footer_copyright" }
+          ]
+        }
+      ]
+    }
+  ]
+}
