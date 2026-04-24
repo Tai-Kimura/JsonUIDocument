@@ -91,7 +91,18 @@
               "background": "surface_muted",
               "child": [
                 { "type": "Label", "style": "section_heading",    "text": "section_pattern_layout_file_heading", "width": "matchParent" },
-                { "type": "Label", "style": "section_subheading", "text": "section_pattern_layout_file_body",    "width": "matchParent" }
+                { "type": "Label", "style": "section_subheading", "text": "section_pattern_layout_file_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "// screen_spec.json — declares the contract and points at the layout file.\n{\n  \"type\": \"screen_spec\",\n  \"metadata\": {\n    \"name\": \"RecentActivity\",\n    \"layoutFile\": \"recent-activity\"    // resolves to docs/screens/layouts/recent-activity.json\n  },\n  \"structure\": {\n    \"components\": [],                    // empty — layout_importer populates at generate time\n    \"layout\":     {}\n  }\n}",
+                  "language": "json",
+                  "filename": "recent-activity.spec.json",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
               ]
             },
             {
@@ -102,7 +113,18 @@
               "background": "surface_card",
               "child": [
                 { "type": "Label", "style": "section_heading",    "text": "section_pattern_parent_sub_heading", "width": "matchParent" },
-                { "type": "Label", "style": "section_subheading", "text": "section_pattern_parent_sub_body",    "width": "matchParent" }
+                { "type": "Label", "style": "section_subheading", "text": "section_pattern_parent_sub_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "// home.spec.json — the parent. Owns the Layout and the sub-spec roster.\n{\n  \"type\": \"screen_parent_spec\",\n  \"metadata\": { \"name\": \"Home\", \"layoutFile\": \"home\" },\n  \"subSpecs\": [\n    { \"file\": \"home/feed.spec.json\",          \"name\": \"HomeFeed\" },\n    { \"file\": \"home/notifications.spec.json\", \"name\": \"HomeNotifications\" }\n  ]\n}\n\n// home/feed.spec.json — one sub. Declares only its slice of state.\n{\n  \"type\": \"screen_sub_spec\",\n  \"metadata\": {\n    \"name\":        \"HomeFeed\",\n    \"description\": \"Feed region state + handlers.\",\n    \"parentSpec\":  \"../home.spec.json\"   // layoutFile is inherited from the parent\n  },\n  \"stateManagement\": {\n    \"uiVariables\":   [ { \"name\": \"feedRows\", \"type\": \"[FeedRow]\", \"initial\": \"[]\" } ],\n    \"eventHandlers\": [ { \"name\": \"onRefreshFeed\" } ]\n  }\n}",
+                  "language": "json",
+                  "filename": "parent + one sub",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
               ]
             },
             {
@@ -113,7 +135,18 @@
               "background": "surface_muted",
               "child": [
                 { "type": "Label", "style": "section_heading",    "text": "section_pattern_component_spec_heading", "width": "matchParent" },
-                { "type": "Label", "style": "section_subheading", "text": "section_pattern_component_spec_body",    "width": "matchParent" }
+                { "type": "Label", "style": "section_subheading", "text": "section_pattern_component_spec_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "// docs/components/json/chart.component.json — the reusable contract.\n{\n  \"type\": \"component_spec\",\n  \"metadata\": { \"name\": \"Chart\", \"category\": \"display\" },\n  \"props\": {\n    \"data\":   { \"type\": \"[ChartPoint]\", \"required\": true },\n    \"height\": { \"type\": \"Int\",          \"default\":  240 }\n  }\n}\n\n// Any screen spec can now reference it:\n{\n  \"structure\": {\n    \"customComponents\": [\n      { \"name\": \"Chart\", \"ref\": \"docs/components/json/chart.component.json\" }\n    ]\n  }\n}",
+                  "language": "json",
+                  "filename": "component spec + screen reference",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
               ]
             },
             {
@@ -124,7 +157,18 @@
               "background": "surface_card",
               "child": [
                 { "type": "Label", "style": "section_heading",    "text": "section_pattern_custom_types_heading", "width": "matchParent" },
-                { "type": "Label", "style": "section_subheading", "text": "section_pattern_custom_types_body",    "width": "matchParent" }
+                { "type": "Label", "style": "section_subheading", "text": "section_pattern_custom_types_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "// Declare the shape once in dataFlow.customTypes...\n{\n  \"dataFlow\": {\n    \"customTypes\": [\n      {\n        \"name\": \"ActivityRow\",\n        \"properties\": [\n          { \"name\": \"id\",    \"type\": \"String\" },\n          { \"name\": \"title\", \"type\": \"String\" },\n          { \"name\": \"url\",   \"type\": \"String\" }\n        ]\n      }\n    ]\n  },\n  \"stateManagement\": {\n    \"uiVariables\": [\n      { \"name\": \"rows\", \"type\": \"[ActivityRow]\", \"initial\": \"[]\" }\n    ]\n  }\n}\n\n// ...then reference it by name from any spec. Register it in\n// .jsonui-type-map.json to cross-reference across files.",
+                  "language": "json",
+                  "filename": "dataFlow.customTypes",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
               ]
             },
             {
@@ -135,7 +179,40 @@
               "background": "surface_muted",
               "child": [
                 { "type": "Label", "style": "section_heading",    "text": "section_pattern_cell_classes_heading", "width": "matchParent" },
-                { "type": "Label", "style": "section_subheading", "text": "section_pattern_cell_classes_body",    "width": "matchParent" }
+                { "type": "Label", "style": "section_subheading", "text": "section_pattern_cell_classes_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "// A Collection with two cell layouts — each cell lives in its own file.\n{\n  \"structure\": {\n    \"collection\": {\n      \"cellClasses\": [\n        \"cells/feed_card\",    // docs/screens/layouts/cells/feed_card.json\n        \"cells/ad_slot\"       // docs/screens/layouts/cells/ad_slot.json\n      ],\n      \"sections\": [\n        { \"cell\": \"cells/feed_card\", \"items\": \"@{posts}\" },\n        { \"cell\": \"cells/ad_slot\",   \"items\": \"@{ads}\" }\n      ]\n    }\n  }\n}\n\n// `jui build` inlines each referenced cell layout into the generated\n// component, so the same cell can be reused by any other Collection.",
+                  "language": "json",
+                  "filename": "multi-cell Collection",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_picking",
+              "style": "home_section",
+              "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_picking_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_picking_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "file grew past ~300 lines? ...................... Pattern 1 (layoutFile)\ntwo screens share the SAME shape? ............... Pattern 1 or Pattern 3\nsame visual tree, different state per region? .... Pattern 2 (parent + sub)\nreusable UI across the whole site? ............... Pattern 3 (component_spec)\nsame row model across multiple screens? ......... Pattern 4 (customTypes)\nCollection needs more than one cell? ............. Pattern 5 (cellClasses)",
+                  "language": "text",
+                  "filename": "decision flow",
+                  "showLineNumbers": false,
+                  "copyable": false
+                }
               ]
             }
           ]

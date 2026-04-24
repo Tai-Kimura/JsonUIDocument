@@ -80,7 +80,18 @@
               "background": "surface_card",
               "child": [
                 { "type": "Label", "style": "section_heading",    "text": "section_top_level_heading", "width": "matchParent" },
-                { "type": "Label", "style": "section_subheading", "text": "section_top_level_body",    "width": "matchParent" }
+                { "type": "Label", "style": "section_subheading", "text": "section_top_level_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "// The skeleton every screen_spec.json starts from. Each top-level key\n// is either required (type / version / metadata / structure) or optional.\n{\n  \"type\":            \"screen_spec\",\n  \"version\":         \"1.0\",\n  \"metadata\":        { /* name, displayName, platforms, layoutFile, … */ },\n  \"structure\":       { /* components, layout, collection, tabView, …     */ },\n  \"stateManagement\": { /* states, uiVariables, eventHandlers, displayLogic */ },\n  \"dataFlow\":        { /* diagram, viewModel, customTypes, repositories, … */ },\n  \"userActions\":     [ /* what the user taps and what the VM does about it */ ],\n  \"validation\":      { /* clientSide / serverSide rules                    */ },\n  \"transitions\":     [ /* onNavigate(url) → destinations                   */ ],\n  \"relatedFiles\":    [ /* Layout / ViewModel / View / Model paths          */ ],\n  \"notes\":           [ /* anything a reviewer needs to know next           */ ]\n}",
+                  "language": "json",
+                  "filename": "screen_spec skeleton",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
               ]
             },
             {
@@ -91,7 +102,18 @@
               "background": "surface_muted",
               "child": [
                 { "type": "Label", "style": "section_heading",    "text": "section_metadata_heading", "width": "matchParent" },
-                { "type": "Label", "style": "section_subheading", "text": "section_metadata_body",    "width": "matchParent" }
+                { "type": "Label", "style": "section_subheading", "text": "section_metadata_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "{\n  \"metadata\": {\n    \"name\":        \"LearnHelloWorld\",            // PascalCase; becomes the class name\n    \"displayName\": \"Hello World\",                  // human-readable title\n    \"description\": \"The five-minute first-screen tutorial.\",\n    \"platforms\":   [\"web\"],                        // drives jui build's distribution\n    \"layoutFile\":  \"learn/hello-world\",            // → docs/screens/layouts/learn/hello-world.json\n    \"parentSpec\":  \"../home.spec.json\",             // optional — for screen_sub_spec\n    \"createdAt\":   \"2026-04-22\",\n    \"updatedAt\":   \"2026-04-24\"\n  }\n}",
+                  "language": "json",
+                  "filename": "metadata",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
               ]
             },
             {
@@ -102,7 +124,18 @@
               "background": "surface_card",
               "child": [
                 { "type": "Label", "style": "section_heading",    "text": "section_state_heading", "width": "matchParent" },
-                { "type": "Label", "style": "section_subheading", "text": "section_state_body",    "width": "matchParent" }
+                { "type": "Label", "style": "section_subheading", "text": "section_state_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "{\n  \"stateManagement\": {\n    \"states\":        [],                                 // rarely used; persistent state machines\n    \"uiVariables\": [                                     // everything the Layout binds to\n      { \"name\": \"count\",            \"type\": \"Int\",    \"initial\": \"0\" },\n      { \"name\": \"statusVisibility\", \"type\": \"String\", \"initial\": \"\\\"gone\\\"\" }\n    ],\n    \"eventHandlers\": [                                   // every handler the Layout binds onClick to\n      { \"name\": \"onIncrement\", \"description\": \"Bump count; flip statusVisibility.\" }\n    ],\n    \"displayLogic\":  [                                   // derive visibility / enabled from state\n      {\n        \"condition\": \"count > 0\",\n        \"effects\":   [{ \"element\": \"status_label\", \"state\": \"visible\",\n                        \"variableName\": \"statusVisibility\" }]\n      }\n    ]\n  }\n}",
+                  "language": "json",
+                  "filename": "stateManagement",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
               ]
             },
             {
@@ -113,7 +146,18 @@
               "background": "surface_muted",
               "child": [
                 { "type": "Label", "style": "section_heading",    "text": "section_dataflow_heading", "width": "matchParent" },
-                { "type": "Label", "style": "section_subheading", "text": "section_dataflow_body",    "width": "matchParent" }
+                { "type": "Label", "style": "section_subheading", "text": "section_dataflow_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "{\n  \"dataFlow\": {\n    \"diagram\": \"flowchart TD\\n    VIEW --> VM\\n    VM -- rows --> VIEW\",\n    \"viewModel\": {                                       // the public VM contract\n      \"methods\": [\n        { \"name\": \"onAppear\",       \"description\": \"Seed rows.\" },\n        { \"name\": \"onSelect\", \"params\": [{ \"name\": \"id\", \"type\": \"String\" }] }\n      ],\n      \"vars\": [\n        { \"name\": \"rows\", \"type\": \"Array(ActivityRow)\", \"observable\": true }\n      ]\n    },\n    \"customTypes\": [                                     // reusable shapes (see Pattern 4)\n      {\n        \"name\":        \"ActivityRow\",\n        \"properties\": [\n          { \"name\": \"id\",    \"type\": \"String\" },\n          { \"name\": \"title\", \"type\": \"String\" }\n        ]\n      }\n    ],\n    \"repositories\": [], \"useCases\": [], \"apiEndpoints\": []   // architecture-level slots\n  }\n}",
+                  "language": "json",
+                  "filename": "dataFlow",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
               ]
             },
             {
@@ -124,7 +168,18 @@
               "background": "surface_card",
               "child": [
                 { "type": "Label", "style": "section_heading",    "text": "section_structure_heading", "width": "matchParent" },
-                { "type": "Label", "style": "section_subheading", "text": "section_structure_body",    "width": "matchParent" }
+                { "type": "Label", "style": "section_subheading", "text": "section_structure_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "{\n  // Most screens leave `structure` mostly empty and let layout_importer\n  // inline the tree from metadata.layoutFile at generate time.\n  \"structure\": {\n    \"components\":         [],      // auto-imported from the Layout JSON\n    \"layout\":             {},      // same — flat tree of the Layout hierarchy\n    \"collection\":         null,    // only set when the screen is a single-Collection page\n    \"tabView\":            null,    // only set when the screen is a root TabView\n    \"decorativeElements\": [],      // purely presentational children\n    \"wrapperViews\":       [],      // structural wrappers with a purpose note\n    \"customComponents\":   [        // see Pattern 3 (component_spec)\n      { \"name\": \"CodeBlock\",\n        \"ref\":  \"docs/components/json/codeblock.component.json\" }\n    ]\n  }\n}",
+                  "language": "json",
+                  "filename": "structure",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
               ]
             }
           ]
