@@ -21,45 +21,76 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 import { StringManager } from "@/generated/StringManager";
 
 const LANGUAGE_STORAGE_KEY = "jsonui-language";
+const LANGUAGE_EVENT = "chrome:languagechange";
+
+// useSyncExternalStore binding over the StringManager singleton. React's
+// official escape-hatch for subscribing to external mutable state: the
+// subscribe function is called once per mount to install a listener that
+// fires `onStoreChange`, and getSnapshot is read on every render to decide
+// whether to re-render (referential equality check).
+//
+// Why this over the previous setState-inside-event-handler pattern: the
+// previous wiring bumped a `version` state on every CustomEvent, but for
+// reasons I did not fully pin down (likely Next.js App Router interplay
+// with the LanguageReloader sitting above the page boundary), the
+// rerender did not always remount the subtree when the sibling
+// ChromeViewModel fired the event. useSyncExternalStore guarantees a
+// consistent subscribe → rerender path documented by React itself.
+function subscribeLanguage(onStoreChange: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(LANGUAGE_EVENT, onStoreChange);
+  return () => window.removeEventListener(LANGUAGE_EVENT, onStoreChange);
+}
+
+function getLanguageSnapshot(): string {
+  return StringManager.language;
+}
+
+function getLanguageServerSnapshot(): string {
+  // Server always renders with the 'en' default — there is no localStorage
+  // on the server. The client reconciles this against the stored language
+  // in the mount-time useEffect below and dispatches the language event
+  // to force a rerender via useSyncExternalStore.
+  return "en";
+}
 
 interface Props {
   children: React.ReactNode;
 }
 
 export function LanguageReloader({ children }: Props) {
-  const [version, setVersion] = useState(0);
   const pathname = usePathname();
+  const language = useSyncExternalStore(
+    subscribeLanguage,
+    getLanguageSnapshot,
+    getLanguageServerSnapshot,
+  );
 
-  // On first client mount, restore the stored language (if any) and force a
-  // remount so subtrees re-render with the live StringManager state. SSR
-  // always renders with the 'en' default (no localStorage on the server),
-  // so the initial DOM is English; if the user had previously toggled to
-  // another language, this bumps the remount key so generated components
-  // re-read StringManager.currentLanguage.
+  // Restore the persisted language on first client mount. If the stored
+  // value differs from the current StringManager state (which always starts
+  // at the 'en' constructor default), flip StringManager and dispatch the
+  // language event so every useSyncExternalStore subscriber rerenders with
+  // the restored language.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const saved = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
     if (saved && saved !== StringManager.language) {
       StringManager.setLanguage(saved);
-      setVersion((v) => v + 1);
-      window.dispatchEvent(new CustomEvent("chrome:languagechange"));
+      window.dispatchEvent(new CustomEvent(LANGUAGE_EVENT));
     }
-    const handler = () => setVersion((v) => v + 1);
-    window.addEventListener("chrome:languagechange", handler);
-    return () => window.removeEventListener("chrome:languagechange", handler);
   }, []);
 
-  // Key on pathname too so a client-side navigation into a page that was
-  // pre-rendered at build time (English) re-mounts under the current
-  // StringManager state — otherwise the hydrated English DOM persists until
-  // the user next toggles the language.
+  // Remount the subtree whenever the language or pathname changes. The
+  // pathname key covers static-exported pages whose pre-rendered English
+  // DOM would otherwise stick around after client-side navigation until
+  // the user next toggles.
   return (
-    <div key={`${version}-${pathname}`} style={{ display: "contents" }}>
+    <div key={`${language}-${pathname}`} style={{ display: "contents" }}>
       {children}
     </div>
   );
