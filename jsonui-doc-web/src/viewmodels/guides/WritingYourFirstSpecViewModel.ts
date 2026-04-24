@@ -73,6 +73,13 @@ export class WritingYourFirstSpecViewModel {
         url: "/guides/testing",
         onNavigate: () => this.navigate("/guides/testing"),
       },
+      {
+        id: "next_spec",
+        titleKey: this.s("next_spec_title"),
+        descriptionKey: this.s("next_spec_description"),
+        url: "/spec/split-overview",
+        onNavigate: () => this.navigate("/spec/split-overview"),
+      },
     ];
 
     this.updateData({

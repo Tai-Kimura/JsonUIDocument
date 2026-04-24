@@ -77,6 +77,13 @@ export class FirstScreenViewModel {
         url: "/learn/data-binding-basics",
         onNavigate: () => this.navigate("/learn/data-binding-basics"),
       },
+      {
+        id: "next_spec",
+        titleKey: this.s("next_spec_title"),
+        descriptionKey: this.s("next_spec_description"),
+        url: "/spec/split-overview",
+        onNavigate: () => this.navigate("/spec/split-overview"),
+      },
     ];
 
     this.updateData({
