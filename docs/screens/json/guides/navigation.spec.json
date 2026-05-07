@@ -1,0 +1,149 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "Navigation",
+    "displayName": "Navigation between screens",
+    "description": "Guides > Navigation between screens. Six sections + TOC + next-reads. Corrects the implicit false claim that the generator writes navigation code — it does not. Walks the spec-side contract (userActions + transitions + onNavigate method with JSON example), what the generator actually emits (Data interface callback slot + VM Base constructor that takes router, nothing else), then real hand-written wiring code for Web (Next.js App Router with TS snippets for VM + page.tsx), iOS (SwiftUI NavigationStack with Route enum), Android (Compose NavHost with sealed Route class), plus sheets/modals/tabs/back cheat sheet across all three platforms.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "guides/navigation",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-24"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_spec_first -> /guides/writing-your-first-spec, next_testing -> /guides/testing) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the guides_navigation_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /guides/writing-your-first-spec, /guides/testing."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /guides/writing-your-first-spec and /guides/testing. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is spec-mapped",
+      "destination": "Target screen or tab",
+      "description": "v1 destinations: /, /guides/writing-your-first-spec, /guides/testing."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/guides/navigation.json",
+      "description": "Layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/guides/NavigationViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/guides/navigation/page.tsx",
+      "description": "Page."
+    }
+  ],
+  "notes": [
+    "Live Guides entry. Flip GUIDES_ENTRIES row for 'navigation' to 'live' in HomeViewModel when shipping.",
+    "Six sections: (1) contract (userActions + transitions + onNavigate method, JSON snippet), (2) what the generator actually writes (text tree + callout bullet — the 'generator does NOT emit Route enum / NavHost' point), (3) Web router wiring (TS VM + TS page.tsx hand-written snippets), (4) iOS SwiftUI NavigationStack with Route enum hand-written snippet, (5) Android Compose NavHost with sealed Route class hand-written snippet, (6) sheet / full-modal / tabs / back 4-way bullet cheat-sheet across platforms.",
+    "Corrects prior implicit false claim that the generator writes navigation code or that jsonui-navigation-ios/android agents 'emit the platform-specific navigation call' — those agents assist authoring, but the code lands as hand-written VM impl / Route enums / NavHost definitions, not @generated.",
+    "Deprecated strings: section_spec_* and toc_row_spec remain in strings.json as unreferenced dead entries to minimise cross-session merge risk (section_contract is the new equivalent)."
+  ]
+}

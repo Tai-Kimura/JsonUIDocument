@@ -1,0 +1,149 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "WhySpecFirst",
+    "displayName": "Why spec-first",
+    "description": "Short essay explaining the design-side and engineering-side motivations for the spec-first JsonUI workflow. ~6-min read. Four H2 sections (The contract / The drift gate / The agent handshake / What we give up) plus a closing 'read next' link row. Uses TableOfContents for in-page nav and CodeBlock for a single illustrative snippet.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "concepts/why-spec-first",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two follow-up concept essays at the bottom of the page (One Layout JSON / Data binding as contract). Seeded by onAppear."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Populate nextReadLinks with the static v1 catalog. Labels flow through StringManager."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation for the breadcrumb ('/concepts') and each NextReadLink."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[WhySpecFirstView] --> VM[WhySpecFirstViewModel]\n    VM -- nextReadLinks --> VIEW\n    VM -- currentLanguage --> VIEW\n    VIEW -- onNavigate(url) --> VM\n    VIEW -- onToggleLanguage --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_data_binding -> /concepts/data-binding, next_one_layout -> /concepts/one-layout-json) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the concepts_why_spec_first_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped concept URLs enumerated in transitions: /concepts, /concepts/one-layout-json, /concepts/data-binding."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /concepts/data-binding and /concepts/one-layout-json. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TableOfContents entry",
+      "processing": "TOC's own scroll-to-anchor logic runs. No VM involvement."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url) with the bound NextReadLink.url."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is a spec-mapped concept URL or /concepts",
+      "destination": "Target spec screen or tab",
+      "description": "v1 destinations referenced from this page: /concepts, /concepts/one-layout-json, /concepts/data-binding — the latter two are upcoming and render their page on the next content pass."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/concepts/why-spec-first.json",
+      "description": "Essay layout. Header with breadcrumb + language toggle, title + lead, a side-by-side hero with TableOfContents + body paragraphs, closing NextRead Collection, footer."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/concepts/WhySpecFirstViewModel.ts",
+      "description": "Seeds nextReadLinks and handles navigation + language toggle. Mirrors HelloWorldViewModel's shape."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/concepts/why-spec-first/page.tsx",
+      "description": "Next.js route. Thin wrapper that mounts the generated WhySpecFirst component bound to a WhySpecFirstViewModel."
+    }
+  ],
+  "notes": [
+    "First live entry under the Concepts tab. Flipping concepts_index's first catalog row from 'upcoming' to 'live' is the implementer's final step.",
+    "TOC items are authored as a literal array in the layout (English-only per the deferred-i18n note on TableOfContents). Re-authoring as a VM-driven @{binding} becomes worthwhile once the overall TOC i18n story lands.",
+    "The essay holds one CodeBlock — a ~5-line snippet showing a minimal screen_spec + derived Layout JSON + derived ViewModelBase stub — to make the 'the spec is the contract' section tangible.",
+    "No Collapse / expandable sections on this page. Troubleshooting-style pages have them; concept essays stay linear."
+  ]
+}

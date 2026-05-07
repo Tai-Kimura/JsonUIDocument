@@ -1,0 +1,76 @@
+{
+  "category": "spacing",
+  "description": {
+    "en": "Spacing attributes control empty space around and inside a component. Margins are outside the component; paddings are inside.",
+    "ja": "スペーシング属性はコンポーネントの周囲と内側の余白を制御する。margin は外側、padding は内側。"
+  },
+  "attributes": {
+    "paddings": {
+      "summary": {
+        "en": "Inner space between component bounds and its content. Accepts `[top, right, bottom, left]`, a single number for all sides, or `[vertical, horizontal]`.",
+        "ja": "コンポーネント境界と中身の間の内側余白。`[top, right, bottom, left]` の 4 要素配列、全辺同一の単一数値、または `[vertical, horizontal]` の 2 要素配列を受け付ける。"
+      },
+      "values": [
+        { "value": "[t, r, b, l]", "description": { "en": "4-element numeric array.", "ja": "4 要素の数値配列。" } },
+        { "value": "<number>", "description": { "en": "Same value applied to all four sides.", "ja": "全辺に同じ値を適用。" } },
+        { "value": "[tb, lr]", "description": { "en": "2-element shorthand: top-bottom and left-right.", "ja": "2 要素のショートハンド: 上下と左右。" } }
+      ],
+      "examples": [
+        { "language": "json", "code": "{ \"type\": \"View\", \"paddings\": [16, 24, 16, 24] }" },
+        { "language": "json", "code": "{ \"type\": \"View\", \"padding\": 16 }" },
+        { "language": "json", "code": "{ \"type\": \"View\", \"paddings\": [8, 16] }" }
+      ],
+      "relatedAttributes": ["padding", "paddingTop", "paddingBottom", "paddingLeft", "paddingRight"]
+    },
+    "padding": {
+      "summary": {
+        "en": "Shorthand applying the same value to all four sides. Equivalent to `paddings: <number>`.",
+        "ja": "全辺に同じ値を適用するショートハンド。`paddings: <number>` と等価。"
+      },
+      "relatedAttributes": ["paddings"]
+    },
+    "paddingTop": {
+      "summary": {
+        "en": "Top inner padding. Overrides the top value of `paddings`.",
+        "ja": "上辺の内側余白。`paddings` の上辺値を上書きする。"
+      }
+    },
+    "paddingBottom": { "summary": { "en": "Bottom inner padding.", "ja": "下辺の内側余白。" } },
+    "paddingLeft": { "summary": { "en": "Left inner padding.", "ja": "左辺の内側余白。" } },
+    "paddingRight": { "summary": { "en": "Right inner padding.", "ja": "右辺の内側余白。" } },
+    "paddingStart": {
+      "summary": {
+        "en": "Start-edge padding (leading). RTL-aware: becomes right padding in RTL languages.",
+        "ja": "開始辺（leading）の padding。RTL 対応: RTL 言語では右 padding になる。"
+      }
+    },
+    "paddingEnd": {
+      "summary": {
+        "en": "End-edge padding (trailing). RTL-aware.",
+        "ja": "終端辺（trailing）の padding。RTL 対応。"
+      }
+    },
+    "margins": {
+      "summary": {
+        "en": "Outer space between component bounds and siblings/parent. Same syntax as `paddings`.",
+        "ja": "コンポーネント境界と兄弟要素／親の間の外側余白。`paddings` と同じ構文。"
+      },
+      "relatedAttributes": ["topMargin", "bottomMargin", "leftMargin", "rightMargin"]
+    },
+    "topMargin": {
+      "summary": {
+        "en": "Top outer margin. Inside SafeAreaView, this adds on top of the safe area inset.",
+        "ja": "上辺の外側 margin。SafeAreaView 内ではセーフエリア inset に加算される。"
+      }
+    },
+    "bottomMargin": { "summary": { "en": "Bottom outer margin.", "ja": "下辺の外側 margin。" } },
+    "leftMargin": { "summary": { "en": "Left outer margin.", "ja": "左辺の外側 margin。" } },
+    "rightMargin": { "summary": { "en": "Right outer margin.", "ja": "右辺の外側 margin。" } },
+    "startMargin": {
+      "summary": { "en": "Start-edge margin. RTL-aware.", "ja": "開始辺の margin。RTL 対応。" }
+    },
+    "endMargin": {
+      "summary": { "en": "End-edge margin. RTL-aware.", "ja": "終端辺の margin。RTL 対応。" }
+    }
+  }
+}

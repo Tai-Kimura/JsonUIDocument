@@ -1,0 +1,68 @@
+{
+  "component": "Radio",
+  "description": {
+    "en": "Mutually exclusive selection within a group. Behaves as a standalone radio button; grouping is established via shared `group` attribute.",
+    "ja": "グループ内で排他的に 1 件を選択するボタン。単体のラジオボタンとして動作し、`group` 属性で排他グループに属するものを定義。"
+  },
+  "usage": {
+    "en": "Use Radio when 2–5 options must all be visible simultaneously and mutually exclusive. For 6+ options use SelectBox. All Radios with the same `group` automatically exclude each other.",
+    "ja": "排他的で全選択肢を同時表示したい 2〜5 件で使う。6 件以上は SelectBox。同じ `group` を持つ Radio は自動で排他関係になる。"
+  },
+  "examples": [
+    {
+      "title": { "en": "3-option group", "ja": "3 択グループ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"S\", \"checked\": \"@{size == 'S'}\", \"label\": \"@string/small\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"M\", \"checked\": \"@{size == 'M'}\", \"label\": \"@string/medium\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"L\", \"checked\": \"@{size == 'L'}\", \"label\": \"@string/large\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Custom icons", "ja": "カスタムアイコン" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Radio\",\n  \"group\": \"option\",\n  \"value\": \"a\",\n  \"icon\": \"radio_off\",\n  \"selectedIcon\": \"radio_on\",\n  \"label\": \"Option A\"\n}"
+    }
+  ],
+  "attributes": {
+    "group": {
+      "note": {
+        "en": "String identifier. All Radios with the same `group` within the same parent View form a mutually-exclusive set.",
+        "ja": "文字列識別子。同一親 View 配下で同じ `group` を持つ Radio が排他グループを形成。"
+      }
+    },
+    "value": {
+      "note": {
+        "en": "The value this Radio represents when selected. Bind `selectedValue` on the parent (or the ViewModel) to track which value is chosen.",
+        "ja": "この Radio が選ばれたときの値。親（または ViewModel）で `selectedValue` をバインドして選択値を管理。"
+      }
+    },
+    "checked": {
+      "note": {
+        "en": "Boolean binding. Usually derived: `@{selectedValue == 'M'}`. Tapping sets all other Radios in the same `group` to `false`.",
+        "ja": "Boolean binding。通常は `@{selectedValue == 'M'}` のように導出する。タップで同 `group` の他の Radio は `false` になる。"
+      }
+    },
+    "label": {
+      "note": {
+        "en": "Inline label rendered to the right of the radio icon. For custom label layout, omit `label` and wrap Radio + Label in a horizontal View.",
+        "ja": "ラジオアイコンの右に表示するインラインラベル。独自配置が必要なら `label` を省略し、水平 View で Radio + Label を並べる。"
+      }
+    },
+    "icon": {
+      "note": {
+        "en": "Unselected icon image name. Defaults to the platform standard radio-off glyph.",
+        "ja": "非選択アイコン画像名。省略時はプラットフォーム標準の radio-off グリフ。"
+      }
+    },
+    "selectedIcon": {
+      "note": {
+        "en": "Selected icon image name. Defaults to the platform standard radio-on glyph.",
+        "ja": "選択中アイコン画像名。省略時はプラットフォーム標準の radio-on グリフ。"
+      }
+    },
+    "spacing": {
+      "note": {
+        "en": "Gap between the icon and the label (pt/dp/px). Default 8.",
+        "ja": "アイコンとラベルの間隔（pt/dp/px）。デフォルト 8。"
+      }
+    }
+  },
+  "relatedComponents": ["Segment", "SelectBox", "CheckBox"]
+}

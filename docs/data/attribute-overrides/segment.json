@@ -1,0 +1,79 @@
+{
+  "component": "Segment",
+  "description": {
+    "en": "Segmented control — mutually exclusive horizontal button group. Shows 2–5 options at a time.",
+    "ja": "排他的な水平ボタングループ。同時に 2〜5 件の選択肢を表示する。"
+  },
+  "usage": {
+    "en": "Use when options are short (1–2 words) and all visible at once benefits the user (filters, toggles). Beyond 5 options use SelectBox. For one-shot action button bars (not selection), set `momentary: true`.",
+    "ja": "選択肢が短く（1〜2 語）、同時に全て見える方が有益な場合（フィルタ、トグル）に使う。6 件以上なら SelectBox。選択ではなくアクションバーとして使う場合は `momentary: true`。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Filter segment", "ja": "フィルタセグメント" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{filterIndex}\",\n  \"items\": [\n    { \"label\": \"@string/all\", \"value\": \"all\" },\n    { \"label\": \"@string/active\", \"value\": \"active\" },\n    { \"label\": \"@string/done\", \"value\": \"done\" }\n  ],\n  \"onValueChange\": \"@{onFilterChanged}\"\n}"
+    },
+    {
+      "title": { "en": "Icon-only segment", "ja": "アイコンのみセグメント" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{viewModeIndex}\",\n  \"items\": [\n    { \"icon\": \"list.bullet\", \"value\": \"list\" },\n    { \"icon\": \"square.grid.2x2\", \"value\": \"grid\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Momentary (action bar)", "ja": "momentary（アクションバー）" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Segment\",\n  \"momentary\": true,\n  \"items\": [\n    { \"label\": \"B\", \"value\": \"bold\" },\n    { \"label\": \"I\", \"value\": \"italic\" },\n    { \"label\": \"U\", \"value\": \"underline\" }\n  ],\n  \"onValueChange\": \"@{onFormat}\"\n}"
+    }
+  ],
+  "attributes": {
+    "items": {
+      "note": {
+        "en": "Array of `{ label?, icon?, value }`. At least `label` or `icon` is required per entry.",
+        "ja": "`{ label?, icon?, value }` の配列。各エントリで `label` または `icon` のいずれかが必須。"
+      }
+    },
+    "selectedIndex": {
+      "note": {
+        "en": "Two-way Int binding. `-1` means nothing selected (in `momentary` mode, always `-1` between taps).",
+        "ja": "Int の two-way binding。`-1` で未選択（`momentary` モードでは連打間は常に `-1`）。"
+      }
+    },
+    "momentary": {
+      "note": {
+        "en": "Boolean. When `true`, segments act like action buttons (no persistent selected state). Default `false`.",
+        "ja": "Boolean。`true` で各セグメントがアクションボタンとして振る舞う（永続的な選択状態なし）。デフォルト `false`。"
+      }
+    },
+    "apportionsSegmentWidthsByContent": {
+      "note": {
+        "en": "iOS UISegmentedControl attribute. When `true`, each segment sizes to its content; when `false`, all segments are equal width.",
+        "ja": "iOS UISegmentedControl の属性。`true` で各セグメントが内容に合わせ、`false` で全セグメント等幅。"
+      }
+    },
+    "tintColor": {
+      "note": {
+        "en": "Primary color for selected segment background and text.",
+        "ja": "選択中セグメントの背景とテキスト色。"
+      }
+    },
+    "selectedColor": {
+      "note": {
+        "en": "Text color when selected. Defaults to contrast of `tintColor`.",
+        "ja": "選択中のテキスト色。省略時は `tintColor` のコントラスト色。"
+      }
+    },
+    "normalColor": {
+      "note": {
+        "en": "Text color for unselected segments.",
+        "ja": "非選択セグメントのテキスト色。"
+      }
+    },
+    "onValueChange": {
+      "note": {
+        "en": "Fires with the new selected value (not index).",
+        "ja": "新しい選択値（インデックスではなく）を引数に発火。"
+      }
+    }
+  },
+  "relatedComponents": ["SelectBox", "Radio"]
+}

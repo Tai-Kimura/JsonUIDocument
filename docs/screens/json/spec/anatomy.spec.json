@@ -1,0 +1,117 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "SpecAnatomy",
+    "displayName": "The anatomy of a screen spec",
+    "description": "Field-by-field dictionary of screen_spec.json: metadata, structure, stateManagement, dataFlow, userActions, validation, transitions, relatedFiles, notes. v1 lands as a scaffold under docs/plans/spec-authoring-deep-dive.md Phase 1; prose + CodeBlocks per section expand in Phase 1b.",
+    "platforms": ["web"],
+    "layoutFile": "spec/anatomy",
+    "createdAt": "2026-04-24",
+    "updatedAt": "2026-04-24"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two follow-up cards pointing at split-overview and writing-your-first-spec."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [{ "name": "url", "type": "String" }],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[SpecAnatomyView] --> VM[SpecAnatomyViewModel]\n    VM -- nextReadLinks --> VIEW",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog. Each row's titleKey / descriptionKey resolves through StringManager with the spec_anatomy_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [{ "name": "url", "type": "String" }],
+          "description": "router.push(url). Destinations: /spec/split-overview, /guides/writing-your-first-spec."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          { "name": "id",             "type": "String" },
+          { "name": "titleKey",       "type": "String" },
+          { "name": "descriptionKey", "type": "String" },
+          { "name": "url",            "type": "String" }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url) with the bound url."
+    }
+  ],
+  "validation": { "clientSide": [], "serverSide": [] },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is /spec/split-overview or /guides/writing-your-first-spec",
+      "destination": "Target spec screen",
+      "description": "v1 destinations: /spec/split-overview, /guides/writing-your-first-spec."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/spec/anatomy.json",
+      "description": "Essay layout — field-dictionary structure per spec section."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/spec/AnatomyViewModel.ts",
+      "description": "Same shape as concepts essay VMs."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/spec/anatomy/page.tsx",
+      "description": "Next.js route."
+    }
+  ],
+  "notes": [
+    "First article under the new Spec section (docs/plans/spec-authoring-deep-dive.md).",
+    "v1 scaffold: header + 5 section headings (top-level, metadata, stateManagement, dataFlow, structure) + next-reads. Prose bodies and CodeBlocks expand in Phase 1b.",
+    "Purpose: complement the Reference > JSON Schema lookup view with a writer-facing walk through every top-level spec field."
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "Kotlin",
+    "displayName": "KotlinJsonUI",
+    "description": "Platforms > Android deep-dive. KotlinJsonUI + kjui CLI + Dynamic mode. Four sections: What you get / Dual-mode output (Compose + XML Views) / Dynamic mode hot reload / Production caveats. ~10-min read.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "platforms/kotlin",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_swift -> /platforms/swift, next_react -> /platforms/react) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the platforms_kotlin_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /platforms/swift, /platforms/react."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /platforms/swift and /platforms/react. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "spec-mapped",
+      "destination": "Target",
+      "description": "v1: /, /platforms/swift, /platforms/react."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/platforms/kotlin.json",
+      "description": "Layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/platforms/KotlinViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/platforms/kotlin/page.tsx",
+      "description": "Page."
+    }
+  ],
+  "notes": [
+    "Second live Platforms entry. Flip PLATFORMS_ENTRIES row 2 (kotlin) to 'live'.",
+    "Audience: Android engineers evaluating JsonUI vs staying on hand-written Compose. Copy emphasises dual-mode (Compose + XML for legacy codebases) and the Dynamic mode hot-reload parity with iOS."
+  ]
+}

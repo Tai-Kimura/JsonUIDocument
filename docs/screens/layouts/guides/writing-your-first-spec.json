@@ -1,0 +1,891 @@
+{
+  "type": "View",
+  "id": "guides_writing_your_first_spec_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateGuides",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "guides_writing_your_first_spec_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "guides_writing_your_first_spec_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            24,
+            32
+          ],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateGuides}",
+              "text": "breadcrumb",
+              "width": "wrapContent"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "#475467",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "#64748B",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "guides_writing_your_first_spec_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "guides_writing_your_first_spec_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_step0",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "step0_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "step0_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "# Is this a JsonUI project?\ncat jui.config.json\n\n# What specs already exist?\nfind docs/screens/json -name \"*.spec.json\" | head\n\n# Look at one for shape reference\ncat docs/screens/json/learn/hello-world.spec.json",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_step1",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "step1_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "step1_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// docs/screens/json/counter.spec.json\n{\n  \"type\": \"screen_spec\",\n  \"version\": \"1.0\",\n  \"metadata\": {\n    \"name\": \"Counter\",\n    \"displayName\": \"Counter\",\n    \"platforms\": [\"web\"],\n    \"layoutFile\": \"counter\"\n  }\n}",
+                      "language": "json",
+                      "filename": "counter.spec.json",
+                      "showLineNumbers": true,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_step2",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "step2_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "step2_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "\"stateManagement\": {\n  \"states\": [],\n  \"uiVariables\": [\n    { \"name\": \"count\",     \"type\": \"Int\",    \"initial\": \"0\" },\n    { \"name\": \"statusKey\", \"type\": \"String\", \"initial\": \"\\\"neutral\\\"\" }\n  ],\n  \"eventHandlers\": [],\n  \"displayLogic\": []\n}",
+                      "language": "json",
+                      "filename": "counter.spec.json (excerpt)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_step3",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "step3_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "step3_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "\"eventHandlers\": [\n  { \"name\": \"onAppear\",      \"description\": \"Seed initial state.\" },\n  { \"name\": \"onIncrement\",   \"description\": \"count += 1.\" },\n  { \"name\": \"onDecrement\",   \"description\": \"count -= 1 when > 0, no-op otherwise.\" }\n]",
+                      "language": "json",
+                      "filename": "counter.spec.json (excerpt)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_step4",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "step4_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "step4_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "\"dataFlow\": {\n  \"repositories\": [],\n  \"useCases\": [],\n  \"apiEndpoints\": [],\n  \"customTypes\": [\n    {\n      \"name\": \"CounterSnapshot\",\n      \"properties\": [\n        { \"name\": \"at\",    \"type\": \"Date\" },\n        { \"name\": \"value\", \"type\": \"Int\" }\n      ]\n    }\n  ]\n}",
+                      "language": "json",
+                      "filename": "counter.spec.json (excerpt)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_step5a",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "step5a_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "step5a_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "# Validate the spec's shape\njui doc validate spec --file docs/screens/json/counter.spec.json\n\n# Exit 0 = ok. Exit 1 = a list of violations.\n# Component specs use a different sub-command:\njui doc validate component --file docs/components/json/badge.component.json",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_step5b",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "step5b_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "step5b_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "# Scaffold all platforms' layout + base + hook\njui generate project --file docs/screens/json/counter.spec.json\n\n# Preview without writing\njui generate project --file docs/screens/json/counter.spec.json --dry-run\n\n# Target a single platform\njui generate project --file docs/screens/json/counter.spec.json --web-only",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_step5c",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "step5c_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "step5c_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "# Rebuild Layouts / Styles / Resources / ViewModelBase across platforms\njui build\n\n# Refuse to let drift escape into a PR\njui verify --fail-on-diff\n\n# Diagnose a single spec with the diff detail\njui verify --file docs/screens/json/counter.spec.json --detail",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "step5c_bullet_structural"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "step5c_bullet_orphan"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "step5c_bullet_unregistered"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_step6",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "step6_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "step6_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "docs/\n  screens/\n    json/\n      counter.spec.json            ← you\n    layouts/\n      counter.json                  ← @generated — do not edit\n      Resources/\n        strings.json                ← you (both en and ja)\njsonui-doc-web/src/\n  generated/                        ← @generated — do not edit\n    viewmodels/CounterViewModelBase.ts\n    hooks/useCounterViewModel.ts\n    data/CounterData.ts\n    StringManager.ts\n  viewmodels/                       ← you\n    CounterViewModel.ts\n  app/counter/                      ← you\n    page.tsx",
+                      "language": "text",
+                      "filename": "tree",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_trouble",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "trouble_heading"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "trouble_1_symptom"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 4,
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "trouble_1_fix"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "trouble_2_symptom"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 4,
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "trouble_2_fix"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "trouble_3_symptom"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 4,
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "trouble_3_fix"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "trouble_4_symptom"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 4,
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "trouble_4_fix"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "trouble_5_symptom"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 4,
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "trouble_5_fix"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontWeight": "semibold",
+                          "fontColor": "#0B1220",
+                          "text": "trouble_6_symptom"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 4,
+                          "fontSize": 14,
+                          "fontColor": "#475467",
+                          "text": "trouble_6_fix"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_writing_your_first_spec_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    32,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "chrome_ink",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "guides_writing_your_first_spec_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 2,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/next_step_card"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_writing_your_first_spec_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "#94A3B8",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "guides_writing_your_first_spec_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [
+                24,
+                16,
+                24,
+                16
+              ],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_writing_your_first_spec_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    0,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        {
+                          "id": "toc_step0",
+                          "label": "toc_row_step0",
+                          "anchor": "section_step0",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_step1",
+                          "label": "toc_row_step1",
+                          "anchor": "section_step1",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_step2",
+                          "label": "toc_row_step2",
+                          "anchor": "section_step2",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_step3",
+                          "label": "toc_row_step3",
+                          "anchor": "section_step3",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_step4",
+                          "label": "toc_row_step4",
+                          "anchor": "section_step4",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_step5a",
+                          "label": "toc_row_step5a",
+                          "anchor": "section_step5a",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_step5b",
+                          "label": "toc_row_step5b",
+                          "anchor": "section_step5b",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_step5c",
+                          "label": "toc_row_step5c",
+                          "anchor": "section_step5c",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_step6",
+                          "label": "toc_row_step6",
+                          "anchor": "section_step6",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_trouble",
+                          "label": "toc_row_trouble",
+                          "anchor": "section_trouble",
+                          "level": 1
+                        }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

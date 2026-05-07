@@ -1,0 +1,44 @@
+{
+  "component": "SafeAreaView",
+  "description": {
+    "en": "View that respects the host platform's safe area (notch, home indicator, status bar). Typically placed at the root of a screen.",
+    "ja": "ホストプラットフォームのセーフエリア（ノッチ、ホームインジケータ、ステータスバー）を尊重する View。画面のルートに置くのが一般的。"
+  },
+  "usage": {
+    "en": "Wrap the outermost content of each screen in SafeAreaView. Inside SafeAreaView, use regular View + ScrollView for normal layout.",
+    "ja": "各画面の最外層コンテンツを SafeAreaView で包む。内部は通常の View + ScrollView でレイアウトする。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Screen root", "ja": "画面ルート" },
+      "language": "json",
+      "code": "{\n  \"type\": \"SafeAreaView\",\n  \"child\": [\n    { \"include\": \"common/header\" },\n    { \"type\": \"ScrollView\", \"weight\": 1, \"child\": [ ] },\n    { \"include\": \"common/footer\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Respect only top + bottom", "ja": "上下エッジのみ尊重" },
+      "language": "json",
+      "code": "{\n  \"type\": \"SafeAreaView\",\n  \"safeAreaInsetPositions\": [\"top\", \"bottom\"],\n  \"child\": [\n    { \"type\": \"View\", \"child\": [ ] }\n  ]\n}"
+    }
+  ],
+  "attributes": {
+    "safeAreaInsetPositions": {
+      "note": {
+        "en": "Array of edges to respect: `top` / `bottom` / `leading` / `trailing`. Omit to respect every edge (default).",
+        "ja": "尊重するエッジの配列: `top` / `bottom` / `leading` / `trailing`。省略で全エッジ（デフォルト）。"
+      }
+    },
+    "child": {
+      "note": {
+        "en": "Same as View — array of child components. Usually contains a Header + main content + Footer structure.",
+        "ja": "View と同様、子要素の配列。通常は Header + 本文 + Footer の構造を持つ。"
+      }
+    },
+    "orientation": {
+      "note": {
+        "en": "Inherited from View. Defaults to `vertical`. SafeAreaView is almost always vertical.",
+        "ja": "View から継承。デフォルト `vertical`。SafeAreaView はほぼ常に vertical。"
+      }
+    }
+  },
+  "relatedComponents": ["View", "ScrollView"]
+}

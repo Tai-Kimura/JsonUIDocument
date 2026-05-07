@@ -1,0 +1,39 @@
+{
+  "component": "Blur",
+  "description": {
+    "en": "Applies a platform-native blur effect (iOS UIBlurEffect / Android RenderEffect / Web CSS backdrop-filter) to everything behind this view.",
+    "ja": "この View の背面にある内容に、プラットフォームネイティブなぼかし（iOS UIBlurEffect / Android RenderEffect / Web CSS backdrop-filter）を適用する。"
+  },
+  "usage": {
+    "en": "Use Blur for frosted-glass overlays (nav bars, modals, glass cards). Place Blur **above** the content to be blurred in the layout tree. `effectStyle` controls the visual variant.",
+    "ja": "半透明フロステッドグラスの重ね表示（ナビバー、モーダル、ガラスカード）に使う。ぼかしたい内容の**上**に配置する。`effectStyle` で見た目を切り替える。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Glass navbar", "ja": "ガラス風ナビバー" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Blur\",\n  \"effectStyle\": \"systemThinMaterial\",\n  \"width\": \"matchParent\",\n  \"height\": 64\n}"
+    },
+    {
+      "title": { "en": "Blurred background behind a title", "ja": "タイトル裏のぼかし背景" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"child\": [\n    { \"type\": \"Image\", \"srcName\": \"hero\", \"width\": \"matchParent\", \"height\": \"matchParent\" },\n    { \"type\": \"Blur\", \"effectStyle\": \"dark\", \"width\": \"matchParent\", \"height\": \"matchParent\" },\n    { \"type\": \"Label\", \"text\": \"@string/title\", \"fontColor\": \"#FFFFFF\", \"fontSize\": 32, \"gravity\": \"center\" }\n  ]\n}"
+    }
+  ],
+  "attributes": {
+    "effectStyle": {
+      "note": {
+        "en": "iOS UIBlurEffect.Style value: `extraLight` / `light` / `dark` / `regular` / `prominent` / `systemUltraThinMaterial` / `systemThinMaterial` / `systemMaterial` / `systemThickMaterial` / `systemChromeMaterial`. On Android / Web the closest visual approximation is used.",
+        "ja": "iOS UIBlurEffect.Style 値: `extraLight` / `light` / `dark` / `regular` / `prominent` / `systemUltraThinMaterial` / `systemThinMaterial` / `systemMaterial` / `systemThickMaterial` / `systemChromeMaterial`。Android / Web では最も近いビジュアルに近似される。"
+      },
+      "platformDiff": {
+        "swift_uikit": "UIVisualEffectView + UIBlurEffect(style:) に直接マップ。",
+        "swift_swiftui": ".ultraThinMaterial / .thinMaterial / .regularMaterial / .thickMaterial / .chromeMaterial に対応（iOS 15+）。",
+        "kotlin_compose": "Modifier.blur(radius) + 色付きオーバーレイで近似（Android 12+ は RenderEffect、それ以前は警告付き fallback）。",
+        "kotlin_xml": "RenderEffect（API 31+）または RenderScript（それ以前）で実装。",
+        "react": "CSS `backdrop-filter: blur(<Npx>)` に変換。対応ブラウザのみ動作。"
+      }
+    }
+  },
+  "relatedComponents": ["GradientView", "View"]
+}

@@ -1,0 +1,171 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "Mcp",
+    "displayName": "jsonui-mcp-server",
+    "description": "Tools > MCP server overview. The typed API surface the agents use to inspect every JsonUI project. 29 tools in four groups: A (lookup), B (validation), C (generation), D (build + runtime). ~12-min read. Companion to /tools/agents — agents are the clients, MCP is the protocol.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "tools/mcp",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "tools",
+        "type": "[McpToolRow]",
+        "initial": "[]",
+        "description": "29 MCP tools. Each entry names the tool, declares its group (A/B/C/D), and a one-line role."
+      },
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards: Agents (client of MCP) + CLI (caller behind jui build)."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed tools + nextReadLinks from the static v1 catalog."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[McpView] --> VM[McpViewModel]\n    VM -- tools --> VIEW\n    VM -- nextReadLinks --> VIEW\n    VIEW -- onNavigate(url) --> VM",
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed tools + nextReadLinks. tools carries 29 MCP tool entries grouped A/B/C/D by function (Discovery / Authoring / Generation / Gate). Each row's nameKey / groupKey / roleKey is pre-resolved via StringManager with the tools_mcp_ prefix. nextReadLinks points to /tools/agents and /tools/cli."
+        },
+        {
+          "name": "onNavigate",
+          "params": [{ "name": "url", "type": "String" }],
+          "description": "router.push(url). Hit by NextReadLink card taps."
+        }
+      ],
+      "vars": [
+        { "name": "tools",          "type": "Array(McpToolRow)",   "observable": true, "description": "29 MCP tool rows, grouped by role (A/B/C/D)." },
+        { "name": "nextReadLinks", "type": "Array(NextReadLink)", "observable": true, "description": "2 closing cards." }
+      ]
+    },
+    "customTypes": [
+      {
+        "name": "McpToolRow",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "nameKey",
+            "type": "String"
+          },
+          {
+            "name": "groupKey",
+            "type": "String"
+          },
+          {
+            "name": "roleKey",
+            "type": "String"
+          }
+        ]
+      },
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is a spec-mapped tools URL or /",
+      "destination": "Target spec screen or tab",
+      "description": "v1 destinations: /, /tools/agents, /tools/cli."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/tools/mcp.json",
+      "description": "MCP overview layout."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/mcp_tool_row.json",
+      "description": "One-line MCP tool row with name / group / role."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/tools/McpViewModel.ts",
+      "description": "Seeds the 29-tool catalog + nextReadLinks."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/tools/mcp/page.tsx",
+      "description": "Next.js route."
+    }
+  ],
+  "notes": [
+    "Second live entry under the Tools tab. Flipping TOOLS_ENTRIES row 2 (mcp) from 'upcoming' to 'live' in HomeViewModel finishes the task.",
+    "29 tools total. Group A = 7 (lookup), Group B = 6 (validation), Group C = 7 (generation), Group D = 9 (build + runtime). Per-tool prose lives on /reference/mcp-tools (upcoming); this page is the overview.",
+    "The cell uses a generic mcp_tool_row layout, not the agent_row layout — even though the visual is similar, the group pill differs in semantics (A/B/C/D letter code rather than a named role)."
+  ]
+}

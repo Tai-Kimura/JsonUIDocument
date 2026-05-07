@@ -1,0 +1,45 @@
+{
+  "type": "View",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "wrapContent",
+  "style": "card_surface",
+  "child": [
+    {
+      "data": [
+        { "name": "commandKey", "class": "String" },
+        { "name": "expectKey", "class": "String" },
+        { "name": "command", "class": "String", "defaultValue": "" },
+        { "name": "language", "class": "String", "defaultValue": "bash" }
+      ]
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "fontSize": 13,
+      "fontWeight": "semibold",
+      "fontColor": "#475467",
+      "text": "@{commandKey}"
+    },
+    {
+      "type": "CodeBlock",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 8,
+      "code": "@{command}",
+      "language": "@{language}",
+      "showLineNumbers": false,
+      "copyable": true
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 10,
+      "fontSize": 14,
+      "fontColor": "#475467",
+      "text": "@{expectKey}"
+    }
+  ]
+}

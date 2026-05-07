@@ -1,0 +1,149 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "WritingLayouts",
+    "displayName": "Writing layouts",
+    "description": "Guides > Writing layouts. Task-focused walk-through of how to author layout JSON well — style definitions, include (sub-layout reuse), Collection basics and multi-section patterns, @{binding} and visibility tricks, and common pitfalls. Seven sections + TOC + next-reads. Web (rjui) focused because this docs site is Web-primary; cross-platform nuances deferred to concept essays.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "guides/writing-layouts",
+    "createdAt": "2026-04-24",
+    "updatedAt": "2026-04-24"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_custom_components -> /guides/custom-components, next_first_spec -> /guides/writing-your-first-spec) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the guides_writing_layouts_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /guides/custom-components, /guides/writing-your-first-spec."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /guides/custom-components and /guides/writing-your-first-spec. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is spec-mapped",
+      "destination": "Target screen or tab",
+      "description": "v1 destinations: /, /guides/custom-components, /guides/writing-your-first-spec."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/guides/writing-layouts.json",
+      "description": "Layout source of truth (hand-edited, distributed to jsonui-doc-web/src/Layouts/guides/writing-layouts.json by jui build)."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/guides/WritingLayoutsViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/guides/writing-layouts/page.tsx",
+      "description": "Page."
+    }
+  ],
+  "notes": [
+    "Sixth live entry under the Guides tab. Follows the same template as the other five (custom-components, localization, navigation, testing, writing-your-first-spec).",
+    "Seven sections: (1) Orient yourself (where layout / cell / style / strings files live, with project tree), (2) Style definitions (styles/ folder, 'style' attribute, merge rule, no inheritance) with 2 CodeBlocks, (3) Include sub-layout reuse ('include' attribute, shared_data + data, not recursive) with 1 CodeBlock, (4) Collection basics — single cell type with items / cellIdProperty / sections / orientation / columnCount / line-itemSpacing / lazy / scrollEnabled; data block on the cell side that becomes a TS Data interface, with 3 CodeBlocks, (5) Collection multi-section — mixing cell types requires multiple sections because rjui cannot pick cell type dynamically per row, with 1 CodeBlock, (6) Binding and visibility — @{property} resolution + visible/invisible/gone triage, (7) Pitfalls — weight vs matchParent in flex-row, topMargin is orientation-agnostic, gone vs invisible DOM implications, _overlay is internal.",
+    "Running exemplars: home.json styles ('primary_button', 'hero_section'), cells/agent_row.json for the cell data block example, and a minimal include example even though JsonUIDocument itself does not currently use the include mechanism (it is a supported feature worth documenting).",
+    "Cross-links: the five existing guides' next-reads will be touched in a follow-up so at least custom-components points to this guide as a natural follow-on."
+  ]
+}

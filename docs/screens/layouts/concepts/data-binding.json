@@ -1,0 +1,418 @@
+{
+  "type": "View",
+  "id": "concepts_data_binding_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateConcepts",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "concepts_data_binding_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "concepts_data_binding_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            24,
+            32
+          ],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateConcepts}",
+              "text": "breadcrumb",
+              "width": "wrapContent"
+            },
+            {
+              "type": "Label",
+              "id": "concepts_data_binding_title",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "id": "concepts_data_binding_lead",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "#475467",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "#64748B",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "concepts_data_binding_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "concepts_data_binding_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_syntax",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_syntax_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_syntax_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// 1. TEXT — Label text, TextField hint, CodeBlock filename, etc.\n{ \"type\": \"Label\",     \"text\": \"@{greeting}\" }\n{ \"type\": \"TextField\", \"hint\": \"@{placeholder}\" }\n\n// 2. STYLE — colors, opacity, fontWeight, borders\n{ \"type\": \"View\",  \"background\": \"@{cardBg}\", \"opacity\":     \"@{fadeAlpha}\" }\n{ \"type\": \"Label\", \"fontColor\":  \"@{status}\", \"fontWeight\":  \"@{emphasis}\"  }\n\n// 3. LAYOUT — sizes, visibility (String enum, NOT Bool)\n{ \"type\": \"View\", \"width\":      \"@{panelWidth}\" }\n{ \"type\": \"View\", \"visibility\": \"@{panelVisibility}\" }   // \"visible\" | \"invisible\" | \"gone\"\n\n// 4. EVENT handlers — onClick, onTextChange, onValueChanged, onPageChanged, ...\n{ \"type\": \"Button\",    \"onClick\":       \"@{onSubmit}\" }\n{ \"type\": \"TextField\", \"onTextChange\":  \"@{onEmailChange}\" }\n\n// 5. COLLECTION / RESOURCE — items, src, currentPage, ...\n{ \"type\": \"Collection\",   \"items\":       \"@{bars}\" }\n{ \"type\": \"NetworkImage\", \"src\":         \"@{coverUrl}\" }\n{ \"type\": \"TabView\",      \"currentPage\": \"@{activeTab}\" }",
+                      "language": "json",
+                      "filename": "five families of bindings",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_typed",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_typed_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_typed_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// The SAME `@{count}` resolves differently per target.\n\n// ANDROID — compile-time check via DataBinding annotation processor.\n//   Generated XML:   android:text=\"@{data.count}\"\n//   Bool → Label.text fails at `./gradlew assemble`.\n\n// WEB — compile-time check via TypeScript + generated FooData interface.\n//   Generated JSX:   {data.count}\n//   Bool → Label.text fails at `next build` (tsc error).\n\n// iOS — runtime reflection via SwiftJsonUI.\n//   Generated SwiftUI: Text(\"\\\\(data.count)\")\n//   Bool → Label.text: blank label + console warning; build still succeeds.\n\n// `jui verify --fail-on-diff` is a STRUCTURAL drift check only\n// (generated Layout tree vs spec). It does NOT type-check bindings.",
+                      "language": "text",
+                      "filename": "per-platform typing",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_oneway",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_oneway_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_oneway_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// NON-INPUT attributes are read-only. The view has no write-back path.\n{ \"type\": \"Label\", \"text\": \"@{greeting}\" }               // VM pushes; view displays.\n\n// FORM INPUTS emit platform-native TWO-WAY machinery automatically.\n// The author still writes the familiar pair — it LOOKS one-way:\n{\n  \"type\": \"TextField\",\n  \"text\":         \"@{email}\",\n  \"onTextChange\": \"@{onEmailChange}\"     // optional — fires AFTER the field updated\n}\n\n// Under the hood the generator emits:\n//   iOS:     TextField(..., text: $data.email)                 // SwiftUI $binding\n//   Android: LaunchedEffect { viewModel.updateData(email=new) } // Compose LaunchedEffect\n//   Web:     <input value={data.email}\n//                   onChange={(e) => data.onEmailChange?.(e.target.value)} />\n\n// The VM field updates on every keystroke — BEFORE the handler runs.\n// To reject / trim / transform, do NOT treat the callback as a gate —\n// let the field update, then snap it back to the corrected value:\nonEmailChange = (next: string) => {\n  const cleaned = next.trim().slice(0, 128);\n  this.updateData({ email: cleaned });   // same binding re-renders the input\n};\n\n// Cross-platform callback signatures:\n//   iOS:     (oldValue: String, newValue: String) -> Void\n//   Android: (newValue: String) -> Unit\n//   Web:     (newValue: string) => void",
+                      "language": "text",
+                      "filename": "form inputs are two-way under the hood",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_no_logic",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_no_logic_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_no_logic_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// ALLOWED grammar — exactly five forms:\n{ \"text\":    \"@{displayName}\" }          // simple property\n{ \"text\":    \"@{user.profile.handle}\" }  // dot-path\n{ \"text\":    \"@{items[0]}\" }             // array index\n{ \"onClick\": \"@{onSubmit}\" }             // action binding\n{ \"text\":    \"@{data.title}\" }           // cell-scoped (inside cells/*.json)\n\n// REJECTED — rjui's binding_validator.rb catches these with actionable warnings.\n{ \"text\": \"@{count > 0 ? 'some' : 'none'}\" }   // ternary\n{ \"text\": \"@{formatName(user)}\" }               // function call\n{ \"text\": \"@{user.name.toUpperCase()}\" }        // method call\n{ \"text\": \"@{a + b}\" }                          // arithmetic\n{ \"text\": \"@{isReady && isValid}\" }             // logical\n\n// Also not in the grammar:\n{ \"text\": \"@{^parentProp}\" }   // no path-ascent\n{ \"text\": \"@{../sibling}\" }    // no relative navigation\n\n// For derived values, compute in the ViewModel and bind the getter:\n//   get countLabel(): string { return this.count > 0 ? this.s('some') : this.s('none'); }\n//   { \"text\": \"@{countLabel}\" }\n\n// Note: validator runs on rjui only.\n// iOS and Android currently accept malformed bindings and fail at runtime.",
+                      "language": "text",
+                      "filename": "allowed grammar + rejected expressions",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "concepts_data_binding_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    32,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "chrome_ink",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "concepts_data_binding_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 2,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/next_step_card"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "concepts_data_binding_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "#94A3B8",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "concepts_data_binding_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [
+                24,
+                16,
+                24,
+                16
+              ],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "concepts_data_binding_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    0,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        {
+                          "id": "toc_syntax",
+                          "label": "toc_row_syntax",
+                          "anchor": "section_syntax",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_typed",
+                          "label": "toc_row_typed",
+                          "anchor": "section_typed",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_oneway",
+                          "label": "toc_row_oneway",
+                          "anchor": "section_oneway",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_no_logic",
+                          "label": "toc_row_no_logic",
+                          "anchor": "section_no_logic",
+                          "level": 1
+                        }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

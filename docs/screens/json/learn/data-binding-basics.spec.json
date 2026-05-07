@@ -1,0 +1,148 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "DataBindingBasics",
+    "displayName": "Data binding basics",
+    "description": "Learn > hands-on data binding walkthrough. Builds a Counter screen from scratch to show @{binding} in three real contexts: value, visibility, event. Four sections + one closing troubleshooting block. ~10-min read. Companion to the concepts/data-binding essay — this one is the practical follow-up.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "learn/data-binding-basics",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_concepts_data_binding -> /concepts/data-binding, next_first_screen -> /learn/first-screen) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the learn_data_binding_basics_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /concepts/data-binding, /learn/first-screen."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /concepts/data-binding and /learn/first-screen. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is a spec-mapped learn or concepts URL or /",
+      "destination": "Target screen or tab",
+      "description": "v1: /, /concepts/data-binding, /learn/first-screen."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/learn/data-binding-basics.json",
+      "description": "Layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/learn/DataBindingBasicsViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/learn/data-binding-basics/page.tsx",
+      "description": "Page."
+    }
+  ],
+  "notes": [
+    "Fourth live entry under the Learn tab. Flipping LEARN_ENTRIES row 4 (data-binding) to 'live' in HomeViewModel finishes.",
+    "Practical pair to /concepts/data-binding — the essay there covers 'why', this one covers 'how'. Each section builds on the previous one, so the reader ends up with a Counter spec + layout + ViewModel that does all three binding kinds.",
+    "Four CodeBlocks total: (1) the skeleton spec + layout before any binding, (2) adding @{count} as a value binding, (3) adding @{statusVisibility} as a visibility binding, (4) adding @{onIncrement} / @{onDecrement} as event bindings — in that order."
+  ]
+}

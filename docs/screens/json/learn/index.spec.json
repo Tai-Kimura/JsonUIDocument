@@ -1,0 +1,135 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "LearnIndex",
+    "displayName": "Learn",
+    "description": "Catalog page for the Learn section. Lists every learn-track article with status (live / upcoming), read time, and one-line description. Dual-purpose: rendered inline inside the home TabView AND at the standalone URL /learn. v1 seeds the catalog statically in the owning ViewModel; a DocContentRepository can replace the seed later without touching this spec.",
+    "platforms": ["web"],
+    "layoutFile": "learn/index",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "articles",
+        "type": "[LearnArticle]",
+        "initial": "[]",
+        "description": "Ordered catalog of learn-track articles. v1 seeds: Installation (live), Hello World (live), First Screen (upcoming), Data Binding Basics (upcoming), What is JsonUI (upcoming). Order is curriculum order — a beginner reads top-to-bottom."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Populate `articles` with the static v1 catalog. All user-visible strings are @string/... keys so language toggle flows through StringManager. Each live article gets an onNavigate closure; upcoming articles get no handler (the card suppresses its tap-surface when status != 'live')."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          { "name": "url", "type": "String" }
+        ],
+        "description": "Client-side navigation. Only the live cards fire this. Destination URLs are spec-mapped (e.g. /learn/installation)."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[LearnIndexView] --> VM[LearnIndexViewModel]\n    VM -- articles --> VIEW\n    VIEW -- onNavigate(url) --> VM",
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed `articles` from the module-scope CATALOG constant in LearnIndexViewModel. Each catalog row carries (id, url, titleKey) where titleKey is the screen's strings.json key (e.g. learn_installation_title). Expands each row into an ArticleCell with StringManager-resolved titleKey + descriptionKey (derived by suffix-substituting `_title` → `_lead`), pre-wired onNavigate closure, and the standard 'live' status decorations (statusBackground #DCFCE7, statusColor #166534, cardOpacity 1). The status / read-time fields stay as empty strings for v1 — the cell layout tolerates empty pills."
+        },
+        {
+          "name": "onNavigate",
+          "params": [{ "name": "url", "type": "String" }],
+          "description": "router.push(url). All live article cards funnel through this one method. Upcoming entries have no onClick binding at the cell layout level."
+        }
+      ],
+      "vars": [
+        {
+          "name": "articles",
+          "type": "Array(LearnArticle)",
+          "observable": true,
+          "description": "Ordered catalog, seeded in onAppear. Order is curriculum order — a beginner reads top-to-bottom."
+        }
+      ]
+    },
+    "customTypes": [
+      {
+        "name": "LearnArticle",
+        "properties": [
+          { "name": "id",             "type": "String" },
+          { "name": "titleKey",       "type": "String" },
+          { "name": "descriptionKey", "type": "String" },
+          { "name": "readTimeKey",    "type": "String" },
+          { "name": "status",         "type": "String" },
+          { "name": "url",            "type": "String" }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a live article card",
+      "processing": "onNavigate(url) is invoked with the bound LearnArticle.url. Router pushes the URL, landing the reader on that article."
+    },
+    {
+      "action": "Tap an upcoming article card",
+      "processing": "No-op. The cell layout omits the onClick binding when status != 'live'. Visual treatment (reduced opacity + 'Coming soon' pill) signals unavailability."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is any spec-mapped learn URL",
+      "destination": "Target spec screen resolved from url",
+      "description": "v1 destinations: /learn/installation, /learn/hello-world. Upcoming destinations (/learn/first-screen, /learn/data-binding-basics, /learn/what-is-jsonui) exist as catalog entries but don't trigger navigation until their specs land."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/learn_index.json",
+      "description": "LearnIndex layout. Hero block + vertical Collection of learn_article_card cells. Flat filename (not learn/index.json) per rjui-tabview-slash-path-identifier workaround — TabView views in home.json reference this as 'learn_index'."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/learn_article_card.json",
+      "description": "Learn article card cell. Renders title, description, status pill, read-time meta; visually dims and suppresses onClick when status != 'live'."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/LearnIndexViewModel.ts",
+      "description": "Standalone owner. Seeds `articles` from a module-scope CATALOG constant mirroring ChromeViewModel's NAV_CATALOG for the `learn` section so the sidebar and the index stay in lockstep."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/learn/page.tsx",
+      "description": "Next.js App Router entry for `/learn`. Landed in design-overhaul-pc-first Phase 12."
+    }
+  ],
+  "notes": [
+    "LearnArticle.status is a String ('live' | 'upcoming'). v1 treats anything non-'live' as disabled. Adding a third state ('deprecated') is purely additive on the cell layer.",
+    "LearnArticle.url is always present — even upcoming entries declare their future URL so the catalog is one additive step away from lighting up each row as content ships.",
+    "When LearnIndex is rendered inside home.TabView, its Data is supplied by HomeViewModel. When it's rendered at the /learn standalone route (future), its Data is supplied by its own LearnIndexViewModel. The screen contract (what Data fields exist) is identical either way — only the *owner* of the seed differs.",
+    "v1 ships 5 catalog entries, 2 live. The upcoming 3 are placeholders that give the reader a sense of the curriculum ahead; their spec files will be authored in separate tasks.",
+    "Strings prefix: `learn_index_*` (per first-prefix-fix, the namespace derives from the directory + basename, so the `learn/index.json` layout resolves its bare-text keys under `learn_index.*`)."
+  ]
+}

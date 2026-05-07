@@ -1,0 +1,29 @@
+{
+  "type": "View",
+  "orientation": "horizontal",
+  "width": "wrapContent",
+  "height": "wrapContent",
+  "leftMargin": 8,
+  "paddings": [3, 8, 3, 8],
+  "background": "#F3F4F6",
+  "cornerRadius": 4,
+  "child": [
+    {
+      "data": [
+        { "name": "label", "class": "String" },
+        { "name": "fontColor", "class": "String", "defaultValue": "var(--color-ink)" }
+      ]
+    },
+    {
+      "type": "Label",
+      "width": "wrapContent",
+      "height": "wrapContent",
+      "fontSize": 11,
+      "fontWeight": "semibold",
+      "fontFamily": "monospace",
+      "fontColor": "@{fontColor}",
+      "text": "@{label}"
+    }
+  ],
+  "_comment": "Platform chip for the page header kicker row. Driven by reference/components/<x>.json via the 'badges' CollectionDataSource. The build script pre-computes fontColor as a var(--color-ink|ink_subtle|ink_faint) reference based on each platform's support state so dark-mode cascade works."
+}

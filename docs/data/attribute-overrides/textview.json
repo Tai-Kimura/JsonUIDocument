@@ -1,0 +1,55 @@
+{
+  "component": "TextView",
+  "description": {
+    "en": "Multi-line text input for long-form user-entered strings (comments, descriptions, messages). Grows vertically with content unless constrained by `height`.",
+    "ja": "複数行の長文入力（コメント・説明・メッセージ）用。`height` で制約されない限り、内容に応じて縦に伸びる。"
+  },
+  "usage": {
+    "en": "Use TextView when expected input exceeds one line. For messaging UI, pair with a fixed-height container and a Scroll.",
+    "ja": "入力が複数行に及ぶことが想定される場合に使う。メッセージ UI では固定高さのコンテナと Scroll を組み合わせる。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Auto-growing multi-line", "ja": "自動伸張の複数行" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TextView\",\n  \"text\": \"@{description}\",\n  \"hint\": \"@string/description_placeholder\",\n  \"width\": \"matchParent\"\n}"
+    },
+    {
+      "title": { "en": "Character counter", "ja": "文字数カウンタ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"TextView\", \"text\": \"@{bio}\", \"maxLength\": 160 },\n    { \"type\": \"Label\", \"text\": \"@{bio.length}/160\", \"fontSize\": 12, \"fontColor\": \"#9CA3AF\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Fixed height (internal scroll)", "ja": "高さ固定（内部スクロール）" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TextView\",\n  \"text\": \"@{longText}\",\n  \"width\": \"matchParent\",\n  \"height\": 200\n}"
+    }
+  ],
+  "attributes": {
+    "text": {
+      "note": {
+        "en": "Two-way. Same semantics as TextField.text. Multi-line input preserves newlines.",
+        "ja": "Two-way。TextField.text と同じ仕様。複数行入力では改行が保持される。"
+      }
+    },
+    "hint": {
+      "note": {
+        "en": "Placeholder shown while empty. Supports multi-line hints.",
+        "ja": "空欄時のプレースホルダ。複数行対応。"
+      }
+    },
+    "maxLength": {
+      "note": {
+        "en": "Positive integer; enforced platform-side. Characters beyond limit are silently dropped.",
+        "ja": "正の整数。プラットフォーム側で強制。超過文字は silent に破棄される。"
+      }
+    },
+    "returnKeyBehavior": {
+      "note": {
+        "en": "Controls whether pressing return inserts a newline or submits. Defaults to newline. Set to `done` / `submit` on mobile for send-on-return UX.",
+        "ja": "リターン押下時に改行を挿入するか送信するかを制御。デフォルトは改行。モバイルでリターン送信 UX にするには `done` / `submit` を指定。"
+      }
+    }
+  },
+  "relatedComponents": ["TextField", "EditText", "Input", "Label"]
+}

@@ -1,0 +1,143 @@
+{
+  "component": "Label",
+  "description": {
+    "en": "Display component for rendering a single-line or multi-line text string. Label is read-only; use TextField or TextView for user input.",
+    "ja": "単一行または複数行のテキストを描画する表示専用コンポーネント。ユーザー入力には TextField / TextView を使う。"
+  },
+  "usage": {
+    "en": "Use Label for all static or bound text: headings, body prose, form labels, list item titles, labels embedded in composite cells. Label does not handle taps — wrap it in a Button if the text should be interactive.",
+    "ja": "見出し・本文・フォームラベル・リストアイテム・ボタン内ラベルなど、あらゆる静的／バインド済みテキストに使う。タップ処理はしないため、押下動作が必要なら Button で包む。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Minimum", "ja": "最小例" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Label\",\n  \"text\": \"Hello, JsonUI\",\n  \"fontSize\": 16,\n  \"fontColor\": \"#111827\"\n}"
+    },
+    {
+      "title": { "en": "With binding", "ja": "binding を使う" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Label\",\n  \"text\": \"@{greeting}\",\n  \"fontSize\": 18,\n  \"fontWeight\": \"bold\"\n}",
+      "note": {
+        "en": "`greeting` must exist on the ViewModel as `String`.",
+        "ja": "`greeting` は ViewModel に `String` として宣言されている必要がある。"
+      }
+    },
+    {
+      "title": { "en": "Multi-line paragraph", "ja": "複数行のパラグラフ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Label\",\n  \"text\": \"@{paragraph}\",\n  \"fontSize\": 14,\n  \"lines\": 0,\n  \"width\": \"matchParent\"\n}",
+      "note": {
+        "en": "`lines: 0` means unlimited (default wrap).",
+        "ja": "`lines: 0` で無制限（デフォルトの折り返し）。"
+      }
+    },
+    {
+      "title": { "en": "Localized via @string", "ja": "@string で多言語化" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Label\",\n  \"text\": \"@string/welcome_title\",\n  \"fontSize\": 28,\n  \"fontWeight\": \"bold\"\n}"
+    },
+    {
+      "title": { "en": "Single-line ellipsis", "ja": "1 行で末尾切り詰め" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Label\",\n  \"text\": \"@{productName}\",\n  \"lines\": 1,\n  \"lineBreakMode\": \"Tail\",\n  \"width\": 200\n}"
+    },
+    {
+      "title": { "en": "String interpolation", "ja": "文字列補間" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Label\",\n  \"text\": \"Total: @{count} items\"\n}"
+    }
+  ],
+  "attributes": {
+    "text": {
+      "note": {
+        "en": "Accepts literal string, `@{binding}`, `@string/key`, or mixed `\"Total: @{count}\"` interpolation. Unresolved bindings render as empty string in release builds.",
+        "ja": "リテラル文字列、`@{binding}`、`@string/key`、または `\"合計: @{count}\"` のような補間をサポート。未解決の binding はリリースビルドで空文字として描画される。"
+      }
+    },
+    "fontColor": {
+      "note": {
+        "en": "Accepts hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`, named colors, or design tokens from `colors.json`. Alpha channel in `#RRGGBBAA` is supported on all platforms.",
+        "ja": "hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`、色名、または `colors.json` のデザイントークンを受け付ける。`#RRGGBBAA` のアルファ付きも全プラットフォーム対応。"
+      }
+    },
+    "font": {
+      "note": {
+        "en": "Font weight name (`regular`, `medium`, `semibold`, `bold`, `heavy`, `light`) or shorthand font name. Combined with `fontFamily` and `fontSize` into a single `FontSpec` object that the host's `Configuration.Font.fontProvider` resolves at the leaf — so weight semantics stay consistent across iOS / Android / Web. Binding supported.",
+        "ja": "フォントウェイト名（`regular` / `medium` / `semibold` / `bold` / `heavy` / `light`）またはフォント名の省略指定。`fontFamily` ・`fontSize` と一つの `FontSpec` オブジェクトにまとめられ、各プラットフォームの leaf で `Configuration.Font.fontProvider` が解決する。これにより iOS / Android / Web で weight の意味が一貫する。binding 可。"
+      },
+      "platformDiff": {
+        "swift_swiftui": "Configuration.Font.resolve(FontSpec(family:, weight:, size:, italic:)) → SwiftUI.Font。プロジェクト側で fontProvider を差し替えると custom font に切り替わる。",
+        "swift_uikit": "FontSpec → UIFont。fontProvider が `UIFont(name:size:)` 解決を行う。",
+        "kotlin_compose": "Configuration.Font.resolve(FontSpec(...)) → androidx.compose.ui.text.TextStyle。FontSpec.weight が FontWeight 値にマップ。",
+        "kotlin_xml": "FontSpec → android.graphics.Typeface。FontSpec.weight + style から Typeface を生成。",
+        "react": "...Configuration.Font.resolve({ family, weight, size, italic }) を JSX style にスプレッド。デフォルト provider は CSS font-family / font-weight にマップ。"
+      }
+    },
+    "fontFamily": {
+      "note": {
+        "en": "Font family name (e.g., `Noto Sans JP`). Passed as the `family` field of `FontSpec` — coexists with `font` (weight) and `fontSize` in the same FontSpec call. Resolved by the host-supplied `Configuration.Font.fontProvider`, so adding a custom font is a single-point change in the host project, not per-component.",
+        "ja": "フォントファミリ名（例: `Noto Sans JP`）。`FontSpec` の `family` フィールドとして渡され、同じ FontSpec の中で `font`（weight）・`fontSize` と併存する。ホスト側の `Configuration.Font.fontProvider` が解決するため、custom font の追加はホストプロジェクト 1 箇所の変更で済む（コンポーネント毎の修正は不要）。"
+      }
+    },
+    "fontWeight": {
+      "note": {
+        "en": "String values (`regular`, `medium`, `semibold`, `bold`, `heavy`, `light`) or numeric 100–900. Mapped to a `FontSpec.weight` value via the shared `font_weight_mapping.json` table — numeric values resolve to the platform-nearest concrete weight. Use `font` for the same purpose; `fontWeight` is the explicit alias.",
+        "ja": "文字列指定（`regular` / `medium` / `semibold` / `bold` / `heavy` / `light`）または 100〜900 の数値。共有テーブル `font_weight_mapping.json` を経由して `FontSpec.weight` 値にマップされる — 数値指定はプラットフォーム別に最も近い具体的 weight に解決される。`font` でも同じ役割を果たすが、`fontWeight` の方が明示的なエイリアス。"
+      }
+    },
+    "lineHeight": {
+      "note": {
+        "en": "Currently React-only. On iOS / Android use `lineHeightMultiple` or `lineSpacing` instead.",
+        "ja": "現在は React 専用。iOS / Android では `lineHeightMultiple` または `lineSpacing` を使う。"
+      },
+      "platformDiff": {
+        "swift_uikit": "NSAttributedString の paragraphStyle.minimumLineHeight 経由で反映される。直接 lineHeight 属性は未サポート。",
+        "swift_swiftui": ".lineSpacing(...) modifier に変換。",
+        "kotlin_compose": "LineHeightStyle.Alignment.Center + TextStyle.lineHeight として適用。",
+        "kotlin_xml": "TextView の lineSpacingExtra にマップ。",
+        "react": "Tailwind の `leading-[Npx]` arbitrary value に変換。"
+      }
+    },
+    "lines": {
+      "note": {
+        "en": "`0` = unlimited (default wrap). Positive integer = max line count; further text is truncated per `lineBreakMode`.",
+        "ja": "`0` は無制限（デフォルトで折り返し）。正の整数は最大行数で、超過分は `lineBreakMode` に従って切り詰められる。"
+      }
+    },
+    "lineBreakMode": {
+      "note": {
+        "en": "`Char` / `Clip` / `Word` / `Head` / `Middle` / `Tail`. `Head` truncates start with leading ellipsis, `Tail` truncates end (most common), `Middle` shows both ends.",
+        "ja": "`Char` / `Clip` / `Word` / `Head` / `Middle` / `Tail`。`Head` は先頭を省略記号で切り、`Tail` は末尾切り詰め（最も一般的）、`Middle` は両端を残して中央を省略。"
+      },
+      "platformDiff": {
+        "kotlin_xml": "`Middle` は Android XML でネイティブ未サポートのため `Tail` に警告付きフォールバック。"
+      }
+    },
+    "textAlign": {
+      "note": {
+        "en": "`Left` / `Center` / `Right` (both camelCase lowercase accepted). No `justify` on most platforms.",
+        "ja": "`Left` / `Center` / `Right`（小文字もサポート）。`justify` は多くのプラットフォームで未サポート。"
+      }
+    },
+    "hint": {
+      "note": {
+        "en": "Placeholder text shown when `text` is empty. Commonly paired with a bound `text` to show a fallback.",
+        "ja": "`text` が空のとき表示するプレースホルダ。バインドされた `text` と組み合わせてフォールバック表示に使う。"
+      }
+    },
+    "autoShrink": {
+      "note": {
+        "en": "Automatically shrinks font size to fit within bounds. Combined with `minimumScaleFactor` to bound the shrink ratio.",
+        "ja": "境界内に収まるようにフォントサイズを自動縮小。`minimumScaleFactor` と組み合わせて縮小率の下限を指定する。"
+      }
+    },
+    "linkable": {
+      "note": {
+        "en": "When `true`, URLs, phone numbers, and emails in the text become tappable. Platform-specific link detection.",
+        "ja": "`true` にすると、テキスト内の URL・電話番号・メールアドレスがタップ可能になる。リンク検出はプラットフォーム依存。"
+      }
+    }
+  },
+  "relatedComponents": ["TextView", "IconLabel", "Button"]
+}

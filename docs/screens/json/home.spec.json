@@ -1,0 +1,141 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "Home",
+    "displayName": "JsonUI",
+    "description": "Top page. Three sections: hero (brand statement + three CTAs), featured cards (3 'start here' links), platform cards (Swift/Kotlin/React), and a 'What's new' changelog ribbon. Navigation between site categories now lives in the site-wide chrome (TopBar + Sidebar) — home is no longer a navigation surface. Language toggle also moved to the top bar; home simply re-renders when StringManager flips.",
+    "platforms": ["web"],
+    "layoutFile": "home",
+    "createdAt": "2026-04-22",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "featuredLinks",
+        "type": "[FeaturedLink]",
+        "initial": "[]",
+        "description": "Three Featured Section cards rendered below the hero: Get started / AI agents / Cross-platform showcase. Hardcoded by the ViewModel in onAppear from the FEATURED_LINKS constant; each row's titleKey and descriptionKey are pre-resolved through StringManager so the cell renders display-ready text."
+      },
+      {
+        "name": "platformCards",
+        "type": "[PlatformCard]",
+        "initial": "[]",
+        "description": "Three platform cards (Swift / Kotlin / React) that link into each platform section. Hardcoded by the ViewModel in onAppear from the PLATFORM_CARDS constant."
+      },
+      {
+        "name": "recentChanges",
+        "type": "[ChangelogCard]",
+        "initial": "[]",
+        "description": "Up to 3–4 'What's new' ribbon cards telling a returning reader what landed since their last visit. Seeded by the ViewModel in onAppear from the RECENT_CHANGES constant; no API, no runtime fetch. Each cell carries a formatted date + title + blurb + CTA label, all localized."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Populate featuredLinks, platformCards, and recentChanges with the static v1 catalogs. Every user-visible string is resolved through StringManager using the home_* namespace so the language toggle (owned by the top bar) re-renders every row on flip. Navigation handlers (onHeroInstallTap etc.) are wired in initializeEventHandlers, not here."
+      },
+      {
+        "name": "onNavigate",
+        "params": [{ "name": "url", "type": "String" }],
+        "description": "Client-side navigation via router.push(url). Invoked by the hero CTAs and every card's onTap closure."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[HomeView] --> VM[HomeViewModel]\n    VM -- featuredLinks --> VIEW\n    VM -- platformCards --> VIEW\n    VM -- recentChanges --> VIEW\n    VIEW -- onNavigate(url) --> VM",
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Build featuredLinks, platformCards, and recentChanges by mapping the module-scope FEATURED_LINKS / PLATFORM_CARDS / RECENT_CHANGES constants through hydrate* helpers that resolve each titleKey / descriptionKey / blurbKey / ctaLabelKey via StringManager.getString() and bind a pre-wired onNavigate closure per row. Also wraps the results in CollectionDataSources via the asCollection() private helper so the generated Collection JSX finds data at data.xxx.sections[0].cells.data."
+        },
+        {
+          "name": "onNavigate",
+          "params": [{ "name": "url", "type": "String" }],
+          "description": "Single navigation funnel: calls router.push(url). Hero CTA bindings (onHeroInstallTap / onHeroAiAgentsTap / onHeroShowcaseTap) and every card's onNavigate closure flow through this one method so future analytics / middleware can hook a single spot."
+        }
+      ],
+      "vars": [
+        { "name": "featuredLinks",  "type": "Array(FeaturedLink)",  "observable": true, "description": "3 featured-card cells, seeded in onAppear." },
+        { "name": "platformCards",  "type": "Array(PlatformCard)",  "observable": true, "description": "3 platform-card cells, seeded in onAppear." },
+        { "name": "recentChanges",  "type": "Array(ChangelogCard)", "observable": true, "description": "3–4 'What's new' ribbon cells, seeded in onAppear." }
+      ]
+    },
+    "customTypes": [
+      {
+        "name": "FeaturedLink",
+        "properties": [
+          { "name": "id",             "type": "String" },
+          { "name": "titleKey",       "type": "String" },
+          { "name": "descriptionKey", "type": "String" },
+          { "name": "url",            "type": "String" },
+          { "name": "iconName",       "type": "String" }
+        ]
+      },
+      {
+        "name": "PlatformCard",
+        "properties": [
+          { "name": "id",             "type": "String" },
+          { "name": "platform",       "type": "String" },
+          { "name": "titleKey",       "type": "String" },
+          { "name": "descriptionKey", "type": "String" },
+          { "name": "url",            "type": "String" },
+          { "name": "accentColor",    "type": "String" }
+        ]
+      },
+      {
+        "name": "ChangelogCard",
+        "properties": [
+          { "name": "id",       "type": "String" },
+          { "name": "date",     "type": "String" },
+          { "name": "title",    "type": "String" },
+          { "name": "blurb",    "type": "String" },
+          { "name": "ctaLabel", "type": "String" },
+          { "name": "ctaUrl",   "type": "String" }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    { "action": "Tap hero CTA",            "processing": "onNavigate(url) with the hero CTA destination (/learn/installation, /tools/agents, or /platforms)." },
+    { "action": "Tap a featured link card", "processing": "onNavigate(url) with the bound FeaturedLink.url." },
+    { "action": "Tap a platform card",      "processing": "onNavigate(url) with the bound PlatformCard.url." },
+    { "action": "Tap a what's-new card",    "processing": "onNavigate(url) with the bound ChangelogCard.ctaUrl." }
+  ],
+  "validation": { "clientSide": [], "serverSide": [] },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is any spec-mapped URL",
+      "destination": "Target spec screen resolved from url",
+      "description": "Client-side navigation via router.push(url). Destinations from this page for v1: /learn/installation, /learn/hello-world, /tools/agents, /platforms, /platforms/swift, /platforms/kotlin, /platforms/react, and whichever changelog cards point to."
+    }
+  ],
+  "relatedFiles": [
+    { "type": "Layout",    "path": "docs/screens/layouts/home.json",                                   "description": "Home layout — three-section landing (hero, featured, platforms) plus the what's-new ribbon." },
+    { "type": "Layout",    "path": "docs/screens/layouts/cells/featured_card.json",                    "description": "FeaturedLink cell layout." },
+    { "type": "Layout",    "path": "docs/screens/layouts/cells/platform_card.json",                    "description": "PlatformCard cell layout." },
+    { "type": "Layout",    "path": "docs/screens/layouts/cells/changelog_card.json",                   "description": "ChangelogCard cell layout." },
+    { "type": "ViewModel", "path": "jsonui-doc-web/src/viewmodels/HomeViewModel.ts",                   "description": "Hand-written VM body with the FEATURED_LINKS / PLATFORM_CARDS / RECENT_CHANGES catalogs." },
+    { "type": "View",      "path": "jsonui-doc-web/src/app/page.tsx",                                  "description": "Next.js App Router home page." }
+  ],
+  "notes": [
+    "Site-wide chrome (TopBar + Sidebar) now owns navigation + language toggle + search. Home hero no longer embeds a language toggle or inline Search. See docs/screens/json/chrome.spec.json.",
+    "v1 uses hand-curated RECENT_CHANGES in the ViewModel. Adding a DocChangelogRepository later is a pure additive change and does not alter the ViewModel's public contract.",
+    "featuredLinks count = 3 (Get started / AI agents / Cross-platform showcase). platformCards count = 3 (Swift / Kotlin / React). recentChanges count = 3–4.",
+    "All user-visible strings flow through StringManager keys under the home_* namespace."
+  ]
+}

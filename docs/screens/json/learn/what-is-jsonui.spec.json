@@ -1,0 +1,147 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "WhatIsJsonui",
+    "displayName": "What is JsonUI?",
+    "description": "Learn > intro essay. Four H2 sections aimed at a reader who has heard of JsonUI but has not used it: What it is in one sentence / The three pieces / Who it is for / How it differs from SwiftUI / Compose / React alone. ~8-min read.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "learn/what-is-jsonui",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_installation -> /learn/installation, next_hello_world -> /learn/hello-world) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the learn_what_is_jsonui_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /learn/installation, /learn/hello-world."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /learn/installation and /learn/hello-world. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is a spec-mapped learn URL or /",
+      "destination": "Target screen or tab",
+      "description": "v1: /, /learn/installation, /learn/hello-world."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/learn/what-is-jsonui.json",
+      "description": "Layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/learn/WhatIsJsonuiViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/learn/what-is-jsonui/page.tsx",
+      "description": "Page."
+    }
+  ],
+  "notes": [
+    "Third live entry under the Learn tab. Flipping LEARN_ENTRIES row 5 (what-is) to 'live' in HomeViewModel finishes.",
+    "Intro essay — no Collection, no custom component beyond CodeBlock + TOC. The reader has not installed anything yet; do not ask them to run commands here — link to /learn/installation for that."
+  ]
+}

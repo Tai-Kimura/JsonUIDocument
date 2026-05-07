@@ -1,0 +1,33 @@
+{
+  "component": "EditText",
+  "aliasOf": "TextField",
+  "description": {
+    "en": "Android-native naming alias for TextField. Identical runtime behavior; exists to preserve attribute-name familiarity for Android engineers migrating from XML `EditText`.",
+    "ja": "TextField の Android ネイティブ命名エイリアス。実行時動作は同一。XML `EditText` から移行する Android エンジニアの属性名の馴染みを保つために存在。"
+  },
+  "usage": {
+    "en": "Prefer TextField in new cross-platform code. Use EditText when porting existing Android XML layouts verbatim.",
+    "ja": "新規クロスプラットフォームコードでは TextField を推奨。既存 Android XML レイアウトをそのまま移植するときに EditText を使う。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Android XML migration example", "ja": "Android XML からの移行例" },
+      "language": "xml",
+      "code": "<EditText\n  android:id=\"@+id/phone\"\n  android:hint=\"@string/phone_hint\"\n  android:inputType=\"phone\"\n  android:maxLength=\"11\"/>"
+    },
+    {
+      "title": { "en": "Same in JsonUI", "ja": "JsonUI での同等コード" },
+      "language": "json",
+      "code": "{\n  \"type\": \"EditText\",\n  \"id\": \"phone\",\n  \"text\": \"@{phone}\",\n  \"hint\": \"@string/phone_hint\",\n  \"inputType\": \"phone\",\n  \"maxLength\": 11\n}"
+    }
+  ],
+  "attributes": {
+    "inputType": {
+      "note": {
+        "en": "Android-style. `text` / `number` / `phone` / `email` / `password` / `textMultiLine`. Maps to TextField's `contentType` internally.",
+        "ja": "Android 風。`text` / `number` / `phone` / `email` / `password` / `textMultiLine`。内部で TextField の `contentType` にマップ。"
+      }
+    }
+  },
+  "relatedComponents": ["TextField", "TextView", "Input"]
+}

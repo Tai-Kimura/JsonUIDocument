@@ -1,0 +1,86 @@
+{
+  "component": "Switch",
+  "description": {
+    "en": "Binary ON/OFF control with an animated toggle thumb. Matches the host platform visually (iOS capsule / Android Material / Web custom).",
+    "ja": "二値 ON/OFF を切り替えるアニメーション付きトグル。ホストプラットフォームに準拠（iOS カプセル / Android Material / Web カスタム）。"
+  },
+  "usage": {
+    "en": "Use Switch when the action takes effect immediately (e.g., `Enable notifications`). For delayed commit (form submission) prefer CheckBox. Bind `value` (or the alias `isOn` / `checked`) to a mutable Boolean on the ViewModel.",
+    "ja": "アクションが即時反映される場合に使う（例: 通知の有効化）。フォーム送信後に反映する場合は CheckBox を使う。`value`（または別名 `isOn` / `checked`）を ViewModel の mutable Boolean にバインドする。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Minimum", "ja": "最小例" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Switch\",\n  \"value\": \"@{notificationsEnabled}\",\n  \"onValueChange\": \"@{onToggleNotifications}\"\n}"
+    },
+    {
+      "title": { "en": "With row label", "ja": "行ラベル付き" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"horizontal\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/enable_notifications\", \"weight\": 1 },\n    { \"type\": \"Switch\", \"value\": \"@{notificationsEnabled}\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Custom tint colors", "ja": "カスタム tint" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Switch\",\n  \"value\": \"@{darkMode}\",\n  \"onTintColor\": \"#2563EB\",\n  \"offTintColor\": \"#D1D5DB\",\n  \"thumbTintColor\": \"#FFFFFF\"\n}"
+    }
+  ],
+  "attributes": {
+    "value": {
+      "note": {
+        "en": "Two-way Boolean binding. Canonical attribute.",
+        "ja": "Boolean の two-way binding。推奨属性。"
+      }
+    },
+    "isOn": {
+      "note": {
+        "en": "Alias for `value`. iOS UISwitch-style naming.",
+        "ja": "`value` のエイリアス。iOS UISwitch 風の命名。"
+      }
+    },
+    "checked": {
+      "note": {
+        "en": "Alias for `value`. Matches CheckBox/Radio naming for consistency.",
+        "ja": "`value` のエイリアス。CheckBox/Radio と命名を揃えたエイリアス。"
+      }
+    },
+    "onValueChange": {
+      "note": {
+        "en": "Fires with the new Boolean value. Mutually compatible with `value` binding; use onValueChange when side effects beyond state update are needed.",
+        "ja": "新しい Boolean を引数に発火。`value` binding と相互互換だが、状態更新以外の副作用があるときに使う。"
+      }
+    },
+    "onToggle": {
+      "note": {
+        "en": "Alias for `onValueChange`. Legacy naming.",
+        "ja": "`onValueChange` のエイリアス。旧命名。"
+      }
+    },
+    "onTintColor": {
+      "note": {
+        "en": "Track color when the switch is ON.",
+        "ja": "Switch が ON のときの trackColor。"
+      },
+      "platformDiff": {
+        "swift_uikit": "UISwitch.onTintColor。",
+        "swift_swiftui": "`.tint(onTintColor)`（iOS 15+）。",
+        "kotlin_compose": "`SwitchColors(checkedTrackColor=...)`。",
+        "kotlin_xml": "`android:trackTint` (checked state selector)。",
+        "react": "CSS variable `--switch-on-bg` を上書き。"
+      }
+    },
+    "offTintColor": {
+      "note": {
+        "en": "Track color when OFF.",
+        "ja": "OFF のときの trackColor。"
+      }
+    },
+    "thumbTintColor": {
+      "note": {
+        "en": "Thumb (the draggable circle) color.",
+        "ja": "thumb（ドラッグ可能な円）の色。"
+      }
+    }
+  },
+  "relatedComponents": ["Toggle", "CheckBox"]
+}

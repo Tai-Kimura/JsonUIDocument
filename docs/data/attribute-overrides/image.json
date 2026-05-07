@@ -1,0 +1,85 @@
+{
+  "component": "Image",
+  "description": {
+    "en": "Bundled/local image display. Reads from the app's resource bundle (asset catalog on iOS, `res/drawable` on Android, `public/` on Web).",
+    "ja": "同梱／ローカル画像を表示。アプリの resource bundle（iOS は asset catalog、Android は `res/drawable`、Web は `public/`）から読み込む。"
+  },
+  "usage": {
+    "en": "Use Image for static assets (icons, logos, backgrounds). For remote URLs use NetworkImage. For SF Symbols / Material Icons as font glyphs use IconLabel.",
+    "ja": "静的アセット（アイコン、ロゴ、背景）に使う。リモート URL なら NetworkImage、フォントグリフ（SF Symbols / Material Icons）なら IconLabel を使う。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Minimum (by name)", "ja": "最小例（名前指定）" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Image\",\n  \"srcName\": \"logo\",\n  \"width\": 120,\n  \"height\": 32\n}"
+    },
+    {
+      "title": { "en": "Aspect-fill hero", "ja": "アスペクトフィルのヒーロー" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Image\",\n  \"srcName\": \"hero_banner\",\n  \"width\": \"matchParent\",\n  \"height\": 200,\n  \"contentMode\": \"aspectFill\"\n}"
+    },
+    {
+      "title": { "en": "Template / tinted icon", "ja": "テンプレート画像・色付け" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Image\",\n  \"srcName\": \"icon_close\",\n  \"width\": 24,\n  \"height\": 24,\n  \"renderingMode\": \"template\",\n  \"tintColor\": \"#FFFFFF\"\n}"
+    },
+    {
+      "title": { "en": "With accessibility alt", "ja": "alt テキスト付き" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Image\",\n  \"srcName\": \"chart_summary\",\n  \"alt\": \"@string/chart_summary_alt\",\n  \"width\": 320,\n  \"height\": 200\n}"
+    }
+  ],
+  "attributes": {
+    "srcName": {
+      "note": {
+        "en": "Asset name (no extension). Resolved per platform: iOS asset catalog / Android `@drawable/<name>` / Web `/images/<name>.{png,svg,webp}`.",
+        "ja": "アセット名（拡張子なし）。iOS は asset catalog、Android は `@drawable/<name>`、Web は `/images/<name>.{png,svg,webp}` に解決される。"
+      },
+      "platformDiff": {
+        "swift_uikit": "Asset Catalog の image 名。`@1x/@2x/@3x` 自動解決。",
+        "swift_swiftui": "同上（`Image(\"name\")`）。",
+        "kotlin_compose": "`painterResource(R.drawable.<name>)` に解決。",
+        "kotlin_xml": "`@drawable/<name>`。",
+        "react": "`/images/<name>.{png,svg,webp}` を解決。`public/images/` 配下に配置。"
+      }
+    },
+    "src": {
+      "note": {
+        "en": "Alternative to `srcName` — full path string. On Web this maps directly to `<img src>`.",
+        "ja": "`srcName` の代わりにフルパス文字列を指定。Web では `<img src>` にそのままマップ。"
+      }
+    },
+    "contentMode": {
+      "note": {
+        "en": "`aspectFit` / `aspectFill` / `fill` / `center`. Determines how the image fits into declared width/height.",
+        "ja": "`aspectFit` / `aspectFill` / `fill` / `center`。画像を指定サイズにどう収めるか。"
+      }
+    },
+    "renderingMode": {
+      "note": {
+        "en": "`original` / `template`. `template` enables tint color (monochrome glyph coloring).",
+        "ja": "`original` / `template`。`template` で tint color が効く（モノクログリフの色付け）。"
+      }
+    },
+    "highlightSrcName": {
+      "note": {
+        "en": "Optional image shown when the parent is a pressed Button. Pair with `srcName` to define the normal / pressed pair.",
+        "ja": "親が押下中の Button のとき表示する画像。`srcName` と対にして通常／押下の組を定義する。"
+      }
+    },
+    "alt": {
+      "note": {
+        "en": "Accessibility description. Spoken by screen readers (VoiceOver / TalkBack). For decorative images, use an empty string or omit.",
+        "ja": "アクセシビリティ説明文。VoiceOver / TalkBack が読み上げる。装飾画像は空文字または省略。"
+      }
+    },
+    "loading": {
+      "note": {
+        "en": "Web-only. `eager` / `lazy`. Maps to HTML `<img loading>`. Default `lazy`.",
+        "ja": "Web 専用。`eager` / `lazy`。HTML `<img loading>` にマップ。デフォルト `lazy`。"
+      }
+    }
+  },
+  "relatedComponents": ["NetworkImage", "IconLabel", "CircleView"]
+}

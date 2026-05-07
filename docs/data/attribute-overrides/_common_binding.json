@@ -1,0 +1,69 @@
+{
+  "category": "binding",
+  "description": {
+    "en": "Binding attributes link JSON values to ViewModel state via the `@{...}` syntax. Three kinds: value binding, string resolution, and event binding.",
+    "ja": "Binding 属性は `@{...}` 構文で JSON 値と ViewModel の状態を繋ぐ。値 binding、文字列解決、イベント binding の 3 種類がある。"
+  },
+  "attributes": {
+    "binding": {
+      "summary": {
+        "en": "Explicit binding declaration for attributes that do not use the `@{...}` inline syntax. Rarely used directly — most binding happens via `@{...}` in attribute values.",
+        "ja": "`@{...}` 構文を使わない属性に対する明示的 binding 宣言。直接使われることは稀 — 通常は属性値内の `@{...}` で binding する。"
+      }
+    },
+    "bind": {
+      "summary": {
+        "en": "Alias for `binding`.",
+        "ja": "`binding` のエイリアス。"
+      }
+    },
+    "bindingScript": {
+      "summary": {
+        "en": "Inline JavaScript expression evaluated against the ViewModel. Use for complex derived values where `@{...}` is not expressive enough. Prefer `computed` in the spec's `stateManagement`.",
+        "ja": "ViewModel に対して評価されるインライン JavaScript 式。`@{...}` では表現しきれない複雑な導出値に使う。spec の `stateManagement.computed` を優先。"
+      }
+    },
+    "binding_id": {
+      "summary": {
+        "en": "Stable identifier for a specific binding. Used by the Hot Loader to route targeted updates to the right element.",
+        "ja": "特定の binding の安定識別子。Hot Loader が更新を適切な要素に振り分けるのに使う。"
+      }
+    },
+    "binding_group": {
+      "summary": {
+        "en": "Groups multiple bindings so they re-evaluate together. Use when several attributes on the same element should update atomically.",
+        "ja": "複数の binding をまとめて再評価させる。同一要素の複数属性をアトミックに更新したいときに使う。"
+      }
+    },
+    "data": {
+      "summary": {
+        "en": "Declares the ViewModel properties this Layout segment expects. Appears at the top of a Layout as `{ \"data\": [...] }`.",
+        "ja": "この Layout セグメントが ViewModel に期待するプロパティを宣言。Layout 先頭に `{ \"data\": [...] }` として現れる。"
+      },
+      "examples": [
+        {
+          "language": "json",
+          "code": "{ \"data\": [\n  { \"name\": \"userName\", \"class\": \"String\", \"defaultValue\": \"\" },\n  { \"name\": \"onTap\", \"class\": \"() -> Void\" }\n] }"
+        }
+      ]
+    },
+    "variables": {
+      "summary": {
+        "en": "Alternative to `data`: compact local variable declarations. Used in cell layouts that receive item data via `@{item.*}`.",
+        "ja": "`data` の代替: コンパクトなローカル変数宣言。`@{item.*}` で item データを受ける cell レイアウトで使う。"
+      }
+    },
+    "shared_data": {
+      "summary": {
+        "en": "Declares data shared with parent screens. Used in include'd partials to propagate state upward.",
+        "ja": "親画面と共有するデータを宣言。include された部分 Layout から状態を上位に伝搬させるのに使う。"
+      }
+    },
+    "propertyName": {
+      "summary": {
+        "en": "Specifies the ViewModel property name that this element's value binding writes to. Sometimes required for custom components whose attribute-to-property mapping isn't automatic.",
+        "ja": "この要素の値 binding が書き戻す ViewModel プロパティ名を指定。属性-プロパティのマッピングが自動でないカスタムコンポーネントで必要になる。"
+      }
+    }
+  }
+}

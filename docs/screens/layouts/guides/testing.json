@@ -1,0 +1,617 @@
+{
+  "type": "View",
+  "id": "guides_testing_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateGuides",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "guides_testing_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "guides_testing_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            24,
+            32
+          ],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateGuides}",
+              "text": "breadcrumb",
+              "width": "wrapContent"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "#475467",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "#64748B",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "guides_testing_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "guides_testing_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_where",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_where_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_where_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "tests/\n  screens/\n    home.test.json\n    learn/hello-world.test.json       ← screen test\n  flows/\n    login-to-profile.test.json        ← flow test\n  descriptions/\n    home.description.json             ← optional richer docs",
+                      "language": "text",
+                      "filename": "tests/ layout",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_screen",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_screen_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_screen_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "{\n  \"type\": \"screen\",\n  \"source\": { \"layout\": \"layouts/counter.json\" },\n  \"metadata\": { \"name\": \"Counter — increment flow\", \"tags\": [\"smoke\"] },\n  \"platform\": \"web\",\n  \"initialState\": { \"viewModel\": { \"count\": 0 } },\n  \"cases\": [\n    {\n      \"name\": \"increment once shows 1\",\n      \"steps\": [\n        { \"assert\": \"text\", \"id\": \"counter_value\", \"equals\": \"0\" },\n        { \"tap\": \"counter_increment_btn\" },\n        { \"assert\": \"text\", \"id\": \"counter_value\", \"equals\": \"1\" }\n      ]\n    }\n  ]\n}",
+                      "language": "json",
+                      "filename": "tests/screens/counter.test.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_flow",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_flow_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_flow_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "{\n  \"type\": \"flow\",\n  \"sources\": [\n    { \"alias\": \"login\", \"layout\": \"layouts/login.json\" },\n    { \"alias\": \"home\",  \"layout\": \"layouts/home.json\" }\n  ],\n  \"metadata\": { \"name\": \"Login → Home happy path\" },\n  \"platform\": \"web\",\n  \"initialState\": { \"screen\": \"login\", \"viewModels\": { \"login\": {} } },\n  \"cases\": [\n    {\n      \"name\": \"logs in and lands on home\",\n      \"steps\": [\n        { \"screen\": \"login\", \"input\": \"email_field\",    \"value\": \"demo@example.com\" },\n        { \"screen\": \"login\", \"input\": \"password_field\", \"value\": \"hunter2\" },\n        { \"screen\": \"login\", \"tap\": \"submit_btn\" },\n        { \"screen\": \"home\",  \"waitFor\": \"home_header\" },\n        { \"checkpoint\": \"arrived_home\", \"screenshot\": true }\n      ]\n    }\n  ]\n}",
+                      "language": "json",
+                      "filename": "tests/flows/login-to-home.test.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_dsl",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_dsl_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_dsl_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_dsl_bullet_actions"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_dsl_bullet_asserts"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_drivers",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_drivers_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_drivers_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_drivers_bullet_ios"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_drivers_bullet_android"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_drivers_bullet_web"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_cli",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_cli_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_cli_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_cli_bullet_install"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_cli_bullet_validate"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_cli_bullet_generate"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_ci",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_ci_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_ci_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_ci_bullet_example"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "# .github/workflows/test.yml (web shard)\n- name: Validate test schemas\n  run: jsonui-test validate tests/\n- name: Run Playwright tests\n  working-directory: jsonui-doc-web\n  run: |\n    npx playwright install --with-deps\n    npx playwright test",
+                      "language": "yaml",
+                      "filename": "GitHub Actions excerpt",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_testing_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    32,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "chrome_ink",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "guides_testing_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 2,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/next_step_card"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_testing_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "#94A3B8",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "guides_testing_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [
+                24,
+                16,
+                24,
+                16
+              ],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_testing_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    0,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        {
+                          "id": "toc_where",
+                          "label": "toc_row_where",
+                          "anchor": "section_where",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_screen",
+                          "label": "toc_row_screen",
+                          "anchor": "section_screen",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_flow",
+                          "label": "toc_row_flow",
+                          "anchor": "section_flow",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_dsl",
+                          "label": "toc_row_dsl",
+                          "anchor": "section_dsl",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_drivers",
+                          "label": "toc_row_drivers",
+                          "anchor": "section_drivers",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_cli",
+                          "label": "toc_row_cli",
+                          "anchor": "section_cli",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_ci",
+                          "label": "toc_row_ci",
+                          "anchor": "section_ci",
+                          "level": 1
+                        }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

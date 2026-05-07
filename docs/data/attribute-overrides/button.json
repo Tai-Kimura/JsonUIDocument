@@ -1,0 +1,102 @@
+{
+  "component": "Button",
+  "description": {
+    "en": "Interactive component that triggers a ViewModel event handler on tap. The visual is determined by `style` and child content; the tap target is always the full bounds.",
+    "ja": "タップで ViewModel のイベントハンドラを起動するインタラクティブコンポーネント。見た目は `style` と子要素で決まり、タップ判定は常に領域全体。"
+  },
+  "usage": {
+    "en": "Always bind `onClick` to a ViewModel event. Never put navigation or business logic inside the Button JSON itself — that belongs in the ViewModel handler. For purely decorative \"button-looking\" non-interactive elements, use a styled View instead.",
+    "ja": "`onClick` は必ず ViewModel のイベントにバインドする。遷移やビジネスロジックを Button の JSON 側に書くのは禁止（ViewModel 側に書く）。装飾だけで操作不能な「ボタン風」要素が必要なら、style を当てた View を使う。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Text-only", "ja": "テキストのみ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Button\",\n  \"text\": \"@string/action_save\",\n  \"onClick\": \"@{onSave}\",\n  \"style\": \"primary_button\"\n}"
+    },
+    {
+      "title": { "en": "Icon + Label composite", "ja": "アイコン + ラベルの組合わせ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onFavorite}\",\n  \"child\": [\n    {\n      \"type\": \"IconLabel\",\n      \"iconName\": \"heart\",\n      \"iconPosition\": \"leading\",\n      \"text\": \"@string/favorite\",\n      \"fontSize\": 14\n    }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Disabled state via binding", "ja": "binding で disabled 状態" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Button\",\n  \"text\": \"@string/submit\",\n  \"onClick\": \"@{onSubmit}\",\n  \"enabled\": \"@{formValid}\"\n}"
+    },
+    {
+      "title": { "en": "Loading spinner inside", "ja": "ローディング中はスピナー" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onRefresh}\",\n  \"enabled\": \"@{!loading}\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"visibility\": \"@{loading ? 'visible' : 'gone'}\" },\n    { \"type\": \"Label\", \"text\": \"@string/refresh\", \"visibility\": \"@{loading ? 'gone' : 'visible'}\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Long-press handler", "ja": "長押しハンドラ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Button\",\n  \"text\": \"@string/delete\",\n  \"onClick\": \"@{onDelete}\",\n  \"onLongClick\": \"@{onConfirmDelete}\"\n}"
+    },
+    {
+      "title": { "en": "With image (iOS UIButton style)", "ja": "画像付き（iOS UIButton 風）" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Button\",\n  \"image\": \"icon_share\",\n  \"text\": \"@string/share\",\n  \"onClick\": \"@{onShare}\"\n}"
+    }
+  ],
+  "attributes": {
+    "text": {
+      "note": {
+        "en": "Supports `@{binding}` and `@string/key`. For composite content (icon + label), omit `text` and use a `child` array instead.",
+        "ja": "`@{binding}` と `@string/key` に対応。アイコン + ラベルなど複合的な中身にするときは `text` を省略して `child` 配列で構成する。"
+      }
+    },
+    "image": {
+      "note": {
+        "en": "Button's own image attribute (iOS UIButton.imageView). For non-iOS platforms or complex icon layouts, prefer nesting an Image or IconLabel inside `child`.",
+        "ja": "Button 固有の画像属性（iOS UIButton.imageView 相当）。iOS 以外や複雑なアイコン配置では `child` 内に Image / IconLabel を入れる方が柔軟。"
+      }
+    },
+    "buttonType": {
+      "note": {
+        "en": "React-only. Maps to HTML `<button type=\"...\">`. Defaults to `button`; use `submit` inside a `<form>`.",
+        "ja": "React 専用。HTML `<button type=\"...\">` にマップ。デフォルト `button`、`<form>` 内では `submit` を使う。"
+      }
+    },
+    "tapBackground": {
+      "note": {
+        "en": "Background color shown while the button is being pressed. Provides immediate visual feedback on touch-down.",
+        "ja": "押下中に表示される背景色。タッチダウン時の視覚的フィードバックに使う。"
+      }
+    },
+    "highlightColor": {
+      "note": {
+        "en": "Text / tint color during the pressed state. On Android spelled `hilightColor` (typo preserved for compatibility).",
+        "ja": "押下中のテキスト／tint 色。Android では `hilightColor` と綴られる（互換のため旧綴り維持）。"
+      }
+    },
+    "disabledFontColor": {
+      "note": {
+        "en": "Text color when `enabled` is `false`. If omitted, `fontColor` is dimmed to ~40% on most platforms.",
+        "ja": "`enabled: false` のときのテキスト色。省略時は `fontColor` が約 40% に減光される。"
+      }
+    }
+  },
+  "commonAttributes": {
+    "onClick": {
+      "note": {
+        "en": "Required for Button to be interactive. Must resolve to a ViewModel event handler. Unbound Button emits a build warning.",
+        "ja": "Button をインタラクティブにするため必須。ViewModel のイベントハンドラに解決される必要がある。未バインドの場合ビルド警告。"
+      }
+    },
+    "onLongClick": {
+      "note": {
+        "en": "Long-press event. Default threshold: iOS 500ms / Android 500ms / Web 600ms.",
+        "ja": "長押しイベント。既定閾値は iOS 500ms / Android 500ms / Web 600ms。"
+      }
+    },
+    "enabled": {
+      "note": {
+        "en": "Boolean binding. When `false`, taps are ignored and the button renders in the disabled style.",
+        "ja": "Boolean binding。`false` のときタップが無視され、disabled スタイルで表示される。"
+      }
+    }
+  },
+  "relatedComponents": ["IconLabel", "Label", "Indicator"]
+}

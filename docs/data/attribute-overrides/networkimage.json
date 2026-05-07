@@ -1,0 +1,79 @@
+{
+  "component": "NetworkImage",
+  "description": {
+    "en": "Image loaded from a URL with automatic caching, placeholder, and error handling.",
+    "ja": "URL から自動ロードされる画像。キャッシュ・プレースホルダ・エラー時フォールバックを備える。"
+  },
+  "usage": {
+    "en": "Use NetworkImage for all user-generated or CDN-hosted images. Always provide `placeholder` or `defaultImage` — the first frame is always the placeholder.",
+    "ja": "ユーザー生成や CDN ホストの画像すべてに使う。最初のフレームは必ずプレースホルダになるため、`placeholder` または `defaultImage` を常に指定する。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Avatar with default", "ja": "デフォルト画像付きアバター" },
+      "language": "json",
+      "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{user.avatarUrl}\",\n  \"defaultImage\": \"avatar_default\",\n  \"errorImage\": \"avatar_error\",\n  \"width\": 48,\n  \"height\": 48,\n  \"cornerRadius\": 24\n}"
+    },
+    {
+      "title": { "en": "Full-bleed with loading state", "ja": "ロード中インジケータ付きの全幅画像" },
+      "language": "json",
+      "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{post.imageUrl}\",\n  \"loadingImage\": \"image_skeleton\",\n  \"width\": \"matchParent\",\n  \"height\": 240,\n  \"contentMode\": \"aspectFill\"\n}"
+    },
+    {
+      "title": { "en": "With cache policy", "ja": "キャッシュポリシー指定" },
+      "language": "json",
+      "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{productImageUrl}\",\n  \"cachePolicy\": \"both\",\n  \"timeout\": 10,\n  \"width\": 200,\n  \"height\": 200\n}"
+    }
+  ],
+  "attributes": {
+    "url": {
+      "note": {
+        "en": "Absolute or protocol-relative URL. Empty/null shows `defaultImage` (or `placeholder` if set). Changes trigger re-download (cache-aware).",
+        "ja": "絶対 URL または protocol-relative URL。空／null では `defaultImage`（未設定なら `placeholder`）を表示。変更時は再ダウンロード（キャッシュ参照あり）。"
+      }
+    },
+    "defaultImage": {
+      "note": {
+        "en": "Local image shown when `url` is empty, null, or resolves to a placeholder-eligible state. Prefer over `placeholder` for consistency.",
+        "ja": "`url` が空・null・プレースホルダ相当の状態のとき表示するローカル画像。一貫性のため `placeholder` よりこちらを優先。"
+      }
+    },
+    "loadingImage": {
+      "note": {
+        "en": "Local image shown during the fetch. Skeletons and shimmer PNGs work well here.",
+        "ja": "fetch 中に表示するローカル画像。スケルトン画像や shimmer の PNG を使うとよい。"
+      }
+    },
+    "errorImage": {
+      "note": {
+        "en": "Displayed on fetch failure (4xx, 5xx, network error). Defaults to `defaultImage` if omitted.",
+        "ja": "fetch 失敗時（4xx / 5xx / ネットワークエラー）に表示。省略時は `defaultImage` を使う。"
+      }
+    },
+    "placeholder": {
+      "note": {
+        "en": "Alias for `loadingImage`. Kept for compatibility; prefer `loadingImage` + `defaultImage` split.",
+        "ja": "`loadingImage` のエイリアス。互換のために残存。`loadingImage` + `defaultImage` の分離指定を推奨。"
+      }
+    },
+    "cachePolicy": {
+      "note": {
+        "en": "`memory` / `disk` / `both` (default) / `none`. `disk` persists across app launches.",
+        "ja": "`memory` / `disk` / `both`（デフォルト）/ `none`。`disk` はアプリ再起動後も保持。"
+      }
+    },
+    "timeout": {
+      "note": {
+        "en": "Fetch timeout in seconds. Default 30. On timeout, `errorImage` is shown.",
+        "ja": "fetch タイムアウト（秒）。デフォルト 30。タイムアウト時は `errorImage` が表示される。"
+      }
+    },
+    "contentMode": {
+      "note": {
+        "en": "Same as Image.contentMode — `aspectFit` / `aspectFill` / `fill` / `center`.",
+        "ja": "Image.contentMode と同じ。`aspectFit` / `aspectFill` / `fill` / `center`。"
+      }
+    }
+  },
+  "relatedComponents": ["Image", "Indicator"]
+}
