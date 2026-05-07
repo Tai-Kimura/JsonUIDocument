@@ -2,8 +2,8 @@
   "category": "responsive",
   "title": "Responsive attributes",
   "description": {
-    "en": "Responsive attributes adjust values based on viewport breakpoints or host platform.",
-    "ja": "レスポンシブ属性はビューポートのブレークポイントやホストプラットフォームに応じて値を変える。"
+    "en": "Responsive attributes pick attribute values based on the host's size class and orientation. The same Layout JSON renders differently on iPhone, iPad, and split-screen.",
+    "ja": "レスポンシブ属性はホストの size class と orientation に応じて属性値を切り替えます。同じ Layout JSON が iPhone / iPad / 分割画面で別の表示になる。"
   },
   "kicker": "Attribute category · Reference",
   "kickerParentLabel": "Attributes",
@@ -31,8 +31,8 @@
               "name": "responsive",
               "type": "object",
               "summary": {
-                "en": "Object whose keys are breakpoint names (`xs` / `sm` / `md` / `lg` / `xl`) and values are attribut…",
-                "ja": "キーがブレークポイント名（`xs` / `sm` / `md` / `lg` / `xl`）、値が当該ブレークポイント以上で適用される属性上書きのオブジェクト。ベース属性にマージされる。"
+                "en": "Object whose keys are size-class names (`compact` / `medium` / `regular` / `landscape` / `compact…",
+                "ja": "キーが size class 名（`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `regular-…"
               },
               "anchorUrl": "#attr-responsive"
             }
@@ -135,8 +135,8 @@
                 ]
               },
               "description": {
-                "en": "Object whose keys are breakpoint names (`xs` / `sm` / `md` / `lg` / `xl`) and values are attribute overrides applied at that breakpoint and above. Merges into the base attributes.",
-                "ja": "キーがブレークポイント名（`xs` / `sm` / `md` / `lg` / `xl`）、値が当該ブレークポイント以上で適用される属性上書きのオブジェクト。ベース属性にマージされる。"
+                "en": "Object whose keys are size-class names (`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `regular-landscape`) and values are attribute overrides. Overrides merge into the base attributes when the host matches that size class. Composite keys win over single keys; landscape wins over the width axis.",
+                "ja": "キーが size class 名（`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `regular-landscape`）、値が属性上書きのオブジェクト。ホストがその size class に該当する時、上書きがベース属性にマージされる。複合キーは単独キーより優先され、landscape は width 軸より優先。"
               },
               "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
@@ -154,17 +154,7 @@
       }
     ]
   },
-  "breakpoints": {
-    "_description": {
-      "en": "Default breakpoints used by jsonui-doc-web. Override in `tailwind.config.js`.",
-      "ja": "jsonui-doc-web のデフォルトブレークポイント。`tailwind.config.js` で上書き可能。"
-    },
-    "xs": "0–479 px",
-    "sm": "480–767 px",
-    "md": "768–1023 px",
-    "lg": "1024–1279 px",
-    "xl": "1280 px+"
-  },
+  "breakpoints": null,
   "nextReadLinks": {
     "sections": [
       {

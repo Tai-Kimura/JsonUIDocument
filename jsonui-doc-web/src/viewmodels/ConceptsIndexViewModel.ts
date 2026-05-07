@@ -30,7 +30,8 @@ const CATALOG: ReadonlyArray<{ id: string; url: string; titleKey: string }> = [
   { id: "one-layout-json", url: "/concepts/one-layout-json", titleKey: "concepts_one_layout_json_title" },
   { id: "viewmodel-owned-state", url: "/concepts/viewmodel-owned-state", titleKey: "concepts_viewmodel_owned_state_title" },
   { id: "data-binding", url: "/concepts/data-binding", titleKey: "concepts_data_binding_title" },
-  { id: "hot-reload", url: "/concepts/hot-reload", titleKey: "concepts_hot_reload_title" }
+  { id: "hot-reload", url: "/concepts/hot-reload", titleKey: "concepts_hot_reload_title" },
+  { id: "responsive-design", url: "/concepts/responsive-design", titleKey: "concepts_responsive_design_title" }
 ];
 
 export class ConceptsIndexViewModel {

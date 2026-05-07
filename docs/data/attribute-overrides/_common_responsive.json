@@ -1,13 +1,13 @@
 {
   "category": "responsive",
   "description": {
-    "en": "Responsive attributes adjust values based on viewport breakpoints or host platform.",
-    "ja": "レスポンシブ属性はビューポートのブレークポイントやホストプラットフォームに応じて値を変える。"
+    "en": "Responsive attributes pick attribute values based on the host's size class and orientation. The same Layout JSON renders differently on iPhone, iPad, and split-screen.",
+    "ja": "レスポンシブ属性はホストの size class と orientation に応じて属性値を切り替えます。同じ Layout JSON が iPhone / iPad / 分割画面で別の表示になる。"
   },
   "attributes": {
     "platforms": {
       "summary": {
-        "en": "Array of platforms this component should render on: `ios` / `android` / `web`. Omitting the component entirely if the current platform is not in the list.",
+        "en": "Array of platforms this component should render on: `ios` / `android` / `web`. The component is omitted entirely if the current platform is not in the list.",
         "ja": "このコンポーネントを描画すべきプラットフォーム配列: `ios` / `android` / `web`。現プラットフォームが含まれなければコンポーネントは完全に省略される。"
       },
       "examples": [
@@ -17,33 +17,62 @@
     },
     "responsive": {
       "summary": {
-        "en": "Object whose keys are breakpoint names (`xs` / `sm` / `md` / `lg` / `xl`) and values are attribute overrides applied at that breakpoint and above. Merges into the base attributes.",
-        "ja": "キーがブレークポイント名（`xs` / `sm` / `md` / `lg` / `xl`）、値が当該ブレークポイント以上で適用される属性上書きのオブジェクト。ベース属性にマージされる。"
+        "en": "Object whose keys are size-class names (`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `regular-landscape`) and values are attribute overrides. Overrides merge into the base attributes when the host matches that size class. Composite keys win over single keys; landscape wins over the width axis.",
+        "ja": "キーが size class 名（`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `regular-landscape`）、値が属性上書きのオブジェクト。ホストがその size class に該当する時、上書きがベース属性にマージされる。複合キーは単独キーより優先され、landscape は width 軸より優先。"
       },
       "examples": [
         {
           "language": "json",
-          "code": "{\n  \"type\": \"Collection\",\n  \"columnCount\": 1,\n  \"responsive\": {\n    \"md\": { \"columnCount\": 2 },\n    \"lg\": { \"columnCount\": 3 },\n    \"xl\": { \"columnCount\": 4 }\n  }\n}"
+          "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"spacing\": 8,\n  \"responsive\": {\n    \"regular\": { \"orientation\": \"horizontal\", \"spacing\": 24 },\n    \"landscape\": { \"spacing\": 16 },\n    \"regular-landscape\": { \"orientation\": \"horizontal\", \"spacing\": 32 }\n  }\n}"
+        },
+        {
+          "language": "json",
+          "code": "{\n  \"type\": \"Collection\",\n  \"columnCount\": 1,\n  \"responsive\": {\n    \"medium\": { \"columnCount\": 2 },\n    \"regular\": { \"columnCount\": 3 }\n  }\n}"
         }
       ],
       "platformDiff": {
-        "react": "CSS media queries + Tailwind breakpoints に変換される（jsonui-doc-web のみ対応）。",
-        "swift_uikit": "size class に応じた layout constraint 切替にマップ（実装依存）。",
-        "swift_swiftui": "`@Environment(\\.horizontalSizeClass)` での分岐に変換。",
-        "kotlin_compose": "`BoxWithConstraints` 内で条件分岐。",
-        "kotlin_xml": "`res/layout-<qualifier>/` のリソースで別 Layout を用意する方式に近い。"
+        "react": "Tailwind ブレークポイント (`md:` `lg:`) と `useMediaQuery` 経由で実装。compact がデフォルト、medium が `md:` (≈768px+)、regular が `lg:` (≈1024px+)、landscape は `useMediaQuery('(orientation: landscape)')`。",
+        "swift_swiftui": "`@Environment(\\.horizontalSizeClass)` + `verticalSizeClass` で判定。Generated モードでは responsive を持つコンポーネントを `@ViewBuilder` 関数に抽出して型チェックタイムアウトを回避。",
+        "swift_uikit": "size class 変化時に layout constraint を切り替える既存パターンに統合。",
+        "kotlin_compose": "`currentWindowAdaptiveInfo()` の `WindowWidthSizeClass` + `LocalConfiguration.orientation` で判定。Generated モードでは `@Composable` wrapper に分離。",
+        "kotlin_xml": "別解像度向けには `res/layout-<qualifier>/` の従来パターンを推奨。`responsive` ブロック自体は Compose 専用。"
       }
     }
   },
-  "breakpoints": {
+  "size_classes": {
     "_description": {
-      "en": "Default breakpoints used by jsonui-doc-web. Override in `tailwind.config.js`.",
-      "ja": "jsonui-doc-web のデフォルトブレークポイント。`tailwind.config.js` で上書き可能。"
+      "en": "Six size-class keys recognized by the resolver. They cover the cross product of width (compact/medium/regular) and orientation (portrait/landscape).",
+      "ja": "リゾルバが認識する 6 種類の size class キー。width 軸（compact/medium/regular）と orientation（portrait/landscape）の直積。"
     },
-    "xs": "0–479 px",
-    "sm": "480–767 px",
-    "md": "768–1023 px",
-    "lg": "1024–1279 px",
-    "xl": "1280 px+"
+    "compact": {
+      "en": "Narrow width. iPhone portrait, foldable inner display closed, web < 768px.",
+      "ja": "狭い width。iPhone portrait、折畳デバイス閉、web < 768px。"
+    },
+    "medium": {
+      "en": "Tablet portrait, split-screen iPad, foldable inner display open. Web ≈768–1023px. iOS falls back to compact (no native medium class).",
+      "ja": "タブレット portrait、iPad split-screen、折畳デバイス展開時。Web ≈768–1023px。iOS は medium が無いので compact にフォールバック。"
+    },
+    "regular": {
+      "en": "Wide width. iPad landscape full-screen, web ≥1024px.",
+      "ja": "広い width。iPad landscape フル画面、web ≥1024px。"
+    },
+    "landscape": {
+      "en": "Vertical size class is compact (any width). Phone in landscape orientation.",
+      "ja": "Vertical size class が compact（width 軸は問わない）。Phone を横にした状態。"
+    },
+    "compact-landscape": {
+      "en": "Composite of compact width AND landscape. Higher priority than either single key.",
+      "ja": "compact width AND landscape の複合キー。単独キーより優先。"
+    },
+    "regular-landscape": {
+      "en": "Composite of regular width AND landscape. Higher priority than either single key.",
+      "ja": "regular width AND landscape の複合キー。単独キーより優先。"
+    }
+  },
+  "priority": {
+    "_description": {
+      "en": "Resolution order when multiple keys could apply: composite-key > landscape > regular > medium > compact > base attributes.",
+      "ja": "複数のキーが該当しうるときの解決順: 複合キー > landscape > regular > medium > compact > ベース属性。"
+    }
   }
 }

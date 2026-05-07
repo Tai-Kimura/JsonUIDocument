@@ -66,6 +66,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "viewmodel-owned-state", titleKey: "concepts_viewmodel_owned_state_title", url: "/concepts/viewmodel-owned-state" },
       { id: "data-binding",          titleKey: "concepts_data_binding_title",          url: "/concepts/data-binding" },
       { id: "hot-reload",            titleKey: "concepts_hot_reload_title",            url: "/concepts/hot-reload" },
+      { id: "responsive-design",     titleKey: "concepts_responsive_design_title",     url: "/concepts/responsive-design" },
     ],
   },
   {

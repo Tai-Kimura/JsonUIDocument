@@ -1,0 +1,148 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "ResponsiveDesign",
+    "displayName": "Responsive design",
+    "description": "Essay: how the `responsive` block flips attribute values per size class so the same Layout JSON adapts to phones, tablets, split-screen, and landscape. Six H2 sections covering taxonomy, the resolution rules, generated-mode wrapper functions, dynamic-mode tree resolution, and when to choose `responsive` vs `platforms` vs separate variants. ~6-min read.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "concepts/responsive-design",
+    "createdAt": "2026-05-08",
+    "updatedAt": "2026-05-08"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two follow-up cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[ResponsiveDesignView] --> VM[ResponsiveDesignViewModel]\n    VM -- nextReadLinks --> VIEW",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_one_layout_json -> /concepts/one-layout-json, next_hot_reload -> /concepts/hot-reload). Each row's titleKey / descriptionKey is resolved through StringManager with the concepts_responsive_design_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped concept URLs enumerated in transitions: /concepts, /concepts/one-layout-json, /concepts/hot-reload."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /concepts/one-layout-json and /concepts/hot-reload. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is a spec-mapped concept URL or /concepts",
+      "destination": "Target spec screen or tab",
+      "description": "v1 destinations: /concepts, /concepts/one-layout-json, /concepts/hot-reload."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/concepts/responsive-design.json",
+      "description": "Essay layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/concepts/ResponsiveDesignViewModel.ts",
+      "description": "Same shape as HotReloadViewModel — seeds nextReadLinks."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/concepts/responsive-design/page.tsx",
+      "description": "Next.js route."
+    }
+  ],
+  "notes": [
+    "Sixth concepts essay. Adds responsive-design between hot-reload and the natural follow-ups (one-layout-json revisits the multi-platform story; hot-reload shows how size-class changes get picked up at runtime).",
+    "Focus on the *mechanism* of size-class resolution, not on Tailwind-specific UI tricks. The reader should leave understanding when to use `responsive`, when `platforms` is enough, and when neither fits and a layout-file split is the right answer.",
+    "Pairs with /reference/attributes/responsive — the reference page documents the attribute shape, this concept page documents the runtime behavior."
+  ]
+}

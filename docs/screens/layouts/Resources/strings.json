@@ -1851,6 +1851,180 @@
       "ja": "なぜ重要か"
     }
   },
+  "concepts_responsive_design": {
+    "breadcrumb": {
+      "en": "← Concepts",
+      "ja": "← Concepts"
+    },
+    "title": {
+      "en": "Responsive design",
+      "ja": "レスポンシブデザイン"
+    },
+    "lead": {
+      "en": "One Layout JSON should not look the same on a 5-inch phone, an 11-inch tablet, and a split-screen iPad. The `responsive` block lets a single component swap attribute values per size class — without forking the layout file. Here is how the resolver picks which set of values wins, what the generator emits per platform, and when responsive is the wrong tool.",
+      "ja": "1 つの Layout JSON が 5 インチのスマートフォン・11 インチのタブレット・iPad の分割画面で同じ見た目になるのは適切ではありません。`responsive` ブロックを使うと、レイアウトファイルを分けずに 1 つのコンポーネント内で size class ごとに属性値を切り替えられます。リゾルバがどう値を選ぶか、各プラットフォームのジェネレータが何を出力するか、そして responsive が向かないケースを解説します。"
+    },
+    "read_time": {
+      "en": "~6 min read",
+      "ja": "約 6 分"
+    },
+    "section_problem_heading": {
+      "en": "The problem",
+      "ja": "解決したい問題"
+    },
+    "section_problem_body": {
+      "en": "A vertical stack with 8 px spacing reads fine on a phone, but on an iPad in landscape the same stack feels cramped — the screen has the room to lay sections out horizontally with 24 px spacing. Forking the file into `home@phone.json` and `home@tablet.json` doubles the maintenance cost; doing all the math at the ViewModel layer leaks layout concerns into business code. The `responsive` block is the third option: keep one Layout JSON, declare the deltas, let the runtime pick.",
+      "ja": "8px spacing の垂直スタックは phone では読みやすいけれど、iPad の landscape では窮屈に感じる — 画面には水平 24px spacing で section を並べる余裕がある。ファイルを `home@phone.json` と `home@tablet.json` に分けるとメンテコストが倍。レイアウト判断を ViewModel 層でやるとビジネスコードにレイアウトが滲みます。`responsive` ブロックは第 3 の選択肢: Layout JSON は 1 本のまま、差分だけ宣言し、ランタイムに選ばせます。"
+    },
+    "section_taxonomy_heading": {
+      "en": "Six size-class keys",
+      "ja": "6 種類の size class キー"
+    },
+    "section_taxonomy_body": {
+      "en": "The resolver recognizes a fixed set of keys. Each maps to a host-platform predicate that the runtime evaluates on every layout pass.",
+      "ja": "リゾルバが認識するキーは決まっています。各キーはランタイムがレイアウトパスごとに評価するホスト側の predicate に対応します。"
+    },
+    "section_taxonomy_bullet_compact": {
+      "en": "• `compact` — narrow width. iPhone portrait, foldable inner display closed, web < 768 px.",
+      "ja": "• `compact` — 狭い width。iPhone portrait、折畳デバイス閉、web < 768px。"
+    },
+    "section_taxonomy_bullet_medium": {
+      "en": "• `medium` — tablet portrait, split-screen iPad, web ≈ 768–1023 px. iOS has no native medium class — falls back to `compact`.",
+      "ja": "• `medium` — タブレット portrait、iPad 分割画面、web ≈ 768–1023px。iOS は medium が無いため `compact` にフォールバック。"
+    },
+    "section_taxonomy_bullet_regular": {
+      "en": "• `regular` — wide width. iPad landscape full-screen, web ≥ 1024 px.",
+      "ja": "• `regular` — 広い width。iPad landscape フル画面、web ≥ 1024px。"
+    },
+    "section_taxonomy_bullet_landscape": {
+      "en": "• `landscape` — vertical size class is compact, regardless of width axis. Phone in landscape orientation.",
+      "ja": "• `landscape` — vertical size class が compact（width 軸は問わない）。Phone を横にした状態。"
+    },
+    "section_taxonomy_bullet_composite": {
+      "en": "• `compact-landscape` / `regular-landscape` — composite keys. Match only when BOTH conditions hold; rank above the single keys in the priority table.",
+      "ja": "• `compact-landscape` / `regular-landscape` — 複合キー。両方の条件が同時に成立する時のみマッチし、単独キーより優先される。"
+    },
+    "section_block_heading": {
+      "en": "The `responsive` block",
+      "ja": "`responsive` ブロック"
+    },
+    "section_block_body": {
+      "en": "Drop a `responsive` object next to the base attributes. Keys are size-class names; values are partial attribute objects that override the base when the host matches that key. The base attributes are the default — used when no key matches.",
+      "ja": "ベース属性の隣に `responsive` オブジェクトを置く。キーは size class 名、値はホストがそのキーにマッチした時にベース属性を上書きする partial 属性オブジェクト。どのキーにもマッチしない時はベース属性がそのまま使われます。"
+    },
+    "section_priority_heading": {
+      "en": "Resolution priority",
+      "ja": "解決の優先順位"
+    },
+    "section_priority_body": {
+      "en": "Multiple keys can match a single host (an iPad in landscape matches `regular`, `landscape`, AND `regular-landscape`). The resolver walks the priority list from highest to lowest, overwriting earlier keys with later ones. Composite keys always win because they are checked first; the base layer is the floor.",
+      "ja": "1 つのホストに複数のキーがマッチすることがあります（iPad の landscape は `regular` / `landscape` / `regular-landscape` の全てにマッチ）。リゾルバは優先順位順に上から評価し、後の評価結果で前の値を上書きします。複合キーは最初に評価されるので必ず勝ち、ベース層が最後の砦です。"
+    },
+    "section_generated_heading": {
+      "en": "Generated mode: wrapper functions",
+      "ja": "Generated モード: ラッパー関数"
+    },
+    "section_generated_body": {
+      "en": "In generated mode each platform's converter inlines the resolution at compile time. SwiftUI lifts the responsive container into a `@ViewBuilder` helper to keep type-checker work bounded; Compose does the same with `@Composable`. The children are emitted exactly once and threaded through `content()`, so an inner `Collection` or `Label` is never duplicated even when six size-class branches exist on the parent.",
+      "ja": "Generated モードでは各プラットフォームの converter が解決をコンパイル時に展開します。SwiftUI は responsive コンテナを `@ViewBuilder` ヘルパーに切り出して型チェッカーの負荷を制限。Compose も `@Composable` で同様。子は一度だけ出力されて `content()` 越しに流し込まれるので、親に 6 つの size class 分岐があっても内側の `Collection` や `Label` が複製されることはありません。"
+    },
+    "section_dynamic_heading": {
+      "en": "Dynamic mode: tree resolution",
+      "ja": "Dynamic モード: ツリー解決"
+    },
+    "section_dynamic_body": {
+      "en": "Dynamic mode (the runtime that powers hot reload on iOS and Android) takes a different path. A shared `ResponsiveResolver` walks the JSON tree once at mount time, flattens every node by merging the matching `responsive` keys back into the parent, and hands a plain JSON dictionary to the per-component converter. Individual converters never know `responsive` exists — they see the resolved attributes only. SwiftJsonUI keys off `@Environment(\\.horizontalSizeClass)` and `verticalSizeClass`; KotlinJsonUI uses `currentWindowAdaptiveInfo()` plus `LocalConfiguration.orientation`. Both rely on the platform's own change-tracking to re-run resolution when the host rotates or splits.",
+      "ja": "Dynamic モード（iOS と Android の hot reload を支えるランタイム）は別の経路を取ります。共有の `ResponsiveResolver` がマウント時に JSON ツリーを 1 度だけ走査し、マッチした `responsive` キーを親にマージしてから各 component の converter にプレーンな JSON 辞書を渡します。個別 converter は `responsive` の存在を知らず、解決済み属性だけを見ます。SwiftJsonUI は `@Environment(\\.horizontalSizeClass)` と `verticalSizeClass` を、KotlinJsonUI は `currentWindowAdaptiveInfo()` と `LocalConfiguration.orientation` を使います。どちらも回転や分割時の再評価はプラットフォーム自身の変更検知に任せます。"
+    },
+    "section_when_heading": {
+      "en": "When `responsive` is not the right tool",
+      "ja": "`responsive` が向かないケース"
+    },
+    "section_when_body": {
+      "en": "Three nearby tools can all answer 'this should look different here'. They are not interchangeable.",
+      "ja": "「ここでは違う見た目にしたい」に答えるツールは近場に 3 つあります。互換ではありません。"
+    },
+    "section_when_bullet_responsive_label": {
+      "en": "`responsive` — same component, different attribute values",
+      "ja": "`responsive` — 同じコンポーネント、属性値だけ変える"
+    },
+    "section_when_bullet_responsive_body": {
+      "en": "Use when the structure stays identical across size classes — same children in the same order — and only spacing, orientation, font size, column count, or similar attribute values need to flip.",
+      "ja": "size class が変わってもコンポーネント構造は同じ（同じ子・同じ順序）で、spacing / orientation / fontSize / columnCount など属性値だけ切り替えたい時。"
+    },
+    "section_when_bullet_platforms_label": {
+      "en": "`platforms` — omit on the wrong host",
+      "ja": "`platforms` — 該当しないホストでは省略する"
+    },
+    "section_when_bullet_platforms_body": {
+      "en": "Use when an entire subtree is platform-specific — an iOS-only screenshot, a web-only sidebar, an Android-only system-bar inset filler. The component renders or is removed; there is no per-host attribute tweaking.",
+      "ja": "サブツリーごとプラットフォーム固有の時 — iOS 限定スクリーンショット、Web 限定サイドバー、Android 限定の system bar inset filler など。描画されるか丸ごと省かれるかの 2 択で、ホスト別の属性微調整はしません。"
+    },
+    "section_when_bullet_split_label": {
+      "en": "Layout file split — different structure entirely",
+      "ja": "Layout ファイル分割 — 構造そのものを別にする"
+    },
+    "section_when_bullet_split_body": {
+      "en": "When the children themselves change — phone shows a stack of cards, tablet shows a master-detail layout — `responsive` is the wrong shape because there is no shared structure to override. Author two layout files, key off the host in the parent screen, and treat them as independent. (A first-class variant-file mechanism — `home@tablet.json` — is on the roadmap; today this means picking the layoutFile in the screen spec.)",
+      "ja": "子そのものが変わる時 — phone はカードの縦リスト、tablet は master-detail レイアウト — は `responsive` の出番ではありません。共有する構造がないので上書きが効きません。Layout ファイルを 2 本書き、親画面でホストを見て切り替え、独立させて扱います。（`home@tablet.json` のような正式バリアントファイル機構はロードマップ。現状は screen spec で layoutFile を選ぶ運用。）"
+    },
+    "next_heading": {
+      "en": "Keep reading",
+      "ja": "次に読む"
+    },
+    "next_one_layout_json_title": {
+      "en": "One Layout JSON, three platforms",
+      "ja": "1 つの Layout JSON で 3 プラットフォーム"
+    },
+    "next_one_layout_json_description": {
+      "en": "Revisit the foundational claim now that you have seen how the resolver enforces it.",
+      "ja": "リゾルバが基盤を支えている仕組みを見たうえで、根本主張に立ち返る。"
+    },
+    "next_hot_reload_title": {
+      "en": "Hot reload everywhere",
+      "ja": "全プラットフォームで hot reload"
+    },
+    "next_hot_reload_description": {
+      "en": "How a size-class change becomes a re-render without a rebuild.",
+      "ja": "size class の変化がリビルドなしの再描画に変わるまで。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページ"
+    },
+    "toc_row_problem": {
+      "en": "The problem",
+      "ja": "解決したい問題"
+    },
+    "toc_row_taxonomy": {
+      "en": "Six size-class keys",
+      "ja": "6 種類の size class キー"
+    },
+    "toc_row_block": {
+      "en": "The `responsive` block",
+      "ja": "`responsive` ブロック"
+    },
+    "toc_row_priority": {
+      "en": "Resolution priority",
+      "ja": "解決の優先順位"
+    },
+    "toc_row_generated": {
+      "en": "Generated mode: wrapper functions",
+      "ja": "Generated モード: ラッパー関数"
+    },
+    "toc_row_dynamic": {
+      "en": "Dynamic mode: tree resolution",
+      "ja": "Dynamic モード: ツリー解決"
+    },
+    "toc_row_when": {
+      "en": "When `responsive` is not the right tool",
+      "ja": "`responsive` が向かないケース"
+    }
+  },
   "guides_writing_your_first_spec": {
     "breadcrumb": {
       "en": "← Guides",
