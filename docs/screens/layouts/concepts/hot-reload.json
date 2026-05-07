@@ -174,7 +174,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 16,
-                      "code": "// AppDelegate.swift — enable Dynamic mode in DEBUG\nimport SwiftJsonUI\n\n@main\nstruct MyApp: App {\n    init() {\n        #if DEBUG\n        SwiftJsonUI.enableDynamicMode(\n            layoutsDirectory: \"docs/screens/layouts\",\n            hotReloadURL: URL(string: \"ws://localhost:8080/hot\")\n        )\n        #endif\n    }\n    var body: some Scene { WindowGroup { ContentView() } }\n}",
+                      "code": "// MyApp.swift — enable Dynamic mode in DEBUG. The HotLoader endpoint is\n// read from `hotloader.json` (Bundle or Documents) which `jui build`\n// writes from docs/hotload/config.json — no URL parameter needed here.\nimport SwiftJsonUI\n\n@main\nstruct MyApp: App {\n    init() {\n        #if DEBUG\n        HotLoader.instance.isHotLoadEnabled = true\n        ViewSwitcher.setDynamicMode(true)\n        #endif\n    }\n    var body: some Scene { WindowGroup { ContentView() } }\n}",
                       "language": "swift",
                       "filename": "MyApp.swift",
                       "showLineNumbers": true,
