@@ -35,7 +35,7 @@ import React, {
   useState,
 } from "react";
 
-import { StringManager } from "@/generated/StringManager";
+import { useLocalizedString } from "@/hooks/useLocalizedString";
 
 export interface TocItem {
   /** Stable id for React key & observer key. Typically equals `anchor`. */
@@ -157,6 +157,10 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
     [onSelect, stickyOffset],
   );
 
+  // SSR-safe localized aria-label. English fallback matches the SSR HTML;
+  // useLocalizedString swaps the persisted locale in post-mount.
+  const tocAriaLabel = useLocalizedString("search_toc_aria_label", "Table of contents");
+
   if (visibleItems.length === 0) return null;
 
   const stickyClasses = sticky
@@ -172,7 +176,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
   return (
     <nav
       id={id}
-      aria-label={title ?? StringManager.getString("search_toc_aria_label")}
+      aria-label={title ?? tocAriaLabel}
       className={[
         "w-full max-w-[260px] py-2",
         stickyClasses,

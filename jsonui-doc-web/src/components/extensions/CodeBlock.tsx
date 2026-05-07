@@ -23,7 +23,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Highlighter, BundledLanguage, BundledTheme } from "shiki";
 
-import { StringManager } from "@/generated/StringManager";
+import { useLocalizedString } from "@/hooks/useLocalizedString";
 
 export interface CodeBlockProps {
   /** Raw source code. Rendered verbatim. Required. */
@@ -140,6 +140,14 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
     () => new Set((highlightLines ?? []).map((n) => Math.trunc(n))),
     [highlightLines]
   );
+
+  // SSR-safe localized strings. The English fallback is what gets baked into
+  // the SSR HTML and used for the first client render; the persisted locale
+  // swaps in post-mount so hydration never sees a divergent aria-label.
+  const copiedLabel = useLocalizedString("search_copied_label", "Copied");
+  const copyCodeLabel = useLocalizedString("search_copy_code_label", "Copy code");
+  const copiedButton = useLocalizedString("search_copied_button", "Copied!");
+  const copyButton = useLocalizedString("search_copy_button", "Copy");
 
   // Split the raw code into lines up front so we can render our own gutter /
   // highlight overlay regardless of Shiki's output. Keep trailing newlines in
@@ -299,20 +307,14 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
         <button
           type="button"
           onClick={handleCopy}
-          aria-label={
-            copied
-              ? StringManager.getString("search_copied_label")
-              : StringManager.getString("search_copy_code_label")
-          }
+          aria-label={copied ? copiedLabel : copyCodeLabel}
           className={`absolute top-2 right-2 z-10 rounded px-2 py-1 text-xs font-sans transition ${
             effectiveTheme === "github-light"
               ? "bg-white/80 text-slate-700 border border-slate-200 hover:bg-white"
               : "bg-slate-800/80 text-slate-200 border border-slate-700 hover:bg-slate-700"
           }`}
         >
-          {copied
-            ? StringManager.getString("search_copied_button")
-            : StringManager.getString("search_copy_button")}
+          {copied ? copiedButton : copyButton}
         </button>
       ) : null}
 
