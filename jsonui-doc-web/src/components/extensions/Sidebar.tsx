@@ -17,7 +17,8 @@ import { useLocalizedString } from "@/hooks/useLocalizedString";
 
 interface SidebarSection {
   id: string;
-  label: string;
+  label: string;        // English label — used for SSR + first client render.
+  labelKey: string;     // strings.json key — Sidebar swaps in the persisted locale post-mount.
   iconName: string;
   entries: SidebarEntry[];
 }
@@ -27,6 +28,7 @@ type PlatformCode = "ios" | "android" | "web";
 interface SidebarEntry {
   id: string;
   label: string;
+  labelKey: string;
   url: string;
   platforms?: PlatformCode[];
 }
@@ -47,6 +49,15 @@ export interface SidebarProps {
   className?: string;
   id?: string;
 }
+
+// Both labels use the same hook pattern: render the English fallback during
+// SSR and the first client render, then post-mount swap in the value
+// resolved via StringManager (which depends on localStorage and would
+// otherwise blow up hydration).
+const LocalizedLabel: React.FC<{ labelKey: string; fallback: string }> = ({ labelKey, fallback }) => {
+  const value = useLocalizedString(labelKey, fallback);
+  return <>{value}</>;
+};
 
 export const Sidebar: React.FC<SidebarProps> = ({
   items,
@@ -105,7 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   aria-hidden="true"
                 />
                 <span className="chrome-sidebar__section-label">
-                  {section.label}
+                  <LocalizedLabel labelKey={section.labelKey} fallback={section.label} />
                 </span>
                 <span
                   className="chrome-sidebar__section-chevron"
@@ -140,7 +151,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         onClick={() => onLinkTap?.(entry.url)}
                       >
                         <span className="chrome-sidebar__link-label">
-                          {entry.label}
+                          <LocalizedLabel labelKey={entry.labelKey} fallback={entry.label} />
                         </span>
                         {platforms && platforms.length > 0 ? (
                           <span
