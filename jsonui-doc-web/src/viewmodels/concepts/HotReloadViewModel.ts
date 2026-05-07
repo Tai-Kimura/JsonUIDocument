@@ -52,29 +52,37 @@ export class HotReloadViewModel {
     });
   };
 
+  // SSR-safe initial seed (default-language). mountLanguage re-seeds with
+  // persisted locale post-mount. See jsonui-cli/docs/bugs/reports/2026-05-08-
+  // rjui-vm-pre-resolve-string-hydration-mismatch.md.
   onAppear = () => {
-
-    const nextReads: NextReadCell[] = [
-      {
-        id: "next_viewmodel",
-        titleKey: this.s("next_viewmodel_title"),
-        descriptionKey: this.s("next_viewmodel_description"),
-        url: "/concepts/viewmodel-owned-state",
-        onNavigate: () => this.navigate("/concepts/viewmodel-owned-state"),
-      },
-      {
-        id: "next_why_spec_first",
-        titleKey: this.s("next_why_spec_first_title"),
-        descriptionKey: this.s("next_why_spec_first_description"),
-        url: "/concepts/why-spec-first",
-        onNavigate: () => this.navigate("/concepts/why-spec-first"),
-      },
-    ];
-
     this.updateData({
-      nextReadLinks: this.asCollection(nextReads),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)),
     });
   };
+
+  mountLanguage = (): void => {
+    this.updateData({
+      nextReadLinks: this.asCollection(this.buildNextReads(this.s)),
+    });
+  };
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
+    {
+      id: "next_viewmodel",
+      titleKey: lookup("next_viewmodel_title"),
+      descriptionKey: lookup("next_viewmodel_description"),
+      url: "/concepts/viewmodel-owned-state",
+      onNavigate: () => this.navigate("/concepts/viewmodel-owned-state"),
+    },
+    {
+      id: "next_why_spec_first",
+      titleKey: lookup("next_why_spec_first_title"),
+      descriptionKey: lookup("next_why_spec_first_description"),
+      url: "/concepts/why-spec-first",
+      onNavigate: () => this.navigate("/concepts/why-spec-first"),
+    },
+  ];
 
   navigate = (url: string): void => {
     this.router.push(url);
@@ -82,6 +90,9 @@ export class HotReloadViewModel {
 
   private s = (key: string): string =>
     StringManager.getString(`concepts_hot_reload_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`concepts_hot_reload_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

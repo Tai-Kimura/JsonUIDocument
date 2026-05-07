@@ -56,29 +56,37 @@ export class WhySpecFirstViewModel {
     });
   };
 
+  // SSR-safe initial seed (default-language). mountLanguage re-seeds with
+  // persisted locale post-mount. See jsonui-cli/docs/bugs/reports/2026-05-08-
+  // rjui-vm-pre-resolve-string-hydration-mismatch.md.
   onAppear = () => {
-
-    const nextReads: NextReadCell[] = [
-      {
-        id: "next_data_binding",
-        titleKey: this.s("next_data_binding_title"),
-        descriptionKey: this.s("next_data_binding_description"),
-        url: "/concepts/data-binding",
-        onNavigate: () => this.navigate("/concepts/data-binding"),
-      },
-      {
-        id: "next_one_layout",
-        titleKey: this.s("next_one_layout_title"),
-        descriptionKey: this.s("next_one_layout_description"),
-        url: "/concepts/one-layout-json",
-        onNavigate: () => this.navigate("/concepts/one-layout-json"),
-      },
-    ];
-
     this.updateData({
-      nextReadLinks: this.asCollection(nextReads),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)),
     });
   };
+
+  mountLanguage = (): void => {
+    this.updateData({
+      nextReadLinks: this.asCollection(this.buildNextReads(this.s)),
+    });
+  };
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
+    {
+      id: "next_data_binding",
+      titleKey: lookup("next_data_binding_title"),
+      descriptionKey: lookup("next_data_binding_description"),
+      url: "/concepts/data-binding",
+      onNavigate: () => this.navigate("/concepts/data-binding"),
+    },
+    {
+      id: "next_one_layout",
+      titleKey: lookup("next_one_layout_title"),
+      descriptionKey: lookup("next_one_layout_description"),
+      url: "/concepts/one-layout-json",
+      onNavigate: () => this.navigate("/concepts/one-layout-json"),
+    },
+  ];
 
   navigate = (url: string): void => {
     this.router.push(url);
@@ -86,6 +94,9 @@ export class WhySpecFirstViewModel {
 
   private s = (key: string): string =>
     StringManager.getString(`concepts_why_spec_first_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`concepts_why_spec_first_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

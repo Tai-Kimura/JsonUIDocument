@@ -52,35 +52,54 @@ export class ResponsiveDesignViewModel {
     });
   };
 
+  // Initial seed runs during VM construction (= during render). Use the
+  // SSR-safe getDefaultString so SSR + first client render produce
+  // identical text. mountLanguage() re-seeds with the persisted locale
+  // post-hydration. See jsonui-cli/docs/bugs/reports/2026-05-08-rjui-vm-
+  // pre-resolve-string-hydration-mismatch.md for the upstream rationale.
   onAppear = () => {
-    const nextReads: NextReadCell[] = [
-      {
-        id: "next_one_layout_json",
-        titleKey: this.s("next_one_layout_json_title"),
-        descriptionKey: this.s("next_one_layout_json_description"),
-        url: "/concepts/one-layout-json",
-        onNavigate: () => this.navigate("/concepts/one-layout-json"),
-      },
-      {
-        id: "next_hot_reload",
-        titleKey: this.s("next_hot_reload_title"),
-        descriptionKey: this.s("next_hot_reload_description"),
-        url: "/concepts/hot-reload",
-        onNavigate: () => this.navigate("/concepts/hot-reload"),
-      },
-    ];
-
     this.updateData({
-      nextReadLinks: this.asCollection(nextReads),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)),
     });
   };
+
+  // Re-seed with persisted-locale strings. Called from a post-mount
+  // useEffect in the hook + on every `jsonui:languagechange` event.
+  mountLanguage = (): void => {
+    this.updateData({
+      nextReadLinks: this.asCollection(this.buildNextReads(this.s)),
+    });
+  };
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
+    {
+      id: "next_one_layout_json",
+      titleKey: lookup("next_one_layout_json_title"),
+      descriptionKey: lookup("next_one_layout_json_description"),
+      url: "/concepts/one-layout-json",
+      onNavigate: () => this.navigate("/concepts/one-layout-json"),
+    },
+    {
+      id: "next_hot_reload",
+      titleKey: lookup("next_hot_reload_title"),
+      descriptionKey: lookup("next_hot_reload_description"),
+      url: "/concepts/hot-reload",
+      onNavigate: () => this.navigate("/concepts/hot-reload"),
+    },
+  ];
 
   navigate = (url: string): void => {
     this.router.push(url);
   };
 
+  // Persisted-locale lookup. Safe in event handlers and post-mount hooks,
+  // unsafe in onAppear / constructor (use sDefault there).
   private s = (key: string): string =>
     StringManager.getString(`concepts_responsive_design_${key}`);
+
+  // SSR-safe lookup (always returns the default-language value).
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`concepts_responsive_design_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);
