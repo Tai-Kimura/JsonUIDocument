@@ -288,7 +288,7 @@ For tablet master/detail layouts or dashboards that host other screens as region
   "embeds": [
     {
       "regionId": "detailPane",
-      "screen": "OrderDetail",
+      "screen": "order_detail",
       "params": { "orderId": "@{selectedOrderId}" },
       "events": { "onOrderUpdated": "onOrderUpdated" },
       "navigationMode": "delegate"
@@ -300,16 +300,17 @@ For tablet master/detail layouts or dashboards that host other screens as region
 Layout JSON (parent) places the embed in the view tree:
 
 ```json
-{ "type": "Embed", "id": "detailPane", "screen": "OrderDetail",
+{ "type": "Embed", "id": "detailPane", "screen": "order_detail",
   "params": { "orderId": "@{selectedOrderId}" }, "weight": 1 }
 ```
 
 Rules:
 
-- Each `regionId` must match a corresponding `Embed.id` in the parent Layout JSON, and must be unique within that layout (it is used as the Android `ViewModelStoreOwner` key for VM isolation).
-- `params` keys must be camelCase. Values may be literals or `@{varName}` bindings — bindings resolve against the parent VM's `vars[]` / `uiVariables[]`.
-- `events` keys follow `on[A-Z]...`. Values must reference existing entries in the parent VM's `dataFlow.viewModel.methods[]` or `stateManagement.eventHandlers[]`.
-- `navigationMode`: `"delegate"` (default) means the embedded screen's `navigate()` calls drive the parent's NavController/Router. `"isolated"` gives the embed its own internal navigation stack.
+- `regionId` (spec) ↔ Layout JSON `Embed.id` are both **camelCase** and must agree. The id is unique within the parent layout — on Android it doubles as the `ViewModelStoreOwner` key for VM isolation.
+- `screen` is the **layout JSON filename in snake_case, no extension** (e.g. `order_detail` loads `docs/screens/layouts/order_detail.json`). Codegen converts to the PascalCase View class name; dynamic mode loads the JSON as-is.
+- `params` keys must be camelCase. Values may be literals or `@{varName}` bindings — bindings resolve against the parent VM's `vars[]` / `uiVariables[]`. VMs that implement `applyInitParams(_:)` consume them; others ignore them.
+- `events` keys follow `on[A-Z]...`. Values must reference existing entries in the parent VM's `dataFlow.viewModel.methods[]` or `stateManagement.eventHandlers[]`. Embedded VMs emit via the lib-provided `emit(name, payload)` helper (no spec-side declaration required).
+- `navigationMode`: **v1 supports `"delegate"` only** — the embedded screen's `navigate()` calls drive the parent's NavController/Router; `pop` / `dismiss` / `navigateBack` are bounded at the embed and do not close it. `"isolated"` (private nav stack) is deferred to v1.5.
 - The embedded screen owns its own ViewModel — completely independent from the parent VM. Cross-screen communication is via `params` (parent → child) and `events` (child → parent) only.
 - The same screen can be embedded multiple times in the same parent (each instance gets its own VM, keyed by `regionId`).
 - Validation is **local to the Embed block** — `doc_validate_spec` does not require the embedded screen to declare anything special. Type contracts beyond key/binding existence are runtime responsibilities (v1 scope).
