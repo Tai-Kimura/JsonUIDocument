@@ -2025,6 +2025,176 @@
       "ja": "`responsive` が向かないケース"
     }
   },
+  "concepts_screen_composition": {
+    "breadcrumb": {
+      "en": "← Concepts",
+      "ja": "← Concepts"
+    },
+    "title": {
+      "en": "Screen composition",
+      "ja": "画面の合成"
+    },
+    "lead": {
+      "en": "Three ways to put one Layout JSON inside another: `include` lets the codegen inline a sub-layout under the same ViewModel; `TabView.tabs[].include` runs multiple layouts under one parent VM; `Embed` hosts a sub-screen with its own ViewModel. The choice changes how state, lifecycle, and navigation work — pick the wrong one and you fight the framework. Here is the trade-off and the decision rule.",
+      "ja": "1 つの Layout JSON を別の Layout JSON に組み込む方法は 3 つ: `include` は codegen が sub-layout を同じ ViewModel 配下に展開、`TabView.tabs[].include` は 1 つの親 VM の下で複数 layout を切り替え、`Embed` は子 screen を独自の ViewModel ごと埋め込みます。選び方で state / lifecycle / navigation の挙動が変わるため、誤ると framework と戦うことになります。trade-off と判断基準を整理します。"
+    },
+    "read_time": {
+      "en": "~7 min read",
+      "ja": "約 7 分"
+    },
+    "section_problem_heading": {
+      "en": "Why three primitives",
+      "ja": "なぜ 3 つあるのか"
+    },
+    "section_problem_body": {
+      "en": "Layout reuse and screen reuse look the same on the surface — both put one file inside another — but they answer different questions. Reusing a *layout* is about avoiding duplicate JSON; the parent screen still owns all the state. Reusing a *screen* is about hosting a fully independent unit (its own data flow, its own lifecycle) inside a host. JsonUI keeps these separate so you don't accidentally couple two screens together, or accidentally split state across what should be one screen.",
+      "ja": "レイアウトの再利用と screen の再利用は表面上どちらも「ファイルを別のファイルの中に入れる」操作ですが、解決する問題が違います。*レイアウト*の再利用は JSON の重複を避けるためで、親 screen がすべての state を持ち続けます。*screen* の再利用は独立した単位（独自のデータフロー・独自のライフサイクル）をホスト内に置くこと。JsonUI ではこれらを別の道具として分離しており、screen を意図せず結合したり、本来 1 つの screen の state を意図せず分断したりすることを防ぎます。"
+    },
+    "section_include_heading": {
+      "en": "include — codegen inlines, shared VM",
+      "ja": "include — codegen 展開・VM 共有"
+    },
+    "section_include_body": {
+      "en": "`include` is a build-time directive. The codegen reads the referenced layout file, replaces the `include` node with its tree, and emits one component. Every `@{...}` binding in the included tree resolves against the parent ViewModel — there is no second VM, no separate lifecycle, no separate state. This is the right tool when two screens have an identical region (a header, a card, a stat block) and you want one source of truth for the JSON.",
+      "ja": "`include` はビルド時のディレクティブ。codegen は参照先 layout ファイルを読んで `include` ノードをそのツリーで置換し、1 つのコンポーネントとして emit します。`@{...}` バインディングはすべて親 ViewModel に対して解決され、別 VM もライフサイクルも state もありません。2 つの screen が同一の領域（ヘッダー・カード・統計ブロックなど）を共有しており、JSON の出典を 1 つにしたい場合に使います。"
+    },
+    "section_include_note": {
+      "en": "If the included tree references a binding the parent VM doesn't expose, codegen fails at build time. Useful: drift surfaces immediately. Limiting: you can't reuse a region whose bindings have meaningful conflict with the parent.",
+      "ja": "include 先が親 VM に存在しないバインディングを参照しているとビルド時に codegen が失敗します。利点はドリフトが即座に表面化する点、制約は親と意味的に衝突するバインディングを持つ領域は再利用できない点です。"
+    },
+    "section_tabview_heading": {
+      "en": "TabView.tabs[].include — one VM, multiple tab layouts",
+      "ja": "TabView.tabs[].include — 1 VM・複数タブ"
+    },
+    "section_tabview_body": {
+      "en": "TabView reuses the `include` mechanism per tab, but adds a persistent tab bar and an `@{selectedIndex}` binding. The host VM owns the selected index and every tab's state. Tab switches are cheap — no VM teardown, no re-fetch — because all tabs co-exist under the same VM. Use this when the user perceives the tabs as different *views* of the same screen (Home/Search/Profile in a single app shell), not as different screens.",
+      "ja": "TabView は per-tab で `include` の仕組みを再利用しつつ、永続的なタブバーと `@{selectedIndex}` バインディングを追加します。ホスト VM が選択 index と各タブの state を所有します。タブ切替は VM の再生成も再取得もないため軽量で、すべてのタブが同じ VM 配下に共存しているからです。ユーザがタブを「同一画面の異なる *ビュー*」として認識する場合（1 つのアプリシェル内の Home/Search/Profile など）に向きます。"
+    },
+    "section_tabview_note": {
+      "en": "Persistent state across tab switches is the headline feature. If the user expects state to reset on tab change, TabView is the wrong tool — that's a navigation pattern, not composition.",
+      "ja": "タブ切替を跨いで state が維持されるのが最大の特徴です。タブ切替で state がリセットされることをユーザが期待する場合は TabView は適していません（それは composition ではなく navigation の問題）。"
+    },
+    "section_embed_heading": {
+      "en": "Embed — child owns its own ViewModel",
+      "ja": "Embed — 子が独立 ViewModel を所有"
+    },
+    "section_embed_body": {
+      "en": "`Embed` is the first composition primitive that creates a second ViewModel. The parent declares `structure.embeds[]` and places an `Embed` node in its Layout; at runtime the framework instantiates the child screen — its VM, its bindings, its lifecycle — inside that region. The child does not know it is embedded, which means the same screen can run stand-alone, embedded in a master/detail, and embedded in a dashboard without code change. Cross-screen communication is `params` (parent → child, push semantics) and `events` (child → parent, callback semantics) only — there is no shared state.",
+      "ja": "`Embed` は 2 つ目の ViewModel を作る最初の composition プリミティブです。親が `structure.embeds[]` を宣言し Layout に `Embed` ノードを配置すると、ランタイムは子 screen（その VM・バインディング・ライフサイクル）をその領域内で生成します。子は埋め込まれていることを知らないため、同じ screen が stand-alone でも master/detail でもダッシュボードでもコード変更なしで動きます。クロス screen のやり取りは `params`（親 → 子、push 的）と `events`（子 → 親、callback 的）のみで、共有 state は持ちません。"
+    },
+    "section_embed_note": {
+      "en": "Independent lifecycle is the whole point. Each embed mounts and unmounts on its own — useful for tablet master/detail where the detail pane is conceptually a separate screen and may even need to refresh independently of the master.",
+      "ja": "ライフサイクルが独立していることが本質的な価値です。各 embed が独自に mount/unmount されるため、master/detail で detail 側を独立に refresh するような使い方が自然です。"
+    },
+    "section_comparison_heading": {
+      "en": "Side-by-side",
+      "ja": "比較表"
+    },
+    "section_comparison_body": {
+      "en": "The columns below are the same questions you ask when picking a tool. Read the table top to bottom: the further down the differences accumulate, the more `Embed` looks like a real screen rather than a layout fragment.",
+      "ja": "下の各列は「どれを使うか」を判断するときに自分に問う質問と同じです。上から下に読むほど差分が積み上がり、`Embed` がレイアウト断片ではなく実画面に近いことが見えてきます。"
+    },
+    "section_lifecycle_heading": {
+      "en": "Embed lifecycle — params, events, navigation",
+      "ja": "Embed のライフサイクル — params / events / navigation"
+    },
+    "section_lifecycle_body": {
+      "en": "Four contracts are worth memorizing when adopting Embed:",
+      "ja": "Embed を採用するときに覚えておく契約は 4 つです:"
+    },
+    "section_lifecycle_bullet_params": {
+      "en": "• `params` is a flat dict (no nesting in v1). Keys are camelCase. Values may be literals or `@{varName}` bindings against the parent VM. The child VM receives them via optional `applyInitParams(_:)`; VMs that don't implement it ignore params silently.",
+      "ja": "• `params` はフラット dict（v1 はネスト不可）。キーは camelCase。値はリテラルか、親 VM に対する `@{varName}` バインディング。子 VM は optional な `applyInitParams(_:)` で受け取り、未実装の VM では params は無視されます。"
+    },
+    "section_lifecycle_bullet_events": {
+      "en": "• `events` maps `on[A-Z]...` names from the child to parent VM handler names. The child emits via the library-provided `emit(name, payload)` helper — no spec declaration on the child side.",
+      "ja": "• `events` は子側の `on[A-Z]...` イベント名 → 親 VM ハンドラ名のマップ。子はライブラリ提供の `emit(name, payload)` ヘルパで発行し、子側の spec には宣言不要です。"
+    },
+    "section_lifecycle_bullet_navigation": {
+      "en": "• `navigationMode: \"delegate\"` (v1 default) shares the parent's NavController/Router. The child's `push` bubbles to the parent so a new screen takes the whole window. `pop` / `dismiss` / `navigateBack` are bounded at the embed — they cannot close the embed itself. (`isolated`, a private nav stack, is deferred to v1.5.)",
+      "ja": "• `navigationMode: \"delegate\"`（v1 のデフォルト）は親の NavController/Router を共有します。子の `push` は親に bubble するため新しい screen は全画面遷移になります。`pop` / `dismiss` / `navigateBack` は embed 境界で stop し、embed 自身を閉じることはできません。（独立 nav stack の `isolated` は v1.5 で対応予定。）"
+    },
+    "section_lifecycle_bullet_multiple": {
+      "en": "• Multiple embeds of the same screen each get their own VM, keyed by `regionId`. On Android this is enforced by a `remember(regionId)` ViewModelStoreOwner inside `EmbedContainer`; iOS and Web get it for free from their respective view systems.",
+      "ja": "• 同じ screen を複数 embed すると各インスタンスが `regionId` ごとに独自の VM を持ちます。Android では `EmbedContainer` 内の `remember(regionId)` による ViewModelStoreOwner で担保され、iOS と Web は各 view system が自然に分離します。"
+    },
+    "section_when_heading": {
+      "en": "Picking the right primitive",
+      "ja": "どれを選ぶか"
+    },
+    "section_when_body": {
+      "en": "Start from the question 'does this region need its own state and lifecycle?' — that's the dividing line. If no, you almost always want `include` (or `TabView.tabs[].include` if you also need a persistent tab bar). If yes, reach for `Embed`.",
+      "ja": "「この領域は独自の state とライフサイクルが必要か？」から考え始めます — ここが境界線。No なら基本は `include`（永続タブバーが必要なら `TabView.tabs[].include`）。Yes なら `Embed`。"
+    },
+    "section_when_bullet_include": {
+      "en": "• `include` — same screen reuses a region, or two unrelated screens share a region whose bindings happen to match the parent VM. No new VM, no lifecycle, no state isolation.",
+      "ja": "• `include` — 同じ screen が領域を再利用するか、2 つの無関係な screen が親 VM とバインディングが一致する領域を共有する場合。新 VM もライフサイクルも state 分離もなし。"
+    },
+    "section_when_bullet_tabview": {
+      "en": "• `TabView.tabs[].include` — tabs feel like *views* of one screen (the user expects state to persist when switching). One VM drives every tab.",
+      "ja": "• `TabView.tabs[].include` — タブが 1 つの screen の *ビュー* に感じられる場合（タブ切替で state が維持されることをユーザが期待）。1 VM が全タブを駆動。"
+    },
+    "section_when_bullet_embed": {
+      "en": "• `Embed` — tablet master/detail (detail is a real screen), dashboard panel with independent fetch, a workspace pane that already runs as a stand-alone screen and should be reusable inside larger surfaces.",
+      "ja": "• `Embed` — タブレット master/detail（detail が実画面）、独立 fetch のダッシュボードパネル、stand-alone でも動く screen を大きい画面の一部として再利用するケース。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_viewmodel_owned_state_title": {
+      "en": "ViewModel-owned state",
+      "ja": "ViewModel が state を持つ"
+    },
+    "next_viewmodel_owned_state_description": {
+      "en": "How a ViewModel keeps its own state — the contract every embedded screen relies on.",
+      "ja": "ViewModel が独自の state を持つ仕組み — 埋め込まれる screen が依存している契約。"
+    },
+    "next_embed_reference_title": {
+      "en": "Embed — Component reference",
+      "ja": "Embed — コンポーネントリファレンス"
+    },
+    "next_embed_reference_description": {
+      "en": "Attribute-by-attribute reference for `Embed`: screen, params, events, navigationMode.",
+      "ja": "`Embed` の属性別リファレンス: screen / params / events / navigationMode。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの目次"
+    },
+    "toc_row_problem": {
+      "en": "Why three primitives",
+      "ja": "なぜ 3 つあるのか"
+    },
+    "toc_row_include": {
+      "en": "include",
+      "ja": "include"
+    },
+    "toc_row_tabview": {
+      "en": "TabView.tabs[].include",
+      "ja": "TabView.tabs[].include"
+    },
+    "toc_row_embed": {
+      "en": "Embed",
+      "ja": "Embed"
+    },
+    "toc_row_comparison": {
+      "en": "Side-by-side",
+      "ja": "比較表"
+    },
+    "toc_row_lifecycle": {
+      "en": "Embed lifecycle",
+      "ja": "Embed のライフサイクル"
+    },
+    "toc_row_when": {
+      "en": "Picking the right primitive",
+      "ja": "どれを選ぶか"
+    }
+  },
   "guides_writing_your_first_spec": {
     "breadcrumb": {
       "en": "← Guides",
@@ -4328,6 +4498,26 @@
       "en": "• Back: Web uses the browser back button or router.back(). iOS pops the NavigationStack automatically on back-swipe or can be driven via path manipulation. Android's NavController pops automatically on hardware/gesture back.",
       "ja": "• Back: Web はブラウザの戻るボタンまたは router.back()。iOS は戻るスワイプで NavigationStack が自動 pop、または path 操作で駆動。Android の NavController はハードウェア/ジェスチャ back で自動 pop。"
     },
+    "section_embed_heading": {
+      "en": "7. Navigation inside an Embed",
+      "ja": "7. Embed 内のナビゲーション"
+    },
+    "section_embed_body": {
+      "en": "When a screen is hosted inside an `Embed` with `navigationMode: \"delegate\"` (the v1 default), the child does not own a private navigation stack — it shares the parent's. That shapes how `push`, `pop`, and gesture/back behave, with one explicit safety rule designed to keep a child screen from accidentally dismissing its own host.",
+      "ja": "`Embed` で `navigationMode: \"delegate\"`（v1 のデフォルト）の screen は独自の navigation stack を持たず、親のものを共有します。これにより `push` / `pop` / 戻るジェスチャの挙動が変わり、子 screen が host 自身を誤って閉じないための安全規約が 1 つ明示されています。"
+    },
+    "section_embed_bullet_push": {
+      "en": "• `push`: the child's `navigate(url)` bubbles to the parent's NavController/Router. The new screen takes the entire window — same behaviour as if the parent had pushed it.",
+      "ja": "• `push`: 子の `navigate(url)` は親の NavController/Router に bubble する。新 screen はウィンドウ全体に遷移し、親が直接 push した場合と同じ挙動。"
+    },
+    "section_embed_bullet_pop": {
+      "en": "• `pop` / `dismiss` / `navigateBack`: bounded at the embed. The child can call them, but the framework absorbs the call so the embed itself is not torn down. To dismiss the embedded screen, the parent emits the relevant `events` handler or unmounts the `Embed` node.",
+      "ja": "• `pop` / `dismiss` / `navigateBack`: embed 境界で stop。子が呼んでもフレームワークが吸収し、embed 自身は閉じない。埋め込まれた screen を閉じたいときは、親が対応する `events` ハンドラを発火するか `Embed` ノードを unmount する。"
+    },
+    "section_embed_bullet_isolated": {
+      "en": "• `navigationMode: \"isolated\"` (private nav stack inside the embed) is deferred to v1.5 — the navigation-* agents will rebind nested NavigationStacks / NavHosts / nested routers when it lands.",
+      "ja": "• `navigationMode: \"isolated\"`（embed 内の独立 nav stack）は v1.5 で対応予定。navigation-* エージェントが nested NavigationStack / NavHost / 入れ子ルーターを再配線する形になる。"
+    },
     "toc_row_contract": {
       "en": "1. The contract",
       "ja": "1. 契約"
@@ -4339,6 +4529,10 @@
     "toc_row_sheets": {
       "en": "6. Sheets / modals / tabs / back",
       "ja": "6. Sheet / modal / tab / back"
+    },
+    "toc_row_embed": {
+      "en": "7. Navigation inside an Embed",
+      "ja": "7. Embed 内のナビゲーション"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -5698,6 +5892,30 @@
       "en": "Embedded web content via WKWebView / WebView / <iframe>.",
       "ja": "WKWebView / WebView / `<iframe>` による埋め込み Web コンテンツ。"
     },
+    "catalog_embed_description": {
+      "en": "Hosts another screen as a region — child owns its own ViewModel.",
+      "ja": "別 screen を領域として埋め込む。子は独自の ViewModel を所有。"
+    },
+    "section_composition_heading": {
+      "en": "Composition primitives",
+      "ja": "Composition プリミティブ"
+    },
+    "section_composition_body": {
+      "en": "Two components in this catalog are not widgets — they are composition primitives, used to *arrange* other layouts or screens rather than to render content of their own. Group them mentally with the spec's `include` directive when picking a tool.",
+      "ja": "このカタログに含まれるうち 2 つは widget ではなく composition プリミティブで、自身が描画する代わりに他のレイアウトや screen を *配置* するためのものです。spec の `include` ディレクティブと同じ「合成手段」のグループとして覚えると選びやすくなります。"
+    },
+    "section_composition_bullet_tabview": {
+      "en": "• `TabView` — multiple layouts under one parent ViewModel, switched by a tab bar.",
+      "ja": "• `TabView` — 1 つの親 ViewModel の下で複数レイアウトを切替える、タブバー付き。"
+    },
+    "section_composition_bullet_embed": {
+      "en": "• `Embed` — hosts a sub-screen with its own ViewModel and lifecycle. The embedded screen is unchanged.",
+      "ja": "• `Embed` — 独自の ViewModel とライフサイクルを持つ子 screen を埋め込む。子 screen は無改修。"
+    },
+    "section_composition_note": {
+      "en": "See [/concepts/screen-composition](/concepts/screen-composition) for the include / TabView / Embed trade-off.",
+      "ja": "include / TabView / Embed の使い分けは [/concepts/screen-composition](/concepts/screen-composition) を参照。"
+    },
     "toc_title": {
       "en": "On this page",
       "ja": "このページ"
@@ -5717,6 +5935,10 @@
     "toc_row_links": {
       "en": "Jumping to a component",
       "ja": "コンポーネントへのジャンプ"
+    },
+    "toc_row_composition": {
+      "en": "Composition primitives",
+      "ja": "Composition プリミティブ"
     },
     "section_catalog_heading": {
       "en": "All components",
@@ -6223,8 +6445,12 @@
       "ja": "structure"
     },
     "section_structure_body": {
-      "en": "The visual tree. Seven sub-keys, but in practice most screens leave `components` / `layout` empty and let `layout_importer` inline the tree from `metadata.layoutFile` at generate time. `collection` and `tabView` are single-purpose slots only set when the screen is a root Collection page or a root TabView. `decorativeElements` and `wrapperViews` annotate purely presentational children and structural wrappers — useful for reviewer communication, not required by the generator. `customComponents` is where you declare this screen uses an externally-specified custom component (see `/spec/split-overview` Pattern 3).",
-      "ja": "視覚ツリーのスロット。7 サブキーがあるが実運用ではほとんどの画面が `components` / `layout` を空のままにし、生成時に `layout_importer` が `metadata.layoutFile` から tree を inline する。`collection` と `tabView` は単一用途スロットで、画面が root Collection もしくは root TabView のときだけ埋める。`decorativeElements` と `wrapperViews` は純粋に装飾的な子 / 構造的 wrapper を注釈する欄で、レビュー向けの情報伝達用（ジェネレータは要求しない）。`customComponents` はこの画面が外部定義のカスタムコンポーネントを使うことを宣言する（`/spec/split-overview` パターン 3）。"
+      "en": "The visual tree. Eight sub-keys, but in practice most screens leave `components` / `layout` empty and let `layout_importer` inline the tree from `metadata.layoutFile` at generate time. `collection` and `tabView` are single-purpose slots only set when the screen is a root Collection page or a root TabView. `decorativeElements` and `wrapperViews` annotate purely presentational children and structural wrappers — useful for reviewer communication, not required by the generator. `customComponents` is where you declare this screen uses an externally-specified custom component (see `/spec/split-overview` Pattern 3). `embeds[]` lists sub-screens this layout hosts as regions — each child owns its own ViewModel (see the screen composition concept article).",
+      "ja": "視覚ツリーのスロット。8 サブキーがあるが実運用ではほとんどの画面が `components` / `layout` を空のままにし、生成時に `layout_importer` が `metadata.layoutFile` から tree を inline する。`collection` と `tabView` は単一用途スロットで、画面が root Collection もしくは root TabView のときだけ埋める。`decorativeElements` と `wrapperViews` は純粋に装飾的な子 / 構造的 wrapper を注釈する欄で、レビュー向けの情報伝達用（ジェネレータは要求しない）。`customComponents` はこの画面が外部定義のカスタムコンポーネントを使うことを宣言する（`/spec/split-overview` パターン 3）。`embeds[]` はこのレイアウトが領域として埋め込む子 screen の一覧で、子は独自の ViewModel を所有する（screen composition の概念記事を参照）。"
+    },
+    "section_structure_embeds_note": {
+      "en": "`embeds[]` entries are: `{ regionId, screen, params?, events?, navigationMode? }`. The Layout JSON places each embed via `{ \"type\": \"Embed\", \"id\": <regionId>, ... }`. The embedded screen is unchanged — only the embedding (parent) spec declares the relationship. See [/concepts/screen-composition](/concepts/screen-composition) and [/reference/components/embed](/reference/components/embed).",
+      "ja": "`embeds[]` の各要素は `{ regionId, screen, params?, events?, navigationMode? }`。Layout JSON は `{ \"type\": \"Embed\", \"id\": <regionId>, ... }` でこれを配置する。埋め込まれる側の screen は無改修で、親 spec のみが関係を宣言する。[/concepts/screen-composition](/concepts/screen-composition) と [/reference/components/embed](/reference/components/embed) を参照。"
     },
     "next_heading": {
       "en": "Keep going",
@@ -6320,13 +6546,25 @@
       "en": "When a Collection needs more than one cell layout — a feed interleaving post cards with ad slots, for example — hoist each cell into `docs/screens/layouts/cells/<name>.json` and list them in `structure.collection.cellClasses[]`. `sections[].cell` picks which cell a section renders. `jui build` inlines each referenced cell at generate time, and the same cell file can be re-used by any other Collection across the site.",
       "ja": "Collection が複数のセルレイアウトを必要とする場合（例: フィードが投稿カードと広告スロットを交互に並べる）、各セルを `docs/screens/layouts/cells/<name>.json` に切り出して `structure.collection.cellClasses[]` に列挙。`sections[].cell` がセクションごとにどのセルを描画するかを選ぶ。`jui build` は生成時に各セルを inline 展開し、同じセルファイルは他の Collection からも再利用可能。"
     },
+    "section_pattern_embed_heading": {
+      "en": "Pattern 6 — Embed (sub-screens with their own ViewModel)",
+      "ja": "パターン 6 — Embed（独立 ViewModel を持つ子 screen）"
+    },
+    "section_pattern_embed_body": {
+      "en": "When a region of a screen needs its own independent ViewModel — a tablet master/detail where the detail pane is conceptually a separate screen, or a dashboard panel with its own data flow — declare each region in `structure.embeds[]` and place an `{ \"type\": \"Embed\", ... }` element in the parent Layout. The embedded screen is **unchanged**: only the embedding (parent) spec is aware of the relationship. `params` (parent → child) and `events` (child → parent) are the only cross-screen channels. Child VMs that implement `applyInitParams(_:)` consume params; others ignore them.",
+      "ja": "画面の一領域が独自の ViewModel を必要とするとき — タブレットの master/detail で detail 側が実質別画面、もしくはダッシュボードのパネルが独自のデータフローを持つ場合 — `structure.embeds[]` に各領域を宣言し、親 Layout に `{ \"type\": \"Embed\", ... }` を配置する。**埋め込まれる側の screen は無改修**で、親 spec のみが関係を宣言する。クロス画面のチャネルは `params`（親 → 子）と `events`（子 → 親）のみ。子 VM が `applyInitParams(_:)` を実装していれば params を受け取れる、しなければ無視。"
+    },
+    "section_pattern_embed_note": {
+      "en": "`navigationMode` in v1 supports `\"delegate\"` only: the child shares the parent's NavController/Router; `push` bubbles to the parent, but `pop` / `dismiss` / `navigateBack` are bounded at the embed to prevent accidental dismissal. See [/concepts/screen-composition](/concepts/screen-composition) for the trade-offs against `include` and `TabView`, and [/reference/components/embed](/reference/components/embed) for the full attribute reference.",
+      "ja": "`navigationMode` の v1 は `\"delegate\"` のみ。子は親の NavController/Router を共有し、`push` は親に bubble するが、`pop` / `dismiss` / `navigateBack` は embed 境界で stop（誤って embed を閉じる事故を防ぐ）。`include` / `TabView` との使い分けは [/concepts/screen-composition](/concepts/screen-composition)、属性の詳細は [/reference/components/embed](/reference/components/embed) を参照。"
+    },
     "section_picking_heading": {
       "en": "Picking the right pattern",
       "ja": "適切なパターンの選び方"
     },
     "section_picking_body": {
-      "en": "The triggers from 'Why split at all' map onto the five patterns in predictable ways — use the cheat sheet below as a starting point, then follow the relevant detail article once it lands in Phase 2 of the spec-authoring rewrite.",
-      "ja": "冒頭の 3 トリガと 5 パターンの対応関係は概ね固定です。下のチートシートを起点に選び、Phase 2 で各パターンの詳細記事が landing したらそちらを読む流れを想定しています。"
+      "en": "The triggers from 'Why split at all' map onto the six patterns in predictable ways — use the cheat sheet below as a starting point, then follow the relevant detail article once it lands in Phase 2 of the spec-authoring rewrite.",
+      "ja": "冒頭の 3 トリガと 6 パターンの対応関係は概ね固定です。下のチートシートを起点に選び、Phase 2 で各パターンの詳細記事が landing したらそちらを読む流れを想定しています。"
     },
     "next_heading": {
       "en": "Keep going",

@@ -174,12 +174,13 @@
                   "width": "matchParent",
                   "height": "wrapContent",
                   "topMargin": 16,
-                  "code": "{\n  // Most screens leave `structure` mostly empty and let layout_importer\n  // inline the tree from metadata.layoutFile at generate time.\n  \"structure\": {\n    \"components\":         [],      // auto-imported from the Layout JSON\n    \"layout\":             {},      // same — flat tree of the Layout hierarchy\n    \"collection\":         null,    // only set when the screen is a single-Collection page\n    \"tabView\":            null,    // only set when the screen is a root TabView\n    \"decorativeElements\": [],      // purely presentational children\n    \"wrapperViews\":       [],      // structural wrappers with a purpose note\n    \"customComponents\":   [        // see Pattern 3 (component_spec)\n      { \"name\": \"CodeBlock\",\n        \"ref\":  \"docs/components/json/codeblock.component.json\" }\n    ]\n  }\n}",
+                  "code": "{\n  // Most screens leave `structure` mostly empty and let layout_importer\n  // inline the tree from metadata.layoutFile at generate time.\n  \"structure\": {\n    \"components\":         [],      // auto-imported from the Layout JSON\n    \"layout\":             {},      // same — flat tree of the Layout hierarchy\n    \"collection\":         null,    // only set when the screen is a single-Collection page\n    \"tabView\":            null,    // only set when the screen is a root TabView\n    \"decorativeElements\": [],      // purely presentational children\n    \"wrapperViews\":       [],      // structural wrappers with a purpose note\n    \"customComponents\":   [        // see Pattern 3 (component_spec)\n      { \"name\": \"CodeBlock\",\n        \"ref\":  \"docs/components/json/codeblock.component.json\" }\n    ],\n    \"embeds\": [                    // Screen composition — child owns its own VM\n      {\n        \"regionId\":       \"detailPane\",\n        \"screen\":         \"order_detail\",\n        \"params\":         { \"orderId\": \"@{selectedOrderId}\" },\n        \"events\":         { \"onOrderUpdated\": \"handleOrderUpdated\" },\n        \"navigationMode\": \"delegate\"\n      }\n    ]\n  }\n}",
                   "language": "json",
                   "filename": "structure",
                   "showLineNumbers": false,
                   "copyable": true
-                }
+                },
+                { "type": "Label", "style": "section_subheading", "text": "section_structure_embeds_note", "width": "matchParent", "topMargin": 12 }
               ]
             }
           ]

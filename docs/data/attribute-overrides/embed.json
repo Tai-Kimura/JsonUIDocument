@@ -1,0 +1,55 @@
+{
+  "component": "Embed",
+  "description": {
+    "en": "Embeds another screen as a region of this layout. The embedded screen owns its own ViewModel — independent from the parent. Use for tablet master/detail or dashboard panels.",
+    "ja": "別の screen を親レイアウトの一領域として埋め込む view type。埋め込まれた screen は親とは独立した ViewModel を所有する。タブレット master/detail やダッシュボードのパネル用途。"
+  },
+  "usage": {
+    "en": "Three composition primitives exist: `include` (codegen inlines, child shares parent VM), `TabView.tabs[].include` (one VM, multiple tab layouts), and `Embed` (child owns its own VM). Pick Embed when the inner screen has its own data flow.",
+    "ja": "レイアウト合成には 3 つの手段がある: `include`（codegen で展開、VM は親と共有）、`TabView.tabs[].include`（VM 1 個、タブごとに別レイアウト）、`Embed`（子が独立した VM を所有）。子画面が独自のデータフローを持つときに Embed を選ぶ。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Tablet master/detail", "ja": "タブレット master/detail" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Embed\",\n  \"id\": \"detailPane\",\n  \"screen\": \"order_detail\",\n  \"params\": { \"orderId\": \"@{selectedOrderId}\" },\n  \"events\": { \"onOrderUpdated\": \"handleOrderUpdated\" },\n  \"navigationMode\": \"delegate\",\n  \"weight\": 1\n}"
+    },
+    {
+      "title": { "en": "Dashboard panel (no params)", "ja": "ダッシュボードパネル (params なし)" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Embed\",\n  \"id\": \"activityPane\",\n  \"screen\": \"recent_activity\",\n  \"navigationMode\": \"delegate\"\n}"
+    },
+    {
+      "title": { "en": "Parent spec — structure.embeds[]", "ja": "親 spec — structure.embeds[]" },
+      "language": "json",
+      "code": "\"structure\": {\n  \"embeds\": [\n    {\n      \"regionId\": \"detailPane\",\n      \"screen\": \"order_detail\",\n      \"params\": { \"orderId\": \"@{selectedOrderId}\" },\n      \"events\": { \"onOrderUpdated\": \"handleOrderUpdated\" },\n      \"navigationMode\": \"delegate\"\n    }\n  ]\n}"
+    }
+  ],
+  "attributes": {
+    "screen": {
+      "note": {
+        "en": "Layout JSON filename in snake_case (no extension). Codegen converts to PascalCase for the generated View class; dynamic mode loads the JSON as-is.",
+        "ja": "Layout JSON のファイル名 (snake_case、拡張子なし)。codegen は PascalCase に変換して生成 View クラス名にする。dynamic mode はそのままロード。"
+      }
+    },
+    "params": {
+      "note": {
+        "en": "Flat dict (no nesting in v1). Keys must be camelCase. Values may be literals or `@{varName}` bindings against the parent VM. Child VMs that implement `applyInitParams(_:)` receive them — others silently ignore.",
+        "ja": "フラット dict（v1 はネスト不可）。キーは camelCase 必須。値はリテラルか、親 VM に対する `@{varName}` バインディング。子 VM が `applyInitParams(_:)` を実装していれば受け取れる、しなければ無視。"
+      }
+    },
+    "events": {
+      "note": {
+        "en": "Map of `on[A-Z]...` event name → parent VM handler name. Embedded VMs emit via the lib-provided `emit(name, payload)` helper — no spec declaration needed on the child side.",
+        "ja": "`on[A-Z]...` イベント名 → 親 VM ハンドラ名のマップ。埋め込まれた VM は lib 提供の `emit(name, payload)` ヘルパで発行（子側 spec への宣言不要）。"
+      }
+    },
+    "navigationMode": {
+      "note": {
+        "en": "v1 supports `\"delegate\"` only: child shares the parent's NavController/Router. `push` bubbles to the parent; `pop`/`dismiss`/`navigateBack` are bounded at the embed (cannot close the embed itself). `\"isolated\"` (private nav stack) is deferred to v1.5.",
+        "ja": "v1 は `\"delegate\"` のみ。子は親の NavController/Router を共有する。`push` は親に bubble、`pop`/`dismiss`/`navigateBack` は embed 境界で stop（embed 自身は閉じない）。`\"isolated\"`（独立 nav stack）は v1.5 で対応予定。"
+      }
+    }
+  },
+  "relatedComponents": ["TabView", "View"]
+}

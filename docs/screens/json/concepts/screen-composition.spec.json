@@ -1,0 +1,148 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "ScreenComposition",
+    "displayName": "Screen composition",
+    "description": "Essay: three ways to compose layouts — `include` (codegen inlines, shared VM), `TabView.tabs[].include` (one VM, multiple tabs), and `Embed` (child owns its own VM). Seven H2 sections covering the problem, each primitive in turn, a comparison table, Embed lifecycle (params/events/navigation), and when to choose which. ~7-min read.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "concepts/screen-composition",
+    "createdAt": "2026-05-14",
+    "updatedAt": "2026-05-14"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two follow-up cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[ScreenCompositionView] --> VM[ScreenCompositionViewModel]\n    VM -- nextReadLinks --> VIEW",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_viewmodel_owned_state -> /concepts/viewmodel-owned-state, next_embed_reference -> /reference/components/embed). Each row's titleKey / descriptionKey is resolved through StringManager with the concepts_screen_composition_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /concepts, /concepts/viewmodel-owned-state, /reference/components/embed."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /concepts/viewmodel-owned-state and /reference/components/embed. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is /concepts, /concepts/viewmodel-owned-state, or /reference/components/embed",
+      "destination": "Target screen",
+      "description": "v1 destinations: /concepts, /concepts/viewmodel-owned-state, /reference/components/embed."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/concepts/screen-composition.json",
+      "description": "Essay layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/concepts/ScreenCompositionViewModel.ts",
+      "description": "Same shape as ResponsiveDesignViewModel — seeds nextReadLinks."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/concepts/screen-composition/page.tsx",
+      "description": "Next.js route."
+    }
+  ],
+  "notes": [
+    "Seventh concepts essay. Companion to the Embed feature added in SwiftJsonUI 10.1.0 / KotlinJsonUI 2.8.0.",
+    "Focus on the *trade-off* between the three composition primitives — when each is the right answer, not how to write each one. The reference page (/reference/components/embed) documents the attribute shape; this page documents the choice.",
+    "Pairs with /spec/split-overview Pattern 6 — that page introduces Embed as a splitting pattern; this page explains why it differs from include and TabView."
+  ]
+}

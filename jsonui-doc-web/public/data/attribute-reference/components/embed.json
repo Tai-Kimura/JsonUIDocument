@@ -1,0 +1,957 @@
+{
+  "component": "Embed",
+  "kebab": "embed",
+  "aliasOf": null,
+  "title": "Embed",
+  "description": {
+    "en": "Embeds another screen as a region of this layout. The embedded screen owns its own ViewModel — independent from the parent. Use for tablet master/detail or dashboard panels.",
+    "ja": "別の screen を親レイアウトの一領域として埋め込む view type。埋め込まれた screen は親とは独立した ViewModel を所有する。タブレット master/detail やダッシュボードのパネル用途。"
+  },
+  "usage": {
+    "en": "Three composition primitives exist: `include` (codegen inlines, child shares parent VM), `TabView.tabs[].include` (one VM, multiple tab layouts), and `Embed` (child owns its own VM). Pick Embed when the inner screen has its own data flow.",
+    "ja": "レイアウト合成には 3 つの手段がある: `include`（codegen で展開、VM は親と共有）、`TabView.tabs[].include`（VM 1 個、タブごとに別レイアウト）、`Embed`（子が独立した VM を所有）。子画面が独自のデータフローを持つときに Embed を選ぶ。"
+  },
+  "aliasNotice": null,
+  "kicker": "Component · Reference",
+  "kickerParentLabel": "Components",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "platform_ios",
+              "label": "iOS",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_android",
+              "label": "Android",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_web",
+              "label": "Web",
+              "fontColor": "var(--color-ink)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "visible",
+  "aliasCalloutVisibility": "gone",
+  "aliasLinkUrl": "",
+  "canonicalCode": "{\n  \"type\": \"Embed\",\n  \"id\": \"detailPane\",\n  \"screen\": \"order_detail\",\n  \"params\": { \"orderId\": \"@{selectedOrderId}\" },\n  \"events\": { \"onOrderUpdated\": \"handleOrderUpdated\" },\n  \"navigationMode\": \"delegate\",\n  \"weight\": 1\n}",
+  "canonicalLanguage": "json",
+  "statRequired": "1",
+  "statOptional": "3",
+  "statEvents": "0",
+  "statRequiredText": {
+    "en": "1 required",
+    "ja": "必須 1"
+  },
+  "statOptionalText": {
+    "en": "3 optional",
+    "ja": "任意 3"
+  },
+  "statEventsText": {
+    "en": "0 events",
+    "ja": "イベント 0"
+  },
+  "usageVisibility": "visible",
+  "attributeCategories": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "cat_common",
+              "label": {
+                "en": "Common",
+                "ja": "共通"
+              },
+              "anchorUrl": "#section-common"
+            },
+            {
+              "id": "cat_event",
+              "label": {
+                "en": "Event",
+                "ja": "イベント"
+              },
+              "anchorUrl": "#section-event"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributesCommon": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_screen",
+              "name": "screen",
+              "anchorId": "attr-screen",
+              "requiredChipText": "required",
+              "requiredChipVisibility": "visible",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-danger)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Layout JSON filename of the screen to embed (snake_case, no extension, relative to layout root). Codegen converts to PascalCase for the generated View class name; dynamic mode loads the layout JSON as-is.",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Layout JSON filename in snake_case (no extension). Codegen converts to PascalCase for the generated View class; dynamic mode loads the JSON as-is.",
+                "ja": "Layout JSON のファイル名 (snake_case、拡張子なし)。codegen は PascalCase に変換して生成 View クラス名にする。dynamic mode はそのままロード。"
+              },
+              "type": "string",
+              "required": "required"
+            },
+            {
+              "id": "attr_params",
+              "name": "params",
+              "anchorId": "attr-params",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Init params handed to the embedded screen's ViewModel (flat dict, no nesting in v1). Keys must be camelCase. Values may be literals or @{varName} bindings against the parent VM. VMs that implement applyInitParams(_:) receive these; others ignore them.",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Flat dict (no nesting in v1). Keys must be camelCase. Values may be literals or `@{varName}` bindings against the parent VM. Child VMs that implement `applyInitParams(_:)` receive them — others silently ignore.",
+                "ja": "フラット dict（v1 はネスト不可）。キーは camelCase 必須。値はリテラルか、親 VM に対する `@{varName}` バインディング。子 VM が `applyInitParams(_:)` を実装していれば受け取れる、しなければ無視。"
+              },
+              "type": "object | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_navigationMode",
+              "name": "navigationMode",
+              "anchorId": "attr-navigationMode",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "delegate",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "v1 supports 'delegate' only: embedded screen shares the parent's NavController/Router. push() bubbles to the parent; pop/dismiss/navigateBack are bounded at the embed (do not close the embed itself). 'isolated' (private nav stack) is deferred to v1.5.",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "v1 supports `\"delegate\"` only: child shares the parent's NavController/Router. `push` bubbles to the parent; `pop`/`dismiss`/`navigateBack` are bounded at the embed (cannot close the embed itself). `\"isolated\"` (private nav stack) is deferred to v1.5.",
+                "ja": "v1 は `\"delegate\"` のみ。子は親の NavController/Router を共有する。`push` は親に bubble、`pop`/`dismiss`/`navigateBack` は embed 境界で stop（embed 自身は閉じない）。`\"isolated\"`（独立 nav stack）は v1.5 で対応予定。"
+              },
+              "type": "string",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupCommonVisibility": "visible",
+  "attributesStyle": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStyleVisibility": "gone",
+  "attributesLayout": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupLayoutVisibility": "gone",
+  "attributesSpacing": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupSpacingVisibility": "gone",
+  "attributesAlignment": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupAlignmentVisibility": "gone",
+  "attributesState": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStateVisibility": "gone",
+  "attributesBinding": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupBindingVisibility": "gone",
+  "attributesEvent": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_events",
+              "name": "events",
+              "anchorId": "attr-events",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Map of embedded-screen event names → parent VM handler names. Event keys must follow on[A-Z]... pattern. Handler values must reference existing entries in the parent VM's dataFlow.viewModel.methods or stateManagement.eventHandlers. Embedded VMs emit events via the lib-provided emit(name, payload) helper (no spec declaration required).",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Map of `on[A-Z]...` event name → parent VM handler name. Embedded VMs emit via the lib-provided `emit(name, payload)` helper — no spec declaration needed on the child side.",
+                "ja": "`on[A-Z]...` イベント名 → 親 VM ハンドラ名のマップ。埋め込まれた VM は lib 提供の `emit(name, payload)` ヘルパで発行（子側 spec への宣言不要）。"
+              },
+              "type": "object",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupEventVisibility": "visible",
+  "attributesResponsive": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupResponsiveVisibility": "gone",
+  "attributesMisc": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupMiscVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_glance",
+      "label": {
+        "en": "At a glance",
+        "ja": "概要"
+      },
+      "anchor": "section-glance",
+      "level": 1
+    },
+    {
+      "id": "toc_common",
+      "label": {
+        "en": "Common",
+        "ja": "共通"
+      },
+      "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_event",
+      "label": {
+        "en": "Event",
+        "ja": "イベント"
+      },
+      "anchor": "section-event",
+      "level": 1
+    },
+    {
+      "id": "toc_examples",
+      "label": {
+        "en": "Examples",
+        "ja": "例"
+      },
+      "anchor": "section-examples",
+      "level": 1
+    },
+    {
+      "id": "toc_related",
+      "label": {
+        "en": "Related",
+        "ja": "関連"
+      },
+      "anchor": "section-related",
+      "level": 1
+    }
+  ],
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "anchorId": "example-1",
+              "title": {
+                "en": "Tablet master/detail",
+                "ja": "タブレット master/detail"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"Embed\",\n  \"id\": \"detailPane\",\n  \"screen\": \"order_detail\",\n  \"params\": { \"orderId\": \"@{selectedOrderId}\" },\n  \"events\": { \"onOrderUpdated\": \"handleOrderUpdated\" },\n  \"navigationMode\": \"delegate\",\n  \"weight\": 1\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Embed\",\n  \"id\": \"detailPane\",\n  \"screen\": \"order_detail\",\n  \"params\": { \"orderId\": \"@{selectedOrderId}\" },\n  \"events\": { \"onOrderUpdated\": \"handleOrderUpdated\" },\n  \"navigationMode\": \"delegate\",\n  \"weight\": 1\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"Embed\",\n  \"id\": \"detailPane\",\n  \"screen\": \"order_detail\",\n  \"params\": { \"orderId\": \"@{selectedOrderId}\" },\n  \"events\": { \"onOrderUpdated\": \"handleOrderUpdated\" },\n  \"navigationMode\": \"delegate\",\n  \"weight\": 1\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "anchorId": "example-2",
+              "title": {
+                "en": "Dashboard panel (no params)",
+                "ja": "ダッシュボードパネル (params なし)"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"Embed\",\n  \"id\": \"activityPane\",\n  \"screen\": \"recent_activity\",\n  \"navigationMode\": \"delegate\"\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Embed\",\n  \"id\": \"activityPane\",\n  \"screen\": \"recent_activity\",\n  \"navigationMode\": \"delegate\"\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"Embed\",\n  \"id\": \"activityPane\",\n  \"screen\": \"recent_activity\",\n  \"navigationMode\": \"delegate\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "anchorId": "example-3",
+              "title": {
+                "en": "Parent spec — structure.embeds[]",
+                "ja": "親 spec — structure.embeds[]"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "\"structure\": {\n  \"embeds\": [\n    {\n      \"regionId\": \"detailPane\",\n      \"screen\": \"order_detail\",\n      \"params\": { \"orderId\": \"@{selectedOrderId}\" },\n      \"events\": { \"onOrderUpdated\": \"handleOrderUpdated\" },\n      \"navigationMode\": \"delegate\"\n    }\n  ]\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "\"structure\": {\n  \"embeds\": [\n    {\n      \"regionId\": \"detailPane\",\n      \"screen\": \"order_detail\",\n      \"params\": { \"orderId\": \"@{selectedOrderId}\" },\n      \"events\": { \"onOrderUpdated\": \"handleOrderUpdated\" },\n      \"navigationMode\": \"delegate\"\n    }\n  ]\n}"
+                }
+              ],
+              "language": "json",
+              "code": "\"structure\": {\n  \"embeds\": [\n    {\n      \"regionId\": \"detailPane\",\n      \"screen\": \"order_detail\",\n      \"params\": { \"orderId\": \"@{selectedOrderId}\" },\n      \"events\": { \"onOrderUpdated\": \"handleOrderUpdated\" },\n      \"navigationMode\": \"delegate\"\n    }\n  ]\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_screen",
+              "name": "screen",
+              "anchorId": "attr-screen",
+              "requiredChipText": "required",
+              "requiredChipVisibility": "visible",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-danger)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Layout JSON filename of the screen to embed (snake_case, no extension, relative to layout root). Codegen converts to PascalCase for the generated View class name; dynamic mode loads the layout JSON as-is.",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Layout JSON filename in snake_case (no extension). Codegen converts to PascalCase for the generated View class; dynamic mode loads the JSON as-is.",
+                "ja": "Layout JSON のファイル名 (snake_case、拡張子なし)。codegen は PascalCase に変換して生成 View クラス名にする。dynamic mode はそのままロード。"
+              },
+              "type": "string",
+              "required": "required"
+            },
+            {
+              "id": "attr_params",
+              "name": "params",
+              "anchorId": "attr-params",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Init params handed to the embedded screen's ViewModel (flat dict, no nesting in v1). Keys must be camelCase. Values may be literals or @{varName} bindings against the parent VM. VMs that implement applyInitParams(_:) receive these; others ignore them.",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Flat dict (no nesting in v1). Keys must be camelCase. Values may be literals or `@{varName}` bindings against the parent VM. Child VMs that implement `applyInitParams(_:)` receive them — others silently ignore.",
+                "ja": "フラット dict（v1 はネスト不可）。キーは camelCase 必須。値はリテラルか、親 VM に対する `@{varName}` バインディング。子 VM が `applyInitParams(_:)` を実装していれば受け取れる、しなければ無視。"
+              },
+              "type": "object | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_events",
+              "name": "events",
+              "anchorId": "attr-events",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Map of embedded-screen event names → parent VM handler names. Event keys must follow on[A-Z]... pattern. Handler values must reference existing entries in the parent VM's dataFlow.viewModel.methods or stateManagement.eventHandlers. Embedded VMs emit events via the lib-provided emit(name, payload) helper (no spec declaration required).",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Map of `on[A-Z]...` event name → parent VM handler name. Embedded VMs emit via the lib-provided `emit(name, payload)` helper — no spec declaration needed on the child side.",
+                "ja": "`on[A-Z]...` イベント名 → 親 VM ハンドラ名のマップ。埋め込まれた VM は lib 提供の `emit(name, payload)` ヘルパで発行（子側 spec への宣言不要）。"
+              },
+              "type": "object",
+              "required": ""
+            },
+            {
+              "id": "attr_navigationMode",
+              "name": "navigationMode",
+              "anchorId": "attr-navigationMode",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "delegate",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "v1 supports 'delegate' only: embedded screen shares the parent's NavController/Router. push() bubbles to the parent; pop/dismiss/navigateBack are bounded at the embed (do not close the embed itself). 'isolated' (private nav stack) is deferred to v1.5.",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "v1 supports `\"delegate\"` only: child shares the parent's NavController/Router. `push` bubbles to the parent; `pop`/`dismiss`/`navigateBack` are bounded at the embed (cannot close the embed itself). `\"isolated\"` (private nav stack) is deferred to v1.5.",
+                "ja": "v1 は `\"delegate\"` のみ。子は親の NavController/Router を共有する。`push` は親に bubble、`pop`/`dismiss`/`navigateBack` は embed 境界で stop（embed 自身は閉じない）。`\"isolated\"`（独立 nav stack）は v1.5 で対応予定。"
+              },
+              "type": "string",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_tab_view",
+              "name": "TabView",
+              "hint": "",
+              "url": "/reference/components/tab-view"
+            },
+            {
+              "id": "related_view",
+              "name": "View",
+              "hint": "",
+              "url": "/reference/components/view"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": {
+                "en": "Attribute reference",
+                "ja": "属性リファレンス"
+              },
+              "descriptionKey": {
+                "en": "Every common attribute in one place — width / padding / binding / events grouped by category.",
+                "ja": "共通属性を 1 箇所にまとめたリファレンス。width / padding / binding / event などカテゴリ別に整理。"
+              },
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": {
+                "en": "Building a custom component",
+                "ja": "カスタムコンポーネントを作る"
+              },
+              "descriptionKey": {
+                "en": "Extend JsonUI with your own components (spec → converter → React/Swift/Kotlin).",
+                "ja": "spec → converter → React/Swift/Kotlin で JsonUI を独自拡張する手順。"
+              },
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

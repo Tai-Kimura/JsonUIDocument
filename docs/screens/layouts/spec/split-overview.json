@@ -196,9 +196,32 @@
             {
               "type": "View",
               "orientation": "vertical",
-              "id": "section_picking",
+              "id": "section_pattern_embed",
               "style": "home_section",
               "background": "surface_card",
+              "child": [
+                { "type": "Label", "style": "section_heading",    "text": "section_pattern_embed_heading", "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "text": "section_pattern_embed_body",    "width": "matchParent" },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "// Parent spec hosts an `OrderDetail` screen as a region. The embedded\n// screen is unchanged — only the parent declares the relationship.\n{\n  \"metadata\": { \"name\": \"OrdersDashboard\", \"layoutFile\": \"orders/dashboard\" },\n  \"structure\": {\n    \"embeds\": [\n      {\n        \"regionId\":       \"detailPane\",\n        \"screen\":         \"order_detail\",\n        \"params\":         { \"orderId\": \"@{selectedOrderId}\" },\n        \"events\":         { \"onOrderUpdated\": \"handleOrderUpdated\" },\n        \"navigationMode\": \"delegate\"\n      }\n    ]\n  }\n}\n\n// Parent Layout JSON places the embed in the tree:\n{ \"type\": \"Embed\", \"id\": \"detailPane\", \"screen\": \"order_detail\",\n  \"params\": { \"orderId\": \"@{selectedOrderId}\" }, \"weight\": 1 }",
+                  "language": "json",
+                  "filename": "structure.embeds[] + Embed in Layout",
+                  "showLineNumbers": false,
+                  "copyable": true
+                },
+                { "type": "Label", "style": "section_subheading", "text": "section_pattern_embed_note", "width": "matchParent", "topMargin": 12 }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_picking",
+              "style": "home_section",
+              "background": "surface_muted",
               "child": [
                 { "type": "Label", "style": "section_heading",    "text": "section_picking_heading", "width": "matchParent" },
                 { "type": "Label", "style": "section_subheading", "text": "section_picking_body",    "width": "matchParent" },
@@ -207,7 +230,7 @@
                   "width": "matchParent",
                   "height": "wrapContent",
                   "topMargin": 16,
-                  "code": "file grew past ~300 lines? ...................... Pattern 1 (layoutFile)\ntwo screens share the SAME shape? ............... Pattern 1 or Pattern 3\nsame visual tree, different state per region? .... Pattern 2 (parent + sub)\nreusable UI across the whole site? ............... Pattern 3 (component_spec)\nsame row model across multiple screens? ......... Pattern 4 (customTypes)\nCollection needs more than one cell? ............. Pattern 5 (cellClasses)",
+                  "code": "file grew past ~300 lines? ...................... Pattern 1 (layoutFile)\ntwo screens share the SAME shape? ............... Pattern 1 or Pattern 3\nsame visual tree, different state per region? .... Pattern 2 (parent + sub)\nreusable UI across the whole site? ............... Pattern 3 (component_spec)\nsame row model across multiple screens? ......... Pattern 4 (customTypes)\nCollection needs more than one cell? ............. Pattern 5 (cellClasses)\nregion needs its own ViewModel (master/detail)? . Pattern 6 (Embed)",
                   "language": "text",
                   "filename": "decision flow",
                   "showLineNumbers": false,

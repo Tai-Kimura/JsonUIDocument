@@ -82,6 +82,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "data-binding",          titleKey: "concepts_data_binding_title",          titleEn: "Data binding as contract",   url: "/concepts/data-binding" },
       { id: "hot-reload",            titleKey: "concepts_hot_reload_title",            titleEn: "Hot reload everywhere",      url: "/concepts/hot-reload" },
       { id: "responsive-design",     titleKey: "concepts_responsive_design_title",     titleEn: "Responsive design",          url: "/concepts/responsive-design" },
+      { id: "screen-composition",    titleKey: "concepts_screen_composition_title",    titleEn: "Screen composition",         url: "/concepts/screen-composition" },
     ],
   },
   {

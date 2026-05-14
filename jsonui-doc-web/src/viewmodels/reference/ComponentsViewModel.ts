@@ -1,5 +1,5 @@
 // ViewModel for Reference > Component reference (index).
-// Seeds a catalog of all 28 components with one-line descriptions + links to
+// Seeds a catalog of all 29 components with one-line descriptions + links to
 // the corresponding detail page at /reference/components/<kebab>.
 
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
@@ -55,6 +55,7 @@ const COMPONENT_CATALOG: Array<{ kebab: string; name: string }> = [
   { kebab: "blur",           name: "Blur"           },
   { kebab: "circle-view",    name: "CircleView"     },
   { kebab: "web",            name: "Web"            },
+  { kebab: "embed",          name: "Embed"          },
 ];
 
 export class ComponentsViewModel {
