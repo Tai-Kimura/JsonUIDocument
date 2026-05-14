@@ -277,6 +277,45 @@ Sub-spec (`screen_sub_spec`) — references the parent and covers one slice:
 
 Sub-specs never duplicate the parent's `layoutFile`. Parent authors the Layout; sub-specs inherit via `parentSpec` (`validator.py:353-405`).
 
+### (5) Screen with embedded sub-screens (`Embed`)
+
+For tablet master/detail layouts or dashboards that host other screens as regions, declare each embed in `structure.embeds`. **Only the embedding (parent) screen needs spec changes — the embedded screen is unchanged.**
+
+```json
+"structure": {
+  "components": [],
+  "layout": {},
+  "embeds": [
+    {
+      "regionId": "detailPane",
+      "screen": "OrderDetail",
+      "params": { "orderId": "@{selectedOrderId}" },
+      "events": { "onOrderUpdated": "onOrderUpdated" },
+      "navigationMode": "delegate"
+    }
+  ]
+}
+```
+
+Layout JSON (parent) places the embed in the view tree:
+
+```json
+{ "type": "Embed", "id": "detailPane", "screen": "OrderDetail",
+  "params": { "orderId": "@{selectedOrderId}" }, "weight": 1 }
+```
+
+Rules:
+
+- Each `regionId` must match a corresponding `Embed.id` in the parent Layout JSON, and must be unique within that layout (it is used as the Android `ViewModelStoreOwner` key for VM isolation).
+- `params` keys must be camelCase. Values may be literals or `@{varName}` bindings — bindings resolve against the parent VM's `vars[]` / `uiVariables[]`.
+- `events` keys follow `on[A-Z]...`. Values must reference existing entries in the parent VM's `dataFlow.viewModel.methods[]` or `stateManagement.eventHandlers[]`.
+- `navigationMode`: `"delegate"` (default) means the embedded screen's `navigate()` calls drive the parent's NavController/Router. `"isolated"` gives the embed its own internal navigation stack.
+- The embedded screen owns its own ViewModel — completely independent from the parent VM. Cross-screen communication is via `params` (parent → child) and `events` (child → parent) only.
+- The same screen can be embedded multiple times in the same parent (each instance gets its own VM, keyed by `regionId`).
+- Validation is **local to the Embed block** — `doc_validate_spec` does not require the embedded screen to declare anything special. Type contracts beyond key/binding existence are runtime responsibilities (v1 scope).
+
+See `jsonui-cli/docs/plans/2026-05-11-embed-feature.md` for the full design.
+
 ## `dataFlow`
 
 ### 🔴 HARD RULE: `dataFlow` is REQUIRED for any screen that isn't pure-static display
