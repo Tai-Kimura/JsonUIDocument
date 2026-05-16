@@ -64,6 +64,15 @@
         "en": "`lazy` accepts a binding so the wrapper can switch between `'lazy'` / `'eager'` / `'none'` at runtime without the parent recreating the Collection. Use this to escape LazyVStack on demand without losing scroll position.",
         "ja": "`lazy` は binding 可能で、親が Collection を再生成しない形で `'lazy'` / `'eager'` / `'none'` を実行時に切り替えられる。スクロール位置を失わず必要なときだけ LazyVStack を抜けられる。"
       }
+    },
+    {
+      "title": { "en": "Column count bound to ViewModel state", "ja": "カラム数を ViewModel の状態にバインド" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{photos}\",\n  \"columns\": \"@{gridColumnCount}\",\n  \"itemSpacing\": 8,\n  \"lineSpacing\": 8,\n  \"sections\": [ { \"cell\": \"cells/photo_card\" } ]\n}",
+      "note": {
+        "en": "`columns` accepts `@{prop}` so a tablet master/detail can drop from 5 columns to 3 when the detail pane opens — the grid stays the same component (LazyVGrid / LazyVerticalGrid / div.grid) and recomposes with the new column count. Literal int (`columns: 5`) takes the static grid path; binding forces the multi-column grid path even if the runtime value resolves to 1, so layout structure stays stable across changes.",
+        "ja": "`columns` は `@{prop}` を受け取れるので、tablet master/detail で detail pane を開いたとき 5 列 → 3 列に動的に切替えられる（同じコンポーネント — LazyVGrid / LazyVerticalGrid / div.grid — のまま新しい列数で recompose）。literal int（`columns: 5`）は静的 grid path、binding は runtime 値が 1 に解決されてもマルチカラム grid path を強制するため、列数変更でレイアウト構造が崩れない。"
+      }
     }
   ],
   "attributes": {

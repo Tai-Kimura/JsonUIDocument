@@ -570,6 +570,12 @@
                           "label": "number",
                           "background": "var(--color-warning_chip_bg)",
                           "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -606,7 +612,7 @@
                 "en": "",
                 "ja": ""
               },
-              "type": "number",
+              "type": "number | binding",
               "required": ""
             },
             {
@@ -3296,6 +3302,49 @@
               "language": "json",
               "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{rows}\",\n  \"lazy\": \"@{collectionMode}\",\n  \"sections\": [ { \"cell\": \"cells/row\" } ]\n}",
               "required": ""
+            },
+            {
+              "id": "example_9",
+              "anchorId": "example-9",
+              "title": {
+                "en": "Column count bound to ViewModel state",
+                "ja": "カラム数を ViewModel の状態にバインド"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{photos}\",\n  \"columns\": \"@{gridColumnCount}\",\n  \"itemSpacing\": 8,\n  \"lineSpacing\": 8,\n  \"sections\": [ { \"cell\": \"cells/photo_card\" } ]\n}",
+              "note": {
+                "en": "`columns` accepts `@{prop}` so a tablet master/detail can drop from 5 columns to 3 when the detail pane opens — the grid stays the same component (LazyVGrid / LazyVerticalGrid / div.grid) and recomposes with the new column count. Literal int (`columns: 5`) takes the static grid path; binding forces the multi-column grid path even if the runtime value resolves to 1, so layout structure stays stable across changes.",
+                "ja": "`columns` は `@{prop}` を受け取れるので、tablet master/detail で detail pane を開いたとき 5 列 → 3 列に動的に切替えられる（同じコンポーネント — LazyVGrid / LazyVerticalGrid / div.grid — のまま新しい列数で recompose）。literal int（`columns: 5`）は静的 grid path、binding は runtime 値が 1 に解決されてもマルチカラム grid path を強制するため、列数変更でレイアウト構造が崩れない。"
+              },
+              "noteVisibility": "visible",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{photos}\",\n  \"columns\": \"@{gridColumnCount}\",\n  \"itemSpacing\": 8,\n  \"lineSpacing\": 8,\n  \"sections\": [ { \"cell\": \"cells/photo_card\" } ]\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{photos}\",\n  \"columns\": \"@{gridColumnCount}\",\n  \"itemSpacing\": 8,\n  \"lineSpacing\": 8,\n  \"sections\": [ { \"cell\": \"cells/photo_card\" } ]\n}",
+              "required": ""
             }
           ]
         }
@@ -3786,6 +3835,12 @@
                           "label": "number",
                           "background": "var(--color-warning_chip_bg)",
                           "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -3822,7 +3877,7 @@
                 "en": "",
                 "ja": ""
               },
-              "type": "number",
+              "type": "number | binding",
               "required": ""
             },
             {
