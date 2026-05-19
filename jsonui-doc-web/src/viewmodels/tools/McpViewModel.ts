@@ -22,7 +22,7 @@ interface NextReadCell {
 
 const TOOL_IDS = [
   "get_project_config", "list_screen_specs", "list_layouts", "list_component_specs",
-  "lookup_component", "lookup_attribute", "search_components",
+  "lookup_component", "lookup_attribute", "search_components", "get_data_source",
 
   "doc_validate_spec", "doc_validate_component", "doc_rules_init", "doc_rules_show",
   "jui_verify", "get_binding_rules",

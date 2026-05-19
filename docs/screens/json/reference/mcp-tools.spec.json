@@ -22,6 +22,12 @@
     "states": [],
     "uiVariables": [
       {
+        "name": "tools",
+        "type": "CollectionDataSource(McpToolDetail)",
+        "initial": "[]",
+        "description": "30 MCP tools with name, group letter, role, and a preformatted parameters block."
+      },
+      {
         "name": "nextReadLinks",
         "type": "[NextReadLink]",
         "initial": "[]",
@@ -67,6 +73,12 @@
       ],
       "vars": [
         {
+          "name": "tools",
+          "type": "CollectionDataSource(McpToolDetail)",
+          "observable": true,
+          "description": "30 MCP tools rendered as one row each via cells/reference_mcp_tool_detail. Each row carries the tool name, group letter chip, one-line role, a Parameters heading, and a preformatted parameters code block (or '(no parameters)')."
+        },
+        {
           "name": "nextReadLinks",
           "type": "Array(NextReadLink)",
           "observable": true,
@@ -97,6 +109,17 @@
             "name": "url",
             "type": "String"
           }
+        ]
+      },
+      {
+        "name": "McpToolDetail",
+        "properties": [
+          { "name": "id",                "type": "String" },
+          { "name": "nameKey",           "type": "String" },
+          { "name": "groupKey",          "type": "String" },
+          { "name": "roleKey",           "type": "String" },
+          { "name": "paramsHeadingKey",  "type": "String" },
+          { "name": "paramsCode",        "type": "String" }
         ]
       }
     ]

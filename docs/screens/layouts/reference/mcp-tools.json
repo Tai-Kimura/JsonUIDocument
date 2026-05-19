@@ -9,6 +9,10 @@
     {
       "data": [
         {
+          "name": "tools",
+          "class": "CollectionDataSource"
+        },
+        {
           "name": "nextReadLinks",
           "class": "CollectionDataSource"
         },
@@ -231,6 +235,36 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
+                  "id": "section_catalog",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "surface_muted",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "ink", "text": "section_catalog_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "ink_muted", "text": "section_catalog_body" },
+                    {
+                      "type": "Collection",
+                      "id": "reference_mcp_tools_catalog_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 1,
+                      "lineSpacing": 12,
+                      "itemSpacing": 12,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{tools}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/reference_mcp_tool_detail" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
                   "id": "reference_mcp_tools_next",
                   "width": "matchParent",
                   "height": "wrapContent",
@@ -355,6 +389,12 @@
                           "id": "toc_versioning",
                           "label": "toc_row_versioning",
                           "anchor": "section_versioning",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_catalog",
+                          "label": "toc_row_catalog",
+                          "anchor": "section_catalog",
                           "level": 1
                         }
                       ],

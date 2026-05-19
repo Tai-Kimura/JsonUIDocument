@@ -2657,8 +2657,8 @@
       "ja": "jsonui-mcp-server"
     },
     "lead": {
-      "en": "Twenty-nine typed tools grouped into four families. The agents use them to inspect any JsonUI project — specs, layouts, components, builds, runtime sync — without each agent needing to re-implement parse, schema-lookup, or file I/O.",
-      "ja": "29 個の型付きツールを 4 ファミリにまとめた MCP サーバー。エージェントはこれを使って JsonUI プロジェクトの spec / layout / コンポーネント / ビルド / ランタイム同期を精査します。各エージェントが parse やスキーマ検索・ファイル IO を再実装する必要がありません。"
+      "en": "Thirty typed tools grouped into four families. The agents use them to inspect any JsonUI project — specs, layouts, components, builds, runtime sync — without each agent needing to re-implement parse, schema-lookup, or file I/O.",
+      "ja": "30 個の型付きツールを 4 ファミリにまとめた MCP サーバー。エージェントはこれを使って JsonUI プロジェクトの spec / layout / コンポーネント / ビルド / ランタイム同期を精査します。各エージェントが parse やスキーマ検索・ファイル IO を再実装する必要がありません。"
     },
     "read_time": {
       "en": "~12 min read",
@@ -2669,8 +2669,8 @@
       "ja": "MCP とは"
     },
     "section_what_body": {
-      "en": "Model Context Protocol is Anthropic's standard for exposing tools to an LLM agent. jsonui-mcp-server is our implementation: it runs as a subprocess that Claude Code (or Codex) spawns on project load, and it publishes a manifest of 29 named tools. Each tool has a typed input schema, a typed output shape, and a brief description. The agent calls them by name; we own the server that answers.",
-      "ja": "Model Context Protocol は LLM エージェントにツールを公開するための Anthropic 標準。jsonui-mcp-server はその実装で、Claude Code（または Codex）がプロジェクト読み込み時に起動する subprocess として動作し、29 個の名前付きツールの manifest を公開します。各ツールは入力スキーマ・出力 shape・短い説明を型付きで持つ。エージェントは名前でツールを呼び、応答するサーバーは私たちが保守します。"
+      "en": "Model Context Protocol is Anthropic's standard for exposing tools to an LLM agent. jsonui-mcp-server is our implementation: it runs as a subprocess that Claude Code (or Codex) spawns on project load, and it publishes a manifest of 30 named tools. Each tool has a typed input schema, a typed output shape, and a brief description. The agent calls them by name; we own the server that answers.",
+      "ja": "Model Context Protocol は LLM エージェントにツールを公開するための Anthropic 標準。jsonui-mcp-server はその実装で、Claude Code（または Codex）がプロジェクト読み込み時に起動する subprocess として動作し、30 個の名前付きツールの manifest を公開します。各ツールは入力スキーマ・出力 shape・短い説明を型付きで持つ。エージェントは名前でツールを呼び、応答するサーバーは私たちが保守します。"
     },
     "section_shape_heading": {
       "en": "The typed surface",
@@ -2685,16 +2685,16 @@
       "ja": "ツール一覧"
     },
     "section_catalog_body": {
-      "en": "All 29, with their group letter and a one-line role. Per-tool parameter docs live at /reference/mcp-tools (upcoming).",
-      "ja": "全 29 件、グループ文字と 1 行説明付き。ツール毎のパラメータ詳細は /reference/mcp-tools（今後公開予定）を参照。"
+      "en": "All 30, with their group letter and a one-line role. Per-tool parameter docs live at [/reference/mcp-tools](/reference/mcp-tools).",
+      "ja": "全 30 件、グループ文字と 1 行説明付き。ツール毎のパラメータ詳細は [/reference/mcp-tools](/reference/mcp-tools) を参照。"
     },
     "section_groups_heading": {
       "en": "Group semantics",
       "ja": "グループの意味"
     },
     "section_groups_body": {
-      "en": "A (Lookup, 7): read-only introspection of specs, layouts, and the component index. B (Validation, 6): schema and drift checks — the gate logic agents run before declaring a change done. C (Generation, 7): create the empty shapes the agent will fill in — specs, scaffolds, HTML docs. D (Build + Runtime, 9): orchestrate the per-platform build, sync the tooling, and read files back so read-only agents (jsonui-debug) can work without spawning shell commands. Each group is one conceptual step in the spec-first loop; each tool is one bounded responsibility.",
-      "ja": "A (Lookup, 7): spec・layout・コンポーネントインデックスの読み取り専用精査。B (Validation, 6): スキーマ検証とドリフト検査 — エージェントが変更を完了とする前に走らせるゲートロジック。C (Generation, 7): エージェントが埋める空 shape を作る — spec / scaffold / HTML ドキュメント。D (Build + Runtime, 9): プラットフォーム毎のビルドを指揮し、tooling を同期し、ファイルを読み直す。read-only エージェント（jsonui-debug）が shell コマンドを spawn せずに動ける。各グループが spec-first ループの 1 ステップ、各ツールが 1 つの責務に限定される構造。"
+      "en": "A (Lookup, 8): read-only introspection of specs, layouts, the component index, and the data-source the server itself is using. B (Validation, 6): schema and drift checks — the gate logic agents run before declaring a change done. C (Generation, 7): create the empty shapes the agent will fill in — specs, scaffolds, HTML docs. D (Build + Runtime, 9): orchestrate the per-platform build, sync the tooling, and read files back so read-only agents (jsonui-debug) can work without spawning shell commands. Each group is one conceptual step in the spec-first loop; each tool is one bounded responsibility.",
+      "ja": "A (Lookup, 8): spec・layout・コンポーネントインデックス、そして MCP サーバ自身が読んでいるデータ出どころの読み取り専用精査。B (Validation, 6): スキーマ検証とドリフト検査 — エージェントが変更を完了とする前に走らせるゲートロジック。C (Generation, 7): エージェントが埋める空 shape を作る — spec / scaffold / HTML ドキュメント。D (Build + Runtime, 9): プラットフォーム毎のビルドを指揮し、tooling を同期し、ファイルを読み直す。read-only エージェント（jsonui-debug）が shell コマンドを spawn せずに動ける。各グループが spec-first ループの 1 ステップ、各ツールが 1 つの責務に限定される構造。"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -2803,6 +2803,18 @@
     "tool_search_components_role": {
       "en": "Fuzzy search across the component index for exploration.",
       "ja": "Fuzzy search across the component index for exploration."
+    },
+    "tool_get_data_source_name": {
+      "en": "get_data_source",
+      "ja": "get_data_source"
+    },
+    "tool_get_data_source_group": {
+      "en": "A",
+      "ja": "A"
+    },
+    "tool_get_data_source_role": {
+      "en": "Report which attribute_definitions.json / component_metadata.json the server loaded — layer, file mtime, and freshness — so agents can confirm the data is current.",
+      "ja": "サーバが読み込んだ attribute_definitions.json / component_metadata.json の出どころ（layer・file mtime・freshness）を報告し、エージェントがデータの新しさを確認できるようにする。"
     },
     "tool_doc_validate_spec_name": {
       "en": "doc_validate_spec",
@@ -6139,6 +6151,138 @@
     "toc_row_versioning": {
       "en": "Tool stability",
       "ja": "ツールの安定性"
+    },
+    "toc_row_catalog": {
+      "en": "Tool catalog",
+      "ja": "ツールカタログ"
+    },
+    "section_catalog_heading": {
+      "en": "Tool catalog",
+      "ja": "ツールカタログ"
+    },
+    "section_catalog_body": {
+      "en": "All 30 tools, in the same order /tools/mcp lists them, with parameter signatures. Required parameters are bold-marked in the agent's view; optional ones default to omitted. `project_dir` repeats on most tools — when omitted, the server falls back to the JUI_PROJECT_DIR env var (or the cwd that spawned it).",
+      "ja": "全 30 ツール、/tools/mcp と同じ並びで、パラメータ署名付きで掲載。required はエージェント視点で必須、optional は省略可能（省略時は default 値かツール内既定）。`project_dir` は多くのツールで共通 — 省略時は JUI_PROJECT_DIR 環境変数（もしくは MCP サーバを起動した cwd）にフォールバック。"
+    },
+    "params_heading": {
+      "en": "Parameters",
+      "ja": "パラメータ"
+    },
+    "no_params": {
+      "en": "(no parameters)",
+      "ja": "(パラメータなし)"
+    },
+    "tool_get_project_config_params": {
+      "en": "• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_list_screen_specs_params": {
+      "en": "• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_list_layouts_params": {
+      "en": "• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_list_component_specs_params": {
+      "en": "• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_lookup_component_params": {
+      "en": "• name (string, required) — Component name. e.g. 'TextField', 'Button', 'View'.",
+      "ja": "• name (string, required) — コンポーネント名。例: 'TextField', 'Button', 'View'。"
+    },
+    "tool_lookup_attribute_params": {
+      "en": "• name (string, required) — Attribute name. e.g. 'fontSize', 'padding', 'onClick'.",
+      "ja": "• name (string, required) — 属性名。例: 'fontSize', 'padding', 'onClick'。"
+    },
+    "tool_search_components_params": {
+      "en": "• query (string, required) — Search keyword. Matches component names and attribute names.",
+      "ja": "• query (string, required) — 検索キーワード。コンポーネント名と属性名にマッチ。"
+    },
+    "tool_doc_validate_spec_params": {
+      "en": "• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_doc_validate_component_params": {
+      "en": "• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_doc_rules_init_params": {
+      "en": "• flutter (boolean, optional) — Include Flutter-specific rules in the template.\n• output_dir (string, optional) — Output directory for the .jsonui-doc-rules.json file (default: project root).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• flutter (boolean, optional) — Flutter 固有ルールをテンプレートに含める。\n• output_dir (string, optional) — .jsonui-doc-rules.json の出力先（デフォルト: プロジェクトルート）。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_doc_rules_show_params": {
+      "en": "• directory (string, optional) — Directory to search for .jsonui-doc-rules.json (default: cwd, walks up).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• directory (string, optional) — .jsonui-doc-rules.json を探すディレクトリ（デフォルト: cwd、親方向に走査）。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_jui_verify_params": {
+      "en": "• detail (boolean, optional) — Include per-screen diff details in the report.\n• fail_on_diff (boolean, optional) — Exit with error if any diff is detected; pair with CI gating.\n• platform (string, optional) — Target platform (defaults to the first one in jui.config.json).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• detail (boolean, optional) — レポートに per-screen の diff 詳細を含める。\n• fail_on_diff (boolean, optional) — diff が検出されたら異常終了。CI ゲートで併用。\n• platform (string, optional) — 対象プラットフォーム（デフォルト: jui.config.json の先頭）。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_doc_init_spec_params": {
+      "en": "• name (string, required) — Screen name in PascalCase. e.g. 'LoginScreen'.\n• display_name (string, optional) — Display name (defaults to the PascalCase name).\n• output_dir (string, optional) — Output directory (defaults to spec_directory in config).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• name (string, required) — PascalCase の screen 名。例: 'LoginScreen'。\n• display_name (string, optional) — 表示名（デフォルト: PascalCase 名）。\n• output_dir (string, optional) — 出力ディレクトリ（デフォルト: config の spec_directory）。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_doc_init_component_params": {
+      "en": "• name (string, required) — Component name in PascalCase. e.g. 'CustomCard'.\n• display_name (string, optional) — Display name.\n• category (enum, optional) — Component category for grouping.\n• output_dir (string, optional) — Output directory.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• name (string, required) — PascalCase のコンポーネント名。例: 'CustomCard'。\n• display_name (string, optional) — 表示名。\n• category (enum, optional) — グルーピング用カテゴリ。\n• output_dir (string, optional) — 出力ディレクトリ。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_doc_generate_spec_params": {
+      "en": "• file (string, required) — Spec file or directory path. e.g. 'login.spec.json' or 'docs/screens/json'.\n• output (string, optional) — Output file or directory path.\n• format (enum, optional) — Output format: html | markdown (default: html).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• file (string, required) — Spec ファイルまたはディレクトリパス。例: 'login.spec.json' / 'docs/screens/json'。\n• output (string, optional) — 出力ファイルまたはディレクトリ。\n• format (enum, optional) — 出力フォーマット: html | markdown（デフォルト: html）。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_doc_generate_component_params": {
+      "en": "• file (string, required) — Component spec file or directory path.\n• output (string, optional) — Output file or directory path.\n• format (enum, optional) — Output format: html | markdown (default: html).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• file (string, required) — Component spec ファイルまたはディレクトリ。\n• output (string, optional) — 出力先。\n• format (enum, optional) — 出力フォーマット: html | markdown（デフォルト: html）。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_doc_generate_html_params": {
+      "en": "• input_dir (string, required) — Directory containing .test.json files.\n• output_dir (string, optional) — Output directory for HTML files.\n• title (string, optional) — Documentation title shown in the generated index.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• input_dir (string, required) — .test.json ファイルのあるディレクトリ。\n• output_dir (string, optional) — HTML 出力先ディレクトリ。\n• title (string, optional) — 生成 index に表示するタイトル。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_jui_generate_project_params": {
+      "en": "• force (boolean, optional) — Force overwrite of declaration files.\n• skip_layout (boolean, optional) — Skip Layout JSON generation.\n• dry_run (boolean, optional) — Show what would be generated without writing.\n• platform (enum, optional) — Generate for a single platform only.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• force (boolean, optional) — 宣言ファイルを強制上書き。\n• skip_layout (boolean, optional) — Layout JSON の生成をスキップ。\n• dry_run (boolean, optional) — 書き込みなしで生成内容を表示。\n• platform (enum, optional) — 単一プラットフォームのみ生成。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_jui_generate_screen_params": {
+      "en": "• names (string[], required) — Screen names in PascalCase. e.g. ['LoginScreen', 'RegisterScreen'].\n• display_name (string, optional) — Display name (only valid when names has exactly one entry).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• names (string[], required) — PascalCase の screen 名配列。例: ['LoginScreen', 'RegisterScreen']。\n• display_name (string, optional) — 表示名（names が 1 件のときのみ有効）。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_jui_init_params": {
+      "en": "• project_name (string, required) — Project name.\n• ios_path (string, optional) — iOS project root relative path.\n• ios_mode (enum, optional) — iOS rendering mode: swiftui | uikit (default: swiftui).\n• android_path (string, optional) — Android project root relative path.\n• android_mode (enum, optional) — Android rendering mode: compose | views (default: compose).\n• package_name (string, optional) — Android package name. e.g. 'com.example.app'.\n• web_path (string, optional) — Web project root relative path.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• project_name (string, required) — プロジェクト名。\n• ios_path (string, optional) — iOS プロジェクトルート相対パス。\n• ios_mode (enum, optional) — iOS 描画モード: swiftui | uikit（デフォルト: swiftui）。\n• android_path (string, optional) — Android プロジェクトルート相対パス。\n• android_mode (enum, optional) — Android 描画モード: compose | views（デフォルト: compose）。\n• package_name (string, optional) — Android パッケージ名。例: 'com.example.app'。\n• web_path (string, optional) — Web プロジェクトルート相対パス。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_jui_build_params": {
+      "en": "• clean (boolean, optional) — Clean build; regenerate everything.\n• platform (enum, optional) — Build a single platform only.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• clean (boolean, optional) — クリーンビルド。全体を再生成。\n• platform (enum, optional) — 単一プラットフォームのみビルド。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_jui_sync_tool_params": {
+      "en": "• platform (enum, optional) — Sync only one platform (default: every platform in jui.config.json).\n• dry_run (boolean, optional) — Show what would change without writing.\n• from (string, optional) — Override source CLI root (default: $JSONUI_CLI_PATH or ~/.jsonui-cli/).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• platform (enum, optional) — 1 プラットフォームのみ sync（デフォルト: jui.config.json の全プラットフォーム）。\n• dry_run (boolean, optional) — 書き込みなしで差分を表示。\n• from (string, optional) — ソース CLI ルートを上書き（デフォルト: $JSONUI_CLI_PATH もしくは ~/.jsonui-cli/）。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_jui_generate_converter_params": {
+      "en": "• from_spec (string, optional) — Generate from a single component spec file path.\n• all (boolean, optional) — Generate from all component specs in the project.\n• container (boolean, optional) — Mark as a container component (accepts child nodes).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• from_spec (string, optional) — 単一の component spec ファイルから生成。\n• all (boolean, optional) — プロジェクト内全 component spec から生成。\n• container (boolean, optional) — コンテナコンポーネント（子要素を受け入れる）として扱う。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_jui_migrate_layouts_params": {
+      "en": "• source_platform (enum, optional) — Platform to copy from: ios | android | web (default: ios).\n• dry_run (boolean, optional) — Show what would be copied without executing.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• source_platform (enum, optional) — コピー元プラットフォーム: ios | android | web（デフォルト: ios）。\n• dry_run (boolean, optional) — 実行せず内容を表示。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_read_spec_file_params": {
+      "en": "• file (string, required) — Filename. e.g. 'login.spec.json' or 'my_card.component.json'.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• file (string, required) — ファイル名。例: 'login.spec.json' / 'my_card.component.json'。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_read_layout_file_params": {
+      "en": "• file (string, required) — Filename. e.g. 'Login.json' or 'Styles/Common.json'.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• file (string, required) — ファイル名。例: 'Login.json' / 'Styles/Common.json'。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_get_platform_mapping_params": {
+      "en": "• category (string, optional) — Mapping category: values, contentMode, textAlign, fontWeight, orientation, gravity, types. Omit for all.",
+      "ja": "• category (string, optional) — マッピングカテゴリ: values, contentMode, textAlign, fontWeight, orientation, gravity, types。省略で全カテゴリ。"
+    },
+    "tool_get_modifier_order_params": {
+      "en": "• platform (enum, optional) — Platform: swift | kotlin | react. Omit for all platforms.",
+      "ja": "• platform (enum, optional) — プラットフォーム: swift | kotlin | react。省略で全プラットフォーム。"
     }
   },
   "reference_cli_commands": {
