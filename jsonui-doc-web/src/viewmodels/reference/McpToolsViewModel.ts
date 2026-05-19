@@ -71,47 +71,56 @@ export class McpToolsViewModel {
     });
   };
 
+  // SSR-safe initial seed: uses getDefaultString so server + first client
+  // render produce identical text. mountLanguage re-seeds with the
+  // persisted locale post-hydration.
   onAppear = () => {
-    const tools: McpToolDetailCell[] = TOOL_IDS.map((id) => {
-      const params = StringManager.getString(`reference_mcp_tools_tool_${id}_params`);
-      const hasParams = params && params !== `reference_mcp_tools_tool_${id}_params`;
-      return {
-        id,
-        nameKey: StringManager.getString(`tools_mcp_tool_${id}_name`),
-        groupKey: StringManager.getString(`tools_mcp_tool_${id}_group`),
-        roleKey: StringManager.getString(`tools_mcp_tool_${id}_role`),
-        paramsHeadingKey: this.s("params_heading"),
-        paramsCode: hasParams ? params : this.s("no_params"),
-      };
-    });
-
-    const nextReads: NextReadCell[] = [
-      {
-        id: "next_mcp_overview",
-        titleKey: this.s("next_mcp_overview_title"),
-        descriptionKey: this.s("next_mcp_overview_description"),
-        url: "/tools/mcp",
-        onNavigate: () => this.navigate("/tools/mcp"),
-      },
-      {
-        id: "next_agents",
-        titleKey: this.s("next_agents_title"),
-        descriptionKey: this.s("next_agents_description"),
-        url: "/tools/agents",
-        onNavigate: () => this.navigate("/tools/agents"),
-      },
-    ];
-
     this.updateData({
-      tools: this.asCollection(tools),
-      nextReadLinks: this.asCollection(nextReads),
+      tools: this.asCollection(this.buildTools((k) => StringManager.getDefaultString(k))),
+      nextReadLinks: this.asCollection(this.buildNextReads((k) => StringManager.getDefaultString(k))),
     });
   };
 
-  navigate = (url: string): void => { this.router.push(url); };
+  mountLanguage = (): void => {
+    this.updateData({
+      tools: this.asCollection(this.buildTools((k) => StringManager.getString(k))),
+      nextReadLinks: this.asCollection(this.buildNextReads((k) => StringManager.getString(k))),
+    });
+  };
 
-  private s = (key: string): string =>
-    StringManager.getString(`reference_mcp_tools_${key}`);
+  private buildTools = (lookup: (key: string) => string): McpToolDetailCell[] =>
+    TOOL_IDS.map((id) => {
+      const paramsKey = `reference_mcp_tools_tool_${id}_params`;
+      const params = lookup(paramsKey);
+      const hasParams = params && params !== paramsKey;
+      return {
+        id,
+        nameKey: lookup(`tools_mcp_tool_${id}_name`),
+        groupKey: lookup(`tools_mcp_tool_${id}_group`),
+        roleKey: lookup(`tools_mcp_tool_${id}_role`),
+        paramsHeadingKey: lookup(`reference_mcp_tools_params_heading`),
+        paramsCode: hasParams ? params : lookup(`reference_mcp_tools_no_params`),
+      };
+    });
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
+    {
+      id: "next_mcp_overview",
+      titleKey: lookup("reference_mcp_tools_next_mcp_overview_title"),
+      descriptionKey: lookup("reference_mcp_tools_next_mcp_overview_description"),
+      url: "/tools/mcp",
+      onNavigate: () => this.navigate("/tools/mcp"),
+    },
+    {
+      id: "next_agents",
+      titleKey: lookup("reference_mcp_tools_next_agents_title"),
+      descriptionKey: lookup("reference_mcp_tools_next_agents_description"),
+      url: "/tools/agents",
+      onNavigate: () => this.navigate("/tools/agents"),
+    },
+  ];
+
+  navigate = (url: string): void => { this.router.push(url); };
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);
