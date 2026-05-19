@@ -51,28 +51,29 @@ export class WhatIsJsonuiViewModel {
   };
 
   onAppear = () => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)) });
+  };
 
-    const nextReads: NextReadCell[] = [
+  mountLanguage = (): void => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.s)) });
+  };
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
       {
         id: "next_installation",
-        titleKey: this.s("next_installation_title"),
-        descriptionKey: this.s("next_installation_description"),
+        titleKey: lookup("next_installation_title"),
+        descriptionKey: lookup("next_installation_description"),
         url: "/learn/installation",
         onNavigate: () => this.navigate("/learn/installation"),
       },
       {
         id: "next_hello_world",
-        titleKey: this.s("next_hello_world_title"),
-        descriptionKey: this.s("next_hello_world_description"),
+        titleKey: lookup("next_hello_world_title"),
+        descriptionKey: lookup("next_hello_world_description"),
         url: "/learn/hello-world",
         onNavigate: () => this.navigate("/learn/hello-world"),
       },
     ];
-
-    this.updateData({
-      nextReadLinks: this.asCollection(nextReads),
-    });
-  };
 
   navigate = (url: string): void => {
     this.router.push(url);
@@ -80,6 +81,9 @@ export class WhatIsJsonuiViewModel {
 
   private s = (key: string): string =>
     StringManager.getString(`learn_what_is_jsonui_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`learn_what_is_jsonui_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

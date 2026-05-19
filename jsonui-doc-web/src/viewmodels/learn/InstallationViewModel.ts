@@ -348,8 +348,19 @@ export class InstallationViewModel {
    * Resolve a bare string suffix (e.g. "headline") against the current
    * language's snake_case flat map, scoped to this screen's prefix.
    */
+  // SSR-safe seed: returns default language during construction; flips
+  // to persisted locale once mountLanguage() is called post-mount.
+  private _useDefault = true;
   private s = (key: string): string => {
-    return StringManager.getString(`learn_installation_${key}`);
+    const full = `learn_installation_${key}`;
+    return this._useDefault
+      ? StringManager.getDefaultString(full)
+      : StringManager.getString(full);
+  };
+
+  mountLanguage = (): void => {
+    this._useDefault = false;
+    this.onAppear();
   };
 
   /**

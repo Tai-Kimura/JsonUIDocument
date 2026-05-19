@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { LearnIndexData, createLearnIndexData } from "@/generated/data/LearnIndexData";
 import { LearnIndexViewModel } from "@/viewmodels/LearnIndexViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function useLearnIndexViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<LearnIndexData>(createLearnIndexData());

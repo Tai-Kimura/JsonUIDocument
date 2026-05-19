@@ -57,27 +57,29 @@ export class AnatomyViewModel {
   };
 
   onAppear = () => {
-    const nextReads: NextReadCell[] = [
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)) });
+  };
+
+  mountLanguage = (): void => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.s)) });
+  };
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
       {
         id: "next_split_overview",
-        titleKey: this.s("next_split_overview_title"),
-        descriptionKey: this.s("next_split_overview_description"),
+        titleKey: lookup("next_split_overview_title"),
+        descriptionKey: lookup("next_split_overview_description"),
         url: "/spec/split-overview",
         onNavigate: () => this.navigate("/spec/split-overview"),
       },
       {
         id: "next_writing_your_first_spec",
-        titleKey: this.s("next_writing_your_first_spec_title"),
-        descriptionKey: this.s("next_writing_your_first_spec_description"),
+        titleKey: lookup("next_writing_your_first_spec_title"),
+        descriptionKey: lookup("next_writing_your_first_spec_description"),
         url: "/guides/writing-your-first-spec",
         onNavigate: () => this.navigate("/guides/writing-your-first-spec"),
       },
     ];
-
-    this.updateData({
-      nextReadLinks: this.asCollection(nextReads),
-    });
-  };
 
   navigate = (url: string): void => {
     this.router.push(url);
@@ -85,6 +87,9 @@ export class AnatomyViewModel {
 
   private s = (key: string): string =>
     StringManager.getString(`spec_anatomy_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`spec_anatomy_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

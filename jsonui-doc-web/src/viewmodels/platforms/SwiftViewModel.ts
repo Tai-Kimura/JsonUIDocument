@@ -47,31 +47,37 @@ export class SwiftViewModel {
   };
 
   onAppear = () => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)) });
+  };
 
-    const nextReads: NextReadCell[] = [
+  mountLanguage = (): void => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.s)) });
+  };
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
       {
         id: "next_kotlin",
-        titleKey: this.s("next_kotlin_title"),
-        descriptionKey: this.s("next_kotlin_description"),
+        titleKey: lookup("next_kotlin_title"),
+        descriptionKey: lookup("next_kotlin_description"),
         url: "/platforms/kotlin",
         onNavigate: () => this.navigate("/platforms/kotlin"),
       },
       {
         id: "next_react",
-        titleKey: this.s("next_react_title"),
-        descriptionKey: this.s("next_react_description"),
+        titleKey: lookup("next_react_title"),
+        descriptionKey: lookup("next_react_description"),
         url: "/platforms/react",
         onNavigate: () => this.navigate("/platforms/react"),
       },
     ];
 
-    this.updateData({ nextReadLinks: this.asCollection(nextReads) });
-  };
-
   navigate = (url: string): void => { this.router.push(url); };
 
   private s = (key: string): string =>
     StringManager.getString(`platforms_swift_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`platforms_swift_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

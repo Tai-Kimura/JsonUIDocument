@@ -66,44 +66,55 @@ export class AttributesViewModel {
   };
 
   onAppear = () => {
-    const catalog: CatalogCell[] = CATEGORY_CATALOG.map((c) => {
+    this.updateData({
+      categoryCatalog: this.asCollection(this.buildCatalog(this.sDefault)),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)),
+    });
+  };
+
+  mountLanguage = (): void => {
+    this.updateData({
+      categoryCatalog: this.asCollection(this.buildCatalog(this.s)),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.s)),
+    });
+  };
+
+  private buildCatalog = (lookup: (key: string) => string): CatalogCell[] =>
+    CATEGORY_CATALOG.map((c) => {
       const url = `/reference/attributes/${c.slug}`;
       return {
         id: `cat_${c.slug}`,
         titleKey: c.name,
-        descriptionKey: this.s(`catalog_${c.slug}_description`),
+        descriptionKey: lookup(`catalog_${c.slug}_description`),
         url,
         onNavigate: () => this.navigate(url),
       };
     });
 
-    const nextReads: NextReadCell[] = [
-      {
-        id: "next_components",
-        titleKey: this.s("next_components_title"),
-        descriptionKey: this.s("next_components_description"),
-        url: "/reference/components",
-        onNavigate: () => this.navigate("/reference/components"),
-      },
-      {
-        id: "next_json_schema",
-        titleKey: this.s("next_json_schema_title"),
-        descriptionKey: this.s("next_json_schema_description"),
-        url: "/reference/json-schema",
-        onNavigate: () => this.navigate("/reference/json-schema"),
-      },
-    ];
-
-    this.updateData({
-      categoryCatalog: this.asCollection(catalog),
-      nextReadLinks: this.asCollection(nextReads),
-    });
-  };
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
+    {
+      id: "next_components",
+      titleKey: lookup("next_components_title"),
+      descriptionKey: lookup("next_components_description"),
+      url: "/reference/components",
+      onNavigate: () => this.navigate("/reference/components"),
+    },
+    {
+      id: "next_json_schema",
+      titleKey: lookup("next_json_schema_title"),
+      descriptionKey: lookup("next_json_schema_description"),
+      url: "/reference/json-schema",
+      onNavigate: () => this.navigate("/reference/json-schema"),
+    },
+  ];
 
   navigate = (url: string): void => { this.router.push(url); };
 
   private s = (key: string): string =>
     StringManager.getString(`reference_attributes_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`reference_attributes_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

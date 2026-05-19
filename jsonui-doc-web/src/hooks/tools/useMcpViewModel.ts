@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { McpData, createMcpData } from "@/generated/data/McpData";
 import { McpViewModel } from "@/viewmodels/tools/McpViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function useMcpViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<McpData>(createMcpData());
@@ -18,6 +20,14 @@ export function useMcpViewModel(router: AppRouterInstance) {
       setData,
     );
   }
+
+  useEffect(() => {
+    viewModelRef.current?.mountLanguage();
+    if (typeof window === "undefined") return;
+    const onLang = () => viewModelRef.current?.mountLanguage();
+    window.addEventListener(LANGUAGE_EVENT, onLang);
+    return () => window.removeEventListener(LANGUAGE_EVENT, onLang);
+  }, []);
 
   const setVars = (vars: Partial<McpData>) => {
     viewModelRef.current?.setVars(vars);

@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { GuidesIndexData, createGuidesIndexData } from "@/generated/data/GuidesIndexData";
 import { GuidesIndexViewModel } from "@/viewmodels/GuidesIndexViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function useGuidesIndexViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<GuidesIndexData>(createGuidesIndexData());

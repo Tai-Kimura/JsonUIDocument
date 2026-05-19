@@ -62,36 +62,43 @@ export class CliViewModel {
   };
 
   onAppear = () => {
-
-    const cliRows: CliRowCell[] = CLI_IDS.map((id) => ({
-      id,
-      nameKey: this.s(`cli_${id}_name`),
-      roleKey: this.s(`cli_${id}_role`),
-      bodyKey: this.s(`cli_${id}_body`),
-    }));
-
-    const nextReads: NextReadCell[] = [
-      {
-        id: "next_agents",
-        titleKey: this.s("next_agents_title"),
-        descriptionKey: this.s("next_agents_description"),
-        url: "/tools/agents",
-        onNavigate: () => this.navigate("/tools/agents"),
-      },
-      {
-        id: "next_mcp",
-        titleKey: this.s("next_mcp_title"),
-        descriptionKey: this.s("next_mcp_description"),
-        url: "/tools/mcp",
-        onNavigate: () => this.navigate("/tools/mcp"),
-      },
-    ];
-
     this.updateData({
-      cliRows: this.asCollection(cliRows),
-      nextReadLinks: this.asCollection(nextReads),
+      cliRows: this.asCollection(this.buildCliRows(this.sDefault)),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)),
     });
   };
+
+  mountLanguage = (): void => {
+    this.updateData({
+      cliRows: this.asCollection(this.buildCliRows(this.s)),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.s)),
+    });
+  };
+
+  private buildCliRows = (lookup: (key: string) => string): CliRowCell[] =>
+    CLI_IDS.map((id) => ({
+      id,
+      nameKey: lookup(`cli_${id}_name`),
+      roleKey: lookup(`cli_${id}_role`),
+      bodyKey: lookup(`cli_${id}_body`),
+    }));
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
+    {
+      id: "next_agents",
+      titleKey: lookup("next_agents_title"),
+      descriptionKey: lookup("next_agents_description"),
+      url: "/tools/agents",
+      onNavigate: () => this.navigate("/tools/agents"),
+    },
+    {
+      id: "next_mcp",
+      titleKey: lookup("next_mcp_title"),
+      descriptionKey: lookup("next_mcp_description"),
+      url: "/tools/mcp",
+      onNavigate: () => this.navigate("/tools/mcp"),
+    },
+  ];
 
   navigate = (url: string): void => {
     this.router.push(url);
@@ -99,6 +106,9 @@ export class CliViewModel {
 
   private s = (key: string): string =>
     StringManager.getString(`tools_cli_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`tools_cli_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

@@ -7,10 +7,12 @@
 // useHomeViewModel (src/generated/hooks/useHomeViewModel.ts) so a future
 // regeneration slotting this file under a generated hook is mechanical.
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { HelloWorldData, createHelloWorldData } from "@/generated/data/HelloWorldData";
 import { HelloWorldViewModel } from "@/viewmodels/learn/HelloWorldViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function useHelloWorldViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<HelloWorldData>(createHelloWorldData());
@@ -25,6 +27,14 @@ export function useHelloWorldViewModel(router: AppRouterInstance) {
       setData,
     );
   }
+
+  useEffect(() => {
+    viewModelRef.current?.mountLanguage();
+    if (typeof window === "undefined") return;
+    const onLang = () => viewModelRef.current?.mountLanguage();
+    window.addEventListener(LANGUAGE_EVENT, onLang);
+    return () => window.removeEventListener(LANGUAGE_EVENT, onLang);
+  }, []);
 
   const setVars = (vars: Partial<HelloWorldData>) => {
     viewModelRef.current?.setVars(vars);

@@ -92,44 +92,55 @@ export class ComponentsViewModel {
   };
 
   onAppear = () => {
-    const catalog: CatalogCell[] = COMPONENT_CATALOG.map((c) => {
+    this.updateData({
+      componentCatalog: this.asCollection(this.buildCatalog(this.sDefault)),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)),
+    });
+  };
+
+  mountLanguage = (): void => {
+    this.updateData({
+      componentCatalog: this.asCollection(this.buildCatalog(this.s)),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.s)),
+    });
+  };
+
+  private buildCatalog = (lookup: (key: string) => string): CatalogCell[] =>
+    COMPONENT_CATALOG.map((c) => {
       const url = `/reference/components/${c.kebab}`;
       return {
         id: `cat_${c.kebab.replace(/-/g, "_")}`,
         titleKey: c.name,
-        descriptionKey: this.s(`catalog_${c.kebab}_description`),
+        descriptionKey: lookup(`catalog_${c.kebab}_description`),
         url,
         onNavigate: () => this.navigate(url),
       };
     });
 
-    const nextReads: NextReadCell[] = [
-      {
-        id: "next_attributes",
-        titleKey: this.s("next_attributes_title"),
-        descriptionKey: this.s("next_attributes_description"),
-        url: "/reference/attributes",
-        onNavigate: () => this.navigate("/reference/attributes"),
-      },
-      {
-        id: "next_custom_components",
-        titleKey: this.s("next_custom_components_title"),
-        descriptionKey: this.s("next_custom_components_description"),
-        url: "/guides/custom-components",
-        onNavigate: () => this.navigate("/guides/custom-components"),
-      },
-    ];
-
-    this.updateData({
-      componentCatalog: this.asCollection(catalog),
-      nextReadLinks: this.asCollection(nextReads),
-    });
-  };
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
+    {
+      id: "next_attributes",
+      titleKey: lookup("next_attributes_title"),
+      descriptionKey: lookup("next_attributes_description"),
+      url: "/reference/attributes",
+      onNavigate: () => this.navigate("/reference/attributes"),
+    },
+    {
+      id: "next_custom_components",
+      titleKey: lookup("next_custom_components_title"),
+      descriptionKey: lookup("next_custom_components_description"),
+      url: "/guides/custom-components",
+      onNavigate: () => this.navigate("/guides/custom-components"),
+    },
+  ];
 
   navigate = (url: string): void => { this.router.push(url); };
 
   private s = (key: string): string =>
     StringManager.getString(`reference_components_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`reference_components_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

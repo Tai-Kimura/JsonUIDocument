@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { PlatformsIndexData, createPlatformsIndexData } from "@/generated/data/PlatformsIndexData";
 import { PlatformsIndexViewModel } from "@/viewmodels/PlatformsIndexViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function usePlatformsIndexViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<PlatformsIndexData>(createPlatformsIndexData());

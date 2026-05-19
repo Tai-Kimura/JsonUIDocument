@@ -172,9 +172,9 @@ export class HomeViewModel extends HomeViewModelBase {
     const recentChanges: ChangelogCardCell[] = RECENT_CHANGES_RAW.map((r) => ({
       id: r.id,
       date: r.date,
-      title: StringManager.getString(r.titleKey),
-      blurb: StringManager.getString(r.blurbKey),
-      ctaLabel: StringManager.getString(r.ctaLabelKey),
+      title: this.lookup(r.titleKey),
+      blurb: this.lookup(r.blurbKey),
+      ctaLabel: this.lookup(r.ctaLabelKey),
       ctaUrl: r.ctaUrl,
       onTap: () => this.navigate(r.ctaUrl),
     }));
@@ -210,17 +210,30 @@ export class HomeViewModel extends HomeViewModelBase {
    */
   private hydrateFeaturedLink = (link: FeaturedLink): FeaturedLink => ({
     ...link,
-    titleKey: StringManager.getString(this.toSnake(link.titleKey)),
-    descriptionKey: StringManager.getString(this.toSnake(link.descriptionKey)),
+    titleKey: this.lookup(this.toSnake(link.titleKey)),
+    descriptionKey: this.lookup(this.toSnake(link.descriptionKey)),
     onNavigate: () => this.navigate(link.url),
   });
 
   private hydratePlatformCard = (card: PlatformCard): PlatformCard => ({
     ...card,
-    titleKey: StringManager.getString(this.toSnake(card.titleKey)),
-    descriptionKey: StringManager.getString(this.toSnake(card.descriptionKey)),
+    titleKey: this.lookup(this.toSnake(card.titleKey)),
+    descriptionKey: this.lookup(this.toSnake(card.descriptionKey)),
     onNavigate: () => this.navigate(card.url),
   });
+
+  // SSR-safe lookup. Returns default-language during construction; flips
+  // to persisted locale once mountLanguage() is called post-mount.
+  private _useDefault = true;
+  private lookup = (key: string): string =>
+    this._useDefault
+      ? StringManager.getDefaultString(key)
+      : StringManager.getString(key);
+
+  mountLanguage = (): void => {
+    this._useDefault = false;
+    this.onAppear();
+  };
 
   /**
    * Convert dot-style string keys (spec style: "home.featured.getStarted.title")

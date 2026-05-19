@@ -53,28 +53,29 @@ export class DataBindingBasicsViewModel {
   };
 
   onAppear = () => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)) });
+  };
 
-    const nextReads: NextReadCell[] = [
+  mountLanguage = (): void => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.s)) });
+  };
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
       {
         id: "next_concepts_data_binding",
-        titleKey: this.s("next_concepts_data_binding_title"),
-        descriptionKey: this.s("next_concepts_data_binding_description"),
+        titleKey: lookup("next_concepts_data_binding_title"),
+        descriptionKey: lookup("next_concepts_data_binding_description"),
         url: "/concepts/data-binding",
         onNavigate: () => this.navigate("/concepts/data-binding"),
       },
       {
         id: "next_first_screen",
-        titleKey: this.s("next_first_screen_title"),
-        descriptionKey: this.s("next_first_screen_description"),
+        titleKey: lookup("next_first_screen_title"),
+        descriptionKey: lookup("next_first_screen_description"),
         url: "/learn/first-screen",
         onNavigate: () => this.navigate("/learn/first-screen"),
       },
     ];
-
-    this.updateData({
-      nextReadLinks: this.asCollection(nextReads),
-    });
-  };
 
   navigate = (url: string): void => {
     this.router.push(url);
@@ -82,6 +83,9 @@ export class DataBindingBasicsViewModel {
 
   private s = (key: string): string =>
     StringManager.getString(`learn_data_binding_basics_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`learn_data_binding_basics_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

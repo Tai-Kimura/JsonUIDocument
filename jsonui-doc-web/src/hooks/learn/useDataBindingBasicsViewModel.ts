@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { DataBindingBasicsData, createDataBindingBasicsData } from "@/generated/data/DataBindingBasicsData";
 import { DataBindingBasicsViewModel } from "@/viewmodels/learn/DataBindingBasicsViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function useDataBindingBasicsViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<DataBindingBasicsData>(createDataBindingBasicsData());
@@ -18,6 +20,14 @@ export function useDataBindingBasicsViewModel(router: AppRouterInstance) {
       setData,
     );
   }
+
+  useEffect(() => {
+    viewModelRef.current?.mountLanguage();
+    if (typeof window === "undefined") return;
+    const onLang = () => viewModelRef.current?.mountLanguage();
+    window.addEventListener(LANGUAGE_EVENT, onLang);
+    return () => window.removeEventListener(LANGUAGE_EVENT, onLang);
+  }, []);
 
   const setVars = (vars: Partial<DataBindingBasicsData>) => {
     viewModelRef.current?.setVars(vars);

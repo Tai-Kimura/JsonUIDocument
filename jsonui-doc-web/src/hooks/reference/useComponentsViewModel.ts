@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { ComponentsData, createComponentsData } from "@/generated/data/ComponentsData";
 import { ComponentsViewModel } from "@/viewmodels/reference/ComponentsViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function useComponentsViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<ComponentsData>(createComponentsData());
@@ -18,6 +20,14 @@ export function useComponentsViewModel(router: AppRouterInstance) {
       setData,
     );
   }
+
+  useEffect(() => {
+    viewModelRef.current?.mountLanguage();
+    if (typeof window === "undefined") return;
+    const onLang = () => viewModelRef.current?.mountLanguage();
+    window.addEventListener(LANGUAGE_EVENT, onLang);
+    return () => window.removeEventListener(LANGUAGE_EVENT, onLang);
+  }, []);
 
   const setVars = (vars: Partial<ComponentsData>) => {
     viewModelRef.current?.setVars(vars);

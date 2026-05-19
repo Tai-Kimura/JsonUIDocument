@@ -51,27 +51,29 @@ export class CustomTypesViewModel {
   };
 
   onAppear = () => {
-    const nextReads: NextReadCell[] = [
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)) });
+  };
+
+  mountLanguage = (): void => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.s)) });
+  };
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
       {
         id: "next_component_spec",
-        titleKey: this.s("next_component_spec_title"),
-        descriptionKey: this.s("next_component_spec_description"),
+        titleKey: lookup("next_component_spec_title"),
+        descriptionKey: lookup("next_component_spec_description"),
         url: "/spec/component-spec",
         onNavigate: () => this.navigate("/spec/component-spec"),
       },
       {
         id: "next_cell_classes",
-        titleKey: this.s("next_cell_classes_title"),
-        descriptionKey: this.s("next_cell_classes_description"),
+        titleKey: lookup("next_cell_classes_title"),
+        descriptionKey: lookup("next_cell_classes_description"),
         url: "/spec/cell-classes",
         onNavigate: () => this.navigate("/spec/cell-classes"),
       },
     ];
-
-    this.updateData({
-      nextReadLinks: this.asCollection(nextReads),
-    });
-  };
 
   navigate = (url: string): void => {
     this.router.push(url);
@@ -79,6 +81,9 @@ export class CustomTypesViewModel {
 
   private s = (key: string): string =>
     StringManager.getString(`spec_custom_types_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`spec_custom_types_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

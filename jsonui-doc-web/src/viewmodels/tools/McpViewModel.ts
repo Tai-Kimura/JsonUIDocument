@@ -72,36 +72,43 @@ export class McpViewModel {
   };
 
   onAppear = () => {
-
-    const tools: McpToolCell[] = TOOL_IDS.map((id) => ({
-      id,
-      nameKey: this.s(`tool_${id}_name`),
-      groupKey: this.s(`tool_${id}_group`),
-      roleKey: this.s(`tool_${id}_role`),
-    }));
-
-    const nextReads: NextReadCell[] = [
-      {
-        id: "next_agents",
-        titleKey: this.s("next_agents_title"),
-        descriptionKey: this.s("next_agents_description"),
-        url: "/tools/agents",
-        onNavigate: () => this.navigate("/tools/agents"),
-      },
-      {
-        id: "next_cli",
-        titleKey: this.s("next_cli_title"),
-        descriptionKey: this.s("next_cli_description"),
-        url: "/tools/cli",
-        onNavigate: () => this.navigate("/tools/cli"),
-      },
-    ];
-
     this.updateData({
-      tools: this.asCollection(tools),
-      nextReadLinks: this.asCollection(nextReads),
+      tools: this.asCollection(this.buildTools(this.sDefault)),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)),
     });
   };
+
+  mountLanguage = (): void => {
+    this.updateData({
+      tools: this.asCollection(this.buildTools(this.s)),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.s)),
+    });
+  };
+
+  private buildTools = (lookup: (key: string) => string): McpToolCell[] =>
+    TOOL_IDS.map((id) => ({
+      id,
+      nameKey: lookup(`tool_${id}_name`),
+      groupKey: lookup(`tool_${id}_group`),
+      roleKey: lookup(`tool_${id}_role`),
+    }));
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
+    {
+      id: "next_agents",
+      titleKey: lookup("next_agents_title"),
+      descriptionKey: lookup("next_agents_description"),
+      url: "/tools/agents",
+      onNavigate: () => this.navigate("/tools/agents"),
+    },
+    {
+      id: "next_cli",
+      titleKey: lookup("next_cli_title"),
+      descriptionKey: lookup("next_cli_description"),
+      url: "/tools/cli",
+      onNavigate: () => this.navigate("/tools/cli"),
+    },
+  ];
 
   navigate = (url: string): void => {
     this.router.push(url);
@@ -109,6 +116,9 @@ export class McpViewModel {
 
   private s = (key: string): string =>
     StringManager.getString(`tools_mcp_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`tools_mcp_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

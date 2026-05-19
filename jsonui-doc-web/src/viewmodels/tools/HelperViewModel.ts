@@ -51,28 +51,29 @@ export class HelperViewModel {
   };
 
   onAppear = () => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)) });
+  };
 
-    const nextReads: NextReadCell[] = [
+  mountLanguage = (): void => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.s)) });
+  };
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
       {
         id: "next_cli",
-        titleKey: this.s("next_cli_title"),
-        descriptionKey: this.s("next_cli_description"),
+        titleKey: lookup("next_cli_title"),
+        descriptionKey: lookup("next_cli_description"),
         url: "/tools/cli",
         onNavigate: () => this.navigate("/tools/cli"),
       },
       {
         id: "next_installation",
-        titleKey: this.s("next_installation_title"),
-        descriptionKey: this.s("next_installation_description"),
+        titleKey: lookup("next_installation_title"),
+        descriptionKey: lookup("next_installation_description"),
         url: "/learn/installation",
         onNavigate: () => this.navigate("/learn/installation"),
       },
     ];
-
-    this.updateData({
-      nextReadLinks: this.asCollection(nextReads),
-    });
-  };
 
   navigate = (url: string): void => {
     this.router.push(url);
@@ -80,6 +81,9 @@ export class HelperViewModel {
 
   private s = (key: string): string =>
     StringManager.getString(`tools_helper_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`tools_helper_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

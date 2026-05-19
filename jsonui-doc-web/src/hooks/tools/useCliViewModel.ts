@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { CliData, createCliData } from "@/generated/data/CliData";
 import { CliViewModel } from "@/viewmodels/tools/CliViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function useCliViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<CliData>(createCliData());
@@ -18,6 +20,14 @@ export function useCliViewModel(router: AppRouterInstance) {
       setData,
     );
   }
+
+  useEffect(() => {
+    viewModelRef.current?.mountLanguage();
+    if (typeof window === "undefined") return;
+    const onLang = () => viewModelRef.current?.mountLanguage();
+    window.addEventListener(LANGUAGE_EVENT, onLang);
+    return () => window.removeEventListener(LANGUAGE_EVENT, onLang);
+  }, []);
 
   const setVars = (vars: Partial<CliData>) => {
     viewModelRef.current?.setVars(vars);

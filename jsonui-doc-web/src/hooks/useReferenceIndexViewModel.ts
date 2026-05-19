@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { ReferenceIndexData, createReferenceIndexData } from "@/generated/data/ReferenceIndexData";
 import { ReferenceIndexViewModel } from "@/viewmodels/ReferenceIndexViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function useReferenceIndexViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<ReferenceIndexData>(createReferenceIndexData());

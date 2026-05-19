@@ -47,31 +47,37 @@ export class JsonSchemaViewModel {
   };
 
   onAppear = () => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)) });
+  };
 
-    const nextReads: NextReadCell[] = [
+  mountLanguage = (): void => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.s)) });
+  };
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
       {
         id: "next_attributes",
-        titleKey: this.s("next_attributes_title"),
-        descriptionKey: this.s("next_attributes_description"),
+        titleKey: lookup("next_attributes_title"),
+        descriptionKey: lookup("next_attributes_description"),
         url: "/reference/attributes",
         onNavigate: () => this.navigate("/reference/attributes"),
       },
       {
         id: "next_spec_first",
-        titleKey: this.s("next_spec_first_title"),
-        descriptionKey: this.s("next_spec_first_description"),
+        titleKey: lookup("next_spec_first_title"),
+        descriptionKey: lookup("next_spec_first_description"),
         url: "/concepts/why-spec-first",
         onNavigate: () => this.navigate("/concepts/why-spec-first"),
       },
     ];
 
-    this.updateData({ nextReadLinks: this.asCollection(nextReads) });
-  };
-
   navigate = (url: string): void => { this.router.push(url); };
 
   private s = (key: string): string =>
     StringManager.getString(`reference_json_schema_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`reference_json_schema_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

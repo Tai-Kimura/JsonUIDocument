@@ -412,10 +412,21 @@ export class HelloWorldViewModel {
 
   /**
    * Resolve a bare string key (e.g. "title") against the current language's
-   * snake_case flat map, scoped to this screen's prefix.
+   * snake_case flat map, scoped to this screen's prefix. Returns the default
+   * language during VM construction (SSR-safe); flips to persisted-locale
+   * lookup once mountLanguage() is called from a post-mount useEffect.
    */
+  private _useDefault = true;
   private s = (key: string): string => {
-    return StringManager.getString(`learn_hello_world_${key}`);
+    const full = `learn_hello_world_${key}`;
+    return this._useDefault
+      ? StringManager.getDefaultString(full)
+      : StringManager.getString(full);
+  };
+
+  mountLanguage = (): void => {
+    this._useDefault = false;
+    this.onAppear();
   };
 
   private panelVisibilityFor = (

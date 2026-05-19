@@ -51,27 +51,29 @@ export class ComponentSpecViewModel {
   };
 
   onAppear = () => {
-    const nextReads: NextReadCell[] = [
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)) });
+  };
+
+  mountLanguage = (): void => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.s)) });
+  };
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
       {
         id: "next_parent_sub_spec",
-        titleKey: this.s("next_parent_sub_spec_title"),
-        descriptionKey: this.s("next_parent_sub_spec_description"),
+        titleKey: lookup("next_parent_sub_spec_title"),
+        descriptionKey: lookup("next_parent_sub_spec_description"),
         url: "/spec/parent-sub-spec",
         onNavigate: () => this.navigate("/spec/parent-sub-spec"),
       },
       {
         id: "next_custom_types",
-        titleKey: this.s("next_custom_types_title"),
-        descriptionKey: this.s("next_custom_types_description"),
+        titleKey: lookup("next_custom_types_title"),
+        descriptionKey: lookup("next_custom_types_description"),
         url: "/spec/custom-types",
         onNavigate: () => this.navigate("/spec/custom-types"),
       },
     ];
-
-    this.updateData({
-      nextReadLinks: this.asCollection(nextReads),
-    });
-  };
 
   navigate = (url: string): void => {
     this.router.push(url);
@@ -79,6 +81,9 @@ export class ComponentSpecViewModel {
 
   private s = (key: string): string =>
     StringManager.getString(`spec_component_spec_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`spec_component_spec_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

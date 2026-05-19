@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { KotlinData, createKotlinData } from "@/generated/data/KotlinData";
 import { KotlinViewModel } from "@/viewmodels/platforms/KotlinViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function useKotlinViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<KotlinData>(createKotlinData());
@@ -18,6 +20,14 @@ export function useKotlinViewModel(router: AppRouterInstance) {
       setData,
     );
   }
+
+  useEffect(() => {
+    viewModelRef.current?.mountLanguage();
+    if (typeof window === "undefined") return;
+    const onLang = () => viewModelRef.current?.mountLanguage();
+    window.addEventListener(LANGUAGE_EVENT, onLang);
+    return () => window.removeEventListener(LANGUAGE_EVENT, onLang);
+  }, []);
 
   const setVars = (vars: Partial<KotlinData>) => {
     viewModelRef.current?.setVars(vars);

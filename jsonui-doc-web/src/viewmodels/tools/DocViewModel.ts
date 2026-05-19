@@ -583,9 +583,23 @@ export class DocViewModel {
     htmlSamplePanelVisibility: id === "html" ? "visible" : "gone",
   });
 
-  /** Resolve a bare key against this screen's tools_doc_ prefix. */
-  private s = (key: string): string =>
-    StringManager.getString(`tools_doc_${key}`);
+  /**
+   * Resolve a bare key against this screen's tools_doc_ prefix. SSR-safe:
+   * returns the default language during construction; flips to the
+   * persisted locale once mountLanguage() is called post-mount.
+   */
+  private _useDefault = true;
+  private s = (key: string): string => {
+    const full = `tools_doc_${key}`;
+    return this._useDefault
+      ? StringManager.getDefaultString(full)
+      : StringManager.getString(full);
+  };
+
+  mountLanguage = (): void => {
+    this._useDefault = false;
+    this.onAppear();
+  };
 
   private asCollection = <T,>(items: T[]): CollectionDataSource<T> =>
     new CollectionDataSource<T>([{ cells: { data: items } }]);

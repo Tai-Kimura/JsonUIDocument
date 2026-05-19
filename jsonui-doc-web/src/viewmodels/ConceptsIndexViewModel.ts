@@ -60,10 +60,22 @@ export class ConceptsIndexViewModel {
   setVars = (vars: Partial<ConceptsIndexData>) => { this.updateData(vars); };
 
   onAppear = () => {
-    const articles: ArticleCell[] = CATALOG.map((e) => ({
+    this.updateData({
+      articles: new CollectionDataSource([{ cells: { data: this.buildArticles((k) => StringManager.getDefaultString(k)) } }]),
+    });
+  };
+
+  mountLanguage = (): void => {
+    this.updateData({
+      articles: new CollectionDataSource([{ cells: { data: this.buildArticles((k) => StringManager.getString(k)) } }]),
+    });
+  };
+
+  private buildArticles = (lookup: (key: string) => string): ArticleCell[] =>
+    CATALOG.map((e) => ({
       id: e.id,
-      titleKey: StringManager.getString(e.titleKey),
-      descriptionKey: StringManager.getString(e.titleKey.replace(/_title$/, "_lead")),
+      titleKey: lookup(e.titleKey),
+      descriptionKey: lookup(e.titleKey.replace(/_title$/, "_lead")),
       readTimeKey: "",
       statusKey: "",
       statusBackground: "#DCFCE7",
@@ -74,10 +86,6 @@ export class ConceptsIndexViewModel {
       platformsVisibility: "gone",
       onNavigate: () => this.navigate(e.url),
     }));
-    this.updateData({
-      articles: new CollectionDataSource([{ cells: { data: articles } }]),
-    });
-  };
 
   navigate = (url: string): void => { this.router.push(url); };
 }

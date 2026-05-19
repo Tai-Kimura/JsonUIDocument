@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Home from "@/generated/components/Home";
-import { useHomeViewModel } from "@/generated/hooks/useHomeViewModel";
+import { useHomeViewModel } from "@/hooks/useHomeViewModel";
 
 /**
  * Next.js App Router entry for "/". Threads the router into the generated

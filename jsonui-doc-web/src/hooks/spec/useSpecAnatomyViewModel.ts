@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {
   AnatomyData,
   createAnatomyData,
 } from "@/generated/data/AnatomyData";
 import { AnatomyViewModel } from "@/viewmodels/spec/AnatomyViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function useSpecAnatomyViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<AnatomyData>(createAnatomyData());
@@ -21,6 +23,14 @@ export function useSpecAnatomyViewModel(router: AppRouterInstance) {
       setData,
     );
   }
+
+  useEffect(() => {
+    viewModelRef.current?.mountLanguage();
+    if (typeof window === "undefined") return;
+    const onLang = () => viewModelRef.current?.mountLanguage();
+    window.addEventListener(LANGUAGE_EVENT, onLang);
+    return () => window.removeEventListener(LANGUAGE_EVENT, onLang);
+  }, []);
 
   const setVars = (vars: Partial<AnatomyData>) => {
     viewModelRef.current?.setVars(vars);

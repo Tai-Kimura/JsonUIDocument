@@ -62,34 +62,17 @@ export class FirstScreenViewModel {
   };
 
   onAppear = () => {
-    const nextReads: NextReadCell[] = [
-      {
-        id: "next_guides",
-        titleKey: this.s("next_guides_title"),
-        descriptionKey: this.s("next_guides_description"),
-        url: "/guides/writing-your-first-spec",
-        onNavigate: () => this.navigate("/guides/writing-your-first-spec"),
-      },
-      {
-        id: "next_data_binding",
-        titleKey: this.s("next_data_binding_title"),
-        descriptionKey: this.s("next_data_binding_description"),
-        url: "/learn/data-binding-basics",
-        onNavigate: () => this.navigate("/learn/data-binding-basics"),
-      },
-      {
-        id: "next_spec",
-        titleKey: this.s("next_spec_title"),
-        descriptionKey: this.s("next_spec_description"),
-        url: "/spec/split-overview",
-        onNavigate: () => this.navigate("/spec/split-overview"),
-      },
-    ];
-
     this.updateData({
-      nextReadLinks: this.asCollection(nextReads),
-      codeTabs: this.asCollection(this.buildCodeTabs(this._activeCodeTab)),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)),
+      codeTabs: this.asCollection(this.buildCodeTabs(this._activeCodeTab, this.sDefault)),
       ...this.panelVisibilityFor(this._activeCodeTab),
+    });
+  };
+
+  mountLanguage = (): void => {
+    this.updateData({
+      nextReadLinks: this.asCollection(this.buildNextReads(this.s)),
+      codeTabs: this.asCollection(this.buildCodeTabs(this._activeCodeTab, this.s)),
     });
   };
 
@@ -102,7 +85,7 @@ export class FirstScreenViewModel {
   onSelectCodeTab = (id: string): void => {
     this._activeCodeTab = id;
     this.updateData({
-      codeTabs: this.asCollection(this.buildCodeTabs(id)),
+      codeTabs: this.asCollection(this.buildCodeTabs(id, this.s)),
       ...this.panelVisibilityFor(id),
     });
   };
@@ -111,7 +94,34 @@ export class FirstScreenViewModel {
     this.router.push(url);
   };
 
-  private buildCodeTabs = (activeId: string): TabHeaderCell[] => {
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
+    {
+      id: "next_guides",
+      titleKey: lookup("next_guides_title"),
+      descriptionKey: lookup("next_guides_description"),
+      url: "/guides/writing-your-first-spec",
+      onNavigate: () => this.navigate("/guides/writing-your-first-spec"),
+    },
+    {
+      id: "next_data_binding",
+      titleKey: lookup("next_data_binding_title"),
+      descriptionKey: lookup("next_data_binding_description"),
+      url: "/learn/data-binding-basics",
+      onNavigate: () => this.navigate("/learn/data-binding-basics"),
+    },
+    {
+      id: "next_spec",
+      titleKey: lookup("next_spec_title"),
+      descriptionKey: lookup("next_spec_description"),
+      url: "/spec/split-overview",
+      onNavigate: () => this.navigate("/spec/split-overview"),
+    },
+  ];
+
+  private buildCodeTabs = (
+    activeId: string,
+    lookup: (key: string) => string,
+  ): TabHeaderCell[] => {
     const make = (id: string, labelKey: string): TabHeaderCell => {
       const isActive = id === activeId;
       return {
@@ -124,9 +134,9 @@ export class FirstScreenViewModel {
       };
     };
     return [
-      make("swift", this.s("tab_swift")),
-      make("kotlin", this.s("tab_kotlin")),
-      make("typescript", this.s("tab_typescript")),
+      make("swift", lookup("tab_swift")),
+      make("kotlin", lookup("tab_kotlin")),
+      make("typescript", lookup("tab_typescript")),
     ];
   };
 
@@ -143,6 +153,9 @@ export class FirstScreenViewModel {
 
   private s = (key: string): string =>
     StringManager.getString(`learn_first_screen_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`learn_first_screen_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

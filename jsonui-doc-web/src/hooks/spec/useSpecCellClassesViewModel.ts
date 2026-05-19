@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {
   CellClassesData,
   createCellClassesData,
 } from "@/generated/data/CellClassesData";
 import { CellClassesViewModel } from "@/viewmodels/spec/CellClassesViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function useSpecCellClassesViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<CellClassesData>(createCellClassesData());
@@ -21,6 +23,14 @@ export function useSpecCellClassesViewModel(router: AppRouterInstance) {
       setData,
     );
   }
+
+  useEffect(() => {
+    viewModelRef.current?.mountLanguage();
+    if (typeof window === "undefined") return;
+    const onLang = () => viewModelRef.current?.mountLanguage();
+    window.addEventListener(LANGUAGE_EVENT, onLang);
+    return () => window.removeEventListener(LANGUAGE_EVENT, onLang);
+  }, []);
 
   const setVars = (vars: Partial<CellClassesData>) => {
     viewModelRef.current?.setVars(vars);

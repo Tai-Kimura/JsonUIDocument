@@ -7,13 +7,15 @@
 // useHelloWorldViewModel so a future regeneration slotting this file under
 // a generated hook is mechanical.
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {
   InstallationData,
   createInstallationData,
 } from "@/generated/data/InstallationData";
 import { InstallationViewModel } from "@/viewmodels/learn/InstallationViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function useInstallationViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<InstallationData>(createInstallationData());
@@ -28,6 +30,14 @@ export function useInstallationViewModel(router: AppRouterInstance) {
       setData,
     );
   }
+
+  useEffect(() => {
+    viewModelRef.current?.mountLanguage();
+    if (typeof window === "undefined") return;
+    const onLang = () => viewModelRef.current?.mountLanguage();
+    window.addEventListener(LANGUAGE_EVENT, onLang);
+    return () => window.removeEventListener(LANGUAGE_EVENT, onLang);
+  }, []);
 
   const setVars = (vars: Partial<InstallationData>) => {
     viewModelRef.current?.setVars(vars);

@@ -47,31 +47,37 @@ export class TestingViewModel {
   };
 
   onAppear = () => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)) });
+  };
 
-    const nextReads: NextReadCell[] = [
+  mountLanguage = (): void => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.s)) });
+  };
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
       {
         id: "next_test_runner",
-        titleKey: this.s("next_test_runner_title"),
-        descriptionKey: this.s("next_test_runner_description"),
+        titleKey: lookup("next_test_runner_title"),
+        descriptionKey: lookup("next_test_runner_description"),
         url: "/tools/test-runner",
         onNavigate: () => this.navigate("/tools/test-runner"),
       },
       {
         id: "next_navigation",
-        titleKey: this.s("next_navigation_title"),
-        descriptionKey: this.s("next_navigation_description"),
+        titleKey: lookup("next_navigation_title"),
+        descriptionKey: lookup("next_navigation_description"),
         url: "/guides/navigation",
         onNavigate: () => this.navigate("/guides/navigation"),
       },
     ];
 
-    this.updateData({ nextReadLinks: this.asCollection(nextReads) });
-  };
-
   navigate = (url: string): void => { this.router.push(url); };
 
   private s = (key: string): string =>
     StringManager.getString(`guides_testing_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`guides_testing_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { ToolsIndexData, createToolsIndexData } from "@/generated/data/ToolsIndexData";
 import { ToolsIndexViewModel } from "@/viewmodels/ToolsIndexViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
 
 export function useToolsIndexViewModel(router: AppRouterInstance) {
   const [data, setData] = useState<ToolsIndexData>(createToolsIndexData());

@@ -60,39 +60,46 @@ export class ToolsAgentsViewModel {
   };
 
   onAppear = () => {
+    this.updateData({
+      agents: this.asCollection(this.buildAgents(this.sDefault)),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)),
+    });
+  };
 
-    const agents: AgentCell[] = [
+  mountLanguage = (): void => {
+    this.updateData({
+      agents: this.asCollection(this.buildAgents(this.s)),
+      nextReadLinks: this.asCollection(this.buildNextReads(this.s)),
+    });
+  };
+
+  private buildAgents = (lookup: (key: string) => string): AgentCell[] =>
+    [
       "conductor", "define", "ground", "implement",
       "test", "debug", "nav_ios", "nav_android", "nav_web",
     ].map((id) => ({
       id,
-      nameKey: this.s(`agent_${id}_name`),
-      roleKey: this.s(`agent_${id}_role`),
-      whenToUseKey: this.s(`agent_${id}_when`),
+      nameKey: lookup(`agent_${id}_name`),
+      roleKey: lookup(`agent_${id}_role`),
+      whenToUseKey: lookup(`agent_${id}_when`),
     }));
 
-    const nextReads: NextReadCell[] = [
-      {
-        id: "next_cli",
-        titleKey: this.s("next_cli_title"),
-        descriptionKey: this.s("next_cli_description"),
-        url: "/tools/cli",
-        onNavigate: () => this.navigate("/tools/cli"),
-      },
-      {
-        id: "next_mcp",
-        titleKey: this.s("next_mcp_title"),
-        descriptionKey: this.s("next_mcp_description"),
-        url: "/tools/mcp",
-        onNavigate: () => this.navigate("/tools/mcp"),
-      },
-    ];
-
-    this.updateData({
-      agents: this.asCollection(agents),
-      nextReadLinks: this.asCollection(nextReads),
-    });
-  };
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
+    {
+      id: "next_cli",
+      titleKey: lookup("next_cli_title"),
+      descriptionKey: lookup("next_cli_description"),
+      url: "/tools/cli",
+      onNavigate: () => this.navigate("/tools/cli"),
+    },
+    {
+      id: "next_mcp",
+      titleKey: lookup("next_mcp_title"),
+      descriptionKey: lookup("next_mcp_description"),
+      url: "/tools/mcp",
+      onNavigate: () => this.navigate("/tools/mcp"),
+    },
+  ];
 
   navigate = (url: string): void => {
     this.router.push(url);
@@ -100,6 +107,9 @@ export class ToolsAgentsViewModel {
 
   private s = (key: string): string =>
     StringManager.getString(`tools_agents_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`tools_agents_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

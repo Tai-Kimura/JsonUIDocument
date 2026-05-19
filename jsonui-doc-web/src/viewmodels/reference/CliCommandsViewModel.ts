@@ -47,31 +47,37 @@ export class CliCommandsViewModel {
   };
 
   onAppear = () => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)) });
+  };
 
-    const nextReads: NextReadCell[] = [
+  mountLanguage = (): void => {
+    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.s)) });
+  };
+
+  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
       {
         id: "next_cli",
-        titleKey: this.s("next_cli_title"),
-        descriptionKey: this.s("next_cli_description"),
+        titleKey: lookup("next_cli_title"),
+        descriptionKey: lookup("next_cli_description"),
         url: "/tools/cli",
         onNavigate: () => this.navigate("/tools/cli"),
       },
       {
         id: "next_first_spec",
-        titleKey: this.s("next_first_spec_title"),
-        descriptionKey: this.s("next_first_spec_description"),
+        titleKey: lookup("next_first_spec_title"),
+        descriptionKey: lookup("next_first_spec_description"),
         url: "/guides/writing-your-first-spec",
         onNavigate: () => this.navigate("/guides/writing-your-first-spec"),
       },
     ];
 
-    this.updateData({ nextReadLinks: this.asCollection(nextReads) });
-  };
-
   navigate = (url: string): void => { this.router.push(url); };
 
   private s = (key: string): string =>
     StringManager.getString(`reference_cli_commands_${key}`);
+
+  private sDefault = (key: string): string =>
+    StringManager.getDefaultString(`reference_cli_commands_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);
