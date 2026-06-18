@@ -1,0 +1,106 @@
+name: Deploy docs to S3 + CloudFront
+
+# Pipeline: jsonui-cli toolchain (sync_tool + jui build) → Next.js static export
+# → S3 (private) → CloudFront (jsonui.tanosys.com).
+# Auth is via GitHub OIDC assuming an AWS IAM role — no long-lived AWS keys.
+# Infra is defined in infra/terraform/.
+#
+# Why the toolchain steps: src/generated/* (incl. ColorManager, StringManager,
+# component TSX) and rjui_tools/ are NOT committed — they are produced by
+# `jui build` from docs/screens/. A bare `npm run build` fails with
+# "Module not found: @/generated/ColorManager". See infra/DESIGN.md §6.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "jsonui-doc-web/**"
+      - "docs/**"
+      - "tests/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-docs
+  cancel-in-progress: true
+
+permissions:
+  id-token: write # required for OIDC
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-1
+  AWS_ROLE_ARN: arn:aws:iam::544218887430:role/jsonui-doc-gha-deploy
+  SITE_BUCKET: jsonui-tanosys-com-site
+  DISTRIBUTION_ID: ESH27Z3X4XNHO
+  # jsonui-cli is fetched from upstream main. Pin to a commit SHA for full
+  # reproducibility once a known-good revision is chosen.
+  JSONUI_CLI_REF: main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: jsonui-doc-web/package-lock.json
+
+      # rjui_tools pins Ruby 3.2.2 (jsonui-doc-web/rjui_tools/.ruby-version).
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2.2"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Fetch jsonui-cli toolchain
+        run: |
+          git clone --depth 1 --branch "${JSONUI_CLI_REF}" \
+            https://github.com/Tai-Kimura/jsonui-cli.git "$RUNNER_TEMP/jsonui-cli"
+          echo "JSONUI_CLI_PATH=$RUNNER_TEMP/jsonui-cli" >> "$GITHUB_ENV"
+
+      - name: Sync platform toolchain (populates jsonui-doc-web/rjui_tools)
+        run: python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" sync_tool
+
+      - name: Generate Layout + TSX (src/generated/*)
+        run: python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" build --web-only --clean
+
+      - name: Install JS dependencies
+        working-directory: jsonui-doc-web
+        run: npm ci
+
+      - name: Build static export
+        working-directory: jsonui-doc-web
+        run: npm run build
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync immutable assets (long cache)
+        working-directory: jsonui-doc-web
+        run: |
+          aws s3 sync out/ "s3://${SITE_BUCKET}" \
+            --exclude "*.html" \
+            --cache-control "public,max-age=31536000,immutable"
+
+      - name: Sync HTML (revalidate)
+        working-directory: jsonui-doc-web
+        run: |
+          aws s3 sync out/ "s3://${SITE_BUCKET}" \
+            --exclude "*" --include "*.html" \
+            --cache-control "public,max-age=0,must-revalidate" \
+            --content-type "text/html; charset=utf-8"
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${DISTRIBUTION_ID}" \
+            --paths "/*"
