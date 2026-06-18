@@ -24,7 +24,10 @@ export function useHomeViewModel(router: AppRouterInstance) {
     const onLang = () => vm?.mountLanguage?.();
     window.addEventListener(LANGUAGE_EVENT, onLang);
     return () => window.removeEventListener(LANGUAGE_EVENT, onLang);
-  }, [result]);
+    // Run once on mount (matches the 41 sibling wrappers). Depending on
+    // `result` re-fired this effect every render → mountLanguage()→setState
+    // → infinite render loop → broken hydration. See トップページ非対話-原因報告.md.
+  }, []);
 
   return result;
 }
