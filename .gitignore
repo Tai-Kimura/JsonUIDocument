@@ -34,8 +34,17 @@ jsonui-doc-android/app/build/
 .bundle/
 vendor/bundle/
 
-# Build toolchain (synced from upstream jsonui-cli via `jui sync_tool`)
-jsonui-doc-web/rjui_tools/
+# Build toolchain — tracked in-repo so project-specific extensions/
+# (custom converters + attribute_definitions) survive a fresh clone.
+# `jui sync_tool` preserves the extensions/ subtree; only ignore runtime caches.
+jsonui-doc-web/rjui_tools/vendor/bundle/
+jsonui-doc-web/rjui_tools/.bundle/
+jsonui-doc-web/rjui_tools/tmp/
+jsonui-doc-web/rjui_tools/log/
+
+# macOS / editor junk
+.DS_Store
+**/.DS_Store
 
 # Per-user Claude settings
 .claude/settings.local.json

@@ -1,0 +1,32 @@
+{
+  "TableOfContents": {
+    "items": {
+      "type": ["array", "binding"],
+      "description": "Ordered list of TocItem entries ({id, label, anchor, level?}). Either a literal array or an @{binding} to a ViewModel field."
+    },
+    "title": {
+      "type": ["string", "binding"],
+      "description": "Optional heading label rendered above the list ('On this page' etc.). Usually a @string/... key resolved by rjui's text-key pass."
+    },
+    "sticky": {
+      "type": ["boolean", "binding"],
+      "description": "Whether the nav sticks to the viewport under sufficient height. Default: true."
+    },
+    "stickyOffset": {
+      "type": ["number", "binding"],
+      "description": "Pixel offset from viewport top when sticky. Default: 80."
+    },
+    "activeAnchor": {
+      "type": ["string", "binding"],
+      "description": "Optional externally-controlled active anchor id. When absent, the component self-computes via IntersectionObserver."
+    },
+    "maxDepth": {
+      "type": ["number", "binding"],
+      "description": "Maximum TocItem.level to render. Items with level > maxDepth are filtered. Default: 2."
+    },
+    "onSelect": {
+      "type": ["binding"],
+      "description": "Optional event: (anchor: String) -> Void. Invoked before the default scroll."
+    }
+  }
+}
