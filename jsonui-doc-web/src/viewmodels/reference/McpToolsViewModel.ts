@@ -23,7 +23,8 @@ interface McpToolDetailCell {
 }
 
 // Catalog order matches /tools/mcp McpViewModel.TOOL_IDS — A (Lookup) →
-// B (Validation) → C (Generation) → D (Build + Runtime). Keep them in sync.
+// B (Validation) → C (Generation) → D (Build + Runtime) → E (API Model
+// Discovery). 33 tools total. Keep them in sync.
 const TOOL_IDS = [
   "get_project_config", "list_screen_specs", "list_layouts", "list_component_specs",
   "lookup_component", "lookup_attribute", "search_components", "get_data_source",
@@ -36,6 +37,8 @@ const TOOL_IDS = [
 
   "jui_init", "jui_build", "jui_sync_tool", "jui_generate_converter", "jui_migrate_layouts",
   "read_spec_file", "read_layout_file", "get_platform_mapping", "get_modifier_order",
+
+  "list_api_specs", "list_api_models", "preview_api_model_sync",
 ] as const;
 
 export class McpToolsViewModel {

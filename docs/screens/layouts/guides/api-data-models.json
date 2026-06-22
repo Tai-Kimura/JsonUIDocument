@@ -1,0 +1,451 @@
+{
+  "type": "View",
+  "id": "guides_api_data_models_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        { "name": "filterConfigRows",      "class": "CollectionDataSource" },
+        { "name": "filterEvalRows",        "class": "CollectionDataSource" },
+        { "name": "skipDomainCompareRows", "class": "CollectionDataSource" },
+        { "name": "mcpPreviewFields",      "class": "CollectionDataSource" },
+        { "name": "mcpDiscoveryFields",    "class": "CollectionDataSource" },
+        { "name": "androidSerializerRows", "class": "CollectionDataSource" },
+        { "name": "webCaseRows",           "class": "CollectionDataSource" },
+        { "name": "haltRows",              "class": "CollectionDataSource" },
+        { "name": "domainPatternTabs",     "class": "CollectionDataSource" },
+        { "name": "nextReadLinks",         "class": "CollectionDataSource" },
+        { "name": "proxyPatternPanelVisibility",    "class": "String", "defaultValue": "visible" },
+        { "name": "typeConvPatternPanelVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "computedPatternPanelVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "storedPatternPanelVisibility",   "class": "String", "defaultValue": "gone" },
+        { "name": "onNavigateGuides", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "guides_api_data_models_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "guides_api_data_models_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 24, 32],
+          "child": [
+            { "type": "Label", "width": "wrapContent", "height": "wrapContent", "fontSize": 13, "fontWeight": "semibold", "fontColor": "#64748B", "tapBackground": "#F3F4F6", "onClick": "@{onNavigateGuides}", "text": "breadcrumb" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 36, "fontWeight": "bold", "fontColor": "#0B1220", "text": "title" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 17, "fontColor": "#475467", "text": "lead" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 13, "fontColor": "#64748B", "text": "read_time" }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "guides_api_data_models_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "guides_api_data_models_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_setup",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_setup_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_setup_body" },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "code": "{\n  \"api\": {\n    \"directory\": \"docs/api\",\n    \"schemas\": { }\n  }\n}",
+                      "language": "json", "filename": "jui.config.json", "showLineNumbers": false, "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_add_schema",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_add_schema_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_add_schema_body" },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "code": "# 1. Drop docs/api/example.json with a User schema in components.schemas.\n# 2. Regenerate DTO + Domain scaffold.\njui g api\n\n# 3. Open Domain/User.swift (or domain/User.kt / src/domain/User.ts)\n#    and add a proxy:\n#       var displayName: String { dto.displayName.uppercased() }",
+                      "language": "bash", "filename": "shell", "showLineNumbers": false, "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_filter",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_filter_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_filter_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 20, "fontSize": 15, "fontWeight": "semibold", "fontColor": "#0B1220", "text": "section_filter_config_subheading" },
+                    {
+                      "type": "Collection", "id": "guides_api_data_models_filter_config_collection",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 12,
+                      "columnCount": 1, "lineSpacing": 10, "itemSpacing": 10,
+                      "lazy": "none", "scrollEnabled": false,
+                      "items": "@{filterConfigRows}", "cellIdProperty": "id",
+                      "sections": [ { "cell": "cells/filter_config_row" } ]
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 20, "fontSize": 15, "fontWeight": "semibold", "fontColor": "#0B1220", "text": "section_filter_eval_subheading" },
+                    {
+                      "type": "Collection", "id": "guides_api_data_models_filter_eval_collection",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 12,
+                      "columnCount": 1, "lineSpacing": 10, "itemSpacing": 10,
+                      "lazy": "none", "scrollEnabled": false,
+                      "items": "@{filterEvalRows}", "cellIdProperty": "id",
+                      "sections": [ { "cell": "cells/filter_eval_row" } ]
+                    },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "code": "// Full example: shared swagger, only ship /api/auth/* and /api/users/*\n// to this app, drop the /api/admin/* surface, and exclude InternalNote.\n{\n  \"api\": {\n    \"schemas\": {\n      \"include_paths\":   [\"/api/auth/*\", \"/api/users/*\"],\n      \"exclude_paths\":   [\"/api/admin/*\"],\n      \"exclude_schemas\": [\"InternalNote\"]\n    }\n  }\n}",
+                      "language": "json", "filename": "jui.config.json", "showLineNumbers": false, "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_filter_note" }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_skip_domain",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_skip_domain_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_skip_domain_body" },
+                    {
+                      "type": "Collection", "id": "guides_api_data_models_skip_domain_collection",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "columnCount": 1, "lineSpacing": 8, "itemSpacing": 8,
+                      "lazy": "none", "scrollEnabled": false,
+                      "items": "@{skipDomainCompareRows}", "cellIdProperty": "id",
+                      "sections": [ { "cell": "cells/comparison_row" } ]
+                    },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "code": "# OR-evaluated pseudo-code\nskip_domain(schema) :=\n  schema.x-jui-skip-domain == true\n  OR schema.name in api.schemas.skip_domain",
+                      "language": "text", "filename": "evaluation rule", "showLineNumbers": false, "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_mcp_preview",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_mcp_preview_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_mcp_preview_body" },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "code": "// preview_api_model_sync — sample output\n{\n  \"kept_schemas\":        [\"User\", \"LoginRequest\", \"Order\"],\n  \"filtered_out\":        [\"InternalNote\"],\n  \"skip_domain_matches\": [\"AuditEvent\"],\n  \"halts\":               []\n}",
+                      "language": "json", "filename": "mcp output", "showLineNumbers": false, "copyable": false
+                    },
+                    {
+                      "type": "Collection", "id": "guides_api_data_models_mcp_preview_collection",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "columnCount": 1, "lineSpacing": 10, "itemSpacing": 10,
+                      "lazy": "none", "scrollEnabled": false,
+                      "items": "@{mcpPreviewFields}", "cellIdProperty": "id",
+                      "sections": [ { "cell": "cells/mcp_field_row" } ]
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_mcp_preview_note" }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_mcp_discovery",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_mcp_discovery_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_mcp_discovery_body" },
+                    {
+                      "type": "Collection", "id": "guides_api_data_models_mcp_discovery_collection",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "columnCount": 1, "lineSpacing": 10, "itemSpacing": 10,
+                      "lazy": "none", "scrollEnabled": false,
+                      "items": "@{mcpDiscoveryFields}", "cellIdProperty": "id",
+                      "sections": [ { "cell": "cells/mcp_field_row" } ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_return_type",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_return_type_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_return_type_body" },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "code": "// UserRepository.swift\nprotocol UserRepository {\n    // returnType: \"User\" in the spec -> auto-resolves to Domain User.\n    func loadCurrent() async throws -> User\n\n    // returnType: \"UserDto\" -> raw wire shape passes through.\n    func loadCurrentRaw() async throws -> UserDto\n}",
+                      "language": "swift", "filename": "Repository (return-type rule)", "showLineNumbers": false, "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_customize",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_customize_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_customize_body" },
+                    {
+                      "type": "Collection", "id": "guides_api_data_models_domain_pattern_tabs",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "columnCount": 4, "lineSpacing": 12, "itemSpacing": 12,
+                      "lazy": "none", "scrollEnabled": false,
+                      "items": "@{domainPatternTabs}", "cellIdProperty": "id",
+                      "sections": [ { "cell": "cells/tab_header" } ]
+                    },
+                    {
+                      "type": "View", "id": "domain_pattern_panel_proxy", "orientation": "vertical",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "visibility": "@{proxyPatternPanelVisibility}",
+                      "child": [
+                        {
+                          "type": "CodeBlock", "width": "matchParent", "height": "wrapContent",
+                          "code": "// Pattern 1 — proxy. Forward a wire-shape property unchanged.\nextension User {\n    var id: String { dto.id }\n}",
+                          "language": "swift", "filename": "Domain/User.swift", "showLineNumbers": false, "copyable": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View", "id": "domain_pattern_panel_type_conv", "orientation": "vertical",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "visibility": "@{typeConvPatternPanelVisibility}",
+                      "child": [
+                        {
+                          "type": "CodeBlock", "width": "matchParent", "height": "wrapContent",
+                          "code": "// Pattern 2 — type conversion. Wire was ISO-8601 String; expose Date.\nimport Foundation\nextension User {\n    var createdAt: Date {\n        ISO8601DateFormatter().date(from: dto.createdAt) ?? .distantPast\n    }\n}",
+                          "language": "swift", "filename": "Domain/User.swift", "showLineNumbers": false, "copyable": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View", "id": "domain_pattern_panel_computed", "orientation": "vertical",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "visibility": "@{computedPatternPanelVisibility}",
+                      "child": [
+                        {
+                          "type": "CodeBlock", "width": "matchParent", "height": "wrapContent",
+                          "code": "// Pattern 3 — computed / derived from DTO fields.\nextension User {\n    var isAdmin: Bool { dto.role == \"admin\" }\n    var initials: String { String(dto.displayName.prefix(1)).uppercased() }\n}",
+                          "language": "swift", "filename": "Domain/User.swift", "showLineNumbers": false, "copyable": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View", "id": "domain_pattern_panel_stored", "orientation": "vertical",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "visibility": "@{storedPatternPanelVisibility}",
+                      "child": [
+                        {
+                          "type": "CodeBlock", "width": "matchParent", "height": "wrapContent",
+                          "code": "// Pattern 4 — stored. Extra state the wire shape doesn't carry.\nstruct User {\n    let dto: UserDto\n    var lastViewedAt: Date?\n}",
+                          "language": "swift", "filename": "Domain/User.swift", "showLineNumbers": false, "copyable": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_android",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_android_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_android_body" },
+                    {
+                      "type": "Collection", "id": "guides_api_data_models_android_collection",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "columnCount": 1, "lineSpacing": 8, "itemSpacing": 8,
+                      "lazy": "none", "scrollEnabled": false,
+                      "items": "@{androidSerializerRows}", "cellIdProperty": "id",
+                      "sections": [ { "cell": "cells/comparison_4col_row" } ]
+                    },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "code": "// android/app/build.gradle.kts — add the Moshi codegen ksp plugin.\nplugins {\n    id(\"com.google.devtools.ksp\")\n}\ndependencies {\n    ksp(\"com.squareup.moshi:moshi-kotlin-codegen:1.15.0\")\n}",
+                      "language": "kotlin", "filename": "build.gradle.kts (excerpt)", "showLineNumbers": false, "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "background": "#F7F8FA", "paddings": [12, 16, 12, 16], "text": "android_kotlinx_domain_serializer_note" }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_web_case",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_web_case_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_web_case_body" },
+                    {
+                      "type": "Collection", "id": "guides_api_data_models_web_case_collection",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "columnCount": 1, "lineSpacing": 8, "itemSpacing": 8,
+                      "lazy": "none", "scrollEnabled": false,
+                      "items": "@{webCaseRows}", "cellIdProperty": "id",
+                      "sections": [ { "cell": "cells/comparison_row" } ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_migrate",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_migrate_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_migrate_body" },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "code": "# Schema-side opt-out (everyone skips this schema's Domain):\n# docs/api/example.json\n#   components.schemas.LegacyThing:\n#     x-jui-skip-domain: true\n\n# App-side overlay (only this app skips):\n# jui.config.json\n{\n  \"api\": {\n    \"schemas\": {\n      \"skip_domain\": [\"LegacyThing\"]\n    }\n  }\n}",
+                      "language": "yaml", "filename": "two ways to opt-out", "showLineNumbers": false, "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "background": "#F7F8FA", "paddings": [12, 16, 12, 16], "text": "section_migrate_type_map_note" }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_reserved",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_reserved_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_reserved_body" }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_cycles",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_cycles_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_cycles_body" },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "code": "# HALT — direct self-ref (cycle has no array boundary)\nNode:\n  properties:\n    parent: { $ref: '#/components/schemas/Node' }\n\n# OK — cycle broken by the array (collection-mediated)\nNode:\n  properties:\n    children:\n      type: array\n      items: { $ref: '#/components/schemas/Node' }",
+                      "language": "yaml", "filename": "cycle examples", "showLineNumbers": false, "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_ci",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_ci_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_ci_body" },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "code": "# .github/workflows/verify.yml — drift detection in CI\nname: jui-verify\non: [push, pull_request]\njobs:\n  verify:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with: { node-version: 20 }\n      - run: npm install -g @jsonui/cli\n      - run: jui build\n      - run: jui verify --fail-on-diff",
+                      "language": "yaml", "filename": ".github/workflows/verify.yml", "showLineNumbers": false, "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_halt_table",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32], "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_halt_table_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_halt_table_body" },
+                    {
+                      "type": "Collection", "id": "guides_api_data_models_halt_collection",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 16,
+                      "columnCount": 1, "lineSpacing": 10, "itemSpacing": 10,
+                      "lazy": "none", "scrollEnabled": false,
+                      "items": "@{haltRows}", "cellIdProperty": "id",
+                      "sections": [ { "cell": "cells/halt_row" } ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "guides_api_data_models_next",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [32, 32, 32, 32], "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 24, "fontWeight": "bold", "fontColor": "chrome_ink", "text": "next_heading" },
+                    {
+                      "type": "Collection", "id": "guides_api_data_models_next_collection",
+                      "width": "matchParent", "height": "wrapContent", "topMargin": 20,
+                      "columnCount": 3, "lineSpacing": 16, "itemSpacing": 16,
+                      "lazy": "none", "scrollEnabled": false,
+                      "items": "@{nextReadLinks}", "cellIdProperty": "id",
+                      "sections": [ { "cell": "cells/next_step_card" } ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "guides_api_data_models_footer",
+                  "width": "matchParent", "height": "wrapContent",
+                  "paddings": [24, 32, 32, 32], "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 12, "fontColor": "#94A3B8", "text": "footer_copyright" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "guides_api_data_models_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [24, 16, 24, 16],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_api_data_models_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 0, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        { "id": "toc_setup",        "label": "toc_row_setup",        "anchor": "section_setup",        "level": 1 },
+                        { "id": "toc_add_schema",   "label": "toc_row_add_schema",   "anchor": "section_add_schema",   "level": 1 },
+                        { "id": "toc_filter",       "label": "toc_row_filter",       "anchor": "section_filter",       "level": 1 },
+                        { "id": "toc_skip_domain",  "label": "toc_row_skip_domain",  "anchor": "section_skip_domain",  "level": 1 },
+                        { "id": "toc_mcp_preview",  "label": "toc_row_mcp_preview",  "anchor": "section_mcp_preview",  "level": 1 },
+                        { "id": "toc_mcp_discovery","label": "toc_row_mcp_discovery","anchor": "section_mcp_discovery","level": 1 },
+                        { "id": "toc_return_type",  "label": "toc_row_return_type",  "anchor": "section_return_type",  "level": 1 },
+                        { "id": "toc_customize",    "label": "toc_row_customize",    "anchor": "section_customize",    "level": 1 },
+                        { "id": "toc_android",      "label": "toc_row_android",      "anchor": "section_android",      "level": 1 },
+                        { "id": "toc_web_case",     "label": "toc_row_web_case",     "anchor": "section_web_case",     "level": 1 },
+                        { "id": "toc_migrate",      "label": "toc_row_migrate",      "anchor": "section_migrate",      "level": 1 },
+                        { "id": "toc_reserved",     "label": "toc_row_reserved",     "anchor": "section_reserved",     "level": 1 },
+                        { "id": "toc_cycles",       "label": "toc_row_cycles",       "anchor": "section_cycles",       "level": 1 },
+                        { "id": "toc_ci",           "label": "toc_row_ci",           "anchor": "section_ci",           "level": 1 },
+                        { "id": "toc_halt_table",   "label": "toc_row_halt_table",   "anchor": "section_halt_table",   "level": 1 }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

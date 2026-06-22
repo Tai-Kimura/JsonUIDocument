@@ -1,0 +1,348 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "DataModelsFromOpenapi",
+    "displayName": "Data models from OpenAPI",
+    "description": "Concept essay: how `jui build` reads OpenAPI files in docs/api/ and emits two layers per platform — a fully regenerated DTO (wire-shape 1:1) plus a one-time Domain scaffold (user-owned). Explains why this kills the 3-platform schema-drift problem, how per-consumer `api.schemas.*` path filters scope what gets generated when many apps share one swagger, and how MCP Group E lets an agent discover and dry-run filter changes. Ten H2 sections, ~9-min read. Companion to /guides/api-data-models which is the cookbook.",
+    "platforms": ["web"],
+    "layoutFile": "concepts/data-models-from-openapi",
+    "createdAt": "2026-05-27",
+    "updatedAt": "2026-05-27"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "dtoVsDomainRows",
+        "type": "[ComparisonRow]",
+        "initial": "[]",
+        "description": "Three rows for the DTO vs Domain comparison table in section 2 (owner / regeneration cadence / what the file holds). Each row carries labelKey + dtoKey + domainKey under the concepts_data_models_from_openapi_ namespace, pre-resolved via StringManager."
+      },
+      {
+        "name": "platformDtoTabs",
+        "type": "[TabHeaderCell]",
+        "initial": "[]",
+        "description": "Three T6-pattern tab headers for the section 3 'What the DTO looks like' switcher (id='swift' | 'kotlin' | 'ts'). Initial active is 'swift'. Rebuilt on every onSelectDtoTab call by buildDtoTabs(activeId) so the active row picks up the accent palette and the others revert to surface. Mirrors LearnHelloWorldViewModel.buildPlatformTabs exactly."
+      },
+      {
+        "name": "platformDomainTabs",
+        "type": "[TabHeaderCell]",
+        "initial": "[]",
+        "description": "Same shape as platformDtoTabs but for section 4 ('What the Domain scaffold looks like'). Independent active state so a reader can read DTO/Swift alongside Domain/Kotlin if they want."
+      },
+      {
+        "name": "lifecycleRows",
+        "type": "[LifecycleStepRow]",
+        "initial": "[]",
+        "description": "Five rows for the section 8 lifecycle list (DTO full regen / Domain skip-if-exists / filter apply / orphan handling / drift check). Each row has stepKey + bodyKey."
+      },
+      {
+        "name": "halts",
+        "type": "[HaltRow]",
+        "initial": "[]",
+        "description": "Six rows for the section 9 ERROR-halt table (format-aware mapping / oneOf / discriminator / multi-file $ref / YAML / direct self-ref). Each row carries triggerKey + behaviorKey + workaroundKey. The narrative emphasizes 'no silent fallback' — the build halts so the author notices."
+      },
+      {
+        "name": "mcpGroupETools",
+        "type": "[McpToolCell]",
+        "initial": "[]",
+        "description": "Three rows for the section 7 'Discovery from your agent' card list: list_api_specs, list_api_models, preview_api_model_sync. Each carries nameKey + roleKey + useCaseKey. Cells are informational only — no per-row navigation; the linked detail lives on /guides/api-data-models §5 and §6."
+      },
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Three closing 'read next' cards: /guides/api-data-models (the cookbook), /concepts/why-spec-first, /concepts/one-layout-json. Seeded in onAppear."
+      },
+      {
+        "name": "activeDtoTab",
+        "type": "String",
+        "initial": "swift",
+        "description": "Id of the currently selected DTO sample tab ('swift' | 'kotlin' | 'ts'). Drives displayLogic for the three section-3 sample panels."
+      },
+      {
+        "name": "activeDomainTab",
+        "type": "String",
+        "initial": "swift",
+        "description": "Id of the currently selected Domain sample tab. Drives displayLogic for the three section-4 sample panels."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed dtoVsDomainRows, lifecycleRows, halts, mcpGroupETools, and nextReadLinks from module-scope catalogs, then call buildDtoTabs('swift') and buildDomainTabs('swift') to populate the two tab-header collections. Every user-visible string flows through StringManager with the concepts_data_models_from_openapi_ prefix."
+      },
+      {
+        "name": "onSelectDtoTab",
+        "params": [{ "name": "id", "type": "String" }],
+        "description": "T6-pattern tab toggle for the DTO sample switcher. Sets activeDtoTab = id, then assigns platformDtoTabs = buildDtoTabs(id). displayLogic derives swiftDtoPanelVisibility / kotlinDtoPanelVisibility / tsDtoPanelVisibility from activeDtoTab."
+      },
+      {
+        "name": "onSelectCodeTab",
+        "params": [{ "name": "id", "type": "String" }],
+        "description": "T6-pattern tab toggle for the Domain sample switcher. Sets activeDomainTab = id, then assigns platformDomainTabs = buildDomainTabs(id). Name reused from the project-wide eventHandlers.allowedNames whitelist."
+      },
+      {
+        "name": "onNavigate",
+        "params": [{ "name": "url", "type": "String" }],
+        "description": "Client-side navigation via router.push(url). Bound to each NextReadLink card's onClick and to the TOC breadcrumb (/concepts)."
+      }
+    ],
+    "displayLogic": [
+      {
+        "condition": "activeDtoTab == 'swift'",
+        "effects": [
+          {
+            "element": "dto_panel_swift",
+            "state": "visible",
+            "variableName": "swiftDtoPanelVisibility"
+          }
+        ]
+      },
+      {
+        "condition": "activeDtoTab == 'kotlin'",
+        "effects": [
+          {
+            "element": "dto_panel_kotlin",
+            "state": "visible",
+            "variableName": "kotlinDtoPanelVisibility"
+          }
+        ]
+      },
+      {
+        "condition": "activeDtoTab == 'ts'",
+        "effects": [
+          {
+            "element": "dto_panel_ts",
+            "state": "visible",
+            "variableName": "tsDtoPanelVisibility"
+          }
+        ]
+      },
+      {
+        "condition": "activeDomainTab == 'swift'",
+        "effects": [
+          {
+            "element": "domain_panel_swift",
+            "state": "visible",
+            "variableName": "swiftDomainPanelVisibility"
+          }
+        ]
+      },
+      {
+        "condition": "activeDomainTab == 'kotlin'",
+        "effects": [
+          {
+            "element": "domain_panel_kotlin",
+            "state": "visible",
+            "variableName": "kotlinDomainPanelVisibility"
+          }
+        ]
+      },
+      {
+        "condition": "activeDomainTab == 'ts'",
+        "effects": [
+          {
+            "element": "domain_panel_ts",
+            "state": "visible",
+            "variableName": "tsDomainPanelVisibility"
+          }
+        ]
+      }
+    ]
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[DataModelsFromOpenapiView] --> VM[DataModelsFromOpenapiViewModel]\n    VM -- dtoVsDomainRows --> VIEW\n    VM -- platformDtoTabs --> VIEW\n    VM -- platformDomainTabs --> VIEW\n    VM -- lifecycleRows --> VIEW\n    VM -- halts --> VIEW\n    VM -- mcpGroupETools --> VIEW\n    VM -- nextReadLinks --> VIEW\n    VM -- activeDtoTab --> VIEW\n    VM -- activeDomainTab --> VIEW\n    VIEW -- onAppear --> VM\n    VIEW -- onSelectDtoTab(id) --> VM\n    VIEW -- onSelectCodeTab(id) --> VM\n    VIEW -- onNavigate(url) --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed every public observable from module-scope static catalogs: dtoVsDomainRows (3 rows), lifecycleRows (5 rows), halts (6 rows), mcpGroupETools (3 rows: list_api_specs / list_api_models / preview_api_model_sync), nextReadLinks (3 cards). Every string field resolves through StringManager with the concepts_data_models_from_openapi_ prefix. Finally calls buildDtoTabs('swift') and buildDomainTabs('swift') to populate the two tab header collections; activeDtoTab and activeDomainTab stay at their 'swift' initial values."
+        },
+        {
+          "name": "onSelectDtoTab",
+          "params": [{ "name": "id", "type": "String" }],
+          "description": "Set activeDtoTab = id, then platformDtoTabs = buildDtoTabs(id). The corresponding swiftDtoPanelVisibility / kotlinDtoPanelVisibility / tsDtoPanelVisibility strings are derived by displayLogic (set by the layout, not the VM)."
+        },
+        {
+          "name": "onSelectCodeTab",
+          "params": [{ "name": "id", "type": "String" }],
+          "description": "Same shape as onSelectDtoTab, but targets activeDomainTab and platformDomainTabs. Bound to the section-4 tab strip."
+        },
+        {
+          "name": "onNavigate",
+          "params": [{ "name": "url", "type": "String" }],
+          "description": "router.push(url). Hit by NextReadLink card taps and the breadcrumb."
+        },
+        {
+          "name": "buildDtoTabs",
+          "params": [{ "name": "activeId", "type": "String" }],
+          "description": "Helper that returns [TabHeaderCell] with 3 entries (id='swift' / 'kotlin' / 'ts'). The row whose id === activeId gets the accent palette (bgColor: var(--color-accent), fgColor: var(--color-on-accent), borderColor: var(--color-accent)); the others get the surface palette. Each row's onSelect is wired to () => this.onSelectDtoTab(id). Mirrors LearnHelloWorldViewModel.buildPlatformTabs exactly."
+        },
+        {
+          "name": "buildDomainTabs",
+          "params": [{ "name": "activeId", "type": "String" }],
+          "description": "Same shape as buildDtoTabs but onSelect is wired to () => this.onSelectCodeTab(id). Independent active state from buildDtoTabs so a reader can hold the DTO panel on Swift while flipping the Domain panel to Kotlin."
+        }
+      ],
+      "vars": [
+        { "name": "dtoVsDomainRows",    "type": "Array(ComparisonRow)",    "observable": true, "description": "3-row comparison table for section 2." },
+        { "name": "platformDtoTabs",    "type": "Array(TabHeaderCell)",    "observable": true, "description": "3-row tab header for the section-3 DTO switcher." },
+        { "name": "platformDomainTabs", "type": "Array(TabHeaderCell)",    "observable": true, "description": "3-row tab header for the section-4 Domain switcher." },
+        { "name": "lifecycleRows",      "type": "Array(LifecycleStepRow)", "observable": true, "description": "5-row lifecycle list for section 8." },
+        { "name": "halts",              "type": "Array(HaltRow)",          "observable": true, "description": "6-row halt table for section 9." },
+        { "name": "mcpGroupETools",     "type": "Array(McpToolCell)",      "observable": true, "description": "3-row Group E catalog for section 7." },
+        { "name": "nextReadLinks",      "type": "Array(NextReadLink)",     "observable": true, "description": "3 closing cards." },
+        { "name": "activeDtoTab",       "type": "String",                  "observable": true, "description": "Currently visible DTO tab id; 'swift' by default." },
+        { "name": "activeDomainTab",    "type": "String",                  "observable": true, "description": "Currently visible Domain tab id; 'swift' by default." },
+        { "name": "swiftDtoPanelVisibility",     "type": "String", "observable": true, "description": "Derived from activeDtoTab via displayLogic." },
+        { "name": "kotlinDtoPanelVisibility",    "type": "String", "observable": true, "description": "Derived from activeDtoTab via displayLogic." },
+        { "name": "tsDtoPanelVisibility",        "type": "String", "observable": true, "description": "Derived from activeDtoTab via displayLogic." },
+        { "name": "swiftDomainPanelVisibility",  "type": "String", "observable": true, "description": "Derived from activeDomainTab via displayLogic." },
+        { "name": "kotlinDomainPanelVisibility", "type": "String", "observable": true, "description": "Derived from activeDomainTab via displayLogic." },
+        { "name": "tsDomainPanelVisibility",     "type": "String", "observable": true, "description": "Derived from activeDomainTab via displayLogic." }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "ComparisonRow",
+        "properties": [
+          { "name": "id",       "type": "String" },
+          { "name": "labelKey", "type": "String" },
+          { "name": "dtoKey",   "type": "String" },
+          { "name": "domainKey","type": "String" }
+        ]
+      },
+      {
+        "name": "LifecycleStepRow",
+        "properties": [
+          { "name": "id",      "type": "String" },
+          { "name": "stepKey", "type": "String" },
+          { "name": "bodyKey", "type": "String" }
+        ]
+      },
+      {
+        "name": "HaltRow",
+        "properties": [
+          { "name": "id",            "type": "String" },
+          { "name": "triggerKey",    "type": "String" },
+          { "name": "behaviorKey",   "type": "String" },
+          { "name": "workaroundKey", "type": "String" }
+        ]
+      },
+      {
+        "name": "McpToolCell",
+        "properties": [
+          { "name": "id",        "type": "String" },
+          { "name": "nameKey",   "type": "String" },
+          { "name": "roleKey",   "type": "String" },
+          { "name": "useCaseKey","type": "String" }
+        ]
+      },
+      {
+        "name": "TabHeaderCell",
+        "properties": [
+          { "name": "id",          "type": "String" },
+          { "name": "labelKey",    "type": "String" },
+          { "name": "bgColor",     "type": "String" },
+          { "name": "fgColor",     "type": "String" },
+          { "name": "borderColor", "type": "String" },
+          { "name": "onSelect",    "type": "(() -> Void)?" }
+        ]
+      },
+      {
+        "name": "NextReadLink",
+        "properties": [
+          { "name": "id",             "type": "String" },
+          { "name": "titleKey",       "type": "String" },
+          { "name": "descriptionKey", "type": "String" },
+          { "name": "url",            "type": "String" }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    { "action": "Tap a TOC entry",                "processing": "TOC-internal scroll." },
+    { "action": "Tap a DTO sample tab",           "processing": "onSelectDtoTab(id) flips activeDtoTab; displayLogic swaps the visible dto_panel_*." },
+    { "action": "Tap a Domain sample tab",        "processing": "onSelectCodeTab(id) flips activeDomainTab; displayLogic swaps the visible domain_panel_*." },
+    { "action": "Tap a NextReadLink card",        "processing": "onNavigate(url)." }
+  ],
+  "validation": { "clientSide": [], "serverSide": [] },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is /concepts, /guides/api-data-models, /concepts/why-spec-first, or /concepts/one-layout-json",
+      "destination": "Target spec screen",
+      "description": "v1 destinations: /concepts (breadcrumb), /guides/api-data-models (NextRead), /concepts/why-spec-first (NextRead), /concepts/one-layout-json (NextRead)."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/concepts/data-models-from-openapi.json",
+      "description": "Essay layout. ScrollView root with 10 H2 sections, two T6-pattern code-tab switchers (DTO / Domain), comparison + lifecycle + halt + MCP-Group-E Collections, and a closing NextRead Collection."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/comparison_row.json",
+      "description": "ComparisonRow cell layout: label column + DTO column + Domain column. Reused if other concept pages introduce a 3-column compare."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/lifecycle_step_row.json",
+      "description": "LifecycleStepRow cell layout: step label + body paragraph."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/halt_row.json",
+      "description": "HaltRow cell layout: trigger pill + behavior column + workaround column."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/mcp_tool_cell.json",
+      "description": "McpToolCell cell layout: tool name (monospace) + role line + use-case oneliner. NOT the same cell as /tools/mcp's mcp_tool_row (that one has an A/B/C/D group pill); this cell sits in a 3-card concept context."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/tab_header.json",
+      "description": "Reused from /learn/hello-world and /tools/doc. Button-style tab header driven by bgColor / fgColor / borderColor."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/concepts/DataModelsFromOpenapiViewModel.ts",
+      "description": "Hand-written VM body. Seeds the static catalogs in onAppear, owns activeDtoTab + activeDomainTab, and implements buildDtoTabs / buildDomainTabs with the same palette-swap shape as LearnHelloWorldViewModel.buildPlatformTabs."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/concepts/data-models-from-openapi/page.tsx",
+      "description": "Next.js App Router page. Dynamic-imports the generated DataModelsFromOpenapiView."
+    },
+    {
+      "type": "Component",
+      "path": "docs/components/json/codeblock.component.json",
+      "description": "Used for the Swift / Kotlin / TS DTO and Domain code samples, plus the inline include_paths and preview_api_model_sync JSON snippets in section 6 and 7."
+    }
+  ],
+  "notes": [
+    "Eighth concept essay. Companion to the cookbook at /guides/api-data-models — this page explains the why (drift problem, two-layer split, lifecycle), the guide explains the how (commands, filter syntax, customization patterns).",
+    "Ten H2 sections per plan 2026-05-27 swagger-models-doc-additions §1.2: (1) The drift problem, (2) DTO + Domain — two layers one boundary, (3) What the DTO looks like, (4) What the Domain scaffold looks like, (5) The customization zone, (6) Scope what gets generated — path filter, (7) Discovery from your agent — MCP Group E, (8) Lifecycle — what happens on every build, (9) What v1 does NOT support, (10) Where to go next.",
+    "Code samples in sections 3, 4, and 5 use generic example schemas (User, Order, LoginRequest) and generic example paths (/api/auth/*, /api/users/*, /api/admin/*). No consumer-project schema names per the project's no-local-project-refs memory rule.",
+    "Section 5 (customization zone) holds ONE complete worked example in Swift — proxy + computed + Date conversion in one Domain extension. Kotlin / TS get a 2-line teaser each that links to the guide §8 for the matching pattern.",
+    "Section 6 path filter coverage is one paragraph + one minimal include_paths snippet only. The full filter mechanics (evaluation order, glob rules, 0-schema warning) live in /guides/api-data-models §3 — single source of truth, no duplicate.",
+    "Section 7 (MCP Group E) names list_api_specs / list_api_models / preview_api_model_sync, one paragraph each. Detail (input schema / output schema / agent-loop pattern) lives in /guides/api-data-models §5 and §6. This section primarily exists to surface the discovery surface to readers who are not running through an agent today.",
+    "Section 9 (NOT supported) lists six ERROR-halt triggers (format-aware mapping, oneOf, discriminator, multi-file $ref, YAML, direct self-ref). The 'no silent fallback' framing is intentional — the build halts so the author notices and updates the schema or the spec.",
+    "Section 10 NextRead points to /guides/api-data-models (1), /concepts/why-spec-first (2), /concepts/one-layout-json (3) — the latter two will be lightly revised in this same define pass to cross-link back to this concept page.",
+    "Strings prefix: concepts_data_models_from_openapi_. Estimated 95-120 keys (section headings, body paragraphs, the four catalog cells, the two code-tab labels, the closing NextRead). en + ja content is jsonui-implement / jsonui-localize's responsibility — only key shapes are declared here.",
+    "Only CodeBlock is referenced as a custom component (already whitelisted). The four cell layouts (comparison_row / lifecycle_step_row / halt_row / mcp_tool_cell) are standard Layout JSON authored alongside the page Layout — they are not custom JsonUI types."
+  ]
+}

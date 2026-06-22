@@ -1,0 +1,557 @@
+{
+  "type": "View",
+  "id": "concepts_data_models_from_openapi_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        { "name": "dtoVsDomainRows",    "class": "CollectionDataSource" },
+        { "name": "platformDtoTabs",    "class": "CollectionDataSource" },
+        { "name": "platformDomainTabs", "class": "CollectionDataSource" },
+        { "name": "lifecycleRows",      "class": "CollectionDataSource" },
+        { "name": "halts",              "class": "CollectionDataSource" },
+        { "name": "mcpGroupETools",     "class": "CollectionDataSource" },
+        { "name": "nextReadLinks",      "class": "CollectionDataSource" },
+        { "name": "swiftDtoPanelVisibility",     "class": "String", "defaultValue": "visible" },
+        { "name": "kotlinDtoPanelVisibility",    "class": "String", "defaultValue": "gone" },
+        { "name": "tsDtoPanelVisibility",        "class": "String", "defaultValue": "gone" },
+        { "name": "swiftDomainPanelVisibility",  "class": "String", "defaultValue": "visible" },
+        { "name": "kotlinDomainPanelVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "tsDomainPanelVisibility",     "class": "String", "defaultValue": "gone" },
+        { "name": "onNavigateConcepts", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "concepts_data_models_from_openapi_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "concepts_data_models_from_openapi_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 24, 32],
+          "child": [
+            { "type": "Label", "width": "wrapContent", "height": "wrapContent", "fontSize": 13, "fontWeight": "semibold", "fontColor": "#64748B", "tapBackground": "#F3F4F6", "onClick": "@{onNavigateConcepts}", "text": "breadcrumb" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 36, "fontWeight": "bold", "fontColor": "#0B1220", "text": "title" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 17, "fontColor": "#475467", "text": "lead" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 13, "fontColor": "#64748B", "text": "read_time" }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "concepts_data_models_from_openapi_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "concepts_data_models_from_openapi_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_problem",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_problem_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_problem_body" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_two_layers",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_two_layers_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_two_layers_body" },
+                    {
+                      "type": "Collection",
+                      "id": "concepts_data_models_from_openapi_compare_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "columnCount": 1,
+                      "lineSpacing": 8,
+                      "itemSpacing": 8,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{dtoVsDomainRows}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/comparison_row" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_dto",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_dto_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_dto_body" },
+                    {
+                      "type": "Collection",
+                      "id": "concepts_data_models_from_openapi_dto_tabs",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "columnCount": 3,
+                      "lineSpacing": 12,
+                      "itemSpacing": 12,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{platformDtoTabs}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/tab_header" }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "dto_panel_swift",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "visibility": "@{swiftDtoPanelVisibility}",
+                      "child": [
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "code": "// Generated. Do not edit by hand.\nstruct UserDto: Codable, Sendable {\n    let id: String\n    let displayName: String\n    let createdAt: String  // wire shape: ISO-8601 string\n    let role: String       // wire shape: \"admin\" | \"member\" | \"guest\"\n}",
+                          "language": "swift",
+                          "filename": "Generated/UserDto.swift",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "dto_panel_kotlin",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "visibility": "@{kotlinDtoPanelVisibility}",
+                      "child": [
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "code": "// Generated. Do not edit by hand.\n@JsonClass(generateAdapter = true)\ndata class UserDto(\n    val id: String,\n    @Json(name = \"display_name\") val displayName: String,\n    @Json(name = \"created_at\") val createdAt: String,\n    val role: String\n)",
+                          "language": "kotlin",
+                          "filename": "generated/UserDto.kt",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "dto_panel_ts",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "visibility": "@{tsDtoPanelVisibility}",
+                      "child": [
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "code": "// Generated. Do not edit by hand.\nexport interface UserDto {\n  id: string;\n  display_name: string;  // snake_case default — zero-cost wire shape\n  created_at: string;\n  role: string;\n}",
+                          "language": "typescript",
+                          "filename": "src/generated/api/UserDto.ts",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_discriminated",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F7F8FA",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_discriminated_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_discriminated_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// swagger.json — field-level oneOf with explicit mapping\nStreamEvent:\n  type: object\n  properties:\n    type: { type: string }\n    content:\n      oneOf:\n        - $ref: '#/components/schemas/StreamConvIdContent'\n        - $ref: '#/components/schemas/StreamThinkingContent'\n      discriminator:\n        propertyName: type\n        mapping:\n          conversation_id: '#/components/schemas/StreamConvIdContent'\n          thinking: '#/components/schemas/StreamThinkingContent'",
+                      "language": "yaml",
+                      "filename": "docs/api/stream.json (excerpt)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// iOS — generated DTO with sealed Content + dispatching init/encode\nstruct StreamEventDto: Codable, Sendable, Equatable, Hashable {\n    let type: String\n    let content: Content\n\n    enum Content: Codable, Sendable, Equatable, Hashable {\n        case conversationId(StreamConvIdContentDto)\n        case thinking(StreamThinkingContentDto)\n        case unknown   // forward-compat\n    }\n\n    init(from decoder: Decoder) throws {\n        let c = try decoder.container(keyedBy: CodingKeys.self)\n        self.type = try c.decode(String.self, forKey: .type)\n        switch self.type {\n        case \"conversation_id\": self.content = .conversationId(try c.decode(StreamConvIdContentDto.self, forKey: .content))\n        case \"thinking\":        self.content = .thinking(try c.decode(StreamThinkingContentDto.self, forKey: .content))\n        default:                self.content = .unknown\n        }\n    }\n}",
+                      "language": "swift",
+                      "filename": "Model/Generated/StreamEventDto.swift",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_discriminated_note" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_domain",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_domain_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_domain_body" },
+                    {
+                      "type": "Collection",
+                      "id": "concepts_data_models_from_openapi_domain_tabs",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "columnCount": 3,
+                      "lineSpacing": 12,
+                      "itemSpacing": 12,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{platformDomainTabs}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/tab_header" }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "domain_panel_swift",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "visibility": "@{swiftDomainPanelVisibility}",
+                      "child": [
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "code": "// Domain/User.swift — generated ONCE, then yours.\n// Add proxies / computed / Date conversion as needed.\nimport Foundation\n\nstruct User {\n    let dto: UserDto\n}\n\nextension User {\n    // proxy\n    var id: String { dto.id }\n}",
+                          "language": "swift",
+                          "filename": "Domain/User.swift (scaffold)",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "domain_panel_kotlin",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "visibility": "@{kotlinDomainPanelVisibility}",
+                      "child": [
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "code": "// domain/User.kt — generated ONCE, then yours.\ndata class User(private val dto: UserDto) {\n    val id: String get() = dto.id\n}",
+                          "language": "kotlin",
+                          "filename": "domain/User.kt (scaffold)",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "id": "domain_panel_ts",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "visibility": "@{tsDomainPanelVisibility}",
+                      "child": [
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "code": "// src/domain/User.ts — generated ONCE, then yours.\nimport type { UserDto } from \"@/generated/api/UserDto\";\n\nexport class User {\n  constructor(private readonly dto: UserDto) {}\n  get id(): string { return this.dto.id; }\n}",
+                          "language": "typescript",
+                          "filename": "src/domain/User.ts (scaffold)",
+                          "showLineNumbers": false,
+                          "copyable": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_customize",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_customize_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_customize_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// Domain/User.swift — fully worked example.\nimport Foundation\n\nstruct User {\n    let dto: UserDto\n    // stored — extra state the wire shape doesn't carry\n    var lastViewedAt: Date?\n}\n\nextension User {\n    // proxy\n    var id: String { dto.id }\n\n    // Date conversion (wire shape was ISO-8601 String)\n    var createdAt: Date {\n        ISO8601DateFormatter().date(from: dto.createdAt) ?? .distantPast\n    }\n\n    // computed / derived\n    var isAdmin: Bool { dto.role == \"admin\" }\n}",
+                      "language": "swift",
+                      "filename": "Domain/User.swift",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_customize_note" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_filter",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_filter_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_filter_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// jui.config.json — only generate schemas reachable from /api/auth/* and /api/users/*\n{\n  \"api\": {\n    \"schemas\": {\n      \"include_paths\": [\"/api/auth/*\", \"/api/users/*\"]\n    }\n  }\n}",
+                      "language": "json",
+                      "filename": "jui.config.json (excerpt)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_filter_note" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_mcp",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_mcp_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_mcp_body" },
+                    {
+                      "type": "Collection",
+                      "id": "concepts_data_models_from_openapi_mcp_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "columnCount": 1,
+                      "lineSpacing": 12,
+                      "itemSpacing": 12,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{mcpGroupETools}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/mcp_tool_cell" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_lifecycle",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_lifecycle_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_lifecycle_body" },
+                    {
+                      "type": "Collection",
+                      "id": "concepts_data_models_from_openapi_lifecycle_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "columnCount": 1,
+                      "lineSpacing": 10,
+                      "itemSpacing": 10,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{lifecycleRows}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/lifecycle_step_row" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_halts",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_halts_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_halts_body" },
+                    {
+                      "type": "Collection",
+                      "id": "concepts_data_models_from_openapi_halts_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "columnCount": 1,
+                      "lineSpacing": 10,
+                      "itemSpacing": 10,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{halts}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/halt_row" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "concepts_data_models_from_openapi_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [32, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 24, "fontWeight": "bold", "fontColor": "chrome_ink", "text": "next_heading" },
+                    {
+                      "type": "Collection",
+                      "id": "concepts_data_models_from_openapi_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 3,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/next_step_card" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "concepts_data_models_from_openapi_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 12, "fontColor": "#94A3B8", "text": "footer_copyright" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "concepts_data_models_from_openapi_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [24, 16, 24, 16],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "concepts_data_models_from_openapi_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 0, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        { "id": "toc_problem",    "label": "toc_row_problem",    "anchor": "section_problem",    "level": 1 },
+                        { "id": "toc_two_layers", "label": "toc_row_two_layers", "anchor": "section_two_layers", "level": 1 },
+                        { "id": "toc_dto",        "label": "toc_row_dto",        "anchor": "section_dto",        "level": 1 },
+                        { "id": "toc_discriminated", "label": "toc_row_discriminated", "anchor": "section_discriminated", "level": 1 },
+                        { "id": "toc_domain",     "label": "toc_row_domain",     "anchor": "section_domain",     "level": 1 },
+                        { "id": "toc_customize",  "label": "toc_row_customize",  "anchor": "section_customize",  "level": 1 },
+                        { "id": "toc_filter",     "label": "toc_row_filter",     "anchor": "section_filter",     "level": 1 },
+                        { "id": "toc_mcp",        "label": "toc_row_mcp",        "anchor": "section_mcp",        "level": 1 },
+                        { "id": "toc_lifecycle",  "label": "toc_row_lifecycle",  "anchor": "section_lifecycle",  "level": 1 },
+                        { "id": "toc_halts",      "label": "toc_row_halts",      "anchor": "section_halts",      "level": 1 },
+                        { "id": "toc_next",       "label": "toc_row_next",       "anchor": "concepts_data_models_from_openapi_next", "level": 1 }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

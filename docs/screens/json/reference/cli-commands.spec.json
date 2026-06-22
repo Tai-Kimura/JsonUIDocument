@@ -4,13 +4,13 @@
   "metadata": {
     "name": "CliCommands",
     "displayName": "CLI command reference",
-    "description": "Reference > CLI command reference. Overview page. Four sections + TOC + next-reads. Generated via /tmp/gen-reference.js.",
+    "description": "Reference > CLI command reference. Overview page. Five sections + TOC + next-reads (api_models section added 2026-05 for swagger-driven Data Model). Generated via /tmp/gen-reference.js.",
     "platforms": [
       "web"
     ],
     "layoutFile": "reference/cli-commands",
     "createdAt": "2026-04-23",
-    "updatedAt": "2026-04-23"
+    "updatedAt": "2026-05-27"
   },
   "structure": {
     "components": [],
@@ -142,6 +142,15 @@
   ],
   "notes": [
     "Live Reference entry. Flip REFERENCE_ENTRIES row for 'cli-commands' to 'live' in HomeViewModel when shipping.",
-    "v1 is hand-authored overview. Auto-generation from the upstream artifact is a future pass."
+    "v1 is hand-authored overview. Auto-generation from the upstream artifact is a future pass.",
+    "2026-05-27 — Swagger-driven Data Model additions. Surgical edits only; do not restructure existing groups.",
+    "Add row to existing 'generate' group: `jui g api`. en summary: 'Regenerate API DTOs + Domain scaffolds from `docs/api/*.json` without running the full build. Honors `api.schemas.*` filter.' ja summary: '`docs/api/*.json` から API DTO と Domain scaffold だけを再生成（full build はスキップ）。`api.schemas.*` の filter も適用される。'",
+    "`jui g api` flags: `--dry-run` (filter preview JSON; same backing as MCP preview_api_model_sync) / `--fail-on-diff` (CI exit non-zero on drift) / `--platform ios|android|web` / `--json`. NOTE: `--regenerate-domain {Name}` is v2-only — do NOT list in v1.",
+    "Add NEW parent command group `jui ls` (discovery) with 2 subcommands. Group summary (en): 'Discovery commands for swagger files and generated API models.' (ja): 'swagger ファイルと生成済み API モデルの discovery コマンド群。'",
+    "`jui ls api-specs` — en: 'List swagger files in `api_directory` with title / version / schema_count / endpoint_count metadata.' ja: '`api_directory` 内の swagger ファイルを title / version / schema 数 / endpoint 数の metadata と共に一覧表示。' Flags: `--platform ios|android|web` / `--json`.",
+    "`jui ls api-models` — en: 'List generated DTO + Domain scaffold files per platform, including orphans (schema deleted but file remains).' ja: 'プラットフォーム別に生成済み DTO / Domain scaffold ファイルを一覧表示。orphan（swagger から schema が削除されたがファイルが残っているケース）も含む。' Flags: `--platform ios|android|web` / `--json`.",
+    "Extend EXISTING `jui lint-generated` with new flag `--fail-on-orphan` — en: 'Fail when a Domain scaffold exists for a schema that has been deleted from the swagger file.' ja: 'swagger ファイルから削除された schema に対応する Domain scaffold が残っている場合に失敗させる。'",
+    "Extend EXISTING `jui verify --fail-on-diff` description with 1 sentence — en: 'Also re-generates API DTOs in-memory and compares byte-equal against disk; fails on any DTO drift.' ja: 'API DTO もメモリ上で再生成し、ディスク上のファイルと byte-equal で比較する。DTO に drift があれば失敗する。'",
+    "String-key declarations required for the above (en + ja owned by jsonui-localize): `reference_cli_commands_cmd_g_api_*` (name / summary_{en,ja} / flag rows), `reference_cli_commands_cmd_ls_*` (group heading / summary_{en,ja}), `reference_cli_commands_cmd_ls_api_specs_*`, `reference_cli_commands_cmd_ls_api_models_*`, `reference_cli_commands_cmd_lint_generated_fail_on_orphan_*`, `reference_cli_commands_cmd_verify_dto_byte_equal_*`. Surgical key additions only — do not rename existing keys."
   ]
 }

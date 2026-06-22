@@ -10,7 +10,7 @@
     ],
     "layoutFile": "learn/installation",
     "createdAt": "2026-04-23",
-    "updatedAt": "2026-04-23"
+    "updatedAt": "2026-05-27"
   },
   "structure": {
     "components": [],
@@ -379,6 +379,7 @@
     "Strings prefix `learn_installation_*`. The spec enumerates WHICH strings exist via the titleKey / locationKey / bodyKey / labelKey / toolKey / noteKey / commandKey / expectKey / symptomKey / causeKey / fixKey fields on the five custom types (and via @string/... refs in the layout for the hero headline / subcopy / step titles / section headers / CTA button labels). The CONTENTS of those strings live in the ViewModel's v1 seeding (implementer's job) and in docs/screens/layouts/Resources/strings.json.",
     "Phase-2 screenshots (plan 18 §6) are deferred. The spec does not declare any screenshot-related uiVariables or custom types.",
     "The home hero CTA currently navigates to /learn/hello-world; the implementer for this page is expected to rewire the home hero CTA to /learn/installation per plan 18 §8. That change belongs to the home screen's Layout (not this spec).",
-    "Standard components + CodeBlock only. No TabView (this page sits inside one of the home TabView tabs — single root ScrollView per plan 18 §3 structure)."
+    "Standard components + CodeBlock only. No TabView (this page sits inside one of the home TabView tabs — single root ScrollView per plan 18 §3 structure).",
+    "2026-05 update (swagger-driven Data Models): the prerequisites Collection's body copy for the Android tier (or a footnote on the Android troubleshooting row) gains ONE sentence noting 'If you plan to consume OpenAPI schemas on Android with the default Moshi serializer, also add the ksp Gradle plugin — see /guides/api-data-models §9 for the exact setup.' No new uiVariable / customType / row — single-string addition wired into the existing PrereqRow noteKey or a new related-link row pointing at /guides/api-data-models §9."
   ]
 }

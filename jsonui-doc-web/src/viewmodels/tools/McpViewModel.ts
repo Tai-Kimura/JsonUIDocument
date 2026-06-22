@@ -20,6 +20,8 @@ interface NextReadCell {
   onNavigate: () => void;
 }
 
+// 33 tools across 5 groups: A (Lookup) → B (Validation) → C (Generation)
+// → D (Build + Runtime) → E (API Model Discovery, added 2026-05).
 const TOOL_IDS = [
   "get_project_config", "list_screen_specs", "list_layouts", "list_component_specs",
   "lookup_component", "lookup_attribute", "search_components", "get_data_source",
@@ -32,6 +34,8 @@ const TOOL_IDS = [
 
   "jui_init", "jui_build", "jui_sync_tool", "jui_generate_converter", "jui_migrate_layouts",
   "read_spec_file", "read_layout_file", "get_platform_mapping", "get_modifier_order",
+
+  "list_api_specs", "list_api_models", "preview_api_model_sync",
 ] as const;
 
 export class McpViewModel {

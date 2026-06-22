@@ -87,6 +87,30 @@ const RECENT_CHANGES_RAW: ReadonlyArray<{
     ctaLabelKey: "home_whats_new_agents_cta",
     ctaUrl: "/tools/agents",
   },
+  {
+    id: "swagger-dto-domain",
+    date: "May 2026",
+    titleKey: "home_whats_new_swagger_dto_domain_title",
+    blurbKey: "home_whats_new_swagger_dto_domain_blurb",
+    ctaLabelKey: "home_whats_new_swagger_dto_domain_cta",
+    ctaUrl: "/concepts/data-models-from-openapi",
+  },
+  {
+    id: "swagger-path-filter",
+    date: "May 2026",
+    titleKey: "home_whats_new_swagger_path_filter_title",
+    blurbKey: "home_whats_new_swagger_path_filter_blurb",
+    ctaLabelKey: "home_whats_new_swagger_path_filter_cta",
+    ctaUrl: "/guides/api-data-models",
+  },
+  {
+    id: "swagger-mcp-discovery",
+    date: "May 2026",
+    titleKey: "home_whats_new_swagger_mcp_discovery_title",
+    blurbKey: "home_whats_new_swagger_mcp_discovery_blurb",
+    ctaLabelKey: "home_whats_new_swagger_mcp_discovery_cta",
+    ctaUrl: "/concepts/data-models-from-openapi",
+  },
 ];
 
 /**

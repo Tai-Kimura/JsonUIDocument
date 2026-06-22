@@ -8,7 +8,7 @@
     "platforms": ["web"],
     "layoutFile": "home",
     "createdAt": "2026-04-22",
-    "updatedAt": "2026-04-23"
+    "updatedAt": "2026-05-27"
   },
   "structure": {
     "components": [],
@@ -35,7 +35,7 @@
         "name": "recentChanges",
         "type": "[ChangelogCard]",
         "initial": "[]",
-        "description": "Up to 3–4 'What's new' ribbon cards telling a returning reader what landed since their last visit. Seeded by the ViewModel in onAppear from the RECENT_CHANGES constant; no API, no runtime fetch. Each cell carries a formatted date + title + blurb + CTA label, all localized."
+        "description": "Up to 3–6 'What's new' ribbon cards telling a returning reader what landed since their last visit. Seeded by the ViewModel in onAppear from the RECENT_CHANGES constant; no API, no runtime fetch. Each cell carries a formatted date + title + blurb + CTA label, all localized. 2026-05 update (swagger-driven Data Models): three new 'May 2026' entries are appended in HomeViewModel.RECENT_CHANGES — (1) DTO + Domain codegen body -> /concepts/data-models-from-openapi, (2) path filter -> /guides/api-data-models §3, (3) MCP Group E discovery -> /concepts/data-models-from-openapi §7. Each entry stays a distinct row (no bundling) so the discovery surface keeps its own first-class card. The spec only confirms the ChangelogCard structure supports the three rows; the literal RECENT_CHANGES catalog content lives in HomeViewModel.ts and is jsonui-implement's responsibility."
       }
     ],
     "eventHandlers": [
@@ -71,7 +71,7 @@
       "vars": [
         { "name": "featuredLinks",  "type": "Array(FeaturedLink)",  "observable": true, "description": "3 featured-card cells, seeded in onAppear." },
         { "name": "platformCards",  "type": "Array(PlatformCard)",  "observable": true, "description": "3 platform-card cells, seeded in onAppear." },
-        { "name": "recentChanges",  "type": "Array(ChangelogCard)", "observable": true, "description": "3–4 'What's new' ribbon cells, seeded in onAppear." }
+        { "name": "recentChanges",  "type": "Array(ChangelogCard)", "observable": true, "description": "3–6 'What's new' ribbon cells, seeded in onAppear. As of 2026-05 the catalog includes three new entries pointing at /concepts/data-models-from-openapi and /guides/api-data-models." }
       ]
     },
     "customTypes": [
@@ -135,7 +135,7 @@
   "notes": [
     "Site-wide chrome (TopBar + Sidebar) now owns navigation + language toggle + search. Home hero no longer embeds a language toggle or inline Search. See docs/screens/json/chrome.spec.json.",
     "v1 uses hand-curated RECENT_CHANGES in the ViewModel. Adding a DocChangelogRepository later is a pure additive change and does not alter the ViewModel's public contract.",
-    "featuredLinks count = 3 (Get started / AI agents / Cross-platform showcase). platformCards count = 3 (Swift / Kotlin / React). recentChanges count = 3–4.",
+    "featuredLinks count = 3 (Get started / AI agents / Cross-platform showcase). platformCards count = 3 (Swift / Kotlin / React). recentChanges count = 3–6 (3 new May 2026 entries appended for the swagger-driven Data Models feature; the spec only confirms ChangelogCard supports these — actual entries live in HomeViewModel.RECENT_CHANGES).",
     "All user-visible strings flow through StringManager keys under the home_* namespace."
   ]
 }

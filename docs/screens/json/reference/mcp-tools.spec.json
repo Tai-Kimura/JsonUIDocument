@@ -10,7 +10,7 @@
     ],
     "layoutFile": "reference/mcp-tools",
     "createdAt": "2026-04-23",
-    "updatedAt": "2026-04-23"
+    "updatedAt": "2026-05-27"
   },
   "structure": {
     "components": [],
@@ -25,7 +25,7 @@
         "name": "tools",
         "type": "CollectionDataSource(McpToolDetail)",
         "initial": "[]",
-        "description": "30 MCP tools with name, group letter, role, and a preformatted parameters block."
+        "description": "33 MCP tools across 5 groups (A:8 / B:6 / C:7 / D:9 / E:3). Each row carries name, group letter, role, and a preformatted parameters block."
       },
       {
         "name": "nextReadLinks",
@@ -76,7 +76,7 @@
           "name": "tools",
           "type": "CollectionDataSource(McpToolDetail)",
           "observable": true,
-          "description": "30 MCP tools rendered as one row each via cells/reference_mcp_tool_detail. Each row carries the tool name, group letter chip, one-line role, a Parameters heading, and a preformatted parameters code block (or '(no parameters)')."
+          "description": "33 MCP tools across 5 groups (A:8 Lookup / B:6 Validation / C:7 Generation / D:9 Build + Runtime / E:3 API Model Discovery) rendered as one row each via cells/reference_mcp_tool_detail. Each row carries the tool name, group letter chip, one-line role, a Parameters heading, and a preformatted parameters code block (or '(no parameters)')."
         },
         {
           "name": "nextReadLinks",
@@ -165,6 +165,14 @@
   ],
   "notes": [
     "Live Reference entry. Flip REFERENCE_ENTRIES row for 'mcp-tools' to 'live' in HomeViewModel when shipping.",
-    "v1 is hand-authored overview. Auto-generation from the upstream artifact is a future pass."
+    "v1 is hand-authored overview. Auto-generation from the upstream artifact is a future pass.",
+    "2026-05-27 — Swagger-driven Data Model additions. Surgical edits only; do not restructure existing group ordering.",
+    "Base catalog is 30 tools across 4 groups: A:8 (Lookup) / B:6 (Validation) / C:7 (Generation) / D:9 (Build + Runtime). Source of truth = `TOOL_IDS` in `jsonui-doc-web/src/viewmodels/reference/McpToolsViewModel.ts` lines 27-39. Do NOT use the earlier (incorrect) 29 / A:7 count that briefly appeared in `tools/mcp.spec.json`.",
+    "Append Group E (API Model Discovery) with 3 entries after the existing Group D tail. New totals: 33 tools / 5 groups (A:8 / B:6 / C:7 / D:9 / E:3).",
+    "Group E entry 1 — `list_api_specs`. group=E. role (en): 'Discover swagger files + parsed metadata (schema_count, endpoint_count, halts)'. role (ja): 'swagger ファイルと metadata を発見（schema 件数 / endpoint 件数 / halt の有無）'.",
+    "Group E entry 2 — `list_api_models`. group=E. role (en): 'Inventory generated DTO + Domain scaffold + orphan files per platform'. role (ja): 'プラットフォーム別 DTO / Domain scaffold / orphan の在庫を返す'.",
+    "Group E entry 3 — `preview_api_model_sync`. group=E. role (en): 'Dry-run filter impact — returns kept_schemas / filtered_out / skip_domain_matches / halts as JSON without writing files'. role (ja): 'filter 変更の影響を dry-run — kept_schemas / filtered_out / skip_domain_matches / halts を JSON で返す。ファイル書き込みなし'.",
+    "String-key declarations for the 3 new rows (en + ja content owned by jsonui-localize): each tool needs name / group letter chip text / role / params heading / params CodeBlock body. Suggested key shape (mirrors existing rows): `reference_mcp_tools_tool_list_api_specs_{name,group,role,params_heading,params_code}`, `reference_mcp_tools_tool_list_api_models_{...}`, `reference_mcp_tools_tool_preview_api_model_sync_{...}`. Group label key (en 'API Model Discovery' / ja 'API Model Discovery'): `reference_mcp_tools_group_e_label`. The actual `_params` JSON schema bodies are jsonui-implement's responsibility — only the string-key declarations live here.",
+    "Update any prose strings on this page that name the group / tool counts: `reference_mcp_tools_intro_*`, `reference_mcp_tools_section_overview_*`, any 'X tools across Y groups' sentence. 30 -> 33, 4 -> 5. Surgical replacements; do not rewrite the surrounding copy."
   ]
 }

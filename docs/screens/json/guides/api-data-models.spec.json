@@ -1,0 +1,354 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "ApiDataModels",
+    "displayName": "API data models",
+    "description": "Guides > API data models. Cookbook companion to /concepts/data-models-from-openapi. Fifteen H2 sections covering setup (docs/api/), the add-schema/build/proxy loop, path + schema filter syntax, the two skip_domain levels, MCP-driven preview + discovery, the Repository return-type rule, the four Domain customization patterns, the Android serializer and Web case-convention picks, migrating hand-written models, reserved-word collisions, cycle rules, drift detection in CI, and the ERROR-halt table. ~18-min read.",
+    "platforms": ["web"],
+    "layoutFile": "guides/api-data-models",
+    "createdAt": "2026-05-27",
+    "updatedAt": "2026-05-27"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "filterConfigRows",
+        "type": "[FilterConfigRow]",
+        "initial": "[]",
+        "description": "Five rows for the §3 'api.schemas.* settings reference' table: include_paths, exclude_paths, include_schemas, exclude_schemas, skip_domain. Each row carries keyKey + typeKey + defaultKey + globKey + descriptionKey under the guides_api_data_models_filter_ namespace."
+      },
+      {
+        "name": "filterEvalRows",
+        "type": "[FilterEvalRow]",
+        "initial": "[]",
+        "description": "Four rows for the §3 evaluation-order table (path includes -> path excludes -> schema includes -> schema excludes). Each row has orderKey + ruleKey + bodyKey."
+      },
+      {
+        "name": "skipDomainCompareRows",
+        "type": "[ComparisonRow]",
+        "initial": "[]",
+        "description": "Three rows for the §4 skip_domain comparison table (where it lives / scope / when to pick which). Each row has labelKey + schemaSideKey + appSideKey under the guides_api_data_models_skip_domain_ namespace."
+      },
+      {
+        "name": "mcpPreviewFields",
+        "type": "[McpFieldRow]",
+        "initial": "[]",
+        "description": "Four rows for §5 documenting the preview_api_model_sync output shape (kept_schemas, filtered_out, skip_domain_matches, halts). Each carries fieldKey + typeKey + bodyKey under the guides_api_data_models_mcp_preview_ namespace."
+      },
+      {
+        "name": "mcpDiscoveryFields",
+        "type": "[McpFieldRow]",
+        "initial": "[]",
+        "description": "Rows for §6 documenting list_api_specs and list_api_models output shapes. Two tools, ~6 rows total. Keys under the guides_api_data_models_mcp_discovery_ namespace."
+      },
+      {
+        "name": "androidSerializerRows",
+        "type": "[ComparisonRow]",
+        "initial": "[]",
+        "description": "Three rows for the §9 Android-serializer comparison table (moshi / kotlinx / none). labelKey + moshiKey + kotlinxKey + noneKey — note this row type has 4 columns not 3; rendered with the comparison_4col cell rather than comparison_row. See customTypes below."
+      },
+      {
+        "name": "webCaseRows",
+        "type": "[ComparisonRow]",
+        "initial": "[]",
+        "description": "Three rows for the §10 Web case-convention comparison (snake_case default zero-cost / camelCase runtime conversion). Reuses ComparisonRow since it's a 3-col compare (label + snake / camel)."
+      },
+      {
+        "name": "haltRows",
+        "type": "[HaltRow]",
+        "initial": "[]",
+        "description": "Six rows for the §15 ERROR-halt table (mirror of the concept page's section 9 but more recipe-flavored: each row has triggerKey + behaviorKey + workaroundKey, where workaround is a concrete code or config patch hint)."
+      },
+      {
+        "name": "domainPatternTabs",
+        "type": "[TabHeaderCell]",
+        "initial": "[]",
+        "description": "Four T6-pattern tab headers for the §8 Domain-customization switcher (id='proxy' | 'type_conv' | 'computed' | 'stored'). Initial active is 'proxy'. Rebuilt by buildDomainPatternTabs(id) on every onSelectCodeTab call."
+      },
+      {
+        "name": "activeDomainPattern",
+        "type": "String",
+        "initial": "proxy",
+        "description": "Id of the currently selected Domain-customization pattern in §8 ('proxy' | 'type_conv' | 'computed' | 'stored'). Drives displayLogic for the four §8 sample panels."
+      },
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Three closing 'read next' cards: /concepts/data-models-from-openapi (back to the concept), /reference/cli-commands (jui g api / jui ls api-* details), /tools/mcp (MCP Group E tool reference). Seeded in onAppear."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed filterConfigRows (5), filterEvalRows (4), skipDomainCompareRows (3), mcpPreviewFields (4), mcpDiscoveryFields (~6), androidSerializerRows (3), webCaseRows (3), haltRows (6), and nextReadLinks (3) from module-scope catalogs, then call buildDomainPatternTabs('proxy') to populate domainPatternTabs. Every string flows through StringManager with the guides_api_data_models_ prefix (and the sub-prefixes _filter_ / _skip_domain_ / _mcp_preview_ / _mcp_discovery_ / _return_type_ where applicable)."
+      },
+      {
+        "name": "onSelectCodeTab",
+        "params": [{ "name": "id", "type": "String" }],
+        "description": "T6-pattern tab toggle for the §8 Domain-pattern switcher. Sets activeDomainPattern = id, then assigns domainPatternTabs = buildDomainPatternTabs(id). displayLogic derives proxyPatternPanelVisibility / typeConvPatternPanelVisibility / computedPatternPanelVisibility / storedPatternPanelVisibility from activeDomainPattern."
+      },
+      {
+        "name": "onNavigate",
+        "params": [{ "name": "url", "type": "String" }],
+        "description": "Client-side navigation via router.push(url). Bound to each NextReadLink card and any inline cross-link CTAs to /concepts/data-models-from-openapi / /reference/cli-commands / /tools/mcp / /learn/installation."
+      }
+    ],
+    "displayLogic": [
+      {
+        "condition": "activeDomainPattern == 'proxy'",
+        "effects": [
+          {
+            "element": "domain_pattern_panel_proxy",
+            "state": "visible",
+            "variableName": "proxyPatternPanelVisibility"
+          }
+        ]
+      },
+      {
+        "condition": "activeDomainPattern == 'type_conv'",
+        "effects": [
+          {
+            "element": "domain_pattern_panel_type_conv",
+            "state": "visible",
+            "variableName": "typeConvPatternPanelVisibility"
+          }
+        ]
+      },
+      {
+        "condition": "activeDomainPattern == 'computed'",
+        "effects": [
+          {
+            "element": "domain_pattern_panel_computed",
+            "state": "visible",
+            "variableName": "computedPatternPanelVisibility"
+          }
+        ]
+      },
+      {
+        "condition": "activeDomainPattern == 'stored'",
+        "effects": [
+          {
+            "element": "domain_pattern_panel_stored",
+            "state": "visible",
+            "variableName": "storedPatternPanelVisibility"
+          }
+        ]
+      }
+    ]
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[ApiDataModelsView] --> VM[ApiDataModelsViewModel]\n    VM -- filterConfigRows --> VIEW\n    VM -- filterEvalRows --> VIEW\n    VM -- skipDomainCompareRows --> VIEW\n    VM -- mcpPreviewFields --> VIEW\n    VM -- mcpDiscoveryFields --> VIEW\n    VM -- androidSerializerRows --> VIEW\n    VM -- webCaseRows --> VIEW\n    VM -- haltRows --> VIEW\n    VM -- domainPatternTabs --> VIEW\n    VM -- activeDomainPattern --> VIEW\n    VM -- nextReadLinks --> VIEW\n    VIEW -- onAppear --> VM\n    VIEW -- onSelectCodeTab(id) --> VM\n    VIEW -- onNavigate(url) --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed every public observable from module-scope static catalogs: filterConfigRows (5 rows from the api.schemas.* settings reference), filterEvalRows (4 rows of evaluation-order), skipDomainCompareRows (3 rows comparing schema-side vs app-side skip_domain), mcpPreviewFields (4 rows for preview_api_model_sync output), mcpDiscoveryFields (~6 rows across list_api_specs and list_api_models output), androidSerializerRows (3 rows: moshi default / kotlinx / none), webCaseRows (3 rows: snake_case default / camelCase), haltRows (6 ERROR-halt rows), nextReadLinks (3 cards). Every string field is resolved through StringManager with the guides_api_data_models_ prefix family. Finally calls buildDomainPatternTabs('proxy') to populate domainPatternTabs; activeDomainPattern stays at its 'proxy' initial value."
+        },
+        {
+          "name": "onSelectCodeTab",
+          "params": [{ "name": "id", "type": "String" }],
+          "description": "Set activeDomainPattern = id and assign domainPatternTabs = buildDomainPatternTabs(id). displayLogic derives the four *PatternPanelVisibility strings from activeDomainPattern."
+        },
+        {
+          "name": "onNavigate",
+          "params": [{ "name": "url", "type": "String" }],
+          "description": "router.push(url). Hit by NextReadLink card taps and the breadcrumb."
+        },
+        {
+          "name": "buildDomainPatternTabs",
+          "params": [{ "name": "activeId", "type": "String" }],
+          "description": "Helper that returns [TabHeaderCell] with 4 entries (id='proxy' / 'type_conv' / 'computed' / 'stored'). The row whose id === activeId gets the accent palette; the others get surface. Each row's onSelect is wired to () => this.onSelectCodeTab(id). Mirrors LearnHelloWorldViewModel.buildPlatformTabs."
+        }
+      ],
+      "vars": [
+        { "name": "filterConfigRows",      "type": "Array(FilterConfigRow)",  "observable": true, "description": "5-row api.schemas.* settings reference for §3." },
+        { "name": "filterEvalRows",        "type": "Array(FilterEvalRow)",    "observable": true, "description": "4-row filter evaluation-order table for §3." },
+        { "name": "skipDomainCompareRows", "type": "Array(ComparisonRow)",    "observable": true, "description": "3-row skip_domain comparison for §4." },
+        { "name": "mcpPreviewFields",      "type": "Array(McpFieldRow)",      "observable": true, "description": "4-row preview_api_model_sync field table for §5." },
+        { "name": "mcpDiscoveryFields",    "type": "Array(McpFieldRow)",      "observable": true, "description": "~6-row list_api_specs / list_api_models field table for §6." },
+        { "name": "androidSerializerRows", "type": "Array(ComparisonRow)",    "observable": true, "description": "3-row moshi / kotlinx / none comparison for §9." },
+        { "name": "webCaseRows",           "type": "Array(ComparisonRow)",    "observable": true, "description": "3-row snake_case / camelCase comparison for §10." },
+        { "name": "haltRows",              "type": "Array(HaltRow)",          "observable": true, "description": "6-row ERROR-halt cookbook table for §15." },
+        { "name": "domainPatternTabs",     "type": "Array(TabHeaderCell)",    "observable": true, "description": "4-row tab header for the §8 Domain-customization switcher." },
+        { "name": "activeDomainPattern",   "type": "String",                  "observable": true, "description": "Currently visible §8 pattern tab id; 'proxy' by default." },
+        { "name": "nextReadLinks",         "type": "Array(NextReadLink)",     "observable": true, "description": "3 closing cards." },
+        { "name": "proxyPatternPanelVisibility",   "type": "String", "observable": true, "description": "Derived from activeDomainPattern via displayLogic." },
+        { "name": "typeConvPatternPanelVisibility","type": "String", "observable": true, "description": "Derived from activeDomainPattern via displayLogic." },
+        { "name": "computedPatternPanelVisibility","type": "String", "observable": true, "description": "Derived from activeDomainPattern via displayLogic." },
+        { "name": "storedPatternPanelVisibility",  "type": "String", "observable": true, "description": "Derived from activeDomainPattern via displayLogic." }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "FilterConfigRow",
+        "properties": [
+          { "name": "id",             "type": "String" },
+          { "name": "keyKey",         "type": "String" },
+          { "name": "typeKey",        "type": "String" },
+          { "name": "defaultKey",     "type": "String" },
+          { "name": "globKey",        "type": "String" },
+          { "name": "descriptionKey", "type": "String" }
+        ]
+      },
+      {
+        "name": "FilterEvalRow",
+        "properties": [
+          { "name": "id",       "type": "String" },
+          { "name": "orderKey", "type": "String" },
+          { "name": "ruleKey",  "type": "String" },
+          { "name": "bodyKey",  "type": "String" }
+        ]
+      },
+      {
+        "name": "ComparisonRow",
+        "properties": [
+          { "name": "id",            "type": "String" },
+          { "name": "labelKey",      "type": "String" },
+          { "name": "leftKey",       "type": "String" },
+          { "name": "rightKey",      "type": "String" },
+          { "name": "thirdKey",      "type": "String" }
+        ]
+      },
+      {
+        "name": "McpFieldRow",
+        "properties": [
+          { "name": "id",       "type": "String" },
+          { "name": "toolKey",  "type": "String" },
+          { "name": "fieldKey", "type": "String" },
+          { "name": "typeKey",  "type": "String" },
+          { "name": "bodyKey",  "type": "String" }
+        ]
+      },
+      {
+        "name": "HaltRow",
+        "properties": [
+          { "name": "id",            "type": "String" },
+          { "name": "triggerKey",    "type": "String" },
+          { "name": "behaviorKey",   "type": "String" },
+          { "name": "workaroundKey", "type": "String" }
+        ]
+      },
+      {
+        "name": "TabHeaderCell",
+        "properties": [
+          { "name": "id",          "type": "String" },
+          { "name": "labelKey",    "type": "String" },
+          { "name": "bgColor",     "type": "String" },
+          { "name": "fgColor",     "type": "String" },
+          { "name": "borderColor", "type": "String" },
+          { "name": "onSelect",    "type": "(() -> Void)?" }
+        ]
+      },
+      {
+        "name": "NextReadLink",
+        "properties": [
+          { "name": "id",             "type": "String" },
+          { "name": "titleKey",       "type": "String" },
+          { "name": "descriptionKey", "type": "String" },
+          { "name": "url",            "type": "String" }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    { "action": "Tap a TOC entry",                       "processing": "TOC-internal scroll." },
+    { "action": "Tap a §8 Domain-pattern tab",           "processing": "onSelectCodeTab(id) flips activeDomainPattern; displayLogic swaps the visible domain_pattern_panel_*." },
+    { "action": "Tap a CodeBlock copy button",           "processing": "Copy handled inside the CodeBlock converter. No VM involvement." },
+    { "action": "Tap a NextReadLink card",               "processing": "onNavigate(url) with the bound NextReadLink.url." },
+    { "action": "Tap an inline cross-link",              "processing": "onNavigate(url) to /concepts/data-models-from-openapi or /reference/cli-commands or /tools/mcp or /learn/installation." }
+  ],
+  "validation": { "clientSide": [], "serverSide": [] },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is /guides, /concepts/data-models-from-openapi, /reference/cli-commands, /tools/mcp, or /learn/installation",
+      "destination": "Target spec screen",
+      "description": "v1 destinations: /guides (breadcrumb), /concepts/data-models-from-openapi (NextRead + inline), /reference/cli-commands (NextRead + inline), /tools/mcp (NextRead + inline), /learn/installation (inline §9 cross-link for the ksp note)."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/guides/api-data-models.json",
+      "description": "Guide layout. ScrollView root with 15 H2 sections, one T6-pattern code-tab switcher (§8 Domain patterns), eight Collections (filter config / filter eval / skip_domain compare / mcp preview fields / mcp discovery fields / android serializer / web case / halts), and a closing NextRead Collection."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/filter_config_row.json",
+      "description": "FilterConfigRow cell layout: key (monospace) + type pill + default + glob-allowed pill + description paragraph."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/filter_eval_row.json",
+      "description": "FilterEvalRow cell layout: order index + rule label + body paragraph."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/comparison_row.json",
+      "description": "Reused for skipDomainCompareRows (3-col) and webCaseRows (3-col). Same cell layout as concept page; the leftKey / rightKey / thirdKey columns adapt to the row's domain."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/comparison_4col_row.json",
+      "description": "Used by androidSerializerRows (4-col: label + moshi + kotlinx + none). Distinct cell because the column count differs."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/mcp_field_row.json",
+      "description": "McpFieldRow cell layout: tool name pill + field (monospace) + type pill + body paragraph. Used in both §5 and §6 Collections."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/halt_row.json",
+      "description": "HaltRow cell layout: trigger pill + behavior column + workaround column. Same cell as concept page §9 but populated with cookbook-flavored workaround strings here."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/tab_header.json",
+      "description": "Reused button-style tab header driven by bgColor / fgColor / borderColor."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/guides/ApiDataModelsViewModel.ts",
+      "description": "Hand-written VM body. Seeds every static catalog in onAppear, owns activeDomainPattern, and implements buildDomainPatternTabs with the same palette-swap shape as the project's other code-tab helpers."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/guides/api-data-models/page.tsx",
+      "description": "Next.js App Router page. Dynamic-imports the generated ApiDataModelsView."
+    },
+    {
+      "type": "Component",
+      "path": "docs/components/json/codeblock.component.json",
+      "description": "Used for every inline code sample: jui.config.json filter snippets, include_paths examples, x-jui-skip-domain example, preview_api_model_sync JSON output, list_api_specs / list_api_models JSON outputs, Swift / Kotlin / TS Repository return-type examples, the four §8 Domain-customization patterns, the Android moshi ksp setup snippet, the §14 CI jui-verify YAML snippet, and the §15 error-message hint snippets."
+    }
+  ],
+  "notes": [
+    "Cookbook companion to /concepts/data-models-from-openapi. Concept explains why; this page is how-to with copy-pasteable recipes.",
+    "Fifteen H2 sections per plan 2026-05-27 swagger-models-doc-additions §2.2: (1) Set up docs/api/, (2) Add a new schema + run build + write proxies, (3) Scope what gets generated — path/schema filter, (4) Two levels of skip_domain, (5) Preview filter changes via MCP preview_api_model_sync, (6) Inspect current state via list_api_specs / list_api_models, (7) DTO vs Domain — Repository return type, (8) Customize Domain — 4 patterns, (9) Android serializer pick, (10) Web case convention pick, (11) Migrating hand-written models, (12) Reserved word collisions, (13) Cycles — what fails what's allowed, (14) Drift detection in CI, (15) Error-halt cookbook table.",
+    "All schema names in code examples are generic: User, Order, LoginRequest. All paths in filter examples are generic: /api/auth/*, /api/users/*, /api/admin/*, /api/internal/*. NEVER use a real consumer-project schema or path — per the project's no-local-project-refs memory rule.",
+    "§3 is the canonical filter reference for the entire site. The 5-row api.schemas.* settings table lives ONLY here; the concept page §6 links to this section instead of duplicating. Same for §4 (skip_domain two-level OR), §5 (preview_api_model_sync), §6 (list_api_specs / list_api_models).",
+    "§7 Repository return-type rule: when a Repository method declares its returnType as a swagger schema name (e.g. 'User'), the codegen auto-resolves it to the Domain type. To get the raw DTO instead, write 'UserDto' explicitly. The Swift code sample shows both shapes side-by-side.",
+    "§8 uses a 4-tab T6-pattern switcher (proxy / type_conv / computed / stored). Each panel holds a complete Swift snippet showing the corresponding Domain customization. Kotlin / TS variants are linked from the §8 lead but not inlined — single-platform sample keeps the section readable.",
+    "§9 Android serializer comparison: moshi (default; requires ksp plugin), kotlinx (no ksp; @Serializable annotations), none (no annotations; reader supplies their own deserializer). The §9 lead links to /learn/installation for the ksp setup steps.",
+    "§10 Web case convention: snake_case is the default and is zero-cost (no runtime conversion); camelCase requires a runtime case transform on every (de)serialize. The lead recommends snake_case unless the rest of the codebase uses camelCase pervasively.",
+    "§11 Migrating hand-written models: §4 skip_domain is the per-schema escape hatch — set x-jui-skip-domain: true on the schema (everyone-skips) or list it in api.schemas.skip_domain (per-app overlay) to keep your hand-written model and not generate a Domain scaffold for that schema. The DTO is still generated; the migration is gradual.",
+    "§13 cycles: direct self-reference ($ref to the same schema at the property level) is ERROR-halt. Collection-mediated cycles (e.g. Node with children: array of Node) are allowed because the cycle is broken by the array boundary.",
+    "§14 CI: drift detection runs jui verify --fail-on-diff. Filter changes that prune schemas + a normal build are SEMANTICALLY identical to the verify step's reconciliation; filter is lenient (warns on 0-schema match), parser is strict (halts on bad schema). The 14-line YAML snippet is GitHub Actions-style.",
+    "§15 halt table: cookbook-flavored — each row carries a concrete workaround (e.g. 'replace oneOf with separate endpoints' or 'inline the $ref-ed schema into the main file'). Recipes, not just diagnoses.",
+    "Strings prefix: guides_api_data_models_ with sub-namespaces _filter_ (§3) / _skip_domain_ (§4) / _mcp_preview_ (§5) / _mcp_discovery_ (§6) / _return_type_ (§7). Estimated 140-180 keys. en + ja content is jsonui-implement / jsonui-localize's responsibility.",
+    "Only CodeBlock referenced as a custom component (already whitelisted). The 7 cell layouts authored alongside the page Layout are standard JsonUI cells, not custom component types."
+  ]
+}

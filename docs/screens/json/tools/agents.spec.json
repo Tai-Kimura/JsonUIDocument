@@ -4,13 +4,13 @@
   "metadata": {
     "name": "Agents",
     "displayName": "Agents for Claude / Codex",
-    "description": "Tools > Agents overview. Explains the 9-agent + 11-skill + 5-rule pack that teaches Claude Code (or Codex) how to run the spec-first JsonUI workflow. Four H2 sections (What ships / The conductor flow / Per-agent summary / Adding your own). ~10-min read. Secondary audience is the AI-first team (plan 00 priority 2) — the page should read like a control-plane reference, not an essay.",
+    "description": "Tools > Agents overview. Explains the 9-agent + 11-skill + 5-rule pack that teaches Claude Code (or Codex) how to run the spec-first JsonUI workflow. Four H2 sections (What ships / The conductor flow / Per-agent summary / Adding your own). ~10-min read. Secondary audience is the AI-first team (plan 00 priority 2) — the page should read like a control-plane reference, not an essay. Per-agent rows now include 1-line notes for the 2026-05 swagger-driven Data Model awareness: conductor checks list_api_specs at startup; define knows the two-tier skip_domain rule; implement carries the DTO vs Domain return-type convention; debug has the swagger -> DTO -> Domain -> Repository -> ViewModel trace; ground sets api_directory during scaffold; test mentions the DTO mock factory.",
     "platforms": [
       "web"
     ],
     "layoutFile": "tools/agents",
     "createdAt": "2026-04-23",
-    "updatedAt": "2026-04-23"
+    "updatedAt": "2026-05-27"
   },
   "structure": {
     "components": [],
@@ -177,6 +177,7 @@
     "First live entry under the Tools tab. Flipping TOOLS_ENTRIES row 4 (agents) from 'upcoming' to 'live' in HomeViewModel finishes the task.",
     "The agents Collection uses a dedicated cells/agent_row layout rather than the generic learn_article_card — the row has three strings (name / role / whenToUse) and a distinct density, so pulling it into its own cell keeps the styling honest.",
     "Plan 11 (content-plan-agents.md) lists nine agents. This page is the INTRO — each agent deserves a dedicated page later, but v1 ships only the overview catalog.",
-    "Priority-2 audience (plan 00) is teams running JsonUI through Claude Code / Codex. Copy stays practical: what to type, when to invoke which agent, how conductor dispatches. No brand prose."
+    "Priority-2 audience (plan 00) is teams running JsonUI through Claude Code / Codex. Copy stays practical: what to type, when to invoke which agent, how conductor dispatches. No brand prose.",
+    "2026-05 update (swagger-driven Data Models): each AgentRow's whenToUseKey body gains ONE sentence about its swagger-aware responsibility — (1) conductor whenToUseKey ends '... and pings list_api_specs at startup to know whether the project consumes OpenAPI'; (2) define whenToUseKey notes 'knows the two-tier skip_domain rule (schema-side x-jui-skip-domain vs app-side api.schemas.skip_domain)'; (3) implement whenToUseKey notes 'follows the Repository return-type convention: schema name -> Domain, *Dto suffix -> raw DTO'; (4) debug whenToUseKey notes 'can trace swagger -> DTO -> Domain -> Repository -> ViewModel end-to-end'; (5) ground whenToUseKey notes 'sets api_directory in jui.config.json during scaffold'; (6) test whenToUseKey notes 'generates DTO mock factories from the codegen DTO'. The remaining 3 agents (navigation-ios / -android / -web) are unaffected. No new uiVariable / customType — body-copy change only inside existing tools_agents_*_when_to_use_body strings."
   ]
 }
