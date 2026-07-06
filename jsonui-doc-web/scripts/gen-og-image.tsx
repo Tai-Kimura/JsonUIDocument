@@ -99,7 +99,7 @@ async function main(): Promise<void> {
             <span>·</span>
             <span>Web</span>
           </div>
-          <div style={{ color: "#CBD5F5", fontWeight: 500 }}>jsonui.dev</div>
+          <div style={{ color: "#CBD5F5", fontWeight: 500 }}>jsonui.tanosys.com</div>
         </div>
       </div>
     ),
