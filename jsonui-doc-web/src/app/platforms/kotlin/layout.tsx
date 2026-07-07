@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `KotlinJsonUI — JsonUI`,
-  description: `Android native output from one spec. kjui is the CLI, Dynamic mode mirrors sjui's story, and output is idiomatic Kotlin — Jetpack Compose by default, XML Views…`,
+  description: `Android native output from one spec. kjui is the CLI, Dynamic mode mirrors sjui's story, and output is idiomatic Kotlin — Jetpack Compose is the primary…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -4,13 +4,13 @@
   "metadata": {
     "name": "Kotlin",
     "displayName": "KotlinJsonUI",
-    "description": "Platforms > Android deep-dive. KotlinJsonUI + kjui CLI + Dynamic mode. Four sections: What you get / Dual-mode output (Compose + XML Views) / Dynamic mode hot reload / Production caveats. ~10-min read.",
+    "description": "Platforms > Android deep-dive. KotlinJsonUI + kjui CLI + Dynamic mode. Five sections: What you get / Dual-mode output (Compose + XML Views) / Platform mode policy (Compose is primary, XML frozen 2026-07) / Dynamic mode hot reload / Production caveats. ~10-min read.",
     "platforms": [
       "web"
     ],
     "layoutFile": "platforms/kotlin",
     "createdAt": "2026-04-23",
-    "updatedAt": "2026-04-23"
+    "updatedAt": "2026-07-07"
   },
   "structure": {
     "components": [],
@@ -142,6 +142,9 @@
   ],
   "notes": [
     "Second live Platforms entry. Flip PLATFORMS_ENTRIES row 2 (kotlin) to 'live'.",
-    "Audience: Android engineers evaluating JsonUI vs staying on hand-written Compose. Copy emphasises dual-mode (Compose + XML for legacy codebases) and the Dynamic mode hot-reload parity with iOS."
+    "Audience: Android engineers evaluating JsonUI vs staying on hand-written Compose. Copy emphasises dual-mode (Compose + XML for legacy codebases) and the Dynamic mode hot-reload parity with iOS.",
+    "2026-07-07 — Platform Mode Policy addition. Add new prose section `section_mode_policy` after `section_dual`. Heading: 'Platform mode policy (2026-07 onward)' / 'Platform モードポリシー (2026-07 以降)'. Body describes: KotlinJsonUI 3.0 に向けて Compose (static + dynamic) が primary、XML / Android Views は maintenance-frozen で新機能は Compose のみ、3.0 で削除候補。Compose 消費者への床要件は BOM 2025.04.01 (Compose UI 1.8.0) 以上・KotlinJsonUI 2.9.3+。理由: renderer-SSoT 化に伴い attribute 実装の SSoT を単一化する方針で、複数モードの並行維持コストを解消するため。既存 XML プロジェクトは 3.0 リリースまで動作継続、以降は Compose 移行または 2.x 系にピン留め。TOC row `toc_mode_policy` を追加、`section_dual` と `section_dynamic` の間。",
+    "2026-07-07 — Update `section_dual_body` to soften the 'XML for laggards' framing and add a forward pointer to `section_mode_policy` (1 sentence: '2026-07 以降の運用方針は次節を参照')。既存の技術的説明 (Compose recomposition・Dynamic mode) は変更しない。",
+    "2026-07-07 — Update `lead` 微修正: 'Jetpack Compose by default, XML Views where legacy codebases need it.' の trailing clause を softer に (例: 'Jetpack Compose is the primary target; XML Views are maintenance-only for legacy migrations.') ja も同様。"
   ]
 }

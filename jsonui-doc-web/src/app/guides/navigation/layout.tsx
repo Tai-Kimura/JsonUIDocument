@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `Navigation between screens — JsonUI`,
-  description: `Wire onNavigate in the ViewModel to each platform's router: Next.js App Router on web, NavigationStack / UINavigationController on iOS, Jetpack Compose…`,
+  description: `Navigation in JsonUI is a platform-external contract: the spec declares intent (transitions + onNavigate method), the generator emits a typed callback stub in…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `Data binding as contract — JsonUI`,
-  description: `@{variable} is not a template expression — it is a typed binding to a ViewModel field. No logic in the layout, ever. Here is what that means in practice.`,
+  description: `\`@{variable}\` is how a layout JSON names a field on its ViewModel. What the field holds, how strongly it is type-checked, and whether the widget can write back…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

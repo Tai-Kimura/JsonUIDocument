@@ -8,7 +8,7 @@
     "platforms": ["web"],
     "layoutFile": "guides/api-data-models",
     "createdAt": "2026-05-27",
-    "updatedAt": "2026-05-27"
+    "updatedAt": "2026-07-07"
   },
   "structure": {
     "components": [],
@@ -349,6 +349,7 @@
     "§14 CI: drift detection runs jui verify --fail-on-diff. Filter changes that prune schemas + a normal build are SEMANTICALLY identical to the verify step's reconciliation; filter is lenient (warns on 0-schema match), parser is strict (halts on bad schema). The 14-line YAML snippet is GitHub Actions-style.",
     "§15 halt table: cookbook-flavored — each row carries a concrete workaround (e.g. 'replace oneOf with separate endpoints' or 'inline the $ref-ed schema into the main file'). Recipes, not just diagnoses.",
     "Strings prefix: guides_api_data_models_ with sub-namespaces _filter_ (§3) / _skip_domain_ (§4) / _mcp_preview_ (§5) / _mcp_discovery_ (§6) / _return_type_ (§7). Estimated 140-180 keys. en + ja content is jsonui-implement / jsonui-localize's responsibility.",
-    "Only CodeBlock referenced as a custom component (already whitelisted). The 7 cell layouts authored alongside the page Layout are standard JsonUI cells, not custom component types."
+    "Only CodeBlock referenced as a custom component (already whitelisted). The 7 cell layouts authored alongside the page Layout are standard JsonUI cells, not custom component types.",
+    "2026-07-07 — Contract check awareness (Renderer SSoT + doc-contract-check rollout). Extend `section_ci_body` with 1-2 sentences noting: 'Since 2026-07, docs↔ implementation drift can also be machine-verified via `jsonui-doc check` (which runs a builtin:openapi-diff between the impl-declared OpenAPI and docs/api/). This complements `jui verify --fail-on-diff` (which verifies DTO regeneration is byte-stable against the docs) — verify catches DTO drift within the doc→code pipeline, check catches API drift between docs and the running server.' Update `section_ci_heading` if needed to reflect both. Do NOT add a link to /guides/verifying-implementation-against-docs yet — that page is authored in a follow-up session. The addition is body-copy only, no new sections or TOC entries. ja も対応。"
   ]
 }

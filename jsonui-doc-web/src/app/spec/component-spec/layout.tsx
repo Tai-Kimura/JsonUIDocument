@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 // render time; we only override title + description so the site-wide
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
-  title: `jsonui-mcp-server — JsonUI`,
-  description: `Thirty-three typed tools grouped into five families. The agents use them to inspect any JsonUI project — specs, layouts, components, builds, runtime sync, and…`,
+  title: `Component specs — JsonUI`,
+  description: `Pattern 3 of spec splitting, in detail. When a custom UI shows up on two or more screens, extract its contract into…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
