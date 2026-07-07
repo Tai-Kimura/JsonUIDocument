@@ -16,14 +16,14 @@ module RjuiTools
           tag_attr = build_tag_attr
 
           # Check if we need partialAttributes rendering (styled text spans)
-          jsx = if json['partialAttributes'] && json['partialAttributes'].is_a?(Array) && !json['partialAttributes'].empty?
+          jsx = if attributes['partialAttributes'] && attributes['partialAttributes'].is_a?(Array) && !attributes['partialAttributes'].empty?
             render_partial_attributes_button(indent, id_attr, class_name, style_attr, on_click, disabled_attr, testid_attr, tag_attr)
           else
-            text = convert_binding(json['text'] || '')
+            text = convert_binding(attributes['text'] || '')
 
             # If href is specified, wrap with Next.js Link
-            if json['href']
-              href = json['href']
+            if attributes['href']
+              href = attributes['href']
               "#{indent_str(indent)}<Link href=\"#{href}\"><button#{id_attr} className=\"#{class_name}\"#{style_attr}#{on_click}#{disabled_attr}#{testid_attr}#{tag_attr}>#{text}</button></Link>"
             else
               "#{indent_str(indent)}<button#{id_attr} className=\"#{class_name}\"#{style_attr}#{on_click}#{disabled_attr}#{testid_attr}#{tag_attr}>#{text}</button>"
@@ -42,39 +42,43 @@ module RjuiTools
           classes << 'cursor-pointer'
           classes << 'transition-colors'
 
-          # Hover state (tapBackground)
-          if json['tapBackground']
-            hover_color = TailwindMapper.map_color(json['tapBackground'], 'hover:bg')
-            classes << hover_color
-          elsif json['highlightBackground']
-            hover_color = TailwindMapper.map_color(json['highlightBackground'], 'hover:bg')
+          # Hover state. tapBackground (tap state) and
+          # highlightBackground (highlighted state) are DISTINCT
+          # attributes in the definitions/runtimes, but the web has a
+          # single hover/active affordance — both map onto it here
+          # (tapBackground wins when both are present).
+          tap_background = attributes['tapBackground'] || attributes['highlightBackground']
+          if tap_background
+            hover_color = TailwindMapper.map_color(tap_background, 'hover:bg')
             classes << hover_color
           else
             classes << 'hover:opacity-80'
           end
 
           # Active/pressed state
-          if json['tapBackground']
-            active_color = TailwindMapper.map_color(json['tapBackground'], 'active:bg')
+          if tap_background
+            active_color = TailwindMapper.map_color(tap_background, 'active:bg')
             classes << active_color
           end
 
-          # Highlight text color on hover
-          if json['highlightColor']
-            hover_text = TailwindMapper.map_color(json['highlightColor'], 'hover:text')
+          # Highlight text color on hover (hilightColor is the legacy
+          # definitions alias of highlightColor)
+          highlight_color = attributes['highlightColor']
+          if highlight_color
+            hover_text = TailwindMapper.map_color(highlight_color, 'hover:text')
             classes << hover_text
           end
 
           # Disabled state
-          if json['disabledBackground']
-            disabled_bg = TailwindMapper.map_color(json['disabledBackground'], 'disabled:bg')
+          if attributes['disabledBackground']
+            disabled_bg = TailwindMapper.map_color(attributes['disabledBackground'], 'disabled:bg')
             classes << disabled_bg
           else
             classes << 'disabled:opacity-50'
           end
 
-          if json['disabledFontColor']
-            disabled_text = TailwindMapper.map_color(json['disabledFontColor'], 'disabled:text')
+          if attributes['disabledFontColor']
+            disabled_text = TailwindMapper.map_color(attributes['disabledFontColor'], 'disabled:text')
             classes << disabled_text
           end
 
@@ -87,8 +91,8 @@ module RjuiTools
           super
 
           # Corner radius
-          if json['cornerRadius']
-            @dynamic_styles['borderRadius'] = "'#{json['cornerRadius']}px'"
+          if attributes['cornerRadius']
+            @dynamic_styles['borderRadius'] = "'#{attributes['cornerRadius']}px'"
           end
 
           return '' if @dynamic_styles.nil? || @dynamic_styles.empty?
@@ -108,7 +112,7 @@ module RjuiTools
         end
 
         def build_disabled_attr
-          enabled = json['enabled']
+          enabled = attributes['enabled']
           return '' if enabled.nil?
 
           if enabled.is_a?(String) && enabled.start_with?('@{') && enabled.end_with?('}')
@@ -126,8 +130,8 @@ module RjuiTools
 
         # Render button with partial attributes (styled spans within text)
         def render_partial_attributes_button(indent, id_attr, class_name, style_attr, on_click, disabled_attr, testid_attr, tag_attr)
-          text = json['text'] || ''
-          partials = json['partialAttributes']
+          text = attributes['text'] || ''
+          partials = attributes['partialAttributes']
 
           lines = []
           lines << "#{indent_str(indent)}<button#{id_attr} className=\"#{class_name}\"#{style_attr}#{on_click}#{disabled_attr}#{testid_attr}#{tag_attr}>"

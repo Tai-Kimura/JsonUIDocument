@@ -154,4 +154,26 @@ RSpec.describe RjuiTools::React::ReactGenerator do
       expect(result).not_to include('$s')
     end
   end
+
+  describe '#generate_component_file Configuration (FontSpec) import emission' do
+    # The generator scans the already-converted JSX for the
+    # Configuration.Font.resolve(...) emission BaseConverter produces when
+    # `fontFamily` is set. If found, it imports `Configuration` from the
+    # synced template path so the spread compiles and the host-supplied
+    # fontProvider can intercept.
+    let(:minimal_json) { { 'type' => 'View' } }
+
+    it 'emits the Configuration import when jsx_content contains Configuration.Font.resolve(...)' do
+      jsx = "      <span style={{ ...Configuration.Font.resolve({ family: 'Inter', italic: false }) }}>Hi</span>"
+      result = generator.send(:generate_component_file, 'Hero', jsx, minimal_json)
+      expect(result).to include("import { Configuration } from '@/lib/jsonui/Configuration';")
+    end
+
+    it 'omits the Configuration import when no FontSpec emission is present in the JSX stream' do
+      jsx = '      <span>plain text</span>'
+      result = generator.send(:generate_component_file, 'Plain', jsx, minimal_json)
+      expect(result).not_to include("from '@/lib/jsonui/Configuration'")
+      expect(result).not_to include('Configuration.Font')
+    end
+  end
 end

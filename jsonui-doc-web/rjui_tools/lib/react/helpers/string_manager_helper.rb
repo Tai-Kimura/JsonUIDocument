@@ -94,7 +94,7 @@ module RjuiTools
 
         private
 
-        # Lookup by value (e.g., "ItemFinder" -> StringManager.currentLanguage.loginItemfinder)
+        # Lookup by value (e.g., "AppFinder" -> StringManager.currentLanguage.loginSampleApp)
         def lookup_string_manager_by_value(text)
           strings_data = load_strings_json
           return nil if strings_data.nil? || strings_data.empty?

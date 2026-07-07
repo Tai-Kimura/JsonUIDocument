@@ -3,6 +3,7 @@
 require 'set'
 require_relative '../core/type_converter'
 require_relative '../core/generated_marker'
+require_relative '../core/normalization'
 require_relative 'converters/base_converter'
 require_relative 'converters/view_converter'
 require_relative 'converters/label_converter'
@@ -43,6 +44,10 @@ module RjuiTools
         'CircleImage' => Converters::ImageConverter,
         'NetworkImage' => Converters::ImageConverter,
         'TextField' => Converters::TextFieldConverter,
+        # EditText / Input are aliases for TextField (attribute_definitions
+        # `_alias_of: TextField`; kept for Android / HTML naming compatibility)
+        'EditText' => Converters::TextFieldConverter,
+        'Input' => Converters::TextFieldConverter,
         'TextView' => Converters::TextViewConverter,
         'Scroll' => Converters::ScrollViewConverter,
         'ScrollView' => Converters::ScrollViewConverter,
@@ -174,6 +179,12 @@ module RjuiTools
                                 .map(&:downcase)
         namespace_parts << snake_basename
         @config['_current_json_name'] = namespace_parts.join('_')
+
+        # Per-file normalization state (same shared-config pattern as
+        # `_current_json_name`). Converters read this through
+        # BaseConverter#layout_normalized? to take the canonical-only
+        # attribute lookup path for L1-normalized layouts.
+        @config['_layout_normalized'] = Core::Normalization.canonicalized?(json)
 
         jsx_content = convert_component(json)
 
