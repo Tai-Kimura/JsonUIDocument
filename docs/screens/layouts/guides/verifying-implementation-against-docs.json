@@ -1,0 +1,313 @@
+{
+  "type": "View",
+  "id": "guides_verifying_implementation_against_docs_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_muted",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks", "class": "CollectionDataSource" },
+        { "name": "onNavigateGuides", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "guides_verifying_implementation_against_docs_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "guides_verifying_implementation_against_docs_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 24, 32],
+          "child": [
+            { "type": "Label", "height": "wrapContent", "fontSize": 13, "fontWeight": "semibold", "fontColor": "ink_subtle", "tapBackground": "surface_sunken", "onClick": "@{onNavigateGuides}", "text": "breadcrumb", "width": "wrapContent" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 36, "fontWeight": "bold", "fontColor": "ink", "text": "title" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 17, "fontColor": "ink_muted", "text": "lead" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 13, "fontColor": "ink_subtle", "text": "read_time" }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "guides_verifying_implementation_against_docs_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "guides_verifying_implementation_against_docs_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_what",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "surface_muted",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "ink", "text": "section_what_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "ink_muted", "text": "section_what_body" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_declare",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "surface_base",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "ink", "text": "section_declare_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "ink_muted", "text": "section_declare_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// jui.config.json\n{\n  \"checks\": [\n    {\n      \"name\": \"api\",\n      \"type\": \"builtin:openapi-diff\",\n      \"impl_openapi_command\": \"python -m app.export_openapi\",\n      \"timeout_seconds\": 60\n    }\n  ]\n}",
+                      "language": "jsonc",
+                      "filename": "jui.config.json",
+                      "showLineNumbers": true,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_fastapi",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "surface_muted",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "ink", "text": "section_fastapi_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "ink_muted", "text": "section_fastapi_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "# app/export_openapi.py\nimport json, sys\nfrom app.main import app\n\nsys.stdout.write(json.dumps(app.openapi(), indent=2))",
+                      "language": "python",
+                      "filename": "app/export_openapi.py",
+                      "showLineNumbers": true,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_frameworks",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "surface_base",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "ink", "text": "section_frameworks_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "ink_muted", "text": "section_frameworks_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "# Spring (springdoc-openapi)\ncurl -s http://localhost:8080/v3/api-docs\n\n# NestJS (@nestjs/swagger)\nnode -e \"import('./main.js').then(m => console.log(JSON.stringify(m.openapi())))\"\n\n# Rails (rswag emits YAML)\nbundle exec rake rswag:specs:swaggerize && yq -o=json swagger/v1/swagger.yaml",
+                      "language": "bash",
+                      "filename": "impl_openapi_command examples",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_execute",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "surface_muted",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "ink", "text": "section_execute_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "ink_muted", "text": "section_execute_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "# Preview what would run without executing\njsonui-doc check --list\n\n# Execute all API checkers\njsonui-doc check api\n# exit 0 = OK   exit 1 = mismatch   exit 2 = execution error\n\n# Combined: check then generate HTML (with implementation-contract page)\njsonui-doc generate html --with-checks",
+                      "language": "bash",
+                      "filename": "local shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "# .github/workflows/docs-check.yml (excerpt)\n- name: Verify docs against implementation\n  env:\n    JSONUI_CHECK_DB_URL_MAIN: ${{ secrets.DB_URL_MAIN }}\n  run: jsonui-doc check",
+                      "language": "yaml",
+                      "filename": ".github/workflows/docs-check.yml",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_html",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "surface_base",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "ink", "text": "section_html_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "ink_muted", "text": "section_html_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// docs/api/.check-report.json (excerpt of one mismatch row)\n{\n  \"target\": \"GET /orders/{id}\",\n  \"status\": \"mismatch\",\n  \"confidence\": \"proof\",\n  \"expected\": \"200: { id, total, status }\",\n  \"actual\":   \"200: { id, total, status, refunded_at }\",\n  \"message\": \"impl declares extra field 'refunded_at' not in docs/api\"\n}",
+                      "language": "jsonc",
+                      "filename": ".check-report.json (mismatch row)",
+                      "showLineNumbers": true,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_limits",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "surface_muted",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "ink", "text": "section_limits_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "ink_muted", "text": "section_limits_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// jui.config.json (full-checker declaration)\n{\n  \"checks\": [\n    {\n      \"name\": \"api-live\",\n      \"type\": \"checker\",\n      \"command\": \".jsonui/checks/live_api_check.py\",\n      \"timeout_seconds\": 120\n    }\n  ]\n}",
+                      "language": "jsonc",
+                      "filename": "jui.config.json (full-checker slot)",
+                      "showLineNumbers": true,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "# .jsonui/checks/live_api_check.py (outline)\nimport httpx, json, sys\n\nresults = []\nfor path in [\"/items\", \"/users\"]:\n    r = httpx.get(f\"https://staging.example.com{path}\", timeout=10)\n    results.append({\"target\": f\"GET {path}\",\n                    \"status\": \"ok\" if r.status_code == 200 else \"mismatch\",\n                    \"confidence\": \"sampled\"})\nsys.stdout.write(json.dumps({\"schemaVersion\": 1, \"results\": results}))",
+                      "language": "python",
+                      "filename": ".jsonui/checks/live_api_check.py",
+                      "showLineNumbers": true,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_verifying_implementation_against_docs_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [32, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 24, "fontWeight": "bold", "fontColor": "chrome_ink", "text": "next_heading" },
+                    {
+                      "type": "Collection",
+                      "id": "guides_verifying_implementation_against_docs_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 2,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [ { "cell": "cells/next_step_card" } ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_verifying_implementation_against_docs_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 12, "fontColor": "ink_faint", "text": "footer_copyright" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "guides_verifying_implementation_against_docs_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [24, 16, 24, 16],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_verifying_implementation_against_docs_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 0, 32],
+                  "background": "surface_muted",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        { "id": "toc_what",       "label": "toc_row_what",       "anchor": "section_what",       "level": 1 },
+                        { "id": "toc_declare",    "label": "toc_row_declare",    "anchor": "section_declare",    "level": 1 },
+                        { "id": "toc_fastapi",    "label": "toc_row_fastapi",    "anchor": "section_fastapi",    "level": 1 },
+                        { "id": "toc_frameworks", "label": "toc_row_frameworks", "anchor": "section_frameworks", "level": 1 },
+                        { "id": "toc_execute",    "label": "toc_row_execute",    "anchor": "section_execute",    "level": 1 },
+                        { "id": "toc_html",       "label": "toc_row_html",       "anchor": "section_html",       "level": 1 },
+                        { "id": "toc_limits",     "label": "toc_row_limits",     "anchor": "section_limits",     "level": 1 }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

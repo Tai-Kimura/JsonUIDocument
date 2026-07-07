@@ -116,7 +116,19 @@
       "en": "Three new MCP tools — `list_api_specs`, `list_api_models`, `preview_api_model_sync` — let an agent inventory swagger files, list per-platform DTOs / Domain scaffolds / orphans, and dry-run filter changes before you commit them.",
       "ja": "新しい MCP ツール 3 種 — `list_api_specs` / `list_api_models` / `preview_api_model_sync` — でエージェントが swagger ファイル一覧、プラットフォーム別 DTO / Domain / orphan 在庫の確認、filter 変更の dry-run を実行できます。"
     },
-    "whats_new_swagger_mcp_discovery_cta": { "en": "See MCP Group E", "ja": "MCP Group E を見る" }
+    "whats_new_swagger_mcp_discovery_cta": { "en": "See MCP Group E", "ja": "MCP Group E を見る" },
+    "whats_new_renderer_ssot_title": { "en": "Renderer SSoT: canonicalized layouts, typed attributes", "ja": "Renderer SSoT: 正規化 layout と型付き属性" },
+    "whats_new_renderer_ssot_blurb": {
+      "en": "Distributed layouts now carry a `$jui` marker with alias→canonical rewrites (L1). Typed attribute extractors are generated from `attribute_definitions.json` for iOS / Android / Web.",
+      "ja": "配布 layout に `$jui` marker が付き、エイリアス → 正準名の書き換え (L1) が既定で走ります。`attribute_definitions.json` から iOS / Android / Web の型付き属性抽出コードが生成されます。"
+    },
+    "whats_new_renderer_ssot_cta": { "en": "Read the concept", "ja": "concept を読む" },
+    "whats_new_implementation_contract_check_title": { "en": "`jsonui-doc check` — verify docs against reality", "ja": "`jsonui-doc check` — ドキュメントを実装と照合する" },
+    "whats_new_implementation_contract_check_blurb": {
+      "en": "OpenAPI diff and DB schema checkers verify that the running server and live DB still match your `docs/api/` and `docs/db/`. Results land in the generated HTML as an implementation-contract page.",
+      "ja": "OpenAPI diff と DB schema チェッカーが、動いている backend と実 DB が `docs/api/` / `docs/db/` とまだ一致しているか検証します。結果は生成 HTML の「実装との整合性」ページに表示されます。"
+    },
+    "whats_new_implementation_contract_check_cta": { "en": "Read the concept", "ja": "concept を読む" }
   },
   "learn_hello_world": {
     "bc_learn": { "en": "Learn", "ja": "ラーン" },
@@ -4631,5 +4643,127 @@
     "category_event": { "en": "Event", "ja": "イベント" },
     "category_responsive": { "en": "Responsive", "ja": "レスポンシブ" },
     "category_misc": { "en": "Misc", "ja": "その他" }
+  },
+  "concepts_implementation_contract_check": {
+    "breadcrumb": { "en": "← Concepts", "ja": "← Concepts" },
+    "title": { "en": "Implementation contract check", "ja": "実装との整合性チェック" },
+    "lead": {
+      "en": "Docs (spec / swagger / DB models) are the source of truth for what gets generated. `jsonui-doc check` verifies that the real running implementation still matches those docs — schema by schema, endpoint by endpoint. Here is the design and how to read the reports.",
+      "ja": "spec / swagger / DB モデルといったドキュメントは、生成の SSoT として機能しています。`jsonui-doc check` は、実際に動いているサーバや実 DB がそのドキュメントとまだ一致しているかを、スキーマ単位・エンドポイント単位で検証します。設計とレポートの読み方を解説します。"
+    },
+    "read_time": { "en": "~7 min read", "ja": "約 7 分" },
+    "toc_title": { "en": "On this page", "ja": "このページの目次" },
+    "toc_row_problem": { "en": "The drift you can't see", "ja": "見えないドリフト" },
+    "toc_row_split": { "en": "check vs generate", "ja": "check と generate の分離" },
+    "toc_row_confidence": { "en": "Three confidence levels", "ja": "3 段階の confidence" },
+    "toc_row_plugin_tiers": { "en": "Adapter vs full checker", "ja": "アダプタ型とフルチェッカー型" },
+    "toc_row_reading": { "en": "Reading the report", "ja": "レポートの読み方" },
+    "toc_row_limits": { "en": "What check cannot catch", "ja": "check で見えないもの" },
+    "section_problem_heading": { "en": "The drift you can't see", "ja": "見えないドリフト" },
+    "section_problem_body": {
+      "en": "`jui verify --fail-on-diff` catches DTO regeneration drift inside the docs→code pipeline: if `docs/api/*.json` changes and the generated `User.swift` no longer matches, verify fails. But there is a second gap it can never see — the gap between the docs and the running server. A backend engineer renames a field, adds a required parameter, or ships an enum value that isn't in the swagger, and every generated DTO on iOS / Android / Web is now silently wrong. The same gap exists for `docs/db/*` versus the live database. Contract check exists to close that outer gap: it compares docs against what the real implementation reports about itself.",
+      "ja": "`jui verify --fail-on-diff` は「ドキュメント → コード」パイプライン内の DTO 再生成 drift を検出します — `docs/api/*.json` が変わって生成された `User.swift` と一致しなくなれば verify は失敗します。しかし verify は「ドキュメントと実サーバ」の間の drift は見えません。バックエンドエンジニアがフィールド名を変更したり、必須パラメータを追加したり、swagger に無い enum 値を出したりすると、iOS / Android / Web の生成 DTO が全部静かにずれます。`docs/db/*` と実 DB でも同じ穴が空きます。contract check はその外側の穴を埋めるために存在します — ドキュメントと「実装が自分自身について宣言している内容」を照合するのが仕事です。"
+    },
+    "section_split_heading": { "en": "check is a producer, generate is a renderer", "ja": "check は生産者、generate は描画者" },
+    "section_split_body": {
+      "en": "`jsonui-doc generate html` never touches the network. Clone the repo, run `generate html`, and you get the site — no config, no credentials, no third-party code execution. That property is a hard invariant. `jsonui-doc check` is the opposite: it explicitly runs whatever commands your `jui.config.json` declares under `checks`, with timeouts and a `--list` that shows you what will run before it runs. Results are saved as `docs/**/.check-report.json`. `generate html` then reads those reports if they exist and renders them as an 'Implementation contract' page — but generate itself still executes zero external code. The split matches the pytest / mypy relationship: check is the test command, generate is the render command, and shipping a docs build never requires proving that the impl is currently in sync.",
+      "ja": "`jsonui-doc generate html` は決してネットワークに触りません。リポジトリを clone して `generate html` を叩けばサイトが生成される — config 不要、認証情報不要、第三者コードの実行ゼロ。これは不変条件です。`jsonui-doc check` は逆で、`jui.config.json` の `checks` に宣言されたコマンドを明示的に実行します。タイムアウト付き、`--list` で実行内容を事前に表示できます。結果は `docs/**/.check-report.json` に保存され、`generate html` はそれを読んで「実装との整合性」ページを描画しますが、generate 自体は依然として外部コードを一切実行しません。この分離は pytest / mypy と test / render の関係に似ています — check がテストコマンド、generate が描画コマンドで、ドキュメントをビルドするたびに実装との同期状態を証明する必要はありません。"
+    },
+    "section_confidence_heading": { "en": "Three confidence levels", "ja": "3 段階の confidence" },
+    "section_confidence_body": {
+      "en": "Every result carries a `confidence` field with one of three values. `proof` means declaration-vs-declaration matching — impl-side OpenAPI vs docs/api, real RDB schema vs docs/db. If proof-level check says OK, the schemas match, full stop. `metadata` means partial matching against structural metadata — e.g. Firestore composite index definitions, DynamoDB DescribeTable output. `sampled` means the checker looked at real data (usually a bounded sample like 1,000 documents) and found no violations; this catches most drift but is not a proof — a rare violation could still be lurking. The distinction is honest: 'no mismatch on a sample of 1,000' is displayed differently in the HTML than 'the schemas are identical.'",
+      "ja": "結果 JSON には必ず `confidence` フィールドが 3 段階のいずれかで入ります。`proof` は宣言同士の照合 — 実装側 OpenAPI と docs/api、実 RDB スキーマと docs/db。proof レベルで OK ならスキーマは一致しています、以上。`metadata` は構造メタデータ (例えば Firestore の複合 index 定義、DynamoDB の DescribeTable 出力) との部分照合。`sampled` はチェッカーが実データ (通常は 1,000 件のようなサンプル) を見て違反が無かったことを意味します — ほとんどの drift はこれで拾えますが、証明ではありません。稀な違反はサンプル外に潜む可能性があります。この区別は正直に表示されます: 「サンプル 1,000 件で違反なし」と「スキーマが完全一致」は HTML 上で別扱いです。"
+    },
+    "section_plugin_tiers_heading": { "en": "Adapter type + full-checker type", "ja": "アダプタ型とフルチェッカー型" },
+    "section_plugin_tiers_body": {
+      "en": "Two ways to plug in. Adapter type is the recommended entry point: you write a tiny command that just outputs facts in the required format (e.g. a Python one-liner that dumps FastAPI's `app.openapi()` to stdout, or a shell script that dumps the DB schema as JSON). The library takes it from there — comparison, judgement, report generation. Full-checker type is for cases adapter can't express: you write a command that does the comparison itself and outputs a result JSON that conforms to the `.check-report.json` schema. Full-checker is where you go when you need to hit a live API with auth, or verify a semantic invariant (like 'this column is null only when the order is refunded') that no declaration file captures. Builtin checkers (`builtin:openapi-diff`, `builtin:db-schema`) plug into the same socket as your adapter — they are 'bundled plugins,' not a privileged path.",
+      "ja": "プラグインの入口は 2 段階です。アダプタ型が推奨: 事実を所定形式で吐くだけの短いコマンドを書きます (例: FastAPI の `app.openapi()` を stdout にダンプする Python 数行、または DB スキーマを JSON でダンプするシェルスクリプト)。比較・判定・レポート生成はライブラリ側が引き受けます。フルチェッカー型はアダプタで表現できないケース用: 比較まで自分で行い、`.check-report.json` スキーマに準拠した結果 JSON を stdout に出すコマンドを書きます。認証付きで live API を叩きたい、宣言ファイルには現れない意味的規約 (例: 「このカラムが NULL なのは注文が返金されたときだけ」) を検証したい、そういうときの領域です。ビルトインチェッカー (`builtin:openapi-diff` / `builtin:db-schema`) はあなたのアダプタと同じソケットに挿さります — 「同梱プラグイン」であって、特権的な別経路ではありません。"
+    },
+    "section_reading_heading": { "en": "Reading the implementation-contract page", "ja": "「実装との整合性」ページの読み方" },
+    "section_reading_body": {
+      "en": "When a report exists, `generate html` renders an extra 'Implementation contract' page with these elements: a verification timestamp (e.g. '2026-07-07 14:00 vs main (MySQL 8.0), matched ✓'), the checker name and target, a confidence badge on every row, a list of mismatches (target / status / expected / actual / message), and a freshness indicator — if the docs have changed since the report was saved, the page shows a 'this report may be stale' banner (compared via `input_hashes` in the report). Exit codes match the `check` command: 0 = OK, 1 = mismatch, 2 = execution error (connection failure, timeout, malformed plugin output). CI gates read the exit code; `generate html` succeeds even when check exits 1 or 2 — you specifically want to see the mismatch page when things are broken.",
+      "ja": "レポートが存在すると `generate html` は「実装との整合性」ページを追加描画します。表示要素は次のとおりです: 検証時刻 (例: '2026-07-07 14:00 時点の main (MySQL 8.0) と照合済み ✓')、チェッカー名・対象、行ごとの confidence バッジ、mismatch 一覧 (target / status / expected / actual / message)、鮮度インジケータ — レポート保存後にドキュメントが変更されていれば「このレポートは古い可能性があります」バナーが出ます (`input_hashes` の比較)。exit code は check コマンドと一致: 0 = OK / 1 = mismatch / 2 = 実行エラー (接続失敗・タイムアウト・プラグイン出力不正)。CI のゲートは exit code を見る側の仕事で、`generate html` は check が 1 や 2 で終わっても成功します — ズレているときこそ「どこがズレているか」のページを見たいはずだからです。"
+    },
+    "section_limits_heading": { "en": "What check cannot catch", "ja": "check で見えないもの" },
+    "section_limits_body": {
+      "en": "The OpenAPI diff checker compares the impl's *declared* OpenAPI against docs — it does not send a single HTTP request. If the impl's OpenAPI says a response has fields `{a, b, c}` but the actual JSON on the wire has `{a, b, d}`, check will not see that. Verifying real responses (with auth, seed data, and network) is the full-checker territory. Similarly for DB: the schema checker verifies structure (columns, types, indexes) — it does not check that a given value in a given row is 'semantically correct.' The default type comparison is family-lenient (e.g. `integer` matches INT / BIGINT / SMALLINT); to force exact-match on a specific column, annotate it with `x-db-type: 'DECIMAL(10,2)'`. Naming the limits up front prevents false confidence — check is a strong tool, not a magic one.",
+      "ja": "OpenAPI diff チェッカーは、実装が「宣言している」OpenAPI と docs を比較するだけで、HTTP リクエストは 1 回も投げません。実装 OpenAPI がレスポンスを `{a, b, c}` と宣言していても実際のワイヤーに `{a, b, d}` が流れていれば、check には見えません。認証付きで実レスポンスを検証するのはフルチェッカー型の領域です。DB も同じで、schema チェッカーが検証するのは構造 (カラム・型・インデックス) であり、「特定の行の特定の値が意味的に正しい」ことは見ません。型比較は既定で「型ファミリ一致」 (例: `integer` は INT / BIGINT / SMALLINT のいずれとも一致) なので、特定カラムに厳密比較を強制したければ `x-db-type: 'DECIMAL(10,2)'` を書きます。制限を先に明示するのは、誤った安心感を避けるためです — check は強力なツールですが、魔法ではありません。"
+    },
+    "next_heading": { "en": "Read next", "ja": "次に読む" },
+    "next_verify_guide_title": { "en": "Verifying implementation against docs", "ja": "実装とドキュメントを照合する" },
+    "next_verify_guide_description": {
+      "en": "Cookbook: declaring checks in jui.config.json, wiring up FastAPI / Spring / NestJS / Rails adapters, running check locally and in CI, and reading the resulting HTML.",
+      "ja": "cookbook: jui.config.json に checks を宣言する、FastAPI / Spring / NestJS / Rails アダプタを配線する、ローカルと CI で check を回す、生成 HTML でレポートを読む — の一連の手順。"
+    },
+    "next_cli_reference_title": { "en": "CLI command reference", "ja": "CLI コマンドリファレンス" },
+    "next_cli_reference_description": {
+      "en": "Complete reference for `jsonui-doc check`, including all subcommands, positional filters (`db` / `api` / `db:main`), the `--list` and `--with-checks` flags, exit-code semantics, and the config schema for `checks` and `databases`.",
+      "ja": "`jsonui-doc check` の全リファレンス — サブコマンド、位置引数フィルタ (`db` / `api` / `db:main`)、`--list` / `--with-checks` フラグ、exit code 意味論、`checks` と `databases` の config スキーマまで。"
+    },
+    "footer_copyright": { "en": "© JsonUI docs", "ja": "© JsonUI docs" }
+  },
+  "guides_verifying_implementation_against_docs": {
+    "breadcrumb": { "en": "← Guides", "ja": "← Guides" },
+    "title": { "en": "Verifying implementation against docs", "ja": "実装とドキュメントを照合する" },
+    "lead": {
+      "en": "Set up `jsonui-doc check` end to end: declare checks in your config, wire up an adapter for whichever backend framework you're using, run the check locally and in CI, and read the resulting HTML page. Includes copy-pasteable snippets for FastAPI, Spring, NestJS, and Rails.",
+      "ja": "`jsonui-doc check` の一連のセットアップを追いかけます — config にチェッカーを宣言し、使用中の backend フレームワーク向けアダプタを配線し、ローカルと CI で走らせ、生成された HTML を読むところまで。FastAPI / Spring / NestJS / Rails のコピペ可能スニペット付きです。"
+    },
+    "read_time": { "en": "~10 min read", "ja": "約 10 分" },
+    "toc_title": { "en": "On this page", "ja": "このページの目次" },
+    "toc_row_what": { "en": "What OpenAPI diff catches", "ja": "OpenAPI diff で見えるもの" },
+    "toc_row_declare": { "en": "Declaring checks in config", "ja": "config に checks を宣言する" },
+    "toc_row_fastapi": { "en": "FastAPI adapter script", "ja": "FastAPI アダプタスクリプト" },
+    "toc_row_frameworks": { "en": "Spring / NestJS / Rails", "ja": "Spring / NestJS / Rails" },
+    "toc_row_execute": { "en": "Running locally + in CI", "ja": "ローカルと CI で実行する" },
+    "toc_row_html": { "en": "Reading the HTML report", "ja": "HTML レポートの読み方" },
+    "toc_row_limits": { "en": "When you need a full checker", "ja": "フルチェッカーが必要なとき" },
+    "section_what_heading": { "en": "What OpenAPI diff catches (and what it doesn't)", "ja": "OpenAPI diff で見えるもの・見えないもの" },
+    "section_what_body": {
+      "en": "The `builtin:openapi-diff` checker compares two OpenAPI documents: the one your backend declares about itself, and the one committed under `docs/api/*.json`. It catches: paths present or absent in either direction (`missing_in_impl` / `missing_in_doc`), request-body and parameter shapes (required, types, names), 2xx response schemas (property existence, types, nullable, required), enum value-set differences, and schema-name mismatches (reported as warnings, not mismatches — the DTO codegen uses the docs name). It does NOT catch: the actual JSON that flows on the wire (only the impl's declared shape), auth flows, or backend business logic. If your backend can emit OpenAPI, this checker works regardless of framework — that's the point of adapter-driven design.",
+      "ja": "`builtin:openapi-diff` は 2 つの OpenAPI ドキュメントを比較します: backend が自分自身について宣言する OpenAPI と、`docs/api/*.json` にコミット済みのもの。検出できる差分: どちら向きでもパスの有無 (`missing_in_impl` / `missing_in_doc`)、リクエストボディ・パラメータの形状 (必須性・型・名前)、2xx レスポンススキーマ (プロパティ存在・型・nullable・required)、enum 値集合の差、スキーマ名の不一致 (mismatch ではなく warning として別枠報告 — DTO 生成は docs 側の名前を使うため)。検出できない差分: ワイヤーに流れる実 JSON (実装が宣言する形しか見ません)、認証フロー、backend のビジネスロジック。backend が OpenAPI を吐ければ framework を問わず動く — それがアダプタ駆動設計の狙いです。"
+    },
+    "section_declare_heading": { "en": "Declaring checks in jui.config.json", "ja": "jui.config.json に checks を宣言する" },
+    "section_declare_body": {
+      "en": "Add a top-level `checks` array to `jui.config.json`. Each entry has a `name` (identifier used in `--list` and reports), a `type` (`builtin:openapi-diff`, `builtin:db-schema`, or `checker` for full-checker), a type-specific field (`impl_openapi_command` for OpenAPI diff), and an optional `timeout_seconds` (default 60). Auth credentials go in environment variables or command-line arguments — never in the config file itself. The runner cds into the project root and executes commands with the declared timeout; nothing outside `checks` runs.",
+      "ja": "`jui.config.json` に top-level `checks` 配列を追加します。各エントリのフィールド: `name` (`--list` とレポートで使う識別子)、`type` (`builtin:openapi-diff` / `builtin:db-schema` / フルチェッカー型は `checker`)、type ごとのフィールド (OpenAPI diff なら `impl_openapi_command`)、任意の `timeout_seconds` (既定 60)。認証情報は必ず環境変数または実行時引数で渡し、config には書きません。ランナーはプロジェクトルートを cwd としてタイムアウト付きでコマンドを実行します — `checks` に宣言していないコードは走りません。"
+    },
+    "section_fastapi_heading": { "en": "FastAPI adapter script", "ja": "FastAPI アダプタスクリプト" },
+    "section_fastapi_body": {
+      "en": "FastAPI already knows its own OpenAPI — `app.openapi()` returns it as a dict. The adapter is a 5-line script that dumps that dict to stdout, invoked from `impl_openapi_command`. Save it as `app/export_openapi.py`, add `python -m app.export_openapi` to your config, and you're done. The same pattern works for any Python framework that exposes an OpenAPI dict.",
+      "ja": "FastAPI は自身の OpenAPI を持っています — `app.openapi()` が dict として返します。アダプタは 5 行程度の Python スクリプトで、この dict を stdout にダンプして `impl_openapi_command` から呼び出すだけです。`app/export_openapi.py` として保存して config に `python -m app.export_openapi` を書けば完了。OpenAPI dict を露出する Python フレームワークならこのパターンがそのまま使えます。"
+    },
+    "section_frameworks_heading": { "en": "Spring / NestJS / Rails adapters", "ja": "Spring / NestJS / Rails のアダプタ" },
+    "section_frameworks_body": {
+      "en": "Every popular backend framework has an OpenAPI-emitting mode. Spring Boot with springdoc-openapi exposes `/v3/api-docs` as JSON — `curl -s http://localhost:8080/v3/api-docs` becomes the `impl_openapi_command`. NestJS with `@nestjs/swagger` builds the document via `SwaggerModule.createDocument(app, config)` — dump it to stdout with `console.log(JSON.stringify(...))`. Rails with rswag emits YAML, so pipe it through `yq -o=json`. The exact shell varies but the pattern is the same: one command that prints valid OpenAPI JSON to stdout.",
+      "ja": "主要な backend フレームワークには OpenAPI 出力機構があります。Spring Boot + springdoc-openapi は `/v3/api-docs` を JSON で公開するので `curl -s http://localhost:8080/v3/api-docs` を `impl_openapi_command` に指定します。NestJS + `@nestjs/swagger` は `SwaggerModule.createDocument(app, config)` でドキュメントを組み立てるので `console.log(JSON.stringify(...))` で stdout に出します。Rails + rswag は YAML を吐くので `yq -o=json` でパイプすれば OK。shell の細部は違いますが、パターンは同じ — 「有効な OpenAPI JSON を stdout に出す 1 コマンド」です。"
+    },
+    "section_execute_heading": { "en": "Running locally and in CI", "ja": "ローカルと CI で実行する" },
+    "section_execute_body": {
+      "en": "Locally: run `jsonui-doc check --list` first to preview what will execute (this prints the resolved commands without running them). Then `jsonui-doc check api` runs only the API checkers, `jsonui-doc check db:main` runs only the checker targeting the `main` database, and `jsonui-doc check` with no filter runs everything declared. Results land in `docs/api/.check-report.json` (or `docs/db/{name}/.check-report.json`) — add these to `.gitignore` so they don't get committed. In CI: expose connection info via environment variables (e.g. `JSONUI_CHECK_DB_URL_MAIN`) and call `jsonui-doc check` as an explicit step. The exit code tells the CI whether to gate the merge: 0 = OK, 1 = mismatch, 2 = execution error.",
+      "ja": "ローカル: まず `jsonui-doc check --list` で実行内容をプレビュー (解決済みのコマンドを表示するだけで実行はしません)。次に `jsonui-doc check api` で API チェッカーだけ、`jsonui-doc check db:main` で DB 名 `main` を対象とするチェッカーだけ、フィルタ無しの `jsonui-doc check` で全宣言を実行。結果は `docs/api/.check-report.json` (または `docs/db/{name}/.check-report.json`) に保存されるので `.gitignore` に追加して commit を避けます。CI: 接続情報は環境変数 (例: `JSONUI_CHECK_DB_URL_MAIN`) で渡し、`jsonui-doc check` を明示ステップとして呼びます。exit code がマージゲートを決めます: 0 = OK / 1 = mismatch / 2 = 実行エラー。"
+    },
+    "section_html_heading": { "en": "Reading the HTML report", "ja": "HTML レポートの読み方" },
+    "section_html_body": {
+      "en": "After check runs, `jsonui-doc generate html` (or the combined `generate html --with-checks` sugar) reads the report and adds an 'Implementation contract' page to the site. The page lists every mismatch row with target (path or table.column), status (mismatch / missing_in_impl / missing_in_doc), confidence badge, expected vs actual, and a human message. Missing rows in the checker output that the impl added get flagged as `missing_in_doc`; missing rows in the impl that the docs still list get flagged as `missing_in_impl`. A stale banner appears if `input_hashes` in the report don't match the current docs — meaning docs changed after the last check ran.",
+      "ja": "check の後に `jsonui-doc generate html` (または合わせ技の `generate html --with-checks` シュガー) がレポートを読んで「実装との整合性」ページをサイトに追加します。ページには mismatch 行が並び、target (パスまたは table.column)、status (mismatch / missing_in_impl / missing_in_doc)、confidence バッジ、expected vs actual、人間向けメッセージが表示されます。実装が追加したのに docs に無い行は `missing_in_doc`、docs に載っているのに実装から消えた行は `missing_in_impl` として区別されます。レポートの `input_hashes` が現在の docs と一致しないと stale バナーが出ます — check 実行後に docs が変わったサインです。"
+    },
+    "section_limits_heading": { "en": "When you need a full checker", "ja": "フルチェッカーが必要なとき" },
+    "section_limits_body": {
+      "en": "Adapter type can't express: hitting a live authenticated API and verifying the real response body, running semantic-invariant checks (like 'this column is null only when the order is refunded'), or spot-checking sampled data. Those go to `type: 'checker'` — you write a command that does the comparison itself and writes a result JSON conforming to the `.check-report.json` schema. The command runs with the same timeout / cwd / env-var contract as adapters. `schemaVersion: 1` is required at the top of the output; malformed output causes exit 2. A common pattern is a Python script using httpx to poll a handful of endpoints on staging, tag each response `ok` / `mismatch`, and set `confidence: 'sampled'` — a report that says 'the wire shape looked right for these N requests' rather than 'the schemas are identical.'",
+      "ja": "アダプタ型では表現できないケース: 認証付き live API を叩いて実レスポンスボディを検証する、意味的規約を検証する (例: 「このカラムが NULL なのは注文が返金されたときだけ」)、実データをサンプリング検証する。こういったケースは `type: 'checker'` (フルチェッカー型) の領域です — 比較まで自分で行い、`.check-report.json` スキーマ準拠の結果 JSON を出力するコマンドを書きます。コマンドはアダプタと同じ契約 (タイムアウト・cwd・環境変数) で実行されます。出力の先頭には `schemaVersion: 1` が必須で、不正な出力は exit 2 になります。よくあるパターンは httpx で staging の数エンドポイントを叩き、各レスポンスに `ok` / `mismatch` タグを付け、`confidence: 'sampled'` で「これら N 件のリクエストではワイヤー形状が正しかった」と報告するスクリプトです。「スキーマが完全一致」とは意味合いが異なることを覚えておいてください。"
+    },
+    "next_heading": { "en": "Read next", "ja": "次に読む" },
+    "next_concept_title": { "en": "Implementation contract check", "ja": "実装との整合性チェック" },
+    "next_concept_description": {
+      "en": "Concept essay: why check is a producer and generate is a renderer, the three confidence levels (proof / metadata / sampled), and the design intent behind the adapter / full-checker split.",
+      "ja": "concept エッセイ: check が生産者・generate が描画者である理由、3 段階の confidence (proof / metadata / sampled)、アダプタ型とフルチェッカー型の分離の設計意図。"
+    },
+    "next_api_cookbook_title": { "en": "API data models (cookbook)", "ja": "API data models (cookbook)" },
+    "next_api_cookbook_description": {
+      "en": "The other side of the API story: how swagger drives DTO + Domain codegen across iOS / Android / Web, with filter / preview / migration recipes.",
+      "ja": "API まわりのもう一方の話: swagger が iOS / Android / Web の DTO + Domain codegen をどう駆動するか、filter・preview・migration の cookbook。"
+    },
+    "footer_copyright": { "en": "© JsonUI docs", "ja": "© JsonUI docs" }
   }
 }

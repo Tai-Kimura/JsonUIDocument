@@ -111,6 +111,22 @@ const RECENT_CHANGES_RAW: ReadonlyArray<{
     ctaLabelKey: "home_whats_new_swagger_mcp_discovery_cta",
     ctaUrl: "/concepts/data-models-from-openapi",
   },
+  {
+    id: "renderer-ssot",
+    date: "Jul 2026",
+    titleKey: "home_whats_new_renderer_ssot_title",
+    blurbKey: "home_whats_new_renderer_ssot_blurb",
+    ctaLabelKey: "home_whats_new_renderer_ssot_cta",
+    ctaUrl: "/concepts/one-layout-json",
+  },
+  {
+    id: "implementation-contract-check",
+    date: "Jul 2026",
+    titleKey: "home_whats_new_implementation_contract_check_title",
+    blurbKey: "home_whats_new_implementation_contract_check_blurb",
+    ctaLabelKey: "home_whats_new_implementation_contract_check_cta",
+    ctaUrl: "/concepts/implementation-contract-check",
+  },
 ];
 
 /**

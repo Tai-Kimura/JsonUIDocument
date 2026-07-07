@@ -32,7 +32,8 @@ const CATALOG: ReadonlyArray<{ id: string; url: string; titleKey: string }> = [
   { id: "data-binding", url: "/concepts/data-binding", titleKey: "concepts_data_binding_title" },
   { id: "hot-reload", url: "/concepts/hot-reload", titleKey: "concepts_hot_reload_title" },
   { id: "responsive-design", url: "/concepts/responsive-design", titleKey: "concepts_responsive_design_title" },
-  { id: "screen-composition", url: "/concepts/screen-composition", titleKey: "concepts_screen_composition_title" }
+  { id: "screen-composition", url: "/concepts/screen-composition", titleKey: "concepts_screen_composition_title" },
+  { id: "implementation-contract-check", url: "/concepts/implementation-contract-check", titleKey: "concepts_implementation_contract_check_title" }
 ];
 
 export class ConceptsIndexViewModel {

@@ -83,7 +83,8 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "hot-reload",            titleKey: "concepts_hot_reload_title",            titleEn: "Hot reload everywhere",      url: "/concepts/hot-reload" },
       { id: "responsive-design",        titleKey: "concepts_responsive_design_title",        titleEn: "Responsive design",                       url: "/concepts/responsive-design" },
       { id: "screen-composition",       titleKey: "concepts_screen_composition_title",       titleEn: "Screen composition",                      url: "/concepts/screen-composition" },
-      { id: "data-models-from-openapi", titleKey: "concepts_data_models_from_openapi_title", titleEn: "Data models from OpenAPI (DTO + Domain)", url: "/concepts/data-models-from-openapi" },
+      { id: "data-models-from-openapi",     titleKey: "concepts_data_models_from_openapi_title",     titleEn: "Data models from OpenAPI (DTO + Domain)", url: "/concepts/data-models-from-openapi" },
+      { id: "implementation-contract-check", titleKey: "concepts_implementation_contract_check_title", titleEn: "Implementation contract check",           url: "/concepts/implementation-contract-check" },
     ],
   },
   {
@@ -112,6 +113,7 @@ const NAV_CATALOG: ReadonlyArray<{
     entries: [
       { id: "writing-your-first-spec", titleKey: "guides_writing_your_first_spec_title", titleEn: "Writing your first spec",     url: "/guides/writing-your-first-spec" },
       { id: "api-data-models",         titleKey: "guides_api_data_models_title",         titleEn: "API data models (cookbook)",  url: "/guides/api-data-models" },
+      { id: "verifying-implementation-against-docs", titleKey: "guides_verifying_implementation_against_docs_title", titleEn: "Verifying implementation against docs", url: "/guides/verifying-implementation-against-docs" },
       { id: "writing-layouts",         titleKey: "guides_writing_layouts_title",         titleEn: "Writing layouts",             url: "/guides/writing-layouts" },
       { id: "navigation",              titleKey: "guides_navigation_title",              titleEn: "Navigation between screens", url: "/guides/navigation" },
       { id: "testing",                 titleKey: "guides_testing_title",                 titleEn: "Writing screen tests",        url: "/guides/testing" },
