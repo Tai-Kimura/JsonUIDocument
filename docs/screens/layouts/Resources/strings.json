@@ -279,8 +279,8 @@
     "card_mcp_title": { "en": "jsonui-mcp-server", "ja": "jsonui-mcp-server" },
     "card_mcp_location": { "en": "~/.jsonui-mcp-server/ + ~/.claude.json", "ja": "~/.jsonui-mcp-server/ と ~/.claude.json" },
     "card_mcp_body": {
-      "en": "33 MCP tools across 5 groups (A:8 / B:6 / C:7 / D:9 / E:3) with runtime-sync so the attribute schema is always current.",
-      "ja": "33 の MCP ツールを 5 グループ（A:8 / B:6 / C:7 / D:9 / E:3）で提供。runtime-sync で常に最新の attribute スキーマを参照します。"
+      "en": "39 MCP tools across 6 groups (A:8 / B:6 / C:7 / D:9 / E:3 / F:6) with runtime-sync so the attribute schema is always current.",
+      "ja": "39 の MCP ツールを 6 グループ（A:8 / B:6 / C:7 / D:9 / E:3 / F:6）で提供。runtime-sync で常に最新の attribute スキーマを参照します。"
     },
     "card_agents_title": { "en": "Agents + Skills + Rules", "ja": "Agents + Skills + Rules" },
     "card_agents_location": { "en": "./.claude/ + CLAUDE.md", "ja": "./.claude/ と CLAUDE.md" },
@@ -459,13 +459,13 @@
     "related_heading": { "en": "Related pages", "ja": "関連ページ" },
     "related_subheading": { "en": "Dig into any component whose details you skipped on this page.", "ja": "このページで飛ばした詳細は関連ページで掘り下げられます。" },
     "related_cli_label": { "en": "CLI reference — every jui / sjui / kjui / rjui command", "ja": "CLI リファレンス — jui / sjui / kjui / rjui の全コマンド" },
-    "related_mcp_label": { "en": "MCP reference — all 33 tools grouped by capability", "ja": "MCP リファレンス — 33 ツールを能力別に整理" },
+    "related_mcp_label": { "en": "MCP reference — all 39 tools grouped by capability", "ja": "MCP リファレンス — 39 ツールを能力別に整理" },
     "related_agents_label": {
       "en": "Agents reference — the 9 agents that drive the spec-first workflow",
       "ja": "Agents リファレンス — spec-first ワークフローを支える 9 エージェント"
     },
     "related_hello_world_label": { "en": "Hello, JsonUI — write your first screen in five minutes", "ja": "Hello, JsonUI — 最初の画面を 5 分で書く" },
-    "related_get_data_source_label": { "en": "MCP tool reference — all 33 tools incl. get-data-source", "ja": "MCP ツールリファレンス — get-data-source を含む全 33 ツール" },
+    "related_get_data_source_label": { "en": "MCP tool reference — all 39 tools incl. get-data-source", "ja": "MCP ツールリファレンス — get-data-source を含む全 39 ツール" },
     "next_heading": { "en": "Next: write your first screen", "ja": "次は最初の画面を書きましょう" },
     "next_subheading": {
       "en": "You have a working toolchain. Hello, JsonUI takes you from blank spec to text on screen in five minutes.",
@@ -610,8 +610,8 @@
     "article_json_schema_read_time": { "en": "downloadable", "ja": "ダウンロード" },
     "article_mcp_tools_title": { "en": "MCP tool API", "ja": "MCP ツール API" },
     "article_mcp_tools_description": {
-      "en": "All 33 MCP tools with full parameter schemas + examples. Hand-authored catalog kept in sync with the MCP server's 5-group tool list.",
-      "ja": "全 33 MCP ツールの引数スキーマ + 例。MCP サーバの 5 グループ tool list と同期する手書きカタログです。"
+      "en": "All 39 MCP tools with full parameter schemas + examples. Hand-authored catalog kept in sync with the MCP server's 6-group tool list.",
+      "ja": "全 39 MCP ツールの引数スキーマ + 例。MCP サーバの 6 グループ tool list と同期する手書きカタログです。"
     },
     "article_mcp_tools_read_time": { "en": "auto-generated", "ja": "自動生成" },
     "article_cli_commands_title": { "en": "CLI command reference", "ja": "CLI コマンドリファレンス" },
@@ -676,8 +676,8 @@
     "article_cli_read_time": { "en": "~10 min read", "ja": "約 10 分" },
     "article_mcp_title": { "en": "jsonui-mcp-server", "ja": "jsonui-mcp-server" },
     "article_mcp_description": {
-      "en": "33 MCP tools in 5 groups. Lookup, validation, generation, build orchestration, API model discovery. Runtime-synced with attribute definitions.",
-      "ja": "33 ツールを 5 グループで提供。Lookup / validation / generation / build / API model discovery を管理、attribute 定義とランタイム同期。"
+      "en": "39 MCP tools in 6 groups. Lookup, validation, generation, build orchestration, API model discovery, test tooling. Runtime-synced with attribute definitions.",
+      "ja": "39 ツールを 6 グループで提供。Lookup / validation / generation / build / API model discovery / test tooling を管理、attribute 定義とランタイム同期。"
     },
     "article_mcp_read_time": { "en": "~12 min read", "ja": "約 12 分" },
     "article_test_runner_title": { "en": "jsonui-test-runner", "ja": "jsonui-test-runner" },
@@ -768,7 +768,7 @@
     },
     "section_agent_heading": { "en": "The agent handshake", "ja": "エージェントとの握手" },
     "section_agent_body": {
-      "en": "LLM-driven engineering lives or dies on context. A spec is a compact, machine-readable description of what a screen must do — exactly the context an agent needs. The spec's contract surface now extends to API schemas too: OpenAPI files in `docs/api/` become DTO + Domain layers across all three platforms, and consumers of a shared swagger can scope what gets generated via `api.schemas.{include_paths, exclude_paths, include_schemas, exclude_schemas, skip_domain}` — see [/concepts/data-models-from-openapi](/concepts/data-models-from-openapi) for the full story. The jsonui-mcp-server exposes the spec + attribute schema via 33 typed tools, so an agent can ask 'what props does a Collection accept?' and get back a structured answer, not a page of prose. The handshake is: the human writes the spec, the agent materializes the implementation within that spec, the drift gate keeps both honest.",
+      "en": "LLM-driven engineering lives or dies on context. A spec is a compact, machine-readable description of what a screen must do — exactly the context an agent needs. The spec's contract surface now extends to API schemas too: OpenAPI files in `docs/api/` become DTO + Domain layers across all three platforms, and consumers of a shared swagger can scope what gets generated via `api.schemas.{include_paths, exclude_paths, include_schemas, exclude_schemas, skip_domain}` — see [/concepts/data-models-from-openapi](/concepts/data-models-from-openapi) for the full story. The jsonui-mcp-server exposes the spec + attribute schema via 39 typed tools, so an agent can ask 'what props does a Collection accept?' and get back a structured answer, not a page of prose. The handshake is: the human writes the spec, the agent materializes the implementation within that spec, the drift gate keeps both honest.",
       "ja": "LLM によるエンジニアリングはコンテキストの質と量で決まります。spec は画面の必須挙動をコンパクトに・機械可読な形式で記述した、まさにエージェントが欲しい形のコンテキストです。spec の射程は API schema にも広がりました: `docs/api/` の OpenAPI ファイルが 3 プラットフォーム共通の DTO + Domain 層になり、共有 swagger を消費する側は `api.schemas.{include_paths, exclude_paths, include_schemas, exclude_schemas, skip_domain}` で生成範囲を絞れます — 詳細は [/concepts/data-models-from-openapi](/concepts/data-models-from-openapi) を参照。jsonui-mcp-server は spec と attribute スキーマを 33 個の型付きツールとして公開し、エージェントは「Collection の props は何か」と聞けば散文ではなく構造化された答えを得ます。握手: 人が spec を書き、エージェントが spec の中で実装を形にし、ドリフトゲートが両者を正直に保つ。"
     },
     "section_tradeoff_heading": { "en": "What we give up", "ja": "代償" },
@@ -1577,7 +1577,7 @@
     },
     "section_flow_heading": { "en": "The conductor flow", "ja": "conductor フロー" },
     "section_flow_body": {
-      "en": "You never invoke the specialist agents (define / implement / test / debug) directly. You start by telling Claude 'Read CLAUDE.md'. That triggers the jsonui-workflow skill, which asks you one question — what workflow are you here for — and dispatches the jsonui-conductor agent. The conductor inspects the repo through the MCP server (33 typed tools, including `list_api_specs` so it knows whether the project consumes OpenAPI), asks one or two clarifying questions, and hands off to exactly the right specialist with the right context already loaded. Everything flows through that single entry point.",
+      "en": "You never invoke the specialist agents (define / implement / test / debug) directly. You start by telling Claude 'Read CLAUDE.md'. That triggers the jsonui-workflow skill, which asks you one question — what workflow are you here for — and dispatches the jsonui-conductor agent. The conductor inspects the repo through the MCP server (39 typed tools, including `list_api_specs` so it knows whether the project consumes OpenAPI), asks one or two clarifying questions, and hands off to exactly the right specialist with the right context already loaded. Everything flows through that single entry point.",
       "ja": "specialist エージェント（define / implement / test / debug）を直接呼ぶことはありません。まず Claude に 'Read CLAUDE.md' と伝える。これが jsonui-workflow スキルを発火し、ワークフロー種別を 1 つ質問して jsonui-conductor エージェントに引き継ぐ。conductor は MCP サーバー（型付きツール 33 個。`list_api_specs` も含むので、プロジェクトが OpenAPI を使っているかを最初に把握できる）でリポジトリを精査し、1〜2 個の確認質問をしてから、適切なコンテキストを載せた状態で正しい specialist に引き渡す。全ては単一の入口経由で流れる構造になっています。"
     },
     "section_catalog_heading": { "en": "Agent catalog", "ja": "エージェント一覧" },
@@ -1652,8 +1652,8 @@
     },
     "next_mcp_title": { "en": "jsonui-mcp-server", "ja": "jsonui-mcp-server" },
     "next_mcp_description": {
-      "en": "33 typed MCP tools — the API surface every agent uses to inspect the repo, including the Group E discovery tools.",
-      "ja": "33 個の型付き MCP ツール — 全エージェントがリポジトリ精査に使う API。Group E の discovery tool も含まれます。"
+      "en": "39 typed MCP tools — the API surface every agent uses to inspect the repo, including the Group E discovery tools and the Group F test tools.",
+      "ja": "39 個の型付き MCP ツール — 全エージェントがリポジトリ精査に使う API。Group E の discovery tool と Group F の test tool も含まれます。"
     },
     "footer_copyright": {
       "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
@@ -1669,8 +1669,8 @@
     "breadcrumb": { "en": "← Tools", "ja": "← Tools" },
     "title": { "en": "jsonui-mcp-server", "ja": "jsonui-mcp-server" },
     "lead": {
-      "en": "Thirty-three typed tools grouped into five families. The agents use them to inspect any JsonUI project — specs, layouts, components, builds, runtime sync, and API model discovery — without each agent needing to re-implement parse, schema-lookup, or file I/O.",
-      "ja": "33 個の型付きツールを 5 ファミリにまとめた MCP サーバー。エージェントはこれを使って JsonUI プロジェクトの spec / layout / コンポーネント / ビルド / ランタイム同期 / API model discovery を精査します。各エージェントが parse やスキーマ検索・ファイル IO を再実装する必要がありません。"
+      "en": "Thirty-nine typed tools grouped into six families. The agents use them to inspect any JsonUI project — specs, layouts, components, builds, runtime sync, API model discovery, and test tooling — without each agent needing to re-implement parse, schema-lookup, or file I/O.",
+      "ja": "39 個の型付きツールを 6 ファミリにまとめた MCP サーバー。エージェントはこれを使って JsonUI プロジェクトの spec / layout / コンポーネント / ビルド / ランタイム同期 / API model discovery / test tooling を精査します。各エージェントが parse やスキーマ検索・ファイル IO を再実装する必要がありません。"
     },
     "read_time": { "en": "~12 min read", "ja": "約 12 分" },
     "section_what_heading": { "en": "What MCP is", "ja": "MCP とは" },
@@ -1685,13 +1685,13 @@
     },
     "section_catalog_heading": { "en": "Tool catalog", "ja": "ツール一覧" },
     "section_catalog_body": {
-      "en": "Hand-authored catalog kept in sync with the MCP server's 5-group tool list (33 tools currently — A:8 / B:6 / C:7 / D:9 / E:3). Per-tool parameter docs live at [/reference/mcp-tools](/reference/mcp-tools).",
-      "ja": "MCP サーバの 5 グループ tool list と同期する手書きカタログ（現在 33 件 — A:8 / B:6 / C:7 / D:9 / E:3）。ツール毎のパラメータ詳細は [/reference/mcp-tools](/reference/mcp-tools) を参照。"
+      "en": "Hand-authored catalog kept in sync with the MCP server's 6-group tool list (39 tools currently — A:8 / B:6 / C:7 / D:9 / E:3 / F:6). Per-tool parameter docs live at [/reference/mcp-tools](/reference/mcp-tools).",
+      "ja": "MCP サーバの 6 グループ tool list と同期する手書きカタログ（現在 39 件 — A:8 / B:6 / C:7 / D:9 / E:3 / F:6）。ツール毎のパラメータ詳細は [/reference/mcp-tools](/reference/mcp-tools) を参照。"
     },
     "section_groups_heading": { "en": "Group semantics", "ja": "グループの意味" },
     "section_groups_body": {
-      "en": "A (Lookup, 8): read-only introspection of specs, layouts, the component index, and the data-source the server itself is using. B (Validation, 6): schema and drift checks — the gate logic agents run before declaring a change done. C (Generation, 7): create the empty shapes the agent will fill in — specs, scaffolds, HTML docs. D (Build + Runtime, 9): orchestrate the per-platform build, sync the tooling, and read files back so read-only agents (jsonui-debug) can work without spawning shell commands. E (API Model Discovery, 3): the new 2026-05 group — list_api_specs / list_api_models / preview_api_model_sync — for inspecting and dry-running the swagger → DTO + Domain pipeline. Each group is one conceptual step in the spec-first loop; each tool is one bounded responsibility.",
-      "ja": "A (Lookup, 8): spec・layout・コンポーネントインデックス、そして MCP サーバ自身が読んでいるデータ出どころの読み取り専用精査。B (Validation, 6): スキーマ検証とドリフト検査 — エージェントが変更を完了とする前に走らせるゲートロジック。C (Generation, 7): エージェントが埋める空 shape を作る — spec / scaffold / HTML ドキュメント。D (Build + Runtime, 9): プラットフォーム毎のビルドを指揮し、tooling を同期し、ファイルを読み直す。read-only エージェント（jsonui-debug）が shell コマンドを spawn せずに動ける。E (API Model Discovery, 3): 2026-05 に追加された新グループ — list_api_specs / list_api_models / preview_api_model_sync — で swagger → DTO + Domain パイプラインを精査・dry-run できる。各グループが spec-first ループの 1 ステップ、各ツールが 1 つの責務に限定される構造。"
+      "en": "A (Lookup, 8): read-only introspection of specs, layouts, the component index, and the data-source the server itself is using. B (Validation, 6): schema and drift checks — the gate logic agents run before declaring a change done. C (Generation, 7): create the empty shapes the agent will fill in — specs, scaffolds, HTML docs. D (Build + Runtime, 9): orchestrate the per-platform build, sync the tooling, and read files back so read-only agents (jsonui-debug) can work without spawning shell commands. E (API Model Discovery, 3): the 2026-05 group — list_api_specs / list_api_models / preview_api_model_sync — for inspecting and dry-running the swagger → DTO + Domain pipeline. F (Test Tooling, 6): the 2026-07 group — test_validate / test_generate_screen / test_generate_flow / test_generate_description / test_report / test_mock_generate — for validating, scaffolding, reporting, and mocking JsonUI tests (the long-running `mock serve` stays CLI-only). Each group is one conceptual step in the spec-first loop; each tool is one bounded responsibility.",
+      "ja": "A (Lookup, 8): spec・layout・コンポーネントインデックス、そして MCP サーバ自身が読んでいるデータ出どころの読み取り専用精査。B (Validation, 6): スキーマ検証とドリフト検査 — エージェントが変更を完了とする前に走らせるゲートロジック。C (Generation, 7): エージェントが埋める空 shape を作る — spec / scaffold / HTML ドキュメント。D (Build + Runtime, 9): プラットフォーム毎のビルドを指揮し、tooling を同期し、ファイルを読み直す。read-only エージェント（jsonui-debug）が shell コマンドを spawn せずに動ける。E (API Model Discovery, 3): 2026-05 のグループ — list_api_specs / list_api_models / preview_api_model_sync — で swagger → DTO + Domain パイプラインを精査・dry-run できる。F (Test Tooling, 6): 2026-07 のグループ — test_validate / test_generate_screen / test_generate_flow / test_generate_description / test_report / test_mock_generate — で JsonUI テストの検証・生成・レポート・モックを行う（常駐する `mock serve` は CLI 専用）。各グループが spec-first ループの 1 ステップ、各ツールが 1 つの責務に限定される構造。"
     },
     "next_heading": { "en": "Keep reading", "ja": "次に読む" },
     "next_agents_title": { "en": "Agents for Claude / Codex", "ja": "Claude / Codex 向け Agents" },
@@ -1894,6 +1894,42 @@
       "en": "Dry-run filter changes — returns `kept_schemas` / `filtered_out` / `skip_domain_matches` / `halts` as JSON without writing files.",
       "ja": "filter 変更を dry-run し、`kept_schemas` / `filtered_out` / `skip_domain_matches` / `halts` を JSON で返します（ファイル書き込みなし）。"
     },
+    "tool_test_validate_name": { "en": "test_validate", "ja": "test_validate" },
+    "tool_test_validate_group": { "en": "F", "ja": "F" },
+    "tool_test_validate_role": {
+      "en": "Validate screen/flow test files + descriptions against the schema; when `test.install` is configured, installs the validated tests to the platform test dirs.",
+      "ja": "画面 / フローテストファイルと description をスキーマ検証。`test.install` 設定時は検証済みテストを各プラットフォームのテスト dir に配置します。"
+    },
+    "tool_test_generate_screen_name": { "en": "test_generate_screen", "ja": "test_generate_screen" },
+    "tool_test_generate_screen_group": { "en": "F", "ja": "F" },
+    "tool_test_generate_screen_role": {
+      "en": "Scaffold a screen test template for a named screen.",
+      "ja": "指定した画面の screen test テンプレートを生成。"
+    },
+    "tool_test_generate_flow_name": { "en": "test_generate_flow", "ja": "test_generate_flow" },
+    "tool_test_generate_flow_group": { "en": "F", "ja": "F" },
+    "tool_test_generate_flow_role": {
+      "en": "Scaffold a flow test template spanning multiple screens.",
+      "ja": "複数画面にまたがる flow test テンプレートを生成。"
+    },
+    "tool_test_generate_description_name": { "en": "test_generate_description", "ja": "test_generate_description" },
+    "tool_test_generate_description_group": { "en": "F", "ja": "F" },
+    "tool_test_generate_description_role": {
+      "en": "Scaffold a description JSON for one screen/flow test case.",
+      "ja": "screen / flow テストの 1 ケース用 description JSON を生成。"
+    },
+    "tool_test_report_name": { "en": "test_report", "ja": "test_report" },
+    "tool_test_report_group": { "en": "F", "ja": "F" },
+    "tool_test_report_role": {
+      "en": "Convert results JSON (results.schema.json) into a JUnit XML or HTML report.",
+      "ja": "結果 JSON (results.schema.json) を JUnit XML / HTML レポートに変換。"
+    },
+    "tool_test_mock_generate_name": { "en": "test_mock_generate", "ja": "test_mock_generate" },
+    "tool_test_mock_generate_group": { "en": "F", "ja": "F" },
+    "tool_test_mock_generate_role": {
+      "en": "Scaffold API mock files from OpenAPI; `check:true` reports drift without writing. (`mock serve` stays CLI-only.)",
+      "ja": "OpenAPI から API モックファイルを生成。`check:true` は書き込まず drift のみ報告。（`mock serve` は CLI 専用。）"
+    },
     "toc_title": { "en": "On this page", "ja": "このページ" },
     "toc_row_what": { "en": "What MCP is", "ja": "MCP とは" },
     "toc_row_shape": { "en": "The typed surface", "ja": "型付きインターフェイス" },
@@ -1955,8 +1991,8 @@
     "cli_jsonui_test_name": { "en": "jsonui-test", "ja": "jsonui-test" },
     "cli_jsonui_test_role": { "en": "TEST RUNNER", "ja": "TEST RUNNER" },
     "cli_jsonui_test_body": {
-      "en": "Executes tests/screens/*.test.json against a real running app — iOS simulator, Android emulator, or a headless browser. Lookup + interact + assert is the only DSL; tests are JSON, not code.",
-      "ja": "tests/screens/*.test.json を実際に動いているアプリ — iOS シミュレータ / Android エミュレータ / ヘッドレスブラウザ — に対して実行します。Lookup + interact + assert が唯一の DSL、テストは JSON であってコードではありません。"
+      "en": "Executes tests/screens/*.test.json against a real running app — iOS simulator, Android emulator, or a headless browser. Every step is an action or an assertion, with the target element found by its `id`; tests are JSON, not code.",
+      "ja": "tests/screens/*.test.json を実際に動いているアプリ — iOS シミュレータ / Android エミュレータ / ヘッドレスブラウザ — に対して実行します。各ステップは action か assert で、対象要素は `id` で特定します。テストは JSON であってコードではありません。"
     },
     "cli_jsonui_doc_name": { "en": "jsonui-doc", "ja": "jsonui-doc" },
     "cli_jsonui_doc_role": { "en": "DOC GEN", "ja": "DOC GEN" },
@@ -1969,8 +2005,8 @@
     "next_agents_description": { "en": "The nine agents that drive jui for you.", "ja": "jui を代わりに動かしてくれる 9 エージェント。" },
     "next_mcp_title": { "en": "jsonui-mcp-server", "ja": "jsonui-mcp-server" },
     "next_mcp_description": {
-      "en": "The 33 typed MCP tools the agents call — many of them wrap jui commands; Group E adds API model discovery.",
-      "ja": "エージェントが呼ぶ 33 個の型付き MCP ツール — 多くは jui コマンドのラッパー。Group E で API model discovery が加わりました。"
+      "en": "The 39 typed MCP tools the agents call — many of them wrap jui commands; Group E adds API model discovery, Group F adds test tooling.",
+      "ja": "エージェントが呼ぶ 39 個の型付き MCP ツール — 多くは jui コマンドのラッパー。Group E で API model discovery、Group F で test tooling が加わりました。"
     },
     "footer_copyright": {
       "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
@@ -2159,14 +2195,14 @@
     "breadcrumb": { "en": "← Tools", "ja": "← Tools" },
     "title": { "en": "jsonui-test-runner", "ja": "jsonui-test-runner" },
     "lead": {
-      "en": "JSON-authored tests that drive a real running app. Screen tests, flow tests, and user-action tests — all in the same 'lookup + interact + assert' DSL, executed by a per-platform driver so one test file runs against iOS simulator, Android emulator, and a headless browser.",
-      "ja": "JSON で記述したテストが、実際に動いているアプリを駆動します。画面テスト・フローテスト・ユーザーアクションテスト — 全て同じ「lookup + interact + assert」DSL で書き、プラットフォーム別ドライバが 1 つのテストファイルを iOS シミュレータ / Android エミュレータ / ヘッドレスブラウザに対して実行します。"
+      "en": "JSON-authored tests that drive a real running app. Screen tests, flow tests, and user-action tests — all in the same action / assertion DSL (targets found by `id`), executed by a per-platform driver so one test file runs against iOS simulator, Android emulator, and a headless browser.",
+      "ja": "JSON で記述したテストが、実際に動いているアプリを駆動します。画面テスト・フローテスト・ユーザーアクションテスト — 全て同じ action / assert DSL（対象は `id` で特定）で書き、プラットフォーム別ドライバが 1 つのテストファイルを iOS シミュレータ / Android エミュレータ / ヘッドレスブラウザに対して実行します。"
     },
     "read_time": { "en": "~8 min read", "ja": "約 8 分" },
     "section_shape_heading": { "en": "JSON test file shape", "ja": "テストファイルの形式" },
     "section_shape_body": {
-      "en": "A test file targets one screen. Each case is a named sequence of steps. Steps are one of three shapes: a `lookup` (find a node by id / text / role), an `interact` (tap / type / scroll), or an `assert` (visible / notVisible / contains / equals). The runner preserves state between steps, so you can find an element once and refer to it later.",
-      "ja": "1 テストファイルは 1 画面を対象とします。各ケースは名前付きステップ列。ステップは 3 種類のいずれか: `lookup`（id / text / role でノード検索）、`interact`（タップ / 入力 / スクロール）、`assert`（visible / notVisible / contains / equals）。ランナーがステップ間で状態を保持するので、一度見つけた要素を後で参照可能です。"
+      "en": "A test file targets one screen. Each case is a named sequence of steps. Every step is one of two shapes: an `action` (tap / input / scroll / waitFor / …) or an `assert` (visible / notVisible / text / count / state). The target element is identified by its `id` inside the step — there is no separate lookup verb — and the runner preserves state between steps.",
+      "ja": "1 テストファイルは 1 画面を対象とします。各ケースは名前付きステップ列。各ステップは 2 種類のいずれか: `action`（tap / input / scroll / waitFor など）または `assert`（visible / notVisible / text / count / state）。対象要素はステップ内の `id` で特定し（独立した lookup 動詞はありません）、ランナーはステップ間で状態を保持します。"
     },
     "section_dsl_heading": { "en": "The DSL", "ja": "DSL" },
     "section_dsl_body": {
@@ -3341,8 +3377,8 @@
     "breadcrumb": { "en": "← Guides", "ja": "← Guides" },
     "title": { "en": "Writing screen tests", "ja": "画面テストを書く" },
     "lead": {
-      "en": "JsonUI tests are JSON files — same language as your layouts. One file describes a screen or a flow, and a per-platform driver (XCUITest for iOS, Espresso for Android, Playwright for Web) executes it. The CLI is jsonui-test, shipped by a separate package (jsonui-test-runner) — there is no `jui test` command. This guide covers the real shape of tests, the action/assert DSL, and the invocation flow.",
-      "ja": "JsonUI のテストは JSON ファイルです — layout と同じ言語。1 ファイルが screen または flow を記述し、プラットフォーム別 driver (iOS: XCUITest, Android: Espresso, Web: Playwright) が実行します。CLI は jsonui-test で、別パッケージ (jsonui-test-runner) から提供されます — `jui test` コマンドは存在しません。このガイドでは実際のテスト形式、action/assert DSL、実行フローを扱います。"
+      "en": "JsonUI tests are JSON files — same language as your layouts. One file describes a screen or a flow, and a per-platform driver (XCUITest for iOS, Espresso / UI Automator for Android, Playwright for Web) executes it. The CLI is jsonui-test, shipped inside jsonui-cli — there is no `jui test` command. This guide covers the real shape of tests, the action/assert DSL, the drivers, and the invocation flow.",
+      "ja": "JsonUI のテストは JSON ファイルです — layout と同じ言語。1 ファイルが screen または flow を記述し、プラットフォーム別 driver (iOS: XCUITest, Android: Espresso / UI Automator, Web: Playwright) が実行します。CLI は jsonui-test で、jsonui-cli に同梱されています — `jui test` コマンドは存在しません。このガイドでは実際のテスト形式、action/assert DSL、ドライバ、実行フローを扱います。"
     },
     "read_time": { "en": "~14 min read", "ja": "約 14 分" },
     "next_heading": { "en": "Keep reading", "ja": "次に読む" },
@@ -3371,46 +3407,54 @@
       "ja": "2 つの schema、いずれも jsonui-test-runner/schemas/ に定義されています。各 step は action (操作) か assert (検証) のどちらか。'lookup' 動詞はありません — 対象の特定は各 step のパラメータの一部です。"
     },
     "section_dsl_bullet_actions": {
-      "en": "• Actions: tap (id or text), doubleTap, longPress (optional duration), input (value required), clear, scroll (direction required), swipe, waitFor / waitForAny, wait (duration), back, screenshot (name), alertTap, selectOption, tapItem (collection cell), selectTab.",
-      "ja": "• Actions: tap (id または text)、doubleTap、longPress (optional duration)、input (value 必須)、clear、scroll (direction 必須)、swipe、waitFor / waitForAny、wait (duration)、back、screenshot (name)、alertTap、selectOption、tapItem (collection cell)、selectTab。"
+      "en": "• Actions: tap (id / text, optional retryTapIfNoChange), doubleTap, longPress (duration), input (value), clear, scroll (direction), scrollUntilVisible (id + container + timeout), swipe, waitFor / waitForAny, wait (ms), back, screenshot (name), readText (stores the text in @{variable} for later steps), repeat (times or while + steps), retry (maxRetries 0–3 + steps), setLocation (latitude / longitude), addMedia (Android only), alertTap, selectOption, tapItem (collection cell), selectTab, setMocks.",
+      "ja": "• Actions: tap (id / text、任意で retryTapIfNoChange)、doubleTap、longPress (duration)、input (value)、clear、scroll (direction)、scrollUntilVisible (id + container + timeout)、swipe、waitFor / waitForAny、wait (ms)、back、screenshot (name)、readText (テキストを @{variable} に格納して後続 step で参照)、repeat (times または while + steps)、retry (maxRetries 0–3 + steps)、setLocation (latitude / longitude)、addMedia (Android のみ)、alertTap、selectOption、tapItem (collection cell)、selectTab、setMocks。"
     },
     "section_dsl_bullet_asserts": {
-      "en": "• Asserts: visible / notVisible (id), enabled / disabled (id), text (id + equals or contains), count (id + equals), state (path in dot-notation + equals — reads the VM observable).",
-      "ja": "• Asserts: visible / notVisible (id)、enabled / disabled (id)、text (id + equals または contains)、count (id + equals)、state (dot-notation パス + equals — VM の observable を読む)。"
+      "en": "• Asserts: visible / notVisible, enabled / disabled, text (id + equals or contains), count (id + equals), state (dot-path + equals, read through a state provider), screenshot (baseline compare, similarity threshold — default 98%). Every assertion auto-waits: it polls every 100 ms up to `timeout` (default 5000 ms) until the condition holds, so explicit waits are rarely needed.",
+      "ja": "• Asserts: visible / notVisible、enabled / disabled、text (id + equals または contains)、count (id + equals)、state (dot-path + equals、state provider 経由で読む)、screenshot (ベースライン比較、類似度しきい値 — 既定 98%)。全アサーションは auto-wait: 条件成立まで `timeout` (既定 5000ms) の範囲で 100ms ごとにポーリングするので、明示的な wait はほぼ不要です。"
     },
     "section_drivers_heading": { "en": "5. The drivers", "ja": "5. ドライバ" },
     "section_drivers_body": {
-      "en": "The same .test.json runs on three very different runtimes. Each driver maps layout `id` attributes onto the native platform's test-automation identifier, then executes the steps. No shared runner binary — each driver is invoked via its native build system.",
-      "ja": "同じ .test.json が 3 つの異なるランタイムで実行されます。各 driver は layout の `id` 属性をそのプラットフォームのテスト自動化識別子にマップし、steps を実行します。共通ランナーバイナリはありません — 各 driver はそのネイティブビルドシステムから起動します。"
+      "en": "The same .test.json runs on three very different runtimes. Each driver is published at version 1.0.0 to its registry (SPM / Maven Central / npm), maps layout `id` attributes onto the platform's test-automation identifier, then executes the steps. No shared runner binary — each driver is invoked via its native build system. Write the JSON once; the drivers give you the same test on all three.",
+      "ja": "同じ .test.json が 3 つの異なるランタイムで実行されます。各 driver は 1.0.0 として各レジストリ (SPM / Maven Central / npm) に公開され、layout の `id` 属性をそのプラットフォームのテスト自動化識別子にマップし、steps を実行します。共通ランナーバイナリはありません — 各 driver はそのネイティブビルドシステムから起動します。JSON は 1 度書けば、3 プラットフォームで同じテストが走ります。"
     },
     "section_drivers_bullet_ios": {
-      "en": "• iOS — XCUITest. id → accessibilityIdentifier. Run via `xcodebuild test` or Xcode GUI.",
-      "ja": "• iOS — XCUITest。id → accessibilityIdentifier にマップ。`xcodebuild test` または Xcode GUI で実行。"
+      "en": "• iOS — XCUITest, via Swift Package `github.com/Tai-Kimura/jsonui-test-runner-ios` (from: \"1.0.0\"). id → accessibilityIdentifier. `JsonUITest.load(from:)` / `loadAll(from:)` → `JsonUITest.createRunner(app:).run(screenTest:)`; check `result.allPassed`. Runs under `xcodebuild test` or the Xcode GUI.",
+      "ja": "• iOS — XCUITest。Swift Package `github.com/Tai-Kimura/jsonui-test-runner-ios` (from: \"1.0.0\")。id → accessibilityIdentifier。`JsonUITest.load(from:)` / `loadAll(from:)` → `JsonUITest.createRunner(app:).run(screenTest:)`、`result.allPassed` で判定。`xcodebuild test` または Xcode GUI で実行。"
     },
     "section_drivers_bullet_android": {
-      "en": "• Android — Espresso + UI Automator. id → contentDescription. Run via `./gradlew connectedAndroidTest` or Firebase Test Lab.",
-      "ja": "• Android — Espresso + UI Automator。id → contentDescription にマップ。`./gradlew connectedAndroidTest` または Firebase Test Lab で実行。"
+      "en": "• Android — Espresso + UI Automator, via Maven Central `io.github.tai-kimura:jsonui-test-runner-android:1.0.0` (needs `mavenCentral()`). id → resource-id (Compose `testTag` exposed via `testTagsAsResourceId`). `JsonUITest.loadFromAssets(ctx, path)` → `JsonUITest.createRunner().run(test)` → `TestSuiteResult.allPassed`. Runs under `./gradlew connectedAndroidTest` or Firebase Test Lab.",
+      "ja": "• Android — Espresso + UI Automator。Maven Central `io.github.tai-kimura:jsonui-test-runner-android:1.0.0` (`mavenCentral()` が必要)。id → resource-id (Compose の `testTag` を `testTagsAsResourceId` で公開)。`JsonUITest.loadFromAssets(ctx, path)` → `JsonUITest.createRunner().run(test)` → `TestSuiteResult.allPassed`。`./gradlew connectedAndroidTest` または Firebase Test Lab で実行。"
     },
     "section_drivers_bullet_web": {
-      "en": "• Web — Playwright. id → DOM data attribute. Run via `npx playwright test` (with Playwright installed in the web project).",
-      "ja": "• Web — Playwright。id → DOM データ属性にマップ。`npx playwright test` で実行 (web プロジェクトに Playwright をインストール済みの状態)。"
+      "en": "• Web — Playwright, via npm `jsonui-test-runner-web@^1.0.0`. id → the HTML `id` attribute (`#id` selector — not data-testid). `TestLoader.loadFromFile(...)` / `loadFromDirectory(...)` → `new JsonUITestRunner(page).run(loadedTest)`; pass/fail via the `allPassed(result)` function. Runs under `npx playwright test`.",
+      "ja": "• Web — Playwright。npm `jsonui-test-runner-web@^1.0.0`。id → HTML の `id` 属性 (`#id` セレクタ — data-testid ではありません)。`TestLoader.loadFromFile(...)` / `loadFromDirectory(...)` → `new JsonUITestRunner(page).run(loadedTest)`、判定は `allPassed(result)` 関数。`npx playwright test` で実行。"
     },
     "section_cli_heading": { "en": "6. The jsonui-test CLI", "ja": "6. jsonui-test CLI" },
     "section_cli_body": {
-      "en": "jsonui-test is a separate Python package — not part of `jui`. Install it once via the bootstrap script. The CLI handles validation and scaffolding; actually running tests happens via the platform driver above.",
-      "ja": "jsonui-test は独立した Python パッケージで、`jui` の一部ではありません。bootstrap スクリプトで 1 度インストールすればよい。CLI は validation と scaffolding を担当し、実行そのものは上記の platform driver が行います。"
+      "en": "jsonui-test ships inside jsonui-cli — the same install as `jui` and `jsonui-doc`. Install it once via the bootstrap script. The CLI handles validation and scaffolding; actually running tests happens via the platform driver above.",
+      "ja": "jsonui-test は jsonui-cli に同梱されています — `jui` や `jsonui-doc` と同じインストールです。bootstrap スクリプトで 1 度インストールすればよい。CLI は validation と scaffolding を担当し、実行そのものは上記の platform driver が行います。"
     },
     "section_cli_bullet_install": {
-      "en": "• Install: curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-test-runner/main/test_tools/installer/bootstrap.sh | bash (requires Python 3.10+).",
-      "ja": "• インストール: curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-test-runner/main/test_tools/installer/bootstrap.sh | bash (Python 3.10+ 必須)。"
+      "en": "• Install (standalone): curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-cli/main/test_tools/installer/bootstrap.sh | bash — or install the full jsonui-cli (jui / jsonui-doc included): curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-cli/main/installer/bootstrap.sh | bash (requires Python 3.10+).",
+      "ja": "• インストール (単体): curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-cli/main/test_tools/installer/bootstrap.sh | bash — または jsonui-cli 一式 (jui / jsonui-doc も同梱): curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-cli/main/installer/bootstrap.sh | bash (Python 3.10+ 必須)。"
     },
     "section_cli_bullet_validate": {
-      "en": "• Validate: `jsonui-test validate tests/screens/counter.test.json` (exit 0 = pass, 1 = schema violation). Also accepts directories: `jsonui-test validate tests/`.",
-      "ja": "• Validate: `jsonui-test validate tests/screens/counter.test.json` (exit 0 = 成功、1 = schema 違反)。ディレクトリも渡せる: `jsonui-test validate tests/`。"
+      "en": "• Validate: `jsonui-test validate tests/` (exit 0 = pass, 1 = schema violation; accepts files or directories). When `jui.config.json` carries a `test.install` block, a passing validate also flatten-installs the validated tests into the platform test dirs — success-gated (broken tests are never distributed), full-sync (stale *.test.json removed first), and a screen-name collision aborts with exit 1. `--no-install` skips the install; `--config` picks the config file. No `test.install` block → validate-only (the CI schema gate stays a pure no-op).",
+      "ja": "• Validate: `jsonui-test validate tests/` (exit 0 = 成功、1 = schema 違反。ファイルもディレクトリも可)。`jui.config.json` に `test.install` があると、検証成功時に検証済みテストを各プラットフォームのテスト dir に flatten-install します — 成功ゲート (壊れたテストは配布しない)、full-sync (先に stale な *.test.json を除去)、画面名の衝突は exit 1 で中断。`--no-install` で配布を skip、`--config` で config を指定。`test.install` なし → 検証のみ (CI のスキーマゲートは純粋な no-op のまま)。"
     },
     "section_cli_bullet_generate": {
-      "en": "• Generate skeleton: `jsonui-test generate test screen --layout …` / `generate test flow --name …`. Generate docs: `generate doc <file> --format html|md` / `generate html tests/` (directory → HTML index).",
-      "ja": "• skeleton 生成: `jsonui-test generate test screen --layout …` / `generate test flow --name …`。doc 生成: `generate doc <file> --format html|md` / `generate html tests/` (ディレクトリ → HTML index)。"
+      "en": "• Generate: `jsonui-test generate test screen|flow <name>` scaffolds a test; `generate description screen|flow <name> <case>` scaffolds a description JSON for one case.",
+      "ja": "• Generate: `jsonui-test generate test screen|flow <name>` でテストを scaffold、`generate description screen|flow <name> <case>` で 1 ケース分の description JSON を scaffold。"
+    },
+    "section_cli_bullet_report": {
+      "en": "• Report: `jsonui-test report <results…> --format junit|html -o <out>` merges the results JSON the drivers emit (results.schema.json) into a JUnit XML or HTML report for CI.",
+      "ja": "• Report: `jsonui-test report <results…> --format junit|html -o <out>` で、ドライバが出力する結果 JSON (results.schema.json) を JUnit XML / HTML レポートに統合 (CI 用)。"
+    },
+    "section_cli_bullet_mock": {
+      "en": "• Mock: `jsonui-test mock generate` scaffolds API mocks from OpenAPI (`--check` = drift-only), `mock serve` runs the local mock server + control panel. See the API Mock guide for the full workflow.",
+      "ja": "• Mock: `jsonui-test mock generate` で OpenAPI から API モックを scaffold (`--check` = drift のみ)、`mock serve` でローカルのモックサーバ + コントロールパネルを起動。詳細は API Mock ガイド参照。"
     },
     "section_ci_heading": { "en": "7. In CI", "ja": "7. CI での運用" },
     "section_ci_body": {
@@ -3420,6 +3464,27 @@
     "section_ci_bullet_example": {
       "en": "• Example (Web): a GitHub Actions step that runs `jsonui-test validate tests/` first, then `npx playwright install --with-deps` + `npx playwright test` inside jsonui-doc-web.",
       "ja": "• 例 (Web): GitHub Actions で `jsonui-test validate tests/` を最初に走らせ、その後 jsonui-doc-web 内で `npx playwright install --with-deps` + `npx playwright test` を実行する step を書く。"
+    },
+    "section_advanced_heading": { "en": "8. Launch, conditions & results", "ja": "8. launch・条件・結果" },
+    "section_advanced_body": {
+      "en": "Three cross-cutting features round out the model. Every step accepts `when` (a condition — the step is skipped unless it holds), `optional` (a failure becomes a warning and the run continues), and `label` (a human-readable name in reports). A root-level `launch` block sets the app's starting state, `teardown` steps always run — even after a failure — and the drivers emit a standardized results JSON that `jsonui-test report` turns into JUnit / HTML.",
+      "ja": "3 つの横断機能がモデルを仕上げます。各ステップは `when` (条件 — 成立しなければその step を skip)、`optional` (失敗を warning に格下げして続行)、`label` (レポート上の表示名) を受け付けます。ルートレベルの `launch` が起動時の状態を設定し、`teardown` ステップは失敗後でも必ず実行され、ドライバは標準化された結果 JSON を出力して `jsonui-test report` が JUnit / HTML に変換します。"
+    },
+    "section_advanced_bullet_when": {
+      "en": "• Conditions & flags: `when` gates a step on `platform` (ios / android / web / all), a `state` path, or `visible` / `notVisible`; `optional: true` downgrades a failure to a warning; `label` names the step in logs and reports.",
+      "ja": "• 条件とフラグ: `when` は `platform` (ios / android / web / all)・`state` パス・`visible` / `notVisible` で step を制御。`optional: true` は失敗を warning に格下げ。`label` はログ・レポートでの step 名。"
+    },
+    "section_advanced_bullet_launch": {
+      "en": "• launch: `clearState` (reset app data), `permissions` (camera / microphone / location / notifications / photos / contacts / calendar / bluetooth → allow / deny / unset), and `arguments` (launch arguments) — applied once before the first step.",
+      "ja": "• launch: `clearState` (アプリデータをリセット)、`permissions` (camera / microphone / location / notifications / photos / contacts / calendar / bluetooth → allow / deny / unset)、`arguments` (起動引数) — 最初の step の前に 1 度適用。"
+    },
+    "section_advanced_bullet_results": {
+      "en": "• teardown & results: `teardown` steps run even when a case fails, so cleanup is guaranteed. The result is `{ format: 'jsonui-test-results', version: 1, platform, suites[] }` with per-case `status` (passed / failed / skipped), `error`, `warnings`, and `durationMs`.",
+      "ja": "• teardown と結果: `teardown` ステップは case が失敗しても実行されるので後片付けが保証されます。結果は `{ format: 'jsonui-test-results', version: 1, platform, suites[] }` で、case ごとに `status` (passed / failed / skipped)・`error`・`warnings`・`durationMs` を持ちます。"
+    },
+    "section_advanced_config_caption": {
+      "en": "jui.config.json test.install + a test using launch and a conditional step:",
+      "ja": "jui.config.json の test.install と、launch・条件付き step を使うテスト:"
     },
     "next_test_runner_title": { "en": "jsonui-test-runner", "ja": "jsonui-test-runner" },
     "next_test_runner_description": { "en": "The runner this guide drives.", "ja": "このガイドが使うランナー本体。" },
@@ -3433,7 +3498,80 @@
     "toc_row_drivers": { "en": "5. The drivers", "ja": "5. ドライバ" },
     "toc_row_cli": { "en": "6. jsonui-test CLI", "ja": "6. jsonui-test CLI" },
     "toc_row_ci": { "en": "7. In CI", "ja": "7. CI での運用" },
-    "toc_row_runner": { "en": "Running the tests", "ja": "テストの実行" }
+    "toc_row_advanced": { "en": "8. Launch, conditions & results", "ja": "8. launch・条件・結果" }
+  },
+  "guides_api_mock": {
+    "breadcrumb": { "en": "← Guides", "ja": "← Guides" },
+    "title": { "en": "Mocking APIs in tests", "ja": "テストで API をモックする" },
+    "lead": {
+      "en": "Test a screen without its backend. jsonui-test generates mock responses from your OpenAPI / Swagger, serves them from a local mock server, and lets each test pick a scenario (success / error / empty) — so the same `.test.json` can drive the happy path and the failure path against deterministic data.",
+      "ja": "バックエンド無しで画面をテストします。jsonui-test は OpenAPI / Swagger からモックレスポンスを生成し、ローカルのモックサーバから配信し、各テストがシナリオ (正常 / エラー / 空) を選べるようにします。これで同じ `.test.json` が、決定的なデータに対して正常系も失敗系も駆動できます。"
+    },
+    "read_time": { "en": "~9 min read", "ja": "約 9 分" },
+    "next_heading": { "en": "Keep reading", "ja": "次に読む" },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    },
+    "section_what_heading": { "en": "1. What API mocks are", "ja": "1. API モックとは" },
+    "section_what_body": {
+      "en": "Three moving parts: mock definition files generated from your API contract, a local mock server that serves them, and a per-test scenario switch. Nothing about your app changes — a test points the driver's MockClient at the mock server, and requests that would hit the real backend are answered from the mock files instead.",
+      "ja": "3 つの要素: API 契約から生成するモック定義ファイル、それを配信するローカルモックサーバ、テストごとのシナリオ切替。アプリ側は変わりません — テストが driver の MockClient をモックサーバに向け、本来バックエンドに飛ぶリクエストがモックファイルから応答されます。"
+    },
+    "section_files_heading": { "en": "2. Mock definition files", "ja": "2. モック定義ファイル" },
+    "section_files_body": {
+      "en": "One `*.mock.json` file per OpenAPI `operationId`. Each file holds multiple named scenarios — typically `default`, an empty result, and an error — and names the active one. `activeScenario` is the fallback; tests override it per case. (`mock.schema.json` is an editor / doc aid only — it is not read at runtime.)",
+      "ja": "OpenAPI の `operationId` ごとに `*.mock.json` を 1 ファイル。各ファイルは複数の名前付きシナリオ (通常 `default` / 空結果 / エラー) を持ち、既定を 1 つ指定します。`activeScenario` は fallback で、テストが case ごとに上書きします。（`mock.schema.json` はエディタ / doc 補助専用で、実行時には読まれません。）"
+    },
+    "section_files_caption": { "en": "One mock file, three scenarios:", "ja": "1 モックファイル・3 シナリオ:" },
+    "section_generate_heading": { "en": "3. Generating mocks", "ja": "3. モックの生成" },
+    "section_generate_body": {
+      "en": "`jsonui-test mock generate --swagger <openapi> --out <dir>` scaffolds one mock file per operation, skipping any that already exist so your hand-tuned scenarios are never clobbered. Run it again whenever the API contract changes.",
+      "ja": "`jsonui-test mock generate --swagger <openapi> --out <dir>` は operation ごとにモックファイルを scaffold します。既存ファイルはスキップするので、手で調整したシナリオが上書きされることはありません。API 契約が変わったら再実行します。"
+    },
+    "section_generate_bullet_check": {
+      "en": "• Drift check: `mock generate --check` writes nothing and reports only what would change vs the current swagger — a clean CI gate. The same is available over MCP as `test_mock_generate` with `check: true`.",
+      "ja": "• Drift チェック: `mock generate --check` は書き込まず、現在の swagger との差分だけを報告します — CI ゲートに使えます。MCP でも `test_mock_generate` の `check: true` で同じことができます。"
+    },
+    "section_serve_heading": { "en": "4. Serving mocks + control panel", "ja": "4. モックの配信とコントロールパネル" },
+    "section_serve_body": {
+      "en": "`jsonui-test mock serve --mock-dir <dir> [--port N]` starts a local mock server plus a browser control panel at `/__jsonui__/panel` where you can flip scenarios live. The panel HTML ships inside the package (loaded via `importlib.resources`, never a repo-relative path).",
+      "ja": "`jsonui-test mock serve --mock-dir <dir> [--port N]` はローカルのモックサーバと、`/__jsonui__/panel` のブラウザ用コントロールパネルを起動します。パネルではシナリオをその場で切り替えられます。パネル HTML はパッケージ同梱で、`importlib.resources` 経由で読み込まれます (repo 相対パスは使いません)。"
+    },
+    "section_serve_bullet_harden": {
+      "en": "• Hardened by default: binds to 127.0.0.1, mints a fresh token per launch, verifies the Host header (DNS-rebind protection), and blocks path traversal.",
+      "ja": "• 既定でハードニング済み: 127.0.0.1 バインド、起動ごとにトークンを再生成、Host ヘッダ検証 (DNS-rebind 対策)、パストラバーサル防止。"
+    },
+    "section_serve_bullet_cli_only": {
+      "en": "• CLI-only: because it is a long-running HTTP server that executes run-targets, `mock serve` is intentionally NOT exposed over MCP. Only `mock generate` is (Group F `test_mock_generate`).",
+      "ja": "• CLI 専用: 常駐 HTTP サーバ + run-target 実行という面のため、`mock serve` は意図的に MCP 非公開です。MCP に出るのは `mock generate` のみ (Group F の `test_mock_generate`)。"
+    },
+    "section_scenarios_heading": { "en": "5. Selecting scenarios from tests", "ja": "5. テストからのシナリオ選択" },
+    "section_scenarios_body": {
+      "en": "A root-level `mocks` map (`{ operationId: scenario }`) sets the initial scenario for a test; a `setMocks` step switches scenarios mid-test. Screen tests pick a scenario per file; flow tests can switch per transition step, so a single journey can walk from a populated list to an empty one to a 500.",
+      "ja": "ルートレベルの `mocks` マップ (`{ operationId: scenario }`) がテストの初期シナリオを設定し、`setMocks` ステップがテスト途中でシナリオを切り替えます。screen test はファイル単位でシナリオを選び、flow test は遷移ステップ単位で切り替えられるので、1 つのジャーニーで「一覧あり → 空 → 500」と歩けます。"
+    },
+    "section_scenarios_caption": { "en": "Initial scenario + a mid-test switch:", "ja": "初期シナリオ + テスト途中の切替:" },
+    "section_drivers_heading": { "en": "6. Driver integration", "ja": "6. ドライバ統合" },
+    "section_drivers_body": {
+      "en": "Each driver has a `MockClient`. Set `mockServerURL` + `token` on the runner config and the driver points the app at the mock server for the run, then resets scenarios afterward. iOS / Android / Web all speak the same admin API.",
+      "ja": "各 driver は `MockClient` を持ちます。runner の config に `mockServerURL` + `token` を設定すると、その実行の間アプリをモックサーバに向け、実行後にシナリオをリセットします。iOS / Android / Web すべてが同じ admin API を話します。"
+    },
+    "section_drivers_bullet_admin": {
+      "en": "• Admin API (all three drivers): POST `/__jsonui__/scenario-set` (body `{ mocks }`) and POST `/__jsonui__/reset`, authenticated with the `X-JsonUI-Token` header. An unknown operationId is rejected, so a typo fails loudly instead of silently serving the wrong data.",
+      "ja": "• Admin API (3 driver 共通): POST `/__jsonui__/scenario-set` (body `{ mocks }`) と POST `/__jsonui__/reset`、認証は `X-JsonUI-Token` ヘッダ。未知の operationId は拒否されるので、タイプミスは黙って誤データを返さず明示的に失敗します。"
+    },
+    "next_testing_title": { "en": "Writing screen tests", "ja": "画面テストを書く" },
+    "next_testing_description": { "en": "The test DSL these mocks plug into.", "ja": "このモックが差し込まれるテスト DSL。" },
+    "next_cli_title": { "en": "CLI command reference", "ja": "CLI コマンドリファレンス" },
+    "next_cli_description": { "en": "Every jsonui-test subcommand, including mock.", "ja": "mock を含む jsonui-test の全サブコマンド。" },
+    "toc_title": { "en": "On this page", "ja": "このページ" },
+    "toc_row_what": { "en": "1. What API mocks are", "ja": "1. API モックとは" },
+    "toc_row_files": { "en": "2. Mock definition files", "ja": "2. モック定義ファイル" },
+    "toc_row_generate": { "en": "3. Generating mocks", "ja": "3. モックの生成" },
+    "toc_row_serve": { "en": "4. Serving + control panel", "ja": "4. 配信とパネル" },
+    "toc_row_scenarios": { "en": "5. Selecting scenarios", "ja": "5. シナリオ選択" },
+    "toc_row_drivers": { "en": "6. Driver integration", "ja": "6. ドライバ統合" }
   },
   "guides_localization": {
     "breadcrumb": { "en": "← Guides", "ja": "← Guides" },
@@ -3866,8 +4004,8 @@
     "breadcrumb": { "en": "← Reference", "ja": "← Reference" },
     "title": { "en": "MCP tool API", "ja": "MCP ツール API" },
     "lead": {
-      "en": "All 33 MCP tools, grouped A–E (Lookup / Validation / Generation / Build + Runtime / API Model Discovery), with their input schemas, return shapes, and one-line descriptions. Hand-authored catalog kept in sync with the MCP server's 5-group tool list.",
-      "ja": "全 33 MCP ツール、A–E グループ (Lookup / Validation / Generation / Build + Runtime / API Model Discovery) 別に、入力スキーマ・戻り値 shape・1 行説明を掲載。MCP サーバの 5 グループ tool list と同期する手書きカタログです。"
+      "en": "All 39 MCP tools, grouped A–F (Lookup / Validation / Generation / Build + Runtime / API Model Discovery / Test Tooling), with their input schemas, return shapes, and one-line descriptions. Hand-authored catalog kept in sync with the MCP server's 6-group tool list.",
+      "ja": "全 39 MCP ツール、A–F グループ (Lookup / Validation / Generation / Build + Runtime / API Model Discovery / Test Tooling) 別に、入力スキーマ・戻り値 shape・1 行説明を掲載。MCP サーバの 6 グループ tool list と同期する手書きカタログです。"
     },
     "read_time": { "en": "auto-generated", "ja": "自動生成" },
     "next_heading": { "en": "Keep reading", "ja": "次に読む" },
@@ -3882,8 +4020,8 @@
     },
     "section_groups_heading": { "en": "Group semantics", "ja": "グループの意味" },
     "section_groups_body": {
-      "en": "A (7 tools, Lookup): read-only introspection. B (6, Validation): schema + drift checks. C (7, Generation): scaffold empty shapes. D (9, Build + Runtime): orchestrate builds, sync tooling, read files back. Each group corresponds to a phase in the spec-first loop, so 'which group is this tool in' is also 'when do I call it'.",
-      "ja": "A (7 ツール、Lookup): 読み取り専用精査。B (6、Validation): スキーマ + ドリフト検査。C (7、Generation): 空の shape を作る。D (9、Build + Runtime): ビルド指揮・ツール同期・ファイル読み直し。各グループが spec-first ループの 1 フェーズに対応するので、「このツールはどのグループか」は「いつ呼ぶか」と同義になります。"
+      "en": "A (8 tools, Lookup): read-only introspection. B (6, Validation): schema + drift checks. C (7, Generation): scaffold empty shapes. D (9, Build + Runtime): orchestrate builds, sync tooling, read files back. E (3, API Model Discovery): inspect + dry-run the swagger → DTO/Domain pipeline. F (6, Test Tooling): validate / scaffold / report / mock JsonUI tests. Each group corresponds to a phase in the spec-first loop, so 'which group is this tool in' is also 'when do I call it'.",
+      "ja": "A (8 ツール、Lookup): 読み取り専用精査。B (6、Validation): スキーマ + ドリフト検査。C (7、Generation): 空の shape を作る。D (9、Build + Runtime): ビルド指揮・ツール同期・ファイル読み直し。E (3、API Model Discovery): swagger → DTO/Domain パイプラインの精査・dry-run。F (6、Test Tooling): JsonUI テストの検証 / 生成 / レポート / モック。各グループが spec-first ループの 1 フェーズに対応するので、「このツールはどのグループか」は「いつ呼ぶか」と同義になります。"
     },
     "section_schema_heading": { "en": "Reading a tool entry", "ja": "ツールエントリの読み方" },
     "section_schema_body": {
@@ -3907,8 +4045,8 @@
     "toc_row_catalog": { "en": "Tool catalog", "ja": "ツールカタログ" },
     "section_catalog_heading": { "en": "Tool catalog", "ja": "ツールカタログ" },
     "section_catalog_body": {
-      "en": "All 33 tools, in the same order /tools/mcp lists them, with parameter signatures. Required parameters are bold-marked in the agent's view; optional ones default to omitted. `project_dir` repeats on most tools — when omitted, the server falls back to the JUI_PROJECT_DIR env var (or the cwd that spawned it).",
-      "ja": "全 33 ツール、/tools/mcp と同じ並びで、パラメータ署名付きで掲載。required はエージェント視点で必須、optional は省略可能（省略時は default 値かツール内既定）。`project_dir` は多くのツールで共通 — 省略時は JUI_PROJECT_DIR 環境変数（もしくは MCP サーバを起動した cwd）にフォールバック。"
+      "en": "All 39 tools, in the same order /tools/mcp lists them, with parameter signatures. Required parameters are bold-marked in the agent's view; optional ones default to omitted. `project_dir` repeats on most tools — when omitted, the server falls back to the JUI_PROJECT_DIR env var (or the cwd that spawned it).",
+      "ja": "全 39 ツール、/tools/mcp と同じ並びで、パラメータ署名付きで掲載。required はエージェント視点で必須、optional は省略可能（省略時は default 値かツール内既定）。`project_dir` は多くのツールで共通 — 省略時は JUI_PROJECT_DIR 環境変数（もしくは MCP サーバを起動した cwd）にフォールバック。"
     },
     "params_heading": { "en": "Parameters", "ja": "パラメータ" },
     "no_params": { "en": "(no parameters)", "ja": "(パラメータなし)" },
@@ -4036,7 +4174,32 @@
       "en": "• project_dir (string, optional) — Project directory. Overrides JUI_PROJECT_DIR env.",
       "ja": "• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
     },
-    "group_e_label": { "en": "API Model Discovery", "ja": "API Model Discovery" }
+    "tool_test_validate_params": {
+      "en": "• files (string[], required) — Files or directories to validate (e.g. ['tests/screens'] or ['login.test.json']).\n• quiet (boolean, optional) — Hide warnings, show only errors.\n• verbose (boolean, optional) — Show all files, including valid ones.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• files (string[], required) — 検証するファイル / ディレクトリ（例: ['tests/screens'] または ['login.test.json']）。\n• quiet (boolean, optional) — 警告を隠しエラーのみ表示。\n• verbose (boolean, optional) — 妥当なファイルも含め全件表示。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_test_generate_screen_params": {
+      "en": "• name (string, required) — Screen name (e.g. login, home).\n• path (string, optional) — Output test file path (default: tests/screens/<name>/<name>.test.json).\n• platform (string, optional) — Target platform: ios / ios-swiftui / ios-uikit / android / web / all.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• name (string, required) — 画面名（例: login, home）。\n• path (string, optional) — 出力テストファイルパス（デフォルト: tests/screens/<name>/<name>.test.json）。\n• platform (string, optional) — 対象プラットフォーム: ios / ios-swiftui / ios-uikit / android / web / all。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_test_generate_flow_params": {
+      "en": "• name (string, required) — Flow name (e.g. login, checkout).\n• path (string, optional) — Output test file path (default: tests/flows/<name>/<name>.test.json).\n• platform (string, optional) — Target platform: ios / ios-swiftui / ios-uikit / android / web / all.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• name (string, required) — フロー名（例: login, checkout）。\n• path (string, optional) — 出力テストファイルパス（デフォルト: tests/flows/<name>/<name>.test.json）。\n• platform (string, optional) — 対象プラットフォーム: ios / ios-swiftui / ios-uikit / android / web / all。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_test_generate_description_params": {
+      "en": "• test_type (string, required) — Whether the case belongs to a screen or flow test: screen / flow.\n• name (string, required) — Screen/flow name (e.g. login, checkout).\n• case_name (string, required) — Test case name (e.g. initial_display, happy_path).\n• path (string, optional) — Output file path (default: tests/<type>s/<name>/descriptions/<case_name>.json).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• test_type (string, required) — ケースが screen / flow どちらのテストに属すか: screen / flow。\n• name (string, required) — 画面 / フロー名（例: login, checkout）。\n• case_name (string, required) — テストケース名（例: initial_display, happy_path）。\n• path (string, optional) — 出力ファイルパス（デフォルト: tests/<type>s/<name>/descriptions/<case_name>.json）。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_test_report_params": {
+      "en": "• files (string[], required) — Results JSON files to convert (multiple inputs merge into one report).\n• format (string, required) — Report format: junit / html.\n• output (string, optional) — Output file path (default: report.xml / report.html).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• files (string[], required) — 変換する結果 JSON ファイル（複数指定は 1 レポートに統合）。\n• format (string, required) — レポート形式: junit / html。\n• output (string, optional) — 出力ファイルパス（デフォルト: report.xml / report.html）。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_test_mock_generate_params": {
+      "en": "• swagger (string[], optional) — Paths to OpenAPI files (repeatable). Defaults to the project mock config if omitted.\n• out (string, optional) — Output mock dir (default: mock.mockDir or tests/mocks).\n• config_file (string, optional) — Config file (default: jui.config.json).\n• check (boolean, optional) — When true, report drift vs swagger and do NOT write (adds --check). Default false.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• swagger (string[], optional) — OpenAPI ファイルのパス（複数可）。省略時はプロジェクトの mock 設定を使用。\n• out (string, optional) — 出力モック dir（デフォルト: mock.mockDir または tests/mocks）。\n• config_file (string, optional) — 設定ファイル（デフォルト: jui.config.json）。\n• check (boolean, optional) — true で swagger との drift を報告し書き込まない（--check 付与）。デフォルト false。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "group_e_label": { "en": "API Model Discovery", "ja": "API Model Discovery" },
+    "group_f_label": { "en": "Test Tooling", "ja": "Test Tooling" }
   },
   "reference_cli_commands": {
     "breadcrumb": { "en": "← Reference", "ja": "← Reference" },
@@ -4096,8 +4259,47 @@
       "en": "`jsonui-doc check` runs the checks declared in `jui.config.json` under the top-level `\"checks\"` array. Positional filters narrow scope: `jsonui-doc check db` runs only DB checkers, `check api` only API checkers, `check db:main` runs checkers targeting the DB named `main`, and a bare checker name runs just that entry. `--list` prints what would run without executing anything. Exit codes: `0` = all OK, `1` = mismatch found (drift), `2` = execution error (connection failure, timeout, malformed plugin output). Reports are saved under `docs/**/.check-report.json` and `jsonui-doc generate html` renders them as an \"Implementation contract\" page when present. `jsonui-doc generate html --with-checks` is a convenience sugar that runs check → generate in one invocation. Two builtin checkers ship: `builtin:openapi-diff` compares the impl-declared OpenAPI (adapter-type: an `impl_openapi_command` you declare, e.g. a FastAPI export script) against `docs/api/*.json`; `builtin:db-schema` compares the real database schema (MySQL / PostgreSQL / SQLite via SQLAlchemy inspector, or an adapter-type `dump_command`) against `docs/db/*.json`. Two plugin tiers: `type: checker` is the full-checker type (your command emits the result JSON contract directly), and adapter-type entries hand off comparison to the builtin engine. A companion cookbook page is planned as a follow-up.",
       "ja": "`jsonui-doc check` は `jui.config.json` の top-level `\"checks\"` 配列で宣言された チェッカーを実行します。位置引数で対象を絞れます: `jsonui-doc check db` は DB 系のみ、`check api` は API 系のみ、`check db:main` は DB 名 `main` を対象とするチェッカー、チェッカー名を直接渡すとその 1 件のみ実行。`--list` は実行内容を事前表示 (実行しない)。exit code は `0` = 全 OK / `1` = mismatch あり / `2` = 実行エラー (接続失敗・タイムアウト・プラグイン出力不正)。結果は `docs/**/.check-report.json` に保存され、`jsonui-doc generate html` は存在すれば「実装との整合性」ページとして描画します。`jsonui-doc generate html --with-checks` は check → generate を 1 回で走らせるシュガー。ビルトインチェッカーは 2 種類: `builtin:openapi-diff` は実装が宣言する OpenAPI (`impl_openapi_command` に 「実装側 OpenAPI を stdout に出すコマンド」を指定するアダプタ型、例えば FastAPI の export スクリプト) と `docs/api/*.json` を差分検出、`builtin:db-schema` は実 DB スキーマ (MySQL / PostgreSQL / SQLite の SQLAlchemy inspector 経由、または `dump_command` アダプタ) と `docs/db/*.json` を照合。プラグインは 2 段階: `type: checker` は フルチェッカー型 (自作コマンドが結果 JSON を出力)、アダプタ型は事実だけ吐かせて比較は ビルトインエンジンに委譲。詳細な cookbook は追って別ページで提供予定。"
     },
+    "section_test_tools_heading": { "en": "Test tooling commands (since 2026-07)", "ja": "テストツール系コマンド (2026-07 追加)" },
+    "section_test_tools_body": {
+      "en": "The `jsonui-test` CLI ships inside jsonui-cli. `jsonui-test validate <files/dirs>` schema-checks screen / flow tests + descriptions (exit 0 = pass, 1 = schema violation); when `jui.config.json` carries a `test.install` block, a passing validate also flatten-installs the tests into the platform test dirs — success-gated (broken tests are never distributed), full-sync (stale files removed first), and a screen-name collision aborts with exit 1. `--no-install` skips the install; `--config` selects the config file; no `test.install` block ⇒ validate-only. `jsonui-test generate test screen|flow <name>` and `generate description screen|flow <name> <case>` scaffold files. `jsonui-test report <results…> --format junit|html -o <out>` turns the drivers' results JSON (results.schema.json) into JUnit / HTML for CI. `jsonui-test mock generate` scaffolds OpenAPI mocks (`--check` = drift-only) and `mock serve` runs the local mock server — see the API Mock guide. Six of these are also exposed over MCP as Group F; the long-running `mock serve` stays CLI-only.",
+      "ja": "`jsonui-test` CLI は jsonui-cli に同梱されています。`jsonui-test validate <files/dirs>` は screen / flow テストと description をスキーマ検証します (exit 0 = 成功、1 = schema 違反)。`jui.config.json` に `test.install` があると、検証成功時に各プラットフォームのテスト dir へ flatten-install もします — 成功ゲート (壊れたテストは配布しない)、full-sync (先に stale ファイルを除去)、画面名の衝突は exit 1 で中断。`--no-install` で配布を skip、`--config` で config を指定、`test.install` なし ⇒ 検証のみ。`jsonui-test generate test screen|flow <name>` と `generate description screen|flow <name> <case>` でファイルを scaffold。`jsonui-test report <results…> --format junit|html -o <out>` はドライバの結果 JSON (results.schema.json) を JUnit / HTML に変換 (CI 用)。`jsonui-test mock generate` は OpenAPI モックを scaffold (`--check` = drift のみ)、`mock serve` はローカルのモックサーバを起動 — 詳細は API Mock ガイド参照。うち 6 つは MCP の Group F としても公開されます (常駐する `mock serve` は CLI 専用)。"
+    },
     "toc_row_ssot": { "en": "SSoT commands", "ja": "SSoT コマンド" },
-    "toc_row_checks": { "en": "Contract checks", "ja": "整合性チェック" }
+    "toc_row_checks": { "en": "Contract checks", "ja": "整合性チェック" },
+    "toc_row_test_tools": { "en": "Test tooling", "ja": "テストツール" }
+  },
+  "reference_test_tooling": {
+    "breadcrumb": { "en": "← Reference", "ja": "← Reference" },
+    "title": { "en": "Test tooling reference", "ja": "テストツール リファレンス" },
+    "lead": {
+      "en": "Two tables that answer 'does this feature work on my platform?' and 'which repo owns this?'. The feature support matrix lists where the three drivers agree and where they differ; the ownership table names the single source of truth for each moving part of the test toolchain.",
+      "ja": "「この機能は自分のプラットフォームで動くか?」と「どのリポが正本か?」に答える 2 つの表です。機能サポートマトリクスは 3 ドライバが一致する点と食い違う点を示し、正本分担表はテストツールチェーンの各要素の唯一の source of truth を示します。"
+    },
+    "read_time": { "en": "reference", "ja": "リファレンス" },
+    "next_heading": { "en": "Keep reading", "ja": "次に読む" },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    },
+    "section_matrix_heading": { "en": "Feature support matrix", "ja": "機能サポートマトリクス" },
+    "section_matrix_body": {
+      "en": "The action / assert DSL is cross-platform: the core actions, all assertions (with auto-wait), `state` assertions via a state provider, and the `screenshot` visual-regression assert run on all three drivers. The rows below are where the drivers genuinely differ — verified against the driver source, not the READMEs.",
+      "ja": "action / assert DSL はクロスプラットフォームです: 主要な action、全 assertion (auto-wait 付き)、state provider 経由の `state` assertion、`screenshot` ビジュアルリグレッション assert は 3 ドライバすべてで動きます。下の表はドライバが実際に食い違う箇所です — README ではなくドライバ実ソースで確認済み。"
+    },
+    "section_matrix_caption": { "en": "Where the drivers differ (source-verified):", "ja": "ドライバが食い違う箇所 (実ソース確認済み):" },
+    "section_ownership_heading": { "en": "Source-of-truth ownership", "ja": "正本の分担" },
+    "section_ownership_body": {
+      "en": "The test toolchain spans several repos, each owning exactly one thing. Schemas live in jsonui-test-runner; the CLI and its validator constants live in jsonui-cli; each driver is published from its own repo; and a drift-check test in jsonui-cli keeps the schemas and the validator constants in lockstep in CI.",
+      "ja": "テストツールチェーンは複数リポにまたがり、各リポが 1 つだけを owner します。スキーマは jsonui-test-runner、CLI とその validator 定数は jsonui-cli、各ドライバは自リポから公開、そして jsonui-cli の drift-check テストがスキーマと validator 定数を CI で一致させ続けます。"
+    },
+    "section_ownership_caption": { "en": "Who owns what:", "ja": "どこが何の正本か:" },
+    "next_testing_title": { "en": "Writing screen tests", "ja": "画面テストを書く" },
+    "next_testing_description": { "en": "The DSL these tables describe.", "ja": "この表が説明する DSL。" },
+    "next_api_mock_title": { "en": "Mocking APIs in tests", "ja": "テストで API をモックする" },
+    "next_api_mock_description": { "en": "Backend-free testing with mock scenarios.", "ja": "モックシナリオによるバックエンド非依存テスト。" },
+    "toc_title": { "en": "On this page", "ja": "このページ" },
+    "toc_row_matrix": { "en": "Feature support matrix", "ja": "サポートマトリクス" },
+    "toc_row_ownership": { "en": "Source-of-truth ownership", "ja": "正本の分担" }
   },
   "search": {
     "close_button": { "en": "Esc", "ja": "Esc" },

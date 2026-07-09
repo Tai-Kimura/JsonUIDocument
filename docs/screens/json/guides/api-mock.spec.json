@@ -1,0 +1,148 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "ApiMock",
+    "displayName": "Mocking APIs in tests",
+    "description": "Guides > Mocking APIs in tests. Six sections + TOC + next-reads. How jsonui-test mocks a backend for tests: mock definition files generated from OpenAPI (*.mock.json, one per operationId, multiple scenarios), `mock generate` (+ --check drift), `mock serve` (local server + /__jsonui__/panel control panel, 127.0.0.1 bind + per-launch token + Host/DNS-rebind + path-traversal hardening, CLI-only / not MCP), per-test scenario selection (root `mocks` + `setMocks` step; screen per-file, flow per-transition), and driver MockClient integration (mockServerURL + token; admin API /__jsonui__/scenario-set + /__jsonui__/reset with X-JsonUI-Token). mock.schema.json is editor/doc-only.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "guides/api-mock",
+    "createdAt": "2026-07-09",
+    "updatedAt": "2026-07-09"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards: /guides/testing (the test DSL) + /reference/cli-commands (the mock subcommands)."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_testing -> /guides/testing, next_cli -> /reference/cli-commands). Each row's titleKey / descriptionKey is resolved through StringManager with the guides_api_mock_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /guides/testing, /reference/cli-commands."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /guides/testing and /reference/cli-commands. Seeded by onAppear and re-seeded by mountLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is spec-mapped",
+      "destination": "Target screen or tab",
+      "description": "v1 destinations: /, /guides/testing, /reference/cli-commands."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/guides/api-mock.json",
+      "description": "Layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/guides/ApiMockViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/guides/api-mock/page.tsx",
+      "description": "Page."
+    }
+  ],
+  "notes": [
+    "Live Guides entry (added 2026-07-09 for the test-tooling doc pass). Added to ChromeViewModel NAV_CATALOG guides + GuidesIndexViewModel CATALOG.",
+    "Six sections: (1) what API mocks are, (2) mock definition files (*.mock.json, multi-scenario) with a code example, (3) mock generate (+ --check drift / MCP test_mock_generate), (4) mock serve + control panel + hardening (CLI-only), (5) per-test scenario selection (root mocks + setMocks; screen per-file / flow per-transition) with a code example, (6) driver MockClient + admin API.",
+    "Companion to /guides/testing (the test DSL) and /reference/test-tooling (the support matrix + ownership table). Sample data is neutral (products / items) per public-repo hygiene."
+  ]
+}

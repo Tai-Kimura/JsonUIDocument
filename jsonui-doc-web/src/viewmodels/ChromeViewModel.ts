@@ -117,6 +117,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "writing-layouts",         titleKey: "guides_writing_layouts_title",         titleEn: "Writing layouts",             url: "/guides/writing-layouts" },
       { id: "navigation",              titleKey: "guides_navigation_title",              titleEn: "Navigation between screens", url: "/guides/navigation" },
       { id: "testing",                 titleKey: "guides_testing_title",                 titleEn: "Writing screen tests",        url: "/guides/testing" },
+      { id: "api-mock",                titleKey: "guides_api_mock_title",                titleEn: "Mocking APIs in tests",       url: "/guides/api-mock" },
       { id: "localization",            titleKey: "guides_localization_title",            titleEn: "Adding a new language",       url: "/guides/localization" },
       { id: "custom-components",       titleKey: "guides_custom_components_title",       titleEn: "Building a custom component", url: "/guides/custom-components" },
       { id: "developer-menu",          titleKey: "guides_developer_menu_title",          titleEn: "Developer menu",              url: "/guides/developer-menu", platforms: ["ios", "android"] },
@@ -132,6 +133,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "json-schema",   titleKey: "reference_json_schema_title",   titleEn: "JSON Schema",            url: "/reference/json-schema" },
       { id: "mcp-tools",     titleKey: "reference_mcp_tools_title",     titleEn: "MCP tool API",           url: "/reference/mcp-tools" },
       { id: "cli-commands",  titleKey: "reference_cli_commands_title",  titleEn: "CLI command reference", url: "/reference/cli-commands" },
+      { id: "test-tooling", titleKey: "reference_test_tooling_title", titleEn: "Test tooling reference", url: "/reference/test-tooling" },
     ],
   },
   {
