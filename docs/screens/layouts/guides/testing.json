@@ -398,6 +398,24 @@
                       "fontSize": 14,
                       "fontColor": "#475467",
                       "text": "section_cli_bullet_generate"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_cli_bullet_report"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_cli_bullet_mock"
                     }
                   ]
                 },
@@ -450,6 +468,87 @@
                       "code": "# .github/workflows/test.yml (web shard)\n- name: Validate test schemas\n  run: jsonui-test validate tests/\n- name: Run Playwright tests\n  working-directory: jsonui-doc-web\n  run: |\n    npx playwright install --with-deps\n    npx playwright test",
                       "language": "yaml",
                       "filename": "GitHub Actions excerpt",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_advanced",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_advanced_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_advanced_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_advanced_bullet_when"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_advanced_bullet_launch"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_advanced_bullet_results"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_advanced_config_caption"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "// jui.config.json — install SSoT tests to the platform test dirs\n\"test\": {\n  \"src\": \"tests\",\n  \"install\": {\n    \"ios\":     { \"target_dir\": \"<ios-app>/<UITests>/GeneratedTests\" },\n    \"android\": { \"assets_dir\": \"<android-app>/app/src/androidTest/assets/tests\" }\n  }\n}\n\n// a test using launch + a conditional step + teardown\n{\n  \"type\": \"screen\",\n  \"source\": { \"layout\": \"layouts/home.json\" },\n  \"launch\": { \"clearState\": true, \"permissions\": { \"location\": \"allow\" } },\n  \"cases\": [{\n    \"name\": \"shows nearby only on mobile\",\n    \"steps\": [\n      { \"when\": { \"platform\": [\"ios\", \"android\"] }, \"assert\": \"visible\", \"id\": \"nearby_section\" },\n      { \"assert\": \"state\", \"path\": \"user.isLoggedIn\", \"equals\": true }\n    ],\n    \"teardown\": [ { \"tap\": \"logout_btn\", \"optional\": true } ]\n  }]\n}",
+                      "language": "json",
+                      "filename": "jui.config.json + *.test.json",
                       "showLineNumbers": false,
                       "copyable": true
                     }
@@ -600,6 +699,12 @@
                           "id": "toc_ci",
                           "label": "toc_row_ci",
                           "anchor": "section_ci",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_advanced",
+                          "label": "toc_row_advanced",
+                          "anchor": "section_advanced",
                           "level": 1
                         }
                       ],

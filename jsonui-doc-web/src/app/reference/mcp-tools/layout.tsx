@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `MCP tool API — JsonUI`,
-  description: `All 33 MCP tools, grouped A–E (Lookup / Validation / Generation / Build + Runtime / API Model Discovery), with their input schemas, return shapes, and one-line…`,
+  description: `All 39 MCP tools, grouped A–F (Lookup / Validation / Generation / Build + Runtime / API Model Discovery / Test Tooling), with their input schemas, return…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

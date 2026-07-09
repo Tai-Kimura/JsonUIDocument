@@ -1,0 +1,148 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "TestTooling",
+    "displayName": "Test tooling reference",
+    "description": "Reference > Test tooling reference. Two sections + TOC + next-reads. (1) Feature support matrix — where the three drivers agree (core actions, all asserts + auto-wait, state via provider, screenshot) and where they differ, source-verified against driver code (id mapping, pass/fail accessor, addMedia, tap.retryTapIfNoChange, launch.permissions/clearState, run command). (2) Source-of-truth ownership — schemas=jsonui-test-runner, validator constants + CLI=jsonui-cli, drivers=each driver repo (1.0.0), mock.schema.json=editor/doc-only, schema<->validator drift-check=jsonui-cli CI. Tables rendered as monospace CodeBlocks.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "reference/test-tooling",
+    "createdAt": "2026-07-09",
+    "updatedAt": "2026-07-09"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards: /guides/testing + /guides/api-mock."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation (bound in the layout as onNavigateReference)."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_testing -> /guides/testing, next_api_mock -> /guides/api-mock). Each row's titleKey / descriptionKey is resolved through StringManager with the reference_test_tooling_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /guides/testing, /guides/api-mock."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /guides/testing and /guides/api-mock. Seeded by onAppear and re-seeded by mountLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is spec-mapped",
+      "destination": "Target screen or tab",
+      "description": "v1 destinations: /, /guides/testing, /guides/api-mock."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/reference/test-tooling.json",
+      "description": "Layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/reference/TestToolingViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/reference/test-tooling/page.tsx",
+      "description": "Page."
+    }
+  ],
+  "notes": [
+    "Live Reference entry (added 2026-07-09 for the test-tooling doc pass). Added to ChromeViewModel NAV_CATALOG reference + ReferenceIndexViewModel CATALOG.",
+    "Matrix rows are source-verified against jsonui-test-runner driver code, deliberately correcting stale docs: Web element id is the HTML id (#id), not data-testid; pass/fail is result.allPassed on iOS + Android (computed property on TestSuiteResult) but the allPassed(result) function on Web.",
+    "Companion to /guides/testing (DSL) and /guides/api-mock (mocks). Tables are monospace CodeBlocks (no new Collection cell needed)."
+  ]
+}

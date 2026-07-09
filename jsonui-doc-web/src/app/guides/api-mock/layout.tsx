@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 // render time; we only override title + description so the site-wide
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
-  title: `jsonui-test-runner — JsonUI`,
-  description: `JSON-authored tests that drive a real running app. Screen tests, flow tests, and user-action tests — all in the same action / assertion DSL (targets found by…`,
+  title: `Mocking APIs in tests — JsonUI`,
+  description: `Test a screen without its backend. jsonui-test generates mock responses from your OpenAPI / Swagger, serves them from a local mock server, and lets each test…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
