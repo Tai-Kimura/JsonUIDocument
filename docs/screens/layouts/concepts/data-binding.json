@@ -232,6 +232,30 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
+                  "id": "section_focus",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_focus_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_focus_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// 1. Give the field an id in the layout\n{ \"type\": \"TextField\", \"id\": \"email\", \"text\": \"@{email}\", \"onTextChange\": \"@{onEmailChange}\" }\n\n// 2. The generator adds a two-way focus field to the data model:\n//    emailIsFocused: boolean\n\n// 3. Focus it from the ViewModel — moves focus AND raises the keyboard\nthis.updateData({ emailIsFocused: true });\n\n// Reads back on blur / focus. Platform machinery:\n//   iOS     SwiftUI @FocusState        (TextView needs SwiftJsonUI 10.3.0+)\n//   Android Compose FocusRequester\n//   Web     ref + useEffect\n//   UIKit   not covered",
+                      "language": "text",
+                      "filename": "<id>IsFocused — focus a field from the ViewModel",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
                   "id": "section_no_logic",
                   "width": "matchParent",
                   "height": "wrapContent",
@@ -395,6 +419,12 @@
                           "id": "toc_oneway",
                           "label": "toc_row_oneway",
                           "anchor": "section_oneway",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_focus",
+                          "label": "toc_row_focus",
+                          "anchor": "section_focus",
                           "level": 1
                         },
                         {
