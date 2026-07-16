@@ -225,8 +225,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Alternative to `srcName` — full path string. On Web this maps directly to `<img src>`.",
-                "ja": "`srcName` の代わりにフルパス文字列を指定。Web では `<img src>` にそのままマップ。"
+                "en": "Alternative to `srcName` — full path string (`/images/hero.png`, absolute URL, `data:` URI). On Web this maps directly to `<img src>`. Literals are deliberately NEVER resolved through strings.json (so registering a string key can't break a picture), and a bare name — no `/`, `.`, or scheme — triggers a build warning: use `srcName` for named assets.",
+                "ja": "`srcName` の代わりにフルパス文字列を指定（`/images/hero.png`、絶対 URL、`data:` URI）。Web では `<img src>` にそのままマップ。リテラルは意図的に strings.json を**一切通らない**（string key の登録で画像が壊れない）。`/`・`.`・スキームを含まない裸名にはビルド警告が出る — named asset は `srcName` を使うこと。"
               },
               "type": "string | binding",
               "required": ""
@@ -527,8 +527,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Accessibility description. Spoken by screen readers (VoiceOver / TalkBack). For decorative images, use an empty string or omit.",
-                "ja": "アクセシビリティ説明文。VoiceOver / TalkBack が読み上げる。装飾画像は空文字または省略。"
+                "en": "Accessibility description. Spoken by screen readers (VoiceOver / TalkBack). Localizable: a registered strings.json key resolves through StringManager just like `text` / `hint`. For decorative images, use an empty string or omit.",
+                "ja": "アクセシビリティ説明文。VoiceOver / TalkBack が読み上げる。ローカライズ対象: 登録済み strings.json キーは `text` / `hint` と同じく StringManager 経由で解決される。装飾画像は空文字または省略。"
               },
               "type": "string",
               "required": ""
@@ -1593,8 +1593,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Alternative to `srcName` — full path string. On Web this maps directly to `<img src>`.",
-                "ja": "`srcName` の代わりにフルパス文字列を指定。Web では `<img src>` にそのままマップ。"
+                "en": "Alternative to `srcName` — full path string (`/images/hero.png`, absolute URL, `data:` URI). On Web this maps directly to `<img src>`. Literals are deliberately NEVER resolved through strings.json (so registering a string key can't break a picture), and a bare name — no `/`, `.`, or scheme — triggers a build warning: use `srcName` for named assets.",
+                "ja": "`srcName` の代わりにフルパス文字列を指定（`/images/hero.png`、絶対 URL、`data:` URI）。Web では `<img src>` にそのままマップ。リテラルは意図的に strings.json を**一切通らない**（string key の登録で画像が壊れない）。`/`・`.`・スキームを含まない裸名にはビルド警告が出る — named asset は `srcName` を使うこと。"
               },
               "type": "string | binding",
               "required": ""
@@ -1895,8 +1895,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Accessibility description. Spoken by screen readers (VoiceOver / TalkBack). For decorative images, use an empty string or omit.",
-                "ja": "アクセシビリティ説明文。VoiceOver / TalkBack が読み上げる。装飾画像は空文字または省略。"
+                "en": "Accessibility description. Spoken by screen readers (VoiceOver / TalkBack). Localizable: a registered strings.json key resolves through StringManager just like `text` / `hint`. For decorative images, use an empty string or omit.",
+                "ja": "アクセシビリティ説明文。VoiceOver / TalkBack が読み上げる。ローカライズ対象: 登録済み strings.json キーは `text` / `hint` と同じく StringManager 経由で解決される。装飾画像は空文字または省略。"
               },
               "type": "string",
               "required": ""

@@ -45,19 +45,19 @@
   "canonicalCode": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"S\", \"checked\": \"@{size == 'S'}\", \"label\": \"@string/small\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"M\", \"checked\": \"@{size == 'M'}\", \"label\": \"@string/medium\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"L\", \"checked\": \"@{size == 'L'}\", \"label\": \"@string/large\" }\n  ]\n}",
   "canonicalLanguage": "json",
   "statRequired": "1",
-  "statOptional": "15",
-  "statEvents": "0",
+  "statOptional": "17",
+  "statEvents": "1",
   "statRequiredText": {
     "en": "1 required",
     "ja": "必須 1"
   },
   "statOptionalText": {
-    "en": "15 optional",
-    "ja": "任意 15"
+    "en": "17 optional",
+    "ja": "任意 17"
   },
   "statEventsText": {
-    "en": "0 events",
-    "ja": "イベント 0"
+    "en": "1 events",
+    "ja": "イベント 1"
   },
   "usageVisibility": "visible",
   "attributeCategories": {
@@ -72,6 +72,14 @@
                 "ja": "共通"
               },
               "anchorUrl": "#section-common"
+            },
+            {
+              "id": "cat_event",
+              "label": {
+                "en": "Event",
+                "ja": "イベント"
+              },
+              "anchorUrl": "#section-event"
             }
           ]
         }
@@ -281,8 +289,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Boolean binding. Usually derived: `@{selectedValue == 'M'}`. Tapping sets all other Radios in the same `group` to `false`.",
-                "ja": "Boolean binding。通常は `@{selectedValue == 'M'}` のように導出する。タップで同 `group` の他の Radio は `false` になる。"
+                "en": "Boolean binding. Usually derived: `@{selectedValue == 'M'}`. Tapping sets all other Radios in the same `group` to `false`. Binding `selectedValue` directly is the simpler alternative.",
+                "ja": "Boolean binding。通常は `@{selectedValue == 'M'}` のように導出する。タップで同 `group` の他の Radio は `false` になる。`selectedValue` を直接バインドする方が簡潔。"
               },
               "type": "boolean | binding",
               "required": ""
@@ -1013,6 +1021,76 @@
               "required": ""
             },
             {
+              "id": "attr_selectedValue",
+              "name": "selectedValue",
+              "anchorId": "attr-selectedValue",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Selected value (binding for two-way).",
+                "ja": "選択値（双方向 binding）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Two-way binding to the group's chosen value — the Radio whose `value` matches renders checked, and tapping a Radio writes its `value` back. Same shape as SelectBox.selectedValue; wired on all three platforms.",
+                "ja": "グループの選択値への two-way binding — `value` が一致する Radio がチェック表示になり、タップでその Radio の `value` が書き戻される。SelectBox.selectedValue と同型で、3 プラットフォームすべてで配線済み。"
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
               "id": "attr_selected_icon",
               "name": "selected_icon",
               "anchorId": "attr-selected_icon",
@@ -1207,12 +1285,77 @@
     "sections": [
       {
         "cells": {
-          "data": []
+          "data": [
+            {
+              "id": "attr_onValueChange",
+              "name": "onValueChange",
+              "anchorId": "attr-onValueChange",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Value change handler — binding only (@{functionName}).",
+                "ja": "値変更時のイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Fires when a Radio in the group is tapped; receives that Radio's `value`. Binding-only (`@{handlerName}`).",
+                "ja": "グループ内の Radio がタップされたときに発火し、その Radio の `value` を受け取る。binding 専用（`@{handlerName}`）。"
+              },
+              "type": "binding",
+              "required": ""
+            }
+          ]
         }
       }
     ]
   },
-  "groupEventVisibility": "gone",
+  "groupEventVisibility": "visible",
   "attributesResponsive": {
     "sections": [
       {
@@ -1250,6 +1393,15 @@
         "ja": "共通"
       },
       "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_event",
+      "label": {
+        "en": "Event",
+        "ja": "イベント"
+      },
+      "anchor": "section-event",
       "level": 1
     },
     {
@@ -1322,6 +1474,49 @@
             {
               "id": "example_2",
               "anchorId": "example-2",
+              "title": {
+                "en": "Bound group (selectedValue)",
+                "ja": "バインドされたグループ (selectedValue)"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"S\", \"selectedValue\": \"@{size}\", \"onValueChange\": \"@{onSizeChanged}\", \"label\": \"@string/small\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"M\", \"selectedValue\": \"@{size}\", \"onValueChange\": \"@{onSizeChanged}\", \"label\": \"@string/medium\" }\n  ]\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"S\", \"selectedValue\": \"@{size}\", \"onValueChange\": \"@{onSizeChanged}\", \"label\": \"@string/small\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"M\", \"selectedValue\": \"@{size}\", \"onValueChange\": \"@{onSizeChanged}\", \"label\": \"@string/medium\" }\n  ]\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"S\", \"selectedValue\": \"@{size}\", \"onValueChange\": \"@{onSizeChanged}\", \"label\": \"@string/small\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"M\", \"selectedValue\": \"@{size}\", \"onValueChange\": \"@{onSizeChanged}\", \"label\": \"@string/medium\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "anchorId": "example-3",
               "title": {
                 "en": "Custom icons",
                 "ja": "カスタムアイコン"
@@ -1570,8 +1765,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Boolean binding. Usually derived: `@{selectedValue == 'M'}`. Tapping sets all other Radios in the same `group` to `false`.",
-                "ja": "Boolean binding。通常は `@{selectedValue == 'M'}` のように導出する。タップで同 `group` の他の Radio は `false` になる。"
+                "en": "Boolean binding. Usually derived: `@{selectedValue == 'M'}`. Tapping sets all other Radios in the same `group` to `false`. Binding `selectedValue` directly is the simpler alternative.",
+                "ja": "Boolean binding。通常は `@{selectedValue == 'M'}` のように導出する。タップで同 `group` の他の Radio は `false` になる。`selectedValue` を直接バインドする方が簡潔。"
               },
               "type": "boolean | binding",
               "required": ""
@@ -2238,6 +2433,70 @@
               "required": ""
             },
             {
+              "id": "attr_onValueChange",
+              "name": "onValueChange",
+              "anchorId": "attr-onValueChange",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Value change handler — binding only (@{functionName}).",
+                "ja": "値変更時のイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Fires when a Radio in the group is tapped; receives that Radio's `value`. Binding-only (`@{handlerName}`).",
+                "ja": "グループ内の Radio がタップされたときに発火し、その Radio の `value` を受け取る。binding 専用（`@{handlerName}`）。"
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
               "id": "attr_selectedIcon",
               "name": "selectedIcon",
               "anchorId": "attr-selectedIcon",
@@ -2299,6 +2558,76 @@
                 "ja": "選択中アイコン画像名。省略時はプラットフォーム標準の radio-on グリフ。"
               },
               "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_selectedValue",
+              "name": "selectedValue",
+              "anchorId": "attr-selectedValue",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Selected value (binding for two-way).",
+                "ja": "選択値（双方向 binding）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Two-way binding to the group's chosen value — the Radio whose `value` matches renders checked, and tapping a Radio writes its `value` back. Same shape as SelectBox.selectedValue; wired on all three platforms.",
+                "ja": "グループの選択値への two-way binding — `value` が一致する Radio がチェック表示になり、タップでその Radio の `value` が書き戻される。SelectBox.selectedValue と同型で、3 プラットフォームすべてで配線済み。"
+              },
+              "type": "string | binding",
               "required": ""
             },
             {

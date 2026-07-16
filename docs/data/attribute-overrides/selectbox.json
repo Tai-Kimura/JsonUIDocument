@@ -12,7 +12,7 @@
     {
       "title": { "en": "Static options", "ja": "静的選択肢" },
       "language": "json",
-      "code": "{\n  \"type\": \"SelectBox\",\n  \"selectedValue\": \"@{country}\",\n  \"items\": [\n    { \"label\": \"Japan\", \"value\": \"JP\" },\n    { \"label\": \"United States\", \"value\": \"US\" },\n    { \"label\": \"United Kingdom\", \"value\": \"UK\" }\n  ],\n  \"prompt\": \"@string/select_country\"\n}"
+      "code": "{\n  \"type\": \"SelectBox\",\n  \"selectedValue\": \"@{country}\",\n  \"items\": [\"Japan\", \"United States\", \"United Kingdom\"],\n  \"prompt\": \"@string/select_country\"\n}"
     },
     {
       "title": { "en": "Bound options from ViewModel", "ja": "ViewModel 由来の選択肢" },
@@ -33,14 +33,14 @@
   "attributes": {
     "items": {
       "note": {
-        "en": "Array of `{ label, value }` objects, or bound to a ViewModel array. When `datePickerMode` is set, `items` is ignored in favor of date range attributes.",
-        "ja": "`{ label, value }` オブジェクトの配列、または ViewModel 配列にバインド。`datePickerMode` 指定時は `items` は無視され日付範囲属性が優先される。"
+        "en": "Canonically an array of **strings** — the string IS the value — or a binding to a ViewModel string array. This is the shape that works on all three platforms. On Web only, entries may also be objects (`{ value, text }` / `{ id, label }`) — a web extension; keep object items out of cross-platform layouts. When `datePickerMode` is set, `items` is ignored in favor of date range attributes.",
+        "ja": "正準形は**文字列**の配列 — 文字列そのものが値 — または ViewModel の文字列配列へのバインド。この形が 3 プラットフォーム全てで動きます。Web に限りオブジェクト要素（`{ value, text }` / `{ id, label }`）も受理されますが web 拡張です — クロスプラットフォームの layout ではオブジェクト items を使わないこと。`datePickerMode` 指定時は `items` は無視され日付範囲属性が優先される。"
       }
     },
     "selectedValue": {
       "note": {
-        "en": "Two-way binding to the selected value (not label). Must match one of `items[].value`.",
-        "ja": "選択された**値**（ラベルではない）への two-way binding。`items[].value` のいずれかと一致する必要がある。"
+        "en": "Two-way binding to the selected value (not label). With canonical string items it holds the selected string itself; with web object items it must match one of `items[].value`.",
+        "ja": "選択された**値**（ラベルではない）への two-way binding。正準の文字列 items では選択された文字列そのものを保持し、web のオブジェクト items では `items[].value` のいずれかと一致する必要がある。"
       }
     },
     "selectedIndex": {
@@ -75,8 +75,8 @@
     },
     "onValueChange": {
       "note": {
-        "en": "Fires after the user confirms a selection. Receives the new value.",
-        "ja": "選択確定後に発火。新しい値を受け取る。"
+        "en": "Fires after the user confirms a selection. Receives the new value as a String on every platform — declare the handler as `((String) -> Void)?` (index-callback signatures are not part of the contract).",
+        "ja": "選択確定後に発火。全プラットフォームで新しい値を **String** として受け取る — ハンドラ宣言は `((String) -> Void)?` にする（index コールバックの規約は存在しない）。"
       }
     },
     "datePickerMode": {

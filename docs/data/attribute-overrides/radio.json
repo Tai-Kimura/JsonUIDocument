@@ -15,6 +15,11 @@
       "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"S\", \"checked\": \"@{size == 'S'}\", \"label\": \"@string/small\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"M\", \"checked\": \"@{size == 'M'}\", \"label\": \"@string/medium\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"L\", \"checked\": \"@{size == 'L'}\", \"label\": \"@string/large\" }\n  ]\n}"
     },
     {
+      "title": { "en": "Bound group (selectedValue)", "ja": "バインドされたグループ (selectedValue)" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"S\", \"selectedValue\": \"@{size}\", \"onValueChange\": \"@{onSizeChanged}\", \"label\": \"@string/small\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"M\", \"selectedValue\": \"@{size}\", \"onValueChange\": \"@{onSizeChanged}\", \"label\": \"@string/medium\" }\n  ]\n}"
+    },
+    {
       "title": { "en": "Custom icons", "ja": "カスタムアイコン" },
       "language": "json",
       "code": "{\n  \"type\": \"Radio\",\n  \"group\": \"option\",\n  \"value\": \"a\",\n  \"icon\": \"radio_off\",\n  \"selectedIcon\": \"radio_on\",\n  \"label\": \"Option A\"\n}"
@@ -35,8 +40,20 @@
     },
     "checked": {
       "note": {
-        "en": "Boolean binding. Usually derived: `@{selectedValue == 'M'}`. Tapping sets all other Radios in the same `group` to `false`.",
-        "ja": "Boolean binding。通常は `@{selectedValue == 'M'}` のように導出する。タップで同 `group` の他の Radio は `false` になる。"
+        "en": "Boolean binding. Usually derived: `@{selectedValue == 'M'}`. Tapping sets all other Radios in the same `group` to `false`. Binding `selectedValue` directly is the simpler alternative.",
+        "ja": "Boolean binding。通常は `@{selectedValue == 'M'}` のように導出する。タップで同 `group` の他の Radio は `false` になる。`selectedValue` を直接バインドする方が簡潔。"
+      }
+    },
+    "selectedValue": {
+      "note": {
+        "en": "Two-way binding to the group's chosen value — the Radio whose `value` matches renders checked, and tapping a Radio writes its `value` back. Same shape as SelectBox.selectedValue; wired on all three platforms.",
+        "ja": "グループの選択値への two-way binding — `value` が一致する Radio がチェック表示になり、タップでその Radio の `value` が書き戻される。SelectBox.selectedValue と同型で、3 プラットフォームすべてで配線済み。"
+      }
+    },
+    "onValueChange": {
+      "note": {
+        "en": "Fires when a Radio in the group is tapped; receives that Radio's `value`. Binding-only (`@{handlerName}`).",
+        "ja": "グループ内の Radio がタップされたときに発火し、その Radio の `value` を受け取る。binding 専用（`@{handlerName}`）。"
       }
     },
     "label": {
