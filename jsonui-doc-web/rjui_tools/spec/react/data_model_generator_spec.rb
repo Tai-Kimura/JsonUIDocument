@@ -307,3 +307,75 @@ RSpec.describe RjuiTools::React::DataModelGenerator do
     end
   end
 end
+RSpec.describe RjuiTools::React::DataModelGenerator, 'focus-state value bindings' do
+  let(:generator) { described_class.new }
+
+  it 'adds a boolean <camel>IsFocused binding per id-bearing editable field' do
+    json = { 'type' => 'View', 'child' => [
+      { 'type' => 'TextField', 'id' => 'email_field' },
+      { 'type' => 'TextView', 'id' => 'note_input' },
+      { 'type' => 'TextField' }
+    ] }
+    bindings = generator.send(:extract_value_bindings, json)
+    expect(bindings['emailFieldIsFocused']).to eq({ type: 'boolean', defaultValue: false })
+    expect(bindings['noteInputIsFocused']).to eq({ type: 'boolean', defaultValue: false })
+    expect(bindings.keys.grep(/IsFocused/).size).to eq(2)
+  end
+
+  describe '#ensure_unique_layout_basenames! (regression: rjui-cell-data-model-name-collision-across-screens)' do
+    let(:generator) { described_class.new }
+
+    it 'aborts when two layouts share a basename across subdirectories' do
+      files = ['/x/Layouts/dashboard/breakdown_row.json', '/x/Layouts/sales/breakdown_row.json']
+      expect { generator.send(:ensure_unique_layout_basenames!, files) }
+        .to raise_error(SystemExit)
+        .and output(/duplicate layout file name.*breakdown_row\.json/m).to_stderr
+    end
+
+    it 'stays silent for unique basenames' do
+      files = ['/x/Layouts/dashboard/breakdown_row.json', '/x/Layouts/sales/sales_breakdown_row.json']
+      expect { generator.send(:ensure_unique_layout_basenames!, files) }.not_to raise_error
+    end
+  end
+
+  describe '#collect_type_map_imports (regression: rjui-data-model-ignores-type-map-custom-types)' do
+    let(:generator) { described_class.new }
+
+    before do
+      generator.instance_variable_set(:@project_type_map, {
+        'SelectOption' => {
+          'class' => 'SelectOption',
+          'imports' => ['Models'],
+          'web' => { 'class' => 'SelectOption', 'imports' => ['@/types/SelectOption'] }
+        },
+        'AmbientType' => {
+          'class' => 'AmbientType',
+          'web' => { 'class' => 'AmbientType', 'imports' => [] }
+        }
+      })
+    end
+
+    it 'emits a type import resolved from the web platform entry' do
+      props = [{ 'name' => 'parkingScopeOptions', 'class' => '[SelectOption]' }]
+      lines = generator.send(:collect_type_map_imports, props)
+      expect(lines).to eq(["import type { SelectOption } from '@/types/SelectOption';"])
+    end
+
+    it 'emits nothing for ambient (imports: []) web entries' do
+      props = [{ 'name' => 'x', 'class' => 'AmbientType' }]
+      expect(generator.send(:collect_type_map_imports, props)).to be_empty
+    end
+
+    it 'ignores tokens not registered in the type map' do
+      props = [{ 'name' => 'y', 'class' => 'UnknownThing' }]
+      expect(generator.send(:collect_type_map_imports, props)).to be_empty
+    end
+
+    it 'wires the import into generated TypeScript content' do
+      props = [{ 'name' => 'parkingScopeOptions', 'class' => '[SelectOption]', 'defaultValue' => nil }]
+      content = generator.send(:generate_typescript_content, 'AdminTopbar', props)
+      expect(content).to include("import type { SelectOption } from '@/types/SelectOption';")
+      expect(content).to include('parkingScopeOptions?: SelectOption[];')
+    end
+  end
+end

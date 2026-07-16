@@ -400,7 +400,7 @@ module RjuiTools
 
           OptionParser.new do |opts|
             opts.on('--attributes ATTRS', 'Add attributes (comma-separated key:type pairs)') do |attrs|
-              attrs.split(',').each do |attr|
+              split_top_level_commas(attrs).each do |attr|
                 key, type = attr.strip.split(':', 2)
                 if key && type
                   options[:attributes][key] = type
@@ -418,9 +418,42 @@ module RjuiTools
             opts.on('--no-container', 'Force component to not be a container (ignores children)') do
               options[:is_container] = false
             end
+
+            opts.on('--force', 'Overwrite existing converter/component files without prompting') do
+              options[:force] = true
+            end
+
+            opts.on('--skip-existing', 'Leave existing converter/component files untouched (non-interactive)') do
+              options[:skip_existing] = true
+            end
           end.parse!(@args)
 
           options
+        end
+
+        # Split an --attributes list on top-level commas only. Spec prop
+        # types can contain commas themselves (multi-arg closure types like
+        # `((String, String) -> Void)?`) — commas nested in parens/brackets
+        # belong to the type, not the list.
+        def split_top_level_commas(str)
+          parts = []
+          depth = 0
+          current = +''
+          str.each_char do |ch|
+            case ch
+            when '(', '[' then depth += 1
+            when ')', ']' then depth -= 1
+            when ','
+              if depth.zero?
+                parts << current
+                current = +''
+                next
+              end
+            end
+            current << ch
+          end
+          parts << current unless current.empty?
+          parts
         end
 
         def to_pascal_case(string)

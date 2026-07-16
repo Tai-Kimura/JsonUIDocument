@@ -62,6 +62,35 @@ RSpec.describe RjuiTools::React::Converters::NetworkImageConverter do
       end
     end
 
+    # Regression: rjui-networkimage-template-missing-id-and-fit-contentmode —
+    # the canonical enum short forms (fit/fill/center/...) must normalize
+    # into the NetworkImageProps union, not pass through verbatim.
+    context 'with canonical contentMode fit' do
+      it 'normalizes to contain' do
+        converter = create_converter({ 'class' => 'NetworkImage', 'url' => 'https://example.com/image.jpg', 'contentMode' => 'fit' })
+        result = converter.convert
+        expect(result).to include('contentMode="contain"')
+        expect(result).to include('object-contain')
+        expect(result).not_to include('contentMode="fit"')
+      end
+    end
+
+    context 'with canonical contentMode fill' do
+      it 'normalizes to cover' do
+        converter = create_converter({ 'class' => 'NetworkImage', 'url' => 'https://example.com/image.jpg', 'contentMode' => 'fill' })
+        result = converter.convert
+        expect(result).to include('contentMode="cover"')
+      end
+    end
+
+    context 'with id' do
+      it 'passes id through to the NetworkImage component' do
+        converter = create_converter({ 'class' => 'NetworkImage', 'id' => 'tenant_logo_image', 'url' => 'https://example.com/image.jpg' })
+        result = converter.convert
+        expect(result).to match(/<NetworkImage id="tenant_logo_image"/)
+      end
+    end
+
     context 'with circle option' do
       it 'adds rounded-full class' do
         converter = create_converter({ 'class' => 'NetworkImage', 'url' => 'https://example.com/image.jpg', 'circle' => true })
@@ -115,6 +144,19 @@ RSpec.describe RjuiTools::React::Converters::NetworkImageConverter do
         converter = create_converter({ 'class' => 'NetworkImage', 'url' => 'https://example.com/image.jpg', 'accessibilityLabel' => 'Profile picture' })
         result = converter.convert
         expect(result).to include('alt="Profile picture"')
+      end
+    end
+
+    # Regression companion (rjui-image-src-bare-name-string-key-collision):
+    # alt resolves strings.json keys on NetworkImage too.
+    context 'alt string-key resolution' do
+      it 'resolves a registered key to a StringManager reference' do
+        converter = create_converter({ 'class' => 'NetworkImage', 'url' => 'https://example.com/i.jpg', 'alt' => 'profile_photo_alt' })
+        allow(converter).to receive(:convert_string_key)
+          .with('profile_photo_alt')
+          .and_return('{StringManager.currentLanguage.profilePhotoAlt}')
+        result = converter.convert
+        expect(result).to include('alt={StringManager.currentLanguage.profilePhotoAlt}')
       end
     end
 

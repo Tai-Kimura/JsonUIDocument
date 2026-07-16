@@ -112,11 +112,27 @@ module RjuiTools
           hint_option = hint ? "\n#{indent_str(indent + 2)}<option value=\"\">#{hint_text}</option>" : ''
           class_attr = build_select_class_attr(class_name)
 
+          # Canonical items are a plain string array ([String] — matches
+          # SwiftJsonUI SelectBoxView's `items: [String]`); {value,text}
+          # object elements stay supported as the web-side extended form.
+          # The widening cast keeps the runtime dual-shape branch compatible
+          # with ANY declared element type — on string[] items a bare
+          # typeof-narrowing would reduce the object branch to `never` and
+          # every property access to TS2339.
+          opt_cast =
+            if config['typescript'] != false
+              ' as string | number | { value?: string | number; id?: string | number; text?: string; label?: string }'
+            else
+              ''
+            end
           <<~JSX.chomp
             #{indent_str(indent)}<select#{id_attr} #{class_attr}#{value_attr}#{on_change}#{disabled_attr}#{style_attr}#{testid_attr}#{tag_attr}>#{hint_option}
-            #{indent_str(indent + 2)}{#{items_prop}?.map((item) => (
-            #{indent_str(indent + 4)}<option key={item.value || item.id} value={item.value || item.id}>{item.text || item.label}</option>
-            #{indent_str(indent + 2)}))}
+            #{indent_str(indent + 2)}{#{items_prop}?.map((item) => {
+            #{indent_str(indent + 4)}const opt = item#{opt_cast};
+            #{indent_str(indent + 4)}return typeof opt === 'object' && opt !== null
+            #{indent_str(indent + 6)}? <option key={String(opt.value ?? opt.id ?? '')} value={String(opt.value ?? opt.id ?? '')}>{opt.text || opt.label}</option>
+            #{indent_str(indent + 6)}: <option key={String(opt)} value={String(opt)}>{String(opt)}</option>;
+            #{indent_str(indent + 2)}})}
             #{indent_str(indent)}</select>
           JSX
         end
@@ -158,6 +174,35 @@ module RjuiTools
             " value={#{prop}}"
           elsif value
             " defaultValue=\"#{value}\""
+          elsif (index_binding = attributes['selectedIndex']) && has_binding?(index_binding)
+            build_index_value_attr(index_binding)
+          else
+            ''
+          end
+        end
+
+        # selectedIndex is a two-way binding, so the <select> must be a
+        # controlled component: resolve the item at the bound index to the
+        # same value string the <option> rows emit (dual-shape aware).
+        def build_index_value_attr(index_binding)
+          index_prop = extract_binding_property(index_binding)
+          items = attributes['items']
+
+          if items.is_a?(String) && has_binding?(items)
+            items_prop = extract_binding_property(items)
+            sel_cast =
+              if config['typescript'] != false
+                ' as string | number | { value?: string | number; id?: string | number } | undefined'
+              else
+                ''
+              end
+            " value={(() => { const sel = #{items_prop}?.[#{index_prop} ?? -1]#{sel_cast}; return sel != null && typeof sel === 'object' ? String(sel.value ?? sel.id ?? '') : String(sel ?? ''); })()}"
+          elsif items.is_a?(Array)
+            values = items.map do |item|
+              raw = item.is_a?(Hash) ? (item['value'] || item['id'] || item['text']) : item
+              "'#{raw.to_s.gsub("'") { "\\'" }}'"
+            end
+            " value={[#{values.join(', ')}][#{index_prop} ?? -1] ?? ''}"
           else
             ''
           end
@@ -190,7 +235,7 @@ module RjuiTools
           return '' if enabled.nil?
 
           if has_binding?(enabled)
-            " disabled={#{extract_binding_property(enabled)} !== \"true\"}"
+            " disabled={!#{extract_binding_property(enabled)}}"
           elsif enabled == false
             ' disabled'
           else

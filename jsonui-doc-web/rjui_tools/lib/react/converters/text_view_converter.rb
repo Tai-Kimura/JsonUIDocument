@@ -18,7 +18,9 @@ module RjuiTools
           on_change = build_on_change
           disabled_attr = build_disabled_attr
 
-          jsx = "#{indent_str(indent)}<textarea#{id_attr} className=\"#{class_name}\"#{style_attr}#{attrs}#{on_change}#{disabled_attr}#{testid_attr}#{tag_attr}></textarea>"
+          focus_attrs = build_focus_binding_attrs
+
+          jsx = "#{indent_str(indent)}<textarea#{id_attr} className=\"#{class_name}\"#{style_attr}#{attrs}#{on_change}#{focus_attrs}#{disabled_attr}#{testid_attr}#{tag_attr}></textarea>"
 
           wrap_with_visibility(jsx, indent)
         end
@@ -137,6 +139,11 @@ module RjuiTools
             resolved = convert_binding(placeholder)
             if resolved != placeholder && resolved.include?('{')
               attrs << " placeholder={#{resolved.gsub(/^\{|\}$/, '')}}"
+            elsif (string_resolved = convert_string_key(placeholder))
+              # strings.json key -> StringManager, matching sjui's hint
+              # contract (get_text_with_string_manager). Unregistered keys
+              # and plain literals fall through unchanged.
+              attrs << " placeholder=#{string_resolved}"
             else
               attrs << " placeholder=\"#{placeholder}\""
             end
@@ -215,8 +222,7 @@ module RjuiTools
           return '' if enabled.nil?
 
           if enabled.is_a?(String) && enabled.start_with?('@{') && enabled.end_with?('}')
-            property_name = enabled[2...-1]
-            " disabled={data.#{property_name} !== \"true\"}"
+            " disabled={!#{extract_binding_property(enabled)}}"
           elsif enabled == false
             ' disabled'
           else

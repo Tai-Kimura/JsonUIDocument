@@ -176,4 +176,117 @@ RSpec.describe RjuiTools::React::ReactGenerator do
       expect(result).not_to include('Configuration.Font')
     end
   end
+
+  describe '#generate_component_file data prop call convention (regression: rjui-include-data-partial-call-convention-missing)' do
+    # `data` is optional at every call site: bare includes render `<Name />`,
+    # data-passing includes provide a Partial merged over createXxxData()
+    # defaults, and pages/cells pass the full object.
+    let(:minimal_json) { { 'type' => 'View' } }
+
+    it 'makes data optional when the body never reads data' do
+      jsx = '      <header>logo + service name</header>'
+      result = generator.send(:generate_component_file, 'UserHeader', jsx, minimal_json)
+      expect(result).to include('data?: UserHeaderData;')
+      expect(result).not_to include('createUserHeaderData')
+    end
+
+    it 'takes an optional Partial and merges over factory defaults when the JSX reads data' do
+      jsx = '      <span>{data.title}</span>'
+      result = generator.send(:generate_component_file, 'Titled', jsx, minimal_json)
+      expect(result).to include('data?: Partial<TitledData>;')
+      expect(result).to include('({ data: dataProp, id }: TitledProps)')
+      expect(result).to include('const data: TitledData = { ...createTitledData(), ...dataProp };')
+      expect(result).to include("import { type TitledData, createTitledData } from '@/generated/data/TitledData';")
+    end
+
+    it 'applies the merge convention when focus bindings reference data' do
+      json = { 'type' => 'View', 'child' => [
+        { 'type' => 'TextField', 'id' => 'email_input' }
+      ] }
+      jsx = '      <input />'
+      result = generator.send(:generate_component_file, 'Form', jsx, json)
+      expect(result).to include('data?: Partial<FormData>;')
+      expect(result).to include('const data: FormData = { ...createFormData(), ...dataProp };')
+    end
+
+    it 'does not mistake cellData references for data usage' do
+      jsx = '      <Cell data={cellData} />'
+      result = generator.send(:generate_component_file, 'ListHost', jsx, minimal_json)
+      expect(result).to include('data?: ListHostData;')
+      expect(result).not_to include('dataProp')
+    end
+  end
+
+  describe '#generate_component_file root id passthrough (regression: rjui-collection-cells-missing-item-index-id)' do
+    # Collections address cells as {collectionId}_item_{index} via an `id`
+    # prop applied to the component's root element (kjui testTag parity).
+    let(:minimal_json) { { 'type' => 'View' } }
+
+    it 'injects id={id} into an element root and destructures id' do
+      jsx = '      <div className="cell">{data.label}</div>'
+      result = generator.send(:generate_component_file, 'RowCell', jsx, minimal_json)
+      expect(result).to include('<div id={id} className="cell">')
+      expect(result).to include('({ data: dataProp, id }: RowCellProps)')
+      expect(result).to include('id?: string;')
+    end
+
+    it 'keeps a layout-declared root id as the fallback' do
+      jsx = '      <div id="own_root" className="cell">{data.label}</div>'
+      result = generator.send(:generate_component_file, 'OwnId', jsx, minimal_json)
+      expect(result).to include('<div id={id ?? "own_root"} className="cell">')
+    end
+
+    it 'skips injection for an expression-container root but keeps id in the interface' do
+      jsx = "    {data.visible !== \"gone\" && (\n    <div>x</div>\n    )}"
+      result = generator.send(:generate_component_file, 'CondRoot', jsx, minimal_json)
+      expect(result).to include('id?: string;')
+      expect(result).not_to include('id={id}')
+      expect(result).to include('({ data: dataProp }: CondRootProps)')
+    end
+  end
+
+  describe '#generate_component_file root visibility wrapper (regression: rjui-root-visibility-binding-emits-bare-jsx-expression-container)' do
+    # A root element with a visibility binding arrives as a bare JSX
+    # expression container (`{cond && (...)}`), which is not legal directly
+    # under `return (` — it must be wrapped in a fragment.
+    let(:minimal_json) { { 'type' => 'View' } }
+
+    it 'wraps a root-level expression container in a fragment' do
+      jsx = "    {data.drawerVisibility !== \"gone\" && (\n    <div id=\"adminDrawerView\">x</div>\n    )}"
+      result = generator.send(:generate_component_file, 'AdminDrawer', jsx, minimal_json)
+      expect(result).to match(/return \(\s*\n\s*<>\s*\n\s*\{data\.drawerVisibility/)
+      expect(result).to include('</>')
+    end
+
+    it 'leaves element-rooted JSX unwrapped' do
+      jsx = '      <div>plain</div>'
+      result = generator.send(:generate_component_file, 'Plain2', jsx, minimal_json)
+      expect(result).not_to include('<>')
+    end
+  end
+end
+RSpec.describe RjuiTools::React::ReactGenerator, 'focus-state declarations' do
+  let(:generator) do
+    described_class.new({ 'use_tailwind' => true, 'layouts_directory' => '/tmp/x', 'generated_directory' => '/tmp/x/out' })
+  end
+
+  it 'hoists a ref + effect per id-bearing editable field and imports the hooks' do
+    json = { 'type' => 'View', 'child' => [
+      { 'type' => 'TextField', 'id' => 'email_field' },
+      { 'type' => 'TextView', 'id' => 'note_input' }
+    ] }
+    out = generator.generate('FocusScreen', json)
+    expect(out).to include("import React, { useRef, useEffect } from 'react';")
+    expect(out).to include('const emailFieldRef = useRef<HTMLInputElement | null>(null);')
+    expect(out).to include('const noteInputRef = useRef<HTMLTextAreaElement | null>(null);')
+    expect(out).to include('useEffect(() => { if (data.emailFieldIsFocused) { emailFieldRef.current?.focus(); } }, [data.emailFieldIsFocused]);')
+    expect(out).to include('"use client"')
+  end
+
+  it 'emits nothing focus-related without editable ids' do
+    json = { 'type' => 'View', 'child' => [{ 'type' => 'Text', 'text' => 'hi' }] }
+    out = generator.generate('PlainScreen', json)
+    expect(out).not_to include('useRef')
+    expect(out).not_to include('IsFocused')
+  end
 end

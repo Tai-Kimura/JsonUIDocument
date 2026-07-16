@@ -119,6 +119,109 @@ RSpec.describe RjuiTools::Core::Resources::ColorManager do
     end
   end
 
+  # Regression: rjui-web-theme-css-not-generated-from-colors-json —
+  # generated components emit `bg-<token>` classes that only resolve when a
+  # Tailwind v4 @theme registers `--color-<token>`. rjui build now emits that
+  # @theme as a @generated theme.css.
+  describe 'theme.css generation' do
+    let(:theme_file) { File.join(source_path, 'src', 'generated', 'theme.css') }
+
+    def write_colors(hash)
+      File.write(File.join(resources_dir, 'colors.json'), JSON.pretty_generate(hash))
+    end
+
+    # process_colors returns early on an empty file list, so drive it with a
+    # colorless layout file — the pass still regenerates ColorManager + theme.
+    def run_process(cfg = config)
+      dummy = File.join(temp_dir, 'dummy_layout.json')
+      File.write(dummy, JSON.pretty_generate('type' => 'View'))
+      described_class.new(cfg, source_path, resources_dir).process_colors([dummy], 1, 0, cfg)
+    end
+
+    it 'emits an @theme block with --color-<token> for each mode-complete token' do
+      write_colors('ink' => '#1C1C1A', 'surface' => '#FFFFFF', 'primary' => '#0E5A46')
+      run_process
+
+      expect(File.exist?(theme_file)).to be true
+      css = File.read(theme_file)
+      expect(css).to include('@theme {')
+      expect(css).to include('--color-ink: #1C1C1A;')
+      expect(css).to include('--color-surface: #FFFFFF;')
+      expect(css).to include('--color-primary: #0E5A46;')
+      expect(css).to include('@generated')
+    end
+
+    it 'converts JsonUI alpha-first 8-digit hex to rgba()' do
+      write_colors('backdrop' => '#731C1C1A')
+      run_process
+
+      css = File.read(theme_file)
+      # #731C1C1A => A=0x73(115)=0.451, R=0x1C(28), G=0x1C(28), B=0x1A(26)
+      expect(css).to include('--color-backdrop: rgba(28, 28, 26, 0.451);')
+    end
+
+    it 'renders fully-opaque 8-digit alpha as integer 1' do
+      write_colors('solid' => '#FF102030')
+      run_process
+
+      expect(File.read(theme_file)).to include('--color-solid: rgba(16, 32, 48, 1);')
+    end
+
+    it 'emits per-mode overrides under :root[data-theme=...] for extra modes' do
+      write_colors(
+        'modes' => %w[light dark],
+        'fallback_mode' => 'light',
+        'light' => { 'surface' => '#FFFFFF', 'ink' => '#1C1C1A' },
+        'dark' => { 'surface' => '#101010', 'ink' => '#F5F5F5' }
+      )
+      run_process
+
+      css = File.read(theme_file)
+      expect(css).to include('@theme {')
+      expect(css).to include('--color-surface: #FFFFFF;')
+      expect(css).to include(':root[data-theme="dark"] {')
+      expect(css).to include('--color-surface: #101010;')
+    end
+
+    it 'skips tokens that are not mode-complete (would emit a dead class)' do
+      write_colors(
+        'modes' => %w[light dark],
+        'light' => { 'surface' => '#FFFFFF', 'lightOnly' => '#ABCDEF' },
+        'dark' => { 'surface' => '#101010' }
+      )
+      run_process
+
+      css = File.read(theme_file)
+      expect(css).to include('--color-surface')
+      expect(css).not_to include('--color-lightOnly')
+    end
+
+    it 'does not write theme.css when there are no colors' do
+      write_colors({})
+      run_process
+      expect(File.exist?(theme_file)).to be false
+    end
+  end
+
+  describe '#css_color_value' do
+    it 'keeps 6-digit hex as-is' do
+      expect(manager.send(:css_color_value, '#0E5A46')).to eq('#0E5A46')
+    end
+
+    it 'expands nothing for 3-digit hex but keeps it valid CSS' do
+      expect(manager.send(:css_color_value, '#abc')).to eq('#abc')
+    end
+
+    it 'converts 8-digit alpha-first hex to rgba' do
+      expect(manager.send(:css_color_value, '#731C1C1A')).to eq('rgba(28, 28, 26, 0.451)')
+    end
+
+    it 'returns nil for non-hex values' do
+      expect(manager.send(:css_color_value, 'not_a_color')).to be_nil
+      expect(manager.send(:css_color_value, nil)).to be_nil
+    end
+  end
+
   describe '#apply_to_color_assets' do
     it 'saves pending colors' do
       manager.apply_to_color_assets
@@ -244,6 +347,47 @@ RSpec.describe RjuiTools::Core::Resources::ColorManager do
       it 'generates key for gray' do
         key = manager.send(:generate_color_key, '#808080')
         expect(key).to include('gray')
+      end
+
+      # rjui-offpalette-hex-dead-tailwind-class: hue-carrying pales must not
+      # collapse to bare `white`/`black` (Tailwind builtins, hue discarded).
+      it 'keeps the hue for a near-white tinted color instead of bare white' do
+        key = manager.send(:generate_color_key, '#DBEAFE') # pale blue-ish
+        expect(key).not_to match(/^white(_\d+)?$/)
+        expect(key).to start_with('pale_') # hue suffix preserved
+      end
+
+      it 'keeps the hue for a near-black tinted color instead of bare black' do
+        key = manager.send(:generate_color_key, '#0A1030') # very dark blue
+        expect(key).not_to match(/^black(_\d+)?$/)
+      end
+
+      it 'still names true neutrals white/black' do
+        expect(manager.send(:generate_color_key, '#FFFFFF')).to eq('white')
+        expect(manager.send(:generate_color_key, '#FDFDFC')).to eq('white')
+        expect(manager.send(:generate_color_key, '#000000')).to eq('black')
+      end
+    end
+
+    describe '#mode_complete_keys / #fallback_hexes' do
+      it 'returns only names defined in every mode' do
+        colors_file = File.join(resources_dir, 'colors.json')
+        File.write(colors_file, JSON.pretty_generate(
+          'modes' => %w[light dark],
+          'fallback_mode' => 'light',
+          'light' => { 'surface' => '#FFFFFF', 'white_2' => '#FFFBEB' },
+          'dark' => { 'surface' => '#0B1220' }
+        ))
+        m = described_class.new(config, source_path, resources_dir)
+        expect(m.mode_complete_keys).to eq(['surface'])
+        expect(m.fallback_hexes).to include('white_2' => '#FFFBEB')
+      end
+
+      it 'treats every key as complete in a single-mode project' do
+        colors_file = File.join(resources_dir, 'colors.json')
+        File.write(colors_file, JSON.pretty_generate('light' => { 'a' => '#111111', 'b' => '#222222' }))
+        m = described_class.new(config, source_path, resources_dir)
+        expect(m.mode_complete_keys.sort).to eq(%w[a b])
       end
     end
 
@@ -676,6 +820,38 @@ RSpec.describe RjuiTools::Core::Resources::ColorManager do
         defined_colors_data = JSON.parse(File.read(defined_colors_file))
         expect(defined_colors_data.keys).to include('custom_color')
       end
+    end
+  end
+
+  describe '#generate_ts_code SYSTEM_MODE_MAPPING type (regression: rjui-colormanager-single-mode-system-mapping-ts-error)' do
+    # With a light-only colors.json, `Object.freeze({ light: 'light' })`
+    # infers a single-key literal type, so `SYSTEM_MODE_MAPPING[osMode]`
+    # (osMode: 'light' | 'dark') fails strict tsc with TS7053. The emitted
+    # const needs an explicit loose readonly record annotation.
+    let(:single_mode_manager) do
+      File.write(File.join(resources_dir, 'colors.json'), JSON.generate({
+        'modes' => ['light'],
+        'fallback_mode' => 'light',
+        'systemModeMapping' => { 'light' => 'light' },
+        'light' => { 'primary' => '#336699' }
+      }))
+      described_class.new(config, source_path, resources_dir)
+    end
+
+    it 'annotates SYSTEM_MODE_MAPPING as a loose readonly record in TS output' do
+      code = single_mode_manager.send(
+        :generate_ts_code, single_mode_manager.send(:deep_clone_palettes), true
+      )
+      expect(code).to include(
+        'const SYSTEM_MODE_MAPPING: Readonly<Record<string, string | undefined>> = Object.freeze({'
+      )
+    end
+
+    it 'leaves the JS output unannotated' do
+      code = single_mode_manager.send(
+        :generate_ts_code, single_mode_manager.send(:deep_clone_palettes), false
+      )
+      expect(code).to include('const SYSTEM_MODE_MAPPING = Object.freeze({')
     end
   end
 end

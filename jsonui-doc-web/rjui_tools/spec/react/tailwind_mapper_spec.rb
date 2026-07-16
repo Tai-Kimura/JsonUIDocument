@@ -254,6 +254,25 @@ RSpec.describe RjuiTools::React::TailwindMapper do
     it 'returns empty string for nil' do
       expect(described_class.map_flex_grow(nil)).to eq('')
     end
+
+    # Regression: rjui-map-flex-grow-truncates-fractional-weights —
+    # `to_i` collapsed 0.8 to flex-none and 1.2 to flex-1, destroying
+    # ratio layouts like 1.2 : 1.4 : 0.8.
+    it 'keeps fractional weights below 1 growing' do
+      expect(described_class.map_flex_grow(0.8)).to eq('flex-[0.8] min-w-0 min-h-0')
+    end
+
+    it 'keeps fractional weights above 1 as arbitrary values' do
+      expect(described_class.map_flex_grow(1.2)).to eq('flex-[1.2] min-w-0 min-h-0')
+    end
+
+    it 'renders integer-valued floats without a trailing .0' do
+      expect(described_class.map_flex_grow(2.0)).to eq('flex-[2] min-w-0 min-h-0')
+    end
+
+    it 'still maps 1.0 to flex-1' do
+      expect(described_class.map_flex_grow(1.0)).to eq('flex-1 min-w-0 min-h-0')
+    end
   end
 
   describe '.map_font' do
@@ -308,6 +327,45 @@ RSpec.describe RjuiTools::React::TailwindMapper do
       it 'returns empty string' do
         expect(described_class.map_font(nil)).to eq('')
       end
+    end
+  end
+end
+
+# rjui-offpalette-hex-dead-tailwind-class: only theme-safe (mode-complete)
+# names may become `bg-<name>` classes; everything else resolves to its hex.
+RSpec.describe RjuiTools::React::TailwindMapper, '.map_color (theme-safe policy)' do
+  after { described_class.reset_palette! }
+
+  it 'emits arbitrary value for hex' do
+    expect(described_class.map_color('#DBEAFE')).to eq('bg-[#DBEAFE]')
+  end
+
+  it 'keeps legacy name behavior when no palette is configured' do
+    expect(described_class.map_color('surface', 'text')).to eq('text-surface')
+  end
+
+  context 'with a configured palette' do
+    before do
+      described_class.configure_palette(
+        theme_safe: ['surface'],
+        fallbacks: { 'surface' => '#FFFFFF', 'white_2' => '#FFFBEB' }
+      )
+    end
+
+    it 'emits the class for a theme-safe name' do
+      expect(described_class.map_color('surface')).to eq('bg-surface')
+    end
+
+    it 'resolves an off-palette name back to its hex (visible, not dead)' do
+      expect(described_class.map_color('white_2')).to eq('bg-[#FFFBEB]')
+    end
+
+    it 'resolves with the requested prefix' do
+      expect(described_class.map_color('white_2', 'border')).to eq('border-[#FFFBEB]')
+    end
+
+    it 'passes through a name absent from colors.json entirely' do
+      expect(described_class.map_color('some-custom-class')).to eq('bg-some-custom-class')
     end
   end
 end

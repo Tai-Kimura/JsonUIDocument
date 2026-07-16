@@ -14,7 +14,6 @@ module RjuiTools
           tag_attr = build_tag_attr
 
           src = build_src_attr
-          alt = attributes['alt'] || attributes['accessibilityLabel'] || ''
           content_mode = build_content_mode_attr
           placeholder_attr = build_placeholder_attr
           error_image = attributes['errorImage'] ? " errorImage=\"#{attributes['errorImage']}\"" : ''
@@ -28,7 +27,7 @@ module RjuiTools
           corner_radius_style = build_corner_radius_style
 
           jsx = <<~JSX.chomp
-            #{indent_str(indent)}<NetworkImage#{id_attr} className="#{class_name}"#{src}#{content_mode}#{placeholder_attr}#{error_image} alt="#{alt}"#{on_load}#{on_error}#{onclick_attr}#{corner_radius_style}#{style_attr}#{testid_attr}#{tag_attr} />
+            #{indent_str(indent)}<NetworkImage#{id_attr} className="#{class_name}"#{src}#{content_mode}#{placeholder_attr}#{error_image}#{build_alt_attr}#{on_load}#{on_error}#{onclick_attr}#{corner_radius_style}#{style_attr}#{testid_attr}#{tag_attr} />
           JSX
 
           wrap_with_visibility(jsx, indent)
@@ -39,14 +38,23 @@ module RjuiTools
         def build_class_name
           classes = [super]
 
-          # Content mode to object-fit
+          # Content mode to object-fit. Keys cover the canonical
+          # attribute_definitions enum (fit/fill/center/top/... /AspectFit)
+          # plus the iOS/Android long forms.
           content_mode = attributes['contentMode'] || attributes['scaleType']
           if content_mode
             mode_map = {
+              'fit' => 'object-contain',
+              'fill' => 'object-cover',
+              'center' => 'object-none object-center',
+              'Center' => 'object-none object-center',
+              'top' => 'object-none object-top',
+              'bottom' => 'object-none object-bottom',
+              'left' => 'object-none object-left',
+              'right' => 'object-none object-right',
               'scaleAspectFill' => 'object-cover',
               'scaleAspectFit' => 'object-contain',
               'scaleToFill' => 'object-fill',
-              'center' => 'object-none',
               'centerCrop' => 'object-cover',
               'fitCenter' => 'object-contain',
               'fitXY' => 'object-fill',
@@ -86,11 +94,22 @@ module RjuiTools
           content_mode = attributes['contentMode'] || attributes['scaleType']
           return '' unless content_mode
 
+          # Normalize the canonical enum (fit/fill/center/top/.../AspectFit)
+          # and the iOS/Android long forms into the NetworkImageProps union
+          # ('cover' | 'contain' | 'fill' | 'none' | 'scaleDown') — the
+          # template contract must accept every value emitted here.
           mode_map = {
+            'fit' => 'contain',
+            'fill' => 'cover',
+            'center' => 'none',
+            'Center' => 'none',
+            'top' => 'none',
+            'bottom' => 'none',
+            'left' => 'none',
+            'right' => 'none',
             'scaleAspectFill' => 'cover',
             'scaleAspectFit' => 'contain',
             'scaleToFill' => 'fill',
-            'center' => 'none',
             'centerCrop' => 'cover',
             'fitCenter' => 'contain',
             'fitXY' => 'fill',

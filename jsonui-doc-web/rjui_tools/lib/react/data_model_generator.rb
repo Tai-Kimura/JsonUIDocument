@@ -34,12 +34,94 @@ module RjuiTools
             file.include?(File.join(@layouts_dir, 'Styles'))
         end
 
+        ensure_unique_layout_basenames!(json_files)
+
         json_files.each do |json_file|
           process_json_file(json_file)
         end
       end
 
+      # Data models are written as <Basename>Data.<ext> into a single flat
+      # directory on EVERY platform (ts here, swift/kt on sjui/kjui — Swift
+      # has no directory namespacing at all), so layout basenames must be
+      # unique project-wide. A silent last-write-wins overwrite corrupts the
+      # earlier screen's Data model (rjui-cell-data-model-name-collision-
+      # across-screens), so duplicates abort the build.
+      def ensure_unique_layout_basenames!(json_files)
+        duplicates = json_files.group_by { |f| File.basename(f) }
+                               .select { |_, files| files.size > 1 }
+        return if duplicates.empty?
+
+        details = duplicates.map do |base, files|
+          rels = files.map { |f| f.sub(%r{\A#{Regexp.escape(@layouts_dir)}/?}, '') }.sort
+          "  #{base}: #{rels.join(', ')}"
+        end
+        abort(
+          "ERROR: duplicate layout file name(s) detected.\n" \
+          "Data models are generated as <Name>Data files into a single directory/package " \
+          "on every platform (TypeScript/Swift/Kotlin), so layout basenames must be unique " \
+          "project-wide even across subdirectories — otherwise the last one processed " \
+          "silently overwrites the others. Rename one file of each pair (and its references):\n" +
+          details.join("\n")
+        )
+      end
+
       private
+
+      # Custom types registered in .jsonui-type-map.json (found walking up
+      # from the project dir) carry per-platform import paths — the guidance
+      # tells users "TypeScript path が必要な型はここに登録", so the
+      # generated Data model must actually resolve them
+      # (rjui-data-model-ignores-type-map-custom-types).
+      def project_type_map
+        return @project_type_map if defined?(@project_type_map)
+
+        @project_type_map = {}
+        dir = @source_path || Dir.pwd
+        while dir && dir != File.dirname(dir)
+          path = File.join(dir, '.jsonui-type-map.json')
+          if File.exist?(path)
+            begin
+              @project_type_map = JSON.parse(File.read(path)).fetch('types', {})
+            rescue JSON::ParserError => e
+              warn "[DataModelGenerator] Warning: failed to parse #{path}: #{e.message}"
+            end
+            break
+          end
+          dir = File.dirname(dir)
+        end
+        @project_type_map
+      end
+
+      # Import lines for custom types referenced by the emitted tsTypes.
+      # Scans identifier tokens against the type map's web entries; the
+      # `web.imports` list wins over the top-level one (which is usually a
+      # Swift module list), matching jui's TypeMapper resolution.
+      def collect_type_map_imports(data_properties)
+        type_map = project_type_map
+        return [] if type_map.empty?
+
+        tokens = data_properties.flat_map do |prop|
+          ts_type = prop['tsType'] || Core::TypeConverter.to_typescript_type(prop['class'])
+          ts_type.to_s.scan(/\b[A-Z][A-Za-z0-9_]*\b/)
+        end.uniq
+
+        lines = []
+        tokens.each do |token|
+          entry = type_map[token]
+          next unless entry.is_a?(Hash)
+
+          web = entry['web'].is_a?(Hash) ? entry['web'] : nil
+          klass = (web && web['class']) || entry['class'] || token
+          imports = web&.key?('imports') ? web['imports'] : entry['imports']
+          Array(imports).each do |import_path|
+            next unless import_path.is_a?(String) && !import_path.empty?
+
+            lines << "import type { #{klass} } from '#{import_path}';"
+          end
+        end
+        lines.uniq
+      end
 
       def process_json_file(json_file)
         json_content = File.read(json_file, encoding: 'UTF-8')
@@ -199,6 +281,7 @@ module RjuiTools
             extract_handler_binding(json_data, handler_key, 'string', handlers) if json_data[handler_key]
           end
 
+
           # Process children
           child = json_data['child'] || json_data['children']
           if child
@@ -262,6 +345,20 @@ module RjuiTools
             if value.is_a?(String) && value.start_with?('@{') && value.end_with?('}')
               property_name = value[2...-1]
               bindings[property_name] = { type: 'string', defaultValue: '""' }
+            end
+          end
+
+          # Focus-state binding (cross-platform parity with sjui/kjui
+          # data.<id>IsFocused): every editable field with a literal id gets a
+          # boolean prop the ViewModel can set to drive focus (the generated
+          # component hoists a ref + effect). The paired optional
+          # on<Camel>IsFocusedChange report-back handler is derived from this
+          # binding by the value-binding handler loop in update_data_file.
+          if %w[TextField EditText Input TextView].include?(component_type)
+            field_id = json_data['id']
+            if field_id.is_a?(String) && !field_id.empty? && !field_id.include?('@{')
+              camel = snake_to_camel_id(field_id)
+              bindings["#{camel}IsFocused"] ||= { type: 'boolean', defaultValue: false }
             end
           end
 
@@ -438,6 +535,9 @@ module RjuiTools
         data_type_imports.each do |data_type|
           imports += "import type { #{data_type} } from './#{data_type}';\n"
         end
+        collect_type_map_imports(data_properties).each do |line|
+          imports += "#{line}\n"
+        end
         imports += "\n"
 
         content = <<~TS
@@ -553,6 +653,12 @@ module RjuiTools
         content += Core::GeneratedMarker.comment_footer + "\n"
 
         content
+      end
+
+      # snake_case id -> lowerCamel stem (sync: BaseConverter#snake_to_camel_id)
+      def snake_to_camel_id(str)
+        parts = str.split('_')
+        parts[0] + parts[1..].map(&:capitalize).join
       end
 
       def capitalize_first(str)

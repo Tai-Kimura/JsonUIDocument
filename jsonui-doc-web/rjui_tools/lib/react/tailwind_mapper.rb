@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../core/logger'
+
 module RjuiTools
   module React
     class TailwindMapper
@@ -150,14 +152,58 @@ module RjuiTools
           RADIUS_MAP[radius] || "rounded-[#{radius}px]"
         end
 
+        # Color-name policy (rjui-offpalette-hex-dead-tailwind-class):
+        # `bg-<name>` only resolves when the web @theme registers `--color-<name>`.
+        # The tool can't read the project's globals.css, but colors.json
+        # mode-completeness is the contract the theme mirrors: a name defined in
+        # EVERY mode is a curated token (theme-safe); a name missing from some
+        # mode is machine-extracted (light-only) and would emit a dead class —
+        # invisible, and worse, `white`/`black` silently hit Tailwind builtins
+        # that never follow dark mode. Those resolve back to their hex as an
+        # arbitrary value (visible, static) with a build warning.
+        # theme_safe: Set of names defined in all modes; fallbacks: name=>hex.
+        def configure_palette(theme_safe:, fallbacks:)
+          @theme_safe_colors = theme_safe
+          @color_fallbacks = fallbacks
+          @warned_colors = {}
+        end
+
+        def reset_palette!
+          @theme_safe_colors = nil
+          @color_fallbacks = nil
+          @warned_colors = nil
+        end
+
         def map_color(color, prefix = 'bg')
           return '' unless color
 
-          if color.start_with?('#')
-            "#{prefix}-[#{color}]"
+          return "#{prefix}-[#{color}]" if color.start_with?('#')
+
+          # Unconfigured (direct helper use / older callers): legacy behavior.
+          return "#{prefix}-#{color}" if @theme_safe_colors.nil? || @theme_safe_colors.include?(color)
+
+          hex = @color_fallbacks&.[](color)
+          if hex
+            warn_off_palette(color, "resolving to #{hex}")
+            "#{prefix}-[#{hex}]"
           else
+            # Name outside colors.json entirely (custom Tailwind class?):
+            # keep it, but flag it — a dead class here is on the author.
+            warn_off_palette(color, 'not in colors.json; emitting as-is')
             "#{prefix}-#{color}"
           end
+        end
+
+        def warn_off_palette(name, detail)
+          @warned_colors ||= {}
+          return if @warned_colors[name]
+
+          @warned_colors[name] = true
+          Core::Logger.warn(
+            "Color '#{name}' is not defined for every mode in colors.json — " \
+            "Tailwind @theme cannot resolve it (#{detail}). Add it to all modes " \
+            'in colors.json (and the @theme block) to make it theme-aware.'
+          )
         end
 
         def map_width(width)
@@ -415,11 +461,17 @@ module RjuiTools
         def map_flex_grow(weight)
           return '' unless weight
 
-          w = weight.to_i
-          base = case w
-                 when 0 then 'flex-none'
-                 when 1 then 'flex-1'
-                 else "flex-[#{w}]"
+          # Fractional weights (0.8, 1.2) are legal — Tailwind arbitrary
+          # values accept decimals — so keep the number as-is instead of
+          # truncating (0.8.to_i == 0 collapsed ratio layouts to flex-none).
+          w = weight.to_f
+          w_str = w == w.to_i ? w.to_i.to_s : w.to_s
+          base = if w == 0
+                   'flex-none'
+                 elsif w == 1
+                   'flex-1'
+                 else
+                   "flex-[#{w_str}]"
                  end
           # `flex-1` / `flex-[N]` children need `min-w-0 min-h-0` so the
           # CSS default `min-*-size: auto` doesn't let long descendants

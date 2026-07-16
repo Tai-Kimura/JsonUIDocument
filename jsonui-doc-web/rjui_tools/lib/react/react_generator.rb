@@ -211,6 +211,7 @@ module RjuiTools
 
       def generate_component_file(name, jsx_content, json)
         state_vars = extract_state_variables(json)
+        focus_fields = extract_focus_fields(json)
         included_component_map = extract_included_components(json)  # { CompName => subdir_or_nil }
         included_components = included_component_map.keys
         extension_components = extract_extension_components(json)
@@ -242,12 +243,17 @@ module RjuiTools
         # Determine if we need useState or "use client"
         needs_state = !state_vars.empty?
         uses_extensions = !extension_components.empty?
-        needs_client = needs_state || uses_string_manager || uses_extensions || needs_landscape
+        needs_focus = !focus_fields.empty?
+        needs_client = needs_state || uses_string_manager || uses_extensions || needs_landscape || needs_focus
         use_client = needs_client ? "\"use client\";\n\n" : ''
 
         # Build React import
         react_hooks = []
         react_hooks << 'useState' if needs_state
+        if needs_focus
+          react_hooks << 'useRef'
+          react_hooks << 'useEffect'
+        end
         react_import = react_hooks.empty? ? "import React from 'react';" : "import React, { #{react_hooks.join(', ')} } from 'react';"
 
         # Generate useMediaQuery import for landscape responsive support
@@ -281,15 +287,26 @@ module RjuiTools
         lucide_import = lucide_icons.empty? ? '' :
                         "\nimport { #{lucide_icons.join(', ')} } from 'lucide-react';"
 
+        # Determined early because the Data import shape depends on it:
+        # data-consuming components also import the createXxxData factory
+        # for the Partial-merge call convention (see props emission below).
+        uses_data = jsx_content.match?(/\bdata\./) || !focus_fields.empty?
+
         # Generate Data type import (for TypeScript)
         data_import = ''
         if @config['typescript']
-          data_import = "\nimport type { #{name}Data } from '@/generated/data/#{name}Data';"
+          data_import = if uses_data
+                          "\nimport { type #{name}Data, create#{name}Data } from '@/generated/data/#{name}Data';"
+                        else
+                          "\nimport type { #{name}Data } from '@/generated/data/#{name}Data';"
+                        end
           # Also import cell Data types for Collections
           cell_types = extract_collection_cell_types(json)
           cell_types.each do |cell_type|
             data_import += "\nimport type { #{cell_type}Data } from '@/generated/data/#{cell_type}Data';"
           end
+        elsif uses_data
+          data_import = "\nimport { create#{name}Data } from '@/generated/data/#{name}Data';"
         end
 
         # Generate imports for extension components
@@ -314,6 +331,17 @@ module RjuiTools
         end.join("\n")
         state_declarations = "\n#{state_declarations}\n" unless state_declarations.empty?
 
+        # Focus-state binding (cross-platform parity with sjui/kjui
+        # data.<id>IsFocused): a ref per editable field plus an effect that
+        # drives DOM focus from the data prop. The converters attach the ref
+        # and report focus changes back via on<Camel>IsFocusedChange.
+        focus_declarations = focus_fields.map do |field|
+          ref_type = field[:element] == 'textarea' ? 'HTMLTextAreaElement' : 'HTMLInputElement'
+          "  const #{field[:camel]}Ref = useRef<#{ref_type} | null>(null);\n" \
+            "  useEffect(() => { if (data.#{field[:camel]}IsFocused) { #{field[:camel]}Ref.current?.focus(); } }, [data.#{field[:camel]}IsFocused]);"
+        end.join("\n")
+        focus_declarations = "\n#{focus_declarations}\n" unless focus_declarations.empty?
+
         # Generate landscape hook declaration
         landscape_declaration = needs_landscape ? "\n  #{ResponsiveHelper.landscape_hook_declaration}\n" : ''
 
@@ -326,9 +354,48 @@ module RjuiTools
           jsx_content = jsx_content.gsub('StringManager.currentLanguage.', '$s.')
         end
 
-        # Generate data-based props interface and signature
-        props_interface = generate_data_props_interface(name)
-        props_sig = @config['typescript'] ? "{ data }: #{name}Props" : '{ data }'
+        # Root id passthrough: collections address cells as
+        # {collectionId}_item_{index} via an `id` prop (kjui testTag
+        # parity — the web test driver clicks `#id` and needs it on the
+        # cell's real root box), and include sites may set id too. Inject
+        # before the visibility fragment wrap: an expression-container
+        # root can't carry an id, so injection is skipped there.
+        jsx_content, root_id_injected = inject_root_id_prop(jsx_content)
+
+        # A root element with a visibility binding arrives here as a bare
+        # JSX expression container (`{cond && (...)}` from
+        # BaseConverter#wrap_with_visibility). That form is only legal as a
+        # child of a JSX element — directly under `return (` it parses as a
+        # block/object literal (TS1005). Wrap it in a fragment.
+        if jsx_content.lstrip.start_with?('{')
+          jsx_content = "    <>\n#{jsx_content}\n    </>"
+        end
+
+        # Generate data-based props interface and signature.
+        # Call convention (rjui-include-data-partial-call-convention-missing):
+        # `data` is optional at every call site — bare includes render
+        # `<Name />`, data-passing includes render `<Name data={{...}} />`
+        # with a Partial, and pages/cells pass the full object. A
+        # data-consuming component merges the prop over its createXxxData()
+        # defaults so every member is present for the body's reads.
+        props_interface = generate_data_props_interface(name, uses_data)
+        # `id` is destructured only when it was injected into the root —
+        # the interface always accepts it (call sites can't know), but an
+        # unused binding would trip noUnusedParameters setups.
+        id_part = root_id_injected ? ', id' : ''
+        props_sig =
+          if uses_data
+            @config['typescript'] ? "{ data: dataProp#{id_part} }: #{name}Props" : "{ data: dataProp#{id_part} }"
+          else
+            @config['typescript'] ? "{ data#{id_part} }: #{name}Props" : "{ data#{id_part} }"
+          end
+        data_merge_declaration =
+          if uses_data
+            type_annotation = @config['typescript'] ? ": #{name}Data" : ''
+            "\n  const data#{type_annotation} = { ...create#{name}Data(), ...dataProp };"
+          else
+            ''
+          end
 
         marker_source = name.gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
                             .gsub(/([a-z\d])([A-Z])/, '\1_\2')
@@ -344,7 +411,7 @@ module RjuiTools
           #{react_import}#{media_query_import}#{link_import}#{string_manager_import}#{cell_id_import}#{configuration_import}#{lucide_import}#{data_import}#{extension_imports}#{component_imports}
 
           #{props_interface if @config['typescript']}
-          export const #{name} = (#{props_sig}) => {#{state_declarations}#{landscape_declaration}#{string_manager_declaration}
+          export const #{name} = (#{props_sig}) => {#{data_merge_declaration}#{state_declarations}#{focus_declarations}#{landscape_declaration}#{string_manager_declaration}
             return (
           #{jsx_content}
             );
@@ -356,17 +423,83 @@ module RjuiTools
         JSX
       end
 
-      # Generate TypeScript interface for data-based props
-      def generate_data_props_interface(name)
+      # Generate TypeScript interface for data-based props.
+      # `data` is always optional: bare include sites render `<Name />`,
+      # data-passing includes provide a Partial that the component merges
+      # over its createXxxData() defaults, and pages/cells pass the full
+      # object (a full XxxData is assignable to Partial<XxxData>).
+      def generate_data_props_interface(name, uses_data = true)
+        data_field = uses_data ? "data?: Partial<#{name}Data>;" : "data?: #{name}Data;"
         <<~TS
           interface #{name}Props {
-            data: #{name}Data;
+            #{data_field}
+            id?: string;
           }
         TS
       end
 
+      # Inject the `id` prop into the root element's tag so collection
+      # cells ({collectionId}_item_{index}) and include sites can address
+      # the component's real root box. Returns [jsx, injected?]. A layout
+      # root that declares its own id keeps it as the fallback
+      # (`id={id ?? "own"}`); an expression-container root (visibility
+      # binding) is left untouched.
+      def inject_root_id_prop(jsx_content)
+        stripped = jsx_content.lstrip
+        return [jsx_content, false] unless stripped.start_with?('<') && stripped[1] =~ /[A-Za-z]/
+
+        first_tag = jsx_content[/\A\s*<[^>]*>/m]
+        return [jsx_content, false] unless first_tag
+
+        if first_tag =~ /\sid="([^"]*)"/
+          [jsx_content.sub(/\sid="([^"]*)"/) { " id={id ?? \"#{Regexp.last_match(1)}\"}" }, true]
+        elsif first_tag =~ /\sid=\{([^}]*)\}/
+          [jsx_content.sub(/\sid=\{([^}]*)\}/) { " id={id ?? (#{Regexp.last_match(1)})}" }, true]
+        else
+          [jsx_content.sub(/\A(\s*)<([A-Za-z][\w.]*)/) { "#{Regexp.last_match(1)}<#{Regexp.last_match(2)} id={id}" }, true]
+        end
+      end
+
       def capitalize_first(str)
         str[0].upcase + str[1..]
+      end
+
+      # Editable fields (TextField / TextView + aliases) with a literal id —
+      # each gets a hoisted ref + focus effect (focus_declarations) matching
+      # the ref/handlers the converters attach. MUST stay in sync with
+      # BaseConverter#build_focus_binding_attrs and the DataModelGenerator
+      # focus bindings.
+      def extract_focus_fields(json, fields = [])
+        return fields unless json.is_a?(Hash) || json.is_a?(Array)
+
+        if json.is_a?(Hash)
+          type = json['type']
+          id = json['id']
+          if id.is_a?(String) && !id.empty? && !id.include?('@{')
+            if %w[TextField EditText Input].include?(type)
+              fields << { id: id, camel: snake_to_camel_id(id), element: 'input' }
+            elsif type == 'TextView'
+              fields << { id: id, camel: snake_to_camel_id(id), element: 'textarea' }
+            end
+          end
+
+          child = json['child'] || json['children']
+          if child.is_a?(Array)
+            child.each { |c| extract_focus_fields(c, fields) }
+          elsif child
+            extract_focus_fields(child, fields)
+          end
+        else
+          json.each { |item| extract_focus_fields(item, fields) }
+        end
+
+        fields.uniq { |f| f[:camel] }
+      end
+
+      # snake_case id -> lowerCamel stem (sync: BaseConverter#snake_to_camel_id)
+      def snake_to_camel_id(str)
+        parts = str.split('_')
+        parts[0] + parts[1..].map(&:capitalize).join
       end
 
       def extract_state_variables(json, vars = [])

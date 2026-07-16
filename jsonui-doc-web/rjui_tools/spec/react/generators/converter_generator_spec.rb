@@ -62,6 +62,113 @@ RSpec.describe RjuiTools::React::Generators::ConverterGenerator do
     it 'falls through to binding-only for truly custom types' do
       expect(generator.send(:map_type_to_json_type, 'MyCustomType?')).to eq('binding')
     end
+
+    it 'maps Callback (exposedEvents) to binding-only' do
+      expect(generator.send(:map_type_to_json_type, 'Callback')).to eq('binding')
+    end
+  end
+
+  describe 'ReactComponentGenerator scaffold id contract (regression: rjui-converter-scaffold-component-props-missing-id)' do
+    let(:component_generator) do
+      RjuiTools::React::Generators::ReactComponentGenerator.new('GanttChart', { attributes: {} }, {})
+    end
+
+    it 'includes id in the props interface, destructure and root element' do
+      template = component_generator.send(:component_template)
+      expect(template).to include('id?: string;')
+      expect(template).to match(/\{ id, children, className \}/)
+      expect(template).to include('<div id={id} className="gantt-chart">')
+    end
+  end
+
+  describe 'overwrite prompt non-interactive behavior (regression: rjui-generator-overwrite-prompt-crashes-on-eof)' do
+    it 'treats stdin EOF as "n" instead of crashing on nil (converter file)' do
+      Dir.mktmpdir do |tmp|
+        Dir.chdir(tmp) do
+          FileUtils.mkdir_p(File.join(tmp, 'rjui_tools'))
+          ext_dir = File.join(tmp, 'rjui_tools', 'lib', 'react', 'converters', 'extensions')
+          FileUtils.mkdir_p(ext_dir)
+          existing_file = File.join(ext_dir, 'card_converter.rb')
+          File.write(existing_file, "ORIGINAL\n")
+
+          original_stdin = $stdin
+          $stdin = StringIO.new('') # immediate EOF -> gets returns nil
+          begin
+            expect { generator.send(:create_converter_file) }.not_to raise_error
+          ensure
+            $stdin = original_stdin
+          end
+          expect(File.read(existing_file)).to eq("ORIGINAL\n")
+        end
+      end
+    end
+
+    it 'overwrites without prompting when options[:force] is set' do
+      Dir.mktmpdir do |tmp|
+        Dir.chdir(tmp) do
+          FileUtils.mkdir_p(File.join(tmp, 'rjui_tools'))
+          ext_dir = File.join(tmp, 'rjui_tools', 'lib', 'react', 'converters', 'extensions')
+          FileUtils.mkdir_p(ext_dir)
+          existing_file = File.join(ext_dir, 'card_converter.rb')
+          File.write(existing_file, "ORIGINAL\n")
+
+          forced = described_class.new('Card', { attributes: {}, force: true }, {})
+          original_stdin = $stdin
+          $stdin = StringIO.new('') # would crash/deny if the prompt were reached
+          begin
+            forced.send(:create_converter_file)
+          ensure
+            $stdin = original_stdin
+          end
+          expect(File.read(existing_file)).not_to eq("ORIGINAL\n")
+        end
+      end
+    end
+
+    it 'skips the existing component file with options[:skip_existing]' do
+      Dir.mktmpdir do |tmp|
+        Dir.chdir(tmp) do
+          comp_dir = File.join(tmp, 'src', 'components', 'extensions')
+          FileUtils.mkdir_p(comp_dir)
+          existing_file = File.join(comp_dir, 'Card.tsx')
+          File.write(existing_file, "USER OWNED\n")
+
+          gen = RjuiTools::React::Generators::ReactComponentGenerator.new(
+            'Card', { attributes: {}, skip_existing: true }, {}
+          )
+          gen.send(:create_component_file)
+          expect(File.read(existing_file)).to eq("USER OWNED\n")
+        end
+      end
+    end
+  end
+
+  describe 'ReactComponentGenerator#ruby_type_to_typescript' do
+    let(:component_generator) do
+      RjuiTools::React::Generators::ReactComponentGenerator.new('Card', { attributes: {} }, {})
+    end
+
+    it 'maps Callback (exposedEvents) to a void function type' do
+      expect(component_generator.send(:ruby_type_to_typescript, 'Callback'))
+        .to eq('(...args: any[]) => void')
+    end
+
+    it 'emits the function type into the props interface' do
+      gen = RjuiTools::React::Generators::ReactComponentGenerator.new(
+        'Card', { attributes: { 'onDateSelected' => 'Callback' }, is_container: false }, {}
+      )
+      interface = gen.send(:generate_props_interface)
+      expect(interface).to include('onDateSelected?: (...args: any[]) => void;')
+    end
+  end
+
+  describe '#generate_props_lines binding branch (regression: rjui-converter-scaffold-binding-props-missing-data-prefix)' do
+    it 'resolves @{} bindings through add_viewmodel_data_prefix like built-in converters' do
+      gen = described_class.new('Card', { attributes: { 'selectionMode' => 'String?' } }, {})
+      out = gen.send(:generate_props_lines).join("\n")
+      expect(out).to include('add_viewmodel_data_prefix(selectionMode_value[2..-2])')
+      expect(out).not_to include('prop_name = selectionMode_value[2..-2]')
+    end
   end
 
   describe '#emit_literal_branch' do
