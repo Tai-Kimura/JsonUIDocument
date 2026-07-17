@@ -3428,13 +3428,149 @@
       "en": "Two schemas, both defined in jsonui-test-runner/schemas/. Every step is either an action (does something) or an assert (checks something). No 'lookup' verb — identifying the target is part of each step's parameters.",
       "ja": "2 つの schema、いずれも jsonui-test-runner/schemas/ に定義されています。各 step は action (操作) か assert (検証) のどちらか。'lookup' 動詞はありません — 対象の特定は各 step のパラメータの一部です。"
     },
-    "section_dsl_bullet_actions": {
-      "en": "• Actions: tap (id / text, optional retryTapIfNoChange), doubleTap, longPress (duration), input (value), clear, typeText (value — types into whatever holds keyboard focus, no id), hideKeyboard (dismiss the keyboard; no-op if none — on iOS the screen needs a dismiss affordance, e.g. ScrollView `keyboardDismissMode: \"interactive\"` or an accessory Done), scroll (direction), scrollUntilVisible (id + container + timeout), swipe, waitFor / waitForAny, wait (ms), back, screenshot (name), readText (stores the text in @{variable} for later steps), repeat (times or while + steps), retry (maxRetries 0–3 + steps), setLocation (latitude / longitude), addMedia (Android: into the gallery; web: sets a file input — not supported on iOS), alertTap (also dismisses iOS SpringBoard system alerts), selectOption, tapItem (collection cell), selectTab, setViewport / setOrientation (drive responsive conditions), setMocks, emitHook (web only — invokes a hook the app registered on `window.__jsonuiTestHooks`, arguments via hookArgs; gate with `when: {platform: \"web\"}`).",
-      "ja": "• Actions: tap (id / text、任意で retryTapIfNoChange)、doubleTap、longPress (duration)、input (value)、clear、typeText (value — フォーカス中の要素に id 無しで入力)、hideKeyboard (キーボードを閉じる; 無ければ no-op — iOS は画面側に閉じる手段が必要、例: ScrollView の `keyboardDismissMode: \"interactive\"` や accessory の Done)、scroll (direction)、scrollUntilVisible (id + container + timeout)、swipe、waitFor / waitForAny、wait (ms)、back、screenshot (name)、readText (テキストを @{variable} に格納して後続 step で参照)、repeat (times または while + steps)、retry (maxRetries 0–3 + steps)、setLocation (latitude / longitude)、addMedia (Android はギャラリーへ投入、web は file input へセット — iOS 非対応)、alertTap (iOS の SpringBoard システムアラートも閉じる)、selectOption、tapItem (collection cell)、selectTab、setViewport / setOrientation (responsive 条件を駆動)、setMocks、emitHook (web 専用 — アプリが `window.__jsonuiTestHooks` に登録したフックを hookArgs 付きで呼ぶ。`when: {platform: \"web\"}` でゲートする)。"
+    "section_dsl_actions_heading": {
+      "en": "Actions",
+      "ja": "Actions"
     },
-    "section_dsl_bullet_asserts": {
-      "en": "• Asserts: visible / notVisible, enabled / disabled, text (id + equals or contains), count (id + equals), state (dot-path + equals, read through a state provider), screenshot (baseline compare, similarity threshold — default 98%), openedUrl (web only — the URL passed to the most recent `window.open`, equals / contains; gate with `when: {platform: \"web\"}`). Every assertion auto-waits: it polls every 100 ms up to `timeout` (default 5000 ms) until the condition holds, so explicit waits are rarely needed.",
-      "ja": "• Asserts: visible / notVisible、enabled / disabled、text (id + equals または contains)、count (id + equals)、state (dot-path + equals、state provider 経由で読む)、screenshot (ベースライン比較、類似度しきい値 — 既定 98%)、openedUrl (web 専用 — 直近の `window.open` に渡された URL を equals / contains で検証。`when: {platform: \"web\"}` でゲートする)。全アサーションは auto-wait: 条件成立まで `timeout` (既定 5000ms) の範囲で 100ms ごとにポーリングするので、明示的な wait はほぼ不要です。"
+    "section_dsl_action_tap": {
+      "en": "• `tap` — id / text, optional retryTapIfNoChange.",
+      "ja": "• `tap` — id / text。任意で retryTapIfNoChange。"
+    },
+    "section_dsl_action_double_tap": {
+      "en": "• `doubleTap` — double-tap the element.",
+      "ja": "• `doubleTap` — 要素をダブルタップ。"
+    },
+    "section_dsl_action_long_press": {
+      "en": "• `longPress` — long-press; optional duration.",
+      "ja": "• `longPress` — 長押し。duration 指定可。"
+    },
+    "section_dsl_action_input": {
+      "en": "• `input` — set the target field's value.",
+      "ja": "• `input` — 対象フィールドに value を設定。"
+    },
+    "section_dsl_action_clear": {
+      "en": "• `clear` — clear the target field.",
+      "ja": "• `clear` — 対象フィールドをクリア。"
+    },
+    "section_dsl_action_type_text": {
+      "en": "• `typeText` — types value into whatever holds keyboard focus (no id).",
+      "ja": "• `typeText` — フォーカス中の要素に id 無しで value を入力。"
+    },
+    "section_dsl_action_hide_keyboard": {
+      "en": "• `hideKeyboard` — dismiss the keyboard; no-op if none. On iOS the screen needs a dismiss affordance, e.g. ScrollView `keyboardDismissMode: \"interactive\"` or an accessory Done.",
+      "ja": "• `hideKeyboard` — キーボードを閉じる（無ければ no-op）。iOS は画面側に閉じる手段が必要（例: ScrollView の `keyboardDismissMode: \"interactive\"` や accessory の Done）。"
+    },
+    "section_dsl_action_scroll": {
+      "en": "• `scroll` — scroll in a direction.",
+      "ja": "• `scroll` — direction 指定でスクロール。"
+    },
+    "section_dsl_action_scroll_until_visible": {
+      "en": "• `scrollUntilVisible` — id + container + timeout.",
+      "ja": "• `scrollUntilVisible` — id + container + timeout。"
+    },
+    "section_dsl_action_swipe": {
+      "en": "• `swipe` — swipe gesture.",
+      "ja": "• `swipe` — スワイプ操作。"
+    },
+    "section_dsl_action_wait_for": {
+      "en": "• `waitFor` / `waitForAny` — wait until the element (any of the elements) appears.",
+      "ja": "• `waitFor` / `waitForAny` — 要素（いずれか）の出現を待つ。"
+    },
+    "section_dsl_action_wait": {
+      "en": "• `wait` — fixed wait in ms.",
+      "ja": "• `wait` — ms 指定の固定待ち。"
+    },
+    "section_dsl_action_back": {
+      "en": "• `back` — navigate back.",
+      "ja": "• `back` — 前の画面へ戻る。"
+    },
+    "section_dsl_action_screenshot": {
+      "en": "• `screenshot` — capture a named screenshot.",
+      "ja": "• `screenshot` — name 付きでスクリーンショットを撮影。"
+    },
+    "section_dsl_action_read_text": {
+      "en": "• `readText` — store the element's text in @{variable} for later steps.",
+      "ja": "• `readText` — テキストを @{variable} に格納して後続 step で参照。"
+    },
+    "section_dsl_action_repeat": {
+      "en": "• `repeat` — times or while + steps.",
+      "ja": "• `repeat` — times または while + steps。"
+    },
+    "section_dsl_action_retry": {
+      "en": "• `retry` — maxRetries 0–3 + steps.",
+      "ja": "• `retry` — maxRetries 0–3 + steps。"
+    },
+    "section_dsl_action_set_location": {
+      "en": "• `setLocation` — latitude / longitude.",
+      "ja": "• `setLocation` — latitude / longitude。"
+    },
+    "section_dsl_action_add_media": {
+      "en": "• `addMedia` — Android: pushes media into the gallery; web: sets a file input. Not supported on iOS.",
+      "ja": "• `addMedia` — Android はギャラリーへ投入、web は file input へセット。iOS 非対応。"
+    },
+    "section_dsl_action_alert_tap": {
+      "en": "• `alertTap` — tap an alert button (also dismisses iOS SpringBoard system alerts).",
+      "ja": "• `alertTap` — アラートのボタンをタップ（iOS の SpringBoard システムアラートも閉じる）。"
+    },
+    "section_dsl_action_select_option": {
+      "en": "• `selectOption` — pick a SelectBox option.",
+      "ja": "• `selectOption` — SelectBox の選択肢を選ぶ。"
+    },
+    "section_dsl_action_tap_item": {
+      "en": "• `tapItem` — tap a collection cell by index.",
+      "ja": "• `tapItem` — collection cell を index 指定でタップ。"
+    },
+    "section_dsl_action_select_tab": {
+      "en": "• `selectTab` — switch a TabView / Segment tab by index.",
+      "ja": "• `selectTab` — TabView / Segment のタブを index で切替。"
+    },
+    "section_dsl_action_set_viewport": {
+      "en": "• `setViewport` / `setOrientation` — drive responsive conditions.",
+      "ja": "• `setViewport` / `setOrientation` — responsive 条件を駆動。"
+    },
+    "section_dsl_action_set_mocks": {
+      "en": "• `setMocks` — switch mock scenarios mid-test.",
+      "ja": "• `setMocks` — テスト途中でモックシナリオを切替。"
+    },
+    "section_dsl_action_emit_hook": {
+      "en": "• `emitHook` — web only: invoke a hook the app registered on `window.__jsonuiTestHooks` (arguments via hookArgs); gate with `when: {platform: \"web\"}`.",
+      "ja": "• `emitHook` — web 専用: アプリが `window.__jsonuiTestHooks` に登録したフックを hookArgs 付きで呼ぶ。`when: {platform: \"web\"}` でゲート。"
+    },
+    "section_dsl_asserts_heading": {
+      "en": "Asserts",
+      "ja": "Asserts"
+    },
+    "section_dsl_assert_visible": {
+      "en": "• `visible` / `notVisible` — the element is (not) shown.",
+      "ja": "• `visible` / `notVisible` — 要素の表示／非表示。"
+    },
+    "section_dsl_assert_enabled": {
+      "en": "• `enabled` / `disabled` — interactivity state.",
+      "ja": "• `enabled` / `disabled` — 活性／非活性。"
+    },
+    "section_dsl_assert_text": {
+      "en": "• `text` — id + equals or contains.",
+      "ja": "• `text` — id + equals または contains。"
+    },
+    "section_dsl_assert_count": {
+      "en": "• `count` — id + equals.",
+      "ja": "• `count` — id + equals。"
+    },
+    "section_dsl_assert_state": {
+      "en": "• `state` — dot-path + equals, read through a state provider.",
+      "ja": "• `state` — dot-path + equals、state provider 経由で読む。"
+    },
+    "section_dsl_assert_screenshot": {
+      "en": "• `screenshot` — baseline compare; similarity threshold, default 98%.",
+      "ja": "• `screenshot` — ベースライン比較。類似度しきい値、既定 98%。"
+    },
+    "section_dsl_assert_opened_url": {
+      "en": "• `openedUrl` — web only: the URL passed to the most recent `window.open`, equals / contains; gate with `when: {platform: \"web\"}`.",
+      "ja": "• `openedUrl` — web 専用: 直近の `window.open` に渡された URL を equals / contains で検証。`when: {platform: \"web\"}` でゲート。"
+    },
+    "section_dsl_asserts_autowait": {
+      "en": "Every assertion auto-waits: it polls every 100 ms up to `timeout` (default 5000 ms) until the condition holds, so explicit waits are rarely needed.",
+      "ja": "全アサーションは auto-wait: 条件成立まで `timeout`（既定 5000ms）の範囲で 100ms ごとにポーリングするので、明示的な wait はほぼ不要です。"
     },
     "section_dsl_bullet_conditions": {
       "en": "• Conditions (when): gate any step or assert with \"when\": { \"platform\": \"ios\" | \"android\" | \"web\", \"responsive\": <bucket | constraint> }. Screen-test cases can also carry case-level platform / responsive. A responsive value is one of the seven canonical buckets (compact / medium / regular plus their landscape variants) or a constraint object (minWidth / maxWidth / minHeight / maxHeight / orientation) — each driver resolves it to mirror that platform's own renderer breakpoints.",
@@ -3446,20 +3582,20 @@
     },
     "section_drivers_heading": { "en": "5. The drivers", "ja": "5. ドライバ" },
     "section_drivers_body": {
-      "en": "The same .test.json runs on three very different runtimes. Each driver is published at version 1.0.0 to its registry (SPM / Maven Central / npm), maps layout `id` attributes onto the platform's test-automation identifier, then executes the steps. No shared runner binary — each driver is invoked via its native build system. Write the JSON once; the drivers give you the same test on all three.",
-      "ja": "同じ .test.json が 3 つの異なるランタイムで実行されます。各 driver は 1.0.0 として各レジストリ (SPM / Maven Central / npm) に公開され、layout の `id` 属性をそのプラットフォームのテスト自動化識別子にマップし、steps を実行します。共通ランナーバイナリはありません — 各 driver はそのネイティブビルドシステムから起動します。JSON は 1 度書けば、3 プラットフォームで同じテストが走ります。"
+      "en": "The same .test.json runs on three very different runtimes. Each driver is published to its registry (SPM / Maven Central / npm) — always use the latest release; the registry, not this page, is the source of truth for version numbers. A driver maps layout `id` attributes onto the platform's test-automation identifier, then executes the steps. No shared runner binary — each driver is invoked via its native build system. Write the JSON once; the drivers give you the same test on all three.",
+      "ja": "同じ .test.json が 3 つの異なるランタイムで実行されます。各 driver は各レジストリ (SPM / Maven Central / npm) に公開されています — 常に最新リリースを使ってください（バージョン番号の正はこのページではなく各レジストリです）。driver は layout の `id` 属性をそのプラットフォームのテスト自動化識別子にマップし、steps を実行します。共通ランナーバイナリはありません — 各 driver はそのネイティブビルドシステムから起動します。JSON は 1 度書けば、3 プラットフォームで同じテストが走ります。"
     },
     "section_drivers_bullet_ios": {
-      "en": "• iOS — XCUITest, via Swift Package `github.com/Tai-Kimura/jsonui-test-runner-ios` (from: \"1.0.0\"). id → accessibilityIdentifier. `JsonUITest.load(from:)` / `loadAll(from:)` → `JsonUITest.createRunner(app:).run(screenTest:)`; check `result.allPassed`. Runs under `xcodebuild test` or the Xcode GUI.",
-      "ja": "• iOS — XCUITest。Swift Package `github.com/Tai-Kimura/jsonui-test-runner-ios` (from: \"1.0.0\")。id → accessibilityIdentifier。`JsonUITest.load(from:)` / `loadAll(from:)` → `JsonUITest.createRunner(app:).run(screenTest:)`、`result.allPassed` で判定。`xcodebuild test` または Xcode GUI で実行。"
+      "en": "• iOS — XCUITest, via Swift Package `github.com/Tai-Kimura/jsonui-test-runner-ios` (a `from:` pin resolves to the latest release; `swift package update` to catch up). id → accessibilityIdentifier. `JsonUITest.load(from:)` / `loadAll(from:)` → `JsonUITest.createRunner(app:).run(screenTest:)`; check `result.allPassed`. Runs under `xcodebuild test` or the Xcode GUI.",
+      "ja": "• iOS — XCUITest。Swift Package `github.com/Tai-Kimura/jsonui-test-runner-ios`（`from:` 指定なら最新リリースに自動解決 — 追従は `swift package update`）。id → accessibilityIdentifier。`JsonUITest.load(from:)` / `loadAll(from:)` → `JsonUITest.createRunner(app:).run(screenTest:)`、`result.allPassed` で判定。`xcodebuild test` または Xcode GUI で実行。"
     },
     "section_drivers_bullet_android": {
-      "en": "• Android — Espresso + UI Automator, via Maven Central `io.github.tai-kimura:jsonui-test-runner-android:1.0.0` (needs `mavenCentral()`). id → resource-id (Compose `testTag` exposed via `testTagsAsResourceId`). `JsonUITest.loadFromAssets(ctx, path)` → `JsonUITest.createRunner().run(test)` → `TestSuiteResult.allPassed`. Runs under `./gradlew connectedAndroidTest` or Firebase Test Lab.",
-      "ja": "• Android — Espresso + UI Automator。Maven Central `io.github.tai-kimura:jsonui-test-runner-android:1.0.0` (`mavenCentral()` が必要)。id → resource-id (Compose の `testTag` を `testTagsAsResourceId` で公開)。`JsonUITest.loadFromAssets(ctx, path)` → `JsonUITest.createRunner().run(test)` → `TestSuiteResult.allPassed`。`./gradlew connectedAndroidTest` または Firebase Test Lab で実行。"
+      "en": "• Android — Espresso + UI Automator, via Maven Central `io.github.tai-kimura:jsonui-test-runner-android` (needs `mavenCentral()`; Gradle wants an exact version — pin the latest from Maven Central and bump when new drivers ship). id → resource-id (Compose `testTag` exposed via `testTagsAsResourceId`). `JsonUITest.loadFromAssets(ctx, path)` → `JsonUITest.createRunner().run(test)` → `TestSuiteResult.allPassed`. Runs under `./gradlew connectedAndroidTest` or Firebase Test Lab.",
+      "ja": "• Android — Espresso + UI Automator。Maven Central `io.github.tai-kimura:jsonui-test-runner-android`（`mavenCentral()` が必要。Gradle は exact pin なので Maven Central の最新版を指定し、新 driver が出たらバンプ）。id → resource-id (Compose の `testTag` を `testTagsAsResourceId` で公開)。`JsonUITest.loadFromAssets(ctx, path)` → `JsonUITest.createRunner().run(test)` → `TestSuiteResult.allPassed`。`./gradlew connectedAndroidTest` または Firebase Test Lab で実行。"
     },
     "section_drivers_bullet_web": {
-      "en": "• Web — Playwright, via npm `jsonui-test-runner-web@^1.0.0`. id → the HTML `id` attribute (`#id` selector — not data-testid). `TestLoader.loadFromFile(...)` / `loadFromDirectory(...)` → `new JsonUITestRunner(page).run(loadedTest)`; pass/fail via the `allPassed(result)` function. Runs under `npx playwright test`.",
-      "ja": "• Web — Playwright。npm `jsonui-test-runner-web@^1.0.0`。id → HTML の `id` 属性 (`#id` セレクタ — data-testid ではありません)。`TestLoader.loadFromFile(...)` / `loadFromDirectory(...)` → `new JsonUITestRunner(page).run(loadedTest)`、判定は `allPassed(result)` 関数。`npx playwright test` で実行。"
+      "en": "• Web — Playwright, via npm `jsonui-test-runner-web@latest` (the `latest` dist-tag always points at the current release). id → the HTML `id` attribute (`#id` selector — not data-testid). `TestLoader.loadFromFile(...)` / `loadFromDirectory(...)` → `new JsonUITestRunner(page).run(loadedTest)`; pass/fail via the `allPassed(result)` function. Runs under `npx playwright test`.",
+      "ja": "• Web — Playwright。npm `jsonui-test-runner-web@latest`（`latest` dist-tag が常に現行リリースを指します）。id → HTML の `id` 属性 (`#id` セレクタ — data-testid ではありません)。`TestLoader.loadFromFile(...)` / `loadFromDirectory(...)` → `new JsonUITestRunner(page).run(loadedTest)`、判定は `allPassed(result)` 関数。`npx playwright test` で実行。"
     },
     "section_cli_heading": { "en": "6. The jsonui-test CLI", "ja": "6. jsonui-test CLI" },
     "section_cli_body": {
@@ -3487,8 +3623,8 @@
       "ja": "• Mock: `jsonui-test mock generate` で OpenAPI から API モックを scaffold (`--check` = drift のみ)、`mock serve` でローカルのモックサーバ + コントロールパネルを起動。詳細は API Mock ガイド参照。"
     },
     "section_cli_bullet_artifacts": {
-      "en": "• Artifacts: `jsonui-test artifacts pull` collects a run's evidence in one command — iOS xcresult attachments (screenshots / screen recordings) and Android on-device files — into `tests/artifacts/<platform>/<stamp>/<test>/<case>/` with a `latest` symlink (`--json` prints absolute paths). `artifacts status` shows the resolved config + what has been collected; `mock serve --artifacts` auto-pulls after each run-target. Configure via `test.artifacts` in jui.config.json (dir / ios.xcresult / android.appId). Recordings: Android records per case with `record=true` on the runner (failures kept, passing runs discarded by default); iOS uses Xcode's automatic recording — set the scheme / test plan's preferred screen capture to screenRecording (kept for failed tests).",
-      "ja": "• Artifacts: `jsonui-test artifacts pull` 1 コマンドで実行証跡を回収 — iOS の xcresult 添付 (スクリーンショット / 画面録画) と Android のデバイス上ファイルを `tests/artifacts/<platform>/<stamp>/<test>/<case>/` に整理し、`latest` symlink を更新します (`--json` で絶対パス一覧)。`artifacts status` は解決済み config と収集済み一覧を表示、`mock serve --artifacts` は run-target 完了ごとに自動 pull。設定は jui.config.json の `test.artifacts` (dir / ios.xcresult / android.appId)。録画: Android は runner の `record=true` でケース単位に録画 (既定は失敗のみ保持)、iOS は Xcode の自動録画を利用 — scheme / test plan の screen capture を screenRecording に設定 (失敗テストのみ保持)。"
+      "en": "• Artifacts: `jsonui-test artifacts pull` collects a run's evidence in one command — iOS xcresult attachments (screenshots / screen recordings) and Android on-device files — into `tests/artifacts/<platform>/<stamp>/<test>/<case>/` with a `latest` symlink (`--json` prints absolute paths). `artifacts status` shows the resolved config + what has been collected; `mock serve --artifacts` auto-pulls after each run-target. Configure via `test.artifacts` in jui.config.json (dir / ios.xcresult / android.appId / android.adb — set `adb` when it is not on PATH; otherwise it is auto-discovered via PATH → ANDROID_HOME → the OS-default SDK location). Recordings: Android records per case with `record=true` on the runner (failures kept, passing runs discarded by default); iOS uses Xcode's automatic recording — set the scheme / test plan's preferred screen capture to screenRecording (kept for failed tests).",
+      "ja": "• Artifacts: `jsonui-test artifacts pull` 1 コマンドで実行証跡を回収 — iOS の xcresult 添付 (スクリーンショット / 画面録画) と Android のデバイス上ファイルを `tests/artifacts/<platform>/<stamp>/<test>/<case>/` に整理し、`latest` symlink を更新します (`--json` で絶対パス一覧)。`artifacts status` は解決済み config と収集済み一覧を表示、`mock serve --artifacts` は run-target 完了ごとに自動 pull。設定は jui.config.json の `test.artifacts` (dir / ios.xcresult / android.appId / android.adb — adb が PATH に無い環境では `adb` を明示。無指定なら PATH → ANDROID_HOME → OS 既定 SDK 位置の順で自動発見)。録画: Android は runner の `record=true` でケース単位に録画 (既定は失敗のみ保持)、iOS は Xcode の自動録画を利用 — scheme / test plan の screen capture を screenRecording に設定 (失敗テストのみ保持)。"
     },
     "section_ci_heading": { "en": "7. In CI", "ja": "7. CI での運用" },
     "section_ci_body": {
@@ -4241,8 +4377,8 @@
       "ja": "• platform (string, optional) — 回収対象を 1 プラットフォームに限定: ios / android。デフォルトは両方。\n• clean (boolean, optional) — Android のみ: pull 後にデバイス側の証跡ツリーを削除。デフォルト false。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。\n戻り値は CLI の JSON 出力そのまま — 回収した全ファイルの絶対パス一覧（tests/artifacts/<platform>/<stamp>/ に整理、latest symlink 更新）。"
     },
     "tool_test_artifacts_status_params": {
-      "en": "• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.\nReturns the resolved `test.artifacts` config (dir / ios.xcresult / android.appId) plus a listing of what has already been collected.",
-      "ja": "• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。\n戻り値は解決済み `test.artifacts` 設定（dir / ios.xcresult / android.appId）と収集済み証跡の一覧。"
+      "en": "• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.\nReturns the resolved `test.artifacts` config (dir / ios.xcresult / android.appId, plus the resolved adb path or null) and a listing of what has already been collected.",
+      "ja": "• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。\n戻り値は解決済み `test.artifacts` 設定（dir / ios.xcresult / android.appId、および解決済み adb パス or null）と収集済み証跡の一覧。"
     },
     "group_e_label": { "en": "API Model Discovery", "ja": "API Model Discovery" },
     "group_f_label": { "en": "Test Tooling", "ja": "Test Tooling" }
