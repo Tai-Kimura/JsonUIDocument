@@ -757,7 +757,7 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_ci",
+                  "id": "section_recording",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -767,6 +767,107 @@
                     32
                   ],
                   "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_recording_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_recording_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_recording_bullet_ios"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_recording_bullet_android"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_recording_bullet_web"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "// playwright.config.ts — browser matrix + recording\nexport default defineConfig({\n  use: { video: 'on' },                 // 'retain-on-failure' keeps failures only\n  projects: [\n    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },\n    { name: 'firefox',  use: { ...devices['Desktop Firefox'] } },\n    { name: 'webkit',   use: { ...devices['Desktop Safari'] } },\n  ],\n});\n\n// in a test — route the driver's PNGs next to each video\ntest('screen', async ({ page }, testInfo) => {\n  const runner = new JsonUITestRunner(page, { screenshotDir: testInfo.outputDir });\n  // runner.run(loadedTest) ...\n});",
+                      "language": "typescript",
+                      "filename": "playwright.config.ts + test",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_recording_naming_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_recording_collect_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "tests/artifacts/\n  ios/<stamp>/<test>/(recordings|screenshots|other)/     <- xcresult attachments\n  android/<stamp>/<test>/<case>/                         <- pulled from the device\n  web/<stamp>/<spec>-<title>-<project>/recordings/video.webm\n  web/<stamp>/<spec>-<title>-<project>/screenshots/screenshot_<test>_<case>_<name>.png\n  <platform>/latest -> the newest <stamp>",
+                      "language": "text",
+                      "filename": "tests/artifacts after pull",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_ci",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
                   "child": [
                     {
                       "type": "Label",
@@ -820,7 +921,7 @@
                     24,
                     32
                   ],
-                  "background": "#FFFFFF",
+                  "background": "#F9FAFB",
                   "child": [
                     {
                       "type": "Label",
@@ -1028,6 +1129,12 @@
                           "id": "toc_cli",
                           "label": "toc_row_cli",
                           "anchor": "section_cli",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_recording",
+                          "label": "toc_row_recording",
+                          "anchor": "section_recording",
                           "level": 1
                         },
                         {

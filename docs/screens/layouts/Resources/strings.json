@@ -3594,8 +3594,8 @@
       "ja": "• Android — Espresso + UI Automator。Maven Central `io.github.tai-kimura:jsonui-test-runner-android`（`mavenCentral()` が必要。Gradle は exact pin なので Maven Central の最新版を指定し、新 driver が出たらバンプ）。id → resource-id (Compose の `testTag` を `testTagsAsResourceId` で公開)。`JsonUITest.loadFromAssets(ctx, path)` → `JsonUITest.createRunner().run(test)` → `TestSuiteResult.allPassed`。`./gradlew connectedAndroidTest` または Firebase Test Lab で実行。"
     },
     "section_drivers_bullet_web": {
-      "en": "• Web — Playwright, via npm `jsonui-test-runner-web@latest` (the `latest` dist-tag always points at the current release). id → the HTML `id` attribute (`#id` selector — not data-testid). `TestLoader.loadFromFile(...)` / `loadFromDirectory(...)` → `new JsonUITestRunner(page).run(loadedTest)`; pass/fail via the `allPassed(result)` function. Runs under `npx playwright test`. Browser matrix and recording are plain Playwright config: `projects` pick the browsers (chromium / firefox / webkit, or `channel: 'chrome'` / `'msedge'` for branded builds) and `use: { video: 'on' }` records every run (`'retain-on-failure'` keeps failures only). Point the runner's `screenshotDir` at `testInfo.outputDir` so action / failure PNGs land next to each video.",
-      "ja": "• Web — Playwright。npm `jsonui-test-runner-web@latest`（`latest` dist-tag が常に現行リリースを指します）。id → HTML の `id` 属性 (`#id` セレクタ — data-testid ではありません)。`TestLoader.loadFromFile(...)` / `loadFromDirectory(...)` → `new JsonUITestRunner(page).run(loadedTest)`、判定は `allPassed(result)` 関数。`npx playwright test` で実行。ブラウザ指定と録画は素の Playwright 設定です: `projects` でブラウザを選び（chromium / firefox / webkit、本物の Chrome / Edge は `channel: 'chrome'` / `'msedge'`）、`use: { video: 'on' }` で全ラン録画（`'retain-on-failure'` は失敗のみ保持）。runner の `screenshotDir` を `testInfo.outputDir` に向けると、action / failure の PNG が各録画の隣に落ちます。"
+      "en": "• Web — Playwright, via npm `jsonui-test-runner-web@latest` (the `latest` dist-tag always points at the current release). id → the HTML `id` attribute (`#id` selector — not data-testid). `TestLoader.loadFromFile(...)` / `loadFromDirectory(...)` → `new JsonUITestRunner(page).run(loadedTest)`; pass/fail via the `allPassed(result)` function. Runs under `npx playwright test`. Browser matrix, recording and screenshots are plain Playwright config — see section 7.",
+      "ja": "• Web — Playwright。npm `jsonui-test-runner-web@latest`（`latest` dist-tag が常に現行リリースを指します）。id → HTML の `id` 属性 (`#id` セレクタ — data-testid ではありません)。`TestLoader.loadFromFile(...)` / `loadFromDirectory(...)` → `new JsonUITestRunner(page).run(loadedTest)`、判定は `allPassed(result)` 関数。`npx playwright test` で実行。ブラウザ指定・録画・スクリーンショットは素の Playwright 設定です — §7 参照。"
     },
     "section_cli_heading": { "en": "6. The jsonui-test CLI", "ja": "6. jsonui-test CLI" },
     "section_cli_body": {
@@ -3623,10 +3623,35 @@
       "ja": "• Mock: `jsonui-test mock generate` で OpenAPI から API モックを scaffold (`--check` = drift のみ)、`mock serve` でローカルのモックサーバ + コントロールパネルを起動。詳細は API Mock ガイド参照。"
     },
     "section_cli_bullet_artifacts": {
-      "en": "• Artifacts: `jsonui-test artifacts pull` collects a run's evidence in one command — iOS xcresult attachments, Android on-device files, and web Playwright output (videos / traces plus the driver's screenshots) — into `tests/artifacts/<platform>/<stamp>/<test>/<case>/` with a `latest` symlink (`--platform ios|android|web`, default all; `--json` prints absolute paths; `--clean` removes the sources after pulling). `artifacts status` shows the resolved config + what has been collected; `mock serve --artifacts` auto-pulls after each run-target. Configure via `test.artifacts` in jui.config.json: dir / ios.xcresult / android.appId / android.adb (set `adb` when it is not on PATH; otherwise auto-discovered via PATH → ANDROID_HOME → the OS-default SDK location) / web.testResults + web.screenshotDir (default `test-results` / `screenshots`). Recordings: iOS uses Xcode's automatic recording — set the scheme / test plan's preferred screen capture to screenRecording (kept for failed tests); Android records per case with `record=true` on the runner (failures kept, passing runs discarded by default); web records via Playwright `video: 'on'` / `'retain-on-failure'` (granularity: test file × browser project).",
-      "ja": "• Artifacts: `jsonui-test artifacts pull` 1 コマンドで実行証跡を回収 — iOS の xcresult 添付、Android のデバイス上ファイル、web の Playwright 出力 (録画 / trace + driver のスクリーンショット) を `tests/artifacts/<platform>/<stamp>/<test>/<case>/` に整理し、`latest` symlink を更新します (`--platform ios|android|web`、既定は全部。`--json` で絶対パス一覧、`--clean` で回収後にソースを削除)。`artifacts status` は解決済み config と収集済み一覧を表示、`mock serve --artifacts` は run-target 完了ごとに自動 pull。設定は jui.config.json の `test.artifacts`: dir / ios.xcresult / android.appId / android.adb (adb が PATH に無い環境では `adb` を明示。無指定なら PATH → ANDROID_HOME → OS 既定 SDK 位置の順で自動発見) / web.testResults + web.screenshotDir (既定は `test-results` / `screenshots`)。録画: iOS は Xcode の自動録画 — scheme / test plan の screen capture を screenRecording に設定 (失敗テストのみ保持)、Android は runner の `record=true` でケース単位 (既定は失敗のみ保持)、web は Playwright の `video: 'on'` / `'retain-on-failure'` (粒度はテストファイル × ブラウザ project)。"
+      "en": "• Artifacts: `jsonui-test artifacts pull` collects a run's evidence in one command — iOS xcresult attachments, Android on-device files, and web Playwright output (videos / traces plus the driver's screenshots) — into `tests/artifacts/<platform>/<stamp>/<test>/<case>/` with a `latest` symlink (`--platform ios|android|web`, default all; `--json` prints absolute paths; `--clean` removes the sources after pulling). `artifacts status` shows the resolved config + what has been collected; `mock serve --artifacts` auto-pulls after each run-target. Configure via `test.artifacts` in jui.config.json: dir / ios.xcresult / android.appId / android.adb (set `adb` when it is not on PATH; otherwise auto-discovered via PATH → ANDROID_HOME → the OS-default SDK location) / web.testResults + web.screenshotDir (default `test-results` / `screenshots`). Per-platform recording setup is covered in the next section.",
+      "ja": "• Artifacts: `jsonui-test artifacts pull` 1 コマンドで実行証跡を回収 — iOS の xcresult 添付、Android のデバイス上ファイル、web の Playwright 出力 (録画 / trace + driver のスクリーンショット) を `tests/artifacts/<platform>/<stamp>/<test>/<case>/` に整理し、`latest` symlink を更新します (`--platform ios|android|web`、既定は全部。`--json` で絶対パス一覧、`--clean` で回収後にソースを削除)。`artifacts status` は解決済み config と収集済み一覧を表示、`mock serve --artifacts` は run-target 完了ごとに自動 pull。設定は jui.config.json の `test.artifacts`: dir / ios.xcresult / android.appId / android.adb (adb が PATH に無い環境では `adb` を明示。無指定なら PATH → ANDROID_HOME → OS 既定 SDK 位置の順で自動発見) / web.testResults + web.screenshotDir (既定は `test-results` / `screenshots`)。プラットフォーム別の録画設定は次のセクション参照。"
     },
-    "section_ci_heading": { "en": "7. In CI", "ja": "7. CI での運用" },
+    "section_recording_heading": { "en": "7. Recording & screenshots", "ja": "7. 録画とスクリーンショット" },
+    "section_recording_body": {
+      "en": "Every driver can record a run and capture screenshots — with nothing bespoke to learn: each platform uses its native mechanism, the file naming is shared, and `jsonui-test artifacts pull` collects everything into one tree. The only thing that differs per platform is how you switch recording on:",
+      "ja": "どのドライバも実行の録画とスクリーンショット取得に対応しています — 独自の仕組みはなく、各プラットフォームのネイティブ機構をそのまま使い、ファイル命名は共通、回収は `jsonui-test artifacts pull` に一本化されています。プラットフォームごとに違うのは録画の有効化方法だけです:"
+    },
+    "section_recording_bullet_ios": {
+      "en": "• iOS — Xcode's automatic screen recording: set the scheme / test plan's preferred screen capture to screenRecording. Recordings are kept for failed tests and land in the xcresult; granularity is the XCTest method.",
+      "ja": "• iOS — Xcode の自動画面録画: scheme / test plan の preferred screen capture を screenRecording に設定します。録画は失敗テストのみ保持され、xcresult に格納されます。粒度は XCTest メソッド単位。"
+    },
+    "section_recording_bullet_android": {
+      "en": "• Android — pass `record=true` to the runner to record per test case (failures are kept; passing runs are discarded by default). Files are written on-device and fetched by `artifacts pull`.",
+      "ja": "• Android — runner に `record=true` を渡すとテストケース単位で録画します（既定は失敗のみ保持、成功分は破棄）。ファイルはデバイス上に書かれ、`artifacts pull` が取得します。"
+    },
+    "section_recording_bullet_web": {
+      "en": "• Web — plain Playwright config: `use: { video: 'on' }` records every run (`'retain-on-failure'` keeps failures only), and `projects` pick the browsers — chromium / firefox / webkit, or `channel: 'chrome'` / `'msedge'` for branded builds. Granularity is test file × browser project. Point the runner's `screenshotDir` at `testInfo.outputDir` so the PNGs land next to each video:",
+      "ja": "• Web — 素の Playwright 設定です: `use: { video: 'on' }` で全ラン録画（`'retain-on-failure'` は失敗のみ保持）、`projects` でブラウザを選択 — chromium / firefox / webkit、本物の Chrome / Edge は `channel: 'chrome'` / `'msedge'`。粒度はテストファイル × ブラウザ project。runner の `screenshotDir` を `testInfo.outputDir` に向けると PNG が各録画の隣に落ちます:"
+    },
+    "section_recording_naming_body": {
+      "en": "Screenshots share one naming scheme on all three platforms: the `screenshot` action saves `screenshot_<test>_<case>_<name>.png`, and a failed step automatically saves `failure_<test>_<case>.png`.",
+      "ja": "スクリーンショットの命名は 3 プラットフォーム共通です: `screenshot` アクションは `screenshot_<test>_<case>_<name>.png` を保存し、step の失敗時は自動で `failure_<test>_<case>.png` が保存されます。"
+    },
+    "section_recording_collect_body": {
+      "en": "`jsonui-test artifacts pull` (or the MCP tool `test_artifacts_pull`) then collects recordings and screenshots from all three platforms into the artifacts tree:",
+      "ja": "回収は `jsonui-test artifacts pull`（または MCP の `test_artifacts_pull`）で、3 プラットフォームの録画・スクリーンショットが artifacts ツリーに揃います:"
+    },
+    "section_ci_heading": { "en": "8. In CI", "ja": "8. CI での運用" },
     "section_ci_body": {
       "en": "No GitHub Actions harness is shipped — you wire the three platforms yourself. The minimum safety net is `jsonui-test validate tests/` as a schema gate before any driver runs. Sharding by platform keeps wall-clock reasonable: Web shards usually finish in under a minute, iOS and Android shards depend on simulator / emulator boot time.",
       "ja": "GitHub Actions harness は同梱しません — 3 プラットフォームを自分で配線します。最低限の安全網は driver 実行前の `jsonui-test validate tests/` schema ゲート。プラットフォーム毎に shard 分割すると wall-clock が現実的に: Web shard は通常 1 分以内、iOS と Android はシミュレータ/エミュレータ起動時間次第。"
@@ -3635,7 +3660,7 @@
       "en": "• Example (Web): a GitHub Actions step that runs `jsonui-test validate tests/` first, then `npx playwright install --with-deps` + `npx playwright test` inside jsonui-doc-web.",
       "ja": "• 例 (Web): GitHub Actions で `jsonui-test validate tests/` を最初に走らせ、その後 jsonui-doc-web 内で `npx playwright install --with-deps` + `npx playwright test` を実行する step を書く。"
     },
-    "section_advanced_heading": { "en": "8. Launch, conditions & results", "ja": "8. launch・条件・結果" },
+    "section_advanced_heading": { "en": "9. Launch, conditions & results", "ja": "9. launch・条件・結果" },
     "section_advanced_body": {
       "en": "Three cross-cutting features round out the model. Every step accepts `when` (a condition — the step is skipped unless it holds), `optional` (a failure becomes a warning and the run continues), and `label` (a human-readable name in reports). A root-level `launch` block sets the app's starting state, `teardown` steps always run — even after a failure — and the drivers emit a standardized results JSON that `jsonui-test report` turns into JUnit / HTML.",
       "ja": "3 つの横断機能がモデルを仕上げます。各ステップは `when` (条件 — 成立しなければその step を skip)、`optional` (失敗を warning に格下げして続行)、`label` (レポート上の表示名) を受け付けます。ルートレベルの `launch` が起動時の状態を設定し、`teardown` ステップは失敗後でも必ず実行され、ドライバは標準化された結果 JSON を出力して `jsonui-test report` が JUnit / HTML に変換します。"
@@ -3667,8 +3692,9 @@
     "toc_row_dsl": { "en": "4. Action & assert DSL", "ja": "4. Action と assert の DSL" },
     "toc_row_drivers": { "en": "5. The drivers", "ja": "5. ドライバ" },
     "toc_row_cli": { "en": "6. jsonui-test CLI", "ja": "6. jsonui-test CLI" },
-    "toc_row_ci": { "en": "7. In CI", "ja": "7. CI での運用" },
-    "toc_row_advanced": { "en": "8. Launch, conditions & results", "ja": "8. launch・条件・結果" }
+    "toc_row_recording": { "en": "7. Recording & screenshots", "ja": "7. 録画とスクリーンショット" },
+    "toc_row_ci": { "en": "8. In CI", "ja": "8. CI での運用" },
+    "toc_row_advanced": { "en": "9. Launch, conditions & results", "ja": "9. launch・条件・結果" }
   },
   "guides_api_mock": {
     "breadcrumb": { "en": "← Guides", "ja": "← Guides" },
