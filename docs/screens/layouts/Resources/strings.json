@@ -3632,8 +3632,8 @@
       "ja": "どのドライバも実行の録画とスクリーンショット取得に対応しています — 独自の仕組みはなく、各プラットフォームのネイティブ機構をそのまま使い、ファイル命名は共通、回収は `jsonui-test artifacts pull` に一本化されています。プラットフォームごとに違うのは録画の有効化方法だけです:"
     },
     "section_recording_bullet_ios": {
-      "en": "• iOS — Xcode's automatic screen recording: set the scheme / test plan's preferred screen capture to screenRecording. Recordings are kept for failed tests and land in the xcresult; granularity is the XCTest method.",
-      "ja": "• iOS — Xcode の自動画面録画: scheme / test plan の preferred screen capture を screenRecording に設定します。録画は失敗テストのみ保持され、xcresult に格納されます。粒度は XCTest メソッド単位。"
+      "en": "• iOS — Xcode's automatic screen recording: set the scheme / test plan's preferred screen capture to screenRecording. By default (attachment lifetime = delete on success) only failed tests keep their recording — switch the lifetime to \"keep all\" to keep recordings for passing tests too. Recordings land in the xcresult; granularity is the XCTest method.",
+      "ja": "• iOS — Xcode の自動画面録画: scheme / test plan の preferred screen capture を screenRecording に設定します。既定 (attachment lifetime = delete on success) では失敗テストのみ録画が保持されます — lifetime を「keep all」にすると成功テストの録画も残ります。録画は xcresult に格納され、粒度は XCTest メソッド単位。"
     },
     "section_recording_bullet_android": {
       "en": "• Android — pass `record=true` to the runner to record per test case (failures are kept; passing runs are discarded by default). Files are written on-device and fetched by `artifacts pull`.",
