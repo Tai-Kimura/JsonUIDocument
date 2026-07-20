@@ -3636,8 +3636,8 @@
       "ja": "• iOS — Xcode の自動画面録画: scheme / test plan の preferred screen capture を screenRecording に設定します。既定 (attachment lifetime = delete on success) では失敗テストのみ録画が保持されます — lifetime を「keep all」にすると成功テストの録画も残ります。録画は xcresult に格納され、粒度は XCTest メソッド単位。"
     },
     "section_recording_bullet_android": {
-      "en": "• Android — pass `record=true` to the runner to record per test case (failures are kept; passing runs are discarded by default). Files are written on-device and fetched by `artifacts pull`.",
-      "ja": "• Android — runner に `record=true` を渡すとテストケース単位で録画します（既定は失敗のみ保持、成功分は破棄）。ファイルはデバイス上に書かれ、`artifacts pull` が取得します。"
+      "en": "• Android — pass `record=true` to the runner to record per test case. Failures are always kept; passing runs are discarded by default — set `keepRecordingOnSuccess(true)` on the runner builder to keep them too. Files are written on-device and fetched by `artifacts pull`.",
+      "ja": "• Android — runner に `record=true` を渡すとテストケース単位で録画します。失敗は常に保持、成功分は既定で破棄 — runner builder の `keepRecordingOnSuccess(true)` で成功分も残せます。ファイルはデバイス上に書かれ、`artifacts pull` が取得します。"
     },
     "section_recording_bullet_web": {
       "en": "• Web — plain Playwright config: `use: { video: 'on' }` records every run (`'retain-on-failure'` keeps failures only), and `projects` pick the browsers — chromium / firefox / webkit, or `channel: 'chrome'` / `'msedge'` for branded builds. Granularity is test file × browser project. Point the runner's `screenshotDir` at `testInfo.outputDir` so the PNGs land next to each video:",
