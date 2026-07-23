@@ -2256,8 +2256,8 @@
     "breadcrumb": { "en": "← Tools", "ja": "← Tools" },
     "title": { "en": "jsonui-helper (VS Code)", "ja": "jsonui-helper (VS Code)" },
     "lead": {
-      "en": "Syntax highlighting + schema-aware completion + preview-on-save for Layout JSON and screen_spec.json. One install away from a JsonUI-native editing experience. Publisher jsonui, extension ID jsonui.jsonui-helper, currently v0.1.0.",
-      "ja": "Layout JSON と screen_spec.json 向けの、シンタックスハイライト + スキーマ補完 + 保存時プレビューを提供する VS Code 拡張。1 インストールで JsonUI-native な編集体験に到達できます。Publisher は jsonui、extension ID は jsonui.jsonui-helper、現行 v0.1.0。"
+      "en": "Syntax highlighting + schema-aware completion + preview-on-save for Layout JSON and screen_spec.json. One install away from a JsonUI-native editing experience. Publisher jsonui, extension ID jsonui.jsonui-helper — the Marketplace listing is the source of truth for the current version.",
+      "ja": "Layout JSON と screen_spec.json 向けの、シンタックスハイライト + スキーマ補完 + 保存時プレビューを提供する VS Code 拡張。1 インストールで JsonUI-native な編集体験に到達できます。Publisher は jsonui、extension ID は jsonui.jsonui-helper — 現行バージョンの正は Marketplace の掲載ページです。"
     },
     "read_time": { "en": "~5 min read", "ja": "約 5 分" },
     "section_what_heading": { "en": "What it does", "ja": "できること" },
@@ -2277,8 +2277,8 @@
     },
     "section_limits_heading": { "en": "Known limits", "ja": "既知の制限" },
     "section_limits_body": {
-      "en": "v0.1.0 ships web-first previews only — iOS / Android rendering in the sidebar is planned. Multi-root workspaces pick up the first workspace's jui.config.json; multi-project workspaces need to be opened one at a time. The old swiftjsonui-helper extension is discontinued; jsonui-helper is its successor and has schema coverage for all three platforms.",
-      "ja": "v0.1.0 はプレビューが Web 専用 — iOS / Android のサイドバー描画は計画中。Multi-root ワークスペースは最初のワークスペースの jui.config.json を拾う仕様なので、マルチプロジェクトは 1 つずつ開いてください。旧 swiftjsonui-helper 拡張は廃止済みで、jsonui-helper がその後継。スキーマカバレッジは 3 プラットフォーム全てに対応しています。"
+      "en": "Current releases ship web-first previews only — iOS / Android rendering in the sidebar is planned. Multi-root workspaces pick up the first workspace's jui.config.json; multi-project workspaces need to be opened one at a time. The old swiftjsonui-helper extension is discontinued; jsonui-helper is its successor and has schema coverage for all three platforms.",
+      "ja": "現行リリースはプレビューが Web 専用 — iOS / Android のサイドバー描画は計画中。Multi-root ワークスペースは最初のワークスペースの jui.config.json を拾う仕様なので、マルチプロジェクトは 1 つずつ開いてください。旧 swiftjsonui-helper 拡張は廃止済みで、jsonui-helper がその後継。スキーマカバレッジは 3 プラットフォーム全てに対応しています。"
     },
     "next_heading": { "en": "Keep reading", "ja": "次に読む" },
     "next_cli_title": { "en": "jsonui-cli", "ja": "jsonui-cli" },
@@ -3465,8 +3465,8 @@
       "ja": "• `scroll` — direction 指定でスクロール。"
     },
     "section_dsl_action_scroll_until_visible": {
-      "en": "• `scrollUntilVisible` — id + container + timeout.",
-      "ja": "• `scrollUntilVisible` — id + container + timeout。"
+      "en": "• `scrollUntilVisible` — id + container + timeout. `direction` is where the search starts; if the target is not found by that end, the driver sweeps back the opposite way before giving up (same on all three platforms).",
+      "ja": "• `scrollUntilVisible` — id + container + timeout。`direction` は探索を始める方向で、その終端まで見つからなければ逆方向へも終端まで再探索してから失敗にします（3 プラットフォーム共通）。"
     },
     "section_dsl_action_swipe": {
       "en": "• `swipe` — swipe gesture.",
@@ -3666,8 +3666,8 @@
       "ja": "3 つの横断機能がモデルを仕上げます。各ステップは `when` (条件 — 成立しなければその step を skip)、`optional` (失敗を warning に格下げして続行)、`label` (レポート上の表示名) を受け付けます。ルートレベルの `launch` が起動時の状態を設定し、`teardown` ステップは失敗後でも必ず実行され、ドライバは標準化された結果 JSON を出力して `jsonui-test report` が JUnit / HTML に変換します。"
     },
     "section_advanced_bullet_when": {
-      "en": "• Conditions & flags: `when` gates a step on `platform` (ios / android / web / all), a `state` path, or `visible` / `notVisible`; `optional: true` downgrades a failure to a warning; `label` names the step in logs and reports.",
-      "ja": "• 条件とフラグ: `when` は `platform` (ios / android / web / all)・`state` パス・`visible` / `notVisible` で step を制御。`optional: true` は失敗を warning に格下げ。`label` はログ・レポートでの step 名。"
+      "en": "• Conditions & flags: `when` gates a step on `platform` (ios / android / web / all), `responsive` (a size-class bucket like compact / regular, or min/max window-size bounds), a `state` path, or `visible` / `notVisible`; `optional: true` downgrades a failure to a warning; `label` names the step in logs and reports.",
+      "ja": "• 条件とフラグ: `when` は `platform` (ios / android / web / all)・`responsive` (compact / regular などの size-class バケット、または window サイズの min/max 境界)・`state` パス・`visible` / `notVisible` で step を制御。`optional: true` は失敗を warning に格下げ。`label` はログ・レポートでの step 名。"
     },
     "section_advanced_bullet_launch": {
       "en": "• launch: `clearState` (reset app data), `permissions` (camera / microphone / location / notifications / photos / contacts / calendar / bluetooth → allow / deny / unset), and `arguments` (launch arguments) — applied once before the first step.",
