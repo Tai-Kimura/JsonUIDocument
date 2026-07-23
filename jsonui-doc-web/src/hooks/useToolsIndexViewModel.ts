@@ -21,5 +21,13 @@ export function useToolsIndexViewModel(router: AppRouterInstance) {
     );
   }
 
+  useEffect(() => {
+    vmRef.current?.mountLanguage();
+    if (typeof window === "undefined") return;
+    const onLang = () => vmRef.current?.mountLanguage();
+    window.addEventListener(LANGUAGE_EVENT, onLang);
+    return () => window.removeEventListener(LANGUAGE_EVENT, onLang);
+  }, []);
+
   return { data, viewModel: vmRef.current };
 }
