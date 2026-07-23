@@ -85,6 +85,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "screen-composition",       titleKey: "concepts_screen_composition_title",       titleEn: "Screen composition",                      url: "/concepts/screen-composition" },
       { id: "data-models-from-openapi",     titleKey: "concepts_data_models_from_openapi_title",     titleEn: "Data models from OpenAPI (DTO + Domain)", url: "/concepts/data-models-from-openapi" },
       { id: "implementation-contract-check", titleKey: "concepts_implementation_contract_check_title", titleEn: "Implementation contract check",           url: "/concepts/implementation-contract-check" },
+      { id: "db-schema-check",               titleKey: "concepts_db_schema_check_title",               titleEn: "DB schema check (docs/db ⇔ live DB)",     url: "/concepts/db-schema-check" },
     ],
   },
   {

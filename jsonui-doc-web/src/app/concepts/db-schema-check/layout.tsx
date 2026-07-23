@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 // render time; we only override title + description so the site-wide
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
-  title: `MCP tool API — JsonUI`,
-  description: `All 41 MCP tools, grouped A–F (Lookup / Validation / Generation / Build + Runtime / API Model Discovery / Test Tooling), with their input schemas, return…`,
+  title: `DB schema check (docs/db ⇔ live DB) — JsonUI`,
+  description: `Every table under \`docs/db/\` is a schema-only OpenAPI file describing the real database. The builtin db-schema checker in \`jsonui-doc check\` compares those…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

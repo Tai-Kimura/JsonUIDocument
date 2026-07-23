@@ -5110,6 +5110,102 @@
       "en": "Complete reference for `jsonui-doc check`, including all subcommands, positional filters (`db` / `api` / `db:main`), the `--list` and `--with-checks` flags, exit-code semantics, and the config schema for `checks` and `databases`.",
       "ja": "`jsonui-doc check` の全リファレンス — サブコマンド、位置引数フィルタ (`db` / `api` / `db:main`)、`--list` / `--with-checks` フラグ、exit code 意味論、`checks` と `databases` の config スキーマまで。"
     },
+    "next_db_schema_title": { "en": "DB schema check (docs/db ⇔ live DB)", "ja": "DB スキーマチェック (docs/db ⇔ 実 DB)" },
+    "next_db_schema_description": {
+      "en": "Deep dive on the DB side: the docs/db table JSON format with its x-* extensions, exactly what the checker compares, and how to declare and run it.",
+      "ja": "DB 側の深掘り: docs/db のテーブル JSON 形式 (x-* 拡張)、チェッカーの比較対象、宣言と実行方法。"
+    },
+    "footer_copyright": { "en": "© JsonUI docs", "ja": "© JsonUI docs" }
+  },
+  "concepts_db_schema_check": {
+    "breadcrumb": { "en": "← Concepts", "ja": "← Concepts" },
+    "title": { "en": "DB schema check (docs/db ⇔ live DB)", "ja": "DB スキーマチェック (docs/db ⇔ 実 DB)" },
+    "lead": {
+      "en": "Every table under `docs/db/` is a schema-only OpenAPI file describing the real database. The builtin db-schema checker in `jsonui-doc check` compares those files against the live schema — declaration vs declaration, confidence `proof` — so migrations can never drift away from the docs unnoticed. This page covers the file format, exactly what gets compared, and how to wire the check up.",
+      "ja": "`docs/db/` 配下の各テーブルは、実 DB を記述する schema-only な OpenAPI ファイルです。`jsonui-doc check` の builtin db-schema チェッカーがそれらを実際の DB スキーマと宣言同士で照合します (confidence は `proof`)。migration が docs から気付かれずに乖離することはなくなります。このページではファイル形式・比較対象・配線方法を解説します。"
+    },
+    "read_time": { "en": "~6 min read", "ja": "約 6 分" },
+    "toc_title": { "en": "On this page", "ja": "このページの目次" },
+    "toc_row_problem": { "en": "Migrations drift silently", "ja": "migration の静かなドリフト" },
+    "toc_row_docs": { "en": "The docs/db table JSON", "ja": "docs/db のテーブル JSON" },
+    "toc_row_compared": { "en": "What gets compared", "ja": "何が比較されるか" },
+    "toc_row_declare": { "en": "Declaring the check", "ja": "check の宣言" },
+    "toc_row_run": { "en": "Run it, read the report", "ja": "実行とレポート" },
+    "toc_row_limits": { "en": "What it does not check", "ja": "検証しないもの" },
+    "section_problem_heading": { "en": "Migrations move, docs stay behind", "ja": "migration は進み、docs は取り残される" },
+    "section_problem_body": {
+      "en": "`docs/db/` is the source of truth for the data model — the generated HTML, the ERD, and every agent working on the project read it. But the real schema moves through migrations (ORM autogeneration, hand-written SQL), and nothing in that path touches `docs/db/`. `jui verify --fail-on-diff` cannot see this drift either: it guards the docs→code pipeline, not docs→database. The db-schema checker closes the loop from the other side — it reads the real database's schema and compares it against `docs/db/`, table by table, column by column.",
+      "ja": "`docs/db/` はデータモデルの SSoT です — 生成 HTML・ERD・プロジェクトで作業するエージェントがこれを参照します。しかし実スキーマは migration (ORM の autogenerate や手書き SQL) で動き、その経路は `docs/db/` に触れません。`jui verify --fail-on-diff` にもこのドリフトは見えません — 守っているのは docs→code パイプラインであって、docs→database ではないからです。db-schema チェッカーは逆側からループを閉じます: 実 DB のスキーマを読み、`docs/db/` とテーブル単位・カラム単位で照合します。"
+    },
+    "section_docs_heading": { "en": "The docs/db table JSON", "ja": "docs/db のテーブル JSON" },
+    "section_docs_body": {
+      "en": "One table per file, written as schema-only OpenAPI: the first non-enum object schema in the file is the table (a file that declares `paths` is treated as an API doc and skipped). The table name comes from `info.x-table-name`, falling back to the snake_case of the schema name. Columns are the schema's `properties`, and DB-specific facts ride on `x-*` extensions. One deliberate convention: a column is NOT NULL unless it declares `nullable: true` — the OpenAPI `required` array is not reused as a NOT-NULL marker. Multi-database projects use one directory per database (`docs/db/<name>/`).",
+      "ja": "1 ファイル = 1 テーブルで、schema-only な OpenAPI として書きます: ファイル内の最初の非 enum object schema がテーブルです (`paths` を持つファイルは API ドキュメント扱いでスキップ)。テーブル名は `info.x-table-name`、無ければ schema 名の snake_case。カラムは schema の `properties` で、DB 固有の事実は `x-*` 拡張に載せます。意図的な規約が 1 つ: カラムは `nullable: true` を宣言しない限り NOT NULL です — OpenAPI の `required` 配列を NOT NULL マーカーとして流用しません。マルチ DB プロジェクトは DB ごとに 1 ディレクトリ (`docs/db/<name>/`) を使います。"
+    },
+    "section_docs_note": {
+      "en": "Enum columns can reference a companion enum schema in the same file (like `UserRole` above). If that enum schema also declares `x-enum-values`, the column is expected to store int codes instead of strings. An `x-foreign-key` written as `{ \"table\": …, \"column\": …, \"enforced\": false }` marks an ERD-only logical reference — no actual DB constraint is expected.",
+      "ja": "enum カラムは同一ファイル内の enum schema を `$ref` できます (上の `UserRole`)。その enum schema が `x-enum-values` も宣言している場合、カラムは文字列ではなく int コードを格納する想定になります。`x-foreign-key` を `{ \"table\": …, \"column\": …, \"enforced\": false }` と書くと ERD 上の論理参照の意味になり、実 DB に制約があることは期待されません。"
+    },
+    "section_compared_heading": { "en": "What gets compared", "ja": "何が比較されるか" },
+    "section_compared_body": {
+      "en": "Every finding is declaration-vs-declaration, so the confidence is always `proof` — when the report says the schemas match, they match:",
+      "ja": "すべての判定は宣言同士の照合なので confidence は常に `proof` です — レポートが一致と言えば、一致しています:"
+    },
+    "section_compared_bullet_tables": {
+      "en": "• Tables, in both directions — a table documented in docs/db but absent from the database is `missing_in_impl`; a live table the docs don't know is `missing_in_doc`. Migration bookkeeping tables (alembic_version, schema_migrations, _prisma_migrations, …) are ignored by default; add project-specific ones via `ignore_tables`.",
+      "ja": "• テーブル (双方向) — docs/db に書かれているのに DB に無ければ `missing_in_impl`、DB にあるのに docs が知らなければ `missing_in_doc`。migration 管理テーブル (alembic_version, schema_migrations, _prisma_migrations など) は既定で無視され、プロジェクト固有のものは `ignore_tables` に足します。"
+    },
+    "section_compared_bullet_columns": {
+      "en": "• Columns — presence in both directions, then type. Type comparison is family-based by default (`integer` accepts INT / BIGINT / SMALLINT, …); declare `x-db-type` for an exact-match comparison, and `maxLength` to pin a varchar length.",
+      "ja": "• カラム — 双方向の存在チェックの後に型。型比較は既定で型ファミリ一致 (`integer` は INT / BIGINT / SMALLINT のいずれとも一致)。厳密比較したいカラムには `x-db-type` を、varchar 長を固定したいなら `maxLength` を書きます。"
+    },
+    "section_compared_bullet_constraints": {
+      "en": "• Constraints & indexes — `x-primary-key`, `x-unique`, `x-auto-increment`, per-column `x-index`, composite `x-indexes`, and `x-foreign-key` (skipped when `enforced: false`).",
+      "ja": "• 制約とインデックス — `x-primary-key`・`x-unique`・`x-auto-increment`・カラム単位の `x-index`・複合の `x-indexes`・`x-foreign-key` (`enforced: false` のものはスキップ)。"
+    },
+    "section_compared_bullet_enums": {
+      "en": "• Enums & nullability — `enum` value sets (int codes when `x-enum-values` is present) and the `nullable: true` convention above.",
+      "ja": "• enum と nullability — `enum` の値セット (`x-enum-values` があれば int コード) と、前述の `nullable: true` 規約。"
+    },
+    "section_declare_heading": { "en": "Declaring the check", "ja": "check の宣言" },
+    "section_declare_body": {
+      "en": "The declaration lives in `jui.config.json`: a `databases` map (`{name: {dialect}}`) plus one `checks` entry of `type: \"builtin:db-schema\"` per database. There are two ways to reach the real schema. The zero-dependency path is a `dump_command` — any command that prints normalized schema JSON (`{ \"tables\": { … } }`) to stdout. Or omit it, and the builtin SQLAlchemy dumper connects directly using the `JSONUI_CHECK_DB_URL_<DATABASE>` environment variable. Connection info never goes in the config — and only commands declared in the config are ever executed, from scripts inside the project root.",
+      "ja": "宣言は `jui.config.json` に書きます: `databases` マップ (`{name: {dialect}}`) と、DB ごとに 1 つの `type: \"builtin:db-schema\"` な `checks` エントリです。実スキーマへの到達方法は 2 つ。ゼロ依存パスは `dump_command` — 正規化スキーマ JSON (`{ \"tables\": { … } }`) を stdout に出す任意のコマンドです。省略すると builtin の SQLAlchemy ダンパが `JSONUI_CHECK_DB_URL_<DATABASE>` 環境変数で直接接続します。接続情報は config には決して書きません — また実行されるのは config に宣言されたコマンドだけで、スクリプトはプロジェクトルート内に置く必要があります。"
+    },
+    "section_declare_note": {
+      "en": "Schema source for the example above: either export `JSONUI_CHECK_DB_URL_DEFAULT=postgresql://…` in the environment, or add `\"dump_command\": [\"python\", \"scripts/dump_schema.py\"]` to the check entry.",
+      "ja": "上の例のスキーマ取得元: 環境変数で `JSONUI_CHECK_DB_URL_DEFAULT=postgresql://…` を渡すか、check エントリに `\"dump_command\": [\"python\", \"scripts/dump_schema.py\"]` を足すかのどちらかです。"
+    },
+    "section_run_heading": { "en": "Run it, read the report", "ja": "実行とレポート" },
+    "section_run_body": {
+      "en": "Results land in `docs/db/.check-report.json` (named databases: `docs/db/<name>/.check-report.json`) — add them to .gitignore. `jsonui-doc generate html` (or the combined `generate html --with-checks`) then renders the Implementation contract page: every finding with its target (`table.column`), status (mismatch / missing_in_impl / missing_in_doc), expected vs actual, and a confidence badge. In CI the exit code is the merge gate: 0 = OK, 1 = mismatch, 2 = execution error.",
+      "ja": "結果は `docs/db/.check-report.json` (named DB は `docs/db/<name>/.check-report.json`) に保存されるので .gitignore に足します。その後 `jsonui-doc generate html` (または合わせ技の `generate html --with-checks`) が「実装との整合性」ページを描画します: 各判定に target (`table.column`)・status (mismatch / missing_in_impl / missing_in_doc)・expected vs actual・confidence バッジが付きます。CI では exit code がマージゲートです: 0 = OK / 1 = mismatch / 2 = 実行エラー。"
+    },
+    "section_run_note": {
+      "en": "The report records `input_hashes` of the docs it verified — if docs/db changes after the last check ran, the HTML shows a stale banner instead of pretending the verdict still holds.",
+      "ja": "レポートは検証時点の docs の `input_hashes` を記録します — check 実行後に docs/db が変わると、HTML は判定が今も有効なふりをせず stale バナーを表示します。"
+    },
+    "section_limits_heading": { "en": "What it does not check", "ja": "検証しないもの" },
+    "section_limits_body": {
+      "en": "It verifies structure — tables, columns, types, constraints, indexes — not data. Whether a specific row's value is semantically valid (\"this column is null only when the order is refunded\") is full-checker territory (`type: \"checker\"`). And because type comparison is family-based unless you pin `x-db-type`, an exact-precision drift (DECIMAL scale, exact varchar width) is only caught where you pinned it. For the confidence model and the plugin tiers, see the Implementation contract check concept page.",
+      "ja": "検証するのは構造 — テーブル・カラム・型・制約・インデックス — であって、データではありません。「このカラムが NULL なのは注文が返金されたときだけ」のような特定行の意味的正しさはフルチェッカー型 (`type: \"checker\"`) の領域です。また型比較は `x-db-type` で固定しない限り型ファミリ一致なので、精度単位のドリフト (DECIMAL の桁、varchar の正確な幅) は固定した箇所でしか検出されません。confidence モデルとプラグイン階層は Implementation contract check の concept ページを参照してください。"
+    },
+    "next_heading": { "en": "Read next", "ja": "次に読む" },
+    "next_contract_title": { "en": "Implementation contract check", "ja": "実装との整合性チェック" },
+    "next_contract_description": {
+      "en": "The umbrella concept: check vs generate, the proof / metadata / sampled confidence levels, and the adapter vs full-checker plugin tiers.",
+      "ja": "全体像の concept: check と generate の分離、proof / metadata / sampled の 3 段階 confidence、アダプタ型とフルチェッカー型の 2 階層。"
+    },
+    "next_verify_guide_title": { "en": "Verifying implementation against docs", "ja": "実装とドキュメントを照合する" },
+    "next_verify_guide_description": {
+      "en": "Cookbook: declaring checks in jui.config.json, wiring up FastAPI / Spring / NestJS / Rails adapters, running check locally and in CI, and reading the resulting HTML.",
+      "ja": "cookbook: jui.config.json に checks を宣言する、FastAPI / Spring / NestJS / Rails アダプタを配線する、ローカルと CI で check を回す、生成 HTML でレポートを読む — の一連の手順。"
+    },
+    "next_cli_reference_title": { "en": "CLI command reference", "ja": "CLI コマンドリファレンス" },
+    "next_cli_reference_description": {
+      "en": "Complete reference for `jsonui-doc check`, including positional filters (`db` / `api` / `db:main`), the `--list` and `--with-checks` flags, exit-code semantics, and the config schema for `checks` and `databases`.",
+      "ja": "`jsonui-doc check` のリファレンス — 位置引数フィルタ (`db` / `api` / `db:main`)、`--list` / `--with-checks` フラグ、exit code 意味論、`checks` と `databases` の config スキーマ。"
+    },
     "footer_copyright": { "en": "© JsonUI docs", "ja": "© JsonUI docs" }
   },
   "guides_verifying_implementation_against_docs": {

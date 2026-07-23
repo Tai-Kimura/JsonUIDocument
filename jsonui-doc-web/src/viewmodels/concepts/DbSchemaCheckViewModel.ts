@@ -1,11 +1,11 @@
-// ViewModel for Concepts > Implementation contract check.
+// ViewModel for Concepts > DB schema check (docs/db ⇔ live DB).
 //
-// Simple prose screen. Seeds two closing "read next" cards and handles the
-// breadcrumb + language toggle. No state beyond private currentLanguage for
-// re-seed on language flip. Mirrors OneLayoutJsonViewModel.
+// Simple prose screen. Seeds three closing "read next" cards and handles the
+// breadcrumb + language toggle. No state beyond re-seed on language flip.
+// Mirrors ImplementationContractCheckViewModel.
 
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { ImplementationContractCheckData } from "@/generated/data/ImplementationContractCheckData";
+import { DbSchemaCheckData } from "@/generated/data/DbSchemaCheckData";
 import { CollectionDataSource } from "@/generated/data/CollectionDataSource";
 import { StringManager } from "@/generated/StringManager";
 
@@ -17,26 +17,22 @@ interface NextReadCell {
   onNavigate: () => void;
 }
 
-export class ImplementationContractCheckViewModel {
+export class DbSchemaCheckViewModel {
   protected router: AppRouterInstance;
-  protected _getData: () => ImplementationContractCheckData;
+  protected _getData: () => DbSchemaCheckData;
   protected _setData: (
-    data:
-      | ImplementationContractCheckData
-      | ((prev: ImplementationContractCheckData) => ImplementationContractCheckData),
+    data: DbSchemaCheckData | ((prev: DbSchemaCheckData) => DbSchemaCheckData),
   ) => void;
 
-  get data(): ImplementationContractCheckData {
+  get data(): DbSchemaCheckData {
     return this._getData();
   }
 
   constructor(
     router: AppRouterInstance,
-    getData: () => ImplementationContractCheckData,
+    getData: () => DbSchemaCheckData,
     setData: (
-      data:
-        | ImplementationContractCheckData
-        | ((prev: ImplementationContractCheckData) => ImplementationContractCheckData),
+      data: DbSchemaCheckData | ((prev: DbSchemaCheckData) => DbSchemaCheckData),
     ) => void,
   ) {
     this.router = router;
@@ -46,11 +42,11 @@ export class ImplementationContractCheckViewModel {
     this.onAppear();
   }
 
-  updateData = (updates: Partial<ImplementationContractCheckData>) => {
+  updateData = (updates: Partial<DbSchemaCheckData>) => {
     this._setData((prev) => ({ ...prev, ...updates }));
   };
 
-  setVars = (vars: Partial<ImplementationContractCheckData>) => {
+  setVars = (vars: Partial<DbSchemaCheckData>) => {
     this.updateData(vars);
   };
 
@@ -74,11 +70,11 @@ export class ImplementationContractCheckViewModel {
 
   private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
     {
-      id: "next_db_schema",
-      titleKey: lookup("next_db_schema_title"),
-      descriptionKey: lookup("next_db_schema_description"),
-      url: "/concepts/db-schema-check",
-      onNavigate: () => this.navigate("/concepts/db-schema-check"),
+      id: "next_contract",
+      titleKey: lookup("next_contract_title"),
+      descriptionKey: lookup("next_contract_description"),
+      url: "/concepts/implementation-contract-check",
+      onNavigate: () => this.navigate("/concepts/implementation-contract-check"),
     },
     {
       id: "next_verify_guide",
@@ -102,12 +98,10 @@ export class ImplementationContractCheckViewModel {
   };
 
   private s = (key: string): string =>
-    StringManager.getString(`concepts_implementation_contract_check_${key}`);
+    StringManager.getString(`concepts_db_schema_check_${key}`);
 
   private sDefault = (key: string): string =>
-    StringManager.getDefaultString(
-      `concepts_implementation_contract_check_${key}`,
-    );
+    StringManager.getDefaultString(`concepts_db_schema_check_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);
