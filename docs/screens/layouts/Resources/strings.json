@@ -3784,8 +3784,8 @@
     },
     "section_shape_heading": { "en": "1. The bilingual shape", "ja": "1. bilingual 形式" },
     "section_shape_body": {
-      "en": "strings.json is a two-level JSON: the outer key is a screen namespace, the inner key is a snake_case string name, and the value is either a { en, ja, … } object or a plain string (used as fallback for every locale). The multi-language object form is what the generators look for — a plain string is a 'not yet translated' placeholder.",
-      "ja": "strings.json は 2 階層の JSON: 外側 key が screen namespace、内側 key が snake_case の文字列名、値は { en, ja, … } オブジェクトまたは平文字列（全 locale 共通のフォールバック）。多言語オブジェクト形式がジェネレータのターゲット — 平文字列は「未翻訳」プレースホルダ扱いです。"
+      "en": "strings.json is a two-level JSON: the outer key is a screen namespace, the inner key is a snake_case string name, and the value is either a { en, ja, … } object or a plain string (used as fallback for every locale). The multi-language object form is what the generators look for — a plain string is a 'not yet translated' placeholder. A third form covers counted text: a plural entry, where each language holds { \"plural\": { \"one\": \"{count} item\", \"other\": \"{count} items\" } } with CLDR cardinal categories.",
+      "ja": "strings.json は 2 階層の JSON: 外側 key が screen namespace、内側 key が snake_case の文字列名、値は { en, ja, … } オブジェクトまたは平文字列（全 locale 共通のフォールバック）。多言語オブジェクト形式がジェネレータのターゲット — 平文字列は「未翻訳」プレースホルダ扱いです。数を含む文言には第 3 の形式として plural エントリがあり、各言語が { \"plural\": { \"one\": \"{count} item\", \"other\": \"{count} items\" } } の形で CLDR cardinal カテゴリを持ちます。"
     },
     "section_naming_heading": { "en": "2. How namespaces are named", "ja": "2. namespace の命名規則" },
     "section_naming_body": {
@@ -3845,12 +3845,12 @@
       "ja": "JsonUI の localisation が現時点で対応していない機能。「無いこと」を先に知っておくと、探し回る時間を減らせます。"
     },
     "section_limits_bullet_plurals": {
-      "en": "• Plurals: no ICU MessageFormat rules. Define separate keys per form (item_singular / items_plural) and switch in the ViewModel.",
-      "ja": "• Plurals: ICU MessageFormat の plural ルールは未対応。単数/複数で別 key を定義し (item_singular / items_plural)、ViewModel 側で切り替えます。"
+      "en": "• Plurals: supported via CLDR-cardinal plural entries ({ \"plural\": { \"one\": …, \"other\": … } }, `{count}` placeholder). Each platform compiles to its native engine — .stringsdict (iOS), R.plurals (Android), Intl.PluralRules (web). Plural keys are VM-only: resolve them in the ViewModel (StringManager accessor with count / getQuantityString / StringManager.plural) and bind the result; referencing one from a layout attribute is a build error. A special count=0 wording stays a ViewModel branch, not a plural category. The old separate-keys idiom (item_singular / items_plural) still works and needs no migration.",
+      "ja": "• Plurals: CLDR cardinal の plural エントリ（{ \"plural\": { \"one\": …, \"other\": … } }、プレースホルダは `{count}`）で対応。各プラットフォームのネイティブ機構 — .stringsdict (iOS) / R.plurals (Android) / Intl.PluralRules (web) — にコンパイルされます。plural key は VM 専用: ViewModel で解決（count 付き StringManager アクセサ / getQuantityString / StringManager.plural）して結果を bind します。レイアウト属性からの直接参照は build エラー。count=0 の特別文言は plural カテゴリではなく ViewModel 分岐で書きます。従来の別 key 方式 (item_singular / items_plural) はそのまま動くため移行は不要です。"
     },
     "section_limits_bullet_interpolation": {
-      "en": "• Interpolation: iOS uses %@, Android uses %s — the build auto-converts between them, and positional specifiers (%1$@ / %1$s) are supported. Web strings are literal; no format engine is bundled.",
-      "ja": "• Interpolation: iOS は %@、Android は %s — build が相互変換し、positional 指定子 (%1$@ / %1$s) も対応。Web は literal で format エンジンは同梱しません。"
+      "en": "• Interpolation: iOS uses %@, Android uses %s — the build auto-converts between them, and positional specifiers (%1$@ / %1$s) are supported. Web strings stay literal for these specifiers (no printf engine); the only substitution the web runtime performs is `{count}` inside plural entries, resolved via Intl.PluralRules.",
+      "ja": "• Interpolation: iOS は %@、Android は %s — build が相互変換し、positional 指定子 (%1$@ / %1$s) も対応。Web はこれらの指定子については literal のまま（printf エンジン非搭載）で、web ランタイムが行う置換は plural エントリ内の `{count}`（Intl.PluralRules で解決）のみです。"
     },
     "section_limits_bullet_pseudo": {
       "en": "• Pseudo-localisation: no tool for auto-wrapping keys with brackets to surface missing translations. Reviewers are expected to catch missing locales in code review.",
