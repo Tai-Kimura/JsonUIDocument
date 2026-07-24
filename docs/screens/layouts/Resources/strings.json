@@ -1663,8 +1663,8 @@
       "ja": "1 つの source of truth"
     },
     "section_one_source_body": {
-      "en": "A screen's visual structure is authored once. The Layout JSON lists the type tree, the bindings, the style references — nothing else. No conditional platform branches. If the same screen needs to look different on narrow vs wide viewports, the branch lives in layout-local visibility flags driven by the ViewModel, not in Swift-vs-Compose forks.",
-      "ja": "画面の見た目の構造は一度だけ書きます。Layout JSON には type ツリー、バインディング、style 参照だけが書かれる。プラットフォーム条件分岐はありません。同じ画面を狭い / 広い viewport で出し分けたければ分岐は ViewModel 駆動の layout-local visibility で、Swift vs Compose の分岐ではない。"
+      "en": "A screen's visual structure is authored once. The Layout JSON lists the type tree, the bindings, the style references — nothing else. No per-platform file forks. When a node genuinely must differ per platform, the branch is declared in the JSON itself — a string `platform` filter that drops the node on the other hosts, or a `platform` override map for per-host attribute values — never in Swift-vs-Compose code forks. Viewport differences likewise stay declarative: the `responsive` block or ViewModel-driven visibility flags.",
+      "ja": "画面の見た目の構造は一度だけ書きます。Layout JSON には type ツリー、バインディング、style 参照だけが書かれる。プラットフォーム別のファイル分岐はありません。ノードを本当にプラットフォームで変えたい時も、分岐は JSON 内で宣言します — 他ホストではノードごと落とす文字列 `platform` フィルタか、ホスト別属性値の `platform` override map — Swift vs Compose のコード分岐には決してなりません。viewport の違いも同様に宣言的に: `responsive` ブロックか ViewModel 駆動の visibility フラグです。"
     },
     "section_three_out_heading": {
       "en": "Three platform renderings",
@@ -1679,8 +1679,8 @@
       "ja": "それが課す制約"
     },
     "section_constraints_body": {
-      "en": "Certain patterns that feel natural in a single-platform codebase are forbidden: platform-conditional children, mid-layout business logic, and ad-hoc style inline strings. The Layout JSON's grammar is deliberately small so the cross-platform renderers can agree. That means you express advanced cases via custom components (spec-first) rather than by stretching the core grammar.",
-      "ja": "単一プラットフォームでは自然なパターンがいくつか封じられます: プラットフォーム条件分岐した子要素、レイアウト中のビジネスロジック、アドホックな inline style 文字列。Layout JSON の文法はあえて小さく保たれており、クロスプラットフォーム描画が合意できる範囲にとどめています。高度なケースは core 文法を拡張するのではなく、spec-first なカスタムコンポーネントとして表現します。"
+      "en": "Certain patterns that feel natural in a single-platform codebase are forbidden: mid-layout business logic and ad-hoc style inline strings. Platform differences themselves are fine — but only declaratively: a string `platform` filter omits a node on the other hosts, a `platform` override map swaps attribute values per host, and a root-level `platforms` array limits the whole screen. What you cannot write is imperative per-platform code inside the layout. The Layout JSON's grammar is deliberately small so the cross-platform renderers can agree. That means you express advanced cases via custom components (spec-first) rather than by stretching the core grammar.",
+      "ja": "単一プラットフォームでは自然なパターンがいくつか封じられます: レイアウト中のビジネスロジックと、アドホックな inline style 文字列。プラットフォーム差そのものは可 — ただし宣言的にのみ: 文字列 `platform` フィルタで他ホストではノードを省略、`platform` override map でホスト別の属性値、ルートの `platforms` 配列で画面全体の配布先限定。書けないのはレイアウト内の命令的なプラットフォーム別コードです。Layout JSON の文法はあえて小さく保たれており、クロスプラットフォーム描画が合意できる範囲にとどめています。高度なケースは core 文法を拡張するのではなく、spec-first なカスタムコンポーネントとして表現します。"
     },
     "section_wins_heading": {
       "en": "The compounding wins",
@@ -2049,12 +2049,12 @@
       "ja": "size class が変わってもコンポーネント構造は同じ（同じ子・同じ順序）で、spacing / orientation / fontSize / columnCount など属性値だけ切り替えたい時。"
     },
     "section_when_bullet_platforms_label": {
-      "en": "`platforms` — omit on the wrong host",
-      "ja": "`platforms` — 該当しないホストでは省略する"
+      "en": "`platform` — omit or override per host",
+      "ja": "`platform` — ホスト別に省略・上書きする"
     },
     "section_when_bullet_platforms_body": {
-      "en": "Use when an entire subtree is platform-specific — an iOS-only screenshot, a web-only sidebar, an Android-only system-bar inset filler. The component renders or is removed; there is no per-host attribute tweaking.",
-      "ja": "サブツリーごとプラットフォーム固有の時 — iOS 限定スクリーンショット、Web 限定サイドバー、Android 限定の system bar inset filler など。描画されるか丸ごと省かれるかの 2 択で、ホスト別の属性微調整はしません。"
+      "en": "Use when a subtree is platform-specific — an iOS-only screenshot, a web-only sidebar, an Android-only system-bar inset filler. Give the node a string `platform` (`\"platform\": \"ios\"`, comma lists like `\"ios,android\"` too) and `jui build` drops it entirely on the other hosts. For per-host attribute values on a shared node, use the object form instead: `\"platform\": {\"ios\": {\"height\": 220}, \"web\": {\"height\": \"100vh\"}}`. (A `platforms` ARRAY is valid only on the layout root, where it whitelists which platforms the whole screen ships to.)",
+      "ja": "サブツリーがプラットフォーム固有の時 — iOS 限定スクリーンショット、Web 限定サイドバー、Android 限定の system bar inset filler など。ノードに文字列の `platform`（`\"platform\": \"ios\"`、`\"ios,android\"` のカンマ区切りも可）を付けると、`jui build` が他ホストではノードごと削除します。共有ノードでホスト別に属性値だけ変えたい時は object 形式: `\"platform\": {\"ios\": {\"height\": 220}, \"web\": {\"height\": \"100vh\"}}`。（配列の `platforms` はレイアウトルート限定 — 画面全体の配布先ホワイトリストです。）"
     },
     "section_when_bullet_split_label": {
       "en": "Variant file (`home@regular.json`) — different structure entirely",

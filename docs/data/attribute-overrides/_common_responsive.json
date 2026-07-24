@@ -5,14 +5,15 @@
     "ja": "レスポンシブ属性はホストの size class と orientation に応じて属性値を切り替えます。同じ Layout JSON が iPhone / iPad / 分割画面で別の表示になる。"
   },
   "attributes": {
-    "platforms": {
+    "platform": {
       "summary": {
-        "en": "Array of platforms this component should render on: `ios` / `android` / `web`. The component is omitted entirely if the current platform is not in the list.",
-        "ja": "このコンポーネントを描画すべきプラットフォーム配列: `ios` / `android` / `web`。現プラットフォームが含まれなければコンポーネントは完全に省略される。"
+        "en": "Platform gate on a node, two forms. String (`\"platform\": \"ios\"`, comma lists like `\"ios,android\"`, legacy language tokens like `\"swift\"` / `\"compose\"` / `\"react\"` also accepted): `jui build` drops the node entirely on non-matching platforms at distribution time. Object (`\"platform\": {\"ios\": {…}, \"web\": {…}}`): per-platform attribute overrides merged into the node — the target platform's map wins, other platforms use the base values. The key is consumed at build time and never reaches the generated code. Note: a `platforms` ARRAY is valid only on the layout ROOT, where it whitelists which platforms the whole screen ships to — an array on a child node is ignored.",
+        "ja": "ノードのプラットフォームゲート。2 形式ある。文字列（`\"platform\": \"ios\"`、`\"ios,android\"` のカンマ区切り、`\"swift\"` / `\"compose\"` / `\"react\"` 等のレガシー言語トークンも受理）: `jui build` が配布時に、マッチしないプラットフォームではノードを丸ごと削除する。オブジェクト（`\"platform\": {\"ios\": {…}, \"web\": {…}}`）: プラットフォーム別の属性上書きをノードにマージ — 対象プラットフォームの map が勝ち、他は base 値のまま。キーはビルド時に消費され、生成コードには残らない。注意: 配列の `platforms` はレイアウトの**ルート限定**（画面全体の配布先ホワイトリスト）— 子ノードに配列を書いても無視される。"
       },
       "examples": [
-        { "language": "json", "code": "{ \"include\": \"common/sidebar\", \"platforms\": [\"web\"] }" },
-        { "language": "json", "code": "{ \"type\": \"Image\", \"srcName\": \"ios_screenshot\", \"platforms\": [\"ios\"] }" }
+        { "language": "json", "code": "{ \"type\": \"Image\", \"srcName\": \"ios_screenshot\", \"platform\": \"ios\" }" },
+        { "language": "json", "code": "{\n  \"type\": \"View\",\n  \"height\": 200,\n  \"platform\": {\n    \"ios\": { \"height\": 220 },\n    \"web\": { \"height\": \"100vh\", \"maxWidth\": 1200 }\n  }\n}" },
+        { "language": "json", "code": "{ \"type\": \"View\", \"platforms\": [\"web\"], \"child\": [ ] }  // root only: screen ships to web alone" }
       ]
     },
     "responsive": {
