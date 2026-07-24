@@ -1945,20 +1945,20 @@
       "ja": "レスポンシブデザイン"
     },
     "lead": {
-      "en": "One Layout JSON should not look the same on a 5-inch phone, an 11-inch tablet, and a split-screen iPad. The `responsive` block lets a single component swap attribute values per size class — without forking the layout file. Here is how the resolver picks which set of values wins, what the generator emits per platform, and when responsive is the wrong tool.",
-      "ja": "1 つの Layout JSON が 5 インチのスマートフォン・11 インチのタブレット・iPad の分割画面で同じ見た目になるのは適切ではありません。`responsive` ブロックを使うと、レイアウトファイルを分けずに 1 つのコンポーネント内で size class ごとに属性値を切り替えられます。リゾルバがどう値を選ぶか、各プラットフォームのジェネレータが何を出力するか、そして responsive が向かないケースを解説します。"
+      "en": "One Layout JSON should not look the same on a 5-inch phone, an 11-inch tablet, and a split-screen iPad. The `responsive` block lets a single component swap attribute values per size class — without forking the layout file. Here is how the resolver picks which set of values wins, what the generator emits per platform, when responsive is the wrong tool — and the `home@regular.json` variant files that swap the whole tree when it is.",
+      "ja": "1 つの Layout JSON が 5 インチのスマートフォン・11 インチのタブレット・iPad の分割画面で同じ見た目になるのは適切ではありません。`responsive` ブロックを使うと、レイアウトファイルを分けずに 1 つのコンポーネント内で size class ごとに属性値を切り替えられます。リゾルバがどう値を選ぶか、各プラットフォームのジェネレータが何を出力するか、responsive が向かないケース、そしてその時にツリーごと差し替える `home@regular.json` バリアントファイルを解説します。"
     },
     "read_time": {
-      "en": "~6 min read",
-      "ja": "約 6 分"
+      "en": "~7 min read",
+      "ja": "約 7 分"
     },
     "section_problem_heading": {
       "en": "The problem",
       "ja": "解決したい問題"
     },
     "section_problem_body": {
-      "en": "A vertical stack with 8 px spacing reads fine on a phone, but on an iPad in landscape the same stack feels cramped — the screen has the room to lay sections out horizontally with 24 px spacing. Forking the file into `home.json` and `home@regular.json` doubles the maintenance cost; doing all the math at the ViewModel layer leaks layout concerns into business code. The `responsive` block is the third option: keep one Layout JSON, declare the deltas, let the runtime pick.",
-      "ja": "8px spacing の垂直スタックは phone では読みやすいけれど、iPad の landscape では窮屈に感じる — 画面には水平 24px spacing で section を並べる余裕がある。ファイルを `home.json` と `home@regular.json` に分けるとメンテコストが倍。レイアウト判断を ViewModel 層でやるとビジネスコードにレイアウトが滲みます。`responsive` ブロックは第 3 の選択肢: Layout JSON は 1 本のまま、差分だけ宣言し、ランタイムに選ばせます。"
+      "en": "A vertical stack with 8 px spacing reads fine on a phone, but on an iPad in landscape the same stack feels cramped — the screen has the room to lay sections out horizontally with 24 px spacing. When only attribute values differ, forking the whole file into `home.json` and `home@regular.json` doubles the maintenance cost for a spacing tweak; doing all the math at the ViewModel layer leaks layout concerns into business code. The `responsive` block is the third option: keep one Layout JSON, declare the deltas, let the runtime pick. (When the structure itself changes per size class, the whole-file fork IS the right tool — that is the variant-file mechanism covered below.)",
+      "ja": "8px spacing の垂直スタックは phone では読みやすいけれど、iPad の landscape では窮屈に感じる — 画面には水平 24px spacing で section を並べる余裕がある。属性値しか変わらないのに `home.json` と `home@regular.json` にファイルごとフォークすると spacing 調整のためにメンテコストが倍。レイアウト判断を ViewModel 層でやるとビジネスコードにレイアウトが滲みます。`responsive` ブロックは第 3 の選択肢: Layout JSON は 1 本のまま、差分だけ宣言し、ランタイムに選ばせます。（size class で構造そのものが変わる時はファイル分割こそが正解 — それが後述のバリアントファイル機構です。）"
     },
     "section_taxonomy_heading": {
       "en": "Six size-class keys",
@@ -2020,6 +2020,18 @@
       "en": "Dynamic mode (the runtime that powers hot reload on iOS and Android) takes a different path. A shared `ResponsiveResolver` walks the JSON tree once at mount time, flattens every node by merging the matching `responsive` keys back into the parent, and hands a plain JSON dictionary to the per-component converter. Individual converters never know `responsive` exists — they see the resolved attributes only. SwiftJsonUI keys off `@Environment(\\.horizontalSizeClass)` and `verticalSizeClass`; KotlinJsonUI uses `currentWindowAdaptiveInfo()` plus `LocalConfiguration.orientation`. Both rely on the platform's own change-tracking to re-run resolution when the host rotates or splits.",
       "ja": "Dynamic モード（iOS と Android の hot reload を支えるランタイム）は別の経路を取ります。共有の `ResponsiveResolver` がマウント時に JSON ツリーを 1 度だけ走査し、マッチした `responsive` キーを親にマージしてから各 component の converter にプレーンな JSON 辞書を渡します。個別 converter は `responsive` の存在を知らず、解決済み属性だけを見ます。SwiftJsonUI は `@Environment(\\.horizontalSizeClass)` と `verticalSizeClass` を、KotlinJsonUI は `currentWindowAdaptiveInfo()` と `LocalConfiguration.orientation` を使います。どちらも回転や分割時の再評価はプラットフォーム自身の変更検知に任せます。"
     },
+    "section_variants_heading": {
+      "en": "Variant files — `home@regular.json`",
+      "ja": "バリアントファイル — `home@regular.json`"
+    },
+    "section_variants_body": {
+      "en": "When the structure itself must change per size class, ship a whole alternative tree instead of overrides: keep `home.json` as the canonical base and place `home@compact.json` / `home@medium.json` / `home@regular.json` next to it. Those three suffixes are the entire vocabulary — landscape and composite keys remain inline-`responsive` territory, and `@tablet` is rejected with a dedicated \"did you mean '@regular'?\" hint. Resolution is exact-match or base, never a neighboring tier: a medium window with only `@regular` shipped renders the base, and iOS — which has no medium size class — folds `@medium` into its compact tier with `@compact` winning. Tier detection is identical to the inline `responsive` block (iOS horizontal size class, Android 600 / 840 dp, web 768 / 1024 px).",
+      "ja": "size class によって構造そのものを変えたい時は、上書きではなくツリー丸ごとの代替を置きます: `home.json` を正準 base のまま、隣に `home@compact.json` / `home@medium.json` / `home@regular.json` を配置。語彙はこの 3 suffix だけです — landscape や結合キーは inline `responsive` の領分のままで、`@tablet` は「'@regular' では?」の専用ヒント付きで拒否されます。解決は完全一致か base のみで、隣の tier への繰り上げはありません: `@regular` しか無いプロジェクトの medium ウィンドウは base を表示し、medium サイズクラスを持たない iOS では `@medium` が compact tier に畳み込まれ、`@compact` があればそちらが勝ちます。tier 検知は inline `responsive` ブロックと同一です（iOS horizontal size class / Android 600・840dp / web 768・1024px）。"
+    },
+    "section_variants_body2": {
+      "en": "Variants declare no `data` and no `platforms` — the data contract stays base-canonical: every binding a variant uses must be declared in the base, ViewModel / Data / spec are generated from the base alone, and `jui build` enforces all of it (vocabulary, orphan variants, `data` / `platforms` declarations, uncovered bindings) as hard errors. Because a tier change swaps the WHOLE tree, view-local state (scroll position, unbound input, focus) is lost by design while the single ViewModel instance — and every bound value — survives: state that must outlive a Split View / foldable transition belongs in a VM binding. In generated mode each variant compiles to its own `<Base><Class>VariantGeneratedView` sharing the base's Data / ViewModel; dynamic mode needs SwiftJsonUI 10.7.0+ / KotlinJsonUI 2.14.0+ — older dynamic runtimes never probe for `@` files and gracefully keep rendering the base.",
+      "ja": "バリアントは `data` も `platforms` も宣言できません — データ契約は base 正準のまま: バリアントが使う binding は全て base に宣言されている必要があり、ViewModel / Data / spec は base 単独から生成され、`jui build` がこれら（語彙・孤児バリアント・`data` / `platforms` 宣言・未包含 binding）をハードエラーで強制します。tier 切替はツリー全置換なので、view ローカル状態（スクロール位置・未バインド入力・フォーカス）は消えるのが仕様、一方 ViewModel は単一インスタンスが swap を跨いで生存し、バインドされた値は全て残ります: Split View / Foldable の遷移を跨いで保持したい状態は VM binding に置いてください。generated モードでは各バリアントが base の Data / ViewModel を共有する専用の `<Base><Class>VariantGeneratedView` にコンパイルされます。dynamic モードは SwiftJsonUI 10.7.0+ / KotlinJsonUI 2.14.0+ が必要 — 旧 dynamic ランタイムは `@` ファイルを探索しないため base 表示に安全に退行します。"
+    },
     "section_when_heading": {
       "en": "When `responsive` is not the right tool",
       "ja": "`responsive` が向かないケース"
@@ -2045,12 +2057,12 @@
       "ja": "サブツリーごとプラットフォーム固有の時 — iOS 限定スクリーンショット、Web 限定サイドバー、Android 限定の system bar inset filler など。描画されるか丸ごと省かれるかの 2 択で、ホスト別の属性微調整はしません。"
     },
     "section_when_bullet_split_label": {
-      "en": "Layout file split — different structure entirely",
-      "ja": "Layout ファイル分割 — 構造そのものを別にする"
+      "en": "Variant file (`home@regular.json`) — different structure entirely",
+      "ja": "バリアントファイル（`home@regular.json`）— 構造そのものを別にする"
     },
     "section_when_bullet_split_body": {
-      "en": "When the children themselves change — phone shows a stack of cards, tablet shows a master-detail layout — `responsive` is the wrong shape because there is no shared structure to override. Ship a variant file instead: keep `home.json` as the canonical base and add `home@regular.json` (also `@compact` / `@medium`) next to it. The runtime swaps the WHOLE tree when the size-class tier matches — exact match or the base, never a neighboring tier (a medium window with only `@regular` shipped renders the base; iOS has no medium size class, so `@medium` folds into its compact tier with `@compact` winning). Variants declare no `data` section and no `platforms` — the data contract stays base-canonical, every binding a variant uses must be declared in the base, and `jui build` enforces all of this as hard errors. Because the swap replaces the tree, view-local state (scroll position, unbound input, focus) is lost by design while the single ViewModel instance — and every bound value — survives: state that must outlive a Split View / foldable transition belongs in a VM binding. Older dynamic runtimes simply never probe for `@` files and keep rendering the base.",
-      "ja": "子そのものが変わる時 — phone はカードの縦リスト、tablet は master-detail レイアウト — は `responsive` の出番ではありません。共有する構造がないので上書きが効きません。ここで使うのがバリアントファイル: `home.json` を正準 base のまま、隣に `home@regular.json`（`@compact` / `@medium` も可）を置きます。ランタイムはサイズクラス tier が一致した時に**ツリー全体**を差し替えます — 解決は完全一致か base のみで、隣の tier への繰り上げはありません（`@regular` しか無いプロジェクトの medium ウィンドウは base を表示。iOS には medium サイズクラスが無いため `@medium` は compact tier に畳み込まれ、`@compact` があればそちらが勝ちます）。バリアントは `data` セクションも `platforms` も宣言できません — データ契約は base 正準で、バリアントが使う binding は全て base の `data` に宣言されている必要があり、`jui build` がこれらをハードエラーで強制します。ツリー全置換なので view ローカル状態（スクロール位置・未バインド入力・フォーカス）は消えるのが仕様、一方 ViewModel は単一インスタンスが swap を跨いで生存し、バインドされた値は全て残ります — Split View / Foldable の遷移を跨いで保持したい入力は VM binding に置いてください。旧 dynamic ランタイムは `@` ファイルを探しに行かないため、base 表示に安全に退行します。"
+      "en": "When the children themselves change — phone shows a stack of cards, tablet shows a master-detail layout — `responsive` is the wrong shape because there is no shared structure to override. Ship a variant file (`home@regular.json`) next to the canonical base instead — the runtime swaps the whole tree when the size-class tier matches. Resolution, data contract, and state rules are covered in the variant-files section above.",
+      "ja": "子そのものが変わる時 — phone はカードの縦リスト、tablet は master-detail レイアウト — は `responsive` の出番ではありません。共有する構造がないので上書きが効きません。ここで使うのが、正準 base の隣に置くバリアントファイル（`home@regular.json`）— サイズクラス tier が一致するとランタイムがツリー全体を差し替えます。解決規則・データ契約・状態の扱いは上のバリアントファイルのセクションを参照。"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -2103,6 +2115,10 @@
     "toc_row_dynamic": {
       "en": "Dynamic mode: tree resolution",
       "ja": "Dynamic モード: ツリー解決"
+    },
+    "toc_row_variants": {
+      "en": "Variant files — `home@regular.json`",
+      "ja": "バリアントファイル — `home@regular.json`"
     },
     "toc_row_when": {
       "en": "When `responsive` is not the right tool",

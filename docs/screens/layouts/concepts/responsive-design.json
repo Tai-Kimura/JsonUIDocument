@@ -358,11 +358,60 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_when",
+                  "id": "section_variants",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [24, 32, 24, 32],
                   "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_variants_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_variants_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "Layouts/\n├── home.json            ← canonical base (data section lives here)\n├── home@compact.json    ← optional whole-tree swap, compact tier\n└── home@regular.json    ← optional whole-tree swap, regular tier\n\n// tier → file: exact match or base — no promotion between tiers\n//   regular window                        → home@regular.json\n//   medium window (no @medium shipped)    → home.json\n//   iOS (no medium class): @medium folds into compact; @compact wins",
+                      "language": "text",
+                      "filename": "variant resolution",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_variants_body2"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_when",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
                   "child": [
                     {
                       "type": "Label",
@@ -530,6 +579,7 @@
                         { "id": "toc_priority",  "label": "toc_row_priority",  "anchor": "section_priority",  "level": 1 },
                         { "id": "toc_generated", "label": "toc_row_generated", "anchor": "section_generated", "level": 1 },
                         { "id": "toc_dynamic",   "label": "toc_row_dynamic",   "anchor": "section_dynamic",   "level": 1 },
+                        { "id": "toc_variants",  "label": "toc_row_variants",  "anchor": "section_variants",  "level": 1 },
                         { "id": "toc_when",      "label": "toc_row_when",      "anchor": "section_when",      "level": 1 }
                       ],
                       "stickyOffset": 80
