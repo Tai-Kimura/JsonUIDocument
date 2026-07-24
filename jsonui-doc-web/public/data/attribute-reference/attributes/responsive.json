@@ -27,6 +27,16 @@
         "cells": {
           "data": [
             {
+              "id": "overview_platform",
+              "name": "platform",
+              "type": "string | object",
+              "summary": {
+                "en": "Platform gate on a node, two forms. String (`\"platform\": \"ios\"`, comma lists like `\"ios,android\"`…",
+                "ja": "ノードのプラットフォームゲート。2 形式ある。文字列（`\"platform\": \"ios\"`、`\"ios,android\"` のカンマ区切り、`\"swift\"` / `\"compose\"` / …"
+              },
+              "anchorUrl": "#attr-platform"
+            },
+            {
               "id": "overview_responsive",
               "name": "responsive",
               "type": "object",
@@ -85,6 +95,76 @@
       {
         "cells": {
           "data": [
+            {
+              "id": "attr_platform",
+              "name": "platform",
+              "anchorId": "attr-platform",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Platform gate on a node, two forms. String (`\"platform\": \"ios\"`, comma lists like `\"ios,android\"`, legacy language tokens like `\"swift\"` / `\"compose\"` / `\"react\"` also accepted): `jui build` drops the node entirely on non-matching platforms at distribution time. Object (`\"platform\": {\"ios\": {…}, \"web\": {…}}`): per-platform attribute overrides merged into the node — the target platform's map wins, other platforms use the base values. The key is consumed at build time and never reaches the generated code. Note: a `platforms` ARRAY is valid only on the layout ROOT, where it whitelists which platforms the whole screen ships to — an array on a child node is ignored.",
+                "ja": "ノードのプラットフォームゲート。2 形式ある。文字列（`\"platform\": \"ios\"`、`\"ios,android\"` のカンマ区切り、`\"swift\"` / `\"compose\"` / `\"react\"` 等のレガシー言語トークンも受理）: `jui build` が配布時に、マッチしないプラットフォームではノードを丸ごと削除する。オブジェクト（`\"platform\": {\"ios\": {…}, \"web\": {…}}`）: プラットフォーム別の属性上書きをノードにマージ — 対象プラットフォームの map が勝ち、他は base 値のまま。キーはビルド時に消費され、生成コードには残らない。注意: 配列の `platforms` はレイアウトの**ルート限定**（画面全体の配布先ホワイトリスト）— 子ノードに配列を書いても無視される。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | object",
+              "required": ""
+            },
             {
               "id": "attr_responsive",
               "name": "responsive",
