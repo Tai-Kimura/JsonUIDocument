@@ -1382,21 +1382,21 @@
     },
     "halt_multi_file_ref_trigger": { "en": "multi-file $ref", "ja": "multi-file $ref" },
     "halt_multi_file_ref_behavior": {
-      "en": "`$ref` across files is rejected — v1 expects each swagger file to be self-contained.",
-      "ja": "ファイルを跨いだ `$ref` は受け付けません。v1 では各 swagger ファイルが self-contained である前提です。"
+      "en": "Supported since 2026-07 — relative `$ref` between files inside `docs/api/` (with or without `./`) is resolved before parsing. Shared schemas referenced from multiple docs are generated once; their bodies must be identical or the load halts with `cross-doc-schema-conflict`.",
+      "ja": "2026-07 対応済み — `docs/api/` 内のファイル間の相対 `$ref`(`./` の有無どちらも)はパース前に解決されます。複数 doc から参照される共有 schema は 1 回だけ生成されます(中身が同一である必要があり、不一致は `cross-doc-schema-conflict` で halt)。"
     },
     "halt_multi_file_ref_workaround": {
-      "en": "Inline the referenced schema into the consuming file, or bundle your swagger before placing it in `docs/api/`.",
-      "ja": "参照先 schema を消費側ファイルに inline するか、`docs/api/` に置く前に swagger を bundle します。"
+      "en": "Still halting: URL `$ref`s, refs escaping `docs/api/` (`ref-outside-api-dir`), pointers outside `#/components/schemas/` / `#/definitions/` (`ref-non-schema-pointer`), and cross-file cycles (`cross-file-ref-cycle` — co-locate mutually recursive schemas in one file).",
+      "ja": "引き続き halt: URL `$ref` / `docs/api/` 外への参照(`ref-outside-api-dir`)/ `#/components/schemas/`・`#/definitions/` 以外への pointer(`ref-non-schema-pointer`)/ ファイル間循環(`cross-file-ref-cycle` — 相互再帰する schema は同一ファイルにまとめる)。"
     },
     "halt_yaml_trigger": { "en": "YAML input", "ja": "YAML 入力" },
     "halt_yaml_behavior": {
-      "en": "Only JSON OpenAPI is parsed in v1 — `.yaml` / `.yml` is not auto-converted.",
-      "ja": "v1 では JSON OpenAPI のみ受け付けます。`.yaml` / `.yml` の自動変換はありません。"
+      "en": "Supported since 2026-07 — `.yaml` / `.yml` swagger files are parsed in memory (PyYAML required; `jui` halts with install guidance when it is missing). The canonical authoring format remains JSON and nothing is converted on disk.",
+      "ja": "2026-07 対応済み — `.yaml` / `.yml` の swagger はメモリ上でパースされます(PyYAML 必須。未導入時は導入手順つきで halt)。正準フォーマットは引き続き JSON で、ディスク上の変換ファイルは作りません。"
     },
     "halt_yaml_workaround": {
-      "en": "Pre-convert with a YAML-to-JSON step in your build pipeline before `jui build` runs.",
-      "ja": "`jui build` の前に YAML→JSON 変換ステップを CI / ビルドパイプラインに挟みます。"
+      "en": "Watch YAML 1.1 implicit typing: unquoted `NO` / date literals in enum members or mapping keys halt with `yaml-type-coercion` (quote the value, e.g. `enum: ['NO']`). Keeping a stale converted `foo.json` next to `foo.yaml` halts with `duplicate-swagger-basename` — keep exactly one.",
+      "ja": "YAML 1.1 の型強制に注意 — enum メンバーやキーの引用符なし `NO` / 日付リテラルは `yaml-type-coercion` で halt します(`enum: ['NO']` のように引用符で囲む)。変換済みの古い `foo.json` を `foo.yaml` と併置すると `duplicate-swagger-basename` で halt するため、どちらか 1 つだけ残します。"
     },
     "halt_self_ref_trigger": { "en": "direct self-ref", "ja": "direct self-ref" },
     "halt_self_ref_behavior": {
@@ -2799,18 +2799,18 @@
     },
     "halt_multi_file_ref_trigger": { "en": "multi-file $ref", "ja": "multi-file $ref" },
     "halt_multi_file_ref_behavior": {
-      "en": "ERROR halt — file-spanning `$ref`s are not resolved in v1.",
-      "ja": "ERROR halt — ファイルを跨いだ `$ref` は v1 では解決しません。"
+      "en": "Supported since 2026-07 — relative `$ref` between files inside `docs/api/` resolves before parsing; shared schemas are generated once (bodies must match, else `cross-doc-schema-conflict`).",
+      "ja": "2026-07 対応済み — `docs/api/` 内のファイル間相対 `$ref` はパース前に解決。共有 schema は 1 回だけ生成(中身の不一致は `cross-doc-schema-conflict` で halt)。"
     },
     "halt_multi_file_ref_workaround": {
-      "en": "Recipe: bundle with `swagger-cli bundle in.yaml --outfile out.json --type json` before placing under `docs/api/`.",
-      "ja": "Recipe: `docs/api/` に置く前に `swagger-cli bundle in.yaml --outfile out.json --type json` で bundle する。"
+      "en": "Still halting: URL refs, refs escaping `docs/api/`, non-schema pointers, cross-file cycles. Recipe: vendor the shared schema into `docs/api/` and target `#/components/schemas/<Name>`.",
+      "ja": "引き続き halt: URL 参照 / `docs/api/` 外参照 / 非 schema pointer / ファイル間循環。Recipe: 共有 schema を `docs/api/` 内に置き `#/components/schemas/<Name>` を参照する。"
     },
     "halt_yaml_trigger": { "en": "YAML input", "ja": "YAML 入力" },
-    "halt_yaml_behavior": { "en": "ERROR halt — only JSON OpenAPI is accepted in v1.", "ja": "ERROR halt — v1 は JSON OpenAPI のみ受け付けます。" },
+    "halt_yaml_behavior": { "en": "Supported since 2026-07 — YAML swagger parses in memory (PyYAML required; guided halt when missing).", "ja": "2026-07 対応済み — YAML swagger はメモリ上でパース(PyYAML 必須。未導入時は導入手順つき halt)。" },
     "halt_yaml_workaround": {
-      "en": "Recipe: convert in CI — `npx js-yaml in.yaml > docs/api/in.json`.",
-      "ja": "Recipe: CI で変換 — `npx js-yaml in.yaml > docs/api/in.json`。"
+      "en": "Recipe: quote YAML 1.1-coerced values (`enum: ['NO']`) — unquoted forms halt with `yaml-type-coercion`; don't keep a stale converted `.json` next to its `.yaml` (`duplicate-swagger-basename`).",
+      "ja": "Recipe: YAML 1.1 に型強制される値は引用符で囲む(`enum: ['NO']`)— 引用符なしは `yaml-type-coercion` で halt。変換済み `.json` を `.yaml` と併置しない(`duplicate-swagger-basename`)。"
     },
     "halt_self_ref_trigger": { "en": "direct self-ref", "ja": "direct self-ref" },
     "halt_self_ref_behavior": {
