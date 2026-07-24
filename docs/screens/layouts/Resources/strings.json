@@ -1589,8 +1589,8 @@
       "ja": "`@{…}` の中に式は書けない"
     },
     "section_no_logic_body": {
-      "en": "The grammar inside `@{…}` is deliberately small: simple property (`@{displayName}`), dot-path (`@{user.profile.handle}`), array index (`@{items[0]}`), action binding (`@{onSubmit}`), and cell-scoped `@{data.prop}` inside `cells/*.json`. That is the entire grammar. Ternaries, comparisons (`===`, `<`, `>`), arithmetic (`+`, `*`, `%`), logical operators (`&&`, `||`), and function or method calls are rejected — rjui's `binding_validator.rb` catches them with actionable warnings. If you need a derived value, compute it in the ViewModel as a getter and bind the getter: `get countLabel(): string { return this.count > 0 ? this.s('some') : this.s('none'); }` → `{ \"text\": \"@{countLabel}\" }`. Path-ascent (`@{^parentProp}`) and relative navigation (`@{../sibling}`) are not part of the grammar — pass values down explicitly through cell data blocks instead. Note: the validator currently runs only on rjui; iOS and Android accept malformed bindings quietly and fail at runtime.",
-      "ja": "`@{…}` 内の文法は意図的に小さく保たれています: 単純なプロパティ (`@{displayName}`)・ドットパス (`@{user.profile.handle}`)・配列インデックス (`@{items[0]}`)・アクションバインディング (`@{onSubmit}`)・cell スコープの `@{data.prop}`（`cells/*.json` 用）。この 5 種類だけ。三項演算子・比較 (`===` / `<` / `>`)・算術 (`+` / `*` / `%`)・論理演算子 (`&&` / `||`)・関数/メソッド呼び出しは全て拒否 — rjui の `binding_validator.rb` が実行可能な警告付きで検出します。派生値が必要なら ViewModel の getter として計算し、そのバインディングを介して使うのが正解: `get countLabel(): string { return this.count > 0 ? this.s('some') : this.s('none'); }` → `{ \"text\": \"@{countLabel}\" }`。`@{^parentProp}` の親参照・`@{../sibling}` の相対ナビゲーションも文法にない — cell の data ブロック経由で明示的に値を降ろすのが正解。注: validator は現状 **rjui のみ** が走る、iOS と Android は malformed binding を静かに受け入れてランタイムで失敗する。"
+      "en": "The grammar inside `@{…}` is deliberately small: simple property (`@{displayName}`), dot-path (`@{user.profile.handle}`), array index (`@{items[0]}`), a default via `??` (`@{nickname ?? 'guest'}` — string / number / bool literal), boolean negation (`@{!isLoading}` — bool properties only), action binding (`@{onSubmit}`), and cell-scoped `@{data.prop}` inside `cells/*.json`. That is the entire grammar. Ternaries, comparisons (`===`, `<`, `>`), arithmetic (`+`, `*`, `%`), logical operators (`&&`, `||`), and function or method calls are rejected — all three generators now ship the same validator rules, with precise rule ids in the messages. The semantics (paths, indexes, defaults, negation, type coercion) are declared once in a shared `binding_semantics.json` and enforced on every platform by shared conformance vectors. If you need a derived value, compute it in the ViewModel as a getter and bind the getter: `get countLabel(): string { return this.count > 0 ? this.s('some') : this.s('none'); }` → `{ \"text\": \"@{countLabel}\" }`. Path-ascent (`@{^parentProp}`) and relative navigation (`@{../sibling}`) are not part of the grammar — pass values down explicitly through cell data blocks instead.",
+      "ja": "`@{…}` 内の文法は意図的に小さく保たれています: 単純なプロパティ (`@{displayName}`)・ドットパス (`@{user.profile.handle}`)・配列インデックス (`@{items[0]}`)・`??` によるデフォルト (`@{nickname ?? 'guest'}` — 文字列 / 数値 / bool リテラル)・bool 否定 (`@{!isLoading}` — bool プロパティ限定)・アクションバインディング (`@{onSubmit}`)・cell スコープの `@{data.prop}`（`cells/*.json` 用）。文法はこれで全部です。三項演算子・比較 (`===` / `<` / `>`)・算術 (`+` / `*` / `%`)・論理演算子 (`&&` / `||`)・関数/メソッド呼び出しは全て拒否 — 現在は 3 つの generator すべてが同一の validator 規則を持ち、メッセージに rule id が付きます。意味論（パス・インデックス・デフォルト・否定・型強制）は共有の `binding_semantics.json` に一度だけ宣言され、共有 conformance ベクタが全プラットフォームで強制します。派生値が必要なら ViewModel の getter として計算し、そのバインディングを介して使うのが正解: `get countLabel(): string { return this.count > 0 ? this.s('some') : this.s('none'); }` → `{ \"text\": \"@{countLabel}\" }`。`@{^parentProp}` の親参照・`@{../sibling}` の相対ナビゲーションも文法にない — cell の data ブロック経由で明示的に値を降ろすのが正解。"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -2187,16 +2187,16 @@
       "ja": "Embed を採用するときに覚えておく契約は 4 つです:"
     },
     "section_lifecycle_bullet_params": {
-      "en": "• `params` is a flat dict (no nesting in v1). Keys are camelCase. Values may be literals or `@{varName}` bindings against the parent VM. The child VM receives them via optional `applyInitParams(_:)`; VMs that don't implement it ignore params silently.",
-      "ja": "• `params` はフラット dict（v1 はネスト不可）。キーは camelCase。値はリテラルか、親 VM に対する `@{varName}` バインディング。子 VM は optional な `applyInitParams(_:)` で受け取り、未実装の VM では params は無視されます。"
+      "en": "• `params` is a tree: keys are camelCase at every level, intermediate nodes are literal objects, and leaves are scalar literals or `@{varName}` bindings against the parent VM (bindings are leaf-only; arrays are not supported). The child VM receives them via optional `applyInitParams(_:)`; VMs that don't implement it ignore params silently. A callback-typed parent property passed as a leaf binding is the canonical escape hatch for navigating out of an isolated embed.",
+      "ja": "• `params` はツリーです: キーは全階層 camelCase、中間ノードはリテラル object、葉はスカラーリテラルか親 VM に対する `@{varName}` バインディング（バインディングは葉のみ、配列は非対応）。子 VM は optional な `applyInitParams(_:)` で受け取り、未実装の VM では無視されます。親のコールバック型プロパティを葉のバインディングとして渡すのが、isolated embed の外へ遷移するための正準 escape hatch です。"
     },
     "section_lifecycle_bullet_events": {
       "en": "• `events` maps `on[A-Z]...` names from the child to parent VM handler names. The child emits via the library-provided `emit(name, payload)` helper — no spec declaration on the child side.",
       "ja": "• `events` は子側の `on[A-Z]...` イベント名 → 親 VM ハンドラ名のマップ。子はライブラリ提供の `emit(name, payload)` ヘルパで発行し、子側の spec には宣言不要です。"
     },
     "section_lifecycle_bullet_navigation": {
-      "en": "• `navigationMode: \"delegate\"` (v1 default) shares the parent's NavController/Router. The child's `push` bubbles to the parent so a new screen takes the whole window. `pop` / `dismiss` / `navigateBack` are bounded at the embed — they cannot close the embed itself. (`isolated`, a private nav stack, is deferred to v1.5.)",
-      "ja": "• `navigationMode: \"delegate\"`（v1 のデフォルト）は親の NavController/Router を共有します。子の `push` は親に bubble するため新しい screen は全画面遷移になります。`pop` / `dismiss` / `navigateBack` は embed 境界で stop し、embed 自身を閉じることはできません。（独立 nav stack の `isolated` は v1.5 で対応予定。）"
+      "en": "• `navigationMode`: `\"delegate\"` (default) shares the parent's NavController/Router — the child's `push` bubbles to the parent so a new screen takes the whole window, while `pop` / `dismiss` / `navigateBack` are bounded at the embed. `\"isolated\"` (SwiftJsonUI 10.5.0+ / KotlinJsonUI 2.12.0+) gives the embed a private nav stack: push stays inside the embed, pop stops at the embed stack's root, and present-type transitions (sheet / dialog / dismiss) are forbidden in the embedded screen. In both modes the child can never close its own host.",
+      "ja": "• `navigationMode`: `\"delegate\"`（デフォルト）は親の NavController/Router を共有 — 子の `push` は親に bubble して全画面遷移になり、`pop` / `dismiss` / `navigateBack` は embed 境界で stop します。`\"isolated\"`（SwiftJsonUI 10.5.0+ / KotlinJsonUI 2.12.0+）は embed に私有の nav stack を与えます: push は embed 内に留まり、pop は embed stack の底で止まり、埋め込まれた screen での present 系遷移（sheet / dialog / dismiss）は禁止。どちらのモードでも子が自分の host を閉じることはできません。"
     },
     "section_lifecycle_bullet_multiple": {
       "en": "• Multiple embeds of the same screen each get their own VM, keyed by `regionId`. On Android this is enforced by a `remember(regionId)` ViewModelStoreOwner inside `EmbedContainer`; iOS and Web get it for free from their respective view systems.",
@@ -3223,8 +3223,8 @@
       "ja": "A"
     },
     "tool_list_layouts_role": {
-      "en": "Enumerate every layout JSON under docs/screens/layouts/.",
-      "ja": "Enumerate every layout JSON under docs/screens/layouts/."
+      "en": "Enumerate every layout JSON under docs/screens/layouts/ (responsive variant files fold under their base entry).",
+      "ja": "docs/screens/layouts/ 配下の全 layout JSON を列挙（responsive variant ファイルは base の項に従属表示）。"
     },
     "tool_list_component_specs_name": {
       "en": "list_component_specs",
@@ -3355,8 +3355,8 @@
       "ja": "B"
     },
     "tool_get_binding_rules_role": {
-      "en": "Return the platform-specific binding syntax + restrictions.",
-      "ja": "Return the platform-specific binding syntax + restrictions."
+      "en": "Return the canonical binding semantics (shared binding_semantics.json) + platform restrictions.",
+      "ja": "正準 binding 意味論（共有 binding_semantics.json）とプラットフォーム別制約を返す。"
     },
     "tool_doc_init_spec_name": {
       "en": "doc_init_spec",
@@ -3415,8 +3415,8 @@
       "ja": "C"
     },
     "tool_doc_generate_html_role": {
-      "en": "Bulk-generate HTML docs across specs. (wraps jsonui-doc CLI — see /tools/doc)",
-      "ja": "Bulk-generate HTML docs across specs.（jsonui-doc CLI のラッパー — /tools/doc を参照）"
+      "en": "Bulk-generate HTML docs across specs — including multi-app whole sites (apps) and extra markdown doc dirs. (wraps jsonui-doc CLI — see /tools/doc)",
+      "ja": "spec 群から HTML ドキュメントを一括生成 — マルチアプリ全体サイト（apps）や追加 markdown ディレクトリにも対応。（jsonui-doc CLI のラッパー — /tools/doc を参照）"
     },
     "tool_jui_generate_project_name": {
       "en": "jui_generate_project",
@@ -5867,20 +5867,20 @@
       "ja": "7. Embed 内のナビゲーション"
     },
     "section_embed_body": {
-      "en": "When a screen is hosted inside an `Embed` with `navigationMode: \"delegate\"` (the v1 default), the child does not own a private navigation stack — it shares the parent's. That shapes how `push`, `pop`, and gesture/back behave, with one explicit safety rule designed to keep a child screen from accidentally dismissing its own host.",
-      "ja": "`Embed` で `navigationMode: \"delegate\"`（v1 のデフォルト）の screen は独自の navigation stack を持たず、親のものを共有します。これにより `push` / `pop` / 戻るジェスチャの挙動が変わり、子 screen が host 自身を誤って閉じないための安全規約が 1 つ明示されています。"
+      "en": "A screen hosted inside an `Embed` navigates in one of two modes. With `navigationMode: \"delegate\"` (the default) the child does not own a private navigation stack — it shares the parent's. With `\"isolated\"` (SwiftJsonUI 10.5.0+ / KotlinJsonUI 2.12.0+) the embed owns a private nested stack. The mode shapes how `push`, `pop`, and gesture/back behave, with one invariant that holds in both: a child screen can never dismiss its own host.",
+      "ja": "`Embed` に載った screen のナビゲーションは 2 モードのどちらかです。`navigationMode: \"delegate\"`（デフォルト）では子は独自の navigation stack を持たず、親のものを共有します。`\"isolated\"`（SwiftJsonUI 10.5.0+ / KotlinJsonUI 2.12.0+）では embed が独立した入れ子 stack を所有します。モードによって `push` / `pop` / 戻るジェスチャの挙動が変わりますが、両モード共通の不変条件が 1 つ: 子 screen は自分の host を閉じることができません。"
     },
     "section_embed_bullet_push": {
-      "en": "• `push`: the child's `navigate(url)` bubbles to the parent's NavController/Router. The new screen takes the entire window — same behaviour as if the parent had pushed it.",
-      "ja": "• `push`: 子の `navigate(url)` は親の NavController/Router に bubble する。新 screen はウィンドウ全体に遷移し、親が直接 push した場合と同じ挙動。"
+      "en": "• `push` — delegate mode: the child's `navigate(url)` bubbles to the parent's NavController/Router and the new screen takes the entire window, same as if the parent had pushed it. Isolated mode: push stays inside the embed — the new screen appears within the embed's frame.",
+      "ja": "• `push` — delegate モード: 子の `navigate(url)` は親の NavController/Router に bubble し、新 screen はウィンドウ全体に遷移（親が直接 push した場合と同じ）。isolated モード: push は embed 内に留まり、新 screen は embed の枠内に表示される。"
     },
     "section_embed_bullet_pop": {
-      "en": "• `pop` / `dismiss` / `navigateBack`: bounded at the embed. The child can call them, but the framework absorbs the call so the embed itself is not torn down. To dismiss the embedded screen, the parent emits the relevant `events` handler or unmounts the `Embed` node.",
-      "ja": "• `pop` / `dismiss` / `navigateBack`: embed 境界で stop。子が呼んでもフレームワークが吸収し、embed 自身は閉じない。埋め込まれた screen を閉じたいときは、親が対応する `events` ハンドラを発火するか `Embed` ノードを unmount する。"
+      "en": "• `pop` / `dismiss` / `navigateBack` — delegate mode: bounded at the embed; the framework absorbs the call so the embed itself is not torn down. Isolated mode: pop walks the embed's private stack and stops at its root — same invariant. Either way, dismissing the embedded screen is the parent's move: emit the relevant `events` handler or unmount the `Embed` node.",
+      "ja": "• `pop` / `dismiss` / `navigateBack` — delegate モード: embed 境界で stop。子が呼んでもフレームワークが吸収し、embed 自身は閉じない。isolated モード: pop は embed の私有 stack を遡り、その底で止まる — 不変条件は同じ。いずれにせよ埋め込まれた screen を閉じるのは親の仕事: 対応する `events` ハンドラを発火するか `Embed` ノードを unmount する。"
     },
     "section_embed_bullet_isolated": {
-      "en": "• `navigationMode: \"isolated\"` (private nav stack inside the embed) is deferred to v1.5 — the navigation-* agents will rebind nested NavigationStacks / NavHosts / nested routers when it lands.",
-      "ja": "• `navigationMode: \"isolated\"`（embed 内の独立 nav stack）は v1.5 で対応予定。navigation-* エージェントが nested NavigationStack / NavHost / 入れ子ルーターを再配線する形になる。"
+      "en": "• `navigationMode: \"isolated\"` — the embed owns a private nav stack (nested NavigationStack / NavHost / memory router). Present-type transitions (sheet / dialog / dismiss) are forbidden inside the embedded screen's spec — validation rejects them. OS gestures and browser back are platform-delegated: iOS edge swipe pops the outermost stack, Android back pops the deepest non-empty embed stack first, browser back walks only the host history — don't rely on gestures for in-embed pops. Escape hatch for navigating out of the embed (logout, session expiry): pass a parent-VM callback down via `params`; the parent always executes the transition.",
+      "ja": "• `navigationMode: \"isolated\"` — embed が私有の nav stack（nested NavigationStack / NavHost / メモリルーター）を所有する。埋め込まれた screen の spec で present 系遷移（sheet / dialog / dismiss）は禁止 — validation がエラーにする。OS ジェスチャとブラウザ back はプラットフォーム委譲: iOS の edge swipe は最外殻 stack を pop、Android の back は最深の非空 embed stack を優先、ブラウザ back はホスト履歴のみ — embed 内 pop をジェスチャに依存しないこと。embed の外へ出る遷移（ログアウト・セッション失効など）の escape hatch は、親 VM のコールバックを `params` で子へ渡す形 — 遷移の実行権は常に親にある。"
     },
     "toc_row_contract": {
       "en": "1. The contract",
@@ -6105,8 +6105,8 @@
       "ja": "• 'visible' — 既定。要素は通常どおり描画され、スペースも占める。"
     },
     "section_binding_bullet_invisible": {
-      "en": "• 'invisible' — the element is not painted but still occupies its space (useful when you want a placeholder to preserve alignment). Each platform maps this to its own mechanism — visibility: hidden on Web, .hidden() on SwiftUI, View.INVISIBLE on Android — so the layout consequence is the same everywhere.",
-      "ja": "• 'invisible' — 描画されないがスペースは残る (プレースホルダとして整列を保ちたいときに有用)。各プラットフォームが相応の機構に変換: Web は visibility: hidden、SwiftUI は .hidden()、Android は View.INVISIBLE。レイアウトへの影響はどのプラットフォームでも同じ。"
+      "en": "• 'invisible' — the element is not painted but still occupies its space, and it disappears from the accessibility tree (useful when you want a placeholder to preserve alignment). Each platform maps this to its own mechanism — visibility: hidden on Web, opacity 0 + accessibility-hidden on SwiftUI, alpha 0 with cleared semantics on Compose — so the consequence is the same everywhere. `hidden: true` is the boolean shorthand for exactly this state (it does NOT collapse the space).",
+      "ja": "• 'invisible' — 描画されないがスペースは残り、アクセシビリティツリーからも消える (プレースホルダとして整列を保ちたいときに有用)。各プラットフォームが相応の機構に変換: Web は visibility: hidden、SwiftUI は opacity 0 + accessibility 非公開、Compose は alpha 0 + semantics クリア。帰結はどのプラットフォームでも同じ。`hidden: true` はまさにこの状態の bool 短縮形です（スペースは潰れません）。"
     },
     "section_binding_bullet_gone": {
       "en": "• 'gone' — the element leaves the layout tree entirely and its space collapses. Each platform realises this differently — a conditional render on Web, an `if` wrap inside the SwiftUI body, View.GONE in Android XML, or an `if` around the Composable — but the intent is uniform: the neighbours close the gap.",
@@ -6129,8 +6129,8 @@
       "ja": "• topMargin は orientation 非依存: どのプラットフォームでも「要素の上方向のスペース」を意味し、親が horizontal か vertical かには左右されません。horizontal View では「要素の上方向にスペースを足す」ことになり、「左の兄弟との間隔」には効かない。行内の兄弟間隔には leftMargin (または親の itemSpacing) を使う。"
     },
     "section_pitfalls_bullet_visibility": {
-      "en": "• 'gone' drops the element from the layout tree on every platform, 'invisible' keeps it: a sibling that depends on a conditional element's space preservation must read 'invisible', not 'gone'. Choosing 'gone' when you wanted 'invisible' quietly collapses alignment; choosing 'invisible' when you wanted 'gone' leaves an empty gap. The semantics are uniform across Web (conditional render), iOS (if-wrapped body), and Android (View.GONE / View.INVISIBLE).",
-      "ja": "• 'gone' は全プラットフォームで要素をレイアウトツリーから落とす、'invisible' は残す: 条件付き要素のスペースに依存する兄弟があるなら 'invisible' を選ぶ。'gone' を誤って選ぶと整列が静かに崩れ、'invisible' を誤って選ぶと空隙が残る。セマンティクスは Web (条件付き render) / iOS (if ラップされた body) / Android (View.GONE / View.INVISIBLE) で共通。"
+      "en": "• 'gone' drops the element from the layout tree on every platform, 'invisible' keeps it: a sibling that depends on a conditional element's space preservation must read 'invisible', not 'gone'. Choosing 'gone' when you wanted 'invisible' quietly collapses alignment; choosing 'invisible' when you wanted 'gone' leaves an empty gap. The same trap exists with the `hidden` boolean: it is the shorthand for 'invisible', so it never collapses the space — use visibility 'gone' for that. The semantics are uniform across Web (conditional render vs visibility:hidden), iOS (if-wrapped body vs opacity 0), and Android (dropped Composable vs alpha 0).",
+      "ja": "• 'gone' は全プラットフォームで要素をレイアウトツリーから落とす、'invisible' は残す: 条件付き要素のスペースに依存する兄弟があるなら 'invisible' を選ぶ。'gone' を誤って選ぶと整列が静かに崩れ、'invisible' を誤って選ぶと空隙が残る。`hidden` bool にも同じ罠があります: これは 'invisible' の短縮形なのでスペースは決して潰れません — 潰したいなら visibility 'gone' を使う。セマンティクスは Web (条件付き render vs visibility:hidden) / iOS (if ラップされた body vs opacity 0) / Android (Composable の脱落 vs alpha 0) で共通。"
     },
     "section_pitfalls_bullet_overlay": {
       "en": "• _overlay is internal: you may see it surface in emitted code (the @generated React tree, for example) but you never write it by hand. When you need absolute or z-ordered positioning, use zIndex as a number — each platform's generator maps it to its native z-order mechanism (CSS z-index on Web, .zIndex() modifier on SwiftUI, elevation / zIndex on Android).",
@@ -6679,6 +6679,10 @@
     "section_cli_bullet_artifacts": {
       "en": "• Artifacts: `jsonui-test artifacts pull` collects a run's evidence in one command — iOS xcresult attachments, Android on-device files, and web Playwright output (videos / traces plus the driver's screenshots) — into `tests/artifacts/<platform>/<stamp>/<test>/<case>/` with a `latest` symlink (`--platform ios|android|web`, default all; `--json` prints absolute paths; `--clean` removes the sources after pulling). `artifacts status` shows the resolved config + what has been collected; `mock serve --artifacts` auto-pulls after each run-target. Configure via `test.artifacts` in jui.config.json: dir / ios.xcresult / android.appId / android.adb (set `adb` when it is not on PATH; otherwise auto-discovered via PATH → ANDROID_HOME → the OS-default SDK location) / web.testResults + web.screenshotDir (default `test-results` / `screenshots`). Per-platform recording setup is covered in the next section.",
       "ja": "• Artifacts: `jsonui-test artifacts pull` 1 コマンドで実行証跡を回収 — iOS の xcresult 添付、Android のデバイス上ファイル、web の Playwright 出力 (録画 / trace + driver のスクリーンショット) を `tests/artifacts/<platform>/<stamp>/<test>/<case>/` に整理し、`latest` symlink を更新します (`--platform ios|android|web`、既定は全部。`--json` で絶対パス一覧、`--clean` で回収後にソースを削除)。`artifacts status` は解決済み config と収集済み一覧を表示、`mock serve --artifacts` は run-target 完了ごとに自動 pull。設定は jui.config.json の `test.artifacts`: dir / ios.xcresult / android.appId / android.adb (adb が PATH に無い環境では `adb` を明示。無指定なら PATH → ANDROID_HOME → OS 既定 SDK 位置の順で自動発見) / web.testResults + web.screenshotDir (既定は `test-results` / `screenshots`)。プラットフォーム別の録画設定は次のセクション参照。"
+    },
+    "section_cli_bullet_pregrant": {
+      "en": "• Media & pregrant: media files for `addMedia` live in `test.mediaDir` (default `tests/media`; reference them by basename) — the install step ships them to the iOS target's `media/` folder. `jsonui-test pregrant` walks your tests and pre-grants the iOS simulator photo permission (`photos-add`) for every reachable `addMedia` step, so no permission dialog interrupts the run.",
+      "ja": "• Media と pregrant: `addMedia` 用のメディアは `test.mediaDir`（既定 `tests/media`、参照は basename）に置きます — install ステップが iOS ターゲットの `media/` へ同送します。`jsonui-test pregrant` は tests を走査し、到達可能な `addMedia` ステップに対して iOS シミュレータの写真権限（`photos-add`）を事前付与するので、実行中に権限ダイアログが割り込みません。"
     },
     "section_recording_heading": {
       "en": "7. Recording & screenshots",
@@ -7951,8 +7955,8 @@
       "ja": "• file (string, required) — Component spec ファイルまたはディレクトリ。\n• output (string, optional) — 出力先。\n• format (enum, optional) — 出力フォーマット: html | markdown（デフォルト: html）。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
     },
     "tool_doc_generate_html_params": {
-      "en": "• input_dir (string, required) — Directory containing .test.json files.\n• output_dir (string, optional) — Output directory for HTML files.\n• title (string, optional) — Documentation title shown in the generated index.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
-      "ja": "• input_dir (string, required) — .test.json ファイルのあるディレクトリ。\n• output_dir (string, optional) — HTML 出力先ディレクトリ。\n• title (string, optional) — 生成 index に表示するタイトル。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+      "en": "• input_dir (string, required) — Directory containing .test.json files.\n• output_dir (string, optional) — Output directory for HTML files.\n• title (string, optional) — Documentation title shown in the generated index.\n• apps (string[], optional) — App sections as NAME:DIR entries (repeatable --app); for multi-app whole-site generation.\n• docs_dirs (string[], optional) — Additional markdown doc directories (repeatable -d/--docs).\n• figma_dir (string, optional) — Figma assets directory (-fig).\n• layouts_dir (string, optional) — Layouts directory override (--layouts-dir).\n• with_checks (boolean, optional) — Run doc contract checks during generation (--with-checks).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• input_dir (string, required) — .test.json ファイルのあるディレクトリ。\n• output_dir (string, optional) — HTML 出力先ディレクトリ。\n• title (string, optional) — 生成 index に表示するタイトル。\n• apps (string[], optional) — NAME:DIR 形式のアプリセクション（繰り返し --app）。マルチアプリ全体サイト生成用。\n• docs_dirs (string[], optional) — 追加の markdown ドキュメントディレクトリ（繰り返し -d/--docs）。\n• figma_dir (string, optional) — Figma アセットのディレクトリ (-fig)。\n• layouts_dir (string, optional) — Layouts ディレクトリの上書き (--layouts-dir)。\n• with_checks (boolean, optional) — 生成時に doc contract check も実行 (--with-checks)。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
     },
     "tool_jui_generate_project_params": {
       "en": "• force (boolean, optional) — Force overwrite of declaration files.\n• skip_layout (boolean, optional) — Skip Layout JSON generation.\n• dry_run (boolean, optional) — Show what would be generated without writing.\n• platform (enum, optional) — Generate for a single platform only.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
@@ -8591,8 +8595,8 @@
       "ja": "画面の一領域が独自の ViewModel を必要とするとき — タブレットの master/detail で detail 側が実質別画面、もしくはダッシュボードのパネルが独自のデータフローを持つ場合 — `structure.embeds[]` に各領域を宣言し、親 Layout に `{ \"type\": \"Embed\", ... }` を配置する。**埋め込まれる側の screen は無改修**で、親 spec のみが関係を宣言する。クロス画面のチャネルは `params`（親 → 子）と `events`（子 → 親）のみ。子 VM が `applyInitParams(_:)` を実装していれば params を受け取れる、しなければ無視。"
     },
     "section_pattern_embed_note": {
-      "en": "`navigationMode` in v1 supports `\"delegate\"` only: the child shares the parent's NavController/Router; `push` bubbles to the parent, but `pop` / `dismiss` / `navigateBack` are bounded at the embed to prevent accidental dismissal. See [/concepts/screen-composition](/concepts/screen-composition) for the trade-offs against `include` and `TabView`, and [/reference/components/embed](/reference/components/embed) for the full attribute reference.",
-      "ja": "`navigationMode` の v1 は `\"delegate\"` のみ。子は親の NavController/Router を共有し、`push` は親に bubble するが、`pop` / `dismiss` / `navigateBack` は embed 境界で stop（誤って embed を閉じる事故を防ぐ）。`include` / `TabView` との使い分けは [/concepts/screen-composition](/concepts/screen-composition)、属性の詳細は [/reference/components/embed](/reference/components/embed) を参照。"
+      "en": "`navigationMode` picks how the child navigates: `\"delegate\"` (default) shares the parent's NavController/Router — `push` bubbles to the parent while `pop` / `dismiss` / `navigateBack` are bounded at the embed; `\"isolated\"` gives the embed a private nested stack — push stays inside, pop stops at the embed's root. See [/concepts/screen-composition](/concepts/screen-composition) for the trade-offs against `include` and `TabView`, and [/reference/components/embed](/reference/components/embed) for the full attribute reference.",
+      "ja": "`navigationMode` は子のナビゲーション方式を選びます: `\"delegate\"`（デフォルト）は親の NavController/Router を共有 — `push` は親に bubble し、`pop` / `dismiss` / `navigateBack` は embed 境界で stop。`\"isolated\"` は embed に私有の入れ子 stack を与えます — push は内側に留まり、pop は embed の底で止まる。`include` / `TabView` との使い分けは [/concepts/screen-composition](/concepts/screen-composition)、属性の詳細は [/reference/components/embed](/reference/components/embed) を参照。"
     },
     "section_picking_heading": {
       "en": "Picking the right pattern",

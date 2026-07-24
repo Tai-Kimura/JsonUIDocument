@@ -241,6 +241,65 @@ RSpec.describe RjuiTools::React::Converters::BaseConverter do
     end
   end
 
+  # Canonical textStringification (shared/core/binding_semantics.json):
+  # TEXT sinks emit template literals so booleans render "true"/"false"
+  # and unresolved paths render "" (raw JSX {data.flag} renders booleans
+  # as NOTHING). Value contexts keep using #convert_binding.
+  describe '#convert_text_binding' do
+    let(:converter) { create_converter({ 'type' => 'View' }) }
+
+    it 'emits a whole-value binding as a stringifying template literal' do
+      expect(converter.send(:convert_text_binding, '@{x}')).to eq('{`${data.x ?? ""}`}')
+    end
+
+    it 'keeps optional chaining for dotted and indexed paths' do
+      expect(converter.send(:convert_text_binding, '@{profile.name}'))
+        .to eq('{`${data.profile?.name ?? ""}`}')
+      expect(converter.send(:convert_text_binding, '@{items[0].title}'))
+        .to eq('{`${data.items?.[0]?.title ?? ""}`}')
+    end
+
+    it 'composes an authored ?? default instead of the empty-string fallback' do
+      expect(converter.send(:convert_text_binding, '@{x ?? "Guest"}'))
+        .to eq('{`${data.x ?? "Guest"}`}')
+      expect(converter.send(:convert_text_binding, '@{count ?? 42}'))
+        .to eq('{`${data.count ?? 42}`}')
+    end
+
+    it 'treats a null default as unresolved (empty string)' do
+      expect(converter.send(:convert_text_binding, '@{x ?? null}')).to eq('{`${data.x ?? ""}`}')
+    end
+
+    it 'canonicalizes mixed text as one template literal run' do
+      expect(converter.send(:convert_text_binding, 'Hello @{name}!'))
+        .to eq('{`Hello ${data.name ?? ""}!`}')
+      expect(converter.send(:convert_text_binding, 'A @{a} and B @{b.c}'))
+        .to eq('{`A ${data.a ?? ""} and B ${data.b?.c ?? ""}`}')
+    end
+
+    it 'escapes backticks and ${ in literal segments' do
+      expect(converter.send(:convert_text_binding, 'a `t` ${n} @{x}'))
+        .to eq('{`a \`t\` \${n} ${data.x ?? ""}`}')
+    end
+
+    it 'renders negation in text as unresolved (binding-negation-context)' do
+      expect(converter.send(:convert_text_binding, '@{!flag}')).to eq('{``}')
+    end
+
+    it 'leaves plain text on the existing literal path' do
+      expect(converter.send(:convert_text_binding, 'plain text')).to eq('plain text')
+      expect(converter.send(:convert_text_binding, "line1\nline2")).to eq('<>line1<br />line2</>')
+    end
+
+    it 'routes strings.json keys to StringManager before binding logic' do
+      allow(converter).to receive(:convert_string_key)
+        .with('home_title')
+        .and_return('{StringManager.currentLanguage.homeTitle}')
+      expect(converter.send(:convert_text_binding, 'home_title'))
+        .to eq('{StringManager.currentLanguage.homeTitle}')
+    end
+  end
+
   describe '#convert_binding' do
     context 'with simple property binding' do
       it 'converts @{title} to {data.title}' do
@@ -267,10 +326,65 @@ RSpec.describe RjuiTools::React::Converters::BaseConverter do
     end
 
     context 'with nested property binding' do
-      it 'converts @{item.name} to {data.item.name}' do
+      # Multi-segment user data paths get optional chaining so a missing
+      # intermediate node resolves to undefined instead of throwing
+      # (binding SSoT: intermediateMiss must never crash).
+      it 'converts @{item.name} to {data.item?.name}' do
         converter = create_converter({ 'type' => 'View' })
         result = converter.send(:convert_binding, '@{item.name}')
-        expect(result).to eq('{data.item.name}')
+        expect(result).to eq('{data.item?.name}')
+      end
+
+      it 'chains every segment of a deep path' do
+        converter = create_converter({ 'type' => 'View' })
+        result = converter.send(:convert_binding, '@{profile.meta.age}')
+        expect(result).to eq('{data.profile?.meta?.age}')
+      end
+
+      it 'chains bracket-indexed paths (@{items[0].title})' do
+        converter = create_converter({ 'type' => 'View' })
+        result = converter.send(:convert_binding, '@{items[0].title}')
+        expect(result).to eq('{data.items?.[0]?.title}')
+      end
+
+      it 'keeps a single flat segment unchained' do
+        converter = create_converter({ 'type' => 'View' })
+        result = converter.send(:convert_binding, '@{title}')
+        expect(result).to eq('{data.title}')
+      end
+    end
+
+    context 'with ?? default (canonical)' do
+      it 'emits the default after the chained path' do
+        converter = create_converter({ 'type' => 'View' })
+        result = converter.send(:convert_binding, "@{a.b ?? 'd'}")
+        expect(result).to eq("{data.a?.b ?? 'd'}")
+      end
+
+      it 'supports double-quoted and non-string literals' do
+        converter = create_converter({ 'type' => 'View' })
+        expect(converter.send(:convert_binding, '@{missing ?? "Guest"}')).to eq('{data.missing ?? "Guest"}')
+        expect(converter.send(:convert_binding, '@{count ?? 42}')).to eq('{data.count ?? 42}')
+        expect(converter.send(:convert_binding, '@{flag ?? true}')).to eq('{data.flag ?? true}')
+      end
+
+      it 'drops a null default (null means unresolved)' do
+        converter = create_converter({ 'type' => 'View' })
+        expect(converter.send(:convert_binding, '@{missing ?? null}')).to eq('{data.missing}')
+      end
+    end
+
+    context 'with bool negation (canonical on bool value contexts)' do
+      it 'emits {!data.flag} instead of {data.!flag}' do
+        converter = create_converter({ 'type' => 'View' })
+        result = converter.send(:convert_binding, '@{!flag}')
+        expect(result).to eq('{!data.flag}')
+      end
+
+      it 'chains a negated dotted path' do
+        converter = create_converter({ 'type' => 'View' })
+        result = converter.send(:convert_binding, '@{!settings.enabled}')
+        expect(result).to eq('{!data.settings?.enabled}')
       end
     end
 

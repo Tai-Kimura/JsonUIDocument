@@ -289,9 +289,11 @@ module RjuiTools
             end
           end
 
-          # Visibility (hidden attribute - static). A binding value is
-          # handled as a conditional class in wrap_with_visibility — mapping
-          # it here would bake an unconditional `hidden` into the className.
+          # Visibility (hidden attribute - static). hidden keeps the layout
+          # space (Tailwind `invisible`, i.e. visibility:"invisible"
+          # shorthand). A binding value is handled as a conditional class in
+          # wrap_with_visibility — mapping it here would bake an
+          # unconditional `invisible` into the className.
           if attributes['hidden'] && !has_binding?(attributes['hidden'])
             classes << TailwindMapper.map_visibility(attributes['hidden'])
           end
@@ -656,6 +658,81 @@ module RjuiTools
           convert_text_with_newlines(value)
         end
 
+        # TEXT-context binding conversion (Label text and equivalents
+        # rendered as JSX children). Canonical textStringification
+        # (shared/core/binding_semantics.json) needs bool => "true"/"false"
+        # and unresolved => "" — but raw JSX `{data.flag}` renders booleans
+        # as NOTHING, so text sinks emit a template literal instead: JS
+        # interpolation is exactly canonical (`${true}` => "true",
+        # `${5.0}` => "5", `${undefined ?? ""}` => "").
+        #
+        #   "@{x}"            => {`${data.x ?? ""}`}
+        #   "@{x ?? 'Guest'}" => {`${data.x ?? 'Guest'}`}
+        #   "Hello @{name}!"  => {`Hello ${data.name ?? ""}!`}
+        #
+        # strings.json keys still route to StringManager BEFORE binding
+        # logic, exactly like convert_binding. Non-text value contexts
+        # (visibility conditions, controlled inputs, handler refs, style
+        # bindings) must keep using convert_binding / raw references.
+        def convert_text_binding(value)
+          return value unless value.is_a?(String)
+
+          if (resolved = convert_string_key(value))
+            return resolved
+          end
+
+          return convert_text_with_newlines(value) unless value.match?(/@\{[^}]+\}/)
+
+          body = value.split(/(@\{[^}]+\})/).map do |part|
+            if (inner = part[/\A@\{([^}]+)\}\z/, 1])
+              expr = text_binding_expression(inner)
+              expr.nil? ? '' : "${#{expr}}"
+            else
+              escape_template_literal_segment(part)
+            end
+          end.join
+
+          "{`#{body}`}"
+        end
+
+        # JS expression for one '@{...}' occurrence in a text run.
+        # Canonical paths get the text-context unresolved default appended
+        # (`?? ""`) unless an authored '?? literal' already survived emit
+        # (a null default is dropped by add_viewmodel_data_prefix, so the
+        # canonical unresolved->emptyString still applies). '!' negation is
+        # a validator error in text (binding-negation-context): the token
+        # resolves as an ordinary unresolvable key => empty string (nil
+        # here). Non-canonical legacy expressions pass through unchanged —
+        # appending '?? ""' to arbitrary JS (e.g. `a || b`) can be a
+        # SyntaxError.
+        def text_binding_expression(inner)
+          expr = inner.to_s.strip
+          return nil if expr.start_with?('!')
+
+          path, default = expr.split(/\s*\?\?\s*/, 2)
+          bare = path.to_s.strip
+                     .sub(/\AviewModel\.data\./, '')
+                     .sub(/\AviewModel\./, '')
+                     .sub(/\Adata\./, '')
+          canonical = bare.match?(BINDING_PATH_RE) &&
+                      (default.nil? || default.strip.match?(BINDING_DEFAULT_LITERAL_RE))
+
+          js = add_viewmodel_data_prefix(expr)
+          return js unless canonical
+
+          js.include?(' ?? ') ? js : "#{js} ?? \"\""
+        end
+
+        # Literal text inside the generated template literal: backticks and
+        # '${' must be escaped so authored braces/backticks render verbatim;
+        # raw newlines become '\n' so the emitted JSX stays single-line.
+        # Block-form gsub is deliberate: in a plain replacement STRING the
+        # sequence backslash-backtick is the PREMATCH special sequence and
+        # would corrupt the output.
+        def escape_template_literal_segment(text)
+          text.gsub('`') { '\\`' }.gsub('${') { '\\${' }.gsub("\n") { '\\n' }
+        end
+
         # Convert text with newline characters to JSX with <br /> tags
         def convert_text_with_newlines(value)
           return value unless value.is_a?(String)
@@ -693,8 +770,9 @@ module RjuiTools
 
           # If the text contains literal { or } that aren't part of JSX expressions,
           # wrap in template literal
-          # Check if text starts with { and is likely JSON (not a binding)
-          if value.start_with?('{') && !value.match?(/^\{[a-zA-Z]/)
+          # Check if text starts with { and is likely JSON (not a binding —
+          # bindings start with an identifier or a '!' negation prefix)
+          if value.start_with?('{') && !value.match?(/^\{!?[a-zA-Z]/)
             # Likely JSON code block, wrap in template literal
             escaped = value.gsub('`', '\\`').gsub('${', '\\${')
             return "{`#{escaped}`}"
@@ -874,6 +952,16 @@ module RjuiTools
           extract_binding_value(value)
         end
 
+        # Resolve a handler attribute (binding `@{name}` or bare selector `name`)
+        # to a `data.`-prefixed property reference
+        def resolve_handler_property(handler)
+          if is_binding_format?(handler)
+            extract_binding_property(handler)
+          else
+            add_viewmodel_data_prefix(handler)
+          end
+        end
+
         # Determine absolute position classes based on align attributes for overlay children
         def overlay_position_classes
           has_align = attributes['centerInParent'] || attributes['centerVertical'] || attributes['centerHorizontal'] ||
@@ -910,35 +998,85 @@ module RjuiTools
           classes.join(' ')
         end
 
-        # Add data. prefix to a property name for binding expressions
-        # All properties are converted to data.xxx format
+        # Canonical binding grammar (shared/core/binding_semantics.json):
+        # inner = [!]path [?? default], path = identifier segments joined by
+        # '.' with optional bracket index (items[0].title).
+        BINDING_PATH_RE = /\A[a-zA-Z_$][\w$]*(?:\.[a-zA-Z_$][\w$]*|\[\d+\])*\z/
+        # Binding shape accepted by the visibility/hidden conditional paths:
+        # optional '!' negation + canonical path (incl. bracket index).
+        SIMPLE_BINDING_EXPR_RE = /\A!?[a-zA-Z_$][\w$]*(?:\.[a-zA-Z_$][\w$]*|\[\d+\])*\z/
+        # Canonical '??' default literals: "x" / 'x' / true / false / number /
+        # null (null = unresolved, so the default is dropped at emit time).
+        BINDING_DEFAULT_LITERAL_RE = /\A(?:"[^"]*"|'[^']*'|true|false|null|-?\d+(?:\.\d+)?)\z/
+
+        # Add data. prefix to a property name for binding expressions.
+        # All properties are converted to data.xxx format.
+        #
+        # Canonical expressions ([!]path [?? literal]) additionally get:
+        # - optional chaining on every segment after the root
+        #   (user.name -> data.user?.name, items[0].title ->
+        #   data.items?.[0]?.title) so a missing intermediate node resolves
+        #   to undefined instead of throwing at runtime; a single flat
+        #   segment stays data.x — two-way/controlled-value emit sites are
+        #   flat-only (binding-two-way-complex) and keep their exact shape
+        # - '!' negation emitted as a JS prefix (!data.flag)
+        # - '?? default' emitted after the chained path; `?.` yields
+        #   undefined for unresolved paths, so JS nullish semantics give the
+        #   canonical unresolved->default behavior naturally. A null default
+        #   means "unresolved" and is dropped.
+        # Non-canonical expressions keep the legacy passthrough (prefix
+        # only) so the validator's business-logic warnings stay the signal.
         def add_viewmodel_data_prefix(prop)
-          if prop.start_with?('data.')
-            # Already has data. prefix, use as-is
-            prop
-          elsif prop.start_with?('viewModel.data.')
-            # viewModel.data.xxx -> data.xxx
-            prop.sub('viewModel.data.', 'data.')
-          elsif prop.start_with?('viewModel.')
-            # viewModel.xxx -> data.xxx
-            "data.#{prop.sub('viewModel.', '')}"
-          else
-            # Add data. prefix for data properties
-            "data.#{prop}"
+          expr = prop.to_s.strip
+          # Legacy viewModel spellings normalize to data.
+          expr = expr.sub(/\AviewModel\.data\./, 'data.')
+          expr = expr.sub(/\AviewModel\./, 'data.')
+
+          negated = expr.start_with?('!')
+          body = negated ? expr[1..].to_s.strip : expr
+
+          path, default = body.split(/\s*\?\?\s*/, 2)
+          path = path.to_s.strip
+          bare = path.sub(/\Adata\./, '')
+
+          canonical = bare.match?(BINDING_PATH_RE) &&
+                      (default.nil? || default.strip.match?(BINDING_DEFAULT_LITERAL_RE))
+          unless canonical
+            return expr.start_with?('data.') ? expr : "data.#{expr}"
           end
+
+          js = "data.#{optional_chain_path(bare)}"
+          js = "!#{js}" if negated
+          if default && default.strip != 'null'
+            js = "#{js} ?? #{default.strip}"
+          end
+          js
+        end
+
+        # user.name -> user?.name / items[0].title -> items?.[0]?.title.
+        # A single flat segment is returned untouched (data.x stays data.x;
+        # the data root itself always exists and never needs chaining).
+        def optional_chain_path(path)
+          segments = path.scan(/[a-zA-Z_$][\w$]*|\[\d+\]/)
+          return path if segments.length <= 1
+
+          segments[0] + segments[1..].map { |seg| "?.#{seg}" }.join
         end
 
         # Build visibility binding for conditional rendering
-        # Only supports simple property binding like "@{isVisible}" - no ternary operators
-        # Returns: { type: :gone/:invisible, condition: "..." } or nil
+        # Supports simple property bindings: flat, dotted, bracket-indexed,
+        # optionally negated ("@{isVisible}", "@{a.b}", "@{items[0].v}",
+        # "@{!x}") - no ternary operators / business logic. Negation on
+        # visibility is a validator error (binding-negation-context —
+        # visibility is a string enum, not a bool attribute), but the emit
+        # path still handles it instead of silently dropping the binding.
         def build_visibility_info
           visibility = attributes['visibility']
           return nil unless visibility && has_binding?(visibility)
 
-          binding_expr = visibility.gsub(/@\{|\}/, '')
+          binding_expr = visibility.gsub(/@\{|\}/, '').strip
 
-          # Only support simple property binding (no ternary operators / business logic)
-          if binding_expr =~ /^[\w.]+$/
+          if binding_expr.match?(SIMPLE_BINDING_EXPR_RE)
             { condition: add_viewmodel_data_prefix(binding_expr) }
           else
             nil
@@ -966,18 +1104,22 @@ module RjuiTools
         end
 
         # `hidden` is ["boolean", "binding"] — a bound value toggles the
-        # Tailwind `hidden` class at runtime instead of baking it in
+        # Tailwind `invisible` class at runtime instead of baking it in
         # statically (static true/false is handled in build_class_name).
+        # hidden = visibility:"invisible" shorthand: the component keeps
+        # its layout space (visibility:hidden), it is NOT display:none.
+        # `hidden` is a bool attribute, so canonical negation ("@{!flag}")
+        # is legal here and emits `!data.flag` as the toggle condition.
         def apply_hidden_binding(jsx)
           hidden = attributes['hidden']
           return jsx unless has_binding?(hidden)
 
-          binding_expr = hidden[/@\{([^}]+)\}/, 1]
+          binding_expr = hidden[/@\{([^}]+)\}/, 1].strip
           # Only simple property bindings (no ternary / business logic)
-          return jsx unless binding_expr =~ /^[\w.]+$/
+          return jsx unless binding_expr.match?(SIMPLE_BINDING_EXPR_RE)
 
           cond = add_viewmodel_data_prefix(binding_expr)
-          inject_class_expression(jsx, "${#{cond} ? \"hidden\" : \"\"}")
+          inject_class_expression(jsx, "${#{cond} ? \"invisible\" : \"\"}")
         end
 
         # Inject invisible class into JSX when visibility === "invisible"

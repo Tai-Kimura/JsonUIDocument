@@ -173,6 +173,108 @@ RSpec.describe RjuiTools::React::ResponsiveHelper do
         expect(result[:classes]).not_to include('hidden')
       end
 
+      it 'emits max-md:flex-none for compact weight 0 (ratio layout opt-out)' do
+        component = {
+          'type' => 'View',
+          'weight' => 1.5,
+          'responsive' => {
+            'compact' => { 'weight' => 0, 'width' => 'matchParent' }
+          }
+        }
+        result = described_class.build_responsive(component)
+
+        expect(result[:classes]).to include('max-md:flex-none')
+        expect(result[:classes].join(' ')).not_to include('max-md:min-w-0')
+      end
+
+      it 'prefixes every utility for non-zero compact weight override' do
+        component = {
+          'type' => 'View',
+          'weight' => 1,
+          'responsive' => {
+            'compact' => { 'weight' => 2.5 }
+          }
+        }
+        result = described_class.build_responsive(component)
+
+        expect(result[:classes]).to include('max-md:flex-[2.5] max-md:min-w-0 max-md:min-h-0')
+      end
+
+      it 'emits md:flex-1 for medium weight 1 override' do
+        component = {
+          'type' => 'View',
+          'weight' => 0,
+          'responsive' => {
+            'medium' => { 'weight' => 1 }
+          }
+        }
+        result = described_class.build_responsive(component)
+
+        expect(result[:classes]).to include('md:flex-1 md:min-w-0 md:min-h-0')
+      end
+
+      # Regression: rjui-responsive-gravity-override-not-emitted — gravity was
+      # silently dropped (not in ATTRIBUTE_MAPPERS). It needs the effective
+      # orientation of the same block, wholesale-replace axis resets, and
+      # re-interpretation when only orientation is overridden.
+      context 'gravity overrides' do
+        it 'interprets gravity against the same block\'s orientation override' do
+          component = {
+            'type' => 'View', 'orientation' => 'horizontal', 'gravity' => 'centerVertical',
+            'responsive' => {
+              'compact' => { 'orientation' => 'vertical', 'gravity' => 'left' }
+            }
+          }
+          result = described_class.build_responsive(component)
+
+          # left under the compact-effective vertical axis = items-start
+          expect(result[:classes]).to include('max-md:items-start')
+          expect(result[:classes].join(' ')).not_to include('max-md:justify-start')
+        end
+
+        it 'resets an axis the base covered but the new gravity does not (wholesale replace)' do
+          component = {
+            'type' => 'View', 'orientation' => 'horizontal', 'gravity' => 'centerVertical',
+            'responsive' => {
+              'compact' => { 'gravity' => 'left' }
+            }
+          }
+          result = described_class.build_responsive(component)
+
+          # left in a row = justify-start; base items-center must be reset
+          expect(result[:classes]).to include('max-md:justify-start')
+          expect(result[:classes]).to include('max-md:items-stretch')
+        end
+
+        it 're-emits base gravity when only orientation is overridden' do
+          component = {
+            'type' => 'View', 'orientation' => 'horizontal', 'gravity' => 'top',
+            'responsive' => {
+              'compact' => { 'orientation' => 'vertical' }
+            }
+          }
+          result = described_class.build_responsive(component)
+
+          # top in a row = items-start; under the vertical override the same
+          # intent is justify-start, and the stale items axis is reset
+          expect(result[:classes]).to include('max-md:justify-start')
+          expect(result[:classes]).to include('max-md:items-stretch')
+        end
+
+        it 'emits nothing when the override resolves to the base classes' do
+          component = {
+            'type' => 'View', 'orientation' => 'vertical', 'gravity' => 'left',
+            'responsive' => {
+              'regular' => { 'gravity' => 'left' }
+            }
+          }
+          result = described_class.build_responsive(component)
+
+          expect(result[:classes].join(' ')).not_to include('items-')
+          expect(result[:classes].join(' ')).not_to include('justify-')
+        end
+      end
+
       it 'scopes padding override below md' do
         component = {
           'type' => 'View',

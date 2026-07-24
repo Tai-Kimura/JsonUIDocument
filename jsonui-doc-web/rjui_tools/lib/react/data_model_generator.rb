@@ -7,6 +7,7 @@ require_relative '../core/config_manager'
 require_relative '../core/type_converter'
 require_relative '../core/generated_marker'
 require_relative 'style_loader'
+require_relative '../core/layout_variant'
 
 module RjuiTools
   module React
@@ -29,6 +30,8 @@ module RjuiTools
 
         # Process all JSON files in Layouts directory
         json_files = Dir.glob(File.join(@layouts_dir, '**/*.json')).reject do |file|
+          # Variant files (home@regular.json) never get their own Data model
+          next true if JsonUIShared::LayoutVariant.variant?(file)
           # Skip Resources folder and Styles folder
           file.include?(File.join(@layouts_dir, 'Resources')) ||
             file.include?(File.join(@layouts_dir, 'Styles'))
@@ -796,16 +799,43 @@ module RjuiTools
           value.to_s.downcase
         else
           # For arrays and objects
-          if value.is_a?(Array)
-            '[]'
-          elsif value.is_a?(Hash)
-            '{}'
+          if value.is_a?(Array) || value.is_a?(Hash)
+            to_js_literal(value)
           elsif value.is_a?(String) && value =~ /^CollectionDataSource\(/
             "new #{value}"
           else
             value.to_s
           end
         end
+      end
+
+      # Render a data-section Hash/Array defaultValue as a real (recursive)
+      # JS literal so nested defaults like {name: "Grace"} actually seed the
+      # data map — binding_semantics fallbackPrecedence step 1 merges the
+      # data-section defaultValue BEFORE any binding resolves, so emptying
+      # these to {} / [] made `data.conformanceProfile?.name` render
+      # nothing. Keys stay as-is when they are valid JS identifiers (quoted
+      # otherwise); strings are double-quoted; bools/numbers stay bare.
+      def to_js_literal(value)
+        case value
+        when Hash
+          return '{}' if value.empty?
+          pairs = value.map { |k, v| "#{js_object_key(k)}: #{to_js_literal(v)}" }
+          "{ #{pairs.join(', ')} }"
+        when Array
+          "[#{value.map { |v| to_js_literal(v) }.join(', ')}]"
+        when String
+          value.to_json
+        when nil
+          'null'
+        else
+          value.to_s
+        end
+      end
+
+      def js_object_key(key)
+        k = key.to_s
+        k.match?(/\A[A-Za-z_$][\w$]*\z/) ? k : k.to_json
       end
 
       def to_pascal_case(str)

@@ -216,8 +216,8 @@ RSpec.describe RjuiTools::Core::BindingValidator do
       end
     end
 
-    context 'with nil coalescing (business logic)' do
-      it 'warns about nil coalescing operator' do
+    context 'with ?? default (official support, binding SSoT track 15)' do
+      it 'accepts a single ?? default with a literal' do
         component = {
           'type' => 'View',
           'child' => [
@@ -226,8 +226,98 @@ RSpec.describe RjuiTools::Core::BindingValidator do
           ]
         }
         warnings = validator.validate(component)
-        expect(warnings).not_to be_empty
-        expect(warnings.first).to include('nil coalescing')
+        expect(warnings).to be_empty
+      end
+
+      it 'rejects more than one ?? (binding-double-default)' do
+        component = {
+          'type' => 'Label',
+          'text' => "@{a ?? 'x' ?? 'y'}"
+        }
+        messages = validator.validate(component)
+        expect(messages.any? { |m| m.include?('[binding-double-default]') }).to be true
+        expect(validator.has_errors?).to be true
+      end
+    end
+
+    context 'with canonical negation and two-way rules' do
+      it 'accepts @{!flag} on a boolean attribute (hidden)' do
+        component = {
+          'type' => 'View',
+          'hidden' => '@{!flag}'
+        }
+        messages = validator.validate(component)
+        expect(messages.select { |m| m.include?('binding-negation-context') }).to be_empty
+        expect(messages.select { |m| m.include?('negation operator') }).to be_empty
+      end
+
+      it 'rejects @{!flag} on a non-boolean known attribute (binding-negation-context)' do
+        component = {
+          'type' => 'Label',
+          'text' => '@{!flag}'
+        }
+        messages = validator.validate(component)
+        expect(messages.any? { |m| m.include?('[binding-negation-context]') }).to be true
+      end
+
+      it 'rejects a dotted path on a two-way attribute (binding-two-way-complex)' do
+        component = {
+          'type' => 'TextField',
+          'text' => '@{user.email}'
+        }
+        messages = validator.validate(component)
+        expect(messages.any? { |m| m.include?('[binding-two-way-complex]') }).to be true
+      end
+
+      it 'accepts a flat identifier on a two-way attribute' do
+        component = {
+          'type' => 'TextField',
+          'text' => '@{email}'
+        }
+        messages = validator.validate(component)
+        expect(messages.select { |m| m.include?('binding-two-way-complex') }).to be_empty
+      end
+    end
+
+    context 'with Collection cell parent-scope dependence' do
+      it 'warns when a cell binds a parent-screen data key (binding-cell-parent-scope)' do
+        component = {
+          'type' => 'View',
+          'data' => [
+            { 'name' => 'screenTitle', 'class' => 'String' },
+            { 'name' => 'items', 'class' => 'Array' }
+          ],
+          'child' => [
+            { 'type' => 'Label', 'text' => '@{screenTitle}' },
+            {
+              'type' => 'Collection',
+              'items' => '@{items}',
+              'sections' => [
+                { 'cell' => { 'type' => 'Label', 'text' => '@{screenTitle}' } }
+              ]
+            }
+          ]
+        }
+        messages = validator.validate(component)
+        expect(messages.any? { |m| m.include?('[binding-cell-parent-scope]') }).to be true
+      end
+
+      it 'does not warn for item-scope (data.-prefixed) cell bindings' do
+        component = {
+          'type' => 'View',
+          'data' => [{ 'name' => 'items', 'class' => 'Array' }],
+          'child' => [
+            {
+              'type' => 'Collection',
+              'items' => '@{items}',
+              'sections' => [
+                { 'cell' => { 'type' => 'Label', 'text' => '@{data.title}' } }
+              ]
+            }
+          ]
+        }
+        messages = validator.validate(component)
+        expect(messages.select { |m| m.include?('binding-cell-parent-scope') }).to be_empty
       end
     end
 
@@ -521,6 +611,58 @@ RSpec.describe RjuiTools::Core::BindingValidator do
         expect(unused_warnings.length).to eq(2)
         expect(warnings.any? { |w| w.include?("'unused1'") }).to be true
         expect(warnings.any? { |w| w.include?("'unused2'") }).to be true
+      end
+    end
+
+    context 'with dot-path bindings (root-segment resolution)' do
+      it 'does not warn when the root variable of a dot-path is defined' do
+        component = {
+          'type' => 'View',
+          'child' => [
+            { 'data' => [{ 'name' => 'user', 'type' => 'Object' }] },
+            { 'type' => 'Label', 'text' => '@{user.name}' }
+          ]
+        }
+        warnings = validator.validate(component)
+        expect(warnings.select { |w| w.include?('not defined in data') }).to be_empty
+      end
+
+      it 'marks the root variable as used (no unused-data warning for dot-path access)' do
+        component = {
+          'type' => 'View',
+          'child' => [
+            { 'data' => [{ 'name' => 'user', 'type' => 'Object' }] },
+            { 'type' => 'Label', 'text' => '@{user.name}' }
+          ]
+        }
+        warnings = validator.validate(component)
+        expect(warnings.any? { |w| w.include?('never used') && w.include?("'user'") }).to be false
+      end
+
+      it 'warns about the undefined root only, never the path segments' do
+        component = {
+          'type' => 'View',
+          'child' => [
+            { 'data' => [{ 'name' => 'other', 'type' => 'String' }] },
+            { 'type' => 'Label', 'text' => '@{user.name}' }
+          ]
+        }
+        warnings = validator.validate(component)
+        expect(warnings.any? { |w| w.include?("'user'") && w.include?('not defined in data') }).to be true
+        expect(warnings.any? { |w| w.include?("'name'") }).to be false
+      end
+
+      it 'resolves bracket-indexed paths to their root variable' do
+        component = {
+          'type' => 'View',
+          'child' => [
+            { 'data' => [{ 'name' => 'items', 'type' => 'Array' }] },
+            { 'type' => 'Label', 'text' => '@{items[0].title}' }
+          ]
+        }
+        warnings = validator.validate(component)
+        expect(warnings.select { |w| w.include?('not defined in data') }).to be_empty
+        expect(warnings.any? { |w| w.include?("'title'") }).to be false
       end
     end
   end

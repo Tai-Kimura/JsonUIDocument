@@ -24,18 +24,25 @@ module RjuiTools
 
           embed_id = attributes['id'] || 'embed'
           navigation_mode = attributes['navigationMode'] || 'delegate'
+          isolated = navigation_mode == 'isolated'
           class_name = build_class_name
           embedded_component = embedded_component_name(screen)
           params_attr = build_params_attr(attributes['params'])
           event_bridge_attr = build_event_bridge_attr(attributes['events'])
 
           class_attr = class_name.empty? ? '' : %( className="#{class_name}")
+          # Version-skew guard: the isolated call site passes screenResolver
+          # via buildEmbedScreenResolver (new export in EmbedContainer.tsx
+          # template v2), so type-checking against an older template fails
+          # instead of silently degrading to delegate mode.
+          isolated_attrs = isolated ? "\n        screenResolver={buildEmbedScreenResolver({ '#{screen}': #{embedded_component} })}" : ''
+          skew_comment = isolated ? "#{indent_str(indent)}{/* Requires EmbedContainer.tsx template v2 (navigationMode: \"isolated\") */}\n" : ''
 
           <<~JSX.chomp
-            #{indent_str(indent)}<EmbedContainer
+            #{skew_comment}#{indent_str(indent)}<EmbedContainer
             #{indent_str(indent + 2)}embedId="#{embed_id}"
             #{indent_str(indent + 2)}screen="#{screen}"
-            #{indent_str(indent + 2)}navigationMode="#{navigation_mode}"#{params_attr}#{event_bridge_attr}#{class_attr}
+            #{indent_str(indent + 2)}navigationMode="#{navigation_mode}"#{isolated_attrs}#{params_attr}#{event_bridge_attr}#{class_attr}
             #{indent_str(indent)}>
             #{indent_str(indent + 2)}<#{embedded_component} />
             #{indent_str(indent)}</EmbedContainer>
@@ -71,18 +78,28 @@ module RjuiTools
           "\n        eventBridge={(event) => { #{cases.join(' ')} }}"
         end
 
-        # Render a single params value as JS expression. Supports literals
-        # and @{binding} → `data.{prop}`.
+        # Render a single params value as JS expression. Supports literals,
+        # @{binding} → `data.{prop}` (leaf-only — the validator rejects
+        # bindings at object positions), and nested literal objects →
+        # inline JS object literals (recursive, so nested leaf bindings
+        # rewrite too — a plain to_json would stringify them dead).
+        # Dotted/indexed parent-data paths get optional chaining like every
+        # other user data path (@{profile.name} → data.profile?.name).
         def render_param_value(value)
           if value.is_a?(String) && value =~ /^@\{(.+)\}$/
-            "data.#{Regexp.last_match(1)}"
+            add_viewmodel_data_prefix(Regexp.last_match(1))
           elsif value.is_a?(String)
             "'#{value.gsub("'", "\\\\'")}'"
           elsif value == true || value == false
             value.to_s
           elsif value.is_a?(Numeric)
             value.to_s
+          elsif value.is_a?(Hash)
+            return '{}' if value.empty?
+            entries = value.map { |k, v| "#{k}: #{render_param_value(v)}" }
+            "{ #{entries.join(', ')} }"
           else
+            # Fallback (arrays are a validate error upstream)
             value.to_json
           end
         end

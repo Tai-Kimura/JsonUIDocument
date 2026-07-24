@@ -20,6 +20,11 @@
       "code": "{\n  \"type\": \"Embed\",\n  \"id\": \"activityPane\",\n  \"screen\": \"recent_activity\",\n  \"navigationMode\": \"delegate\"\n}"
     },
     {
+      "title": { "en": "Isolated stack + nested params with a callback escape hatch", "ja": "isolated stack + ネスト params（コールバック escape hatch 付き）" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Embed\",\n  \"id\": \"settingsPane\",\n  \"screen\": \"settings_home\",\n  \"navigationMode\": \"isolated\",\n  \"params\": {\n    \"session\": { \"userId\": \"@{userId}\", \"plan\": \"pro\" },\n    \"onRequestLogout\": \"@{handleLogout}\"\n  }\n}"
+    },
+    {
       "title": { "en": "Parent spec — structure.embeds[]", "ja": "親 spec — structure.embeds[]" },
       "language": "json",
       "code": "\"structure\": {\n  \"embeds\": [\n    {\n      \"regionId\": \"detailPane\",\n      \"screen\": \"order_detail\",\n      \"params\": { \"orderId\": \"@{selectedOrderId}\" },\n      \"events\": { \"onOrderUpdated\": \"handleOrderUpdated\" },\n      \"navigationMode\": \"delegate\"\n    }\n  ]\n}"
@@ -34,8 +39,8 @@
     },
     "params": {
       "note": {
-        "en": "Flat dict (no nesting in v1). Keys must be camelCase. Values may be literals or `@{varName}` bindings against the parent VM. Child VMs that implement `applyInitParams(_:)` receive them — others silently ignore.",
-        "ja": "フラット dict（v1 はネスト不可）。キーは camelCase 必須。値はリテラルか、親 VM に対する `@{varName}` バインディング。子 VM が `applyInitParams(_:)` を実装していれば受け取れる、しなければ無視。"
+        "en": "A tree: keys must be camelCase at every level; intermediate nodes are literal objects, leaves are scalar literals or `@{varName}` bindings against the parent VM (bindings are leaf-only — an `@{}` at an object position is a validation error; arrays are not supported). Child VMs that implement `applyInitParams(_:)` receive them — others silently ignore. A callback-typed parent property passed as a leaf binding is the canonical escape hatch for navigating out of an isolated embed.",
+        "ja": "ツリー。キーは全階層 camelCase 必須。中間ノードはリテラル object、葉はスカラーリテラルか親 VM への `@{varName}` バインディング（バインディングは葉のみ — object 位置の `@{}` は validation エラー。配列は非対応）。子 VM が `applyInitParams(_:)` を実装していれば受け取れる、しなければ無視。親のコールバック型プロパティを葉のバインディングとして渡すのが、isolated embed の外へ遷移する正準 escape hatch。"
       }
     },
     "events": {
@@ -46,8 +51,8 @@
     },
     "navigationMode": {
       "note": {
-        "en": "v1 supports `\"delegate\"` only: child shares the parent's NavController/Router. `push` bubbles to the parent; `pop`/`dismiss`/`navigateBack` are bounded at the embed (cannot close the embed itself). `\"isolated\"` (private nav stack) is deferred to v1.5.",
-        "ja": "v1 は `\"delegate\"` のみ。子は親の NavController/Router を共有する。`push` は親に bubble、`pop`/`dismiss`/`navigateBack` は embed 境界で stop（embed 自身は閉じない）。`\"isolated\"`（独立 nav stack）は v1.5 で対応予定。"
+        "en": "`\"delegate\"` (default): child shares the parent's NavController/Router — `push` bubbles to the parent; `pop`/`dismiss`/`navigateBack` are bounded at the embed (cannot close the embed itself). `\"isolated\"` (SwiftJsonUI 10.5.0+ / KotlinJsonUI 2.12.0+): the embed owns a private nested stack — push stays inside, pop stops at the embed stack's root, present-type transitions (sheet/dialog/dismiss) are forbidden in the embedded screen's spec, and OS gestures / browser back are platform-delegated (don't rely on them for in-embed pops). Escape hatch out of an isolated embed: a parent-VM callback passed via `params` — the parent executes the transition.",
+        "ja": "`\"delegate\"`（デフォルト）: 子は親の NavController/Router を共有 — `push` は親に bubble、`pop`/`dismiss`/`navigateBack` は embed 境界で stop（embed 自身は閉じない）。`\"isolated\"`（SwiftJsonUI 10.5.0+ / KotlinJsonUI 2.12.0+）: embed が私有の入れ子 stack を所有 — push は内側に留まり、pop は embed stack の底で止まる。埋め込み screen の spec で present 系遷移（sheet/dialog/dismiss）は禁止、OS ジェスチャ / ブラウザ back はプラットフォーム委譲（embed 内 pop をそれらに依存しない）。isolated の外へ出る escape hatch は `params` で渡す親 VM コールバック — 遷移は親が実行する。"
       }
     }
   },

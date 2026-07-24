@@ -13,9 +13,11 @@ require_relative '../../core/resources/color_manager'
 require_relative '../../react/react_generator'
 require_relative '../../react/style_loader'
 require_relative '../../core/layout_validator'
+require_relative '../../core/plural_validator'
 require_relative '../../react/data_model_generator'
 require_relative '../../react/viewmodel_generator'
 require_relative '../../react/hook_generator'
+require_relative '../../core/layout_variant'
 
 module RjuiTools
   module CLI
@@ -42,7 +44,12 @@ module RjuiTools
           end
 
           # Update StringManager from Strings directory
-          update_string_manager
+          begin
+            update_string_manager
+          rescue JsonUIShared::PluralValidator::ValidationError => e
+            Core::Logger.error(e.message)
+            exit 1
+          end
 
           # Update Data models from JSON data sections
           update_data_models
@@ -50,11 +57,16 @@ module RjuiTools
           # Emit shared cellIdGenerator helper
           emit_cell_id_generator
 
-          json_files = Dir.glob(File.join(layouts_dir, '**', '*.json')).reject do |file|
+          all_json_files = Dir.glob(File.join(layouts_dir, '**', '*.json')).reject do |file|
             # Skip Resources folder (colors.json, strings.json, etc.)
             # Skip Styles folder (reusable style definitions, not components)
             file.include?(File.join(layouts_dir, 'Resources')) ||
               file.include?(File.join(layouts_dir, 'Styles'))
+          end
+          # Responsive variant files (home@regular.json) are generated
+          # alongside their base screen, never standalone (06 track).
+          json_files = all_json_files.reject do |file|
+            JsonUIShared::LayoutVariant.variant?(file)
           end
 
           if json_files.empty?
@@ -67,7 +79,7 @@ module RjuiTools
           # with dark/light/custom-mode support. Runs BEFORE the main generator
           # loop so hex→key rewrites land in the JSON before component JSX
           # emission.
-          update_color_manager(json_files, layouts_dir)
+          update_color_manager(all_json_files, layouts_dir)
 
           # First pass: build component name -> subdir mapping
           component_paths = {}
@@ -124,7 +136,13 @@ module RjuiTools
               subdir_parts.shift if %w[pages components].include?(subdir_parts.first)
               nested_subdir = subdir_parts.join('/')
 
-              output = generator.generate(component_name, json_content, subdir: nested_subdir)
+              variants = JsonUIShared::LayoutVariant.variants_for(json_file)
+              variant_comps = variants.keys.each_with_object({}) do |cls, map|
+                map[cls] = "#{component_name}#{cls.capitalize}Variant"
+              end
+
+              output = generator.generate(component_name, json_content, subdir: nested_subdir,
+                                          variants: variant_comps)
 
               # Use .tsx for TypeScript, .jsx for JavaScript
               extension = @config['typescript'] ? '.tsx' : '.jsx'
@@ -147,6 +165,40 @@ module RjuiTools
               expected_component_paths << File.expand_path(output_path)
 
               Core::Logger.success("Generated: #{output_path}")
+
+              # Generate one component per variant file. Variants keep the
+              # base's Data type and string namespace — the media-query
+              # dispatch in the base component selects the tree at runtime.
+              base_namespace_stem = File.basename(json_file, '.json')
+              variants.each do |cls, variant_file|
+                v_json = JSON.parse(File.read(variant_file, encoding: 'UTF-8'))
+                v_json = React::StyleLoader.load_and_merge(v_json)
+                @validator.normalized = Core::Normalization.canonicalized?(v_json)
+                validate_component(v_json, variant_file)
+                validate_bindings(v_json, variant_file)
+                v_shared_warnings = JsonUIShared::LayoutValidator.validate_layout(
+                  v_json, source_path: File.basename(variant_file)
+                )
+                JsonUIShared::LayoutValidator.print_warnings(v_shared_warnings) unless v_shared_warnings.empty?
+
+                v_name = variant_comps[cls]
+                v_rel = variant_file.sub("#{layouts_dir}/", '')
+                v_output = generator.generate(
+                  v_name, v_json, subdir: nested_subdir,
+                  data_type: component_name,
+                  source_rel: "Layouts/#{v_rel}",
+                  namespace_stem: base_namespace_stem
+                )
+                v_path = if nested_subdir.empty?
+                           File.join(@config['components_directory'], "#{v_name}#{extension}")
+                         else
+                           File.join(@config['components_directory'], nested_subdir, "#{v_name}#{extension}")
+                         end
+                FileUtils.mkdir_p(File.dirname(v_path))
+                File.write(v_path, v_output)
+                expected_component_paths << File.expand_path(v_path)
+                Core::Logger.success("Generated variant: #{v_path}")
+              end
             rescue JSON::ParserError => e
               Core::Logger.error("Invalid JSON in #{json_file}: #{e.message}")
             rescue StandardError => e
@@ -212,6 +264,7 @@ module RjuiTools
           layouts_dir = @config['layouts_directory']
           expected_names = Dir.glob(File.join(layouts_dir, '**', '*.json'))
             .reject { |f| f.include?('/Resources/') || f.include?('/Styles/') }
+            .reject { |f| JsonUIShared::LayoutVariant.variant?(f) }
             .map { |f| to_pascal_case(File.basename(f, '.json')) }
             .to_set
 
@@ -478,32 +531,56 @@ module RjuiTools
 
           # Read strings from both sources
           strings_data = {}
-          languages.each { |lang| strings_data[lang] = {} }
+          plurals_data = {}
+          languages.each do |lang|
+            strings_data[lang] = {}
+            plurals_data[lang] = {}
+          end
+          plural_errors = []
 
           # Source 1: Layouts/Resources/strings.json (sjui/kjui shared format)
           # Format: { "screen_name": { "key": { "en": "Hello", "ja": "こんにちは" } } }
           if File.exist?(resources_strings_json)
             shared_strings = JSON.parse(File.read(resources_strings_json, encoding: 'UTF-8'))
-            shared_strings.each do |file_prefix, keys|
-              next unless keys.is_a?(Hash)
 
-              keys.each do |key, value|
-                full_key = "#{file_prefix}_#{key}"
-                if value.is_a?(Hash)
-                  # Multi-language: { "en": "Hello", "ja": "こんにちは" }
-                  languages.each do |lang|
-                    resolved = value[lang] || value[default_language] || value.values.first || ''
-                    strings_data[lang][full_key] = resolved
-                  end
-                else
-                  # Single string (default language only)
-                  languages.each do |lang|
-                    strings_data[lang][full_key] = value.to_s
+            # Plural entries (CLDR cardinal): schema check + layouts must not
+            # reference plural keys directly (VM-only in v1 — converters
+            # inline layout strings statically and cannot pass a count).
+            plural_errors.concat(JsonUIShared::PluralValidator.validate_strings(shared_strings))
+            layout_files = Dir.glob(File.join(layouts_dir, '**', '*.json')).reject do |file|
+              file.include?(File.join(layouts_dir, 'Resources'))
+            end
+            plural_errors.concat(
+              JsonUIShared::PluralValidator.validate_layout_references(shared_strings, layout_files)
+            )
+
+            if plural_errors.empty?
+              shared_strings.each do |file_prefix, keys|
+                next unless keys.is_a?(Hash)
+
+                keys.each do |key, value|
+                  full_key = "#{file_prefix}_#{key}"
+                  if JsonUIShared::PluralValidator.plural_value?(value)
+                    languages.each do |lang|
+                      forms = JsonUIShared::PluralValidator.plural_forms(value, lang, default_language)
+                      plurals_data[lang][full_key] = forms if forms
+                    end
+                  elsif value.is_a?(Hash)
+                    # Multi-language: { "en": "Hello", "ja": "こんにちは" }
+                    languages.each do |lang|
+                      resolved = value[lang] || value[default_language] || value.values.first || ''
+                      strings_data[lang][full_key] = resolved
+                    end
+                  else
+                    # Single string (default language only)
+                    languages.each do |lang|
+                      strings_data[lang][full_key] = value.to_s
+                    end
                   end
                 end
               end
+              Core::Logger.info("Loaded strings from #{resources_strings_json}")
             end
-            Core::Logger.info("Loaded strings from #{resources_strings_json}")
           end
 
           # Source 2: src/Strings/en.json, ja.json (legacy per-language files)
@@ -513,13 +590,27 @@ module RjuiTools
               lang_file = File.join(strings_dir, "#{lang}.json")
               if File.exist?(lang_file)
                 lang_strings = JSON.parse(File.read(lang_file, encoding: 'UTF-8'))
+                lang_strings.each_key do |key|
+                  value = lang_strings[key]
+                  next unless value.is_a?(Hash) && value.key?('plural')
+                  plural_errors << "#{lang_file}: '#{key}' — plural entries are not supported in " \
+                                   'legacy per-language files; move the key to ' \
+                                   "#{resources_strings_json}"
+                  lang_strings.delete(key)
+                end
                 strings_data[lang].merge!(lang_strings)
               end
             end
           end
 
+          unless plural_errors.empty?
+            plural_errors.each { |e| Core::Logger.error(e) }
+            raise JsonUIShared::PluralValidator::ValidationError,
+                  "strings.json plural validation failed (#{plural_errors.length} error(s))"
+          end
+
           # Skip if no strings from any source
-          return if strings_data.values.all?(&:empty?)
+          return if strings_data.values.all?(&:empty?) && plurals_data.values.all?(&:empty?)
 
           # Generate StringManager content
           strings_json = JSON.pretty_generate(strings_data)
@@ -535,9 +626,129 @@ module RjuiTools
                       string_manager_javascript_content(strings_json, default_language, marker_header, marker_footer)
                     end
 
+          # Plural support is injected only when plural keys exist, so
+          # projects without plurals keep a byte-identical StringManager.
+          content = augment_with_plurals(content, plurals_data, default_language, is_ts: is_ts)
+
           FileUtils.mkdir_p(generated_dir)
           File.write(string_manager_path, content)
           Core::Logger.success("Updated: #{string_manager_path}")
+        end
+
+        # camelCase spelling matching createCamelCaseProxy in the generated
+        # StringManager (underscore collapses before [a-z0-9]).
+        def plural_camel_key(snake_key)
+          snake_key.gsub(/_([a-z0-9])/) { Regexp.last_match(1).upcase }
+        end
+
+        # Inject the plural runtime into the generated StringManager:
+        # - `plurals` tables (lang -> key -> CLDR category -> body) resolved
+        #   via Intl.PluralRules with `{count}` substitution
+        # - loud failures for count-less access to plural keys (proxy
+        #   properties + getString/getDefaultString), which would otherwise
+        #   render as undefined/empty
+        # Anchor-based insertion keeps the base templates byte-stable when no
+        # plural key exists.
+        def augment_with_plurals(content, plurals_data, default_language, is_ts:)
+          return content if plurals_data.nil? || plurals_data.values.all?(&:empty?)
+
+          canonical = {}
+          plurals_data.each_value do |keys|
+            keys.each_key do |full_key|
+              canonical[full_key] = full_key
+              camel = plural_camel_key(full_key)
+              canonical[camel] = full_key unless camel == full_key
+            end
+          end
+
+          plurals_json = JSON.pretty_generate(plurals_data)
+          canonical_json = JSON.pretty_generate(canonical)
+
+          plurals_decl = is_ts ? 'const plurals: PluralsRoot =' : 'const plurals ='
+          canonical_decl = is_ts ? 'const PLURAL_KEY_CANONICAL: Record<string, string> =' : 'const PLURAL_KEY_CANONICAL ='
+          tables = +''
+          tables << "type PluralsRoot = Record<string, Record<string, StringMap>>;\n\n" if is_ts
+          tables << <<~JS
+            // Plural tables compiled from strings.json `plural` entries (CLDR
+            // cardinal, `{count}` placeholder). Plural keys are VM-only — resolve
+            // them with StringManager.plural(key, count) (or getDefaultPlural for
+            // SSR-safe seed code); count-less access throws.
+            #{plurals_decl} #{plurals_json};
+
+            // Both snake_case and camelCase spellings of every plural key, mapped
+            // to the canonical (snake_case) key.
+            #{canonical_decl} #{canonical_json};
+
+          JS
+          content = content.sub("const LANGUAGE_STORAGE_KEY") { "#{tables}const LANGUAGE_STORAGE_KEY" }
+
+          proxy_guard = <<-JS
+  for (const pluralKey of Object.keys(PLURAL_KEY_CANONICAL)) {
+    Object.defineProperty(camelCaseMap, pluralKey, {
+      enumerable: false,
+      configurable: true,
+      get() {
+        throw new Error(`'${pluralKey}' is a plural key - use StringManager.plural('${pluralKey}', count) from the ViewModel`);
+      },
+    });
+  }
+          JS
+          content = content.sub("  return camelCaseMap;") { "#{proxy_guard}  return camelCaseMap;" }
+
+          lookup_guard = <<-JS
+    if (PLURAL_KEY_CANONICAL[key]) {
+      throw new Error(`'${key}' is a plural key - use StringManager.plural('${key}', count) from the ViewModel`);
+    }
+          JS
+          content = content.sub("    return this.currentLanguage[key] || key;") do
+            "#{lookup_guard}    return this.currentLanguage[key] || key;"
+          end
+          content = content.sub("    return this._cache[defaultLang][key] || key;") do
+            "#{lookup_guard}    return this._cache[defaultLang][key] || key;"
+          end
+
+          sig = is_ts ? '(key: string, count: number): string' : '(key, count)'
+          resolve_sig = is_ts ? '(lang: string, key: string, count: number): string' : '(lang, key, count)'
+          private_kw = is_ts ? 'private ' : ''
+          category_decl = is_ts ? 'let category: string' : 'let category'
+          methods = <<-JS
+
+  // Resolve a plural key for the current language. `count` picks the CLDR
+  // cardinal category via Intl.PluralRules and replaces `{count}`.
+  plural#{sig} {
+    return this._resolvePlural(this.language, key, count);
+  }
+
+  // SSR-safe plural pinned to the default language (see getDefaultString).
+  getDefaultPlural#{sig} {
+    return this._resolvePlural('#{default_language}', key, count);
+  }
+
+  #{private_kw}_resolvePlural#{resolve_sig} {
+    const canonicalKey = PLURAL_KEY_CANONICAL[key];
+    if (!canonicalKey) {
+      throw new Error(`Unknown plural key '${key}' - register it in strings.json with a "plural" value`);
+    }
+    const defaultTables = plurals['#{default_language}'];
+    const langTables = plurals[lang] || defaultTables;
+    const table = (langTables && langTables[canonicalKey]) || (defaultTables && defaultTables[canonicalKey]);
+    if (!table) {
+      throw new Error(`Plural key '${canonicalKey}' has no forms for language '${lang}'`);
+    }
+    #{category_decl} = 'other';
+    try {
+      category = new Intl.PluralRules(lang).select(count);
+    } catch (_e) {
+      // Unknown locale tag: fall back to the required 'other' category
+    }
+    const body = table[category] !== undefined ? table[category] : table['other'];
+    return body.replace(/\\{count\\}/g, String(count));
+  }
+          JS
+          anchor = "}\n\nexport const StringManager = new StringManagerClass();"
+          content = content.sub(anchor) { "#{methods}#{anchor}" }
+
+          content
         end
 
         def string_manager_javascript_content(strings_json, default_language, marker_header, marker_footer)
