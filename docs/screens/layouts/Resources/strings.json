@@ -1225,7 +1225,7 @@
     "toc_row_filter": { "en": "Scope what gets generated", "ja": "生成対象を絞る" },
     "toc_row_mcp": { "en": "Discovery from your agent", "ja": "エージェントから discovery" },
     "toc_row_lifecycle": { "en": "Lifecycle", "ja": "ライフサイクル" },
-    "toc_row_halts": { "en": "What v1 does NOT support", "ja": "v1 で未対応の挙動" },
+    "toc_row_halts": { "en": "ERROR halts (permanent & conditional)", "ja": "ERROR halt（恒久・条件付き）" },
     "toc_row_next": { "en": "Where to go next", "ja": "次に進む" },
     "section_problem_heading": { "en": "The drift problem", "ja": "ドリフトという問題" },
     "section_problem_body": {
@@ -1348,19 +1348,19 @@
       "en": "`jui verify --fail-on-diff` recomputes the DTO from the spec and byte-compares against the committed file. If you (or a bad merge) edited a DTO by hand, this trips and the build refuses to advance.",
       "ja": "`jui verify --fail-on-diff` が spec から DTO を再計算し、commit 済みファイルと byte 比較します。手で（または事故的マージで）DTO を編集していると検出されてビルドが進みません。"
     },
-    "section_halts_heading": { "en": "What v1 does NOT support — ERROR halts", "ja": "v1 で未対応の挙動 — ERROR halt" },
+    "section_halts_heading": { "en": "ERROR halts — permanent & conditional", "ja": "ERROR halt — 恒久と条件付き" },
     "section_halts_body": {
-      "en": "Six OpenAPI patterns cause the build to halt with an ERROR instead of silently producing a wrong DTO. This is intentional — no silent fallback, no 'best-effort' mapping. Note (2026-05): field-level `oneOf` with explicit `discriminator` + `mapping` is now supported (discriminated unions land as a sealed/enum + custom (de)serializer); only schema-level oneOf, anyOf, and discriminator-without-mapping still halt. If the build halts here, you either fix the schema, opt out via `skip_domain`, or wait for the matching v2 feature.",
-      "ja": "v1 では、誤った DTO を静かに吐く代わりに ERROR halt する OpenAPI パターンが 6 つあります。silent fallback も「最善努力」マッピングもしません。注（2026-05）: field-level の `oneOf` + 明示 `discriminator` + `mapping` は サポート対象になりました（discriminated union が sealed / enum + custom (de)serializer として生成されます）。引き続き halt するのは schema-level の oneOf、anyOf、mapping 無しの discriminator のみです。halt したら schema を直すか、`skip_domain` で逃がすか、対応する v2 機能を待つかです。"
+      "en": "The halt table below is split in two: permanent halts and conditional halts. Permanent (2+1, by design — not pending features): `anyOf` (untagged unions have no portable native representation), direct self-reference without a collection boundary, and using a union schema as another union's variant. Conditional halts fire only in specific configurations: a discriminator mapping that can be neither declared nor inferred, kotlinx-only features on a moshi/none Android serializer (unions, wrappers, `api.format_mapping`), URL `$ref`s / refs escaping the api directory, and YAML 1.1 type coercion. Everything else that used to halt — YAML input, multi-file `$ref`, schema-level `oneOf`, format-aware mapping — is supported as of 2026-07. When a halt fires you fix the schema, opt out (`skip_domain`, `api.format_mapping_exclude`), or restructure as the message suggests; there is still no silent fallback.",
+      "ja": "下の halt 表は「恒久」と「条件付き」の 2 群に整理しました。恒久は 2+1 件（設計判断であり、対応待ちではない）: `anyOf`（untagged union にはポータブルな native 表現が存在しない）、コレクション境界の無い direct self-reference、そして union schema を別 union の variant にする形です。条件付き halt は特定の構成でのみ発火します: 宣言も推論もできない discriminator mapping、moshi/none serializer での kotlinx 必須機能（union / wrapper / `api.format_mapping`）、URL `$ref` や api ディレクトリ外への ref、YAML 1.1 の型強制など。かつて halt していた YAML 入力・multi-file `$ref`・schema-level `oneOf`・format-aware mapping は 2026-07 時点でサポート済みです。halt したら schema を直すか、opt-out（`skip_domain` / `api.format_mapping_exclude`）するか、メッセージの提案どおり再構成します — silent fallback をしない方針は変わりません。"
     },
     "halt_format_aware_trigger": { "en": "format-aware mapping", "ja": "format-aware mapping" },
     "halt_format_aware_behavior": {
-      "en": "OpenAPI `format` (e.g. `date-time`, `uuid`, `binary`) is recorded but not auto-mapped to a richer native type.",
-      "ja": "OpenAPI の `format`（`date-time` / `uuid` / `binary` など）は記録されますが、native の豊富な型へ自動マッピングはしません。"
+      "en": "Supported since 2026-07, opt-in: set `api.format_mapping: true` and `date-time` / `uuid` / `binary` map to native DTO types — iOS `Date` / `UUID` / `Data`, Android `kotlinx.datetime.Instant` / `Uuid` typealias / base64 `ByteArray`, Web `Date` + generated wire parse/serialize helpers. Default stays off (existing output is byte-identical); `api.format_mapping_exclude: [\"legacy.json\"]` opts individual docs out. Android requires the kotlinx serializer (+ kotlinx-datetime dependency) — moshi/none halts rather than silently keeping `String` while iOS gets `Date`.",
+      "ja": "2026-07 からサポート（opt-in）: `api.format_mapping: true` で `date-time` / `uuid` / `binary` が native DTO 型になります — iOS は `Date` / `UUID` / `Data`、Android は `kotlinx.datetime.Instant` / `Uuid` typealias / base64 `ByteArray`、Web は `Date` + 生成された wire parse/serialize ヘルパ。既定は off（既存出力はバイト不変）で、`api.format_mapping_exclude: [\"legacy.json\"]` で doc 単位の除外ができます。Android は kotlinx serializer（+ kotlinx-datetime 依存）が必須 — moshi/none は「iOS だけ `Date` になる silent parity break」を作らないため halt します。"
     },
     "halt_format_aware_workaround": {
-      "en": "Use a proxy in the Domain layer for the conversion (see §5 customization zone).",
-      "ja": "Domain 層に変換用 proxy を書きます（§5 カスタマイズ領域を参照）。"
+      "en": "Mind serialization normalization: re-emitted values are semantically equal, not byte-equal — UUIDs re-encode uppercase on iOS, `+09:00` offsets normalize to UTC `Z`, fractional-second digits follow the formatter. If your server echo-validates raw strings, keep that doc in `api.format_mapping_exclude`. Web note: `Date` DTOs are mutable references — treat parsed DTOs as immutable, and expect naive serializable-state middleware to flag them.",
+      "ja": "serialize 時の正規化に注意: 再送信される値はバイト同値ではなく意味論同値です — iOS の UUID は大文字で re-encode され、`+09:00` は UTC の `Z` に正規化され、小数秒桁は formatter 依存です。サーバが raw 文字列を echo 検証する運用なら、その doc は `api.format_mapping_exclude` に入れてください。Web 注意: `Date` DTO は可変参照です — parse 済み DTO は不変として扱い、素朴な serializable-state 検査系 middleware には検出されうる前提で。"
     },
     "halt_one_of_trigger": { "en": "anyOf (untagged union)", "ja": "anyOf（untagged union）" },
     "halt_one_of_behavior": {
@@ -2767,17 +2767,17 @@
     },
     "section_halt_table_heading": { "en": "When the build halts — cookbook table", "ja": "Build が halt するとき — クックブック表" },
     "section_halt_table_body": {
-      "en": "Six v1 halts, each with a concrete workaround. Same triggers as the concept page §9, framed as recipes: do this exact step to keep moving. Discriminated unions (field-level `oneOf` + `discriminator` + `mapping`) are NOT in this table anymore — they are supported since 2026-05; only the narrower schema-level oneOf / anyOf / discriminator-without-mapping remain as halts.",
-      "ja": "v1 の halt は 6 種、それぞれに具体的な workaround を載せています。トリガーは concept ページ §9 と同じで、ここでは「次にこの 1 ステップを実行する」というレシピ形式で書いています。discriminated union（field-level の `oneOf` + `discriminator` + `mapping`）は 2026-05 以降サポート対象でこの表から外しています — 引き続き halt するのは schema-level の oneOf / anyOf / mapping 無しの discriminator だけです。"
+      "en": "Permanent halts: 2+1 (`anyOf`, direct self-ref, union-as-variant) — design decisions with a restructuring recipe, not pending features. Conditional halts fire only in specific configurations: a non-inferrable discriminator mapping, kotlinx-only features on moshi/none (unions, wrappers, `api.format_mapping`), URL / out-of-dir `$ref`s, YAML type coercion. YAML input, multi-file `$ref`, schema-level `oneOf`, and format-aware mapping are supported since 2026-07 and appear below only for their remaining edges. Each row is a recipe: do this exact step to keep moving.",
+      "ja": "恒久 halt は 2+1 件（`anyOf` / direct self-ref / union-as-variant）— どれも対応待ちではなく、再構成レシピ付きの設計判断です。条件付き halt は特定構成でのみ発火します: 推論不能な discriminator mapping、moshi/none での kotlinx 必須機能（union / wrapper / `api.format_mapping`）、URL・api ディレクトリ外 `$ref`、YAML 型強制。YAML 入力・multi-file `$ref`・schema-level `oneOf`・format-aware mapping は 2026-07 以降サポート済みで、下の表には残エッジのみ載せています。各行は「次にこの 1 ステップを実行する」レシピです。"
     },
     "halt_format_aware_trigger": { "en": "format-aware mapping", "ja": "format-aware mapping" },
     "halt_format_aware_behavior": {
-      "en": "ERROR halt — the build refuses to silently widen an `int32` to a `String`-typed Date.",
-      "ja": "ERROR halt — `int32` を `String` 型の Date として静かに広げる挙動は許しません。"
+      "en": "Supported since 2026-07, opt-in via `api.format_mapping: true` (default off; while off, output is byte-identical): `date-time` → `Date` / `Instant`, `uuid` → `UUID` / typealias, `binary` → `Data` / base64 `ByteArray`. Remaining halt: Android moshi/none with format fields — the kotlinx serializer (+ kotlinx-datetime) is required.",
+      "ja": "2026-07 からサポート（`api.format_mapping: true` の opt-in、既定 off の間は出力バイト不変）: `date-time` → `Date` / `Instant`、`uuid` → `UUID` / typealias、`binary` → `Data` / base64 `ByteArray`。残る halt は Android の moshi/none × format フィールド — kotlinx serializer（+ kotlinx-datetime）が必須です。"
     },
     "halt_format_aware_workaround": {
-      "en": "Recipe: add a proxy in Domain — `var createdAt: Date { ISO8601DateFormatter().date(from: dto.createdAt) ?? .distantPast }`.",
-      "ja": "Recipe: Domain で proxy を書く — `var createdAt: Date { ISO8601DateFormatter().date(from: dto.createdAt) ?? .distantPast }`。"
+      "en": "Recipe: set `api.platforms.android.serializer: \"kotlinx\"` and add kotlinx-datetime to the consumer's build.gradle; a legacy doc that lies about formats goes in `api.format_mapping_exclude`. Web migration is compiler-guided: turning the flag on makes `tsc` list every Domain spot that must switch from `string` to `Date`. Expect semantic (not byte) round-trips: UUID uppercasing, TZ normalization to `Z`.",
+      "ja": "Recipe: `api.platforms.android.serializer: \"kotlinx\"` にして consumer の build.gradle へ kotlinx-datetime を追加。format を騙るレガシー doc は `api.format_mapping_exclude` へ。Web の移行はコンパイラ主導 — フラグを on にすると `string` → `Date` へ直すべき Domain の箇所を `tsc` が列挙します。round-trip はバイト同値ではなく意味論同値（UUID 大文字化・TZ の `Z` 正規化）が前提です。"
     },
     "halt_one_of_trigger": { "en": "anyOf (untagged union)", "ja": "anyOf（untagged union）" },
     "halt_one_of_behavior": {
