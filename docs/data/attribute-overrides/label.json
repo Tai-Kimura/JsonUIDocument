@@ -138,8 +138,8 @@
         "ja": "`range`（`[start, end]` の組・テキストパターン・binding）で選んだ部分文字列に font / サイズ / 色 / 下線 / 影を当て、`onclick` でタップ可能にできる。`text` が素のテキストである以上、Label 内で強調やリンクを得る正規の手段はこれ。遷移はハンドラがホスト言語側で行うので、web のルーターにしか通じない URL に頼らずに済み、相互参照の表現としても移植可能。"
       },
       "platformDiff": {
-        "en": "Web renders only the `[start, end]` form today: the React converter slices the raw `text` attribute at build time, so a text-pattern range is dropped silently and a `text` that holds a localization key or a binding is sliced as that literal key (measured 2026-07-27, reported upstream).",
-        "ja": "web が今描画できるのは `[start, end]` 形式だけ。React コンバータはビルド時に `text` 属性の生値を切り出すため、テキストパターン指定は黙って落ち、`text` がローカライズキーや binding の場合はそのキー文字列自体が切り出される（2026-07-27 実測・上流に報告済み）。"
+        "en": "All three platforms resolve partials at runtime against the resolved string, so a pattern range works and a localized or bound `text` is matched after translation. The semantics are identical everywhere: an array range is `[start, end)` with the end exclusive; a string range matches the FIRST occurrence and the partial is skipped — not an error — when the pattern is absent; an out-of-bounds or inverted range is skipped; partials apply in declaration order and merge where they overlap, later declarations winning per property.",
+        "ja": "3 プラットフォームとも partial は実行時に解決後の文字列へ適用されるので、パターン指定も使え、ローカライズ済み・binding の `text` にも当たります。意味論も共通: 配列指定は `[start, end)` で end は排他、文字列指定は最初の 1 件のみでパターンが無ければその partial を skip（エラーにしない）、範囲外・逆転も skip、複数の partial は宣言順に適用され重なりはプロパティ単位で後勝ちマージ。"
       }
     },
     "linkable": {
