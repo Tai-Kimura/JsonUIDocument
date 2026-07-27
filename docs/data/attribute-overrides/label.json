@@ -10,12 +10,18 @@
   },
   "examples": [
     {
-      "title": { "en": "Minimum", "ja": "最小例" },
+      "title": {
+        "en": "Minimum",
+        "ja": "最小例"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Label\",\n  \"text\": \"Hello, JsonUI\",\n  \"fontSize\": 16,\n  \"fontColor\": \"#111827\"\n}"
     },
     {
-      "title": { "en": "With binding", "ja": "binding を使う" },
+      "title": {
+        "en": "With binding",
+        "ja": "binding を使う"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Label\",\n  \"text\": \"@{greeting}\",\n  \"fontSize\": 18,\n  \"fontWeight\": \"bold\"\n}",
       "note": {
@@ -24,7 +30,10 @@
       }
     },
     {
-      "title": { "en": "Multi-line paragraph", "ja": "複数行のパラグラフ" },
+      "title": {
+        "en": "Multi-line paragraph",
+        "ja": "複数行のパラグラフ"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Label\",\n  \"text\": \"@{paragraph}\",\n  \"fontSize\": 14,\n  \"lines\": 0,\n  \"width\": \"matchParent\"\n}",
       "note": {
@@ -33,17 +42,26 @@
       }
     },
     {
-      "title": { "en": "Localized via @string", "ja": "@string で多言語化" },
+      "title": {
+        "en": "Localized via @string",
+        "ja": "@string で多言語化"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Label\",\n  \"text\": \"@string/welcome_title\",\n  \"fontSize\": 28,\n  \"fontWeight\": \"bold\"\n}"
     },
     {
-      "title": { "en": "Single-line ellipsis", "ja": "1 行で末尾切り詰め" },
+      "title": {
+        "en": "Single-line ellipsis",
+        "ja": "1 行で末尾切り詰め"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Label\",\n  \"text\": \"@{productName}\",\n  \"lines\": 1,\n  \"lineBreakMode\": \"Tail\",\n  \"width\": 200\n}"
     },
     {
-      "title": { "en": "String interpolation", "ja": "文字列補間" },
+      "title": {
+        "en": "String interpolation",
+        "ja": "文字列補間"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Label\",\n  \"text\": \"Total: @{count} items\"\n}"
     }
@@ -134,12 +152,8 @@
     },
     "partialAttributes": {
       "note": {
-        "en": "Style a substring picked by `range` (a `[start, end]` pair, a text pattern, or a binding) with font / size / colour / underline / shadow, and make it tappable with `onclick`. This is the supported way to emphasise or link part of a Label — `text` is plain text — and the portable way to express a cross-reference, because the handler performs the navigation in host code instead of relying on a URL that only a web router understands.",
-        "ja": "`range`（`[start, end]` の組・テキストパターン・binding）で選んだ部分文字列に font / サイズ / 色 / 下線 / 影を当て、`onclick` でタップ可能にできる。`text` が素のテキストである以上、Label 内で強調やリンクを得る正規の手段はこれ。遷移はハンドラがホスト言語側で行うので、web のルーターにしか通じない URL に頼らずに済み、相互参照の表現としても移植可能。"
-      },
-      "platformDiff": {
-        "en": "All three platforms resolve partials at runtime against the resolved string, so a pattern range works and a localized or bound `text` is matched after translation. The semantics are identical everywhere: an array range is `[start, end)` with the end exclusive; a string range matches the FIRST occurrence and the partial is skipped — not an error — when the pattern is absent; an out-of-bounds or inverted range is skipped; partials apply in declaration order and merge where they overlap, later declarations winning per property.",
-        "ja": "3 プラットフォームとも partial は実行時に解決後の文字列へ適用されるので、パターン指定も使え、ローカライズ済み・binding の `text` にも当たります。意味論も共通: 配列指定は `[start, end)` で end は排他、文字列指定は最初の 1 件のみでパターンが無ければその partial を skip（エラーにしない）、範囲外・逆転も skip、複数の partial は宣言順に適用され重なりはプロパティ単位で後勝ちマージ。"
+        "en": "Style a substring picked by `range` (a `[start, end]` pair, a text pattern, or a binding) with font / size / colour / underline / shadow, and make it tappable with `onclick`. This is the supported way to emphasise or link part of a Label — `text` is plain text — and the portable way to express a cross-reference, because the handler performs the navigation in host code instead of relying on a URL that only a web router understands. All three platforms resolve partials at runtime against the resolved string, so a pattern range works and a localized or bound `text` is matched after translation. The semantics are identical everywhere: an array range is `[start, end)` with the end exclusive; a string range matches the first occurrence and the partial is skipped — not an error — when the pattern is absent; an out-of-bounds or inverted range is skipped; partials apply in declaration order and merge where they overlap, later declarations winning per property.",
+        "ja": "`range`（`[start, end]` の組・テキストパターン・binding）で選んだ部分文字列に font / サイズ / 色 / 下線 / 影を当て、`onclick` でタップ可能にできる。`text` が素のテキストである以上、Label 内で強調やリンクを得る正規の手段はこれ。遷移はハンドラがホスト言語側で行うので、web のルーターにしか通じない URL に頼らずに済み、相互参照の表現としても移植可能。 3 プラットフォームとも partial は実行時に解決後の文字列へ適用されるので、パターン指定も使え、ローカライズ済み・binding の `text` にも当たります。意味論も共通: 配列指定は `[start, end)` で end は排他、文字列指定は最初の 1 件のみでパターンが無ければその partial を skip（エラーにしない）、範囲外・逆転も skip、複数の partial は宣言順に適用され重なりはプロパティ単位で後勝ちマージ。"
       }
     },
     "linkable": {
@@ -149,5 +163,9 @@
       }
     }
   },
-  "relatedComponents": ["TextView", "IconLabel", "Button"]
+  "relatedComponents": [
+    "TextView",
+    "IconLabel",
+    "Button"
+  ]
 }
