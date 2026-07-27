@@ -501,8 +501,8 @@
       "ja": "~/.jsonui-mcp-server/ と ~/.claude.json"
     },
     "card_mcp_body": {
-      "en": "39 MCP tools across 6 groups (A:8 / B:6 / C:7 / D:9 / E:3 / F:6) with runtime-sync so the attribute schema is always current.",
-      "ja": "39 の MCP ツールを 6 グループ（A:8 / B:6 / C:7 / D:9 / E:3 / F:6）で提供。runtime-sync で常に最新の attribute スキーマを参照します。"
+      "en": "42 MCP tools across 6 groups (A:8 / B:7 / C:7 / D:9 / E:3 / F:8) with runtime-sync so the attribute schema is always current.",
+      "ja": "42 の MCP ツールを 6 グループ（A:8 / B:7 / C:7 / D:9 / E:3 / F:8）で提供。runtime-sync で常に最新の attribute スキーマを参照します。"
     },
     "card_agents_title": {
       "en": "Agents + Skills + Rules",
@@ -1407,8 +1407,8 @@
       "ja": "エージェントとの握手"
     },
     "section_agent_body": {
-      "en": "LLM-driven engineering lives or dies on context. A spec is a compact, machine-readable description of what a screen must do — exactly the context an agent needs. The spec's contract surface now extends to API schemas too: OpenAPI files in `docs/api/` become DTO + Domain layers across all three platforms, and consumers of a shared swagger can scope what gets generated via `api.schemas.{include_paths, exclude_paths, include_schemas, exclude_schemas, skip_domain}` — see [/concepts/data-models-from-openapi](/concepts/data-models-from-openapi) for the full story. The jsonui-mcp-server exposes the spec + attribute schema via 41 typed tools, so an agent can ask 'what props does a Collection accept?' and get back a structured answer, not a page of prose. The handshake is: the human writes the spec, the agent materializes the implementation within that spec, the drift gate keeps both honest.",
-      "ja": "LLM によるエンジニアリングはコンテキストの質と量で決まります。spec は画面の必須挙動をコンパクトに・機械可読な形式で記述した、まさにエージェントが欲しい形のコンテキストです。spec の射程は API schema にも広がりました: `docs/api/` の OpenAPI ファイルが 3 プラットフォーム共通の DTO + Domain 層になり、共有 swagger を消費する側は `api.schemas.{include_paths, exclude_paths, include_schemas, exclude_schemas, skip_domain}` で生成範囲を絞れます — 詳細は [/concepts/data-models-from-openapi](/concepts/data-models-from-openapi) を参照。jsonui-mcp-server は spec と attribute スキーマを 41 個の型付きツールとして公開し、エージェントは「Collection の props は何か」と聞けば散文ではなく構造化された答えを得ます。握手: 人が spec を書き、エージェントが spec の中で実装を形にし、ドリフトゲートが両者を正直に保つ。"
+      "en": "LLM-driven engineering lives or dies on context. A spec is a compact, machine-readable description of what a screen must do — exactly the context an agent needs. The spec's contract surface now extends to API schemas too: OpenAPI files in `docs/api/` become DTO + Domain layers across all three platforms, and consumers of a shared swagger can scope what gets generated via `api.schemas.{include_paths, exclude_paths, include_schemas, exclude_schemas, skip_domain}` — see [/concepts/data-models-from-openapi](/concepts/data-models-from-openapi) for the full story. The jsonui-mcp-server exposes the spec + attribute schema via 42 typed tools, so an agent can ask 'what props does a Collection accept?' and get back a structured answer, not a page of prose. The handshake is: the human writes the spec, the agent materializes the implementation within that spec, the drift gate keeps both honest.",
+      "ja": "LLM によるエンジニアリングはコンテキストの質と量で決まります。spec は画面の必須挙動をコンパクトに・機械可読な形式で記述した、まさにエージェントが欲しい形のコンテキストです。spec の射程は API schema にも広がりました: `docs/api/` の OpenAPI ファイルが 3 プラットフォーム共通の DTO + Domain 層になり、共有 swagger を消費する側は `api.schemas.{include_paths, exclude_paths, include_schemas, exclude_schemas, skip_domain}` で生成範囲を絞れます — 詳細は [/concepts/data-models-from-openapi](/concepts/data-models-from-openapi) を参照。jsonui-mcp-server は spec と attribute スキーマを 42 個の型付きツールとして公開し、エージェントは「Collection の props は何か」と聞けば散文ではなく構造化された答えを得ます。握手: 人が spec を書き、エージェントが spec の中で実装を形にし、ドリフトゲートが両者を正直に保つ。"
     },
     "section_tradeoff_heading": {
       "en": "What we give up",
@@ -3111,8 +3111,8 @@
       "ja": "conductor フロー"
     },
     "section_flow_body": {
-      "en": "You never invoke the specialist agents (define / implement / test / debug) directly. You start by telling Claude 'Read CLAUDE.md'. That triggers the jsonui-workflow skill, which asks you one question — what workflow are you here for — and dispatches the jsonui-conductor agent. The conductor inspects the repo through the MCP server (41 typed tools, including `list_api_specs` so it knows whether the project consumes OpenAPI), asks one or two clarifying questions, and hands off to exactly the right specialist with the right context already loaded. Everything flows through that single entry point.",
-      "ja": "specialist エージェント（define / implement / test / debug）を直接呼ぶことはありません。まず Claude に 'Read CLAUDE.md' と伝える。これが jsonui-workflow スキルを発火し、ワークフロー種別を 1 つ質問して jsonui-conductor エージェントに引き継ぐ。conductor は MCP サーバー（型付きツール 41 個。`list_api_specs` も含むので、プロジェクトが OpenAPI を使っているかを最初に把握できる）でリポジトリを精査し、1〜2 個の確認質問をしてから、適切なコンテキストを載せた状態で正しい specialist に引き渡す。全ては単一の入口経由で流れる構造になっています。"
+      "en": "You never invoke the specialist agents (define / implement / test / debug) directly. You start by telling Claude 'Read CLAUDE.md'. That triggers the jsonui-workflow skill, which asks you one question — what workflow are you here for — and dispatches the jsonui-conductor agent. The conductor inspects the repo through the MCP server (42 typed tools, including `list_api_specs` so it knows whether the project consumes OpenAPI), asks one or two clarifying questions, and hands off to exactly the right specialist with the right context already loaded. Everything flows through that single entry point.",
+      "ja": "specialist エージェント（define / implement / test / debug）を直接呼ぶことはありません。まず Claude に 'Read CLAUDE.md' と伝える。これが jsonui-workflow スキルを発火し、ワークフロー種別を 1 つ質問して jsonui-conductor エージェントに引き継ぐ。conductor は MCP サーバー（型付きツール 42 個。`list_api_specs` も含むので、プロジェクトが OpenAPI を使っているかを最初に把握できる）でリポジトリを精査し、1〜2 個の確認質問をしてから、適切なコンテキストを載せた状態で正しい specialist に引き渡す。全ては単一の入口経由で流れる構造になっています。"
     },
     "section_catalog_heading": {
       "en": "Agent catalog",
@@ -3255,8 +3255,8 @@
       "ja": "jsonui-mcp-server"
     },
     "next_mcp_description": {
-      "en": "41 typed MCP tools — the API surface every agent uses to inspect the repo, including the Group E discovery tools and the Group F test tools.",
-      "ja": "41 個の型付き MCP ツール — 全エージェントがリポジトリ精査に使う API。Group E の discovery tool と Group F の test tool も含まれます。"
+      "en": "42 typed MCP tools — the API surface every agent uses to inspect the repo, including the Group E discovery tools and the Group F test tools.",
+      "ja": "42 個の型付き MCP ツール — 全エージェントがリポジトリ精査に使う API。Group E の discovery tool と Group F の test tool も含まれます。"
     },
     "footer_copyright": {
       "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
@@ -3305,8 +3305,8 @@
       "ja": "MCP とは"
     },
     "section_what_body": {
-      "en": "Model Context Protocol is Anthropic's standard for exposing tools to an LLM agent. jsonui-mcp-server is our implementation: it runs as a subprocess that Claude Code (or Codex) spawns on project load, and it publishes a manifest of 41 named tools. Each tool has a typed input schema, a typed output shape, and a brief description. The agent calls them by name; we own the server that answers.",
-      "ja": "Model Context Protocol は LLM エージェントにツールを公開するための Anthropic 標準。jsonui-mcp-server はその実装で、Claude Code（または Codex）がプロジェクト読み込み時に起動する subprocess として動作し、41 個の名前付きツールの manifest を公開します。各ツールは入力スキーマ・出力 shape・短い説明を型付きで持つ。エージェントは名前でツールを呼び、応答するサーバーは私たちが保守します。"
+      "en": "Model Context Protocol is Anthropic's standard for exposing tools to an LLM agent. jsonui-mcp-server is our implementation: it runs as a subprocess that Claude Code (or Codex) spawns on project load, and it publishes a manifest of 42 named tools. Each tool has a typed input schema, a typed output shape, and a brief description. The agent calls them by name; we own the server that answers.",
+      "ja": "Model Context Protocol は LLM エージェントにツールを公開するための Anthropic 標準。jsonui-mcp-server はその実装で、Claude Code（または Codex）がプロジェクト読み込み時に起動する subprocess として動作し、42 個の名前付きツールの manifest を公開します。各ツールは入力スキーマ・出力 shape・短い説明を型付きで持つ。エージェントは名前でツールを呼び、応答するサーバーは私たちが保守します。"
     },
     "section_shape_heading": {
       "en": "The typed surface",
@@ -3321,8 +3321,8 @@
       "ja": "ツール一覧"
     },
     "section_catalog_body": {
-      "en": "Hand-authored catalog kept in sync with the MCP server's 6-group tool list (41 tools currently — A:8 / B:6 / C:7 / D:9 / E:3 / F:8). Per-tool parameter docs live at [/reference/mcp-tools](/reference/mcp-tools).",
-      "ja": "MCP サーバの 6 グループ tool list と同期する手書きカタログ（現在 41 件 — A:8 / B:6 / C:7 / D:9 / E:3 / F:8）。ツール毎のパラメータ詳細は [/reference/mcp-tools](/reference/mcp-tools) を参照。"
+      "en": "Hand-authored catalog kept in sync with the MCP server's 6-group tool list (42 tools currently — A:8 / B:7 / C:7 / D:9 / E:3 / F:8). Per-tool parameter docs live at [/reference/mcp-tools](/reference/mcp-tools).",
+      "ja": "MCP サーバの 6 グループ tool list と同期する手書きカタログ（現在 42 件 — A:8 / B:7 / C:7 / D:9 / E:3 / F:8）。ツール毎のパラメータ詳細は [/reference/mcp-tools](/reference/mcp-tools) を参照。"
     },
     "section_groups_heading": {
       "en": "Group semantics",
@@ -4019,8 +4019,8 @@
       "ja": "jsonui-mcp-server"
     },
     "next_mcp_description": {
-      "en": "The 41 typed MCP tools the agents call — many of them wrap jui commands; Group E adds API model discovery, Group F adds test tooling.",
-      "ja": "エージェントが呼ぶ 41 個の型付き MCP ツール — 多くは jui コマンドのラッパー。Group E で API model discovery、Group F で test tooling が加わりました。"
+      "en": "The 42 typed MCP tools the agents call — many of them wrap jui commands; Group E adds API model discovery, Group F adds test tooling.",
+      "ja": "エージェントが呼ぶ 42 個の型付き MCP ツール — 多くは jui コマンドのラッパー。Group E で API model discovery、Group F で test tooling が加わりました。"
     },
     "footer_copyright": {
       "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
@@ -7977,8 +7977,8 @@
       "ja": "MCP ツール API"
     },
     "lead": {
-      "en": "All 41 MCP tools, grouped A–F (Lookup / Validation / Generation / Build + Runtime / API Model Discovery / Test Tooling), with their input schemas, return shapes, and one-line descriptions. Hand-authored catalog kept in sync with the MCP server's 6-group tool list.",
-      "ja": "全 41 MCP ツール、A–F グループ (Lookup / Validation / Generation / Build + Runtime / API Model Discovery / Test Tooling) 別に、入力スキーマ・戻り値 shape・1 行説明を掲載。MCP サーバの 6 グループ tool list と同期する手書きカタログです。"
+      "en": "All 42 MCP tools, grouped A–F (Lookup / Validation / Generation / Build + Runtime / API Model Discovery / Test Tooling), with their input schemas, return shapes, and one-line descriptions. Hand-authored catalog kept in sync with the MCP server's 6-group tool list.",
+      "ja": "全 42 MCP ツール、A–F グループ (Lookup / Validation / Generation / Build + Runtime / API Model Discovery / Test Tooling) 別に、入力スキーマ・戻り値 shape・1 行説明を掲載。MCP サーバの 6 グループ tool list と同期する手書きカタログです。"
     },
     "read_time": {
       "en": "auto-generated",
