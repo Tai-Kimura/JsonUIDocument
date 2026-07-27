@@ -77,6 +77,16 @@
               "anchorUrl": "#attr-partial"
             },
             {
+              "id": "overview_role",
+              "name": "role",
+              "type": "string",
+              "summary": {
+                "en": "Declares what the layout IS, on the layout root: `screen` | `cell` | `partial`. It wins over ever…",
+                "ja": "レイアウト root に書く「このレイアウトは何か」の宣言: `screen` | `cell` | `partial`。すべての導出ルールより優先されるので、外れた分類を直す手段になります —…"
+              },
+              "anchorUrl": "#attr-role"
+            },
+            {
               "id": "overview_tag",
               "name": "tag",
               "type": "number | binding",
@@ -473,6 +483,89 @@
                 "ja": ""
               },
               "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_role",
+              "name": "role",
+              "anchorId": "attr-role",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "screen",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "cell",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "partial",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Declares what the layout IS, on the layout root: `screen` | `cell` | `partial`. It wins over every derivation rule, so it is the way to correct an outlier — a cell that no other layout happens to reference is otherwise derived as a screen. Only a layout classified as a screen carries a screen marker, is a valid `screen` value in a test, and becomes a transition-diagram node. Read the current classification back with `jui screens`.",
+                "ja": "レイアウト root に書く「このレイアウトは何か」の宣言: `screen` | `cell` | `partial`。すべての導出ルールより優先されるので、外れた分類を直す手段になります — たまたまどのレイアウトからも参照されていない cell は、放っておくと画面として導出されます。画面に分類されたレイアウトだけが screen marker を持ち、テストの `screen` の値として妥当で、遷移図のノードになります。現在の分類は `jui screens` で確認できます。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
               "required": ""
             },
             {

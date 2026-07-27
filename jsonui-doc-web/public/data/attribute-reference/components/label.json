@@ -139,16 +139,16 @@
                 ]
               },
               "description": {
-                "en": "Text content (binding supported, supports interpolation).",
-                "ja": "表示するテキスト。`@{binding}` と `\"合計: @{count}\"` のような補間をサポート。"
+                "en": "Text content (binding supported, supports interpolation). Plain text — markdown is not interpreted.",
+                "ja": "表示するテキスト。`@{binding}` と `\"合計: @{count}\"` のような補間をサポート。素のテキストで markdown は解釈しない。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Accepts literal string, `@{binding}`, `@string/key`, or mixed `\"Total: @{count}\"` interpolation. Unresolved bindings render as empty string in release builds.",
-                "ja": "リテラル文字列、`@{binding}`、`@string/key`、または `\"合計: @{count}\"` のような補間をサポート。未解決の binding はリリースビルドで空文字として描画される。"
+                "en": "Accepts literal string, `@{binding}`, `@string/key`, or mixed `\"Total: @{count}\"` interpolation. Unresolved bindings render as empty string in release builds. The value is plain text: markdown is never interpreted, so `[label](/path)`, `**bold**` and backticks render literally, brackets and all. Emphasise or link part of the string with `partialAttributes`; rendering real markdown is out of scope for Label and belongs in a custom component.",
+                "ja": "リテラル文字列、`@{binding}`、`@string/key`、または `\"合計: @{count}\"` のような補間をサポート。未解決の binding はリリースビルドで空文字として描画される。値は素のテキストで、markdown は解釈されない — `[label](/path)`・`**bold**`・バッククォートは括弧ごとそのまま出る。一部を強調・リンクにしたい場合は `partialAttributes` を使う。markdown そのものを描画したいなら Label のスコープ外で、カスタムコンポーネントの仕事。"
               },
               "type": "string | binding",
               "required": ""
@@ -1239,16 +1239,16 @@
                 ]
               },
               "description": {
-                "en": "Enable URL/phone detection.",
-                "ja": "URL・電話番号を自動検出してリンク化する。"
+                "en": "Auto-link bare http(s) URLs and phone numbers; markdown and relative paths are never linked.",
+                "ja": "裸の http(s) URL と電話番号を自動リンク化する。markdown と相対パスはリンクにしない。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "When `true`, URLs, phone numbers, and emails in the text become tappable. Platform-specific link detection.",
-                "ja": "`true` にすると、テキスト内の URL・電話番号・メールアドレスがタップ可能になる。リンク検出はプラットフォーム依存。"
+                "en": "When `true`, bare `http(s)` URLs and phone numbers in the text become tappable. Markdown is not parsed, and relative paths are deliberately never linked: a path like `/guides/x` only means something to a web router, so linkifying it would produce a control that is dead on iOS and Android. Express a cross-document reference with `partialAttributes` (`range` + `onclick`) and let the handler navigate — it can also scroll to the target position, which an href cannot express on mobile.",
+                "ja": "`true` にすると、テキスト内の裸の `http(s)` URL と電話番号がタップ可能になる。markdown は解析せず、相対パスは意図的にリンク化しない — `/guides/x` のようなパスは web のルーターにしか意味がなく、リンクにすると iOS / Android では死んだコントロールになるため。文書間の相互参照は `partialAttributes`（`range` + `onclick`）で表現し、遷移はハンドラが行う — 目的位置へのスクロールもハンドラなら書けるが、href では表現できない。"
               },
               "type": "boolean | binding",
               "required": ""
@@ -1910,7 +1910,7 @@
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
               "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
                   {
@@ -1946,16 +1946,16 @@
                 ]
               },
               "description": {
-                "en": "Partial text styling.",
-                "ja": "部分テキストのスタイル属性。"
+                "en": "Style (and optionally make tappable) a substring selected by `range`.",
+                "ja": "`range` で選んだ部分文字列にスタイルを当て、必要なら `onclick` でタップ可能にする。"
               },
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "Style a substring picked by `range` (a `[start, end]` pair, a text pattern, or a binding) with font / size / colour / underline / shadow, and make it tappable with `onclick`. This is the supported way to emphasise or link part of a Label — `text` is plain text — and the portable way to express a cross-reference, because the handler performs the navigation in host code instead of relying on a URL that only a web router understands.",
+                "ja": "`range`（`[start, end]` の組・テキストパターン・binding）で選んだ部分文字列に font / サイズ / 色 / 下線 / 影を当て、`onclick` でタップ可能にできる。`text` が素のテキストである以上、Label 内で強調やリンクを得る正規の手段はこれ。遷移はハンドラがホスト言語側で行うので、web のルーターにしか通じない URL に頼らずに済み、相互参照の表現としても移植可能。"
               },
               "type": "array",
               "required": ""
@@ -2557,16 +2557,16 @@
                 ]
               },
               "description": {
-                "en": "Text content (binding supported, supports interpolation).",
-                "ja": "表示するテキスト。`@{binding}` と `\"合計: @{count}\"` のような補間をサポート。"
+                "en": "Text content (binding supported, supports interpolation). Plain text — markdown is not interpreted.",
+                "ja": "表示するテキスト。`@{binding}` と `\"合計: @{count}\"` のような補間をサポート。素のテキストで markdown は解釈しない。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Accepts literal string, `@{binding}`, `@string/key`, or mixed `\"Total: @{count}\"` interpolation. Unresolved bindings render as empty string in release builds.",
-                "ja": "リテラル文字列、`@{binding}`、`@string/key`、または `\"合計: @{count}\"` のような補間をサポート。未解決の binding はリリースビルドで空文字として描画される。"
+                "en": "Accepts literal string, `@{binding}`, `@string/key`, or mixed `\"Total: @{count}\"` interpolation. Unresolved bindings render as empty string in release builds. The value is plain text: markdown is never interpreted, so `[label](/path)`, `**bold**` and backticks render literally, brackets and all. Emphasise or link part of the string with `partialAttributes`; rendering real markdown is out of scope for Label and belongs in a custom component.",
+                "ja": "リテラル文字列、`@{binding}`、`@string/key`、または `\"合計: @{count}\"` のような補間をサポート。未解決の binding はリリースビルドで空文字として描画される。値は素のテキストで、markdown は解釈されない — `[label](/path)`・`**bold**`・バッククォートは括弧ごとそのまま出る。一部を強調・リンクにしたい場合は `partialAttributes` を使う。markdown そのものを描画したいなら Label のスコープ外で、カスタムコンポーネントの仕事。"
               },
               "type": "string | binding",
               "required": ""
@@ -3657,16 +3657,16 @@
                 ]
               },
               "description": {
-                "en": "Enable URL/phone detection.",
-                "ja": "URL・電話番号を自動検出してリンク化する。"
+                "en": "Auto-link bare http(s) URLs and phone numbers; markdown and relative paths are never linked.",
+                "ja": "裸の http(s) URL と電話番号を自動リンク化する。markdown と相対パスはリンクにしない。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "When `true`, URLs, phone numbers, and emails in the text become tappable. Platform-specific link detection.",
-                "ja": "`true` にすると、テキスト内の URL・電話番号・メールアドレスがタップ可能になる。リンク検出はプラットフォーム依存。"
+                "en": "When `true`, bare `http(s)` URLs and phone numbers in the text become tappable. Markdown is not parsed, and relative paths are deliberately never linked: a path like `/guides/x` only means something to a web router, so linkifying it would produce a control that is dead on iOS and Android. Express a cross-document reference with `partialAttributes` (`range` + `onclick`) and let the handler navigate — it can also scroll to the target position, which an href cannot express on mobile.",
+                "ja": "`true` にすると、テキスト内の裸の `http(s)` URL と電話番号がタップ可能になる。markdown は解析せず、相対パスは意図的にリンク化しない — `/guides/x` のようなパスは web のルーターにしか意味がなく、リンクにすると iOS / Android では死んだコントロールになるため。文書間の相互参照は `partialAttributes`（`range` + `onclick`）で表現し、遷移はハンドラが行う — 目的位置へのスクロールもハンドラなら書けるが、href では表現できない。"
               },
               "type": "boolean | binding",
               "required": ""
@@ -4328,7 +4328,7 @@
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
               "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
                   {
@@ -4364,16 +4364,16 @@
                 ]
               },
               "description": {
-                "en": "Partial text styling.",
-                "ja": "部分テキストのスタイル属性。"
+                "en": "Style (and optionally make tappable) a substring selected by `range`.",
+                "ja": "`range` で選んだ部分文字列にスタイルを当て、必要なら `onclick` でタップ可能にする。"
               },
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "Style a substring picked by `range` (a `[start, end]` pair, a text pattern, or a binding) with font / size / colour / underline / shadow, and make it tappable with `onclick`. This is the supported way to emphasise or link part of a Label — `text` is plain text — and the portable way to express a cross-reference, because the handler performs the navigation in host code instead of relying on a URL that only a web router understands.",
+                "ja": "`range`（`[start, end]` の組・テキストパターン・binding）で選んだ部分文字列に font / サイズ / 色 / 下線 / 影を当て、`onclick` でタップ可能にできる。`text` が素のテキストである以上、Label 内で強調やリンクを得る正規の手段はこれ。遷移はハンドラがホスト言語側で行うので、web のルーターにしか通じない URL に頼らずに済み、相互参照の表現としても移植可能。"
               },
               "type": "array",
               "required": ""

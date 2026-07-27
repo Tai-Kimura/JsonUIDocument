@@ -341,8 +341,8 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Emit JSON instead of the aligned table (what the MCP wrappers consume).",
-            "ja": "整形テーブルの代わりに JSON を出力（MCP ラッパーが消費する形式）。"
+            "en": "Emit JSON instead of the aligned table (what the MCP wrappers consume). Adds `derivedScreens` — every screen the resolver derived rather than read from an explicit `role`, which is the complete set to audit. The `needsReview` list beside it is a name-shaped hint, never complete.",
+            "ja": "整形テーブルの代わりに JSON を出力（MCP ラッパーが消費する形式）。`derivedScreens` が付き、明示 `role` ではなく導出で画面になったものが全件出ます — 監査すべき完全な集合はこちら。隣の `needsReview` は名前ベースのヒントで、完全なリストではありません。"
           }
         },
         {
@@ -358,7 +358,7 @@
       "examples": [
         {
           "language": "bash",
-          "code": "$ jui screens\nScreen identity: 97 screen(s), 36 non-screen(s)\n  cell     agent_row                        (referenced)\n  screen   agents                           (default)\n  cell     breadcrumb_item                  (referenced)\n  screen   data-binding                     (default)"
+          "code": "$ jui screens\nScreen identity: 95 screen(s), 36 non-screen(s)\n  95 of 95 screen(s) DERIVED, not declared. Derivation cannot see cells built from host code; declare \"role\": \"cell\" on any that are not screens ('jui screens --json' lists them under derivedScreens).\n  cell     agent_row                        (referenced)\n  screen   agents                           (default)\n  cell     breadcrumb_item                  (referenced)\n  screen   data-binding                     (default)"
         }
       ],
       "seeAlso": [
