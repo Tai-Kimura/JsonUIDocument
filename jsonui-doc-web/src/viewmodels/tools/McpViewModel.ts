@@ -28,7 +28,7 @@ const TOOL_IDS = [
   "lookup_component", "lookup_attribute", "search_components", "get_data_source",
 
   "doc_validate_spec", "doc_validate_component", "doc_rules_init", "doc_rules_show",
-  "jui_verify", "get_binding_rules",
+  "jui_verify", "get_binding_rules", "get_screen_identity",
 
   "doc_init_spec", "doc_init_component", "doc_generate_spec", "doc_generate_component",
   "doc_generate_html", "jui_generate_project", "jui_generate_screen",

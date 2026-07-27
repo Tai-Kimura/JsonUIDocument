@@ -11,7 +11,10 @@
         "ja": "Layout 内の一意識別子。ViewModel 参照とテストランナーの selector に必須。命名規則: `<screen>_<purpose>`。"
       },
       "examples": [
-        { "language": "json", "code": "{ \"type\": \"Button\", \"id\": \"login_submit_button\", \"text\": \"@string/submit\" }" }
+        {
+          "language": "json",
+          "code": "{ \"type\": \"Button\", \"id\": \"login_submit_button\", \"text\": \"@string/submit\" }"
+        }
       ]
     },
     "testId": {
@@ -44,14 +47,38 @@
         "ja": "別の Layout ファイルを参照し、この位置にインライン展開。パスは layouts ルートからの相対、拡張子なし。"
       },
       "examples": [
-        { "language": "json", "code": "{ \"include\": \"common/header\" }" }
+        {
+          "language": "json",
+          "code": "{ \"include\": \"common/header\" }"
+        }
       ]
     },
     "partial": {
       "summary": {
-        "en": "Marks the file as a partial layout that is only usable via `include`. Prevents direct routing.",
-        "ja": "このファイルが `include` 経由でのみ使えるパーシャル Layout であることをマーク。直接ルーティングを防ぐ。"
+        "en": "Marks the layout as a partial that is only usable via `include`. Also excludes it from screen identity — a partial is never a screen, never carries a screen marker and is not a valid `screen` value in a test. It is a sufficient condition only: prefer the explicit `role` when you are correcting a classification.",
+        "ja": "そのレイアウトが `include` 経由でのみ使う partial であることをマーク。screen identity からも除外されます — partial は画面ではなく、screen marker も持たず、テストの `screen` の値としても妥当ではありません。ただし十分条件にすぎないので、分類を直す用途では明示の `role` を優先します。"
       }
+    },
+    "role": {
+      "summary": {
+        "en": "Declares what the layout IS, on the layout root: `screen` | `cell` | `partial`. It wins over every derivation rule, so it is the way to correct an outlier — a cell that no other layout happens to reference is otherwise derived as a screen. Only a layout classified as a screen carries a screen marker, is a valid `screen` value in a test, and becomes a transition-diagram node. Read the current classification back with `jui screens`.",
+        "ja": "レイアウト root に書く「このレイアウトは何か」の宣言: `screen` | `cell` | `partial`。すべての導出ルールより優先されるので、外れた分類を直す手段になります — たまたまどのレイアウトからも参照されていない cell は、放っておくと画面として導出されます。画面に分類されたレイアウトだけが screen marker を持ち、テストの `screen` の値として妥当で、遷移図のノードになります。現在の分類は `jui screens` で確認できます。"
+      },
+      "enumValues": [
+        "screen",
+        "cell",
+        "partial"
+      ],
+      "examples": [
+        {
+          "language": "json",
+          "code": "{ \"type\": \"View\", \"role\": \"cell\", \"child\": [ ] }"
+        },
+        {
+          "language": "text",
+          "code": "$ jui screens\n  cell     conversation_cell                (role)\n  screen   chat                             (default)"
+        }
+      ]
     },
     "generatedBy": {
       "summary": {

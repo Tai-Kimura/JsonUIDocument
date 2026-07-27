@@ -1,0 +1,314 @@
+{
+  "type": "View",
+  "id": "concepts_screen_identity_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks", "class": "CollectionDataSource" },
+        { "name": "onNavigateConcepts", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "concepts_screen_identity_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "concepts_screen_identity_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 24, 32],
+          "child": [
+            { "type": "Label", "width": "wrapContent", "height": "wrapContent", "fontSize": 13, "fontWeight": "semibold", "fontColor": "#64748B", "tapBackground": "#F3F4F6", "onClick": "@{onNavigateConcepts}", "text": "breadcrumb" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 36, "fontWeight": "bold", "fontColor": "#0B1220", "text": "title" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 17, "fontColor": "#475467", "text": "lead" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 13, "fontColor": "#64748B", "text": "read_time" }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "concepts_screen_identity_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "concepts_screen_identity_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_problem",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_problem_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_problem_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "{ \"assert\": \"screen\", \"name\": \"mypage\" }",
+                      "language": "json",
+                      "filename": "the whole assertion",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_id",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_id_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_id_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_id_bullet_recursive" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_id_bullet_unique" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_id_bullet_variant" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_classification",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_classification_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_classification_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "1. explicit  \"role\": \"screen\" | \"cell\" | \"partial\" on the layout root  → wins outright\n2. referenced as a non-screen by another layout\n     (cell / header / footer / cellClasses / include)                → not a screen\n3. \"partial\": true                                                    → not a screen\n4. anything left over                                                 → screen\n\n$ jui screens          # read back what derivation decided\n  screen   home                             (default)\n  cell     conversation_cell                (role)\n  partial  filter_sheet_body                (partial)",
+                      "language": "text",
+                      "filename": "classification order",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_classification_note" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_classification_appowned" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_marker",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_marker_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_marker_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "Platform        | marker node                       | gate\n----------------+-----------------------------------+---------------------------\niOS (SwiftUI)   | 0.5x0.5 clear leaf in an overlay, | #if DEBUG in the library\n                | accessibilityIdentifier           |   modifier\niOS (UIKit)     | 1x1 sibling UIView,               | #if DEBUG\n                | accessibilityIdentifier           |\nAndroid         | 1.dp Box sibling, testTag +       | host app's FLAG_DEBUGGABLE\n                | testTagsAsResourceId on itself    |   (runtime check)\nWeb (React)     | data-screen=\"<id>\" on the root    | NODE_ENV via a generated\n                | element (present in SSR markup)   |   screenMarker() helper",
+                      "language": "text",
+                      "filename": "marker per platform",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "text": "section_marker_bullet_one" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_marker_bullet_placement" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_marker_bullet_debug" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_assert",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_assert_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_assert_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "{\n  \"steps\": [\n    { \"screen\": \"login\", \"action\": \"tap\", \"id\": \"submit_button\" },\n    { \"assert\": \"screen\", \"name\": \"mypage\", \"timeout\": 10000 }\n  ]\n}",
+                      "language": "json",
+                      "filename": "flow test step",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_assert_note" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_implicit",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_implicit_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_implicit_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_implicit_bullet_absent" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_implicit_bullet_previous" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_implicit_bullet_notdisplayed" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_implicit_bullet_children" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 16, "fontColor": "#475467", "text": "section_implicit_rollout" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_validation",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_validation_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_validation_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "screen-unknown              error    the 'screen' value is neither a layout nor an app-owned screen\nscreen-not-a-screen         error    the 'screen' value resolves to a cell or partial — name the owning screen\nscreen-id-collision         error    two layouts share a basename, so the id is ambiguous\nscreen-source-layout-missing error    a flow's sources[].layout path does not exist\nscreen-alias-unreferenced   warning  a declared sources[].alias is referenced by no step",
+                      "language": "text",
+                      "filename": "validator rules",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_validation_note" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_limits",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_limits_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_limits_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_limits_bullet_hydration" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_limits_bullet_suspend" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_limits_bullet_exclusive" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "concepts_screen_identity_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [32, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 24, "fontWeight": "bold", "fontColor": "chrome_ink", "text": "next_heading" },
+                    {
+                      "type": "Collection",
+                      "id": "concepts_screen_identity_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 3,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/next_step_card" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "concepts_screen_identity_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 12, "fontColor": "#94A3B8", "text": "footer_copyright" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "concepts_screen_identity_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [24, 16, 24, 16],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "concepts_screen_identity_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 0, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        { "id": "toc_problem",        "label": "toc_row_problem",        "anchor": "section_problem",        "level": 1 },
+                        { "id": "toc_id",             "label": "toc_row_id",             "anchor": "section_id",             "level": 1 },
+                        { "id": "toc_classification", "label": "toc_row_classification", "anchor": "section_classification", "level": 1 },
+                        { "id": "toc_marker",         "label": "toc_row_marker",         "anchor": "section_marker",         "level": 1 },
+                        { "id": "toc_assert",         "label": "toc_row_assert",         "anchor": "section_assert",         "level": 1 },
+                        { "id": "toc_implicit",       "label": "toc_row_implicit",       "anchor": "section_implicit",       "level": 1 },
+                        { "id": "toc_validation",     "label": "toc_row_validation",     "anchor": "section_validation",     "level": 1 },
+                        { "id": "toc_limits",         "label": "toc_row_limits",         "anchor": "section_limits",         "level": 1 }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

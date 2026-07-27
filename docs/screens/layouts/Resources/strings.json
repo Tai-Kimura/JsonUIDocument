@@ -2223,6 +2223,228 @@
       "ja": "どれを選ぶか"
     }
   },
+  "concepts_screen_identity": {
+    "breadcrumb": {
+      "en": "← Concepts",
+      "ja": "← Concepts"
+    },
+    "title": {
+      "en": "Screen identity and navigation assertion",
+      "ja": "画面アイデンティティと遷移検証"
+    },
+    "lead": {
+      "en": "A test should be able to say 'we are on the my-page screen' without knowing a single element inside it. That needs one shared answer to 'what is a screen, and what is it called' — used by layouts, specs, tests, generated code and the transition diagram alike. Here is that answer, and the runtime marker that makes it checkable.",
+      "ja": "テストは画面の中身を 1 つも知らずに「いま mypage 画面にいる」と言えるべきです。そのためには「画面とは何か、その名前は何か」という問いに、レイアウト・spec・テスト・生成コード・遷移図が同じ 1 つの答えを使う必要があります。その答えと、それを実行時に検証可能にする marker の話です。"
+    },
+    "read_time": {
+      "en": "~8 min read",
+      "ja": "約 8 分"
+    },
+    "section_problem_heading": {
+      "en": "The assertion you want to write",
+      "ja": "書きたい検証はこれだけ"
+    },
+    "section_problem_body": {
+      "en": "Asserting 'the navigation worked' by probing for some element that happens to live on the destination is fragile: the element moves, the copy changes, and the test starts reporting a layout edit as a navigation bug. A screen assertion names the destination itself. The runtime side is a marker that code generation emits into every screen — tests never spell it, and it exists only in development builds.",
+      "ja": "遷移先にたまたま存在する要素を探して「遷移できた」と判定するのは脆い方法です。要素は移動するし文言も変わるので、レイアウトの編集が遷移のバグとして報告され始めます。画面検証は遷移先そのものを名指しします。実行時側の仕掛けは、codegen が各画面に埋め込む marker です — テストがそれを綴ることはなく、開発ビルドにしか存在しません。"
+    },
+    "section_id_heading": {
+      "en": "A screen's id is its layout basename",
+      "ja": "画面 ID はレイアウトの basename"
+    },
+    "section_id_body": {
+      "en": "`Layouts/mypage.json` is the screen `mypage`. The same string is what a spec references, what a test's `screen` key holds, what the generated marker carries, and what a diagram node is called — there is no second naming scheme to keep in sync.",
+      "ja": "`Layouts/mypage.json` は画面 `mypage` です。spec が参照する文字列も、テストの `screen` キーに書く文字列も、生成された marker が持つ文字列も、遷移図のノード名も同じ — 同期を取るべき第 2 の命名体系は存在しません。"
+    },
+    "section_id_bullet_recursive": {
+      "en": "• Layout directories are scanned **recursively** (`Layouts/**/*.json`). Nesting sheets and cells one level down is normal, so a flat glob would silently miss most of them.",
+      "ja": "• レイアウトディレクトリは**再帰的に**走査されます（`Layouts/**/*.json`）。sheet や cell を 1 階層下に置くのは普通なので、フラットな glob では大半を取りこぼします。"
+    },
+    "section_id_bullet_unique": {
+      "en": "• Basenames must be **unique across the whole tree**. Two `detail.json` in different folders make the id ambiguous — that is the `screen-id-collision` error, not a silently-picked winner.",
+      "ja": "• basename は**ツリー全体で一意**である必要があります。別フォルダに `detail.json` が 2 つあると ID が曖昧になり、`screen-id-collision` エラーになります（どちらかが黙って採用されることはありません）。"
+    },
+    "section_id_bullet_variant": {
+      "en": "• Responsive variant files normalize to the base id: `home@regular.json` is still the screen `home`. A variant is another rendering of one screen, never a second screen.",
+      "ja": "• レスポンシブのバリアントファイルは基底 ID に正規化されます: `home@regular.json` も画面 `home` です。バリアントは 1 つの画面の別レンダリングであって、別画面ではありません。"
+    },
+    "section_classification_heading": {
+      "en": "Not every layout is a screen",
+      "ja": "すべてのレイアウトが画面ではない"
+    },
+    "section_classification_body": {
+      "en": "Cells and partials are layouts too, but they are instantiated inside another layout — sometimes once per data row. They must not carry a marker, must not be a valid `screen` value in a test, and must not become diagram nodes. Classification runs in a fixed order and the earliest matching rule wins.",
+      "ja": "cell や partial もレイアウトですが、それらは別のレイアウトの内側で（ときにはデータ 1 行につき 1 個）実体化されます。marker を持ってはならず、テストの `screen` の値として妥当であってもならず、遷移図のノードになってもいけません。分類は固定順で走り、最初に一致した規則が勝ちます。"
+    },
+    "section_classification_note": {
+      "en": "Derivation is deliberately imperfect — a screen-shaped layout that nothing references yet is classified as a screen. That is why the tools print what they decided: run `jui screens` (or the MCP `list_layouts`, which folds the same classification in), and correct any outlier with an explicit `\"role\"` on the layout root. `\"partial\": true` still works but is a sufficient condition only, so it is not enough on its own.",
+      "ja": "導出はあえて不完全です — まだどこからも参照されていない画面型のレイアウトは画面に分類されます。だからツールは判定結果を印字します: `jui screens`（同じ分類を折り込んだ MCP の `list_layouts` でも可）で確認し、外れているものはレイアウト root の `\"role\"` 明示で直します。`\"partial\": true` も有効ですが十分条件にすぎないので、それだけでは足りません。"
+    },
+    "section_classification_appowned": {
+      "en": "Screens the app owns outright — a hand-written page with no JsonUI layout behind it — are declared in `jui.config.json` under `test.appOwnedScreens: [\"tokushoho\", \"company\"]`. They are real navigation destinations, so without the declaration a legitimate id would be rejected as `screen-unknown`. On web the page's root element carries the same `data-screen=\"<id>\"` attribute code generation would emit, so drivers cannot tell the two apart.",
+      "ja": "アプリが自前で持つ画面（JsonUI レイアウトを持たない手書きページ）は `jui.config.json` の `test.appOwnedScreens: [\"tokushoho\", \"company\"]` で宣言します。これらも実在の遷移先なので、宣言しないと正当な ID が `screen-unknown` で弾かれます。web ではページの root 要素に codegen と同じ `data-screen=\"<id>\"` を手で付けるため、driver からは区別されません。"
+    },
+    "section_marker_heading": {
+      "en": "The marker is a dedicated node, in dev builds only",
+      "ja": "marker は専用ノード、開発ビルド限定"
+    },
+    "section_marker_body": {
+      "en": "Code generation emits `__screen_<id>` into every screen and only into screens. It is a node of its own, never an identifier applied to the layout's root: every platform has exactly one identifier slot per node, and the root's own id is already load-bearing for existing tests. The runtime layer forms the prefixed name from a bare screen id, so generators pass the id and nothing else.",
+      "ja": "codegen は `__screen_<id>` を各画面に、画面にだけ出力します。これは独立したノードで、レイアウト root への識別子付与ではありません: 各プラットフォームのノードには識別子スロットが 1 つしかなく、root 自身の id は既存テストが依存しているからです。接頭辞付きの名前を組み立てるのはランタイム層の責務なので、generator は素の画面 ID だけを渡します。"
+    },
+    "section_marker_bullet_one": {
+      "en": "• A rendered screen exposes **exactly one** marker. Zero means the generated code or the library pin is stale; two or more is a generator bug. Both are hard errors, not warnings.",
+      "ja": "• 描画中の画面が公開する marker は**ちょうど 1 つ**。ゼロなら生成コードかライブラリの pin が古く、2 つ以上なら generator のバグです。どちらも warning ではなくハードエラー扱い。"
+    },
+    "section_marker_bullet_placement": {
+      "en": "• The marker sits as a **sibling of the screen's scrollable**, never inside the scrolling content: a node scrolled out of the viewport disappears from the accessibility tree, and the screen would stop reporting itself as displayed halfway down a long page (measured on Android API 35).",
+      "ja": "• marker は**スクロール可能要素の兄弟**に置き、スクロールする内容の中には入れません: ビューポート外に出たノードはアクセシビリティツリーから消えるため、長いページを下までスクロールすると画面が「表示中」と報告しなくなります（Android API 35 で実測）。"
+    },
+    "section_marker_bullet_debug": {
+      "en": "• The gate is per platform: `#if DEBUG` on iOS, the host app's `FLAG_DEBUGGABLE` at runtime on Android (KotlinJsonUI ships as an AAR, so its own BuildConfig describes the library, not your app), and a generated `screenMarker()` helper keyed on the literal `process.env.NODE_ENV` on web. UI tests therefore run against a debug / development build — the same constraint Dynamic mode already imposes.",
+      "ja": "• ゲートはプラットフォームごとに異なります: iOS は `#if DEBUG`、Android はホストアプリの `FLAG_DEBUGGABLE` を実行時に判定（KotlinJsonUI は AAR 配布なので自身の BuildConfig はライブラリのビルド方法しか表さない）、web は生成された `screenMarker()` ヘルパーがリテラルの `process.env.NODE_ENV` を見ます。したがって UI テストは debug / development ビルドに対して実行します — Dynamic mode が既に課しているのと同じ制約です。"
+    },
+    "section_assert_heading": {
+      "en": "`assert: \"screen\"`",
+      "ja": "`assert: \"screen\"`"
+    },
+    "section_assert_body": {
+      "en": "The target key is `name`, mirroring the screenshot assertion. It is deliberately not the step-level `screen` key: that one says where the step runs, and during a transition the two legitimately differ. `timeout`, `label`, `optional` and `when` are accepted like any other assertion, and assertions already auto-wait — there is no separate `waitForScreen`.",
+      "ja": "対象キーは `name` で、スクリーンショット検証と揃えてあります。step レベルの `screen` キーとは意図的に別です: あちらは「その step がどの画面で走るか」であり、遷移の最中は両者が食い違うのが正当だからです。`timeout` / `label` / `optional` / `when` は他の検証と同じく指定でき、検証は元から auto-wait するので `waitForScreen` のような別動詞はありません。"
+    },
+    "section_assert_note": {
+      "en": "It asserts the named screen **is displayed**, not that it is displayed exclusively: embedded screens, split panes and tab hosts legitimately show several markers at once. Note also that a marker means the destination has been constructed, not that the transition animation has settled — both NavigationStack and NavHost compose source and destination simultaneously while animating.",
+      "ja": "これは指定画面が**表示されている**ことの検証で、それだけが表示されていることの検証ではありません: 埋め込み画面・split pane・タブホストでは複数の marker が同時に見えるのが正当です。また marker は遷移先が構築されたことを意味し、遷移アニメーションが収まったことは意味しません — NavigationStack も NavHost もアニメーション中は遷移元と遷移先を同時に構成します。"
+    },
+    "section_implicit_heading": {
+      "en": "Implicit verification on every screen change",
+      "ja": "画面が変わるたびの暗黙検証"
+    },
+    "section_implicit_body": {
+      "en": "In a flow test the driver can verify the marker at every point where an inline step's `screen` differs from the previous step's — without a single assertion written by hand. Steps skipped by `when` do not advance the tracker, a file-reference step resets it to unknown, and steps inside a block continue the enclosing screen. The wait uses `screenTransitionTimeout` (10000 ms) rather than the 5000 ms default, because real cross-screen waits after a cold start are longer. Failures are classified rather than lumped together:",
+      "ja": "flow テストでは、inline step の `screen` が前の step と変わるたびに driver が marker を検証できます — 検証を 1 行も書かずに。`when` でスキップされた step は追跡を進めず、ファイル参照 step は追跡を unknown に戻し、block の中の step は外側の画面を継続します。待ち時間は既定の 5000ms ではなく `screenTransitionTimeout`（10000ms）— コールドスタート後の実際の画面間待ちはもっと長いからです。失敗は一括りにせず分類されます:"
+    },
+    "section_implicit_bullet_absent": {
+      "en": "• `marker-absent` — no marker anywhere: stale generated code or a stale library pin. Infrastructure, not a test failure. Only reported after the timeout, because a suspending navigation legitimately shows no marker while it is pending.",
+      "ja": "• `marker-absent` — marker がどこにも無い: 生成コードかライブラリ pin が古い。テストの失敗ではなくインフラの問題です。suspend する遷移は保留中に marker が 1 つも無い時間が正当に存在するため、timeout 経過後にのみ報告されます。"
+    },
+    "section_implicit_bullet_previous": {
+      "en": "• `previous-screen-only` — only the previous screen's marker is present: the navigation did not happen. This is a real test failure.",
+      "ja": "• `previous-screen-only` — 前の画面の marker しか無い: 遷移が起きていない。これは本物のテスト失敗です。"
+    },
+    "section_implicit_bullet_notdisplayed": {
+      "en": "• `marker-not-displayed` — the expected marker exists but fails the platform predicate: a transition-animation or predicate problem.",
+      "ja": "• `marker-not-displayed` — 期待した marker は存在するがプラットフォームの述語を満たさない: 遷移アニメーションか述語の問題。"
+    },
+    "section_implicit_bullet_children": {
+      "en": "• `children-unresolvable` — the marker is present but the screen's own element ids cannot be resolved: an accessibility regression.",
+      "ja": "• `children-unresolvable` — marker はあるが画面自身の要素 ID が解決できない: アクセシビリティのリグレッション。"
+    },
+    "section_implicit_rollout": {
+      "en": "The switch is `verifyScreenTransitions` in the runner config. It ships **false** and the canonical end state is `true`: turning it on before a project has rebuilt with marker-emitting code would fail every screen change with `marker-absent` — an infrastructure mismatch dressed up as a test failure. So rebuild first (`jui build`), raise the library and driver pins, then flip the flag in one line.",
+      "ja": "スイッチは runner 設定の `verifyScreenTransitions` です。出荷時は **false**、正準の最終形は `true`: marker を出す生成コードに作り直す前に有効化すると、全画面遷移が `marker-absent` で落ちます — インフラの不整合がテスト失敗の顔をして現れるだけです。まず `jui build` で再生成し、ライブラリと driver の pin を上げ、それから 1 行でフラグを切り替えます。"
+    },
+    "section_validation_heading": {
+      "en": "What the validator enforces",
+      "ja": "validator が強制すること"
+    },
+    "section_validation_body": {
+      "en": "`jsonui-test validate` resolves every `screen` value against the classified layout tree plus the declared app-owned screens. Four of the five rules are errors, so a violation stops the install pipeline — pass `--no-install` when you only want to inspect.",
+      "ja": "`jsonui-test validate` は、分類済みのレイアウトツリーと宣言済み app-owned 画面に対して、すべての `screen` 値を解決します。5 規則のうち 4 つが error なので、違反があるとインストールのパイプラインが止まります — 確認だけしたいときは `--no-install` を付けてください。"
+    },
+    "section_validation_note": {
+      "en": "Order matters when you clean up a project: giving a layout `\"role\": \"cell\"` is what makes the steps that used it as a `screen` start failing with `screen-not-a-screen`. Declare the role and fix those steps in the same commit.",
+      "ja": "プロジェクトを整理するときは順序が重要です: レイアウトに `\"role\": \"cell\"` を付けた瞬間に、それを `screen` として使っていた step が `screen-not-a-screen` で落ち始めます。role の付与と step の修正は同じコミットで行ってください。"
+    },
+    "section_limits_heading": {
+      "en": "Known limits",
+      "ja": "既知の限界"
+    },
+    "section_limits_body": {
+      "en": "These are named rather than papered over — a gate no driver can implement would be worse than a documented gap.",
+      "ja": "取り繕わず明示します — どの driver にも実装できない門を正準にするより、隙間を名指しするほうがましだからです。"
+    },
+    "section_limits_bullet_hydration": {
+      "en": "• **Web, first document load**: the marker is in the server-rendered markup, so a screen assertion can pass while the page is still hydrating and clicks are being dropped (measured). React exposes no standard 'hydrated' signal, so the predicate cannot gate on it. It does not recur on client-side navigation, which happens after hydration.",
+      "ja": "• **web の初回ドキュメントロード**: marker はサーバーレンダリングされたマークアップに含まれるため、hydration 中でクリックが握り潰されている間でも画面検証が通り得ます（実測）。React には標準の hydrated シグナルが無いので述語に組み込めません。hydration 後に起きるクライアントサイド遷移では再発しません。"
+    },
+    "section_limits_bullet_suspend": {
+      "en": "• **Suspending transitions**: the source unmounts to a fallback before the destination mounts, so there is a window with no marker at all (~1.2 s measured). That is why `marker-absent` is only reportable after the timeout.",
+      "ja": "• **suspend する遷移**: 遷移先がマウントされる前に遷移元が fallback に置き換わるため、marker が 1 つも無い時間帯（実測 約 1.2 秒）が生じます。`marker-absent` を timeout 後にしか報告しないのはこのためです。"
+    },
+    "section_limits_bullet_exclusive": {
+      "en": "• **No exclusivity assertion**: there is no 'only this screen is displayed' form. Asserting exclusivity needs window scoping that no driver has, and co-presence is legitimate anyway (split panes, tab hosts, embeds).",
+      "ja": "• **排他検証は無し**: 「この画面だけが表示されている」という形は用意していません。排他性の検証にはどの driver も持たないウィンドウスコープが要るうえ、そもそも同時表示は正当です（split pane・タブホスト・embed）。"
+    },
+    "next_heading": {
+      "en": "Keep reading",
+      "ja": "次に読む"
+    },
+    "next_testing_title": {
+      "en": "Testing across three platforms",
+      "ja": "3 プラットフォームのテスト"
+    },
+    "next_testing_description": {
+      "en": "Where the screen assertion sits in the wider action / assert DSL.",
+      "ja": "画面検証が action / assert DSL 全体のどこに収まるか。"
+    },
+    "next_composition_title": {
+      "en": "Screen composition",
+      "ja": "画面合成"
+    },
+    "next_composition_description": {
+      "en": "Embeds and tab hosts are exactly the cases where several screens are displayed at once.",
+      "ja": "embed やタブホストこそ、複数画面が同時表示される当のケース。"
+    },
+    "next_responsive_title": {
+      "en": "Responsive design",
+      "ja": "レスポンシブデザイン"
+    },
+    "next_responsive_description": {
+      "en": "Variant files render the same screen differently — and share its id.",
+      "ja": "バリアントファイルは同じ画面の別レンダリング — ID も共有します。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイト自身が、ここで説明しているツールチェーンで作られています。"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの内容"
+    },
+    "toc_row_problem": {
+      "en": "The assertion you want",
+      "ja": "書きたい検証"
+    },
+    "toc_row_id": {
+      "en": "Screen id",
+      "ja": "画面 ID"
+    },
+    "toc_row_classification": {
+      "en": "What counts as a screen",
+      "ja": "画面の判定"
+    },
+    "toc_row_marker": {
+      "en": "The marker",
+      "ja": "marker"
+    },
+    "toc_row_assert": {
+      "en": "`assert: \"screen\"`",
+      "ja": "`assert: \"screen\"`"
+    },
+    "toc_row_implicit": {
+      "en": "Implicit verification",
+      "ja": "暗黙検証"
+    },
+    "toc_row_validation": {
+      "en": "Validator rules",
+      "ja": "validator 規則"
+    },
+    "toc_row_limits": {
+      "en": "Known limits",
+      "ja": "既知の限界"
+    }
+  },
   "concepts_data_models_from_openapi": {
     "breadcrumb": {
       "en": "← Concepts",
@@ -3071,8 +3293,8 @@
       "ja": "jsonui-mcp-server"
     },
     "lead": {
-      "en": "Forty-one typed tools grouped into six families. The agents use them to inspect any JsonUI project — specs, layouts, components, builds, runtime sync, API model discovery, and test tooling — without each agent needing to re-implement parse, schema-lookup, or file I/O.",
-      "ja": "41 個の型付きツールを 6 ファミリにまとめた MCP サーバー。エージェントはこれを使って JsonUI プロジェクトの spec / layout / コンポーネント / ビルド / ランタイム同期 / API model discovery / test tooling を精査します。各エージェントが parse やスキーマ検索・ファイル IO を再実装する必要がありません。"
+      "en": "Forty-two typed tools grouped into six families. The agents use them to inspect any JsonUI project — specs, layouts, components, builds, runtime sync, API model discovery, and test tooling — without each agent needing to re-implement parse, schema-lookup, or file I/O.",
+      "ja": "42 個の型付きツールを 6 ファミリにまとめた MCP サーバー。エージェントはこれを使って JsonUI プロジェクトの spec / layout / コンポーネント / ビルド / ランタイム同期 / API model discovery / test tooling を精査します。各エージェントが parse やスキーマ検索・ファイル IO を再実装する必要がありません。"
     },
     "read_time": {
       "en": "~12 min read",
@@ -3167,8 +3389,8 @@
       "ja": "A"
     },
     "tool_list_layouts_role": {
-      "en": "Enumerate every layout JSON under docs/screens/layouts/ (responsive variant files fold under their base entry).",
-      "ja": "docs/screens/layouts/ 配下の全 layout JSON を列挙（responsive variant ファイルは base の項に従属表示）。"
+      "en": "Enumerate every layout JSON under docs/screens/layouts/ with its screen / cell / partial classification (responsive variant files fold under their base entry).",
+      "ja": "docs/screens/layouts/ 配下の全 layout JSON を screen / cell / partial 分類つきで列挙（responsive variant ファイルは base の項に従属表示）。"
     },
     "tool_list_component_specs_name": {
       "en": "list_component_specs",
@@ -3301,6 +3523,18 @@
     "tool_get_binding_rules_role": {
       "en": "Return the canonical binding semantics (shared binding_semantics.json) + platform restrictions.",
       "ja": "正準 binding 意味論（共有 binding_semantics.json）とプラットフォーム別制約を返す。"
+    },
+    "tool_get_screen_identity_name": {
+      "en": "get_screen_identity",
+      "ja": "get_screen_identity"
+    },
+    "tool_get_screen_identity_group": {
+      "en": "B",
+      "ja": "B"
+    },
+    "tool_get_screen_identity_role": {
+      "en": "Return the canonical screen-identity rules (shared screen_identity.json): what counts as a screen, how ids are derived, the runtime marker and the assert:\"screen\" vocabulary.",
+      "ja": "画面アイデンティティの正準ルール（共有 screen_identity.json）を返す: 何が画面か、ID の導出、実行時 marker、`assert:\"screen\"` の語彙。"
     },
     "tool_doc_init_spec_name": {
       "en": "doc_init_spec",
@@ -6560,9 +6794,17 @@
       "en": "• `openedUrl` — web only: the URL passed to the most recent `window.open`, equals / contains; gate with `when: {platform: \"web\"}`.",
       "ja": "• `openedUrl` — web 専用: 直近の `window.open` に渡された URL を equals / contains で検証。`when: {platform: \"web\"}` でゲート。"
     },
+    "section_dsl_assert_screen": {
+      "en": "• `screen` — the named screen is displayed; the target key is `name` (not the step-level `screen`, which says where the step runs). Checks a marker code generation emits into every screen, so it needs no knowledge of the screen's contents. See [screen identity](/concepts/screen-identity).",
+      "ja": "• `screen` —指定した画面が表示されていること。対象キーは `name`（step レベルの `screen` ではありません — あちらは「その step がどの画面で走るか」）。codegen が各画面に埋め込む marker を見るので、画面の中身を知る必要がありません。詳細は [画面アイデンティティ](/concepts/screen-identity)。"
+    },
     "section_dsl_asserts_autowait": {
       "en": "Every assertion auto-waits: it polls every 100 ms up to `timeout` (default 5000 ms) until the condition holds, so explicit waits are rarely needed.",
       "ja": "全アサーションは auto-wait: 条件成立まで `timeout`（既定 5000ms）の範囲で 100ms ごとにポーリングするので、明示的な wait はほぼ不要です。"
+    },
+    "section_dsl_asserts_screen_transitions": {
+      "en": "Screen changes can also be verified without writing anything: set `verifyScreenTransitions` in the runner config and the driver checks the marker every time a flow's inline step changes `screen`, waiting up to `screenTransitionTimeout` (10000 ms). It ships off — a project must first rebuild with marker-emitting code (SwiftJsonUI 10.8.0+ / KotlinJsonUI 2.15.0+, drivers iOS 1.8.0 / Android 1.7.0 / web 1.7.0), otherwise every transition fails as `marker-absent`.",
+      "ja": "画面遷移は何も書かずに検証させることもできます: runner 設定で `verifyScreenTransitions` を有効にすると、flow の inline step の `screen` が変わるたびに driver が marker を検証します（待ちは `screenTransitionTimeout`、10000ms）。既定は無効 — marker を出す生成コード（SwiftJsonUI 10.8.0+ / KotlinJsonUI 2.15.0+、driver は iOS 1.8.0 / Android 1.7.0 / web 1.7.0）に作り直す前に有効化すると、全遷移が `marker-absent` で落ちます。"
     },
     "section_dsl_bullet_conditions": {
       "en": "• Conditions (when): gate any step or assert with \"when\": { \"platform\": \"ios\" | \"android\" | \"web\", \"responsive\": <bucket | constraint> }. Screen-test cases can also carry case-level platform / responsive. A responsive value is one of the seven canonical buckets (compact / medium / regular plus their landscape variants) or a constraint object (minWidth / maxWidth / minHeight / maxHeight / orientation) — each driver resolves it to mirror that platform's own renderer breakpoints.",
@@ -6627,6 +6869,10 @@
     "section_cli_bullet_pregrant": {
       "en": "• Media & pregrant: media files for `addMedia` live in `test.mediaDir` (default `tests/media`; reference them by basename) — the install step ships them to the iOS target's `media/` folder. `jsonui-test pregrant` walks your tests and pre-grants the iOS simulator photo permission (`photos-add`) for every reachable `addMedia` step, so no permission dialog interrupts the run.",
       "ja": "• Media と pregrant: `addMedia` 用のメディアは `test.mediaDir`（既定 `tests/media`、参照は basename）に置きます — install ステップが iOS ターゲットの `media/` へ同送します。`jsonui-test pregrant` は tests を走査し、到達可能な `addMedia` ステップに対して iOS シミュレータの写真権限（`photos-add`）を事前付与するので、実行中に権限ダイアログが割り込みません。"
+    },
+    "section_cli_bullet_screens": {
+      "en": "• Screen names: every step's `screen` must resolve to a layout classified as a screen (`jui screens` prints the classification) or to an id declared in `jui.config.json` under `test.appOwnedScreens` for hand-written pages. Violations are validator errors, so they stop the install — pass `--no-install` when you only want to inspect.",
+      "ja": "• 画面名: 各 step の `screen` は、画面に分類されたレイアウト（分類は `jui screens` で確認）か、手書きページ用に `jui.config.json` の `test.appOwnedScreens` で宣言した ID に解決される必要があります。違反は validator の error なのでインストールが止まります — 確認だけなら `--no-install` を付けてください。"
     },
     "section_recording_heading": {
       "en": "7. Recording & screenshots",

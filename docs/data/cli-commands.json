@@ -1,7 +1,6 @@
 {
   "_description": "Seed data for /reference/cli-commands. Expanded incrementally per plan 25. Initial seed covers `jui` subcommands; sjui/kjui/rjui/jsonui-test/jsonui-doc to be added in subsequent sessions.",
   "_schemaVersion": "1.0",
-
   "binaries": [
     {
       "name": "jui",
@@ -10,7 +9,9 @@
         "en": "Unified generator / verifier / orchestrator for JsonUI. Cross-platform.",
         "ja": "JsonUI の統合ジェネレータ／検証／オーケストレータ。クロスプラットフォーム。"
       },
-      "platforms": ["all"]
+      "platforms": [
+        "all"
+      ]
     },
     {
       "name": "sjui",
@@ -19,7 +20,9 @@
         "en": "SwiftJsonUI development CLI (iOS).",
         "ja": "SwiftJsonUI 開発 CLI（iOS）。"
       },
-      "platforms": ["ios"]
+      "platforms": [
+        "ios"
+      ]
     },
     {
       "name": "kjui",
@@ -28,7 +31,9 @@
         "en": "KotlinJsonUI development CLI (Android).",
         "ja": "KotlinJsonUI 開発 CLI（Android）。"
       },
-      "platforms": ["android"]
+      "platforms": [
+        "android"
+      ]
     },
     {
       "name": "rjui",
@@ -37,7 +42,9 @@
         "en": "ReactJsonUI development CLI (Web).",
         "ja": "ReactJsonUI 開発 CLI（Web）。"
       },
-      "platforms": ["web"]
+      "platforms": [
+        "web"
+      ]
     },
     {
       "name": "jsonui-test",
@@ -46,7 +53,9 @@
         "en": "Test file validator and generator. Cross-platform.",
         "ja": "テストファイル検証・生成ツール。クロスプラットフォーム。"
       },
-      "platforms": ["all"]
+      "platforms": [
+        "all"
+      ]
     },
     {
       "name": "jsonui-doc",
@@ -55,10 +64,11 @@
         "en": "Documentation generator for specs and components.",
         "ja": "spec / component のドキュメント生成ツール。"
       },
-      "platforms": ["all"]
+      "platforms": [
+        "all"
+      ]
     }
   ],
-
   "commands": [
     {
       "binary": "jui",
@@ -103,12 +113,17 @@
           "code": "$ jui init --platforms web,ios --project-name myapp\n✓ Created jui.config.json\n✓ Created .jsonui-type-map.json\n✓ Initialized jsonui-doc-web/\n✓ Initialized jsonui-doc-ios/"
         }
       ],
-      "seeAlso": ["jui g screen", "jui g project"]
+      "seeAlso": [
+        "jui g screen",
+        "jui g project"
+      ]
     },
     {
       "binary": "jui",
       "command": "g project",
-      "aliases": ["generate project"],
+      "aliases": [
+        "generate project"
+      ],
       "synopsis": "jui g project [--file <spec>] [--platforms <list>]",
       "purpose": {
         "en": "Generate Layout JSON + ViewModel stubs from one or all screen specs.",
@@ -149,12 +164,17 @@
           "code": "$ jui g project --file docs/screens/json/learn/hello-world.spec.json\n✓ Generated docs/screens/layouts/learn/hello-world.json\n✓ Generated viewmodels: LearnHelloWorldViewModel.{ts,swift,kt}"
         }
       ],
-      "seeAlso": ["jui build", "jui verify"]
+      "seeAlso": [
+        "jui build",
+        "jui verify"
+      ]
     },
     {
       "binary": "jui",
       "command": "g screen",
-      "aliases": ["generate screen"],
+      "aliases": [
+        "generate screen"
+      ],
       "synopsis": "jui g screen --name <Name> [--route <path>]",
       "purpose": {
         "en": "Create a new screen spec skeleton plus empty Layout + ViewModel stubs. Interactive prompts fill in metadata.",
@@ -186,12 +206,16 @@
           "code": "$ jui g screen --name UserProfile --route /user/profile\n? Display name: User Profile\n? Description: Show user's profile and edit actions\n✓ Created docs/screens/json/user/profile.spec.json"
         }
       ],
-      "seeAlso": ["jui g project"]
+      "seeAlso": [
+        "jui g project"
+      ]
     },
     {
       "binary": "jui",
       "command": "g converter",
-      "aliases": ["generate converter"],
+      "aliases": [
+        "generate converter"
+      ],
       "synopsis": "jui g converter --from <component-spec>",
       "purpose": {
         "en": "Create a custom component converter (Ruby source) from a component spec. Used for reusable UI widgets.",
@@ -214,7 +238,9 @@
           "code": "$ jui g converter --from docs/screens/json/components/codeblock.component.json\n✓ Generated rjui_tools/lib/converters/codeblock_converter.rb\n✓ Generated sjui_tools/lib/converters/codeblock_converter.rb\n✓ Generated kjui_tools/lib/converters/codeblock_converter.rb"
         }
       ],
-      "seeAlso": ["jui g project"]
+      "seeAlso": [
+        "jui g project"
+      ]
     },
     {
       "binary": "jui",
@@ -229,7 +255,10 @@
           "name": "--platforms",
           "type": "comma-separated",
           "default": "from config",
-          "description": { "en": "Override", "ja": "上書き指定" }
+          "description": {
+            "en": "Override",
+            "ja": "上書き指定"
+          }
         },
         {
           "name": "--watch",
@@ -256,7 +285,9 @@
           "code": "$ jui build\n✓ Built jsonui-doc-web (44 layouts, 0 warnings)\n✓ Built jsonui-doc-ios (44 layouts, 0 warnings)"
         }
       ],
-      "seeAlso": ["jui verify"]
+      "seeAlso": [
+        "jui verify"
+      ]
     },
     {
       "binary": "jui",
@@ -292,7 +323,47 @@
           "code": "$ jui verify --fail-on-diff\n✓ All 44 layouts match their specs"
         }
       ],
-      "seeAlso": ["jui build"]
+      "seeAlso": [
+        "jui build"
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "screens",
+      "synopsis": "jui screens [--json] [--layouts-dir <dir>]",
+      "purpose": {
+        "en": "List every layout with the screen / cell / partial classification the screen-identity resolver derived, and why. Read this back before writing tests: only a layout classified as a screen is a valid `screen` value or an `assert: \"screen\"` target.",
+        "ja": "screen identity リゾルバが導出した screen / cell / partial 分類を、判定理由つきで全レイアウトについて一覧表示。テストを書く前の確認用 — 画面に分類されたレイアウトだけが `screen` の値や `assert: \"screen\"` の対象として妥当。"
+      },
+      "options": [
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Emit JSON instead of the aligned table (what the MCP wrappers consume).",
+            "ja": "整形テーブルの代わりに JSON を出力（MCP ラッパーが消費する形式）。"
+          }
+        },
+        {
+          "name": "--layouts-dir",
+          "type": "string",
+          "default": "project's shared layouts",
+          "description": {
+            "en": "Classify a different layout directory instead of the one in jui.config.json.",
+            "ja": "jui.config.json のレイアウトディレクトリではなく、指定したディレクトリを分類する。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui screens\nScreen identity: 97 screen(s), 36 non-screen(s)\n  cell     agent_row                        (referenced)\n  screen   agents                           (default)\n  cell     breadcrumb_item                  (referenced)\n  screen   data-binding                     (default)"
+        }
+      ],
+      "seeAlso": [
+        "jui build"
+      ]
     },
     {
       "binary": "jui",
@@ -314,7 +385,9 @@
         }
       ],
       "examples": [],
-      "seeAlso": ["jui sync-tool"]
+      "seeAlso": [
+        "jui sync-tool"
+      ]
     },
     {
       "binary": "jui",
@@ -341,9 +414,10 @@
           "code": "$ jui sync-tool\n✓ Synced rjui_tools to latest main\n✓ Synced sjui_tools to latest main\n✓ Synced kjui_tools to latest main"
         }
       ],
-      "seeAlso": ["jui migrate-layouts"]
-    }
-    ,
+      "seeAlso": [
+        "jui migrate-layouts"
+      ]
+    },
     {
       "binary": "sjui",
       "command": "init",
@@ -354,7 +428,10 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": ["sjui setup", "sjui generate"]
+      "seeAlso": [
+        "sjui setup",
+        "sjui generate"
+      ]
     },
     {
       "binary": "sjui",
@@ -366,12 +443,16 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": ["sjui hotload"]
+      "seeAlso": [
+        "sjui hotload"
+      ]
     },
     {
       "binary": "sjui",
       "command": "generate",
-      "aliases": ["g"],
+      "aliases": [
+        "g"
+      ],
       "synopsis": "sjui generate <type> <name>",
       "purpose": {
         "en": "Scaffold a new view / view-controller / cell / style. `<type>` = `view` / `viewcontroller` / `cell` / `style`.",
@@ -391,7 +472,10 @@
           "name": "<name>",
           "type": "positional",
           "required": true,
-          "description": { "en": "PascalCase name.", "ja": "PascalCase 名。" }
+          "description": {
+            "en": "PascalCase name.",
+            "ja": "PascalCase 名。"
+          }
         }
       ],
       "examples": [
@@ -400,7 +484,9 @@
           "code": "$ sjui generate view HomeView\n✓ Created Layouts/home_view.json\n✓ Created ViewControllers/HomeViewController.swift"
         }
       ],
-      "seeAlso": ["sjui destroy"]
+      "seeAlso": [
+        "sjui destroy"
+      ]
     },
     {
       "binary": "sjui",
@@ -412,7 +498,9 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": ["sjui generate"]
+      "seeAlso": [
+        "sjui generate"
+      ]
     },
     {
       "binary": "sjui",
@@ -424,7 +512,9 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": ["jui build"]
+      "seeAlso": [
+        "jui build"
+      ]
     },
     {
       "binary": "sjui",
@@ -436,7 +526,9 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": ["sjui validate"]
+      "seeAlso": [
+        "sjui validate"
+      ]
     },
     {
       "binary": "sjui",
@@ -448,7 +540,9 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": ["jui verify"]
+      "seeAlso": [
+        "jui verify"
+      ]
     },
     {
       "binary": "sjui",
@@ -460,7 +554,9 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": ["sjui hotload"]
+      "seeAlso": [
+        "sjui hotload"
+      ]
     },
     {
       "binary": "sjui",
@@ -477,9 +573,10 @@
           "code": "$ sjui hotload start\nHot Loader server running on ws://localhost:8080"
         }
       ],
-      "seeAlso": ["sjui watch"]
+      "seeAlso": [
+        "sjui watch"
+      ]
     },
-
     {
       "binary": "kjui",
       "command": "init",
@@ -490,7 +587,9 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": ["kjui setup"]
+      "seeAlso": [
+        "kjui setup"
+      ]
     },
     {
       "binary": "kjui",
@@ -507,7 +606,9 @@
     {
       "binary": "kjui",
       "command": "generate",
-      "aliases": ["g"],
+      "aliases": [
+        "g"
+      ],
       "synopsis": "kjui generate <type> <name>",
       "purpose": {
         "en": "Scaffold a fragment / activity / view / cell / style.",
@@ -515,7 +616,10 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": ["kjui destroy", "kjui generate-xml"]
+      "seeAlso": [
+        "kjui destroy",
+        "kjui generate-xml"
+      ]
     },
     {
       "binary": "kjui",
@@ -541,7 +645,6 @@
       "examples": [],
       "seeAlso": []
     },
-
     {
       "binary": "rjui",
       "command": "init",
@@ -552,7 +655,9 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": ["rjui setup"]
+      "seeAlso": [
+        "rjui setup"
+      ]
     },
     {
       "binary": "rjui",
@@ -569,7 +674,9 @@
     {
       "binary": "rjui",
       "command": "generate",
-      "aliases": ["g"],
+      "aliases": [
+        "g"
+      ],
       "synopsis": "rjui generate <type> <name>",
       "purpose": {
         "en": "Scaffold a page / component / cell / viewmodel.",
@@ -591,7 +698,6 @@
       "examples": [],
       "seeAlso": []
     },
-
     {
       "binary": "jsonui-test",
       "command": "validate",
@@ -607,7 +713,9 @@
           "code": "$ jsonui-test validate tests/\n✓ 12 screen tests valid\n✓ 3 flow tests valid"
         }
       ],
-      "seeAlso": ["jsonui-test run"]
+      "seeAlso": [
+        "jsonui-test run"
+      ]
     },
     {
       "binary": "jsonui-test",
@@ -619,7 +727,9 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": ["jsonui-test validate"]
+      "seeAlso": [
+        "jsonui-test validate"
+      ]
     },
     {
       "binary": "jsonui-test",
@@ -646,9 +756,10 @@
           "code": "$ jsonui-test run --driver web --spec tests/screens/hello-world.test.json"
         }
       ],
-      "seeAlso": ["jsonui-test validate"]
+      "seeAlso": [
+        "jsonui-test validate"
+      ]
     },
-
     {
       "binary": "jsonui-doc",
       "command": "init",
@@ -671,7 +782,9 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": ["jsonui-doc validate spec"]
+      "seeAlso": [
+        "jsonui-doc validate spec"
+      ]
     },
     {
       "binary": "jsonui-doc",
@@ -695,7 +808,9 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": ["jsonui-doc generate spec"]
+      "seeAlso": [
+        "jsonui-doc generate spec"
+      ]
     },
     {
       "binary": "jsonui-doc",

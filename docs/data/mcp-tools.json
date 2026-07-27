@@ -2,11 +2,13 @@
   "_description": "Seed data for /reference/mcp-tools. Expanded incrementally per plan 26. Initial seed covers the most-used tools from each group; remaining tools to be filled in subsequent sessions.",
   "_schemaVersion": "1.0",
   "_source": "upstream: jsonui-mcp-server",
-
   "groups": [
     {
       "id": "A",
-      "name": { "en": "Spec & Layout", "ja": "Spec と Layout 読取" },
+      "name": {
+        "en": "Spec & Layout",
+        "ja": "Spec と Layout 読取"
+      },
       "description": {
         "en": "Read-only tools for listing and reading spec / layout / config files. Always safe to call; the entry point for any workflow.",
         "ja": "spec / layout / 設定ファイルを読み取る読み取り専用ツール群。常に安全に呼べ、どのワークフローでも最初に使う。"
@@ -15,7 +17,10 @@
     },
     {
       "id": "B",
-      "name": { "en": "Build & Verify", "ja": "ビルド・検証" },
+      "name": {
+        "en": "Build & Verify",
+        "ja": "ビルド・検証"
+      },
       "description": {
         "en": "Tools with side effects — run jui init / build / verify / generate. Must be called after Group A confirms project state.",
         "ja": "副作用を持つツール群 — jui init / build / verify / generate を実行する。Group A でプロジェクト状態を確認した上で呼ぶ。"
@@ -24,7 +29,10 @@
     },
     {
       "id": "C",
-      "name": { "en": "Doc Authoring", "ja": "ドキュメント執筆" },
+      "name": {
+        "en": "Doc Authoring",
+        "ja": "ドキュメント執筆"
+      },
       "description": {
         "en": "jsonui-doc equivalents. Used when writing / validating spec-backed HTML documentation.",
         "ja": "jsonui-doc 相当のツール群。spec 由来 HTML ドキュメントの執筆・検証に使う。"
@@ -33,15 +41,17 @@
     },
     {
       "id": "D",
-      "name": { "en": "Lookup & Search", "ja": "検索・lookup" },
+      "name": {
+        "en": "Lookup & Search",
+        "ja": "検索・lookup"
+      },
       "description": {
         "en": "Attribute / component lookup and cross-platform mapping queries. Essential for agents that need to know what attributes exist and how they map across platforms.",
         "ja": "属性 / コンポーネントの lookup とクロスプラットフォームマッピング。属性の存在・マッピング確認が必要なエージェントに必須。"
       },
-      "toolCount": 9
+      "toolCount": 10
     }
   ],
-
   "tools": [
     {
       "name": "get_project_config",
@@ -54,13 +64,23 @@
       "returns": {
         "type": "object",
         "example": {
-          "platforms": ["web", "ios", "android"],
+          "platforms": [
+            "web",
+            "ios",
+            "android"
+          ],
           "specDir": "docs/screens/json",
           "layoutDir": "docs/screens/layouts",
           "outputs": {
-            "web": { "root": "jsonui-doc-web" },
-            "ios": { "root": "jsonui-doc-ios" },
-            "android": { "root": "jsonui-doc-android" }
+            "web": {
+              "root": "jsonui-doc-web"
+            },
+            "ios": {
+              "root": "jsonui-doc-ios"
+            },
+            "android": {
+              "root": "jsonui-doc-android"
+            }
           }
         }
       },
@@ -79,7 +99,10 @@
           "ja": "どのワークフローでも最初に呼んで、対象プラットフォームとパスを把握する。"
         }
       ],
-      "seeAlso": ["list_screen_specs", "list_layouts"]
+      "seeAlso": [
+        "list_screen_specs",
+        "list_layouts"
+      ]
     },
     {
       "name": "list_screen_specs",
@@ -103,7 +126,11 @@
         "type": "object",
         "example": {
           "specs": [
-            { "path": "docs/screens/json/learn/hello-world.spec.json", "name": "LearnHelloWorld", "url": "/learn/hello-world" }
+            {
+              "path": "docs/screens/json/learn/hello-world.spec.json",
+              "name": "LearnHelloWorld",
+              "url": "/learn/hello-world"
+            }
           ]
         }
       },
@@ -118,7 +145,11 @@
           "ja": "サブパスに一致する画面（例: 全 learn/*）を絞り込む。"
         }
       ],
-      "seeAlso": ["list_component_specs", "read_spec_file", "list_layouts"]
+      "seeAlso": [
+        "list_component_specs",
+        "read_spec_file",
+        "list_layouts"
+      ]
     },
     {
       "name": "read_spec_file",
@@ -167,24 +198,35 @@
           "ja": "編集やビルド前に特定の画面の詳細を読む。"
         }
       ],
-      "seeAlso": ["list_screen_specs", "read_layout_file"]
+      "seeAlso": [
+        "list_screen_specs",
+        "read_layout_file"
+      ]
     },
     {
       "name": "list_layouts",
       "group": "A",
       "purpose": {
-        "en": "List all generated Layout JSON files under layoutDir.",
-        "ja": "layoutDir 配下の生成済み Layout JSON を全てリスト。"
+        "en": "List all Layout JSON files under layoutDir, with the screen-identity classification (screen / cell / partial) folded in and responsive variant files grouped under their base entry.",
+        "ja": "layoutDir 配下の Layout JSON を全てリスト。screen identity の分類（screen / cell / partial）を折り込み、レスポンシブのバリアントファイルは base の項に従属表示。"
       },
       "arguments": [
         {
           "name": "pattern",
           "type": "string",
           "required": false,
-          "description": { "en": "Glob filter.", "ja": "グロブフィルタ。" }
+          "description": {
+            "en": "Glob filter.",
+            "ja": "グロブフィルタ。"
+          }
         }
       ],
-      "returns": { "type": "object", "example": { "layouts": [] } },
+      "returns": {
+        "type": "object",
+        "example": {
+          "layouts": []
+        }
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -192,7 +234,10 @@
           "ja": "verify 実行前に、どの layout が存在するか確認する。"
         }
       ],
-      "seeAlso": ["read_layout_file"]
+      "seeAlso": [
+        "read_layout_file",
+        "get_screen_identity"
+      ]
     },
     {
       "name": "jui_build",
@@ -206,13 +251,19 @@
           "name": "platforms",
           "type": "array",
           "required": false,
-          "description": { "en": "Override platform list.", "ja": "プラットフォーム一覧の上書き。" }
+          "description": {
+            "en": "Override platform list.",
+            "ja": "プラットフォーム一覧の上書き。"
+          }
         },
         {
           "name": "verbose",
           "type": "boolean",
           "required": false,
-          "description": { "en": "Return per-file log.", "ja": "ファイルごとのログを返す。" }
+          "description": {
+            "en": "Return per-file log.",
+            "ja": "ファイルごとのログを返す。"
+          }
         }
       ],
       "returns": {
@@ -221,7 +272,11 @@
           "status": "success",
           "warnings": [],
           "errors": [],
-          "stats": { "layouts": 44, "viewModels": 44, "warnings": 0 }
+          "stats": {
+            "layouts": 44,
+            "viewModels": 44,
+            "warnings": 0
+          }
         }
       },
       "errors": [
@@ -239,7 +294,9 @@
           "ja": "どのワークフローでも最後に呼んで、全プラットフォームで正常ビルドを確認。"
         }
       ],
-      "seeAlso": ["jui_verify"]
+      "seeAlso": [
+        "jui_verify"
+      ]
     },
     {
       "name": "jui_verify",
@@ -261,7 +318,10 @@
       ],
       "returns": {
         "type": "object",
-        "example": { "status": "clean", "drifts": [] }
+        "example": {
+          "status": "clean",
+          "drifts": []
+        }
       },
       "errors": [
         {
@@ -278,7 +338,9 @@
           "ja": "jui_build 通過後の最終ガードとして、生成ファイルの手編集を検出する。"
         }
       ],
-      "seeAlso": ["jui_build"]
+      "seeAlso": [
+        "jui_build"
+      ]
     },
     {
       "name": "lookup_component",
@@ -303,8 +365,19 @@
         "example": {
           "name": "Label",
           "description": "Text display component",
-          "attributes": { "text": { "type": ["string", "binding"] } },
-          "platforms": ["ios", "android", "web"]
+          "attributes": {
+            "text": {
+              "type": [
+                "string",
+                "binding"
+              ]
+            }
+          },
+          "platforms": [
+            "ios",
+            "android",
+            "web"
+          ]
         }
       },
       "errors": [
@@ -322,7 +395,10 @@
           "ja": "Layout を実装する際、コンポーネントがどの属性をサポートするか確認する。"
         }
       ],
-      "seeAlso": ["lookup_attribute", "search_components"]
+      "seeAlso": [
+        "lookup_attribute",
+        "search_components"
+      ]
     },
     {
       "name": "search_components",
@@ -336,15 +412,26 @@
           "name": "query",
           "type": "string",
           "required": true,
-          "description": { "en": "Search term.", "ja": "検索語。" }
+          "description": {
+            "en": "Search term.",
+            "ja": "検索語。"
+          }
         }
       ],
       "returns": {
         "type": "object",
         "example": {
           "results": [
-            { "name": "Label", "score": 0.95, "summary": "Text display component" },
-            { "name": "IconLabel", "score": 0.78, "summary": "Label with an icon glyph" }
+            {
+              "name": "Label",
+              "score": 0.95,
+              "summary": "Text display component"
+            },
+            {
+              "name": "IconLabel",
+              "score": 0.78,
+              "summary": "Label with an icon glyph"
+            }
           ]
         }
       },
@@ -355,7 +442,9 @@
           "ja": "コンポーネント名がうろ覚えのとき（「リスト系の何か」など）。"
         }
       ],
-      "seeAlso": ["lookup_component"]
+      "seeAlso": [
+        "lookup_component"
+      ]
     },
     {
       "name": "lookup_attribute",
@@ -384,9 +473,18 @@
           }
         }
       ],
-      "returns": { "type": "object", "example": {} },
+      "returns": {
+        "type": "object",
+        "example": {}
+      },
       "errors": [
-        { "code": "UNKNOWN_ATTRIBUTE", "message": { "en": "No such attribute.", "ja": "該当属性なし。" } }
+        {
+          "code": "UNKNOWN_ATTRIBUTE",
+          "message": {
+            "en": "No such attribute.",
+            "ja": "該当属性なし。"
+          }
+        }
       ],
       "whenToUse": [
         {
@@ -394,9 +492,11 @@
           "ja": "特定属性の型 / enum / binding 方向が必要なとき。"
         }
       ],
-      "seeAlso": ["lookup_component", "get_binding_rules"]
-    }
-    ,
+      "seeAlso": [
+        "lookup_component",
+        "get_binding_rules"
+      ]
+    },
     {
       "name": "list_component_specs",
       "group": "A",
@@ -409,10 +509,18 @@
           "name": "pattern",
           "type": "string",
           "required": false,
-          "description": { "en": "Glob filter.", "ja": "グロブフィルタ。" }
+          "description": {
+            "en": "Glob filter.",
+            "ja": "グロブフィルタ。"
+          }
         }
       ],
-      "returns": { "type": "object", "example": { "components": [] } },
+      "returns": {
+        "type": "object",
+        "example": {
+          "components": []
+        }
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -420,7 +528,10 @@
           "ja": "converter 生成前に component spec の存在を確認する。"
         }
       ],
-      "seeAlso": ["list_screen_specs", "read_spec_file"]
+      "seeAlso": [
+        "list_screen_specs",
+        "read_spec_file"
+      ]
     },
     {
       "name": "read_layout_file",
@@ -434,12 +545,24 @@
           "name": "path",
           "type": "string",
           "required": true,
-          "description": { "en": "Path to the layout file.", "ja": "layout ファイルのパス。" }
+          "description": {
+            "en": "Path to the layout file.",
+            "ja": "layout ファイルのパス。"
+          }
         }
       ],
-      "returns": { "type": "object", "example": {} },
+      "returns": {
+        "type": "object",
+        "example": {}
+      },
       "errors": [
-        { "code": "FILE_NOT_FOUND", "message": { "en": "Path does not exist.", "ja": "パスが存在しない。" } }
+        {
+          "code": "FILE_NOT_FOUND",
+          "message": {
+            "en": "Path does not exist.",
+            "ja": "パスが存在しない。"
+          }
+        }
       ],
       "whenToUse": [
         {
@@ -447,7 +570,10 @@
           "ja": "画面が想定外の描画をする理由をデバッグするとき、spec と並べて生成済み layout を読む。"
         }
       ],
-      "seeAlso": ["read_spec_file", "list_layouts"]
+      "seeAlso": [
+        "read_spec_file",
+        "list_layouts"
+      ]
     },
     {
       "name": "get_data_source",
@@ -476,7 +602,13 @@
         }
       },
       "errors": [
-        { "code": "NOT_RESOLVED", "message": { "en": "No definition found.", "ja": "定義が見つからない。" } }
+        {
+          "code": "NOT_RESOLVED",
+          "message": {
+            "en": "No definition found.",
+            "ja": "定義が見つからない。"
+          }
+        }
       ],
       "whenToUse": [
         {
@@ -484,9 +616,11 @@
           "ja": "識別子や binding が解決されないとき、その理由を突き止める。"
         }
       ],
-      "seeAlso": ["read_spec_file", "read_layout_file"]
+      "seeAlso": [
+        "read_spec_file",
+        "read_layout_file"
+      ]
     },
-
     {
       "name": "jui_init",
       "group": "B",
@@ -499,16 +633,30 @@
           "name": "platforms",
           "type": "array",
           "required": false,
-          "description": { "en": "Target platforms.", "ja": "対象プラットフォーム。" }
+          "description": {
+            "en": "Target platforms.",
+            "ja": "対象プラットフォーム。"
+          }
         },
         {
           "name": "projectName",
           "type": "string",
           "required": false,
-          "description": { "en": "Project identifier.", "ja": "プロジェクト識別子。" }
+          "description": {
+            "en": "Project identifier.",
+            "ja": "プロジェクト識別子。"
+          }
         }
       ],
-      "returns": { "type": "object", "example": { "created": ["jui.config.json", ".jsonui-type-map.json"] } },
+      "returns": {
+        "type": "object",
+        "example": {
+          "created": [
+            "jui.config.json",
+            ".jsonui-type-map.json"
+          ]
+        }
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -516,7 +664,10 @@
           "ja": "AI ワークフロー内から shell 経由せずプロジェクトを立ち上げるとき。"
         }
       ],
-      "seeAlso": ["jui_generate_project", "jui_generate_screen"]
+      "seeAlso": [
+        "jui_generate_project",
+        "jui_generate_screen"
+      ]
     },
     {
       "name": "jui_generate_project",
@@ -530,18 +681,35 @@
           "name": "file",
           "type": "string",
           "required": false,
-          "description": { "en": "Single spec file.", "ja": "単一 spec ファイル。" }
+          "description": {
+            "en": "Single spec file.",
+            "ja": "単一 spec ファイル。"
+          }
         },
         {
           "name": "force",
           "type": "boolean",
           "required": false,
-          "description": { "en": "Overwrite hand-edited files.", "ja": "手編集ファイルを上書き。" }
+          "description": {
+            "en": "Overwrite hand-edited files.",
+            "ja": "手編集ファイルを上書き。"
+          }
         }
       ],
-      "returns": { "type": "object", "example": { "generated": [] } },
+      "returns": {
+        "type": "object",
+        "example": {
+          "generated": []
+        }
+      },
       "errors": [
-        { "code": "INVALID_SPEC", "message": { "en": "Spec schema validation failed.", "ja": "spec スキーマ検証失敗。" } }
+        {
+          "code": "INVALID_SPEC",
+          "message": {
+            "en": "Spec schema validation failed.",
+            "ja": "spec スキーマ検証失敗。"
+          }
+        }
       ],
       "whenToUse": [
         {
@@ -549,7 +717,10 @@
           "ja": "spec 編集後に layout と ViewModel スタブを再生成するとき。"
         }
       ],
-      "seeAlso": ["read_spec_file", "jui_build"]
+      "seeAlso": [
+        "read_spec_file",
+        "jui_build"
+      ]
     },
     {
       "name": "jui_generate_screen",
@@ -563,18 +734,33 @@
           "name": "name",
           "type": "string",
           "required": true,
-          "description": { "en": "PascalCase name.", "ja": "PascalCase 名。" }
+          "description": {
+            "en": "PascalCase name.",
+            "ja": "PascalCase 名。"
+          }
         },
         {
           "name": "route",
           "type": "string",
           "required": false,
-          "description": { "en": "URL path.", "ja": "URL パス。" }
+          "description": {
+            "en": "URL path.",
+            "ja": "URL パス。"
+          }
         }
       ],
-      "returns": { "type": "object", "example": {} },
+      "returns": {
+        "type": "object",
+        "example": {}
+      },
       "errors": [
-        { "code": "NAME_CONFLICT", "message": { "en": "A screen with this name already exists.", "ja": "同名の画面がすでに存在。" } }
+        {
+          "code": "NAME_CONFLICT",
+          "message": {
+            "en": "A screen with this name already exists.",
+            "ja": "同名の画面がすでに存在。"
+          }
+        }
       ],
       "whenToUse": [
         {
@@ -582,7 +768,10 @@
           "ja": "JsonUI ワークフロー内で新しい画面を 0 から始めるとき。"
         }
       ],
-      "seeAlso": ["jui_generate_project", "doc_init_spec"]
+      "seeAlso": [
+        "jui_generate_project",
+        "doc_init_spec"
+      ]
     },
     {
       "name": "jui_generate_converter",
@@ -596,10 +785,18 @@
           "name": "from",
           "type": "string",
           "required": true,
-          "description": { "en": "Path to the component spec.", "ja": "component spec ファイルのパス。" }
+          "description": {
+            "en": "Path to the component spec.",
+            "ja": "component spec ファイルのパス。"
+          }
         }
       ],
-      "returns": { "type": "object", "example": { "generated": [] } },
+      "returns": {
+        "type": "object",
+        "example": {
+          "generated": []
+        }
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -607,9 +804,10 @@
           "ja": "component spec を書いた後、全対象プラットフォームの converter を scaffold するとき。"
         }
       ],
-      "seeAlso": ["list_component_specs"]
+      "seeAlso": [
+        "list_component_specs"
+      ]
     },
-
     {
       "name": "doc_init_spec",
       "group": "C",
@@ -618,7 +816,10 @@
         "ja": "対話プロンプトで画面 spec 雛形を作成。"
       },
       "arguments": [],
-      "returns": { "type": "object", "example": {} },
+      "returns": {
+        "type": "object",
+        "example": {}
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -626,7 +827,10 @@
           "ja": "`jsonui-screen-spec` スキルが新規 spec を要求したとき。"
         }
       ],
-      "seeAlso": ["doc_init_component", "doc_validate_spec"]
+      "seeAlso": [
+        "doc_init_component",
+        "doc_validate_spec"
+      ]
     },
     {
       "name": "doc_init_component",
@@ -636,7 +840,10 @@
         "ja": "component spec 雛形を作成。"
       },
       "arguments": [],
-      "returns": { "type": "object", "example": {} },
+      "returns": {
+        "type": "object",
+        "example": {}
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -644,7 +851,9 @@
           "ja": "新規カスタムコンポーネントを計画するとき。"
         }
       ],
-      "seeAlso": ["doc_init_spec"]
+      "seeAlso": [
+        "doc_init_spec"
+      ]
     },
     {
       "name": "doc_generate_spec",
@@ -658,10 +867,16 @@
           "name": "specPath",
           "type": "string",
           "required": true,
-          "description": { "en": "Path to the spec.", "ja": "spec ファイルのパス。" }
+          "description": {
+            "en": "Path to the spec.",
+            "ja": "spec ファイルのパス。"
+          }
         }
       ],
-      "returns": { "type": "object", "example": {} },
+      "returns": {
+        "type": "object",
+        "example": {}
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -669,7 +884,10 @@
           "ja": "spec 編集後、人間可読なドキュメントページを再生成するとき。"
         }
       ],
-      "seeAlso": ["doc_validate_spec", "doc_generate_html"]
+      "seeAlso": [
+        "doc_validate_spec",
+        "doc_generate_html"
+      ]
     },
     {
       "name": "doc_generate_component",
@@ -683,10 +901,16 @@
           "name": "componentSpecPath",
           "type": "string",
           "required": true,
-          "description": { "en": "Path to the component spec.", "ja": "component spec のパス。" }
+          "description": {
+            "en": "Path to the component spec.",
+            "ja": "component spec のパス。"
+          }
         }
       ],
-      "returns": { "type": "object", "example": {} },
+      "returns": {
+        "type": "object",
+        "example": {}
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -694,7 +918,9 @@
           "ja": "component spec を編集した後。"
         }
       ],
-      "seeAlso": ["doc_generate_spec"]
+      "seeAlso": [
+        "doc_generate_spec"
+      ]
     },
     {
       "name": "doc_generate_html",
@@ -704,7 +930,12 @@
         "ja": "最終的な結合 HTML ドキュメントセット（全 spec + components + index）を生成。"
       },
       "arguments": [],
-      "returns": { "type": "object", "example": { "files": 50 } },
+      "returns": {
+        "type": "object",
+        "example": {
+          "files": 50
+        }
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -712,7 +943,9 @@
           "ja": "ドキュメントサイト公開前。"
         }
       ],
-      "seeAlso": ["doc_generate_spec"]
+      "seeAlso": [
+        "doc_generate_spec"
+      ]
     },
     {
       "name": "doc_validate_spec",
@@ -726,12 +959,26 @@
           "name": "specPath",
           "type": "string",
           "required": true,
-          "description": { "en": "Path to the spec.", "ja": "spec のパス。" }
+          "description": {
+            "en": "Path to the spec.",
+            "ja": "spec のパス。"
+          }
         }
       ],
-      "returns": { "type": "object", "example": { "status": "clean" } },
+      "returns": {
+        "type": "object",
+        "example": {
+          "status": "clean"
+        }
+      },
       "errors": [
-        { "code": "DOC_OUT_OF_SYNC", "message": { "en": "Spec and doc differ.", "ja": "spec と doc が乖離。" } }
+        {
+          "code": "DOC_OUT_OF_SYNC",
+          "message": {
+            "en": "Spec and doc differ.",
+            "ja": "spec と doc が乖離。"
+          }
+        }
       ],
       "whenToUse": [
         {
@@ -739,7 +986,9 @@
           "ja": "`jui verify` 前に、ドキュメントが spec を反映しているか確認するとき。"
         }
       ],
-      "seeAlso": ["doc_generate_spec"]
+      "seeAlso": [
+        "doc_generate_spec"
+      ]
     },
     {
       "name": "doc_validate_component",
@@ -753,10 +1002,16 @@
           "name": "componentSpecPath",
           "type": "string",
           "required": true,
-          "description": { "en": "Path to the component spec.", "ja": "component spec のパス。" }
+          "description": {
+            "en": "Path to the component spec.",
+            "ja": "component spec のパス。"
+          }
         }
       ],
-      "returns": { "type": "object", "example": {} },
+      "returns": {
+        "type": "object",
+        "example": {}
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -764,7 +1019,9 @@
           "ja": "component spec 編集後。"
         }
       ],
-      "seeAlso": ["doc_validate_spec"]
+      "seeAlso": [
+        "doc_validate_spec"
+      ]
     },
     {
       "name": "doc_rules_init",
@@ -774,7 +1031,10 @@
         "ja": "プロジェクトローカルの `.jsonui-doc-rules.json` を作成。"
       },
       "arguments": [],
-      "returns": { "type": "object", "example": {} },
+      "returns": {
+        "type": "object",
+        "example": {}
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -782,7 +1042,9 @@
           "ja": "プロジェクト固有のドキュメントルールが必要なとき。"
         }
       ],
-      "seeAlso": ["doc_rules_show"]
+      "seeAlso": [
+        "doc_rules_show"
+      ]
     },
     {
       "name": "doc_rules_show",
@@ -792,7 +1054,12 @@
         "ja": "現在有効なドキュメントルールセットを表示。"
       },
       "arguments": [],
-      "returns": { "type": "object", "example": { "rules": {} } },
+      "returns": {
+        "type": "object",
+        "example": {
+          "rules": {}
+        }
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -800,9 +1067,10 @@
           "ja": "現プロジェクトでどのルールが有効かを確認するとき。"
         }
       ],
-      "seeAlso": ["doc_rules_init"]
+      "seeAlso": [
+        "doc_rules_init"
+      ]
     },
-
     {
       "name": "get_binding_rules",
       "group": "D",
@@ -828,7 +1096,39 @@
           "ja": "binding 式を書く前に、属性が希望の方向をサポートするか確認するとき。"
         }
       ],
-      "seeAlso": ["lookup_attribute"]
+      "seeAlso": [
+        "lookup_attribute"
+      ]
+    },
+    {
+      "name": "get_screen_identity",
+      "group": "D",
+      "purpose": {
+        "en": "Return the canonical screen-identity rules: what counts as a screen, how a screen id is derived, the runtime marker, the per-platform 'is this screen displayed' predicates and the assert:\"screen\" vocabulary.",
+        "ja": "画面アイデンティティの正準ルールを返す: 何を画面とみなすか、画面 ID の導出、実行時 marker、プラットフォーム別の「その画面が表示されているか」述語、`assert:\"screen\"` の語彙。"
+      },
+      "arguments": [],
+      "returns": {
+        "type": "object",
+        "example": {
+          "screenId": {
+            "source": "layoutBasename"
+          },
+          "marker": {
+            "namePattern": "__screen_<screenId>"
+          }
+        }
+      },
+      "errors": [],
+      "whenToUse": [
+        {
+          "en": "Before writing screen / flow tests or navigation code, to get the screen id and assertion vocabulary right.",
+          "ja": "screen / flow テストや遷移コードを書く前に、画面 ID と検証語彙を正しく揃えるとき。"
+        }
+      ],
+      "seeAlso": [
+        "list_layouts"
+      ]
     },
     {
       "name": "get_modifier_order",
@@ -838,7 +1138,18 @@
         "ja": "コード生成器が使う canonical な SwiftUI modifier 順序を返す。既存出力に合わせるカスタム converter を書くときに重要。"
       },
       "arguments": [],
-      "returns": { "type": "object", "example": { "order": ["frame", "padding", "background", "cornerRadius", "shadow"] } },
+      "returns": {
+        "type": "object",
+        "example": {
+          "order": [
+            "frame",
+            "padding",
+            "background",
+            "cornerRadius",
+            "shadow"
+          ]
+        }
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -846,7 +1157,9 @@
           "ja": "modifier chain を組み立てる SwiftJsonUI converter を実装するとき。"
         }
       ],
-      "seeAlso": ["lookup_attribute"]
+      "seeAlso": [
+        "lookup_attribute"
+      ]
     },
     {
       "name": "get_platform_mapping",
@@ -860,13 +1173,19 @@
           "name": "attribute",
           "type": "string",
           "required": true,
-          "description": { "en": "Attribute name.", "ja": "属性名。" }
+          "description": {
+            "en": "Attribute name.",
+            "ja": "属性名。"
+          }
         },
         {
           "name": "component",
           "type": "string",
           "required": false,
-          "description": { "en": "Component scope (optional).", "ja": "コンポーネントスコープ（任意）。" }
+          "description": {
+            "en": "Component scope (optional).",
+            "ja": "コンポーネントスコープ（任意）。"
+          }
         }
       ],
       "returns": {
@@ -886,7 +1205,10 @@
           "ja": "プラットフォーム固有ドキュメントを書くとき、または描画差分をデバッグするとき。"
         }
       ],
-      "seeAlso": ["lookup_attribute", "get_binding_rules"]
+      "seeAlso": [
+        "lookup_attribute",
+        "get_binding_rules"
+      ]
     },
     {
       "name": "jui_migrate_layouts",
@@ -900,10 +1222,16 @@
           "name": "fromVersion",
           "type": "string",
           "required": true,
-          "description": { "en": "Previous version.", "ja": "移行元バージョン。" }
+          "description": {
+            "en": "Previous version.",
+            "ja": "移行元バージョン。"
+          }
         }
       ],
-      "returns": { "type": "object", "example": {} },
+      "returns": {
+        "type": "object",
+        "example": {}
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -911,7 +1239,9 @@
           "ja": "JsonUI バージョン更新後、破壊的変更の transform を適用するとき。"
         }
       ],
-      "seeAlso": ["jui_sync_tool"]
+      "seeAlso": [
+        "jui_sync_tool"
+      ]
     },
     {
       "name": "jui_sync_tool",
@@ -931,9 +1261,22 @@
           }
         }
       ],
-      "returns": { "type": "object", "example": { "synced": ["rjui_tools"] } },
+      "returns": {
+        "type": "object",
+        "example": {
+          "synced": [
+            "rjui_tools"
+          ]
+        }
+      },
       "errors": [
-        { "code": "TOOL_SYNC_FAILED", "message": { "en": "Git fetch/reset failed.", "ja": "git fetch/reset 失敗。" } }
+        {
+          "code": "TOOL_SYNC_FAILED",
+          "message": {
+            "en": "Git fetch/reset failed.",
+            "ja": "git fetch/reset 失敗。"
+          }
+        }
       ],
       "whenToUse": [
         {
@@ -941,7 +1284,9 @@
           "ja": "ライブラリバグ修正が upstream でリリースされた後、消費プロジェクトに取り込むとき。"
         }
       ],
-      "seeAlso": ["jui_migrate_layouts"]
+      "seeAlso": [
+        "jui_migrate_layouts"
+      ]
     },
     {
       "name": "jui_lint_generated",
@@ -951,7 +1296,10 @@
         "ja": "生成ファイルが期待するヘッダマーカーを保持しているか検証する CI 専用リンター。通常の MCP フローでは呼ばれず、メタデータ網羅のためここに記載。"
       },
       "arguments": [],
-      "returns": { "type": "object", "example": {} },
+      "returns": {
+        "type": "object",
+        "example": {}
+      },
       "errors": [],
       "whenToUse": [
         {
@@ -959,55 +1307,110 @@
           "ja": "CI のみ、shell コマンド `jui lint-generated` で使う。"
         }
       ],
-      "seeAlso": ["jui_verify"]
+      "seeAlso": [
+        "jui_verify"
+      ]
     }
   ],
-
   "errorCodes": [
     {
       "code": "NOT_IN_PROJECT",
-      "meaning": { "en": "No jui.config.json in cwd.", "ja": "カレントに jui.config.json がない。" },
-      "cause": { "en": "`jui init` not run.", "ja": "`jui init` 未実行。" }
+      "meaning": {
+        "en": "No jui.config.json in cwd.",
+        "ja": "カレントに jui.config.json がない。"
+      },
+      "cause": {
+        "en": "`jui init` not run.",
+        "ja": "`jui init` 未実行。"
+      }
     },
     {
       "code": "FILE_NOT_FOUND",
-      "meaning": { "en": "Path does not exist.", "ja": "パスが存在しない。" },
-      "cause": { "en": "Typo or file moved.", "ja": "タイポまたはファイル移動。" }
+      "meaning": {
+        "en": "Path does not exist.",
+        "ja": "パスが存在しない。"
+      },
+      "cause": {
+        "en": "Typo or file moved.",
+        "ja": "タイポまたはファイル移動。"
+      }
     },
     {
       "code": "INVALID_SPEC",
-      "meaning": { "en": "Schema validation failed.", "ja": "スキーマ検証失敗。" },
-      "cause": { "en": "`type` / `version` / metadata missing.", "ja": "`type` / `version` / metadata の欠落。" }
+      "meaning": {
+        "en": "Schema validation failed.",
+        "ja": "スキーマ検証失敗。"
+      },
+      "cause": {
+        "en": "`type` / `version` / metadata missing.",
+        "ja": "`type` / `version` / metadata の欠落。"
+      }
     },
     {
       "code": "DRIFT_DETECTED",
-      "meaning": { "en": "Generated file modified by hand.", "ja": "生成ファイルが手編集された。" },
-      "cause": { "en": "Hand-edit of a @generated file.", "ja": "@generated ファイルの手編集。" }
+      "meaning": {
+        "en": "Generated file modified by hand.",
+        "ja": "生成ファイルが手編集された。"
+      },
+      "cause": {
+        "en": "Hand-edit of a @generated file.",
+        "ja": "@generated ファイルの手編集。"
+      }
     },
     {
       "code": "BUILD_WARNINGS",
-      "meaning": { "en": "Build succeeded but warnings remain.", "ja": "ビルド成功だが警告あり。" },
-      "cause": { "en": "Unused bindings or missing strings.", "ja": "未使用 binding や欠落 strings。" }
+      "meaning": {
+        "en": "Build succeeded but warnings remain.",
+        "ja": "ビルド成功だが警告あり。"
+      },
+      "cause": {
+        "en": "Unused bindings or missing strings.",
+        "ja": "未使用 binding や欠落 strings。"
+      }
     },
     {
       "code": "UNKNOWN_COMPONENT",
-      "meaning": { "en": "Component name not registered.", "ja": "コンポーネント名が未登録。" },
-      "cause": { "en": "Typo or custom component not yet registered via attribute_definitions.", "ja": "タイポ、または attribute_definitions に未登録のカスタムコンポーネント。" }
+      "meaning": {
+        "en": "Component name not registered.",
+        "ja": "コンポーネント名が未登録。"
+      },
+      "cause": {
+        "en": "Typo or custom component not yet registered via attribute_definitions.",
+        "ja": "タイポ、または attribute_definitions に未登録のカスタムコンポーネント。"
+      }
     },
     {
       "code": "UNKNOWN_ATTRIBUTE",
-      "meaning": { "en": "Attribute not defined.", "ja": "属性が定義されていない。" },
-      "cause": { "en": "Typo or attribute not yet added to attribute_definitions.", "ja": "タイポまたは attribute_definitions に未追加。" }
+      "meaning": {
+        "en": "Attribute not defined.",
+        "ja": "属性が定義されていない。"
+      },
+      "cause": {
+        "en": "Typo or attribute not yet added to attribute_definitions.",
+        "ja": "タイポまたは attribute_definitions に未追加。"
+      }
     },
     {
       "code": "TOOL_SYNC_FAILED",
-      "meaning": { "en": "`jui sync-tool` failed.", "ja": "`jui sync-tool` 失敗。" },
-      "cause": { "en": "Network / git error.", "ja": "ネットワーク / git エラー。" }
+      "meaning": {
+        "en": "`jui sync-tool` failed.",
+        "ja": "`jui sync-tool` 失敗。"
+      },
+      "cause": {
+        "en": "Network / git error.",
+        "ja": "ネットワーク / git エラー。"
+      }
     },
     {
       "code": "PLATFORM_UNSUPPORTED",
-      "meaning": { "en": "Tool not available for current platform.", "ja": "現プラットフォームで対応していないツール。" },
-      "cause": { "en": "iOS-only tool on a web-only project.", "ja": "web 専用プロジェクトで iOS 専用ツールを呼んだ。" }
+      "meaning": {
+        "en": "Tool not available for current platform.",
+        "ja": "現プラットフォームで対応していないツール。"
+      },
+      "cause": {
+        "en": "iOS-only tool on a web-only project.",
+        "ja": "web 専用プロジェクトで iOS 専用ツールを呼んだ。"
+      }
     }
   ]
 }

@@ -33,6 +33,7 @@ const CATALOG: ReadonlyArray<{ id: string; url: string; titleKey: string }> = [
   { id: "hot-reload", url: "/concepts/hot-reload", titleKey: "concepts_hot_reload_title" },
   { id: "responsive-design", url: "/concepts/responsive-design", titleKey: "concepts_responsive_design_title" },
   { id: "screen-composition", url: "/concepts/screen-composition", titleKey: "concepts_screen_composition_title" },
+  { id: "screen-identity", url: "/concepts/screen-identity", titleKey: "concepts_screen_identity_title" },
   { id: "implementation-contract-check", url: "/concepts/implementation-contract-check", titleKey: "concepts_implementation_contract_check_title" },
   { id: "db-schema-check", url: "/concepts/db-schema-check", titleKey: "concepts_db_schema_check_title" }
 ];
