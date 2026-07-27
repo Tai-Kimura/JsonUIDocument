@@ -115,14 +115,14 @@
     }
   ],
   "notes": [
-    "2026-07-27 — New page for the screen-identity track (canonical asset shared/core/screen_identity.json, libraries SwiftJsonUI 10.8.0+ / KotlinJsonUI 2.15.0+, drivers ios 1.8.0 / android 1.7.0 / web 1.7.0).",
+    "2026-07-27 — New page for the screen-identity track (canonical asset shared/core/screen_identity.json, libraries SwiftJsonUI 10.8.0+ / KotlinJsonUI 2.15.0+, drivers ios 1.9.0 / android 1.8.0 / web 1.8.0 — implicit verification flipped ON by default on 2026-07-27).",
     "Eight H2 sections + TOC + next-reads (3 cards).",
     "Section 1 — section_problem: why probing for an element on the destination is fragile; the whole assertion is { assert: 'screen', name: '<id>' }.",
-    "Section 2 — section_id: id = layout basename; recursive collection, project-wide uniqueness (screen-id-collision), variant files normalize to the base id.",
+    "Section 2 — section_id: id = layout basename; recursive collection minus the Resources/Styles subtrees (screenId.nonLayoutSubtrees), project-wide uniqueness (screen-id-collision), variant files normalize to the base id.",
     "Section 3 — section_classification: four-step resolution order + `jui screens` read-back + app-owned screens (test.appOwnedScreens, hand-written data-screen on web).",
     "Section 4 — section_marker: dedicated node __screen_<id>, per-platform mechanism table, exactly-one invariant, sibling-of-scrollable placement, dev-build gating.",
     "Section 5 — section_assert: target key is `name` (not the step-level `screen`), non-exclusive semantics, marker means constructed not settled.",
-    "Section 6 — section_implicit: implicit verification scope + tracker rules, screenTransitionTimeout 10000, four failure classes, verifyScreenTransitions ships false with the rebuild-then-flip rollout.",
+    "Section 6 — section_implicit: implicit verification scope + tracker rules, screenTransitionTimeout 10000, four failure classes (a class names the cause, not a severity — all fail through the ordinary assertion path), verifyScreenTransitions ON by default with the rebuild-first rollout and the per-platform pin-propagation caveat.",
     "Section 7 — section_validation: the five validator rules; --no-install for inspection; role-then-steps ordering warning.",
     "Section 8 — section_limits: web hydration gap, suspending transitions, no exclusivity assertion.",
     "Every claim is taken from the canonical screen_identity.json and its measured evidence; nothing here is inferred from the implementation report alone."

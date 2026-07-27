@@ -2257,8 +2257,8 @@
       "ja": "`Layouts/mypage.json` は画面 `mypage` です。spec が参照する文字列も、テストの `screen` キーに書く文字列も、生成された marker が持つ文字列も、遷移図のノード名も同じ — 同期を取るべき第 2 の命名体系は存在しません。"
     },
     "section_id_bullet_recursive": {
-      "en": "• Layout directories are scanned **recursively** (`Layouts/**/*.json`). Nesting sheets and cells one level down is normal, so a flat glob would silently miss most of them.",
-      "ja": "• レイアウトディレクトリは**再帰的に**走査されます（`Layouts/**/*.json`）。sheet や cell を 1 階層下に置くのは普通なので、フラットな glob では大半を取りこぼします。"
+      "en": "• Layout directories are scanned **recursively** (`Layouts/**/*.json`) minus the resource subtrees. Nesting sheets and cells one level down is normal, so a flat glob would silently miss most of them; JSON at any depth under `Resources/` or `Styles/` is skipped entirely, neither classified nor scanned for references. Nothing references `strings.json` or `colors.json`, so without that exclusion they fall through to the default and become phantom screens.",
+      "ja": "• レイアウトディレクトリは**再帰的に**走査されます（`Layouts/**/*.json`）— ただしリソースのサブツリーは除外。sheet や cell を 1 階層下に置くのは普通なのでフラットな glob では大半を取りこぼしますが、`Resources/` と `Styles/` 配下の JSON はどの深さでも完全にスキップされ、分類も参照走査もされません。`strings.json` や `colors.json` は誰からも参照されないため、この除外が無いと既定の分類に落ちて幽霊画面になります。"
     },
     "section_id_bullet_unique": {
       "en": "• Basenames must be **unique across the whole tree**. Two `detail.json` in different folders make the id ambiguous — that is the `screen-id-collision` error, not a silently-picked winner.",
@@ -2321,12 +2321,12 @@
       "ja": "画面が変わるたびの暗黙検証"
     },
     "section_implicit_body": {
-      "en": "In a flow test the driver can verify the marker at every point where an inline step's `screen` differs from the previous step's — without a single assertion written by hand. Steps skipped by `when` do not advance the tracker, a file-reference step resets it to unknown, and steps inside a block continue the enclosing screen. The wait uses `screenTransitionTimeout` (10000 ms) rather than the 5000 ms default, because real cross-screen waits after a cold start are longer. Failures are classified rather than lumped together:",
-      "ja": "flow テストでは、inline step の `screen` が前の step と変わるたびに driver が marker を検証できます — 検証を 1 行も書かずに。`when` でスキップされた step は追跡を進めず、ファイル参照 step は追跡を unknown に戻し、block の中の step は外側の画面を継続します。待ち時間は既定の 5000ms ではなく `screenTransitionTimeout`（10000ms）— コールドスタート後の実際の画面間待ちはもっと長いからです。失敗は一括りにせず分類されます:"
+      "en": "In a flow test the driver can verify the marker at every point where an inline step's `screen` differs from the previous step's — without a single assertion written by hand. Steps skipped by `when` do not advance the tracker, a file-reference step resets it to unknown, and steps inside a block continue the enclosing screen. The wait uses `screenTransitionTimeout` (10000 ms) rather than the 5000 ms default, because real cross-screen waits after a cold start are longer. Failures are classified rather than lumped together — every class fails the step through the ordinary assertion path, so the class names the likely **cause**, not how seriously to take it:",
+      "ja": "flow テストでは、inline step の `screen` が前の step と変わるたびに driver が marker を検証できます — 検証を 1 行も書かずに。`when` でスキップされた step は追跡を進めず、ファイル参照 step は追跡を unknown に戻し、block の中の step は外側の画面を継続します。待ち時間は既定の 5000ms ではなく `screenTransitionTimeout`（10000ms）— コールドスタート後の実際の画面間待ちはもっと長いからです。失敗は一括りにせず分類されます — どの分類も通常の assertion 経路で step を失敗させるので、分類が示すのは深刻度ではなく想定される**原因**です:"
     },
     "section_implicit_bullet_absent": {
-      "en": "• `marker-absent` — no marker anywhere: stale generated code or a stale library pin. Infrastructure, not a test failure. Only reported after the timeout, because a suspending navigation legitimately shows no marker while it is pending.",
-      "ja": "• `marker-absent` — marker がどこにも無い: 生成コードかライブラリ pin が古い。テストの失敗ではなくインフラの問題です。suspend する遷移は保留中に marker が 1 つも無い時間が正当に存在するため、timeout 経過後にのみ報告されます。"
+      "en": "• `marker-absent` — no marker anywhere. The cause is the build rather than the navigation: a production build (markers are development-only), stale generated code, or a stale library pin. Fix it with `jui build` and a current pin — the failure itself is not softened. Only reported after the timeout, because a suspending navigation legitimately shows no marker while it is pending.",
+      "ja": "• `marker-absent` — marker がどこにも無い。原因は遷移ではなくビルド側です: 本番ビルド（marker は開発ビルド限定）、生成コードが古い、ライブラリ pin が古い、のいずれか。`jui build` と最新の pin で直します — 失敗の扱いが緩められるわけではありません。suspend する遷移は保留中に marker が 1 つも無い時間が正当に存在するため、timeout 経過後にのみ報告されます。"
     },
     "section_implicit_bullet_previous": {
       "en": "• `previous-screen-only` — only the previous screen's marker is present: the navigation did not happen. This is a real test failure.",
@@ -2341,8 +2341,8 @@
       "ja": "• `children-unresolvable` — marker はあるが画面自身の要素 ID が解決できない: アクセシビリティのリグレッション。"
     },
     "section_implicit_rollout": {
-      "en": "The switch is `verifyScreenTransitions` in the runner config. It ships **false** and the canonical end state is `true`: turning it on before a project has rebuilt with marker-emitting code would fail every screen change with `marker-absent` — an infrastructure mismatch dressed up as a test failure. So rebuild first (`jui build`), raise the library and driver pins, then flip the flag in one line.",
-      "ja": "スイッチは runner 設定の `verifyScreenTransitions` です。出荷時は **false**、正準の最終形は `true`: marker を出す生成コードに作り直す前に有効化すると、全画面遷移が `marker-absent` で落ちます — インフラの不整合がテスト失敗の顔をして現れるだけです。まず `jui build` で再生成し、ライブラリと driver の pin を上げ、それから 1 行でフラグを切り替えます。"
+      "en": "The switch is `verifyScreenTransitions` in the runner config, and it is **on by default** from drivers iOS 1.9.0 / Android 1.8.0 / web 1.8.0. An app whose generated code predates screen markers therefore fails every screen change with `marker-absent` — the intended signal that it needs `jui build` and a current library pin, not a reason to soften the check. The pins do not move in step: an `upToNextMajor` SwiftPM range picks the new driver up on the next resolve, while the Android and web pins stay put until you raise them by hand, so regenerate iOS first. A project mid-migration opts out in one line with `verifyScreenTransitions: false`.",
+      "ja": "スイッチは runner 設定の `verifyScreenTransitions` で、driver iOS 1.9.0 / Android 1.8.0 / web 1.8.0 から**既定で ON** です。marker を出さない生成コードのままのアプリは全画面遷移が `marker-absent` で落ちますが、これは「`jui build` と最新の pin が要る」という意図された信号であって、チェックを緩める理由ではありません。pin の上がり方は揃っていません: SwiftPM の `upToNextMajor` 指定は次の解決で自動的に新 driver を拾う一方、Android と web は手で上げるまで動かないので、iOS から先に再生成してください。移行中のプロジェクトは `verifyScreenTransitions: false` の 1 行で明示的に降りられます。"
     },
     "section_validation_heading": {
       "en": "What the validator enforces",
@@ -6803,8 +6803,8 @@
       "ja": "全アサーションは auto-wait: 条件成立まで `timeout`（既定 5000ms）の範囲で 100ms ごとにポーリングするので、明示的な wait はほぼ不要です。"
     },
     "section_dsl_asserts_screen_transitions": {
-      "en": "Screen changes can also be verified without writing anything: set `verifyScreenTransitions` in the runner config and the driver checks the marker every time a flow's inline step changes `screen`, waiting up to `screenTransitionTimeout` (10000 ms). It ships off — a project must first rebuild with marker-emitting code (SwiftJsonUI 10.8.0+ / KotlinJsonUI 2.15.0+, drivers iOS 1.8.0 / Android 1.7.0 / web 1.7.0), otherwise every transition fails as `marker-absent`.",
-      "ja": "画面遷移は何も書かずに検証させることもできます: runner 設定で `verifyScreenTransitions` を有効にすると、flow の inline step の `screen` が変わるたびに driver が marker を検証します（待ちは `screenTransitionTimeout`、10000ms）。既定は無効 — marker を出す生成コード（SwiftJsonUI 10.8.0+ / KotlinJsonUI 2.15.0+、driver は iOS 1.8.0 / Android 1.7.0 / web 1.7.0）に作り直す前に有効化すると、全遷移が `marker-absent` で落ちます。"
+      "en": "Screen changes can also be verified without writing anything: the driver checks the marker every time a flow's inline step changes `screen`, waiting up to `screenTransitionTimeout` (10000 ms). `verifyScreenTransitions` is **on by default** from drivers iOS 1.9.0 / Android 1.8.0 / web 1.8.0, with the markers coming from SwiftJsonUI 10.8.0+ / KotlinJsonUI 2.15.0+ — so a project that has not rebuilt yet fails every transition as `marker-absent`. Rebuild with `jui build`, or set `verifyScreenTransitions: false` while you migrate.",
+      "ja": "画面遷移は何も書かずに検証させることもできます: flow の inline step の `screen` が変わるたびに driver が marker を検証します（待ちは `screenTransitionTimeout`、10000ms）。`verifyScreenTransitions` は driver iOS 1.9.0 / Android 1.8.0 / web 1.8.0 から**既定で ON**（marker を出すのは SwiftJsonUI 10.8.0+ / KotlinJsonUI 2.15.0+）なので、まだ再生成していないプロジェクトは全遷移が `marker-absent` で落ちます。`jui build` で作り直すか、移行中は `verifyScreenTransitions: false` で降りてください。"
     },
     "section_dsl_bullet_conditions": {
       "en": "• Conditions (when): gate any step or assert with \"when\": { \"platform\": \"ios\" | \"android\" | \"web\", \"responsive\": <bucket | constraint> }. Screen-test cases can also carry case-level platform / responsive. A responsive value is one of the seven canonical buckets (compact / medium / regular plus their landscape variants) or a constraint object (minWidth / maxWidth / minHeight / maxHeight / orientation) — each driver resolves it to mirror that platform's own renderer breakpoints.",
