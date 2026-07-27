@@ -4,7 +4,7 @@
   "metadata": {
     "name": "ScreenIdentity",
     "displayName": "Screen identity and navigation assertion",
-    "description": "Concept essay: what a screen is, how its id is derived, the runtime marker, and how a test asserts 'this screen is displayed'. Covers screen id = layout basename (recursive collection, project-wide uniqueness, variant normalization), the four-step classification order (explicit role > referenced as cell/header/footer/cellClasses/include > partial:true > default screen) and `jui screens` read-back, app-owned screens via test.appOwnedScreens, the __screen_<id> marker (dedicated node, exactly one per rendered screen, sibling of the scrollable, dev-build gating per platform), the assert:\"screen\" vocabulary with `name` as target key, implicit verification on flow screen changes (verifyScreenTransitions / screenTransitionTimeout / four failure classes), the five validator rules, and the measured limits (web hydration gap, suspending transitions, no exclusivity form). Eight H2 sections + TOC + next-reads. ~8-min read. Canonical source: shared/core/screen_identity.json.",
+    "description": "Concept essay: what a screen is, how its id is derived, the runtime marker, and how a test asserts 'this screen is displayed'. Covers screen id = layout basename (recursive collection, project-wide uniqueness, variant normalization), the four-step classification order (explicit role > referenced as cell/header/footer/cellClasses/include > partial:true > default screen) and `jui screens` read-back, app-owned screens via test.appOwnedScreens, the __screen_<id> marker (dedicated node, exactly one per rendered screen, sibling of the scrollable, centred on the root, clear of the Android system-bar window, dev-build gating per platform), the assert:\"screen\" vocabulary with `name` as target key, implicit verification on flow screen changes (verifyScreenTransitions / screenTransitionTimeout / four failure classes), the five validator rules, and the measured limits (web hydration gap, suspending transitions, no exclusivity form). Eight H2 sections + TOC + next-reads. ~8-min read. Canonical source: shared/core/screen_identity.json.",
     "platforms": [
       "web"
     ],
@@ -115,7 +115,7 @@
     }
   ],
   "notes": [
-    "2026-07-27 — New page for the screen-identity track (canonical asset shared/core/screen_identity.json, libraries SwiftJsonUI 10.8.0+ / KotlinJsonUI 2.15.0+, drivers ios 1.9.0 / android 1.8.0 / web 1.8.0 — implicit verification flipped ON by default on 2026-07-27).",
+    "2026-07-27 — New page for the screen-identity track (canonical asset shared/core/screen_identity.json, libraries SwiftJsonUI 10.8.0+ / KotlinJsonUI 2.15.0+, drivers ios 1.9.1 / android 1.8.0 / web 1.8.0 — implicit verification flipped ON by default on 2026-07-27; marker placement fixes landed as SwiftJsonUI 10.8.1 (centre overlay) and KotlinJsonUI 2.15.1 (inset past the system-bar window), and the iOS predicate gained its second clause in driver 1.9.1).",
     "Eight H2 sections + TOC + next-reads (3 cards).",
     "Section 1 — section_problem: why probing for an element on the destination is fragile; the whole assertion is { assert: 'screen', name: '<id>' }.",
     "Section 2 — section_id: id = layout basename; recursive collection minus the Resources/Styles subtrees (screenId.nonLayoutSubtrees), project-wide uniqueness (screen-id-collision), variant files normalize to the base id.",
