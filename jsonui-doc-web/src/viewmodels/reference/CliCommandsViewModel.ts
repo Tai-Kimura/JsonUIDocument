@@ -42,6 +42,8 @@ export class CliCommandsViewModel {
 
   protected initializeEventHandlers = () => {
     this.updateData({
+      onNavigateDbSchemaCheck: () => this.navigate("/concepts/db-schema-check"),
+      onNavigateContractCheck: () => this.navigate("/concepts/implementation-contract-check"),
       onNavigateReference: () => this.navigate("/"),
     });
   };

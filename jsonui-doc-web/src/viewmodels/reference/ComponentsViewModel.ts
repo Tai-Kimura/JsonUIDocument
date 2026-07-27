@@ -87,6 +87,7 @@ export class ComponentsViewModel {
 
   protected initializeEventHandlers = () => {
     this.updateData({
+      onNavigateScreenComposition: () => this.navigate("/concepts/screen-composition"),
       onNavigateReference: () => this.navigate("/"),
     });
   };

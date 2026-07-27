@@ -76,6 +76,7 @@ export class McpViewModel {
 
   protected initializeEventHandlers = () => {
     this.updateData({
+      onNavigateMcpTools: () => this.navigate("/reference/mcp-tools"),
       onNavigateTools: () => this.navigate("/"),
     });
   };

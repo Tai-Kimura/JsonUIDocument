@@ -8,6 +8,7 @@
   "child": [
     {
       "data": [
+        { "name": "onNavigateLayoutFile", "class": "() -> Void" },
         { "name": "nextReadLinks",  "class": "CollectionDataSource" },
         { "name": "onNavigateSpec", "class": "() -> Void" }
       ]
@@ -70,7 +71,7 @@
               "type": "View", "orientation": "vertical", "id": "section_verify", "style": "home_section", "background": "surface_card",
               "child": [
                 { "type": "Label", "style": "section_heading",    "text": "section_verify_heading", "width": "matchParent" },
-                { "type": "Label", "style": "section_subheading", "text": "section_verify_body",    "width": "matchParent" },
+                { "type": "Label", "style": "section_subheading", "partialAttributes": [{"range": "/spec/layout-file", "fontColor": "accent", "underline": {"lineStyle": "Single"}, "onclick": "onNavigateLayoutFile"}], "text": "section_verify_body",    "width": "matchParent" },
                 {
                   "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
                   "code": "$ jui verify --fail-on-diff\n\n# Layout drift (layer 1)\n─────────────────────────────────────────────────────────\nscreen: learn/hello-world            ✔ no drift\nscreen: learn/installation           ✔ no drift\nscreen: learn/first-screen           ✗ drift detected\n    at  first-screen.spec.root.child[1].child[0]\n    expected  { \"type\": \"Label\", \"fontSize\": 18, \"text\": \"lead\" }\n    actual    { \"type\": \"Label\", \"fontSize\": 16, \"text\": \"lead\" }\n\nSkipped (layout authored externally):\n- chrome.spec -> chrome.json\n\n# Data-section orphans (layer 2)\n─────────────────────────────────────────────────────────\nWARNING: 1 data-section entries not declared in spec.uiVariables\n   across 1 Layout JSON file(s):\n- learn/first-screen:\n    - data.scrollOffset (Int)\n  → add each missing entry to stateManagement.uiVariables\n    (or remove it from the Layout JSON's data section).\n\n# Unregistered custom types (layer 3, warnings only)\n─────────────────────────────────────────────────────────\nWARNING: 1 custom type(s) referenced but not registered in TypeMapper.\n   Add entries to `.jsonui-type-map.json`:\n```json\n{\n  \"types\": {\n    \"EntryRow\": { \"class\": \"EntryRow\", \"imports\": [] }\n  }\n}\n```\n  Usage locations:\n  - EntryRow: first-screen.spec:uiVariables.entries\n\nExit code: 1   (layer 1 or 2 triggered --fail-on-diff)",

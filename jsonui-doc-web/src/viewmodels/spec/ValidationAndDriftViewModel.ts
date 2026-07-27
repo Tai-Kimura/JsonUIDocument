@@ -46,6 +46,7 @@ export class ValidationAndDriftViewModel {
 
   protected initializeEventHandlers = () => {
     this.updateData({
+      onNavigateLayoutFile: () => this.navigate("/spec/layout-file"),
       onNavigateSpec: () => this.navigate("/spec/split-overview"),
     });
   };

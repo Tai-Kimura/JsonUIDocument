@@ -55,6 +55,7 @@ export class ToolsAgentsViewModel {
 
   protected initializeEventHandlers = () => {
     this.updateData({
+      onNavigateDataModels: () => this.navigate("/concepts/data-models-from-openapi"),
       onNavigateTools: () => this.navigate("/"),
     });
   };

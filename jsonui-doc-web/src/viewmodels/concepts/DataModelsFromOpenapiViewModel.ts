@@ -103,6 +103,8 @@ export class DataModelsFromOpenapiViewModel {
 
   protected initializeEventHandlers = () => {
     this.updateData({
+      onNavigateApiDataModels: () => this.navigate("/guides/api-data-models"),
+      onNavigateMcpTools: () => this.navigate("/reference/mcp-tools"),
       onNavigateConcepts: () => this.navigate("/concepts"),
     });
   };

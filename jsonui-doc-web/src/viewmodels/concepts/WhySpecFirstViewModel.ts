@@ -52,6 +52,7 @@ export class WhySpecFirstViewModel {
 
   protected initializeEventHandlers = () => {
     this.updateData({
+      onNavigateDataModels: () => this.navigate("/concepts/data-models-from-openapi"),
       onNavigateConcepts: () => this.navigate("/"),
     });
   };

@@ -114,6 +114,7 @@ export class ApiDataModelsViewModel {
 
   protected initializeEventHandlers = () => {
     this.updateData({
+      onNavigateDataModels: () => this.navigate("/concepts/data-models-from-openapi"),
       onNavigateGuides: () => this.navigate("/guides"),
     });
   };

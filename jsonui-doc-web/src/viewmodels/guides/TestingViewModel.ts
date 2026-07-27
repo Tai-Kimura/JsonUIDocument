@@ -42,6 +42,7 @@ export class TestingViewModel {
 
   protected initializeEventHandlers = () => {
     this.updateData({
+      onNavigateScreenIdentity: () => this.navigate("/concepts/screen-identity"),
       onNavigateGuides: () => this.navigate("/"),
     });
   };

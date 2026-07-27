@@ -52,6 +52,8 @@ export class SplitOverviewViewModel {
 
   protected initializeEventHandlers = () => {
     this.updateData({
+      onNavigateScreenComposition: () => this.navigate("/concepts/screen-composition"),
+      onNavigateEmbedComponent: () => this.navigate("/reference/components/embed"),
       onNavigateSpec: () => this.navigate("/spec/anatomy"),
     });
   };
