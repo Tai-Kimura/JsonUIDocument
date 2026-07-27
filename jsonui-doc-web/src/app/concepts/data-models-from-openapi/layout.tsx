@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `Data models from OpenAPI — JsonUI`,
-  description: `\`jui build\` reads OpenAPI files in \`docs/api/\` and emits two layers per platform: a fully regenerated **DTO** (wire-shape 1:1) plus a one-time **Domain…`,
+  description: `\`jui build\` reads OpenAPI files in \`docs/api/\` and emits two layers per platform: a fully regenerated DTO (wire-shape 1:1) plus a one-time Domain scaffold…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
