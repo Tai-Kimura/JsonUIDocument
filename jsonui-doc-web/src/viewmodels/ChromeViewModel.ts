@@ -136,6 +136,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "mcp-tools",     titleKey: "reference_mcp_tools_title",     titleEn: "MCP tool API",           url: "/reference/mcp-tools" },
       { id: "cli-commands",  titleKey: "reference_cli_commands_title",  titleEn: "CLI command reference", url: "/reference/cli-commands" },
       { id: "test-tooling", titleKey: "reference_test_tooling_title", titleEn: "Test tooling reference", url: "/reference/test-tooling" },
+      { id: "generated-code", titleKey: "reference_generated_code_title", titleEn: "Generated code", url: "/reference/generated-code" },
     ],
   },
   {

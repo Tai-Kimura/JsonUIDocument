@@ -31,7 +31,8 @@ const CATALOG: ReadonlyArray<{ id: string; url: string; titleKey: string }> = [
   { id: "json-schema", url: "/reference/json-schema", titleKey: "reference_json_schema_title" },
   { id: "mcp-tools", url: "/reference/mcp-tools", titleKey: "reference_mcp_tools_title" },
   { id: "cli-commands", url: "/reference/cli-commands", titleKey: "reference_cli_commands_title" },
-  { id: "test-tooling", url: "/reference/test-tooling", titleKey: "reference_test_tooling_title" }
+  { id: "test-tooling", url: "/reference/test-tooling", titleKey: "reference_test_tooling_title" },
+  { id: "generated-code", url: "/reference/generated-code", titleKey: "reference_generated_code_title" }
 ];
 
 export class ReferenceIndexViewModel {
