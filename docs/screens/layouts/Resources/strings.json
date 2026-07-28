@@ -8707,20 +8707,20 @@
       "ja": "つまみは 3 箇所に分かれています。探す場所を間違えないよう、どれがどこにあるかを先に押さえておくと早いです。"
     },
     "section_knobs_bullet_config": {
-      "en": "• `jui.config.json` — `build.normalizeLayouts` (default true) decides whether distributed layouts are L1-canonicalized before the platform builders see them. `lint.exclude_dir_names` and `lint.exclude_files` narrow what `jui lint-generated` walks, which is how you keep a vendored or legacy tree out of the audit.",
-      "ja": "• `jui.config.json` — `build.normalizeLayouts`（既定 true）は、配布するレイアウトをプラットフォームビルダーに渡す前に L1 正規化するかどうかを決めます。`lint.exclude_dir_names` と `lint.exclude_files` は `jui lint-generated` の走査対象を絞るもので、vendor 済みや legacy のツリーを監査から外すのに使います。"
+      "en": "• `jui.config.json` — `build.normalizeLayouts` (default true) decides whether distributed layouts are L1-canonicalized before the platform builders see them. `lint.exclude_dir_names` and `lint.exclude_files` narrow what `jui lint-generated` walks, which is how you keep a vendored or legacy tree out of the audit. `lint.max_depth` and `lint.max_lines` declare the bounds the linter checks against, so a project that wants to gate on a stricter number gets it on every run — CI and local alike — instead of depending on each invocation repeating the same flag.",
+      "ja": "• `jui.config.json` — `build.normalizeLayouts`（既定 true）は、配布するレイアウトをプラットフォームビルダーに渡す前に L1 正規化するかどうかを決めます。`lint.exclude_dir_names` と `lint.exclude_files` は `jui lint-generated` の走査対象を絞るもので、vendor 済みや legacy のツリーを監査から外すのに使います。`lint.max_depth` と `lint.max_lines` は linter が照合する上限そのものを宣言します。より厳しい値でゲートしたいプロジェクトは、実行のたびに同じフラグを書き直さなくても、CI でもローカルでも同じ値が効きます。"
     },
     "section_knobs_bullet_flags": {
-      "en": "• Command-line flags — `--max-depth` (default 5) and `--max-lines` (default 250) set the bounds the linter checks against, and `--fail-on any|size-ratchet|health` picks the gating signal. These are per-invocation, which suits CI: a stricter number in a nightly job costs nothing in the inner loop.",
-      "ja": "• コマンドラインフラグ — `--max-depth`（既定 5）と `--max-lines`（既定 250）は linter が照合する上限、`--fail-on any|size-ratchet|health` はゲートにするシグナルを選びます。実行ごとの指定なので CI 向きです（夜間ジョブだけ厳しくしても内側のループには影響しません）。"
+      "en": "• Command-line flags — `--max-depth` and `--max-lines` override whatever the config declares, and `--fail-on any|size-ratchet|health` picks the gating signal. The order is flag, then `jui.config.json`, then the built-in 5 and 250. The two size flags carry no number of their own by default, precisely so that typing the built-in number explicitly still wins over a config asking for something stricter — a per-invocation override suits a nightly job that gates harder than the inner loop.",
+      "ja": "• コマンドラインフラグ — `--max-depth` と `--max-lines` は設定ファイルの宣言を上書きし、`--fail-on any|size-ratchet|health` はゲートにするシグナルを選びます。優先順位はフラグ → `jui.config.json` → 組み込みの既定値 5 / 250 です。サイズ系の 2 つのフラグは既定値として数値を持ちません。これは、組み込みと同じ数値を明示的に打った場合でも、より厳しい設定より優先されるようにするためです。実行ごとの上書きなので、内側のループより厳しくゲートしたい夜間ジョブに向きます。"
     },
     "section_knobs_bullet_env": {
       "en": "• Environment — `KJUI_SECTION_WAIVER_WARNINGS=1` restores the Android size warnings for one run. `JSONUI_CLI_DIR` / `JSONUI_MCP_DIR` / `JSONUI_CLI_PATH` relocate the toolchain itself.",
       "ja": "• 環境変数 — `KJUI_SECTION_WAIVER_WARNINGS=1` はその実行だけ Android のサイズ警告を戻します。`JSONUI_CLI_DIR` / `JSONUI_MCP_DIR` / `JSONUI_CLI_PATH` はツールチェーン自体の場所を差し替えます。"
     },
     "section_knobs_bullet_fixed": {
-      "en": "• Not configurable — the bounds the generators themselves cut against are constants in sjui and kjui, not settings. Raising them in a project would mean shipping a screen that the runtime cannot decode on a real device, so the number that matters is the one the tools were calibrated to. The linter's flags exist to let CI check a stricter number, not a looser one.",
-      "ja": "• 設定できないもの — ジェネレータ自身が切断の基準にする上限は sjui / kjui 側の定数で、設定項目ではありません。プロジェクト側で緩めるということは、実機でメタデータを展開できない画面を出荷するということなので、意味を持つのはツールが較正された値だけです。linter のフラグは CI がより厳しい値で検査するためのもので、緩めるためのものではありません。"
+      "en": "• Stricter only — the bounds the generators themselves cut against are constants in sjui and kjui, not settings. Raising them in a project would mean shipping a screen that the runtime cannot decode on a real device, so the number that matters is the one the tools were calibrated to. A `lint.max_depth` or `lint.max_lines` above the built-in is therefore refused: the linter warns, uses the built-in, and points you at `.jui-size-waivers`. Standing slack belongs there, recorded function by function where a new entry is visible, rather than folded into a number that hides every overrun at once.",
+      "ja": "• 厳しくする方向にだけ動かせる — ジェネレータ自身が切断の基準にする上限は sjui / kjui 側の定数で、設定項目ではありません。プロジェクト側で緩めるということは、実機でメタデータを展開できない画面を出荷するということなので、意味を持つのはツールが較正された値だけです。したがって組み込みより緩い `lint.max_depth` / `lint.max_lines` は採用されません — linter は警告を出して組み込みの値を使い、`.jui-size-waivers` を案内します。恒常的に許容したいものはそちらに、関数ごとに記録します。増えれば気付ける形で残るので、数値を緩めて超過をまとめて隠すのとは違います。"
     },
     "section_warnings_heading": {
       "en": "Warnings you may see, and where they come from",

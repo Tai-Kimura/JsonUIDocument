@@ -421,7 +421,7 @@
     {
       "binary": "jui",
       "command": "lint-generated",
-      "synopsis": "jui lint-generated [--fix] [--verbose] [--max-depth <n>] [--max-lines <n>] [--update-size-baseline]",
+      "synopsis": "jui lint-generated [--fix] [--verbose] [--max-depth <n>] [--max-lines <n>] [--update-size-baseline] [--fail-on any|size-ratchet|health]",
       "purpose": {
         "en": "CI-side audit of the generated tree: every generated file must carry the `@generated` sentinel, and every generated view function must stay inside the size bounds. Not part of `jui build` — run it in CI or before a release.",
         "ja": "生成物の CI 向け監査: 生成ファイルは `@generated` sentinel を持つこと、生成ビューの各関数はサイズ上限内に収まることを確認する。`jui build` には含まれないので、CI かリリース前に実行する。"
@@ -448,19 +448,28 @@
         {
           "name": "--max-depth",
           "type": "number",
-          "default": "5",
+          "default": "5 (or lint.max_depth)",
           "description": {
-            "en": "Per-function brace-nesting bound for generated view code. Depth is what actually matters on iOS: SwiftUI composes one generic type per view and the runtime decodes its metadata on a 1 MB device stack.",
-            "ja": "生成ビュー関数のブレース深さ上限。iOS で効くのは深さ — SwiftUI はビューごとに 1 個のジェネリック型を合成し、ランタイムがそのメタデータを 1MB の実機スタックで展開するため。"
+            "en": "Per-function brace-nesting bound for generated view code. Depth is what actually matters on iOS: SwiftUI composes one generic type per view and the runtime decodes its metadata on a 1 MB device stack. Omit the flag and `jui.config.json`'s `lint.max_depth` applies; omit both and the built-in 5 does. A configured value looser than 5 is refused with a warning — record accepted depths in `.jui-size-waivers` instead.",
+            "ja": "生成ビュー関数のブレース深さ上限。iOS で効くのは深さ — SwiftUI はビューごとに 1 個のジェネリック型を合成し、ランタイムがそのメタデータを 1MB の実機スタックで展開するため。フラグを省くと `jui.config.json` の `lint.max_depth`、どちらも無ければ組み込みの 5 が使われる。5 より緩い設定値は警告付きで拒否されるので、許容したい深さは `.jui-size-waivers` に記録する。"
           }
         },
         {
           "name": "--max-lines",
           "type": "number",
-          "default": "250",
+          "default": "250 (or lint.max_lines)",
           "description": {
-            "en": "Per-function line-count bound. A soft target: a function that satisfies the depth bound but overruns the line count is reported, not rejected.",
-            "ja": "生成ビュー関数の行数上限。ソフト目標で、深さを満たしていて行数だけ超えるものは報告に留まる。"
+            "en": "Per-function line-count bound. A soft target: a function that satisfies the depth bound but overruns the line count is reported, not rejected. Resolved the same way as `--max-depth` — flag, then `lint.max_lines`, then the built-in 250 — and a looser configured value is likewise refused.",
+            "ja": "生成ビュー関数の行数上限。ソフト目標で、深さを満たしていて行数だけ超えるものは報告に留まる。解決順は `--max-depth` と同じ（フラグ → `lint.max_lines` → 組み込みの 250）で、緩い設定値が拒否されるのも同様。"
+          }
+        },
+        {
+          "name": "--fail-on",
+          "type": "enum",
+          "default": "any",
+          "description": {
+            "en": "Which finding sets a non-zero exit code: `any`, `size-ratchet`, or `health`. Exit 2 is a size-ratchet regression, 3 is generated-artifact health, and non-gating findings are still printed. Splitting them lets one signal gate a job without the other holding it red.",
+            "ja": "どの検出結果を非ゼロ終了にするかを選ぶ（`any` / `size-ratchet` / `health`）。終了コード 2 が size-ratchet の悪化、3 が生成物の健全性で、ゲートしない側も出力はされる。分けておくと、片方のシグナルでジョブをゲートしつつ、もう片方が赤を出し続ける状態を避けられる。"
           }
         },
         {
