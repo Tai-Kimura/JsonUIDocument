@@ -319,7 +319,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
       ) : null}
 
       <div
-        className={`${wrapLines ? "overflow-x-hidden" : "overflow-x-auto"}`}
+        className={`jui-code-scroll ${wrapLines ? "overflow-x-hidden" : "overflow-x-auto"}`}
         style={codeRegionStyle}
       >
         <pre className="m-0 p-0 leading-relaxed">

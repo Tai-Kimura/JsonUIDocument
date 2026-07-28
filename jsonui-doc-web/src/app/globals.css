@@ -207,6 +207,48 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Browser-drawn UI (scrollbar tracks, form controls) follows the site theme
+   rather than the OS default. Without this, an always-visible scrollbar —
+   macOS "Show scroll bars: Always", and every scrollbar on Windows — paints
+   its track white inside a dark code block. */
+:root {
+  color-scheme: light;
+}
+
+[data-color-mode="dark"] {
+  color-scheme: dark;
+}
+
+/* The scroll region inside a CodeBlock. `color-scheme` above already darkens
+   the track; this keeps the bar thin and tints it to the code surface so a
+   long line does not gain a full-width rail across the block. */
+.jui-code-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border_strong) transparent;
+}
+
+.jui-code-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.jui-code-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.jui-code-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-border_strong);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+
+.jui-code-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink_faint);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
 /* =========================================================================
    Chrome layout — spec-driven Chrome (TopBar + Sidebar) is a sibling of
    <main>; these rules reserve space so the page content isn't hidden
