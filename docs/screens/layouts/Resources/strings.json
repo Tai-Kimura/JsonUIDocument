@@ -7315,6 +7315,204 @@
       "ja": "3 言語以上へ拡張"
     }
   },
+  "guides_colors": {
+    "breadcrumb": {
+      "en": "Guides",
+      "ja": "ガイド"
+    },
+    "title": {
+      "en": "Colors and theming",
+      "ja": "色とテーマ"
+    },
+    "lead": {
+      "en": "One colors.json feeds every platform's colour handling: the palette per mode, the generated ColorManager, and — on web — the Tailwind `@theme` block. `jui build` also registers colours for you: a raw hex in a layout is extracted into the palette and the layout is rewritten to reference the name. This page covers what that does, when it helps, and where it stops short of a curated palette.",
+      "ja": "1 つの colors.json が全プラットフォームの色の扱いを支えます — モードごとのパレット、生成される ColorManager、そして web では Tailwind の `@theme` ブロック。`jui build` は色の登録も自動で行います: レイアウトに直接書かれた hex はパレットへ抽出され、レイアウト側はその名前を参照する形に書き換えられます。このページでは、それが何をしていて、どこまでが自動で、どこからが人の仕事なのかを扱います。"
+    },
+    "read_time": {
+      "en": "8 min read",
+      "ja": "8 分で読めます"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの内容"
+    },
+    "next_heading": {
+      "en": "Keep reading",
+      "ja": "続けて読む"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI",
+      "ja": "© 2026 JsonUI"
+    },
+    "section_palette_heading": {
+      "en": "1. The palette file",
+      "ja": "1. パレットファイル"
+    },
+    "section_palette_body": {
+      "en": "`Resources/colors.json` sits next to `strings.json` and is distributed to every platform by `jui build`. Its shape is themed: a `modes` list, a `fallback_mode` used when a key is missing from the current mode, a `systemModeMapping` that says which mode the OS appearance selects, and one `{ key: hex }` object per mode. A flat `{ key: hex }` file from an older project is still accepted — the first build migrates it into the themed shape and says so in the log.",
+      "ja": "`Resources/colors.json` は `strings.json` と同じ場所に置かれ、`jui build` が全プラットフォームへ配布します。形式はテーマ対応で、`modes` のリスト、現在のモードにキーが無いときに使う `fallback_mode`、OS の外観がどのモードを選ぶかを決める `systemModeMapping`、そしてモードごとの `{ キー: hex }` から成ります。古いプロジェクトのフラットな `{ キー: hex }` 形式も受け付けます — 最初のビルドがテーマ形式へ移行し、その旨をログに出します。"
+    },
+    "section_palette_note": {
+      "en": "The file travels the same route as strings.json — see /guides/localization for the other half of the Resources pipeline. Keys are mode-agnostic on the layout side: a layout says `\"fontColor\": \"ink_muted\"` and the runtime picks the value for whichever mode is current. Two modes may give the same key completely different values — that is the point.",
+      "ja": "このファイルは strings.json と同じ経路を通ります — Resources パイプラインのもう半分は /guides/localization を参照してください。レイアウト側から見るとキーはモード非依存です: レイアウトは `\"fontColor\": \"ink_muted\"` と書くだけで、実行時に現在のモードの値が選ばれます。同じキーがモードごとに全く違う値を持って構いません — それがテーマの意味です。"
+    },
+    "section_auto_heading": {
+      "en": "2. Colours register themselves",
+      "ja": "2. 色は自動で登録される"
+    },
+    "section_auto_body": {
+      "en": "During `jui build`, every layout is scanned for colour-bearing attributes (`background`, `fontColor`, `borderColor`, `tintColor`, `tapBackground`, `caretColor`, and their siblings — /reference/attributes/style lists them with their per-platform notes). A literal hex is looked up in the palette; if it is not there it is added under a generated name, and the distributed layout is rewritten to reference the name instead of the hex. Binding expressions are skipped — `@{...}` is left exactly as written.",
+      "ja": "`jui build` の実行中、全レイアウトが色属性（`background` / `fontColor` / `borderColor` / `tintColor` / `tapBackground` / `caretColor` など。一覧とプラットフォーム別の注記は /reference/attributes/style）について走査されます。リテラルの hex はパレットと突き合わされ、無ければ生成された名前で追加され、配布されるレイアウトは hex ではなくその名前を参照する形に書き換えられます。binding 式はスキップされ、`@{...}` はそのまま残ります。"
+    },
+    "section_auto_bullet_key": {
+      "en": "• The generated name is derived from the colour itself: brightness picks the prefix (`white` / `pale` / `light` / `medium` / `dark` / `deep` / `black`) and the dominant channel adds a suffix (`_red`, `_green`, `_cyan`, …). `#123456` became `dark_cyan` and `#FE4A49` became `medium_red` in a measured run. Descriptive, not meaningful — that is what makes it a placeholder rather than a design token.",
+      "ja": "• 生成される名前は色自体から導かれます: 明度が接頭辞（`white` / `pale` / `light` / `medium` / `dark` / `deep` / `black`）を決め、支配的なチャンネルが接尾辞（`_red` / `_green` / `_cyan` …）を足します。実測では `#123456` が `dark_cyan`、`#FE4A49` が `medium_red` になりました。説明的ではあっても意味は持ちません — だからこれはデザイントークンではなく、あくまで仮の名前です。"
+    },
+    "section_auto_bullet_match": {
+      "en": "• A hex that already exists in the palette resolves to that key instead of creating a new one. This is why a layout written with `#475467` ends up referencing `ink_muted`: the build recognised the value. It also means writing a light-mode hex silently opts that node into the token — including the token's dark value.",
+      "ja": "• 既にパレットにある hex は、新しいキーを作らずそのキーに解決されます。`#475467` と書いたレイアウトが `ink_muted` を参照する形になるのはこのためで、ビルドが値を認識しているからです。裏を返すと、light モードの hex を書くとそのノードは黙ってそのトークンを使うことになります — dark 側の値も含めて。"
+    },
+    "section_auto_bullet_where": {
+      "en": "• Extraction writes to the distributed tree, not to what you author. Your layout keeps its hex; the per-platform copy carries the name, and the new entry lands in that copy's palette in a single mode (`extract_into_mode`, defaulting to `light`). Nothing in your source directory changes, so the registration is regenerated on every build rather than remembered.",
+      "ja": "• 抽出が書き込むのは配布先のツリーで、あなたが書いたファイルではありません。元のレイアウトは hex のままで、プラットフォーム別のコピーが名前を持ち、新しいエントリはそのコピーのパレットに 1 モードだけ（`extract_into_mode`、既定は `light`）追加されます。ソース側は変わらないので、この登録は記憶されるのではなく毎回のビルドで作り直されます。"
+    },
+    "section_auto_bullet_undefined": {
+      "en": "• A name that is not a hex and not in any palette is recorded in `Resources/defined_colors.json` rather than dropped, so a typo or a colour you have not defined yet shows up in one place instead of failing silently at runtime.",
+      "ja": "• hex でもパレットにも無い名前は、捨てられずに `Resources/defined_colors.json` に記録されます。打ち間違いや未定義の色が、実行時に黙って落ちるのではなく 1 箇所に集まります。"
+    },
+    "section_emits_heading": {
+      "en": "3. What each platform gets",
+      "ja": "3. 各プラットフォームが受け取るもの"
+    },
+    "section_emits_body": {
+      "en": "The palette is compiled, not shipped as data: each platform gets a generated ColorManager holding every mode's palette, plus the machinery to say which mode is current.",
+      "ja": "パレットはデータとして配られるのではなくコンパイルされます。各プラットフォームは全モードのパレットを持つ ColorManager の生成物と、現在のモードを決める仕組みを受け取ります。"
+    },
+    "section_emits_note": {
+      "en": "On web there is a second output: `theme.css`, a `@generated` Tailwind v4 `@theme` block with one `--color-<name>` variable per token, plus a `:root[data-theme=\"<mode>\"]` rule re-binding those variables for every non-base mode. The build prints the one `@import` line to add to your global stylesheet; after that, new tokens flow through without touching CSS again.",
+      "ja": "web にはもう 1 つ出力があります: `theme.css` — トークンごとに `--color-<名前>` を定義する `@generated` な Tailwind v4 の `@theme` ブロックと、base 以外の各モードで同じ変数を再束縛する `:root[data-theme=\"<mode>\"]` ルールです。グローバル CSS に足す `@import` の 1 行はビルドがログに出します。以後は CSS を触らなくても新しいトークンが流れてきます。"
+    },
+    "section_runtime_heading": {
+      "en": "4. Switching theme at runtime",
+      "ja": "4. 実行時のテーマ切り替え"
+    },
+    "section_runtime_body": {
+      "en": "Every platform's ColorManager exposes the same three ideas — the current mode, a way to set it, and a way to hear about changes. What differs is only how the change reaches the view layer.",
+      "ja": "どのプラットフォームの ColorManager も、現在のモード・設定する手段・変更を受け取る手段という同じ 3 つを持ちます。違うのは、その変更がビュー層へどう届くかだけです。"
+    },
+    "section_runtime_bullet_system": {
+      "en": "• Following the OS is the default. `systemModeMapping` maps the system appearance onto your mode names, so a project whose modes are not called light and dark still tracks the OS. iOS reads `UIUserInterfaceStyle` (`applySystemMode`, or feed it a `UITraitCollection`), Android reads the system dark-theme flag, and web subscribes to `matchMedia('(prefers-color-scheme: dark)')`.",
+      "ja": "• 既定は OS 追従です。`systemModeMapping` がシステムの外観をあなたのモード名に対応づけるので、モード名が light / dark でなくても OS に追従できます。iOS は `UIUserInterfaceStyle` を読み（`applySystemMode`、または `UITraitCollection` を渡す形）、Android はシステムのダークテーマ設定を読み、web は `matchMedia('(prefers-color-scheme: dark)')` を購読します。"
+    },
+    "section_runtime_bullet_manual": {
+      "en": "• `setMode` overrides it for an in-app switch, and on web `followSystemMode = false` stops the OS from taking it back. An unknown mode name is ignored with a warning rather than applied.",
+      "ja": "• アプリ内の切り替えには `setMode` を使い、web では `followSystemMode = false` にすると OS 側に戻されなくなります。知らないモード名は適用されず、警告つきで無視されます。"
+    },
+    "section_runtime_bullet_subscribe": {
+      "en": "• Propagation is per platform: Compose holds `currentMode` in a `mutableStateOf` so recomposition is automatic, iOS publishes it on an observable object, and web notifies subscribers — the generated `useColorMode` hook wraps that in `useSyncExternalStore`, and this documentation site mirrors the mode onto `<html data-color-mode>` so the CSS variables swap in one attribute write.",
+      "ja": "• 伝播の仕方はプラットフォーム次第です: Compose は `currentMode` を `mutableStateOf` で持つので再コンポーズが自動、iOS は observable object 経由で publish、web は購読者に通知します（生成される `useColorMode` フックが `useSyncExternalStore` で包みます）。このドキュメントサイトはモードを `<html data-color-mode>` に反映し、属性 1 つの書き換えで CSS 変数を差し替えています。"
+    },
+    "section_static_dynamic_heading": {
+      "en": "5. Static names vs bound colours",
+      "ja": "5. 静的な名前とバインドされた色"
+    },
+    "section_static_dynamic_body": {
+      "en": "A colour written in the layout and a colour handed over by the ViewModel take different paths on web. A static name becomes a Tailwind class backed by the theme variable, so the theme follows with no JavaScript at all. A bound value cannot become a class — it lands in an inline style, where it is resolved through the palette at render time.",
+      "ja": "レイアウトに書かれた色と、ViewModel から渡される色とでは、web での経路が違います。静的な名前はテーマ変数に紐づく Tailwind クラスになるので、JavaScript を一切介さずにテーマへ追従します。バインドされた値はクラスにできないため inline style に落ち、描画時にパレットを通して解決されます。"
+    },
+    "section_static_dynamic_note": {
+      "en": "The resolver takes a palette key or any CSS colour: a key becomes the current mode's value (falling back to `fallback_mode`), and a hex, `rgb()` or CSS colour name passes through untouched. It deliberately does not warn on an unresolved value — it cannot tell a mistyped key from a legitimate CSS colour name, and a warning per render would be noise. iOS and Android resolve bound colours by name too; web was the outlier until 2026-07-28.",
+      "ja": "リゾルバはパレットのキーでも任意の CSS 色でも受け付けます: キーは現在のモードの値（無ければ `fallback_mode`）になり、hex・`rgb()`・CSS の色名はそのまま通ります。未解決でも意図的に警告しません — 打ち間違えたキーと正当な CSS 色名を区別できず、描画のたびに警告を出せばただのノイズになるからです。iOS と Android も以前からバインドされた色を名前で解決しており、2026-07-28 まで web だけが例外でした。"
+    },
+    "section_mode_complete_heading": {
+      "en": "6. A token is theme-safe only when every mode defines it",
+      "ja": "6. トークンが「テーマ対応」になる条件"
+    },
+    "section_mode_complete_body": {
+      "en": "The web `@theme` block mirrors mode-complete names only — names present in every mode. A name defined in one mode cannot be a theme variable, because there would be nothing to swap it to. When the mapper meets one, it resolves the name back to its fallback hex and emits that literal (`bg-[#123456]`) so the colour still renders, and warns once per name that the value will not follow the theme.",
+      "ja": "web の `@theme` ブロックがミラーするのは mode-complete な名前だけ — すべてのモードに存在する名前です。1 つのモードにしか無い名前はテーマ変数にできません（切り替える先が無いため）。マッパーはその名前を fallback の hex に解決してリテラル（`bg-[#123456]`）として出力し、色自体は描画されるようにしたうえで、テーマに追従しない旨を名前ごとに 1 回警告します。"
+    },
+    "section_mode_complete_note": {
+      "en": "This is exactly what an auto-registered colour is: it lands in one mode, so it warns until a human gives it the other modes' values. The warning is the handover point between the build's placeholder and your palette — it is not something to silence.",
+      "ja": "自動登録された色はまさにこの状態です: 1 モードにしか入らないので、人が他モードの値を与えるまで警告が出続けます。この警告はビルドの仮置きからあなたのパレットへの引き継ぎ点であり、黙らせるためのものではありません。"
+    },
+    "section_gotchas_heading": {
+      "en": "7. Things worth knowing before you rely on it",
+      "ja": "7. 頼りきる前に知っておくこと"
+    },
+    "section_gotchas_body": {
+      "en": "Automatic registration is a safety net for hexes that slipped into a layout. It is not a palette designer, and a few of its edges are sharp.",
+      "ja": "自動登録は、レイアウトに紛れ込んだ hex を拾うための安全網です。パレットを設計してくれるわけではなく、いくつか角の立った挙動もあります。"
+    },
+    "section_gotchas_bullet_promote": {
+      "en": "• Promote, do not accumulate. A generated name like `medium_red` says nothing about intent; give the colour a real name in `colors.json` for every mode and use that name in the layout. Until you do, the build repeats the same warning every run.",
+      "ja": "• 溜めずに昇格させる。`medium_red` のような生成名は意図を何も語りません。`colors.json` に全モード分の値を持つ本来の名前を用意し、レイアウトではその名前を使ってください。そうするまで、ビルドは毎回同じ警告を出し続けます。"
+    },
+    "section_gotchas_bullet_optin": {
+      "en": "• A hex that matches a token is a token. Copying `#2563EB` out of a design file gives you `accent`, which in dark mode is a completely different colour. If you wanted a fixed colour rather than the token, do not spell it with the token's light-mode value.",
+      "ja": "• トークンと一致する hex はトークンになります。デザインファイルから `#2563EB` をコピーすると `accent` になり、dark モードでは全く別の色になります。トークンではなく固定色が欲しいなら、そのトークンの light 値と同じ綴りにしないでください。"
+    },
+    "section_gotchas_bullet_alpha": {
+      "en": "• JsonUI hex is alpha-first (`#AARRGGBB`), which CSS cannot parse — it reads `#RRGGBBAA`. The theme emitter converts 8-digit values to `rgba()` for you; a non-hex value (a CSS colour name, say) is simply skipped when the token list is built.",
+      "ja": "• JsonUI の hex はアルファ先頭（`#AARRGGBB`）で、CSS はこれを解釈できません（CSS は `#RRGGBBAA`）。テーマ生成側が 8 桁の値を `rgba()` に変換します。hex でない値（CSS の色名など）はトークン一覧を組み立てる際にスキップされます。"
+    },
+    "section_gotchas_bullet_inline": {
+      "en": "• Inline styles do not re-theme by themselves. A bound colour is read at render time, so a mode switch reaches it only on the next render — the same constraint Compose's `ColorManager.compose.color` has. Static names have no such gap: the CSS variable changes underneath them.",
+      "ja": "• inline style は自力でテーマに追従しません。バインドされた色は描画時に読まれるので、モード切り替えが反映されるのは次の描画時です — Compose の `ColorManager.compose.color` と同じ制約です。静的な名前にはこの隙がなく、下にある CSS 変数が入れ替わります。"
+    },
+    "toc_row_palette": {
+      "en": "The palette file",
+      "ja": "パレットファイル"
+    },
+    "toc_row_auto": {
+      "en": "Automatic registration",
+      "ja": "自動登録"
+    },
+    "toc_row_emits": {
+      "en": "Per-platform output",
+      "ja": "プラットフォーム別の出力"
+    },
+    "toc_row_runtime": {
+      "en": "Runtime switching",
+      "ja": "実行時の切り替え"
+    },
+    "toc_row_static_dynamic": {
+      "en": "Static vs bound",
+      "ja": "静的とバインド"
+    },
+    "toc_row_mode_complete": {
+      "en": "Theme-safe tokens",
+      "ja": "テーマ対応トークン"
+    },
+    "toc_row_gotchas": {
+      "en": "Gotchas",
+      "ja": "注意点"
+    },
+    "next_localization_title": {
+      "en": "Adding a new language",
+      "ja": "言語を追加する"
+    },
+    "next_localization_description": {
+      "en": "The same Resources pipeline for strings.json, locale by locale.",
+      "ja": "strings.json でも同じ Resources パイプラインを使います。"
+    },
+    "next_style_title": {
+      "en": "Style attributes",
+      "ja": "スタイル属性"
+    },
+    "next_style_description": {
+      "en": "Every colour-bearing attribute, with its per-platform notes.",
+      "ja": "色を取る属性の一覧とプラットフォーム別の注記。"
+    },
+    "next_rjui_title": {
+      "en": "ReactJsonUI",
+      "ja": "ReactJsonUI"
+    },
+    "next_rjui_description": {
+      "en": "How token classes and theme.css fit into the web output.",
+      "ja": "トークンクラスと theme.css が web 出力にどう収まるか。"
+    }
+  },
   "guides_custom_components": {
     "breadcrumb": {
       "en": "← Guides",

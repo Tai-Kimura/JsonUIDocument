@@ -32,6 +32,7 @@ const CATALOG: ReadonlyArray<{ id: string; url: string; titleKey: string; platfo
   { id: "testing", url: "/guides/testing", titleKey: "guides_testing_title" },
   { id: "api-mock", url: "/guides/api-mock", titleKey: "guides_api_mock_title" },
   { id: "localization", url: "/guides/localization", titleKey: "guides_localization_title" },
+  { id: "colors", url: "/guides/colors", titleKey: "guides_colors_title" },
   { id: "custom-components", url: "/guides/custom-components", titleKey: "guides_custom_components_title" },
   { id: "developer-menu", url: "/guides/developer-menu", titleKey: "guides_developer_menu_title", platforms: "iOS · Android" },
   { id: "verifying-implementation-against-docs", url: "/guides/verifying-implementation-against-docs", titleKey: "guides_verifying_implementation_against_docs_title" }

@@ -121,6 +121,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "testing",                 titleKey: "guides_testing_title",                 titleEn: "Writing screen tests",        url: "/guides/testing" },
       { id: "api-mock",                titleKey: "guides_api_mock_title",                titleEn: "Mocking APIs in tests",       url: "/guides/api-mock" },
       { id: "localization",            titleKey: "guides_localization_title",            titleEn: "Adding a new language",       url: "/guides/localization" },
+      { id: "colors",                  titleKey: "guides_colors_title",                  titleEn: "Colors and theming",          url: "/guides/colors" },
       { id: "custom-components",       titleKey: "guides_custom_components_title",       titleEn: "Building a custom component", url: "/guides/custom-components" },
       { id: "developer-menu",          titleKey: "guides_developer_menu_title",          titleEn: "Developer menu",              url: "/guides/developer-menu", platforms: ["ios", "android"] },
     ],
