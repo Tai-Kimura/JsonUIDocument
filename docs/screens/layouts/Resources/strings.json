@@ -8457,12 +8457,12 @@
       "ja": "CLI コマンドリファレンス"
     },
     "lead": {
-      "en": "Every jui / sjui / kjui / rjui / jsonui-test / jsonui-doc subcommand with its flags, environment variables, and exit codes. Generated from the `--help` output of each binary so the reference cannot drift from the shipped CLI.",
-      "ja": "jui / sjui / kjui / rjui / jsonui-test / jsonui-doc の全サブコマンド、フラグ、環境変数、exit code。各バイナリの `--help` 出力から生成されるので、リファレンスが配布 CLI から drift することはありません。"
+      "en": "Every jui / sjui / kjui / rjui / jsonui-test / jsonui-doc subcommand with its synopsis and purpose, the flags this reference records, and the exit codes and environment variables the binaries share. Hand-maintained against each binary's `--help`, which stays the authority if the two ever disagree.",
+      "ja": "jui / sjui / kjui / rjui / jsonui-test / jsonui-doc の全サブコマンドを、synopsis と目的、このリファレンスが記録しているフラグ、そして各バイナリ共通の exit code と環境変数とともに掲載しています。各バイナリの `--help` を見ながら手で維持しているので、食い違ったときは `--help` が正です。"
     },
     "read_time": {
-      "en": "auto-generated",
-      "ja": "自動生成"
+      "en": "reference",
+      "ja": "リファレンス"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -8477,8 +8477,8 @@
       "ja": "レイアウト構成"
     },
     "section_layout_body": {
-      "en": "Top-level table of contents is one section per binary (jui, sjui, kjui, rjui, jsonui-test, jsonui-doc). Inside each, a row per subcommand (`jui init`, `jui generate project`, `jui build`, `jui verify`, `jui sync_tool`, etc.). Each row expands to show flags, environment variables the command honours, and the exit-code table.",
-      "ja": "最上位 TOC がバイナリ単位で 1 節 (jui / sjui / kjui / rjui / jsonui-test / jsonui-doc)。各節内でサブコマンドごとに 1 行 (`jui init` / `jui generate project` / `jui build` / `jui verify` / `jui sync_tool` 等)。各行はフラグ・尊重する環境変数・exit code テーブルを展開表示。"
+      "en": "The catalogue below runs binary by binary — `jui` first, then sjui, kjui, rjui, jsonui-test and jsonui-doc — with one card per subcommand carrying its synopsis, what the command is for, its flags, an example invocation, and the related commands worth reading next. Coverage is deliberately uneven: every `jui` subcommand lists its flags, while most of the platform CLIs currently carry synopsis and purpose only and their own `--help` remains the fuller source. Exit codes, environment variables and the stability policy are shared across binaries, so they get their own sections instead of being repeated on every card.",
+      "ja": "下のカタログはバイナリ順に並んでいます — `jui` から始まり、sjui / kjui / rjui / jsonui-test / jsonui-doc。サブコマンドごとに 1 枚のカードがあり、synopsis、そのコマンドの目的、フラグ、実行例、関連コマンドを載せています。網羅度は意図的に均一ではありません — `jui` のサブコマンドはすべてフラグまで記載していますが、プラットフォーム別 CLI の多くは現状 synopsis と目的のみで、詳細はそれぞれの `--help` の方が充実しています。exit code・環境変数・安定性ポリシーはバイナリ共通なので、カードごとに繰り返さず独立した節にしています。"
     },
     "section_exit_heading": {
       "en": "Exit code conventions",
@@ -8587,6 +8587,54 @@
     "toc_row_test_tools": {
       "en": "Test tooling",
       "ja": "テストツール"
+    },
+    "toc_row_binaries": {
+      "en": "The six binaries",
+      "ja": "6 つのバイナリ"
+    },
+    "toc_row_catalog": {
+      "en": "Command catalogue",
+      "ja": "コマンドカタログ"
+    },
+    "section_binaries_heading": {
+      "en": "The six binaries",
+      "ja": "6 つのバイナリ"
+    },
+    "section_binaries_body": {
+      "en": "One install brings all six. Which one you reach for follows the platform you are generating for — `jui` is the cross-platform entry point that most workflows drive, and the platform CLIs sit underneath it doing the per-language work.",
+      "ja": "インストール 1 回で 6 つとも入ります。どれを使うかは生成対象のプラットフォームで決まります — `jui` がクロスプラットフォームの入口で、たいていのワークフローはこれを叩きます。プラットフォーム別 CLI はその下で言語ごとの仕事をします。"
+    },
+    "section_catalog_heading": {
+      "en": "Command catalogue",
+      "ja": "コマンドカタログ"
+    },
+    "section_catalog_body": {
+      "en": "Every subcommand, grouped by binary in the order above. The synopsis is the invocation shape; `Flags` lists what the command accepts wherever this reference records them.",
+      "ja": "全サブコマンドを、上の順序でバイナリごとにまとめています。synopsis が呼び出しの形、`フラグ` はこのリファレンスが記録している範囲での受け付けるオプションです。"
+    },
+    "catalog_options_heading": {
+      "en": "Flags",
+      "ja": "フラグ"
+    },
+    "catalog_example_heading": {
+      "en": "Example",
+      "ja": "実行例"
+    },
+    "catalog_see_also_prefix": {
+      "en": "See also: ",
+      "ja": "関連: "
+    },
+    "catalog_aliases_prefix": {
+      "en": "Also: ",
+      "ja": "別名: "
+    },
+    "catalog_required_marker": {
+      "en": "required",
+      "ja": "必須"
+    },
+    "catalog_default_prefix": {
+      "en": "default",
+      "ja": "既定"
     }
   },
   "reference_generated_code": {

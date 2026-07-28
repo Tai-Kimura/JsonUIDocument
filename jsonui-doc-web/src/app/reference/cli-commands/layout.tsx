@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `CLI command reference — JsonUI`,
-  description: `Every jui / sjui / kjui / rjui / jsonui-test / jsonui-doc subcommand with its flags, environment variables, and exit codes. Generated from the \`--help\` output…`,
+  description: `Every jui / sjui / kjui / rjui / jsonui-test / jsonui-doc subcommand with its synopsis and purpose, the flags this reference records, and the exit codes and…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

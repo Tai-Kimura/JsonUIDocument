@@ -26,12 +26,24 @@
         "type": "[NextReadLink]",
         "initial": "[]",
         "description": "Two closing cards."
+      },
+      {
+        "name": "binaries",
+        "type": "[CliBinaryRow]",
+        "initial": "[]",
+        "description": "One row per binary declared in docs/data/cli-commands.json."
+      },
+      {
+        "name": "commands",
+        "type": "[CliCommandDetail]",
+        "initial": "[]",
+        "description": "One detail card per subcommand, ordered by the binary order in the dataset."
       }
     ],
     "eventHandlers": [
       {
         "name": "onAppear",
-        "description": "Seed nextReadLinks."
+        "description": "Seed nextReadLinks, binaries and commands."
       },
       {
         "name": "onNavigate",
@@ -71,10 +83,27 @@
           "type": "Array(NextReadLink)",
           "observable": true,
           "description": "Two closing 'read next' cards pointing at /tools/cli and /guides/writing-your-first-spec. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        },
+        {
+          "name": "binaries",
+          "type": "Array(CliBinaryRow)",
+          "observable": true,
+          "description": "Binary overview rows built from CliCommandsRepository.binaries(). meta concatenates implementation language, target platforms and the subcommand count from countsByBinary()."
+        },
+        {
+          "name": "commands",
+          "type": "Array(CliCommandDetail)",
+          "observable": true,
+          "description": "Command cards built from CliCommandsRepository.commands(). Prose comes from the dataset's own en / ja pair via pickCli, not from strings.json; only the fixed labels (Flags / Example / See also / Also / required / default) are StringManager keys. Optional blocks are hidden by driving each visibility field to 'gone' — aliases, flags, example and seeAlso are absent on most platform-CLI commands."
         }
       ]
     },
-    "repositories": [],
+    "repositories": [
+      {
+        "name": "CliCommandsRepository",
+        "description": "Hand-written. Statically imports src/data/cli-commands.json, staged and validated from docs/data/cli-commands.json by scripts/build-cli-commands.ts (npm run build:cli, part of prebuild). No network call — the catalogue is bundled so it renders during the static export."
+      }
+    ],
     "useCases": [],
     "apiEndpoints": [],
     "customTypes": [
@@ -97,6 +126,35 @@
             "name": "url",
             "type": "String"
           }
+        ]
+      },
+      {
+        "name": "CliBinaryRow",
+        "properties": [
+          { "name": "id", "type": "String" },
+          { "name": "name", "type": "String" },
+          { "name": "meta", "type": "String" },
+          { "name": "purpose", "type": "String" }
+        ]
+      },
+      {
+        "name": "CliCommandDetail",
+        "properties": [
+          { "name": "id", "type": "String" },
+          { "name": "binary", "type": "String" },
+          { "name": "name", "type": "String" },
+          { "name": "aliases", "type": "String" },
+          { "name": "aliasesVisibility", "type": "String" },
+          { "name": "synopsis", "type": "String" },
+          { "name": "purpose", "type": "String" },
+          { "name": "optionsHeading", "type": "String" },
+          { "name": "optionsText", "type": "String" },
+          { "name": "optionsVisibility", "type": "String" },
+          { "name": "exampleHeading", "type": "String" },
+          { "name": "exampleCode", "type": "String" },
+          { "name": "exampleVisibility", "type": "String" },
+          { "name": "seeAlso", "type": "String" },
+          { "name": "seeAlsoVisibility", "type": "String" }
         ]
       }
     ]
@@ -142,7 +200,9 @@
   ],
   "notes": [
     "Live Reference entry. Flip REFERENCE_ENTRIES row for 'cli-commands' to 'live' in HomeViewModel when shipping.",
-    "v1 is hand-authored overview. Auto-generation from the upstream artifact is a future pass.",
+    "v1 was a hand-authored overview with no command listing. 2026-07-28 — the listing shipped: section_binaries + section_catalog render docs/data/cli-commands.json (6 binaries, 36 commands) through cells/cli_binary_row and cells/cli_command_detail. Until then the dataset had been accumulating for three sessions while NOTHING read it, so every entry added to it (including jui screens and jui lint-generated) was invisible on the site; the page meanwhile claimed the reference was generated from each binary's --help and that rows expanded to show flags. Both claims are gone from lead / section_layout_body, and read_time no longer says 'auto-generated'.",
+    "Coverage is uneven by dataset, not by design of the page: all 10 jui subcommands carry flags, plus sjui generate and jsonui-test run; the other 22 commands have synopsis + purpose only. section_layout_body states this rather than letting the gap read as an omission. Filling it means editing docs/data/cli-commands.json — the page needs no change.",
+    "Optional blocks (aliases / flags / example / seeAlso) are hidden by driving a per-block visibility field to 'gone'. They are wrapped in a View because `visibility` on a CodeBlock node is silently dropped by the rjui converter — the guard is emitted for Label and View but not for the extension component, so an unwrapped CodeBlock rendered empty-but-present. Filed upstream (rjui-codeblock-visibility-dropped).",
     "2026-05-27 — Swagger-driven Data Model additions. Surgical edits only; do not restructure existing groups.",
     "Add row to existing 'generate' group: `jui g api`. en summary: 'Regenerate API DTOs + Domain scaffolds from `docs/api/*.json` without running the full build. Honors `api.schemas.*` filter.' ja summary: '`docs/api/*.json` から API DTO と Domain scaffold だけを再生成（full build はスキップ）。`api.schemas.*` の filter も適用される。'",
     "`jui g api` flags: `--dry-run` (filter preview JSON; same backing as MCP preview_api_model_sync) / `--fail-on-diff` (CI exit non-zero on drift) / `--platform ios|android|web` / `--json`. NOTE: `--regenerate-domain {Name}` is v2-only — do NOT list in v1.",

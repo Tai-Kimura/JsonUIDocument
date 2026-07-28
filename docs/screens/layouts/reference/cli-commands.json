@@ -21,6 +21,14 @@
           "class": "CollectionDataSource"
         },
         {
+          "name": "binaries",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "commands",
+          "class": "CollectionDataSource"
+        },
+        {
           "name": "onNavigateReference",
           "class": "() -> Void"
         }
@@ -131,6 +139,98 @@
                       "fontSize": 16,
                       "fontColor": "ink_muted",
                       "text": "section_layout_body"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_binaries",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_binaries_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_binaries_body"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "reference_cli_commands_binaries_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 1,
+                      "lineSpacing": 10,
+                      "itemSpacing": 10,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{binaries}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/cli_binary_row" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_catalog",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "surface_muted",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_catalog_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_catalog_body"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "reference_cli_commands_catalog_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 1,
+                      "lineSpacing": 12,
+                      "itemSpacing": 12,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{commands}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/cli_command_detail" }
+                      ]
                     }
                   ]
                 },
@@ -482,6 +582,18 @@
                           "id": "toc_layout",
                           "label": "toc_row_layout",
                           "anchor": "section_layout",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_binaries",
+                          "label": "toc_row_binaries",
+                          "anchor": "section_binaries",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_catalog",
+                          "label": "toc_row_catalog",
+                          "anchor": "section_catalog",
                           "level": 1
                         },
                         {

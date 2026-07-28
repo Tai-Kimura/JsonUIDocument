@@ -1,0 +1,163 @@
+{
+  "type": "View",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "wrapContent",
+  "paddings": [16, 18, 16, 18],
+  "background": "surface_card",
+  "cornerRadius": 12,
+  "borderWidth": 1,
+  "borderColor": "border",
+  "child": [
+    {
+      "data": [
+        { "name": "binary", "class": "String" },
+        { "name": "name", "class": "String" },
+        { "name": "aliases", "class": "String", "defaultValue": "" },
+        { "name": "aliasesVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "synopsis", "class": "String", "defaultValue": "" },
+        { "name": "purpose", "class": "String" },
+        { "name": "optionsHeading", "class": "String", "defaultValue": "" },
+        { "name": "optionsText", "class": "String", "defaultValue": "" },
+        { "name": "optionsVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "exampleHeading", "class": "String", "defaultValue": "" },
+        { "name": "exampleCode", "class": "String", "defaultValue": "" },
+        { "name": "exampleVisibility", "class": "String", "defaultValue": "gone" },
+        { "name": "seeAlso", "class": "String", "defaultValue": "" },
+        { "name": "seeAlsoVisibility", "class": "String", "defaultValue": "gone" }
+      ]
+    },
+    {
+      "type": "View",
+      "orientation": "horizontal",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "alignment": "centerVertical",
+      "child": [
+        {
+          "type": "Label",
+          "width": "wrapContent",
+          "height": "wrapContent",
+          "paddings": [3, 10, 3, 10],
+          "fontSize": 12,
+          "fontWeight": "semibold",
+          "fontColor": "accent_ink",
+          "background": "accent_tint",
+          "cornerRadius": 999,
+          "text": "@{binary}"
+        },
+        {
+          "type": "Label",
+          "weight": 1,
+          "height": "wrapContent",
+          "leftMargin": 12,
+          "fontSize": 17,
+          "fontWeight": "bold",
+          "fontFamily": "ui-monospace, SFMono-Regular, Menlo, monospace",
+          "fontColor": "ink",
+          "text": "@{name}"
+        }
+      ]
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 6,
+      "fontSize": 12,
+      "fontColor": "ink_subtle",
+      "visibility": "@{aliasesVisibility}",
+      "text": "@{aliases}"
+    },
+    {
+      "type": "CodeBlock",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 10,
+      "code": "@{synopsis}",
+      "language": "bash",
+      "filename": "",
+      "showLineNumbers": false,
+      "copyable": true
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 10,
+      "fontSize": 14,
+      "fontColor": "ink_muted",
+      "text": "@{purpose}"
+    },
+    {
+      "type": "View",
+      "orientation": "vertical",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 12,
+      "visibility": "@{optionsVisibility}",
+      "child": [
+        {
+          "type": "Label",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "fontSize": 12,
+          "fontWeight": "semibold",
+          "fontColor": "ink_subtle",
+          "text": "@{optionsHeading}"
+        },
+        {
+          "type": "CodeBlock",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 6,
+          "code": "@{optionsText}",
+          "language": "text",
+          "filename": "",
+          "showLineNumbers": false,
+          "copyable": false
+        }
+      ]
+    },
+    {
+      "type": "View",
+      "orientation": "vertical",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 12,
+      "visibility": "@{exampleVisibility}",
+      "child": [
+        {
+          "type": "Label",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "fontSize": 12,
+          "fontWeight": "semibold",
+          "fontColor": "ink_subtle",
+          "text": "@{exampleHeading}"
+        },
+        {
+          "type": "CodeBlock",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "topMargin": 6,
+          "code": "@{exampleCode}",
+          "language": "bash",
+          "filename": "",
+          "showLineNumbers": false,
+          "copyable": true
+        }
+      ]
+    },
+    {
+      "type": "Label",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "topMargin": 12,
+      "fontSize": 12,
+      "fontColor": "ink_subtle",
+      "visibility": "@{seeAlsoVisibility}",
+      "text": "@{seeAlso}"
+    }
+  ]
+}
