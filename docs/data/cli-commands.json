@@ -419,6 +419,72 @@
       ]
     },
     {
+      "binary": "jui",
+      "command": "lint-generated",
+      "synopsis": "jui lint-generated [--fix] [--verbose] [--max-depth <n>] [--max-lines <n>] [--update-size-baseline]",
+      "purpose": {
+        "en": "CI-side audit of the generated tree: every generated file must carry the `@generated` sentinel, and every generated view function must stay inside the size bounds. Not part of `jui build` — run it in CI or before a release.",
+        "ja": "生成物の CI 向け監査: 生成ファイルは `@generated` sentinel を持つこと、生成ビューの各関数はサイズ上限内に収まることを確認する。`jui build` には含まれないので、CI かリリース前に実行する。"
+      },
+      "options": [
+        {
+          "name": "--fix",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Print the regeneration command when markers are missing (it does not edit files).",
+            "ja": "マーカー欠落時に再生成コマンドを表示する（ファイルは書き換えない）。"
+          }
+        },
+        {
+          "name": "--verbose",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "List every checked file, not just the failures.",
+            "ja": "失敗分だけでなく検査した全ファイルを列挙する。"
+          }
+        },
+        {
+          "name": "--max-depth",
+          "type": "number",
+          "default": "5",
+          "description": {
+            "en": "Per-function brace-nesting bound for generated view code. Depth is what actually matters on iOS: SwiftUI composes one generic type per view and the runtime decodes its metadata on a 1 MB device stack.",
+            "ja": "生成ビュー関数のブレース深さ上限。iOS で効くのは深さ — SwiftUI はビューごとに 1 個のジェネリック型を合成し、ランタイムがそのメタデータを 1MB の実機スタックで展開するため。"
+          }
+        },
+        {
+          "name": "--max-lines",
+          "type": "number",
+          "default": "250",
+          "description": {
+            "en": "Per-function line-count bound. A soft target: a function that satisfies the depth bound but overruns the line count is reported, not rejected.",
+            "ja": "生成ビュー関数の行数上限。ソフト目標で、深さを満たしていて行数だけ超えるものは報告に留まる。"
+          }
+        },
+        {
+          "name": "--update-size-baseline",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Write the current oversized-function set to `.jui-size-waivers`. Commit that file and later runs can separate the known set from functions that became oversized after it.",
+            "ja": "現在の超過関数の集合を `.jui-size-waivers` に書き出す。このファイルをコミットしておくと、以降の実行で既知分と新たに超過したものを切り分けられる。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui lint-generated --verbose\n  OK: 1217   Missing header: 0   Oversized fns: 3\n\n$ jui lint-generated --update-size-baseline\n✓ Wrote .jui-size-waivers (3 entries)"
+        }
+      ],
+      "seeAlso": [
+        "jui build",
+        "jui verify"
+      ]
+    },
+    {
       "binary": "sjui",
       "command": "init",
       "synopsis": "sjui init",

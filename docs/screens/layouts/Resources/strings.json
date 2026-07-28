@@ -2719,8 +2719,8 @@
       "ja": "Orphan の扱い"
     },
     "lifecycle_orphan_handling_body": {
-      "en": "If a schema was previously generated and is now filtered out, the DTO file becomes an orphan. `jui lint-generated --fail-on-orphan` detects this state for CI; cleanup is your decision (you may still want the Domain scaffold for historical reasons).",
-      "ja": "以前生成した schema が今回 filter で外れると、DTO ファイルは orphan になります。`jui lint-generated --fail-on-orphan` が CI でこれを検出します。削除するかは Domain scaffold の事情も含めてあなたの判断です。"
+      "en": "If a schema was previously generated and is now filtered out, the DTO file becomes an orphan. `jui ls api-models` lists the orphans (`--json` for CI); cleanup is your decision (you may still want the Domain scaffold for historical reasons).",
+      "ja": "以前生成した schema が今回 filter で外れると、DTO ファイルは orphan になります。`jui ls api-models`（CI では `--json`）が orphan を列挙します。削除するかは Domain scaffold の事情も含めてあなたの判断です。"
     },
     "lifecycle_drift_check_step": {
       "en": "Drift check",
@@ -3753,8 +3753,8 @@
       "ja": "E"
     },
     "tool_list_api_models_role": {
-      "en": "Per-platform inventory of generated DTOs, Domain scaffolds, and orphans (the same set `jui lint-generated --fail-on-orphan` checks).",
-      "ja": "プラットフォーム別の DTO 生成ファイル / Domain scaffold / orphan を返します（`jui lint-generated --fail-on-orphan` と同じ集合）。"
+      "en": "Per-platform inventory of generated DTOs, Domain scaffolds, and orphans (the same set `jui ls api-models` reports).",
+      "ja": "プラットフォーム別の DTO 生成ファイル / Domain scaffold / orphan を返します（`jui ls api-models` と同じ集合）。"
     },
     "tool_preview_api_model_sync_name": {
       "en": "preview_api_model_sync",
@@ -4997,8 +4997,8 @@
       "ja": "本番での注意点"
     },
     "section_prod_body": {
-      "en": "Generated Swift is plain Swift — App Store review sees only the compiled binary, same as hand-written. Two things to know up front: (1) if you use obscure SwiftUI modifiers the generator has not yet learned, you will get a build warning; add the mapping in rjui_tools (sjui_tools) or file it under /learn/installation's troubleshooting. (2) SwiftData and Observation framework work, but the generator's ViewModel emission assumes Combine-first — if you want the new macros you will write a thin adapter for now.",
-      "ja": "生成される Swift は普通の Swift — App Store 審査は手書きと同じくコンパイル後のバイナリを見るだけ。先に知っておくべき点が 2 つ: (1) ジェネレータ未対応のマイナーな SwiftUI modifier を使うとビルド warning が出ます。sjui_tools にマッピングを足すか、/learn/installation のトラブルシューティングに項目を追加してください。(2) SwiftData と Observation framework は動きますが、ジェネレータの ViewModel 出力は Combine を前提にしているので、新しいマクロを使いたければ現状は薄い adapter を挟む形です。"
+      "en": "Generated Swift is plain Swift — App Store review sees only the compiled binary, same as hand-written. Two things to know up front: (1) if you use obscure SwiftUI modifiers the generator has not yet learned, you will get a build warning; add the mapping in rjui_tools (sjui_tools) or file it under /learn/installation's troubleshooting. (2) SwiftData and Observation framework work, but the generator's ViewModel emission assumes Combine-first — if you want the new macros you will write a thin adapter for now. (3) Generated views are size-bounded: each function stays within a hard brace depth of 5 and a soft 250-line target, and every extracted section boundary is erased through `AnyView`. The erasure is the point — `some View` is opaque but still composes one giant generic type whose metadata the runtime decodes on a 1 MB device stack, so splitting into `some View` helpers does not stop a stack overflow (measured on a device with an 881-line body that had already been extracted). Anything the bounder cannot split safely is named in a build warning rather than passed over quietly.",
+      "ja": "生成される Swift は普通の Swift — App Store 審査は手書きと同じくコンパイル後のバイナリを見るだけ。先に知っておくべき点が 2 つ: (1) ジェネレータ未対応のマイナーな SwiftUI modifier を使うとビルド warning が出ます。sjui_tools にマッピングを足すか、/learn/installation のトラブルシューティングに項目を追加してください。(2) SwiftData と Observation framework は動きますが、ジェネレータの ViewModel 出力は Combine を前提にしているので、新しいマクロを使いたければ現状は薄い adapter を挟む形です。(3) 生成ビューはサイズ有界です: 関数ごとにブレース深さ 5 がハード上限、250 行はソフト目標で、切り出したセクション境界は必ず `AnyView` で型消去されます。この型消去こそが本質で、`some View` は opaque でも合成された 1 個の巨大なジェネリック型のままです。ランタイムはそのメタデータを 1MB の実機スタック上で展開するため、`some View` のヘルパーに割っただけではスタックオーバーフローは止まりません（切り出し済みの 881 行 body が実機で落ちた実測例あり）。安全に切れなかった箇所は黙って見逃さず、ビルド警告で名指しされます。"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -5091,8 +5091,8 @@
       "ja": "本番での注意点"
     },
     "section_prod_body": {
-      "en": "Generated Kotlin is plain Kotlin. Two gotchas worth flagging: (1) if your app supports minSdk below 23, the Compose-first emission can fall back to XML under the same spec — but test the fallback early, because design fidelity is not identical. (2) Firebase / third-party library integration sits on your side of the contract; the generator does not opine on DI, so Hilt / Koin / Dagger2 all work but you wire them at the ViewModel layer.",
-      "ja": "生成される Kotlin は普通の Kotlin。注意点 2 つ: (1) minSdk が 23 未満をサポートする場合、同じ spec でも Compose 既定から XML へフォールバックするケースがあります。デザインの忠実度は完全一致しないので早めにテストしてください。(2) Firebase / サードパーティライブラリの統合はあなたの契約側にあります。ジェネレータは DI について意見を持たないので、Hilt / Koin / Dagger2 いずれも動きますが、接続は ViewModel レイヤで行います。"
+      "en": "Generated Kotlin is plain Kotlin. Two gotchas worth flagging: (1) if your app supports minSdk below 23, the Compose-first emission can fall back to XML under the same spec — but test the fallback early, because design fidelity is not identical. (2) Firebase / third-party library integration sits on your side of the contract; the generator does not opine on DI, so Hilt / Koin / Dagger2 all work but you wire them at the ViewModel layer. (3) Generated Composables are bounded by the same extractor, but the size limits are calibrated for the iOS mechanism and Compose has no counterpart — the real Android ceiling is the dex 65,535 code-unit cap, which is a hard compile error, so a build that succeeds has already proved the point (measured worst case: 12.6 % of the cap). Oversized functions are therefore not a build warning here; `jui lint-generated` lists them, and `--update-size-baseline` records the current set in `.jui-size-waivers` so later runs can single out functions that are newly oversized.",
+      "ja": "生成される Kotlin は普通の Kotlin。注意点 2 つ: (1) minSdk が 23 未満をサポートする場合、同じ spec でも Compose 既定から XML へフォールバックするケースがあります。デザインの忠実度は完全一致しないので早めにテストしてください。(2) Firebase / サードパーティライブラリの統合はあなたの契約側にあります。ジェネレータは DI について意見を持たないので、Hilt / Koin / Dagger2 いずれも動きますが、接続は ViewModel レイヤで行います。(3) 生成 Composable も同じ extractor で有界化されますが、サイズ上限は iOS の機序に較正したもので、Compose に対応する機序はありません。Android で実在する上限は dex の 65,535 code unit で、超えればハードなコンパイルエラーになるため、ビルドが通った時点で証明済みです（実測の最悪ケースで上限の 12.6%）。したがって超過関数はビルド警告にはなりません。`jui lint-generated` が一覧表示し、`--update-size-baseline` で現在の集合を `.jui-size-waivers` に記録しておくと、以降の実行で新たに超過した関数だけを切り分けられます。"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -5395,8 +5395,8 @@
       "ja": "今の状態を確認 — list_api_specs / list_api_models"
     },
     "section_mcp_discovery_body": {
-      "en": "Two read-only tools answer 'what is in the repo right now?'. `list_api_specs` enumerates swagger files with title / version / schema_count / endpoint_count. `list_api_models` returns per-platform DTO files, Domain scaffolds, and orphans (the same set `jui lint-generated --fail-on-orphan` checks).",
-      "ja": "「今リポジトリには何があるか」を答える読み取り専用 tool が 2 つ。`list_api_specs` は swagger ファイルを title / version / schema 数 / endpoint 数 つきで列挙。`list_api_models` はプラットフォーム別の DTO / Domain scaffold / orphan を返し、これは `jui lint-generated --fail-on-orphan` と同じ集合です。"
+      "en": "Two read-only tools answer 'what is in the repo right now?'. `list_api_specs` enumerates swagger files with title / version / schema_count / endpoint_count. `list_api_models` returns per-platform DTO files, Domain scaffolds, and orphans (the same set `jui ls api-models` reports).",
+      "ja": "「今リポジトリには何があるか」を答える読み取り専用 tool が 2 つ。`list_api_specs` は swagger ファイルを title / version / schema 数 / endpoint 数 つきで列挙。`list_api_models` はプラットフォーム別の DTO / Domain scaffold / orphan を返し、これは `jui ls api-models` と同じ集合です。"
     },
     "section_return_type_heading": {
       "en": "DTO vs Domain — Repository return type",
@@ -5979,8 +5979,8 @@
       "ja": "string[]"
     },
     "list_models_field_orphans_body": {
-      "en": "Generated files whose source schema is no longer in `kept_schemas` (filtered out, schema deleted, or filter tightened). Same set as `jui lint-generated --fail-on-orphan`.",
-      "ja": "ソース schema が `kept_schemas` から外れた生成ファイル（filter 除外 / schema 削除 / filter 強化）。`jui lint-generated --fail-on-orphan` と同じ集合。"
+      "en": "Generated files whose source schema is no longer in `kept_schemas` (filtered out, schema deleted, or filter tightened). Same set as `jui ls api-models`.",
+      "ja": "ソース schema が `kept_schemas` から外れた生成ファイル（filter 除外 / schema 削除 / filter 強化）。`jui ls api-models` と同じ集合。"
     }
   },
   "guides_navigation": {
