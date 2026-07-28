@@ -8469,8 +8469,8 @@
       "ja": "Android には対応する機序が無い"
     },
     "section_android_body": {
-      "en": "The same extractor bounds Compose output, but the numbers are calibrated for the iOS mechanism and Compose has no counterpart to it. The ceiling that actually exists on Android is the dex limit of 65,535 code units per method, and exceeding it is a hard compile error — so a build that succeeded has already proved the point. The measured worst case in a real app was 12.6 % of the cap, smaller than a hand-written ViewModel method in the same project.",
-      "ja": "同じ extractor が Compose 出力も有界化しますが、数値は iOS の機序に較正したもので、Compose に対応する機序はありません。Android で実在する上限は 1 メソッドあたり dex の 65,535 code unit で、超えればハードなコンパイルエラーになります — つまりビルドが通った時点で証明済みです。実アプリでの実測の最悪ケースは上限の 12.6% で、同じプロジェクトの手書き ViewModel のメソッドより小さい値でした。"
+      "en": "The same extractor bounds Compose output, but the numbers are calibrated for the iOS mechanism and Compose has no counterpart to it. The ceiling that actually exists on Android is the method-size limit — 65,536 bytes of bytecode in a class file, 65,535 code units after dexing — which is what the Compose extractor is written against, and exceeding it is a hard compile error — so a build that succeeded has already proved the point. The measured worst case in a real app was 12.6 % of the cap, smaller than a hand-written ViewModel method in the same project.",
+      "ja": "同じ extractor が Compose 出力も有界化しますが、数値は iOS の機序に較正したもので、Compose に対応する機序はありません。Android で実在する上限はメソッドサイズ — class ファイルでは bytecode 65,536 byte、dex 化後は 65,535 code unit — で、Compose 側の extractor もこれを基準に書かれています。超えればハードなコンパイルエラーです — つまりビルドが通った時点で証明済みです。実アプリでの実測の最悪ケースは上限の 12.6% で、同じプロジェクトの手書き ViewModel のメソッドより小さい値でした。"
     },
     "section_android_note": {
       "en": "So oversized Compose functions are not a build warning: a warning that can never be actioned is a warning that trains people to ignore the build. `jui lint-generated` still lists them. If you are debugging the extractor itself, `KJUI_SECTION_WAIVER_WARNINGS=1` puts the warnings back for that run. /platforms/kotlin covers the rest of the Compose output.",

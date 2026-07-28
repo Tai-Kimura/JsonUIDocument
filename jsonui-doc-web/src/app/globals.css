@@ -557,19 +557,3 @@ body {
   background: var(--color-surface);
   display: block;
 }
-
-/* Prose labels that carry a partialAttributes link.
-   ───────────────────────────────────────────────────────────────────────
-   The Label converter always emits `flex items-center`, and the generated
-   partialText helper returns one node per text run. Inside a flex box each
-   run becomes its own flex item, so a paragraph with a link in the middle
-   lays out as a single row: the text after the link is pushed to the right
-   edge instead of wrapping (measured 2026-07-28 — a 844px label whose runs
-   ended at x=1148). Restoring normal inline flow for exactly those labels
-   is enough; `items-center` only mattered for single-line labels.
-
-   Reported upstream as web-partial-labels-render-inside-a-flex-row; remove
-   this rule once the converter stops flexing labels with partialAttributes. */
-span.flex:has(> span.cursor-pointer) {
-  display: block;
-}
