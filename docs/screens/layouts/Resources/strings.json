@@ -5663,8 +5663,8 @@
       "ja": "CLI コマンド — `jui g api` / `jui ls`"
     },
     "next_cli_commands_description": {
-      "en": "Reference page for `jui g api`, the new `ls api-specs` / `ls api-models` discovery commands, and `--fail-on-orphan`.",
-      "ja": "`jui g api`、新しい discovery 系 `ls api-specs` / `ls api-models`、`--fail-on-orphan` のリファレンス。"
+      "en": "Reference page for `jui g api` and the `ls api-specs` / `ls api-models` discovery commands.",
+      "ja": "`jui g api` と discovery 系 `ls api-specs` / `ls api-models` のリファレンス。"
     },
     "next_mcp_title": {
       "en": "MCP tool API — Group E",
@@ -8311,8 +8311,8 @@
       "ja": "API モデル系コマンド (2026-05〜)"
     },
     "section_api_models_body": {
-      "en": "`jui g api` regenerates API DTOs + Domain scaffolds from swagger files under `api_directory` (default `docs/api`) without running the full build. Flags: `--dry-run` (filter preview JSON; also the backing for the MCP `preview_api_model_sync` tool) / `--fail-on-diff` (CI exit non-zero on drift) / `--platform ios|android|web` / `--json`. The new `jui ls` discovery group has two subcommands: `jui ls api-specs` lists swagger files with title / version / schema_count / endpoint_count metadata; `jui ls api-models` lists generated DTO + Domain scaffold files per platform, including orphans (schema deleted from swagger but file still on disk). `jui lint-generated --fail-on-orphan` fails when such orphan Domain scaffolds remain — a clean CI gate. `jui verify --fail-on-diff` now also re-generates API DTOs in-memory and compares them byte-equal against disk, so it covers DTO drift in addition to layout drift.",
-      "ja": "`jui g api` は `api_directory`（既定 `docs/api`）配下の swagger から API DTO と Domain scaffold を再生成（full build はスキップ）。フラグは `--dry-run`（filter プレビュー JSON、MCP `preview_api_model_sync` ツールの裏側でもある）/ `--fail-on-diff`（CI 用、drift 時 exit 非 0）/ `--platform ios|android|web` / `--json`。新設の `jui ls` discovery グループには 2 つのサブコマンド: `jui ls api-specs` は swagger ファイルを title / version / schema 数 / endpoint 数の metadata 付きで一覧、`jui ls api-models` はプラットフォーム別に生成済み DTO + Domain scaffold ファイルを一覧（swagger から schema が消えたがファイルが残っている orphan も含む）。`jui lint-generated --fail-on-orphan` はその orphan が残っているときに失敗する — CI ゲートとして使える。`jui verify --fail-on-diff` も API DTO をメモリ上で再生成してディスクと byte-equal 比較するようになり、layout の drift に加えて DTO の drift も同時に検出します。"
+      "en": "`jui g api` regenerates API DTOs + Domain scaffolds from swagger files under `api_directory` (default `docs/api`) without running the full build. Flags: `--dry-run` (filter preview JSON; also the backing for the MCP `preview_api_model_sync` tool) / `--fail-on-diff` (CI exit non-zero on drift) / `--platform ios|android|web` / `--json`. The new `jui ls` discovery group has two subcommands: `jui ls api-specs` lists swagger files with title / version / schema_count / endpoint_count metadata; `jui ls api-models` lists generated DTO + Domain scaffold files per platform, including orphans (schema deleted from swagger but file still on disk). `--json` makes that list machine-readable, which is the CI-side hook for orphan cleanup. `jui verify --fail-on-diff` now also re-generates API DTOs in-memory and compares them byte-equal against disk, so it covers DTO drift in addition to layout drift.",
+      "ja": "`jui g api` は `api_directory`（既定 `docs/api`）配下の swagger から API DTO と Domain scaffold を再生成（full build はスキップ）。フラグは `--dry-run`（filter プレビュー JSON、MCP `preview_api_model_sync` ツールの裏側でもある）/ `--fail-on-diff`（CI 用、drift 時 exit 非 0）/ `--platform ios|android|web` / `--json`。新設の `jui ls` discovery グループには 2 つのサブコマンド: `jui ls api-specs` は swagger ファイルを title / version / schema 数 / endpoint 数の metadata 付きで一覧、`jui ls api-models` はプラットフォーム別に生成済み DTO + Domain scaffold ファイルを一覧（swagger から schema が消えたがファイルが残っている orphan も含む）。`--json` を付ければ機械可読になるので、orphan の後始末を CI に組み込むならこれを読みます。`jui verify --fail-on-diff` も API DTO をメモリ上で再生成してディスクと byte-equal 比較するようになり、layout の drift に加えて DTO の drift も同時に検出します。"
     },
     "next_cli_title": {
       "en": "jsonui-cli overview",
