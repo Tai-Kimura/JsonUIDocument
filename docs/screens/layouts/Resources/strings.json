@@ -3837,8 +3837,8 @@
       "ja": "F"
     },
     "tool_test_mock_generate_role": {
-      "en": "Scaffold API mock files from OpenAPI; `check:true` reports drift without writing. (`mock serve` stays CLI-only.)",
-      "ja": "OpenAPI から API モックファイルを生成。`check:true` は書き込まず drift のみ報告。（`mock serve` は CLI 専用。）"
+      "en": "Scaffold API mock files from OpenAPI into `<mockDir>/generated/`; `check:true` reports drift without writing, comparing scenario bodies against the schema for their status code. (`mock serve` stays CLI-only.)",
+      "ja": "OpenAPI から API モックファイルを `<mockDir>/generated/` に生成。`check:true` は書き込まず、各シナリオの本文をステータスコード対応のスキーマと突き合わせて drift を報告。（`mock serve` は CLI 専用。）"
     },
     "tool_test_artifacts_pull_name": {
       "en": "test_artifacts_pull",
@@ -6863,8 +6863,8 @@
       "ja": "• Report: `jsonui-test report <results…> --format junit|html -o <out>` で、ドライバが出力する結果 JSON (results.schema.json) を JUnit XML / HTML レポートに統合 (CI 用)。"
     },
     "section_cli_bullet_mock": {
-      "en": "• Mock: `jsonui-test mock generate` scaffolds API mocks from OpenAPI (`--check` = drift-only), `mock serve` runs the local mock server + control panel. See the API Mock guide for the full workflow.",
-      "ja": "• Mock: `jsonui-test mock generate` で OpenAPI から API モックを scaffold (`--check` = drift のみ)、`mock serve` でローカルのモックサーバ + コントロールパネルを起動。詳細は API Mock ガイド参照。"
+      "en": "• Mock: `jsonui-test mock generate` writes API mocks from OpenAPI into `<mockDir>/generated/`, and `--check` compares each scenario body against the schema for its status code rather than just its route. `mock serve` runs the local mock server and control panel, and validates what the app sends as well. Neither is something you have to remember: `jsonui-test validate` runs the contract check and regenerates `generated/` when it is stale. See the API Mock guide for the full workflow.",
+      "ja": "• Mock: `jsonui-test mock generate` は OpenAPI から API モックを `<mockDir>/generated/` に書き出し、`--check` は経路だけでなく各シナリオの本文をステータスコード対応のスキーマと突き合わせます。`mock serve` はローカルのモックサーバとコントロールパネルを起動し、アプリが送る側も検証します。どちらも自分で覚えておく必要はありません — `jsonui-test validate` が契約検査を実行し、`generated/` が古ければ再生成します。詳細は API Mock ガイド参照。"
     },
     "section_cli_bullet_artifacts": {
       "en": "• Artifacts: `jsonui-test artifacts pull` collects a run's evidence in one command — iOS xcresult attachments, Android on-device files, and web Playwright output (videos / traces plus the driver's screenshots) — into `tests/artifacts/<platform>/<stamp>/<test>/<case>/` with a `latest` symlink (`--platform ios|android|web`, default all; `--json` prints absolute paths; `--clean` removes the sources after pulling). `artifacts status` shows the resolved config + what has been collected; `mock serve --artifacts` auto-pulls after each run-target. Configure via `test.artifacts` in jui.config.json: dir / ios.xcresult / android.appId / android.adb (set `adb` when it is not on PATH; otherwise auto-discovered via PATH → ANDROID_HOME → the OS-default SDK location) / web.testResults + web.screenshotDir (default `test-results` / `screenshots`). Per-platform recording setup is covered in the next section.",
@@ -7037,8 +7037,8 @@
       "ja": "2. モック定義ファイル"
     },
     "section_files_body": {
-      "en": "One `*.mock.json` file per OpenAPI `operationId`. Each file holds multiple named scenarios — typically `default`, an empty result, and an error — and names the active one. `activeScenario` is the fallback; tests override it per case. (`mock.schema.json` is an editor / doc aid only — it is not read at runtime.)",
-      "ja": "OpenAPI の `operationId` ごとに `*.mock.json` を 1 ファイル。各ファイルは複数の名前付きシナリオ (通常 `default` / 空結果 / エラー) を持ち、既定を 1 つ指定します。`activeScenario` は fallback で、テストが case ごとに上書きします。（`mock.schema.json` はエディタ / doc 補助専用で、実行時には読まれません。）"
+      "en": "One `*.mock.json` file per OpenAPI operation, holding several named scenarios — typically `default`, an empty result and an error — with one named active. `activeScenario` is the fallback; tests override it per case. Since 2026-07-30 the tree has two halves: `<mockDir>/generated/<tag>/*.mock.json` is regenerated wholesale on every run and can be gitignored, while `<mockDir>/<tag>/*.mock.json` is yours and the tools never touch it. They overlay per scenario, not per file, so a hand-written file only needs the scenarios its tests actually drive — routine ones like `error_403` fill in from the generated side, and a hand-written `activeScenario` wins. Startup prints which hand-written file covered what, because a file silently shadowing another is the failure mode worth avoiding. (`mock.schema.json` is an editor aid only — it is not read at runtime.)",
+      "ja": "OpenAPI の operation ごとに `*.mock.json` を 1 ファイル。各ファイルは複数の名前付きシナリオ（通常 `default` / 空結果 / エラー）を持ち、既定を 1 つ指定します。`activeScenario` は fallback で、テストが case ごとに上書きします。2026-07-30 以降、ツリーは 2 つに分かれています — `<mockDir>/generated/<tag>/*.mock.json` は毎回まるごと再生成されるので gitignore できます。`<mockDir>/<tag>/*.mock.json` は手書きで、ツールは一切触りません。重ね合わせはファイル単位ではなく**シナリオ単位**なので、手書き側はテストが実際に駆動するシナリオだけ持てば十分です — `error_403` のような定型は generated 側から埋まり、手書きの `activeScenario` が勝ちます。どの手書きファイルが何を覆ったかは起動時に出力されます（黙って影に入るのが一番困る形なので）。（`mock.schema.json` はエディタ補助専用で、実行時には読まれません。）"
     },
     "section_files_caption": {
       "en": "One mock file, three scenarios:",
@@ -7049,16 +7049,16 @@
       "ja": "3. モックの生成"
     },
     "section_generate_body": {
-      "en": "`jsonui-test mock generate --swagger <openapi> --out <dir>` scaffolds one mock file per operation, skipping any that already exist so your hand-tuned scenarios are never clobbered. Run it again whenever the API contract changes.",
-      "ja": "`jsonui-test mock generate --swagger <openapi> --out <dir>` は operation ごとにモックファイルを scaffold します。既存ファイルはスキップするので、手で調整したシナリオが上書きされることはありません。API 契約が変わったら再実行します。"
+      "en": "`jsonui-test mock generate --swagger <openapi> --out <dir>` writes one mock file per operation into `generated/`, clearing that directory first so it is always exactly what the current contract says. Your own files live outside it and are never read for this, so there is nothing to clobber and nothing to merge by hand. Run it whenever the contract changes — or let `jsonui-test validate` do it for you, which it does when `generated/` is missing or older than the swagger, so a fresh clone and a first CI run both start from a complete set.",
+      "ja": "`jsonui-test mock generate --swagger <openapi> --out <dir>` は operation ごとのモックファイルを `generated/` に書き出します。書く前にそのディレクトリを空にするので、中身は常に現在の契約そのものです。手書きファイルはその外にあり、この処理では読まれもしないため、上書きされるものも手でマージするものもありません。契約が変わったら再実行します — あるいは `jsonui-test validate` に任せることもできます（`generated/` が無い、または swagger より古いときに再生成するので、クローン直後でも CI の初回でも完全な状態から始まります）。"
     },
     "section_generate_bullet_check": {
-      "en": "• Drift check: `mock generate --check` writes nothing and reports only what would change vs the current swagger — a clean CI gate. The same is available over MCP as `test_mock_generate` with `check: true`.",
-      "ja": "• Drift チェック: `mock generate --check` は書き込まず、現在の swagger との差分だけを報告します — CI ゲートに使えます。MCP でも `test_mock_generate` の `check: true` で同じことができます。"
+      "en": "• `--update-default` rewrites only the `default` body and the `source` route of existing files, leaving every other scenario byte-identical — the ones your tests drive keep their data. It preserves `source.swagger` too, so running it from a different directory does not churn every file. Over MCP the same generation is `test_mock_generate` (Group F), with `check: true` for the read-only form.",
+      "ja": "• `--update-default` は既存ファイルのうち `default` の本文と `source` の経路だけを書き換え、他のシナリオは 1 バイトも触りません — テストが駆動しているデータはそのまま残ります。`source.swagger` も保持するので、別のディレクトリから実行しても全ファイルが churn することはありません。MCP では同じ生成が `test_mock_generate`（グループ F）で、読み取り専用の形は `check: true` です。"
     },
     "section_serve_heading": {
-      "en": "4. Serving mocks + control panel",
-      "ja": "4. モックの配信とコントロールパネル"
+      "en": "5. Serving mocks + control panel",
+      "ja": "5. モックの配信とコントロールパネル"
     },
     "section_serve_body": {
       "en": "`jsonui-test mock serve --mock-dir <dir> [--port N]` starts a local mock server plus a browser control panel at `/__jsonui__/panel` where you can flip scenarios live. The panel HTML ships inside the package (loaded via `importlib.resources`, never a repo-relative path).",
@@ -7073,8 +7073,8 @@
       "ja": "• CLI 専用: 常駐 HTTP サーバ + run-target 実行という面のため、`mock serve` は意図的に MCP 非公開です。MCP に出るのは `mock generate` のみ (Group F の `test_mock_generate`)。"
     },
     "section_scenarios_heading": {
-      "en": "5. Selecting scenarios from tests",
-      "ja": "5. テストからのシナリオ選択"
+      "en": "6. Selecting scenarios from tests",
+      "ja": "6. テストからのシナリオ選択"
     },
     "section_scenarios_body": {
       "en": "A root-level `mocks` map (`{ operationId: scenario }`) sets the initial scenario for a test — screen tests and flow tests alike (in a flow it is applied before launch, so even the app's very first fetch runs under the scenario; drivers 1.4.0+). A `setMocks` step switches scenarios mid-test — flow tests can switch per transition step, so a single journey can walk from a populated list to an empty one to a 500. `setMocks` cannot cross a relaunch; anything that must be in effect at startup belongs in the file-level map.",
@@ -7085,8 +7085,8 @@
       "ja": "初期シナリオ + テスト途中の切替:"
     },
     "section_drivers_heading": {
-      "en": "6. Driver integration",
-      "ja": "6. ドライバ統合"
+      "en": "7. Driver integration",
+      "ja": "7. ドライバ統合"
     },
     "section_drivers_body": {
       "en": "Each driver has a `MockClient`. Set `mockServerURL` + `token` on the runner config and the driver points the app at the mock server for the run, then resets scenarios afterward. iOS / Android / Web all speak the same admin API.",
@@ -7129,16 +7129,44 @@
       "ja": "3. モックの生成"
     },
     "toc_row_serve": {
-      "en": "4. Serving + control panel",
-      "ja": "4. 配信とパネル"
+      "en": "5. Serving + control panel",
+      "ja": "5. 配信とパネル"
     },
     "toc_row_scenarios": {
-      "en": "5. Selecting scenarios",
-      "ja": "5. シナリオ選択"
+      "en": "6. Selecting scenarios",
+      "ja": "6. シナリオ選択"
+    },
+    "section_checks_heading": {
+      "en": "4. Contract checks",
+      "ja": "4. 契約検査"
+    },
+    "section_checks_body": {
+      "en": "A mock is a claim about what the server returns, and `mock generate --check` is what keeps that claim honest. Since 2026-07-30 it actually reads the bodies: every scenario is matched to the schema for its status code and compared recursively — declared types, `required` fields including nested ones and array elements, and `enum` values, with `nullable` respected. Before that it compared only the method and path, so a body describing a contract the server no longer had still reported `No drift`, which is the worst thing a drift check can do: stay quiet and reassure you. Scenarios are now identified by route rather than filename, so a project that names files after paths is no longer reported as one hundred percent orphaned; a mismatch with the naming convention is called out separately as `[NAME]` instead of being buried in a pile of ORPHAN and MISSING lines.",
+      "ja": "モックは「サーバがこう返す」という主張であり、その主張を嘘にしないための仕組みが `mock generate --check` です。2026-07-30 以降は実際に本文を読みます — 各シナリオをステータスコードに対応するスキーマに突き合わせ、宣言された型・`required`（ネストの中や配列要素の中も含む）・`enum` を再帰的に比較します（`nullable` は尊重）。それ以前はメソッドとパスしか見ていなかったため、サーバがもう持っていない契約を表す本文があっても `No drift` と報告していました — 黙っていて、しかも安心させるという、ドリフト検査として最悪の形です。シナリオの同定はファイル名ではなくルートで行うようになったので、パス由来の命名をしているプロジェクトが「全件 ORPHAN」と報告されることもなくなりました。命名規約とのズレは ORPHAN と MISSING の山に埋もれず、`[NAME]` として個別に名指しされます。"
+    },
+    "section_checks_bullet_severity": {
+      "en": "• Findings under `generated/` are warnings — regenerating fixes them. Findings outside it are errors, because a human has to decide what the right body is.",
+      "ja": "• `generated/` 配下の指摘は警告です（再生成すれば直るため）。その外の指摘はエラーです — 正しい本文が何かを人が決める必要があるからです。"
+    },
+    "section_checks_bullet_requests": {
+      "en": "• The server checks what your app sends, too. `mock serve` validates request bodies and query parameters against the contract, merging the path-level `parameters` an operation inherits. It does not reject the request: a violation means the implementation does not satisfy the contract, not that the screen should render an error, and answering 422 would rewrite what every test touching that endpoint is testing. Violations are deduplicated, summarized at the end of the run and set a non-zero exit code; you can also read them live at `/__jsonui__/contract-violations`.",
+      "ja": "• サーバはアプリが送る側も検査します。`mock serve` はリクエストボディとクエリパラメータを契約に突き合わせます（operation が継承するパスレベルの `parameters` もマージします）。リクエスト自体は通します — 違反は「実装が契約を満たしていない」ことであって「画面がエラーを表示すべき」ことではなく、422 を返すとその endpoint に触る全テストの意味が書き換わってしまうためです。違反は重複排除のうえ実行の最後にまとめて出力され、終了コードが非 0 になります。実行中は `/__jsonui__/contract-violations` でも読めます。"
+    },
+    "section_checks_bullet_entry": {
+      "en": "• Both run without being asked. `jsonui-test validate` reads the swagger and mock directory from the config and runs the contract check as part of validation — the old `--check` existed for a long time while nothing called it, which is precisely why stale mocks survived. Request validation is on by default for the same reason. The escape hatches are `--no-mock-check`, and for requests `mock.validateRequests=false`, `--no-validate-requests`, or `skipRequestValidation` on a single scenario.",
+      "ja": "• どちらも明示的に呼ばなくても走ります。`jsonui-test validate` が config から swagger とモックディレクトリを読み、検証の一部として契約検査を実行します — 従来の `--check` は長らく存在していたのに誰も呼んでおらず、古いモックが生き残った理由がまさにそれでした。リクエスト側の検査が既定で有効なのも同じ理由です。逃げ道は `--no-mock-check`、リクエスト側は `mock.validateRequests=false` / `--no-validate-requests` / シナリオ単位の `skipRequestValidation` です。"
+    },
+    "section_checks_bullet_limits": {
+      "en": "• Two deliberate simplifications. `oneOf` / `anyOf` are checked against the first branch only — the goal is to report real violations, not to prove full conformance. An empty array is accepted without demanding the shape of its elements, because an empty array is a legitimate example of an array schema and the generator itself emits one for the `empty` scenario. Scenario names are never used to infer meaning: a response is an error shape because its status code says so, not because someone called it `not_found`.",
+      "ja": "• 意図的な割り切りが 2 つあります。`oneOf` / `anyOf` は先頭の分岐だけを見ます — 完全な適合証明ではなく、実在する違反を報告することを優先しています。空配列はその中の要素形状を要求せずに受け入れます（空配列は配列スキーマの正当な実例で、生成器自身が `empty` シナリオでそれを出すため）。シナリオ名から意味を推測することは一切しません — エラー形なのはステータスコードがそう言っているからであって、誰かが `not_found` と名付けたからではありません。"
+    },
+    "toc_row_checks": {
+      "en": "4. Contract checks",
+      "ja": "4. 契約検査"
     },
     "toc_row_drivers": {
-      "en": "6. Driver integration",
-      "ja": "6. ドライバ統合"
+      "en": "7. Driver integration",
+      "ja": "7. ドライバ統合"
     }
   },
   "guides_localization": {
@@ -8557,8 +8585,8 @@
       "ja": "Renderer SSoT コマンド (2026-07 追加)"
     },
     "section_ssot_body": {
-      "en": "The Renderer SSoT rollout adds two commands under `jui`. `jui conformance generate` reads `shared/core/attribute_definitions.json` and emits fixture layouts + screen tests per component × attribute; `jui conformance report` collates the per-platform results into a matrix (rows = fixtures, columns = iOS / Android / Web) and prints where the three implementations disagree; `jui conformance compat-doc --platform android` renders KotlinJsonUI's `attribute_compatibility.md` from the SSoT + latest conformance results, replacing the hand-maintained table with a deterministic `@generated` artifact. `jui generate attr-bindings [--lang swift|kotlin|ruby|all]` emits typed attribute extractors for the same SSoT — Swift structs / Kotlin data classes / Ruby modules — so converters read typed objects instead of raw JSON. Related: `normalizeLayouts` in `jui.config.json` is default-true since 2026-07 (opt out with `\"normalizeLayouts\": false`); it rewrites aliases to canonical names and stamps a `$jui` marker on distributed layouts, and `attribute_validator` treats that marker as a known key.",
-      "ja": "Renderer SSoT 化に伴い `jui` にサブコマンドが 2 つ追加されました。`jui conformance generate` は `shared/core/attribute_definitions.json` を読んでコンポーネント × 属性ごと の fixture layout と screen test を生成し、`jui conformance report` は各プラットフォーム の実行結果を突き合わせてマトリクス (行 = fixture / 列 = iOS・Android・Web) を出力、3 実装 が食い違う行を上部に別表で示します。`jui conformance compat-doc --platform android` は SSoT と最新 conformance 結果から KotlinJsonUI の `attribute_compatibility.md` を決定的に 生成し、手動維持だった表を `@generated` アーティファクトに置き換えます。`jui generate attr-bindings [--lang swift|kotlin|ruby|all]` は同じ SSoT から 3 言語の 型付き属性抽出コード (Swift の struct / Kotlin の data class / Ruby module) を生成し、converter が生 JSON ではなく型付きオブジェクトを扱えるようにします。関連: `jui.config.json` の `normalizeLayouts` は 2026-07 以降 default true (`\"normalizeLayouts\": false` で opt-out)。配布時にエイリアスを正準名に書き換え、layout 先頭に `$jui` marker を刻印します。`attribute_validator` はその marker を known key として 扱うため zero warnings を維持できます。"
+      "en": "The Renderer SSoT rollout adds two commands under `jui`. `jui conformance generate` reads `shared/core/attribute_definitions.json` and emits fixture layouts + screen tests per component × attribute; `jui conformance report` collates the per-platform results into a matrix (rows = fixtures, columns = iOS / Android / Web) and prints where the three implementations disagree; `jui conformance compat-doc --platform android` renders KotlinJsonUI's `attribute_compatibility.md` from the SSoT + latest conformance results, replacing the hand-maintained table with a deterministic `@generated` artifact. `jui conformance coverage` (2026-07-29) answers a different question — not whether a fixture exists, but whether the converter actually reads the attribute — by scanning converter source rather than output, because a fixture for a dropped attribute renders a blank screen that matches its blank baseline and passes. It is a ratchet backed by `conformance/coverage.json`: a gap missing from the ledger fails, and so does a ledger entry whose gap is gone, otherwise the file rots into a list of things that used to be broken. The first measurement found 209 gaps across 1179 attribute × platform pairs (web 79 / iOS 68 / Android 62), and the 85 `mode: uikit` attributes are outside its reach because SwiftJsonUI's Swift runtime reads those directly — a blind spot, not a clean bill of health. `jui generate attr-bindings [--lang swift|kotlin|ruby|all]` emits typed attribute extractors for the same SSoT — Swift structs / Kotlin data classes / Ruby modules — so converters read typed objects instead of raw JSON. Related: `normalizeLayouts` in `jui.config.json` is default-true since 2026-07 (opt out with `\"normalizeLayouts\": false`); it rewrites aliases to canonical names and stamps a `$jui` marker on distributed layouts, and `attribute_validator` treats that marker as a known key.",
+      "ja": "Renderer SSoT 化に伴い `jui` にサブコマンドが 2 つ追加されました。`jui conformance generate` は `shared/core/attribute_definitions.json` を読んでコンポーネント × 属性ごと の fixture layout と screen test を生成し、`jui conformance report` は各プラットフォーム の実行結果を突き合わせてマトリクス (行 = fixture / 列 = iOS・Android・Web) を出力、3 実装 が食い違う行を上部に別表で示します。`jui conformance compat-doc --platform android` は SSoT と最新 conformance 結果から KotlinJsonUI の `attribute_compatibility.md` を決定的に 生成し、手動維持だった表を `@generated` アーティファクトに置き換えます。`jui conformance coverage`（2026-07-29 追加）は別の問いに答えます — fixture があるかではなく、コンバータが実際にその属性を読んでいるか。出力ではなくコンバータのソースを走査します（属性を握り潰している fixture は空の画面が空の baseline と一致して pass してしまうため）。台帳は `conformance/coverage.json` でラチェットです — 台帳に無いギャップでも、解消済みなのに残っているエントリでも落ちます（そうしないと台帳が「昔壊れていたもの一覧」に腐るため）。初回計測は 1179 の属性 × プラットフォーム組のうち 209 件のギャップ（web 79 / iOS 68 / Android 62）。`mode: uikit` の 85 属性は SwiftJsonUI の Swift ランタイムが直接読むため検査対象外で、これは「問題なし」ではなく盲点です。`jui generate attr-bindings [--lang swift|kotlin|ruby|all]` は同じ SSoT から 3 言語の 型付き属性抽出コード (Swift の struct / Kotlin の data class / Ruby module) を生成し、converter が生 JSON ではなく型付きオブジェクトを扱えるようにします。関連: `jui.config.json` の `normalizeLayouts` は 2026-07 以降 default true (`\"normalizeLayouts\": false` で opt-out)。配布時にエイリアスを正準名に書き換え、layout 先頭に `$jui` marker を刻印します。`attribute_validator` はその marker を known key として 扱うため zero warnings を維持できます。"
     },
     "section_checks_heading": {
       "en": "Implementation contract checks (since 2026-07)",
@@ -8573,8 +8601,8 @@
       "ja": "テストツール系コマンド (2026-07 追加)"
     },
     "section_test_tools_body": {
-      "en": "The `jsonui-test` CLI ships inside jsonui-cli. `jsonui-test validate <files/dirs>` schema-checks screen / flow tests + descriptions (exit 0 = pass, 1 = schema violation); when `jui.config.json` carries a `test.install` block, a passing validate also flatten-installs the tests into the platform test dirs — success-gated (broken tests are never distributed), full-sync (stale files removed first), and a screen-name collision aborts with exit 1. `--no-install` skips the install; `--config` selects the config file; no `test.install` block ⇒ validate-only. `jsonui-test generate test screen|flow <name>` and `generate description screen|flow <name> <case>` scaffold files. `jsonui-test report <results…> --format junit|html -o <out>` turns the drivers' results JSON (results.schema.json) into JUnit / HTML for CI. `jsonui-test mock generate` scaffolds OpenAPI mocks (`--check` = drift-only) and `mock serve` runs the local mock server — see the API Mock guide. `jsonui-test artifacts pull` collects run evidence — iOS xcresult attachments, Android on-device files, and web Playwright videos / traces / screenshots — into `tests/artifacts/<platform>/<stamp>/` with a `latest` symlink (`--platform ios|android|web`; `artifacts status` shows the resolved config; `mock serve --artifacts` auto-pulls after each run-target; configured via `test.artifacts` in jui.config.json). Eight of these are also exposed over MCP as Group F; the long-running `mock serve` stays CLI-only.",
-      "ja": "`jsonui-test` CLI は jsonui-cli に同梱されています。`jsonui-test validate <files/dirs>` は screen / flow テストと description をスキーマ検証します (exit 0 = 成功、1 = schema 違反)。`jui.config.json` に `test.install` があると、検証成功時に各プラットフォームのテスト dir へ flatten-install もします — 成功ゲート (壊れたテストは配布しない)、full-sync (先に stale ファイルを除去)、画面名の衝突は exit 1 で中断。`--no-install` で配布を skip、`--config` で config を指定、`test.install` なし ⇒ 検証のみ。`jsonui-test generate test screen|flow <name>` と `generate description screen|flow <name> <case>` でファイルを scaffold。`jsonui-test report <results…> --format junit|html -o <out>` はドライバの結果 JSON (results.schema.json) を JUnit / HTML に変換 (CI 用)。`jsonui-test mock generate` は OpenAPI モックを scaffold (`--check` = drift のみ)、`mock serve` はローカルのモックサーバを起動 — 詳細は API Mock ガイド参照。`jsonui-test artifacts pull` は実行証跡 — iOS の xcresult 添付、Android のデバイス上ファイル、web の Playwright 録画 / trace / スクリーンショット — を `tests/artifacts/<platform>/<stamp>/` に回収し `latest` symlink を更新 (`--platform ios|android|web`。`artifacts status` で解決済み設定を表示、`mock serve --artifacts` で run-target ごとに自動 pull、設定は jui.config.json の `test.artifacts`)。うち 8 つは MCP の Group F としても公開されます (常駐する `mock serve` は CLI 専用)。"
+      "en": "The `jsonui-test` CLI ships inside jsonui-cli. `jsonui-test validate <files/dirs>` schema-checks screen / flow tests + descriptions (exit 0 = pass, 1 = schema violation); when `jui.config.json` carries a `test.install` block, a passing validate also flatten-installs the tests into the platform test dirs — success-gated (broken tests are never distributed), full-sync (stale files removed first), and a screen-name collision aborts with exit 1. `--no-install` skips the install; `--config` selects the config file; no `test.install` block ⇒ validate-only. `jsonui-test generate test screen|flow <name>` and `generate description screen|flow <name> <case>` scaffold files. `jsonui-test report <results…> --format junit|html -o <out>` turns the drivers' results JSON (results.schema.json) into JUnit / HTML for CI. `jsonui-test mock generate` writes OpenAPI mocks into `<mockDir>/generated/` (`--check` compares scenario bodies against the schema for their status code; `--update-default` refreshes only the default body) and `mock serve` runs the local mock server, validating request bodies and query parameters against the contract as it goes — see the API Mock guide. `jsonui-test artifacts pull` collects run evidence — iOS xcresult attachments, Android on-device files, and web Playwright videos / traces / screenshots — into `tests/artifacts/<platform>/<stamp>/` with a `latest` symlink (`--platform ios|android|web`; `artifacts status` shows the resolved config; `mock serve --artifacts` auto-pulls after each run-target; configured via `test.artifacts` in jui.config.json). Eight of these are also exposed over MCP as Group F; the long-running `mock serve` stays CLI-only.",
+      "ja": "`jsonui-test` CLI は jsonui-cli に同梱されています。`jsonui-test validate <files/dirs>` は screen / flow テストと description をスキーマ検証します (exit 0 = 成功、1 = schema 違反)。`jui.config.json` に `test.install` があると、検証成功時に各プラットフォームのテスト dir へ flatten-install もします — 成功ゲート (壊れたテストは配布しない)、full-sync (先に stale ファイルを除去)、画面名の衝突は exit 1 で中断。`--no-install` で配布を skip、`--config` で config を指定、`test.install` なし ⇒ 検証のみ。`jsonui-test generate test screen|flow <name>` と `generate description screen|flow <name> <case>` でファイルを scaffold。`jsonui-test report <results…> --format junit|html -o <out>` はドライバの結果 JSON (results.schema.json) を JUnit / HTML に変換 (CI 用)。`jsonui-test mock generate` は OpenAPI モックを `<mockDir>/generated/` に書き出し（`--check` は各シナリオの本文をステータスコード対応のスキーマと比較、`--update-default` は default の本文だけを更新）、`mock serve` はローカルのモックサーバを起動してリクエストボディとクエリパラメータを契約に突き合わせます — 詳細は API Mock ガイド参照。`jsonui-test artifacts pull` は実行証跡 — iOS の xcresult 添付、Android のデバイス上ファイル、web の Playwright 録画 / trace / スクリーンショット — を `tests/artifacts/<platform>/<stamp>/` に回収し `latest` symlink を更新 (`--platform ios|android|web`。`artifacts status` で解決済み設定を表示、`mock serve --artifacts` で run-target ごとに自動 pull、設定は jui.config.json の `test.artifacts`)。うち 8 つは MCP の Group F としても公開されます (常駐する `mock serve` は CLI 専用)。"
     },
     "toc_row_ssot": {
       "en": "SSoT commands",

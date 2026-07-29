@@ -420,6 +420,44 @@
     },
     {
       "binary": "jui",
+      "command": "conformance coverage",
+      "synopsis": "jui conformance coverage [--platform ios|android|web] [--update-ledger]",
+      "purpose": {
+        "en": "Answer whether each declared attribute is actually read by the converter for the platform that declares it — by scanning converter source, not output. Screenshot conformance cannot see this: a fixture for a dropped attribute renders a blank screen, matches its blank baseline and passes. Backed by `conformance/coverage.json` as a ratchet that fails in both directions — an unrecorded gap fails, and so does a recorded gap that no longer exists, so the ledger cannot rot into a list of things that used to be broken.",
+        "ja": "宣言されている各属性を、それを宣言したプラットフォームのコンバータが実際に読んでいるかを判定する — 出力ではなくコンバータのソースを走査する。スクリーンショットの conformance ではこれは見えない（属性を握り潰した fixture は空の画面を描き、空の baseline と一致して pass するため）。台帳は `conformance/coverage.json` で、両方向に落ちるラチェット — 未記録のギャップでも、解消済みなのに残っているエントリでも失敗するので、台帳が「昔壊れていたもの一覧」に腐ることがない。"
+      },
+      "options": [
+        {
+          "name": "--platform",
+          "type": "enum",
+          "description": {
+            "en": "Limit the scan to `ios`, `android` or `web`. Omit for all three.",
+            "ja": "`ios` / `android` / `web` に限定する。省略で 3 つとも。"
+          }
+        },
+        {
+          "name": "--update-ledger",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Rewrite `conformance/coverage.json` to the current gap set. Review it — an entry added here is a declared attribute nobody wired up.",
+            "ja": "現在のギャップ集合で `conformance/coverage.json` を書き直す。追加されたエントリは「宣言されているのに誰も配線していない属性」なので、内容は確認すること。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui conformance coverage\n1179 attribute x platform pairs checked\n209 gaps (web 79 / ios 68 / android 62)\nNote: 85 mode:uikit attributes are out of scope - read by the Swift runtime, not a Ruby converter"
+        }
+      ],
+      "seeAlso": [
+        "jui build",
+        "jui lint-generated"
+      ]
+    },
+    {
+      "binary": "jui",
       "command": "lint-generated",
       "synopsis": "jui lint-generated [--fix] [--verbose] [--max-depth <n>] [--max-lines <n>] [--update-size-baseline] [--fail-on any|size-ratchet|health]",
       "purpose": {
@@ -776,19 +814,102 @@
     {
       "binary": "jsonui-test",
       "command": "validate",
-      "synopsis": "jsonui-test validate <path>",
+      "synopsis": "jsonui-test validate <path> [--no-mock-check]",
       "purpose": {
-        "en": "Validate test JSON files (schema, reference integrity, element ID existence).",
-        "ja": "テスト JSON ファイル検証（スキーマ、参照整合性、要素 ID の存在）。"
+        "en": "Validate test JSON files (schema, reference integrity, element ID existence). Since 2026-07-30 it also runs the mock contract check, and regenerates `<mockDir>/generated/` when it is missing or older than the swagger — a fresh clone or a first CI run therefore starts from a complete mock set. If that regeneration fails the suite does not run, because an empty `generated/` turns into a confusing pile of 404s.",
+        "ja": "テスト JSON ファイル検証（スキーマ、参照整合性、要素 ID の存在）。2026-07-30 以降はモックの契約検査も実行し、`<mockDir>/generated/` が無い、または swagger より古い場合は再生成する — クローン直後でも CI 初回でも完全なモック一式から始められる。再生成に失敗した場合はスイートを走らせずに落とす（空の `generated/` で走ると分かりにくい 404 の山になるため）。"
       },
-      "options": [],
+      "options": [
+        {
+          "name": "--no-mock-check",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Skip the mock contract check. The check is on by default deliberately: `mock generate --check` existed for a long time while nothing called it, which is why stale mocks survived unnoticed.",
+            "ja": "モックの契約検査をスキップする。既定で有効なのは意図的で、`mock generate --check` は長らく存在していたのに誰も呼んでおらず、それが古いモックの生き残った理由だったため。"
+          }
+        }
+      ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ jsonui-test validate tests/\n✓ 12 screen tests valid\n✓ 3 flow tests valid"
+          "code": "$ jsonui-test validate tests/\n✓ 12 screen tests valid\n✓ 3 flow tests valid\n✓ mock contract: 166 mocks checked, no drift"
         }
       ],
       "seeAlso": [
+        "jsonui-test run",
+        "jsonui-test mock generate"
+      ]
+    },
+    {
+      "binary": "jsonui-test",
+      "command": "mock generate",
+      "synopsis": "jsonui-test mock generate --swagger <openapi> --out <dir> [--check] [--update-default]",
+      "purpose": {
+        "en": "Write one mock file per OpenAPI operation into `<out>/generated/`, clearing that directory first so it always matches the current contract. Hand-written mocks live outside `generated/` and are never touched; the two overlay per scenario, so a hand-written file only needs the scenarios its tests drive.",
+        "ja": "OpenAPI の operation ごとにモックファイルを `<out>/generated/` に書き出す。書く前にディレクトリを空にするので、中身は常に現在の契約と一致する。手書きモックは `generated/` の外に置かれ、ツールは一切触らない。両者はシナリオ単位で重なるため、手書き側はテストが駆動するシナリオだけ持てばよい。"
+      },
+      "options": [
+        {
+          "name": "--check",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Write nothing; compare each scenario body against the schema for its status code — declared types, `required` (including nested fields and array elements) and `enum`, with `nullable` respected. Scenarios are matched by route, not filename. Findings under `generated/` are warnings (regeneration fixes them); findings outside it are errors.",
+            "ja": "書き込まず、各シナリオの本文をステータスコード対応のスキーマと比較する — 宣言された型・`required`（ネストや配列要素の中も）・`enum` を見る（`nullable` は尊重）。シナリオの同定はファイル名ではなくルート。`generated/` 配下の指摘は警告（再生成で直る）、その外はエラー。"
+          }
+        },
+        {
+          "name": "--update-default",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Rewrite only the `default` body and the `source` route of existing files, leaving every other scenario byte-identical so test-driven data survives. `source.swagger` is preserved, so running from a different directory does not churn every file.",
+            "ja": "既存ファイルの `default` 本文と `source` の経路だけを書き換え、他のシナリオは 1 バイトも変えない（テストが駆動するデータが残る）。`source.swagger` も保持するので、別ディレクトリから実行しても全ファイルが churn しない。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-test mock generate --swagger docs/api/app.json --out tests/mocks --check\n[NAME] products/list.mock.json does not follow <tag>/<operationId>.mock.json\n[ERROR] tests/mocks/products/list.mock.json  default: 'total' is required but missing"
+        }
+      ],
+      "seeAlso": [
+        "jsonui-test mock serve",
+        "jsonui-test validate"
+      ]
+    },
+    {
+      "binary": "jsonui-test",
+      "command": "mock serve",
+      "synopsis": "jsonui-test mock serve --mock-dir <dir> [--port N] [--no-validate-requests]",
+      "purpose": {
+        "en": "Serve the mock files over HTTP with a browser control panel at `/__jsonui__/panel` for flipping scenarios live. Binds to 127.0.0.1, mints a fresh token per launch, verifies the Host header and blocks path traversal. Not exposed over MCP — it is a long-running server that executes run targets.",
+        "ja": "モックファイルを HTTP で配信し、`/__jsonui__/panel` のコントロールパネルからシナリオを切り替えられる。127.0.0.1 にバインドし、起動ごとにトークンを発行、Host ヘッダを検証し、パストラバーサルを遮断する。MCP には公開していない（run target を実行する長時間サーバのため）。"
+      },
+      "options": [
+        {
+          "name": "--no-validate-requests",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Turn off request-side validation. On by default: request bodies and query parameters are checked against the contract (path-level `parameters` merged in). The request is still answered — a violation means the implementation does not satisfy the contract, and returning 422 would rewrite what every test on that endpoint is testing. Violations are deduplicated, summarized at end of run with a non-zero exit code, and readable at `/__jsonui__/contract-violations`. Also settable as `mock.validateRequests=false`, or per scenario with `skipRequestValidation`.",
+            "ja": "リクエスト側の検証を無効にする。既定で有効で、リクエストボディとクエリパラメータを契約に突き合わせる（パスレベルの `parameters` もマージ）。リクエスト自体は通す — 違反は「実装が契約を満たしていない」ことであり、422 を返すとその endpoint に触る全テストの意味が変わってしまうため。違反は重複排除して実行末尾に要約し、終了コードを非 0 にする。`/__jsonui__/contract-violations` でも読める。`mock.validateRequests=false` やシナリオ単位の `skipRequestValidation` でも指定できる。"
+          }
+        },
+        {
+          "name": "--port",
+          "type": "number",
+          "description": {
+            "en": "Port to listen on.",
+            "ja": "待ち受けポート。"
+          }
+        }
+      ],
+      "examples": [],
+      "seeAlso": [
+        "jsonui-test mock generate",
         "jsonui-test run"
       ]
     },
@@ -872,6 +993,45 @@
       "options": [],
       "examples": [],
       "seeAlso": []
+    },
+    {
+      "binary": "jsonui-doc",
+      "command": "generate html",
+      "synopsis": "jsonui-doc generate html --input-dir <dir> --output-dir <dir> [--allow-partial] [--with-checks]",
+      "purpose": {
+        "en": "Render the whole documentation site — test files, specs, API docs, Figma assets — as static HTML. Since 2026-07-29 a page that fails to generate no longer passes silently: every page is still attempted, the intact ones are written, and the run ends with a summary naming each failure, the input file behind it, and a non-zero exit code. Failed pages get a placeholder carrying the reason, so a link in the index never dead-ends.",
+        "ja": "テストファイル・spec・API ドキュメント・Figma アセットからドキュメントサイト全体を静的 HTML として生成する。2026-07-29 以降、ページ単位の生成失敗が黙って通ることはない — 全ページを試行し、壊れていないものは出力したうえで、末尾に失敗の一覧（原因と入力ファイル）を出して非 0 で終了する。失敗したページは理由を載せたプレースホルダになるので、index からのリンクが行き止まりにならない。"
+      },
+      "options": [
+        {
+          "name": "--allow-partial",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Accept an incomplete site: page failures are still reported, but the exit code stays 0. The escape hatch for a run that legitimately cannot fix its inputs yet.",
+            "ja": "不完全なサイトを許容する。失敗の報告は出るが終了コードは 0 のまま。入力をまだ直せない実行のための逃げ道。"
+          }
+        },
+        {
+          "name": "--with-checks",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Run the doc contract checks during generation and put the drift onto the page. Independent of `--allow-partial`: this is about drift being reported, that one is about the page existing at all.",
+            "ja": "生成時に doc contract check を実行し、drift をページに載せる。`--allow-partial` とは独立 — こちらは drift を報告する話、あちらはページ自体が出ているかの話。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-doc generate html --input-dir tests --output-dir html\nGenerated 4 HTML files\n\n1 page(s) failed to generate:\n  API doc Broken table [db/broken_table.json]\n      x-custom-validations[0] in broken_table is str; expected an object\nThe documentation is incomplete. Fix the inputs above, or pass --allow-partial.\n# exit 1"
+        }
+      ],
+      "seeAlso": [
+        "jsonui-doc generate spec",
+        "jsonui-doc validate spec"
+      ]
     },
     {
       "binary": "jsonui-doc",

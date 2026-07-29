@@ -627,8 +627,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Horizontal orientation only. `true` wraps overflow onto subsequent rows. Maps to CSS flex-wrap on Web.",
-                "ja": "horizontal のみ。`true` で溢れた子を次行に折り返す。Web では CSS flex-wrap にマップ。"
+                "en": "Web only, and a string rather than a boolean: `nowrap` / `wrap` / `wrap-reverse`, emitted as the matching Tailwind class. Meaningful on a horizontal row, where `wrap` lets overflow fall onto the next line. A `responsive` override compiles the same way any other attribute does, so a row can wrap on narrow screens and stay on one line above the breakpoint. The value was declared before it was implemented — until 2026-07-29 the web converter dropped it silently, so a layout that asked to wrap simply did not, without a warning.",
+                "ja": "Web 専用で、値は boolean ではなく文字列です — `nowrap` / `wrap` / `wrap-reverse` が対応する Tailwind クラスとして出力されます。効くのは horizontal の行で、`wrap` を指定すると溢れた子が次の行に落ちます。`responsive` での上書きも他の属性と同じ形でコンパイルされるので、狭い画面だけ折り返して、ブレークポイント以上では 1 行に保つ、という書き方ができます。なおこの値は実装より先に宣言されていました — 2026-07-29 までは web のコンバータが黙って捨てていたため、折り返しを指定しても警告なしに効きませんでした。"
               },
               "type": "string",
               "required": ""
@@ -2311,8 +2311,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Horizontal orientation only. `true` wraps overflow onto subsequent rows. Maps to CSS flex-wrap on Web.",
-                "ja": "horizontal のみ。`true` で溢れた子を次行に折り返す。Web では CSS flex-wrap にマップ。"
+                "en": "Web only, and a string rather than a boolean: `nowrap` / `wrap` / `wrap-reverse`, emitted as the matching Tailwind class. Meaningful on a horizontal row, where `wrap` lets overflow fall onto the next line. A `responsive` override compiles the same way any other attribute does, so a row can wrap on narrow screens and stay on one line above the breakpoint. The value was declared before it was implemented — until 2026-07-29 the web converter dropped it silently, so a layout that asked to wrap simply did not, without a warning.",
+                "ja": "Web 専用で、値は boolean ではなく文字列です — `nowrap` / `wrap` / `wrap-reverse` が対応する Tailwind クラスとして出力されます。効くのは horizontal の行で、`wrap` を指定すると溢れた子が次の行に落ちます。`responsive` での上書きも他の属性と同じ形でコンパイルされるので、狭い画面だけ折り返して、ブレークポイント以上では 1 行に保つ、という書き方ができます。なおこの値は実装より先に宣言されていました — 2026-07-29 までは web のコンバータが黙って捨てていたため、折り返しを指定しても警告なしに効きませんでした。"
               },
               "type": "string",
               "required": ""

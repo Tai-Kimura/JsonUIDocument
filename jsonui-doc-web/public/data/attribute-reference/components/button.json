@@ -390,6 +390,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -415,18 +421,18 @@
                 ]
               },
               "description": {
-                "en": "Button image.",
-                "ja": "ボタン画像。"
+                "en": "Leading icon, by asset name (binding supported).",
+                "ja": "先頭に置くアイコン。アセット名で指定（binding 可）。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Button's own image attribute (iOS UIButton.imageView). For non-iOS platforms or complex icon layouts, prefer nesting an Image or IconLabel inside `child`.",
-                "ja": "Button 固有の画像属性（iOS UIButton.imageView 相当）。iOS 以外や複雑なアイコン配置では `child` 内に Image / IconLabel を入れる方が柔軟。"
+                "en": "A leading icon, with an 8pt / 8dp gap before the label — the same shape on iOS, Android and Web since 2026-07-29. It resolves by asset name exactly like `Image#srcName`, and a binding (`@{iconName}`) works too. Tinting is opt-in: with `tintColor` or `fontColor` set the icon is recoloured to match (iOS `.template`, Android `Icon`, Web a mask); without them the artwork renders as drawn, so a multi-colour icon survives. Size is 1.25x the font size, or 18pt / 18dp when the font size is unset. An icon-only button takes the image name as its accessible name; alongside a label the icon is decorative. Needs SwiftJsonUI 10.9.0+ — the generated Swift says so in a comment — while Android's generated code uses no new library API. Two caveats: the gap is fixed, because `spacing` is not a declared Button attribute and a layout carrying it would fail the zero-warning build; and on iOS UIKit without a config, `image` still means `setBackgroundImage`, so the attribute has two meanings inside iOS.",
+                "ja": "先頭に置くアイコン。ラベルとの間隔は 8pt / 8dp で、2026-07-29 以降 iOS / Android / Web で同じ形です。解決規則は `Image#srcName` と同じアセット名で、binding（`@{iconName}`）も使えます。単色化は指定したときだけ — `tintColor` か `fontColor` があればその色に染め（iOS は `.template`、Android は `Icon`、Web は mask）、無ければ元の絵のまま描くので多色アイコンが潰れません。サイズはフォントサイズの 1.25 倍、フォントサイズ未指定なら 18pt / 18dp。アイコンのみのボタンは画像名がアクセシブル名になり、ラベル併記時は装飾扱いです。SwiftJsonUI 10.9.0 以上が必要（生成された Swift にその旨のコメントが出ます）。Android の生成コードは新しいライブラリ API を使わないので追加要件はありません。注意が 2 点 — 間隔は固定です（`spacing` は Button の宣言済み属性ではなく、レイアウトに書くとゼロ警告ビルドを壊すため）。また iOS UIKit の config なし経路では `image` は従来どおり `setBackgroundImage` を指すので、iOS の中で意味が 2 つに割れています。"
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -1784,6 +1790,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -1809,18 +1821,18 @@
                 ]
               },
               "description": {
-                "en": "Button image.",
-                "ja": "ボタン画像。"
+                "en": "Leading icon, by asset name (binding supported).",
+                "ja": "先頭に置くアイコン。アセット名で指定（binding 可）。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Button's own image attribute (iOS UIButton.imageView). For non-iOS platforms or complex icon layouts, prefer nesting an Image or IconLabel inside `child`.",
-                "ja": "Button 固有の画像属性（iOS UIButton.imageView 相当）。iOS 以外や複雑なアイコン配置では `child` 内に Image / IconLabel を入れる方が柔軟。"
+                "en": "A leading icon, with an 8pt / 8dp gap before the label — the same shape on iOS, Android and Web since 2026-07-29. It resolves by asset name exactly like `Image#srcName`, and a binding (`@{iconName}`) works too. Tinting is opt-in: with `tintColor` or `fontColor` set the icon is recoloured to match (iOS `.template`, Android `Icon`, Web a mask); without them the artwork renders as drawn, so a multi-colour icon survives. Size is 1.25x the font size, or 18pt / 18dp when the font size is unset. An icon-only button takes the image name as its accessible name; alongside a label the icon is decorative. Needs SwiftJsonUI 10.9.0+ — the generated Swift says so in a comment — while Android's generated code uses no new library API. Two caveats: the gap is fixed, because `spacing` is not a declared Button attribute and a layout carrying it would fail the zero-warning build; and on iOS UIKit without a config, `image` still means `setBackgroundImage`, so the attribute has two meanings inside iOS.",
+                "ja": "先頭に置くアイコン。ラベルとの間隔は 8pt / 8dp で、2026-07-29 以降 iOS / Android / Web で同じ形です。解決規則は `Image#srcName` と同じアセット名で、binding（`@{iconName}`）も使えます。単色化は指定したときだけ — `tintColor` か `fontColor` があればその色に染め（iOS は `.template`、Android は `Icon`、Web は mask）、無ければ元の絵のまま描くので多色アイコンが潰れません。サイズはフォントサイズの 1.25 倍、フォントサイズ未指定なら 18pt / 18dp。アイコンのみのボタンは画像名がアクセシブル名になり、ラベル併記時は装飾扱いです。SwiftJsonUI 10.9.0 以上が必要（生成された Swift にその旨のコメントが出ます）。Android の生成コードは新しいライブラリ API を使わないので追加要件はありません。注意が 2 点 — 間隔は固定です（`spacing` は Button の宣言済み属性ではなく、レイアウトに書くとゼロ警告ビルドを壊すため）。また iOS UIKit の config なし経路では `image` は従来どおり `setBackgroundImage` を指すので、iOS の中で意味が 2 つに割れています。"
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
