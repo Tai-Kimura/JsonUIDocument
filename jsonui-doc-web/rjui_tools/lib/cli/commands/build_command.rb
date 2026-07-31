@@ -63,6 +63,16 @@ module RjuiTools
           emit_screen_marker_helper
           emit_partial_text_helper
 
+          # Emit the Collection scroll-control helper (scrollTo /
+          # defaultScrollAnchor / currentPage / onItemAppear)
+          emit_collection_scroll_helper
+
+          # Emit the relative-positioning helper (align*View / align*OfView)
+          emit_relative_position_helper
+
+          # Emit the date-format helper (SelectBox dateStringFormat)
+          emit_date_format_helper
+
           all_json_files = Dir.glob(File.join(layouts_dir, '**', '*.json')).reject do |file|
             # Skip Resources folder (colors.json, strings.json, etc.)
             # Skip Styles folder (reusable style definitions, not components)
@@ -1237,6 +1247,467 @@ module RjuiTools
 
           File.write(path, content)
           Core::Logger.info("Generated: #{path}")
+        end
+
+        # dateStringFormat — the shape the ViewModel holds its date string in.
+        #
+        # A native date/time input only ever speaks ISO: `yyyy-MM-dd`, `HH:mm`,
+        # or `yyyy-MM-ddTHH:mm`. iOS formats `selectedDate` with the declared
+        # pattern, so without a conversion the web would silently hand the
+        # ViewModel a string in a format it did not ask for — and reject the one
+        # it stored. Hence a round trip on both edges of the input.
+        def emit_date_format_helper
+          generated_dir = @config['generated_directory'] || 'src/generated'
+          FileUtils.mkdir_p(generated_dir)
+          is_ts = @config['typescript']
+          extension = is_ts ? 'ts' : 'js'
+          path = File.join(generated_dir, "dateFormat.#{extension}")
+
+          str = is_ts ? ': string' : ''
+          str_or_null = is_ts ? ': string | null | undefined' : ''
+          ret_str = is_ts ? ': string' : ''
+          parts_type = is_ts ? ': Record<string, string>' : ''
+          scan_ret = is_ts ? ': { order: string[]; regex: RegExp }' : ''
+
+          marker_header = Core::GeneratedMarker.comment_header(
+            source: "dateFormat (SelectBox dateStringFormat helper)",
+            generator: "rjui build"
+          )
+          marker_footer = Core::GeneratedMarker.comment_footer
+
+          content = <<~JS
+            #{marker_header}
+            // Converts between a declared `dateStringFormat` and the ISO value a
+            // native date/time input requires. Supported tokens: yyyy MM dd HH mm
+            // ss — the DateFormatter patterns JsonUI layouts actually use.
+
+            const TOKENS = ['yyyy', 'MM', 'dd', 'HH', 'mm', 'ss'];
+
+            function scanPattern(pattern#{str})#{scan_ret} {
+              const order#{is_ts ? ': string[]' : ''} = [];
+              let source = '';
+              let i = 0;
+              while (i < pattern.length) {
+                const token = TOKENS.find((t) => pattern.startsWith(t, i));
+                if (token) {
+                  order.push(token);
+                  source += token === 'yyyy' ? '(\\\\d{4})' : '(\\\\d{1,2})';
+                  i += token.length;
+                } else {
+                  source += pattern[i].replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');
+                  i += 1;
+                }
+              }
+              return { order, regex: new RegExp('^' + source + '$') };
+            }
+
+            function pad(value#{str}, width#{is_ts ? ': number' : ''}) {
+              return value.length >= width ? value : '0'.repeat(width - value.length) + value;
+            }
+
+            // The three ISO shapes an <input type="date|time|datetime-local">
+            // reports, in one pass.
+            function isoParts(iso#{str})#{is_ts ? ': Record<string, string> | null' : ''} {
+              const [datePart, timePart] = iso.split('T');
+              const parts#{parts_type} = {};
+              const date = (datePart ?? '').split('-');
+              const time = (timePart ?? (iso.includes(':') && !iso.includes('-') ? iso : '')).split(':');
+              if (date.length === 3) {
+                parts.yyyy = date[0];
+                parts.MM = date[1];
+                parts.dd = date[2];
+              }
+              if (time.length >= 2) {
+                parts.HH = time[0];
+                parts.mm = time[1];
+                parts.ss = time[2] ?? '00';
+              }
+              return Object.keys(parts).length > 0 ? parts : null;
+            }
+
+            /** ISO (what the input reports) -> the declared format. */
+            export function formatDateValue(
+              iso#{str_or_null},
+              pattern#{str},
+              _inputType#{str}
+            )#{ret_str} {
+              if (!iso) return '';
+              const parts = isoParts(iso);
+              if (!parts) return iso;
+              return pattern.replace(/yyyy|MM|dd|HH|mm|ss/g, (token) => parts[token] ?? '');
+            }
+
+            /** The declared format (what the ViewModel holds) -> ISO. */
+            export function toIsoDateValue(
+              value#{str_or_null},
+              pattern#{str},
+              inputType#{str}
+            )#{ret_str} {
+              if (!value) return '';
+              const { order, regex } = scanPattern(pattern);
+              const match = regex.exec(value);
+              if (!match) {
+                // A ViewModel still holding ISO keeps working; anything else is
+                // dropped rather than fed to the input as an invalid value,
+                // which React would warn about on every render.
+                return isoParts(value) ? value : '';
+              }
+              const parts#{parts_type} = {};
+              order.forEach((token, index) => {
+                parts[token] = match[index + 1];
+              });
+              const date = parts.yyyy && parts.MM && parts.dd
+                ? pad(parts.yyyy, 4) + '-' + pad(parts.MM, 2) + '-' + pad(parts.dd, 2)
+                : '';
+              const time = parts.HH && parts.mm
+                ? pad(parts.HH, 2) + ':' + pad(parts.mm, 2) +
+                  (order.includes('ss') && parts.ss ? ':' + pad(parts.ss, 2) : '')
+                : '';
+              if (inputType === 'time') return time;
+              if (inputType === 'datetime-local') return date && time ? date + 'T' + time : '';
+              return date;
+            }
+
+            #{marker_footer}
+          JS
+
+          File.write(path, content)
+          Core::Logger.success("Updated: #{path}")
+        end
+
+        # align*OfView / align*View / alignCenter*View — positioning a child
+        # against a SIBLING's box.
+        #
+        # CSS has no way to express this statically: `position: absolute` offsets
+        # resolve against the containing block, never against another element.
+        # (Anchor positioning would, but it is Chromium-only.) So the boxes are
+        # measured and the offsets written, which is what AutoLayout does on iOS
+        # and what RelativePositionContainer does in SwiftUI.
+        #
+        # Which edge is set matters: an absolutely positioned box applies its
+        # margin OUTWARD from whichever offset is set, so anchoring the child's
+        # bottom uses `bottom` and lets margin-bottom push it up — the same sign
+        # UIKit gives it. Setting `top` and subtracting a margin would fight the
+        # class-driven margin already on the element.
+        def emit_relative_position_helper
+          generated_dir = @config['generated_directory'] || 'src/generated'
+          FileUtils.mkdir_p(generated_dir)
+          is_ts = @config['typescript']
+          extension = is_ts ? 'ts' : 'js'
+          path = File.join(generated_dir, "relativePosition.#{extension}")
+
+          spec_type = is_ts ? <<~TS : ''
+
+            /** One child's constraints. Every value is the id of a sibling. */
+            export interface RelativeConstraint {
+              /** id of the element being positioned */
+              id: string;
+              /** alignTopOfView — this element's bottom sits at the anchor's top */
+              above?: string;
+              /** alignBottomOfView — this element's top sits at the anchor's bottom */
+              below?: string;
+              /** alignLeftOfView — this element's right sits at the anchor's left */
+              leftOf?: string;
+              /** alignRightOfView — this element's left sits at the anchor's right */
+              rightOf?: string;
+              /** alignTopView / alignBottomView / alignLeftView / alignRightView */
+              alignTop?: string;
+              alignBottom?: string;
+              alignLeft?: string;
+              alignRight?: string;
+              /** alignCenterVerticalView / alignCenterHorizontalView */
+              centerVertical?: string;
+              centerHorizontal?: string;
+            }
+          TS
+          container_param = is_ts ? ': HTMLElement | null | undefined' : ''
+          spec_param = is_ts ? ': RelativeConstraint[]' : ''
+          cleanup_ret = is_ts ? ': () => void' : ''
+          el_type = is_ts ? ' as HTMLElement | null' : ''
+
+          marker_header = Core::GeneratedMarker.comment_header(
+            source: "relativePosition (align*View / align*OfView helper)",
+            generator: "rjui build"
+          )
+          marker_footer = Core::GeneratedMarker.comment_footer
+
+          content = <<~JS
+            #{marker_header}
+            // Positions children against sibling boxes. See RelativeConstraint
+            // for which JsonUI attribute each field comes from.
+            #{spec_type}
+            function findChild(container#{container_param}, id#{is_ts ? ': string' : ''}) {
+              if (!container) return null;
+              return container.querySelector('[id="' + id + '"]')#{el_type};
+            }
+
+            // Writes one child's offsets. Returns true when anything moved, so the
+            // caller can settle chains (A below B below C) without needing the
+            // constraints in dependency order.
+            function place(
+              container#{container_param},
+              spec#{is_ts ? ': RelativeConstraint' : ''}
+            ) {
+              const child = findChild(container, spec.id);
+              if (!container || !child) return false;
+
+              const box = container.getBoundingClientRect();
+              const self = child.getBoundingClientRect();
+              const anchorOf = (id#{is_ts ? ': string | undefined' : ''}) => {
+                if (!id) return null;
+                const el = findChild(container, id);
+                return el ? el.getBoundingClientRect() : null;
+              };
+
+              let top#{is_ts ? ': number | null' : ''} = null;
+              let bottom#{is_ts ? ': number | null' : ''} = null;
+              let left#{is_ts ? ': number | null' : ''} = null;
+              let right#{is_ts ? ': number | null' : ''} = null;
+
+              const above = anchorOf(spec.above);
+              if (above) bottom = box.bottom - above.top;
+              const below = anchorOf(spec.below);
+              if (below) top = below.bottom - box.top;
+              const alignTop = anchorOf(spec.alignTop);
+              if (alignTop) top = alignTop.top - box.top;
+              const alignBottom = anchorOf(spec.alignBottom);
+              if (alignBottom) bottom = box.bottom - alignBottom.bottom;
+              const centerVertical = anchorOf(spec.centerVertical);
+              if (centerVertical) {
+                top = centerVertical.top + centerVertical.height / 2 - box.top - self.height / 2;
+              }
+
+              const leftOf = anchorOf(spec.leftOf);
+              if (leftOf) right = box.right - leftOf.left;
+              const rightOf = anchorOf(spec.rightOf);
+              if (rightOf) left = rightOf.right - box.left;
+              const alignLeft = anchorOf(spec.alignLeft);
+              if (alignLeft) left = alignLeft.left - box.left;
+              const alignRight = anchorOf(spec.alignRight);
+              if (alignRight) right = box.right - alignRight.right;
+              const centerHorizontal = anchorOf(spec.centerHorizontal);
+              if (centerHorizontal) {
+                left = centerHorizontal.left + centerHorizontal.width / 2 - box.left - self.width / 2;
+              }
+
+              let moved = false;
+              const write = (
+                prop#{is_ts ? ": 'top' | 'bottom' | 'left' | 'right'" : ''},
+                value#{is_ts ? ': number | null' : ''}
+              ) => {
+                const next = value === null ? '' : Math.round(value) + 'px';
+                if (child.style[prop] === next) return;
+                child.style[prop] = next;
+                moved = true;
+              };
+              // A vertical constraint clears the opposite edge, so re-running
+              // after a layout change cannot leave both edges pinned and stretch
+              // the element. An axis with no constraint is left alone.
+              if (top !== null || bottom !== null) {
+                write('top', top);
+                write('bottom', bottom);
+              }
+              if (left !== null || right !== null) {
+                write('left', left);
+                write('right', right);
+              }
+              return moved;
+            }
+
+            export function applyRelativePositions(
+              container#{container_param},
+              spec#{spec_param}
+            )#{cleanup_ret} {
+              if (!container || spec.length === 0) return () => {};
+
+              const settle = () => {
+                // One pass per constraint is enough to settle any acyclic chain;
+                // the loop exits as soon as nothing moves, so the common case is
+                // two passes.
+                for (let pass = 0; pass < spec.length + 1; pass++) {
+                  let moved = false;
+                  for (const one of spec) {
+                    if (place(container, one)) moved = true;
+                  }
+                  if (!moved) return;
+                }
+              };
+
+              settle();
+
+              if (typeof ResizeObserver === 'undefined') return () => {};
+              // Anchors move when their own content reflows, so the container
+              // alone is not enough to observe.
+              const observer = new ResizeObserver(() => settle());
+              observer.observe(container);
+              for (const one of spec) {
+                const child = findChild(container, one.id);
+                if (child) observer.observe(child);
+                for (const anchorId of [
+                  one.above, one.below, one.leftOf, one.rightOf,
+                  one.alignTop, one.alignBottom, one.alignLeft, one.alignRight,
+                  one.centerVertical, one.centerHorizontal
+                ]) {
+                  const anchor = anchorId ? findChild(container, anchorId) : null;
+                  if (anchor) observer.observe(anchor);
+                }
+              }
+              return () => observer.disconnect();
+            }
+
+            #{marker_footer}
+          JS
+
+          File.write(path, content)
+          Core::Logger.success("Updated: #{path}")
+        end
+
+        # Collection scroll control — scrollTo / scrollAnchor / scrollAnimated /
+        # defaultScrollAnchor / currentPage / onItemAppear.
+        #
+        # These live in a helper rather than inline in every generated component
+        # because each one is a measurement, and measurement blobs repeated per
+        # collection are where drift starts. `scrollIntoView` is deliberately
+        # not used: it scrolls every scrollable ancestor, so scrolling a list to
+        # its last row would also scroll the page.
+        def emit_collection_scroll_helper
+          generated_dir = @config['generated_directory'] || 'src/generated'
+          FileUtils.mkdir_p(generated_dir)
+          is_ts = @config['typescript']
+          extension = is_ts ? 'ts' : 'js'
+          path = File.join(generated_dir, "collectionScroll.#{extension}")
+
+          anchor_type = is_ts ? "\n\nexport type CollectionScrollAnchor = 'top' | 'center' | 'bottom';" : ''
+          el_param = is_ts ? ': HTMLElement | null | undefined' : ''
+          index_param = is_ts ? ': number | undefined | null' : ''
+          anchor_param = is_ts ? ': CollectionScrollAnchor | undefined' : ''
+          horizontal_param = is_ts ? ': boolean' : ''
+          animated_param = is_ts ? ': boolean' : ''
+          page_ret = is_ts ? ': number' : ''
+          # `behavior` must be ScrollBehavior, not string, or ScrollToOptions
+          # rejects it under TS.
+          behavior_type = is_ts ? ': ScrollBehavior' : ''
+          appear_param = is_ts ? ': (index: number) => void' : ''
+          cleanup_ret = is_ts ? ': () => void' : ''
+
+          marker_header = Core::GeneratedMarker.comment_header(
+            source: "collectionScroll (Collection scroll-control helper)",
+            generator: "rjui build"
+          )
+          marker_footer = Core::GeneratedMarker.comment_footer
+
+          content = <<~JS
+            #{marker_header}
+            // Scroll control for Collection components. Every function is a
+            // no-op on a missing element so a generated effect never has to
+            // guard the ref itself.#{anchor_type}
+
+            function leadingEdge(box#{is_ts ? ': DOMRect' : ''}, horizontal#{horizontal_param}) {
+              return horizontal ? box.left : box.top;
+            }
+
+            // scrollTo: bring the cell at `index` to `anchor` within the
+            // collection's own scroll box — NOT the page's.
+            export function scrollCollectionToItem(
+              container#{el_param},
+              index#{index_param},
+              anchor#{anchor_param},
+              animated#{animated_param},
+              horizontal#{horizontal_param}
+            ) {
+              if (!container || index === undefined || index === null) return;
+              const child = container.children[Number(index)];
+              if (!child) return;
+              const containerBox = container.getBoundingClientRect();
+              const childBox = child.getBoundingClientRect();
+              const scrolled = horizontal ? container.scrollLeft : container.scrollTop;
+              const start =
+                leadingEdge(childBox, horizontal) - leadingEdge(containerBox, horizontal) + scrolled;
+              const childSize = horizontal ? childBox.width : childBox.height;
+              const viewport = horizontal ? container.clientWidth : container.clientHeight;
+              let offset = start;
+              if (anchor === 'center') offset = start - (viewport - childSize) / 2;
+              else if (anchor !== 'top') offset = start - (viewport - childSize);
+              offset = Math.max(0, offset);
+              const behavior#{behavior_type} = animated === false ? 'auto' : 'smooth';
+              container.scrollTo(
+                horizontal ? { left: offset, behavior } : { top: offset, behavior }
+              );
+            }
+
+            // defaultScrollAnchor: where the collection starts. Runs once, so it
+            // sets the scroll offset directly rather than animating to it.
+            export function applyCollectionDefaultAnchor(
+              container#{el_param},
+              anchor#{anchor_param},
+              horizontal#{horizontal_param}
+            ) {
+              if (!container) return;
+              const max = horizontal
+                ? container.scrollWidth - container.clientWidth
+                : container.scrollHeight - container.clientHeight;
+              if (max <= 0) return;
+              const offset = anchor === 'bottom' ? max : anchor === 'center' ? max / 2 : 0;
+              if (horizontal) container.scrollLeft = offset;
+              else container.scrollTop = offset;
+            }
+
+            // currentPage read-back: the cell nearest the collection's leading
+            // edge. Measured rather than divided by a page width, because cells
+            // are not required to be uniformly sized.
+            export function currentCollectionPage(
+              container#{el_param},
+              horizontal#{horizontal_param}
+            )#{page_ret} {
+              if (!container) return 0;
+              const origin = leadingEdge(container.getBoundingClientRect(), horizontal);
+              let nearest = 0;
+              let best = Infinity;
+              for (let i = 0; i < container.children.length; i++) {
+                const box = container.children[i].getBoundingClientRect();
+                const distance = Math.abs(leadingEdge(box, horizontal) - origin);
+                if (distance < best) {
+                  best = distance;
+                  nearest = i;
+                }
+              }
+              return nearest;
+            }
+
+            // onItemAppear: fires with the cell index each time a cell enters the
+            // collection's viewport, matching SwiftUI's .onAppear and Compose's
+            // LaunchedEffect per cell. Returns the observer teardown.
+            export function observeCollectionItems(
+              container#{el_param},
+              onAppear#{appear_param}
+            )#{cleanup_ret} {
+              if (!container || typeof IntersectionObserver === 'undefined') {
+                return () => {};
+              }
+              const observer = new IntersectionObserver(
+                (entries) => {
+                  for (const entry of entries) {
+                    if (!entry.isIntersecting) continue;
+                    const index = Array.prototype.indexOf.call(
+                      container.children,
+                      entry.target
+                    );
+                    if (index >= 0) onAppear(index);
+                  }
+                },
+                { root: container }
+              );
+              for (let i = 0; i < container.children.length; i++) {
+                observer.observe(container.children[i]);
+              }
+              return () => observer.disconnect();
+            }
+
+            #{marker_footer}
+          JS
+
+          File.write(path, content)
+          Core::Logger.success("Updated: #{path}")
         end
 
         def emit_cell_id_generator

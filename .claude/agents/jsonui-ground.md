@@ -88,6 +88,33 @@ Pass only the platforms the user wants. `jui init` creates:
 
 Review the generated `jui.config.json` with the user — especially platform paths and `layoutsDir`. Adjust if needed.
 
+### 1.1a Optional: API model setup
+
+If the project will consume an HTTP API, the `jui build` pipeline can auto-generate per-platform DTO + Domain model files from a swagger document (v3 plan §2). Default config requires no changes:
+
+- `api_directory` defaults to `docs/api/` (relative to project root)
+- `api.platforms.<ios|android|web>` defaults are wired up automatically
+
+**For shared swaggers (multiple apps consuming one swagger file)**, set `api_directory` to a relative path above the project root, and scope each app with `api.schemas.include_paths`:
+
+```jsonc
+{
+  "api_directory": "../docs/api",     // shared swagger lives outside project_root
+  "api": {
+    "platforms": {
+      "android": { "serializer": "moshi" }    // or "kotlinx" or "none"
+    },
+    "schemas": {
+      "include_paths": ["/api/auth/*", "/api/user/*"],
+      "exclude_paths": ["/api/admin/*"],
+      "skip_domain": ["LoginRequest"]
+    }
+  }
+}
+```
+
+Don't author swagger files here — that's `jsonui-define`'s job. Just confirm the consumer's config is set up so generation works once swagger files arrive.
+
 ### 1.2 Read `docs/app-config/` (if present)
 
 If `{app_config_path}` exists, read its files to extract:
@@ -113,6 +140,8 @@ app_config_path: {app_config_path}
 ```
 
 This is the consolidated Phase 4 skill that replaces the 5 legacy setup skills (`swiftjsonui-swiftui-setup`, `swiftjsonui-uikit-setup`, `kotlinjsonui-compose-setup`, `kotlinjsonui-xml-setup`, `reactjsonui-setup`). It installs the platform's tools (`sjui_tools/` / `kjui_tools/` / `rjui_tools/`), bootstraps the app shell, and wires up JsonUI. The skill does the work; you invoke and monitor.
+
+> Note: `rjui init` emits a `EmbedContainer.tsx` template into the project for the `Embed` view type as part of scaffold. No separate setup step is needed for Embed support.
 
 > Legacy fallback (pre-Phase 4 projects): if `/jsonui-platform-setup` is not yet installed in the user's environment, fall back to the individual legacy skill matching `platform` + `mode`. They remain in the skills/ directory until Phase 6.
 

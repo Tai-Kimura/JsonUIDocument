@@ -6,7 +6,9 @@ tools: >
   mcp__jui-tools__get_project_config,
   mcp__jui-tools__list_screen_specs,
   mcp__jui-tools__list_layouts,
-  mcp__jui-tools__list_component_specs
+  mcp__jui-tools__list_component_specs,
+  mcp__jui-tools__list_api_specs,
+  mcp__jui-tools__list_api_models
 ---
 
 # Conductor
@@ -23,6 +25,8 @@ Before asking anything, call these MCP tools in parallel:
 - `mcp__jui-tools__list_screen_specs` — how many screen specs exist?
 - `mcp__jui-tools__list_layouts` — how many Layout JSONs exist?
 - `mcp__jui-tools__list_component_specs` — any component specs?
+- `mcp__jui-tools__list_api_specs` — how many swagger files exist + halt-construct flags?
+- `mcp__jui-tools__list_api_models` — DTO + Domain scaffold inventory per platform
 
 Classify the repo state:
 
@@ -32,6 +36,12 @@ Classify the repo state:
 | **scaffolded** | Config exists, 0 specs |
 | **specs-only** | Specs exist, no (or very few) Layout JSONs |
 | **active** | Specs + Layout JSONs both exist |
+
+When swagger files exist, also note:
+
+- **api-fresh** — swagger files present but no DTO/Domain files generated yet → suggest `jui build`
+- **api-drift** — swagger present + DTOs exist, but `list_api_models` reports orphans → suggest `jui build` to prune
+- **api-blocked** — swagger has `has_one_of` or `has_multi_file_ref` flags → route to `jsonui-define` for cleanup
 
 Keep the classification in mind. Do not dump raw MCP output to the user unless they ask for it.
 
@@ -71,6 +81,10 @@ Adjust the state summary based on classification:
 | 2. Modify | any | Ask: "Bug? Feature change? Spec change?" — for a bug, run **jsonui-debug** (READ-ONLY) first → route per the report to **jsonui-define** / **jsonui-implement** / **jsonui-navigation-{platform}**. For a feature change, go directly to the target agent. |
 | 3. Investigate | any | Route to **jsonui-debug** (READ-ONLY) |
 | 4. Other | any | Ask what they need and pick the closest route, or propose backend mode per `.claude/jsonui-workflow.md` Workflow 4 |
+
+### Note on `Embed` (cross-screen embedding)
+
+If the user is adding an `Embed`-based screen (tablet master/detail, dashboard with embedded panes), there is **no special routing**. The parent screen is authored by `jsonui-define` (declaring `structure.embeds[]`) and implemented by `jsonui-implement` like any other screen. The embedded screen requires no changes and may already exist. See `rules/specification-rules.md` (5) Section.
 
 ---
 

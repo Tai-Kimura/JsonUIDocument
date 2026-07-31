@@ -641,4 +641,158 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
       expect(result).not_to include('onClick={@{handleTap}}')
     end
   end
+  # highlightAttributes / highlightColor take over while `selected` is true.
+  # Canonical semantics come from the iOS UIKit runtime, which keeps two
+  # attribute dictionaries and swaps on `selected`.
+  describe 'highlight state' do
+    it 'swaps at runtime when selected is a binding' do
+      result = create_converter({
+        'type' => 'Label', 'text' => 'Hi', 'fontSize' => 14, 'fontColor' => '#000000',
+        'selected' => '@{isChosen}',
+        'highlightAttributes' => { 'fontSize' => 24, 'fontColor' => '#FF0000' }
+      }).convert
+
+      expect(result).to include('className={data.isChosen ?')
+      expect(result).to include('text-[#FF0000]')
+    end
+
+    # Tailwind precedence comes from stylesheet order, not attribute order, so
+    # `text-black text-red-500` in one class list has no defined winner.
+    it 'replaces the base font classes rather than appending to them' do
+      result = create_converter({
+        'type' => 'Label', 'text' => 'Hi', 'fontSize' => 14, 'fontColor' => '#000000',
+        'selected' => '@{isChosen}',
+        'highlightAttributes' => { 'fontSize' => 24, 'fontColor' => '#FF0000' }
+      }).convert
+      highlighted = result[/className=\{data\.isChosen \? "([^"]*)"/, 1]
+
+      expect(highlighted).to include('text-[#FF0000]')
+      expect(highlighted).not_to include('text-[#000000]')
+      expect(highlighted).not_to include('text-sm')
+    end
+
+    it 'keeps the base branch intact for the unselected state' do
+      result = create_converter({
+        'type' => 'Label', 'text' => 'Hi', 'fontColor' => '#000000',
+        'selected' => '@{isChosen}', 'highlightColor' => '#00FF00'
+      }).convert
+      base = result[/: "([^"]*)"\}/, 1]
+
+      expect(base).to include('text-[#000000]')
+      expect(base).not_to include('text-[#00FF00]')
+    end
+
+    it 'needs no runtime branch when selected is literally true' do
+      result = create_converter({
+        'type' => 'Label', 'text' => 'Hi', 'fontColor' => '#000000', 'selected' => true,
+        'highlightAttributes' => { 'fontColor' => '#FF0000' }
+      }).convert
+
+      expect(result).to include('className="')
+      expect(result).not_to include('?')
+      expect(result).to include('text-[#FF0000]')
+      expect(result).not_to include('text-[#000000]')
+    end
+
+    # SJUILabel's creator: a non-empty highlightAttributes wins, otherwise
+    # highlightColor.
+    it 'prefers highlightAttributes and falls through when it has no usable key' do
+      both = create_converter({
+        'type' => 'Label', 'text' => 'Hi', 'selected' => true,
+        'highlightAttributes' => { 'fontColor' => '#FF0000' }, 'highlightColor' => '#00FF00'
+      }).convert
+      expect(both).to include('text-[#FF0000]')
+      expect(both).not_to include('text-[#00FF00]')
+
+      empty = create_converter({
+        'type' => 'Label', 'text' => 'Hi', 'selected' => true,
+        'highlightAttributes' => {}, 'highlightColor' => '#00FF00'
+      }).convert
+      expect(empty).to include('text-[#00FF00]')
+    end
+
+    # textAlign is two classes on web: text-* from the base converter and
+    # justify-* because a single-run label is a flex container.
+    it 'swaps both the text-* and justify-* classes for textAlign' do
+      result = create_converter({
+        'type' => 'Label', 'text' => 'Hi', 'textAlign' => 'Left', 'selected' => '@{sel}',
+        'highlightAttributes' => { 'textAlign' => 'Center' }
+      }).convert
+      highlighted = result[/className=\{data\.sel \? "([^"]*)"/, 1]
+
+      expect(highlighted).to include('text-center')
+      expect(highlighted).to include('justify-center')
+      expect(highlighted).not_to include('text-left')
+      expect(highlighted).not_to include('justify-start')
+    end
+
+    # Line height is a unitless multiplier in the style object, not a class.
+    it 'swaps lineHeight through the style object' do
+      result = create_converter({
+        'type' => 'Label', 'text' => 'Hi', 'lineHeightMultiple' => 1.2,
+        'selected' => '@{sel}', 'highlightAttributes' => { 'lineHeightMultiple' => 1.5 }
+      }).convert
+
+      expect(result).to include('lineHeight: (data.sel ? 1.5 : 1.2)')
+    end
+
+    it 'falls back to CSS normal when the base sets no line height' do
+      result = create_converter({
+        'type' => 'Label', 'text' => 'Hi', 'selected' => '@{sel}',
+        'highlightAttributes' => { 'lineHeightMultiple' => 1.5 }
+      }).convert
+
+      expect(result).to include("lineHeight: (data.sel ? 1.5 : 'normal')")
+    end
+
+    it 'leaves the class list untouched when there is no driver' do
+      with_driver = create_converter({
+        'type' => 'Label', 'text' => 'Hi', 'fontColor' => '#000000', 'highlightColor' => '#00FF00'
+      }).convert
+      without = create_converter({
+        'type' => 'Label', 'text' => 'Hi', 'fontColor' => '#000000'
+      }).convert
+
+      expect(with_driver).to eq(without)
+    end
+  end
+end
+
+RSpec.describe RjuiTools::React::Converters::LabelConverter, 'web-only text attributes' do
+  let(:config) { { 'use_tailwind' => true } }
+
+  def label(extra)
+    described_class.new({ 'class' => 'Label', 'text' => 'hi' }.merge(extra), config).convert(2)
+  end
+
+  # Declared `platform: react`: CSS text-transform is the web's own capability.
+  it 'maps every textTransform value' do
+    expect(label('textTransform' => 'uppercase')).to include('uppercase')
+    expect(label('textTransform' => 'lowercase')).to include('lowercase')
+    expect(label('textTransform' => 'capitalize')).to include('capitalize')
+  end
+
+  # `none` is the CSS initial value, but a style block may have set another, so
+  # it is spelled out rather than omitted.
+  it 'spells out none' do
+    expect(label('textTransform' => 'none')).to include('normal-case')
+  end
+
+  it 'ignores an unknown value' do
+    result = label('textTransform' => 'smallcaps')
+    %w[uppercase lowercase capitalize normal-case].each { |c| expect(result).not_to include(c) }
+  end
+
+  # lineHeight is the CSS property directly, in px.
+  it 'emits lineHeight in px' do
+    expect(label('lineHeight' => 28)).to include("lineHeight: '28px'")
+  end
+
+  # The cross-platform spellings are the multiplier and the extra spacing, so
+  # they win over the web-only literal.
+  it 'yields to lineHeightMultiple and lineSpacing' do
+    expect(label('lineHeight' => 28, 'lineHeightMultiple' => 1.5)).to include('lineHeight: 1.5')
+    expect(label('lineHeight' => 28, 'lineHeightMultiple' => 1.5)).not_to include('28px')
+    expect(label('lineHeight' => 28, 'lineSpacing' => 4, 'fontSize' => 16)).not_to include('28px')
+  end
 end

@@ -423,8 +423,8 @@
       "command": "conformance coverage",
       "synopsis": "jui conformance coverage [--platform ios|android|web] [--update-ledger]",
       "purpose": {
-        "en": "Answer whether each declared attribute is actually read by the converter for the platform that declares it — by scanning converter source, not output. Screenshot conformance cannot see this: a fixture for a dropped attribute renders a blank screen, matches its blank baseline and passes. Backed by `conformance/coverage.json` as a ratchet that fails in both directions — an unrecorded gap fails, and so does a recorded gap that no longer exists, so the ledger cannot rot into a list of things that used to be broken.",
-        "ja": "宣言されている各属性を、それを宣言したプラットフォームのコンバータが実際に読んでいるかを判定する — 出力ではなくコンバータのソースを走査する。スクリーンショットの conformance ではこれは見えない（属性を握り潰した fixture は空の画面を描き、空の baseline と一致して pass するため）。台帳は `conformance/coverage.json` で、両方向に落ちるラチェット — 未記録のギャップでも、解消済みなのに残っているエントリでも失敗するので、台帳が「昔壊れていたもの一覧」に腐ることがない。"
+        "en": "Answer whether each declared attribute is actually read by the converter for the platform that declares it — by scanning converter source, not output. Screenshot conformance cannot see this: a fixture for a dropped attribute renders a blank screen, matches its blank baseline and passes. The scan is per component × attribute pair (2026-07-31) — a read in one converter no longer marks the attribute implemented for every component — with alias routing and per-file component attribution. Backed by `conformance/coverage.json` as a ratchet that fails in both directions — an unrecorded gap fails, and so does a recorded gap that no longer exists, so the ledger cannot rot into a list of things that used to be broken.",
+        "ja": "宣言されている各属性を、それを宣言したプラットフォームのコンバータが実際に読んでいるかを判定する — 出力ではなくコンバータのソースを走査する。スクリーンショットの conformance ではこれは見えない（属性を握り潰した fixture は空の画面を描き、空の baseline と一致して pass するため）。走査はコンポーネント × 属性の組単位（2026-07-31）— どこかのコンバータの read が全コンポーネントを実装済み扱いにすることはなくなり、alias のルーティングとファイル単位のコンポーネント帰属を持つ。台帳は `conformance/coverage.json` で、両方向に落ちるラチェット — 未記録のギャップでも、解消済みなのに残っているエントリでも失敗するので、台帳が「昔壊れていたもの一覧」に腐ることがない。"
       },
       "options": [
         {
@@ -448,7 +448,7 @@
       "examples": [
         {
           "language": "bash",
-          "code": "$ jui conformance coverage\n1179 attribute x platform pairs checked\n209 gaps (web 79 / ios 68 / android 62)\nNote: 85 mode:uikit attributes are out of scope - read by the Swift runtime, not a Ruby converter"
+          "code": "$ jui conformance coverage\nattribute x platform pairs checked per component (pair-based scan)\n15 gaps: 5 unimplemented (UIKit-facing surfaces) / 10 legacy aliases\nNote: 85 mode:uikit attributes are out of scope - read by the Swift runtime, not a Ruby converter"
         }
       ],
       "seeAlso": [

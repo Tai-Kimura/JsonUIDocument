@@ -19,8 +19,9 @@ module RjuiTools
           disabled_attr = build_disabled_attr
 
           focus_attrs = build_focus_binding_attrs
+          submit_attr = build_on_submit_attr
 
-          jsx = "#{indent_str(indent)}<input#{id_attr} className=\"#{class_name}\"#{style_attr}#{attrs}#{on_change}#{focus_attrs}#{disabled_attr}#{testid_attr}#{tag_attr} />"
+          jsx = "#{indent_str(indent)}<input#{id_attr} className=\"#{class_name}\"#{style_attr}#{attrs}#{on_change}#{focus_attrs}#{submit_attr}#{disabled_attr}#{testid_attr}#{tag_attr} />"
 
           wrap_with_visibility(jsx, indent)
         end
@@ -74,7 +75,7 @@ module RjuiTools
             classes << 'disabled:cursor-not-allowed'
           end
 
-          classes.compact.reject(&:empty?).join(' ')
+          finalize_classes(classes)
         end
 
         def build_style_attr
@@ -148,15 +149,18 @@ module RjuiTools
             end
           end
 
-          # Value handling depends on binding presence
-          if attributes['text']
-            if has_binding?(attributes['text'])
+          # Value handling depends on binding presence. `bind` is the
+          # alternative spelling iOS already accepts here
+          # (textfield_converter.rb: text || value || bind).
+          text_value = with_bind_fallback(attributes['text'])
+          if text_value
+            if has_binding?(text_value)
               # Binding present: use controlled component (value + onChange)
-              value = convert_binding(attributes['text'])
+              value = convert_binding(text_value)
               attrs << " value={#{value.gsub(/[{}]/, '')}}"
             else
               # No binding: use uncontrolled component (defaultValue only)
-              attrs << " defaultValue=\"#{attributes['text']}\""
+              attrs << " defaultValue=\"#{text_value}\""
             end
           end
 
@@ -187,7 +191,51 @@ module RjuiTools
           # Read only
           attrs << ' readOnly' if attributes['readOnly'] || attributes['editable'] == false
 
+          # Native browser validation. Both are declared `platform: react`, i.e.
+          # they exist FOR the web, so there is no other surface to defer to.
+          if attributes['pattern']
+            attrs << " pattern=\"#{escape_attribute(attributes['pattern'])}\""
+          end
+          attrs << ' required' if attributes['required'] == true || attributes['required'] == 'true'
+
+          # Soft-keyboard behaviour. The declared values are the UIKit spellings;
+          # HTML has its own vocabulary for the same two ideas.
+          if attributes['autocapitalizationType']
+            capitalize = map_autocapitalization(attributes['autocapitalizationType'])
+            attrs << " autoCapitalize=\"#{capitalize}\"" if capitalize
+          end
+          if attributes['autocorrectionType']
+            correct = map_autocorrection(attributes['autocorrectionType'])
+            # spellCheck rides along: `no` means "stop correcting me", and a
+            # browser that only honours one of the two should still obey.
+            attrs << " autoCorrect=\"#{correct}\" spellCheck={#{correct == 'on'}}" if correct
+          end
+
           attrs.join
+        end
+
+        # UITextAutocapitalizationType spellings -> the HTML autocapitalize values.
+        def map_autocapitalization(value)
+          case value.to_s.downcase.sub(/^uitextautocapitalizationtype/, '')
+          when 'none' then 'off'
+          when 'words' then 'words'
+          when 'sentences' then 'sentences'
+          when 'allcharacters', 'characters' then 'characters'
+          end
+        end
+
+        # UITextAutocorrectionType spellings -> the HTML autocorrect values.
+        # `default` is deliberately unmapped: it means "leave it to the platform",
+        # and emitting an explicit value would override the browser default.
+        def map_autocorrection(value)
+          case value.to_s.downcase.sub(/^uitextautocorrectiontype/, '')
+          when 'no', 'off', 'false' then 'off'
+          when 'yes', 'on', 'true' then 'on'
+          end
+        end
+
+        def escape_attribute(value)
+          value.to_s.gsub('"', '&quot;')
         end
 
         def determine_input_type
@@ -241,42 +289,54 @@ module RjuiTools
           end
         end
 
-        def map_input_mode(input)
-          case input&.downcase
-          when 'number', 'numberpad'
-            'numeric'
-          when 'decimal', 'decimalpad'
-            'decimal'
-          when 'tel', 'phonenumber'
-            'tel'
-          when 'email'
-            'email'
-          when 'url'
-            'url'
-          when 'search', 'websearch'
-            'search'
-          else
-            nil
-          end
+
+
+        # Both spellings of each event fire, in declaration order — the web pair
+        # (onFocus/onBlur) and the UIKit pair (onBeginEditing/onEndEditing) name
+        # the same moment, and a layout may carry either.
+        #
+        # Written out per attribute rather than looped over a name list: the
+        # attribute-coverage scan matches a literal `attributes['name']`, so a
+        # loop reads as "nobody consumes this" and the attribute stays recorded
+        # as a gap after it has been implemented.
+        def declared_focus_calls
+          [
+            handler_call(attributes['onFocus']),
+            handler_call(attributes['onBeginEditing'])
+          ].compact
         end
 
-        def map_return_key(return_key)
-          case return_key
-          when 'Done'
-            'done'
-          when 'Go'
-            'go'
-          when 'Next'
-            'next'
-          when 'Search'
-            'search'
-          when 'Send'
-            'send'
-          when 'Enter', 'Return'
-            'enter'
-          else
-            nil
-          end
+        def declared_blur_calls
+          [
+            handler_call(attributes['onBlur']),
+            handler_call(attributes['onEndEditing'])
+          ].compact
+        end
+
+        # onSubmit fires on the return/done key. HTML `onSubmit` is a form event,
+        # not an input one, so the key press is what has to be listened for.
+        # Enter closes the field: it runs the focus chain first, then the
+        # author's own handler — the same order sjui's combined .onSubmit block
+        # uses. Merged into ONE onKeyDown because these are React props: a second
+        # onKeyDown replaces the first rather than adding a listener, so emitting
+        # them separately would silently drop whichever came first.
+        def build_on_submit_attr
+          calls = [next_focus_call, handler_call(attributes['onSubmit'])].compact
+          return '' if calls.empty?
+
+          body = calls.map { |c| "#{c};" }.join(' ')
+          " onKeyDown={(e) => { if (e.key === 'Enter') { #{body} } }}"
+        end
+
+        # nextFocus — the id of the field to focus on submit. The target's ref is
+        # the one ReactGenerator already hoists for every editable field with a
+        # literal id (extract_focus_fields), so the chain needs nothing new; a
+        # binding-form or missing id has no ref to reach for.
+        def next_focus_call
+          target = attributes['nextFocus']
+          return nil unless target.is_a?(String) && !target.empty? && !has_binding?(target)
+
+          "#{snake_to_camel_id(target)}Ref.current?.focus()"
         end
 
         def build_on_change

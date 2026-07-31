@@ -15,6 +15,26 @@ tools: >
 
 Writes test files for JsonUI screens and flows. Starts from the spec (same principle as `jsonui-debug` and `jsonui-define`): assertions come from what the spec declares, not from what the impl happens to do.
 
+
+## Screen identity (read this before writing `screen` values)
+
+Call `mcp__jui-tools__get_screen_identity` for the canonical rules, and
+`list_layouts` (or `jui screens`) for this project's classification.
+
+- A step's `screen` is the layout **basename without `.json`**; variants
+  normalize to the base. Basenames are unique project-wide.
+- Only real screens are valid. A layout instantiated via `cell` / `header` /
+  `footer` / `cellClasses` / `include` is a fragment — naming one is a
+  validator **error**. Use the screen that owns it.
+- `{ "assert": "screen", "name": "<id>" }` asserts the screen is displayed.
+  The target key is `name` (step-level `screen` means "where the step runs").
+  It never asserts exclusivity.
+- Screens the app owns with no layout are declared in `jui.config.json` under
+  `test.appOwnedScreens`. An entry is a bare id, or `{ "id", "group" }` when it
+  also needs a transition-diagram group (it has no screen test to declare one in).
+- `jsonui-test validate` INSTALLS tests as a side effect. Pass `--no-install`
+  when you only want to check.
+
 ## Responsibilities
 
 - Screen test files (`tests/screens/{screen}.test.json`) — one per screen, asserts a single screen's behavior
@@ -77,6 +97,32 @@ Extract:
 - `dataFlow.viewModel.vars` → observable state to verify
 - Layout JSON component IDs → selectors for assertions
 
+#### Fixture construction for API-backed flows
+
+When the VM method consumes a Domain model derived from a swagger schema
+(e.g. `User`, `Bar`), build the test fixture by constructing the DTO first
+and wrapping with the Domain factory — the same path the Repository takes
+in production:
+
+```swift
+let dto = UserDto(id: "test", displayName: "Test User", ...)
+let user = User(dto: dto)
+```
+
+```kotlin
+val dto = UserDto(id = "test", displayName = "Test User", ...)
+val user = User(dto)
+```
+
+```typescript
+const dto: UserDto = { id: "test", display_name: "Test User", ... };
+const user = userFromDto(dto);
+```
+
+This keeps tests aligned with the Repository's actual conversion logic.
+DTOs are `Equatable` (Swift) / `data class` (Kotlin) / structurally
+typed (TS) — equality assertions work out of the box.
+
 ### A2. Draft the test cases
 
 For each eventHandler and each key displayLogic state, draft a test case:
@@ -89,12 +135,10 @@ For each eventHandler and each key displayLogic state, draft a test case:
       "name": "successful_login",
       "description": "valid email + password → navigate to home",
       "steps": [
-        { "action": "tap", "target": "email_field" },
-        { "action": "type", "text": "user@example.com" },
-        { "action": "tap", "target": "password_field" },
-        { "action": "type", "text": "correct-horse-battery-staple" },
-        { "action": "tap", "target": "login_button" },
-        { "action": "wait_for", "condition": "screen == 'home'", "timeout": 5000 }
+        { "action": "input", "id": "email_field", "value": "user@example.com" },
+        { "action": "input", "id": "password_field", "value": "correct-horse-battery-staple" },
+        { "action": "tap", "id": "login_button" },
+        { "action": "waitFor", "id": "home_screen", "timeout": 5000 }
       ]
     },
     {
@@ -121,11 +165,96 @@ Use `Write` or `Edit` directly.
 jsonui-test validate tests/screens/{screen}.test.json
 ```
 
-Fix any errors. If you need the list of available actions/assertions:
+Fix any errors. When the project config declares `mock.swagger` + `mock.mockDir`,
+this gate **also** regenerates `<mockDir>/generated/` if it is stale and fails on
+mock contract drift — so a failure here is not necessarily about the test file.
+Read the output before assuming the test is wrong; `--no-mock-check` isolates the
+test-file half. For the full list of available actions/assertions and their
+parameters, see the `/jsonui-screen-test` skill's reference or read
+`test_tools/jsonui_test_cli/schema.py` in the jsonui-cli repo.
 
-```bash
-jsonui-test --schema
+Note: assertions **auto-wait** (poll until the condition holds or `timeout`), so
+don't precede an assertion with `waitFor`. New capabilities available: `when`/`optional`
+step attributes, `repeat`/`retry` control steps, `readText` + `@{vars}`, `scrollUntilVisible`,
+`screenshot` visual-regression assertion, `state` assertion, and root-level `launch` config.
+
+Artifacts: after a run, `jsonui-test artifacts pull` (or the `test_artifacts_pull`
+MCP tool, `project_dir` required) collects screenshots/recordings from the latest
+iOS xcresult, the Android device, and the web Playwright output into the
+`test.artifacts.dir` of jui.config.json, organized per platform/test/case, and
+returns absolute file paths — use it when the user asks to see failure evidence.
+Web recording/browser selection is Playwright-native: `use: { video: 'on' }` +
+`projects` in playwright.config, and pass `screenshotDir: testInfo.outputDir` to the
+runner so driver PNGs land next to the video. `jsonui-test artifacts status` shows
+the resolved config; `mock serve --artifacts` auto-pulls after each run target.
+
+### A4b. API mocks (only when the screen calls an API)
+
+Mocks live in two places and the distinction matters:
+
 ```
+<mockDir>/<tag>/*.mock.json             hand-written — yours, never rewritten
+<mockDir>/generated/<tag>/*.mock.json   generated — wiped and rewritten from swagger
+```
+
+`generated/` is a pure function of the swagger, so it is safe to gitignore and
+is rebuilt automatically. **Write only the scenarios your test drives** into the
+hand-written side; `mock serve` overlays them on the generated ones per scenario
+name, so `default` / `empty` / `error_404` keep coming from the contract for
+free. A hand-written file still needs its `source` block — that is what routes it.
+
+Mocks are identified by `source.method` + `source.path`, never by filename, so
+existing projects keep whatever naming they have. `--check` reports a naming
+difference as `[NAME]`, which is informational, not drift.
+
+- `mcp__jui-tools__test_mock_generate` — regenerate `generated/`
+- `... check: true` — report drift. Findings under `generated/` are warnings
+  (regenerating fixes them); findings in hand-written mocks are errors.
+- `... update_default: true` — repair a hand-written mock's `default` scenario:
+  it ADDS the required fields the contract has and the body lacks, and changes
+  nothing else. No existing value is overwritten, nothing is removed, other
+  scenarios are untouched. `dry_run: true` shows what it would add first.
+
+`default` is where a project keeps the data its tests assert on — scaffolding
+creates `default` and nothing else, so there is nowhere else for it to live.
+Never replace a body wholesale to satisfy the check, by tool or by hand: the
+values in it are what the assertions read.
+
+A violation `update_default` cannot fix — a value of the wrong TYPE, or a
+field the contract does not have — is reported for a person. Fix those by
+editing the offending field only, keeping the surrounding fixture data.
+
+**A `[NOTE]` is not a failure.** A mock that merely omits OPTIONAL fields is a
+valid instance of the contract — it is under-specified, not wrong. Do **not**
+fill those fields in to make the note go away: a mechanical merge from the
+generated body puts `null` into non-nullable slots and manufactures real
+violations. Only `[BODY]` (required missing / wrong type / bad enum / a field
+the contract does not have) needs action. `strict: true` (or
+`mock.checkOptionalFields`) is the opt-in for teams that do want full coverage.
+
+**`mock serve` also checks the requests the app sends** against the operation's
+`requestBody` and query parameters. Violations do not fail the request — they
+are recorded and reported with a non-zero exit at the end of the run. So a green
+suite plus a contract summary means "the tests pass but the screen sends
+something the real API would reject (422)", which is a bug in the screen, not in
+the test. Escape hatches: `mock.validateRequests: false`, or
+`"skipRequestValidation": true` on one scenario.
+
+`mock.swagger` in jui.config.json takes a path or a list of paths.
+
+**Only the endpoints this project consumes are checked.** When a swagger is
+shared by several front-ends, `api.schemas.include_paths` / `exclude_paths`
+(the same keys the DTO codegen filters on) narrow what counts. Endpoints
+outside the scope are not scaffolded and are not `[MISSING]` — another realm's
+endpoints are not this project's missing mocks. A mock serving an out-of-scope
+route is reported as `[SCOPE]`, an unused file that is safe to delete, and does
+not fail; `[ORPHAN]` still means "no such endpoint in the swagger at all" and
+still fails. `mock.includePaths` / `mock.excludePaths` override when the mock
+scope differs from the DTO scope.
+
+If a check reports a large number of `[MISSING]` mocks, read the paths before
+writing any: endpoints from a realm this app cannot reach mean the scope is
+undeclared, and the fix is one config key, not N mock files.
 
 ### A5. (Optional) Description + HTML
 
@@ -186,26 +315,24 @@ mcp__jui-tools__doc_generate_html with input_dir: "tests/", output_dir: "tests/h
 
 ## Flow D: Validation only
 
-Run `jsonui-test validate` on the target directory via Bash. Report errors; do not fix them blindly — understand each one. For the schema reference of available actions / assertions:
-
-```bash
-jsonui-test --schema
-```
+Run `jsonui-test validate` on the target directory via Bash. Report errors; do not fix them blindly — understand each one. For the schema reference of available actions / assertions, see the `/jsonui-screen-test` skill or `test_tools/jsonui_test_cli/schema.py` in the jsonui-cli repo.
 
 ---
 
 ## CLI availability
 
-The `jsonui-test` CLI is a separate tool from `jui` / `jsonui-doc`. Check it's installed:
+The `jsonui-test` CLI is a separate binary from `jui` / `jsonui-doc`, but it ships
+from the same `jsonui-cli` monorepo (`test_tools/`) and is installed by the same
+`jsonui-cli` install.sh. Check it's installed:
 
 ```bash
 which jsonui-test
 ```
 
-If missing, instruct the user:
+If missing, instruct the user (standalone install; it also comes with a full jsonui-cli install):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-test-runner/main/test_tools/installer/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-cli/main/test_tools/installer/bootstrap.sh | bash
 ```
 
 Python 3.10+ required.
@@ -233,6 +360,7 @@ Every assertion should trace back to a spec section:
 | Spec section | What it drives in the test |
 |---|---|
 | `structure.components` | Which element IDs exist (selectors) |
+| `structure.embeds` | Whether a test must run in an embedded context — use the `embeddedIn` test-runner field (see below) |
 | `stateManagement.eventHandlers` | `action: tap / swipe / long_press` steps |
 | `dataFlow.viewModel.methods` | Async flows (success / error / loading) |
 | `dataFlow.viewModel.vars` | `assert: value == ...` / observable state |
@@ -240,6 +368,23 @@ Every assertion should trace back to a spec section:
 | `userActions` / `transitions` | Navigation assertions (`wait_for screen == ...`) |
 
 If a test assertion doesn't map back to the spec, either the spec is missing a declaration (route to `jsonui-define` to add it) or the test is testing impl details (remove or rewrite).
+
+### Testing embedded screens
+
+When a screen is intended to run inside an `Embed` slot of a parent screen, the screen test can declare the embed context so the runner spins it up inside the parent:
+
+```json
+{
+  "screen": "OrderDetail",
+  "embeddedIn": "Dashboard.detailPane",
+  "cases": [ ... ]
+}
+```
+
+Notes:
+- `embeddedIn` value is `{ParentScreen}.{regionId}` (PascalCase parent + camelCase regionId — matches the spec).
+- In v1 `navigationMode: "delegate"`, navigation assertions for the embedded screen target the **parent's** NavController/Router. `pop` / `dismiss` / `navigateBack` are bounded at the embed.
+- Flow tests do not yet support assertions that cross the embed boundary (v1 limitation). If the user needs an end-to-end flow that involves an embed, write two screen tests (parent + embedded) and assert their states independently, or wait for the flow test schema's `embeddedIn` support (deferred).
 
 ---
 

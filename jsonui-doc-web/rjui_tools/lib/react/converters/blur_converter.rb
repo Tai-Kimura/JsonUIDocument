@@ -43,7 +43,7 @@ module RjuiTools
           # Cursor pointer for clickable items
           classes << 'cursor-pointer' if attributes['onClick'] || attributes['onclick']
 
-          classes.compact.reject(&:empty?).join(' ')
+          finalize_classes(classes)
         end
 
         def build_blur_style
@@ -118,7 +118,12 @@ module RjuiTools
         end
 
         def get_effect_style
-          (attributes['effectStyle'] || json['style'] || 'regular').downcase.gsub(/\s+/, '')
+          # `effectStyle` only. The `json['style']` fallback used to be here was
+          # reading `common.style` — the STYLE FILE name — so a Blur inside a
+          # styled screen matched its style-file reference against blur
+          # appearances. sjui had the same misread and no `effectStyle` read at
+          # all.
+          attributes['effectStyle'].to_s.downcase.gsub(/\s+/, '').then { |v| v.empty? ? 'regular' : v }
         end
       end
     end

@@ -14,6 +14,18 @@ tools: >
 
 Implements navigation code for iOS apps. Spec is platform-agnostic; navigation code is not — this agent handles the Swift-specific part that lives outside the spec.
 
+
+## Do not hand-write screen markers
+
+Generated screen views already carry a screen-identity marker that the test
+drivers use to tell which screen is displayed. It is emitted by code
+generation, is development-build only, and its spelling is owned by the
+library. Do not add accessibility identifiers / test tags / data attributes
+that imitate it, and do not attach it at a dynamic-renderer entry point —
+cells, tabs, embeds and dialogs re-enter that entry point and would each grow
+a false marker. Call `mcp__jui-tools__get_screen_identity` if you need the
+rules.
+
 ## Responsibilities
 
 - SwiftUI `NavigationStack` + navigation destinations (iOS 16+ pattern)
@@ -64,7 +76,7 @@ Pattern: one `NavigationStack` at the root, with a typed `NavigationPath` drivin
 enum Route: Hashable {
   case home
   case itemDetail(id: String)
-  case composeForm(item: Item)
+  case reviewForm(item: Product)
 }
 
 // In root:
@@ -74,7 +86,7 @@ NavigationStack(path: $path) {
       switch route {
       case .home:                       HomeScreen()
       case .itemDetail(let id):       ItemDetailScreen(itemId: id)
-      case .composeForm(let item):      ComposeFormScreen(item: item)
+      case .reviewForm(let item):    ReviewFormScreen(item: item)
       }
     }
 }
@@ -97,7 +109,7 @@ let vc = ItemDetailViewController(itemId: "123")
 navigationController?.pushViewController(vc, animated: true)
 
 // Modal:
-let nav = UINavigationController(rootViewController: ComposeFormViewController())
+let nav = UINavigationController(rootViewController: ReviewFormViewController())
 present(nav, animated: true)
 ```
 
@@ -183,7 +195,7 @@ Your changes are Swift source, not Layout JSON — `jui build` should still pass
 
 ### Routes added
 - Route.itemDetail(id: String) → ItemDetailScreen
-- Route.composeForm(item: Item) → ComposeFormScreen
+- Route.reviewForm(item: Product) → ReviewFormScreen
 
 ### Files touched
 - {project}/Navigation/Route.swift
@@ -192,7 +204,7 @@ Your changes are Swift source, not Layout JSON — `jui build` should still pass
 
 ### Presentation styles
 - itemDetail: push
-- composeForm: sheet
+- reviewForm: sheet
 
 ### Deep links
 - Configured / skipped (per spec)
@@ -225,6 +237,25 @@ Keep the glue minimal. If navigation logic starts living inside VMs in ways that
 4. **Deep link collisions** — if two routes map to the same URL pattern, define a precedence. Test both directions.
 5. **`.navigationDestination` not firing** — the modifier must be inside the `NavigationStack`, not on its root.
 6. **Back button state not restored** — `@State` resets on pop; use `@StateObject` or keep VM in a parent scope.
+
+---
+
+## Embed navigation
+
+When the spec contains `structure.embeds[]`, navigation involving the embedded screen is handled per the `navigationMode`:
+
+- **`delegate` (default)** — embedded screen's `navigate(...)` drives the **parent's** `NavigationStack` / `UINavigationController`. The runtime threads `parentNavigation` into `EmbedContainer`; you do not write extra plumbing in the parent. The embedded screen's `userActions[]` / `transitions[]` targets are pushed onto the parent stack as usual.
+  - `pop` / `dismiss` / `navigateBack` are **bounded at the embed** — calling them inside the embedded screen does NOT close the embed. The runtime enforces this; do not work around it.
+  - If the user wants the embedded screen to be popped together with the parent (e.g. tapping back on the parent should also close any pushed destination originating from the embed), that's standard parent stack behavior — no extra code needed.
+- **`isolated` (requires SwiftJsonUI >= 10.5.0)** — the embed owns a private `NavigationStack`. Generated code passes `navigationMode: .isolated, isolatedNavigation: .automatic` and a `// Requires SwiftJsonUI >= 10.5.0` header; compiling against an older library **fails deliberately** (version-skew guard) — bump the pin, don't delete the argument.
+  - Semantics (conformance-tested on all 3 platforms): `push` stays inside the embed; `pop` stops at the embed root — the embed never closes itself; stack lifetime == container view identity (resets when the embed leaves the tree). Deep links address the host router only — there is no addressing into an embed stack.
+  - Pushed screens: screen-name pushes resolve through the built-in `EmbedDestination` destination — DEBUG builds fall back to `DynamicView`, release builds render an explicit error unless you pass a `destinationResolver` at the embed call site. App-defined `Hashable` routes: attach `.navigationDestination(for:)` **inside** the embed content as usual.
+  - Driving the stack from OUTSIDE the embed (parent VM resetting a pane on tab switch, etc.): `EmbedNavigatorRegistry.shared.navigator(for: embedId)` — the container registers its navigator while mounted; last mount wins per embedId.
+  - **Escape hatch** (transitions OUT of the embed — logout, full-screen flows): pass a parent-VM callback through a `params` leaf binding (e.g. `"onExitRequested": "@{handleChildExit}"`). The child calls the callback; the PARENT performs the navigation. present-style transitions (sheet / modal / dismiss…) declared by a screen embedded in isolated mode are a **`jui build` hard error**.
+  - Gesture note (measured 2026-07-24; platform-delegated, not a contract): the iOS edge swipe routes to the **outermost** NavigationStack — it pops the parent screen (embed and its stack leave with it) even while the embed stack is non-empty. Never rely on edge swipe to pop inside an embed; give in-embed pushed screens explicit back affordances (`navigateBack` / back button — the embed's own nav bar shows one by default).
+- **`params` nesting** (same release): `params` may be a nested object tree — intermediate nodes must be literal objects, `@{}` bindings only on scalar leaves, arrays not allowed. The validators enforce this (zero-warnings gate).
+
+Generated code already wires `parentNavigation` for you (via the SwiftUI converter). Your job in this agent is to make sure the **parent's** `NavigationStack` covers any new destinations introduced by `userActions[]` from the embedded screen, and — for isolated embeds in release builds — that a `destinationResolver` or in-embed `.navigationDestination` covers every pushable screen.
 
 ---
 

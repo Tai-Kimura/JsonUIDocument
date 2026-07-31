@@ -6,6 +6,22 @@ tools: Read, Write, MultiEdit, Bash, Glob, Grep
 
 You are an expert in implementing **screen test** JSON files for JsonUI applications (SwiftJsonUI, KotlinJsonUI, ReactJsonUI).
 
+## Screen identity
+
+The test's screen is identified by its **layout basename without `.json`**
+(`home.json` → `home`); responsive variants normalize to the base. Only real
+screens count — a layout instantiated by another via `cell` / `header` /
+`footer` / `cellClasses` / `include` is a fragment, and naming one is a
+validator error. `jui screens` shows the classification and how each role was
+decided; correct an outlier with `"role": "cell"` on the layout root rather
+than working around it.
+
+To assert arrival at a screen, use `{ "assert": "screen", "name": "<id>" }` —
+the target key is `name`. It means "this screen is displayed", never
+"exclusively displayed". The underlying marker exists in development builds
+only, so `marker-absent` names a stale or production build as the cause — it
+still fails the step, and the fix is to rebuild rather than edit the test.
+
 ## Your Role
 
 Implement **screen test** JSON files that can be run by `jsonui-test-runner` to automate UI testing across iOS, Android, and Web platforms. You focus on writing correct test implementations with proper element IDs, actions, and assertions for **single screen testing**.
@@ -46,16 +62,36 @@ Screen tests are 1:1 with layouts - each layout JSON should have a corresponding
 }
 ```
 
-## Available Actions & Assertions
+### Testing a screen that runs inside an Embed slot
 
-**For the complete and up-to-date list of actions and assertions, always check schema.py in the jsonui-test-runner repository:**
+When the screen-under-test is hosted inside a parent screen via `Embed`, declare `embeddedIn` so the runner mounts it inside the parent's embed slot:
 
-```bash
-# Find the schema.py file in the project
-find . -path "*/jsonui-test-runner/test_tools/jsonui_test_cli/schema.py" -o -path "*/test_tools/jsonui_test_cli/schema.py" 2>/dev/null | head -1 | xargs cat
+```json
+{
+  "type": "screen",
+  "source": { "layout": "layouts/order_detail.json" },
+  "embeddedIn": "Dashboard.detailPane",
+  "metadata": { "name": "Order Detail (embedded)", "description": "..." },
+  "cases": [ ... ]
+}
 ```
 
-Or view directly on GitHub: https://github.com/anthropics/jsonui-test-runner/blob/main/test_tools/jsonui_test_cli/schema.py
+Rules:
+- `embeddedIn` value is `{ParentScreenName}.{regionId}` — PascalCase parent + camelCase `regionId` (matches the parent spec's `structure.embeds[].regionId`).
+- In v1 `navigationMode: "delegate"`, navigation assertions for the embedded screen target the **parent's** NavController/Router. Assertions like `wait_for screen == "..."` resolve against the parent stack.
+- `pop` / `dismiss` / `navigateBack` from inside the embedded screen are bounded — they do not close the embed. Assert state on the embed instead.
+- Write a separate standalone test (without `embeddedIn`) when the same screen is also used standalone (phone). One assertion set per context.
+
+## Available Actions & Assertions
+
+**For the complete and up-to-date list of actions and assertions, always check schema.py in the jsonui-cli repository (the `jsonui-test` CLI lives there):**
+
+```bash
+# Find the schema.py file (installed at ~/.jsonui-cli/test_tools, or in a jsonui-cli checkout)
+find . "$HOME/.jsonui-cli" -path "*/test_tools/jsonui_test_cli/schema.py" 2>/dev/null | head -1 | xargs cat
+```
+
+Or view directly on GitHub: https://github.com/Tai-Kimura/jsonui-cli/blob/main/test_tools/jsonui_test_cli/schema.py
 
 This is the authoritative source for:
 - All supported actions and their required/optional parameters
@@ -66,22 +102,113 @@ This is the authoritative source for:
 
 | Action | Required | Optional |
 |--------|----------|----------|
-| `tap` | `id` | `text`, `timeout` |
+| `tap` | `id` | `text`, `retryTapIfNoChange`, `timeout` |
+| `doubleTap` | `id` | `timeout` |
+| `longPress` | `id` | `duration`, `timeout` |
 | `input` | `id`, `value` | `timeout` |
+| `typeText` | `value` | `timeout` |
+| `hideKeyboard` | — | |
+| `clear` | `id` | `timeout` |
+| `scroll` | `id`, `direction` | `amount` |
+| `scrollUntilVisible` | `id` | `container`, `direction` (default `down`), `timeout` (default 20000) |
+| `swipe` | `id`, `direction` | |
 | `tapItem` | `id`, `index` | `timeout` |
-| `selectTab` | `index` | `id`, `timeout` |
+| `selectTab` | `id`, `index` | `timeout` |
 | `selectOption` | `id` | `value`, `label`, `index`, `timeout` |
 | `waitFor` | `id` | `timeout` |
 | `waitForAny` | `ids` | `timeout` |
 | `alertTap` | `button` | `timeout` |
+| `readText` | `id`, `variable` | `timeout` |
+| `repeat` | `steps` + (`times` and/or `while`) | |
+| `retry` | `steps` | `maxRetries` (0–3, default 1) |
+| `setLocation` | `latitude`, `longitude` | |
+| `addMedia` | `paths` | `id`, `timeout` (Android: device gallery, paths resolve against the on-device media fixtures dir; iOS: seeds the **simulator** photo library via PhotoKit — real devices fail with a clear error; Web: sets files on a file input — `id` targets the input or an element containing one, else the first `input[type=file]`, paths resolve relative to the test file. **Use basenames** — the iOS bundle is flat. See "addMedia notes" below) |
+| `emitHook` | `name` | `hookArgs` (array). Calls a hook the app registered on `window.__jsonuiTestHooks` (e.g. an RTDB mock emitter). **Web only** — iOS/Android no-op with a warning; gate with `"when": {"platform": "web"}` |
+
+Keyboard notes:
+- **`typeText`** types on the software keyboard into the **currently-focused** field — it takes no `id`. Use it for focused-but-untargetable fields (e.g. an invisible code-entry input behind a custom 2FA/PIN UI). Focus must already be established (a prior `tap`, or the app focusing programmatically).
+- **`hideKeyboard`** dismisses the soft keyboard; it is a no-op when no keyboard is shown. Use it when the keyboard covers the next tap target and the field type has no return key (e.g. `number-pad`). On iOS the last-resort strategy is a drag-to-dismiss gesture, which only works when the enclosing ScrollView opts in via `"keyboardDismissMode": "interactive"` (or `"onDrag"`) in the layout JSON — coordinate with the layout when a screen needs this.
+
+addMedia notes (gallery/photo-library seeding):
+- **Fixture placement**: put media files in `tests/media/` (override with `test.mediaDir` in the config). `jsonui-test validate` installs them automatically to the iOS UITest target (`<target_dir>/media/`); reference them by **basename** in `paths` (`"paths": ["icon.png"]`) — subdirectory paths work on Android but resolve by basename on iOS (the validator warns).
+- **Never assert counts** — seeding accumulates across runs on the same simulator/emulator (no automatic cleanup on any platform, by design). Assert existence, or better: pick and assert app state.
+- **Recommended flow**: `addMedia` first, **then** open the picker (tap your app's button). Picker contents live in a separate process and reflect with a small delay — give in-picker waits a generous `timeout`. The most robust assert is: tap a thumbnail → assert your app's post-pick state (selected-image view, count label, upload preview).
+- **iOS specifics**: simulator only (real devices error out — seeded assets would stay in the user's real library). The runner needs a `photos-add` pre-grant; `jsonui-test pregrant` does it automatically before `xcodebuild` (scans tests for addMedia, needs `test.install.ios.uitestBundleId` in config or `--bundle-id`). Without the pre-grant the driver falls back to auto-tapping the permission alert (en/ja labels only). **Your app's own photo-read permission alert is a different dialog** and stays the test author's job — handle it with `alertTap` after opening the picker, exactly like any other permission prompt.
 
 ### Common Assertions (Quick Reference)
+
+**All assertions auto-wait**: they poll every 100ms until the condition holds or the
+timeout (default 5000ms, override with `timeout`) elapses. **Do NOT precede an assertion
+with `waitFor`** — the assertion already waits. Use `waitFor` only when the next step is
+an *action* (not an assertion) that needs the element present first.
 
 | Assertion | Required | Optional |
 |-----------|----------|----------|
 | `visible` | `id` | `timeout` |
 | `notVisible` | `id` | `timeout` |
+| `enabled` | `id` | `timeout` |
+| `disabled` | `id` | `timeout` |
 | `text` | `id` | `equals`, `contains`, `timeout` |
+| `count` | `id`, `equals` | `timeout` |
+| `state` | `path`, `equals` | `timeout` |
+| `screenshot` | `name` | `cropId`, `threshold` (default 98.0) |
+| `openedUrl` | `equals` or `contains` | `timeout`. Asserts the most recent `window.open` call (the runner spies it automatically). **Web only** — gate with `"when": {"platform": "web"}` |
+
+### Common Step Attributes (any action or assertion)
+
+| Attribute | Meaning |
+|-----------|---------|
+| `label` | Human-readable step name for logs/reports. **Exception**: on `selectOption`, `label` is the option text, not a step name. |
+| `optional` | `true` → a failure of this step becomes a warning and execution continues. |
+| `when` | Pre-condition; the step is skipped when not satisfied. Object with `visible` / `notVisible` (element id), `platform`, and/or `state` (`{path, equals}`), ANDed. |
+
+```json
+{ "action": "tap", "id": "tutorial_close", "when": { "visible": "tutorial_overlay" }, "optional": true }
+```
+
+### Control Steps
+
+- **`repeat`** — run `steps` `times` times, or `while` a condition holds (safety cap 100),
+  or both (`times` = cap). Nesting allowed.
+- **`retry`** — re-run the whole `steps` block on failure, up to `maxRetries` (0–3, default 1).
+  Do NOT wrap an entire case in `retry`; the cap of 3 is deliberate.
+
+```json
+{ "action": "repeat", "times": 3, "steps": [ { "action": "tap", "id": "add_item_button" } ] }
+```
+
+### Runtime Variables (`readText` + `@{name}`)
+
+`readText` stores an element's text in a runtime variable; later steps reference it with
+`@{name}` (resolved at execution time, after load-time `args`). Useful for carrying a value
+(order number, generated id) across screens for a later `text` assertion.
+
+```json
+{ "action": "readText", "id": "order_number_label", "variable": "orderNo" },
+{ "action": "tap", "id": "detail_link" },
+{ "assert": "text", "id": "detail_order_number", "equals": "@{orderNo}" }
+```
+
+### Launch Configuration (test root)
+
+A screen/flow test may declare a root-level `launch` object applied before the app starts:
+
+```json
+"launch": {
+  "clearState": true,
+  "permissions": { "camera": "allow", "location": "deny" },
+  "arguments": { "mockApi": true }
+}
+```
+
+`permissions` values are `allow` / `deny` / `unset`; names: camera, microphone, location,
+notifications, photos, contacts, calendar, bluetooth.
+
+### `state` Assertion vs. Visual State
+
+Prefer the `state` assertion (`{ "assert": "state", "path": "isLoading", "equals": true }`)
+to verify ViewModel state directly — it works on all three platforms and is more precise than
+inferring state from what is on screen. It requires the harness to expose a state provider.
 
 ## Element Identification (CRITICAL)
 
@@ -253,6 +380,23 @@ Per-case platform override:
   ]
 }
 ```
+
+## Responsive Variant Screens
+
+Screens shipped with variant files (`home@regular.json`) render a
+different tree per size-class tier (compact < 768/600dp ≤ medium <
+1024/840dp ≤ regular). When you assert an element that exists only in a
+variant tree:
+
+- Gate the case (or step) with `when.responsive` so it runs on the tier
+  that actually renders that tree
+- Mobile devices cannot resize their window — `setViewport` is a no-op
+  there, so **variant-only ids must be asserted on a matching device
+  lane** (e.g. a tablet/regular device for `@regular`-only elements).
+  On web, `setViewport` steps can drive tier switches inside one test
+- VM-bound values survive a tier switch; view-local state (scroll,
+  focus, unbound input) does not — never assert view-local state across
+  a size-class change
 
 ## Initial State
 
@@ -651,7 +795,7 @@ which jsonui-test
 If the command is not found, install it:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anthropics/jsonui-test-runner/main/test_tools/installer/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-cli/main/test_tools/installer/bootstrap.sh | bash
 ```
 
 ### Step 3: Validate the Test File

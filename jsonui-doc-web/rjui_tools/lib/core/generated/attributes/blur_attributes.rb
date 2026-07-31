@@ -15,6 +15,8 @@ module JsonUI
       # contract together with `rows` / `declared?` / `alias_map`
       # (see the directory README).
       ATTRS = [
+        # Blur radius in px/dp. Android and Web only: both blur by radius, while UIKit/SwiftUI express the appearance as effectStyle (UIVisualEffectView has styles, not radii). Overrides the radius effectStyle resolves to.
+        { name: 'blurRadius', kind: :number }.freeze,
         # Blur effect style
         { name: 'effectStyle', kind: :enum, values: ['Light', 'Dark', 'ExtraLight'].freeze }.freeze,
       ].freeze

@@ -19,7 +19,10 @@ module RjuiTools
           checked_attr = build_checked_attr
           on_change = build_on_change
           disabled_attr = build_disabled_attr
-          tint_color = attributes['tintColor'] || attributes['onTintColor'] || '#34C759'
+          # `onTintColor` is the track colour when on, `tint` and `tintColor` are the
+          # generic spellings (kjui: onTintColor || tint || tintColor).
+          tint_color = attributes['onTintColor'] || attributes['tint'] ||
+                       attributes['tintColor'] || '#34C759'
           thumb_color = attributes['thumbTintColor'] || '#FFFFFF'
           off_tint_color = attributes['offTintColor'] || '#E5E7EB'
 
@@ -63,7 +66,7 @@ module RjuiTools
             classes << "${!#{binding_expr} ? 'opacity-50 cursor-not-allowed' : ''}"
           end
 
-          classes.compact.reject(&:empty?).join(' ')
+          finalize_classes(classes)
         end
 
         def build_switch_element(checked_attr, on_change, disabled_attr, tint_color, thumb_color, off_tint_color)
@@ -78,7 +81,7 @@ module RjuiTools
         end
 
         def build_checked_attr
-          is_on = attributes['isOn'] || attributes['checked'] || attributes['value']
+          is_on = with_bind_fallback(attributes['isOn'] || attributes['checked'] || attributes['value'])
 
           if is_on && has_binding?(is_on)
             prop = extract_binding_property(is_on)
@@ -100,7 +103,7 @@ module RjuiTools
 
           # Auto-generate onChange from isOn/checked/value binding property
           # e.g., isOn: "@{isEnabled}" -> onChange={(e) => data.onIsEnabledChange?.(e.target.checked)}
-          is_on = attributes['isOn'] || attributes['checked'] || attributes['value']
+          is_on = with_bind_fallback(attributes['isOn'] || attributes['checked'] || attributes['value'])
           if is_on && has_binding?(is_on)
             property_name = extract_raw_binding_property(is_on)
             handler_name = "on#{capitalize_first(property_name)}Change"

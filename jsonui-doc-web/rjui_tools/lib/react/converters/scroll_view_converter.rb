@@ -91,7 +91,7 @@ module RjuiTools
             classes << 'scroll-p-0'
           end
 
-          classes.compact.reject(&:empty?).join(' ')
+          finalize_classes(classes)
         end
 
         def build_style_attr
@@ -123,6 +123,14 @@ module RjuiTools
           # Max zoom (for zoomable content)
           if attributes['maxZoom']
             @dynamic_styles['touchAction'] = "'pan-x pan-y pinch-zoom'"
+          end
+
+          # scrollBehavior — declared `platform: react`, i.e. it exists for the
+          # web, and maps straight onto the CSS property of the same name. It
+          # governs programmatic scrolling (scrollIntoView, anchor jumps), not
+          # the user's own dragging.
+          if %w[auto smooth].include?(attributes['scrollBehavior'])
+            @dynamic_styles['scrollBehavior'] = "'#{attributes['scrollBehavior']}'"
           end
 
           return '' if @dynamic_styles.nil? || @dynamic_styles.empty?

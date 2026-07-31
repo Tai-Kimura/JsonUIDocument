@@ -9,14 +9,12 @@ require_relative 'common_attributes'
 module JsonUI
   module Generated
     # Typed attribute extraction for the `Check` component.
-    # Overrides the common definition of: `bind`, `enabled`.
+    # Overrides the common definition of: `enabled`.
     module CheckAttributes
       # Declared-attribute rows — part of the public metadata
       # contract together with `rows` / `declared?` / `alias_map`
       # (see the directory README).
       ATTRS = [
-        # Two-way binding @{variable} [binding: two-way]
-        { name: 'bind', kind: :binding }.freeze,
         # Check state (binding for two-way) [binding: two-way]
         { name: 'checked', kind: :boolean, bindable: true }.freeze,
         # Color when checked.
@@ -39,12 +37,10 @@ module JsonUI
         { name: 'isOn', kind: :boolean, bindable: true }.freeze,
         # Check label text (can be data binding)
         { name: 'label', kind: :string, bindable: true }.freeze,
-        # Image source for checked state
-        { name: 'onSrc', kind: :string }.freeze,
         # Value change handler - binding only (@{functionName})
         { name: 'onValueChange', kind: :binding }.freeze,
         # Selected icon name
-        { name: 'selectedIcon', kind: :string }.freeze,
+        { name: 'selectedIcon', kind: :string, aliases: ['onSrc'].freeze }.freeze,
         # Space between icon and text (binding supported)
         { name: 'spacing', kind: :number, bindable: true }.freeze,
         # Image source for unchecked state

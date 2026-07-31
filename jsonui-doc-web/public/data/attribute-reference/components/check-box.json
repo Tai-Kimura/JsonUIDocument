@@ -45,19 +45,19 @@
   "canonicalCode": "{\n  \"type\": \"CheckBox\",\n  \"checked\": \"@{agreeToTerms}\",\n  \"label\": \"@string/accept_terms\",\n  \"onValueChange\": \"@{onAgreeChanged}\"\n}",
   "canonicalLanguage": "json",
   "statRequired": "0",
-  "statOptional": "20",
-  "statEvents": "2",
+  "statOptional": "18",
+  "statEvents": "1",
   "statRequiredText": {
     "en": "0 required",
     "ja": "必須 0"
   },
   "statOptionalText": {
-    "en": "20 optional",
-    "ja": "任意 20"
+    "en": "18 optional",
+    "ja": "任意 18"
   },
   "statEventsText": {
-    "en": "2 events",
-    "ja": "イベント 2"
+    "en": "1 events",
+    "ja": "イベント 1"
   },
   "usageVisibility": "visible",
   "attributeCategories": {
@@ -80,14 +80,6 @@
                 "ja": "状態"
               },
               "anchorUrl": "#section-state"
-            },
-            {
-              "id": "cat_binding",
-              "label": {
-                "en": "Binding",
-                "ja": "バインディング"
-              },
-              "anchorUrl": "#section-binding"
             },
             {
               "id": "cat_event",
@@ -428,10 +420,10 @@
                 "en": "Icon name.",
                 "ja": "アイコン名。"
               },
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
+              "platformWebLabel": "—",
               "note": {
                 "en": "Alias for `src`.",
                 "ja": "`src` のエイリアス。"
@@ -489,10 +481,10 @@
                 ]
               },
               "description": "Icon size (pt / dp).",
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
+              "platformWebLabel": "—",
               "note": {
                 "en": "",
                 "ja": ""
@@ -550,10 +542,10 @@
                 ]
               },
               "description": "Icon tint color.",
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
+              "platformWebLabel": "—",
               "note": {
                 "en": "",
                 "ja": ""
@@ -821,10 +813,10 @@
                 ]
               },
               "description": "Color when checked.",
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
+              "platformWebLabel": "—",
               "note": {
                 "en": "",
                 "ja": ""
@@ -1055,7 +1047,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
@@ -1086,7 +1078,14 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "onSrc",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
@@ -1095,10 +1094,10 @@
                 "en": "Selected icon name.",
                 "ja": "選択時のアイコン名。"
               },
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
+              "platformWebLabel": "—",
               "note": {
                 "en": "Alias for `onSrc`.",
                 "ja": "`onSrc` のエイリアス。"
@@ -1156,10 +1155,10 @@
                 ]
               },
               "description": "Color when unchecked.",
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
+              "platformWebLabel": "—",
               "note": {
                 "en": "",
                 "ja": ""
@@ -1298,146 +1297,17 @@
     "sections": [
       {
         "cells": {
-          "data": [
-            {
-              "id": "attr_bind",
-              "name": "bind",
-              "anchorId": "attr-bind",
-              "requiredChipText": "",
-              "requiredChipVisibility": "gone",
-              "deprecatedChipVisibility": "gone",
-              "accentBarColor": "var(--color-border)",
-              "nameTextStyle": "normal",
-              "nameFontColor": "var(--color-ink)",
-              "defaultChipText": "",
-              "defaultChipVisibility": "gone",
-              "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
-              "typeChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": [
-                        {
-                          "id": "tc_0",
-                          "label": "binding",
-                          "background": "var(--color-accent_tint)",
-                          "fontColor": "var(--color-accent_secondary_strong)"
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "enumChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "aliasChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "description": {
-                "en": "Two-way binding @{variable}.",
-                "ja": "双方向 binding（`@{変数名}`）。"
-              },
-              "platformMatrixVisibility": "gone",
-              "platformIosLabel": "✓",
-              "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
-              "note": {
-                "en": "",
-                "ja": ""
-              },
-              "type": "binding",
-              "required": ""
-            }
-          ]
+          "data": []
         }
       }
     ]
   },
-  "groupBindingVisibility": "visible",
+  "groupBindingVisibility": "gone",
   "attributesEvent": {
     "sections": [
       {
         "cells": {
           "data": [
-            {
-              "id": "attr_onSrc",
-              "name": "onSrc",
-              "anchorId": "attr-onSrc",
-              "requiredChipText": "",
-              "requiredChipVisibility": "gone",
-              "deprecatedChipVisibility": "gone",
-              "accentBarColor": "var(--color-border)",
-              "nameTextStyle": "normal",
-              "nameFontColor": "var(--color-ink)",
-              "defaultChipText": "",
-              "defaultChipVisibility": "gone",
-              "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
-              "noteVisibility": "visible",
-              "typeChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": [
-                        {
-                          "id": "tc_0",
-                          "label": "string",
-                          "background": "var(--color-chip_string_bg)",
-                          "fontColor": "var(--color-chip_string_fg)"
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "enumChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "aliasChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "description": {
-                "en": "Image source for checked state.",
-                "ja": "チェック状態の画像ソース。"
-              },
-              "platformMatrixVisibility": "gone",
-              "platformIosLabel": "✓",
-              "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
-              "note": {
-                "en": "Checked-state image name.",
-                "ja": "チェック時の画像名。"
-              },
-              "type": "string",
-              "required": ""
-            },
             {
               "id": "attr_onValueChange",
               "name": "onValueChange",
@@ -1554,15 +1424,6 @@
         "ja": "状態"
       },
       "anchor": "section-state",
-      "level": 1
-    },
-    {
-      "id": "toc_binding",
-      "label": {
-        "en": "Binding",
-        "ja": "バインディング"
-      },
-      "anchor": "section-binding",
       "level": 1
     },
     {
@@ -2058,10 +1919,10 @@
                 "en": "Icon name.",
                 "ja": "アイコン名。"
               },
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
+              "platformWebLabel": "—",
               "note": {
                 "en": "Alias for `src`.",
                 "ja": "`src` のエイリアス。"
@@ -2119,10 +1980,10 @@
                 ]
               },
               "description": "Icon size (pt / dp).",
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
+              "platformWebLabel": "—",
               "note": {
                 "en": "",
                 "ja": ""
@@ -2180,10 +2041,10 @@
                 ]
               },
               "description": "Icon tint color.",
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
+              "platformWebLabel": "—",
               "note": {
                 "en": "",
                 "ja": ""
@@ -2472,70 +2333,6 @@
               "required": ""
             },
             {
-              "id": "attr_bind",
-              "name": "bind",
-              "anchorId": "attr-bind",
-              "requiredChipText": "",
-              "requiredChipVisibility": "gone",
-              "deprecatedChipVisibility": "gone",
-              "accentBarColor": "var(--color-border)",
-              "nameTextStyle": "normal",
-              "nameFontColor": "var(--color-ink)",
-              "defaultChipText": "",
-              "defaultChipVisibility": "gone",
-              "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
-              "typeChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": [
-                        {
-                          "id": "tc_0",
-                          "label": "binding",
-                          "background": "var(--color-accent_tint)",
-                          "fontColor": "var(--color-accent_secondary_strong)"
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "enumChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "aliasChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "description": {
-                "en": "Two-way binding @{variable}.",
-                "ja": "双方向 binding（`@{変数名}`）。"
-              },
-              "platformMatrixVisibility": "gone",
-              "platformIosLabel": "✓",
-              "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
-              "note": {
-                "en": "",
-                "ja": ""
-              },
-              "type": "binding",
-              "required": ""
-            },
-            {
               "id": "attr_checkedColor",
               "name": "checkedColor",
               "anchorId": "attr-checkedColor",
@@ -2585,10 +2382,10 @@
                 ]
               },
               "description": "Color when checked.",
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
+              "platformWebLabel": "—",
               "note": {
                 "en": "",
                 "ja": ""
@@ -2807,70 +2604,6 @@
               "required": ""
             },
             {
-              "id": "attr_onSrc",
-              "name": "onSrc",
-              "anchorId": "attr-onSrc",
-              "requiredChipText": "",
-              "requiredChipVisibility": "gone",
-              "deprecatedChipVisibility": "gone",
-              "accentBarColor": "var(--color-border)",
-              "nameTextStyle": "normal",
-              "nameFontColor": "var(--color-ink)",
-              "defaultChipText": "",
-              "defaultChipVisibility": "gone",
-              "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
-              "noteVisibility": "visible",
-              "typeChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": [
-                        {
-                          "id": "tc_0",
-                          "label": "string",
-                          "background": "var(--color-chip_string_bg)",
-                          "fontColor": "var(--color-chip_string_fg)"
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "enumChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "aliasChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "description": {
-                "en": "Image source for checked state.",
-                "ja": "チェック状態の画像ソース。"
-              },
-              "platformMatrixVisibility": "gone",
-              "platformIosLabel": "✓",
-              "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
-              "note": {
-                "en": "Checked-state image name.",
-                "ja": "チェック時の画像名。"
-              },
-              "type": "string",
-              "required": ""
-            },
-            {
               "id": "attr_onValueChange",
               "name": "onValueChange",
               "anchorId": "attr-onValueChange",
@@ -2947,7 +2680,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
@@ -2978,7 +2711,14 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "onSrc",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
@@ -2987,10 +2727,10 @@
                 "en": "Selected icon name.",
                 "ja": "選択時のアイコン名。"
               },
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
+              "platformWebLabel": "—",
               "note": {
                 "en": "Alias for `onSrc`.",
                 "ja": "`onSrc` のエイリアス。"
@@ -3048,10 +2788,10 @@
                 ]
               },
               "description": "Color when unchecked.",
-              "platformMatrixVisibility": "gone",
+              "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
+              "platformWebLabel": "—",
               "note": {
                 "en": "",
                 "ja": ""

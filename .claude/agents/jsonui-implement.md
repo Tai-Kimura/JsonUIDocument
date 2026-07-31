@@ -16,7 +16,9 @@ tools: >
   mcp__jui-tools__search_components,
   mcp__jui-tools__get_binding_rules,
   mcp__jui-tools__get_modifier_order,
-  mcp__jui-tools__get_platform_mapping
+  mcp__jui-tools__get_platform_mapping,
+  mcp__jui-tools__list_api_specs,
+  mcp__jui-tools__list_api_models
 ---
 
 # Implement Agent
@@ -128,6 +130,35 @@ jui g partial {path/to/partial}
 
 Then edit the generated JSON.
 
+### 3.5 Embed nodes in the Layout JSON (cross-screen embedding)
+
+If the spec declares `structure.embeds[]`, the corresponding Layout JSON must contain `{"type": "Embed"}` nodes inside the view tree — one per `structure.embeds[].regionId`. The `Embed` node's `id` is camelCase and matches the spec's `regionId`. The `screen` value is the **snake_case layout filename** of the embedded screen (no extension).
+
+Shape:
+
+```json
+{
+  "type": "Embed",
+  "id": "detailPane",
+  "screen": "order_detail",
+  "params": { "orderId": "@{selectedOrderId}" },
+  "navigationMode": "delegate",
+  "weight": 1
+}
+```
+
+Before authoring:
+
+- Confirm the embedded screen exists via `mcp__jui-tools__list_layouts` (the embedded layout JSON must be on disk) and `mcp__jui-tools__list_screen_specs` (the embedded screen's spec). **You do not modify the embedded screen** — both spec and Layout JSON stay as-is.
+- Make sure every `@{varName}` in `params` is declared in the parent VM's `stateManagement.uiVariables` or `dataFlow.viewModel.vars` (otherwise spec validation rejected the spec earlier — recheck and route back to `jsonui-define` if missed).
+- `navigationMode` in v1 is `"delegate"` only. If the user asked for `"isolated"`, stop and tell them — that's deferred to v1.5.
+
+After `jui build`, the generated screen code includes an `EmbedContainer { ... }` block. **Do not hand-edit the generated EmbedContainer** — it is regenerated. If the embedding is wrong, fix the spec / Layout JSON.
+
+Same-screen multi-embed: it's supported. Each Layout JSON `Embed.id` keys an independent VM instance (Android uses `remember(id)` on a per-slot `ViewModelStoreOwner` — do not bypass). Confirm IDs are unique within the parent layout, otherwise the two embeds will collide on Android.
+
+`/jsonui-localize` does not touch `Embed` nodes (they hold no user-visible strings). The embedded screen is localized as part of its own implementation — make sure it has already been localized before considering the parent done.
+
 ### 4. Implement VM / Repository / UseCase bodies
 
 The **signatures** are generated from the spec (`dataFlow.viewModel.methods/vars`, `dataFlow.repositories[].methods`, `dataFlow.useCases[].methods`). You do NOT add new signatures here — you fill in the `{ ... }` of method bodies.
@@ -139,6 +170,29 @@ For each method:
 - UseCase method: orchestrates multiple repositories + validation
 
 Invoke `/jsonui-viewmodel-impl` skill for authoring conventions (per platform). Write the code yourself via `Edit`.
+
+#### Data Model: DTO vs Domain
+
+When a Repository method's `returnType` is a swagger schema name (e.g. `User`):
+
+- **Return type uses the Domain wrapper** (`User`), not the DTO (`UserDto`). The schema name auto-registers in `TypeMapper` — no `.jsonui-type-map.json` edit needed.
+- **Inside the Repository body**: decode wire bytes into the DTO, then wrap into the Domain:
+  ```swift
+  let dto = try JSONDecoder().decode(UserDto.self, from: data)
+  return User(dto: dto)
+  ```
+  ```kotlin
+  val dto = moshi.adapter(UserDto::class.java).fromJson(body) ?: throw ...
+  return User(dto)
+  ```
+  ```typescript
+  const dto: UserDto = await response.json();
+  return userFromDto(dto);
+  ```
+- **Computed properties / proxies live on the Domain** (`Model/{Name}.swift` etc.) — that file is created once by `jui build` and is **user-owned thereafter**. Add your `var displayAbv: String { String(format: "%.1f%%", dto.abv) }` style accessors there.
+- **NEVER edit `Model/Generated/{Name}Dto.swift`** (and the Android/Web counterparts under `generated/`) — they regenerate on every `jui build` and your changes will be lost.
+
+Use `mcp__jui-tools__list_api_models` to see the current DTO + Domain inventory; use `mcp__jui-tools__list_api_specs` to confirm which schemas have been authored on the swagger side.
 
 #### If you need to add a new public member
 

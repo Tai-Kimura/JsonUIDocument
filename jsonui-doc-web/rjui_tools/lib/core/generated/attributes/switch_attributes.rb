@@ -9,14 +9,12 @@ require_relative 'common_attributes'
 module JsonUI
   module Generated
     # Typed attribute extraction for the `Switch` component.
-    # Overrides the common definition of: `bind`, `enabled`, `tintColor`.
+    # Overrides the common definition of: `enabled`, `tintColor`.
     module SwitchAttributes
       # Declared-attribute rows — part of the public metadata
       # contract together with `rows` / `declared?` / `alias_map`
       # (see the directory README).
       ATTRS = [
-        # Two-way binding @{variable} [binding: two-way]
-        { name: 'bind', kind: :binding }.freeze,
         # Switch state alias (binding for two-way) [binding: two-way]
         { name: 'checked', kind: :boolean, bindable: true }.freeze,
         # Whether enabled (can be data binding)
@@ -34,7 +32,7 @@ module JsonUI
         # Toggle handler function - binding only (@{functionName}). Alias of onValueChange.
         { name: 'onToggle', kind: :binding }.freeze,
         # Value change handler - binding only (@{functionName})
-        { name: 'onValueChange', kind: :binding }.freeze,
+        { name: 'onValueChange', kind: :binding, aliases: ['onToggle'].freeze }.freeze,
         # Thumb tint color - hex string or color name from colors.json (binding supported)
         { name: 'thumbTintColor', kind: :string, bindable: true }.freeze,
         # Tint color - hex string or color name from colors.json (binding supported)

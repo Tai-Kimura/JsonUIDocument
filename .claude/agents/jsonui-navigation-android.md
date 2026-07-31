@@ -14,6 +14,18 @@ tools: >
 
 Implements navigation code for Android apps. Spec is platform-agnostic; navigation code is not — this agent handles the Kotlin-specific part outside the spec.
 
+
+## Do not hand-write screen markers
+
+Generated screen views already carry a screen-identity marker that the test
+drivers use to tell which screen is displayed. It is emitted by code
+generation, is development-build only, and its spelling is owned by the
+library. Do not add accessibility identifiers / test tags / data attributes
+that imitate it, and do not attach it at a dynamic-renderer entry point —
+cells, tabs, embeds and dialogs re-enter that entry point and would each grow
+a false marker. Call `mcp__jui-tools__get_screen_identity` if you need the
+rules.
+
 ## Responsibilities
 
 - Jetpack Compose Navigation — `NavHost`, `composable(route)`, `NavController`
@@ -65,8 +77,8 @@ sealed class Route(val path: String) {
   data class ItemDetail(val id: String) : Route("item/$id") {
     companion object { const val pattern = "item/{id}" }
   }
-  data class ComposeForm(val itemId: String) : Route("compose/$itemId") {
-    companion object { const val pattern = "compose/{itemId}" }
+  data class ReviewForm(val itemId: String) : Route("review/$itemId") {
+    companion object { const val pattern = "review/{itemId}" }
   }
 }
 
@@ -195,7 +207,7 @@ Kotlin compile should succeed. If errors, fix Kotlin code.
 
 ### Routes added
 - Route.ItemDetail(id) → "item/{id}"
-- Route.ComposeForm(itemId) → "compose/{itemId}"
+- Route.ReviewForm(itemId) → "review/{itemId}"
 
 ### Files touched
 - app/src/main/java/.../nav/Route.kt
@@ -204,7 +216,7 @@ Kotlin compile should succeed. If errors, fix Kotlin code.
 
 ### Presentation
 - itemDetail: composable (push)
-- composeForm: dialog
+- reviewForm: dialog
 
 ### Deep links
 - Configured / skipped
@@ -232,6 +244,25 @@ Navigation is the prominent spec-external work. Keep the glue minimal. If naviga
 4. **Back stack manipulation** — prefer `popBackStack(route, inclusive)` over raw `popBackStack()` for reliability.
 5. **Deep links not triggering** — check manifest `<activity>` intent filters match the `deepLinks` declaration in Compose.
 6. **Fragment transitions vs Compose animations** — different APIs. Pick one framework per screen, don't mix in one route.
+
+---
+
+## Embed navigation
+
+When the spec contains `structure.embeds[]`, navigation behaves per the `navigationMode`:
+
+- **`delegate` (default)** — embedded screen's `navigate(...)` drives the **parent's** `NavController`. The runtime threads `parentNavController` through `EmbedContainer`; no extra plumbing in the parent composable. Add any new destinations from the embedded screen's `userActions[]` to the parent's `NavHost`.
+  - `pop` / `dismiss` / `navigateBack` are **bounded at the embed** — calling them inside the embedded screen does NOT close the embed. Runtime enforces this; do not patch around it.
+  - VM isolation: `EmbedContainer` `remember(embedId)` a per-slot `ViewModelStoreOwner` so that the same embedded screen used in two slots gets two VM instances. **Do not bypass this** — `viewModel()` resolves against `LocalViewModelStoreOwner`, and the wrong owner means shared state.
+- **`isolated` (requires KotlinJsonUI >= 2.12.0)** — the embed owns a **library-managed private memory stack** (deliberately NOT a nested `NavHost`; the library has no androidx.navigation dependency and the memory stack matches iOS/web semantics exactly). Generated code calls the overload with `isolatedNavigation = EmbedIsolatedNavigation.Automatic` and a `Requires KotlinJsonUI >= 2.12.0` header; compiling against an older library **fails deliberately** (version-skew guard) — bump the pin, don't delete the argument.
+  - Semantics (conformance-tested on all 3 platforms): push stays inside the embed; pop stops at the embed root — the embed never closes itself; the stack survives configuration changes (`rememberSaveable`, non-`Serializable` params dropped best-effort on save) and resets when the embed leaves composition. Deep links address the host router only.
+  - Pushed screens render through the `destinationContent` slot: library-dynamic wires `DynamicView` resolution automatically; for static codegen supply `destinationContent = { entry -> … }` mapping `entry.screen` to composables — a pushed entry without it renders an explicit error box, never a silent no-op.
+  - Back handling (measured 2026-07-24): `BackHandler(enabled = depth > 0)` lives inside the container; Compose resolves nested BackHandlers innermost-first, so the **deepest composed non-empty isolated stack** pops first, and back at depth 0 delegates to the parent (NavController pop / activity finish).
+  - Driving the stack from OUTSIDE the embed (parent VM resetting a pane on tab switch, etc.): `EmbedNavigatorRegistry.get(embedId)` — the container registers its navigator while composed; last composition wins per embedId.
+  - **Escape hatch** (transitions OUT of the embed — logout, full-screen flows): pass a parent-VM callback through a `params` leaf binding (e.g. `"onExitRequested": "@{handleChildExit}"`). The child calls the callback; the PARENT performs the navigation. present-style transitions (sheet / dialog / bottomSheet / dismiss…) declared by a screen embedded in isolated mode are a **`jui build` hard error**.
+- **`params` nesting** (same release): `params` may be a nested object tree — intermediate nodes must be literal objects, `@{}` bindings only on scalar leaves, arrays not allowed. The validators enforce this (zero-warnings gate).
+
+Generated Compose code from `kjui_tools` wires the per-slot `ViewModelStoreOwner` and `parentNavController` for you. Your job here is to make sure the parent's `NavHost` covers the destination set, including any destinations introduced by the embedded screen's `userActions[]`, and — for isolated embeds in static (non-Dynamic) apps — that `destinationContent` covers every pushable screen.
 
 ---
 

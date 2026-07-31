@@ -54,7 +54,7 @@ module RjuiTools
           # Cursor pointer for clickable items
           classes << 'cursor-pointer' if attributes['onClick'] || attributes['onclick']
 
-          classes.compact.reject(&:empty?).join(' ')
+          finalize_classes(classes)
         end
 
         def build_text_class_name
@@ -67,7 +67,10 @@ module RjuiTools
           classes << TailwindMapper.map_font_weight(attributes['fontWeight']) if attributes['fontWeight']
 
           # Font color
-          if attributes['fontColor'] && !has_binding?(attributes['fontColor'])
+          if attributes['selected'] == true && attributes['selectedFontColor']
+            # Statically selected: the selected colour IS the colour.
+            classes << TailwindMapper.map_color(attributes['selectedFontColor'], 'text')
+          elsif attributes['fontColor'] && !has_binding?(attributes['fontColor'])
             classes << TailwindMapper.map_color(attributes['fontColor'], 'text')
           end
 
@@ -75,16 +78,32 @@ module RjuiTools
           classes << 'underline' if attributes['underline']
           classes << 'line-through' if attributes['strikethrough']
 
-          classes.compact.reject(&:empty?).join(' ')
+          finalize_classes(classes)
         end
 
         def build_text_style
           style_parts = []
 
-          # Dynamic font color
-          if attributes['fontColor'] && has_binding?(attributes['fontColor'])
+          # selectedFontColor with a bound selected state: the colour follows
+          # the selection at runtime — same swap the icon does in get_icon_src.
+          if attributes['selectedFontColor'] && attributes['selected'] &&
+             has_binding?(attributes['selected'])
+            selected_expr = extract_binding_property(attributes['selected'])
+            base_color = attributes['fontColor'] && !has_binding?(attributes['fontColor']) ? attributes['fontColor'] : nil
+            fallback = base_color ? "'#{base_color}'" : 'undefined'
+            style_parts << "color: #{selected_expr} ? '#{attributes['selectedFontColor']}' : #{fallback}"
+          elsif attributes['fontColor'] && has_binding?(attributes['fontColor'])
             binding_expr = convert_binding(attributes['fontColor']).gsub(/^\{|\}$/, '')
             style_parts << "color: #{binding_expr}"
+          end
+
+          # textShadow — same canonical object contract as Label.
+          shadow = attributes['textShadow']
+          if shadow.is_a?(Hash) && shadow['color'] && shadow['blur'] && shadow['offset'].is_a?(Array)
+            css_color = shadow['color'].to_s.start_with?('#') ? shadow['color'] : "var(--color-#{shadow['color']})"
+            style_parts << "textShadow: '#{shadow['offset'][0]}px #{shadow['offset'][1]}px #{shadow['blur']}px #{css_color}'"
+          elsif shadow.is_a?(String) && !shadow.empty?
+            style_parts << "textShadow: '#{shadow}'"
           end
 
           return '' if style_parts.empty?
@@ -134,7 +153,7 @@ module RjuiTools
           tint_color = attributes['iconTintColor'] || attributes['tintColor']
           # Note: CSS filter or mix-blend-mode would be needed for actual color tinting
 
-          classes.compact.reject(&:empty?).join(' ')
+          finalize_classes(classes)
         end
       end
     end

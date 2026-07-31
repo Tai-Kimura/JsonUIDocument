@@ -48,7 +48,12 @@ module RjuiTools
         def build_class_name
           classes = [super]
 
-          classes << 'flex items-center gap-2' if attributes['text'] || attributes['label']
+          if attributes['text'] || attributes['label']
+            # `spacing` = control-to-label gap, same reading as kjui's checkbox.
+            spacing = attributes['spacing']
+            classes << 'flex items-center'
+            classes << (spacing ? "gap-[#{spacing}px]" : 'gap-2')
+          end
           classes << 'cursor-pointer'
 
           # Disabled state
@@ -59,11 +64,11 @@ module RjuiTools
             classes << "${!#{binding_expr} ? 'opacity-50 cursor-not-allowed' : ''}"
           end
 
-          classes.compact.reject(&:empty?).join(' ')
+          finalize_classes(classes)
         end
 
         def build_checked_attr
-          is_on = attributes['isOn'] || attributes['checked']
+          is_on = with_bind_fallback(attributes['isOn'] || attributes['checked'])
 
           if is_on && has_binding?(is_on)
             prop = extract_binding_property(is_on)
@@ -85,7 +90,7 @@ module RjuiTools
 
           # Auto-generate onChange from isOn/checked binding property
           # e.g., isOn: "@{isEnabled}" -> onChange={(e) => data.onIsEnabledChange?.(e.target.checked)}
-          is_on = attributes['isOn'] || attributes['checked']
+          is_on = with_bind_fallback(attributes['isOn'] || attributes['checked'])
           if is_on && has_binding?(is_on)
             property_name = extract_raw_binding_property(is_on)
             handler_name = "on#{capitalize_first(property_name)}Change"
@@ -115,7 +120,8 @@ module RjuiTools
         end
 
         def build_checkbox_style
-          tint_color = attributes['tintColor'] || attributes['onTintColor']
+          # Same precedence as kjui's switch_component: onTintColor || tint || tintColor.
+          tint_color = attributes['onTintColor'] || attributes['tint'] || attributes['tintColor']
           return '' unless tint_color
 
           " style={{ accentColor: '#{tint_color}' }}"

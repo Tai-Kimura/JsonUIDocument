@@ -695,11 +695,11 @@
     },
     "onPan": {
       "type": "binding",
-      "description": "Pan gesture handler (camelCase) - binding only (@{functionName})"
+      "description": "Pan gesture handler (camelCase) - binding only (@{functionName}). Invoked repeatedly while the user drags. Payload: cumulative translation since the gesture began (iOS CGSize, Android Offset; web passes the PointerEvent). A handler declared () -> Void is called without the payload."
     },
     "onPinch": {
       "type": "binding",
-      "description": "Pinch gesture handler (camelCase) - binding only (@{functionName})"
+      "description": "Pinch gesture handler (camelCase) - binding only (@{functionName}). Invoked repeatedly while the user pinches. Payload: cumulative scale factor since the gesture began (iOS CGFloat, Android Float; web passes the TouchEvent). A handler declared () -> Void is called without the payload."
     },
     "canTap": {
       "type": [
@@ -720,14 +720,13 @@
         "string",
         "object"
       ],
-      "description": "Data binding expression"
+      "description": "Legacy UIKit KVC binding: names the data property a view is bound to (SJUIViewCreator sets view.binding / view.bindingSet, and UIKit's Binding class pushes values through it). The object form is also the pre-@{} Table data source ({\"data\": \"@{items}\"}). Superseded by '@{...}' in the attribute value itself — use `bind` or the component's own value attribute instead.",
+      "platform": "swift"
     },
     "bind": {
-      "type": [
-        "string",
-        "object"
-      ],
-      "description": "Data binding expression (alias)"
+      "type": "binding",
+      "binding_direction": "two-way",
+      "description": "Two-way binding for the component's primary value — Switch/Check isOn, Slider value, Segment selectedIndex, SelectBox selectedValue, Progress progress, Table items. An alternative spelling to each component's own value attribute, which takes precedence when both are set."
     },
     "include": {
       "type": "string",
@@ -882,11 +881,25 @@
     },
     "indexBelow": {
       "type": "string",
-      "description": "Place below specified view ID"
+      "description": "Place below specified view ID",
+      "platform": [
+        "swift",
+        "react"
+      ],
+      "platform_reasons": {
+        "kotlin": "Compose z-order is Modifier.zIndex on each component's own modifier chain; the codegen has no shared chain, so wiring it partially would work on some components and silently not on others — and z-order only means anything inside a Box (Column/Row children do not overlap). iOS degrades to zIndex(-1); re-declare if the codegen grows a shared modifier chain."
+      }
     },
     "indexAbove": {
       "type": "string",
-      "description": "Place above specified view ID"
+      "description": "Place above specified view ID",
+      "platform": [
+        "swift",
+        "react"
+      ],
+      "platform_reasons": {
+        "kotlin": "Same as indexBelow: Compose z-order is Modifier.zIndex on each component's own modifier chain, and without a shared chain a partial wiring would be silently inconsistent across components. Re-declare if the codegen grows a shared modifier chain."
+      }
     },
     "touchDisabledState": {
       "type": "string",
@@ -1151,9 +1164,7 @@
         "boolean",
         "binding"
       ],
-      "description": "Selected state (binding supported)",
-      "platform": "swift",
-      "mode": "uikit"
+      "description": "Selected state (binding supported). Decides which attribute set is in force: while true the label renders with 'highlightAttributes' (or 'highlightColor'), otherwise with its base font and colour."
     },
     "textAlign": {
       "type": [
@@ -2115,7 +2126,8 @@
     },
     "inputType": {
       "type": "string",
-      "description": "Input type for Android"
+      "description": "Input type for Android (Android-only; `input` is the cross-platform attribute)",
+      "platform": "kotlin"
     }
   },
   "Input": {
@@ -2451,7 +2463,7 @@
     },
     "headers": {
       "type": "object",
-      "description": "HTTP headers for the image request (Coil ImageRequest.Builder.addHeader).",
+      "description": "HTTP headers for the image request (Coil 3: httpHeaders(NetworkHeaders) on ImageRequest.Builder).",
       "platform": "kotlin",
       "mode": "compose"
     }
@@ -2802,11 +2814,6 @@
       "description": "Switch state alias (binding for two-way)",
       "binding_direction": "two-way"
     },
-    "bind": {
-      "type": "binding",
-      "description": "Two-way binding @{variable}",
-      "binding_direction": "two-way"
-    },
     "enabled": {
       "type": [
         "boolean",
@@ -2851,7 +2858,10 @@
     },
     "onValueChange": {
       "type": "binding",
-      "description": "Value change handler - binding only (@{functionName})"
+      "description": "Value change handler - binding only (@{functionName})",
+      "aliases": [
+        "onToggle"
+      ]
     },
     "labelAttributes": {
       "type": "object",
@@ -2921,11 +2931,6 @@
       "description": "Toggle state alias (binding for two-way)",
       "binding_direction": "two-way"
     },
-    "bind": {
-      "type": "binding",
-      "description": "Two-way binding @{variable}",
-      "binding_direction": "two-way"
-    },
     "enabled": {
       "type": [
         "boolean",
@@ -2970,7 +2975,10 @@
     },
     "onValueChange": {
       "type": "binding",
-      "description": "Value change handler - binding only (@{functionName})"
+      "description": "Value change handler - binding only (@{functionName})",
+      "aliases": [
+        "onToggle"
+      ]
     },
     "labelAttributes": {
       "type": "object",
@@ -3257,10 +3265,6 @@
       "type": "array",
       "description": "Child components (alias for child)"
     },
-    "alignment": {
-      "type": "string",
-      "description": "Child alignment"
-    },
     "distribution": {
       "type": "string",
       "enum": [
@@ -3399,6 +3403,7 @@
     },
     "scrollMode": {
       "type": "string",
+      "platform": "react",
       "enum": [
         "inner",
         "window"
@@ -3407,11 +3412,25 @@
     },
     "showsHorizontalScrollIndicator": {
       "type": "boolean",
-      "description": "Show horizontal indicator"
+      "description": "Show horizontal indicator",
+      "platform": [
+        "swift",
+        "react"
+      ],
+      "platform_reasons": {
+        "kotlin": "Compose has no scrollbar primitive for scrollable/Lazy content (ScrollbarStyle is Desktop-only), so there is nothing to switch on or off — needs a drawn scrollbar composable in KotlinJsonUI first. iOS uses .scrollIndicators and web uses CSS, both native. Re-declare when the composable exists."
+      }
     },
     "showsVerticalScrollIndicator": {
       "type": "boolean",
-      "description": "Show vertical indicator"
+      "description": "Show vertical indicator",
+      "platform": [
+        "swift",
+        "react"
+      ],
+      "platform_reasons": {
+        "kotlin": "Compose has no scrollbar primitive for scrollable/Lazy content (ScrollbarStyle is Desktop-only), so there is nothing to switch on or off — needs a drawn scrollbar composable in KotlinJsonUI first. iOS uses .scrollIndicators and web uses CSS, both native. Re-declare when the composable exists."
+      }
     },
     "paging": {
       "type": "boolean",
@@ -3419,7 +3438,14 @@
     },
     "bounces": {
       "type": "boolean",
-      "description": "Enable bounce effect"
+      "description": "Enable bounce effect",
+      "platform": [
+        "swift",
+        "react"
+      ],
+      "platform_reasons": {
+        "kotlin": "Compose's equivalent is overscroll, and disabling it means CompositionLocalProvider(LocalOverscrollConfiguration provides null) — an experimental Foundation API the generated code does not carry an @OptIn for. Re-declare when the API stabilizes."
+      }
     },
     "scrollEnabled": {
       "type": [
@@ -3443,14 +3469,28 @@
         "number",
         "binding"
       ],
-      "description": "Maximum zoom scale (binding supported)"
+      "description": "Maximum zoom scale (binding supported)",
+      "platform": [
+        "swift",
+        "react"
+      ],
+      "platform_reasons": {
+        "kotlin": "Pinch-zoom on a SCROLLING container needs real gesture arbitration in Compose — detectTransformGestures/transformable consume the drag and would take scrolling away — and a maximum without minZoom would be half a feature. iOS gets zoom from UIScrollView; web delegates to the browser via touch-action."
+      }
     },
     "minZoom": {
       "type": [
         "number",
         "binding"
       ],
-      "description": "Minimum zoom scale (binding supported)"
+      "description": "Minimum zoom scale (binding supported)",
+      "platform": [
+        "swift"
+      ],
+      "platform_reasons": {
+        "kotlin": "Same gesture-arbitration problem as maxZoom: Compose has no zoom primitive for a scrolling container.",
+        "react": "The browser arbitrates pinch zoom itself (touch-action); there is no control surface for a minimum scale."
+      }
     },
     "contentSize": {
       "type": "array",
@@ -3478,6 +3518,7 @@
     },
     "keyboardDismissMode": {
       "type": "string",
+      "platform": "swift",
       "enum": [
         "none",
         "onDrag",
@@ -3612,11 +3653,25 @@
     },
     "showsHorizontalScrollIndicator": {
       "type": "boolean",
-      "description": "Show horizontal indicator"
+      "description": "Show horizontal indicator",
+      "platform": [
+        "swift",
+        "react"
+      ],
+      "platform_reasons": {
+        "kotlin": "Compose has no scrollbar primitive for Lazy lists (ScrollbarStyle is Desktop-only), so there is nothing to switch on or off — needs a drawn scrollbar composable in KotlinJsonUI first. iOS uses .scrollIndicators and web uses CSS, both native. Re-declare when the composable exists."
+      }
     },
     "showsVerticalScrollIndicator": {
       "type": "boolean",
-      "description": "Show vertical indicator"
+      "description": "Show vertical indicator",
+      "platform": [
+        "swift",
+        "react"
+      ],
+      "platform_reasons": {
+        "kotlin": "Compose has no scrollbar primitive for Lazy lists (ScrollbarStyle is Desktop-only), so there is nothing to switch on or off — needs a drawn scrollbar composable in KotlinJsonUI first. iOS uses .scrollIndicators and web uses CSS, both native. Re-declare when the composable exists."
+      }
     },
     "paging": {
       "type": "boolean",
@@ -3738,12 +3793,6 @@
       "platform": "swift",
       "mode": "swiftui"
     },
-    "sectionSticky": {
-      "type": "boolean",
-      "description": "When true, section headers stick using LazyColumn.stickyHeader (Compose).",
-      "platform": "kotlin",
-      "mode": "compose"
-    },
     "onValueChange": {
       "type": [
         "string",
@@ -3796,6 +3845,9 @@
       "platform": [
         "swift",
         "kotlin"
+      ],
+      "aliases": [
+        "selected_icon"
       ]
     },
     "selected_icon": {
@@ -3918,11 +3970,6 @@
       "description": "Checked state alias (binding for two-way)",
       "binding_direction": "two-way"
     },
-    "bind": {
-      "type": "binding",
-      "description": "Two-way binding @{variable}",
-      "binding_direction": "two-way"
-    },
     "icon": {
       "type": "string",
       "description": "Icon name for unchecked state",
@@ -3941,11 +3988,10 @@
       "platform": [
         "swift",
         "kotlin"
+      ],
+      "aliases": [
+        "onSrc"
       ]
-    },
-    "onSrc": {
-      "type": "string",
-      "description": "Selected icon name (alias)"
     },
     "value": {
       "type": "any",
@@ -4042,11 +4088,6 @@
       "description": "Checked state (binding for two-way)",
       "binding_direction": "two-way"
     },
-    "bind": {
-      "type": "binding",
-      "description": "Two-way binding @{variable}",
-      "binding_direction": "two-way"
-    },
     "label": {
       "type": [
         "string",
@@ -4079,11 +4120,10 @@
       "platform": [
         "swift",
         "kotlin"
+      ],
+      "aliases": [
+        "onSrc"
       ]
-    },
-    "onSrc": {
-      "type": "string",
-      "description": "Image source for checked state"
     },
     "enabled": {
       "type": [
@@ -4212,6 +4252,14 @@
         "ExtraLight"
       ],
       "description": "Blur effect style"
+    },
+    "blurRadius": {
+      "type": "number",
+      "description": "Blur radius in px/dp. Android and Web only: both blur by radius, while UIKit/SwiftUI express the appearance as effectStyle (UIVisualEffectView has styles, not radii). Overrides the radius effectStyle resolves to.",
+      "platform": [
+        "kotlin",
+        "react"
+      ]
     }
   },
   "IconLabel": {
@@ -4227,9 +4275,7 @@
         "boolean",
         "binding"
       ],
-      "description": "Selected state (binding supported)",
-      "platform": "swift",
-      "mode": "uikit"
+      "description": "Selected state (binding supported). Chooses icon_on over icon_off and selectedFontColor over fontColor, so every platform declaring those needs this too."
     },
     "font": {
       "type": "string",
@@ -4244,8 +4290,11 @@
       "description": "Text color - hex string or color name from colors.json"
     },
     "textShadow": {
-      "type": "string",
-      "description": "Text shadow"
+      "type": [
+        "string",
+        "object"
+      ],
+      "description": "Text shadow — same object contract as Label ({color, blur, offset: [x, y]}; the UIKit runtime passes the identical JSON to both)"
     },
     "selectedFontColor": {
       "type": "string",
@@ -4288,11 +4337,13 @@
     },
     "allowsBackForwardNavigationGestures": {
       "type": "boolean",
-      "description": "Enable swipe navigation"
+      "description": "Enable swipe navigation",
+      "platform": "swift"
     },
     "allowsLinkPreview": {
       "type": "boolean",
-      "description": "Enable link preview"
+      "description": "Enable link preview",
+      "platform": "swift"
     },
     "sandbox": {
       "type": "string",

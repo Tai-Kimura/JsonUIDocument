@@ -51,9 +51,9 @@ module JsonUI
         { name: 'aspectWidth', kind: :number, bindable: true }.freeze,
         # Background color - hex string (#RRGGBB or #RRGGBBAA) or color name from colors.json (can be data binding)
         { name: 'background', kind: :string, bindable: true }.freeze,
-        # Data binding expression (alias) [accepts: string | object]
-        { name: 'bind', kind: :raw }.freeze,
-        # Data binding expression [accepts: string | object]
+        # Two-way binding for the component's primary value — Switch/Check isOn, Slider value, Segment selectedIndex, SelectBox selectedValue, Progress progress, Table items. An alternative spelling to each component's own value attribute, which takes precedence when both are set. [binding: two-way]
+        { name: 'bind', kind: :binding }.freeze,
+        # Legacy UIKit KVC binding: names the data property a view is bound to (SJUIViewCreator sets view.binding / view.bindingSet, and UIKit's Binding class pushes values through it). The object form is also the pre-@{} Table data source ({"data": "@{items}"}). Superseded by '@{...}' in the attribute value itself — use `bind` or the component's own value attribute instead. [accepts: string | object]
         { name: 'binding', kind: :raw }.freeze,
         # Custom Swift binding code
         { name: 'bindingScript', kind: :string }.freeze,
@@ -217,9 +217,9 @@ module JsonUI
         { name: 'onDisappear', kind: :string }.freeze,
         # Long press gesture handler (camelCase) - binding only (@{functionName}) [binding: one-way]
         { name: 'onLongPress', kind: :binding }.freeze,
-        # Pan gesture handler (camelCase) - binding only (@{functionName})
+        # Pan gesture handler (camelCase) - binding only (@{functionName}). Invoked repeatedly while the user drags. Payload: cumulative translation since the gesture began (iOS CGSize, Android Offset; web passes the PointerEvent). A handler declared () -> Void is called without the payload.
         { name: 'onPan', kind: :binding }.freeze,
-        # Pinch gesture handler (camelCase) - binding only (@{functionName})
+        # Pinch gesture handler (camelCase) - binding only (@{functionName}). Invoked repeatedly while the user pinches. Payload: cumulative scale factor since the gesture began (iOS CGFloat, Android Float; web passes the TouchEvent). A handler declared () -> Void is called without the payload.
         { name: 'onPinch', kind: :binding }.freeze,
         # Click handler function name (selector-based, lowercase) - string only, no binding [accepts: string | array]
         { name: 'onclick', kind: :raw }.freeze,

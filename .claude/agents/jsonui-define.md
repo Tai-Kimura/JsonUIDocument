@@ -18,7 +18,9 @@ tools: >
   mcp__jui-tools__jui_verify,
   mcp__jui-tools__lookup_component,
   mcp__jui-tools__lookup_attribute,
-  mcp__jui-tools__search_components
+  mcp__jui-tools__search_components,
+  mcp__jui-tools__list_api_specs,
+  mcp__jui-tools__preview_api_model_sync
 ---
 
 # Define Agent
@@ -126,6 +128,7 @@ Before a screen spec references a custom component (`CodeBlock`, `NavLink`, `Col
 | `structure.layout` | `{}` | Always empty for the same reason. |
 | `structure.collection` | `null`, or a Collection with `cellClasses: [...]` / `cell.layoutFile` / `sections[]` | See `rules/specification-rules.md` section "(2) Collection screen" for the three accepted shapes. `cellClasses` is an **array of strings** (Layout JSON refs). |
 | `structure.tabView` | `null`, or `{id, tabs: [{title, layoutFile}]}` | Each tab is its own Layout JSON. |
+| `structure.embeds` | `[]`, or `[{regionId, screen, params?, events?, navigationMode?}]` | Use when a parent screen hosts another screen as a region (tablet master/detail, dashboard panels). See `rules/specification-rules.md` (5) and the dedicated dialogue block below. |
 | `stateManagement.uiVariables` | Typed screen data (visibility flags, toast messages, callbacks) | Callback variables use `"type": "(() -> Void)?"` (or the `"callback"` alias) |
 | `stateManagement.eventHandlers` | View-local handlers — name + description only | Anything that needs to be callable from the ViewModel belongs in `dataFlow.viewModel.methods` |
 | `stateManagement.displayLogic` | `condition` + `effects[{element, state}]` for visibility rules | Auto-generated `{element_id}Visibility` var names unless `variableName` is explicit |
@@ -146,6 +149,45 @@ Naming regexes the schema enforces silently — violations make the spec get SKI
 - Any `component.id` → `^[a-z][a-z0-9_]*$` (snake_case)
 - `uiVariable.name` → `^[a-z][a-zA-Z0-9]*$` (camelCase)
 - `eventHandler.name` → `^on[A-Z][a-zA-Z0-9]*$`
+- `structure.embeds[].regionId` → `^[a-z][a-zA-Z0-9]*$` (camelCase — matches Layout JSON `Embed.id`)
+- `structure.embeds[].screen` → `^[a-z][a-z0-9_]*$` (snake_case layout JSON filename, no extension)
+
+### 1.3.1 When the parent screen embeds another screen (`Embed`)
+
+If the screen hosts another screen as a region (tablet master/detail, dashboard pane), ask the user this block explicitly **before** writing `structure.embeds[]`:
+
+```
+This screen embeds another screen. A few details:
+- regionId (camelCase, used in the parent Layout JSON Embed.id):
+- screen to embed (the embedded screen's layout JSON filename, snake_case):
+- params to pass (key → parent VM var name or literal):
+- events to receive from the child (on[A-Z]... → parent VM method or eventHandler):
+- navigationMode: 'delegate' is the v1 default ('isolated' is deferred to v1.5).
+```
+
+Then translate into:
+
+```json
+"structure": {
+  "components": [],
+  "layout": {},
+  "embeds": [
+    {
+      "regionId": "detailPane",
+      "screen": "order_detail",
+      "params": { "orderId": "@{selectedOrderId}" },
+      "events": { "onOrderUpdated": "handleOrderUpdated" },
+      "navigationMode": "delegate"
+    }
+  ]
+}
+```
+
+Then make sure the parent VM has:
+- `stateManagement.uiVariables[]` (or `dataFlow.viewModel.vars[]`) entries for every `@{varName}` binding referenced in `params`
+- `dataFlow.viewModel.methods[]` (or `stateManagement.eventHandlers[]`) entries for every handler name referenced in `events`
+
+`doc_validate_spec` will reject the spec if either reference is unresolved (`validator.py :: _validate_embed`). The embedded screen's spec is NOT modified — leave it alone.
 
 ### 1.4 Validate
 
@@ -221,6 +263,51 @@ Invoke `/jsonui-swagger` for the authoring guide. Output:
 - DB: `docs/db/{table_name}.json`
 
 Validate with any project-specific rules. Don't over-engineer — keep endpoints to what's actually referenced from `dataFlow.repositories[].methods[].endpoint`.
+
+### 3.1 Swagger drives DTO + Domain codegen
+
+When you author / edit a swagger, `jui build` automatically generates per-platform Data Model files (v3 plan §2):
+
+| Platform | DTO (`@generated`, regenerated every build) | Domain scaffold (created once, user-owned) |
+|---|---|---|
+| iOS | `Model/Generated/{Name}Dto.swift` | `Model/{Name}.swift` |
+| Android | `<pkg>/model/generated/{Name}Dto.kt` | `<pkg>/model/{Name}.kt` |
+| Web | `models/generated/{Name}Dto.ts` | `models/{Name}.ts` |
+
+You don't write the DTO/Domain files — your swagger schema definitions drive them. After editing the swagger, call `mcp__jui-tools__preview_api_model_sync` to see what would be generated (no disk writes), then advise the user to run `jui build` to materialize the files.
+
+### 3.2 Domain wrapper opt-out
+
+For "pure transport" schemas where a Domain wrapper adds no value (e.g. `LoginRequest`), use either:
+
+- **Per-schema (swagger author choice)**: add `x-jui-skip-domain: true` to the schema in the swagger — affects every consumer
+- **Per-app (consumer choice)**: list the schema name in `api.schemas.skip_domain` array of `jui.config.json` — affects only this app
+
+Both apply OR-style: either causes the Domain scaffold to be skipped while the DTO is still generated.
+
+### 3.3 Multi-app shared swaggers
+
+When multiple apps share one swagger file (e.g. `../docs/api/shared_swagger.json`), each app's `jui.config.json` declares `api.schemas.include_paths` to scope only the endpoints that app actually calls. The codegen transitively resolves `$ref` so DTOs for unreachable schemas are pruned automatically. See `file-locations.md` for the config shape.
+
+### 3.4 v1 halt constructs
+
+`mcp__jui-tools__list_api_specs` flags swagger files containing:
+
+- `has_one_of: true` — flagged when any `oneOf` / `anyOf` / `discriminator` keyword appears anywhere in the file. **Not all of these halt** — see breakdown below.
+- `has_multi_file_ref: true` — `$ref` pointing outside the same file (v1 halts; inline the referenced schema)
+
+What actually halts vs what works:
+
+| Construct | Status |
+|---|---|
+| Field-level `oneOf` + `discriminator` with explicit `mapping`, variants `$ref` top-level schemas, sibling discriminator property exists | **Supported** (codegens dispatch via Swift enum / Kotlin sealed class / TS discriminated union) |
+| Field-level `oneOf` without `discriminator` | Halts |
+| Field-level `oneOf` + `discriminator` but `mapping` missing / partial / pointing outside `oneOf` list | Halts |
+| Schema-level `oneOf` (top-level discriminated envelope) — with or without discriminator | Halts (v2) |
+| `discriminator` without `oneOf` | Halts |
+| `anyOf` anywhere | Halts (v2) |
+
+When `has_one_of: true` fires, open the swagger and verify each `oneOf` site matches the supported shape — only halt-shaped cases need rework before `jui build`.
 
 ---
 

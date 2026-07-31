@@ -12,6 +12,7 @@ JsonUI agents call the `jsonui-mcp-server` (the `jui-tools` MCP) to interact wit
 | List specs / layouts / components | `mcp__jui-tools__list_screen_specs`, `list_layouts`, `list_component_specs` | — |
 | Read spec / layout files | `mcp__jui-tools__read_spec_file`, `read_layout_file` | — |
 | Look up components / attributes | `mcp__jui-tools__lookup_component`, `lookup_attribute`, `search_components` | — |
+| Screen identity rules (what is a screen, ids, `assert:"screen"`) | `mcp__jui-tools__get_screen_identity` | `jui screens` |
 | Create spec / component template | `mcp__jui-tools__doc_init_spec`, `doc_init_component` | — |
 | Generate screen scaffold from spec | `mcp__jui-tools__jui_generate_screen` | `jui g screen` |
 | Generate Layout JSON + VM stubs | `mcp__jui-tools__jui_generate_project` | — |
@@ -23,6 +24,9 @@ JsonUI agents call the `jsonui-mcp-server` (the `jui-tools` MCP) to interact wit
 | Validate spec | `mcp__jui-tools__doc_validate_spec`, `doc_validate_component` | — |
 | Generate docs | `mcp__jui-tools__doc_generate_spec`, `doc_generate_html` | — |
 | Lint @generated markers | — | `jui lint-generated` (CI only) |
+| List swagger / OpenAPI files | `mcp__jui-tools__list_api_specs` | `jui ls api-specs --json` |
+| List generated DTO + Domain files (with orphan detection) | `mcp__jui-tools__list_api_models` | `jui ls api-models --json` |
+| Preview swagger filter + emit plan without writing | `mcp__jui-tools__preview_api_model_sync` | `jui g api --dry-run --json` |
 
 Only **one** CLI command has no MCP equivalent today: `jui lint-generated`. Everything else goes through MCP.
 
@@ -66,11 +70,12 @@ tools: >
 | Agent | MCP tools |
 |---|---|
 | `conductor` | `get_project_config`, `list_screen_specs`, `list_layouts`, `list_component_specs` |
+| `implement` (screen marker) | `get_screen_identity` — before hand-writing anything that looks like a screen beacon |
 | `define` | `doc_init_spec`, `doc_init_component`, `doc_validate_spec`, `doc_validate_component`, `doc_generate_spec`, `read_spec_file`, `lookup_component`, `lookup_attribute`, `search_components`, `jui_verify` |
 | `ground` | `jui_init`, `jui_sync_tool`, `get_project_config` |
 | `implement` | `jui_generate_project`, `jui_build`, `jui_verify`, `read_spec_file`, `read_layout_file`, `list_layouts`, `lookup_component`, `lookup_attribute`, `get_binding_rules`, `get_modifier_order`, `get_platform_mapping` |
-| `navigation-ios` / `navigation-android` / `navigation-web` | `read_spec_file`, `read_layout_file`, `list_screen_specs`, `get_platform_mapping` |
-| `test` | `list_screen_specs`, `read_spec_file`, `doc_generate_html` |
+| `navigation-ios` / `navigation-android` / `navigation-web` | `read_spec_file`, `read_layout_file`, `list_screen_specs`, `get_platform_mapping`, `get_screen_identity` |
+| `test` | `list_screen_specs`, `read_spec_file`, `doc_generate_html`, `list_layouts`, `get_screen_identity` |
 | `debug` (READ-ONLY) | `get_project_config`, `list_screen_specs`, `list_layouts`, `read_spec_file`, `read_layout_file`, `jui_verify`, `jui_build`, `doc_validate_spec`, `lookup_component`, `lookup_attribute`, `search_components` (+ `Read, Bash, Glob, Grep` for impl grep) |
 
 Agents that do not appear in this table should still follow the "explicit enumeration" pattern.

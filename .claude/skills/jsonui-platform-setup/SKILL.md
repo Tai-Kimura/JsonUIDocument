@@ -182,6 +182,22 @@ Same as `compose` except `--mode xml`. Generates Dynamic-mode Android Views with
    jui build --web-only
    ```
 
+6. Wire the generated Tailwind theme (once). `jui build` emits
+   `src/generated/theme.css` — a `@generated` `@theme { --color-<token> }`
+   block mirroring `colors.json`. Without it, generated `bg-<token>` /
+   `text-<token>` utility classes resolve to nothing under Tailwind v4 and
+   brand colors fall back to defaults. Add a single import to the project's
+   global stylesheet (e.g. `src/app/globals.css`), after the Tailwind import:
+
+   ```css
+   @import "tailwindcss";
+   @import "../generated/theme.css";   /* ← wires colors.json tokens */
+   ```
+
+   The build logs the exact relative path when it can find the stylesheet.
+   Re-running `jui build` regenerates theme.css, so token changes flow through
+   automatically — no further edits to globals.css.
+
 ### Mode: `nextjs`
 
 Same as `react` except `--framework nextjs`. Bootstraps a Next.js App Router project (`src/app/`), configures `next.config.js`, and generates page-level components that embed the Dynamic loader.
@@ -196,7 +212,7 @@ Prerequisites: `target: app` setup has already run for the platform.
 
    ```bash
    which jsonui-test || \
-     curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-test-runner/main/test_tools/installer/bootstrap.sh | bash
+     curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-cli/main/test_tools/installer/bootstrap.sh | bash
    ```
 
    Requires Python 3.10+.
@@ -240,6 +256,23 @@ Wire the JsonUITestRunner XCUITest driver into the iOS project:
 
 6. Run `xcodebuild test` or in Xcode to verify.
 
+7. **If tests use `addMedia`** (photo-library seeding, simulator only):
+   - Set `test.install.ios.uitestBundleId` in the config to the UI test
+     target's bundle identifier (e.g. `com.example.AppUITests`) so
+     `jsonui-test pregrant` can derive the runner id
+     (`<uitestBundleId>.xctrunner`).
+   - Run `jsonui-test pregrant` after booting the simulator and **before**
+     `xcodebuild test` — it grants `photos-add` so no permission alert ever
+     appears (grant survives reinstalls; reset with
+     `xcrun simctl privacy <udid> reset photos-add`).
+   - Optionally add `NSPhotoLibraryAddUsageDescription` to the UI test
+     target (`INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription`) — not
+     required on the simulator, but documents intent and future-proofs a
+     possible real-device opt-in.
+   - Media fixtures live in `tests/media/` (`test.mediaDir`); `jsonui-test
+     validate` installs them into `<target_dir>/media/` automatically, and
+     the driver resolves basenames from there.
+
 ### Android test setup
 
 Wire UIAutomator-based driver:
@@ -247,7 +280,7 @@ Wire UIAutomator-based driver:
 1. Add to `app/build.gradle.kts`:
 
    ```kotlin
-   androidTestImplementation("com.tai-kimura:jsonui-test-runner:1.0.0")
+   androidTestImplementation("io.github.tai-kimura:jsonui-test-runner-android:1.0.0")
    ```
 
 2. Create `app/src/androidTest/java/.../SmokeTest.kt`:
@@ -278,14 +311,14 @@ Wire Playwright:
 2. Add the JsonUI test runner package:
 
    ```bash
-   npm install --save-dev @tai-kimura/jsonui-test-runner-web
+   npm install --save-dev jsonui-test-runner-web
    ```
 
 3. Create `tests/playwright/smoke.spec.ts`:
 
    ```ts
    import { test, expect } from '@playwright/test';
-   import { JsonUITestRunner } from '@tai-kimura/jsonui-test-runner-web';
+   import { JsonUITestRunner } from 'jsonui-test-runner-web';
 
    test('runner loads', async ({ page }) => {
      const runner = new JsonUITestRunner(page);

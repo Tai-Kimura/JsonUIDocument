@@ -343,6 +343,26 @@ module RjuiTools
           # Z-index
           classes << TailwindMapper.map_z_index(attributes['zIndex']) if attributes['zIndex']
 
+          # indexBelow — "place below the named view". CSS has no relative
+          # z-order, so this lands on the same answer the iOS codegen gives for
+          # the view-ID form: behind, at z -1 (base_view_converter). A true
+          # relative order would need the other element's resolved z, which is
+          # not knowable at codegen time. An explicit `zIndex` is the author
+          # being specific, so it wins.
+          #
+          # No numeric branch: the attribute is declared `type: string`, so a
+          # number never reaches here (TypedAttributes drops it). iOS honours one
+          # only because that converter reads raw JSON.
+          if attributes['indexBelow'] && !attributes['zIndex']
+            classes << TailwindMapper.map_z_index(-1)
+          end
+
+          # indexAbove — the mirror: in front, at z 1 (same degradation the
+          # iOS codegen applies for the view-ID form; an explicit zIndex wins).
+          if attributes['indexAbove'] && !attributes['zIndex']
+            classes << TailwindMapper.map_z_index(1)
+          end
+
           # Flex grow (weight)
           classes << TailwindMapper.map_flex_grow(attributes['weight']) if attributes['weight']
 
@@ -359,8 +379,28 @@ module RjuiTools
           # Gravity alignment - pass orientation for correct flexbox mapping
           classes.concat(TailwindMapper.map_gravity(attributes['gravity'], attributes['orientation'])) if attributes['gravity']
 
-          # Direction (RTL/LTR)
-          classes << TailwindMapper.map_direction(attributes['direction']) if attributes['direction']
+          # Layout direction — child ORDER, not text direction.
+          #
+          # The declared enum is topToBottom / bottomToTop / leftToRight /
+          # rightToLeft / none, and both other platforms read it the same way:
+          # it reverses the children of a container that already has an
+          # `orientation` (SJUIView switches on orientation then direction;
+          # kjui's container_component reverses the child array). Anything that
+          # is not the reverse value, or a container with no orientation, means
+          # normal order.
+          #
+          # This used to map to `rtl` / `ltr` classes — a different attribute's
+          # semantics, and dead twice over: those values are not in the enum, so
+          # the mapper always returned "", and Tailwind has no `.rtl` utility
+          # anyway (`rtl:` is a variant, `[dir="rtl"] &`). The control-diff check
+          # is what surfaced it: every direction fixture rendered pixel-identical
+          # to its control.
+          if attributes['direction'] && attributes['orientation']
+            reversed_class = TailwindMapper.map_direction(
+              attributes['direction'], attributes['orientation']
+            )
+            classes << reversed_class unless reversed_class.empty?
+          end
 
           # Additional className from JSON
           classes << attributes['className'] if attributes['className']
@@ -382,7 +422,66 @@ module RjuiTools
             classes.concat(@responsive_result[:classes])
           end
 
-          classes.compact.reject(&:empty?).join(' ')
+          finalize_classes(classes)
+        end
+
+        # Tailwind utilities that set `display`. Only these participate in the
+        # reconciliation below.
+        DISPLAY_UTILITIES = %w[
+          block inline-block inline flex inline-flex grid inline-grid
+          table inline-table table-cell table-row flow-root contents
+          list-item hidden
+        ].freeze
+
+        # Join the class list, reconciling `display` against `visibility`.
+        #
+        # Two things have to happen here rather than at the point each class is
+        # added, because the pieces arrive from different places: the base
+        # converter emits `hidden` and the responsive overrides, and the
+        # subclass appends the component's own display utility AFTERWARDS.
+        #
+        # 1. `visibility: "gone"` outranks the component's default display.
+        #    Both are single-class selectors, so the browser picks whichever
+        #    Tailwind emitted later in the stylesheet — and `.inline-flex`
+        #    comes after `.hidden`. A Button with `visibility: "gone"` was
+        #    therefore fully visible. Dropping the unprefixed display utility
+        #    is what makes `hidden` mean what it says; using `!important`
+        #    instead would also beat the breakpoint override in (2).
+        #
+        # 2. A responsive `visibility: "visible"` restores the component's
+        #    NATURAL display, not `block`. ResponsiveHelper emits
+        #    `<bp>:[display:revert]`, upgraded here to the display utility this
+        #    converter actually emitted, so `max-md:inline-flex` — inside a
+        #    media query, hence later in the stylesheet than `.hidden` — wins
+        #    at the breakpoint while keeping the flex context the component's
+        #    internals rely on.
+        #
+        # Runs twice on the same list (a subclass calls `super`, which
+        # finalizes, then finalizes the combined list). That is why the upgrade
+        # only ever replaces the marker with something MORE specific and never
+        # the other way: the base pass sees no display utility yet, so it
+        # leaves `[display:revert]` — itself the right answer for a component
+        # that has none — and the subclass pass upgrades it.
+        def finalize_classes(classes)
+          tokens = classes.compact.flat_map { |c| c.to_s.split(/\s+/) }.reject(&:empty?)
+
+          natural = tokens.reverse.find do |t|
+                      !t.include?(':') && t != 'hidden' && DISPLAY_UTILITIES.include?(t)
+                    end
+          marker = ResponsiveHelper::NATURAL_DISPLAY
+          hidden = tokens.include?('hidden')
+
+          out = []
+          tokens.each do |t|
+            if natural && t.end_with?(marker)
+              out << t.sub(marker, natural)
+            elsif hidden && t != 'hidden' && !t.include?(':') && DISPLAY_UTILITIES.include?(t)
+              next
+            else
+              out << t
+            end
+          end
+          out.join(' ')
         end
 
         def has_binding?(value)
@@ -517,17 +616,64 @@ module RjuiTools
         # Build className attribute, handling landscape responsive with template literal.
         # Returns the full className="..." or className={`...`} string.
         def build_responsive_class_attr(static_classes)
+          expressions = []
+
           if @responsive_result && @responsive_result[:needs_landscape_hook] &&
              !@responsive_result[:landscape_styles].empty?
             landscape_expr = ResponsiveHelper.build_landscape_class_expression(
               @responsive_result[:landscape_styles]
             )
-            unless landscape_expr.empty?
-              return " className={`#{static_classes} #{landscape_expr}`}"
-            end
+            expressions << landscape_expr unless landscape_expr.empty?
           end
 
+          expressions << enabled_class_expression
+          expressions << interaction_class_expression
+
+          expressions.compact!
+          return " className={`#{static_classes} #{expressions.join(' ')}`}" if expressions.any?
+
           " className=\"#{static_classes}\""
+        end
+
+        # `enabled` as a binding cannot become a static class: the value is only
+        # known at runtime. It becomes a template-literal fragment, and it must
+        # stay OUT of the class list — finalize_classes splits on whitespace and
+        # would tear the expression into pieces. (That is the shape a `${...}`
+        # took when it was pushed into `classes` and landed inside a plain
+        # className="…": React renders it as literal text, so it did nothing.)
+        #
+        # Only the binding form needs this; a literal `enabled: false` is known
+        # at build time and is already a plain class.
+        # canTap — "whether component is tappable". It gates the TAP, not every
+        # pointer event: a child of a non-tappable view is still tappable, which
+        # is what UIKit's SJUIView.canTap does (the recogniser checks it) and
+        # what the Compose codegen does with `.clickable(enabled = …)`.
+        # `userInteractionEnabled` is the stronger one and blocks the subtree.
+        def can_tap_gated_click(handler_expr)
+          value = attributes['canTap']
+          return " onClick={#{handler_expr}}" if value.nil? || value == true || value == 'true'
+          return '' if value == false || value == 'false'
+          return " onClick={#{handler_expr}}" unless has_binding?(value)
+
+          gate = extract_binding_property(value)
+          " onClick={(e) => { if (#{gate}) #{handler_expr}?.(e); }}"
+        end
+
+        def enabled_class_expression
+          enabled = attributes['enabled']
+          return nil unless enabled.is_a?(String) && has_binding?(enabled)
+
+          "${!#{extract_binding_property(enabled)} ? 'opacity-50 pointer-events-none' : ''}"
+        end
+
+        # userInteractionEnabled blocks the whole subtree, which is what
+        # `pointer-events: none` does — and unlike `enabled` it is not a visual
+        # state, so it does not dim.
+        def interaction_class_expression
+          value = attributes['userInteractionEnabled']
+          return nil unless value.is_a?(String) && has_binding?(value)
+
+          "${!#{extract_binding_property(value)} ? 'pointer-events-none' : ''}"
         end
 
         # Check if this component needs the useMediaQuery hook for landscape
@@ -872,15 +1018,83 @@ module RjuiTools
         # ref and reports focus changes back through the optional
         # `on<Camel>IsFocusedChange` handler. Only fields with a literal id
         # participate (the ref/effect are derived from the same walk).
+        # ref + onFocus/onBlur for the `<id>IsFocused` binding, MERGED with any
+        # focus handlers the component itself declares.
+        #
+        # Merged rather than appended because these are React props: a second
+        # `onFocus` on the same element does not add a listener, it replaces the
+        # first one, so emitting both would silently drop either the focus-state
+        # binding or the layout's own handler.
         def build_focus_binding_attrs
-          id_value = attributes['id']
-          return '' unless id_value.is_a?(String) && !id_value.empty? && !has_binding?(id_value)
+          focus_calls = []
+          blur_calls = []
+          ref_attr = ''
 
-          camel = snake_to_camel_id(id_value)
-          handler = "on#{camel[0].upcase}#{camel[1..]}IsFocusedChange"
-          " ref={#{camel}Ref}" \
-            " onFocus={() => data.#{handler}?.(true)}" \
-            " onBlur={() => data.#{handler}?.(false)}"
+          id_value = attributes['id']
+          if id_value.is_a?(String) && !id_value.empty? && !has_binding?(id_value)
+            camel = snake_to_camel_id(id_value)
+            handler = "on#{camel[0].upcase}#{camel[1..]}IsFocusedChange"
+            ref_attr = " ref={#{camel}Ref}"
+            focus_calls << "data.#{handler}?.(true)"
+            blur_calls << "data.#{handler}?.(false)"
+          end
+
+          focus_calls.concat(declared_focus_calls)
+          blur_calls.concat(declared_blur_calls)
+          return '' if focus_calls.empty? && blur_calls.empty?
+
+          attrs = ref_attr.dup
+          attrs << " onFocus={() => #{arrow_body(focus_calls)}}" if focus_calls.any?
+          attrs << " onBlur={() => #{arrow_body(blur_calls)}}" if blur_calls.any?
+          attrs
+        end
+
+        # `bind` — the alternative spelling for a component's primary value
+        # binding. Declared on `common`, honoured by eight Compose components and
+        # by the iOS checkbox/text-field paths, and read nowhere on web until
+        # now. The component's own value attribute wins; this is the last
+        # fallback, so an explicit `isOn` / `value` / `items` still decides.
+        #
+        # Kept as one helper rather than added to each chain so the fallback
+        # cannot drift between components — and so the truthiness of the
+        # existing chains is preserved exactly (a literal `isOn: false` still
+        # falls through, as it always did).
+        def with_bind_fallback(value)
+          value || attributes['bind']
+        end
+
+        # A single call stays an expression body so the common case emits exactly
+        # what it always did; several calls need a block.
+        def arrow_body(calls)
+          return calls.first if calls.length == 1
+
+          "{ #{calls.map { |c| "#{c};" }.join(' ')} }"
+        end
+
+        # Focus/blur handlers the component declares. Overridden by the text
+        # inputs, which are the only components that declare any.
+        def declared_focus_calls
+          []
+        end
+
+        def declared_blur_calls
+          []
+        end
+
+        # A declared handler as a callable expression. The attributes take
+        # "binding or raw method name", and both spellings resolve to the same
+        # `data.` receiver.
+        def handler_call(value)
+          return nil unless value.is_a?(String) && !value.empty?
+
+          if is_binding_format?(value)
+            prop = extract_binding_value(value)
+            return nil if prop.nil? || prop.empty?
+
+            "#{add_viewmodel_data_prefix(prop)}?.()"
+          else
+            "data.#{value}?.()"
+          end
         end
 
         # snake_case id -> lowerCamel stem. MUST stay in sync with
@@ -956,7 +1170,7 @@ module RjuiTools
             elsif is_binding_format?(handler)
               # Valid binding: @{handleClick} -> viewModel.data.handleClick
               prop = handler.gsub(/@\{|\}/, '')
-              return " onClick={#{add_viewmodel_data_prefix(prop)}}"
+              return can_tap_gated_click(add_viewmodel_data_prefix(prop))
             else
               # ERROR: onClick (camelCase) must use binding format
               return " {/* ERROR: onClick requires binding format @{functionName} */}"
@@ -1003,6 +1217,48 @@ module RjuiTools
 
         # Resolve a handler attribute (binding `@{name}` or bare selector `name`)
         # to a `data.`-prefixed property reference
+        # Soft-keyboard vocabulary shared by TextField and TextView: the
+        # declared values are the UIKit spellings, HTML has its own words for
+        # the same ideas (inputMode / enterKeyHint). One copy so the two
+        # converters cannot drift.
+        def map_input_mode(input)
+          case input&.downcase
+          when 'number', 'numberpad'
+            'numeric'
+          when 'decimal', 'decimalpad'
+            'decimal'
+          when 'tel', 'phonenumber'
+            'tel'
+          when 'email'
+            'email'
+          when 'url'
+            'url'
+          when 'search', 'websearch'
+            'search'
+          else
+            nil
+          end
+        end
+
+        def map_return_key(return_key)
+          case return_key
+          when 'Done'
+            'done'
+          when 'Go'
+            'go'
+          when 'Next'
+            'next'
+          when 'Search'
+            'search'
+          when 'Send'
+            'send'
+          when 'Enter', 'Return'
+            'enter'
+          else
+            nil
+          end
+        end
+
         def resolve_handler_property(handler)
           if is_binding_format?(handler)
             extract_binding_property(handler)
@@ -1012,39 +1268,59 @@ module RjuiTools
         end
 
         # Determine absolute position classes based on align attributes for overlay children
+        # Sibling-relative positioning (align*OfView / align*View /
+        # alignCenter*View). Written out rather than looped over a name list so
+        # the consumed-attribute scan and the coverage ratchet see the reads.
+        def sibling_vertical_constraint?
+          !!(attributes['alignTopOfView'] || attributes['alignBottomOfView'] ||
+             attributes['alignTopView'] || attributes['alignBottomView'] ||
+             attributes['alignCenterVerticalView'])
+        end
+
+        def sibling_horizontal_constraint?
+          !!(attributes['alignLeftOfView'] || attributes['alignRightOfView'] ||
+             attributes['alignLeftView'] || attributes['alignRightView'] ||
+             attributes['alignCenterHorizontalView'])
+        end
+
+        def sibling_constraint?
+          sibling_vertical_constraint? || sibling_horizontal_constraint?
+        end
+
         def overlay_position_classes
-          has_align = attributes['centerInParent'] || attributes['centerVertical'] || attributes['centerHorizontal'] ||
-                      attributes['alignTop'] || attributes['alignBottom'] || attributes['alignLeft'] || attributes['alignRight']
+          center_all = attributes['centerInParent']
 
-          unless has_align
-            return 'inset-0'
-          end
-
-          classes = []
-
-          if attributes['centerInParent']
-            classes << 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
-          else
-            # Vertical
-            if attributes['centerVertical']
-              classes << 'top-1/2 -translate-y-1/2'
+          # An axis constrained against a SIBLING is owned by the inline style
+          # that @/generated/relativePosition writes, so no class may touch it.
+          # `inset-0` is the dangerous one: it pins all four edges and would
+          # stretch the element across the container.
+          vertical =
+            if sibling_vertical_constraint?
+              nil
+            elsif center_all || attributes['centerVertical']
+              'top-1/2 -translate-y-1/2'
             elsif attributes['alignBottom']
-              classes << 'bottom-0'
+              'bottom-0'
             elsif attributes['alignTop']
-              classes << 'top-0'
+              'top-0'
             end
 
-            # Horizontal
-            if attributes['centerHorizontal']
-              classes << 'left-1/2 -translate-x-1/2'
+          horizontal =
+            if sibling_horizontal_constraint?
+              nil
+            elsif center_all || attributes['centerHorizontal']
+              'left-1/2 -translate-x-1/2'
             elsif attributes['alignRight']
-              classes << 'right-0'
+              'right-0'
             elsif attributes['alignLeft']
-              classes << 'left-0'
+              'left-0'
             end
-          end
 
-          classes.join(' ')
+          # No instruction on either axis: fill the container, as an overlay
+          # child with no alignment always has.
+          return 'inset-0' if vertical.nil? && horizontal.nil? && !sibling_constraint?
+
+          [vertical, horizontal].compact.join(' ')
         end
 
         # Canonical binding grammar (shared/core/binding_semantics.json):

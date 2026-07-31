@@ -56,11 +56,11 @@ module RjuiTools
             classes << "${!#{binding_expr} ? 'opacity-50 cursor-not-allowed' : ''}"
           end
 
-          classes.compact.reject(&:empty?).join(' ')
+          finalize_classes(classes)
         end
 
         def build_value_attr
-          value = attributes['value']
+          value = with_bind_fallback(attributes['value'])
 
           if value && has_binding?(value)
             prop = extract_binding_property(value)
@@ -83,7 +83,7 @@ module RjuiTools
 
           # Auto-generate onChange from value binding property
           # e.g., value: "@{sliderValue}" -> onChange={(e) => data.onSliderValueChange?.(Number(e.target.value))}
-          value = attributes['value']
+          value = with_bind_fallback(attributes['value'])
           if value && has_binding?(value)
             property_name = extract_raw_binding_property(value)
             handler_name = "on#{capitalize_first(property_name)}Change"

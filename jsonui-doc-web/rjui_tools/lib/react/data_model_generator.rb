@@ -311,13 +311,17 @@ module RjuiTools
 
       # Extract value bindings from components (Switch, Slider, SelectBox, TextField, TextView, etc.)
       # These are the bound values like @{notificationsEnabled} in Switch isOn attribute
+      # `bind` is the alternative spelling for a component's primary value
+      # binding (see BaseConverter#with_bind_fallback). It has to register here
+      # too, or a layout that uses only `bind` gets JSX referencing a Data
+      # property the model never declared.
       def extract_value_bindings(json_data, bindings = {})
         if json_data.is_a?(Hash)
           component_type = json_data['type']
 
           # Switch, Toggle - isOn/checked/value binding (boolean)
           if %w[Switch Toggle].include?(component_type)
-            is_on = json_data['isOn'] || json_data['checked'] || json_data['value']
+            is_on = json_data['isOn'] || json_data['checked'] || json_data['value'] || json_data['bind']
             if is_on.is_a?(String) && is_on.start_with?('@{') && is_on.end_with?('}')
               property_name = is_on[2...-1]
               bindings[property_name] = { type: 'boolean', defaultValue: false }
@@ -326,7 +330,7 @@ module RjuiTools
 
           # CheckBox, Check - isOn/checked binding (boolean)
           if %w[CheckBox Check].include?(component_type)
-            is_on = json_data['isOn'] || json_data['checked']
+            is_on = json_data['isOn'] || json_data['checked'] || json_data['bind']
             if is_on.is_a?(String) && is_on.start_with?('@{') && is_on.end_with?('}')
               property_name = is_on[2...-1]
               bindings[property_name] = { type: 'boolean', defaultValue: false }
@@ -335,7 +339,7 @@ module RjuiTools
 
           # Slider - value binding (number)
           if component_type == 'Slider'
-            value = json_data['value']
+            value = json_data['value'] || json_data['bind']
             if value.is_a?(String) && value.start_with?('@{') && value.end_with?('}')
               property_name = value[2...-1]
               bindings[property_name] = { type: 'number', defaultValue: 0 }
@@ -344,10 +348,21 @@ module RjuiTools
 
           # Radio, Segment, SelectBox - value binding (string)
           if %w[Radio Segment SelectBox].include?(component_type)
-            value = json_data['value']
+            value = json_data['value'] || json_data['bind']
             if value.is_a?(String) && value.start_with?('@{') && value.end_with?('}')
               property_name = value[2...-1]
               bindings[property_name] = { type: 'string', defaultValue: '""' }
+            end
+          end
+
+          # Collection - currentPage binding (number). The paired
+          # on<Prop>Change report-back handler is derived from this binding by
+          # the value-binding handler loop in update_data_file — it is what the
+          # collection's onScroll calls when the user scrolls to another page.
+          if component_type == 'Collection'
+            page = json_data['currentPage']
+            if page.is_a?(String) && page.start_with?('@{') && page.end_with?('}')
+              bindings[page[2...-1]] = { type: 'number', defaultValue: 0 }
             end
           end
 
@@ -367,7 +382,7 @@ module RjuiTools
 
           # TextField - text binding (string)
           if component_type == 'TextField'
-            text = json_data['text']
+            text = json_data['text'] || json_data['bind']
             if text.is_a?(String) && text.start_with?('@{') && text.end_with?('}')
               property_name = text[2...-1]
               bindings[property_name] = { type: 'string', defaultValue: '""' }
@@ -376,7 +391,7 @@ module RjuiTools
 
           # TextView - text binding (string)
           if component_type == 'TextView'
-            text = json_data['text']
+            text = json_data['text'] || json_data['bind']
             if text.is_a?(String) && text.start_with?('@{') && text.end_with?('}')
               property_name = text[2...-1]
               bindings[property_name] = { type: 'string', defaultValue: '""' }

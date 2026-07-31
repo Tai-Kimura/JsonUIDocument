@@ -279,41 +279,25 @@ Sub-specs never duplicate the parent's `layoutFile`. Parent authors the Layout; 
 
 ### (5) Screen with embedded sub-screens (`Embed`)
 
-For tablet master/detail layouts or dashboards that host other screens as regions, declare each embed in `structure.embeds`. **Only the embedding (parent) screen needs spec changes — the embedded screen is unchanged.**
+Use the `Embed` view type when a parent screen hosts another screen as a region of its layout (tablet master/detail, dashboard panels). The embedded screen owns its own ViewModel — independent from the parent VM.
 
-```json
-"structure": {
-  "components": [],
-  "layout": {},
-  "embeds": [
-    {
-      "regionId": "detailPane",
-      "screen": "order_detail",
-      "params": { "orderId": "@{selectedOrderId}" },
-      "events": { "onOrderUpdated": "onOrderUpdated" },
-      "navigationMode": "delegate"
-    }
-  ]
-}
-```
+**Canonical reference**: JsonUIDocument [`specification-rules.md` (5) section](../../../JsonUIDocument/.claude/jsonui-rules/specification-rules.md) (the file authored at distribution time). Treat that section as authoritative for the JSON shape, attribute table, and validation rules.
 
-Layout JSON (parent) places the embed in the view tree:
+**Quick recap of the rules (mirror these in spec / Layout JSON authoring):**
 
-```json
-{ "type": "Embed", "id": "detailPane", "screen": "order_detail",
-  "params": { "orderId": "@{selectedOrderId}" }, "weight": 1 }
-```
+| Field | Where | Convention | Example |
+|---|---|---|---|
+| `structure.components[].id` (spec) | spec | snake_case | `detail_pane` |
+| `Embed.id` (Layout JSON) | layout | camelCase | `detailPane` |
+| `structure.embeds[].regionId` (spec) | spec | camelCase — references the Layout JSON `Embed.id` | `detailPane` |
+| `Embed.screen` value | spec & layout | **snake_case layout JSON filename** (no extension) — codegen converts to PascalCase View name | `order_detail` |
+| `params` keys | spec & layout | camelCase | `orderId` |
+| `events` keys | spec | `^on[A-Z][a-zA-Z0-9]*$` | `onOrderUpdated` |
+| `navigationMode` | spec & layout | **v1: `"delegate"` only** (`"isolated"` deferred to v1.5) | `delegate` |
 
-Rules:
+**Local-only validation** — `doc_validate_spec` checks the Embed block in isolation; the embedded screen's spec is NOT required to declare anything special. Type contracts beyond key/binding existence are runtime responsibilities (v1 scope). See `validator.py :: _validate_embed`.
 
-- `regionId` (spec) ↔ Layout JSON `Embed.id` are both **camelCase** and must agree. The id is unique within the parent layout — on Android it doubles as the `ViewModelStoreOwner` key for VM isolation.
-- `screen` is the **layout JSON filename in snake_case, no extension** (e.g. `order_detail` loads `docs/screens/layouts/order_detail.json`). Codegen converts to the PascalCase View class name; dynamic mode loads the JSON as-is.
-- `params` keys must be camelCase. Values may be literals or `@{varName}` bindings — bindings resolve against the parent VM's `vars[]` / `uiVariables[]`. VMs that implement `applyInitParams(_:)` consume them; others ignore them.
-- `events` keys follow `on[A-Z]...`. Values must reference existing entries in the parent VM's `dataFlow.viewModel.methods[]` or `stateManagement.eventHandlers[]`. Embedded VMs emit via the lib-provided `emit(name, payload)` helper (no spec-side declaration required).
-- `navigationMode`: **v1 supports `"delegate"` only** — the embedded screen's `navigate()` calls drive the parent's NavController/Router; `pop` / `dismiss` / `navigateBack` are bounded at the embed and do not close it. `"isolated"` (private nav stack) is deferred to v1.5.
-- The embedded screen owns its own ViewModel — completely independent from the parent VM. Cross-screen communication is via `params` (parent → child) and `events` (child → parent) only.
-- The same screen can be embedded multiple times in the same parent (each instance gets its own VM, keyed by `regionId`).
-- Validation is **local to the Embed block** — `doc_validate_spec` does not require the embedded screen to declare anything special. Type contracts beyond key/binding existence are runtime responsibilities (v1 scope).
+**Embedded screen is unchanged.** Parents declare the embed; embedded VMs stay as-is. VMs that implement `applyInitParams(_:)` consume `params`; emit events via the lib-provided `emit(name, payload)` helper.
 
 See `jsonui-cli/docs/plans/2026-05-11-embed-feature.md` for the full design.
 
@@ -332,6 +316,8 @@ Agents have shipped specs with empty or missing `dataFlow` even when the screen 
 | `dataFlow.repositories[]` | Screen reads/writes ANYTHING outside the VM — API, disk, keychain, cache, shared state, platform SDK (StoreKit, Firebase, CoreLocation). | At minimum one Repository with `methods[]` and `endpoint` (or SDK description in `description`). API calls via ViewModel directly are NOT allowed — see design-philosophy.md. |
 | `dataFlow.useCases[]` | Screen has orchestration across multiple repositories, multi-step validation, or business logic that doesn't belong in either the VM or a Repo. | Declare the UseCase and link it to Repositories via `useCase.repositories` or `methods[].calls`. Skip the UseCase for 1-API single-repo screens. |
 | `dataFlow.apiEndpoints[]` | Every endpoint referenced by `repositories[*].methods[*].endpoint` must have a matching entry here. | `{path, method, request, response, notes}`. Paths must match repo entries exactly. |
+
+> **Swagger-driven Data Models** — When a Repository method's `returnType` (or a param type) is the name of a schema declared under `docs/api/*.json#components.schemas.*`, the type resolves to the **Domain wrapper** (`User`), not the DTO (`UserDto`). `jui build` auto-registers swagger schema names in TypeMapper, so no manual `.jsonui-type-map.json` entry is needed. To declare a return type as the raw DTO, write `returnType: "UserDto"` explicitly. See `file-locations.md` (API Specifications + Data Model section) for the DTO ↔ Domain layout and `invariants.md` (rules 5-8) for the editing contract.
 
 **Pure-static display screens** (no interaction, no dynamic data, no observable state — e.g. a help page with hard-coded text) are the ONE exception. For those, still write `dataFlow.viewModel: { methods: [], vars: [] }` **explicitly** — do not omit the `dataFlow` key entirely, so the next editor can see it was a considered choice rather than a skip.
 
@@ -557,6 +543,28 @@ Rules:
 - Screen-level `stateManagement.uiVariables` is for the screen's own data
   (collection data source, visibility flags, toast messages…). Cell data
   belongs on the cell node, not on the screen.
+
+### Multiple Collections on one screen
+
+A screen with more than one Collection declares the extras in
+`structure.collections` (an **array** of the same collection shape).
+`structure.collection` stays the primary slot — only it participates in
+Layout JSON auto-generation — but every `collections[]` entry is
+first-class for validation (`jsonui-doc validate spec`), doc generation,
+and cell Layout generation (`jui g project` emits a cell Layout for each
+entry with `generateCellLayout: true`):
+
+```json
+"collection": { "id": "fee_sections_collection", "cell": { ... } },
+"collections": [
+  { "id": "cancel_policy_sections_collection", "cell": { ... } },
+  { "id": "gallery_thumbnail_row", "cell": { ... } }
+]
+```
+
+Screens using `collections` are expected to author the screen Layout JSON
+externally (`metadata.layoutFile`) — the auto-generated layout only places
+the primary `collection`.
 
 ## Collection: `lazy: true` (default) vs `lazy: false`
 

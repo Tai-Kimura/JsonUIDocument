@@ -44,7 +44,12 @@ type AttrDef = {
   aliases?: string[];
   binding_direction?: string;
   enum?: string[];
-  platform?: string;
+  // Declared surface. The SSoT vocabulary is emitter languages
+  // (swift / kotlin / react), normalized to ios / android / web here.
+  platform?: string | string[];
+  // Why a platform was excluded from the declared surface (SSoT, since
+  // 2026-07-31). Keyed by emitter language; English prose.
+  platform_reasons?: Record<string, string>;
 };
 
 type ExampleVariant = { language: string; label?: string; code: string };
@@ -197,7 +202,7 @@ type MergedAttribute = {
   description: string | Lang2;
   note?: Lang2;
   platformDiff?: Record<string, string>;
-  platform?: string;
+  platform?: string | string[];
   bindingDirection?: string;
   enumValues?: string[];
   aliases?: string[];
@@ -266,7 +271,7 @@ function mergeComponent(args: {
       type: describeType(def),
       required: !!def.required,
       description: resolveAttrDescription(attrName, def, ov?.summary, descriptionsDict),
-      note: ov?.note,
+      note: mergeNotes(ov?.note, platformReasonsNote(def.platform_reasons)),
       platformDiff: ov?.platformDiff,
       platform: def.platform,
       bindingDirection: def.binding_direction,
@@ -307,7 +312,7 @@ type MergedCategoryAttribute = {
   examples?: Array<{ title?: Lang2; language: string; code: string }>;
   platformDiff?: Record<string, string>;
   relatedAttributes?: string[];
-  platform?: string;
+  platform?: string | string[];
   bindingDirection?: string;
   enumValues?: string[];
   aliases?: string[];
@@ -356,7 +361,7 @@ function mergeCategory(args: {
       default: ov?.default,
       deprecated: ov?.deprecated,
       subgroup: ov?.subgroup,
-      note: ov?.note,
+      note: mergeNotes(ov?.note, platformReasonsNote(def.platform_reasons)),
     };
   });
 
@@ -1955,31 +1960,63 @@ function buildAliasChips(aliases: string[] | undefined): EnumChip[] {
   }));
 }
 
+// SSoT platform vocabulary is emitter languages; the site speaks platforms.
+const PLATFORM_LANG_MAP: Record<string, "ios" | "android" | "web"> = {
+  swift: "ios",
+  kotlin: "android",
+  react: "web",
+  ios: "ios",
+  android: "android",
+  web: "web",
+};
+
+// Normalized declared surface, or null when the attribute is declared
+// everywhere (no `platform` key). Unknown tokens are dropped — upstream
+// fail-fasts on them at declaration time, so none should reach us.
+function declaredPlatformSet(
+  attrPlatform: string | string[] | undefined,
+): Set<"ios" | "android" | "web"> | null {
+  if (!attrPlatform) return null;
+  const list = Array.isArray(attrPlatform) ? attrPlatform : [attrPlatform];
+  const set = new Set<"ios" | "android" | "web">();
+  for (const token of list) {
+    const mapped = PLATFORM_LANG_MAP[token];
+    if (mapped) set.add(mapped);
+  }
+  return set.size > 0 ? set : null;
+}
+
 function buildPlatformMatrix(
   attrPlatformDiff: Record<string, string> | undefined,
   componentPlatforms: Platforms,
-  attrPlatform: string | undefined,
+  attrPlatform: string | string[] | undefined,
 ): {
   visibility: string;
   ios: string;
   android: string;
   web: string;
 } {
-  const fallback = (p: Support, explicit?: string): string => {
+  const declared = declaredPlatformSet(attrPlatform);
+  const fallback = (
+    p: Support,
+    explicit: string | undefined,
+    key: "ios" | "android" | "web",
+  ): string => {
     if (explicit) return explicit;
+    // The SSoT declares the surface per attribute; a platform outside it is
+    // not supported there no matter what the component-level default says.
+    if (declared && !declared.has(key)) return "—";
     if (p === "yes") return "✓";
     if (p === "partial") return "✓ (partial)";
     return "—";
   };
   const hasDiff = attrPlatformDiff && Object.keys(attrPlatformDiff).length > 0;
-  const attrPlatformHint = attrPlatform
-    ? (p: Support) => (attrPlatform === "ios" ? (p === "yes" ? undefined : "—") : undefined)
-    : () => undefined;
+  const narrowed = !!declared && declared.size < 3;
   const result = {
-    visibility: hasDiff ? "visible" : "gone",
-    ios: fallback(componentPlatforms.ios, attrPlatformDiff?.ios ?? attrPlatformHint(componentPlatforms.ios)),
-    android: fallback(componentPlatforms.android, attrPlatformDiff?.android),
-    web: fallback(componentPlatforms.web, attrPlatformDiff?.web),
+    visibility: hasDiff || narrowed ? "visible" : "gone",
+    ios: fallback(componentPlatforms.ios, attrPlatformDiff?.ios, "ios"),
+    android: fallback(componentPlatforms.android, attrPlatformDiff?.android, "android"),
+    web: fallback(componentPlatforms.web, attrPlatformDiff?.web, "web"),
   };
   // Also show matrix when any component-level platform is not "yes".
   if (
@@ -1990,6 +2027,42 @@ function buildPlatformMatrix(
     result.visibility = "visible";
   }
   return result;
+}
+
+// platform_reasons rendered as a note fragment. The prose is English in the
+// SSoT; only the framing label is localized, so the reason cannot drift
+// between locales.
+const PLATFORM_DISPLAY_NAME: Record<string, string> = {
+  swift: "iOS",
+  kotlin: "Android",
+  react: "Web",
+  ios: "iOS",
+  android: "Android",
+  web: "Web",
+};
+
+function platformReasonsNote(
+  reasons: Record<string, string> | undefined,
+): Lang2 | undefined {
+  if (!reasons) return undefined;
+  const parts = Object.entries(reasons)
+    .map(([lang, why]) => `${PLATFORM_DISPLAY_NAME[lang] ?? lang}: ${why}`)
+    .filter(Boolean);
+  if (parts.length === 0) return undefined;
+  const joined = parts.join(" / ");
+  return {
+    en: `Why the surface is narrower — ${joined}`,
+    ja: `対応面が狭い理由 — ${joined}`,
+  };
+}
+
+function mergeNotes(base?: Lang2, extra?: Lang2): Lang2 | undefined {
+  if (!extra) return base;
+  if (!base || (!base.en && !base.ja)) return extra;
+  return {
+    en: [base.en, extra.en].filter(Boolean).join(" "),
+    ja: [base.ja, extra.ja].filter(Boolean).join(" "),
+  };
 }
 
 type BadgeRow = { id: string; label: string; fontColor: string };

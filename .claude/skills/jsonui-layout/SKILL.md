@@ -8,6 +8,22 @@ tools: Read, Write, MultiEdit, Bash, Glob, Grep
 
 Specialized in correct JSON layout implementation. Styles extraction and DRY cleanup are done inline — there is no separate refactor skill.
 
+## `role` — declaring what a layout IS
+
+A layout root may declare `"role": "screen" | "cell" | "partial"`. It decides
+whether the layout is a navigation destination (and so carries a screen marker
+and may appear as a test's `screen`) or a fragment that renders inside a host.
+
+When it is absent the role is DERIVED: a layout referenced by another via
+`cell` / `header` / `footer` / `cellClasses` / `include` is a fragment,
+`"partial": true` is a fragment, and anything left over is a screen. The
+derivation is deliberately imperfect — a fragment that nothing references yet
+derives to "screen". `jui build` reports this, and the fix is to declare the
+role explicitly, never to rename the file.
+
+Declare `"role"` explicitly whenever a layout's purpose is not obvious from how
+it is referenced.
+
 ## Rule Reference
 
 Read the following rule files first:
@@ -226,6 +242,65 @@ root.json (TabView only)
 
 ---
 
+## Embed (Cross-Screen Embedding)
+
+Use `Embed` when a screen hosts another screen as a region of its layout (tablet master/detail, dashboard panels). **The embedded screen owns its own ViewModel** — completely independent from the parent VM. This is the core design contract; it is what separates `Embed` from `include` (which shares the parent VM) and `TabView` (which also shares).
+
+### When to use Embed
+
+- iPad master/detail: master list on the left, embed `OrderDetail` on the right
+- Dashboards: a dashboard screen hosting `RecentActivity`, `Calendar`, etc.
+- Same screen reused: phone shows it standalone, tablet embeds it inside a parent
+
+### Layout JSON shape
+
+```json
+{
+  "type": "View",
+  "id": "rootContainer",
+  "orientation": "horizontal",
+  "child": [
+    {
+      "type": "View",
+      "id": "masterPane",
+      "width": 320,
+      "child": [ /* master list */ ]
+    },
+    {
+      "type": "Embed",
+      "id": "detailPane",
+      "screen": "order_detail",
+      "params": { "orderId": "@{selectedOrderId}" },
+      "navigationMode": "delegate",
+      "weight": 1
+    }
+  ]
+}
+```
+
+### Attribute conventions
+
+| Attribute | Convention | Notes |
+|---|---|---|
+| `id` | **camelCase**, unique within the parent layout | Doubles as the Android `ViewModelStoreOwner` key — must be unique even when the same screen is embedded twice. |
+| `screen` | **snake_case layout JSON filename** (no extension) | E.g. `order_detail` loads `docs/screens/layouts/order_detail.json`. Codegen converts to PascalCase View class name. |
+| `params` | keys camelCase | Values: literal or `@{varName}` binding against the parent VM. Embedded VMs that implement `applyInitParams(_:)` consume them; others ignore. |
+| `navigationMode` | `"delegate"` (v1 only) | `"isolated"` deferred to v1.5. delegate forwards `navigate()` to the parent's NavController/Router. |
+
+### Rules
+
+- **Same screen multi-embed** is supported. Each Layout JSON `Embed.id` keys a separate VM instance. ID uniqueness is critical on Android.
+- **Embedded screen needs no changes** — its spec and layout stay as-is. The parent declares the embedding.
+- **Navigation bounded at the embed**: `pop` / `dismiss` / `navigateBack` from inside the embedded screen do NOT close the embed itself (runtime enforces this in delegate mode).
+- **No localize on the Embed node** — the node has no user-visible strings. The embedded screen is localized as part of its own implementation.
+- **Spec contract**: when adding an Embed to a Layout JSON, the parent spec must also declare `structure.embeds[]` with a matching `regionId` (camelCase same as the layout `id`), or `jui verify` will flag drift.
+
+→ Examples: `examples/embed.json` (parent layout), `examples/embed-spec-fragment.json` (spec side).
+
+See also `rules/specification-rules.md` (5) Section and `rules/design-philosophy.md` "VM isolation across embedded screens".
+
+---
+
 ## Include Syntax
 
 **Include is NOT a type** - It's a reference directive.
@@ -257,17 +332,34 @@ The `data: [...]` block in a Collection cell Layout only DECLARES the variable n
 
 Only write `@{bindingName}`. Type definitions live in the spec's `stateManagement.uiVariables` and `dataFlow.viewModel.vars` — see the `jsonui-dataflow` skill.
 
+### Canonical Expression Forms (SwiftJsonUI ≥ 10.6.0 / KotlinJsonUI ≥ 2.13.0)
+
+The resolution semantics are SSoT-declared (`shared/core/binding_semantics.json`;
+`get_binding_rules` returns them under `semantics`). Canonical forms:
+
+- **Dot path / bracket index** (read-only value + text contexts, all platforms):
+  `@{profile.name}`, `@{items[0].title}`
+- **Default**: `@{title ?? "Untitled"}` or `?? 'Untitled'` — ONE `??` max;
+  string defaults in single or double quotes, `true`/`false`/number bare.
+  A resolved value (even `false`/`0`/`""`) always wins over the default.
+- **Negation**: `@{!isHidden}` — **boolean value attributes only**
+  (`hidden`, `enabled`, ...). Anywhere else it is a validator error.
+- **Two-way bindings** (TextField text, Switch isOn, ...) must be a single
+  flat identifier — no dots, brackets, `??`, or `!`.
+- Unresolved keys: text renders empty, typed values fall back to the
+  attribute default, Embed params drop the key (child defaults apply).
+
 ### No Logic in Bindings (Critical)
 
 **Prohibited patterns:**
 - `@{selectedTab == 0 ? #D4A574 : #B8A894}` - Ternary operators
 - `@{items.count > 0}` - Comparisons
 - `@{price * quantity}` - Calculations
-- `@{!isHidden}` - Negation
 
 **Allowed:**
 - `@{searchTabColor}` - ViewModel computed property
 - `@{onButtonTap}` - ViewModel function
+- `@{!isHidden}` - Negation, on boolean value attributes only
 
 → Examples: `examples/binding-correct.json`, `examples/binding-wrong.json`
 
@@ -399,7 +491,7 @@ Priority: compound > landscape > regular > medium > compact > default
 - Only attribute overrides — `type`, `child`, `data` CANNOT be in responsive
 - Unspecified attributes keep the default value
 - Use for: orientation changes, spacing/padding adjustments, visibility toggling, fontSize changes
-- For completely different layouts, use variant files (`screen@tablet.json`) instead
+- For completely different structures, use variant files (`screen@regular.json`) — see below
 
 ### Common Patterns
 
@@ -417,6 +509,53 @@ Priority: compound > landscape > regular > medium > compact > default
 ```json
 { "spacing": 8, "responsive": { "regular": { "spacing": 24 }, "landscape": { "spacing": 16 } } }
 ```
+
+---
+
+## Variant Files (whole-tree replacement per size class)
+
+When a size class needs a **structurally different** layout (not just
+attribute tweaks), ship a sibling variant file:
+
+```
+Layouts/home.json            ← base (REQUIRED, canonical)
+Layouts/home@regular.json    ← full replacement for the regular tier
+```
+
+**Vocabulary (v1):** `@compact` / `@medium` / `@regular` only.
+Landscape and combined forms stay in the inline `responsive` attribute.
+`@tablet` is not a size class — use `@regular`.
+
+**Resolution:** tier X renders `<base>@X.json` when it exists, otherwise
+the base. No cross-tier promotion (a medium window with only `@regular`
+shipped renders the base). Tier detection matches inline `responsive`:
+iOS horizontal size class (no medium on iOS — `@medium` folds into the
+compact tier, `@compact` wins when both exist), Android 600/840dp, web
+768/1024px.
+
+**Contract (enforced as `jui build` errors):**
+- The variant is a FULL replacement — no partial merge (share structure
+  via `include`/styles instead)
+- Variants must NOT declare a `data` section — the data contract is
+  base-canonical; every `@{binding}` in a variant must be declared in
+  the base's `data` section
+- Variants must NOT declare `platforms` (inherited from the base)
+- Screen-root layouts only: no variants of `partial: true` layouts or
+  Collection cell layouts
+- A real layout named `<base>_<class>_variant.json` collides with the
+  generated variant view name
+
+**State contract:** a size-class change swaps the whole tree — VM-owned
+state (bindings) survives (one VM instance spans the swap); view-local
+state (scroll position, unbound input, focus) is lost by design. Any
+input that must survive a Split View / foldable transition belongs in a
+VM binding.
+
+**Generated code:** the base screen's GeneratedView gains a size-class
+dispatch and each variant gets its own `<Base><Class>VariantGeneratedView`
+sharing the base's Data/ViewModel. Variants never generate their own
+VM/Data/spec. Old dynamic runtimes ignore variant files and render the
+base (graceful degradation).
 
 ---
 

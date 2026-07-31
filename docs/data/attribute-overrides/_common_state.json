@@ -47,6 +47,10 @@
       "summary": {
         "en": "Boolean. When `false`, the component ignores user interaction and applies its disabled styling (dimmed / desaturated).",
         "ja": "Boolean。`false` でユーザー操作を無視し、disabled スタイル（減光／彩度低下）が適用される。"
+      },
+      "note": {
+        "en": "Works on containers, not just inputs — a `View` with an `onClick` is interactive, and disabling it while a request is in flight is the standard double-submit guard (since 2026-07-30; before that the binding form was silently dropped everywhere, and containers ignored it entirely on Android). Each platform disables interactive descendants too (SwiftUI `.disabled`, Compose gates the click and marks the a11y node, web adds `pointer-events-none` with `aria-disabled`), and because the state lands in the accessibility tree, `assert: \"disabled\"` in a screen test can see it — a ViewModel-side guard cannot be asserted that way.",
+        "ja": "入力系だけでなくコンテナにも効きます — `onClick` を持つ `View` はインタラクティブであり、リクエスト中に無効化するのが二重送信ガードの定石です（2026-07-30 以降。それ以前は binding 形式が全プラットフォームで黙って落ち、Android ではコンテナ自体が無視していました）。各プラットフォームで配下のインタラクティブ要素も無効になり（SwiftUI は `.disabled`、Compose はクリックを遮断して a11y ノードに記録、web は `pointer-events-none` + `aria-disabled`）、状態がアクセシビリティツリーに載るため画面テストの `assert: \"disabled\"` で検証できます — ViewModel 側のガードではこのアサートは書けません。"
       }
     },
     "alpha": {

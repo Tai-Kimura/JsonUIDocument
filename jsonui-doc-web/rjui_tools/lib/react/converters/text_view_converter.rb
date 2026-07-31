@@ -62,6 +62,31 @@ module RjuiTools
             classes << "placeholder-#{attributes['hintAttributes']['fontColor']}"
           end
 
+          # Placeholder typography, through the `placeholder:` variant so it
+          # targets ::placeholder rather than the textarea's own text.
+          if attributes['hintFontSize']
+            classes << "placeholder:text-[#{attributes['hintFontSize'].to_i}px]"
+          end
+          if attributes['hintFont']
+            hint_font = TailwindMapper.map_font(attributes['hintFont'])
+            classes << "placeholder:#{hint_font}" if hint_font && !hint_font.empty?
+          end
+          if attributes['hintLineHeightMultiple']
+            classes << "placeholder:leading-[#{attributes['hintLineHeightMultiple']}]"
+          end
+
+          # hideOnFocused defaults to true: the hint goes away when the field is
+          # focused, not when the first character arrives. That is the declared
+          # default and how the iOS and Android runtimes behave, whereas a browser
+          # keeps the placeholder visible until there is text — so the class is
+          # emitted unless the layout explicitly opts out.
+          unless attributes['hideOnFocused'] == false
+            classes << 'focus:placeholder-transparent'
+          end
+
+          # Text selection
+          classes << 'select-none' if attributes['selectable'] == false
+
           # Disabled state
           if attributes['enabled'] == false || attributes['enabled'].is_a?(String)
             if attributes['disabledBackground']
@@ -72,7 +97,7 @@ module RjuiTools
             classes << 'disabled:cursor-not-allowed'
           end
 
-          classes.compact.reject(&:empty?).join(' ')
+          finalize_classes(classes)
         end
 
         def build_style_attr
@@ -81,6 +106,22 @@ module RjuiTools
           # Corner radius
           if attributes['cornerRadius']
             @dynamic_styles['borderRadius'] = "'#{attributes['cornerRadius']}px'"
+          end
+
+          # lineBreakMode — same truncation mapping as Label (a textarea shows
+          # its own scrollbar rather than truncating, so this only matters for
+          # the read-only/one-line styling cases, but the declared attribute
+          # must not be silently dropped).
+          if attributes['lineBreakMode']
+            case attributes['lineBreakMode']
+            when 'Head'
+              @dynamic_styles['textOverflow'] = "'ellipsis'"
+              @dynamic_styles['direction'] = "'rtl'"
+              @dynamic_styles['textAlign'] = "'left'"
+            when 'Middle', 'Tail', 'Clip'
+              @dynamic_styles['textOverflow'] = "'ellipsis'"
+            end
+            @dynamic_styles['overflow'] = "'hidden'"
           end
 
           # Hint/placeholder color is now handled via Tailwind class in build_class_name
@@ -179,7 +220,53 @@ module RjuiTools
           # Auto focus
           attrs << ' autoFocus' if attributes['autoFocus'] || attributes['becomeFirstResponder']
 
+          # Soft-keyboard hints — same UIKit-spelling vocabulary as TextField,
+          # mapped by the shared base helpers. A textarea has no `type`, so
+          # `input` only contributes the mobile keyboard mode here.
+          if attributes['input']
+            inputmode = map_input_mode(attributes['input'])
+            attrs << " inputMode=\"#{inputmode}\"" if inputmode
+          end
+          if attributes['returnKeyType']
+            enter_key_hint = map_return_key(attributes['returnKeyType'])
+            attrs << " enterKeyHint=\"#{enter_key_hint}\"" if enter_key_hint
+          end
+
+          # Columns — the horizontal counterpart of `rows`.
+          attrs << " cols={#{attributes['cols'].to_i}}" if attributes['cols']
+
+          # Native browser validation. `required` is a textarea attribute;
+          # `pattern` is NOT — HTML only defines it for <input> — so the same
+          # contract is met through the constraint-validation API, which still
+          # blocks form submission and still drives :invalid.
+          attrs << ' required' if attributes['required'] == true || attributes['required'] == 'true'
+          if attributes['pattern']
+            escaped = attributes['pattern'].to_s.gsub('\\', '\\\\\\\\').gsub("'", "\\\\'")
+            attrs << " onInput={(e) => e.target.setCustomValidity(" \
+                     "new RegExp('^(?:#{escaped})$').test(e.target.value) ? '' : 'Invalid format')}"
+          end
+
+          # Soft keyboard. `input` is the TextField spelling of the same idea and
+          # already maps through here; keyboardType is the UIKit one.
+          if attributes['keyboardType']
+            inputmode = map_keyboard_type(attributes['keyboardType'])
+            attrs << " inputMode=\"#{inputmode}\"" if inputmode
+          end
+
           attrs.join
+        end
+
+        # UIKeyboardType spellings -> the HTML inputmode vocabulary.
+        def map_keyboard_type(value)
+          case value.to_s.downcase.sub(/^uikeyboardtype/, '')
+          when 'numberpad', 'number', 'numbersandpunctuation' then 'numeric'
+          when 'decimalpad', 'decimal' then 'decimal'
+          when 'phonepad', 'phone' then 'tel'
+          when 'emailaddress', 'email' then 'email'
+          when 'url', 'weburl' then 'url'
+          when 'websearch', 'search' then 'search'
+          when 'default', 'asciicapable', 'text' then 'text'
+          end
         end
 
         def build_on_change

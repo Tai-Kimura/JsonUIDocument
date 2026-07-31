@@ -27,11 +27,18 @@ Flow tests should **reuse screen tests** rather than duplicate test logic:
 
 ## Flow Test Structure
 
+> **Embed (`structure.embeds[]`) limitation in v1**: flow tests cannot cross the embed boundary in a single flow. If a user journey involves a parent screen and its embedded sub-screen, write **two screen tests** (one for the parent with `embeddedIn` omitted, one for the embedded screen with `embeddedIn: "Parent.regionId"`) and assert each independently. Flow-level support for embedded screens is deferred to v1.5. — See `rules/specification-rules.md` (5).
+
 ### Basic Structure with File References (Recommended)
 
 ```json
 {
   "type": "flow",
+  "sources": [
+    { "layout": "docs/screens/layouts/landing.json", "alias": "landing" },
+    { "layout": "docs/screens/layouts/registration.json", "alias": "registration" },
+    { "layout": "docs/screens/layouts/confirmation.json", "alias": "confirmation" }
+  ],
   "metadata": {
     "name": "User Registration Flow",
     "description": "Complete user registration flow from landing to confirmation"
@@ -43,6 +50,84 @@ Flow tests should **reuse screen tests** rather than duplicate test logic:
   ]
 }
 ```
+
+### `sources` (Screen Registry)
+
+`sources` declares the screens involved in the flow. It **MUST be an array** of
+`{ layout, alias?, spec? }` objects — `layout` (path to the screen's layout JSON) is
+required; `alias` is the short name that inline steps reference via `screen`; `spec`
+optionally points at the spec document.
+
+```json
+"sources": [
+  { "layout": "docs/screens/layouts/login.json", "alias": "login" },
+  { "layout": "docs/screens/layouts/home.json", "alias": "home", "spec": "docs/screens/specs/home.md" }
+]
+```
+
+### `screen` values are canonical screen ids
+
+A step's `screen` is the **layout basename without `.json`** — `home.json` →
+`"home"`, `settings/profile.json` → `"profile"`. Responsive variants normalize
+to the base (`home@regular.json` → `"home"`). Basenames are unique across the
+whole layout tree, so the id is unambiguous.
+
+**Only real screens are valid.** A layout that another layout instantiates via
+`cell` / `header` / `footer` / `cellClasses` / `include` is NOT a screen — it
+renders inside its host, potentially once per data row. Naming a cell as a
+step's `screen` is a validator **error**; use the screen that owns it.
+
+Run `jui screens` (or `list_layouts`) to see the classification, including HOW
+each role was decided. A layout that is really a fragment but that nothing
+references yet will show up as a screen with reason `default` — the fix is to
+declare `"role": "cell"` on its layout root, not to work around it in the test.
+
+Screens the app owns without a JsonUI layout (a hand-written page) are declared
+in `jui.config.json` under `test.appOwnedScreens`, otherwise they are rejected
+as unknown. An entry is a bare id, or an object when the screen also needs a
+transition-diagram group — it has no screen test to carry `metadata.group`, so
+without one it stays in the diagram's ungrouped bucket:
+
+```jsonc
+"test": {
+  "appOwnedScreens": [
+    "licenses",                              // ungrouped
+    { "id": "tokushoho", "group": "static" } // grouped
+  ]
+}
+```
+
+### Asserting arrival: `assert: "screen"`
+
+```json
+{ "screen": "cart", "assert": "screen", "name": "cart" }
+```
+
+Asserts that the named screen **is displayed**. Note the target key is `name`,
+not `screen` — the step-level `screen` means "where this step runs", and during
+a transition the two legitimately differ.
+
+- It does NOT assert exclusivity. Split panes, tab hosts and embedded screens
+  legitimately show several screens at once.
+- Assertions already auto-wait, so there is no separate "wait for screen"
+  action. The default wait is longer than a normal assertion (10s) because
+  cross-screen waits genuinely are.
+- You usually do not need to write it. `verifyScreenTransitions` is **on by
+  default**, so the driver verifies automatically wherever an inline step's
+  `screen` changes. Write it explicitly when you want the arrival to be the
+  point of the step.
+
+The marker it looks for is emitted by code generation and only exists in
+**development builds**. A failure saying `marker-absent` means the app was
+built for production, or its generated code / library pin is stale. That names
+the **cause** — it is still a hard failure, and the fix is `jui build` plus a
+current library pin, not a change to the test.
+
+**Do NOT use the legacy object-map form** (`"sources": { "login": "path/to/login.json" }`) —
+it passes as JSON but the iOS/Android drivers reject it at parse time, and
+`jsonui-test validate` now errors on it.
+
+Most examples below omit `sources` for brevity; real flow tests should declare it.
 
 ### File Reference Options
 
@@ -64,6 +149,24 @@ Execute all test cases defined in the screen test:
 { "file": "login" }
 ```
 When no `case` or `cases` is specified, all cases from the referenced screen test are executed in the order they are defined.
+
+#### Conditional Flow Steps (`when`)
+Any flow step (file reference, block, or inline) may carry a `when` pre-condition and is
+skipped when it is not satisfied. Same condition object as screen tests
+(`visible` / `notVisible` / `platform` / `state`, ANDed):
+```json
+{ "file": "product-detail", "case": "詳細表示", "when": { "platform": ["ios", "android"] } }
+```
+
+#### Launch Configuration (flow root)
+A flow test may declare a root-level `launch` object (`clearState` / `permissions` /
+`arguments`) applied before the flow starts — same shape as screen tests. See the
+jsonui-screen-test skill for details.
+
+#### Step-level Features
+Inline flow steps and block steps support the same step attributes as screen tests —
+`label`, `optional`, `when`, the `repeat` / `retry` control steps, `readText` + `@{vars}`,
+and the auto-wait assertion behavior. See the jsonui-screen-test skill for the full list.
 
 #### Overriding Args in File References
 
@@ -99,7 +202,7 @@ When screen tests define `args` with default values, flow tests can override the
   "steps": [
     { "file": "login", "case": "login_with_credentials", "args": { "email": "admin@example.com", "password": "adminPass123" } },
     { "file": "dashboard", "case": "verify_admin_panel" },
-    { "action": "tap", "id": "logout_button" },
+    { "screen": "dashboard", "action": "tap", "id": "logout_button" },
     { "file": "login", "case": "login_with_credentials", "args": { "email": "user@example.com", "password": "userPass456" } },
     { "file": "dashboard", "case": "verify_user_panel" }
   ]
@@ -128,7 +231,13 @@ When screen tests define `args` with default values, flow tests can override the
 
 ### Inline Steps (For Flow-Specific Actions)
 
-You can also include inline steps for flow-specific actions that don't belong to any screen test:
+You can also include inline steps for flow-specific actions that don't belong to any screen test.
+
+**Every top-level inline step (action or assert) MUST carry a non-empty `screen`** — the
+alias (from `sources`) of the screen the step runs on. This applies to `steps`, `setup`,
+and `teardown` alike, and to every action (even `wait` / `screenshot`). The drivers never
+execute a screen-less inline step, and `jsonui-test validate` errors on it. Steps **inside
+a `block`** are the one exception — they don't need `screen`.
 
 ```json
 {
@@ -139,9 +248,9 @@ You can also include inline steps for flow-specific actions that don't belong to
   },
   "steps": [
     { "file": "login", "case": "valid_login" },
-    { "action": "waitFor", "id": "home_screen", "timeout": 5000 },
+    { "screen": "home", "action": "waitFor", "id": "home_screen", "timeout": 5000 },
     { "file": "home", "case": "navigate_to_cart" },
-    { "action": "wait", "ms": 1000 },
+    { "screen": "cart", "action": "wait", "ms": 1000 },
     { "file": "checkout", "case": "complete_purchase" }
   ]
 }
@@ -182,7 +291,7 @@ tests/flows/login_error_handling_flow/
         { "action": "tap", "id": "login_button" }
       ]
     },
-    { "action": "waitFor", "id": "home_screen", "timeout": 5000 },
+    { "screen": "home", "action": "waitFor", "id": "home_screen", "timeout": 5000 },
     { "file": "home", "case": "verify_initial_state" }
   ]
 }
@@ -270,6 +379,7 @@ tests/flows/payment_flow/
 - File references are NOT allowed inside block steps
 - Nested blocks are NOT allowed
 - Block steps are only allowed in flow tests (not screen tests)
+- Steps inside a block do NOT need `screen` (only top-level inline steps do)
 
 #### When to Use Block Steps
 
@@ -379,10 +489,10 @@ The loader tries these locations in order:
 
 ## Available Actions & Assertions
 
-**For the complete and up-to-date list of actions and assertions, always check schema.py in the jsonui-test-runner repository:**
+**For the complete and up-to-date list of actions and assertions, always check schema.py in the jsonui-cli repository (the `jsonui-test` CLI lives there):**
 
 ```bash
-find . -path "*/jsonui-test-runner/test_tools/jsonui_test_cli/schema.py" -o -path "*/test_tools/jsonui_test_cli/schema.py" 2>/dev/null | head -1 | xargs cat
+find . "$HOME/.jsonui-cli" -path "*/test_tools/jsonui_test_cli/schema.py" 2>/dev/null | head -1 | xargs cat
 ```
 
 ### Common Actions for Flow Tests
@@ -393,7 +503,11 @@ find . -path "*/jsonui-test-runner/test_tools/jsonui_test_cli/schema.py" -o -pat
 | `wait` | `ms` | - | Wait for animations/loading |
 | `tap` | `id` | `text`, `timeout` | Navigate between screens |
 | `back` | - | - | Navigate back |
+| `typeText` | `value` | `timeout` | Type into the currently-focused field (no `id`) |
+| `hideKeyboard` | - | - | Dismiss soft keyboard before tapping a covered target |
 | `screenshot` | `name` | - | Document flow state |
+
+(Inline usage of any action requires `screen`; see the schema.py reference above for the full action list.)
 
 ### Common Assertions for Flow Tests
 
@@ -470,7 +584,7 @@ Run steps before/after the entire flow:
   "type": "flow",
   "metadata": { "name": "checkout_flow" },
   "setup": [
-    { "action": "wait", "ms": 1000 },
+    { "screen": "login", "action": "wait", "ms": 1000 },
     { "file": "login", "case": "valid_login" }
   ],
   "steps": [
@@ -478,7 +592,7 @@ Run steps before/after the entire flow:
     { "file": "checkout", "case": "complete_purchase" }
   ],
   "teardown": [
-    { "action": "screenshot", "name": "flow_complete" }
+    { "screen": "checkout", "action": "screenshot", "name": "flow_complete" }
   ]
 }
 ```
@@ -540,8 +654,8 @@ Inline steps are appropriate for:
 {
   "steps": [
     { "file": "login", "case": "valid_login" },
-    { "action": "waitFor", "id": "home_screen", "timeout": 5000 },
-    { "assert": "text", "id": "welcome_message", "contains": "test@example.com" },
+    { "screen": "home", "action": "waitFor", "id": "home_screen", "timeout": 5000 },
+    { "screen": "home", "assert": "text", "id": "welcome_message", "contains": "test@example.com" },
     { "file": "home", "case": "verify_initial_state" }
   ]
 }
@@ -563,9 +677,9 @@ Don't combine unrelated journeys in a single flow test.
 {
   "steps": [
     { "file": "cart", "case": "add_items" },
-    { "action": "screenshot", "name": "cart_before_checkout" },
+    { "screen": "cart", "action": "screenshot", "name": "cart_before_checkout" },
     { "file": "checkout", "case": "complete_purchase" },
-    { "action": "screenshot", "name": "purchase_complete" }
+    { "screen": "checkout", "action": "screenshot", "name": "purchase_complete" }
   ]
 }
 ```
@@ -581,7 +695,7 @@ Add appropriate waits for:
 {
   "steps": [
     { "file": "login", "case": "valid_login" },
-    { "action": "waitFor", "id": "home_dashboard", "timeout": 10000 },
+    { "screen": "home", "action": "waitFor", "id": "home_dashboard", "timeout": 10000 },
     { "file": "home", "case": "verify_loaded" }
   ]
 }
@@ -600,7 +714,7 @@ Add appropriate waits for:
   "steps": [
     { "file": "login", "case": "initial_display" },
     { "file": "login", "case": "valid_login" },
-    { "action": "waitFor", "id": "home_screen", "timeout": 5000 },
+    { "screen": "home", "action": "waitFor", "id": "home_screen", "timeout": 5000 },
     { "file": "home", "case": "verify_initial_state" }
   ]
 }
@@ -616,10 +730,10 @@ Add appropriate waits for:
   },
   "steps": [
     { "file": "landing", "case": "tap_register" },
-    { "action": "waitFor", "id": "registration_form", "timeout": 3000 },
+    { "screen": "registration", "action": "waitFor", "id": "registration_form", "timeout": 3000 },
     { "file": "registration", "case": "fill_valid_form" },
     { "file": "registration", "case": "submit_form" },
-    { "action": "waitFor", "id": "confirmation_screen", "timeout": 5000 },
+    { "screen": "confirmation", "action": "waitFor", "id": "confirmation_screen", "timeout": 5000 },
     { "file": "confirmation", "case": "verify_success" }
   ]
 }
@@ -635,17 +749,17 @@ Add appropriate waits for:
   },
   "setup": [
     { "file": "login", "case": "valid_login" },
-    { "action": "waitFor", "id": "home_screen", "timeout": 5000 }
+    { "screen": "home", "action": "waitFor", "id": "home_screen", "timeout": 5000 }
   ],
   "steps": [
     { "file": "products", "case": "add_item_to_cart" },
-    { "action": "screenshot", "name": "item_added" },
+    { "screen": "products", "action": "screenshot", "name": "item_added" },
     { "file": "cart", "case": "view_cart" },
     { "file": "cart", "case": "proceed_to_checkout" },
-    { "action": "waitFor", "id": "checkout_form", "timeout": 3000 },
+    { "screen": "checkout", "action": "waitFor", "id": "checkout_form", "timeout": 3000 },
     { "file": "checkout", "case": "fill_shipping_info" },
     { "file": "checkout", "case": "complete_purchase" },
-    { "action": "waitFor", "id": "order_confirmation", "timeout": 5000 },
+    { "screen": "confirmation", "action": "waitFor", "id": "order_confirmation", "timeout": 5000 },
     { "file": "confirmation", "case": "verify_order_details" }
   ],
   "checkpoints": [
@@ -665,12 +779,12 @@ Add appropriate waits for:
   },
   "steps": [
     { "file": "login", "case": "invalid_credentials" },
-    { "assert": "visible", "id": "error_message" },
-    { "action": "screenshot", "name": "login_error_shown" },
+    { "screen": "login", "assert": "visible", "id": "error_message" },
+    { "screen": "login", "action": "screenshot", "name": "login_error_shown" },
     { "file": "login", "case": "clear_and_retry" },
     { "file": "login", "case": "valid_login" },
-    { "action": "waitFor", "id": "home_screen", "timeout": 5000 },
-    { "assert": "notVisible", "id": "error_message" }
+    { "screen": "home", "action": "waitFor", "id": "home_screen", "timeout": 5000 },
+    { "screen": "home", "assert": "notVisible", "id": "error_message" }
   ]
 }
 ```
@@ -688,7 +802,7 @@ which jsonui-test
 ### Step 2: Install if Not Found
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anthropics/jsonui-test-runner/main/test_tools/installer/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-cli/main/test_tools/installer/bootstrap.sh | bash
 ```
 
 ### Step 3: Validate the Test File

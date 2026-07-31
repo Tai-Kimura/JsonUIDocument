@@ -14,6 +14,18 @@ tools: >
 
 Implements navigation code for Web apps (React or Next.js). Spec is platform-agnostic; navigation code is not.
 
+
+## Do not hand-write screen markers
+
+Generated screen views already carry a screen-identity marker that the test
+drivers use to tell which screen is displayed. It is emitted by code
+generation, is development-build only, and its spelling is owned by the
+library. Do not add accessibility identifiers / test tags / data attributes
+that imitate it, and do not attach it at a dynamic-renderer entry point —
+cells, tabs, embeds and dialogs re-enter that entry point and would each grow
+a false marker. Call `mcp__jui-tools__get_screen_identity` if you need the
+rules.
+
 ## Responsibilities
 
 - React Router v6+ — `<Routes>`, `<Route>`, `useNavigate`, `useParams`
@@ -67,7 +79,7 @@ const router = createBrowserRouter([
   { path: '/',                  element: <LoginScreen /> },
   { path: '/home',              element: <HomeScreen /> },
   { path: '/item/:id',        element: <ItemDetailScreen /> },
-  { path: '/compose/:itemId', element: <ComposeFormScreen /> },
+  { path: '/review/:itemId', element: <ReviewFormScreen /> },
 ]);
 
 // App.tsx
@@ -92,8 +104,8 @@ Filesystem-based routing:
 src/app/
 ├── page.tsx                     ← Login
 ├── home/page.tsx                ← Home
-├── item/[id]/page.tsx           ← Item detail
-└── compose/[itemId]/page.tsx    ← Compose form
+├── item/[id]/page.tsx         ← Item detail
+└── review/[itemId]/page.tsx  ← Review form
 ```
 
 Navigation:
@@ -211,7 +223,7 @@ For Next.js, if a new route was created, the dev server (`npm run dev`) should p
 
 ### Routes added
 - /item/:id  → ItemDetailScreen
-- /compose/:itemId → ComposeFormScreen
+- /review/:itemId → ReviewFormScreen
 
 ### Files touched
 - (React Router) src/routes.tsx
@@ -245,6 +257,24 @@ Same as iOS/Android: keep navigation glue minimal. If nav logic starts duplicati
 5. **Dynamic segments colliding** — `/item/[id]` and `/item/new` in Next.js: literal routes take precedence, but be explicit.
 6. **Query params vs path params** — use path params for identifiers (`/item/[id]`), query for filters (`/search?q=...`).
 7. **SSR hydration mismatch** (Next.js) — navigation state that differs between server and client causes hydration errors. Guard with `useEffect` for client-only logic.
+
+---
+
+## Embed navigation
+
+When the spec contains `structure.embeds[]`, navigation involving the embedded screen is handled per the `navigationMode`:
+
+- **`delegate` (default)** — embedded component's `navigate(...)` drives the **parent's** router. The generated `<EmbedContainer>` either receives `routerOverride` (when isolation is needed by other parts of the system) or transparently uses the parent's `useRouter` / `useNavigate`. Add any new routes triggered by the embedded screen's `userActions[]` to the route tree as you normally would for the parent screen.
+  - `pop` / dismiss / `navigateBack` semantics are **bounded at the embed** — calling them inside the embedded component does NOT unmount the embed. Runtime enforces this; do not work around it.
+  - VM isolation comes from hook closure scoping — embedding the same screen twice naturally yields two hook instances. No extra wiring needed on the web side.
+- **`isolated` (requires `EmbedContainer.tsx` template v2)** — the embed owns a private **in-memory stack**: the URL is never synced, and the browser back button always drives the HOST history (measured 2026-07-24: back after an embed push moves only the host history; the embed stack stays put). Generated code emits `screenResolver={buildEmbedScreenResolver({ '<root>': RootComponent })}` and imports v2-only exports (`useEmbedNavigator`, `buildEmbedScreenResolver`) — type-checking against a v1 template **fails deliberately** (version-skew guard). The template lives in the consumer's `extensions/` which `jui sync_tool` preserves, so **existing projects must update the vendored template manually** (re-vendor from `rjui_tools/lib/react/templates/EmbedContainer.tsx`).
+  - Semantics (conformance-tested on all 3 platforms): push stays inside the embed; pop stops at the embed root — the embed never closes itself; the root child stays mounted under pushed entries so its hook state survives push/pop round trips; stack resets on unmount. Deep links address the host router only.
+  - Pushed-screen resolution: the per-embed `screenResolver` table (codegen emits the root screen only) is consulted first, then the **app-wide table** — call `registerEmbedScreens({ screen_name: Component, … })` once in app bootstrap to register every pushable screen instead of enumerating them at each call site. An unresolvable screen renders an explicit error box, never a silent no-op.
+  - In-embed access: `useEmbedNavigator()` (null in delegate/standalone). Access from OUTSIDE the embed (parent driving a pane): `getEmbedNavigator(embedId)` — registered while the isolated embed is mounted.
+  - **Escape hatch** (transitions OUT of the embed — logout, full-screen flows): pass a parent-VM callback through a `params` leaf binding (e.g. `"onExitRequested": "@{handleChildExit}"`). The child calls the callback; the PARENT performs the navigation. present-style transitions declared by a screen embedded in isolated mode are a **`jui build` hard error**.
+- **`params` nesting** (same release): `params` may be a nested object tree — intermediate nodes must be literal objects, `@{}` bindings only on scalar leaves, arrays not allowed. The validators enforce this (zero-warnings gate). Params reach the embedded component as its `data` prop (root child and pushed entries alike).
+
+Generated React/Next.js code from `rjui_tools` already emits `<EmbedContainer>` around the embedded screen component. Your job here is to make sure the parent's route definitions cover any destinations introduced by the embedded screen's `userActions[]`, and — for isolated embeds — that every pushable screen is reachable via `registerEmbedScreens` or the call-site resolver table. The embedded screen component is untouched.
 
 ---
 

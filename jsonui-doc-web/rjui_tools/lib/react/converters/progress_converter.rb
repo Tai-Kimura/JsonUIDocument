@@ -64,11 +64,11 @@ module RjuiTools
             classes << '[&::-moz-progress-bar]:bg-blue-500'
           end
 
-          classes.compact.reject(&:empty?).join(' ')
+          finalize_classes(classes)
         end
 
         def build_value_attr
-          value = attributes['value'] || attributes['progress'] || 0
+          value = with_bind_fallback(attributes['value'] || attributes['progress']) || 0
 
           if has_binding?(value)
             prop = extract_binding_property(value)

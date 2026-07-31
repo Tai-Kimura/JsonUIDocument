@@ -78,11 +78,11 @@ module RjuiTools
             classes << "${!#{binding_expr} ? 'opacity-50' : ''}"
           end
 
-          classes.compact.reject(&:empty?).join(' ')
+          finalize_classes(classes)
         end
 
         def build_button_class(index)
-          selected_index = attributes['selectedIndex'] || attributes['selectedTabIndex'] || 0
+          selected_index = with_bind_fallback(attributes['selectedIndex'] || attributes['selectedTabIndex']) || 0
 
           # Build font size class
           font_size_class = if attributes['fontSize']
@@ -128,7 +128,7 @@ module RjuiTools
         end
 
         def build_selected_binding
-          selected = attributes['selectedIndex'] || attributes['selectedTabIndex']
+          selected = with_bind_fallback(attributes['selectedIndex'] || attributes['selectedTabIndex'])
 
           if selected && has_binding?(selected)
             extract_binding_property(selected)
@@ -144,9 +144,13 @@ module RjuiTools
 
           if handler && has_binding?(handler)
             extract_binding_property(handler)
+          elsif attributes['valueChange'].is_a?(String) && !attributes['valueChange'].empty?
+            # `valueChange` is the legacy SELECTOR spelling (a bare method
+            # name, like `onclick`) that only the UIKit runtime read.
+            add_viewmodel_data_prefix(to_camel_case(attributes['valueChange']))
           else
             # Generate setter from the raw binding name (without viewModel.data. prefix)
-            selected = attributes['selectedIndex'] || attributes['selectedTabIndex']
+            selected = with_bind_fallback(attributes['selectedIndex'] || attributes['selectedTabIndex'])
             return nil unless selected && has_binding?(selected)
 
             raw_binding = extract_raw_binding_property(selected)
