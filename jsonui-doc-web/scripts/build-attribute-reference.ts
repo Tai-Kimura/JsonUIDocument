@@ -2718,6 +2718,27 @@ export default function Page() {
 // with "_" are author-side comments and are skipped.
 // ---------------------------------------------------------------------------
 
+// Component-alias sections (`_alias_of` pointers, jsonui-cli B1) carry no
+// attribute copies of their own — resolve one hop so an alias page renders
+// the full canonical table (the alias override files already carry the
+// alias prose) and overrides on alias pages validate against real attrs.
+// A pointer to a missing or alias-shaped target degrades to the section
+// itself, mirroring the resolution rule in every other SSoT consumer.
+function resolveAliasSection(
+  attrDefsFile: Record<string, Record<string, AttrDef>>,
+  name: string,
+): Record<string, AttrDef> {
+  const section = attrDefsFile[name] ?? {};
+  const aliasOf = (section as Record<string, unknown>)["_alias_of"];
+  if (typeof aliasOf === "string" && attrDefsFile[aliasOf]) {
+    const target = attrDefsFile[aliasOf] as Record<string, unknown>;
+    if (typeof target["_alias_of"] !== "string") {
+      return attrDefsFile[aliasOf];
+    }
+  }
+  return section;
+}
+
 async function validateOverrides(args: {
   attrDefsFile: Record<string, Record<string, AttrDef>>;
   categoryMap: Record<string, string>;
@@ -2775,7 +2796,7 @@ async function validateOverrides(args: {
     const override = await readJsonOptional<ComponentOverride>(
       path.join(PATHS.overridesDir, file),
     );
-    const table = attrDefsFile[component];
+    const table = resolveAliasSection(attrDefsFile, component);
     for (const attr of Object.keys(override?.attributes ?? {})) {
       if (attr.startsWith("_")) continue;
       if (attr in table) continue;
@@ -2847,7 +2868,7 @@ async function main() {
 
     const merged = mergeComponent({
       name,
-      defAttrs: attrDefsFile[name],
+      defAttrs: resolveAliasSection(attrDefsFile, name),
       override,
       orderMap: orderFile.overrides ?? {},
       defaultOrder: orderFile.defaultOrder ?? [],
