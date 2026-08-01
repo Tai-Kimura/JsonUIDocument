@@ -4420,20 +4420,20 @@
               "languagePill": "json",
               "languagePillVisibility": "visible",
               "activeLanguage": "json",
-              "activeCode": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    {\n      \"type\": \"TextField\",\n      \"text\": \"@{email}\",\n      \"hint\": \"@string/email_placeholder\",\n      \"contentType\": \"emailAddress\",\n      \"onTextChange\": \"@{onEmailChanged}\"\n    },\n    {\n      \"type\": \"Label\",\n      \"text\": \"@{emailError}\",\n      \"visibility\": \"@{emailError != null && emailError != ''}\",\n      \"fontColor\": \"#EF4444\",\n      \"fontSize\": 12\n    }\n  ]\n}",
+              "activeCode": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    {\n      \"type\": \"TextField\",\n      \"text\": \"@{email}\",\n      \"hint\": \"@string/email_placeholder\",\n      \"contentType\": \"emailAddress\",\n      \"onTextChange\": \"@{onEmailChanged}\"\n    },\n    {\n      \"type\": \"Label\",\n      \"text\": \"@{emailError}\",\n      \"visibility\": \"@{emailErrorVisibility}\",\n      \"fontColor\": \"#EF4444\",\n      \"fontSize\": 12\n    }\n  ]\n}",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "`visibility` takes the `visible` / `invisible` / `gone` enum, so the empty-check lives in the ViewModel: `get emailErrorVisibility() { return this.emailError ? \"visible\" : \"gone\"; }`.",
+                "ja": "`visibility` は `visible` / `invisible` / `gone` の enum を取るので、空チェックは ViewModel 側に置く: `get emailErrorVisibility() { return this.emailError ? \"visible\" : \"gone\"; }`。"
               },
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "_variants": [
                 {
                   "language": "json",
-                  "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    {\n      \"type\": \"TextField\",\n      \"text\": \"@{email}\",\n      \"hint\": \"@string/email_placeholder\",\n      \"contentType\": \"emailAddress\",\n      \"onTextChange\": \"@{onEmailChanged}\"\n    },\n    {\n      \"type\": \"Label\",\n      \"text\": \"@{emailError}\",\n      \"visibility\": \"@{emailError != null && emailError != ''}\",\n      \"fontColor\": \"#EF4444\",\n      \"fontSize\": 12\n    }\n  ]\n}"
+                  "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    {\n      \"type\": \"TextField\",\n      \"text\": \"@{email}\",\n      \"hint\": \"@string/email_placeholder\",\n      \"contentType\": \"emailAddress\",\n      \"onTextChange\": \"@{onEmailChanged}\"\n    },\n    {\n      \"type\": \"Label\",\n      \"text\": \"@{emailError}\",\n      \"visibility\": \"@{emailErrorVisibility}\",\n      \"fontColor\": \"#EF4444\",\n      \"fontSize\": 12\n    }\n  ]\n}"
                 }
               ],
               "language": "json",
-              "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    {\n      \"type\": \"TextField\",\n      \"text\": \"@{email}\",\n      \"hint\": \"@string/email_placeholder\",\n      \"contentType\": \"emailAddress\",\n      \"onTextChange\": \"@{onEmailChanged}\"\n    },\n    {\n      \"type\": \"Label\",\n      \"text\": \"@{emailError}\",\n      \"visibility\": \"@{emailError != null && emailError != ''}\",\n      \"fontColor\": \"#EF4444\",\n      \"fontSize\": 12\n    }\n  ]\n}",
+              "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    {\n      \"type\": \"TextField\",\n      \"text\": \"@{email}\",\n      \"hint\": \"@string/email_placeholder\",\n      \"contentType\": \"emailAddress\",\n      \"onTextChange\": \"@{onEmailChanged}\"\n    },\n    {\n      \"type\": \"Label\",\n      \"text\": \"@{emailError}\",\n      \"visibility\": \"@{emailErrorVisibility}\",\n      \"fontColor\": \"#EF4444\",\n      \"fontSize\": 12\n    }\n  ]\n}",
               "required": ""
             },
             {

@@ -512,20 +512,20 @@
               "languagePill": "json",
               "languagePillVisibility": "visible",
               "activeLanguage": "json",
-              "activeCode": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}",
+              "activeCode": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loadingVisibility}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "`loadingVisibility` is derived in the ViewModel: `get loadingVisibility() { return this.loading ? \"visible\" : \"gone\"; }` — expressions inside `@{…}` are not part of the grammar.",
+                "ja": "`loadingVisibility` は ViewModel で導出する: `get loadingVisibility() { return this.loading ? \"visible\" : \"gone\"; }` — `@{…}` 内の式は文法に無い。"
               },
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "_variants": [
                 {
                   "language": "json",
-                  "code": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}"
+                  "code": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loadingVisibility}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}"
                 }
               ],
               "language": "json",
-              "code": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}",
+              "code": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loadingVisibility}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}",
               "required": ""
             },
             {
@@ -555,7 +555,7 @@
               "languagePill": "json",
               "languagePillVisibility": "visible",
               "activeLanguage": "json",
-              "activeCode": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}",
+              "activeCode": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loadingVisibility}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}",
               "note": {
                 "en": "",
                 "ja": ""
@@ -564,11 +564,11 @@
               "_variants": [
                 {
                   "language": "json",
-                  "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}"
+                  "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loadingVisibility}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}"
                 }
               ],
               "language": "json",
-              "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}",
+              "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loadingVisibility}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}",
               "required": ""
             }
           ]

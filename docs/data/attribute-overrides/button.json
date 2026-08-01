@@ -27,7 +27,11 @@
     {
       "title": { "en": "Loading spinner inside", "ja": "ローディング中はスピナー" },
       "language": "json",
-      "code": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onRefresh}\",\n  \"enabled\": \"@{!loading}\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"visibility\": \"@{loading ? 'visible' : 'gone'}\" },\n    { \"type\": \"Label\", \"text\": \"@string/refresh\", \"visibility\": \"@{loading ? 'gone' : 'visible'}\" }\n  ]\n}"
+      "code": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onRefresh}\",\n  \"enabled\": \"@{!loading}\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"visibility\": \"@{spinnerVisibility}\" },\n    { \"type\": \"Label\", \"text\": \"@string/refresh\", \"visibility\": \"@{labelVisibility}\" }\n  ]\n}",
+      "note": {
+        "en": "`@{!loading}` is canonical (`!` negation on a boolean attribute). The two visibilities are derived in the ViewModel from the same `loading` flag — expressions like ternaries are not part of the binding grammar.",
+        "ja": "`@{!loading}` は正準（boolean 属性上の `!` 否定）。2 つの visibility は同じ `loading` から ViewModel 側で導出する — 三項演算子などの式はバインディング文法に無い。"
+      }
     },
     {
       "title": { "en": "Long-press handler", "ja": "長押しハンドラ" },

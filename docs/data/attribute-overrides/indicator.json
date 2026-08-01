@@ -17,12 +17,16 @@
     {
       "title": { "en": "Conditional display", "ja": "条件付き表示" },
       "language": "json",
-      "code": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}"
+      "code": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loadingVisibility}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}",
+      "note": {
+        "en": "`loadingVisibility` is derived in the ViewModel: `get loadingVisibility() { return this.loading ? \"visible\" : \"gone\"; }` — expressions inside `@{…}` are not part of the grammar.",
+        "ja": "`loadingVisibility` は ViewModel で導出する: `get loadingVisibility() { return this.loading ? \"visible\" : \"gone\"; }` — `@{…}` 内の式は文法に無い。"
+      }
     },
     {
       "title": { "en": "Full-screen overlay", "ja": "全画面オーバーレイ" },
       "language": "json",
-      "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loading ? 'visible' : 'gone'}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}"
+      "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loadingVisibility}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}"
     }
   ],
   "attributes": {

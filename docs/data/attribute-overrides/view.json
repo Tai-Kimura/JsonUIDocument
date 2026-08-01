@@ -27,7 +27,11 @@
     {
       "title": { "en": "Conditional show/hide", "ja": "条件付き表示" },
       "language": "json",
-      "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{hasError ? 'visible' : 'gone'}\",\n  \"background\": \"#FEE2E2\",\n  \"paddings\": [12, 12, 12, 12],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@{errorMessage}\", \"fontColor\": \"#991B1B\" }\n  ]\n}"
+      "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{errorVisibility}\",\n  \"background\": \"#FEE2E2\",\n  \"paddings\": [12, 12, 12, 12],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@{errorMessage}\", \"fontColor\": \"#991B1B\" }\n  ]\n}",
+      "note": {
+        "en": "No expressions inside `@{…}` — derive the value in the ViewModel: `get errorVisibility() { return this.hasError ? \"visible\" : \"gone\"; }`.",
+        "ja": "`@{…}` の中に式は書けない — ViewModel 側で導出する: `get errorVisibility() { return this.hasError ? \"visible\" : \"gone\"; }`。"
+      }
     },
     {
       "title": { "en": "Linear gradient background", "ja": "線形グラデーション背景" },

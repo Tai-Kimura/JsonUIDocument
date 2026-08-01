@@ -1382,20 +1382,20 @@
               "languagePill": "json",
               "languagePillVisibility": "visible",
               "activeLanguage": "json",
-              "activeCode": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onRefresh}\",\n  \"enabled\": \"@{!loading}\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"visibility\": \"@{loading ? 'visible' : 'gone'}\" },\n    { \"type\": \"Label\", \"text\": \"@string/refresh\", \"visibility\": \"@{loading ? 'gone' : 'visible'}\" }\n  ]\n}",
+              "activeCode": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onRefresh}\",\n  \"enabled\": \"@{!loading}\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"visibility\": \"@{spinnerVisibility}\" },\n    { \"type\": \"Label\", \"text\": \"@string/refresh\", \"visibility\": \"@{labelVisibility}\" }\n  ]\n}",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "`@{!loading}` is canonical (`!` negation on a boolean attribute). The two visibilities are derived in the ViewModel from the same `loading` flag — expressions like ternaries are not part of the binding grammar.",
+                "ja": "`@{!loading}` は正準（boolean 属性上の `!` 否定）。2 つの visibility は同じ `loading` から ViewModel 側で導出する — 三項演算子などの式はバインディング文法に無い。"
               },
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "_variants": [
                 {
                   "language": "json",
-                  "code": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onRefresh}\",\n  \"enabled\": \"@{!loading}\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"visibility\": \"@{loading ? 'visible' : 'gone'}\" },\n    { \"type\": \"Label\", \"text\": \"@string/refresh\", \"visibility\": \"@{loading ? 'gone' : 'visible'}\" }\n  ]\n}"
+                  "code": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onRefresh}\",\n  \"enabled\": \"@{!loading}\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"visibility\": \"@{spinnerVisibility}\" },\n    { \"type\": \"Label\", \"text\": \"@string/refresh\", \"visibility\": \"@{labelVisibility}\" }\n  ]\n}"
                 }
               ],
               "language": "json",
-              "code": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onRefresh}\",\n  \"enabled\": \"@{!loading}\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"visibility\": \"@{loading ? 'visible' : 'gone'}\" },\n    { \"type\": \"Label\", \"text\": \"@string/refresh\", \"visibility\": \"@{loading ? 'gone' : 'visible'}\" }\n  ]\n}",
+              "code": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onRefresh}\",\n  \"enabled\": \"@{!loading}\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"visibility\": \"@{spinnerVisibility}\" },\n    { \"type\": \"Label\", \"text\": \"@string/refresh\", \"visibility\": \"@{labelVisibility}\" }\n  ]\n}",
               "required": ""
             },
             {
