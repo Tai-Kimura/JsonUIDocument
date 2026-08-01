@@ -167,6 +167,16 @@
               "anchorUrl": "#attr-alignTopView"
             },
             {
+              "id": "overview_alignment",
+              "name": "alignment",
+              "type": "string",
+              "summary": {
+                "en": "String alternative to numeric `gravity`, using the SwiftUI-style 9-position vocabulary (`topLeadi…",
+                "ja": "数値 `gravity` の文字列版。SwiftUI 流の 9 方位ボキャブラリ（`topLeading` … `bottomTrailing`）で指定し、iOS では SwiftUI `Ali…"
+              },
+              "anchorUrl": "#attr-alignment"
+            },
+            {
               "id": "overview_centerHorizontal",
               "name": "centerHorizontal",
               "type": "boolean | binding",
@@ -1231,6 +1241,125 @@
               "required": ""
             },
             {
+              "id": "attr_alignment",
+              "name": "alignment",
+              "anchorId": "attr-alignment",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "topLeading",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "top",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "topTrailing",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "leading",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_4",
+                          "label": "center",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_5",
+                          "label": "trailing",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_6",
+                          "label": "bottomLeading",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_7",
+                          "label": "bottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_8",
+                          "label": "bottomTrailing",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "String alternative to numeric `gravity`, using the SwiftUI-style 9-position vocabulary (`topLeading` … `bottomTrailing`). Resolves to SwiftUI `Alignment` on iOS and `Arrangement` + `Alignment` on Compose.",
+                "ja": "数値 `gravity` の文字列版。SwiftUI 流の 9 方位ボキャブラリ（`topLeading` … `bottomTrailing`）で指定し、iOS では SwiftUI `Alignment`、Compose では `Arrangement` + `Alignment` に解決される。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
               "id": "attr_centerHorizontal",
               "name": "centerHorizontal",
               "anchorId": "attr-centerHorizontal",
@@ -1732,7 +1861,10 @@
               },
               "description": "Key bottom view ID",
               "platformMatrixVisibility": "visible",
-              "platformIosLabel": "✓",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
               "platformAndroidLabel": "—",
               "platformWebLabel": "—",
               "note": {
@@ -1793,7 +1925,10 @@
               },
               "description": "Key left view ID",
               "platformMatrixVisibility": "visible",
-              "platformIosLabel": "✓",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
               "platformAndroidLabel": "—",
               "platformWebLabel": "—",
               "note": {
@@ -1854,7 +1989,10 @@
               },
               "description": "Key right view ID",
               "platformMatrixVisibility": "visible",
-              "platformIosLabel": "✓",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
               "platformAndroidLabel": "—",
               "platformWebLabel": "—",
               "note": {
@@ -1915,7 +2053,10 @@
               },
               "description": "Key top view ID",
               "platformMatrixVisibility": "visible",
-              "platformIosLabel": "✓",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
               "platformAndroidLabel": "—",
               "platformWebLabel": "—",
               "note": {
@@ -1976,7 +2117,10 @@
               },
               "description": "Relative layout target view",
               "platformMatrixVisibility": "visible",
-              "platformIosLabel": "✓",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
               "platformAndroidLabel": "—",
               "platformWebLabel": "—",
               "note": {

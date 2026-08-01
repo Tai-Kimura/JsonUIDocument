@@ -50,6 +50,11 @@ type AttrDef = {
   // Why a platform was excluded from the declared surface (SSoT, since
   // 2026-07-31). Keyed by emitter language; English prose.
   platform_reasons?: Record<string, string>;
+  // Render-mode surface. SSoT vocabulary: uikit / swiftui (iOS), xml /
+  // compose (Android), react (Web), dynamic-only, all. Absent = every mode.
+  // Semantics mirror the toolchain validators' mode_compatible?: the active
+  // mode must appear in Array(mode).
+  mode?: string | string[];
 };
 
 type ExampleVariant = { language: string; label?: string; code: string };
@@ -203,6 +208,7 @@ type MergedAttribute = {
   note?: Lang2;
   platformDiff?: Record<string, string>;
   platform?: string | string[];
+  mode?: string | string[];
   bindingDirection?: string;
   enumValues?: string[];
   aliases?: string[];
@@ -274,6 +280,7 @@ function mergeComponent(args: {
       note: mergeNotes(ov?.note, platformReasonsNote(def.platform_reasons)),
       platformDiff: ov?.platformDiff,
       platform: def.platform,
+      mode: def.mode,
       bindingDirection: def.binding_direction,
       enumValues: ov?.enumValues ?? def.enum,
       aliases: ov?.aliases ?? def.aliases,
@@ -313,6 +320,7 @@ type MergedCategoryAttribute = {
   platformDiff?: Record<string, string>;
   relatedAttributes?: string[];
   platform?: string | string[];
+  mode?: string | string[];
   bindingDirection?: string;
   enumValues?: string[];
   aliases?: string[];
@@ -355,6 +363,7 @@ function mergeCategory(args: {
       platformDiff: ov?.platformDiff,
       relatedAttributes: ov?.relatedAttributes,
       platform: def.platform,
+      mode: def.mode,
       bindingDirection: def.binding_direction,
       enumValues: ov?.enumValues ?? def.enum,
       aliases: ov?.aliases ?? def.aliases,
@@ -1986,34 +1995,111 @@ function declaredPlatformSet(
   return set.size > 0 ? set : null;
 }
 
+// Render modes per platform column. The SSoT `mode` field lists the modes an
+// attribute is emitted in; the toolchain validators accept the attribute only
+// when the active mode appears in that list (or the list is absent). A column
+// whose platform has none of its modes listed is not reachable there at all;
+// a column reachable in a strict subset of its modes carries a factual note.
+const PLATFORM_MODES: Record<"ios" | "android" | "web", string[]> = {
+  ios: ["uikit", "swiftui"],
+  android: ["xml", "compose"],
+  web: ["react"],
+};
+
+const MODE_NOTE_LABELS: Record<string, Lang2> = {
+  uikit: { en: "UIKit mode only", ja: "UIKit モードのみ" },
+  swiftui: { en: "SwiftUI mode only", ja: "SwiftUI モードのみ" },
+  xml: { en: "XML mode only", ja: "XML モードのみ" },
+  compose: { en: "Compose mode only", ja: "Compose モードのみ" },
+};
+
+type ModeNarrowing = {
+  notes: { ios: Lang2 | null; android: Lang2 | null; web: Lang2 | null };
+  excluded: Set<"ios" | "android" | "web">;
+};
+
+function modeNarrowing(
+  attrMode: string | string[] | undefined,
+): ModeNarrowing | null {
+  if (!attrMode) return null;
+  const list = (Array.isArray(attrMode) ? attrMode : [attrMode]).map(String);
+  if (list.length === 0 || list.includes("all")) return null;
+  if (list.includes("dynamic-only")) {
+    // Not a per-platform mode: the attribute only exists in the runtime-
+    // interpreted (dynamic) pipeline, wherever the platform surface allows it.
+    const note: Lang2 = { en: "dynamic mode only", ja: "dynamic モードのみ" };
+    return { notes: { ios: note, android: note, web: note }, excluded: new Set() };
+  }
+  const known = list.filter((m) =>
+    (Object.keys(PLATFORM_MODES) as Array<"ios" | "android" | "web">).some(
+      (p) => PLATFORM_MODES[p].includes(m),
+    ),
+  );
+  // Unknown tokens are dropped (upstream fail-fasts at declaration time). If
+  // nothing recognizable remains, do not narrow rather than blank the row.
+  if (known.length === 0) return null;
+  const narrowing: ModeNarrowing = {
+    notes: { ios: null, android: null, web: null },
+    excluded: new Set(),
+  };
+  for (const p of ["ios", "android", "web"] as const) {
+    const present = PLATFORM_MODES[p].filter((m) => known.includes(m));
+    if (present.length === 0) narrowing.excluded.add(p);
+    else if (present.length < PLATFORM_MODES[p].length) {
+      narrowing.notes[p] = MODE_NOTE_LABELS[present[0]] ?? null;
+    }
+  }
+  return narrowing;
+}
+
+// Compose the column label from support level + optional mode note. Returns
+// Lang2 when a bilingual note is attached; the hook's pickLangDeep flattens
+// it to the active language at fetch time.
+function columnLabel(p: Support, modeNote: Lang2 | null): string | Lang2 {
+  if (p === "no") return "—";
+  const partial = p === "partial";
+  if (!modeNote) return partial ? "✓ (partial)" : "✓";
+  const en = [partial ? "partial" : null, modeNote.en].filter(Boolean).join(", ");
+  const ja = [partial ? "partial" : null, modeNote.ja].filter(Boolean).join("、");
+  return { en: `✓ (${en})`, ja: `✓（${ja}）` };
+}
+
 function buildPlatformMatrix(
   attrPlatformDiff: Record<string, string> | undefined,
   componentPlatforms: Platforms,
   attrPlatform: string | string[] | undefined,
+  attrMode: string | string[] | undefined,
 ): {
   visibility: string;
-  ios: string;
-  android: string;
-  web: string;
+  ios: string | Lang2;
+  android: string | Lang2;
+  web: string | Lang2;
 } {
   const declared = declaredPlatformSet(attrPlatform);
+  const modeN = modeNarrowing(attrMode);
   const fallback = (
     p: Support,
     explicit: string | undefined,
     key: "ios" | "android" | "web",
-  ): string => {
+  ): string | Lang2 => {
     if (explicit) return explicit;
     // The SSoT declares the surface per attribute; a platform outside it is
     // not supported there no matter what the component-level default says.
     if (declared && !declared.has(key)) return "—";
-    if (p === "yes") return "✓";
-    if (p === "partial") return "✓ (partial)";
-    return "—";
+    // Same for modes: a platform none of whose modes emit the attribute.
+    if (modeN && modeN.excluded.has(key)) return "—";
+    return columnLabel(p, modeN ? modeN.notes[key] : null);
   };
   const hasDiff = attrPlatformDiff && Object.keys(attrPlatformDiff).length > 0;
   const narrowed = !!declared && declared.size < 3;
+  const modeNarrowed =
+    !!modeN &&
+    (modeN.excluded.size > 0 ||
+      modeN.notes.ios !== null ||
+      modeN.notes.android !== null ||
+      modeN.notes.web !== null);
   const result = {
-    visibility: hasDiff || narrowed ? "visible" : "gone",
+    visibility: hasDiff || narrowed || modeNarrowed ? "visible" : "gone",
     ios: fallback(componentPlatforms.ios, attrPlatformDiff?.ios, "ios"),
     android: fallback(componentPlatforms.android, attrPlatformDiff?.android, "android"),
     web: fallback(componentPlatforms.web, attrPlatformDiff?.web, "web"),
@@ -2306,7 +2392,7 @@ function buildAttributeRow(
   componentPlatforms: Platforms,
 ): Record<string, unknown> {
   const flags = computeAttrVisibility(a);
-  const matrix = buildPlatformMatrix(a.platformDiff, componentPlatforms, a.platform);
+  const matrix = buildPlatformMatrix(a.platformDiff, componentPlatforms, a.platform, a.mode);
   return {
     id: a.id,
     name: a.name,
@@ -2332,7 +2418,7 @@ function buildCategoryAttributeRow(
   categoryDefaultPlatforms: Platforms,
 ): Record<string, unknown> {
   const flags = computeAttrVisibility(a);
-  const matrix = buildPlatformMatrix(a.platformDiff, categoryDefaultPlatforms, a.platform);
+  const matrix = buildPlatformMatrix(a.platformDiff, categoryDefaultPlatforms, a.platform, a.mode);
   return {
     id: a.id,
     name: a.name,
@@ -2626,6 +2712,90 @@ export default function Page() {
 }
 
 // ---------------------------------------------------------------------------
+// Override validation — every attribute an override file documents must exist
+// in the SSoT table it will be merged against, or it silently documents an
+// attribute that does not exist (the "phantom docs" class). Keys starting
+// with "_" are author-side comments and are skipped.
+// ---------------------------------------------------------------------------
+
+async function validateOverrides(args: {
+  attrDefsFile: Record<string, Record<string, AttrDef>>;
+  categoryMap: Record<string, string>;
+}): Promise<number> {
+  const { attrDefsFile, categoryMap } = args;
+  const commonDefs = attrDefsFile.common ?? {};
+  const componentByFile = new Map<string, string>();
+  for (const name of Object.keys(attrDefsFile)) {
+    if (name === "common" || name.startsWith("_")) continue;
+    componentByFile.set(kebab(name).replace(/-/g, ""), name);
+  }
+  const categories = new Set(Object.values(categoryMap));
+
+  let violations = 0;
+  const warn = (msg: string) => {
+    violations++;
+    console.warn(`warning: ${msg}`);
+  };
+
+  for (const file of (await fs.readdir(PATHS.overridesDir)).sort()) {
+    if (!file.endsWith(".json")) continue;
+    const base = file.slice(0, -5);
+    const rel = `docs/data/attribute-overrides/${file}`;
+
+    if (base.startsWith("_common_")) {
+      const cat = base.slice("_common_".length);
+      if (!categories.has(cat)) {
+        warn(`${rel}: no category '${cat}' in attribute-categories.json`);
+        continue;
+      }
+      const override = await readJsonOptional<CategoryOverride>(
+        path.join(PATHS.overridesDir, file),
+      );
+      for (const attr of Object.keys(override?.attributes ?? {})) {
+        if (attr.startsWith("_")) continue;
+        if (!(attr in commonDefs)) {
+          warn(`${rel}: '${attr}' is not a common attribute in the SSoT`);
+        } else if (categoryMap[attr] !== cat) {
+          const actual = categoryMap[attr];
+          warn(
+            actual
+              ? `${rel}: '${attr}' belongs to category '${actual}' — move it to _common_${actual}.json`
+              : `${rel}: '${attr}' has no category in attribute-categories.json — register it first`,
+          );
+        }
+      }
+      continue;
+    }
+
+    const component = componentByFile.get(base);
+    if (!component) {
+      warn(`${rel}: no SSoT component matches this file name`);
+      continue;
+    }
+    const override = await readJsonOptional<ComponentOverride>(
+      path.join(PATHS.overridesDir, file),
+    );
+    const table = attrDefsFile[component];
+    for (const attr of Object.keys(override?.attributes ?? {})) {
+      if (attr.startsWith("_")) continue;
+      if (attr in table) continue;
+      warn(
+        attr in commonDefs
+          ? `${rel}: '${attr}' is a common attribute — document it in _common_${categoryMap[attr] ?? "<category>"}.json instead`
+          : `${rel}: '${attr}' is not in the SSoT table for ${component} — remove it or fix the name`,
+      );
+    }
+    for (const attr of Object.keys(override?.commonAttributes ?? {})) {
+      if (attr.startsWith("_")) continue;
+      if (!(attr in commonDefs)) {
+        warn(`${rel}: commonAttributes.'${attr}' is not a common attribute in the SSoT`);
+      }
+    }
+  }
+  return violations;
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
@@ -2658,6 +2828,14 @@ async function main() {
     .filter((k) => k !== "common" && !k.startsWith("_"))
     .sort();
   const commonDefs = attrDefsFile.common ?? {};
+
+  const overrideViolations = await validateOverrides({ attrDefsFile, categoryMap });
+  if (overrideViolations > 0) {
+    console.error(
+      `build-attribute-reference: ${overrideViolations} override attribute(s) missing from the SSoT — fix the override files above.`,
+    );
+    process.exit(1);
+  }
 
   console.log(`→ ${componentNames.length} components, ${Object.keys(commonDefs).length} common attributes, ${Object.keys(descriptionsDict).length} translated attribute descriptions`);
 

@@ -32,7 +32,7 @@
     {
       "title": { "en": "Long-press handler", "ja": "長押しハンドラ" },
       "language": "json",
-      "code": "{\n  \"type\": \"Button\",\n  \"text\": \"@string/delete\",\n  \"onClick\": \"@{onDelete}\",\n  \"onLongClick\": \"@{onConfirmDelete}\"\n}"
+      "code": "{\n  \"type\": \"Button\",\n  \"text\": \"@string/delete\",\n  \"onClick\": \"@{onDelete}\",\n  \"onLongPress\": \"@{onConfirmDelete}\"\n}"
     },
     {
       "title": { "en": "With image (iOS UIButton style)", "ja": "画像付き（iOS UIButton 風）" },
@@ -85,10 +85,10 @@
         "ja": "Button をインタラクティブにするため必須。ViewModel のイベントハンドラに解決される必要がある。未バインドの場合ビルド警告。"
       }
     },
-    "onLongClick": {
+    "onLongPress": {
       "note": {
-        "en": "Long-press event. Default threshold: iOS 500ms / Android 500ms / Web 600ms.",
-        "ja": "長押しイベント。既定閾値は iOS 500ms / Android 500ms / Web 600ms。"
+        "en": "Long-press event. Fires instead of `onClick` when the press exceeds the platform's long-press threshold.",
+        "ja": "長押しイベント。プラットフォームの長押し閾値を超えると `onClick` の代わりに発火する。"
       }
     },
     "enabled": {
