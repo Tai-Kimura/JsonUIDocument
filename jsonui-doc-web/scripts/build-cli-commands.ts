@@ -132,6 +132,10 @@ function main(): void {
     if (typeof c.synopsis !== "string" || c.synopsis === "") fail(where, "missing synopsis");
     checkLocalized(c.purpose, `${where}.purpose`);
     checkStringArray(c.aliases, `${where}.aliases`);
+    // seeAlso is REQUIRED (use [] when none): the web repository types it as
+    // string[] and the ViewModel reads .length unguarded — a missing key
+    // passes this build and then crashes next build at prerender.
+    if (c.seeAlso === undefined) fail(where, "missing seeAlso (use [] when none)");
     checkStringArray(c.seeAlso, `${where}.seeAlso`);
 
     if (seen.has(label)) fail(where, "duplicate command");
