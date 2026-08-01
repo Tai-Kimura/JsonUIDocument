@@ -74,6 +74,14 @@
               "anchorUrl": "#section-common"
             },
             {
+              "id": "cat_alignment",
+              "label": {
+                "en": "Alignment",
+                "ja": "配置"
+              },
+              "anchorUrl": "#section-alignment"
+            },
+            {
               "id": "cat_event",
               "label": {
                 "en": "Event",
@@ -325,101 +333,6 @@
                 "ja": "子要素の配列。順序がレイアウト順序を決定。バインドされた配列からの動的繰り返しは `child` ではなく Collection を使う。"
               },
               "type": "array",
-              "required": ""
-            },
-            {
-              "id": "attr_distribution",
-              "name": "distribution",
-              "anchorId": "attr-distribution",
-              "requiredChipText": "",
-              "requiredChipVisibility": "gone",
-              "deprecatedChipVisibility": "gone",
-              "accentBarColor": "var(--color-border)",
-              "nameTextStyle": "normal",
-              "nameFontColor": "var(--color-ink)",
-              "defaultChipText": "",
-              "defaultChipVisibility": "gone",
-              "enumChipsVisibility": "visible",
-              "aliasChipsVisibility": "gone",
-              "noteVisibility": "visible",
-              "typeChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": [
-                        {
-                          "id": "tc_0",
-                          "label": "string",
-                          "background": "var(--color-chip_string_bg)",
-                          "fontColor": "var(--color-chip_string_fg)"
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "enumChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": [
-                        {
-                          "id": "ec_0",
-                          "label": "fill",
-                          "background": "var(--color-surface_sunken)",
-                          "fontColor": "var(--color-ink)"
-                        },
-                        {
-                          "id": "ec_1",
-                          "label": "fillEqually",
-                          "background": "var(--color-surface_sunken)",
-                          "fontColor": "var(--color-ink)"
-                        },
-                        {
-                          "id": "ec_2",
-                          "label": "equalSpacing",
-                          "background": "var(--color-surface_sunken)",
-                          "fontColor": "var(--color-ink)"
-                        },
-                        {
-                          "id": "ec_3",
-                          "label": "equalCentering",
-                          "background": "var(--color-surface_sunken)",
-                          "fontColor": "var(--color-ink)"
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "aliasChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "description": {
-                "en": "Child distribution mode for stacks.",
-                "ja": "スタック内での子要素の配分モード。"
-              },
-              "platformMatrixVisibility": "visible",
-              "platformIosLabel": {
-                "en": "✓ (SwiftUI mode only)",
-                "ja": "✓（SwiftUI モードのみ）"
-              },
-              "platformAndroidLabel": {
-                "en": "✓ (Compose mode only)",
-                "ja": "✓（Compose モードのみ）"
-              },
-              "platformWebLabel": "✓",
-              "note": {
-                "en": "Main-axis distribution. `start` / `center` / `end` / `spaceBetween` / `spaceAround` / `spaceEvenly`. Controls gap and edge behavior for children.",
-                "ja": "主軸方向の配分。`start` / `center` / `end` / `spaceBetween` / `spaceAround` / `spaceEvenly`。子要素間のギャップと端の挙動を制御。"
-              },
-              "type": "string",
               "required": ""
             },
             {
@@ -1078,12 +991,108 @@
     "sections": [
       {
         "cells": {
-          "data": []
+          "data": [
+            {
+              "id": "attr_distribution",
+              "name": "distribution",
+              "anchorId": "attr-distribution",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "fill",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "fillEqually",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "equalSpacing",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "equalCentering",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Child distribution mode for stacks.",
+                "ja": "スタック内での子要素の配分モード。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (SwiftUI mode only)",
+                "ja": "✓（SwiftUI モードのみ）"
+              },
+              "platformAndroidLabel": {
+                "en": "✓ (Compose mode only)",
+                "ja": "✓（Compose モードのみ）"
+              },
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Main-axis distribution. `start` / `center` / `end` / `spaceBetween` / `spaceAround` / `spaceEvenly`. Controls gap and edge behavior for children.",
+                "ja": "主軸方向の配分。`start` / `center` / `end` / `spaceBetween` / `spaceAround` / `spaceEvenly`。子要素間のギャップと端の挙動を制御。"
+              },
+              "type": "string",
+              "required": ""
+            }
+          ]
         }
       }
     ]
   },
-  "groupAlignmentVisibility": "gone",
+  "groupAlignmentVisibility": "visible",
   "attributesState": {
     "sections": [
       {
@@ -1472,6 +1481,15 @@
         "ja": "共通"
       },
       "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_alignment",
+      "label": {
+        "en": "Alignment",
+        "ja": "配置"
+      },
+      "anchor": "section-alignment",
       "level": 1
     },
     {
