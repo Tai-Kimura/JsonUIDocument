@@ -9101,6 +9101,148 @@
       "ja": "ツール"
     }
   },
+  "reference_jui_config": {
+      "breadcrumb": {
+          "en": "← Reference",
+          "ja": "← Reference"
+      },
+      "title": {
+          "en": "jui.config.json",
+          "ja": "jui.config.json"
+      },
+      "lead": {
+          "en": "Every key the toolchain reads from jui.config.json, in one place: core directories, platform roots, build normalization, API model generation, test install targets, doc contract checks, and lint bounds. Until now these were scattered across the pages that use them.",
+          "ja": "ツールチェーンが jui.config.json から読む全キーを 1 ページに集約: コアディレクトリ、プラットフォームルート、build 正規化、API モデル生成、テストのインストール先、ドキュメント契約チェック、lint 境界。これまで各機能のページに散在していた情報です。"
+      },
+      "read_time": {
+          "en": "hand-maintained",
+          "ja": "手書き管理"
+      },
+      "section_file_heading": {
+          "en": "The file and how it is found",
+          "ja": "ファイルと探索"
+      },
+      "section_file_body": {
+          "en": "jui.config.json lives at the project root and is the single project-level configuration for the whole toolchain — jui, the platform builders it drives, jsonui-test and jsonui-doc all resolve it. Commands look for it in the current directory and upward; MCP tools take an explicit project_dir (or the JUI_PROJECT_DIR environment variable) instead. `jui init` writes the initial file.",
+          "ja": "jui.config.json はプロジェクトルートに置かれ、ツールチェーン全体 — jui・各プラットフォームビルダー・jsonui-test・jsonui-doc — が参照する唯一のプロジェクト設定です。コマンドはカレントから上方向に探索し、MCP ツールは明示の project_dir（または JUI_PROJECT_DIR 環境変数）を使います。初期ファイルは `jui init` が書き出します。"
+      },
+      "section_directories_heading": {
+          "en": "Core directories",
+          "ja": "コアディレクトリ"
+      },
+      "section_directories_body": {
+          "en": "The top-level string keys point the toolchain at your spec, layout, style, image, component-spec and swagger directories. The values below are the built-in defaults — a key you omit falls back to exactly these. strings_file has no default: localization is off until you point it at a strings.json. document_tools_path is only needed when jsonui-doc is not importable from the standard install.",
+          "ja": "トップレベルの文字列キーが spec / layout / style / image / component spec / swagger の各ディレクトリを指します。以下は組み込みデフォルト — 省略したキーはこの値に落ちます。strings_file にデフォルトは無く、strings.json を指すまでローカライズは無効です。document_tools_path は jsonui-doc が標準インストールから import できない場合のみ必要です。"
+      },
+      "section_platforms_heading": {
+          "en": "platforms.*",
+          "ja": "platforms.*"
+      },
+      "section_platforms_body": {
+          "en": "One block per shipped platform. `root` is the platform project directory; `layoutsDir` / `imagesDir` are where `jui build` distributes layouts and images inside that root. iOS additionally takes `xcassetsDir`, Android `drawableDir`. A platform without a block simply is not built. The web block below is this documentation site's real configuration.",
+          "ja": "出荷プラットフォームごとに 1 ブロック。`root` はプラットフォームプロジェクトのディレクトリ、`layoutsDir` / `imagesDir` は `jui build` が layout と画像を配布する先です。iOS は `xcassetsDir`、Android は `drawableDir` を追加で取ります。ブロックの無いプラットフォームは単にビルドされません。以下の web ブロックはこのドキュメントサイト自身の実設定です。"
+      },
+      "section_build_heading": {
+          "en": "build.normalizeLayouts",
+          "ja": "build.normalizeLayouts"
+      },
+      "section_build_body": {
+          "en": "Default true: `jui build` distributes L1-canonicalized layouts (aliases rewritten to canonical names) and stamps the $jui marker on each distributed file. Set false for byte-identical-to-legacy distribution — the escape hatch, not the recommendation.",
+          "ja": "デフォルト true: `jui build` は L1 正準化済み layout（エイリアスを正準名に書き換え）を配布し、各配布ファイルに $jui マーカーを刻印します。false にするとレガシーとバイト一致の配布になります — 逃げ道であって推奨ではありません。"
+      },
+      "section_api_heading": {
+          "en": "api.*",
+          "ja": "api.*"
+      },
+      "section_api_body": {
+          "en": "Drives `jui g api` (swagger → DTO + Domain models). `api.platforms.<p>` sets the output locations per platform — the values below are the built-in defaults (Android's serializer accepts moshi / kotlinx / none, web's case_convention accepts snake_case / camelCase). `api.schemas` is the endpoint/schema filter: include/exclude path globs pick endpoints, include/exclude schema globs adjust the schema set, and skip_domain names schemas that emit DTOs only. format_mapping opts into OpenAPI format-driven type mapping, with format_mapping_exclude as its per-format opt-out list.",
+          "ja": "`jui g api`（swagger → DTO + Domain モデル）を制御します。`api.platforms.<p>` はプラットフォーム別の出力先 — 以下は組み込みデフォルトです（Android の serializer は moshi / kotlinx / none、web の case_convention は snake_case / camelCase）。`api.schemas` はエンドポイント/スキーマのフィルタ: パスのグロブで対象エンドポイントを選び、スキーマ名のグロブで対象スキーマ集合を調整し、skip_domain に挙げたスキーマは DTO のみ生成します。format_mapping は OpenAPI の format による型マッピングのオプトインで、format_mapping_exclude が format 単位の除外リストです。"
+      },
+      "section_test_heading": {
+          "en": "test.*",
+          "ja": "test.*"
+      },
+      "section_test_body": {
+          "en": "`test.appOwnedScreens` names layouts that the app owns (splash, system dialogs) so `jui screens` classifies them correctly. `test.install` gives jsonui-test its copy targets: when present, a passing `jsonui-test validate` also installs the validated test JSON into each platform's test bundle (iOS additionally takes uitestBundleId for the pre-grant step; a platform value can be a plain path string).",
+          "ja": "`test.appOwnedScreens` はアプリ側が所有する layout（スプラッシュ等）を宣言し、`jui screens` の分類を正します。`test.install` は jsonui-test のコピー先: これがあると `jsonui-test validate` の成功時に検証済みテスト JSON を各プラットフォームのテストバンドルへ自動インストールします（iOS は pre-grant 用の uitestBundleId を追加で取り、値は素のパス文字列でも可）。"
+      },
+      "section_checks_heading": {
+          "en": "checks[] + databases{}",
+          "ja": "checks[] + databases{}"
+      },
+      "section_checks_body": {
+          "en": "Declarations for `jsonui-doc check` — the doc-contract checker. Each entry has a name, a type (builtin:db-schema, builtin:openapi-diff, or checker for a custom script) and an optional timeout_seconds (default 60). db-schema entries reference a database from databases{} (each declares its dialect) and may pin a dump_command plus ignore_tables; openapi-diff entries must declare impl_openapi_command and may narrow with ignore_paths / ignore_response_codes / scope (all | generated). Credentials never go in this file — connection info comes from environment variables, and declared commands must resolve inside the project.",
+          "ja": "`jsonui-doc check`（ドキュメント契約チェッカー）の宣言です。各エントリは name・type（builtin:db-schema / builtin:openapi-diff / カスタムスクリプト用の checker）・任意の timeout_seconds（デフォルト 60）を持ちます。db-schema は databases{}（各 DB が dialect を宣言）を参照し、dump_command と ignore_tables を指定可能。openapi-diff は impl_openapi_command が必須で、ignore_paths / ignore_response_codes / scope（all | generated）で絞り込めます。認証情報はこのファイルに書かない — 接続情報は環境変数から、宣言コマンドはプロジェクト内に解決されるものだけです。"
+      },
+      "section_lint_heading": {
+          "en": "lint.*",
+          "ja": "lint.*"
+      },
+      "section_lint_body": {
+          "en": "Bounds for `jui lint-generated`. lint.max_depth and lint.max_lines can only tighten below the generator's own cut points (depth 5 / 250 lines) — a looser value is clamped with a warning, so the config can never mask what the generators enforce. exclude_dir_names and exclude_files take extra paths out of the scan (extensions/ trees, vendored files).",
+          "ja": "`jui lint-generated` の境界値です。lint.max_depth / lint.max_lines はジェネレータ自身のカット値（depth 5 / 250 行）より厳しくすることしかできません — 緩い値は警告付きでクランプされ、ジェネレータの強制を設定で覆い隠せない設計です。exclude_dir_names / exclude_files は走査から外す追加パス（extensions/ ツリーや vendored ファイル）を指定します。"
+      },
+      "next_heading": {
+          "en": "Keep reading",
+          "ja": "次に読む"
+      },
+      "next_cli_title": {
+          "en": "CLI command reference",
+          "ja": "CLI コマンドリファレンス"
+      },
+      "next_cli_description": {
+          "en": "The commands that read every key on this page.",
+          "ja": "このページの全キーを読むコマンド群。"
+      },
+      "next_db_check_title": {
+          "en": "DB schema check",
+          "ja": "DB スキーマチェック"
+      },
+      "next_db_check_description": {
+          "en": "What checks[] declarations actually verify.",
+          "ja": "checks[] 宣言が実際に検証するもの。"
+      },
+      "toc_title": {
+          "en": "On this page",
+          "ja": "このページ"
+      },
+      "toc_row_file": {
+          "en": "The file",
+          "ja": "ファイルと探索"
+      },
+      "toc_row_directories": {
+          "en": "Core directories",
+          "ja": "コアディレクトリ"
+      },
+      "toc_row_platforms": {
+          "en": "platforms.*",
+          "ja": "platforms.*"
+      },
+      "toc_row_build": {
+          "en": "build.normalizeLayouts",
+          "ja": "build.normalizeLayouts"
+      },
+      "toc_row_api": {
+          "en": "api.*",
+          "ja": "api.*"
+      },
+      "toc_row_test": {
+          "en": "test.*",
+          "ja": "test.*"
+      },
+      "toc_row_checks": {
+          "en": "checks[] + databases{}",
+          "ja": "checks[] + databases{}"
+      },
+      "toc_row_lint": {
+          "en": "lint.*",
+          "ja": "lint.*"
+      },
+      "footer_copyright": {
+          "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+          "ja": "© 2026 JsonUI contributors. このサイト自身が、ここで解説しているツールチェーンで構築されています。"
+      }
+  },
   "spec_index": {
     "eyebrow": {
       "en": "Spec",
