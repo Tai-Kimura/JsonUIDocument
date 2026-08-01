@@ -33,9 +33,11 @@ env:
   AWS_ROLE_ARN: arn:aws:iam::544218887430:role/jsonui-doc-gha-deploy
   SITE_BUCKET: jsonui-tanosys-com-site
   DISTRIBUTION_ID: ESH27Z3X4XNHO
-  # jsonui-cli is fetched from upstream main. Pin to a commit SHA for full
-  # reproducibility once a known-good revision is chosen.
-  JSONUI_CLI_REF: main
+  # jsonui-cli is pinned to a known-good commit SHA for reproducible deploys.
+  # Bump procedure: pick the new jsonui-cli main SHA, replace this value, and
+  # review the regenerated reference pages in that deploy — the SHA bump is
+  # the review point for reference updates.
+  JSONUI_CLI_REF: f201f2bbef5f7c35fa22fc35dfc2edffd5927e35
 
 jobs:
   deploy:
@@ -59,9 +61,14 @@ jobs:
           python-version: "3.11"
 
       - name: Fetch jsonui-cli toolchain
+        # fetch-by-SHA instead of clone --branch: --branch only accepts
+        # branch/tag names, and JSONUI_CLI_REF is pinned to a commit SHA.
         run: |
-          git clone --depth 1 --branch "${JSONUI_CLI_REF}" \
-            https://github.com/Tai-Kimura/jsonui-cli.git "$RUNNER_TEMP/jsonui-cli"
+          git init "$RUNNER_TEMP/jsonui-cli"
+          git -C "$RUNNER_TEMP/jsonui-cli" remote add origin \
+            https://github.com/Tai-Kimura/jsonui-cli.git
+          git -C "$RUNNER_TEMP/jsonui-cli" fetch --depth 1 origin "${JSONUI_CLI_REF}"
+          git -C "$RUNNER_TEMP/jsonui-cli" checkout --detach FETCH_HEAD
           echo "JSONUI_CLI_PATH=$RUNNER_TEMP/jsonui-cli" >> "$GITHUB_ENV"
 
       - name: Sync platform toolchain (populates jsonui-doc-web/rjui_tools)
