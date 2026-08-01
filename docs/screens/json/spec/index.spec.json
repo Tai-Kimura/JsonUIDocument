@@ -1,0 +1,128 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "SpecIndex",
+    "displayName": "Spec",
+    "description": "Catalog page for the Spec section. Lists the eight spec-authoring articles (anatomy, the six split patterns' map, layout-file, parent + sub, component spec, custom types, cell classes, validation + drift) with one-line descriptions. Same seeder pattern as GuidesIndex: the catalog constant mirrors ChromeViewModel's NAV_CATALOG for the `spec` section so the sidebar and this index stay in lockstep.",
+    "platforms": ["web"],
+    "layoutFile": "spec/index",
+    "createdAt": "2026-08-01",
+    "updatedAt": "2026-08-01"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "articles",
+        "type": "[SpecArticle]",
+        "initial": "[]",
+        "description": "Ordered catalog of spec-section articles. Order matches the sidebar: anatomy, split-overview, layout-file, parent-sub-spec, component-spec, custom-types, cell-classes, validation-and-drift. All eight are live."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Populate `articles` from the static catalog. Titles resolve from each target page's strings key (spec_<name>_title); descriptions derive by suffix substitution `_title` → `_lead`, so the index re-uses each article's own lead and cannot drift from it."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          { "name": "url", "type": "String" }
+        ],
+        "description": "Client-side navigation. Destination URLs are spec-mapped (e.g. /spec/anatomy)."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[SpecIndexView] --> VM[SpecIndexViewModel]\n    VM -- articles --> VIEW\n    VIEW -- onNavigate(url) --> VM",
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed `articles` from the module-scope CATALOG constant in SpecIndexViewModel. Each row expands into an ArticleCell with StringManager-resolved titleKey + descriptionKey (`_title` → `_lead`), a pre-wired onNavigate closure, and the standard live-status decorations."
+        },
+        {
+          "name": "onNavigate",
+          "params": [{ "name": "url", "type": "String" }],
+          "description": "router.push(url). All article cards funnel through this one method."
+        }
+      ],
+      "vars": [
+        {
+          "name": "articles",
+          "type": "Array(SpecArticle)",
+          "observable": true,
+          "description": "Ordered catalog, seeded in onAppear. Order matches the sidebar's spec section."
+        }
+      ]
+    },
+    "customTypes": [
+      {
+        "name": "SpecArticle",
+        "properties": [
+          { "name": "id",             "type": "String" },
+          { "name": "titleKey",       "type": "String" },
+          { "name": "descriptionKey", "type": "String" },
+          { "name": "readTimeKey",    "type": "String" },
+          { "name": "status",         "type": "String" },
+          { "name": "url",            "type": "String" }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap an article card",
+      "processing": "onNavigate(url) is invoked with the bound SpecArticle.url. Router pushes the URL, landing the reader on that article."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is any spec-mapped /spec/* URL",
+      "destination": "Target spec screen resolved from url",
+      "description": "Destinations: /spec/anatomy, /spec/split-overview, /spec/layout-file, /spec/parent-sub-spec, /spec/component-spec, /spec/custom-types, /spec/cell-classes, /spec/validation-and-drift."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/spec_index.json",
+      "description": "SpecIndex layout. Hero block + vertical Collection of learn_article_card cells. Flat filename (not spec/index.json), matching the other section indexes."
+    },
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/cells/learn_article_card.json",
+      "description": "Shared article card cell (title, description, status pill, read-time meta)."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/SpecIndexViewModel.ts",
+      "description": "Standalone owner. Seeds `articles` from a module-scope CATALOG constant mirroring ChromeViewModel's NAV_CATALOG for the `spec` section."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/spec/page.tsx",
+      "description": "Next.js App Router entry for `/spec`."
+    }
+  ],
+  "notes": [
+    "The spec section shipped its eight articles before it had an index; /spec was the only section root without a landing page. This screen closes that gap.",
+    "Strings prefix: `spec_index_*` (namespace derives from the layoutFile `spec/index`)."
+  ]
+}

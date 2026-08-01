@@ -114,6 +114,66 @@ function extractSectionAnchors(layoutPath: string): string[] {
   return anchors;
 }
 
+// Section index pages are real URLs (/learn, /spec, …) but only learn/ and
+// spec/ have index spec files — the other five are layout + hand-written VM
+// only, so the spec walk below cannot see them. Declared explicitly; the
+// walk's urlOf() null-skip on */index keeps the two spec-backed ones from
+// double-entering.
+const SECTION_INDEXES: Array<{ url: string; namespace: string }> = [
+  { url: "/learn", namespace: "learn_index" },
+  { url: "/guides", namespace: "guides_index" },
+  { url: "/concepts", namespace: "concepts_index" },
+  { url: "/reference", namespace: "reference_index" },
+  { url: "/platforms", namespace: "platforms_index" },
+  { url: "/tools", namespace: "tools_index" },
+  { url: "/spec", namespace: "spec_index" },
+];
+
+// Attribute-reference pages carry no strings.json namespace — their copy
+// ships in the runtime JSON that build:attrs writes (prebuild runs
+// build:attrs before build:search). Indexed from those files so the 29
+// component + 9 category pages are searchable, with per-attribute anchors
+// as section headings (searching an attribute name lands on its row).
+const ATTR_REF_DIR = resolve(__dirname, "..", "public", "data", "attribute-reference");
+
+type AttrRefRow = { name?: string; anchorId?: string };
+type AttrRefFile = {
+  title?: string;
+  description?: StringValue;
+  attributes?: { sections?: Array<{ cells?: { data?: AttrRefRow[] } }> };
+};
+
+function attrRefEntries(): IndexEntry[] {
+  const out: IndexEntry[] = [];
+  for (const kind of ["components", "attributes"] as const) {
+    const dir = join(ATTR_REF_DIR, kind);
+    let files: string[] = [];
+    try {
+      files = readdirSync(dir).filter((f) => f.endsWith(".json"));
+    } catch {
+      console.warn(`build-search-index: ${dir} missing — run build:attrs first; attribute-reference pages will be absent from the index.`);
+      return out;
+    }
+    for (const f of files) {
+      const raw: AttrRefFile = JSON.parse(readFileSync(join(dir, f), "utf8"));
+      const slug = f.replace(/\.json$/, "");
+      const title = raw.title ?? slug;
+      const lead = resolveText(raw.description);
+      const rows: AttrRefRow[] = raw.attributes?.sections?.[0]?.cells?.data ?? [];
+      out.push({
+        url: `/reference/${kind}/${slug}`,
+        namespace: `reference_${kind}_${slug.replace(/-/g, "_")}`,
+        title: { en: title, ja: title },
+        lead,
+        sections: rows
+          .filter((r) => r.name && r.anchorId)
+          .map((r) => ({ anchor: r.anchorId as string, heading: { en: r.name as string, ja: r.name as string } })),
+      });
+    }
+  }
+  return out;
+}
+
 const entries: IndexEntry[] = [];
 const skipped: Array<{ spec: string; reason: string }> = [];
 
@@ -132,7 +192,11 @@ for (const specPath of walkSpecs(specsRoot)) {
   const ns = namespaceOf(layoutFile);
   const nsEntries = strings[ns];
   if (!nsEntries) {
-    skipped.push({ spec: relative(PROJECT_ROOT, specPath), reason: `namespace '${ns}' not in strings.json` });
+    // Attribute-reference pages intentionally have no strings namespace —
+    // attrRefEntries() indexes them from the runtime JSON instead.
+    if (!/^reference\/(components|attributes)\//.test(layoutFile)) {
+      skipped.push({ spec: relative(PROJECT_ROOT, specPath), reason: `namespace '${ns}' not in strings.json` });
+    }
     continue;
   }
   // Some early pages (installation) used `headline` as the hero title key
@@ -169,6 +233,34 @@ for (const specPath of walkSpecs(specsRoot)) {
     sections,
   });
 }
+
+for (const sec of SECTION_INDEXES) {
+  const nsEntries = strings[sec.namespace];
+  if (!nsEntries) {
+    skipped.push({ spec: sec.url, reason: `namespace '${sec.namespace}' not in strings.json` });
+    continue;
+  }
+  const title = resolveText(nsEntries.title) ?? resolveText(nsEntries.headline);
+  if (!title) {
+    skipped.push({ spec: sec.url, reason: `namespace '${sec.namespace}' missing title/headline` });
+    continue;
+  }
+  const lead = resolveText(nsEntries.lead) ?? resolveText(nsEntries.subcopy);
+  let anchors: string[] = [];
+  try {
+    anchors = extractSectionAnchors(resolve(layoutsRoot, `${sec.namespace}.json`));
+  } catch {
+    // Flat index layout missing: fine. Just no section anchors.
+  }
+  const sections: IndexEntry["sections"] = [];
+  for (const anchor of anchors) {
+    const heading = resolveText(nsEntries[`${anchor}_heading`]);
+    if (heading) sections.push({ anchor, heading });
+  }
+  entries.push({ url: sec.url, namespace: sec.namespace, title, lead, sections });
+}
+
+entries.push(...attrRefEntries());
 
 entries.sort((a, b) => a.url.localeCompare(b.url));
 
