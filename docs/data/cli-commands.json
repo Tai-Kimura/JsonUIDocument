@@ -1,5 +1,5 @@
 {
-  "_description": "Seed data for /reference/cli-commands. Expanded incrementally per plan 25. Initial seed covers `jui` subcommands; sjui/kjui/rjui/jsonui-test/jsonui-doc to be added in subsequent sessions.",
+  "_description": "Hand-maintained command catalog for /reference/cli-commands, covering jui / sjui / kjui / rjui / jsonui-test / jsonui-doc. Keep entries in sync with each binary's --help; the jui section mirrors jui_tools/jui_cli/commands/ argparse registrations.",
   "_schemaVersion": "1.0",
   "binaries": [
     {
@@ -73,61 +73,100 @@
     {
       "binary": "jui",
       "command": "init",
-      "synopsis": "jui init [--platforms <list>] [--project-name <name>]",
+      "synopsis": "jui init --project-name <name> [--ios PATH] [--android PATH] [--web PATH]",
       "purpose": {
-        "en": "Initialize a new JsonUI project in the current directory. Creates jui.config.json, platform scaffolding, and .jsonui-type-map.json.",
-        "ja": "カレントディレクトリに新しい JsonUI プロジェクトを初期化。jui.config.json、プラットフォーム足場、.jsonui-type-map.json を作成。"
+        "en": "Initialize a JsonUI project: write jui.config.json and register the platform roots you pass. Copies platform tools into each root unless --no-sync-tools is given.",
+        "ja": "JsonUI プロジェクトを初期化: jui.config.json を書き、渡したプラットフォームルートを登録。--no-sync-tools を付けない限り各ルートへプラットフォームツールをコピーする。"
       },
       "options": [
         {
-          "name": "--platforms",
-          "type": "comma-separated",
-          "default": "web",
-          "description": {
-            "en": "Target platforms: `web` / `ios` / `android`.",
-            "ja": "対象プラットフォーム: `web` / `ios` / `android`。"
-          }
-        },
-        {
           "name": "--project-name",
           "type": "string",
-          "default": "basename of cwd",
+          "default": "—",
           "description": {
-            "en": "Project identifier.",
-            "ja": "プロジェクト識別子。"
+            "en": "Project name.",
+            "ja": "プロジェクト名。"
+          },
+          "required": true
+        },
+        {
+          "name": "--ios",
+          "type": "path",
+          "default": "—",
+          "description": {
+            "en": "iOS project root path.",
+            "ja": "iOS プロジェクトルート。"
           }
         },
         {
-          "name": "--overwrite",
+          "name": "--ios-mode",
+          "type": "enum",
+          "default": "swiftui",
+          "description": {
+            "en": "iOS rendering mode: swiftui or uikit.",
+            "ja": "iOS レンダリングモード: swiftui / uikit。"
+          }
+        },
+        {
+          "name": "--android",
+          "type": "path",
+          "default": "—",
+          "description": {
+            "en": "Android project root path.",
+            "ja": "Android プロジェクトルート。"
+          }
+        },
+        {
+          "name": "--android-mode",
+          "type": "enum",
+          "default": "compose",
+          "description": {
+            "en": "Android rendering mode: compose or xml.",
+            "ja": "Android レンダリングモード: compose / xml。"
+          }
+        },
+        {
+          "name": "--package-name",
+          "type": "string",
+          "default": "—",
+          "description": {
+            "en": "Android package name (e.g. com.example.app).",
+            "ja": "Android パッケージ名（例: com.example.app）。"
+          }
+        },
+        {
+          "name": "--web",
+          "type": "path",
+          "default": "—",
+          "description": {
+            "en": "Web project root path.",
+            "ja": "Web プロジェクトルート。"
+          }
+        },
+        {
+          "name": "--no-sync-tools",
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Overwrite existing config files.",
-            "ja": "既存の設定ファイルを上書き。"
+            "en": "Skip copying sjui_tools / kjui_tools / rjui_tools into the platform roots.",
+            "ja": "sjui_tools / kjui_tools / rjui_tools のコピーを省略。"
           }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ jui init --platforms web,ios --project-name myapp\n✓ Created jui.config.json\n✓ Created .jsonui-type-map.json\n✓ Initialized jsonui-doc-web/\n✓ Initialized jsonui-doc-ios/"
+          "code": "$ jui init --project-name MyApp --ios ios/ --web web/"
         }
-      ],
-      "seeAlso": [
-        "jui g screen",
-        "jui g project"
       ]
     },
     {
       "binary": "jui",
       "command": "g project",
-      "aliases": [
-        "generate project"
-      ],
-      "synopsis": "jui g project [--file <spec>] [--platforms <list>]",
+      "synopsis": "jui g project [--file SPEC] [--ios-only|--android-only|--web-only]",
       "purpose": {
-        "en": "Generate Layout JSON + ViewModel stubs from one or all screen specs.",
-        "ja": "単一または全ての画面 spec から Layout JSON + ViewModel スタブを生成。"
+        "en": "Generate Layout JSON plus ViewModel / Repository / UseCase declaration stubs from every screen spec, or from a single spec with --file.",
+        "ja": "全 screen spec（--file で単一 spec）から Layout JSON と ViewModel / Repository / UseCase の宣言スタブを生成。"
       },
       "options": [
         {
@@ -135,17 +174,8 @@
           "type": "path",
           "default": "all specs",
           "description": {
-            "en": "Single spec file path. If omitted, processes every spec under specDir.",
-            "ja": "単一 spec ファイルのパス。省略時は specDir 配下の全 spec が対象。"
-          }
-        },
-        {
-          "name": "--platforms",
-          "type": "comma-separated",
-          "default": "from config",
-          "description": {
-            "en": "Override target platforms for this run.",
-            "ja": "今回の実行における対象プラットフォームを上書き。"
+            "en": "Single spec file to process.",
+            "ja": "処理する単一 spec ファイル。"
           }
         },
         {
@@ -153,149 +183,327 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Overwrite hand-edited Layout files that bear the @generated marker.",
-            "ja": "@generated マーカー付きで手編集された Layout を上書き。"
+            "en": "Force-overwrite declaration files.",
+            "ja": "宣言ファイルを強制上書き。"
+          }
+        },
+        {
+          "name": "--skip-layout",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Skip Layout JSON generation.",
+            "ja": "Layout JSON 生成を省略。"
+          }
+        },
+        {
+          "name": "--dry-run",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Show what would be generated without writing.",
+            "ja": "書き込まずに生成内容を表示。"
+          }
+        },
+        {
+          "name": "--ios-only",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Generate iOS files only.",
+            "ja": "iOS のみ生成。"
+          }
+        },
+        {
+          "name": "--android-only",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Generate Android files only.",
+            "ja": "Android のみ生成。"
+          }
+        },
+        {
+          "name": "--web-only",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Generate Web files only.",
+            "ja": "Web のみ生成。"
+          }
+        },
+        {
+          "name": "--type-map",
+          "type": "path",
+          "default": ".jsonui-type-map.json",
+          "description": {
+            "en": "Path to the type map file.",
+            "ja": "type map ファイルのパス。"
           }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ jui g project --file docs/screens/json/learn/hello-world.spec.json\n✓ Generated docs/screens/layouts/learn/hello-world.json\n✓ Generated viewmodels: LearnHelloWorldViewModel.{ts,swift,kt}"
+          "code": "$ jui g project --file login.spec.json --web-only"
         }
-      ],
-      "seeAlso": [
-        "jui build",
-        "jui verify"
       ]
     },
     {
       "binary": "jui",
       "command": "g screen",
-      "aliases": [
-        "generate screen"
-      ],
-      "synopsis": "jui g screen --name <Name> [--route <path>]",
+      "synopsis": "jui g screen <Name> [<Name> ...] [--display-name <text>]",
       "purpose": {
-        "en": "Create a new screen spec skeleton plus empty Layout + ViewModel stubs. Interactive prompts fill in metadata.",
-        "ja": "新規画面の spec 雛形 + 空 Layout + ViewModel スタブを作成。メタデータは対話プロンプトで入力。"
+        "en": "Create screen-spec templates for one or more new screens (PascalCase names).",
+        "ja": "新規画面の spec テンプレートを作成（PascalCase 名、複数可）。"
       },
       "options": [
         {
-          "name": "--name",
-          "type": "string",
-          "required": true,
+          "name": "names",
+          "type": "positional",
+          "default": "—",
           "description": {
-            "en": "PascalCase screen name (becomes ViewModel class name).",
-            "ja": "PascalCase の画面名（ViewModel クラス名になる）。"
-          }
+            "en": "Screen names (PascalCase).",
+            "ja": "画面名（PascalCase）。"
+          },
+          "required": true
         },
         {
-          "name": "--route",
+          "name": "--display-name",
           "type": "string",
-          "default": "auto-derived",
+          "default": "—",
           "description": {
-            "en": "URL path for the screen. If omitted, derived from --name.",
-            "ja": "画面の URL パス。省略時は --name から導出。"
+            "en": "Display name (single screen only).",
+            "ja": "表示名（単一画面のときのみ）。"
           }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ jui g screen --name UserProfile --route /user/profile\n? Display name: User Profile\n? Description: Show user's profile and edit actions\n✓ Created docs/screens/json/user/profile.spec.json"
+          "code": "$ jui g screen Login Settings"
         }
-      ],
-      "seeAlso": [
-        "jui g project"
       ]
     },
     {
       "binary": "jui",
       "command": "g converter",
-      "aliases": [
-        "generate converter"
-      ],
-      "synopsis": "jui g converter --from <component-spec>",
+      "synopsis": "jui g converter [<Name>] [--from SPEC | --all]",
       "purpose": {
-        "en": "Create a custom component converter (Ruby source) from a component spec. Used for reusable UI widgets.",
-        "ja": "component spec からカスタムコンポーネント converter（Ruby）を生成。再利用可能な UI ウィジェットに使う。"
+        "en": "Generate a custom-component converter — from a name + --attributes, from a component spec with --from, or from every component spec with --all.",
+        "ja": "カスタムコンポーネントの converter を生成 — 名前 + --attributes、--from で component spec から、--all で全 component spec から。"
       },
       "options": [
         {
+          "name": "name",
+          "type": "positional",
+          "default": "—",
+          "description": {
+            "en": "Component name.",
+            "ja": "コンポーネント名。"
+          }
+        },
+        {
           "name": "--from",
           "type": "path",
-          "required": true,
+          "default": "—",
           "description": {
-            "en": "Path to the component spec file.",
-            "ja": "component spec ファイルのパス。"
+            "en": "Component spec file (resolved against component_spec_directory).",
+            "ja": "component spec ファイル（component_spec_directory 起点で解決）。"
+          }
+        },
+        {
+          "name": "--all",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Generate from all component specs.",
+            "ja": "全 component spec から生成。"
+          }
+        },
+        {
+          "name": "--attributes",
+          "type": "string",
+          "default": "—",
+          "description": {
+            "en": "Attributes as key:type,... pairs.",
+            "ja": "属性を key:type,... で指定。"
+          }
+        },
+        {
+          "name": "--container",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Mark as a container component.",
+            "ja": "コンテナコンポーネントとして生成。"
+          }
+        },
+        {
+          "name": "--skip-existing",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Skip converters that already exist (used by jui build).",
+            "ja": "既存 converter をスキップ（jui build が使用）。"
           }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ jui g converter --from docs/screens/json/components/codeblock.component.json\n✓ Generated rjui_tools/lib/converters/codeblock_converter.rb\n✓ Generated sjui_tools/lib/converters/codeblock_converter.rb\n✓ Generated kjui_tools/lib/converters/codeblock_converter.rb"
+          "code": "$ jui g converter --from rating-stars.component.json"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "g api",
+      "synopsis": "jui g api [--dry-run] [--platform ios|android|web]",
+      "purpose": {
+        "en": "Generate DTO + Domain models from the swagger files (api.schemas filter applies). --dry-run previews without writing.",
+        "ja": "swagger から DTO + Domain モデルを生成（api.schemas フィルタ適用）。--dry-run で書き込まずにプレビュー。"
+      },
+      "options": [
+        {
+          "name": "--dry-run",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Show what would be generated without writing files.",
+            "ja": "書き込まずに生成内容を表示。"
+          }
+        },
+        {
+          "name": "--platform",
+          "type": "enum",
+          "default": "all",
+          "description": {
+            "en": "Restrict to a single platform.",
+            "ja": "単一プラットフォームに限定。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Emit JSON (used by MCP wrappers).",
+            "ja": "JSON で出力（MCP ラッパー用）。"
+          }
         }
       ],
-      "seeAlso": [
-        "jui g project"
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui g api --dry-run --platform web"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "g attr-bindings",
+      "synopsis": "jui g attr-bindings [--lang swift|kotlin|ruby|all] [--out DIR]",
+      "purpose": {
+        "en": "Generate typed attribute-extraction code from the SSoT attribute_definitions.json. Deterministic output — re-running is byte-identical.",
+        "ja": "SSoT の attribute_definitions.json から型付き属性抽出コードを生成。出力は決定的で、再実行してもバイト一致。"
+      },
+      "options": [
+        {
+          "name": "--lang",
+          "type": "enum",
+          "default": "all",
+          "description": {
+            "en": "Target language: swift, kotlin, ruby, or all.",
+            "ja": "対象言語: swift / kotlin / ruby / all。"
+          }
+        },
+        {
+          "name": "--out",
+          "type": "path",
+          "default": "build/attr_codegen/<lang>",
+          "description": {
+            "en": "Output directory (per-language subdirs with --lang all).",
+            "ja": "出力ディレクトリ（--lang all では言語別サブディレクトリ）。"
+          }
+        },
+        {
+          "name": "--definitions",
+          "type": "path",
+          "default": "bundled SSoT",
+          "description": {
+            "en": "Override the attribute definitions file.",
+            "ja": "attribute definitions ファイルを差し替え。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui g attr-bindings --lang kotlin"
+        }
       ]
     },
     {
       "binary": "jui",
       "command": "build",
-      "synopsis": "jui build [--platforms <list>] [--watch]",
+      "synopsis": "jui build [--clean] [--ios-only|--android-only|--web-only]",
       "purpose": {
-        "en": "Build the project for all configured platforms. Outputs validated, optimized artifacts. Must pass with zero warnings (JsonUI invariant #1).",
-        "ja": "設定済み全プラットフォーム向けにビルド。検証済み・最適化された成果物を出力。警告ゼロで通過必須（JsonUI 不変条件 #1）。"
+        "en": "Build all configured platforms (or one with the --*-only flags). Must pass with zero warnings (JsonUI invariant #1).",
+        "ja": "設定済み全プラットフォーム（--*-only で単一）をビルド。警告ゼロで通過必須（JsonUI 不変条件 #1）。"
       },
       "options": [
         {
-          "name": "--platforms",
-          "type": "comma-separated",
-          "default": "from config",
-          "description": {
-            "en": "Override",
-            "ja": "上書き指定"
-          }
-        },
-        {
-          "name": "--watch",
+          "name": "--clean",
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Rebuild on file change.",
-            "ja": "ファイル変更時に再ビルド。"
+            "en": "Clean build — regenerate everything.",
+            "ja": "クリーンビルド — 全て再生成。"
           }
         },
         {
-          "name": "--verbose",
+          "name": "--ios-only",
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Detailed per-file log.",
-            "ja": "ファイルごとの詳細ログ。"
+            "en": "Build iOS only.",
+            "ja": "iOS のみビルド。"
+          }
+        },
+        {
+          "name": "--android-only",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Build Android only.",
+            "ja": "Android のみビルド。"
+          }
+        },
+        {
+          "name": "--web-only",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Build Web only.",
+            "ja": "Web のみビルド。"
           }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ jui build\n✓ Built jsonui-doc-web (44 layouts, 0 warnings)\n✓ Built jsonui-doc-ios (44 layouts, 0 warnings)"
+          "code": "$ jui build --web-only --clean"
         }
-      ],
-      "seeAlso": [
-        "jui verify"
       ]
     },
     {
       "binary": "jui",
       "command": "verify",
-      "synopsis": "jui verify [--fail-on-diff] [--quiet]",
+      "synopsis": "jui verify [--fail-on-diff] [--file SPEC] [--platform <p>]",
       "purpose": {
-        "en": "Verify that no hand-edited @generated files drift from the spec. Core guard for JsonUI invariant #2.",
-        "ja": "@generated ファイルの手作業編集が spec から乖離していないか検証。JsonUI 不変条件 #2 の中核ガード。"
+        "en": "Compare generated Layout JSON against the committed Layouts to detect spec drift. --fail-on-diff exits non-zero for CI (JsonUI invariant #2).",
+        "ja": "生成 Layout JSON とコミット済み Layout を突き合わせて spec drift を検出。--fail-on-diff は CI 用に非ゼロ終了（JsonUI 不変条件 #2）。"
       },
       "options": [
         {
@@ -303,28 +511,43 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Exit non-zero if drift is detected. Use in CI.",
-            "ja": "drift 検出時に non-zero で終了。CI で使う。"
+            "en": "Exit non-zero if any diff is detected.",
+            "ja": "diff 検出時に非ゼロ終了。"
           }
         },
         {
-          "name": "--quiet",
+          "name": "--detail",
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Suppress per-file log; show only summary.",
-            "ja": "ファイルごとのログを抑制し、サマリのみ表示。"
+            "en": "Include per-screen diff details in the report.",
+            "ja": "画面ごとの diff 詳細を出力。"
+          }
+        },
+        {
+          "name": "--file",
+          "type": "path",
+          "default": "all specs",
+          "description": {
+            "en": "Verify a single spec file.",
+            "ja": "単一 spec のみ検証。"
+          }
+        },
+        {
+          "name": "--platform",
+          "type": "enum",
+          "default": "first in config",
+          "description": {
+            "en": "Target platform.",
+            "ja": "対象プラットフォーム。"
           }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ jui verify --fail-on-diff\n✓ All 44 layouts match their specs"
+          "code": "$ jui verify --fail-on-diff"
         }
-      ],
-      "seeAlso": [
-        "jui build"
       ]
     },
     {
@@ -367,8 +590,69 @@
     },
     {
       "binary": "jui",
+      "command": "ls api-specs",
+      "synopsis": "jui ls api-specs [--json]",
+      "purpose": {
+        "en": "List swagger / OpenAPI files with parsed metadata (MCP discovery command).",
+        "ja": "swagger / OpenAPI ファイルをメタデータ付きで一覧（MCP discovery コマンド）。"
+      },
+      "options": [
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Emit JSON (used by MCP wrappers).",
+            "ja": "JSON で出力（MCP ラッパー用）。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui ls api-specs --json"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "ls api-models",
+      "synopsis": "jui ls api-models [--platform ios|android|web] [--json]",
+      "purpose": {
+        "en": "List generated DTO + Domain scaffold files per platform (MCP discovery command).",
+        "ja": "生成済み DTO + Domain スキャフォールドをプラットフォーム別に一覧（MCP discovery コマンド）。"
+      },
+      "options": [
+        {
+          "name": "--platform",
+          "type": "enum",
+          "default": "all",
+          "description": {
+            "en": "Restrict to a single platform.",
+            "ja": "単一プラットフォームに限定。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Emit JSON (used by MCP wrappers).",
+            "ja": "JSON で出力（MCP ラッパー用）。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui ls api-models --platform ios"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
       "command": "migrate-layouts",
-      "synopsis": "jui migrate-layouts --from <old-version>",
+      "synopsis": "jui migrate-layouts [--from PATH] [--dry-run]",
       "purpose": {
         "en": "One-shot migration for breaking changes between JsonUI versions. Applies AST transforms to all Layout JSON files.",
         "ja": "JsonUI バージョン間の破壊的変更に対する一括移行。全 Layout JSON に AST 変換を適用。"
@@ -376,84 +660,515 @@
       "options": [
         {
           "name": "--from",
-          "type": "string",
-          "required": true,
+          "type": "path",
+          "default": "—",
           "description": {
-            "en": "Previous version to migrate from (e.g. `1.x`).",
-            "ja": "移行元のバージョン（例: `1.x`）。"
+            "en": "Source layouts directory.",
+            "ja": "移行元 layouts ディレクトリ。"
           }
-        }
-      ],
-      "examples": [],
-      "seeAlso": [
-        "jui sync-tool"
-      ]
-    },
-    {
-      "binary": "jui",
-      "command": "sync-tool",
-      "synopsis": "jui sync-tool [<tool-name>]",
-      "purpose": {
-        "en": "Pull latest versions of rjui_tools / sjui_tools / kjui_tools from upstream. Used after library bug fixes are released.",
-        "ja": "rjui_tools / sjui_tools / kjui_tools を upstream から最新化。ライブラリバグ修正後に使う。"
-      },
-      "options": [
+        },
         {
-          "name": "<tool-name>",
-          "type": "positional",
-          "default": "all",
+          "name": "--dry-run",
+          "type": "flag",
+          "default": "false",
           "description": {
-            "en": "Specific tool to sync. If omitted, all are updated.",
-            "ja": "同期する個別ツール。省略時は全て更新。"
+            "en": "Show planned changes without writing.",
+            "ja": "書き込まずに変更予定を表示。"
           }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ jui sync-tool\n✓ Synced rjui_tools to latest main\n✓ Synced sjui_tools to latest main\n✓ Synced kjui_tools to latest main"
+          "code": "$ jui migrate-layouts --dry-run"
         }
-      ],
-      "seeAlso": [
-        "jui migrate-layouts"
       ]
     },
     {
       "binary": "jui",
-      "command": "conformance coverage",
-      "synopsis": "jui conformance coverage [--platform ios|android|web] [--update-ledger]",
+      "command": "sync_tool",
+      "synopsis": "jui sync_tool [--platform <p>] [--prune] [--dry-run]",
       "purpose": {
-        "en": "Answer whether each declared attribute is actually read by the converter for the platform that declares it — by scanning converter source, not output. Screenshot conformance cannot see this: a fixture for a dropped attribute renders a blank screen, matches its blank baseline and passes. The scan is per component × attribute pair (2026-07-31) — a read in one converter no longer marks the attribute implemented for every component — with alias routing and per-file component attribution. Backed by `conformance/coverage.json` as a ratchet that fails in both directions — an unrecorded gap fails, and so does a recorded gap that no longer exists, so the ledger cannot rot into a list of things that used to be broken.",
-        "ja": "宣言されている各属性を、それを宣言したプラットフォームのコンバータが実際に読んでいるかを判定する — 出力ではなくコンバータのソースを走査する。スクリーンショットの conformance ではこれは見えない（属性を握り潰した fixture は空の画面を描き、空の baseline と一致して pass するため）。走査はコンポーネント × 属性の組単位（2026-07-31）— どこかのコンバータの read が全コンポーネントを実装済み扱いにすることはなくなり、alias のルーティングとファイル単位のコンポーネント帰属を持つ。台帳は `conformance/coverage.json` で、両方向に落ちるラチェット — 未記録のギャップでも、解消済みなのに残っているエントリでも失敗するので、台帳が「昔壊れていたもの一覧」に腐ることがない。"
+        "en": "Sync project-local platform tools (sjui_tools / kjui_tools / rjui_tools) from the home install (~/.jsonui-cli), preserving each tool's extensions/.",
+        "ja": "プロジェクト内のプラットフォームツール（sjui_tools / kjui_tools / rjui_tools）を home インストール（~/.jsonui-cli）から同期。各ツールの extensions/ は保持。"
+      },
+      "options": [
+        {
+          "name": "--from",
+          "type": "path",
+          "default": "$JSONUI_CLI_PATH or ~/.jsonui-cli",
+          "description": {
+            "en": "Source directory.",
+            "ja": "同期元ディレクトリ。"
+          }
+        },
+        {
+          "name": "--platform",
+          "type": "enum",
+          "default": "all in config",
+          "description": {
+            "en": "Sync only one platform.",
+            "ja": "単一プラットフォームのみ同期。"
+          }
+        },
+        {
+          "name": "--prune",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Delete target files missing from the source (outside extensions/).",
+            "ja": "同期元に無いファイルを削除（extensions/ 以外）。"
+          }
+        },
+        {
+          "name": "--dry-run",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Print actions without modifying files.",
+            "ja": "変更せずに実行内容を表示。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui sync_tool --platform web"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "hotload listen",
+      "synopsis": "jui hotload listen [--host H] [--port P] [--ws-path PATH]",
+      "purpose": {
+        "en": "Start the unified hot-reload server in the foreground. One process serves iOS and Android; it watches the layouts directory and pushes resolved JSON over WebSocket.",
+        "ja": "統合ホットリロードサーバをフォアグラウンド起動。1 プロセスで iOS / Android 両対応、layouts ディレクトリを監視して解決済み JSON を WebSocket で push。"
+      },
+      "options": [
+        {
+          "name": "--host",
+          "type": "string",
+          "default": "from docs/hotload/config.json",
+          "description": {
+            "en": "Override server.host.",
+            "ja": "server.host を上書き。"
+          }
+        },
+        {
+          "name": "--port",
+          "type": "number",
+          "default": "8081",
+          "description": {
+            "en": "Override server.port.",
+            "ja": "server.port を上書き。"
+          }
+        },
+        {
+          "name": "--ws-path",
+          "type": "string",
+          "default": "/ws",
+          "description": {
+            "en": "Override server.wsPath.",
+            "ja": "server.wsPath を上書き。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui hotload listen"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "hotload status",
+      "synopsis": "jui hotload status",
+      "purpose": {
+        "en": "Print whether a hotload server is running.",
+        "ja": "hotload サーバの稼働状態を表示。"
+      },
+      "options": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui hotload status"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "hotload stop",
+      "synopsis": "jui hotload stop",
+      "purpose": {
+        "en": "Stop the running hotload server.",
+        "ja": "稼働中の hotload サーバを停止。"
+      },
+      "options": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui hotload stop"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "conformance generate",
+      "synopsis": "jui conformance generate [--definitions PATH] [--out DIR]",
+      "purpose": {
+        "en": "Generate the conformance fixtures/ directory + manifest.json from attribute_definitions.json.",
+        "ja": "attribute_definitions.json から conformance の fixtures/ と manifest.json を生成。"
+      },
+      "options": [
+        {
+          "name": "--definitions",
+          "type": "path",
+          "default": "bundled SSoT",
+          "description": {
+            "en": "Path to attribute_definitions.json.",
+            "ja": "attribute_definitions.json のパス。"
+          }
+        },
+        {
+          "name": "--out",
+          "type": "path",
+          "default": "conformance/",
+          "description": {
+            "en": "Output directory.",
+            "ja": "出力ディレクトリ。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui conformance generate"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "conformance report",
+      "synopsis": "jui conformance report [--dir DIR] [--results DIR] [--out PATH]",
+      "purpose": {
+        "en": "Merge results/*.results.json into REPORT.md — the cross-platform compat matrix.",
+        "ja": "results/*.results.json を REPORT.md（クロスプラットフォーム互換マトリクス）にマージ。"
+      },
+      "options": [
+        {
+          "name": "--dir",
+          "type": "path",
+          "default": "conformance/",
+          "description": {
+            "en": "Conformance directory containing manifest.json.",
+            "ja": "manifest.json を含む conformance ディレクトリ。"
+          }
+        },
+        {
+          "name": "--results",
+          "type": "path",
+          "default": "<dir>/results",
+          "description": {
+            "en": "Results directory.",
+            "ja": "results ディレクトリ。"
+          }
+        },
+        {
+          "name": "--out",
+          "type": "path",
+          "default": "<dir>/REPORT.md",
+          "description": {
+            "en": "Report output path.",
+            "ja": "レポート出力先。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui conformance report"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "conformance gate",
+      "synopsis": "jui conformance gate --platform <p> [--platform <p>...] [--no-visual]",
+      "purpose": {
+        "en": "Render REPORT.md and fail on regressions — the CI gate, runnable locally.",
+        "ja": "REPORT.md を生成しリグレッションで失敗させる — CI ゲート（ローカル実行可）。"
+      },
+      "options": [
+        {
+          "name": "--platform",
+          "type": "enum (repeatable)",
+          "default": "—",
+          "description": {
+            "en": "Platform whose results this gate judges.",
+            "ja": "このゲートが判定するプラットフォーム。"
+          },
+          "required": true
+        },
+        {
+          "name": "--dir",
+          "type": "path",
+          "default": "conformance/",
+          "description": {
+            "en": "Conformance directory.",
+            "ja": "conformance ディレクトリ。"
+          }
+        },
+        {
+          "name": "--results",
+          "type": "path",
+          "default": "<dir>/results",
+          "description": {
+            "en": "Results directory.",
+            "ja": "results ディレクトリ。"
+          }
+        },
+        {
+          "name": "--out",
+          "type": "path",
+          "default": "<dir>/REPORT.md",
+          "description": {
+            "en": "Report output path.",
+            "ja": "レポート出力先。"
+          }
+        },
+        {
+          "name": "--no-visual",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Skip screenshot-dependent checks (for lanes that cannot compare renders).",
+            "ja": "スクリーンショット依存の検査を省略（レンダ比較できないレーン用）。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui conformance gate --platform web --no-visual"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "conformance compat-doc",
+      "synopsis": "jui conformance compat-doc --platform <p> -o PATH",
+      "purpose": {
+        "en": "Generate the @generated attribute-compatibility markdown from conformance results.",
+        "ja": "conformance 結果から @generated の属性互換マークダウンを生成。"
       },
       "options": [
         {
           "name": "--platform",
           "type": "enum",
+          "default": "—",
           "description": {
-            "en": "Limit the scan to `ios`, `android` or `web`. Omit for all three.",
-            "ja": "`ios` / `android` / `web` に限定する。省略で 3 つとも。"
+            "en": "Platform whose results feed the coverage column.",
+            "ja": "coverage 列の元になるプラットフォーム。"
+          },
+          "required": true
+        },
+        {
+          "name": "--definitions",
+          "type": "path",
+          "default": "bundled SSoT",
+          "description": {
+            "en": "Path to attribute_definitions.json.",
+            "ja": "attribute_definitions.json のパス。"
           }
         },
         {
-          "name": "--update-ledger",
-          "type": "flag",
-          "default": "false",
+          "name": "--dir",
+          "type": "path",
+          "default": "conformance/",
           "description": {
-            "en": "Rewrite `conformance/coverage.json` to the current gap set. Review it — an entry added here is a declared attribute nobody wired up.",
-            "ja": "現在のギャップ集合で `conformance/coverage.json` を書き直す。追加されたエントリは「宣言されているのに誰も配線していない属性」なので、内容は確認すること。"
+            "en": "Conformance directory.",
+            "ja": "conformance ディレクトリ。"
+          }
+        },
+        {
+          "name": "-o, --out",
+          "type": "path",
+          "default": "—",
+          "description": {
+            "en": "Output markdown path.",
+            "ja": "出力する markdown のパス。"
+          },
+          "required": true
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui conformance compat-doc --platform ios -o Docs/attribute_compatibility.md"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "conformance baseline update",
+      "synopsis": "jui conformance baseline update --platform <p> [--artifacts DIR]",
+      "purpose": {
+        "en": "Hash artifacts/<platform>/*.png into baselines/<platform>.hashes.json (perceptual-hash screenshot baselines).",
+        "ja": "artifacts/<platform>/*.png をハッシュ化して baselines/<platform>.hashes.json に記録（perceptual-hash ベースライン）。"
+      },
+      "options": [
+        {
+          "name": "--platform",
+          "type": "enum",
+          "default": "—",
+          "description": {
+            "en": "Platform whose artifacts to baseline.",
+            "ja": "ベースライン化するプラットフォーム。"
+          },
+          "required": true
+        },
+        {
+          "name": "--dir",
+          "type": "path",
+          "default": "conformance/",
+          "description": {
+            "en": "Conformance directory.",
+            "ja": "conformance ディレクトリ。"
+          }
+        },
+        {
+          "name": "--artifacts",
+          "type": "path",
+          "default": "<dir>/artifacts/<platform>",
+          "description": {
+            "en": "Artifacts directory.",
+            "ja": "artifacts ディレクトリ。"
           }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ jui conformance coverage\nattribute x platform pairs checked per component (pair-based scan)\n15 gaps: 5 unimplemented (UIKit-facing surfaces) / 10 legacy aliases\nNote: 85 mode:uikit attributes are out of scope - read by the Swift runtime, not a Ruby converter"
+          "code": "$ jui conformance baseline update --platform android"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "conformance coverage",
+      "synopsis": "jui conformance coverage [--platform <p>...] [--update]",
+      "purpose": {
+        "en": "Check declared attributes against what each platform's converters actually read; --update rewrites coverage.json from the current gaps (reasons preserved).",
+        "ja": "宣言済み属性と各プラットフォームの converter が実際に読む属性を突き合わせ。--update は現状の gap から coverage.json を書き直す（理由は保持）。"
+      },
+      "options": [
+        {
+          "name": "--platform",
+          "type": "enum (repeatable)",
+          "default": "all",
+          "description": {
+            "en": "Limit the check to a platform.",
+            "ja": "検査対象プラットフォームを限定。"
+          }
+        },
+        {
+          "name": "--definitions",
+          "type": "path",
+          "default": "bundled SSoT",
+          "description": {
+            "en": "Path to attribute_definitions.json.",
+            "ja": "attribute_definitions.json のパス。"
+          }
+        },
+        {
+          "name": "--dir",
+          "type": "path",
+          "default": "conformance/",
+          "description": {
+            "en": "Conformance directory holding coverage.json.",
+            "ja": "coverage.json を含む conformance ディレクトリ。"
+          }
+        },
+        {
+          "name": "--repo-root",
+          "type": "path",
+          "default": "—",
+          "description": {
+            "en": "Repo root holding the converter sources.",
+            "ja": "converter ソースを含むリポジトリルート。"
+          }
+        },
+        {
+          "name": "--update",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Rewrite coverage.json from the current gaps.",
+            "ja": "現状の gap から coverage.json を再生成。"
+          }
         }
       ],
-      "seeAlso": [
-        "jui build",
-        "jui lint-generated"
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui conformance coverage --platform web"
+        }
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "conformance effect",
+      "synopsis": "jui conformance effect --platform <p> [--update]",
+      "purpose": {
+        "en": "Record / check which fixtures render differently from their control (the attribute-effect ledger).",
+        "ja": "各 fixture が control と異なって描画されるかを記録・検査（attribute effect 台帳）。"
+      },
+      "options": [
+        {
+          "name": "--platform",
+          "type": "enum",
+          "default": "—",
+          "description": {
+            "en": "Platform whose artifacts to measure.",
+            "ja": "計測対象プラットフォーム。"
+          },
+          "required": true
+        },
+        {
+          "name": "--dir",
+          "type": "path",
+          "default": "conformance/",
+          "description": {
+            "en": "Conformance directory.",
+            "ja": "conformance ディレクトリ。"
+          }
+        },
+        {
+          "name": "--artifacts",
+          "type": "path",
+          "default": "<dir>/artifacts/<platform>",
+          "description": {
+            "en": "Directory holding this platform's screenshots.",
+            "ja": "このプラットフォームのスクリーンショットディレクトリ。"
+          }
+        },
+        {
+          "name": "--update",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Record fixtures that differ from control into control_diff.json (existing entries kept).",
+            "ja": "control と異なる fixture を control_diff.json に記録（既存エントリは保持）。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui conformance effect --platform ios --update"
+        }
       ]
     },
     {

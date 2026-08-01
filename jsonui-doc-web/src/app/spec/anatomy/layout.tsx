@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `The anatomy of a screen spec — JsonUI`,
-  description: `A field-by-field walk through screen_spec.json — every top-level section, what it declares, and how it cross-references the others. v1 lands as a scaffold;…`,
+  description: `A field-by-field walk through screen_spec.json — every top-level section, what it declares, and how it cross-references the others.`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

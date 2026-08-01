@@ -99,7 +99,7 @@ const NAV_CATALOG: ReadonlyArray<{
     labelEn: "Spec",
     entries: [
       { id: "anatomy",              titleKey: "spec_anatomy_title",              titleEn: "The anatomy of a screen spec",  url: "/spec/anatomy" },
-      { id: "split-overview",       titleKey: "spec_split_overview_title",       titleEn: "Five ways to split a spec",     url: "/spec/split-overview" },
+      { id: "split-overview",       titleKey: "spec_split_overview_title",       titleEn: "Six ways to split a spec",      url: "/spec/split-overview" },
       { id: "layout-file",          titleKey: "spec_layout_file_title",          titleEn: "Separating the layout file",    url: "/spec/layout-file" },
       { id: "parent-sub-spec",      titleKey: "spec_parent_sub_spec_title",      titleEn: "Parent + sub specs",            url: "/spec/parent-sub-spec" },
       { id: "component-spec",       titleKey: "spec_component_spec_title",       titleEn: "Component specs",               url: "/spec/component-spec" },

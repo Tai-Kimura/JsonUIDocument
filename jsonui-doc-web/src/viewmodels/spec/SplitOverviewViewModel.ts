@@ -1,4 +1,4 @@
-// ViewModel for Spec > Five ways to split a spec.
+// ViewModel for Spec > Six ways to split a spec.
 //
 // Spec: docs/screens/json/spec/split-overview.spec.json
 // Hand-written (no ViewModelBase — same pattern as AnatomyViewModel and the

@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `JSON Schema — JsonUI`,
-  description: `Formal JSON Schema for Layout JSON and screen_spec.json. Downloadable; drop the URL into any JSON-aware editor (VS Code, IntelliJ, Neovim with coc-json) to get…`,
+  description: `Where JSON Schema fits in JsonUI today: the spec-file schemas ship inside the jsonui-helper VS Code extension, Layout JSON is validated by the toolchain…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

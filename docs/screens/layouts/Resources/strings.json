@@ -817,8 +817,8 @@
       "ja": "CLI リファレンス — jui / sjui / kjui / rjui の全コマンド"
     },
     "related_mcp_label": {
-      "en": "MCP reference — all 39 tools grouped by capability",
-      "ja": "MCP リファレンス — 39 ツールを能力別に整理"
+      "en": "MCP reference — all 42 tools grouped by capability",
+      "ja": "MCP リファレンス — 42 ツールを能力別に整理"
     },
     "related_agents_label": {
       "en": "Agents reference — the 9 agents that drive the spec-first workflow",
@@ -829,8 +829,8 @@
       "ja": "Hello, JsonUI — 最初の画面を 5 分で書く"
     },
     "related_get_data_source_label": {
-      "en": "MCP tool reference — all 39 tools incl. get-data-source",
-      "ja": "MCP ツールリファレンス — get-data-source を含む全 39 ツール"
+      "en": "MCP tool reference — all 42 tools incl. get-data-source",
+      "ja": "MCP ツールリファレンス — get-data-source を含む全 42 ツール"
     },
     "next_heading": {
       "en": "Next: write your first screen",
@@ -1079,16 +1079,16 @@
       "ja": "セクション"
     },
     "catalog_subheading": {
-      "en": "Pick a reference area. Most are auto-generated from the spec files so they stay in sync with the runtime.",
-      "ja": "各セクション。ほとんどが spec ファイルから自動生成されるのでランタイムと常に同期。"
+      "en": "Pick a reference area. Attribute and component pages are generated from the SSoT attribute tables plus hand-authored overrides; the MCP and CLI catalogs are hand-maintained.",
+      "ja": "各セクション。属性・コンポーネントページは SSoT の属性テーブル + 手書き override から生成、MCP / CLI カタログは手書き管理。"
     },
     "article_attributes_title": {
       "en": "Attribute reference",
       "ja": "属性リファレンス"
     },
     "article_attributes_description": {
-      "en": "Every attribute on every View, Button, Collection, TabView, etc. Searchable, filterable, linkable.",
-      "ja": "View / Button / Collection / TabView など全コンポーネントの全属性。検索・絞り込み・直リンク対応。"
+      "en": "Every attribute on every View, Button, Collection, TabView, etc., with per-attribute platform and mode facts.",
+      "ja": "View / Button / Collection / TabView など全コンポーネントの全属性。属性ごとの platform / mode 事実表示付き。"
     },
     "article_attributes_read_time": {
       "en": "auto-generated",
@@ -1123,12 +1123,12 @@
       "ja": "MCP ツール API"
     },
     "article_mcp_tools_description": {
-      "en": "All 39 MCP tools with full parameter schemas + examples. Hand-authored catalog kept in sync with the MCP server's 6-group tool list.",
-      "ja": "全 39 MCP ツールの引数スキーマ + 例。MCP サーバの 6 グループ tool list と同期する手書きカタログです。"
+      "en": "All 42 MCP tools with full parameter schemas + examples. Hand-authored catalog kept in sync with the MCP server's 6-group tool list.",
+      "ja": "全 42 MCP ツールの引数スキーマ + 例。MCP サーバの 6 グループ tool list と同期する手書きカタログです。"
     },
     "article_mcp_tools_read_time": {
-      "en": "auto-generated",
-      "ja": "自動生成"
+      "en": "hand-maintained",
+      "ja": "手書き管理"
     },
     "article_cli_commands_title": {
       "en": "CLI command reference",
@@ -1139,8 +1139,8 @@
       "ja": "jui / sjui / kjui / rjui / jsonui-test / jsonui-doc の全サブコマンド、フラグ、exit code。"
     },
     "article_cli_commands_read_time": {
-      "en": "auto-generated",
-      "ja": "自動生成"
+      "en": "hand-maintained",
+      "ja": "手書き管理"
     }
   },
   "platforms_index": {
@@ -1239,8 +1239,8 @@
       "ja": "jsonui-mcp-server"
     },
     "article_mcp_description": {
-      "en": "39 MCP tools in 6 groups. Lookup, validation, generation, build orchestration, API model discovery, test tooling. Runtime-synced with attribute definitions.",
-      "ja": "39 ツールを 6 グループで提供。Lookup / validation / generation / build / API model discovery / test tooling を管理、attribute 定義とランタイム同期。"
+      "en": "42 MCP tools in 6 groups. Lookup, validation, generation, build orchestration, API model discovery, test tooling. Runtime-synced with attribute definitions.",
+      "ja": "42 ツールを 6 グループで提供。Lookup / validation / generation / build / API model discovery / test tooling を管理、attribute 定義とランタイム同期。"
     },
     "article_mcp_read_time": {
       "en": "~12 min read",
@@ -1517,8 +1517,8 @@
       "ja": "`@{…}` の中に式は書けない"
     },
     "section_no_logic_body": {
-      "en": "The grammar inside `@{…}` is deliberately small: simple property (`@{displayName}`), dot-path (`@{user.profile.handle}`), array index (`@{items[0]}`), a default via `??` (`@{nickname ?? 'guest'}` — string / number / bool / `null` literal, at most one `??` per expression), boolean negation (`@{!isLoading}` — only as the whole value of a boolean-typed attribute such as `hidden` or `enabled`), action binding (`@{onSubmit}`), and cell-scoped `@{data.prop}` inside `cells/*.json`. That is the entire grammar — and it narrows further by context: two-way form attributes (`TextField.text`, `Switch.isOn`, …) accept only a single flat identifier (no dot-path, index, `??`, or `!`), and Embed `params` leaves accept a path but no `??` or `!`. Ternaries, comparisons (`===`, `<`, `>`), arithmetic (`+`, `*`, `%`), logical operators (`&&`, `||`), and function or method calls are not part of the grammar: at runtime the whole expression is treated as one unresolvable key (it renders as nothing), and the validator flags them as business-logic warnings during `jui build`. Violations of the canonical grammar itself — a second `??`, negation outside a boolean attribute, a complex two-way expression — are build errors: `jui build` fails outright, reporting precise rule ids (`binding-double-default`, `binding-negation-context`, `binding-two-way-complex`, …) that are identical across all three generators. The semantics (paths, indexes, defaults, negation, type coercion) are declared once in a shared `binding_semantics.json` and enforced on every platform by shared conformance vectors. If you need a derived value, compute it in the ViewModel as a getter and bind the getter: `get countLabel(): string { return this.count > 0 ? this.s('some') : this.s('none'); }` → `{ \"text\": \"@{countLabel}\" }`. Path-ascent (`@{^parentProp}`) and relative navigation (`@{../sibling}`) are not part of the grammar — pass values down explicitly through cell data blocks instead.",
-      "ja": "`@{…}` 内の文法は意図的に小さく保たれています: 単純なプロパティ (`@{displayName}`)・ドットパス (`@{user.profile.handle}`)・配列インデックス (`@{items[0]}`)・`??` によるデフォルト (`@{nickname ?? 'guest'}` — 文字列 / 数値 / bool / `null` リテラル、`??` は 1 式につき 1 回まで)・bool 否定 (`@{!isLoading}` — `hidden` や `enabled` のような boolean 型属性の値全体として書く場合のみ)・アクションバインディング (`@{onSubmit}`)・cell スコープの `@{data.prop}`（`cells/*.json` 用）。文法はこれで全部 — しかもコンテキストによってさらに狭まります: two-way のフォーム属性（`TextField.text` / `Switch.isOn` など）は flat な識別子 1 個のみ（ドットパス・インデックス・`??`・`!` は不可）、Embed の `params` の葉はパスのみで `??` と `!` は不可。三項演算子・比較 (`===` / `<` / `>`)・算術 (`+` / `*` / `%`)・論理演算子 (`&&` / `||`)・関数/メソッド呼び出しは文法の外です: ランタイムは式全体を 1 個の解決不能なキーとして扱い（何も表示されない）、`jui build` 時に validator が business-logic 警告として検出します。正準文法そのものの違反 — 2 個目の `??`・boolean 属性以外での否定・two-way での複雑な式 — はビルドエラーです: `jui build` がその場で失敗し、3 つの generator で同一の rule id（`binding-double-default` / `binding-negation-context` / `binding-two-way-complex` など）付きで報告されます。意味論（パス・インデックス・デフォルト・否定・型強制）は共有の `binding_semantics.json` に一度だけ宣言され、共有 conformance ベクタが全プラットフォームで強制します。派生値が必要なら ViewModel の getter として計算し、そのバインディングを介して使うのが正解: `get countLabel(): string { return this.count > 0 ? this.s('some') : this.s('none'); }` → `{ \"text\": \"@{countLabel}\" }`。`@{^parentProp}` の親参照・`@{../sibling}` の相対ナビゲーションも文法にない — cell の data ブロック経由で明示的に値を降ろすのが正解。"
+      "en": "The grammar inside `@{…}` is deliberately small: simple property (`@{displayName}`), dot-path (`@{user.profile.handle}`), array index (`@{items[0]}`), a default via `??` (`@{nickname ?? 'guest'}` — string / number / bool / `null` literal, at most one `??` per expression), boolean negation (`@{!isLoading}` — only as the whole value of a boolean-typed attribute such as `hidden` or `enabled`), action binding (`@{onSubmit}`), and cell-scoped `@{data.prop}` inside `cells/*.json`. That is the entire grammar — and it narrows further by context: two-way form attributes (`TextField.text`, `Switch.isOn`, …) accept only a single flat identifier (no dot-path, index, `??`, or `!`), and Embed `params` leaves accept a path but no `??` or `!`. Ternaries, comparisons (`===`, `<`, `>`), arithmetic (`+`, `*`, `%`), logical operators (`&&`, `||`), and function or method calls are not part of the grammar: at runtime the whole expression is treated as one unresolvable key (it renders as nothing), and the validator flags them as business-logic warnings during `jui build`. Violations of the canonical grammar itself — a second `??`, negation outside a boolean attribute, a complex two-way expression — fail `jui build` with precise rule ids (`binding-double-default`, `binding-negation-context`, `binding-two-way-complex`, …). Today that validator ships in the rjui toolchain only: builds that include the web target catch these at build time, while the iOS and Android generators accept malformed bindings and the error surfaces at runtime instead. The semantics (paths, indexes, defaults, negation, type coercion) are declared once in a shared `binding_semantics.json` with shared conformance vectors. If you need a derived value, compute it in the ViewModel as a getter and bind the getter: `get countLabel(): string { return this.count > 0 ? this.s('some') : this.s('none'); }` → `{ \"text\": \"@{countLabel}\" }`. Path-ascent (`@{^parentProp}`) and relative navigation (`@{../sibling}`) are not part of the grammar — pass values down explicitly through cell data blocks instead.",
+      "ja": "`@{…}` 内の文法は意図的に小さく保たれています: 単純なプロパティ (`@{displayName}`)・ドットパス (`@{user.profile.handle}`)・配列インデックス (`@{items[0]}`)・`??` によるデフォルト (`@{nickname ?? 'guest'}` — 文字列 / 数値 / bool / `null` リテラル、`??` は 1 式につき 1 回まで)・bool 否定 (`@{!isLoading}` — `hidden` や `enabled` のような boolean 型属性の値全体として書く場合のみ)・アクションバインディング (`@{onSubmit}`)・cell スコープの `@{data.prop}`（`cells/*.json` 用）。文法はこれで全部 — しかもコンテキストによってさらに狭まります: two-way のフォーム属性（`TextField.text` / `Switch.isOn` など）は flat な識別子 1 個のみ（ドットパス・インデックス・`??`・`!` は不可）、Embed の `params` の葉はパスのみで `??` と `!` は不可。三項演算子・比較 (`===` / `<` / `>`)・算術 (`+` / `*` / `%`)・論理演算子 (`&&` / `||`)・関数/メソッド呼び出しは文法の外です: ランタイムは式全体を 1 個の解決不能なキーとして扱い（何も表示されない）、`jui build` 時に validator が business-logic 警告として検出します。正準文法そのものの違反 — 2 個目の `??`・boolean 属性以外での否定・two-way での複雑な式 — は `jui build` を rule id（`binding-double-default` / `binding-negation-context` / `binding-two-way-complex` など）付きで落とします。ただしこの validator が実装されているのは現状 rjui ツールチェーンのみ: web ターゲットを含むビルドではビルド時に検出されますが、iOS / Android の generator は不正なバインディングを素通しし、エラーはランタイムで顕在化します。意味論（パス・インデックス・デフォルト・否定・型強制）は共有の `binding_semantics.json` に一度だけ宣言され、共有 conformance ベクタを持ちます。派生値が必要なら ViewModel の getter として計算し、そのバインディングを介して使うのが正解: `get countLabel(): string { return this.count > 0 ? this.s('some') : this.s('none'); }` → `{ \"text\": \"@{countLabel}\" }`。`@{^parentProp}` の親参照・`@{../sibling}` の相対ナビゲーションも文法にない — cell の data ブロック経由で明示的に値を降ろすのが正解。"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -3025,8 +3025,8 @@
       "ja": "JSON で書いて実アプリを駆動するテスト。"
     },
     "next_spec_title": {
-      "en": "Five ways to split a spec",
-      "ja": "spec を分割する 5 つの方法"
+      "en": "Six ways to split a spec",
+      "ja": "spec を分割する 6 つの方法"
     },
     "next_spec_description": {
       "en": "Once the single-file spec you just wrote starts to bulge, the Spec section shows five carve-up patterns to reach for.",
@@ -3979,8 +3979,8 @@
       "ja": "Web"
     },
     "cli_rjui_body": {
-      "en": "ReactJsonUI builder. Generates Next.js + React + Tailwind code from Layout JSON, invoked as part of `jui build --platform web` (or plain `jui build`). Powers this documentation site: the regenerated TSX is what Next.js HMR pushes into the open browser tab when you edit a JSON file.",
-      "ja": "ReactJsonUI 用 builder。Layout JSON から Next.js + React + Tailwind のコードを生成し、`jui build --platform web`（または単なる `jui build`）の一部として呼び出されます。このドキュメントサイト自体を駆動しています: JSON を編集すると再生成された TSX が Next.js HMR 経由でブラウザタブに push されます。"
+      "en": "ReactJsonUI builder. Generates Next.js + React + Tailwind code from Layout JSON, invoked as part of `jui build --web-only` (or plain `jui build`). Powers this documentation site: the regenerated TSX is what Next.js HMR pushes into the open browser tab when you edit a JSON file.",
+      "ja": "ReactJsonUI 用 builder。Layout JSON から Next.js + React + Tailwind のコードを生成し、`jui build --web-only`（または単なる `jui build`）の一部として呼び出されます。このドキュメントサイト自体を駆動しています: JSON を編集すると再生成された TSX が Next.js HMR 経由でブラウザタブに push されます。"
     },
     "cli_jsonui_test_name": {
       "en": "jsonui-test",
@@ -4895,8 +4895,8 @@
       "ja": "この画面で使った 3 種類の @{binding} を 1 つずつ丁寧に解説。"
     },
     "next_spec_title": {
-      "en": "Five ways to split a spec",
-      "ja": "spec を分割する 5 つの方法"
+      "en": "Six ways to split a spec",
+      "ja": "spec を分割する 6 つの方法"
     },
     "next_spec_description": {
       "en": "Once this single-file spec grows past a couple hundred lines, the Spec section shows five ways to carve it up.",
@@ -8113,12 +8113,12 @@
       "ja": "JSON Schema"
     },
     "lead": {
-      "en": "Formal JSON Schema for Layout JSON and screen_spec.json. Downloadable; drop the URL into any JSON-aware editor (VS Code, IntelliJ, Neovim with coc-json) to get autocompletion and schema-diagnostic squigglies before you save.",
-      "ja": "Layout JSON と screen_spec.json の公式 JSON Schema。ダウンロード可能で、JSON-aware エディタ (VS Code / IntelliJ / coc-json 付き Neovim) に URL を貼ると、保存前に補完と schema 警告が効きます。"
+      "en": "Where JSON Schema fits in JsonUI today: the spec-file schemas ship inside the jsonui-helper VS Code extension, Layout JSON is validated by the toolchain itself, and no standalone schema files are published for download yet.",
+      "ja": "JsonUI における JSON Schema の現在地: spec ファイル用スキーマは VS Code 拡張 jsonui-helper に同梱、Layout JSON はツールチェーン自身が検証、単体スキーマファイルの一般配布はまだありません。"
     },
     "read_time": {
-      "en": "downloadable",
-      "ja": "ダウンロード可"
+      "en": "in-editor today",
+      "ja": "エディタ同梱"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -8129,36 +8129,36 @@
       "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
     },
     "section_what_heading": {
-      "en": "What it covers",
-      "ja": "対象範囲"
+      "en": "What exists today",
+      "ja": "現状あるもの"
     },
     "section_what_body": {
-      "en": "Two schemas, one URL each. `layout.schema.json` describes the recursive View / leaf shape — every attribute the core grammar supports. `screen-spec.schema.json` describes the screen_spec.json file — metadata, stateManagement, dataFlow, transitions. Custom component attribute definitions extend the Layout schema at build time, but the shipped schema is the built-in baseline.",
-      "ja": "2 つのスキーマ、それぞれ URL 1 つ。`layout.schema.json` は再帰的な View / リーフ形状を記述 — core 文法が対応する全属性。`screen-spec.schema.json` は screen_spec.json ファイルを記述 — metadata / stateManagement / dataFlow / transitions。カスタムコンポーネントの attribute 定義はビルド時に Layout スキーマを拡張しますが、同梱スキーマは組み込みベースラインを指します。"
+      "en": "Two spec schemas exist — `screen_spec_schema.json` and `component_spec_schema.json` — vendored inside jsonui-helper and matched to `*.spec.json` files. There is no JSON Schema for Layout JSON: the layout grammar's source of truth is the SSoT attribute table (`attribute_definitions.json`) that `jui build` validates against, and this site's attribute reference is generated from the same table.",
+      "ja": "spec 用スキーマが 2 本 — `screen_spec_schema.json` と `component_spec_schema.json` — jsonui-helper に同梱され、`*.spec.json` にマッチします。Layout JSON 用の JSON Schema はありません: レイアウト文法の正本は SSoT の属性テーブル（`attribute_definitions.json`）で、`jui build` がそれに対して検証し、本サイトの属性リファレンスも同じテーブルから生成されています。"
     },
     "section_editor_heading": {
-      "en": "Wiring an editor",
-      "ja": "エディタへの接続"
+      "en": "Editor support today",
+      "ja": "現状のエディタ対応"
     },
     "section_editor_body": {
-      "en": "VS Code: add `$schema` at the top of your Layout JSON pointing at the published URL, or register it in settings.json's `json.schemas`. jsonui-helper does this for you. IntelliJ / WebStorm: 'JSON Schema Mappings' under Preferences. Neovim: coc-json pulls schemas automatically if the file has a `$schema` key.",
-      "ja": "VS Code: Layout JSON の先頭に公開 URL を指す `$schema` を書くか、settings.json の `json.schemas` に登録。jsonui-helper は自動でやってくれます。IntelliJ / WebStorm: Preferences の 'JSON Schema Mappings'。Neovim: ファイルに `$schema` キーがあれば coc-json が自動取得。"
+      "en": "VS Code: install jsonui-helper — it registers the two spec schemas for `*.spec.json` automatically, no `$schema` key needed. Other editors have no packaged integration today; validation there comes from running `jui build` and the MCP `doc_validate_spec` tool rather than from editor-side schema checks.",
+      "ja": "VS Code: jsonui-helper を入れると `*.spec.json` に 2 本の spec スキーマが自動登録されます（`$schema` キー不要）。他エディタ向けのパッケージ済み連携は現状ありません。その場合の検証は `jui build` と MCP の `doc_validate_spec` が担います。"
     },
     "section_validation_heading": {
       "en": "Runtime vs editor validation",
       "ja": "ランタイム vs エディタ検証"
     },
     "section_validation_body": {
-      "en": "The editor catches 90% of mistakes — typos, missing required fields, wrong types — before you save. The remaining 10% (semantic checks like 'custom type is not in the whitelist' or 'binding refers to a uiVariable that does not exist') land in `jui verify` and the MCP `doc_validate_spec` tool. Editor validation is fast and local; runtime validation is authoritative and catches the things schema alone cannot.",
-      "ja": "エディタ検証は 90% のミス — typo / 必須欠け / 型違い — を保存前にキャッチ。残り 10%（「カスタム型が whitelist に無い」「binding が未宣言 uiVariable を指す」のような意味レベルの検査）は `jui verify` と MCP の `doc_validate_spec` が担当。エディタ検証は高速・ローカル、ランタイム検証は権威的 — スキーマ単独で追えないものを拾います。"
+      "en": "For `*.spec.json`, jsonui-helper's schema checks catch shape mistakes — typos, missing required fields, wrong types — before you save. Semantic checks ('custom type is not in the whitelist', 'binding refers to a uiVariable that does not exist') land in `jui verify` and the MCP `doc_validate_spec` tool, and Layout JSON is checked by `jui build`'s validators. Editor validation is fast and local; toolchain validation is authoritative and catches the things schema alone cannot.",
+      "ja": "`*.spec.json` については jsonui-helper のスキーマ検査が形状ミス — typo / 必須欠け / 型違い — を保存前にキャッチ。意味レベルの検査（「カスタム型が whitelist に無い」「binding が未宣言 uiVariable を指す」）は `jui verify` と MCP の `doc_validate_spec` が担当し、Layout JSON は `jui build` の validator が検査します。エディタ検証は高速・ローカル、ツールチェーン検証は権威的 — スキーマ単独で追えないものを拾います。"
     },
     "section_versioning_heading": {
       "en": "Versioning",
       "ja": "バージョニング"
     },
     "section_versioning_body": {
-      "en": "Each schema is versioned and published to a stable URL. Breaking changes land behind a new major version; projects pin to the version their CLI shipped with. `jui sync_tool` bumps the pinned version alongside the rjui_tools / sjui_tools / kjui_tools upgrade, so editor suggestions stay in lock-step with what the generator emits.",
-      "ja": "各スキーマはバージョニングされ、安定 URL に配置。破壊的変更は新メジャーでのみ着地し、プロジェクトは CLI 同梱のバージョンに pin。`jui sync_tool` が rjui_tools / sjui_tools / kjui_tools 更新と同時に pin を bump するので、エディタ補完とジェネレータ出力は常に同期したまま動きます。"
+      "en": "The vendored schemas version with the jsonui-helper release that bundles them — updating the extension updates the schemas. There are no separately versioned public schema URLs today; if standalone publication ships later, it will be announced here.",
+      "ja": "同梱スキーマのバージョンは jsonui-helper のリリースに従います — 拡張を更新すればスキーマも更新されます。独立してバージョニングされた公開スキーマ URL は現状ありません。単体配布が始まる場合はこのページで告知します。"
     },
     "next_attributes_title": {
       "en": "Attribute reference",
@@ -8181,12 +8181,12 @@
       "ja": "このページ"
     },
     "toc_row_what": {
-      "en": "What it covers",
-      "ja": "対象範囲"
+      "en": "What exists today",
+      "ja": "現状あるもの"
     },
     "toc_row_editor": {
-      "en": "Wiring an editor",
-      "ja": "エディタ連携"
+      "en": "Editor support today",
+      "ja": "現状のエディタ対応"
     },
     "toc_row_validation": {
       "en": "Runtime vs editor validation",
@@ -8251,8 +8251,8 @@
       "ja": "ツールの安定性"
     },
     "section_versioning_body": {
-      "en": "Tools under Group A / B are stable — those have been exercised across all three platforms. Group C / D tools added in the last sprint may add optional fields over time; callers should not rely on an exhaustive struct destructure. Removals require a major version bump.",
-      "ja": "Group A / B のツールは安定 — 3 プラットフォーム全てで運用済み。直近スプリントで追加された Group C / D は時間とともに optional フィールドが増える可能性があるので、呼び出し側は構造の完全な destructure に依存しない方が安全。削除はメジャーバージョン更新が必要。"
+      "en": "Tools under Group A / B are stable — those have been exercised across all three platforms. Group C / D tools are newer and may add optional fields over time; callers should not rely on an exhaustive struct destructure. Removals require a major version bump.",
+      "ja": "Group A / B のツールは安定 — 3 プラットフォーム全てで運用済み。Group C / D は比較的新しく、時間とともに optional フィールドが増える可能性があるので、呼び出し側は構造の完全な destructure に依存しない方が安全。削除はメジャーバージョン更新が必要。"
     },
     "next_mcp_overview_title": {
       "en": "jsonui-mcp-server",
@@ -8299,8 +8299,8 @@
       "ja": "ツールカタログ"
     },
     "section_catalog_body": {
-      "en": "All 39 tools, in the same order /tools/mcp lists them, with parameter signatures. Required parameters are bold-marked in the agent's view; optional ones default to omitted. `project_dir` repeats on most tools — when omitted, the server falls back to the JUI_PROJECT_DIR env var (or the cwd that spawned it).",
-      "ja": "全 39 ツール、/tools/mcp と同じ並びで、パラメータ署名付きで掲載。required はエージェント視点で必須、optional は省略可能（省略時は default 値かツール内既定）。`project_dir` は多くのツールで共通 — 省略時は JUI_PROJECT_DIR 環境変数（もしくは MCP サーバを起動した cwd）にフォールバック。"
+      "en": "All 42 tools, in the same order /tools/mcp lists them, with parameter signatures. Required parameters are bold-marked in the agent's view; optional ones default to omitted. `project_dir` repeats on most tools — when omitted, the server falls back to the JUI_PROJECT_DIR env var (or the cwd that spawned it).",
+      "ja": "全 42 ツール、/tools/mcp と同じ並びで、パラメータ署名付きで掲載。required はエージェント視点で必須、optional は省略可能（省略時は default 値かツール内既定）。`project_dir` は多くのツールで共通 — 省略時は JUI_PROJECT_DIR 環境変数（もしくは MCP サーバを起動した cwd）にフォールバック。"
     },
     "params_heading": {
       "en": "Parameters",
@@ -8529,8 +8529,8 @@
       "ja": "コマンド安定性"
     },
     "section_stability_body": {
-      "en": "Core flags (--file, --watch, --fail-on-diff, --platform) are stable across majors. One-shot migration helpers such as `jui migrate-layouts` are adoption tooling rather than pipeline commands — they may change shape without a major bump, so keep them out of CI. Everything the reference documents for build / verify / generate is what your pipeline can safely depend on.",
-      "ja": "コア flag（--file / --watch / --fail-on-diff / --platform）はメジャー間で安定。`jui migrate-layouts` のような一度きりの移行ヘルパーはパイプライン用ではなく導入補助なので、メジャー更新なしに shape が変わる可能性があります — CI には組み込まないでください。build / verify / generate についてリファレンスが記載している範囲が、パイプラインから安全に依存できる範囲です。"
+      "en": "Core flags (--file, --fail-on-diff, --platform) are stable across majors. One-shot migration helpers such as `jui migrate-layouts` are adoption tooling rather than pipeline commands — they may change shape without a major bump, so keep them out of CI. Everything the reference documents for build / verify / generate is what your pipeline can safely depend on.",
+      "ja": "コア flag（--file / --fail-on-diff / --platform）はメジャー間で安定。`jui migrate-layouts` のような一度きりの移行ヘルパーはパイプライン用ではなく導入補助なので、メジャー更新なしに shape が変わる可能性があります — CI には組み込まないでください。build / verify / generate についてリファレンスが記載している範囲が、パイプラインから安全に依存できる範囲です。"
     },
     "section_api_models_heading": {
       "en": "API model commands (since 2026-05)",
@@ -8585,8 +8585,8 @@
       "ja": "Renderer SSoT コマンド (2026-07 追加)"
     },
     "section_ssot_body": {
-      "en": "The Renderer SSoT rollout adds two commands under `jui`. `jui conformance generate` reads `shared/core/attribute_definitions.json` and emits fixture layouts + screen tests per component × attribute; `jui conformance report` collates the per-platform results into a matrix (rows = fixtures, columns = iOS / Android / Web) and prints where the three implementations disagree; `jui conformance compat-doc --platform android` renders KotlinJsonUI's `attribute_compatibility.md` from the SSoT + latest conformance results, replacing the hand-maintained table with a deterministic `@generated` artifact. `jui conformance coverage` (2026-07-29) answers a different question — not whether a fixture exists, but whether the converter actually reads the attribute — by scanning converter source rather than output, because a fixture for a dropped attribute renders a blank screen that matches its blank baseline and passes. It is a ratchet backed by `conformance/coverage.json`: a gap missing from the ledger fails, and so does a ledger entry whose gap is gone, otherwise the file rots into a list of things that used to be broken. The first measurement reported 209 gaps, and that number turned out to be mostly a declaration problem: attributes with no `platform` narrowing were counted against all three platforms, iOS-only concepts included. What followed (2026-07-31) fixed the input rather than the meter — platform-specific attributes now declare their surface, with a `platform_reasons` field carrying *why* an excluded platform is excluded; the scan became per component × attribute pair instead of matching bare attribute names, which surfaced 62 real gaps the flat scan had been hiding; and that backlog was then implemented. The ledger stands at 15 pairs: 5 genuinely unimplemented (UIKit-facing surfaces like the TextField accessory family) and 10 legacy aliases, each entry carrying the file-level evidence for why it is there. The 85 `mode: uikit` attributes still sit outside the scan — SwiftJsonUI's Swift runtime reads those directly — a blind spot, not a clean bill of health. `jui generate attr-bindings [--lang swift|kotlin|ruby|all]` emits typed attribute extractors for the same SSoT — Swift structs / Kotlin data classes / Ruby modules — so converters read typed objects instead of raw JSON. Related: `normalizeLayouts` in `jui.config.json` is default-true since 2026-07 (opt out with `\"normalizeLayouts\": false`); it rewrites aliases to canonical names and stamps a `$jui` marker on distributed layouts, and `attribute_validator` treats that marker as a known key.",
-      "ja": "Renderer SSoT 化に伴い `jui` にサブコマンドが 2 つ追加されました。`jui conformance generate` は `shared/core/attribute_definitions.json` を読んでコンポーネント × 属性ごと の fixture layout と screen test を生成し、`jui conformance report` は各プラットフォーム の実行結果を突き合わせてマトリクス (行 = fixture / 列 = iOS・Android・Web) を出力、3 実装 が食い違う行を上部に別表で示します。`jui conformance compat-doc --platform android` は SSoT と最新 conformance 結果から KotlinJsonUI の `attribute_compatibility.md` を決定的に 生成し、手動維持だった表を `@generated` アーティファクトに置き換えます。`jui conformance coverage`（2026-07-29 追加）は別の問いに答えます — fixture があるかではなく、コンバータが実際にその属性を読んでいるか。出力ではなくコンバータのソースを走査します（属性を握り潰している fixture は空の画面が空の baseline と一致して pass してしまうため）。台帳は `conformance/coverage.json` でラチェットです — 台帳に無いギャップでも、解消済みなのに残っているエントリでも落ちます（そうしないと台帳が「昔壊れていたもの一覧」に腐るため）。初回計測は 209 件のギャップを報告しましたが、この数字の大半は宣言側の問題でした — `platform` の絞り込みが無い属性が iOS 固有の概念まで含めて 3 プラットフォームすべてに計上されていたためです。その後（2026-07-31）、計器ではなく入力が直されました。プラットフォーム固有の属性は宣言面を絞り、除外した理由を `platform_reasons` フィールドに持つようになり、走査は属性名の平坦な照合からコンポーネント × 属性の組単位になりました（これにより平坦な照合が隠していた本物のギャップ 62 組が浮上）。そしてそのバックログは実装されました。台帳は現在 15 組 — 本当に未実装の 5 組（TextField のアクセサリ系など UIKit 向けの面）と legacy エイリアス 10 組で、全エントリが「なぜそこにあるか」のファイルレベルの証跡を持ちます。`mode: uikit` の 85 属性は引き続き走査対象外です（SwiftJsonUI の Swift ランタイムが直接読むため）— これは「問題なし」ではなく盲点です。`jui generate attr-bindings [--lang swift|kotlin|ruby|all]` は同じ SSoT から 3 言語の 型付き属性抽出コード (Swift の struct / Kotlin の data class / Ruby module) を生成し、converter が生 JSON ではなく型付きオブジェクトを扱えるようにします。関連: `jui.config.json` の `normalizeLayouts` は 2026-07 以降 default true (`\"normalizeLayouts\": false` で opt-out)。配布時にエイリアスを正準名に書き換え、layout 先頭に `$jui` marker を刻印します。`attribute_validator` はその marker を known key として 扱うため zero warnings を維持できます。"
+      "en": "The Renderer SSoT rollout added the `jui conformance` command family. `jui conformance generate` reads `shared/core/attribute_definitions.json` and emits fixture layouts + screen tests per component × attribute; `jui conformance report` collates the per-platform results into a matrix (rows = fixtures, columns = iOS / Android / Web) and prints where the three implementations disagree; `jui conformance compat-doc --platform android` renders KotlinJsonUI's `attribute_compatibility.md` from the SSoT + latest conformance results, replacing the hand-maintained table with a deterministic `@generated` artifact. `jui conformance coverage` (2026-07-29) answers a different question — not whether a fixture exists, but whether the converter actually reads the attribute — by scanning converter source rather than output, because a fixture for a dropped attribute renders a blank screen that matches its blank baseline and passes. It is a ratchet backed by `conformance/coverage.json`: a gap missing from the ledger fails, and so does a ledger entry whose gap is gone, otherwise the file rots into a list of things that used to be broken. The first measurement reported 209 gaps, and that number turned out to be mostly a declaration problem: attributes with no `platform` narrowing were counted against all three platforms, iOS-only concepts included. What followed (2026-07-31) fixed the input rather than the meter — platform-specific attributes now declare their surface, with a `platform_reasons` field carrying *why* an excluded platform is excluded; the scan became per component × attribute pair instead of matching bare attribute names, which surfaced 62 real gaps the flat scan had been hiding; and that backlog was then implemented. The ledger stands at 15 pairs: 5 genuinely unimplemented (UIKit-facing surfaces like the TextField accessory family) and 10 legacy aliases, each entry carrying the file-level evidence for why it is there. The 85 `mode: uikit` attributes still sit outside the scan — SwiftJsonUI's Swift runtime reads those directly — a blind spot, not a clean bill of health. `jui generate attr-bindings [--lang swift|kotlin|ruby|all]` emits typed attribute extractors for the same SSoT — Swift structs / Kotlin data classes / Ruby modules — so converters read typed objects instead of raw JSON. Related: `normalizeLayouts` in `jui.config.json` is default-true since 2026-07 (opt out with `\"normalizeLayouts\": false`); it rewrites aliases to canonical names and stamps a `$jui` marker on distributed layouts, and `attribute_validator` treats that marker as a known key.",
+      "ja": "Renderer SSoT 化に伴い `jui conformance` コマンド群が追加されました。`jui conformance generate` は `shared/core/attribute_definitions.json` を読んでコンポーネント × 属性ごと の fixture layout と screen test を生成し、`jui conformance report` は各プラットフォーム の実行結果を突き合わせてマトリクス (行 = fixture / 列 = iOS・Android・Web) を出力、3 実装 が食い違う行を上部に別表で示します。`jui conformance compat-doc --platform android` は SSoT と最新 conformance 結果から KotlinJsonUI の `attribute_compatibility.md` を決定的に 生成し、手動維持だった表を `@generated` アーティファクトに置き換えます。`jui conformance coverage`（2026-07-29 追加）は別の問いに答えます — fixture があるかではなく、コンバータが実際にその属性を読んでいるか。出力ではなくコンバータのソースを走査します（属性を握り潰している fixture は空の画面が空の baseline と一致して pass してしまうため）。台帳は `conformance/coverage.json` でラチェットです — 台帳に無いギャップでも、解消済みなのに残っているエントリでも落ちます（そうしないと台帳が「昔壊れていたもの一覧」に腐るため）。初回計測は 209 件のギャップを報告しましたが、この数字の大半は宣言側の問題でした — `platform` の絞り込みが無い属性が iOS 固有の概念まで含めて 3 プラットフォームすべてに計上されていたためです。その後（2026-07-31）、計器ではなく入力が直されました。プラットフォーム固有の属性は宣言面を絞り、除外した理由を `platform_reasons` フィールドに持つようになり、走査は属性名の平坦な照合からコンポーネント × 属性の組単位になりました（これにより平坦な照合が隠していた本物のギャップ 62 組が浮上）。そしてそのバックログは実装されました。台帳は現在 15 組 — 本当に未実装の 5 組（TextField のアクセサリ系など UIKit 向けの面）と legacy エイリアス 10 組で、全エントリが「なぜそこにあるか」のファイルレベルの証跡を持ちます。`mode: uikit` の 85 属性は引き続き走査対象外です（SwiftJsonUI の Swift ランタイムが直接読むため）— これは「問題なし」ではなく盲点です。`jui generate attr-bindings [--lang swift|kotlin|ruby|all]` は同じ SSoT から 3 言語の 型付き属性抽出コード (Swift の struct / Kotlin の data class / Ruby module) を生成し、converter が生 JSON ではなく型付きオブジェクトを扱えるようにします。関連: `jui.config.json` の `normalizeLayouts` は 2026-07 以降 default true (`\"normalizeLayouts\": false` で opt-out)。配布時にエイリアスを正準名に書き換え、layout 先頭に `$jui` marker を刻印します。`attribute_validator` はその marker を known key として 扱うため zero warnings を維持できます。"
     },
     "section_checks_heading": {
       "en": "Implementation contract checks (since 2026-07)",
@@ -9111,8 +9111,8 @@
       "ja": "screen spec の全体像"
     },
     "lead": {
-      "en": "A field-by-field walk through screen_spec.json — every top-level section, what it declares, and how it cross-references the others. v1 lands as a scaffold; each section's prose + CodeBlocks expand in the next Phase of docs/plans/spec-authoring-deep-dive.md.",
-      "ja": "screen_spec.json をフィールド単位で一周します。各 top-level セクションが何を宣言するか、他セクションとどう繋がるか。v1 は scaffold として着地し、各セクションの prose + CodeBlock は docs/plans/spec-authoring-deep-dive.md の次 Phase で埋めます。"
+      "en": "A field-by-field walk through screen_spec.json — every top-level section, what it declares, and how it cross-references the others.",
+      "ja": "screen_spec.json をフィールド単位で一周します。各 top-level セクションが何を宣言するか、他セクションとどう繋がるか。"
     },
     "read_time": {
       "en": "~10 min read",
@@ -9171,8 +9171,8 @@
       "ja": "上が writer 向けの概観。下の 2 本は「分割の判断」と「1 spec を end-to-end で書く」に進みます。"
     },
     "next_split_overview_title": {
-      "en": "Five ways to split a spec",
-      "ja": "spec を分割する 5 つの方法"
+      "en": "Six ways to split a spec",
+      "ja": "spec を分割する 6 つの方法"
     },
     "next_split_overview_description": {
       "en": "Map article — layoutFile, parent + sub, component_spec, customTypes, cellClasses. Compare, pick the right one for your screen.",
@@ -9197,12 +9197,12 @@
       "ja": "← Spec"
     },
     "title": {
-      "en": "Five ways to split a spec",
-      "ja": "spec を分割する 5 つの方法"
+      "en": "Six ways to split a spec",
+      "ja": "spec を分割する 6 つの方法"
     },
     "lead": {
-      "en": "A single screen_spec.json is fine until the file passes 300 lines, or until two screens need to share the same shape. This article is the map: five established split patterns, what each one buys you, and how to pick. v1 lands as a scaffold; per-pattern detail articles land in Phase 2 of docs/plans/spec-authoring-deep-dive.md.",
-      "ja": "screen_spec.json 1 枚で完結するのは 300 行を超えない間、もしくは共通化する画面が現れるまで。本記事はマップ: 既存の 5 分割パターン、それぞれが何を解決するか、どう選ぶかを示します。v1 は scaffold で着地し、各パターンの詳細記事は docs/plans/spec-authoring-deep-dive.md の Phase 2 で別記事として追加されます。"
+      "en": "A single screen_spec.json is fine until the file passes 300 lines, or until two screens need to share the same shape. This article is the map: six established split patterns, what each one buys you, and how to pick.",
+      "ja": "screen_spec.json 1 枚で完結するのは 300 行を超えない間、もしくは共通化する画面が現れるまで。本記事はマップ: 既存の 6 分割パターン、それぞれが何を解決するか、どう選ぶかを示します。"
     },
     "read_time": {
       "en": "~7 min read",
@@ -9379,8 +9379,8 @@
       "ja": "1 パターン終了、残り 4 つ。マップへ戻るか、次の詳細記事に進んでください。"
     },
     "next_split_overview_title": {
-      "en": "Five ways to split a spec",
-      "ja": "spec を分割する 5 つの方法"
+      "en": "Six ways to split a spec",
+      "ja": "spec を分割する 6 つの方法"
     },
     "next_split_overview_description": {
       "en": "The map article. Jump back for the other four patterns and the picker cheat sheet.",
@@ -9787,8 +9787,8 @@
       "ja": "パターン 4 — 共通の行 / entry 型を dataFlow.customTypes に 1 度宣言する。"
     },
     "next_split_overview_title": {
-      "en": "Five ways to split a spec",
-      "ja": "spec を分割する 5 つの方法"
+      "en": "Six ways to split a spec",
+      "ja": "spec を分割する 6 つの方法"
     },
     "next_split_overview_description": {
       "en": "Back to the map article with the picker cheat sheet.",
@@ -9873,8 +9873,8 @@
       "ja": "これで Spec セクションは一巡。マップに戻って任意のパターンを読み返すか、CI 自動化の次の層として test-runner ドキュメントに進むか。"
     },
     "next_split_overview_title": {
-      "en": "Five ways to split a spec",
-      "ja": "spec を分割する 5 つの方法"
+      "en": "Six ways to split a spec",
+      "ja": "spec を分割する 6 つの方法"
     },
     "next_split_overview_description": {
       "en": "Back to the map article with the picker cheat sheet.",
