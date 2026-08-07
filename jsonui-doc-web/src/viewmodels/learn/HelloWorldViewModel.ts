@@ -50,6 +50,8 @@ interface TabHeaderCell {
 interface BreadcrumbCell {
   id: string;
   labelKey: string;
+  // The trailing item carries no separator after it.
+  separatorVisibility?: string;
   onNavigate?: () => void;
 }
 
@@ -121,6 +123,7 @@ export class HelloWorldViewModel {
       {
         id: "bc_hello_world",
         labelKey: this.s("bc_hello_world"),
+        separatorVisibility: "gone",
       },
     ];
 

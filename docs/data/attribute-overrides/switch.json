@@ -50,12 +50,6 @@
         "ja": "新しい Boolean を引数に発火。`value` binding と相互互換だが、状態更新以外の副作用があるときに使う。"
       }
     },
-    "onToggle": {
-      "note": {
-        "en": "Alias for `onValueChange`. Legacy naming.",
-        "ja": "`onValueChange` のエイリアス。旧命名。"
-      }
-    },
     "onTintColor": {
       "note": {
         "en": "Track color when the switch is ON.",
@@ -73,6 +67,12 @@
       "note": {
         "en": "Track color when OFF.",
         "ja": "OFF のときの trackColor。"
+      }
+    },
+    "trackTintColor": {
+      "note": {
+        "en": "Paints the ON track. Since 2026-08 iOS paints the track itself rather than the whole view background (a codegen bug until then). The OFF track cannot be painted on iOS — a structural SwiftUI Toggle constraint, recorded upstream as permanent, so an OFF-state track colour there is not a bug to report. Use `offTintColor` where the platform supports it.",
+        "ja": "ON 側トラックを塗ります。2026-08 以降、iOS はビュー全体の背景ではなくトラックそのものを塗ります（それまでは codegen のバグでした）。OFF 側トラックは iOS では構造的に塗れません — SwiftUI Toggle の恒久制約として上流の台帳に記録済みなので、iOS で OFF トラックの色が効かないのはバグ報告の対象ではありません。対応プラットフォームでは `offTintColor` を使ってください。"
       }
     },
     "thumbTintColor": {

@@ -15,9 +15,28 @@ module RjuiTools
           tag_attr = build_tag_attr
 
           # Check if we need partialAttributes rendering
+          #
+          # `linkable` chooses between two SHAPES, not two styles, so there is
+          # no CSS property a binding could land on. `"@{v}"` is truthy in
+          # Ruby, so a bound one always took the linkable branch — frozen ON.
+          # A shape decision does have a runtime form in React, though: the
+          # ternary. It is the same construct `render_plain_text` already uses
+          # for the runtime-emptiness hint swap below, so the interaction with
+          # `wrap_with_visibility` (which patches the FIRST opening tag) is
+          # the one this file already lives with rather than a new one.
+          linkable = attributes['linkable']
+          linkable_expr = bound_value_expr(linkable)
           jsx = if partial_attributes_list
             render_partial_attributes(indent, id_attr, class_attr, style_attr, onclick_attr, testid_attr, tag_attr)
-          elsif attributes['linkable']
+          elsif linkable_expr
+            <<~JSX.chomp
+              #{indent_str(indent)}{(#{linkable_expr}) ? (
+              #{render_linkable_text(indent + 2, id_attr, class_attr, style_attr, onclick_attr, testid_attr, tag_attr)}
+              #{indent_str(indent)}) : (
+              #{render_plain_text(indent + 2, id_attr, class_attr, style_attr, onclick_attr, testid_attr, tag_attr)}
+              #{indent_str(indent)})}
+            JSX
+          elsif linkable
             render_linkable_text(indent, id_attr, class_attr, style_attr, onclick_attr, testid_attr, tag_attr)
           else
             render_plain_text(indent, id_attr, class_attr, style_attr, onclick_attr, testid_attr, tag_attr)
@@ -90,7 +109,12 @@ module RjuiTools
 
           color = attrs['fontColor'] || attributes['hintColor']
           parts = []
-          if color && !has_binding?(color)
+          if has_binding?(color)
+            # Was dropped outright. A runtime colour resolves the same way
+            # every other bound colour in this tree does, so a palette name
+            # still becomes a real value instead of reaching CSS as a token.
+            parts << "color: #{color_style_expr(color)}"
+          elsif color
             css = color.to_s.start_with?('#') ? color : "var(--color-#{color})"
             parts << "color: '#{css}'"
           end
@@ -122,6 +146,17 @@ module RjuiTools
         # the text around each detected URL.
         def multi_run_text?
           !partial_attributes_list.nil? || !!attributes['linkable']
+        end
+
+        # A static multi-line cap, which `line-clamp-N` renders through
+        # `display: -webkit-box`. `lines: 1` is `truncate` instead — that one
+        # sets no display and still wants a block box. A BOUND cap goes to the
+        # inline style, which carries its own display.
+        def line_clamped?
+          lines = attributes['lines']
+          return true if has_binding?(lines)
+
+          lines.is_a?(Numeric) && lines > 1
         end
 
         # The className attribute, which is an EXPRESSION when the label has a
@@ -172,7 +207,16 @@ module RjuiTools
 
           classes = classes.reject { |c| c.nil? || c.empty? }
           if classes.empty? && attributes['highlightColor']
-            classes = [TailwindMapper.map_color(attributes['highlightColor'], 'text')]
+            # The highlight set is swapped by a runtime `className={cond ? …}`
+            # ternary, so it has to stay a CLASS — an inline style would apply
+            # in both states. A bound colour cannot be a palette class
+            # (`map_color` built `text-@{v}`), so it rides a custom property
+            # the arbitrary value reads back.
+            highlight_color = attributes['highlightColor']
+            classes = [
+              bound_state_color_class(highlight_color, custom_property: '--jui-highlight-color', prefix: 'text') ||
+                TailwindMapper.map_color(highlight_color, 'text')
+            ]
           end
           classes.reject { |c| c.nil? || c.empty? }
         end
@@ -255,7 +299,19 @@ module RjuiTools
         def build_class_name
           classes = [super]
 
-          if multi_run_text?
+          if line_clamped?
+            # `line-clamp-N` IS a display utility (`display: -webkit-box`), and
+            # the `flex` below is another one at the same specificity. Which
+            # wins is decided by their order in the generated stylesheet, not
+            # by the order they appear in the class attribute — measured:
+            # `.line-clamp-2` at offset 7010, `.flex` at 7130, so flex won and
+            # the cap did nothing. The fixture rendered all five lines with
+            # `line-clamp-2` sitting right there in the class list.
+            #
+            # So a clamped label emits NO display utility of its own and lets
+            # the clamp keep the box it needs. Same reasoning as the multi-run
+            # branch below: vertical centering means nothing once text wraps.
+          elsif multi_run_text?
             # partialText / linkable emit one node per run (text, span, text…).
             # As flex items every run becomes its own line box, so the whole
             # paragraph lays out as a single row and stops wrapping — the text
@@ -294,7 +350,16 @@ module RjuiTools
           end
 
           # Line clamp for multiple lines
-          if attributes['lines'] && attributes['lines'] > 0
+          #
+          # A BOUND cap has no class — `line-clamp-N` needs N at build time —
+          # so it goes to the inline style, which is where the utility class
+          # expands to anyway. Routed here, before the numeric comparison:
+          # `"@{n}" > 0` raised `ArgumentError: comparison of String with 0
+          # failed` and took `jui build` down on a layout written the way the
+          # SSoT declares the attribute (`["number", "binding"]`, plan 41).
+          if has_binding?(attributes['lines'])
+            apply_bound_line_clamp(attributes['lines'])
+          elsif attributes['lines'] && attributes['lines'] > 0
             if attributes['lines'] == 1
               classes << 'truncate'
             else
@@ -321,8 +386,9 @@ module RjuiTools
           # Cursor pointer for clickable items
           classes << 'cursor-pointer' if attributes['onClick'] || attributes['onclick']
 
-          # Linkable text
-          classes << 'cursor-pointer' if attributes['linkable']
+          # Linkable text. The class is shared by both arms of the runtime
+          # branch above, so a bound value decides it at runtime too.
+          classes << 'cursor-pointer' if bound_flag_style('cursor', attributes['linkable'], on: 'pointer')
 
           finalize_classes(classes)
         end
@@ -335,13 +401,32 @@ module RjuiTools
           # `platform: react` and is the CSS property directly, in px — the
           # cross-platform spellings are the multiplier and the extra spacing, so
           # they take precedence over the web-only literal.
-          if attributes['lineHeightMultiple']
-            @dynamic_styles['lineHeight'] = attributes['lineHeightMultiple'].to_s
-          elsif attributes['lineSpacing']
+          #
+          # Both cross-platform spellings used to assume a number. A bound
+          # `lineHeightMultiple` was written into the style object verbatim,
+          # so the emitted file contained `lineHeight: @{v}` and did not
+          # compile at all; a bound `lineSpacing` went through `.to_f`, which
+          # is 0.0 for a string, and every one of them froze on a 1.0
+          # multiplier. The arithmetic moves into the emitted expression.
+          line_height_multiple = attributes['lineHeightMultiple']
+          line_spacing = attributes['lineSpacing']
+          if (multiple_expr = bound_value_expr(line_height_multiple))
+            @dynamic_styles['lineHeight'] = multiple_expr
+          elsif line_height_multiple
+            @dynamic_styles['lineHeight'] = line_height_multiple.to_s
+          elsif line_spacing
             # Convert lineSpacing (px) to lineHeight (em-ish)
             font_size = attributes['fontSize'] || 16
-            line_height = ((font_size + attributes['lineSpacing'].to_f) / font_size).round(2)
-            @dynamic_styles['lineHeight'] = line_height.to_s
+            spacing_expr = bound_value_expr(line_spacing)
+            font_size_expr = bound_value_expr(font_size)
+            if spacing_expr || font_size_expr
+              size_js = font_size_expr || font_size
+              spacing_js = spacing_expr || line_spacing.to_f
+              @dynamic_styles['lineHeight'] = "((#{size_js}) + (#{spacing_js})) / (#{size_js})"
+            else
+              line_height = ((font_size + line_spacing.to_f) / font_size).round(2)
+              @dynamic_styles['lineHeight'] = line_height.to_s
+            end
 
           elsif attributes['lineHeight']
             @dynamic_styles['lineHeight'] = "'#{attributes['lineHeight']}px'"
@@ -392,21 +477,30 @@ module RjuiTools
           end
 
           # lineBreakMode (truncation)
-          if attributes['lineBreakMode']
-            case attributes['lineBreakMode']
-            when 'Head'
-              @dynamic_styles['textOverflow'] = "'ellipsis'"
+          #
+          # `Char` and `Word` are WRAP modes, not truncation — they had no
+          # branch and fell through to the clipping below, which handed them
+          # `overflow: hidden` plus `white-space: nowrap`. Nowrap defeats
+          # wrapping outright, so the two values that ask for MORE wrapping
+          # were the two that got none. Only the truncating modes clip.
+          case attributes['lineBreakMode']
+          when 'Char'
+            @dynamic_styles['wordBreak'] = "'break-all'"
+          when 'Word'
+            @dynamic_styles['overflowWrap'] = "'break-word'"
+          when 'Head', 'Middle', 'Tail', 'Clip'
+            # CSS has no native middle truncation; ellipsis is the fallback.
+            @dynamic_styles['textOverflow'] = "'ellipsis'"
+            if attributes['lineBreakMode'] == 'Head'
               @dynamic_styles['direction'] = "'rtl'"
               @dynamic_styles['textAlign'] = "'left'"
-            when 'Middle'
-              # CSS doesn't support middle truncation natively
-              # We'll use ellipsis as fallback
-              @dynamic_styles['textOverflow'] = "'ellipsis'"
-            when 'Tail', 'Clip'
-              @dynamic_styles['textOverflow'] = "'ellipsis'"
             end
             @dynamic_styles['overflow'] = "'hidden'"
-            @dynamic_styles['whiteSpace'] = "'nowrap'" unless attributes['lines'] && attributes['lines'] > 1
+            # A bound cap is multi-line as far as this decision goes — the
+            # runtime number decides how many, and `nowrap` would defeat any
+            # cap above one. Tested before the comparison for the same reason
+            # as the clamp above: `"@{n}" > 1` raises.
+            @dynamic_styles['whiteSpace'] = "'nowrap'" unless multiline_cap?
           end
 
           # autoShrink - use CSS font-size clamp or viewport units
@@ -414,24 +508,56 @@ module RjuiTools
           if attributes['autoShrink']
             min_scale = attributes['minimumScaleFactor'] || 0.5
             font_size = attributes['fontSize'] || 16
-            min_size = (font_size * min_scale).round
-            # Use min() to allow shrinking but not below minimum
-            @dynamic_styles['fontSize'] = "'min(#{font_size}px, max(#{min_size}px, 1vw))'"
+            # `16 * "@{v}"` raises `String can't be coerced into Integer`, so a
+            # Label declaring autoShrink with either value bound did not fail
+            # to style — `jui build` ABORTED on it. Same shape as the
+            # `closest_padding` crash `static_spacing` was written for. The
+            # multiplication moves into the emitted expression.
+            scale_expr = bound_value_expr(min_scale)
+            size_expr = bound_value_expr(font_size)
+            if scale_expr || size_expr
+              size_js = size_expr || font_size
+              scale_js = scale_expr || min_scale
+              @dynamic_styles['fontSize'] =
+                "`min(${#{size_js}}px, max(${Math.round((#{size_js}) * (#{scale_js}))}px, 1vw))`"
+            else
+              min_size = (font_size * min_scale).round
+              # Use min() to allow shrinking but not below minimum
+              @dynamic_styles['fontSize'] = "'min(#{font_size}px, max(#{min_size}px, 1vw))'"
+            end
           end
 
-          return '' if @dynamic_styles.nil? || @dynamic_styles.empty?
-
-          # Delegate per-entry rendering to BaseConverter so the SPREAD
-          # sentinel (Configuration.Font.resolve(...) emission) is handled
-          # consistently across every converter.
-          style_pairs = @dynamic_styles.map do |key, value|
-            format_dynamic_style_pair(key, value)
-          end
-
-          " style={{ #{style_pairs.join(', ')} }}"
+          # One renderer for every converter (BaseConverter#style_attr_for):
+          # the SPREAD sentinel and the `React.CSSProperties` assertion a
+          # custom-property key needs are handled in ONE place. Six converters
+          # had hand-copied this loop, and four of the copies had lost the
+          # assertion — which only surfaced when a bound colour started
+          # writing `--jui-*` keys and the host's tsc rejected them.
+          style_attr_for(@dynamic_styles)
         end
 
         private
+
+        # Whether the line cap allows more than one line. A bound cap counts:
+        # its value is not known here, and treating it as single-line would
+        # emit `white-space: nowrap` that defeats whatever the runtime asks
+        # for.
+        def multiline_cap?
+          lines = attributes['lines']
+          return true if has_binding?(lines)
+
+          !!lines && lines > 1
+        end
+
+        # The inline-style form of `line-clamp-N` for a cap that only exists
+        # at runtime. These four declarations are what the Tailwind utility
+        # expands to, so a bound cap renders the same way a static one does.
+        def apply_bound_line_clamp(value)
+          @dynamic_styles['display'] = "'-webkit-box'"
+          @dynamic_styles['WebkitBoxOrient'] = "'vertical'"
+          @dynamic_styles['WebkitLineClamp'] = unwrap_jsx_braces(convert_binding(value))
+          @dynamic_styles['overflow'] = "'hidden'"
+        end
 
         # Render text with partial attributes.
         #

@@ -16,7 +16,7 @@ module JsonUI
       ATTRS = [
         # Enable auto-shrink
         { name: 'autoShrink', kind: :boolean }.freeze,
-        # Edge insets as array or pipe-separated string [accepts: array | string; DEPRECATED: Compose Text has no edgeInset; use padding* instead.]
+        # Edge insets as array or pipe-separated string. Applied on every platform including Compose, where it maps to .padding() (kjui text_component.rb / DynamicTextComponent.kt) - the former "Compose Text has no edgeInset" deprecation was contradicted by that implementation and was retracted 2026-08-05. [accepts: array | string]
         { name: 'edgeInset', kind: :raw }.freeze,
         # Font weight name (regular/medium/semibold/bold/...) or font name. Passed as the `weight` field of `FontSpec` to `Configuration.Font.fontProvider`. Can be a data binding.
         { name: 'font', kind: :string, bindable: true }.freeze,
@@ -34,7 +34,7 @@ module JsonUI
         { name: 'highlightColor', kind: :string, bindable: true }.freeze,
         # Placeholder text when empty (primary)
         { name: 'hint', kind: :string }.freeze,
-        # Hint text styling attributes
+        # Hint text styling attributes. The nested keys win over the flat spellings (hintColor / hintFont / hintFontSize): a bag scoped to the hint is the more specific statement. That is the ordinary cascade rule and what all four readers do (rjui label_converter, kjui text_component, sjui Label and SelectBox) - it was unwritten until 2026-08-05, when the one converter that had it backwards was found by contradicting its own comment.
         { name: 'hintAttributes', kind: :object }.freeze,
         # Hint text color - hex string or color name from colors.json (binding supported)
         { name: 'hintColor', kind: :string, bindable: true }.freeze,

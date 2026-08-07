@@ -16,8 +16,12 @@
     },
     "onclick": {
       "summary": {
-        "en": "Lowercase alias for `onClick` (HTML-style).",
-        "ja": "`onClick` の小文字エイリアス（HTML 風）。"
+        "en": "Selector-based click handler — a plain handler name, not a binding.",
+        "ja": "セレクタ形式のクリックハンドラ。ハンドラ名を直接書く（binding ではない）。"
+      },
+      "note": {
+        "en": "Not an alias for `onClick` — a different face of the same event. `onClick` takes a binding (`@{handler}`); lowercase `onclick` takes a bare handler name resolved against the ViewModel, and since 2026-08 it also accepts an array (`[\"a\", \"b\"]`), calling every handler in declared order on all three platforms. Before that the array form silently called nothing on iOS dynamic, broke generation on Android, and emitted invalid syntax on web.",
+        "ja": "`onClick` のエイリアスではなく、同じイベントの別の面です。`onClick` は binding（`@{handler}`）を取り、小文字の `onclick` は ViewModel に対して解決されるハンドラ名を直接取ります。2026-08 からは配列（`[\"a\", \"b\"]`）も受け付け、3 プラットフォームとも宣言順に全ハンドラを呼びます。それ以前の配列形は iOS dynamic で無呼び出し、Android で生成死、web で不正構文でした。"
       }
     },
     "onLongPress": {

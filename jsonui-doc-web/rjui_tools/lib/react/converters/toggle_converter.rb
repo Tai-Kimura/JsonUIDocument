@@ -15,10 +15,14 @@ module RjuiTools
           id_attr = build_id_attr
           testid_attr = build_testid_attr
           tag_attr = build_tag_attr
-          text = attributes['text'] || attributes['label'] || ''
+          # 'label' is the CheckBox-specific spelling and wins over the
+          # generic text (kjui reads the same order — 33 cross-effect
+          # adjudication: label overrides text on every platform).
+          text = attributes['label'] || attributes['text'] || ''
 
           # Get state binding
           checked_attr = build_checked_attr
+          value_attr = build_value_attr
           on_change = build_on_change
           disabled_attr = build_disabled_attr
           checkbox_style = build_checkbox_style
@@ -26,18 +30,35 @@ module RjuiTools
           jsx = if text.empty?
             # Checkbox only (no label)
             <<~JSX.chomp
-              #{indent_str(indent)}<input#{id_attr} type="checkbox" className="#{class_name}"#{checked_attr}#{on_change}#{disabled_attr}#{checkbox_style}#{style_attr}#{testid_attr}#{tag_attr} />
+              #{indent_str(indent)}<input#{id_attr} type="checkbox" className="#{class_name}"#{value_attr}#{checked_attr}#{on_change}#{disabled_attr}#{checkbox_style}#{style_attr}#{testid_attr}#{tag_attr} />
             JSX
           else
             # Checkbox with label. The layout `id` lands on the <label>
             # wrapper, so reflect the disabled state there too (the native
             # `disabled` attr only exists on the inner <input>).
-            <<~JSX.chomp
-              #{indent_str(indent)}<label#{id_attr} className="#{class_name}"#{style_attr}#{testid_attr}#{tag_attr}#{build_aria_disabled_attr}>
-              #{indent_str(indent + 2)}<input type="checkbox"#{checked_attr}#{on_change}#{disabled_attr}#{checkbox_style} />
-              #{indent_str(indent + 2)}<span>#{convert_text_binding(text)}</span>
-              #{indent_str(indent)}</label>
-            JSX
+            # Custom icon checkbox: hidden input + state-swapped images
+            # ('src' is the unchecked spelling, selectedIcon the checked one
+            # — 33 cross-effect: web rendered the native box for them).
+            icon_off = attributes['icon'] || attributes['src']
+            icon_on = attributes['selectedIcon'] || icon_off
+            if icon_off || icon_on
+              off_src = icon_off || icon_on
+              control_jsx =
+                "<input type=\"checkbox\"#{value_attr}#{checked_attr}#{on_change}#{disabled_attr} className=\"peer sr-only\" />"                 "<img src=\"#{off_src}\" alt=\"\" className=\"w-6 h-6 peer-checked:hidden\" />"                 "<img src=\"#{icon_on}\" alt=\"\" className=\"w-6 h-6 hidden peer-checked:block\" />"
+              <<~JSX.chomp
+                #{indent_str(indent)}<label#{id_attr} className="#{class_name}"#{style_attr}#{testid_attr}#{tag_attr}#{build_aria_disabled_attr}>
+                #{indent_str(indent + 2)}#{control_jsx}
+                #{indent_str(indent + 2)}<span>#{convert_text_binding(text)}</span>
+                #{indent_str(indent)}</label>
+              JSX
+            else
+              <<~JSX.chomp
+                #{indent_str(indent)}<label#{id_attr} className="#{class_name}"#{style_attr}#{testid_attr}#{tag_attr}#{build_aria_disabled_attr}>
+                #{indent_str(indent + 2)}<input type="checkbox"#{value_attr}#{checked_attr}#{on_change}#{disabled_attr}#{checkbox_style} />
+                #{indent_str(indent + 2)}<span>#{convert_text_binding(text)}</span>
+                #{indent_str(indent)}</label>
+              JSX
+            end
           end
 
           wrap_with_visibility(jsx, indent)
@@ -50,7 +71,10 @@ module RjuiTools
 
           if attributes['text'] || attributes['label']
             # `spacing` = control-to-label gap, same reading as kjui's checkbox.
-            spacing = attributes['spacing']
+            # A bound value used to be interpolated into the arbitrary value
+            # and produced `gap-[@{v}px]`, a class that matches nothing;
+            # `bound_length_style` sends it to the inline `gap` instead.
+            spacing = bound_length_style('gap', attributes['spacing'])
             classes << 'flex items-center'
             classes << (spacing ? "gap-[#{spacing}px]" : 'gap-2')
           end
@@ -65,6 +89,25 @@ module RjuiTools
           end
 
           finalize_classes(classes)
+        end
+
+        # `value` is the CheckBox's FORM value, not a third spelling of its
+        # checked state: attribute_definitions calls it "Associated value when
+        # checked" and declares it `any`, while isOn/checked are the
+        # two-way booleans. RadioConverter already emits its sibling this way.
+        #
+        # It was read by nothing, so a CheckBox declaring `value` submitted the
+        # browser default "on" (plan 49 D handoff, CheckBox.value [web] C0 —
+        # the handoff proposed folding it into the checked state, which the
+        # declaration does not support: two different values would then be one
+        # bit, which is what C2 measured when it was tried).
+        def build_value_attr
+          value = attributes['value']
+          return '' if value.nil?
+
+          return " value={#{extract_binding_property(value)}}" if has_binding?(value)
+
+          " value=\"#{value}\""
         end
 
         def build_checked_attr

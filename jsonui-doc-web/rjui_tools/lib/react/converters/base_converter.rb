@@ -64,7 +64,8 @@ module RjuiTools
           # Overlay child (absolute positioning within parent)
           if json['_overlay']
             classes << 'absolute'
-            classes << overlay_position_classes
+            position = overlay_position_classes
+            classes << position unless position.empty?
           end
 
           # Width/Height - handle matchParent with horizontal margin
@@ -73,7 +74,9 @@ module RjuiTools
           has_horizontal_margin = left_margin.is_a?(Numeric) && left_margin > 0 ||
                                   right_margin.is_a?(Numeric) && right_margin > 0
 
-          if attributes['width'] == 'matchParent' && has_horizontal_margin
+          if apply_bound_dimension('width')
+            # The bound value owns the width; no Tailwind class can carry it.
+          elsif attributes['width'] == 'matchParent' && has_horizontal_margin
             # Use calc to account for margins
             total_margin = (left_margin.is_a?(Numeric) ? left_margin : 0) +
                           (right_margin.is_a?(Numeric) ? right_margin : 0)
@@ -88,7 +91,9 @@ module RjuiTools
           #   from fixed-size siblings like a 3px accent bar
           # - flex-col parent or unknown (height is MAIN axis): use flex-1 —
           #   h-full overflows when siblings exist, flex-1 fills the gap
-          if attributes['height'] == 'matchParent' && !attributes['weight']
+          if apply_bound_dimension('height')
+            # The bound value owns the height; no Tailwind class can carry it.
+          elsif attributes['height'] == 'matchParent' && !attributes['weight']
             if json['_overlay']
               classes << 'h-full'
             elsif json['_parent_orientation'] == 'horizontal'
@@ -107,7 +112,7 @@ module RjuiTools
 
           # Prevent flex shrinking when fixed dimensions are specified
           # This ensures elements maintain their specified size in flex containers
-          if attributes['width'].is_a?(Numeric) || attributes['height'].is_a?(Numeric)
+          if explicit_size?('width') || explicit_size?('height')
             classes << 'shrink-0'
           end
 
@@ -116,27 +121,35 @@ module RjuiTools
           # prop via attribute_definitions/<Component>.json — otherwise the
           # wrapper <div> steals keys like CodeBlock#maxHeight that the
           # custom component uses for its own purpose.
-          classes << TailwindMapper.map_min_width(attributes['minWidth'])   if attributes['minWidth']   && decoration_allowed?('minWidth')
-          classes << TailwindMapper.map_max_width(attributes['maxWidth'])   if attributes['maxWidth']   && decoration_allowed?('maxWidth')
-          classes << TailwindMapper.map_min_height(attributes['minHeight']) if attributes['minHeight'] && decoration_allowed?('minHeight')
-          classes << TailwindMapper.map_max_height(attributes['maxHeight']) if attributes['maxHeight'] && decoration_allowed?('maxHeight')
+          # An EXPLICIT numeric size wins over its max bound (canonical
+          # size.maxBoundsClampFill corollary — kjui/ios pin the declared
+          # dimension and leave the bound inert; CSS max-* would clamp it,
+          # which the 33 geometry diagnosis measured as a web-only shrink).
+          explicit_w = explicit_size?('width')
+          explicit_h = explicit_size?('height')
+          classes << TailwindMapper.map_min_width(attributes['minWidth'])   if attributes['minWidth']   && decoration_allowed?('minWidth')   && !apply_bound_dimension('minWidth')
+          classes << TailwindMapper.map_max_width(attributes['maxWidth'])   if attributes['maxWidth']   && !explicit_w && decoration_allowed?('maxWidth')  && !apply_bound_dimension('maxWidth')
+          classes << TailwindMapper.map_min_height(attributes['minHeight']) if attributes['minHeight'] && decoration_allowed?('minHeight')  && !apply_bound_dimension('minHeight')
+          classes << TailwindMapper.map_max_height(attributes['maxHeight']) if attributes['maxHeight'] && !explicit_h && decoration_allowed?('maxHeight') && !apply_bound_dimension('maxHeight')
 
           # Padding (array format)
-          classes << TailwindMapper.map_padding(attributes['padding'] || attributes['paddings'])
+          classes << TailwindMapper.map_padding(
+            bound_length_style('padding', attributes['padding'] || attributes['paddings'])
+          )
 
           # Individual paddings (topPadding, bottomPadding, leftPadding, rightPadding)
           # Also support paddingTop, paddingRight, paddingBottom, paddingLeft format
           classes << TailwindMapper.map_individual_paddings(
-            attributes['topPadding'] || attributes['paddingTop'],
-            attributes['rightPadding'] || attributes['paddingRight'],
-            attributes['bottomPadding'] || attributes['paddingBottom'],
-            attributes['leftPadding'] || attributes['paddingLeft']
+            static_spacing('paddingTop', attributes['topPadding'] || attributes['paddingTop']),
+            static_spacing('paddingRight', attributes['rightPadding'] || attributes['paddingRight']),
+            static_spacing('paddingBottom', attributes['bottomPadding'] || attributes['paddingBottom']),
+            static_spacing('paddingLeft', attributes['leftPadding'] || attributes['paddingLeft'])
           )
 
           # RTL-aware paddings (paddingStart, paddingEnd)
           classes << TailwindMapper.map_rtl_paddings(
-            attributes['paddingStart'],
-            attributes['paddingEnd']
+            static_spacing('paddingInlineStart', attributes['paddingStart']),
+            static_spacing('paddingInlineEnd', attributes['paddingEnd'])
           )
 
           # Insets (alternative padding format)
@@ -148,16 +161,16 @@ module RjuiTools
 
           # Individual margins (topMargin, bottomMargin, leftMargin, rightMargin)
           classes << TailwindMapper.map_individual_margins(
-            attributes['topMargin'],
-            attributes['rightMargin'],
-            attributes['bottomMargin'],
-            attributes['leftMargin']
+            static_spacing('marginTop', attributes['topMargin']),
+            static_spacing('marginRight', attributes['rightMargin']),
+            static_spacing('marginBottom', attributes['bottomMargin']),
+            static_spacing('marginLeft', attributes['leftMargin'])
           )
 
           # RTL-aware margins (startMargin, endMargin)
           classes << TailwindMapper.map_rtl_margins(
-            attributes['startMargin'],
-            attributes['endMargin']
+            static_spacing('marginInlineStart', attributes['startMargin']),
+            static_spacing('marginInlineEnd', attributes['endMargin'])
           )
 
           # Background - check for dynamic binding or gradient
@@ -173,7 +186,8 @@ module RjuiTools
           end
 
           # Corner radius
-          classes << TailwindMapper.map_corner_radius(attributes['cornerRadius']) if attributes['cornerRadius']
+          corner_radius = bound_length_style('borderRadius', attributes['cornerRadius'])
+          classes << TailwindMapper.map_corner_radius(corner_radius) if corner_radius
 
           # Text color - check for dynamic binding
           if attributes['fontColor']
@@ -208,13 +222,31 @@ module RjuiTools
             # Pick the weight-bearing string for the FontSpec. fontWeight
             # wins over `font` so explicit weight overrides a polymorphic
             # `font` (which can carry weight names too).
+            #
+            # A bound fontWeight keeps its own inline-style route below, so
+            # it stays out of the spec exactly as before. A bound `font` has
+            # no other route — it used to be dropped here and then dropped
+            # again by `map_font`'s vocabulary case — so it goes into the
+            # spec as the expression itself.
             spec_weight = font_weight_attr || font_attr
-            spec_weight = nil if spec_weight.is_a?(String) && has_binding?(spec_weight)
+            if spec_weight.is_a?(String) && has_binding?(spec_weight)
+              spec_weight =
+                if has_binding?(font_weight_attr)
+                  nil
+                else
+                  Helpers::FontSpecHelper.js_expr(bound_value_expr(spec_weight))
+                end
+            end
 
             spec_size = font_size_attr.is_a?(Numeric) ? font_size_attr : nil
 
+            spec_family = font_family_attr
+            if has_binding?(spec_family)
+              spec_family = Helpers::FontSpecHelper.js_expr(bound_value_expr(spec_family))
+            end
+
             spread = Helpers::FontSpecHelper.build_resolve_spread(
-              family: font_family_attr,
+              family: spec_family,
               weight: spec_weight,
               size:   spec_size,
               italic: false
@@ -234,12 +266,32 @@ module RjuiTools
               @dynamic_styles['fontWeight'] = convert_binding(font_weight_attr)
             end
           else
-            # Font size
-            classes << TailwindMapper.map_font_size(font_size_attr) if font_size_attr
+            # Font size. A bound size is a px inline style — no Tailwind
+            # class can carry a value that exists only at runtime, and
+            # `map_font_size` used to build the dead class `text-[@{v}px]`.
+            font_size_value = bound_length_style('fontSize', font_size_attr)
+            classes << TailwindMapper.map_font_size(font_size_value) if font_size_value
 
             # Font - can be weight name (bold, semibold) or font family alias (monospace).
             # TailwindMapper.map_font already discriminates between the two.
-            if font_attr
+            #
+            # It can only do that discrimination on a value it can SEE, so a
+            # bound `font` fell through its case to `''` and vanished. The
+            # binding routes through `Configuration.Font.resolve` instead —
+            # the same provider the fontFamily branch uses, which is where
+            # the weight vocabulary already lives. Reimplementing that
+            # vocabulary as a runtime lookup here would be a second copy of
+            # shared/core/font_weight_mapping.json, and a copied vocabulary
+            # drifts (40). `font` lands in the WEIGHT slot, matching the
+            # spec routing above and both other platforms (kjui
+            # `attrs['fontWeight'] || attrs['font']`, sjui `fontWeight:`).
+            if (font_expr = bound_value_expr(font_attr))
+              bound_spread = Helpers::FontSpecHelper.build_resolve_spread(
+                weight: Helpers::FontSpecHelper.js_expr(font_expr),
+                italic: false
+              )
+              @dynamic_styles['__SPREAD__font'] = bound_spread if bound_spread
+            elsif font_attr
               font_class = TailwindMapper.map_font(font_attr)
               classes << font_class if font_class && !font_class.empty?
             end
@@ -254,8 +306,14 @@ module RjuiTools
             end
           end
 
-          # Text align
-          classes << TailwindMapper.map_text_align(attributes['textAlign'])
+          # Text align. The declared vocabulary (Left/Center/Right in either
+          # case) IS the CSS one, and CSS keyword values are case-insensitive,
+          # so a bound value goes straight into the property — no runtime
+          # lookup, and no second copy of the vocabulary. `map_text_align`
+          # matched on a `case` and silently returned '' for a binding.
+          classes << TailwindMapper.map_text_align(
+            bound_enum_style('textAlign', attributes['textAlign'])
+          )
 
           # Orientation (flex)
           classes << TailwindMapper.map_orientation(attributes['orientation'])
@@ -263,8 +321,28 @@ module RjuiTools
           # Shadow
           classes << TailwindMapper.map_shadow(attributes['shadow']) if attributes['shadow']
 
-          # Border
-          if attributes['borderWidth'] || attributes['borderColor'] || attributes['borderStyle']
+          # Border — both-attributes guard. **The PAIR is what requests a
+          # border**; neither half requests one on its own, and there is no
+          # default border colour. `borderStyle` alone draws nothing either:
+          # it decorates a border the pair asked for, it never summons one.
+          #
+          # The ruling lives in shared/core/attribute_semantics.json
+          # (`semantics.border`), is a 2026-08-03 USER ruling, and its five
+          # `observable` entries are a machine gate — `jui conformance gate
+          # --cross-effect` checks them against control_diff, so making any
+          # single declaration draw turns the next 3PF measure red.
+          #
+          # Do not re-derive this from attribute_definitions.json. The
+          # `"default": "solid"` on `borderStyle` is the trap: it proves style
+          # is a MODIFIER, and it is tempting to conclude that `borderWidth`
+          # must therefore be what summons the border. That conclusion has now
+          # been reached — and reverted — three times (`d2c8628` took the
+          # gray-default direction and the user ruling superseded it; plan 49
+          # took it again across all three toolchains and it was reverted
+          # again). Rulings live once, in attribute_semantics.json, verified
+          # by cross-effect (`d119189`); read that file before reasoning from
+          # types, enums and defaults.
+          if attributes['borderWidth'] && attributes['borderColor']
             border_width_binding = attributes['borderWidth'] && has_binding?(attributes['borderWidth'])
             border_color_binding = attributes['borderColor'] && has_binding?(attributes['borderColor'])
             border_style_binding = attributes['borderStyle'] && has_binding?(attributes['borderStyle'])
@@ -337,8 +415,22 @@ module RjuiTools
             classes << 'pointer-events-none'
           end
 
-          # Clip to bounds
-          classes << TailwindMapper.map_overflow(attributes['clipToBounds']) if attributes['clipToBounds']
+          # A visual-effect material declared on any component, not just Blur.
+          # BlurConverter builds its own (richer) style from the same tables
+          # and skips this, so the two cannot disagree.
+          if attributes['effectStyle'] && json['type'] != 'Blur'
+            key = effect_style_key
+            blur = effect_style_blur_px(key)
+            @dynamic_styles['backdropFilter'] = "'blur(#{blur}px)'"
+            @dynamic_styles['WebkitBackdropFilter'] = "'blur(#{blur}px)'"
+            @dynamic_styles['backgroundColor'] ||= "'#{effect_style_background(key)}'"
+          end
+
+          # Clip to bounds. `map_overflow` is a bare truthiness test, and a
+          # `"@{v}"` string is truthy in Ruby — every bound clipToBounds
+          # froze to overflow-hidden regardless of what the value became.
+          clip_to_bounds = bound_flag_style('overflow', attributes['clipToBounds'], on: 'hidden')
+          classes << TailwindMapper.map_overflow(clip_to_bounds) if clip_to_bounds
 
           # Z-index
           classes << TailwindMapper.map_z_index(attributes['zIndex']) if attributes['zIndex']
@@ -363,15 +455,59 @@ module RjuiTools
             classes << TailwindMapper.map_z_index(1)
           end
 
-          # Flex grow (weight)
-          classes << TailwindMapper.map_flex_grow(attributes['weight']) if attributes['weight']
+          # The SIZE half of the parent's `distribution`. An explicit `weight`
+          # below is the more specific declaration and wins the same axis, the
+          # way an explicit size wins over a bound one.
+          if (parent_distribution = json['_parent_distribution']) && !attributes['weight']
+            classes << DISTRIBUTION_CHILD_CLASS[parent_distribution]
+          end
+
+          # Flex grow (weight). `map_flex_grow` calls `.to_f` on its argument
+          # and `"@{v}".to_f` is 0.0, so every bound weight froze to
+          # `flex-none` — the exact opposite of what a weight is for.
+          weight = bound_number_style('flexGrow', attributes['weight'])
+          classes << TailwindMapper.map_flex_grow(weight) if weight
 
           # Self-centering (for non-View elements like Image, Label)
           # centerHorizontal: center this element horizontally within parent
           # centerVertical: center this element vertically within parent
-          classes << 'mx-auto' if attributes['centerHorizontal']
-          classes << 'my-auto' if attributes['centerVertical']
-          if attributes['centerInParent']
+          #
+          # These are the plainest form of the frozen family: `if
+          # attributes['centerVertical']` is a Ruby truthiness test, and the
+          # STRING `"@{v}"` is truthy whatever the binding resolves to — the
+          # element was centered unconditionally. mx-auto / my-auto are
+          # `margin-inline: auto` / `margin-block: auto`, so the bound form
+          # is the same declaration behind a runtime condition.
+          classes << 'mx-auto' if bound_flag_style('marginInline', attributes['centerHorizontal'], on: 'auto')
+          classes << 'my-auto' if bound_flag_style('marginBlock', attributes['centerVertical'], on: 'auto')
+
+          # Edge alignment for a FLOW child.
+          #
+          # The four align* spellings were consumed only by
+          # `overlay_position_classes`, the ABSOLUTE path — a flow child had a
+          # center* path and no align* path at all, so the declaration reached
+          # nothing (plan 41: `common.alignBottom` / `alignRight` C0
+          # unread-spelling, and all four C1 bound-dropped for the same
+          # reason: there was no code to drop it in).
+          #
+          # An auto margin is the flow answer, the same one center* already
+          # uses one line above: in flexbox an auto margin absorbs the free
+          # space on EITHER axis, so `mt-auto` pushes the child to the bottom
+          # whether the parent is a row or a column. That is why this needs no
+          # `_parent_orientation` — unlike `height: matchParent`, which has to
+          # know which axis it is on.
+          #
+          # The opposite-edge margin is what does the pushing: to sit at the
+          # bottom you take all the free space ABOVE you.
+          classes << 'mt-auto' if bound_flag_style('marginTop', attributes['alignBottom'], on: 'auto')
+          classes << 'mb-auto' if bound_flag_style('marginBottom', attributes['alignTop'], on: 'auto')
+          classes << 'ms-auto' if bound_flag_style('marginInlineStart', attributes['alignRight'], on: 'auto')
+          classes << 'me-auto' if bound_flag_style('marginInlineEnd', attributes['alignLeft'], on: 'auto')
+          center_in_parent = attributes['centerInParent']
+          if (center_expr = bound_value_expr(center_in_parent))
+            dynamic_styles['marginInline'] = "#{center_expr} ? 'auto' : undefined"
+            dynamic_styles['marginBlock']  = "#{center_expr} ? 'auto' : undefined"
+          elsif center_in_parent
             classes << 'mx-auto'
             classes << 'my-auto'
           end
@@ -593,7 +729,412 @@ module RjuiTools
             format_dynamic_style_pair(key, value)
           end
 
-          " style={{ #{style_pairs.join(', ')} }}"
+          # `React.CSSProperties` admits only known properties, so a CSS custom
+          # property key fails a strict consumer's tsc with TS2353 — and the
+          # generated file cannot be hand-patched. Assert the type only when one
+          # is present; an unconditional cast would silence real style errors.
+          cast = custom_property_styles? ? ' as React.CSSProperties' : ''
+
+          " style={{ #{style_pairs.join(', ')} }#{cast}}"
+        end
+
+        def custom_property_styles?
+          @dynamic_styles.keys.any? { |key| key.to_s.start_with?('--') }
+        end
+
+        # A bound dimension only resolves at runtime, so no Tailwind class can
+        # carry it — it goes to the inline style as a px template literal. The
+        # SSoT declares `binding` for all six size attributes and the other two
+        # platforms already read it (kjui `.height(data.v.dp)`, sjui
+        # `.frame(height: data.v)`), where a bound value means dp/points; px is
+        # the web spelling of the same contract.
+        def apply_bound_dimension(attr)
+          value = attributes[attr]
+          return false unless has_binding?(value)
+
+          @dynamic_styles[attr] = "`${#{extract_binding_property(value)}}px`"
+          true
+        end
+
+        # The same contract for the per-side spacing attributes, which the SSoT
+        # also declares as `["number", "binding"]`.
+        #
+        # Without this a bound value reached `TailwindMapper.closest_padding`,
+        # which does `(k - value).abs` over the spacing scale and raised
+        # `TypeError: String can't be coerced into Integer` — `jui build` on a
+        # layout written exactly the way the SSoT describes ABORTED. Sixteen
+        # attributes were in that state (plan 41 codegen differential); kjui
+        # resolves the same declaration to `.padding(data.v.dp)` and sjui to
+        # `.padding(.top, data.v)`, so px is once again the web spelling of a
+        # contract the other two already honour.
+        #
+        # Returns the value to hand the Tailwind mapper, and nil once the
+        # binding has been routed to the inline style. Deliberately additive:
+        # a numeric value is returned untouched and takes the byte-identical
+        # path it took before, because `closest_padding` is the road every
+        # STATIC padding travels and moving that would move every fixture.
+        #
+        # It takes the VALUE, not the attribute names, so the subscript reads
+        # stay at the call site. Two scanners look for them there — this tree's
+        # consumed-attribute spec and `jui conformance coverage`, which builds
+        # the declared-but-unread ledger — and a helper that resolved the names
+        # itself would blind both, quietly inventing sixteen coverage gaps.
+        def static_spacing(css_property, value)
+          bound_length_style(css_property, value)
+        end
+
+        # ------------------------------------------------------------------
+        # The bound-value emitter series
+        # ------------------------------------------------------------------
+        #
+        # A Tailwind class is a compile-time string. It cannot carry a value
+        # that only exists at runtime. Every defect plan 41 classified as
+        # bound-literal-leak / bound-uncompilable / bound-frozen is that one
+        # mistake made in a different place — a `"@{v}"` STRING handed to a
+        # code path written for a static value:
+        #
+        #   TailwindMapper.map_font_size("@{v}")  => "text-[@{v}px]"  dead class
+        #   TailwindMapper.map_text_align("@{v}") => ""               dropped
+        #   `if <the centerVertical read>`         => truthy           frozen ON
+        #   `<the lineSpacing read>.to_f`          => 0.0              frozen
+        #   `"min={#{<the minValue read>}}"`       => "min={@{v}}"     not a program
+        #
+        # (Written as prose rather than as the actual subscripts because both
+        # coverage scanners match those LITERALLY, comments included — this
+        # comment first recorded `lineSpacing` and `minValue` as attributes
+        # BaseConverter consumes.)
+        #
+        # The guard sits at the EMIT boundary, not at the read entry.
+        # The typed attribute read deliberately hands back the raw `"@{v}"`, and the
+        # paths that already do the right thing — color_style_expr,
+        # apply_bound_dimension, build_visibility_info, apply_hidden_binding —
+        # depend on receiving it. Filtering at the entry would break those, and
+        # would only move the defect class from "frozen" to "silently dropped".
+        #
+        # The universal sink is the inline style. `@dynamic_styles` values are
+        # emitted as arbitrary JS expressions, so a runtime value lands there in
+        # whatever shape CSS wants: `${x}px`, a bare number, a ternary, an object
+        # lookup. Classes cannot carry a runtime value; CSS properties can. That
+        # also settles specificity in the safe direction — inline always beats a
+        # class, so the side that declared the binding wins.
+        #
+        # `jsx_value_expr` covers the one context that is not a style: a JSX
+        # attribute in code position (`min={…}`, `rows={…}`).
+        #
+        # Every emitter is ADDITIVE: a static value is returned untouched and
+        # takes the byte-identical path it took before. And every one takes the
+        # VALUE, never the attribute name, so the subscript reads stay at the
+        # call site where `consumed_attributes_coverage_spec` and
+        # `jui conformance coverage` scan for them — 41 blinded both by passing
+        # names into a helper and invented sixteen coverage gaps.
+        #
+        # (Both scanners match the subscript LITERALLY, in comments too. Do not
+        # write one as an example here: this comment did, and the coverage spec
+        # promptly recorded the placeholder as a consumed attribute.)
+
+        # The JS expression that produces `value` at runtime, or nil when the
+        # value carries no binding.
+        #
+        # A whole-value binding becomes the bare reference (`data.x`) so the
+        # caller can use it as a number, a boolean or an object key. A value
+        # that only CONTAINS a binding ("@{w}px solid") keeps its surrounding
+        # text and becomes a template literal, because dropping the literal
+        # part would change what the author wrote.
+        def bound_value_expr(value)
+          str = value.to_s
+          return nil unless has_binding?(str)
+
+          # Whole-value binding: `@{…}` and nothing else. Tested by "no SECOND
+          # `@{` opener" rather than by scanning for `}`, so a default literal
+          # that contains a brace (`@{x ?? '}'}`) still resolves as one
+          # expression — and `"@{a} @{b}"`, which is not a whole-value
+          # binding at all, does not (it satisfies is_binding_format? on the
+          # ends alone, and the old subscript arithmetic turned it into the
+          # garbage property `a} @{b`).
+          if is_binding_format?(str) && str.index('@{', 2).nil?
+            return add_viewmodel_data_prefix(extract_binding_value(str))
+          end
+
+          interpolated = str.gsub(/@\{([^}]+)\}/) { "${#{add_viewmodel_data_prefix(::Regexp.last_match(1))}}" }
+          "`#{interpolated}`"
+        end
+
+        # Length attribute: the CSS property takes px.
+        def bound_length_style(css_property, value)
+          expr = bound_value_expr(value)
+          return value unless expr
+
+          dynamic_styles[css_property] = "`${#{expr}}px`"
+          nil
+        end
+
+        # Unitless number (lineHeight, flexGrow, …).
+        def bound_number_style(css_property, value)
+          expr = bound_value_expr(value)
+          return value unless expr
+
+          dynamic_styles[css_property] = expr
+          nil
+        end
+
+        # Boolean flag whose ON state is one fixed CSS declaration. `off:`
+        # defaults to `undefined`, which is React's "do not emit this property"
+        # — the element keeps whatever the classes gave it, which is what a
+        # false flag has always meant.
+        def bound_flag_style(css_property, value, on:, off: nil)
+          expr = bound_value_expr(value)
+          return value unless expr
+
+          dynamic_styles[css_property] = "#{expr} ? '#{on}' : #{off.nil? ? 'undefined' : "'#{off}'"}"
+          nil
+        end
+
+        # Enum attribute. With no `map:` the declared vocabulary IS the CSS
+        # vocabulary and the runtime value is emitted straight. With a `map:`
+        # the translation that the static path does at codegen time has to
+        # happen at runtime instead, so it is emitted as an object lookup —
+        # an unmapped value yields undefined, i.e. the property is not set,
+        # which is the same answer the static path gives for a value it does
+        # not recognise.
+        def bound_enum_style(css_property, value, map: nil)
+          expr = bound_value_expr(value)
+          return value unless expr
+
+          dynamic_styles[css_property] =
+            css_assert(map ? "(#{js_object_literal(map)})[#{expr}]" : expr, css_property)
+          nil
+        end
+
+        # Assert a runtime string INTO the property's own type.
+        #
+        # Most CSS properties in `React.CSSProperties` are unions of string
+        # literals — `textAlign` is `TextAlign`, `objectFit` is `ObjectFit` —
+        # so a value that is only known to be `string` is TS2322 there. The
+        # binding genuinely is a string at compile time, and the vocabulary it
+        # must belong to is the declared enum, so the assertion is the honest
+        # spelling: it says "this is the property's own type", not `any`, and
+        # it is written in terms of `React.CSSProperties[…]` so it tracks the
+        # React types rather than restating a union that would drift.
+        #
+        # Only reachable from the bound paths — a static value is matched
+        # against a literal vocabulary at codegen time and needs no assertion.
+        def css_assert(expression, css_property)
+          "(#{expression}) as React.CSSProperties['#{css_property}']"
+        end
+
+        # A STATE color — `hover:` / `active:` / `disabled:`. This is the one
+        # family the inline style cannot take directly: an inline declaration
+        # applies unconditionally, and CSS has no way to scope it to a
+        # pseudo-class. `map_color` was handed the raw `"@{v}"`, decided it
+        # was a palette name because it does not start with `#`, and built
+        # `active:bg-@{v}` — a class that matches nothing.
+        #
+        # An inline style CAN set a custom property, and a variant utility CAN
+        # read one back, so the binding lands on `--jui-*` and the class
+        # becomes `active:bg-[var(--jui-*)]`. That class is a literal in the
+        # emitted source, so Tailwind's scanner still generates it — which is
+        # why the var name is fixed per state rather than composed per node.
+        #
+        # Returns nil for a static value, leaving the caller's existing
+        # palette path byte-identical.
+        def bound_state_color_class(value, custom_property:, prefix:)
+          return nil unless has_binding?(value)
+
+          dynamic_styles[custom_property] = color_style_expr(value)
+          "#{prefix}-[var(#{custom_property})]"
+        end
+
+        # A JSX attribute in CODE position: `min={…}`, `rows={…}`, `step={…}`.
+        # Returns the JS expression to place inside the braces — the binding
+        # reference when bound, the value's own literal spelling otherwise.
+        # This is the context that produced `min={@{v}}`, an emit that is not
+        # a program: the generated file does not compile at all.
+        def jsx_value_expr(value)
+          bound_value_expr(value) || value.to_s
+        end
+
+        # contentMode → the CSS pair, keyed by the LOWERCASED spelling.
+        #
+        # THE one table. It used to be four: ImageConverter's `case`,
+        # NetworkImageConverter's class map, NetworkImageConverter's prop map,
+        # and this one for the bound path — and no two of them accepted the
+        # same spellings. `aspect_fit` was only in the first; `centerCrop` /
+        # `fitCenter` / `fitXY` only in the second and third, which were also
+        # case-SENSITIVE, so a lowercase `aspectfill` fell through to an
+        # `object-#{value}` fallback and emitted a class that matches nothing.
+        # An author writing one declaration got a different answer on `<img>`
+        # than on `<NetworkImage>`.
+        #
+        # The union of both components' declared enums plus the iOS/Android
+        # long forms lives here once. An unrecognised value resolves to the
+        # declared default rather than being interpolated into a class name.
+        CONTENT_MODE_OBJECT_FIT = {
+          'fit' => 'contain', 'aspectfit' => 'contain', 'aspect_fit' => 'contain',
+          'scaleaspectfit' => 'contain', 'fitcenter' => 'contain',
+          'fill' => 'fill', 'scaletofill' => 'fill', 'scale_to_fill' => 'fill', 'fitxy' => 'fill',
+          'aspectfill' => 'cover', 'aspect_fill' => 'cover',
+          'scaleaspectfill' => 'cover', 'centercrop' => 'cover',
+          'center' => 'none', 'top' => 'none', 'bottom' => 'none',
+          'left' => 'none', 'right' => 'none'
+        }.freeze
+
+        CONTENT_MODE_OBJECT_POSITION = {
+          'center' => 'center', 'top' => 'top', 'bottom' => 'bottom',
+          'left' => 'left', 'right' => 'right'
+        }.freeze
+
+        # `distribution` splits into TWO KINDS, and conflating them is the
+        # defect the canon names (shared/core/attribute_semantics.json,
+        # semantics.distribution, 2026-08-05 ruling):
+        #
+        #   SIZE  fill / fillEqually        distribute SIZE among the children
+        #   GAP   equalSpacing / equalCentering  distribute the FREE SPACE
+        #
+        # The size values are NOT an arrangement. `fill` means the children
+        # grow until there is no free space LEFT to distribute, so mapping it
+        # to `justify-between` — which distributes free space — is, in the
+        # ruling's words, precisely backwards. They are `flex-grow` on each
+        # child, the same shape as `Modifier.weight(1f)` on Compose and
+        # `.frame(maxWidth: .infinity)` on SwiftUI.
+        #
+        #   fill         children grow FROM their content size  -> `grow`
+        #                (flex-grow:1, flex-basis:auto)
+        #   fillEqually  every child the SAME size regardless    -> `flex-1`
+        #                (flex:1 1 0%)
+        #
+        # web used to send fillEqually and equalCentering both to
+        # justify-evenly, so no fixture comparing those two values could tell
+        # them apart — and `--inert-complete` could not see it, because both
+        # differ from the CONTROL while being identical to each other.
+        DISTRIBUTION_CHILD_CLASS = {
+          'fill' => 'grow',
+          'fillequally' => 'flex-1 min-w-0 min-h-0'
+        }.freeze
+
+        # The GAP values, which really are `justify-content`.
+        #
+        # `equalCentering` is equal CENTRE-TO-CENTRE distance. CSS's exact
+        # equivalent is an equal-track grid, but `space-around` is what the
+        # other two platforms reach for (Compose `Arrangement.SpaceAround`),
+        # and three platforms agreeing matters more here than CSS purity —
+        # the whole point of the ruling is that the four values must stop
+        # collapsing into each other in DIFFERENT ways per platform.
+        DISTRIBUTION_JUSTIFY = {
+          'equalspacing' => 'justify-between',
+          'equalcentering' => 'justify-around'
+        }.freeze
+
+        # The lowercased SIZE value this container declares, or nil.
+        def distribution_size_value
+          key = attributes['distribution'].to_s.downcase
+          DISTRIBUTION_CHILD_CLASS.key?(key) ? key : nil
+        end
+
+        # `effectStyle` — the UIKit visual-effect material, declared on `common`
+        # and not just on Blur.
+        #
+        # Only BlurConverter read it, so a plain View declaring a material got
+        # nothing at all: the codegen-effect gate reported `common.effectStyle`
+        # as unread on all three platforms the moment E's mode audit put these
+        # fixtures back in scope. The vocabulary lives here now rather than in
+        # BlurConverter, so the component that OWNS the concept and the common
+        # spelling cannot answer differently.
+        #
+        # Keys are downcased and whitespace-stripped, matching the way all
+        # three converters already normalise. `Regular` is the declared
+        # default and the fallback all three already used.
+        EFFECT_STYLE_BLUR_PX = {
+          'ultrathin' => 4, 'systemultrathinmaterial' => 4,
+          'thin' => 8, 'systemthinmaterial' => 8,
+          'regular' => 12, 'systemmaterial' => 12,
+          'thick' => 16, 'systemthickmaterial' => 16,
+          'chrome' => 20, 'systemchromematerial' => 20
+        }.freeze
+        EFFECT_STYLE_DEFAULT_BLUR_PX = 10
+
+        EFFECT_STYLE_BACKGROUND = {
+          'light' => 'rgba(255, 255, 255, 0.7)',
+          'extralight' => 'rgba(255, 255, 255, 0.7)',
+          'dark' => 'rgba(0, 0, 0, 0.5)',
+          'ultrathin' => 'rgba(255, 255, 255, 0.3)',
+          'systemultrathinmaterial' => 'rgba(255, 255, 255, 0.3)',
+          'thin' => 'rgba(255, 255, 255, 0.5)',
+          'systemthinmaterial' => 'rgba(255, 255, 255, 0.5)',
+          'regular' => 'rgba(255, 255, 255, 0.7)',
+          'systemmaterial' => 'rgba(255, 255, 255, 0.7)',
+          'thick' => 'rgba(255, 255, 255, 0.85)',
+          'systemthickmaterial' => 'rgba(255, 255, 255, 0.85)',
+          'chrome' => 'rgba(255, 255, 255, 0.9)',
+          'systemchromematerial' => 'rgba(255, 255, 255, 0.9)',
+          'prominent' => 'rgba(240, 240, 240, 0.8)'
+        }.freeze
+        EFFECT_STYLE_DEFAULT_BACKGROUND = 'rgba(255, 255, 255, 0.6)'
+
+        # The declared value, normalised. `regular` when absent.
+        def effect_style_key(value = attributes['effectStyle'])
+          normalized = value.to_s.downcase.gsub(/\s+/, '')
+          normalized.empty? ? 'regular' : normalized
+        end
+
+        def effect_style_blur_px(key)
+          EFFECT_STYLE_BLUR_PX.fetch(key, EFFECT_STYLE_DEFAULT_BLUR_PX)
+        end
+
+        def effect_style_background(key)
+          EFFECT_STYLE_BACKGROUND.fetch(key, EFFECT_STYLE_DEFAULT_BACKGROUND)
+        end
+
+        #: The declared default when a value is absent or unrecognised
+        #: (`image.defaultContentMode` in shared/core/attribute_semantics.json).
+        CONTENT_MODE_DEFAULT_FIT = 'contain'
+
+        # The Tailwind classes for a STATIC contentMode. `none` is the only fit
+        # that also needs a position, which is why the two tables are separate.
+        def content_mode_classes(value)
+          key = value.to_s.downcase
+          fit = CONTENT_MODE_OBJECT_FIT.fetch(key, CONTENT_MODE_DEFAULT_FIT)
+          position = CONTENT_MODE_OBJECT_POSITION[key]
+          position ? "object-#{fit} object-#{position}" : "object-#{fit}"
+        end
+
+        # The same value as the NetworkImageProps `contentMode` union wants.
+        def content_mode_prop(value)
+          CONTENT_MODE_OBJECT_FIT.fetch(value.to_s.downcase, CONTENT_MODE_DEFAULT_FIT)
+        end
+
+        # Route a bound contentMode to object-fit / object-position. Returns
+        # true when the binding was routed, false for a static value so the
+        # caller's own vocabulary table stays on its exact previous path.
+        def apply_bound_content_mode(value)
+          expr = bound_value_expr(value)
+          return false unless expr
+
+          key = "String(#{expr}).toLowerCase()"
+          dynamic_styles['objectFit'] = css_assert(
+            "(#{js_object_literal(CONTENT_MODE_OBJECT_FIT)})[#{key}] ?? 'contain'", 'objectFit'
+          )
+          dynamic_styles['objectPosition'] = css_assert(
+            "(#{js_object_literal(CONTENT_MODE_OBJECT_POSITION)})[#{key}]", 'objectPosition'
+          )
+          true
+        end
+
+        def js_object_literal(map)
+          '{ ' + map.map { |k, v| "'#{k}': '#{v}'" }.join(', ') + ' }'
+        end
+
+        # `@dynamic_styles` is initialized by `build_class_name`; converters
+        # that route a binding before (or without) calling it get the hash
+        # created on demand rather than a NoMethodError on nil.
+        def dynamic_styles
+          @dynamic_styles ||= {}
+        end
+
+        # A bound size pins the element exactly like a numeric one: it must not
+        # shrink inside a flex container, and it wins over its own max bound.
+        def explicit_size?(attr)
+          value = attributes[attr]
+          value.is_a?(Numeric) || has_binding?(value)
         end
 
         # Render a single (key, value) entry from `@dynamic_styles` as a JSX
@@ -611,6 +1152,19 @@ module RjuiTools
           # CSS custom properties (starting with --) need to be quoted in JSX
           key_str = key.start_with?('--') ? "'#{key}'" : key
           "#{key_str}: #{clean_value}"
+        end
+
+        # Render a standalone `style={{ … }}` for an element that is NOT the
+        # subtree root. `@dynamic_styles` belongs to the root tag, so an inner
+        # element a converter composes itself (the Switch track and knob, say)
+        # has no way to reach it — and a runtime colour has nowhere else to
+        # go, since an arbitrary-value class cannot hold one.
+        def style_attr_for(pairs)
+          return '' if pairs.nil? || pairs.empty?
+
+          rendered = pairs.map { |key, value| format_dynamic_style_pair(key, value) }
+          cast = pairs.keys.any? { |key| key.to_s.start_with?('--') } ? ' as React.CSSProperties' : ''
+          " style={{ #{rendered.join(', ')} }#{cast}}"
         end
 
         # Build className attribute, handling landscape responsive with template literal.
@@ -694,15 +1248,20 @@ module RjuiTools
           # cross-axis instruction. Same pattern as `_overlay` injection in
           # ViewConverter.
           parent_orientation = attributes['orientation']
+          # `distribution`'s two SIZE values are an instruction to the CHILDREN,
+          # not an arrangement of them — see DISTRIBUTION_CHILD_CLASS.
+          parent_distribution = distribution_size_value
 
-          child_array.filter_map do |child|
+          child_array.map do |child|
             # Skip data-only elements (they define props, not rendered content)
             next nil if data_only_element?(child)
 
-            annotated = parent_orientation ? child.merge('_parent_orientation' => parent_orientation) : child
+            annotated = child
+            annotated = annotated.merge('_parent_orientation' => parent_orientation) if parent_orientation
+            annotated = annotated.merge('_parent_distribution' => parent_distribution) if parent_distribution
             converter = create_converter_for_child(annotated)
             converter.convert_node(indent + 2)
-          end.join("\n")
+          end.compact.join("\n")
         end
 
         # Check if a child element is a data-only element (should not be rendered)
@@ -1179,17 +1738,31 @@ module RjuiTools
 
           # Check onclick (lowercase) - selector format only
           if attributes['onclick']
-            handler = attributes['onclick']
-            if is_binding_format?(handler)
-              # ERROR: onclick (lowercase) must use selector format
-              return " {/* ERROR: onclick requires selector format (string) */}"
-            else
-              # Valid selector: functionName -> data.functionName
-              return " onClick={data.#{handler}}"
-            end
+            expr = onclick_selector_expr(attributes['onclick'])
+            return expr ? " onClick={#{expr}}" : " {/* ERROR: onclick requires selector format (string) */}"
           end
 
           ''
+        end
+
+        # The declared onclick as a JS expression, or nil for the
+        # not-a-selector error case. The declaration is string|array
+        # (attribute_definitions common.onclick); interpolating the array
+        # directly produced `data.["a", "b"]`, which is not syntax. Multiple
+        # selectors are called in declared order — the semantics the ios
+        # codegen (both selectors emitted) already exhibits.
+        def onclick_selector_expr(handler)
+          if handler.is_a?(Array)
+            return nil if handler.empty? || handler.any? { |h| is_binding_format?(h) }
+
+            calls = handler.map { |h| "data.#{h}?.();" }.join(' ')
+            "() => { #{calls} }"
+          elsif is_binding_format?(handler)
+            nil
+          else
+            # Valid selector: functionName -> data.functionName
+            "data.#{handler}"
+          end
         end
 
         # Check if value is binding format (@{...})
@@ -1227,7 +1800,10 @@ module RjuiTools
             'numeric'
           when 'decimal', 'decimalpad'
             'decimal'
-          when 'tel', 'phonenumber'
+          # `phone` is the spelling attribute_definitions actually declares;
+          # only the UIKit long forms were listed, so the one value a layout
+          # author is told to write mapped to nothing.
+          when 'tel', 'phone', 'phonenumber'
             'tel'
           when 'email'
             'email'
@@ -1235,8 +1811,13 @@ module RjuiTools
             'url'
           when 'search', 'websearch'
             'search'
-          else
-            nil
+          # `alphabet` (and its `allphabet` typo alias) is the ASCII-capable
+          # keyboard — the author asking for a TEXT keyboard explicitly, as
+          # distinct from `default`, which is "whatever the platform picks".
+          # Both used to emit nothing, so two declared values reached the DOM
+          # identically and `input` measured as unread on web.
+          when 'alphabet', 'allphabet', 'asciicapable', 'text'
+            'text'
           end
         end
 
@@ -1316,11 +1897,27 @@ module RjuiTools
               'left-0'
             end
 
-          # No instruction on either axis: fill the container, as an overlay
-          # child with no alignment always has.
-          return 'inset-0' if vertical.nil? && horizontal.nil? && !sibling_constraint?
+          # No instruction on either axis. A SIZED child takes bare `absolute`
+          # (auto insets): its static position is the CONTENT-box origin, so
+          # parent padding shifts it exactly like the ios/android overlay
+          # containers do — `inset-0` pins to the padding box and swallowed
+          # leftPadding/topPadding on web (33 cross-effect AAi family).
+          # Render-identical for unpadded parents. A size-less child keeps
+          # inset-0: fill the container, as an overlay child with no
+          # alignment always has.
+          if vertical.nil? && horizontal.nil? && !sibling_constraint?
+            return '' if explicitly_sized?
+            return 'inset-0'
+          end
 
           [vertical, horizontal].compact.join(' ')
+        end
+
+        # Both dimensions declared as concrete numbers — the child cannot be
+        # container-filling, so overlay positioning may rely on the static
+        # position instead of pinned edges.
+        def explicitly_sized?
+          attributes['width'].is_a?(Numeric) && attributes['height'].is_a?(Numeric)
         end
 
         # Canonical binding grammar (shared/core/binding_semantics.json):
@@ -1588,12 +2185,15 @@ module RjuiTools
             parts << "className: '#{klass}'" unless klass.empty?
 
             if partial['onclick']
-              parts << if is_binding_format?(partial['onclick'])
-                         # Same contract as every other handler site: a
-                         # handler is a selector, not a binding. Kept as an
-                         # inline comment so the marker survives into the
-                         # emitted object literal instead of vanishing.
+              # Same contract as every other handler site: a handler is a
+              # selector (string|array), not a binding. The error marker is
+              # kept as an inline comment so it survives into the emitted
+              # object literal instead of vanishing.
+              expr = onclick_selector_expr(partial['onclick'])
+              parts << if expr.nil?
                          '/* ERROR: onclick requires selector format (string) */'
+                       elsif partial['onclick'].is_a?(Array)
+                         "onClick: #{expr}"
                        else
                          "onClick: #{add_viewmodel_data_prefix(partial['onclick'])}"
                        end

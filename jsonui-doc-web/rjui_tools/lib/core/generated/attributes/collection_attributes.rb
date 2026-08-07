@@ -56,12 +56,14 @@ module JsonUI
         { name: 'items', kind: :array, bindable: true }.freeze,
         # Enable keyboard avoidance
         { name: 'keyboardAvoidance', kind: :boolean }.freeze,
-        # Layout type (flow: wrapping layout, LeftAligned: left-aligned wrapping)
+        # Layout type (vertical | horizontal | flow — wrapping layout packed to the leading edge). Flow/LeftAligned/leftAligned are accepted alias spellings of flow (2026-08-03 unification ruling; the old 'left-aligned wrapping' distinction was a frozen-UIKit fossil — no modern path ever implemented it).
         { name: 'layout', kind: :enum, values: ['vertical', 'horizontal', 'flow', 'Flow', 'LeftAligned', 'leftAligned'].freeze }.freeze,
         # Outer container shape for the Collection (single-column section path uses CollectionStackView/CollectionStack). Accepts: 'lazy' (default) -> ScrollView+LazyVStack/LazyHStack on iOS, LazyColumn/LazyRow on Android, with virtualized cell rendering. 'eager' -> ScrollView+VStack/HStack on iOS, Column(verticalScroll)/Row(horizontalScroll) on Android — no virtualization, smooth scrolling for heavy cells (markdown / images / attributed text) that suffer from LazyVStack re-evaluation. 'none' -> VStack/HStack only, no scroll container, parent must already be scrollable. Bindings (@{prop}) are resolved at runtime via the wrapper's mode parameter so toggles preserve view identity. Sticky headers and paging require 'lazy'. [default: lazy]
         { name: 'lazy', kind: :enum, bindable: true, values: ['lazy', 'eager', 'none'].freeze }.freeze,
         # Spacing between rows
         { name: 'lineSpacing', kind: :number }.freeze,
+        # Called with the cell index (Int) when a cell appears on screen. Use for pagination by checking index against total count in ViewModel. Declared `binding` because that is what a layout actually carries: the author writes `@{handlerName}`, a STRING, and every reader matches it as one (kjui collection_component.rb:364 `json_data['onItemAppear'].match(/@\{([^}]+)\}/)`, and the binding validators infer `((Int) -> Unit)?` from that spelling). It was `type: "callback"` — the only callback-typed attribute in the whole SSoT — and attr-codegen skips that type as "function-valued, not extractable from JSON". True of a function; not true of the `@{...}` string a JSON layout can hold, so the attribute had no row in any generated table and no platform could read it typed (2026-08-05, plan 49-E, raised by A).
+        { name: 'onItemAppear', kind: :string, bindable: true }.freeze,
         # Collection page/selection change handler. Canonical; prefer over onPageChanged. [binding: one-way]
         { name: 'onValueChange', kind: :string, bindable: true, aliases: ['onValueChanged', 'onPageChanged'].freeze }.freeze,
         # Scroll orientation (horizontal or vertical)
@@ -70,13 +72,13 @@ module JsonUI
         { name: 'paging', kind: :boolean }.freeze,
         # Reverse the layout direction of the Collection grid. When true, section order in the generated code is also reversed so that JSON definition order (index 0 first) matches the visual top-to-bottom order on iOS (which does not support reverseLayout). Compose's reverseLayout then flips the entire list so index 0 appears at the bottom.
         { name: 'reverseLayout', kind: :boolean }.freeze,
-        # Anchor point for scroll target (default: bottom)
+        # Anchor point for the scrollTo target. Measured 2026-08-05: ios (sjui collection_converter.rb:1138), web (rjui build_command.rb:768) and the Compose GRID path (kjui collection_component.rb:313) all fall back to bottom, so bottom is the declared default. The Compose LIST path emits no anchor offset unless the attribute is explicitly declared, which lands the target at top - that is a divergence in that one path, not a second default. [default: bottom]
         { name: 'scrollAnchor', kind: :enum, values: ['top', 'center', 'bottom'].freeze }.freeze,
         # Whether scrollTo uses animation (default: true)
         { name: 'scrollAnimated', kind: :boolean }.freeze,
         # Enable/disable scrolling (binding supported)
         { name: 'scrollEnabled', kind: :boolean, bindable: true }.freeze,
-        # PassthroughSubject<Int, Never> for programmatic scrolling to cell index
+        # Binding that requests a programmatic scroll. The declared DATA CLASS is a plain value — `String` when cellIdProperty is set (scroll to that cell id), `Int` otherwise (scroll to that index). It is deliberately NOT `PassthroughSubject<Int, Never>`, which this description used to prescribe: PassthroughSubject is a Combine type, and naming a Swift transport in the cross-platform SSoT is what made consumers write it into their data section, where kjui's map_to_kotlin_type passes unknown classes through verbatim and the Kotlin build dies on it. How the request is delivered is each platform's own business — iOS wraps the value in a publisher so a repeated send re-scrolls, Compose reads the String directly, web keys a useEffect on it. STATUS 2026-08-05, after B landed the derivation (jsonui-cli 8c41e3e): the CODEGEN side of all three platforms now takes the plain value — sjui emits `.onChange(of: data.<prop>)` with no publisher and no throttle, Compose keys a LaunchedEffect on it, web a useEffect. The remaining gap is the SwiftUI DYNAMIC renderer: CollectionConverter.swift:127 still resolves the binding as `data[propName] as? PassthroughSubject<Int, Never>` and gets nil for a plain value, so the scroll silently never fires there (it does not crash, it does nothing). Consequence for fixtures: a Collection.scrollTo fixture is now declarable and no longer kills the Kotlin build, and Collection.scrollAnchor is measurable on the codegen path — but ios codegen and ios dynamic will disagree until the dynamic resolver accepts the value, so expect a parity finding there rather than a render failure. Owner of the remainder: the SwiftJsonUI dynamic lane. Note also that the vendored CollectionAttributes.swift still carries the old publisher wording in its doc comment; it is generated from this description and will pick the correction up at the next re-vendor.
         { name: 'scrollTo', kind: :binding }.freeze,
         # Section-based configuration
         { name: 'sections', kind: :array }.freeze,

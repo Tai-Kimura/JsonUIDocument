@@ -102,26 +102,16 @@ module RjuiTools
           classes = [super]
 
           # Content mode (canonical enum: fit/fill/center/top/... plus the
-          # iOS long forms — see attribute_definitions Image.contentMode)
-          case attributes['contentMode']&.downcase
-          when 'fit', 'aspectfit', 'aspect_fit'
-            classes << 'object-contain'
-          when 'fill', 'aspectfill', 'aspect_fill'
-            classes << 'object-cover'
-          when 'center'
-            classes << 'object-none object-center'
-          when 'top'
-            classes << 'object-none object-top'
-          when 'bottom'
-            classes << 'object-none object-bottom'
-          when 'left'
-            classes << 'object-none object-left'
-          when 'right'
-            classes << 'object-none object-right'
-          when 'scaletofill', 'scale_to_fill'
-            classes << 'object-fill'
-          else
-            classes << 'object-cover'
+          # iOS long forms — see attribute_definitions Image.contentMode).
+          # Canonical semantics live in shared/core/attribute_semantics.json:
+          # fill = stretch (scaleToFill synonym — AspectFill is the crop),
+          # and the default is fit (image.defaultContentMode), both verified
+          # by `jui conformance gate --cross-effect`.
+          # A bound value has no spelling to match, so it fell straight
+          # through to the `else` and every binding froze on object-contain.
+          # It routes to the CSS pair instead (BaseConverter's shared table).
+          unless apply_bound_content_mode(attributes['contentMode'])
+            classes << content_mode_classes(attributes['contentMode'])
           end
 
           # CircleImage type
@@ -140,21 +130,18 @@ module RjuiTools
         def build_style_attr
           super
 
-          # Corner radius (for non-circle images)
-          if attributes['cornerRadius'] && json['type'] != 'CircleImage'
-            @dynamic_styles['borderRadius'] = "'#{attributes['cornerRadius']}px'"
+          # Corner radius (for non-circle images). A bound one is already in
+          # `borderRadius` from the base pass; re-writing it here would put
+          # the characters `@{v}` back into the style.
+          corner_radius = attributes['cornerRadius']
+          if corner_radius && !has_binding?(corner_radius) && json['type'] != 'CircleImage'
+            @dynamic_styles['borderRadius'] = "'#{corner_radius}px'"
           end
 
-          return '' if @dynamic_styles.nil? || @dynamic_styles.empty?
-
-          # Delegate per-entry rendering to BaseConverter so the SPREAD
-          # sentinel (Configuration.Font.resolve(...) emission) is handled
-          # consistently across every converter.
-          style_pairs = @dynamic_styles.map do |key, value|
-            format_dynamic_style_pair(key, value)
-          end
-
-          " style={{ #{style_pairs.join(', ')} }}"
+          # One renderer for every converter (BaseConverter#style_attr_for):
+          # the SPREAD sentinel and the `React.CSSProperties` assertion a
+          # custom-property key needs are handled in ONE place.
+          style_attr_for(@dynamic_styles)
         end
 
         def build_onclick_attr
@@ -162,6 +149,14 @@ module RjuiTools
 
           onclick = attributes['onclick'] || attributes['onClick']
           return '' unless onclick
+
+          # The array face first: `end_with?` on an Array is a NoMethodError
+          # (the exact crash kjui's get_event_handler_call had), so the whole
+          # generation died on a declaration the SSoT allows.
+          if onclick.is_a?(Array)
+            expr = onclick_selector_expr(onclick)
+            return expr ? " onClick={#{expr}}" : ''
+          end
 
           if onclick.end_with?(':')
             # Selector format: "methodName:"

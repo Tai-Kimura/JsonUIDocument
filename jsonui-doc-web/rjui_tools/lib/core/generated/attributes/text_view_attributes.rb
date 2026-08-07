@@ -25,8 +25,8 @@ module JsonUI
         { name: 'dataDetectorTypes', kind: :string }.freeze,
         # Background color when disabled - hex string or color name from colors.json
         { name: 'disabledBackground', kind: :string }.freeze,
-        # Deprecated on kotlin. [DEPRECATED: Compose Text has no edgeInset; use padding* instead.]
-        { name: 'edgeInset', kind: :string }.freeze,
+        # The UIKit spelling of containerInset (content inset). Same accepted shapes: a single number, or an array of 1/2/4 numbers. Was declared deprecated on kotlin ("Compose Text has no edgeInset"); retracted 2026-08-05 because Label.edgeInset maps to .padding() on Compose in both the codegen and the dynamic renderer. Unimplemented on the Compose TextView path, not impossible. [accepts: number | array]
+        { name: 'edgeInset', kind: :raw }.freeze,
         # Enable/disable editing
         { name: 'editable', kind: :boolean }.freeze,
         # Enable flexible height
@@ -43,7 +43,7 @@ module JsonUI
         { name: 'hideOnFocused', kind: :boolean }.freeze,
         # Placeholder text (primary)
         { name: 'hint', kind: :string }.freeze,
-        # Hint styling attributes
+        # Hint styling attributes. The nested keys win over the flat spellings (hintColor / hintFont / hintFontSize): a bag scoped to the hint is the more specific statement. That is the ordinary cascade rule and what all four readers do (rjui label_converter, kjui text_component, sjui Label and SelectBox) - it was unwritten until 2026-08-05, when the one converter that had it backwards was found by contradicting its own comment.
         { name: 'hintAttributes', kind: :object }.freeze,
         # Placeholder color - hex string or color name from colors.json (binding supported)
         { name: 'hintColor', kind: :string, bindable: true }.freeze,
@@ -55,10 +55,10 @@ module JsonUI
         { name: 'hintLineHeightMultiple', kind: :number }.freeze,
         # Input type (includes 'allphabet' typo for backward compatibility)
         { name: 'input', kind: :enum, values: ['default', 'alphabet', 'allphabet', 'email', 'number', 'phone', 'url', 'password', 'decimal'].freeze }.freeze,
-        # Keyboard type
-        { name: 'keyboardType', kind: :string }.freeze,
-        # Line break mode
-        { name: 'lineBreakMode', kind: :string }.freeze,
+        # Soft-keyboard type. The canonical token of each pair is the one all three converters accept: `number` rather than UIKit's numberPad (Compose only matches `number` and would fall back to a plain text keyboard), likewise decimal/phone/email. `namePhonePad` and `twitter` reach iOS only; the other platforms fall back to their default keyboard.
+        { name: 'keyboardType', kind: :enum, values: ['default', 'asciiCapable', 'alphabet', 'number', 'numberPad', 'decimal', 'decimalPad', 'phone', 'phonePad', 'email', 'emailAddress', 'URL', 'webURL', 'webSearch', 'search', 'namePhonePad', 'twitter', 'text', 'numeric', 'numbersAndPunctuation'].freeze }.freeze,
+        # Truncation mode. Same vocabulary as Label.lineBreakMode — the two were the same concept declared twice, once enumerated and once as a bare string.
+        { name: 'lineBreakMode', kind: :enum, values: ['Char', 'Clip', 'Word', 'Head', 'Middle', 'Tail'].freeze }.freeze,
         # Maximum input length
         { name: 'maxLength', kind: :number }.freeze,
         # Begin editing event handler

@@ -40,36 +40,31 @@ module RjuiTools
 
           # Content mode to object-fit. Keys cover the canonical
           # attribute_definitions enum (fit/fill/center/top/... /AspectFit)
-          # plus the iOS/Android long forms.
+          # plus the iOS/Android long forms. Canonical semantics:
+          # shared/core/attribute_semantics.json — fill = stretch
+          # (scaleToFill synonym), AspectFill is the crop.
           content_mode = attributes['contentMode'] || attributes['scaleType']
-          if content_mode
-            mode_map = {
-              'fit' => 'object-contain',
-              'fill' => 'object-cover',
-              'center' => 'object-none object-center',
-              'Center' => 'object-none object-center',
-              'top' => 'object-none object-top',
-              'bottom' => 'object-none object-bottom',
-              'left' => 'object-none object-left',
-              'right' => 'object-none object-right',
-              'scaleAspectFill' => 'object-cover',
-              'scaleAspectFit' => 'object-contain',
-              'scaleToFill' => 'object-fill',
-              'centerCrop' => 'object-cover',
-              'fitCenter' => 'object-contain',
-              'fitXY' => 'object-fill',
-              'AspectFill' => 'object-cover',
-              'AspectFit' => 'object-contain'
-            }
-            classes << (mode_map[content_mode] || "object-#{content_mode}")
+          if has_binding?(content_mode)
+            # A bound value matched no key and fell to the `||` fallback,
+            # which built the dead class `object-@{v}`.
+            #
+            # Unlike Image, this does NOT route to an inline style: the
+            # NetworkImage component takes `contentMode` as a PROP and derives
+            # its own object-fit class from it, and NetworkImageProps has no
+            # `style` at all — writing one is TS2322 on the element. The prop
+            # emitted by build_content_mode_attr already carries the binding.
+          elsif content_mode
+            classes << content_mode_classes(content_mode)
           end
 
           # Circle image
           classes << 'rounded-full' if attributes['circle'] || attributes['circleImage']
 
-          # Corner radius class (if using Tailwind standard values)
+          # Corner radius class (if using Tailwind standard values). A bound
+          # radius is already an inline `borderRadius` from the base pass;
+          # this arbitrary-value class would only restate it as dead text.
           corner_radius = attributes['cornerRadius']
-          if corner_radius && !attributes['circle'] && !attributes['circleImage']
+          if corner_radius && !has_binding?(corner_radius) && !attributes['circle'] && !attributes['circleImage']
             classes << "rounded-[#{corner_radius}px]"
           end
 
@@ -94,31 +89,26 @@ module RjuiTools
           content_mode = attributes['contentMode'] || attributes['scaleType']
           return '' unless content_mode
 
-          # Normalize the canonical enum (fit/fill/center/top/.../AspectFit)
-          # and the iOS/Android long forms into the NetworkImageProps union
-          # ('cover' | 'contain' | 'fill' | 'none' | 'scaleDown') — the
-          # template contract must accept every value emitted here.
-          mode_map = {
-            'fit' => 'contain',
-            'fill' => 'cover',
-            'center' => 'none',
-            'Center' => 'none',
-            'top' => 'none',
-            'bottom' => 'none',
-            'left' => 'none',
-            'right' => 'none',
-            'scaleAspectFill' => 'cover',
-            'scaleAspectFit' => 'contain',
-            'scaleToFill' => 'fill',
-            'centerCrop' => 'cover',
-            'fitCenter' => 'contain',
-            'fitXY' => 'fill',
-            'AspectFill' => 'cover',
-            'AspectFit' => 'contain'
-          }
+          # The NetworkImageProps union ('cover' | 'contain' | 'fill' | 'none'
+          # | 'scaleDown' | 'fit') is the same vocabulary object-fit takes, so
+          # this reads BaseConverter's one table rather than keeping a third
+          # copy. The copy it replaced was case-sensitive and had a
+          # pass-the-value-through fallback, so a lowercase `aspectfill` — a
+          # spelling ImageConverter accepted — reached the component as
+          # `aspectfill`, outside the union.
+          #
+          # A bound value cannot be normalised at codegen time, and quoting it
+          # handed the component the four characters `@{v}`. The normalisation
+          # moves into the emitted expression, asserted through the component's
+          # own prop type rather than by restating the union.
+          if (expr = bound_value_expr(content_mode))
+            lookup = js_object_literal(CONTENT_MODE_OBJECT_FIT)
+            cast = "React.ComponentProps<typeof NetworkImage>['contentMode']"
+            return " contentMode={((#{lookup})[String(#{expr}).toLowerCase()] ?? " \
+                   "'#{CONTENT_MODE_DEFAULT_FIT}') as #{cast}}"
+          end
 
-          mapped_mode = mode_map[content_mode] || content_mode
-          " contentMode=\"#{mapped_mode}\""
+          " contentMode=\"#{content_mode_prop(content_mode)}\""
         end
 
         # Native lazy/eager fetch hint, forwarded to the underlying <img>.
@@ -130,17 +120,27 @@ module RjuiTools
         end
 
         def build_placeholder_attr
-          # `hint` is the canonical spelling; `placeholder` and `defaultImage`
-          # are the aliases (kjui already read the canonical — ios/web only
-          # read the aliases, which the pair-scan flagged).
-          placeholder = attributes['hint'] || attributes['placeholder'] || attributes['defaultImage']
-          return '' unless placeholder
-
-          if has_binding?(placeholder)
-            " placeholder={#{convert_binding(placeholder).gsub(/^\{|\}$/, '')}}"
-          else
-            " placeholder=\"#{placeholder}\""
+          # `hint` is the canonical spelling; `placeholder` and `loadingImage`
+          # are the loading-state chain. defaultImage is NOT part of it —
+          # it is the no-src display and travels as its own prop (canonical
+          # networkImage.noSrc = defaultImage, shared/core/
+          # attribute_semantics.json); collapsing it into placeholder let a
+          # declared placeholder hijack the no-src state.
+          placeholder = attributes['hint'] || attributes['placeholder'] || attributes['loadingImage']
+          attr = ''
+          if placeholder
+            attr +=
+              if has_binding?(placeholder)
+                " placeholder={#{convert_binding(placeholder).gsub(/^\{|\}$/, '')}}"
+              else
+                " placeholder=\"#{placeholder}\""
+              end
           end
+          default_image = attributes['defaultImage']
+          if default_image && !has_binding?(default_image)
+            attr += " defaultImage=\"#{default_image}\""
+          end
+          attr
         end
 
         def build_event_handler(event_name)

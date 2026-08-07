@@ -164,6 +164,77 @@
               "required": "required"
             },
             {
+              "id": "attr_fontColor",
+              "name": "fontColor",
+              "anchorId": "attr-fontColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "normalColor",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Font color — hex string or color name from colors.json (binding supported).",
+                "ja": "フォント色。hex 文字列または `colors.json` のトークン名（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Text color for unselected segments.",
+                "ja": "非選択セグメントのテキスト色。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
               "id": "attr_apportionsSegmentWidthsByContent",
               "name": "apportionsSegmentWidthsByContent",
               "anchorId": "attr-apportionsSegmentWidthsByContent",
@@ -298,9 +369,9 @@
               "required": ""
             },
             {
-              "id": "attr_normalColor",
-              "name": "normalColor",
-              "anchorId": "attr-normalColor",
+              "id": "attr_selectedFontColor",
+              "name": "selectedFontColor",
+              "anchorId": "attr-selectedFontColor",
               "requiredChipText": "",
               "requiredChipVisibility": "gone",
               "deprecatedChipVisibility": "gone",
@@ -310,7 +381,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
@@ -322,12 +393,6 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
-                        },
-                        {
-                          "id": "tc_1",
-                          "label": "binding",
-                          "background": "var(--color-accent_tint)",
-                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -347,100 +412,31 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "description": {
-                "en": "Normal state color — hex string or color name from colors.json (binding supported).",
-                "ja": "通常状態の色。hex または `colors.json` のトークン名（binding 可）。"
-              },
-              "platformMatrixVisibility": "visible",
-              "platformIosLabel": {
-                "en": "✓ (SwiftUI mode only)",
-                "ja": "✓（SwiftUI モードのみ）"
-              },
-              "platformAndroidLabel": "—",
-              "platformWebLabel": "—",
-              "note": {
-                "en": "Text color for unselected segments.",
-                "ja": "非選択セグメントのテキスト色。"
-              },
-              "type": "string | binding",
-              "required": ""
-            },
-            {
-              "id": "attr_selectedColor",
-              "name": "selectedColor",
-              "anchorId": "attr-selectedColor",
-              "requiredChipText": "",
-              "requiredChipVisibility": "gone",
-              "deprecatedChipVisibility": "gone",
-              "accentBarColor": "var(--color-border)",
-              "nameTextStyle": "normal",
-              "nameFontColor": "var(--color-ink)",
-              "defaultChipText": "",
-              "defaultChipVisibility": "gone",
-              "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
-              "noteVisibility": "visible",
-              "typeChips": {
-                "sections": [
-                  {
-                    "cells": {
                       "data": [
                         {
-                          "id": "tc_0",
-                          "label": "string",
-                          "background": "var(--color-chip_string_bg)",
-                          "fontColor": "var(--color-chip_string_fg)"
-                        },
-                        {
-                          "id": "tc_1",
-                          "label": "binding",
-                          "background": "var(--color-accent_tint)",
-                          "fontColor": "var(--color-accent_secondary_strong)"
+                          "id": "al_0",
+                          "label": "selectedColor",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
                         }
                       ]
                     }
                   }
                 ]
               },
-              "enumChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "aliasChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
               "description": {
-                "en": "Selected state color — hex string or color name from colors.json (binding supported).",
-                "ja": "選択状態の色。hex または `colors.json` のトークン名（binding 可）。"
+                "en": "Selected text color — hex string or color name from colors.json.",
+                "ja": "選択時のテキスト色。hex または `colors.json` のトークン名。"
               },
-              "platformMatrixVisibility": "visible",
-              "platformIosLabel": {
-                "en": "✓ (SwiftUI mode only)",
-                "ja": "✓（SwiftUI モードのみ）"
-              },
-              "platformAndroidLabel": "—",
-              "platformWebLabel": "—",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
               "note": {
                 "en": "Text color when selected. Defaults to contrast of `tintColor`.",
                 "ja": "選択中のテキスト色。省略時は `tintColor` のコントラスト色。"
               },
-              "type": "string | binding",
+              "type": "string",
               "required": ""
             },
             {
@@ -1068,6 +1064,77 @@
               "required": "required"
             },
             {
+              "id": "attr_fontColor",
+              "name": "fontColor",
+              "anchorId": "attr-fontColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "normalColor",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Font color — hex string or color name from colors.json (binding supported).",
+                "ja": "フォント色。hex 文字列または `colors.json` のトークン名（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Text color for unselected segments.",
+                "ja": "非選択セグメントのテキスト色。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
               "id": "attr_tintColor",
               "name": "tintColor",
               "anchorId": "attr-tintColor",
@@ -1266,79 +1333,6 @@
               "required": ""
             },
             {
-              "id": "attr_normalColor",
-              "name": "normalColor",
-              "anchorId": "attr-normalColor",
-              "requiredChipText": "",
-              "requiredChipVisibility": "gone",
-              "deprecatedChipVisibility": "gone",
-              "accentBarColor": "var(--color-border)",
-              "nameTextStyle": "normal",
-              "nameFontColor": "var(--color-ink)",
-              "defaultChipText": "",
-              "defaultChipVisibility": "gone",
-              "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
-              "noteVisibility": "visible",
-              "typeChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": [
-                        {
-                          "id": "tc_0",
-                          "label": "string",
-                          "background": "var(--color-chip_string_bg)",
-                          "fontColor": "var(--color-chip_string_fg)"
-                        },
-                        {
-                          "id": "tc_1",
-                          "label": "binding",
-                          "background": "var(--color-accent_tint)",
-                          "fontColor": "var(--color-accent_secondary_strong)"
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "enumChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "aliasChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "description": {
-                "en": "Normal state color — hex string or color name from colors.json (binding supported).",
-                "ja": "通常状態の色。hex または `colors.json` のトークン名（binding 可）。"
-              },
-              "platformMatrixVisibility": "visible",
-              "platformIosLabel": {
-                "en": "✓ (SwiftUI mode only)",
-                "ja": "✓（SwiftUI モードのみ）"
-              },
-              "platformAndroidLabel": "—",
-              "platformWebLabel": "—",
-              "note": {
-                "en": "Text color for unselected segments.",
-                "ja": "非選択セグメントのテキスト色。"
-              },
-              "type": "string | binding",
-              "required": ""
-            },
-            {
               "id": "attr_onValueChange",
               "name": "onValueChange",
               "anchorId": "attr-onValueChange",
@@ -1403,9 +1397,9 @@
               "required": ""
             },
             {
-              "id": "attr_selectedColor",
-              "name": "selectedColor",
-              "anchorId": "attr-selectedColor",
+              "id": "attr_selectedFontColor",
+              "name": "selectedFontColor",
+              "anchorId": "attr-selectedFontColor",
               "requiredChipText": "",
               "requiredChipVisibility": "gone",
               "deprecatedChipVisibility": "gone",
@@ -1415,7 +1409,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
@@ -1427,12 +1421,6 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
-                        },
-                        {
-                          "id": "tc_1",
-                          "label": "binding",
-                          "background": "var(--color-accent_tint)",
-                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -1452,27 +1440,31 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "selectedColor",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
               },
               "description": {
-                "en": "Selected state color — hex string or color name from colors.json (binding supported).",
-                "ja": "選択状態の色。hex または `colors.json` のトークン名（binding 可）。"
+                "en": "Selected text color — hex string or color name from colors.json.",
+                "ja": "選択時のテキスト色。hex または `colors.json` のトークン名。"
               },
-              "platformMatrixVisibility": "visible",
-              "platformIosLabel": {
-                "en": "✓ (SwiftUI mode only)",
-                "ja": "✓（SwiftUI モードのみ）"
-              },
-              "platformAndroidLabel": "—",
-              "platformWebLabel": "—",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
               "note": {
                 "en": "Text color when selected. Defaults to contrast of `tintColor`.",
                 "ja": "選択中のテキスト色。省略時は `tintColor` のコントラスト色。"
               },
-              "type": "string | binding",
+              "type": "string",
               "required": ""
             },
             {

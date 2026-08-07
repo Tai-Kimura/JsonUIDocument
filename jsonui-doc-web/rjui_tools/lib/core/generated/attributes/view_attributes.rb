@@ -29,8 +29,8 @@ module JsonUI
         { name: 'flexWrap', kind: :enum, values: ['nowrap', 'wrap', 'wrap-reverse'].freeze }.freeze,
         # Gradient colors
         { name: 'gradient', kind: :array }.freeze,
-        # Gradient direction
-        { name: 'gradientDirection', kind: :string }.freeze,
+        # Gradient direction. Canon copied from GradientView.gradientDirection, which declared the enum for the same concept while this spelling stayed a bare string. Vertical is the fallback on all three. CASE MATTERS on ios: sjui matches 'Horizontal'/'Oblique' literally (modifier_helper.rb:16) without downcasing, while Compose and web downcase — so the capitalised spellings are canonical and the aliases normalise to them before any converter sees the value. RightToLeft and BottomToTop are declared without an alias on purpose: they are reversed directions web implements (gradient_view_converter.rb:88,90) and the other two have no equivalent, so folding them into Horizontal/Vertical would silently reverse the gradient rather than preserve it. [default: Vertical]
+        { name: 'gradientDirection', kind: :enum, values: ['Vertical', 'Horizontal', 'Oblique', 'LeftToRight', 'TopToBottom', 'Diagonal', 'RightToLeft', 'BottomToTop'].freeze }.freeze,
         # View highlighted state
         { name: 'highlighted', kind: :boolean }.freeze,
         # Gradient color stop locations
@@ -47,7 +47,7 @@ module JsonUI
         { name: 'onDrop', kind: :binding }.freeze,
         # Stack orientation (default: zstack)
         { name: 'orientation', kind: :enum, values: ['horizontal', 'vertical'].freeze }.freeze,
-        # Safe area inset positions (SafeAreaView only)
+        # Which edges reserve the safe area. Declared here as well as on SafeAreaView on purpose: SafeAreaView is its own definition section and does not inherit View's, and every platform honours the attribute on a PLAIN view too (sjui base_view_converter.rb#apply_safe_area_insets_to_bag runs for every component; rjui view_converter.rb#safe_area_edges emits env(safe-area-inset-*) padding). The two declarations are the same concept reaching two routing paths, not a duplicate.
         { name: 'safeAreaInsetPositions', kind: :array }.freeze,
         # Space between children (binding supported)
         { name: 'spacing', kind: :number, bindable: true }.freeze,

@@ -199,9 +199,13 @@ module RjuiTools
 
       def extract_onclick_actions(json_data, actions = Set.new)
         if json_data.is_a?(Hash)
-          # Check for onclick attribute (selector format)
-          if json_data['onclick'] && json_data['onclick'].is_a?(String)
-            actions.add(json_data['onclick'])
+          # Check for onclick attribute (selector format, string|array — the
+          # String guard silently dropped the array face's actions)
+          onclick = json_data['onclick']
+          if onclick.is_a?(String)
+            actions.add(onclick)
+          elsif onclick.is_a?(Array)
+            onclick.each { |a| actions.add(a) if a.is_a?(String) }
           end
 
           # Process children
@@ -315,6 +319,17 @@ module RjuiTools
       # binding (see BaseConverter#with_bind_fallback). It has to register here
       # too, or a layout that uses only `bind` gets JSX referencing a Data
       # property the model never declared.
+      # The report-back handler a value binding derives. SelectBox and the
+      # TextField family derive `on<Prop>Change`; Radio and Segment derive
+      # `set<Prop>`. The convention rides on the binding (recorded by
+      # extract_value_bindings) because the emit loops cannot tell which
+      # component a property came from.
+      def value_binding_handler_name(prop_name, info)
+        return "set#{capitalize_first(prop_name)}" if info.is_a?(Hash) && info[:handler] == :setter
+
+        "on#{capitalize_first(prop_name)}Change"
+      end
+
       def extract_value_bindings(json_data, bindings = {})
         if json_data.is_a?(Hash)
           component_type = json_data['type']
@@ -347,11 +362,53 @@ module RjuiTools
           end
 
           # Radio, Segment, SelectBox - value binding (string)
+          #
+          # The CANONICAL selection spellings are read too, not just the
+          # generic `value` / `bind`. Each of these converters reads its own
+          # spelling and emits BOTH a `data.<prop>` read and a report-back
+          # handler call from it — so a layout written the way the SSoT
+          # describes produced references to properties the data model never
+          # declared, i.e. TS2339 in an @generated file the consumer cannot
+          # patch. Same shape as the Radio `checked={…}` TS2367 that blocked
+          # this wave's push; found by plan 49 D hitting the SelectBox case.
+          #
+          # The handler NAME is not uniform: SelectBox derives
+          # `on<Prop>Change` while Radio and Segment derive `set<Prop>`, so
+          # the convention travels with the binding rather than being assumed
+          # by the emit loop.
           if %w[Radio Segment SelectBox].include?(component_type)
             value = json_data['value'] || json_data['bind']
             if value.is_a?(String) && value.start_with?('@{') && value.end_with?('}')
               property_name = value[2...-1]
               bindings[property_name] = { type: 'string', defaultValue: '""' }
+            end
+          end
+
+          # SelectBox — `selectedDate` (date-picker mode) and `selectedValue`.
+          # Both reach the <input>/<select> value as a string.
+          if component_type == 'SelectBox'
+            selected = json_data['selectedDate'] || json_data['selectedValue']
+            if selected.is_a?(String) && selected.start_with?('@{') && selected.end_with?('}')
+              bindings[selected[2...-1]] ||= { type: 'string', defaultValue: '""' }
+            end
+          end
+
+          # Radio — `selectedValue`, reported back through `set<Prop>`.
+          if component_type == 'Radio'
+            selected = json_data['selectedValue']
+            if selected.is_a?(String) && selected.start_with?('@{') && selected.end_with?('}')
+              bindings[selected[2...-1]] ||=
+                { type: 'string', defaultValue: '""', handler: :setter }
+            end
+          end
+
+          # Segment — `selectedIndex` is an INDEX, so it is a number, and it
+          # is reported back through `set<Prop>` like Radio.
+          if component_type == 'Segment'
+            selected = json_data['selectedIndex'] || json_data['selectedTabIndex']
+            if selected.is_a?(String) && selected.start_with?('@{') && selected.end_with?('}')
+              bindings[selected[2...-1]] ||=
+                { type: 'number', defaultValue: 0, handler: :setter }
             end
           end
 
@@ -455,7 +512,16 @@ module RjuiTools
 
           # Check for TabView tabs - generate data properties for each tab's view
           if json_data['type'] == 'TabView' && json_data['tabs'].is_a?(Array)
-            # Add setSelectedTabIndex function for tab switching
+            # The tab state and its setter. The converter reads the state back
+            # (`data.selectedTabIndex ?? 0`) when selectedIndex is not bound, so
+            # declaring only the setter left the generated JSX referencing a
+            # property the interface does not have.
+            properties << {
+              'name' => 'selectedTabIndex',
+              'class' => 'Int',
+              'tsType' => 'number',
+              'defaultValue' => nil
+            }
             properties << {
               'name' => 'setSelectedTabIndex',
               'class' => 'Function',
@@ -587,14 +653,22 @@ module RjuiTools
             content += "  #{prop_name}: #{ts_type};\n"
           end
 
-          # Add onclick actions as function properties
+          # Add onclick actions as function properties. A layout MAY declare
+          # the handler in its data section (a selector names a data property
+          # exactly as `@{...}` does); the declaration wins, and emitting the
+          # synthesized twin beside it produced a duplicate identifier — the
+          # same guard every other synthesized group below already has.
           onclick_actions.each do |action|
+            next if existing_prop_names.include?(action)
+
             content += "  #{action}?: () => void;\n"
           end
 
           # Add onChange handlers for TextField bindings
           text_field_bindings.each do |binding|
             handler_name = "on#{capitalize_first(binding)}Change"
+            next if existing_prop_names.include?(handler_name)
+
             content += "  #{handler_name}?: (value: string) => void;\n"
           end
 
@@ -603,7 +677,7 @@ module RjuiTools
           text_field_set = text_field_bindings.to_set
           value_bindings.each do |prop_name, info|
             next if text_field_set.include?(prop_name)
-            handler_name = "on#{capitalize_first(prop_name)}Change"
+            handler_name = value_binding_handler_name(prop_name, info)
             next if existing_prop_names.include?(handler_name)
             ts_type = info[:type]
             content += "  #{handler_name}?: (value: #{ts_type}) => void;\n"
@@ -641,20 +715,24 @@ module RjuiTools
         end
 
         onclick_actions.each do |action|
+          next if existing_prop_names.include?(action)
+
           content += "  #{action}: undefined,\n"
         end
 
         # Add onChange handlers with undefined default
         text_field_bindings.each do |binding|
           handler_name = "on#{capitalize_first(binding)}Change"
+          next if existing_prop_names.include?(handler_name)
+
           content += "  #{handler_name}: undefined,\n"
         end
 
         # Add onChange handlers for value bindings with undefined default
         # Skip if already handled by text_field_bindings
-        value_bindings.each do |prop_name, _info|
+        value_bindings.each do |prop_name, info|
           next if text_field_set.include?(prop_name)
-          handler_name = "on#{capitalize_first(prop_name)}Change"
+          handler_name = value_binding_handler_name(prop_name, info)
           next if existing_prop_names.include?(handler_name)
           content += "  #{handler_name}: undefined,\n"
         end
@@ -713,12 +791,16 @@ module RjuiTools
         end
 
         onclick_actions.each do |action|
+          next if existing_prop_names.include?(action)
+
           content += " * @property {(() => void) | undefined} [#{action}]\n"
         end
 
         # Add onChange handlers for TextField bindings
         text_field_bindings.each do |binding|
           handler_name = "on#{capitalize_first(binding)}Change"
+          next if existing_prop_names.include?(handler_name)
+
           content += " * @property {((value: string) => void) | undefined} [#{handler_name}]\n"
         end
 
@@ -728,7 +810,7 @@ module RjuiTools
         value_bindings.each do |prop_name, info|
           next if text_field_set.include?(prop_name)
 
-          handler_name = "on#{capitalize_first(prop_name)}Change"
+          handler_name = value_binding_handler_name(prop_name, info)
           ts_type = info[:type]
           content += " * @property {((value: #{ts_type}) => void) | undefined} [#{handler_name}]\n"
         end
@@ -762,21 +844,25 @@ module RjuiTools
         end
 
         onclick_actions.each do |action|
+          next if existing_prop_names.include?(action)
+
           content += "  #{action}: undefined,\n"
         end
 
         # Add onChange handlers with undefined default
         text_field_bindings.each do |binding|
           handler_name = "on#{capitalize_first(binding)}Change"
+          next if existing_prop_names.include?(handler_name)
+
           content += "  #{handler_name}: undefined,\n"
         end
 
         # Add onChange handlers for value bindings with undefined default
         # Skip if already handled by text_field_bindings
-        value_bindings.each do |prop_name, _info|
+        value_bindings.each do |prop_name, info|
           next if text_field_set.include?(prop_name)
 
-          handler_name = "on#{capitalize_first(prop_name)}Change"
+          handler_name = value_binding_handler_name(prop_name, info)
           content += "  #{handler_name}: undefined,\n"
         end
 
@@ -796,6 +882,10 @@ module RjuiTools
 
       def format_default_value(value, ts_type, json_class = nil)
         return 'undefined' if value.nil?
+
+        if json_class == 'CollectionDataSource' && (value.is_a?(Array) || value.is_a?(Hash))
+          return collection_data_source_literal(value)
+        end
 
         case ts_type
         when 'string'
@@ -822,6 +912,33 @@ module RjuiTools
             value.to_s
           end
         end
+      end
+
+      # CollectionDataSource defaultValue → constructor call. Shapes
+      # (INTERACTIVE_HOST_CONTRACT.md §4): shorthand `[ {...} ]` (one section
+      # holding these cell dicts) or explicit
+      # `{"sections" => [{"cell" => name?, "cells" => [...]}]}`. The generated
+      # collection component reads `items?.sections?.[i]?.cells?.data`, which
+      # a plain array literal never satisfies. Cell view names come from the
+      # node's own `sections` declaration — the TS section shape carries none.
+      def collection_data_source_literal(value)
+        sections =
+          if value.is_a?(Array)
+            [{ 'cells' => value }]
+          elsif value['sections'].is_a?(Array)
+            value['sections']
+          else
+            []
+          end
+        return 'new CollectionDataSource()' if sections.empty?
+
+        section_literals = sections.map do |section|
+          next nil unless section.is_a?(Hash)
+          cells = section['cells'].is_a?(Array) ? section['cells'] : []
+          "{ cells: { data: #{to_js_literal(cells)} } }"
+        end.compact
+
+        "new CollectionDataSource([#{section_literals.join(', ')}])"
       end
 
       # Render a data-section Hash/Array defaultValue as a real (recursive)

@@ -53,15 +53,11 @@
         "ja": "入力系だけでなくコンテナにも効きます — `onClick` を持つ `View` はインタラクティブであり、リクエスト中に無効化するのが二重送信ガードの定石です（2026-07-30 以降。それ以前は binding 形式が全プラットフォームで黙って落ち、Android ではコンテナ自体が無視していました）。各プラットフォームで配下のインタラクティブ要素も無効になり（SwiftUI は `.disabled`、Compose はクリックを遮断して a11y ノードに記録、web は `pointer-events-none` + `aria-disabled`）、状態がアクセシビリティツリーに載るため画面テストの `assert: \"disabled\"` で検証できます — ViewModel 側のガードではこのアサートは書けません。"
       }
     },
-    "alpha": {
-      "summary": {
-        "en": "0.0–1.0. Translucency. `alpha: 0` is visually hidden but still receives touches — use `visibility` to disable entirely.",
-        "ja": "0.0〜1.0。不透明度。`alpha: 0` は見えなくても touch は受け付ける。完全無効化には `visibility` を使う。"
-      },
-      "relatedAttributes": ["opacity"]
-    },
     "opacity": {
-      "summary": { "en": "Alias for `alpha` (CSS-style naming).", "ja": "`alpha` のエイリアス（CSS 風命名）。" }
+      "summary": {
+        "en": "0.0–1.0. Translucency. `opacity: 0` is visually hidden but still receives touches — use `visibility` to disable entirely. `alpha` is an accepted alias spelling.",
+        "ja": "0.0〜1.0。不透明度。`opacity: 0` は見えなくても touch は受け付ける。完全無効化には `visibility` を使う。`alpha` は互換エイリアス綴り。"
+      }
     },
     "canTap": {
       "summary": {

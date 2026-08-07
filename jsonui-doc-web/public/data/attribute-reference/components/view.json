@@ -548,10 +548,7 @@
                 "ja": "グラデーションの色配列。"
               },
               "platformMatrixVisibility": "visible",
-              "platformIosLabel": {
-                "en": "✓ (UIKit mode only)",
-                "ja": "✓（UIKit モードのみ）"
-              },
+              "platformIosLabel": "✓",
               "platformAndroidLabel": "—",
               "platformWebLabel": "—",
               "note": {
@@ -573,7 +570,7 @@
               "nameFontColor": "var(--color-ink)",
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
-              "enumChipsVisibility": "gone",
+              "enumChipsVisibility": "visible",
               "aliasChipsVisibility": "gone",
               "noteVisibility": "visible",
               "typeChips": {
@@ -596,7 +593,56 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "Vertical",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "Horizontal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "Oblique",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "LeftToRight",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_4",
+                          "label": "TopToBottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_5",
+                          "label": "Diagonal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_6",
+                          "label": "RightToLeft",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_7",
+                          "label": "BottomToTop",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
@@ -615,10 +661,7 @@
                 "ja": "グラデーションの方向。"
               },
               "platformMatrixVisibility": "visible",
-              "platformIosLabel": {
-                "en": "✓ (UIKit mode only)",
-                "ja": "✓（UIKit モードのみ）"
-              },
+              "platformIosLabel": "✓",
               "platformAndroidLabel": "—",
               "platformWebLabel": "—",
               "note": {
@@ -1081,8 +1124,8 @@
               },
               "platformWebLabel": "✓",
               "note": {
-                "en": "Main-axis distribution. `start` / `center` / `end` / `spaceBetween` / `spaceAround` / `spaceEvenly`. Controls gap and edge behavior for children.",
-                "ja": "主軸方向の配分。`start` / `center` / `end` / `spaceBetween` / `spaceAround` / `spaceEvenly`。子要素間のギャップと端の挙動を制御。"
+                "en": "Main-axis distribution for stacks, and the four values fall into two families (since 2026-08, all three platforms agree): `fill` / `fillEqually` distribute the children's sizes — children grow from their content to fill the axis, equally in the `fillEqually` case — while `equalSpacing` / `equalCentering` distribute the gaps between children whose sizes stay content-driven. A child's own explicit size still wins over distribution-driven growth. Screens using distribution may lay out differently than before 2026-08 on iOS, where the two gap values used to render identically.",
+                "ja": "スタックの主軸方向の配分。4 値は 2 系統に分かれます（2026-08 以降、3 プラットフォーム一致）— `fill` / `fillEqually` は子のサイズを配る系（子が content から伸びて軸を埋める。`fillEqually` は均等に）、`equalSpacing` / `equalCentering` は隙間を配る系（子のサイズは content のまま）。子が明示したサイズは distribution 由来の伸長より優先されます。iOS では 2026-08 まで隙間系の 2 値が同一に描画されていたため、distribution を使う画面は並びが変わることがあります。"
               },
               "type": "string",
               "required": ""
@@ -2075,8 +2118,8 @@
               },
               "platformWebLabel": "✓",
               "note": {
-                "en": "Main-axis distribution. `start` / `center` / `end` / `spaceBetween` / `spaceAround` / `spaceEvenly`. Controls gap and edge behavior for children.",
-                "ja": "主軸方向の配分。`start` / `center` / `end` / `spaceBetween` / `spaceAround` / `spaceEvenly`。子要素間のギャップと端の挙動を制御。"
+                "en": "Main-axis distribution for stacks, and the four values fall into two families (since 2026-08, all three platforms agree): `fill` / `fillEqually` distribute the children's sizes — children grow from their content to fill the axis, equally in the `fillEqually` case — while `equalSpacing` / `equalCentering` distribute the gaps between children whose sizes stay content-driven. A child's own explicit size still wins over distribution-driven growth. Screens using distribution may lay out differently than before 2026-08 on iOS, where the two gap values used to render identically.",
+                "ja": "スタックの主軸方向の配分。4 値は 2 系統に分かれます（2026-08 以降、3 プラットフォーム一致）— `fill` / `fillEqually` は子のサイズを配る系（子が content から伸びて軸を埋める。`fillEqually` は均等に）、`equalSpacing` / `equalCentering` は隙間を配る系（子のサイズは content のまま）。子が明示したサイズは distribution 由来の伸長より優先されます。iOS では 2026-08 まで隙間系の 2 値が同一に描画されていたため、distribution を使う画面は並びが変わることがあります。"
               },
               "type": "string",
               "required": ""
@@ -2294,10 +2337,7 @@
                 "ja": "グラデーションの色配列。"
               },
               "platformMatrixVisibility": "visible",
-              "platformIosLabel": {
-                "en": "✓ (UIKit mode only)",
-                "ja": "✓（UIKit モードのみ）"
-              },
+              "platformIosLabel": "✓",
               "platformAndroidLabel": "—",
               "platformWebLabel": "—",
               "note": {
@@ -2319,7 +2359,7 @@
               "nameFontColor": "var(--color-ink)",
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
-              "enumChipsVisibility": "gone",
+              "enumChipsVisibility": "visible",
               "aliasChipsVisibility": "gone",
               "noteVisibility": "visible",
               "typeChips": {
@@ -2342,7 +2382,56 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "Vertical",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "Horizontal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "Oblique",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "LeftToRight",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_4",
+                          "label": "TopToBottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_5",
+                          "label": "Diagonal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_6",
+                          "label": "RightToLeft",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_7",
+                          "label": "BottomToTop",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
@@ -2361,10 +2450,7 @@
                 "ja": "グラデーションの方向。"
               },
               "platformMatrixVisibility": "visible",
-              "platformIosLabel": {
-                "en": "✓ (UIKit mode only)",
-                "ja": "✓（UIKit モードのみ）"
-              },
+              "platformIosLabel": "✓",
               "platformAndroidLabel": "—",
               "platformWebLabel": "—",
               "note": {

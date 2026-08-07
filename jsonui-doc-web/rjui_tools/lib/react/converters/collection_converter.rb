@@ -40,6 +40,16 @@ module RjuiTools
           layout.to_s.downcase == 'horizontal'
         end
 
+        # layout: flow — wrapping layout, packed to the top-left. Unified
+        # 2026-08-03: 'LeftAligned' IS flow (the accepted spellings survive
+        # as aliases, same case-insensitive read sjui/kjui use for 'Flow').
+        # sjui renders a custom flow layout, kjui a FlowRow; the CSS shape
+        # of the same thing is a wrapping flex row.
+        def flow_collection?
+          layout = attributes['orientation'] || attributes['layout'] || ''
+          %w[flow leftaligned].include?(layout.to_s.downcase)
+        end
+
         # A literal id is what ties the element to the hoisted ref, exactly as
         # it does for the focus bindings and for `{id}_item_{index}`. Without
         # one there is no stable variable name to agree on, so the attributes
@@ -127,13 +137,55 @@ module RjuiTools
           is_horizontal = horizontal_collection?
           # lazy: "none" → drop overflow scroll classes; Collection is expected to
           # render inside an already-scrollable parent.
-          is_lazy = attributes['lazy'] != 'none'
+          #
+          # A BOUND value is a string, and `"@{v}" != 'none'` is always true,
+          # so a Collection whose container shape is chosen at runtime could
+          # never reach the `none` shape — it froze on scrolling. (`lazy` vs
+          # `eager` is not a distinction web makes: the emit is a plain
+          # `.map()` either way, so there is no virtualization to switch off.
+          # `none` is the only one of the three that changes the DOM here.)
+          # The scroll classes stay as the default and the inline style
+          # overrides them when the runtime value turns out to be `none`.
+          lazy = attributes['lazy']
+          lazy_expr = bound_value_expr(lazy)
+          is_lazy = lazy_expr ? true : lazy != 'none'
 
-          if is_horizontal
+          if flow_collection?
+            # Flow is checked before horizontal, like sjui/kjui route to
+            # their flow generators first — the declared layout wins over
+            # the horizontalScroll boolean.
+            classes << 'flex flex-row flex-wrap content-start'
+            if is_lazy && attributes['scrollEnabled'] != false
+              classes << 'overflow-y-auto'
+              dynamic_styles['overflowY'] = "#{lazy_expr} === 'none' ? 'visible' : 'auto'" if lazy_expr
+            end
+            # lineSpacing = gap between wrapped lines, itemSpacing = gap
+            # within a line (the grid branch's row/column mapping).
+            # `columnSpacing` is the SSoT's own name for the column gap and
+            # was read only in the horizontal branch — a flow or grid
+            # Collection ignored it, which is every Collection that declares
+            # `columns` (plan 34: pixel-identical to its control on web while
+            # both mobile platforms honoured it).
+            row_gap = attributes['lineSpacing']
+            col_gap = attributes['columnSpacing'] || attributes['itemSpacing'] || attributes['spacing']
+            if row_gap && col_gap
+              classes << "gap-x-[#{col_gap}px] gap-y-[#{row_gap}px]"
+            elsif row_gap
+              classes << "gap-y-[#{row_gap}px]"
+            elsif col_gap
+              classes << "gap-[#{col_gap}px]"
+            end
+          elsif is_horizontal
             # Horizontal scroll collection
-            classes << 'overflow-x-auto' if is_lazy
+            if is_lazy
+              classes << 'overflow-x-auto'
+              dynamic_styles['overflowX'] = "#{lazy_expr} === 'none' ? 'visible' : 'auto'" if lazy_expr
+            end
             classes << 'flex flex-row'
-            classes << 'flex-nowrap' if is_lazy && attributes['scrollEnabled'] != false
+            if is_lazy && attributes['scrollEnabled'] != false
+              classes << 'flex-nowrap'
+              dynamic_styles['flexWrap'] = "#{lazy_expr} === 'none' ? 'wrap' : 'nowrap'" if lazy_expr
+            end
             # For horizontal: columnSpacing (or lineSpacing/itemSpacing) = gap between items
             spacing = attributes['columnSpacing'] || attributes['lineSpacing'] || attributes['itemSpacing'] || attributes['spacing']
             classes << "gap-[#{spacing}px]" if spacing
@@ -143,7 +195,10 @@ module RjuiTools
             # time so we always route through the grid path below to keep
             # the layout structure stable across runtime column changes.
             classes << 'flex flex-col'
-            classes << 'overflow-y-auto' if is_lazy && attributes['scrollEnabled'] != false
+            if is_lazy && attributes['scrollEnabled'] != false
+              classes << 'overflow-y-auto'
+              dynamic_styles['overflowY'] = "#{lazy_expr} === 'none' ? 'visible' : 'auto'" if lazy_expr
+            end
             # lineSpacing for vertical spacing between items
             spacing = attributes['lineSpacing'] || attributes['itemSpacing'] || attributes['spacing']
             classes << "gap-[#{spacing}px]" if spacing
@@ -160,9 +215,9 @@ module RjuiTools
             else
               classes << "grid-cols-#{columns}"
             end
-            # lineSpacing for row gap, itemSpacing for column gap
+            # lineSpacing for row gap, columnSpacing/itemSpacing for column gap
             row_gap = attributes['lineSpacing']
-            col_gap = attributes['itemSpacing'] || attributes['spacing']
+            col_gap = attributes['columnSpacing'] || attributes['itemSpacing'] || attributes['spacing']
             if row_gap && col_gap
               classes << "gap-x-[#{col_gap}px] gap-y-[#{row_gap}px]"
             elsif row_gap
@@ -374,6 +429,16 @@ module RjuiTools
             base_name = class_name.split('/').last
             return to_pascal_case(base_name)
           end
+
+          # Layout-file view names ("conformance_cell") resolve exactly like
+          # the path branch above: the component rjui build generates from
+          # conformance_cell.json is ConformanceCell — the same name
+          # extract_included_components imports and
+          # extract_collection_cell_types types against. The UIKit-suffix
+          # heuristics below are for migrated UIKit CLASS names, which are
+          # always PascalCase; running a snake_case name through them emitted
+          # "conformance_CellView", a component that exists nowhere.
+          return to_pascal_case(class_name) if class_name.include?('_') || class_name.match?(/^[a-z]/)
 
           # If already PascalCase React component name (starts with uppercase, no underscores),
           # use as-is without appending 'View'

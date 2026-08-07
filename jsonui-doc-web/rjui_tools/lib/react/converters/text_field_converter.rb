@@ -59,10 +59,33 @@ module RjuiTools
             end
           end
 
-          # Placeholder color using Tailwind
+          # Placeholder color. Through map_color, like every other colour:
+          # interpolating the raw value emits `placeholder-#FF0000`, which is
+          # not a Tailwind class at all (rjui-offpalette-hex-dead-tailwind-class
+          # — the policy existed, this caller predated it). The conformance
+          # host hid it: its generated shim defines `.placeholder-dark_red`,
+          # so the palette-named spelling rendered while the hex died.
+          #
+          # A BOUND colour cannot go through map_color either — it decides the
+          # value is a palette name (it does not start with `#`) and builds
+          # `placeholder-@{v}`. `::placeholder` is a pseudo-element, so an
+          # inline declaration cannot reach it; the binding rides a custom
+          # property that the arbitrary value reads back.
           if attributes['hintColor'] || attributes['placeholderColor']
             color = attributes['hintColor'] || attributes['placeholderColor']
-            classes << "placeholder-#{color}"
+            classes << (bound_state_color_class(color, custom_property: '--jui-hint-color', prefix: 'placeholder') ||
+                        TailwindMapper.map_color(color, 'placeholder'))
+          end
+
+          # Placeholder FONT. `::placeholder` is a pseudo-element, so it is
+          # unreachable from the inline style the rest of the font handling
+          # uses — Tailwind's `placeholder:` variant with an arbitrary value is
+          # the only surface that can carry it.
+          if (hint_font = attributes['hintFont'])
+            classes << "placeholder:[font-family:#{hint_font.to_s.gsub(/\s+/, '_')}]"
+          end
+          if (hint_font_size = attributes['hintFontSize'])
+            classes << "placeholder:[font-size:#{hint_font_size}px]"
           end
 
           # Disabled state
@@ -111,16 +134,13 @@ module RjuiTools
             end
           end
 
-          return '' if @dynamic_styles.nil? || @dynamic_styles.empty?
-
-          # Delegate per-entry rendering to BaseConverter so the SPREAD
-          # sentinel (Configuration.Font.resolve(...) emission) is handled
-          # consistently across every converter.
-          style_pairs = @dynamic_styles.map do |key, value|
-            format_dynamic_style_pair(key, value)
-          end
-
-          " style={{ #{style_pairs.join(', ')} }}"
+          # One renderer for every converter (BaseConverter#style_attr_for):
+          # the SPREAD sentinel and the `React.CSSProperties` assertion a
+          # custom-property key needs are handled in ONE place. Six converters
+          # had hand-copied this loop, and four of the copies had lost the
+          # assertion — which only surfaced when a bound colour started
+          # writing `--jui-*` keys and the host's tsc rejected them.
+          style_attr_for(@dynamic_styles)
         end
 
         def build_attributes
@@ -167,9 +187,16 @@ module RjuiTools
           # Max length
           attrs << " maxLength={#{attributes['maxLength']}}" if attributes['maxLength']
 
-          # Auto complete / content type
-          if attributes['contentType']
-            autocomplete = map_content_type(attributes['contentType'])
+          # Auto complete / content type. A bound value matches no key, so the
+          # attribute was dropped entirely — the same mapping happens at
+          # runtime instead. An unmapped value yields undefined, which React
+          # omits, exactly like the static path's `if autocomplete`.
+          content_type = attributes['contentType']
+          if (content_type_expr = bound_value_expr(content_type))
+            lookup = js_object_literal(CONTENT_TYPE_AUTOCOMPLETE)
+            attrs << " autoComplete={(#{lookup})[String(#{content_type_expr}).toLowerCase()]}"
+          elsif content_type
+            autocomplete = map_content_type(content_type)
             attrs << " autoComplete=\"#{autocomplete}\"" if autocomplete
           end
 
@@ -247,7 +274,8 @@ module RjuiTools
             'email'
           when 'number', 'decimal', 'numberpad', 'decimalpad'
             'number'
-          when 'tel', 'phonenumber', 'namephonepad'
+          # `phone` is the declared enum spelling (see map_input_mode).
+          when 'tel', 'phone', 'phonenumber', 'namephonepad'
             'tel'
           when 'url'
             'url'
@@ -258,35 +286,28 @@ module RjuiTools
           end
         end
 
+        # contentType → the HTML `autocomplete` token, keyed by the lowercased
+        # spelling. A table rather than a `case` so the bound path can emit
+        # the SAME mapping as a runtime lookup instead of a second copy of it
+        # (a duplicated vocabulary drifts).
+        CONTENT_TYPE_AUTOCOMPLETE = {
+          'username' => 'username',
+          'password' => 'current-password',
+          'newpassword' => 'new-password',
+          'email' => 'email',
+          'name' => 'name',
+          'givenname' => 'given-name',
+          'familyname' => 'family-name',
+          'tel' => 'tel',
+          'telephonenumber' => 'tel',
+          'streetaddress' => 'street-address',
+          'postalcode' => 'postal-code',
+          'country' => 'country',
+          'creditcardnumber' => 'cc-number'
+        }.freeze
+
         def map_content_type(type)
-          case type&.downcase
-          when 'username'
-            'username'
-          when 'password'
-            'current-password'
-          when 'newpassword'
-            'new-password'
-          when 'email'
-            'email'
-          when 'name'
-            'name'
-          when 'givenname'
-            'given-name'
-          when 'familyname'
-            'family-name'
-          when 'tel', 'telephonenumber'
-            'tel'
-          when 'streetaddress'
-            'street-address'
-          when 'postalcode'
-            'postal-code'
-          when 'country'
-            'country'
-          when 'creditcardnumber'
-            'cc-number'
-          else
-            nil
-          end
+          CONTENT_TYPE_AUTOCOMPLETE[type&.downcase]
         end
 
 
