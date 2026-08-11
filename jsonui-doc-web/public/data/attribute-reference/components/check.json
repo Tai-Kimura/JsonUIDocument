@@ -48,15 +48,15 @@
   "canonicalCode": "{ \"type\": \"Check\", \"checked\": \"@{subscribe}\" }",
   "canonicalLanguage": "json",
   "statRequired": "0",
-  "statOptional": "18",
+  "statOptional": "19",
   "statEvents": "1",
   "statRequiredText": {
     "en": "0 required",
     "ja": "必須 0"
   },
   "statOptionalText": {
-    "en": "18 optional",
-    "ja": "任意 18"
+    "en": "19 optional",
+    "ja": "任意 19"
   },
   "statEventsText": {
     "en": "1 events",
@@ -697,6 +697,83 @@
               "required": ""
             },
             {
+              "id": "attr_fontWeight",
+              "name": "fontWeight",
+              "anchorId": "attr-fontWeight",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "fontStyle",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Font weight name ('regular', 'medium', 'semibold', 'bold', 'heavy', 'light') or numeric 100-900. Passed as the `weight` field of `FontSpec` to the host's `Configuration.Font.fontProvider`. Binding supported.",
+                "ja": "フォントウェイト。`regular` / `medium` / `semibold` / `bold` / `heavy` / `light` の文字列、または 100〜900 の数値。`FontSpec` の `weight` フィールドとして `Configuration.Font.fontProvider` に渡る（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | number",
+              "required": ""
+            },
+            {
               "id": "attr_spacing",
               "name": "spacing",
               "anchorId": "attr-spacing",
@@ -779,7 +856,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "gone",
               "typeChips": {
                 "sections": [
@@ -810,12 +887,25 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "checkColor",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "al_1",
+                          "label": "onTintColor",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
               },
-              "description": "Color when checked.",
+              "description": "Color when checked. Legacy accent spellings fold here (sjui checkbox_converter.rb:98 and kjui checkbox_component.rb:211 both read the same four spellings for this one colour). `tintColor` is deliberately NOT in the alias list: it is already declared on `common`, and an alias that is also a declared row is a silent no-op (test_no_alias_is_cancelled_by_a_declaration_of_its_own_name). On a CheckBox the common tint IS the checked colour - that is what both converters implement - so it needs no alias row. Declaring the other two also settles a live divergence: ios reads `checkedColor` first, android reads `checkColor` first, so a layout setting both drew two different colours until the normalizer began folding them (plan 51-E).",
               "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
@@ -1324,7 +1414,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "gone",
               "typeChips": {
                 "sections": [
@@ -1355,7 +1445,20 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "action",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "al_1",
+                          "label": "onValueChanged",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
@@ -2110,6 +2213,83 @@
               "required": ""
             },
             {
+              "id": "attr_fontWeight",
+              "name": "fontWeight",
+              "anchorId": "attr-fontWeight",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "fontStyle",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Font weight name ('regular', 'medium', 'semibold', 'bold', 'heavy', 'light') or numeric 100-900. Passed as the `weight` field of `FontSpec` to the host's `Configuration.Font.fontProvider`. Binding supported.",
+                "ja": "フォントウェイト。`regular` / `medium` / `semibold` / `bold` / `heavy` / `light` の文字列、または 100〜900 の数値。`FontSpec` の `weight` フィールドとして `Configuration.Font.fontProvider` に渡る（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | number",
+              "required": ""
+            },
+            {
               "id": "attr_spacing",
               "name": "spacing",
               "anchorId": "attr-spacing",
@@ -2262,7 +2442,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "gone",
               "typeChips": {
                 "sections": [
@@ -2293,12 +2473,25 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "checkColor",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "al_1",
+                          "label": "onTintColor",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
               },
-              "description": "Color when checked.",
+              "description": "Color when checked. Legacy accent spellings fold here (sjui checkbox_converter.rb:98 and kjui checkbox_component.rb:211 both read the same four spellings for this one colour). `tintColor` is deliberately NOT in the alias list: it is already declared on `common`, and an alias that is also a declared row is a silent no-op (test_no_alias_is_cancelled_by_a_declaration_of_its_own_name). On a CheckBox the common tint IS the checked colour - that is what both converters implement - so it needs no alias row. Declaring the other two also settles a live divergence: ios reads `checkedColor` first, android reads `checkColor` first, so a layout setting both drew two different colours until the normalizer began folding them (plan 51-E).",
               "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
@@ -2533,7 +2726,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "gone",
               "typeChips": {
                 "sections": [
@@ -2564,7 +2757,20 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "action",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "al_1",
+                          "label": "onValueChanged",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]

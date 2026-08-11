@@ -9,7 +9,10 @@ module RjuiTools
         def convert(indent = 2)
           class_attr = build_class_attr
           style_attr = build_style_attr
-          id_attr = build_id_attr
+          # The autoShrink ref rides with the id attribute so every render
+          # shape below (plain / hint swap / linkable / partial) carries it —
+          # they all place `id_attr` on the element that holds the text.
+          id_attr = "#{build_id_attr}#{build_auto_shrink_ref_attr}"
           onclick_attr = build_onclick_attr
           testid_attr = build_testid_attr
           tag_attr = build_tag_attr
@@ -46,6 +49,21 @@ module RjuiTools
         end
 
         protected
+
+        # The ref the hoisted autoShrink effect writes through. A literal id is
+        # the contract between the two halves — MUST stay in sync with
+        # ReactGenerator#auto_shrink_ref_name / #extract_auto_shrink_targets.
+        # Without an id there is nothing to hoist, so the Label simply renders
+        # at its declared size.
+        def build_auto_shrink_ref_attr
+          shrink = attributes['autoShrink']
+          return '' if shrink.nil? || shrink == false || shrink == 'false'
+
+          id = extract_id
+          return '' unless id.is_a?(String) && !id.empty? && !id.include?('@{')
+
+          " ref={#{snake_to_camel_id(id)}ShrinkRef}"
+        end
 
         # The plain single-span label, with the hint swap when configured.
         #
@@ -367,11 +385,10 @@ module RjuiTools
             end
           end
 
-          # Underline
-          classes << 'underline' if attributes['underline']
-
-          # Strikethrough
-          classes << 'line-through' if attributes['strikethrough']
+          # Underline / strikethrough, both faces. Contract:
+          # attribute_semantics.json -> textDecoration.
+          classes.concat(text_decoration_classes(underline: attributes['underline'],
+                                                 strikethrough: attributes['strikethrough']))
 
           # textTransform — declared `platform: react`; CSS text-transform is the
           # web's own capability, and `none` is the initial value, so it is
@@ -503,29 +520,18 @@ module RjuiTools
             @dynamic_styles['whiteSpace'] = "'nowrap'" unless multiline_cap?
           end
 
-          # autoShrink - use CSS font-size clamp or viewport units
-          # This is a simplified version - full implementation would need JS
-          if attributes['autoShrink']
-            min_scale = attributes['minimumScaleFactor'] || 0.5
-            font_size = attributes['fontSize'] || 16
-            # `16 * "@{v}"` raises `String can't be coerced into Integer`, so a
-            # Label declaring autoShrink with either value bound did not fail
-            # to style — `jui build` ABORTED on it. Same shape as the
-            # `closest_padding` crash `static_spacing` was written for. The
-            # multiplication moves into the emitted expression.
-            scale_expr = bound_value_expr(min_scale)
-            size_expr = bound_value_expr(font_size)
-            if scale_expr || size_expr
-              size_js = size_expr || font_size
-              scale_js = scale_expr || min_scale
-              @dynamic_styles['fontSize'] =
-                "`min(${#{size_js}}px, max(${Math.round((#{size_js}) * (#{scale_js}))}px, 1vw))`"
-            else
-              min_size = (font_size * min_scale).round
-              # Use min() to allow shrinking but not below minimum
-              @dynamic_styles['fontSize'] = "'min(#{font_size}px, max(#{min_size}px, 1vw))'"
-            end
-          end
+          # autoShrink / minimumScaleFactor are fitted at runtime by the
+          # `@/generated/autoShrink` helper, which the generator hoists a ref
+          # and an effect for (ReactGenerator#auto_shrink_effect). Nothing is
+          # written into the style object here.
+          #
+          # It used to emit `min(<size>px, max(<size * factor>px, 1vw))`. That
+          # reads like a shrink and is not one: it sizes text against the
+          # VIEWPORT, which is unrelated to whether the text fits its box. A
+          # 16px Label rendered at 8px on a 375px-wide phone, and on anything
+          # wide enough the 1vw term outran both floors so minimumScaleFactor
+          # changed nothing at all (measured: fixture and control both computed
+          # 10.24px at a 1024px viewport, 0 differing px — plan 51-A).
 
           # One renderer for every converter (BaseConverter#style_attr_for):
           # the SPREAD sentinel and the `React.CSSProperties` assertion a
@@ -589,6 +595,80 @@ module RjuiTools
           styles.join(', ')
         end
 
+        #: lineStyle -> the utilities that draw it. `Single` is spelled out
+        #: rather than omitted for the same reason `textTransform: none` is: a
+        #: style block may have set something else on the element.
+        TEXT_DECORATION_STYLES = {
+          'single' => %w[decoration-solid],
+          'double' => %w[decoration-double],
+          'thick' => %w[decoration-solid decoration-2]
+        }.freeze
+
+        # Classes for one element's underline / strikethrough declarations.
+        # Both faces: a truthy scalar draws the plain line, an object draws the
+        # line it describes, and `lineStyle: "None"` draws nothing. The whole
+        # ruling lives in attribute_semantics.json -> textDecoration.
+        #
+        # A Hash is truthy in Ruby, which is why the presence test this
+        # replaces drew a line for `{lineStyle: "None"}` too.
+        # The two declarations arrive as keywords rather than being read out of
+        # a hash inside the loop: `attributes['underline']` has to appear
+        # LITERALLY in converter source or neither the consumed-attribute spec
+        # nor conformance/coverage.py can see the read, and an implemented
+        # attribute reads as a coverage gap.
+        def text_decoration_classes(underline:, strikethrough:, element_level: true)
+          classes = []
+          lines = []
+          { 'underline' => [underline, 'underline'],
+            'strikethrough' => [strikethrough, 'line-through'] }.each do |attr, (spec, line_class)|
+            next unless decoration_drawn?(spec)
+
+            lines << line_class
+            next unless spec.is_a?(Hash)
+
+            classes.concat(TEXT_DECORATION_STYLES[spec['lineStyle'].to_s.downcase] || [])
+            # An absent colour means "do not modify" — the line inherits the
+            # text colour, which is what CSS does with no decoration-color.
+            if spec['color']
+              bound = element_level &&
+                      bound_state_color_class(spec['color'], custom_property: "--jui-#{attr}-color",
+                                                             prefix: 'decoration')
+              classes << (bound || TailwindMapper.map_color(spec['color'], 'decoration'))
+            end
+            # lineOffset is declared on underline only, and strikethrough must
+            # not invent one.
+            offset = spec['lineOffset']
+            classes << "underline-offset-[#{offset}px]" if attr == 'underline' && offset.is_a?(Numeric)
+          end
+
+          # `underline` and `line-through` are two utilities writing ONE CSS
+          # property, so a Label asking for both would keep whichever the
+          # stylesheet happens to order last. The pair goes through the style
+          # object, where both survive — except inside partialAttributes, whose
+          # ranges are styled by class only (a span per range, no style object
+          # of its own), so there the arbitrary property is the way to say it.
+          if lines.length > 1
+            if element_level
+              @dynamic_styles['textDecorationLine'] = "'#{lines.join(' ')}'"
+            else
+              classes << "[text-decoration-line:#{lines.join('_')}]"
+            end
+          else
+            classes.concat(lines)
+          end
+
+          classes.reject { |c| c.nil? || c.to_s.empty? }
+        end
+
+        # Is a line drawn at all? Absent / false / the one object value that
+        # means "nothing" draw none; everything else draws.
+        def decoration_drawn?(spec)
+          return false if spec.nil? || spec == false || spec == 'false'
+          return spec['lineStyle'].to_s.casecmp('none') != 0 if spec.is_a?(Hash)
+
+          true
+        end
+
         def build_partial_class(partial)
           classes = []
           # Same color resolution as the main fontColor / background path:
@@ -597,8 +677,11 @@ module RjuiTools
           # `color: 'accent'`, which no browser understands.
           classes << TailwindMapper.map_color(partial['fontColor'], 'text') if partial['fontColor']
           classes << TailwindMapper.map_color(partial['background'], 'bg') if partial['background']
-          classes << 'underline' if partial['underline']
-          classes << 'line-through' if partial['strikethrough']
+          # partialAttributes[].underline carries the same two faces as the
+          # component-level attribute (attribute_semantics -> textDecoration).
+          classes.concat(text_decoration_classes(underline: partial['underline'],
+                                                 strikethrough: partial['strikethrough'],
+                                                 element_level: false))
           classes << 'cursor-pointer' if partial['onclick']
           classes.reject { |c| c.nil? || c.empty? }.join(' ')
         end

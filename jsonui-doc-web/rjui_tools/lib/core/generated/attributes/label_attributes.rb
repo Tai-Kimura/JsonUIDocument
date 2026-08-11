@@ -14,8 +14,10 @@ module JsonUI
       # contract together with `rows` / `declared?` / `alias_map`
       # (see the directory README).
       ATTRS = [
-        # Enable auto-shrink
+        # Enable auto-shrink. Active only on a bounded axis (explicit size, matchParent, or a max bound) — a no-op under wrapContent, which grows to the content and leaves nothing to shrink into. Full ruling in attribute_semantics.json -> autoShrink.
         { name: 'autoShrink', kind: :boolean }.freeze,
+        # Font color when disabled - hex string or color name from colors.json (binding supported). Declared from the implementation, which already read it: sjui label_converter.rb:179-180 (plan 51-E).
+        { name: 'disabledFontColor', kind: :string, bindable: true }.freeze,
         # Edge insets as array or pipe-separated string. Applied on every platform including Compose, where it maps to .padding() (kjui text_component.rb / DynamicTextComponent.kt) - the former "Compose Text has no edgeInset" deprecation was contradicted by that implementation and was retracted 2026-08-05. [accepts: array | string]
         { name: 'edgeInset', kind: :raw }.freeze,
         # Font weight name (regular/medium/semibold/bold/...) or font name. Passed as the `weight` field of `FontSpec` to `Configuration.Font.fontProvider`. Can be a data binding.
@@ -58,7 +60,7 @@ module JsonUI
         { name: 'placeholder', kind: :string }.freeze,
         # Selected state (binding supported). Decides which attribute set is in force: while true the label renders with 'highlightAttributes' (or 'highlightColor'), otherwise with its base font and colour.
         { name: 'selected', kind: :boolean, bindable: true }.freeze,
-        # Strikethrough styling (boolean for simple, object for styled) [accepts: boolean | object]
+        # Strikethrough styling: boolean for a plain line, object to style it. Same contract as Label.underline, minus lineOffset, which strikethrough does not declare and must not invent. `lineStyle: "None"` draws nothing, exactly like `false`. Full ruling in attribute_semantics.json -> textDecoration; do not restate it in toolchain comments. [accepts: boolean | object]
         { name: 'strikethrough', kind: :raw }.freeze,
         # Text content (can be data binding, supports interpolation). PLAIN TEXT: markdown is not interpreted, so "[label](/path)", "**bold**" and backticks render literally, brackets and all. To emphasise or link part of the string, use partialAttributes ('range' plus font/color/underline, and 'onclick' for a tappable span). Rendering real markdown is out of scope for Label — write a custom component.
         { name: 'text', kind: :string, bindable: true }.freeze,
@@ -68,7 +70,7 @@ module JsonUI
         { name: 'textShadow', kind: :raw }.freeze,
         # Text transformation
         { name: 'textTransform', kind: :enum, values: ['none', 'capitalize', 'uppercase', 'lowercase'].freeze }.freeze,
-        # Underline styling (boolean for simple, object for styled) [accepts: boolean | object | array]
+        # Underline styling: boolean for a plain line, object to style it. The object face must never draw LESS than `true` does — a platform that cannot honour lineStyle or color still draws the plain Single line in the text colour. `lineStyle: "None"` is the one object value that draws nothing, exactly like `false`. Full ruling in attribute_semantics.json -> textDecoration; do not restate it in toolchain comments. [accepts: boolean | object | array]
         { name: 'underline', kind: :raw }.freeze,
       ].freeze
 

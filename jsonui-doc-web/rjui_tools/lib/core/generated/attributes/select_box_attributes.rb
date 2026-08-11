@@ -24,8 +24,8 @@ module JsonUI
         { name: 'datePickerMode', kind: :enum, values: ['date', 'time', 'datetime', 'dateAndTime', 'countDown'].freeze }.freeze,
         # Date picker style
         { name: 'datePickerStyle', kind: :enum, values: ['automatic', 'wheel', 'wheels', 'compact', 'graphical', 'inline'].freeze }.freeze,
-        # Date string format
-        { name: 'dateStringFormat', kind: :string }.freeze,
+        # Date string format. `dateFormat` folds here (sjui selectbox_converter.rb:132 reads `dateFormat || dateStringFormat`).
+        { name: 'dateStringFormat', kind: :string, aliases: ['dateFormat'].freeze }.freeze,
         # Divider styling attributes
         { name: 'dividerAttributes', kind: :object }.freeze,
         # Font name
@@ -66,7 +66,7 @@ module JsonUI
         { name: 'referenceView', kind: :string }.freeze,
         # Select item type
         { name: 'selectItemType', kind: :enum, values: ['Normal', 'Date'].freeze }.freeze,
-        # Initial selected date (yyyy-MM-dd format, two-way binding)
+        # Initial selected date (yyyy-MM-dd format, two-way binding). No `default`: when it is absent no initial selection has been stated, and the closed face shows the prompt / hint / placeholder rather than today's date. Full ruling in attribute_semantics.json -> selectBoxDate.
         { name: 'selectedDate', kind: :string, bindable: true }.freeze,
         # Initial selected index for normal picker (two-way binding) [binding: two-way]
         { name: 'selectedIndex', kind: :number, bindable: true }.freeze,

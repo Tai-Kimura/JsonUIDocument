@@ -15,11 +15,11 @@ module JsonUI
       # contract together with `rows` / `declared?` / `alias_map`
       # (see the directory README).
       ATTRS = [
-        # Maximum value (binding supported). `maxValue` / `maximumValue` are accepted alias spellings.
+        # Maximum value (binding supported). `maxValue` / `maximumValue` are accepted alias spellings. Defaults to 1: with no bounds declared the range is 0 .. 1, this SSoT's convention for a unitless value on a track (compare Progress.progress and opacity, both declared min 0 / max 1). Full ruling in attribute_semantics.json -> sliderRange. [default: 1]
         { name: 'maximum', kind: :number, bindable: true, aliases: ['maximumValue', 'maxValue'].freeze }.freeze,
         # Image at maximum end
         { name: 'maximumValueImage', kind: :string }.freeze,
-        # Minimum value (binding supported). `minValue` / `minimumValue` are accepted alias spellings.
+        # Minimum value (binding supported). `minValue` / `minimumValue` are accepted alias spellings. Defaults to 0: with no bounds declared the range is 0 .. 1, this SSoT's convention for a unitless value on a track (compare Progress.progress and opacity, both declared min 0 / max 1). Full ruling in attribute_semantics.json -> sliderRange. [default: 0]
         { name: 'minimum', kind: :number, bindable: true, aliases: ['minimumValue', 'minValue'].freeze }.freeze,
         # Image at minimum end
         { name: 'minimumValueImage', kind: :string }.freeze,
@@ -27,6 +27,8 @@ module JsonUI
         { name: 'onValueChange', kind: :binding, aliases: ['onValueChanged'].freeze }.freeze,
         # Colour of the filled portion of the track - hex string or color name from colors.json. Was declared deprecated on swift ("SwiftUI Slider uses unified tint only"); retracted 2026-08-05 because Progress, also SwiftUI, maps the same attribute to .tint(). Unimplemented on the Slider path, not impossible.
         { name: 'progressTintColor', kind: :string }.freeze,
+        # Both bounds at once, as [minimum, maximum] — a shorthand for declaring `minimum` and `maximum` separately. It is NOT an alias: one spelling carries two values, so the normalizer cannot fold it. Read only when it is a two-element array; anything else leaves `minimum` / `maximum` to speak for themselves. Declared from the implementation, which already read it: sjui slider_converter.rb:16-19 (plan 51-E).
+        { name: 'range', kind: :array }.freeze,
         # Step increment value
         { name: 'step', kind: :number }.freeze,
         # Tint color - hex string or color name from colors.json

@@ -14,8 +14,8 @@ module JsonUI
       # contract together with `rows` / `declared?` / `alias_map`
       # (see the directory README).
       ATTRS = [
-        # Seeds the group's INITIAL selection — it is not the live state, and it is not two-way. The state a radio group carries is `selectedValue`; `checked` only says which option starts selected when nothing else has said. Precedence, and all three platforms implement it in this order: a BOUND `selectedValue` wins outright (the group's own two-way state), then a LITERAL `selectedValue` (a group-level statement naming the starting option), then this option's `checked`. So a radio group that binds selectedValue ignores `checked` entirely, which is what stops a seed from freezing a group that the user can no longer change. The bound form of `checked` seeds the glyph rather than the state, since a property initialiser cannot read the data map: it selects only while the group has made no choice yet (sjui radio_converter.rb:88-103, and the same rule in RadioConverter.swift). CONTRAST with CheckBox.checked and Switch.checked, which look identical and are not: those ARE the control's state and carry binding_direction two-way. A radio has no state of its own — the group does. Declared 2026-08-05 (plan 49-E) from the implementations; the previous description said only "Initial checked state", which was true and told nobody what happens when both are declared.
-        { name: 'checked', kind: :boolean, bindable: true }.freeze,
+        # Seeds the group's INITIAL selection — it is not the live state, and it is not two-way. The state a radio group carries is `selectedValue`; `checked` only says which option starts selected when nothing else has said. Precedence, and all three platforms implement it in this order: a BOUND `selectedValue` wins outright (the group's own two-way state), then a LITERAL `selectedValue` (a group-level statement naming the starting option), then this option's `checked`. So a radio group that binds selectedValue ignores `checked` entirely, which is what stops a seed from freezing a group that the user can no longer change. The bound form of `checked` seeds the glyph rather than the state, since a property initialiser cannot read the data map: it selects only while the group has made no choice yet (sjui radio_converter.rb:88-103, and the same rule in RadioConverter.swift). CONTRAST with CheckBox.checked and Switch.checked, which look identical and are not: those ARE the control's state and carry binding_direction two-way. A radio has no state of its own — the group does. Declared 2026-08-05 (plan 49-E) from the implementations; the previous description said only "Initial checked state", which was true and told nobody what happens when both are declared. `isOn` folds here (sjui radio_converter.rb:88,102 read both the literal and the bound form as `checked || isOn`).
+        { name: 'checked', kind: :boolean, bindable: true, aliases: ['isOn'].freeze }.freeze,
         # Color when checked.
         { name: 'checkedColor', kind: :color }.freeze,
         # Font name (binding supported)
@@ -32,6 +32,8 @@ module JsonUI
         { name: 'iconColor', kind: :color }.freeze,
         # Icon size (pt / dp).
         { name: 'iconSize', kind: :number }.freeze,
+        # List of items for normal picker (can be template variable). Declared from the implementation, which already read it: sjui radio_converter.rb:13 — the option list a radio GROUP renders; with it the converter emits a group, without it a single radio (plan 51-E).
+        { name: 'items', kind: :array, bindable: true }.freeze,
         # Radio label (can be data binding)
         { name: 'label', kind: :string, bindable: true }.freeze,
         # Value change handler - binding only (@{functionName})

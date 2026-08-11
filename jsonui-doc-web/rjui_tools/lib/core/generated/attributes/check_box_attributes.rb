@@ -17,8 +17,8 @@ module JsonUI
       ATTRS = [
         # Checked state alias (binding for two-way) [binding: two-way]
         { name: 'checked', kind: :boolean, bindable: true }.freeze,
-        # Color when checked.
-        { name: 'checkedColor', kind: :color }.freeze,
+        # Color when checked. Legacy accent spellings fold here (sjui checkbox_converter.rb:98 and kjui checkbox_component.rb:211 both read the same four spellings for this one colour). `tintColor` is deliberately NOT in the alias list: it is already declared on `common`, and an alias that is also a declared row is a silent no-op (test_no_alias_is_cancelled_by_a_declaration_of_its_own_name). On a CheckBox the common tint IS the checked colour - that is what both converters implement - so it needs no alias row. Declaring the other two also settles a live divergence: ios reads `checkedColor` first, android reads `checkColor` first, so a layout setting both drew two different colours until the normalizer began folding them (plan 51-E).
+        { name: 'checkedColor', kind: :color, aliases: ['checkColor', 'onTintColor'].freeze }.freeze,
         # Whether enabled (can be data binding)
         { name: 'enabled', kind: :boolean, bindable: true }.freeze,
         # Font name (binding supported)
@@ -27,6 +27,8 @@ module JsonUI
         { name: 'fontColor', kind: :string, bindable: true }.freeze,
         # Font size (binding supported)
         { name: 'fontSize', kind: :number, bindable: true }.freeze,
+        # Font weight (e.g., 'bold', 'semibold', '500', 600). Canonical name matches Label and Button; the legacy `fontStyle` spelling folds here. Declared from the implementation, which already read it: sjui checkbox_converter.rb:74-76, which reads `fontStyle` and emits `fontWeight:` (plan 51-E). [accepts: string | number]
+        { name: 'fontWeight', kind: :raw, aliases: ['fontStyle'].freeze }.freeze,
         # Icon name for unchecked state
         { name: 'icon', kind: :string }.freeze,
         # Icon tint color.
@@ -37,8 +39,8 @@ module JsonUI
         { name: 'isOn', kind: :boolean, bindable: true }.freeze,
         # Checkbox label (can be data binding)
         { name: 'label', kind: :string, bindable: true }.freeze,
-        # Value change handler - binding only (@{functionName})
-        { name: 'onValueChange', kind: :binding }.freeze,
+        # Value change handler - binding only (@{functionName}). Legacy handler spellings fold here (sjui checkbox_converter.rb:122 reads `onValueChange || onClick || action || onValueChanged`; `onClick` stays common).
+        { name: 'onValueChange', kind: :binding, aliases: ['action', 'onValueChanged'].freeze }.freeze,
         # Selected icon name
         { name: 'selectedIcon', kind: :string, aliases: ['onSrc'].freeze }.freeze,
         # Space between icon and text (binding supported)

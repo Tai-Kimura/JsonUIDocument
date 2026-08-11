@@ -45,15 +45,15 @@
   "canonicalCode": "{\n  \"type\": \"IconLabel\",\n  \"text\": \"@string/favorite\",\n  \"icon_off\": \"star_outline\",\n  \"icon_on\": \"star_filled\",\n  \"selected\": \"@{isFavorite}\",\n  \"fontSize\": 14\n}",
   "canonicalLanguage": "json",
   "statRequired": "0",
-  "statOptional": "11",
+  "statOptional": "12",
   "statEvents": "0",
   "statRequiredText": {
     "en": "0 required",
     "ja": "必須 0"
   },
   "statOptionalText": {
-    "en": "11 optional",
-    "ja": "任意 11"
+    "en": "12 optional",
+    "ja": "任意 12"
   },
   "statEventsText": {
     "en": "0 events",
@@ -166,7 +166,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "gone",
               "typeChips": {
                 "sections": [
@@ -203,7 +203,14 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "isOn",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
@@ -310,6 +317,73 @@
                 "ja": ""
               },
               "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_iconSize",
+              "name": "iconSize",
+              "anchorId": "attr-iconSize",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Icon size. A number sizes both edges; a two-element [width, height] sizes them separately (rjui icon_label_converter.rb:130-138 reads both, and its spec covers both). NOT the same shape as CheckBox.iconSize, which is a square glyph and takes a number only. sjui icon_label_converter.rb:50-51 interpolates the value straight into `iconSize:`, so the array form is web-only today — declared here because the attribute's value space is a property of the attribute, not of whichever face lags (plan 51-E).",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number | array",
               "required": ""
             },
             {
@@ -1191,7 +1265,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "gone",
               "typeChips": {
                 "sections": [
@@ -1228,7 +1302,14 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "isOn",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
@@ -1335,6 +1416,73 @@
                 "ja": ""
               },
               "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_iconSize",
+              "name": "iconSize",
+              "anchorId": "attr-iconSize",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Icon size. A number sizes both edges; a two-element [width, height] sizes them separately (rjui icon_label_converter.rb:130-138 reads both, and its spec covers both). NOT the same shape as CheckBox.iconSize, which is a square glyph and takes a number only. sjui icon_label_converter.rb:50-51 interpolates the value straight into `iconSize:`, so the array form is web-only today — declared here because the attribute's value space is a property of the attribute, not of whichever face lags (plan 51-E).",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number | array",
               "required": ""
             },
             {

@@ -34,12 +34,14 @@ module JsonUI
         { name: 'loadingImage', kind: :string }.freeze,
         # Placeholder image name (alias for hint)
         { name: 'placeholder', kind: :string }.freeze,
+        # Rendering mode. Declared from the implementation, which already read it: sjui network_image_converter.rb:67-68 (plan 51-E).
+        { name: 'renderingMode', kind: :enum, values: ['original', 'template'].freeze }.freeze,
         # Image URL (can be data binding)
         { name: 'src', kind: :string, bindable: true }.freeze,
         # Download timeout in seconds
         { name: 'timeout', kind: :number }.freeze,
-        # Image URL (alias, can be data binding)
-        { name: 'url', kind: :string, bindable: true }.freeze,
+        # Image URL (alias, can be data binding). `source` folds here (sjui network_image_converter.rb:14 reads `url || source || src`).
+        { name: 'url', kind: :string, bindable: true, aliases: ['source'].freeze }.freeze,
       ].freeze
 
       # Returns a Hash keyed by canonical attribute name.

@@ -20,12 +20,14 @@ interface NextReadCell {
   onNavigate: () => void;
 }
 
-// 41 tools across 6 groups: A (Lookup) → B (Validation) → C (Generation)
+// 44 tools across 6 groups: A (Lookup) → B (Validation) → C (Generation)
 // → D (Build + Runtime) → E (API Model Discovery, added 2026-05)
 // → F (Test Tooling, added 2026-07; artifacts tools added 2026-07-16).
+// search_specs + get_platform_rules added in MCP 2.8.0 (2026-08).
 const TOOL_IDS = [
-  "get_project_config", "list_screen_specs", "list_layouts", "list_component_specs",
-  "lookup_component", "lookup_attribute", "search_components", "get_data_source",
+  "get_project_config", "list_screen_specs", "search_specs", "list_layouts",
+  "list_component_specs", "lookup_component", "lookup_attribute",
+  "search_components", "get_platform_rules", "get_data_source",
 
   "doc_validate_spec", "doc_validate_component", "doc_rules_init", "doc_rules_show",
   "jui_verify", "get_binding_rules", "get_screen_identity",

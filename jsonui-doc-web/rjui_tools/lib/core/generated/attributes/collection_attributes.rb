@@ -18,8 +18,12 @@ module JsonUI
         { name: 'autoChangeTrackingId', kind: :boolean }.freeze,
         # Cell class definitions
         { name: 'cellClasses', kind: :array }.freeze,
+        # Fixed height for every cell, in pt / dp / px. Applied to the cell view AFTER it is built, so it overrides whatever height the cell layout asked for; leave it out to let each cell size itself. Declared from the implementation, which already read it: sjui collection_converter.rb:260,286,318,402 (plan 51-E).
+        { name: 'cellHeight', kind: :number }.freeze,
         # Cell data property key to use as unique ID for ForEach identity. When set, scrollTo uses String type instead of Int.
         { name: 'cellIdProperty', kind: :string }.freeze,
+        # Fixed width for every cell, in pt / dp / px. Applied to the cell view AFTER it is built, so it overrides whatever width the cell layout asked for; leave it out to let each cell size itself. Declared from the implementation, which already read it: sjui collection_converter.rb:256,282,315,650 (plan 51-E).
+        { name: 'cellWidth', kind: :number }.freeze,
         # Number of columns for CSS grid
         { name: 'columnCount', kind: :number }.freeze,
         # Spacing between columns
@@ -40,6 +44,8 @@ module JsonUI
         { name: 'footerClasses', kind: :array }.freeze,
         # Header class definitions
         { name: 'headerClasses', kind: :array }.freeze,
+        # Hide the row separators a list draws between cells. A NO-OP where the container draws no separators (a grid-shaped Collection has none) — that is the contract, not an unimplemented gap, and it does not license switching the container to a List. No CODEGEN face reads it, so the coverage row is runtime-only. Full ruling in attribute_semantics.json -> collectionSeparators.
+        { name: 'hideSeparator', kind: :boolean }.freeze,
         # Enable horizontal scroll
         { name: 'horizontalScroll', kind: :boolean }.freeze,
         # Horizontal inset
@@ -60,8 +66,10 @@ module JsonUI
         { name: 'layout', kind: :enum, values: ['vertical', 'horizontal', 'flow', 'Flow', 'LeftAligned', 'leftAligned'].freeze }.freeze,
         # Outer container shape for the Collection (single-column section path uses CollectionStackView/CollectionStack). Accepts: 'lazy' (default) -> ScrollView+LazyVStack/LazyHStack on iOS, LazyColumn/LazyRow on Android, with virtualized cell rendering. 'eager' -> ScrollView+VStack/HStack on iOS, Column(verticalScroll)/Row(horizontalScroll) on Android — no virtualization, smooth scrolling for heavy cells (markdown / images / attributed text) that suffer from LazyVStack re-evaluation. 'none' -> VStack/HStack only, no scroll container, parent must already be scrollable. Bindings (@{prop}) are resolved at runtime via the wrapper's mode parameter so toggles preserve view identity. Sticky headers and paging require 'lazy'. [default: lazy]
         { name: 'lazy', kind: :enum, bindable: true, values: ['lazy', 'eager', 'none'].freeze }.freeze,
-        # Spacing between rows
-        { name: 'lineSpacing', kind: :number }.freeze,
+        # Spacing between rows. `sectionSpacing` folds here (sjui collection_converter.rb:799,960 read `sectionSpacing || lineSpacing || 8`).
+        { name: 'lineSpacing', kind: :number, aliases: ['sectionSpacing'].freeze }.freeze,
+        # Which list chrome the collection is drawn with. Enumerated from the only implementation that reads it (SwiftJsonUI TableConverter.applyListStyle); an unrecognised value falls back to plain. ORTHOGONAL to hideSeparator — that one hides the separators, this one picks the chrome, and neither overrides the other. No CODEGEN face reads it, so the coverage row is runtime-only: sjui collection_converter.rb:213 hardcodes PlainListStyle instead. Full ruling in attribute_semantics.json -> collectionSeparators. [default: plain]
+        { name: 'listStyle', kind: :enum, values: ['plain', 'grouped', 'insetGrouped', 'sidebar'].freeze }.freeze,
         # Called with the cell index (Int) when a cell appears on screen. Use for pagination by checking index against total count in ViewModel. Declared `binding` because that is what a layout actually carries: the author writes `@{handlerName}`, a STRING, and every reader matches it as one (kjui collection_component.rb:364 `json_data['onItemAppear'].match(/@\{([^}]+)\}/)`, and the binding validators infer `((Int) -> Unit)?` from that spelling). It was `type: "callback"` — the only callback-typed attribute in the whole SSoT — and attr-codegen skips that type as "function-valued, not extractable from JSON". True of a function; not true of the `@{...}` string a JSON layout can hold, so the attribute had no row in any generated table and no platform could read it typed (2026-08-05, plan 49-E, raised by A).
         { name: 'onItemAppear', kind: :string, bindable: true }.freeze,
         # Collection page/selection change handler. Canonical; prefer over onPageChanged. [binding: one-way]
