@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 // render time; we only override title + description so the site-wide
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
-  title: `ReactJsonUI — JsonUI`,
-  description: `The web target. rjui is the CLI, Next.js App Router is the default host (since jsonui-cli 1.6.7 a web_framework adapter in rjui.config.json can retarget the…`,
+  title: `Web framework adapters — JsonUI`,
+  description: `Since jsonui-cli 1.6.7, every web-framework-specific string rjui emits — the RSC directive, the Link component wiring, the router import, hook and type — is…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

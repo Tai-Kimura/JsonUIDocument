@@ -1,0 +1,271 @@
+{
+  "type": "View",
+  "id": "guides_web_framework_adapters_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks", "class": "CollectionDataSource" },
+        { "name": "onNavigateGuides", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "guides_web_framework_adapters_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "guides_web_framework_adapters_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 24, 32],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateGuides}",
+              "text": "breadcrumb"
+            },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 36, "fontWeight": "bold", "fontColor": "#0B1220", "text": "title" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 17, "fontColor": "#475467", "text": "lead" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 13, "fontColor": "#64748B", "text": "read_time" }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "guides_web_framework_adapters_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "guides_web_framework_adapters_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_seam",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_seam_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_seam_body" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_config",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_config_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_config_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "// built-in adapter by name (or omit the key entirely — same thing)\n\"web_framework\": \"next\"\n\n// custom adapter, declared inline — no tool changes, no Ruby\n\"web_framework\": {\n  \"name\": \"remix\",\n  \"link_import_line\": \"import { Link } from '@remix-run/react';\",\n  \"link_href_attribute\": \"to\"\n}",
+                      "language": "json",
+                      "filename": "rjui.config.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_keys",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_keys_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_keys_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "key                    | default          | controls\n-----------------------+------------------+------------------------------------------\nuse_client_directive   | \"\" (none)        | the directive atop client components\nlink_import_line       | \"\" (no import)   | how the Link component is imported\nlink_href_attribute    | \"href\"           | the Link attribute holding the target URL\nrouter_hook_import     | \"\" (no import)   | how the router hook is imported\nrouter_hook_statement  | \"\" (no line)     | the statement that reads the router\nrouter_type_import     | \"\" (no import)   | the import backing the router type\nrouter_type            | \"any\"            | the router's TypeScript type\nrouter_type_jsdoc      | -> router_type   | the JSDoc spelling for JS projects",
+                      "language": "text",
+                      "filename": "adapter keys",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_behavior",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_behavior_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_behavior_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "text": "section_behavior_bullet_empty" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_behavior_bullet_jsdoc" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_behavior_bullet_unknown" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_behavior_bullet_nonstring" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_examples",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_examples_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_examples_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "\"web_framework\": {\n  \"name\": \"remix\",\n  \"use_client_directive\": \"\",\n  \"link_import_line\": \"import { Link } from '@remix-run/react';\",\n  \"link_href_attribute\": \"to\",\n  \"router_hook_import\": \"import { useNavigate } from '@remix-run/react';\",\n  \"router_hook_statement\": \"const router = useNavigate();\",\n  \"router_type_import\": \"import { NavigateFunction } from 'react-router-dom';\",\n  \"router_type\": \"NavigateFunction\",\n  \"router_type_jsdoc\": \"import('react-router-dom').NavigateFunction\"\n}",
+                      "language": "json",
+                      "filename": "rjui.config.json — Remix",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "\"web_framework\": {\n  \"name\": \"tanstack-start\",\n  \"link_import_line\": \"import { Link } from '@tanstack/react-router';\",\n  \"link_href_attribute\": \"to\",\n  \"router_hook_import\": \"import { useNavigate } from '@tanstack/react-router';\",\n  \"router_hook_statement\": \"const router = useNavigate();\"\n}",
+                      "language": "json",
+                      "filename": "rjui.config.json — TanStack Start (minimal)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_templates",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_templates_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_templates_body" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_web_framework_adapters_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [32, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 24, "fontWeight": "bold", "fontColor": "chrome_ink", "text": "next_heading" },
+                    {
+                      "type": "Collection",
+                      "id": "guides_web_framework_adapters_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 3,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/next_step_card" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_web_framework_adapters_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 12, "fontColor": "#94A3B8", "text": "footer_copyright" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "guides_web_framework_adapters_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [24, 16, 24, 16],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_web_framework_adapters_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 0, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        { "id": "toc_seam", "label": "toc_row_seam", "anchor": "section_seam", "level": 1 },
+                        { "id": "toc_config", "label": "toc_row_config", "anchor": "section_config", "level": 1 },
+                        { "id": "toc_keys", "label": "toc_row_keys", "anchor": "section_keys", "level": 1 },
+                        { "id": "toc_behavior", "label": "toc_row_behavior", "anchor": "section_behavior", "level": 1 },
+                        { "id": "toc_examples", "label": "toc_row_examples", "anchor": "section_examples", "level": 1 },
+                        { "id": "toc_templates", "label": "toc_row_templates", "anchor": "section_templates", "level": 1 }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

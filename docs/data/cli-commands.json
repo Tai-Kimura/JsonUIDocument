@@ -1577,22 +1577,46 @@
       "command": "init",
       "synopsis": "rjui init",
       "purpose": {
-        "en": "Add the ReactJsonUI extension to the current Next.js project. Creates rjui.config.json.",
-        "ja": "現在の Next.js プロジェクトに ReactJsonUI 拡張を追加。rjui.config.json を作成。"
+        "en": "Initialize ReactJsonUI in the current web project. Creates rjui.config.json — where `web_framework` selects the target framework (Next.js by default; a custom adapter object retargets any React-family framework).",
+        "ja": "現在の web プロジェクトに ReactJsonUI を初期化。rjui.config.json を作成 — その `web_framework` がターゲットフレームワークを選びます（既定は Next.js。カスタムアダプタオブジェクトで任意の React 系フレームワークへ向け替え可能）。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": []
+    },
+    {
+      "binary": "rjui",
+      "command": "build",
+      "synopsis": "rjui build",
+      "purpose": {
+        "en": "Build React components from JSON layouts. Day to day this runs as part of `jui build --web-only` rather than directly.",
+        "ja": "JSON レイアウトから React コンポーネントをビルド。日常的には直接ではなく `jui build --web-only` の一部として実行されます。"
       },
       "options": [],
       "examples": [],
       "seeAlso": [
-        "rjui setup"
+        "jui build"
       ]
     },
     {
       "binary": "rjui",
-      "command": "setup",
-      "synopsis": "rjui setup",
+      "command": "watch",
+      "synopsis": "rjui watch",
       "purpose": {
-        "en": "Configure Tailwind CSS and integrate ReactJsonUI runtime.",
-        "ja": "Tailwind CSS を設定し、ReactJsonUI ランタイムを統合。"
+        "en": "Watch JSON files and auto-rebuild on changes.",
+        "ja": "JSON ファイルを監視し、変更時に自動リビルド。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": []
+    },
+    {
+      "binary": "rjui",
+      "command": "hotload",
+      "synopsis": "rjui hotload [listen|stop|status]",
+      "purpose": {
+        "en": "HotLoader control (listen / stop / status). A bare `rjui hotload` defaults to listen.",
+        "ja": "HotLoader の制御（listen / stop / status）。引数なしの `rjui hotload` は listen になります。"
       },
       "options": [],
       "examples": [],
@@ -1606,20 +1630,8 @@
       ],
       "synopsis": "rjui generate <type> <name>",
       "purpose": {
-        "en": "Scaffold a page / component / cell / viewmodel.",
-        "ja": "page / component / cell / viewmodel の scaffold を生成。"
-      },
-      "options": [],
-      "examples": [],
-      "seeAlso": []
-    },
-    {
-      "binary": "rjui",
-      "command": "dev",
-      "synopsis": "rjui dev",
-      "purpose": {
-        "en": "Start the Next.js dev server alongside rjui file watcher. Combines `next dev` with JsonUI HMR.",
-        "ja": "Next.js dev サーバーと rjui ファイル監視を同時起動。`next dev` と JsonUI HMR を組合わせる。"
+        "en": "Scaffold a view / component / collection cell / converter (short forms: v / c / col / conv).",
+        "ja": "view / component / collection セル / converter の scaffold を生成（短縮形: v / c / col / conv）。"
       },
       "options": [],
       "examples": [],

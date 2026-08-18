@@ -1193,8 +1193,8 @@
       "ja": "ReactJsonUI"
     },
     "article_react_description": {
-      "en": "Web. Next.js App Router. rjui_tools CLI. The generator that builds this very documentation site.",
-      "ja": "Web 向け。Next.js App Router。rjui_tools CLI。このドキュメントサイトを生成している generator そのもの。"
+      "en": "Web. React with Next.js App Router as the default host — a web_framework adapter in rjui.config.json retargets the emit to other React-family frameworks. rjui_tools CLI. The generator that builds this very documentation site.",
+      "ja": "Web 向け。既定ホストは Next.js App Router — rjui.config.json の web_framework アダプタで他の React 系フレームワークにも向け替え可能。rjui_tools CLI。このドキュメントサイトを生成している generator そのもの。"
     },
     "article_react_read_time": {
       "en": "~12 min read",
@@ -2835,6 +2835,148 @@
       "ja": "1 つの Layout JSON が 3 つのネイティブ UI を生む — API model 側も同じく 1 つの OpenAPI schema を 3 プラットフォームで共有します。"
     }
   },
+  "guides_web_framework_adapters": {
+    "breadcrumb": {
+      "en": "Guides",
+      "ja": "ガイド"
+    },
+    "title": {
+      "en": "Web framework adapters",
+      "ja": "Web フレームワークアダプタ"
+    },
+    "lead": {
+      "en": "Since jsonui-cli 1.6.7, every web-framework-specific string rjui emits — the RSC directive, the Link component wiring, the router import, hook and type — is resolved through an adapter selected by `web_framework` in rjui.config.json. The default is the built-in Next.js adapter, whose output is the historical emit byte for byte. Declaring a custom adapter object retargets the same Layout JSON to any React-family framework — Remix, TanStack Start, and friends — without touching the tool.",
+      "ja": "jsonui-cli 1.6.7 から、rjui が emit する web フレームワーク固有の文字列すべて — RSC directive、Link コンポーネントの配線、router の import・hook・型 — は rjui.config.json の `web_framework` で選ばれるアダプタ経由で解決されます。既定はビルトインの Next.js アダプタで、その出力は従来の emit とバイト一致。カスタムアダプタオブジェクトを宣言すれば、同じ Layout JSON を Remix / TanStack Start などの任意の React 系フレームワークへ、ツールを触らずに向け替えられます。"
+    },
+    "read_time": {
+      "en": "6 min read",
+      "ja": "6 分で読めます"
+    },
+    "section_seam_heading": {
+      "en": "1. What the seam covers",
+      "ja": "1. seam が覆う範囲"
+    },
+    "section_seam_body": {
+      "en": "Emitters are framework-neutral: whenever generated code needs a framework string, it asks the adapter. Five surfaces flow through it — the `\"use client\"` directive at the top of client components, the Link import line, the attribute name Link takes for its destination (`href` vs `to`), the router hook (import + the statement that reads it), and the router type (import + type name, with a JSDoc spelling for JavaScript projects). Templates copied verbatim into your tree (NetworkImage, useColorMode) pass through the same directive rewrite, so a framework with no RSC directive gets clean files with no leftover blank line.",
+      "ja": "emitter はフレームワーク中立です: 生成コードがフレームワーク固有文字列を必要とする箇所は、すべてアダプタに問い合わせます。通る面は 5 つ — client コンポーネント先頭の `\"use client\"` directive、Link の import 行、Link が遷移先に取る属性名（`href` か `to` か）、router hook（import と読み出し文）、router の型（import と型名。JavaScript プロジェクト向けの JSDoc 綴りも）。ツリーへそのままコピーされるテンプレート（NetworkImage / useColorMode）も同じ directive 書き換えを通るため、RSC directive を持たないフレームワークでも空行の残骸なしのファイルになります。"
+    },
+    "section_config_heading": {
+      "en": "2. The two forms of web_framework",
+      "ja": "2. web_framework の 2 形態"
+    },
+    "section_config_body": {
+      "en": "`web_framework` accepts a built-in adapter name as a string, or an inline object declaring a custom adapter. Omitting the key entirely selects `\"next\"`. An unknown name string fails the build with the list of built-ins — it never falls back silently. Switching adapters is a regenerate away in either direction: retargeting back to `\"next\"` restores the historical output byte for byte, directive included.",
+      "ja": "`web_framework` は、ビルトインアダプタ名の文字列か、カスタムアダプタを宣言するインラインオブジェクトを取ります。キー自体を省略すると `\"next\"`。未知の名前文字列はビルトイン一覧付きでビルドエラーになり、黙ってフォールバックすることはありません。アダプタの切替はどちら向きでも再生成 1 回で、`\"next\"` へ戻せば directive 含め従来出力にバイト一致で復元されます。"
+    },
+    "section_keys_heading": {
+      "en": "3. The eight adapter keys and their defaults",
+      "ja": "3. アダプタキー全 8 種と既定値"
+    },
+    "section_keys_body": {
+      "en": "Every key is optional and every value is a string. The defaults are deliberately neutral — no directive, no imports, a plain `<Link href>`, an untyped router — so a minimal adapter declares only what its framework actually needs. `name` may also be declared (informational only; defaults to `custom`).",
+      "ja": "全キー任意・値はすべて文字列です。既定値は意図的に中立 — directive なし・import なし・素の `<Link href>`・型なし router — なので、最小のアダプタは自分のフレームワークが実際に必要とするものだけを宣言すれば済みます。`name` も宣言可能です（表示用のみ。既定は `custom`）。"
+    },
+    "section_behavior_heading": {
+      "en": "4. Declaration semantics and errors",
+      "ja": "4. 宣言の意味論とエラー"
+    },
+    "section_behavior_body": {
+      "en": "The declaration rules are strict where a typo could silently corrupt output, and lenient where a framework legitimately has nothing to say:",
+      "ja": "宣言規則は「typo が出力を黙って壊し得る箇所」には厳格に、「フレームワークが正当に何も持たない箇所」には寛容にできています:"
+    },
+    "section_behavior_bullet_empty": {
+      "en": "• An empty string suppresses the whole line — an adapter with no directive or no router import leaves no blank-line residue in the emit.",
+      "ja": "• 空文字の宣言は行ごと抑制されます — directive や router import を持たないアダプタでも、emit に空行の残骸は残りません。"
+    },
+    "section_behavior_bullet_jsdoc": {
+      "en": "• `router_type_jsdoc` left undeclared falls back to `router_type` — declare it only when the JSDoc spelling differs from the TypeScript one.",
+      "ja": "• `router_type_jsdoc` を未宣言にすると `router_type` にフォールバックします — JSDoc の綴りが TypeScript と異なるときだけ宣言してください。"
+    },
+    "section_behavior_bullet_unknown": {
+      "en": "• An unknown key fails the build immediately, listing the allowed keys — a misspelled `link_import_line` can never silently become the default.",
+      "ja": "• 未知のキーは許可キー一覧付きで即ビルドエラー — `link_import_line` の綴りミスが黙って既定値になることはありません。"
+    },
+    "section_behavior_bullet_nonstring": {
+      "en": "• A non-string value (a boolean, a nested object) also fails the build, naming the offending key.",
+      "ja": "• 文字列以外の値（boolean やネストしたオブジェクト）も、該当キー名付きでビルドエラーになります。"
+    },
+    "section_examples_heading": {
+      "en": "5. Worked examples: Remix and TanStack Start",
+      "ja": "5. 実例: Remix と TanStack Start"
+    },
+    "section_examples_body": {
+      "en": "The Remix adapter below is the reference example the seam ships with — it exercises every key, including an empty directive and a JSDoc spelling. The TanStack Start one shows the minimal style: declare the Link and router wiring, let everything else fall back (no directive, router typed `any`), and tighten `router_type` / `router_type_import` later once you settle on the exact type.",
+      "ja": "下の Remix アダプタは seam に同梱されている参照例で、空 directive と JSDoc 綴りを含む全キーを使います。TanStack Start の例は最小スタイル — Link と router の配線だけ宣言して残りはフォールバックに任せ（directive なし・router は `any`）、使う型が固まったら `router_type` / `router_type_import` を後から絞る書き方です。"
+    },
+    "section_templates_heading": {
+      "en": "6. Template files follow the directive",
+      "ja": "6. テンプレートも directive に追従"
+    },
+    "section_templates_body": {
+      "en": "NetworkImage and useColorMode are authored in the Next dialect and copied into your tree at build time. The copy passes through the adapter's directive rewrite: with the Next adapter the files are unchanged; with an empty `use_client_directive` the directive line and its trailing blank are dropped; with a different non-empty directive it is replaced in place. You never edit the templates to retarget them.",
+      "ja": "NetworkImage と useColorMode は Next 方言で書かれており、ビルド時にツリーへコピーされます。このコピーはアダプタの directive 書き換えを通ります: Next アダプタならファイルは不変、`use_client_directive` が空なら directive 行と直後の空行が除去され、別の非空 directive なら行がその場で置換されます。向け替えのためにテンプレートを手で編集する必要はありません。"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの内容"
+    },
+    "toc_row_seam": {
+      "en": "What the seam covers",
+      "ja": "seam が覆う範囲"
+    },
+    "toc_row_config": {
+      "en": "The two forms",
+      "ja": "2 形態"
+    },
+    "toc_row_keys": {
+      "en": "The eight keys",
+      "ja": "キー全 8 種"
+    },
+    "toc_row_behavior": {
+      "en": "Semantics and errors",
+      "ja": "意味論とエラー"
+    },
+    "toc_row_examples": {
+      "en": "Remix / TanStack Start",
+      "ja": "Remix / TanStack Start"
+    },
+    "toc_row_templates": {
+      "en": "Template files",
+      "ja": "テンプレート"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_rjui_title": {
+      "en": "ReactJsonUI (web platform)",
+      "ja": "ReactJsonUI（web プラットフォーム）"
+    },
+    "next_rjui_description": {
+      "en": "The web target the adapter retargets: rjui CLI, generated TSX, Tailwind.",
+      "ja": "アダプタが向け替える web ターゲット本体 — rjui CLI・生成 TSX・Tailwind。"
+    },
+    "next_navigation_title": {
+      "en": "Navigation between screens",
+      "ja": "画面間ナビゲーション"
+    },
+    "next_navigation_description": {
+      "en": "The router contract the adapter's router keys plug into.",
+      "ja": "アダプタの router 系キーが接続する router 契約。"
+    },
+    "next_jui_config_title": {
+      "en": "jui.config.json reference",
+      "ja": "jui.config.json リファレンス"
+    },
+    "next_jui_config_description": {
+      "en": "Where web_framework lives among the rest of the project configuration.",
+      "ja": "web_framework が置かれるプロジェクト設定全体のリファレンス。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI",
+      "ja": "© 2026 JsonUI"
+    }
+  },
   "guides_writing_your_first_spec": {
     "breadcrumb": {
       "en": "← Guides",
@@ -4003,8 +4145,8 @@
       "ja": "Web"
     },
     "cli_rjui_body": {
-      "en": "ReactJsonUI builder. Generates Next.js + React + Tailwind code from Layout JSON, invoked as part of `jui build --web-only` (or plain `jui build`). Powers this documentation site: the regenerated TSX is what Next.js HMR pushes into the open browser tab when you edit a JSON file.",
-      "ja": "ReactJsonUI 用 builder。Layout JSON から Next.js + React + Tailwind のコードを生成し、`jui build --web-only`（または単なる `jui build`）の一部として呼び出されます。このドキュメントサイト自体を駆動しています: JSON を編集すると再生成された TSX が Next.js HMR 経由でブラウザタブに push されます。"
+      "en": "ReactJsonUI builder. Generates React + Tailwind code from Layout JSON — targeting Next.js by default, or any React-family framework via the web_framework adapter in rjui.config.json — invoked as part of `jui build --web-only` (or plain `jui build`). Powers this documentation site: the regenerated TSX is what Next.js HMR pushes into the open browser tab when you edit a JSON file.",
+      "ja": "ReactJsonUI 用 builder。Layout JSON から React + Tailwind のコードを生成します — 既定ターゲットは Next.js、rjui.config.json の web_framework アダプタで任意の React 系フレームワークへ向け替え可能。`jui build --web-only`（または単なる `jui build`）の一部として呼び出されます。このドキュメントサイト自体を駆動しています: JSON を編集すると再生成された TSX が Next.js HMR 経由でブラウザタブに push されます。"
     },
     "cli_jsonui_test_name": {
       "en": "jsonui-test",
@@ -5185,8 +5327,8 @@
       "ja": "ReactJsonUI"
     },
     "lead": {
-      "en": "The web target. rjui is the CLI, Next.js App Router is the host, Tailwind is the styling layer. The documentation site you are reading right now is built with rjui — if the output looked or felt off, you would not be reading it on it.",
-      "ja": "Web ターゲット。CLI は rjui、ホストは Next.js App Router、スタイリングは Tailwind。あなたが今読んでいるこのドキュメントサイト自体が rjui で作られています — 出力に違和感があれば、あなたはこのページを読んでいないはず。"
+      "en": "The web target. rjui is the CLI, Next.js App Router is the default host (since jsonui-cli 1.6.7 a web_framework adapter in rjui.config.json can retarget the emit to any React-family framework — see the Web framework adapters guide), Tailwind is the styling layer. The documentation site you are reading right now is built with rjui — if the output looked or felt off, you would not be reading it on it.",
+      "ja": "Web ターゲット。CLI は rjui、既定ホストは Next.js App Router（jsonui-cli 1.6.7 からは rjui.config.json の web_framework アダプタで任意の React 系フレームワークへ向け替え可能 — Web フレームワークアダプタのガイド参照）、スタイリングは Tailwind。あなたが今読んでいるこのドキュメントサイト自体が rjui で作られています — 出力に違和感があれば、あなたはこのページを読んでいないはず。"
     },
     "read_time": {
       "en": "~10 min read",
@@ -5221,8 +5363,8 @@
       "ja": "本番での注意点"
     },
     "section_prod_body": {
-      "en": "Generated TSX is TSX — Next.js builds it exactly like any other file. Two things to know: (1) Server Components vs Client Components is your call; rjui's default is client-side for anything touching state, which is safe but SEO-focused sites may want more Server-rendered. Flip that at the screen level by authoring a small wrapper. (2) Image assets use Next.js's Image component if imported explicitly; the default Layout output uses plain `<img>` because cross-platform consistency matters more than Next's image optimisation for most spec-driven screens. Swap per screen as needed.",
-      "ja": "生成される TSX は TSX — Next.js は他のファイルと同じようにビルドします。注意点 2 つ: (1) Server Components vs Client Components の選択はあなたの責任。rjui の既定は state に触れるものは client 側で、安全ですが SEO 重視のサイトは Server 描画を増やしたいかもしれません。画面レベルで小さなラッパを書いて切り替え可能。(2) Image asset は明示的に import すれば Next.js の Image コンポーネントを使いますが、既定の Layout 出力は素の `<img>` — spec 駆動画面では Next の画像最適化より「クロスプラットフォーム整合性」の方が優先されるため。必要に応じて画面ごとに切り替えてください。"
+      "en": "Generated TSX is TSX — Next.js builds it exactly like any other file. Two things to know: (1) Server Components vs Client Components is your call; rjui's default is client-side for anything touching state, which is safe but SEO-focused sites may want more Server-rendered. Flip that at the screen level by authoring a small wrapper. (2) Image assets use Next.js's Image component if imported explicitly; the default Layout output uses plain `<img>` because cross-platform consistency matters more than Next's image optimisation for most spec-driven screens. Swap per screen as needed. And Next itself is not a hard dependency: everything framework-specific in the emit — the directive, Link, the router import and type — flows through the web_framework adapter, so declaring a custom adapter in rjui.config.json retargets these same rules to Remix, TanStack Start, or any other React-family framework.",
+      "ja": "生成される TSX は TSX — Next.js は他のファイルと同じようにビルドします。注意点 2 つ: (1) Server Components vs Client Components の選択はあなたの責任。rjui の既定は state に触れるものは client 側で、安全ですが SEO 重視のサイトは Server 描画を増やしたいかもしれません。画面レベルで小さなラッパを書いて切り替え可能。(2) Image asset は明示的に import すれば Next.js の Image コンポーネントを使いますが、既定の Layout 出力は素の `<img>` — spec 駆動画面では Next の画像最適化より「クロスプラットフォーム整合性」の方が優先されるため。必要に応じて画面ごとに切り替えてください。なお Next 自体は必須依存ではありません: emit のフレームワーク固有部分 — directive・Link・router の import と型 — はすべて web_framework アダプタを通るため、rjui.config.json にカスタムアダプタを宣言すれば同じ規則のまま Remix / TanStack Start などへ向け替えられます。"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -6125,8 +6267,8 @@
       "ja": "3. Web router の配線 (Next.js App Router)"
     },
     "section_web_body": {
-      "en": "The Web side assumes Next.js App Router — the Data interface's onNavigate slot expects the router from next/navigation. Pattern: read useRouter() in the page.tsx, pass it into the hand-written ViewModel, implement onNavigate as router.push(url). URL is opaque to the spec; file-based routing under src/app/ does the resolution.",
-      "ja": "Web 側は Next.js App Router 前提 — Data interface の onNavigate スロットは next/navigation の router を期待します。パターン: page.tsx で useRouter() を読み、手書き ViewModel に渡し、onNavigate を router.push(url) として実装。URL は spec 視点では opaque、src/app/ 配下のファイルベースルーティングが解決を担います。"
+      "en": "By default the Web side targets Next.js App Router — the Data interface's onNavigate slot is typed with the router from next/navigation. Pattern: read useRouter() in the page.tsx, pass it into the hand-written ViewModel, implement onNavigate as router.push(url). URL is opaque to the spec; file-based routing under src/app/ does the resolution. Since jsonui-cli 1.6.7 the router import, hook and type all come from the web_framework adapter in rjui.config.json, so a Remix or TanStack Start project declares its own router wiring there and this same pattern applies with that framework's hook.",
+      "ja": "Web 側の既定ターゲットは Next.js App Router — Data interface の onNavigate スロットは next/navigation の router で型付けされます。パターン: page.tsx で useRouter() を読み、手書き ViewModel に渡し、onNavigate を router.push(url) として実装。URL は spec 視点では opaque、src/app/ 配下のファイルベースルーティングが解決を担います。jsonui-cli 1.6.7 からは router の import・hook・型はすべて rjui.config.json の web_framework アダプタ由来なので、Remix / TanStack Start のプロジェクトはそこに自前の router 配線を宣言すれば、同じパターンがそのフレームワークの hook で成立します。"
     },
     "section_ios_heading": {
       "en": "4. Wiring iOS (SwiftUI NavigationStack)",
