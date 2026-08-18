@@ -8,8 +8,8 @@
     "ja": "URL から自動ロードされる画像。キャッシュ・プレースホルダ・エラー時フォールバックを備える。"
   },
   "usage": {
-    "en": "Use NetworkImage for all user-generated or CDN-hosted images. Always provide `placeholder` or `defaultImage` — the first frame is always the placeholder.",
-    "ja": "ユーザー生成や CDN ホストの画像すべてに使う。最初のフレームは必ずプレースホルダになるため、`placeholder` または `defaultImage` を常に指定する。"
+    "en": "Use NetworkImage for all user-generated or CDN-hosted images. Always provide `placeholder` or `defaultImage` — the first frame is always the placeholder. The common attribute surface — `onClick`, `style`, `testId`, `tag` — is directly declarable since 2026-08 (web) and forwarded to the root element of every render branch (image / placeholder / loading / fallback), so the click target and test hooks survive load-state transitions; a wrapper View around the image is no longer needed for tap handling. Until then a declared `onClick` passed every generation gate but failed the consumer's TypeScript build.",
+    "ja": "ユーザー生成や CDN ホストの画像すべてに使う。最初のフレームは必ずプレースホルダになるため、`placeholder` または `defaultImage` を常に指定する。common 属性面 — `onClick`・`style`・`testId`・`tag` — は 2026-08 から（web）直宣言でき、全レンダ分岐（本画像 / プレースホルダ / ロード中 / フォールバック）のルート要素へ転送されるため、ロード状態が遷移してもクリックターゲットとテストフックが生き残ります。タップ処理のために View で包む回避策は不要です。それまでは宣言が生成ゲートを全部通るのに consumer 側の TypeScript ビルドで割れていました。"
   },
   "aliasNotice": null,
   "kicker": "Component · Reference",
@@ -1283,6 +1283,49 @@
               "id": "example_2",
               "anchorId": "example-2",
               "title": {
+                "en": "Tappable image (no wrapper View)",
+                "ja": "タップ可能な画像（View で包まない）"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{item.imageUrl}\",\n  \"placeholder\": \"image_placeholder\",\n  \"onClick\": \"@{onImageTap}\",\n  \"testId\": \"main_image\",\n  \"width\": \"matchParent\",\n  \"height\": 240\n}",
+              "note": {
+                "en": "`onClick` and `testId` ride on the image itself and keep working while the placeholder or fallback is showing — the handler and hook are forwarded to whichever branch is rendered.",
+                "ja": "`onClick` と `testId` は画像そのものに載り、プレースホルダやフォールバック表示中も効き続けます — ハンドラとフックは描画中の分岐へ転送されます。"
+              },
+              "noteVisibility": "visible",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{item.imageUrl}\",\n  \"placeholder\": \"image_placeholder\",\n  \"onClick\": \"@{onImageTap}\",\n  \"testId\": \"main_image\",\n  \"width\": \"matchParent\",\n  \"height\": 240\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{item.imageUrl}\",\n  \"placeholder\": \"image_placeholder\",\n  \"onClick\": \"@{onImageTap}\",\n  \"testId\": \"main_image\",\n  \"width\": \"matchParent\",\n  \"height\": 240\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "anchorId": "example-3",
+              "title": {
                 "en": "Full-bleed with loading state",
                 "ja": "ロード中インジケータ付きの全幅画像"
               },
@@ -1323,8 +1366,8 @@
               "required": ""
             },
             {
-              "id": "example_3",
-              "anchorId": "example-3",
+              "id": "example_4",
+              "anchorId": "example-4",
               "title": {
                 "en": "With cache policy",
                 "ja": "キャッシュポリシー指定"
