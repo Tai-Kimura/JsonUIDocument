@@ -25,6 +25,14 @@
       "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{productImageUrl}\",\n  \"cachePolicy\": \"both\",\n  \"timeout\": 10,\n  \"width\": 200,\n  \"height\": 200\n}"
     }
   ],
+  "commonAttributes": {
+    "onClick": {
+      "note": {
+        "en": "Directly declarable on NetworkImage since 2026-08 (web): the common surface — `onClick`, `style`, `testId`, `tag` — is forwarded to the root element of every render branch (image / placeholder / loading / fallback), so the click target and test hooks survive load-state transitions. Until then a declared `onClick` passed every generation gate but failed the consumer's TypeScript build; a wrapper View around the image is no longer needed for tap handling.",
+        "ja": "2026-08 から（web）NetworkImage に直宣言できます: common 面 — `onClick`・`style`・`testId`・`tag` — は全レンダ分岐（本画像 / プレースホルダ / ロード中 / フォールバック）のルート要素へ転送されるため、ロード状態が遷移してもクリックターゲットとテストフックが生き残ります。それまでは宣言が生成ゲートを全部通るのに consumer 側の TypeScript ビルドで割れていました。タップ処理のために View で包む回避策は不要になりました。"
+      }
+    }
+  },
   "attributes": {
     "url": {
       "note": {
