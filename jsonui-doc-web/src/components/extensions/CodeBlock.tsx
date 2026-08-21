@@ -284,6 +284,12 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
     "text-sm",
     "font-mono",
     "overflow-hidden",
+    // The copy button is absolutely positioned and takes 8px + 26px from the
+    // top, which is taller than a one-line block with no caption (~25px) —
+    // overflow-hidden then cut the button in half. Reserve its height plus the
+    // matching gap underneath. Blocks with a caption or several lines already
+    // clear this and are unaffected.
+    copyable !== false ? "min-h-[42px]" : "",
     className,
   ]
     .filter(Boolean)
