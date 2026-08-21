@@ -284,12 +284,6 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
     "text-sm",
     "font-mono",
     "overflow-hidden",
-    // The copy button is absolutely positioned and takes 8px + 26px from the
-    // top, which is taller than a one-line block with no caption (~25px) —
-    // overflow-hidden then cut the button in half. Reserve its height plus the
-    // matching gap underneath. Blocks with a caption or several lines already
-    // clear this and are unaffected.
-    copyable !== false ? "min-h-[42px]" : "",
     className,
   ]
     .filter(Boolean)
@@ -309,25 +303,34 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
         </div>
       ) : null}
 
-      {copyable !== false ? (
-        <button
-          type="button"
-          onClick={handleCopy}
-          aria-label={copied ? copiedLabel : copyCodeLabel}
-          className={`absolute top-2 right-2 z-10 rounded px-2 py-1 text-xs font-sans transition ${
-            effectiveTheme === "github-light"
-              ? "bg-white/80 text-slate-700 border border-slate-200 hover:bg-white"
-              : "bg-slate-800/80 text-slate-200 border border-slate-700 hover:bg-slate-700"
-          }`}
-        >
-          {copied ? copiedButton : copyButton}
-        </button>
-      ) : null}
-
+      {/* The button anchors to the code area, not to the outer frame: anchored
+          outside, `top-2` measured from the frame, so a captioned block put the
+          button astride the caption bar while an uncaptioned one put it over the
+          first line — two different places for the same control. Measured from
+          the code area it sits in the same spot either way. The min-height rides
+          here too, so a one-line block is still tall enough to contain it. */}
       <div
-        className={`jui-code-scroll ${wrapLines ? "overflow-x-hidden" : "overflow-x-auto"}`}
-        style={codeRegionStyle}
+        className={`relative ${copyable !== false ? "min-h-[42px]" : ""}`}
       >
+        {copyable !== false ? (
+          <button
+            type="button"
+            onClick={handleCopy}
+            aria-label={copied ? copiedLabel : copyCodeLabel}
+            className={`absolute top-2 right-2 z-10 rounded px-2 py-1 text-xs font-sans transition ${
+              effectiveTheme === "github-light"
+                ? "bg-white/80 text-slate-700 border border-slate-200 hover:bg-white"
+                : "bg-slate-800/80 text-slate-200 border border-slate-700 hover:bg-slate-700"
+            }`}
+          >
+            {copied ? copiedButton : copyButton}
+          </button>
+        ) : null}
+
+        <div
+          className={`jui-code-scroll ${wrapLines ? "overflow-x-hidden" : "overflow-x-auto"}`}
+          style={codeRegionStyle}
+        >
         <pre className="m-0 p-0 leading-relaxed">
           <code className={`block ${lineWrapClass}`}>
             {lines.map((rawLine, idx) => {
@@ -364,8 +367,9 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
                 </div>
               );
             })}
-          </code>
-        </pre>
+            </code>
+          </pre>
+        </div>
       </div>
 
       {loadError ? (
