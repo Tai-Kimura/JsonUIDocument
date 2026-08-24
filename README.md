@@ -8,24 +8,39 @@ Built with Next.js. The site itself is authored spec-first under `docs/screens/`
 
 - Node.js 20+
 - Ruby 3.x (for the rjui_tools build pipeline)
-- [`jsonui-cli`](https://github.com/Tai-Kimura/jsonui-cli) installed (`pip install jsonui-cli`)
+- [`jsonui-cli`](https://github.com/Tai-Kimura/jsonui-cli) installed — it is **not on PyPI**; install with the bootstrap below
+
+## Installing / updating the toolchain
+
+Both `~/.jsonui-cli` (the `jui` CLI) and `~/.jsonui-mcp-server` (the Claude Code MCP server) are installed **and updated** by the same idempotent one-liner (it resets to `origin/main`):
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-cli/main/installer/bootstrap.sh | bash
+```
+
+The default installs everything, MCP server included; narrow with `-t sjui|kjui|rjui|jui|test|doc|mcp` if needed. Prerequisites: git (plus Node.js when the MCP step runs).
+
+To update only the MCP server later: `bash ~/.jsonui-mcp-server/install.sh` (idempotent: resets to `origin/main`, `npm install`, build, registers into `~/.claude.json`).
+
+**After any MCP update, restart Claude Code completely** — a running server answers from its in-memory cache, so new tools and attributes do not appear until the restart.
+
+To check what you have against what this repo was built with: compare `~/.jsonui-cli/VERSION` with the committed `jsonui-doc-web/rjui_tools/VERSION`, and see the `JSONUI_CLI_REF` pin in `.github/workflows/deploy.yml` (CI builds from that exact commit). A local toolchain *newer* than the pin is normal — `main` may carry pre-release fixes; older means update before you build.
 
 ## First-time setup
 
-The `jsonui-doc-web/rjui_tools/` directory is **not committed** — it is synced from upstream `jsonui-cli` on each machine.
+The `jsonui-doc-web/rjui_tools/` directory **is committed** (CI rebuilds from the `JSONUI_CLI_REF` pin, so the vendored copy and the pin move together). Do not edit it by hand — it is refreshed by `jui sync_tool` when the toolchain updates.
 
 ```sh
 # 1. Clone
 git clone git@github.com:Tai-Kimura/JsonUIDocument.git
 cd JsonUIDocument
 
-# 2. Sync the build toolchain (one-time per checkout)
-jui sync_tool
-
-# 3. Install JS deps
+# 2. Install JS deps (the rjui_tools build toolchain ships committed)
 cd jsonui-doc-web
 npm install
 ```
+
+`jui sync_tool` is **not** part of setup: it copies your local `~/.jsonui-cli` into the tree, which may not match the committed pin. It is run deliberately when uptaking a new toolchain release, together with the `JSONUI_CLI_REF` bump.
 
 ## Development
 
