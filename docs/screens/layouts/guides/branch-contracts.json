@@ -257,6 +257,43 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
+                  "id": "section_android",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_android_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_android_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "$ jsonui-test generate branch-tests profile_screen \\\n    --platform android --package com.example.profile \\\n    --out-dir app/src/test/java --harness-dir app/src/test/java\nGenerated branch tests for 'profile_screen':\n  app/src/test/java/com/example/profile/ProfileScreenBranchesTest.kt  (3 declared branch(es), 1 note-only listed as comments)\n  app/src/test/java/com/example/profile/JsonuiBranchRuntime.kt  (shared runtime)\n  app/src/test/java/com/example/profile/ProfileScreenBranchHarness.kt  (NEW harness skeleton — implement createHarness())\n  routes: updateProfile",
+                      "language": "bash",
+                      "filename": "generate branch-tests --platform android — output",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "text": "section_android_bullet_design" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_android_bullet_prereqs" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "// branch 2: cond=\"formValid\" & api.updateProfile=\"success\"\n@Test fun `onTapSave branch 2`() {\n  runBranchTest(routes, mapOf<String, Any?>(\"updateProfile\" to \"success\"), ::createProfileScreenBranchHarness) { h, rec ->\n    h.setState(mapOf<String, Any?>(\"isSaving\" to false, \"form\" to mapOf<String, Any?>(\"nickname\" to \"a\")))\n    val ref_form = h.readField(\"form\")\n    h.invoke(\"onTapSave\")\n    h.settle()\n    h.expectTransition(\"HomeScreen\")\n    assertTrue(rec.countFor(\"updateProfile\") > 0)\n    assertEquals(emptyList<String>(), partialMismatches(rec.lastBodyFor(\"updateProfile\"), mapOf<String, Any?>(\"nickname\" to Ref(ref_form))))\n  }\n}",
+                      "language": "kotlin",
+                      "filename": "ProfileScreenBranchesTest.kt — branch 2 (@generated)",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
                   "id": "guides_branch_contracts_next",
                   "width": "matchParent",
                   "height": "wrapContent",
@@ -329,7 +366,8 @@
                         { "id": "toc_then", "label": "toc_row_then", "anchor": "section_then", "level": 1 },
                         { "id": "toc_validate", "label": "toc_row_validate", "anchor": "section_validate", "level": 1 },
                         { "id": "toc_render", "label": "toc_row_render", "anchor": "section_render", "level": 1 },
-                        { "id": "toc_tests", "label": "toc_row_tests", "anchor": "section_tests", "level": 1 }
+                        { "id": "toc_tests", "label": "toc_row_tests", "anchor": "section_tests", "level": 1 },
+                        { "id": "toc_android", "label": "toc_row_android", "anchor": "section_android", "level": 1 }
                       ],
                       "stickyOffset": 80
                     }

@@ -2991,8 +2991,8 @@
       "ja": "画面 spec は、各メソッドの分岐を機械検証可能な表として宣言できます。任意の `branchContracts` 節は、spec が既に宣言している名前だけの閉じた語彙で分岐を記述させます — だから `jsonui-doc validate` が検査でき、生成ドキュメントには決定表として描画され、`jsonui-test` はユニットテストを生成できます。jsonui-cli 1.6.18 から。節を書かない既存 spec には一切影響しません。"
     },
     "read_time": {
-      "en": "8 min read",
-      "ja": "8 分で読めます"
+      "en": "9 min read",
+      "ja": "9 分で読めます"
     },
     "section_what_heading": {
       "en": "1. What branch contracts are",
@@ -3085,6 +3085,26 @@
     "toc_row_tests": {
       "en": "Generating tests",
       "ja": "テスト生成"
+    },
+    "section_android_heading": {
+      "en": "9. Android (JVM) generation",
+      "ja": "9. Android（JVM）生成"
+    },
+    "section_android_body": {
+      "en": "Since jsonui-cli 1.6.20, the same declarations also generate Kotlin JUnit4 (Robolectric) tests: add `--platform android --package <pkg>`. Here --out-dir and --harness-dir point at the Kotlin test source root (for example app/src/test/java) and the package path is appended automatically. Vocabulary binding and its hard errors are identical to the web path, and --package itself is required (its absence is one more hard error). iOS is not supported yet — `--platform` accepts web and android only.",
+      "ja": "jsonui-cli 1.6.20 からは、同じ宣言から Kotlin JUnit4（Robolectric）テストも生成できます: `--platform android --package <pkg>` を足すだけです。このとき --out-dir と --harness-dir は Kotlin のテストソースルート（例: app/src/test/java）を指し、パッケージパスは自動で付加されます。語彙の束縛とその hard error は web と完全に同一で、--package 自体も必須です（欠けるとこれも hard error）。iOS は未対応 — `--platform` が受けるのは web と android だけです。"
+    },
+    "section_android_bullet_design": {
+      "en": "The HTTP boundary is MockWebServer — the real Retrofit ApiService, Repository, and kotlinx-serialization DTO decoding all run in every test, so \"the call returned 2xx but the payload was wrong\" failures land in the net. Scenario bodies are embedded into the generated file, so the test is self-contained, and the runtime ships a reflection-based BaseBranchHarness that can read and set fields, StateFlows, and data-class state generically.",
+      "ja": "HTTP 境界は MockWebServer です — 本物の Retrofit ApiService・Repository・kotlinx-serialization の DTO デコードが毎回走るので、「2xx なのに中身が違う」系の失敗が網にかかります。シナリオ本文は生成ファイルに埋め込まれるため自己完結で、ランタイムには field・StateFlow・data class の状態を汎用に読み書きする reflection ベースの BaseBranchHarness が同梱されます。"
+    },
+    "section_android_bullet_prereqs": {
+      "en": "Consumer prerequisites: test dependencies (Robolectric, MockWebServer, kotlinx-coroutines-test, kotlin-reflect), `testOptions.unitTests.isIncludeAndroidResources = true` in the module's Gradle file, and a robolectric.properties that pins the sdk and names a plain Application class — a real DI-heavy Application will try to boot on the JVM and fail.",
+      "ja": "利用側の前提: テスト依存（Robolectric・MockWebServer・kotlinx-coroutines-test・kotlin-reflect）、モジュールの Gradle 設定に `testOptions.unitTests.isIncludeAndroidResources = true`、そして sdk をピンして素の Application クラスを指定する robolectric.properties — DI を積んだ実 Application は JVM 上で boot しようとして失敗します。"
+    },
+    "toc_row_android": {
+      "en": "Android generation",
+      "ja": "Android 生成"
     },
     "next_heading": {
       "en": "Keep going",
