@@ -3167,8 +3167,8 @@
       "ja": "probe を疑う前に arrange を見てください。「〜が解除される / 畳まれる / 空になる」型の契約は、ある状態からの遷移を主張しています — その状態のフィールドを `baseline` が既定値のままにしていて、その既定値が既に「解除後」と同じなら、その主張は書かれた瞬間から空振りです: act の前後で何も変わらないのだから、実装を外しても何も変わりません。この失敗は probe の時点ではなく執筆の時点で決まっており、そこが「壊す行の選び方」とは違います。何かが消えることを表明する枝を書いたら、baseline でまずそれを置くこと — 表示中・選択済み・中身あり — そうして初めて、緑のままだった red-check が赤くなります。"
     },
     "section_redcheck_landed": {
-      "en": "And confirm the mutation actually landed before reading the result: the same line of code often exists in more than one method (mutate by line number, not by string match), and an edit applied to the wrong window leaves the original untouched (grep the file for the change afterwards). A green run only means something if the thing you meant to break is really broken.",
-      "ja": "そして、結果を読む前に変異が本当に当たったことを確認してください: 同じコード行が複数のメソッドに存在することはよくあり（文字列一致ではなく行番号で撃つ）、窓を切り違えた編集は元の行を残したままになります（適用後にファイルを grep する）。緑の実行に意味があるのは、壊したつもりのものが本当に壊れているときだけです。"
+      "en": "Make landing the mutation a procedure, not a good intention — the same two lines of error handling often appear verbatim in several methods of one file, so a string-targeted edit lands in a neighbour and the contracted method stays intact. Two steps are enough: locate the function first and mutate relative to it (\"the first match below `func confirmDelete()`\"), never by string alone; and when the run comes back green, suspect a missed probe before you conclude the implementation is right — grep for the marker and check its line number before reading anything into the result. A green run only means something if the thing you meant to break is really broken.",
+      "ja": "変異を当てることは心がけではなく手順にしてください — 同じ 2 行のエラー処理が 1 つのファイルの複数メソッドに全く同じ形で現れることはよくあり、文字列を狙った編集は隣のメソッドに着弾し、契約対象は無傷のまま残ります。手順は 2 つで足ります: まず関数を特定し、そこからの相対で撃つこと（「`func confirmDelete()` の下、最初の一致」）— 文字列だけで当てない。そして緑で返ってきたら、「実装が正しい」と結論する前に「プローブが外れた」を先に疑うこと — マーカーを grep して行番号を確かめてから結果を読みます。緑の実行に意味があるのは、壊したつもりのものが本当に壊れているときだけです。"
     },
     "section_harness_bullet_shadow": {
       "en": "On web, write the ViewModel through the runtime's `applyDeclaredKeys(vm, state)` (since jsonui-cli 1.6.31) rather than assigning every key in a loop, then hand the same object to the data store. A plain loop invents ViewModel properties for data-only fields — values the screen updates through the store and the ViewModel never declares — and because readField consults the ViewModel first, those invented properties shadow the store for the rest of the test: the branch then fails against a correct implementation. Android skips writes to undeclared fields in its base harness and iOS goes through a typed switch, so this one is web-only; 1.6.31 lines the three faces up.",
@@ -3185,6 +3185,10 @@
     "section_boundary_bullet_deps": {
       "en": "Declare every operation the method reaches, not just the one the branch is about. A method that also calls another screen's API still makes that call under test; without a declaration it has no route, the request goes unmatched, and the run stops partway with a failure that reads like the branch itself is broken.",
       "ja": "対象メソッドが到達する操作はすべて宣言してください — その枝の主題である 1 つだけでは足りません。他画面の API も呼ぶメソッドは、テスト中でもその呼び出しを行います。宣言が無ければルートが無く、リクエストは未一致となり、実行は途中で止まります。その失敗は、枝そのものが壊れているように読めてしまいます。"
+    },
+    "section_redcheck_principle": {
+      "en": "One line holds all three together: the baseline is an arrange, not decoration. It is not a restatement of the declaration — it is the operation that puts the subject into the state where the observation can happen at all. Read the three failures that way and they stop being separate problems: vacuous means no pre-state was built, a lying harness means it was built in the wrong place, and the wrong path means it was built with the wrong contents. When a new shape of arrange appears in a contract, suspect the harness before the implementation — a harness only has to handle the states someone has asked it for, so a new kind of arrange is exactly when its shortcuts surface.",
+      "ja": "3 つを貫く一文はこれです: baseline は arrange であって、飾りではありません。宣言の言い換えではなく、観測がそもそも成立する状態に対象を置く操作です。そう読めば 3 つの失敗は別々の問題ではなくなります — 空振りは事前状態を作っていない、嘘をつくハーネスは作った先が間違っている、経路違いは作った内容が間違っている。契約に新しい型の arrange が現れたら、実装より先にハーネスを疑ってください — ハーネスは誰かが求めた状態しか扱う必要がなく、新しい種類の arrange こそ、その手抜きが露出する場面だからです。"
     },
     "next_heading": {
       "en": "Keep going",
