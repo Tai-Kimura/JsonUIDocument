@@ -3142,6 +3142,10 @@
       "en": "Since jsonui-cli 1.6.24, validate also holds these endpoint declarations against the project's API canon — structurally opt-in: it fires only when the project has an api_directory with OpenAPI documents. Three warning classes: a path no document declares, a path declared but not for that HTTP method (the declared methods are listed), and parameter-spelling differences (the canonical spelling is quoted). Non-HTTP declarations (`RTDB onValue(...)` and the like) are always legal and never checked, and validation stays PASSED — these are warnings:",
       "ja": "jsonui-cli 1.6.24 からは、validate がこの endpoint 宣言をプロジェクトの API 正本とも突き合わせます — 構造的 opt-in で、api_directory に OpenAPI 文書を持つプロジェクトでのみ発火します。warning は 3 クラス: どの文書にも無いパス / パスはあるがその HTTP メソッドが無い（正本の宣言済みメソッドを併記）/ パラメータの綴り差（正本の綴りを併記）。非 HTTP の宣言（`RTDB onValue(...)` など）は常に合法で検査対象外、validation は PASSED のままです — これは warning です:"
     },
+    "section_ios_bullet_null": {
+      "en": "A `null` expectation compares equal to both Swift nil and NSNull() (since jsonui-cli 1.6.27): assertFieldEquals normalizes both sides on entry, so a harness readField can return an Optional property as-is — nothing to remember. Before 1.6.27 only the request matcher (partialMismatches) knew this equivalence, so a branch asserting a field back to null always failed on iOS — a reminder that a convention only one face of a runtime knows is a hole, not a convention.",
+      "ja": "`null` の期待値は Swift の nil とも NSNull() とも等しく比較されます（jsonui-cli 1.6.27 から）: assertFieldEquals が入口で両側を正規化するので、harness の readField は Optional プロパティをそのまま返して構いません — 覚えることはありません。1.6.27 より前はリクエスト照合（partialMismatches）だけがこの同値を知っており、フィールドが null に戻ることを表明する枝は iOS では必ず落ちていました — ランタイムの片面しか知らない規約は規約ではなく穴だ、という教訓です。"
+    },
     "next_heading": {
       "en": "Keep going",
       "ja": "次に進む"
@@ -3269,8 +3273,8 @@
       "ja": "5. then の語彙"
     },
     "section_then_body": {
-      "en": "Outcomes are equally closed. A data.<field> value is a literal, a `@strings_key` reference, or `@data.<field>` (copy another field). `\"api\": \"none\"` asserts that no operation fires at all; `api.<op>` asserts one operation's verdict; `api.<op>.request` matches the request body partially — only the listed entries are checked, extra entries are ignored.",
-      "ja": "結果側も同じく閉じています。data.<field> の値はリテラル、`@strings_key` 参照、または `@data.<field>`（別フィールドのコピー）。`\"api\": \"none\"` は操作が一切発火しないことを、`api.<op>` は特定操作の発火有無を表明します。`api.<op>.request` はリクエストボディの部分照合で、書いたエントリだけが検査され、それ以外は無視されます。"
+      "en": "Outcomes are equally closed. A data.<field> value is a literal, a `@strings_key` reference, or `@data.<field>` (copy another field). A data.<field> value may also be `null`, asserting that the field returns to unset — an empty string is a different state. This is the standard way to contract a screen with optimistic updates — change the UI first, the API fails, roll back: the branch that stops \"the mark appeared locally but the server rejected it\" asserts the optimistic field back to null on the failure scenario. Any screen with optimistic updates has this branch; since jsonui-cli 1.6.27 the harness needs nothing special for it (an Optional can be returned as-is). `\"api\": \"none\"` asserts that no operation fires at all; `api.<op>` asserts one operation's verdict; `api.<op>.request` matches the request body partially — only the listed entries are checked, extra entries are ignored.",
+      "ja": "結果側も同じく閉じています。data.<field> の値はリテラル、`@strings_key` 参照、または `@data.<field>`（別フィールドのコピー）。data.<field> の値には `null` も書けます — フィールドが未設定に戻ることの表明で、空文字列とは別の状態です。これは楽観更新を持つ画面を契約化するときの標準的な書き方です — 先に UI を変える → API が失敗する → ロールバック: 「手元では印が付いたのにサーバは拒否した」状態を止める枝が、失敗シナリオで楽観フィールドの null 復帰を表明します。楽観更新のある画面には必ずこの枝があり、jsonui-cli 1.6.27 からは harness 側に特別な対応は不要です（Optional をそのまま返せます）。`\"api\": \"none\"` は操作が一切発火しないことを、`api.<op>` は特定操作の発火有無を表明します。`api.<op>.request` はリクエストボディの部分照合で、書いたエントリだけが検査され、それ以外は無視されます。"
     },
     "section_validate_heading": {
       "en": "7. What validate enforces",
