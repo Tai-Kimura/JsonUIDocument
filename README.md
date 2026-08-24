@@ -24,7 +24,7 @@ To update only the MCP server later: `bash ~/.jsonui-mcp-server/install.sh` (ide
 
 **After any MCP update, restart Claude Code completely** — a running server answers from its in-memory cache, so new tools and attributes do not appear until the restart.
 
-To check what you have against what this repo was built with: compare `~/.jsonui-cli/VERSION` with the committed `jsonui-doc-web/rjui_tools/VERSION`, and see the `JSONUI_CLI_REF` pin in `.github/workflows/deploy.yml` (CI builds from that exact commit). A local toolchain *newer* than the pin is normal — `main` may carry pre-release fixes; older means update before you build.
+To check what you have against what this repo was built with: compare `~/.jsonui-cli/VERSION` with the committed `jsonui-doc-web/rjui_tools/VERSION`, and see the `JSONUI_CLI_REF` pin in `.github/workflows/deploy.yml` (CI builds from that exact commit). Since jsonui-cli 1.6.28, `jsonui-test --version` and `jsonui-doc --version` also report the toolchain version, so a stale display means a stale copy on your PATH. A local toolchain *newer* than the pin is normal — `main` may carry pre-release fixes; older means update before you build.
 
 ## First-time setup
 
