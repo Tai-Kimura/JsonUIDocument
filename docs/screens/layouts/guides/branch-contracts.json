@@ -316,6 +316,37 @@
                       "filename": "then keys",
                       "showLineNumbers": false,
                       "copyable": false
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_then_passthrough"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "// the three @ forms, side by side\n\"data.title\":        \"@profile_screen_saved\"   // a string from your table\n\"data.previousName\": \"@data.form\"             // a field's value before the act\n\"data.errorMessage\": \"@response.error.message\" // what the server returned\n\n// a passthrough branch names exactly one scenario:\n{ \"when\": { \"api.createOrder\": \"declined\" },\n  \"then\": { \"data.errorMessage\": \"@response.error.message\" } }",
+                      "language": "jsonc",
+                      "filename": "@key / @data.<field> / @response.<path>",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "Error: ...branches[2]: '@response.<path>' needs exactly one `api.<op>` in `when` to read\n       the response from, found 0\nError: ...then.data.errorMessage: scenario 'declined' has no 'error.detail' in its response\n       body — at error the available keys are: code, message\nError: ...then.data.errorMessage: 'error' in scenario 'declined' is a dict, and a displayed\n       value must be a scalar\n\n[WARNING] ...branches[2].then: '@response.<path>' reads the response of the branch's own\n          scenario, but `when` names 0 `api.<op>` scenario(s) — test generation needs\n          exactly one",
+                      "language": "text",
+                      "filename": "generation stops, and validate warns first",
+                      "showLineNumbers": false,
+                      "copyable": false
                     }
                   ]
                 },
