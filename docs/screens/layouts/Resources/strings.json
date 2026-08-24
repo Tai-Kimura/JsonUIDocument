@@ -3107,8 +3107,8 @@
       "ja": "9. 信頼する手順: red-check と再生成"
     },
     "section_redcheck_body": {
-      "en": "A green suite proves the tests can pass; a red-check proves they can fail. After the first green run, break one implementation line and confirm that exactly one branch goes red — then restore it. Pick the line on the surface the contract observes: a payload field the method itself reads, a request field, a guard. A line that only feeds later screens will not turn anything red, and that silence tells you which surface the contract is actually watching.",
-      "ja": "緑のスイートは「通れること」しか証明しません。red-check が「落ちられること」を証明します。最初の緑のあと、実装の 1 行を壊してちょうど 1 分岐だけが赤くなることを確認し、元に戻してください。壊す行は契約が観測する面 — メソッド自身が読むペイロードのフィールド、リクエストのフィールド、ガード — から選ぶこと。後続画面にしか渡らない行は何も赤くしませんし、その沈黙は契約が実際に見ている面を教えてくれます。"
+      "en": "A green suite proves the tests can pass; a red-check proves they can fail. After the first green run, break one implementation line and confirm that exactly one branch goes red — then restore it. Vary the depth of the mutation rather than hunting for the one perfect line: a mutation at the decode/mapping stage — where the response becomes your domain value — behaves like a real failure, because a real payload drop empties every reader downstream of it; a shallow mutation of one stored field can stay green when the method reads the response directly. Shoot coarse to fine, and treat a probe that stays green as information, not failure — it is telling you which surface the contract actually watches.",
+      "ja": "緑のスイートは「通れること」しか証明しません。red-check が「落ちられること」を証明します。最初の緑のあと、実装の 1 行を壊してちょうど 1 分岐だけが赤くなることを確認し、元に戻してください。「完璧な 1 行」を探すのではなく、変異の深さを変えて撃つこと: デコード/写像の段 — レスポンスがドメインの値になる場所 — での変異は現実の失敗と同じ振る舞いをします。本物のペイロード欠落はその下流の読み手を全部空にするからです。逆に、保存済みフィールド 1 つだけの浅い変異は、メソッドがレスポンスを直読していれば緑のまま残り得ます。粗→細の順で撃ち、緑のまま残った probe は失敗ではなく情報として扱ってください — 契約が実際に見ている面を教えてくれています。"
     },
     "section_redcheck_regen": {
       "en": "The regeneration loop afterwards: edit the spec → `jsonui-doc validate spec` → generate again (the @generated pair is rewritten, the harness is kept) → run. The decision table and the tests stay two views of the same declaration.",
