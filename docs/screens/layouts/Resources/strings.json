@@ -2991,8 +2991,8 @@
       "ja": "branchContracts の宣言 1 本から、3 プラットフォームの実スタックユニットテストが出ます: `jsonui-test generate branch-tests` は同じ分岐表から web には vitest、Android には JUnit4（Robolectric）、iOS には XCTest を生成します — モックするのは HTTP 境界だけ。このページではコマンド、生成物と所有関係、各プラットフォームの harness 契約、生成を止めるエラー、そして結果を信頼する方法を説明します。"
     },
     "read_time": {
-      "en": "11 min read",
-      "ja": "11 分で読めます"
+      "en": "12 min read",
+      "ja": "12 分で読めます"
     },
     "section_what_heading": {
       "en": "1. One declaration, three platforms",
@@ -3103,8 +3103,8 @@
       "ja": "実装が本当に分かれているとき — 片方のプラットフォームだけ独自のアラート用フィールドを持ち、他は共有フィールドを使う、など — は分岐に `platforms`（ios / android / web の非空部分集合、jsonui-cli 1.6.22 から。それ以外は validate が拒否）を付けられます。各生成器は対象外の枝を明示コメントつきで skip し、宣言数のカウントからも除きます — 黙殺はしません:"
     },
     "section_redcheck_heading": {
-      "en": "11. Trust it: red-check, then regenerate",
-      "ja": "11. 信頼する手順: red-check と再生成"
+      "en": "12. Trust it: red-check, then regenerate",
+      "ja": "12. 信頼する手順: red-check と再生成"
     },
     "section_redcheck_body": {
       "en": "A green suite proves the tests can pass; a red-check proves they can fail. After the first green run, break one implementation line and confirm that exactly one branch goes red — then restore it. Vary the depth of the mutation rather than hunting for the one perfect line: a mutation at the decode/mapping stage — where the response becomes your domain value — behaves like a real failure, because a real payload drop empties every reader downstream of it; a shallow mutation of one stored field can stay green when the method reads the response directly. Shoot coarse to fine, and treat a probe that stays green as information, not failure — it is telling you which surface the contract actually watches.",
@@ -3145,6 +3145,22 @@
     "section_ios_bullet_null": {
       "en": "A `null` expectation compares equal to both Swift nil and NSNull() (since jsonui-cli 1.6.27): assertFieldEquals normalizes both sides on entry, so a harness readField can return an Optional property as-is — nothing to remember. Before 1.6.27 only the request matcher (partialMismatches) knew this equivalence, so a branch asserting a field back to null always failed on iOS — a reminder that a convention only one face of a runtime knows is a hole, not a convention.",
       "ja": "`null` の期待値は Swift の nil とも NSNull() とも等しく比較されます（jsonui-cli 1.6.27 から）: assertFieldEquals が入口で両側を正規化するので、harness の readField は Optional プロパティをそのまま返して構いません — 覚えることはありません。1.6.27 より前はリクエスト照合（partialMismatches）だけがこの同値を知っており、フィールドが null に戻ることを表明する枝は iOS では必ず落ちていました — ランタイムの片面しか知らない規約は規約ではなく穴だ、という教訓です。"
+    },
+    "section_scope_heading": {
+      "en": "11. Scope: claims that pin an unrelated axis",
+      "ja": "11. 範囲: 無関係な軸を釘付けにする主張"
+    },
+    "section_scope_body": {
+      "en": "The three classes above are things the machine cannot judge. There is a fourth reason to keep something out of the contract, and it is different in kind: the claim is perfectly writable — but writing it pins an axis the contract has no business fixing. The canonical shape: a section's display variants (empty / populated / an upgrade prompt) depend on the user's plan tier. Declare all three and the contract silently fixes the tier axis too — the day a tier is added, branches go red for a reason that has nothing to do with the screen being broken. What belongs in the contract instead is the one fact that holds on every tier: the section is visible. Weakening the claim is not a compromise — one axis-independent fact outlives three axis-dependent variants.",
+      "ja": "上の 3 クラスは「機械には判定できない」ものでした。契約に載せない理由には種類の違う 4 つ目があります: 主張自体は問題なく書けるのに、書くと契約が固定すべきでない軸まで釘付けにしてしまう場合です。典型形: セクションの表示バリエーション（空 / 中身あり / アップグレード促し）が利用プランの種別に依存している画面。3 態を全部宣言すると、契約は暗黙にプラン軸まで固定します — プランが増えた日、画面が壊れたのとは無関係な理由で枝が赤くなります。契約に載せるべきは、どのプランでも成り立つ 1 事実 — セクションが見えていること — の側です。主張を弱めることは妥協ではありません: 軸非依存の 1 事実は、軸依存の 3 態より長生きします。"
+    },
+    "section_scope_test": {
+      "en": "The test: does this claim survive a change on an axis it is not about? If not, weaken it to the part that does. And the inverse reading is the useful alarm — if you can imagine a branch going red for any reason other than \"the implementation broke\", the contract's scope is too wide.",
+      "ja": "判断基準: この主張は、関係ない軸が変わっても成り立つか? 成り立たないなら、成り立つ部分まで弱めて置くこと。逆向きの読み方が実用的な警報になります — 「実装が壊れた」以外の理由で赤くなる情景が思い浮かぶ契約は、範囲が広すぎます。"
+    },
+    "toc_row_scope": {
+      "en": "Contract scope",
+      "ja": "契約の範囲"
     },
     "next_heading": {
       "en": "Keep going",
