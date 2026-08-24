@@ -2987,12 +2987,12 @@
       "ja": "分岐コントラクト"
     },
     "lead": {
-      "en": "A screen spec can declare each method's branches as a machine-checkable table. The optional `branchContracts` section keeps those declarations inside a closed vocabulary of names the spec has already declared — so `jsonui-doc validate` can check them, and the generated documentation renders them as decision tables. Available since jsonui-cli 1.6.18; existing specs without the section are untouched.",
-      "ja": "画面 spec は、各メソッドの分岐を機械検証可能な表として宣言できます。任意の `branchContracts` 節は、spec が既に宣言している名前だけの閉じた語彙で分岐を記述させます — だから `jsonui-doc validate` が検査でき、生成ドキュメントには決定表として描画されます。jsonui-cli 1.6.18 から。節を書かない既存 spec には一切影響しません。"
+      "en": "A screen spec can declare each method's branches as a machine-checkable table. The optional `branchContracts` section keeps those declarations inside a closed vocabulary of names the spec has already declared — so `jsonui-doc validate` can check them, the generated documentation renders them as decision tables, and `jsonui-test` can generate unit tests from them. Available since jsonui-cli 1.6.18; existing specs without the section are untouched.",
+      "ja": "画面 spec は、各メソッドの分岐を機械検証可能な表として宣言できます。任意の `branchContracts` 節は、spec が既に宣言している名前だけの閉じた語彙で分岐を記述させます — だから `jsonui-doc validate` が検査でき、生成ドキュメントには決定表として描画され、`jsonui-test` はユニットテストを生成できます。jsonui-cli 1.6.18 から。節を書かない既存 spec には一切影響しません。"
     },
     "read_time": {
-      "en": "7 min read",
-      "ja": "7 分で読めます"
+      "en": "8 min read",
+      "ja": "8 分で読めます"
     },
     "section_what_heading": {
       "en": "1. What branch contracts are",
@@ -3007,16 +3007,16 @@
       "ja": "2. 完全な例"
     },
     "section_example_body": {
-      "en": "One method, four branches: the guard fails, the save succeeds, the save fails, and one note. `@profile_screen_invalid` is a strings.json key reference, `@data.form` copies another data field, and `api.updateProfile.request` asserts a partial request body. The when value for `api.<op>` names a mock scenario such as \"success\" or \"failure\" — the scenario name itself is not checked against any declaration today.",
-      "ja": "1 メソッド・4 分岐: ガード失敗、保存成功、保存失敗、そして note が 1 つ。`@profile_screen_invalid` は strings.json のキー参照、`@data.form` は別のデータフィールドのコピー、`api.updateProfile.request` はリクエストボディの部分照合です。when の `api.<op>` の値は \"success\" や \"failure\" のようなモックシナリオ名です — シナリオ名自体は現時点ではどの宣言とも照合されません。"
+      "en": "One method, four branches: the guard fails, the save succeeds, the save fails, and one note. `@profile_screen_invalid` is a strings.json key reference, `@data.form` copies another data field, and `api.updateProfile.request` asserts a partial request body. The when value for `api.<op>` names a mock scenario such as \"success\" or \"failure\" — validate does not check the name, but test generation (section 8) binds it to your mock files and fails hard if it does not exist.",
+      "ja": "1 メソッド・4 分岐: ガード失敗、保存成功、保存失敗、そして note が 1 つ。`@profile_screen_invalid` は strings.json のキー参照、`@data.form` は別のデータフィールドのコピー、`api.updateProfile.request` はリクエストボディの部分照合です。when の `api.<op>` の値は \"success\" や \"failure\" のようなモックシナリオ名です — validate は名前を検査しませんが、テスト生成（第 8 節）がモックファイルへ束縛し、存在しなければ hard error にします。"
     },
     "section_conditions_heading": {
       "en": "3. Named conditions and witnesses",
       "ja": "3. 名前つき条件と witness"
     },
     "section_conditions_body": {
-      "en": "A cond is a named predicate declared in `branchContracts.conditions`. Deliberately, the expression body is NOT declared — it would only mirror the code and drift with it. Instead each condition carries a human `meaning` plus `witness_true` / `witness_false`: example data states that make it true and false. Witness keys are checked against declared data fields, and a witness gives any consumer of the contract a concrete state to replay. Reference a condition from when as `\"cond\": \"formValid\"`, or negated as `\"cond\": \"!formValid\"` — negation is first-class, so no mirror-image condition is needed.",
-      "ja": "cond は `branchContracts.conditions` で宣言する名前つき述語です。式の本体はあえて宣言しません — コードの写しになって一緒にずれるだけだからです。代わりに各条件は人間向けの `meaning` と、`witness_true` / `witness_false` — それを真・偽にするデータ状態の実例 — を持ちます。witness のキーは宣言済みデータフィールドと照合され、コントラクトの利用側に再現可能な具体状態を与えます。when からは `\"cond\": \"formValid\"`、否定は `\"cond\": \"!formValid\"` と参照します — 否定は第一級なので、鏡写しの条件を別に作る必要はありません。"
+      "en": "A cond is a named predicate declared in `branchContracts.conditions`. Deliberately, the expression body is NOT declared — it would only mirror the code and drift with it. Instead each condition carries a human `meaning` plus `witness_true` / `witness_false`: example data states that make it true and false. Witness keys are checked against declared data fields, and a witness gives any consumer of the contract a concrete state to replay — test generation arranges each branch from exactly these witnesses. Reference a condition from when as `\"cond\": \"formValid\"`, or negated as `\"cond\": \"!formValid\"` — negation is first-class, so no mirror-image condition is needed.",
+      "ja": "cond は `branchContracts.conditions` で宣言する名前つき述語です。式の本体はあえて宣言しません — コードの写しになって一緒にずれるだけだからです。代わりに各条件は人間向けの `meaning` と、`witness_true` / `witness_false` — それを真・偽にするデータ状態の実例 — を持ちます。witness のキーは宣言済みデータフィールドと照合され、コントラクトの利用側に再現可能な具体状態を与えます — テスト生成は各分岐の状態をまさにこの witness から組み立てます。when からは `\"cond\": \"formValid\"`、否定は `\"cond\": \"!formValid\"` と参照します — 否定は第一級なので、鏡写しの条件を別に作る必要はありません。"
     },
     "section_when_heading": {
       "en": "4. The when vocabulary",
@@ -3061,6 +3061,30 @@
     "section_render_body": {
       "en": "`jsonui-doc generate spec` renders the section as decision tables: a summary line counting methods, declared branches, and note-only branches (\"outside the machine-checkable contract\"), a Named Conditions table showing both witnesses, and one numbered when/then table per method with its baseline row. The text below is the actual generated HTML for the example above, flattened to text:",
       "ja": "`jsonui-doc generate spec` はこの節を決定表として描画します: メソッド数・宣言済み分岐数・note のみの分岐数（\"outside the machine-checkable contract\"）を数えるサマリ行、両方の witness を並べた Named Conditions 表、そしてメソッドごとに baseline 行つきの番号入り when/then 表です。以下は上の例から実際に生成した HTML をテキスト化したものです:"
+    },
+    "section_tests_heading": {
+      "en": "8. Generating tests from the contract",
+      "ja": "8. コントラクトからテストを生成する"
+    },
+    "section_tests_body": {
+      "en": "Since jsonui-cli 1.6.19, `jsonui-test generate branch-tests <screen>` turns the same declarations into web (vitest) unit tests — one `it` per declared branch (arrange = baseline, then the condition's witness, then when's data entries, later wins; act = the method itself; assert = exactly the then entries, nothing more), with note-only branches listed as numbered comments so the coverage boundary stays visible. Three things must be in place: `endpoint` declarations on the dataFlow methods the contract references, mock files under tests/mocks (*.mock.json with source.method/path and named scenarios), and vitest in the project.",
+      "ja": "jsonui-cli 1.6.19 からは、`jsonui-test generate branch-tests <screen>` が同じ宣言を web（vitest）ユニットテストにします — 宣言済み分岐 1 つにつき `it` が 1 つ（arrange = baseline → 条件の witness → when の data エントリの順に上書き、act = メソッドそのもの、assert = then のエントリだけ）。note のみの分岐は番号つきコメントとして列挙され、カバレッジの境界が見えたままになります。前提は 3 つ: コントラクトが参照する dataFlow メソッドへの `endpoint` 宣言、tests/mocks 配下のモックファイル（source.method/path と名前つきシナリオを持つ *.mock.json）、そしてプロジェクトの vitest です。"
+    },
+    "section_tests_bullet_mock": {
+      "en": "Mocking happens at the HTTP boundary only — the real ViewModel, UseCase, and Repository run in every test; fetch is stubbed to answer with the named scenarios from your mock files. Every declared endpoint that has a mock also answers with its default scenario, so incidental calls during the method do not fail the test.",
+      "ja": "モックは HTTP 境界だけです — どのテストでも本物の ViewModel・UseCase・Repository が走り、fetch がモックファイルの名前つきシナリオで応答するようスタブされます。モックを持つ宣言済み endpoint は既定シナリオでも応答するので、メソッド中の付随的な呼び出しがテストを壊すことはありません。"
+    },
+    "section_tests_bullet_harness": {
+      "en": "The harness — ViewModel construction, the data store, a router recorder, the screenRoutes map from transition destinations to URLs, and resolveString — is consumer-owned: a skeleton is emitted only when the file does not exist, and re-generation never overwrites it. The @generated test and runtime files are rewritten on every run.",
+      "ja": "harness — ViewModel の構築、データストア、router の記録、遷移先→URL の screenRoutes マップ、resolveString — は利用側の所有です: skeleton はファイルが無いときだけ出力され、再生成が上書きすることはありません。@generated のテストとランタイムは毎回書き直されます。"
+    },
+    "section_tests_bullet_binding": {
+      "en": "Every api.<op> resolves through the dataFlow method's endpoint declaration to a mock file matched on source.method + path, and then to the named scenario. A reference that cannot be bound is a hard generation error — a test that cannot bind its vocabulary must not silently weaken. All four messages below are real output, one seeded mistake each:",
+      "ja": "api.<op> はすべて、dataFlow メソッドの endpoint 宣言 → source.method + path で照合したモックファイル → 名前つきシナリオ、の順で解決されます。束縛できない参照は生成時の hard error です — 語彙を束縛できないテストを黙って弱くしてはならないからです。以下の 4 メッセージは、誤りを 1 つずつ仕込んで得た実出力です:"
+    },
+    "toc_row_tests": {
+      "en": "Generating tests",
+      "ja": "テスト生成"
     },
     "next_heading": {
       "en": "Keep going",

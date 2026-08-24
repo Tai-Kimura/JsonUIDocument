@@ -208,6 +208,55 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
+                  "id": "section_tests",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_tests_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_tests_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "$ jsonui-test generate branch-tests profile_screen\nGenerated branch tests for 'profile_screen':\n  tests/unit/generated/profile_screen.branches.test.ts  (3 declared branch(es), 1 note-only listed as comments)\n  tests/unit/generated/jsonui-branch-runtime.ts  (shared runtime)\n  tests/unit/branch-harness/profile_screen.ts  (NEW harness skeleton — implement createHarness())\n  routes: updateProfile",
+                      "language": "bash",
+                      "filename": "generate branch-tests — output",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "text": "section_tests_bullet_mock" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_tests_bullet_harness" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "it(\"branch 2: cond=\\\"formValid\\\" & api.updateProfile=\\\"success\\\"\", async () => {\n  const h = createHarness();\n  h.setState({\"isSaving\": false, \"form\": {\"nickname\": \"a\"}});\n  const rec = installFetchMock(ROUTES, {\"updateProfile\": \"success\"});\n  const ref_form = h.readField(\"form\");\n  try {\n    await (h.vm as any).onTapSave();\n    await settle();\n    h.expectTransition(\"HomeScreen\");\n    expect(rec.countFor(\"updateProfile\")).toBeGreaterThan(0);\n    expect(partialMismatches(rec.lastBodyFor(\"updateProfile\"), { \"nickname\": ref_form })).toEqual([]);\n  } finally {\n    rec.restore();\n  }\n});",
+                      "language": "typescript",
+                      "filename": "profile_screen.branches.test.ts — branch 2 (@generated)",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "text": "section_tests_bullet_binding" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "Error: branches[1].when.api.updateProfile: api operation 'updateProfile' has no `endpoint`\n       declaration in dataFlow.repositories/useCases — declare the method with its\n       endpoint (e.g. \"endpoint\": \"POST /api/...\")\nError: branches[1].when.api.updateProfile: no mock file found for PUT /api/items\n       (op 'updateProfile') under the mocks directory\nError: branches[1].when.api.updateProfile: scenario 'timeout' not found in\n       ['failure', 'success'] (mock for PUT /api/items)\nError: condition 'formValid' has no witness_false — test generation needs a witness\n       to arrange the state",
+                      "language": "text",
+                      "filename": "hard generation errors — one seeded mistake each",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
                   "id": "guides_branch_contracts_next",
                   "width": "matchParent",
                   "height": "wrapContent",
@@ -279,7 +328,8 @@
                         { "id": "toc_when", "label": "toc_row_when", "anchor": "section_when", "level": 1 },
                         { "id": "toc_then", "label": "toc_row_then", "anchor": "section_then", "level": 1 },
                         { "id": "toc_validate", "label": "toc_row_validate", "anchor": "section_validate", "level": 1 },
-                        { "id": "toc_render", "label": "toc_row_render", "anchor": "section_render", "level": 1 }
+                        { "id": "toc_render", "label": "toc_row_render", "anchor": "section_render", "level": 1 },
+                        { "id": "toc_tests", "label": "toc_row_tests", "anchor": "section_tests", "level": 1 }
                       ],
                       "stickyOffset": 80
                     }
