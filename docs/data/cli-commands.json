@@ -1271,6 +1271,67 @@
     },
     {
       "binary": "jui",
+      "command": "lint-strings",
+      "synopsis": "jui lint-strings [--json] [--usage] [--update-allowlist] [--allowlist <path>]",
+      "purpose": {
+        "en": "Localize gate: every user-visible string in a layout must resolve through strings.json, not sit there as a raw literal. Bare keys resolve only within the sections the layout owns, so a key that exists only in someone else's section is reported rather than silently borrowed.",
+        "ja": "ローカライズのゲート: レイアウト内のユーザーに見える文字列は生のリテラルではなく strings.json 経由で解決されること。bare キーはそのレイアウトが所有するセクション内でのみ解決されるため、他所のセクションにしかないキーは黙って借りずに報告される。"
+      },
+      "options": [
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Emit the report as JSON (findings, stale entries, counts). With --usage the report also carries a `usage` object.",
+            "ja": "レポートを JSON で出力（findings / stale entries / 件数）。--usage 併用時は `usage` オブジェクトも含まれる。"
+          }
+        },
+        {
+          "name": "--usage",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Since v1.6.15. Also check set agreement between strings.json and every referencing face — unused keys, missing keys, and dynamic references that bypass a *_STRING_KEYS map. Opt-in per run, or per project via lint.stringsUsage in jui.config.json.",
+            "ja": "v1.6.15 から。strings.json と参照側すべての集合一致も検査する — 未使用キー、欠落キー、*_STRING_KEYS マップを経由しない動的参照。実行ごとの opt-in か、jui.config.json の lint.stringsUsage でプロジェクト単位に有効化。"
+          }
+        },
+        {
+          "name": "--update-allowlist",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Write the current raw-literal set into the allowlist ledger, preserving existing reasons. New entries get an empty reason and keep the lint failing until documented.",
+            "ja": "現在の生リテラル集合を allowlist 台帳へ書き出す（既存の理由は保持）。新規項目は理由が空のままで、記載するまで lint は失敗し続ける。"
+          }
+        },
+        {
+          "name": "--allowlist",
+          "type": "string",
+          "default": ".jui-strings-allowlist.json",
+          "description": {
+            "en": "Ledger path. Defaults to the project root file, or lint.stringsAllowlist from jui.config.json.",
+            "ja": "台帳のパス。既定はプロジェクトルートのファイル、または jui.config.json の lint.stringsAllowlist。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui lint-strings"
+        },
+        {
+          "language": "bash",
+          "code": "$ jui lint-strings --usage --json"
+        }
+      ],
+      "seeAlso": [
+        "jui build",
+        "jui lint-generated"
+      ]
+    },
+    {
+      "binary": "jui",
       "command": "lint-generated",
       "synopsis": "jui lint-generated [--fix] [--verbose] [--max-depth <n>] [--max-lines <n>] [--update-size-baseline] [--fail-on any|size-ratchet|health]",
       "purpose": {
