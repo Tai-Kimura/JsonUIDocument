@@ -2977,6 +2977,156 @@
       "ja": "© 2026 JsonUI"
     }
   },
+  "guides_branch_contracts": {
+    "breadcrumb": {
+      "en": "Guides",
+      "ja": "ガイド"
+    },
+    "title": {
+      "en": "Branch contracts",
+      "ja": "分岐コントラクト"
+    },
+    "lead": {
+      "en": "A screen spec can declare each method's branches as a machine-checkable table. The optional `branchContracts` section keeps those declarations inside a closed vocabulary of names the spec has already declared — so `jsonui-doc validate` can check them, and the generated documentation renders them as decision tables. Available since jsonui-cli 1.6.18; existing specs without the section are untouched.",
+      "ja": "画面 spec は、各メソッドの分岐を機械検証可能な表として宣言できます。任意の `branchContracts` 節は、spec が既に宣言している名前だけの閉じた語彙で分岐を記述させます — だから `jsonui-doc validate` が検査でき、生成ドキュメントには決定表として描画されます。jsonui-cli 1.6.18 から。節を書かない既存 spec には一切影響しません。"
+    },
+    "read_time": {
+      "en": "7 min read",
+      "ja": "7 分で読めます"
+    },
+    "section_what_heading": {
+      "en": "1. What branch contracts are",
+      "ja": "1. 分岐コントラクトとは"
+    },
+    "section_what_body": {
+      "en": "Behavioral prose in a spec — \"if the form is invalid, show an error and skip the API call\" — is exactly the part no tool has been able to check, and it drifts silently as the implementation evolves. branchContracts turns that prose into data: per-method tables of when (the state going in) and then (the observable outcome), where every name must come from vocabulary the spec already declares. Data fields come from stateManagement.uiVariables / dataFlow.viewModel.vars / stateManagement.states, method names from dataFlow.viewModel.methods or stateManagement.eventHandlers, API operations from dataFlow repositories/useCases, transition destinations from transitions[]. The section is fully opt-in — leave it out and validate and doc generation behave exactly as before. Branches that genuinely cannot be said in the closed vocabulary are declared as note entries: they stay legal, but the generated docs count them separately, so a contract that is mostly notes is visible at a glance.",
+      "ja": "spec の振る舞いの散文 — 「フォームが不正ならエラーを表示して API は呼ばない」— は、これまでどのツールも検査できなかった部分であり、実装が進むにつれて黙ってずれていきます。branchContracts はこの散文をデータにします: メソッドごとの when（入口の状態）と then（観測可能な結果）の表で、登場する名前はすべて spec が既に宣言している語彙に限られます。データフィールドは stateManagement.uiVariables / dataFlow.viewModel.vars / stateManagement.states から、メソッド名は dataFlow.viewModel.methods か stateManagement.eventHandlers から、API 操作は dataFlow の repositories/useCases から、遷移先は transitions[] からです。節は完全に opt-in — 書かなければ validate も doc 生成も従来とまったく同じです。閉じた語彙でどうしても言えない分岐は note エントリとして宣言します: 合法のままですが、生成ドキュメントが別枠でカウントするので、note だらけのコントラクトは一目でわかります。"
+    },
+    "section_example_heading": {
+      "en": "2. A complete example",
+      "ja": "2. 完全な例"
+    },
+    "section_example_body": {
+      "en": "One method, four branches: the guard fails, the save succeeds, the save fails, and one note. `@profile_screen_invalid` is a strings.json key reference, `@data.form` copies another data field, and `api.updateProfile.request` asserts a partial request body. The when value for `api.<op>` names a mock scenario such as \"success\" or \"failure\" — the scenario name itself is not checked against any declaration today.",
+      "ja": "1 メソッド・4 分岐: ガード失敗、保存成功、保存失敗、そして note が 1 つ。`@profile_screen_invalid` は strings.json のキー参照、`@data.form` は別のデータフィールドのコピー、`api.updateProfile.request` はリクエストボディの部分照合です。when の `api.<op>` の値は \"success\" や \"failure\" のようなモックシナリオ名です — シナリオ名自体は現時点ではどの宣言とも照合されません。"
+    },
+    "section_conditions_heading": {
+      "en": "3. Named conditions and witnesses",
+      "ja": "3. 名前つき条件と witness"
+    },
+    "section_conditions_body": {
+      "en": "A cond is a named predicate declared in `branchContracts.conditions`. Deliberately, the expression body is NOT declared — it would only mirror the code and drift with it. Instead each condition carries a human `meaning` plus `witness_true` / `witness_false`: example data states that make it true and false. Witness keys are checked against declared data fields, and a witness gives any consumer of the contract a concrete state to replay. Reference a condition from when as `\"cond\": \"formValid\"`, or negated as `\"cond\": \"!formValid\"` — negation is first-class, so no mirror-image condition is needed.",
+      "ja": "cond は `branchContracts.conditions` で宣言する名前つき述語です。式の本体はあえて宣言しません — コードの写しになって一緒にずれるだけだからです。代わりに各条件は人間向けの `meaning` と、`witness_true` / `witness_false` — それを真・偽にするデータ状態の実例 — を持ちます。witness のキーは宣言済みデータフィールドと照合され、コントラクトの利用側に再現可能な具体状態を与えます。when からは `\"cond\": \"formValid\"`、否定は `\"cond\": \"!formValid\"` と参照します — 否定は第一級なので、鏡写しの条件を別に作る必要はありません。"
+    },
+    "section_when_heading": {
+      "en": "4. The when vocabulary",
+      "ja": "4. when の語彙"
+    },
+    "section_when_body": {
+      "en": "Four key shapes, nothing else — anything outside this closed set is an error, not a guess. Multiple keys in one when are combined with AND.",
+      "ja": "キーの形は 4 つだけで、それ以外はありません — この閉集合の外はエラーであり、推測はしません。1 つの when に複数のキーを書くと AND になります。"
+    },
+    "section_then_heading": {
+      "en": "5. The then vocabulary",
+      "ja": "5. then の語彙"
+    },
+    "section_then_body": {
+      "en": "Outcomes are equally closed. A data.<field> value is a literal, a `@strings_key` reference, or `@data.<field>` (copy another field). `\"api\": \"none\"` asserts that no operation fires at all; `api.<op>` asserts one operation's verdict; `api.<op>.request` matches the request body partially — only the listed entries are checked, extra entries are ignored.",
+      "ja": "結果側も同じく閉じています。data.<field> の値はリテラル、`@strings_key` 参照、または `@data.<field>`（別フィールドのコピー）。`\"api\": \"none\"` は操作が一切発火しないことを、`api.<op>` は特定操作の発火有無を表明します。`api.<op>.request` はリクエストボディの部分照合で、書いたエントリだけが検査され、それ以外は無視されます。"
+    },
+    "section_validate_heading": {
+      "en": "6. What validate enforces",
+      "ja": "6. validate は何を検査するか"
+    },
+    "section_validate_body": {
+      "en": "`jsonui-doc validate spec` (also reachable through the doc MCP tools) draws a deliberate line between errors and warnings. Every message below is real validator output, each produced by seeding one mistake into the example spec:",
+      "ja": "`jsonui-doc validate spec`（doc 系 MCP ツールからも実行可能）は、エラーと警告の線引きを意図的に分けています。以下はすべて実際の validator 出力で、例の spec に誤りを 1 つずつ仕込んで得たものです:"
+    },
+    "section_validate_bullet_error": {
+      "en": "Errors — structural violations: an unknown when/then key, a cond referencing an undeclared condition, a note entry carrying when/then alongside, a method name the spec never declares, and type violations. These fail validation.",
+      "ja": "エラー — 構造違反: 未知の when/then キー、未宣言の条件を参照する cond、when/then を同乗させた note エントリ、spec が宣言していないメソッド名、型違反。これらは validation を失敗させます。"
+    },
+    "section_validate_bullet_warning": {
+      "en": "Warnings — name-existence findings: a data field, API operation, or transition destination the spec never declares. Warning-level on purpose: VM-internal state and operation ids may legitimately stay undeclared.",
+      "ja": "警告 — 名前の実在に関する所見: spec が宣言していないデータフィールド・API 操作・遷移先。あえて警告どまりです: VM 内部の状態や操作 id は、宣言しないのが正しい場合があるからです。"
+    },
+    "section_validate_bullet_skip": {
+      "en": "Skip — when the referenced declaration section is absent entirely (for example the spec has no transitions[] at all), the existence check is skipped: a dangling reference cannot be proven without a contract to check against.",
+      "ja": "スキップ — 参照先の宣言節がまるごと無い場合（たとえば spec に transitions[] 自体が無い）、実在検査はスキップされます: 照合相手のコントラクトが無ければ、参照が宙に浮いていることを証明できないからです。"
+    },
+    "section_render_heading": {
+      "en": "7. What the generated docs show",
+      "ja": "7. 生成ドキュメントの描画"
+    },
+    "section_render_body": {
+      "en": "`jsonui-doc generate spec` renders the section as decision tables: a summary line counting methods, declared branches, and note-only branches (\"outside the machine-checkable contract\"), a Named Conditions table showing both witnesses, and one numbered when/then table per method with its baseline row. The text below is the actual generated HTML for the example above, flattened to text:",
+      "ja": "`jsonui-doc generate spec` はこの節を決定表として描画します: メソッド数・宣言済み分岐数・note のみの分岐数（\"outside the machine-checkable contract\"）を数えるサマリ行、両方の witness を並べた Named Conditions 表、そしてメソッドごとに baseline 行つきの番号入り when/then 表です。以下は上の例から実際に生成した HTML をテキスト化したものです:"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_first_spec_title": {
+      "en": "Writing your first spec",
+      "ja": "はじめての spec"
+    },
+    "next_first_spec_description": {
+      "en": "The spec sections branchContracts builds on — data, methods, transitions.",
+      "ja": "branchContracts の土台になる spec の節 — データ・メソッド・遷移。"
+    },
+    "next_verifying_title": {
+      "en": "Verifying implementation against docs",
+      "ja": "実装とドキュメントの照合"
+    },
+    "next_verifying_description": {
+      "en": "The wider check suite that keeps spec and implementation from drifting.",
+      "ja": "spec と実装のずれを防ぐ、より広い検査群。"
+    },
+    "next_testing_title": {
+      "en": "Writing screen tests",
+      "ja": "画面テストの書き方"
+    },
+    "next_testing_description": {
+      "en": "Screen and flow tests — the executable side of behavior documentation.",
+      "ja": "画面テストとフローテスト — 振る舞い記述の実行可能な側。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI",
+      "ja": "© 2026 JsonUI"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの内容"
+    },
+    "toc_row_what": {
+      "en": "What it is",
+      "ja": "分岐コントラクトとは"
+    },
+    "toc_row_example": {
+      "en": "Complete example",
+      "ja": "完全な例"
+    },
+    "toc_row_conditions": {
+      "en": "Conditions & witnesses",
+      "ja": "条件と witness"
+    },
+    "toc_row_when": {
+      "en": "when vocabulary",
+      "ja": "when の語彙"
+    },
+    "toc_row_then": {
+      "en": "then vocabulary",
+      "ja": "then の語彙"
+    },
+    "toc_row_validate": {
+      "en": "Validate rules",
+      "ja": "validate の検査"
+    },
+    "toc_row_render": {
+      "en": "Generated docs",
+      "ja": "生成ドキュメント"
+    }
+  },
   "guides_writing_your_first_spec": {
     "breadcrumb": {
       "en": "← Guides",

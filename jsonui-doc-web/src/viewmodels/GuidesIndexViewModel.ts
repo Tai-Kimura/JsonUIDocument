@@ -36,7 +36,8 @@ const CATALOG: ReadonlyArray<{ id: string; url: string; titleKey: string; platfo
   { id: "web-framework-adapters", url: "/guides/web-framework-adapters", titleKey: "guides_web_framework_adapters_title" },
   { id: "custom-components", url: "/guides/custom-components", titleKey: "guides_custom_components_title" },
   { id: "developer-menu", url: "/guides/developer-menu", titleKey: "guides_developer_menu_title", platforms: "iOS · Android" },
-  { id: "verifying-implementation-against-docs", url: "/guides/verifying-implementation-against-docs", titleKey: "guides_verifying_implementation_against_docs_title" }
+  { id: "verifying-implementation-against-docs", url: "/guides/verifying-implementation-against-docs", titleKey: "guides_verifying_implementation_against_docs_title" },
+  { id: "branch-contracts", url: "/guides/branch-contracts", titleKey: "guides_branch_contracts_title" }
 ];
 
 export class GuidesIndexViewModel {

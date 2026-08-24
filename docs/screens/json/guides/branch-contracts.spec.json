@@ -1,0 +1,56 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "BranchContracts",
+    "displayName": "Branch contracts",
+    "description": "Guides > Branch contracts. How the opt-in `branchContracts` section of a screen spec declares machine-checkable branch tables for VM/UseCase methods (jsonui-cli 1.6.18). Seven sections: what the section is (closed vocabulary over already-declared spec names, note entries as a counted escape hatch), a complete worked example, named conditions with witness states, the when vocabulary (data./arg./api./cond), the then vocabulary (data assignments, transition, api verdicts, partial request match), what validate enforces (unknown keys / ghost conditions / note+when = error; undeclared field, op, destination names = warning; absent referenced section = skip), and what the generated HTML shows (per-method decision tables with declared/note-only counts). ~7-min read.",
+    "platforms": ["web"],
+    "layoutFile": "guides/branch-contracts",
+    "createdAt": "2026-08-24",
+    "updatedAt": "2026-08-24"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Three closing cards: writing your first spec, verifying implementation against docs, writing screen tests."
+      }
+    ],
+    "eventHandlers": [
+      { "name": "onAppear", "description": "Seed nextReadLinks." },
+      {
+        "name": "onNavigate",
+        "params": [{ "name": "url", "type": "String" }],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "customTypes": [
+    {
+      "name": "NextReadLink",
+      "fields": [
+        { "name": "id", "type": "String" },
+        { "name": "titleKey", "type": "String" },
+        { "name": "descriptionKey", "type": "String" },
+        { "name": "url", "type": "String" }
+      ]
+    }
+  ],
+  "notes": [
+    "2026-08-24 — New page, requested alongside the jsonui-cli 1.6.18 uptake: branchContracts is the first machine-checked slice of a screen spec's behavioral prose, so it gets a dedicated authoring guide.",
+    "Canonical source: document_tools/jsonui_doc_cli/spec_doc/screen_spec_schema.py (branchContracts + branchCondition + branchMethodContract + branchEntry $defs; the descriptions there are the primary vocabulary definition) and spec_doc/validator.py (_validate_branch_contracts and its collectors define the error/warning/skip boundary).",
+    "Every validate message and the rendered decision-table text on this page were measured against the shipped 1.6.18 tools with a neutral fixture spec (ProfileScreen), not transcribed from release notes: each error/warning class was triggered one mutation at a time, and the HTML summary line (declared/note-only counts) comes from the actual generator output.",
+    "This page's layout file is kebab-case (branch-contracts.json); own-section string resolution for kebab basenames requires jsonui-cli >= 1.6.5."
+  ]
+}

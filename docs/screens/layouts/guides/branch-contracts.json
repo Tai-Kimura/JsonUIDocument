@@ -1,0 +1,295 @@
+{
+  "type": "View",
+  "id": "guides_branch_contracts_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks", "class": "CollectionDataSource" },
+        { "name": "onNavigateGuides", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "guides_branch_contracts_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "guides_branch_contracts_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 24, 32],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateGuides}",
+              "text": "breadcrumb"
+            },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 36, "fontWeight": "bold", "fontColor": "#0B1220", "text": "title" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 17, "fontColor": "#475467", "text": "lead" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 13, "fontColor": "#64748B", "text": "read_time" }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "guides_branch_contracts_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "guides_branch_contracts_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_what",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_what_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_what_body" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_example",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_example_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_example_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "\"branchContracts\": {\n  \"conditions\": {\n    \"formValid\": {\n      \"meaning\": \"every required field is filled\",\n      \"witness_true\":  { \"form\": { \"nickname\": \"a\" } },\n      \"witness_false\": { \"form\": { \"nickname\": \"\" } }\n    }\n  },\n  \"methods\": {\n    \"onTapSave\": {\n      \"baseline\": { \"isSaving\": false },\n      \"branches\": [\n        { \"when\": { \"cond\": \"!formValid\" },\n          \"then\": { \"data.errorMessage\": \"@profile_screen_invalid\", \"api\": \"none\" } },\n        { \"when\": { \"cond\": \"formValid\", \"api.updateProfile\": \"success\" },\n          \"then\": { \"transition\": \"HomeScreen\",\n                    \"api.updateProfile.request\": { \"nickname\": \"@data.form\" } } },\n        { \"when\": { \"cond\": \"formValid\", \"api.updateProfile\": \"failure\" },\n          \"then\": { \"data.errorMessage\": \"@profile_screen_failed\",\n                    \"api.updateProfile\": \"called\" } },\n        { \"note\": \"double-tap guard: second tap while isSaving is dropped\" }\n      ]\n    }\n  }\n}",
+                      "language": "json",
+                      "filename": "ProfileScreen.spec.json — branchContracts",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_conditions",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_conditions_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_conditions_body" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_when",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_when_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_when_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "key           | value                          | means\n--------------+--------------------------------+-------------------------------------------------\ndata.<field>  | literal                        | the declared data field holds this value\narg.<name>    | literal                        | the method argument holds this value\napi.<op>      | named mock scenario            | the API operation answers with this scenario\ncond          | condition name ('!' prefix ok) | a named condition from branchContracts.conditions",
+                      "language": "text",
+                      "filename": "when keys",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_then",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_then_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_then_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "key              | value                                    | asserts\n-----------------+------------------------------------------+--------------------------------------------\ndata.<field>     | literal / \"@strings_key\" / \"@data.<field>\" | the field ends up holding this value\ntransition       | destination name                         | the screen navigates there\napi              | \"none\"                                   | no API operation is called at all\napi.<op>         | \"called\" or \"not-called\"                 | whether that operation fires\napi.<op>.request | partial object                           | the request body contains these entries",
+                      "language": "text",
+                      "filename": "then keys",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_validate",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_validate_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_validate_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "text": "section_validate_bullet_error" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_validate_bullet_warning" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_validate_bullet_skip" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "[ERROR] ...when.flag.debug: Unknown when key 'flag.debug' — allowed: 'data.<field>',\n        'arg.<name>', 'api.<op>', 'cond'\n[ERROR] ...when.cond: cond references undeclared condition 'ghostCondition' — declare it\n        in branchContracts.conditions\n[ERROR] ...branches[3]: A note branch must contain only 'note' (found ['when']). Declare\n        the contract half as a separate {when, then} branch.\n[ERROR] branchContracts.methods.ghostMethod: Method 'ghostMethod' not found in\n        dataFlow.viewModel.methods or stateManagement.eventHandlers\n[WARNING] ...then.data.typoField: Data field 'typoField' is not declared in\n        stateManagement.uiVariables / dataFlow.viewModel.vars / stateManagement.states\n[WARNING] ...when.api.deleteProfile: API operation 'deleteProfile' is not declared in\n        dataFlow.repositories[].methods or dataFlow.useCases[].methods\n[WARNING] ...then.transition: Transition destination 'GhostScreen' does not match any\n        transitions[].destination",
+                      "language": "text",
+                      "filename": "jsonui-doc validate spec — findings",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_render",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_render_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_render_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "Branch Contracts\n1 method(s) — 3 declared branch(es), 1 note-only branch(es) outside the\nmachine-checkable contract.\n\nNamed Conditions\n  Name      | Meaning                        | Witness (true)          | Witness (false)\n  formValid | every required field is filled | form = {\"nickname\":\"a\"} | form = {\"nickname\":\"\"}\n\nonTapSave — Baseline: isSaving = false\n  # | When                                              | Then\n  1 | cond = \"!formValid\"                               | data.errorMessage = \"@profile_screen_invalid\", api = \"none\"\n  2 | cond = \"formValid\", api.updateProfile = \"success\" | transition = \"HomeScreen\", api.updateProfile.request = {...}\n  3 | cond = \"formValid\", api.updateProfile = \"failure\" | data.errorMessage = \"@profile_screen_failed\", api.updateProfile = \"called\"\n  4 | note (not machine-checked): double-tap guard: second tap while isSaving is dropped",
+                      "language": "text",
+                      "filename": "generated HTML — decision table (as text)",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_branch_contracts_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [32, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 24, "fontWeight": "bold", "fontColor": "chrome_ink", "text": "next_heading" },
+                    {
+                      "type": "Collection",
+                      "id": "guides_branch_contracts_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 3,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/next_step_card" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_branch_contracts_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 12, "fontColor": "#94A3B8", "text": "footer_copyright" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "guides_branch_contracts_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [24, 16, 24, 16],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_branch_contracts_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 0, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        { "id": "toc_what", "label": "toc_row_what", "anchor": "section_what", "level": 1 },
+                        { "id": "toc_example", "label": "toc_row_example", "anchor": "section_example", "level": 1 },
+                        { "id": "toc_conditions", "label": "toc_row_conditions", "anchor": "section_conditions", "level": 1 },
+                        { "id": "toc_when", "label": "toc_row_when", "anchor": "section_when", "level": 1 },
+                        { "id": "toc_then", "label": "toc_row_then", "anchor": "section_then", "level": 1 },
+                        { "id": "toc_validate", "label": "toc_row_validate", "anchor": "section_validate", "level": 1 },
+                        { "id": "toc_render", "label": "toc_row_render", "anchor": "section_render", "level": 1 }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
