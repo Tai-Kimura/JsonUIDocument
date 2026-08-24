@@ -2991,8 +2991,8 @@
       "ja": "branchContracts の宣言 1 本から、3 プラットフォームの実スタックユニットテストが出ます: `jsonui-test generate branch-tests` は同じ分岐表から web には vitest、Android には JUnit4（Robolectric）、iOS には XCTest を生成します — モックするのは HTTP 境界だけ。このページではコマンド、生成物と所有関係、各プラットフォームの harness 契約、生成を止めるエラー、そして結果を信頼する方法を説明します。"
     },
     "read_time": {
-      "en": "10 min read",
-      "ja": "10 分で読めます"
+      "en": "11 min read",
+      "ja": "11 分で読めます"
     },
     "section_what_heading": {
       "en": "1. One declaration, three platforms",
@@ -3087,24 +3087,24 @@
       "ja": "ios — すべて型付き: setState は Data.update(dictionary:) と VM 内部状態向けのイベントハンドラ経由、invoke / expectTransition / resolveString は閉じた switch です。skeleton 自身のコメントが契約を明文化しています:"
     },
     "section_errors_heading": {
-      "en": "7. What stops generation",
-      "ja": "7. 生成を止めるもの"
+      "en": "8. What stops generation",
+      "ja": "8. 生成を止めるもの"
     },
     "section_errors_body": {
       "en": "The binding chain is the same on every platform: api.<op> resolves through the dataFlow method's endpoint declaration to a mock file matched on source.method + path, then to the named scenario — a reference that cannot be bound is a hard error, because a test that cannot bind its vocabulary must not silently weaken. The platform flags have their own requirements. All six messages below are real output, one seeded mistake each:",
       "ja": "束縛の連鎖はどのプラットフォームでも同じです: api.<op> は dataFlow メソッドの endpoint 宣言 → source.method + path で照合したモックファイル → 名前つきシナリオ、の順に解決され、束縛できない参照は hard error です — 語彙を束縛できないテストを黙って弱くしてはならないからです。プラットフォームのフラグにもそれぞれ必須があります。以下の 6 メッセージは、誤りを 1 つずつ仕込んで得た実出力です:"
     },
     "section_scoped_heading": {
-      "en": "8. Platform-scoped branches",
-      "ja": "8. プラットフォーム限定の分岐"
+      "en": "9. Platform-scoped branches",
+      "ja": "9. プラットフォーム限定の分岐"
     },
     "section_scoped_body": {
       "en": "When implementations genuinely diverge — one platform surfaces an alert field of its own where the others share one — a branch can carry `platforms` (a non-empty subset of ios / android / web, since jsonui-cli 1.6.22; anything else fails validate). Each generator skips out-of-scope branches with an explicit comment and excludes them from its declared count — never silently:",
       "ja": "実装が本当に分かれているとき — 片方のプラットフォームだけ独自のアラート用フィールドを持ち、他は共有フィールドを使う、など — は分岐に `platforms`（ios / android / web の非空部分集合、jsonui-cli 1.6.22 から。それ以外は validate が拒否）を付けられます。各生成器は対象外の枝を明示コメントつきで skip し、宣言数のカウントからも除きます — 黙殺はしません:"
     },
     "section_redcheck_heading": {
-      "en": "9. Trust it: red-check, then regenerate",
-      "ja": "9. 信頼する手順: red-check と再生成"
+      "en": "11. Trust it: red-check, then regenerate",
+      "ja": "11. 信頼する手順: red-check と再生成"
     },
     "section_redcheck_body": {
       "en": "A green suite proves the tests can pass; a red-check proves they can fail. After the first green run, break one implementation line and confirm that exactly one branch goes red — then restore it. Vary the depth of the mutation rather than hunting for the one perfect line: a mutation at the decode/mapping stage — where the response becomes your domain value — behaves like a real failure, because a real payload drop empties every reader downstream of it; a shallow mutation of one stored field can stay green when the method reads the response directly. Shoot coarse to fine, and treat a probe that stays green as information, not failure — it is telling you which surface the contract actually watches.",
@@ -3113,6 +3113,30 @@
     "section_redcheck_regen": {
       "en": "The regeneration loop afterwards: edit the spec → `jsonui-doc validate spec` → generate again (the @generated pair is rewritten, the harness is kept) → run. The decision table and the tests stay two views of the same declaration.",
       "ja": "その後の再生成ループ: spec を編集 → `jsonui-doc validate spec` → 再生成（@generated の 2 ファイルは書き直し、harness は保持）→ 実行。決定表とテストは、同じ宣言の 2 つのビューであり続けます。"
+    },
+    "section_format_heading": {
+      "en": "7. Formatted strings: pseudo-key + harness formatting",
+      "ja": "7. 書式付き文字列: 擬似キー + harness 整形"
+    },
+    "section_format_body": {
+      "en": "`@key` resolves one whole entry of the string table — there is no vocabulary for format arguments, and hard-coding the formatted result (\"Resuming from step 0/10\") as a literal breaks on every locale but one. The locale-independent pattern: the spec declares a pseudo-key that names the expectation — `@resume_info_step_0_of_10` — and the harness's closed map resolves it by formatting the app's own string table with the arguments the name spells out. The expectation then flows through exactly the string the user sees, and the closed-map contract (unknown names fail loudly) already covers it:",
+      "ja": "`@key` は文字列表のエントリ 1 つを丸ごと解決する語彙で、書式引数を渡す語彙はありません。整形結果（\"Resuming from step 0/10\"）をリテラルで書き込むと、その 1 ロケール以外で壊れます。ロケール非依存のパターンは擬似キーです: spec 側は期待を名前にした擬似キー — `@resume_info_step_0_of_10` — を書き、harness の閉マップがそれを、名前が示す引数でアプリ自身の文字列表を整形して解決します。期待はユーザーが実際に見る文字列そのものを通り、閉マップの契約（未知の名前は loud fail）がそのまま効きます:"
+    },
+    "toc_row_format": {
+      "en": "Formatted strings",
+      "ja": "書式付き文字列"
+    },
+    "section_timemodel_heading": {
+      "en": "10. Time-dependent state: a note, not a platform split",
+      "ja": "10. 時間依存の状態は platforms ではなく note へ"
+    },
+    "section_timemodel_body": {
+      "en": "State that changes by itself after a delay — a banner that auto-dismisses after five seconds — can observe differently per platform even when the implementation is identical, because the test time models differ: the Android runtime drives a StandardTestDispatcher whose virtual clock advances inside settle(), so the dismissal has already fired; the iOS runtime drains the real-time main run loop in short slices, so it has not. That split is a property of the harnesses, not of the implementations — scoping such a branch with `platforms` would leak the test's time model into the spec. Declare the delayed outcome as a note with the reason, and keep the machine-checked branch to the immediately observable part. Auto-dismissing UI is common — check for this before puzzling over a one-platform red:",
+      "ja": "一定時間後に勝手に変わる状態 — 5 秒で自動的に消えるバナーなど — は、実装が同一でもプラットフォームごとに観測が割れ得ます。テストの時間モデルが違うからです: Android ランタイムは StandardTestDispatcher を回し、その仮想時計は settle() の中で進むので、消滅は既に起きています。iOS ランタイムは実時間の main run loop を短いスライスで drain するので、まだ起きていません。この割れは harness の性質であって実装差ではありません — こういう枝を `platforms` で面分割すると、テストの時間モデルが spec に漏れます。遅延後の結果は理由つきの note として宣言し、機械検証する枝は即時に観測できる部分に留めてください。自動で消える UI は頻出です — 片面だけの赤に悩む前にこれを疑ってください:"
+    },
+    "toc_row_timemodel": {
+      "en": "Time-dependent state",
+      "ja": "時間依存の状態"
     },
     "next_heading": {
       "en": "Keep going",
