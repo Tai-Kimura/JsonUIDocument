@@ -2579,8 +2579,8 @@
       "ja": "DTO の中身"
     },
     "section_dto_body": {
-      "en": "The DTO mirrors the schema 1:1. It is regenerated on every build, so editing it by hand has no effect — your changes get overwritten next build. Pick a platform tab to see the shape.",
-      "ja": "DTO は schema を 1:1 で写したものです。毎ビルド再生成されるため手で編集しても次回ビルドで上書きされます。各プラットフォーム タブで実際の形を確認してください。"
+      "en": "The DTO mirrors the schema 1:1. It is regenerated on every build, so editing it by hand has no effect — your changes get overwritten next build. Pick a platform tab to see the shape. A field constrained to a fixed set of values becomes a generated enum type, named after the schema and the field (`kind` on `Msg` gives `MsgKind`), and a schema that is nothing but such a constraint becomes an enum in its own right. Since jsonui-cli 1.6.14 the OpenAPI 3.1 spelling `const: \"chat\"` produces exactly the same thing as `enum: [\"chat\"]` — with or without an explicit `type` (bare `const` infers it from the value, which is the form FastAPI's `Literal` emits), keeping any `default` alongside it, down to byte-identical generated DTOs on all three platforms. Before 1.6.14 the const spelling was not read here and the field quietly came out as a plain string, so v1.6.14 is the floor if your schemas use it. The contract checker learned the same equivalence one release earlier, in 1.6.11, so both halves of the pipeline now read the two spellings as one thing.",
+      "ja": "DTO は schema を 1:1 で写したものです。毎ビルド再生成されるため手で編集しても次回ビルドで上書きされます。各プラットフォーム タブで実際の形を確認してください。取り得る値が固定されているフィールドは生成された enum 型になり、名前は schema 名とフィールド名から作られます（`Msg` の `kind` なら `MsgKind`）。またその制約だけでできている schema は、それ自体が独立した enum になります。jsonui-cli 1.6.14 からは OpenAPI 3.1 の綴り `const: \"chat\"` が `enum: [\"chat\"]` と完全に同じ結果を生みます — `type` の明示があってもなくても（素の `const` は値から型を推論します。FastAPI の `Literal` が吐くのはこの形です）、`default` を併記していればそれも保たれ、3 プラットフォームの生成 DTO はバイト単位で一致します。1.6.14 より前は const 綴りがここで読まれず、フィールドは黙って素の文字列型になっていたため、const を使うなら下限は v1.6.14 です。照合器は 1 つ前の 1.6.11 で同じ等価性を獲得しているので、パイプラインの両側が 2 つの綴りを同じものとして読むようになりました。"
     },
     "tab_swift": {
       "en": "Swift",
