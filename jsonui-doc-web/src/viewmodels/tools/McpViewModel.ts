@@ -20,10 +20,11 @@ interface NextReadCell {
   onNavigate: () => void;
 }
 
-// 44 tools across 6 groups: A (Lookup) → B (Validation) → C (Generation)
+// 45 tools across 6 groups: A (Lookup) → B (Validation) → C (Generation)
 // → D (Build + Runtime) → E (API Model Discovery, added 2026-05)
 // → F (Test Tooling, added 2026-07; artifacts tools added 2026-07-16).
-// search_specs + get_platform_rules added in MCP 2.8.0 (2026-08).
+// search_specs + get_platform_rules added in MCP 2.8.0;
+// test_generate_branch_tests in MCP 2.9.0 (2026-08).
 const TOOL_IDS = [
   "get_project_config", "list_screen_specs", "search_specs", "list_layouts",
   "list_component_specs", "lookup_component", "lookup_attribute",
@@ -42,7 +43,7 @@ const TOOL_IDS = [
 
   "test_validate", "test_generate_screen", "test_generate_flow",
   "test_generate_description", "test_report", "test_mock_generate",
-  "test_artifacts_pull", "test_artifacts_status",
+  "test_generate_branch_tests", "test_artifacts_pull", "test_artifacts_status",
 ] as const;
 
 export class McpViewModel {

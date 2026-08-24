@@ -501,7 +501,7 @@
       "ja": "~/.jsonui-mcp-server/ と ~/.claude.json"
     },
     "card_mcp_body": {
-      "en": "44 MCP tools across 6 groups (A:10 / B:7 / C:7 / D:9 / E:3 / F:8) with runtime-sync so the attribute schema is always current.",
+      "en": "45 MCP tools across 6 groups (A:10 / B:7 / C:7 / D:9 / E:3 / F:9) with runtime-sync so the attribute schema is always current.",
       "ja": "44 の MCP ツールを 6 グループ（A:10 / B:7 / C:7 / D:9 / E:3 / F:8）で提供。runtime-sync で常に最新の attribute スキーマを参照します。"
     },
     "card_agents_title": {
@@ -817,7 +817,7 @@
       "ja": "CLI リファレンス — jui / sjui / kjui / rjui の全コマンド"
     },
     "related_mcp_label": {
-      "en": "MCP reference — all 44 tools grouped by capability",
+      "en": "MCP reference — all 45 tools grouped by capability",
       "ja": "MCP リファレンス — 44 ツールを能力別に整理"
     },
     "related_agents_label": {
@@ -829,7 +829,7 @@
       "ja": "Hello, JsonUI — 最初の画面を 5 分で書く"
     },
     "related_get_data_source_label": {
-      "en": "MCP tool reference — all 44 tools incl. get-platform-rules",
+      "en": "MCP tool reference — all 45 tools incl. branch-test generation",
       "ja": "MCP ツールリファレンス — get-platform-rules を含む全 44 ツール"
     },
     "next_heading": {
@@ -1123,8 +1123,8 @@
       "ja": "MCP ツール API"
     },
     "article_mcp_tools_description": {
-      "en": "All 44 MCP tools with full parameter schemas + examples. Hand-authored catalog kept in sync with the MCP server's 6-group tool list.",
-      "ja": "全 44 MCP ツールの引数スキーマ + 例。MCP サーバの 6 グループ tool list と同期する手書きカタログです。"
+      "en": "All 45 MCP tools with full parameter schemas + examples. Hand-authored catalog kept in sync with the MCP server's 6-group tool list.",
+      "ja": "全 45 MCP ツールの引数スキーマ + 例。MCP サーバの 6 グループ tool list と同期する手書きカタログです。"
     },
     "article_mcp_tools_read_time": {
       "en": "hand-maintained",
@@ -2999,8 +2999,8 @@
       "ja": "1. 宣言 1 本、3 プラットフォーム"
     },
     "section_what_body": {
-      "en": "`jsonui-test generate branch-tests <screen>` resolves `<spec_directory>/<screen>.spec.json` (from jui.config.json; `--spec` overrides) and emits three files per platform: an @generated test file — one test per declared branch (arrange = baseline, then the condition's witness, then when's data entries, later wins; act = the method plus settle(); assert = exactly the then entries), with note-only branches listed as numbered comments so the coverage boundary stays visible — an @generated shared runtime, and a consumer-owned harness skeleton emitted only when the file does not exist. Common prerequisites: `endpoint` declarations on the dataFlow methods the contract references, and mock files under tests/mocks (*.mock.json with source.method/path and named scenarios). Each platform then needs its own runner (sections 3–5).",
-      "ja": "`jsonui-test generate branch-tests <screen>` は `<spec_directory>/<screen>.spec.json` を解決し（jui.config.json から。`--spec` で上書き可）、プラットフォームごとに 3 ファイルを出力します: @generated のテストファイル — 宣言済み分岐 1 つにつきテスト 1 つ（arrange = baseline → 条件の witness → when の data エントリの順に上書き、act = メソッド + settle()、assert = then のエントリだけ）で、note のみの分岐は番号つきコメントとして列挙されカバレッジの境界が見えたままになります — @generated の共有ランタイム、そしてファイルが無いときだけ出力される利用側所有の harness skeleton です。共通の前提は、コントラクトが参照する dataFlow メソッドへの `endpoint` 宣言と、tests/mocks 配下のモックファイル（source.method/path と名前つきシナリオを持つ *.mock.json）。あとは各プラットフォームのランナーが要ります（第 3〜5 節）。"
+      "en": "`jsonui-test generate branch-tests <screen>` resolves `<spec_directory>/<screen>.spec.json` (from jui.config.json; `--spec` overrides) and emits three files per platform: an @generated test file — one test per declared branch (arrange = baseline, then the condition's witness, then when's data entries, later wins; act = the method plus settle(); assert = exactly the then entries), with note-only branches listed as numbered comments so the coverage boundary stays visible — an @generated shared runtime, and a consumer-owned harness skeleton emitted only when the file does not exist. Common prerequisites: `endpoint` declarations on the dataFlow methods the contract references, and mock files under tests/mocks (*.mock.json with source.method/path and named scenarios). Each platform then needs its own runner (sections 3–5). Agents reach the same generator through the `test_generate_branch_tests` MCP tool (jsonui-mcp-server 2.9.0), which maps every flag above — restart Claude Code after updating the server so the new tool is visible.",
+      "ja": "`jsonui-test generate branch-tests <screen>` は `<spec_directory>/<screen>.spec.json` を解決し（jui.config.json から。`--spec` で上書き可）、プラットフォームごとに 3 ファイルを出力します: @generated のテストファイル — 宣言済み分岐 1 つにつきテスト 1 つ（arrange = baseline → 条件の witness → when の data エントリの順に上書き、act = メソッド + settle()、assert = then のエントリだけ）で、note のみの分岐は番号つきコメントとして列挙されカバレッジの境界が見えたままになります — @generated の共有ランタイム、そしてファイルが無いときだけ出力される利用側所有の harness skeleton です。共通の前提は、コントラクトが参照する dataFlow メソッドへの `endpoint` 宣言と、tests/mocks 配下のモックファイル（source.method/path と名前つきシナリオを持つ *.mock.json）。あとは各プラットフォームのランナーが要ります（第 3〜5 節）。エージェントからは MCP ツール `test_generate_branch_tests`（jsonui-mcp-server 2.9.0）で同じ生成器に届きます — 上記のフラグはすべて写像されています。サーバ更新後は Claude Code を完全に再起動すると新ツールが見えます。"
     },
     "section_what_outputs": {
       "en": "Ownership at a glance: the test file and the runtime are @generated — regenerate after every spec edit, they are rewritten in place; the harness (one per screen) is yours, and re-generation never overwrites it.",
@@ -3281,8 +3281,8 @@
       "ja": "4. when の語彙"
     },
     "section_when_body": {
-      "en": "Four key shapes, nothing else — anything outside this closed set is an error, not a guess. Multiple keys in one when are combined with AND.",
-      "ja": "キーの形は 4 つだけで、それ以外はありません — この閉集合の外はエラーであり、推測はしません。1 つの when に複数のキーを書くと AND になります。"
+      "en": "Four key shapes, nothing else — anything outside this closed set is an error, not a guess. Multiple keys in one when are combined with AND. `arg.<name>` binds to `dataFlow.viewModel.methods[].params` and nowhere else: eventHandlers have no params in the schema because they belong to the View layer, while the ViewModel's public API is what dataFlow declares — so a contract that fixes an argument requires the method to be part of that public API. Since jsonui-cli 1.6.30 an `arg` with no matching param is an error (test generation stops too); before that the declaration was silently dropped and the test ran with no arguments at all.",
+      "ja": "キーの形は 4 つだけで、それ以外はありません — この閉集合の外はエラーであり、推測はしません。1 つの when に複数のキーを書くと AND になります。`arg.<name>` の束縛先は `dataFlow.viewModel.methods[].params` だけです: eventHandlers はスキーマ上 params を持ちません — View 層に属するものだからで、ViewModel の公開 API は dataFlow が宣言する側です。したがって引数を固定する契約は、そのメソッドが公開 API であることを要求します。jsonui-cli 1.6.30 からは対応する param の無い `arg` はエラーです（テスト生成も停止します）。それ以前は宣言が黙って落とされ、引数なしでテストが走っていました。"
     },
     "section_then_heading": {
       "en": "5. The then vocabulary",
@@ -4457,6 +4457,18 @@
     "tool_test_mock_generate_role": {
       "en": "Scaffold API mock files from OpenAPI into `<mockDir>/generated/`; `check:true` reports drift without writing, comparing scenario bodies against the schema for their status code. (`mock serve` stays CLI-only.)",
       "ja": "OpenAPI から API モックファイルを `<mockDir>/generated/` に生成。`check:true` は書き込まず、各シナリオの本文をステータスコード対応のスキーマと突き合わせて drift を報告。（`mock serve` は CLI 専用。）"
+    },
+    "tool_test_generate_branch_tests_name": {
+      "en": "test_generate_branch_tests",
+      "ja": "test_generate_branch_tests"
+    },
+    "tool_test_generate_branch_tests_group": {
+      "en": "F",
+      "ja": "F"
+    },
+    "tool_test_generate_branch_tests_role": {
+      "en": "Generate unit-level branch tests from a spec's branchContracts (vitest / Kotlin JUnit4 + Robolectric / Swift XCTest). A screen with no branchContracts is an error, not a no-op.",
+      "ja": "spec の branchContracts からユニットレベルの分岐テストを生成（vitest / Kotlin JUnit4 + Robolectric / Swift XCTest）。branchContracts の無い画面はエラーで、no-op ではありません。"
     },
     "tool_test_artifacts_pull_name": {
       "en": "test_artifacts_pull",
@@ -9075,6 +9087,10 @@
     "tool_test_generate_description_params": {
       "en": "• test_type (string, required) — Whether the case belongs to a screen or flow test: screen / flow.\n• name (string, required) — Screen/flow name (e.g. login, checkout).\n• case_name (string, required) — Test case name (e.g. initial_display, happy_path).\n• path (string, optional) — Output file path (default: tests/<type>s/<name>/descriptions/<case_name>.json).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
       "ja": "• test_type (string, required) — ケースが screen / flow どちらのテストに属すか: screen / flow。\n• name (string, required) — 画面 / フロー名（例: login, checkout）。\n• case_name (string, required) — テストケース名（例: initial_display, happy_path）。\n• path (string, optional) — 出力ファイルパス（デフォルト: tests/<type>s/<name>/descriptions/<case_name>.json）。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+    },
+    "tool_test_generate_branch_tests_params": {
+      "en": "• screen (string, required) — Screen name in snake_case (resolves <spec_directory>/<screen>.spec.json).\n• platform (string, optional) — web (default) / android / ios. android also requires package; ios also requires module.\n• package (string, optional) — Kotlin package for the generated sources — required for platform 'android'.\n• module (string, optional) — App module name for @testable import — required for platform 'ios'.\n• spec (string, optional) — Explicit spec file path (overrides spec_directory resolution).\n• out_dir (string, optional) — Output directory for the @generated test + runtime files.\n• harness_dir (string, optional) — Project-owned harness directory (skeleton written only when absent).\n• mocks_dir (string, optional) — Directory scanned for *.mock.json scenario files.\n• project_dir (string, optional) — Project directory (overrides JUI_PROJECT_DIR).",
+      "ja": "• screen (string, 必須) — snake_case の画面名（<spec_directory>/<screen>.spec.json を解決）。\n• platform (string, 任意) — web（既定）/ android / ios。android は package、ios は module も必須。\n• package (string, 任意) — 生成ソースの Kotlin パッケージ — platform 'android' で必須。\n• module (string, 任意) — @testable import するアプリモジュール名 — platform 'ios' で必須。\n• spec (string, 任意) — spec ファイルパスの明示指定（spec_directory 解決を上書き）。\n• out_dir (string, 任意) — @generated のテスト + ランタイムの出力先。\n• harness_dir (string, 任意) — プロジェクト所有 harness のディレクトリ（skeleton は不在時のみ書き出し）。\n• mocks_dir (string, 任意) — *.mock.json を走査するディレクトリ。\n• project_dir (string, 任意) — プロジェクトディレクトリ（JUI_PROJECT_DIR を上書き）。"
     },
     "tool_test_report_params": {
       "en": "• files (string[], required) — Results JSON files to convert (multiple inputs merge into one report).\n• format (string, required) — Report format: junit / html.\n• output (string, optional) — Output file path (default: report.xml / report.html).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
