@@ -1,0 +1,376 @@
+{
+  "type": "View",
+  "id": "guides_branch_tests_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks", "class": "CollectionDataSource" },
+        { "name": "onNavigateGuides", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "guides_branch_tests_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "guides_branch_tests_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 24, 32],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateGuides}",
+              "text": "breadcrumb"
+            },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 36, "fontWeight": "bold", "fontColor": "#0B1220", "text": "title" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 17, "fontColor": "#475467", "text": "lead" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 13, "fontColor": "#64748B", "text": "read_time" }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "guides_branch_tests_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "guides_branch_tests_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_what",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_what_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_what_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_what_outputs" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_boundary",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_boundary_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_boundary_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "text": "section_boundary_bullet_none" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_web",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_web_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_web_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "$ jsonui-test generate branch-tests profile_screen\nGenerated branch tests for 'profile_screen':\n  tests/unit/generated/profile_screen.branches.test.ts  (3 declared branch(es), 1 note-only listed as comments)\n  tests/unit/generated/jsonui-branch-runtime.ts  (shared runtime)\n  tests/unit/branch-harness/profile_screen.ts  (NEW harness skeleton — implement createHarness())\n  routes: updateProfile",
+                      "language": "bash",
+                      "filename": "web (default) — output",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "it(\"branch 2: cond=\\\"formValid\\\" & api.updateProfile=\\\"success\\\"\", async () => {\n  const h = createHarness();\n  h.setState({\"isSaving\": false, \"form\": {\"nickname\": \"a\"}});\n  const rec = installFetchMock(ROUTES, {\"updateProfile\": \"success\"});\n  const ref_form = h.readField(\"form\");\n  try {\n    await (h.vm as any).onTapSave();\n    await settle();\n    h.expectTransition(\"HomeScreen\");\n    expect(rec.countFor(\"updateProfile\")).toBeGreaterThan(0);\n    expect(partialMismatches(rec.lastBodyFor(\"updateProfile\"), { \"nickname\": ref_form })).toEqual([]);\n  } finally {\n    rec.restore();\n  }\n});",
+                      "language": "typescript",
+                      "filename": "profile_screen.branches.test.ts — branch 2 (@generated)",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_web_launcher" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_android",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_android_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_android_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "$ jsonui-test generate branch-tests profile_screen \\\n    --platform android --package com.example.profile \\\n    --out-dir app/src/test/java --harness-dir app/src/test/java\nGenerated branch tests for 'profile_screen':\n  app/src/test/java/com/example/profile/ProfileScreenBranchesTest.kt  (3 declared branch(es), 1 note-only listed as comments)\n  app/src/test/java/com/example/profile/JsonuiBranchRuntime.kt  (shared runtime)\n  app/src/test/java/com/example/profile/ProfileScreenBranchHarness.kt  (NEW harness skeleton — implement createHarness())\n  routes: updateProfile",
+                      "language": "bash",
+                      "filename": "android — output",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_android_prereqs" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "// branch 2: cond=\"formValid\" & api.updateProfile=\"success\"\n@Test fun `onTapSave branch 2`() {\n  runBranchTest(routes, mapOf<String, Any?>(\"updateProfile\" to \"success\"), ::createProfileScreenBranchHarness) { h, rec ->\n    h.setState(mapOf<String, Any?>(\"isSaving\" to false, \"form\" to mapOf<String, Any?>(\"nickname\" to \"a\")))\n    val ref_form = h.readField(\"form\")\n    h.invoke(\"onTapSave\")\n    h.settle()\n    h.expectTransition(\"HomeScreen\")\n    assertTrue(rec.countFor(\"updateProfile\") > 0)\n    assertEquals(emptyList<String>(), partialMismatches(rec.lastBodyFor(\"updateProfile\"), mapOf<String, Any?>(\"nickname\" to Ref(ref_form))))\n  }\n}",
+                      "language": "kotlin",
+                      "filename": "ProfileScreenBranchesTest.kt — branch 2 (@generated)",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_ios",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_ios_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_ios_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "$ jsonui-test generate branch-tests profile_screen \\\n    --platform ios --module ProfileApp \\\n    --out-dir AppTests --harness-dir AppTests\nGenerated branch tests for 'profile_screen':\n  AppTests/ProfileScreenBranchesTest.swift  (3 declared branch(es), 1 note-only listed as comments)\n  AppTests/JsonuiBranchRuntime.swift  (shared runtime)\n  AppTests/ProfileScreenBranchHarness.swift  (NEW harness skeleton — implement createHarness())\n  routes: updateProfile",
+                      "language": "bash",
+                      "filename": "ios — output",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "// branch 2: cond=\"formValid\" & api.updateProfile=\"success\"\nfunc test_onTapSave_branch_2() {\n  runBranchTest(routes: routes, overrides: [\"updateProfile\": \"success\"],\n                    harnessFactory: createProfileScreenBranchHarness) { h, rec in\n    h.setState([\"isSaving\": false, \"form\": [\"nickname\": \"a\"]])\n    let ref_form = h.readField(\"form\")\n    h.invoke(\"onTapSave\", args: [])\n    h.settle()\n    h.expectTransition(\"HomeScreen\")\n    XCTAssertGreaterThan(rec.countFor(\"updateProfile\"), 0)\n    XCTAssertEqual(partialMismatches(rec.lastBodyFor(\"updateProfile\"), [\"nickname\": Ref(value: ref_form)]), [])\n  }\n}",
+                      "language": "swift",
+                      "filename": "ProfileScreenBranchesTest.swift — branch 2 (@generated)",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "text": "section_ios_bullet_interception" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_ios_bullet_asymmetry" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_ios_bullet_retain" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_ios_bullet_xcode" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_harness",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_harness_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_harness_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "text": "section_harness_bullet_web" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_harness_bullet_android" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_harness_bullet_ios" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "// Swift has no reflective writes, so this harness is the typed side of the\n// contract: setState routes through the generated Data.update(dictionary:)\n// (plus event-handler calls for VM-internal state), while invoke /\n// expectTransition / resolveString are closed switches — an unknown name\n// must fail loudly, never soften.",
+                      "language": "swift",
+                      "filename": "ProfileScreenBranchHarness.swift — skeleton contract comment",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_errors",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_errors_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_errors_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "Error: branches[1].when.api.updateProfile: api operation 'updateProfile' has no `endpoint`\n       declaration in dataFlow.repositories/useCases — declare the method with its\n       endpoint (e.g. \"endpoint\": \"POST /api/...\")\nError: branches[1].when.api.updateProfile: no mock file found for PUT /api/items\n       (op 'updateProfile') under the mocks directory\nError: branches[1].when.api.updateProfile: scenario 'timeout' not found in\n       ['failure', 'success'] (mock for PUT /api/items)\nError: condition 'formValid' has no witness_false — test generation needs a witness\n       to arrange the state\nError: --package is required for --platform android (Kotlin package of the generated\n       test sources)\nError: --module is required for --platform ios (the app module name for @testable import)",
+                      "language": "text",
+                      "filename": "hard generation errors — one seeded mistake each",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_scoped",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_scoped_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_scoped_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "// in ProfileScreenBranchesTest.swift (--platform ios):\n// branch 3 is platform-scoped (['web', 'android']) — not generated for ios\n\n// in profile_screen.branches.test.ts (web):\n// branch 4 is platform-scoped (['ios']) — not generated for web",
+                      "language": "text",
+                      "filename": "generator output — scoped branches are skipped loudly",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_redcheck",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_redcheck_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_redcheck_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_redcheck_regen" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_branch_tests_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [32, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 24, "fontWeight": "bold", "fontColor": "chrome_ink", "text": "next_heading" },
+                    {
+                      "type": "Collection",
+                      "id": "guides_branch_tests_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 3,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/next_step_card" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_branch_tests_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 12, "fontColor": "#94A3B8", "text": "footer_copyright" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "guides_branch_tests_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [24, 16, 24, 16],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_branch_tests_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 0, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        { "id": "toc_what", "label": "toc_row_what", "anchor": "section_what", "level": 1 },
+                        { "id": "toc_boundary", "label": "toc_row_boundary", "anchor": "section_boundary", "level": 1 },
+                        { "id": "toc_web", "label": "toc_row_web", "anchor": "section_web", "level": 1 },
+                        { "id": "toc_android", "label": "toc_row_android", "anchor": "section_android", "level": 1 },
+                        { "id": "toc_ios", "label": "toc_row_ios", "anchor": "section_ios", "level": 1 },
+                        { "id": "toc_harness", "label": "toc_row_harness", "anchor": "section_harness", "level": 1 },
+                        { "id": "toc_errors", "label": "toc_row_errors", "anchor": "section_errors", "level": 1 },
+                        { "id": "toc_scoped", "label": "toc_row_scoped", "anchor": "section_scoped", "level": 1 },
+                        { "id": "toc_redcheck", "label": "toc_row_redcheck", "anchor": "section_redcheck", "level": 1 }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

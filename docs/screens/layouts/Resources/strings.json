@@ -2977,6 +2977,216 @@
       "ja": "© 2026 JsonUI"
     }
   },
+  "guides_branch_tests": {
+    "breadcrumb": {
+      "en": "Guides",
+      "ja": "ガイド"
+    },
+    "title": {
+      "en": "Branch tests",
+      "ja": "分岐テスト生成"
+    },
+    "lead": {
+      "en": "One branchContracts declaration, three platforms of real-stack unit tests: `jsonui-test generate branch-tests` emits vitest for web, JUnit4 (Robolectric) for Android, and XCTest for iOS from the same branch tables — mocking nothing but the HTTP boundary. This page covers the command, the generated files and who owns them, the harness contract on each platform, the errors that stop generation, and how to trust the result.",
+      "ja": "branchContracts の宣言 1 本から、3 プラットフォームの実スタックユニットテストが出ます: `jsonui-test generate branch-tests` は同じ分岐表から web には vitest、Android には JUnit4（Robolectric）、iOS には XCTest を生成します — モックするのは HTTP 境界だけ。このページではコマンド、生成物と所有関係、各プラットフォームの harness 契約、生成を止めるエラー、そして結果を信頼する方法を説明します。"
+    },
+    "read_time": {
+      "en": "10 min read",
+      "ja": "10 分で読めます"
+    },
+    "section_what_heading": {
+      "en": "1. One declaration, three platforms",
+      "ja": "1. 宣言 1 本、3 プラットフォーム"
+    },
+    "section_what_body": {
+      "en": "`jsonui-test generate branch-tests <screen>` resolves `<spec_directory>/<screen>.spec.json` (from jui.config.json; `--spec` overrides) and emits three files per platform: an @generated test file — one test per declared branch (arrange = baseline, then the condition's witness, then when's data entries, later wins; act = the method plus settle(); assert = exactly the then entries), with note-only branches listed as numbered comments so the coverage boundary stays visible — an @generated shared runtime, and a consumer-owned harness skeleton emitted only when the file does not exist. Common prerequisites: `endpoint` declarations on the dataFlow methods the contract references, and mock files under tests/mocks (*.mock.json with source.method/path and named scenarios). Each platform then needs its own runner (sections 3–5).",
+      "ja": "`jsonui-test generate branch-tests <screen>` は `<spec_directory>/<screen>.spec.json` を解決し（jui.config.json から。`--spec` で上書き可）、プラットフォームごとに 3 ファイルを出力します: @generated のテストファイル — 宣言済み分岐 1 つにつきテスト 1 つ（arrange = baseline → 条件の witness → when の data エントリの順に上書き、act = メソッド + settle()、assert = then のエントリだけ）で、note のみの分岐は番号つきコメントとして列挙されカバレッジの境界が見えたままになります — @generated の共有ランタイム、そしてファイルが無いときだけ出力される利用側所有の harness skeleton です。共通の前提は、コントラクトが参照する dataFlow メソッドへの `endpoint` 宣言と、tests/mocks 配下のモックファイル（source.method/path と名前つきシナリオを持つ *.mock.json）。あとは各プラットフォームのランナーが要ります（第 3〜5 節）。"
+    },
+    "section_what_outputs": {
+      "en": "Ownership at a glance: the test file and the runtime are @generated — regenerate after every spec edit, they are rewritten in place; the harness (one per screen) is yours, and re-generation never overwrites it.",
+      "ja": "所有関係の要点: テストファイルとランタイムは @generated — spec を編集したら再生成し、毎回書き直されます。harness（画面ごとに 1 つ）はあなたのもので、再生成が上書きすることはありません。"
+    },
+    "section_boundary_heading": {
+      "en": "2. Mock only the HTTP boundary",
+      "ja": "2. モックは HTTP 境界だけ"
+    },
+    "section_boundary_body": {
+      "en": "The real ViewModel, UseCase, and Repository run in every test, and so does response decoding — the web runtime stubs fetch, Android points real Retrofit (and kotlinx-serialization decoding) at MockWebServer, iOS intercepts at URLProtocol under real Codable decoding. That is what lets \"the call returned 2xx but the payload was wrong\" failures land in the net instead of being mocked away. Every declared endpoint that has a mock answers with its default scenario, so incidental calls during the method do not fail the test.",
+      "ja": "どのテストでも本物の ViewModel・UseCase・Repository が走り、レスポンスのデコードも本物です — web ランタイムは fetch をスタブし、Android は本物の Retrofit（と kotlinx-serialization のデコード）を MockWebServer に向け、iOS は本物の Codable デコードの下で URLProtocol が横取りします。「2xx なのに中身が違う」系の失敗がモックに握り潰されず網にかかるのはこのためです。モックを持つ宣言済み endpoint は既定シナリオで応答するので、メソッド中の付随的な呼び出しがテストを壊すことはありません。"
+    },
+    "section_boundary_bullet_none": {
+      "en": "`api: \"none\"` asserts zero calls on the declared surface (the matched routes). Unrelated traffic — an analytics SDK posting telemetry, say — is recorded for diagnosis and answered with an error status, but does not fail the contract. This matters most on iOS, where interception is process-wide.",
+      "ja": "`api: \"none\"` は宣言面（照合済みルート）への呼び出しがゼロであることの表明です。無関係なトラフィック — たとえば解析 SDK のテレメトリ送信 — は診断用に記録されエラーステータスで応答されますが、契約を失敗させません。横取りがプロセス全体に及ぶ iOS でとくに効きます。"
+    },
+    "section_web_heading": {
+      "en": "3. Web (vitest)",
+      "ja": "3. Web（vitest）"
+    },
+    "section_web_body": {
+      "en": "Web is the default platform — no flags needed. Outputs land under tests/unit/; the project needs vitest (scope its config to the unit directory so an existing Playwright `npm test` stays untouched).",
+      "ja": "web が既定のプラットフォームで、フラグは不要です。出力は tests/unit/ 配下。プロジェクトには vitest が要ります（設定を unit ディレクトリに限定すれば、既存の Playwright の `npm test` はそのまま動きます）。"
+    },
+    "section_web_launcher": {
+      "en": "If `jsonui-test` rejects branch-tests as an invalid choice, an older console script on your PATH is shadowing the toolchain — use the launcher at `~/.jsonui-cli/test_tools/jsonui-test`.",
+      "ja": "`jsonui-test` が branch-tests を invalid choice として拒否する場合は、PATH 上の古い console script がツールチェーンを覆い隠しています — ランチャー `~/.jsonui-cli/test_tools/jsonui-test` を使ってください。"
+    },
+    "section_android_heading": {
+      "en": "4. Android (Robolectric)",
+      "ja": "4. Android（Robolectric）"
+    },
+    "section_android_body": {
+      "en": "Add `--platform android --package <pkg>` (since jsonui-cli 1.6.20). Here --out-dir and --harness-dir point at the Kotlin test source root and the package path is appended automatically. The runtime brings MockWebServer plus a reflection-based BaseBranchHarness that reads and sets fields, StateFlows, and data-class state generically; scenario bodies are embedded, so the generated file is self-contained.",
+      "ja": "`--platform android --package <pkg>` を足します（jsonui-cli 1.6.20 から）。このとき --out-dir と --harness-dir は Kotlin のテストソースルートを指し、パッケージパスは自動で付加されます。ランタイムは MockWebServer と、field・StateFlow・data class の状態を汎用に読み書きする reflection ベースの BaseBranchHarness を同梱。シナリオ本文は埋め込まれるため生成ファイルは自己完結です。"
+    },
+    "section_android_prereqs": {
+      "en": "Prerequisites: test dependencies (Robolectric, MockWebServer, kotlinx-coroutines-test, kotlin-reflect), `testOptions.unitTests.isIncludeAndroidResources = true` in the module's Gradle file, and a robolectric.properties that pins the sdk and names a plain Application class — a real DI-heavy Application will try to boot on the JVM and fail.",
+      "ja": "前提: テスト依存（Robolectric・MockWebServer・kotlinx-coroutines-test・kotlin-reflect）、モジュールの Gradle 設定に `testOptions.unitTests.isIncludeAndroidResources = true`、そして sdk をピンして素の Application クラスを指定する robolectric.properties — DI を積んだ実 Application は JVM 上で boot しようとして失敗します。"
+    },
+    "section_ios_heading": {
+      "en": "5. iOS (XCTest)",
+      "ja": "5. iOS（XCTest）"
+    },
+    "section_ios_body": {
+      "en": "Add `--platform ios --module <app module>` (since jsonui-cli 1.6.22) — --module names the module the tests `@testable import`. Point --out-dir and --harness-dir at the test target's folder; with Xcode 16's synchronized folders, having the files on disk is enough — no project-file editing.",
+      "ja": "`--platform ios --module <app module>` を足します（jsonui-cli 1.6.22 から）— --module はテストが `@testable import` するモジュール名です。--out-dir と --harness-dir はテストターゲットのフォルダを指してください。Xcode 16 の同期フォルダ形式なら、ファイルがディスクにあるだけで取り込まれます — プロジェクトファイルの編集は不要です。"
+    },
+    "section_ios_bullet_interception": {
+      "en": "Interception is process-wide: the runtime registers a URLProtocol and also swizzles the URLSessionConfiguration.default / .ephemeral getters, so network layers that build their own sessions from those configurations are captured too — nothing reaches the real network.",
+      "ja": "横取りはプロセス全体です: ランタイムは URLProtocol を登録し、さらに URLSessionConfiguration.default / .ephemeral の getter を swizzle するので、これらの configuration から自前でセッションを組むネットワーク層も捕捉されます — 実ネットワークには何も届きません。"
+    },
+    "section_ios_bullet_asymmetry": {
+      "en": "Reads are generic, writes are typed: the runtime reads any field via Mirror traversal (unwrapping @Published); Swift has no reflective writes, so setState goes through the generated Data.update(dictionary:) and declared event handlers — that typed side lives in your harness.",
+      "ja": "読みは汎用、書きは型付きです: ランタイムは Mirror 走査（@Published の unwrap 込み）でどのフィールドも読めますが、Swift に reflection での書き込みは無いので、setState は生成済みの Data.update(dictionary:) と宣言済みイベントハンドラを経由します — その型付きの面があなたの harness です。"
+    },
+    "section_ios_bullet_retain": {
+      "en": "Harnesses are deliberately retained for the process lifetime: deallocating @MainActor types on teardown goes through the isolated-deinit back-deploy shim on current simulators and crashes with an invalid free, so the runtime keeps the few test VMs alive instead — the full reason is a comment in the generated runtime.",
+      "ja": "harness は意図的にプロセス生存期間 retain されます: teardown で @MainActor 型を解放すると、現行シミュレータでは isolated deinit の back-deploy シムを通って不正 free でクラッシュするため、ランタイムはテスト数個分の VM を保持し続けます — 理由の全文は生成ランタイム内のコメントにあります。"
+    },
+    "section_ios_bullet_xcode": {
+      "en": "With Xcode 16's synchronized folders (FileSystemSynchronizedRootGroup), the generated files are picked up by the test target as soon as they exist on disk.",
+      "ja": "Xcode 16 の同期フォルダ（FileSystemSynchronizedRootGroup）なら、生成ファイルはディスクに置かれた時点でテストターゲットに取り込まれます。"
+    },
+    "section_harness_heading": {
+      "en": "6. The harness — your side of the contract",
+      "ja": "6. harness — 契約のあなた側"
+    },
+    "section_harness_body": {
+      "en": "One hand-written file per screen: it constructs the real ViewModel against the mock boundary and implements setState, invoke, expectTransition, and resolveString. The shared rule across all three platforms: unknown names must fail loudly — a harness that silently ignores a name it does not know would quietly weaken every branch that uses it. The three flavors:",
+      "ja": "画面ごとに手書き 1 ファイル: モック境界に向けて本物の ViewModel を構築し、setState / invoke / expectTransition / resolveString を実装します。3 プラットフォーム共通のルールは「未知の名前は loud fail」— 知らない名前を黙って無視する harness は、それを使う全分岐を静かに弱めてしまいます。3 つの流儀:"
+    },
+    "section_harness_bullet_web": {
+      "en": "web — plain closed maps: screenRoutes from transition destinations to URLs, and a closed string-key map (keep it closed so string-usage lint gates stay computable).",
+      "ja": "web — 素朴な閉マップ: 遷移先→URL の screenRoutes と、閉じた文字列キーのマップ（閉じたままにしておくと文字列使用 lint のゲートが計算可能に保たれます）。"
+    },
+    "section_harness_bullet_android": {
+      "en": "android — extend the generated reflection-based BaseBranchHarness (fields, StateFlows, and `_data` data-class copies are handled generically) and add closed maps for strings and transition predicates.",
+      "ja": "android — 生成済みの reflection ベース BaseBranchHarness を継承し（field・StateFlow・`_data` の data class copy は汎用処理されます）、strings と遷移述語の閉マップを足します。"
+    },
+    "section_harness_bullet_ios": {
+      "en": "ios — everything typed: setState through Data.update(dictionary:) plus event-handler routing for VM-internal state; invoke / expectTransition / resolveString as closed switches. The skeleton's own comment states the contract:",
+      "ja": "ios — すべて型付き: setState は Data.update(dictionary:) と VM 内部状態向けのイベントハンドラ経由、invoke / expectTransition / resolveString は閉じた switch です。skeleton 自身のコメントが契約を明文化しています:"
+    },
+    "section_errors_heading": {
+      "en": "7. What stops generation",
+      "ja": "7. 生成を止めるもの"
+    },
+    "section_errors_body": {
+      "en": "The binding chain is the same on every platform: api.<op> resolves through the dataFlow method's endpoint declaration to a mock file matched on source.method + path, then to the named scenario — a reference that cannot be bound is a hard error, because a test that cannot bind its vocabulary must not silently weaken. The platform flags have their own requirements. All six messages below are real output, one seeded mistake each:",
+      "ja": "束縛の連鎖はどのプラットフォームでも同じです: api.<op> は dataFlow メソッドの endpoint 宣言 → source.method + path で照合したモックファイル → 名前つきシナリオ、の順に解決され、束縛できない参照は hard error です — 語彙を束縛できないテストを黙って弱くしてはならないからです。プラットフォームのフラグにもそれぞれ必須があります。以下の 6 メッセージは、誤りを 1 つずつ仕込んで得た実出力です:"
+    },
+    "section_scoped_heading": {
+      "en": "8. Platform-scoped branches",
+      "ja": "8. プラットフォーム限定の分岐"
+    },
+    "section_scoped_body": {
+      "en": "When implementations genuinely diverge — one platform surfaces an alert field of its own where the others share one — a branch can carry `platforms` (a non-empty subset of ios / android / web, since jsonui-cli 1.6.22; anything else fails validate). Each generator skips out-of-scope branches with an explicit comment and excludes them from its declared count — never silently:",
+      "ja": "実装が本当に分かれているとき — 片方のプラットフォームだけ独自のアラート用フィールドを持ち、他は共有フィールドを使う、など — は分岐に `platforms`（ios / android / web の非空部分集合、jsonui-cli 1.6.22 から。それ以外は validate が拒否）を付けられます。各生成器は対象外の枝を明示コメントつきで skip し、宣言数のカウントからも除きます — 黙殺はしません:"
+    },
+    "section_redcheck_heading": {
+      "en": "9. Trust it: red-check, then regenerate",
+      "ja": "9. 信頼する手順: red-check と再生成"
+    },
+    "section_redcheck_body": {
+      "en": "A green suite proves the tests can pass; a red-check proves they can fail. After the first green run, break one implementation line and confirm that exactly one branch goes red — then restore it. Pick the line on the surface the contract observes: a payload field the method itself reads, a request field, a guard. A line that only feeds later screens will not turn anything red, and that silence tells you which surface the contract is actually watching.",
+      "ja": "緑のスイートは「通れること」しか証明しません。red-check が「落ちられること」を証明します。最初の緑のあと、実装の 1 行を壊してちょうど 1 分岐だけが赤くなることを確認し、元に戻してください。壊す行は契約が観測する面 — メソッド自身が読むペイロードのフィールド、リクエストのフィールド、ガード — から選ぶこと。後続画面にしか渡らない行は何も赤くしませんし、その沈黙は契約が実際に見ている面を教えてくれます。"
+    },
+    "section_redcheck_regen": {
+      "en": "The regeneration loop afterwards: edit the spec → `jsonui-doc validate spec` → generate again (the @generated pair is rewritten, the harness is kept) → run. The decision table and the tests stay two views of the same declaration.",
+      "ja": "その後の再生成ループ: spec を編集 → `jsonui-doc validate spec` → 再生成（@generated の 2 ファイルは書き直し、harness は保持）→ 実行。決定表とテストは、同じ宣言の 2 つのビューであり続けます。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_contracts_title": {
+      "en": "Branch contracts",
+      "ja": "分岐コントラクト"
+    },
+    "next_contracts_description": {
+      "en": "The declaration side: vocabulary, validate, and the rendered decision tables.",
+      "ja": "宣言の側: 語彙・validate・決定表の描画。"
+    },
+    "next_testing_title": {
+      "en": "Writing screen tests",
+      "ja": "画面テストの書き方"
+    },
+    "next_testing_description": {
+      "en": "Screen and flow tests — the executable side of behavior documentation.",
+      "ja": "画面テストとフローテスト — 振る舞い記述の実行可能な側。"
+    },
+    "next_verifying_title": {
+      "en": "Verifying implementation against docs",
+      "ja": "実装とドキュメントの照合"
+    },
+    "next_verifying_description": {
+      "en": "The wider check suite that keeps spec and implementation from drifting.",
+      "ja": "spec と実装のずれを防ぐ、より広い検査群。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI",
+      "ja": "© 2026 JsonUI"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの内容"
+    },
+    "toc_row_what": {
+      "en": "One declaration, 3 platforms",
+      "ja": "宣言 1 本、3 面"
+    },
+    "toc_row_boundary": {
+      "en": "HTTP boundary only",
+      "ja": "HTTP 境界だけ"
+    },
+    "toc_row_web": {
+      "en": "Web (vitest)",
+      "ja": "Web（vitest）"
+    },
+    "toc_row_android": {
+      "en": "Android",
+      "ja": "Android"
+    },
+    "toc_row_ios": {
+      "en": "iOS",
+      "ja": "iOS"
+    },
+    "toc_row_harness": {
+      "en": "Harness contract",
+      "ja": "harness 契約"
+    },
+    "toc_row_errors": {
+      "en": "Hard errors",
+      "ja": "生成エラー"
+    },
+    "toc_row_scoped": {
+      "en": "Platform-scoped branches",
+      "ja": "プラットフォーム限定"
+    },
+    "toc_row_redcheck": {
+      "en": "Red-check & regenerate",
+      "ja": "red-check と再生成"
+    }
+  },
   "guides_branch_contracts": {
     "breadcrumb": {
       "en": "Guides",
@@ -2991,8 +3201,8 @@
       "ja": "画面 spec は、各メソッドの分岐を機械検証可能な表として宣言できます。任意の `branchContracts` 節は、spec が既に宣言している名前だけの閉じた語彙で分岐を記述させます — だから `jsonui-doc validate` が検査でき、生成ドキュメントには決定表として描画され、`jsonui-test` はユニットテストを生成できます。jsonui-cli 1.6.18 から。節を書かない既存 spec には一切影響しません。"
     },
     "read_time": {
-      "en": "9 min read",
-      "ja": "9 分で読めます"
+      "en": "8 min read",
+      "ja": "8 分で読めます"
     },
     "section_what_heading": {
       "en": "1. What branch contracts are",
@@ -3007,8 +3217,8 @@
       "ja": "2. 完全な例"
     },
     "section_example_body": {
-      "en": "One method, four branches: the guard fails, the save succeeds, the save fails, and one note. `@profile_screen_invalid` is a strings.json key reference, `@data.form` copies another data field, and `api.updateProfile.request` asserts a partial request body. The when value for `api.<op>` names a mock scenario such as \"success\" or \"failure\" — validate does not check the name, but test generation (section 8) binds it to your mock files and fails hard if it does not exist.",
-      "ja": "1 メソッド・4 分岐: ガード失敗、保存成功、保存失敗、そして note が 1 つ。`@profile_screen_invalid` は strings.json のキー参照、`@data.form` は別のデータフィールドのコピー、`api.updateProfile.request` はリクエストボディの部分照合です。when の `api.<op>` の値は \"success\" や \"failure\" のようなモックシナリオ名です — validate は名前を検査しませんが、テスト生成（第 8 節）がモックファイルへ束縛し、存在しなければ hard error にします。"
+      "en": "One method, four branches: the guard fails, the save succeeds, the save fails, and one note. `@profile_screen_invalid` is a strings.json key reference, `@data.form` copies another data field, and `api.updateProfile.request` asserts a partial request body. The when value for `api.<op>` names a mock scenario such as \"success\" or \"failure\" — validate does not check the name, but test generation binds it to your mock files and fails hard if it does not exist (see the Branch tests guide).",
+      "ja": "1 メソッド・4 分岐: ガード失敗、保存成功、保存失敗、そして note が 1 つ。`@profile_screen_invalid` は strings.json のキー参照、`@data.form` は別のデータフィールドのコピー、`api.updateProfile.request` はリクエストボディの部分照合です。when の `api.<op>` の値は \"success\" や \"failure\" のようなモックシナリオ名です — validate は名前を検査しませんが、テスト生成がモックファイルへ束縛し、存在しなければ hard error にします（Branch tests ガイド参照）。"
     },
     "section_conditions_heading": {
       "en": "3. Named conditions and witnesses",
@@ -3035,8 +3245,8 @@
       "ja": "結果側も同じく閉じています。data.<field> の値はリテラル、`@strings_key` 参照、または `@data.<field>`（別フィールドのコピー）。`\"api\": \"none\"` は操作が一切発火しないことを、`api.<op>` は特定操作の発火有無を表明します。`api.<op>.request` はリクエストボディの部分照合で、書いたエントリだけが検査され、それ以外は無視されます。"
     },
     "section_validate_heading": {
-      "en": "6. What validate enforces",
-      "ja": "6. validate は何を検査するか"
+      "en": "7. What validate enforces",
+      "ja": "7. validate は何を検査するか"
     },
     "section_validate_body": {
       "en": "`jsonui-doc validate spec` (also reachable through the doc MCP tools) draws a deliberate line between errors and warnings. Every message below is real validator output, each produced by seeding one mistake into the example spec:",
@@ -3059,56 +3269,40 @@
       "ja": "警告を宣言に昇格させるとき — 未宣言フィールドの警告を dataFlow.viewModel.vars への追加で解消する場合は、`observable` を実装の実際の型に合わせてください。`observable: true`（既定）は生成される Protocol にリアクティブ形 — iOS は @Published、Android は StateFlow、web は Data オブジェクト経由 — を要求させるので、plain な var をそのまま宣言するとコンパイルが通りません。その場合は `observable: false` で宣言します。片方のプラットフォームにしか無いフィールドは `platforms` で面を限定できます（省略 = 全プラットフォーム、`[]` は「どこにも無い」で警告）。"
     },
     "section_render_heading": {
-      "en": "7. What the generated docs show",
-      "ja": "7. 生成ドキュメントの描画"
+      "en": "8. What the generated docs show",
+      "ja": "8. 生成ドキュメントの描画"
     },
     "section_render_body": {
       "en": "`jsonui-doc generate spec` renders the section as decision tables: a summary line counting methods, declared branches, and note-only branches (\"outside the machine-checkable contract\"), a Named Conditions table showing both witnesses, and one numbered when/then table per method with its baseline row. The text below is the actual generated HTML for the example above, flattened to text:",
       "ja": "`jsonui-doc generate spec` はこの節を決定表として描画します: メソッド数・宣言済み分岐数・note のみの分岐数（\"outside the machine-checkable contract\"）を数えるサマリ行、両方の witness を並べた Named Conditions 表、そしてメソッドごとに baseline 行つきの番号入り when/then 表です。以下は上の例から実際に生成した HTML をテキスト化したものです:"
     },
-    "section_tests_heading": {
-      "en": "8. Generating tests from the contract",
-      "ja": "8. コントラクトからテストを生成する"
+    "section_scoped_heading": {
+      "en": "6. Platform-scoped branches",
+      "ja": "6. プラットフォーム限定の分岐"
     },
-    "section_tests_body": {
-      "en": "Since jsonui-cli 1.6.19, `jsonui-test generate branch-tests <screen>` turns the same declarations into web (vitest) unit tests — one `it` per declared branch (arrange = baseline, then the condition's witness, then when's data entries, later wins; act = the method itself; assert = exactly the then entries, nothing more), with note-only branches listed as numbered comments so the coverage boundary stays visible. Three things must be in place: `endpoint` declarations on the dataFlow methods the contract references, mock files under tests/mocks (*.mock.json with source.method/path and named scenarios), and vitest in the project. (If `jsonui-test` rejects branch-tests as an invalid choice, an older console script on your PATH is shadowing the toolchain — use the launcher at `~/.jsonui-cli/test_tools/jsonui-test`.)",
-      "ja": "jsonui-cli 1.6.19 からは、`jsonui-test generate branch-tests <screen>` が同じ宣言を web（vitest）ユニットテストにします — 宣言済み分岐 1 つにつき `it` が 1 つ（arrange = baseline → 条件の witness → when の data エントリの順に上書き、act = メソッドそのもの、assert = then のエントリだけ）。note のみの分岐は番号つきコメントとして列挙され、カバレッジの境界が見えたままになります。前提は 3 つ: コントラクトが参照する dataFlow メソッドへの `endpoint` 宣言、tests/mocks 配下のモックファイル（source.method/path と名前つきシナリオを持つ *.mock.json）、そしてプロジェクトの vitest です。（`jsonui-test` が branch-tests を invalid choice として拒否する場合は、PATH 上の古い console script がツールチェーンを覆い隠しています — ランチャー `~/.jsonui-cli/test_tools/jsonui-test` を使ってください。）"
+    "section_scoped_body": {
+      "en": "A branch may carry `platforms` alongside when/then — a non-empty subset of ios / android / web (since jsonui-cli 1.6.22) — declaring that this outcome exists only on those platforms. Real implementations do diverge: one platform may surface an alert field of its own where the others share one, and scoping the branch keeps the divergence declared instead of papered over. validate rejects anything else with \"platforms must be a non-empty array of ['ios', 'android', 'web']\"; test generators skip out-of-scope branches with an explicit comment and count (see the Branch tests guide).",
+      "ja": "分岐には when/then と並べて `platforms` — ios / android / web の非空部分集合（jsonui-cli 1.6.22 から）— を付けられます。「この結果はこれらのプラットフォームにだけ存在する」という宣言です。実装は本当に分かれることがあります: 片方だけ独自のアラート用フィールドを持ち、他は共有フィールドを使う、など。枝を面で限定すれば、その分岐は取り繕われず宣言されたままになります。それ以外の値は validate が \"platforms must be a non-empty array of ['ios', 'android', 'web']\" で拒否します。テスト生成器は対象外の枝を明示コメント+カウントつきで skip します（Branch tests ガイド参照）。"
     },
-    "section_tests_bullet_mock": {
-      "en": "Mocking happens at the HTTP boundary only — the real ViewModel, UseCase, and Repository run in every test; fetch is stubbed to answer with the named scenarios from your mock files. Every declared endpoint that has a mock also answers with its default scenario, so incidental calls during the method do not fail the test.",
-      "ja": "モックは HTTP 境界だけです — どのテストでも本物の ViewModel・UseCase・Repository が走り、fetch がモックファイルの名前つきシナリオで応答するようスタブされます。モックを持つ宣言済み endpoint は既定シナリオでも応答するので、メソッド中の付随的な呼び出しがテストを壊すことはありません。"
+    "section_generate_heading": {
+      "en": "9. Generating tests from the contract",
+      "ja": "9. コントラクトからテストを生成する"
     },
-    "section_tests_bullet_harness": {
-      "en": "The harness — ViewModel construction, the data store, a router recorder, the screenRoutes map from transition destinations to URLs, and resolveString — is consumer-owned: a skeleton is emitted only when the file does not exist, and re-generation never overwrites it. The @generated test and runtime files are rewritten on every run.",
-      "ja": "harness — ViewModel の構築、データストア、router の記録、遷移先→URL の screenRoutes マップ、resolveString — は利用側の所有です: skeleton はファイルが無いときだけ出力され、再生成が上書きすることはありません。@generated のテストとランタイムは毎回書き直されます。"
+    "section_generate_body": {
+      "en": "The same declarations generate real-stack unit tests for all three platforms — vitest on web, JUnit4 (Robolectric) on Android, XCTest on iOS — one test per declared branch, mocking only the HTTP boundary, with hard errors whenever a declared reference cannot be bound to a real mock scenario. The generation machinery, the harness you own, and the red-check discipline have their own guide:",
+      "ja": "同じ宣言から、3 プラットフォームすべての実スタックユニットテストが生成できます — web は vitest、Android は JUnit4（Robolectric）、iOS は XCTest。宣言済み分岐 1 つにつきテスト 1 つ、モックは HTTP 境界だけ、宣言した参照が実在のモックシナリオに束縛できなければ hard error です。生成の仕組み・あなたが所有する harness・red-check の作法は専用ガイドにまとめました:"
     },
-    "section_tests_bullet_binding": {
-      "en": "Every api.<op> resolves through the dataFlow method's endpoint declaration to a mock file matched on source.method + path, and then to the named scenario. A reference that cannot be bound is a hard generation error — a test that cannot bind its vocabulary must not silently weaken. All four messages below are real output, one seeded mistake each:",
-      "ja": "api.<op> はすべて、dataFlow メソッドの endpoint 宣言 → source.method + path で照合したモックファイル → 名前つきシナリオ、の順で解決されます。束縛できない参照は生成時の hard error です — 語彙を束縛できないテストを黙って弱くしてはならないからです。以下の 4 メッセージは、誤りを 1 つずつ仕込んで得た実出力です:"
+    "section_generate_link": {
+      "en": "Branch tests — generating unit tests from branchContracts →",
+      "ja": "Branch tests — branchContracts からのユニットテスト生成 →"
     },
-    "toc_row_tests": {
+    "toc_row_scoped": {
+      "en": "Platform-scoped branches",
+      "ja": "プラットフォーム限定"
+    },
+    "toc_row_generate": {
       "en": "Generating tests",
       "ja": "テスト生成"
-    },
-    "section_android_heading": {
-      "en": "9. Android (JVM) generation",
-      "ja": "9. Android（JVM）生成"
-    },
-    "section_android_body": {
-      "en": "Since jsonui-cli 1.6.20, the same declarations also generate Kotlin JUnit4 (Robolectric) tests: add `--platform android --package <pkg>`. Here --out-dir and --harness-dir point at the Kotlin test source root (for example app/src/test/java) and the package path is appended automatically. Vocabulary binding and its hard errors are identical to the web path, and --package itself is required (its absence is one more hard error). iOS is not supported yet — `--platform` accepts web and android only.",
-      "ja": "jsonui-cli 1.6.20 からは、同じ宣言から Kotlin JUnit4（Robolectric）テストも生成できます: `--platform android --package <pkg>` を足すだけです。このとき --out-dir と --harness-dir は Kotlin のテストソースルート（例: app/src/test/java）を指し、パッケージパスは自動で付加されます。語彙の束縛とその hard error は web と完全に同一で、--package 自体も必須です（欠けるとこれも hard error）。iOS は未対応 — `--platform` が受けるのは web と android だけです。"
-    },
-    "section_android_bullet_design": {
-      "en": "The HTTP boundary is MockWebServer — the real Retrofit ApiService, Repository, and kotlinx-serialization DTO decoding all run in every test, so \"the call returned 2xx but the payload was wrong\" failures land in the net. Scenario bodies are embedded into the generated file, so the test is self-contained, and the runtime ships a reflection-based BaseBranchHarness that can read and set fields, StateFlows, and data-class state generically.",
-      "ja": "HTTP 境界は MockWebServer です — 本物の Retrofit ApiService・Repository・kotlinx-serialization の DTO デコードが毎回走るので、「2xx なのに中身が違う」系の失敗が網にかかります。シナリオ本文は生成ファイルに埋め込まれるため自己完結で、ランタイムには field・StateFlow・data class の状態を汎用に読み書きする reflection ベースの BaseBranchHarness が同梱されます。"
-    },
-    "section_android_bullet_prereqs": {
-      "en": "Consumer prerequisites: test dependencies (Robolectric, MockWebServer, kotlinx-coroutines-test, kotlin-reflect), `testOptions.unitTests.isIncludeAndroidResources = true` in the module's Gradle file, and a robolectric.properties that pins the sdk and names a plain Application class — a real DI-heavy Application will try to boot on the JVM and fail.",
-      "ja": "利用側の前提: テスト依存（Robolectric・MockWebServer・kotlinx-coroutines-test・kotlin-reflect）、モジュールの Gradle 設定に `testOptions.unitTests.isIncludeAndroidResources = true`、そして sdk をピンして素の Application クラスを指定する robolectric.properties — DI を積んだ実 Application は JVM 上で boot しようとして失敗します。"
-    },
-    "toc_row_android": {
-      "en": "Android generation",
-      "ja": "Android 生成"
     },
     "next_heading": {
       "en": "Keep going",

@@ -1,0 +1,56 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "BranchTests",
+    "displayName": "Branch tests",
+    "description": "Guides > Branch tests. Dedicated page (user-directed split from the branch-contracts guide) for `jsonui-test generate branch-tests` across all three platforms (jsonui-cli 1.6.19 web, 1.6.20 android, 1.6.22 ios). Nine sections: what it generates and who owns which file, the HTTP-boundary-only design principle (incl. api:\"none\" = zero matched-route calls), per-platform sections for web/vitest, android/Robolectric+MockWebServer, ios/XCTest+URLProtocol (with the read/write asymmetry, config swizzle, process-lifetime harness retain, Xcode 16 file placement), the harness contract in its three flavors, the hard generation errors, platform-scoped branches (`platforms` key, loud skip), and the red-check discipline + regeneration flow. ~10-min read.",
+    "platforms": ["web"],
+    "layoutFile": "guides/branch-tests",
+    "createdAt": "2026-08-24",
+    "updatedAt": "2026-08-24"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Three closing cards: branch contracts (the declaration side), writing screen tests, verifying implementation against docs."
+      }
+    ],
+    "eventHandlers": [
+      { "name": "onAppear", "description": "Seed nextReadLinks." },
+      {
+        "name": "onNavigate",
+        "params": [{ "name": "url", "type": "String" }],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "customTypes": [
+    {
+      "name": "NextReadLink",
+      "fields": [
+        { "name": "id", "type": "String" },
+        { "name": "titleKey", "type": "String" },
+        { "name": "descriptionKey", "type": "String" },
+        { "name": "url", "type": "String" }
+      ]
+    }
+  ],
+  "notes": [
+    "2026-08-24 — New page for the v1.6.22 uptake, per user direction: generation moves off /guides/branch-contracts into this dedicated guide; the old page keeps declaration/validate/decision-table and links here.",
+    "Canonical sources: test_tools/jsonui_test_cli/branch_tests.py (module docstring + the ios runtime template's reason comments — URLProtocol config swizzle, retain-for-process-lifetime) and document_tools screen_spec_schema/validator for the branch-level platforms key.",
+    "Measurement: web and android sections reuse the fixture-measured outputs from the v1.6.19/v1.6.20 uptakes; ios generation, --module requirement, the platforms-scoped skip comments (both directions), the platforms validate error, and the api:\"none\" matchedCalls() assertion were measured against the shipped 1.6.22 tools with the same neutral fixture. The ios @generated blocks on the page are verbatim generator output; actual XCTest execution was not run here (no xcodebuild in this lane) — execution evidence is the upstream P3b report's 6/6 green.",
+    "The HTML decision table does not yet tag platforms-scoped branch rows (only the test generators honor the key visibly) — noted upstream in the v1.6.22 acceptance report; this page deliberately claims only validate + generator behavior."
+  ]
+}
