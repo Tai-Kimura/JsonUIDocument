@@ -101,6 +101,24 @@
     "repositories": [
       {
         "name": "CliCommandsRepository",
+        "methods": [
+          {
+            "name": "binaries",
+            "description": "Every binary in dataset order."
+          },
+          {
+            "name": "commands",
+            "description": "Every command, ordered by the binary order declared in the dataset."
+          },
+          {
+            "name": "commandCount",
+            "description": "Total number of commands."
+          },
+          {
+            "name": "countsByBinary",
+            "description": "Commands per binary, keyed by binary name, in dataset order."
+          }
+        ],
         "description": "Hand-written. Statically imports src/data/cli-commands.json, staged and validated from docs/data/cli-commands.json by scripts/build-cli-commands.ts (npm run build:cli, part of prebuild). No network call — the catalogue is bundled so it renders during the static export."
       }
     ],
