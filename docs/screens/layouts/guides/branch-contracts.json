@@ -413,6 +413,15 @@
                       "text": "section_validate_bullet_skip"
                     },
                     {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_validate_bullet_crossface"
+                    },
+                    {
                       "type": "CodeBlock",
                       "width": "matchParent",
                       "height": "wrapContent",
@@ -420,6 +429,17 @@
                       "code": "[ERROR] ...when.flag.debug: Unknown when key 'flag.debug' — allowed: 'data.<field>',\n        'arg.<name>', 'api.<op>', 'cond'\n[ERROR] ...when.cond: cond references undeclared condition 'ghostCondition' — declare it\n        in branchContracts.conditions\n[ERROR] ...branches[3]: A note branch must contain only 'note' (found ['when']). Declare\n        the contract half as a separate {when, then} branch.\n[ERROR] branchContracts.methods.ghostMethod: Method 'ghostMethod' not found in\n        dataFlow.viewModel.methods or stateManagement.eventHandlers\n[WARNING] ...then.data.typoField: Data field 'typoField' is not declared in\n        stateManagement.uiVariables / dataFlow.viewModel.vars / stateManagement.states\n[WARNING] ...when.api.deleteProfile: API operation 'deleteProfile' is not declared in\n        dataFlow.repositories[].methods or dataFlow.useCases[].methods\n[WARNING] ...then.transition: Transition destination 'GhostScreen' does not match any\n        transitions[].destination",
                       "language": "text",
                       "filename": "jsonui-doc validate spec — findings",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "[WARNING] validation.serverSide[0]: Prose mentions branch-like token 'payment_expired'\n          that branchContracts does not know — declare the branch (or scenario) or\n          update the stale prose\n[WARNING] userActions[0]: Prose routes to transition 'SettingsScreen' but no branch of\n          the contracted method(s) declares `then.transition` to it — declare the\n          branch or update the stale prose",
+                      "language": "text",
+                      "filename": "cross-face warnings — one seeded drift each",
                       "showLineNumbers": false,
                       "copyable": false
                     }
