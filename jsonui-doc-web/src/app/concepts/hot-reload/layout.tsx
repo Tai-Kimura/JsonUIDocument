@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `Hot reload everywhere — JsonUI`,
-  description: `One JSON edit, three simulators update in under a second. Web is Next.js dev; iOS and Android both run a Dynamic mode that pulls Layout JSON over the network…`,
+  description: `One JSON edit, three simulators update in under a second. On web the React dev server you already run does it — Next.js dev in the default setup, but any dev…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

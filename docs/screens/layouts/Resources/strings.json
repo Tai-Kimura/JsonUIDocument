@@ -1357,8 +1357,8 @@
       "ja": "全プラットフォームで hot reload"
     },
     "article_hot_reload_description": {
-      "en": "Dynamic mode on iOS + Android, Next.js dev on web. One edit, three live reloads.",
-      "ja": "iOS と Android は Dynamic mode、Web は Next.js dev。1 つの編集で 3 プラットフォームが即反映。"
+      "en": "Dynamic mode on iOS + Android, your own dev server on web. One edit, three live reloads.",
+      "ja": "iOS と Android は Dynamic mode、Web は dev server の HMR。1 つの編集で 3 プラットフォームが即反映。"
     },
     "article_hot_reload_read_time": {
       "en": "~5 min read",
@@ -1779,20 +1779,20 @@
       "ja": "全プラットフォームで hot reload"
     },
     "lead": {
-      "en": "One JSON edit, three simulators update in under a second. Web is Next.js dev; iOS and Android both run a Dynamic mode that pulls Layout JSON over the network at runtime. Here is how each platform does it.",
-      "ja": "1 回の JSON 編集で、3 つのシミュレータが 1 秒以内に更新される。Web は Next.js dev、iOS と Android はどちらもランタイムで Layout JSON をネットワーク経由で読み直す Dynamic mode を使います。各プラットフォームの仕組みを解説。"
+      "en": "One JSON edit, three simulators update in under a second. On web the React dev server you already run does it — Next.js dev in the default setup, but any dev server that watches your source tree; iOS and Android both run a Dynamic mode that pulls Layout JSON over the network at runtime. Here is how each platform does it.",
+      "ja": "1 回の JSON 編集で、3 つのシミュレータが 1 秒以内に更新される。Web は既に動かしている React の dev server がそのまま担当し（既定構成では Next.js dev、ただしソースツリーを監視する dev server なら何でも同じ）、iOS と Android はどちらもランタイムで Layout JSON をネットワーク経由で読み直す Dynamic mode を使います。各プラットフォームの仕組みを解説。"
     },
     "read_time": {
       "en": "~5 min read",
       "ja": "約 5 分"
     },
     "section_web_heading": {
-      "en": "Web: Next.js dev",
-      "ja": "Web: Next.js dev"
+      "en": "Web: your framework's dev server",
+      "ja": "Web: フレームワークの dev server"
     },
     "section_web_body": {
-      "en": "Web is the simplest case: `jui hotload listen` is deliberately out of scope for web because Next.js already does everything on its own. Run `npm run dev` and edit a Layout JSON — rjui regenerates the TSX as part of your normal `jui build` loop, and Next.js's dev server picks up the TSX diff and HMR-pushes the new component to the open tab. No custom runtime, no network fetch, no additional watcher process.",
-      "ja": "Web は一番シンプルなケース: `jui hotload listen` は意図的に Web 対象外 — Next.js が既に自力でライブリロードを実現しているからです。`npm run dev` を起動して Layout JSON を編集すると、rjui は通常の `jui build` ループの中で TSX を再生成し、Next.js の dev server が TSX の差分を検知して HMR push する。カスタムランタイムもネットワーク fetch も追加の watcher プロセスも不要。"
+      "en": "Web is the simplest case: `jui hotload listen` is not a web target at all — the hotload server lists only ios and android as supported platforms, annotated with the note that web is build-step only. A React dev server already does live reload on its own. Start it and edit a Layout JSON: rjui regenerates the TSX as part of your normal `jui build` loop, the dev server sees the changed file under your source tree, and the component in the open tab is hot-module-replaced. No custom runtime, no network fetch, no additional watcher process. Nothing in that loop is Next-specific. Next.js App Router is the default `web_framework` adapter, so `npm run dev` with Fast Refresh is what most projects see — but the toolchain's own web conformance host runs Vite + React with no Next dependency and reloads exactly the same way. Which framework you target is a `web_framework` question, answered in the Web framework adapters guide; hot reload does not change with the answer.",
+      "ja": "Web は一番シンプルなケース: `jui hotload listen` はそもそも Web を対象にしていません — hotload サーバーがサポート対象として挙げるのは ios と android だけで、web は build ステップのみと注記されています。React の dev server が既に自力でライブリロードを実現しているからです。dev server を起動して Layout JSON を編集すると、rjui は通常の `jui build` ループの中で TSX を再生成し、dev server がソースツリー上の変更を検知して、開いているタブのコンポーネントを HMR で差し替える。カスタムランタイムもネットワーク fetch も追加の watcher プロセスも不要。このループに Next 固有のものは何もありません。既定の `web_framework` アダプタが Next.js App Router なので、多くのプロジェクトが見るのは Fast Refresh 付きの `npm run dev` ですが、ツールチェーン自身の web conformance ホストは Next 非依存の Vite + React で、まったく同じように反映されます。どのフレームワークを対象にするかは `web_framework` の話で、答えは Web フレームワークアダプタのガイドにあります — hot reload の仕組みはその答えによって変わりません。"
     },
     "section_ios_heading": {
       "en": "iOS: SwiftJsonUI Dynamic mode",
@@ -1847,8 +1847,8 @@
       "ja": "このページ"
     },
     "toc_row_web": {
-      "en": "Web: Next.js dev",
-      "ja": "Web: Next.js dev"
+      "en": "Web: your framework's dev server",
+      "ja": "Web: フレームワークの dev server"
     },
     "toc_row_ios": {
       "en": "iOS: SwiftJsonUI Dynamic mode",
@@ -5843,8 +5843,8 @@
       "ja": "得られるもの"
     },
     "section_get_body": {
-      "en": "`jui build` delegates web generation to rjui, which emits plain React TSX that Next.js compiles and serves. No custom runtime, no bundler plugins beyond what you already have — if Next.js can build it, it is already in your pipeline. The output has a boring generated-file header, imports StringManager for i18n, and looks like TSX anyone on your team could have written; it is just produced deterministically from the Layout JSON.",
-      "ja": "`jui build` は Web の生成を rjui に委譲します — rjui が素の React TSX を emit し、Next.js がそれをコンパイルして配信します。カスタムランタイムも既存にないバンドラプラグインも不要 — Next.js がビルドできるならあなたのパイプラインには既にあります。出力は退屈な生成ファイルヘッダー付き、i18n のために StringManager を import し、チームの誰が書いてもおかしくない TSX に見える — ただ Layout JSON から決定論的に生成されるだけです。"
+      "en": "`jui build` delegates web generation to rjui, which emits plain React TSX that your framework compiles and serves — Next.js by default. No custom runtime, no bundler plugins beyond what you already have — if your React toolchain can build TSX, it is already in your pipeline. The output has a boring generated-file header, imports StringManager for i18n, and looks like TSX anyone on your team could have written; it is just produced deterministically from the Layout JSON.",
+      "ja": "`jui build` は Web の生成を rjui に委譲します — rjui が素の React TSX を emit し、フレームワーク（既定では Next.js）がそれをコンパイルして配信します。カスタムランタイムも既存にないバンドラプラグインも不要 — React のツールチェーンで TSX をビルドできるなら、あなたのパイプラインには既にあります。出力は退屈な生成ファイルヘッダー付き、i18n のために StringManager を import し、チームの誰が書いてもおかしくない TSX に見える — ただ Layout JSON から決定論的に生成されるだけです。"
     },
     "section_next_heading": {
       "en": "Next.js integration",
@@ -7127,8 +7127,8 @@
       "ja": "• Release ビルドではシートもジェスチャも描画せず、オーバーレイの state も一切確保しません。container は content closure の直接呼び出しに退化します。"
     },
     "section_overview_bullet_platforms": {
-      "en": "• iOS (SwiftJsonUI, SwiftUI) and Android (KotlinJsonUI, Jetpack Compose) ship a container. ReactJsonUI does not. If you want a screen-switcher on the web app, you'd build it yourself — but hot-reload on the web is handled by Next.js's own dev server, so the motivation is weaker.",
-      "ja": "• iOS (SwiftJsonUI, SwiftUI) と Android (KotlinJsonUI, Jetpack Compose) に container が同梱されています。ReactJsonUI には同梱されていません。Web アプリで画面切替が欲しいなら自分で作ることになりますが、Web 側のホットリロードは Next.js の dev server で完結するので動機は弱いです。"
+      "en": "• iOS (SwiftJsonUI, SwiftUI) and Android (KotlinJsonUI, Jetpack Compose) ship a container. ReactJsonUI does not. If you want a screen-switcher on the web app, you'd build it yourself — but hot-reload on the web is handled by whichever React dev server you already run, so the motivation is weaker.",
+      "ja": "• iOS (SwiftJsonUI, SwiftUI) と Android (KotlinJsonUI, Jetpack Compose) に container が同梱されています。ReactJsonUI には同梱されていません。Web アプリで画面切替が欲しいなら自分で作ることになりますが、Web 側のホットリロードは既に使っている React の dev server で完結するので動機は弱いです。"
     },
     "section_conform_heading": {
       "en": "2. Conform your Screen enum to DeveloperScreen",
@@ -7905,8 +7905,8 @@
       "ja": "4. ランタイムの言語切替"
     },
     "section_runtime_body": {
-      "en": "Reactive language switching is Web-only. `StringManager.setLanguage(locale)` mutates the singleton and Next.js re-renders consuming components. On iOS and Android, StringManager has no setLanguage API — the device locale is the source of truth, picked up via Settings > General > Language on iOS and Settings > System > Languages on Android. In-app toggles on mobile require hand-written code (Locale.preferredLanguages on iOS, AppCompatDelegate.setApplicationLocales() on Android).",
-      "ja": "リアクティブな言語切替は Web 専用です。`StringManager.setLanguage(locale)` が singleton を書き換え、Next.js が消費コンポーネントを再描画します。iOS と Android の StringManager には setLanguage API が無く、デバイス locale が source of truth — iOS は設定 > 一般 > 言語と地域、Android は設定 > システム > 言語から取得されます。アプリ内トグルをモバイルで実装するには手書きコードが必要（iOS は Locale.preferredLanguages、Android は AppCompatDelegate.setApplicationLocales()）。"
+      "en": "Reactive language switching is Web-only. `StringManager.setLanguage(locale)` mutates the singleton and React re-renders consuming components — the generated string hook subscribes through useSyncExternalStore, so this is React behavior, not a Next.js feature. On iOS and Android, StringManager has no setLanguage API — the device locale is the source of truth, picked up via Settings > General > Language on iOS and Settings > System > Languages on Android. In-app toggles on mobile require hand-written code (Locale.preferredLanguages on iOS, AppCompatDelegate.setApplicationLocales() on Android).",
+      "ja": "リアクティブな言語切替は Web 専用です。`StringManager.setLanguage(locale)` が singleton を書き換え、React が消費コンポーネントを再描画します — 生成される文字列 hook が useSyncExternalStore で購読しており、Next.js の機能ではなく React の振る舞いです。iOS と Android の StringManager には setLanguage API が無く、デバイス locale が source of truth — iOS は設定 > 一般 > 言語と地域、Android は設定 > システム > 言語から取得されます。アプリ内トグルをモバイルで実装するには手書きコードが必要（iOS は Locale.preferredLanguages、Android は AppCompatDelegate.setApplicationLocales()）。"
     },
     "section_new_lang_heading": {
       "en": "5. Adding a new locale (five steps)",
