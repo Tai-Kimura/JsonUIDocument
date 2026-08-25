@@ -1,0 +1,75 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "GuidesIndex",
+    "displayName": "Guides",
+    "description": "Catalog page for the Guides section: task-oriented how-to articles, each card carrying a title, summary and (where relevant) the platforms it applies to. Rendered both at the standalone URL and inline in the home TabView; the catalog is seeded statically in the owning ViewModel, so a content repository can replace the seed later without touching this spec.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "guides_index",
+    "createdAt": "2026-08-25",
+    "updatedAt": "2026-08-25"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "articles",
+        "type": "[CatalogEntry]",
+        "initial": "[]",
+        "description": "Ordered catalog of Guides entries. Order is editorial, not alphabetical — it is the order a reader should meet them in."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed `articles` from the ViewModel's catalog. Every user-visible string resolves through StringManager so the language toggle reaches these cards."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation to the selected entry."
+      }
+    ],
+    "displayLogic": []
+  },
+  "customTypes": [
+    {
+      "name": "CatalogEntry",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String"
+        },
+        {
+          "name": "titleKey",
+          "type": "String"
+        },
+        {
+          "name": "descriptionKey",
+          "type": "String"
+        },
+        {
+          "name": "url",
+          "type": "String"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "2026-08-25 — Authored when the spec-coverage check (jsonui-cli 1.6.35) reported this index layout as a screen with no spec. The index pages are real screens (they render at their own URL and inside the home TabView), so they are declared as screens rather than marked `\"role\": \"cell\"`. The catalog itself is seeded in the owning ViewModel; this spec records the screen's shape and its one data surface."
+  ]
+}

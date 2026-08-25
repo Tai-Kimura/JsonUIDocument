@@ -5,10 +5,12 @@
     "name": "LearnIndex",
     "displayName": "Learn",
     "description": "Catalog page for the Learn section. Lists every learn-track article with status (live / upcoming), read time, and one-line description. Dual-purpose: rendered inline inside the home TabView AND at the standalone URL /learn. v1 seeds the catalog statically in the owning ViewModel; a DocContentRepository can replace the seed later without touching this spec.",
-    "platforms": ["web"],
-    "layoutFile": "learn/index",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "learn_index",
     "createdAt": "2026-04-23",
-    "updatedAt": "2026-04-23"
+    "updatedAt": "2026-08-25"
   },
   "structure": {
     "components": [],
@@ -34,7 +36,10 @@
       {
         "name": "onNavigate",
         "params": [
-          { "name": "url", "type": "String" }
+          {
+            "name": "url",
+            "type": "String"
+          }
         ],
         "description": "Client-side navigation. Only the live cards fire this. Destination URLs are spec-mapped (e.g. /learn/installation)."
       }
@@ -54,7 +59,12 @@
         },
         {
           "name": "onNavigate",
-          "params": [{ "name": "url", "type": "String" }],
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
           "description": "router.push(url). All live article cards funnel through this one method. Upcoming entries have no onClick binding at the cell layout level."
         }
       ],
@@ -71,12 +81,30 @@
       {
         "name": "LearnArticle",
         "properties": [
-          { "name": "id",             "type": "String" },
-          { "name": "titleKey",       "type": "String" },
-          { "name": "descriptionKey", "type": "String" },
-          { "name": "readTimeKey",    "type": "String" },
-          { "name": "status",         "type": "String" },
-          { "name": "url",            "type": "String" }
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "readTimeKey",
+            "type": "String"
+          },
+          {
+            "name": "status",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
         ]
       }
     ]
@@ -130,6 +158,7 @@
     "LearnArticle.url is always present — even upcoming entries declare their future URL so the catalog is one additive step away from lighting up each row as content ships.",
     "When LearnIndex is rendered inside home.TabView, its Data is supplied by HomeViewModel. When it's rendered at the /learn standalone route (future), its Data is supplied by its own LearnIndexViewModel. The screen contract (what Data fields exist) is identical either way — only the *owner* of the seed differs.",
     "v1 ships 5 catalog entries, 2 live. The upcoming 3 are placeholders that give the reader a sense of the curriculum ahead; their spec files will be authored in separate tasks.",
-    "Strings prefix: `learn_index_*` (per first-prefix-fix, the namespace derives from the directory + basename, so the `learn/index.json` layout resolves its bare-text keys under `learn_index.*`)."
+    "Strings prefix: `learn_index_*` (per first-prefix-fix, the namespace derives from the directory + basename, so the `learn/index.json` layout resolves its bare-text keys under `learn_index.*`).",
+    "2026-08-25 — layoutFile corrected from 'learn/index' to 'learn_index': the layout has always lived at the flat path, and the stale nested spelling meant the spec claimed a layout that does not exist. Surfaced by the spec-coverage check added in jsonui-cli 1.6.35 — no earlier gate compared these two sides."
   ]
 }
