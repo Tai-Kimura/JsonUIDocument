@@ -73,17 +73,35 @@
       {
         "name": "NextReadLink",
         "properties": [
-          { "name": "id", "type": "String" },
-          { "name": "titleKey", "type": "String" },
-          { "name": "descriptionKey", "type": "String" },
-          { "name": "url", "type": "String" }
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
         ]
       }
     ]
   },
   "userActions": [
-    { "action": "Tap a TOC entry", "processing": "TOC-internal scroll." },
-    { "action": "Tap a NextReadLink card", "processing": "onNavigate(url)." }
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
   ],
   "validation": {
     "clientSide": [],
@@ -126,6 +144,7 @@
     "Section 7 — section_validation: the five validator rules; --no-install for inspection; role-then-steps ordering warning.",
     "Section 8 — section_limits: web hydration gap, suspending transitions, no exclusivity assertion.",
     "Every claim is taken from the canonical screen_identity.json and its measured evidence; nothing here is inferred from the implementation report alone.",
-    "2026-07-31 — marker-absent bullet extended: drivers Android 1.8.2 / web 1.8.1 name the likeliest culprit in the failure message. Android distinguishes another app owning the foreground (system dialog, stuck picker) from stale generated code — the stale-codegen hint only appears when the app under test is frontmost; web appends the current URL, which surfaces auth redirects. Source: 2026-07-31-platform-truth-mcp-and-inbox-three.md §5."
+    "2026-07-31 — marker-absent bullet extended: drivers Android 1.8.2 / web 1.8.1 name the likeliest culprit in the failure message. Android distinguishes another app owning the foreground (system dialog, stuck picker) from stale generated code — the stale-codegen hint only appears when the app under test is frontmost; web appends the current URL, which surfaces auth redirects. Source: 2026-07-31-platform-truth-mcp-and-inbox-three.md §5.",
+    "2026-08-25 — v1.6.37 uptake: the app-owned paragraph now mirrors the canon's added sentence — having no layout is what these screens are, not an omission, which is why the spec-coverage check passes over them (nothing to carry a role, nothing for the spec to describe). The canon gained that sentence because the declaration acquired a new reader; the page follows for the same reason."
   ]
 }
