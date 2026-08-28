@@ -5,7 +5,9 @@
     "name": "CanonicalMarks",
     "displayName": "Referencing the API canon from a spec",
     "description": "Guides > Referencing the API canon from a spec. The `@canonical` / `@canonical.wire` marks introduced in jsonui-cli 1.7.0, which let a dataFlow method that declares an `endpoint` reference the OpenAPI operation instead of restating it. Seven sections: what a mark is and which dataFlow sections are walked, what expansion produces (parameters + JSON requestBody properties, required -> non-optional), the mixed form and same-name precedence, `spec.canonical_param_case`, why returnType takes only `@canonical.wire` (domain type vs wire type), the three non-marks (omission, unresolved = error with all five messages verbatim, plain `@canonical` on returnType), and when a hand-written declaration is the right answer.",
-    "platforms": ["web"],
+    "platforms": [
+      "web"
+    ],
     "layoutFile": "guides/canonical-marks",
     "createdAt": "2026-08-28",
     "updatedAt": "2026-08-28"
@@ -27,10 +29,18 @@
       }
     ],
     "eventHandlers": [
-      { "name": "onAppear", "description": "Seed nextReadLinks." },
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
       {
         "name": "onNavigate",
-        "params": [{ "name": "url", "type": "String" }],
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
         "description": "Client-side navigation."
       }
     ],
@@ -40,10 +50,22 @@
     {
       "name": "NextReadLink",
       "fields": [
-        { "name": "id", "type": "String" },
-        { "name": "titleKey", "type": "String" },
-        { "name": "descriptionKey", "type": "String" },
-        { "name": "url", "type": "String" }
+        {
+          "name": "id",
+          "type": "String"
+        },
+        {
+          "name": "titleKey",
+          "type": "String"
+        },
+        {
+          "name": "descriptionKey",
+          "type": "String"
+        },
+        {
+          "name": "url",
+          "type": "String"
+        }
       ]
     }
   ],
@@ -51,8 +73,10 @@
     "2026-08-28 — New page for the v1.7.0 uptake. The feature has no home on an existing page: /guides/api-data-models covers where the OpenAPI documents live and DTO generation, /guides/writing-your-first-spec covers dataFlow itself, and neither is about referencing the canon from a method declaration.",
     "Canonical sources: shared/core/openapi_canonical.py (module docstring, iter_marked_methods, resolve_params, resolve_return_type, miss_reason, param_case_for) and the screen_spec schema's params/returnType/endpoint descriptions.",
     "Every code block on this page is measured output, not illustration: the expansion samples, the three casing rows, the wire-lift error and all five unresolved-mark messages were produced by running the shipped shared/core against a fixture OpenAPI document (a required + an optional query parameter, and a JSON requestBody with one required property).",
+    "2026-08-28 (v1.7.1) — two facts added to section 2 after measuring them: path variables are expanded as arguments (the expansion does not filter on a parameter's `in`, while route matching normalizes variable names away, so a rename moves the signature without moving the resolution), and `required` on a body property is an AND with `requestBody.required` (1.7.1 warns rather than leaving it to be noticed). The section 1 sentence about `required` was published before this was known and now carries a forward reference instead of an unqualified claim.",
     "The `section_what_bullet_where` sentence records a measured limit rather than a documented one: marks are walked only in dataFlow.repositories[] and dataFlow.useCases[], while the schema accepts the same method shape (endpoint, params, returnType) under dataFlow.viewModel.methods[]. A mark written there is left as the literal string and validate reports nothing. Filed upstream separately; the sentence stays until the walk or the schema changes.",
     "Census figures (320 endpoint-declaring methods across four projects, 63% referenceable) are quoted from the upstream release report; this lane did not measure them and the page attributes them as a count from real projects rather than as a property of the tool.",
-    "This site declares no endpoints and has no docs/api, so nothing here could be converted to marks — the page is written from fixtures, which is also why the fixtures are described in the prose."
+    "This site declares no endpoints and has no docs/api, so nothing here could be converted to marks — the page is written from fixtures, which is also why the fixtures are described in the prose.",
+    "Upstream confirmed the viewModel-mark filing and chose to make it an error rather than to walk that section (specification-rules.md rule 14 already says a ViewModel does not call an API directly). When that ships, the `section_what_bullet_where` sentence changes from 'not expanded and validate does not object' to whatever the error says."
   ]
 }

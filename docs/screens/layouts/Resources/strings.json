@@ -11299,8 +11299,8 @@
       "ja": "1. マークとは何か"
     },
     "section_what_body": {
-      "en": "Two marks, each a string standing in the position it replaces. `@canonical` stands in for a method's `params` and expands to the operation's `parameters` plus the properties of a JSON `requestBody` — POST-shaped methods usually carry their arguments in the body, so a version of this feature that read only `parameters` would find a fraction of what is there. A parameter the canon marks `required` becomes a non-optional type; everything else gets the optional spelling. `@canonical.wire` stands in for `returnType` and resolves to the schema name the success response references.",
-      "ja": "マークは 2 つ、どちらも置き換える位置に書く文字列です。`@canonical` はメソッドの `params` の位置に立ち、operation の `parameters` と JSON `requestBody` のプロパティへ展開されます — POST 系のメソッドは引数のほとんどが body 側にあるので、`parameters` だけを読む実装なら実在する引数の一部しか拾えません。正本で `required` が付いた引数は非オプショナル型に、それ以外はオプショナル表記になります。`@canonical.wire` は `returnType` の位置に立ち、成功応答が参照するスキーマ名へ解決されます。"
+      "en": "Two marks, each a string standing in the position it replaces. `@canonical` stands in for a method's `params` and expands to the operation's `parameters` plus the properties of a JSON `requestBody` — POST-shaped methods usually carry their arguments in the body, so a version of this feature that read only `parameters` would find a fraction of what is there. A parameter the canon marks `required` becomes a non-optional type; everything else gets the optional spelling — with one qualifier for body properties, in the next section. `@canonical.wire` stands in for `returnType` and resolves to the schema name the success response references.",
+      "ja": "マークは 2 つ、どちらも置き換える位置に書く文字列です。`@canonical` はメソッドの `params` の位置に立ち、operation の `parameters` と JSON `requestBody` のプロパティへ展開されます — POST 系のメソッドは引数のほとんどが body 側にあるので、`parameters` だけを読む実装なら実在する引数の一部しか拾えません。正本で `required` が付いた引数は非オプショナル型に、それ以外はオプショナル表記になります — body のプロパティにはもう 1 つ条件があり、次節で述べます。`@canonical.wire` は `returnType` の位置に立ち、成功応答が参照するスキーマ名へ解決されます。"
     },
     "section_what_caption": {
       "en": "Reference instead of restating:",
@@ -11325,6 +11325,18 @@
     "section_expand_caption": {
       "en": "Measured against the fixture above:",
       "ja": "上の fixture に対する実測:"
+    },
+    "section_expand_bullet_path": {
+      "en": "• Path variables are arguments too. The expansion does not filter by where a parameter lives, so `GET /api/venues/{venue_id}/items` contributes `venueId` alongside the query parameters. Route matching, by contrast, normalizes variable names away — `{id}` and `{item_id}` are the same route. The same rename therefore leaves resolution untouched and changes the generated signature, which is worth knowing before you read a conversion diff.",
+      "ja": "• パス変数も引数になります。展開は引数がどこに在るかで絞らないので、`GET /api/venues/{venue_id}/items` は query 引数と並んで `venueId` を持ち込みます。一方でルート照合は変数名を正規化して無視します — `{id}` と `{item_id}` は同じルートです。したがって同じ改名が、解決には無影響で生成シグネチャには影響する、という分かれ方をします。変換の diff を読む前に知っておく価値があります。"
+    },
+    "section_expand_bullet_required": {
+      "en": "• For body properties, `required` is an AND with `requestBody.required`. A caller may omit an optional body entirely, so a property inside it cannot be an unconditional argument: with `requestBody.required` unset, everything in the body expands optional however the schema marks it. Since 1.7.1 that says so rather than leaving you to notice, and it is a warning rather than an error because the declaration is legal and the expansion is correct.",
+      "ja": "• body のプロパティでは、`required` は `requestBody.required` との AND です。任意の body は呼び出し側が丸ごと省略できるので、その中のプロパティを無条件の引数にはできません: `requestBody.required` が未設定なら、schema がどう書いていても body の中身は全てオプショナルに展開されます。1.7.1 からはその旨を明示するようになりました(気づくのを待たない)。宣言自体は合法で展開も正しいため、エラーではなく警告です。"
+    },
+    "section_expand_caption_warn": {
+      "en": "The warning, verbatim:",
+      "ja": "その警告文(実測):"
     },
     "section_mix_heading": {
       "en": "3. Mixing hand-written entries in",
