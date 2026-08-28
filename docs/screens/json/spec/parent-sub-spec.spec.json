@@ -4,11 +4,13 @@
   "metadata": {
     "name": "SpecParentSubSpec",
     "displayName": "Parent + sub specs",
-    "description": "Pattern 2 of spec splitting — deep dive into screen_parent_spec + screen_sub_spec. When to use, how `subSpecs[]` and `metadata.parentSpec` reference each other, what validator treats as inherited vs child-owned, and what `jui build` does at merge time.",
-    "platforms": ["web"],
+    "description": "Pattern 2 of spec splitting — deep dive into screen_parent_spec + screen_sub_spec. Rewritten for jsonui-cli 1.7.6, where the parent became a pure container: every behavioural section is supplied by the sub-specs and declaring one in the parent is an error. Covers the parent's remaining fields, what a sub owns (including branchContracts beside the method it constrains), a merger-derived table of where each section goes, the keyed-vs-concatenated merge rules and where a conflict is reported, and a migration section for parents written earlier.",
+    "platforms": [
+      "web"
+    ],
     "layoutFile": "spec/parent-sub-spec",
     "createdAt": "2026-04-24",
-    "updatedAt": "2026-04-24"
+    "updatedAt": "2026-08-28"
   },
   "structure": {
     "components": [],
@@ -19,11 +21,28 @@
   "stateManagement": {
     "states": [],
     "uiVariables": [
-      { "name": "nextReadLinks", "type": "[NextReadLink]", "initial": "[]", "description": "Follow-up cards." }
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Follow-up cards."
+      }
     ],
     "eventHandlers": [
-      { "name": "onAppear",   "description": "Seed nextReadLinks." },
-      { "name": "onNavigate", "params": [{ "name": "url", "type": "String" }], "description": "Client-side navigation." }
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
     ],
     "displayLogic": []
   },
@@ -31,30 +50,67 @@
     "diagram": "flowchart TD\n    VIEW[SpecParentSubSpecView] --> VM[SpecParentSubSpecViewModel]\n    VM -- nextReadLinks --> VIEW",
     "viewModel": {
       "methods": [
-        { "name": "onAppear",   "description": "Seed nextReadLinks from NEXT_READ_ENTRIES." },
-        { "name": "onNavigate", "params": [{ "name": "url", "type": "String" }], "description": "router.push." }
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from NEXT_READ_ENTRIES."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "router.push."
+        }
       ],
       "vars": [
-        { "name": "nextReadLinks", "type": "Array(NextReadLink)", "observable": true, "description": "Closing cards." }
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Closing cards."
+        }
       ]
     },
-    "repositories": [], "useCases": [], "apiEndpoints": [],
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
     "customTypes": [
       {
         "name": "NextReadLink",
         "properties": [
-          { "name": "id",             "type": "String" },
-          { "name": "titleKey",       "type": "String" },
-          { "name": "descriptionKey", "type": "String" },
-          { "name": "url",            "type": "String" }
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
         ]
       }
     ]
   },
   "userActions": [
-    { "action": "Tap a NextReadLink card", "processing": "onNavigate(url)." }
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
   ],
-  "validation": { "clientSide": [], "serverSide": [] },
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
   "transitions": [
     {
       "trigger": "onNavigate(url)",
@@ -64,12 +120,26 @@
     }
   ],
   "relatedFiles": [
-    { "type": "Layout",    "path": "docs/screens/layouts/spec/parent-sub-spec.json",           "description": "Detail layout for Pattern 2." },
-    { "type": "ViewModel", "path": "jsonui-doc-web/src/viewmodels/spec/ParentSubSpecViewModel.ts", "description": "Essay VM." },
-    { "type": "View",      "path": "jsonui-doc-web/src/app/spec/parent-sub-spec/page.tsx",      "description": "Next.js route." }
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/spec/parent-sub-spec.json",
+      "description": "Detail layout for Pattern 2."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/spec/ParentSubSpecViewModel.ts",
+      "description": "Essay VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/spec/parent-sub-spec/page.tsx",
+      "description": "Next.js route."
+    }
   ],
   "notes": [
     "Phase 2 article 2/5: the parent + sub split. Uses ~6 sections to walk through why + how + what validator enforces + what jui build merges.",
-    "No live examples of this pattern inside JsonUIDocument yet — the CodeBlocks are illustrative (a Home screen with Feed + Notifications sub regions)."
+    "No live examples of this pattern inside JsonUIDocument yet — the CodeBlocks are illustrative (a Home screen with Feed + Notifications sub regions).",
+    "2026-08-28 (v1.7.3 + v1.7.6) — rewritten after measuring the merger directly: a parent declaring dataFlow.viewModel / repositories / stateManagement.uiVariables / userActions produced four errors with the move-it wording (quoted on the page); two subs declaring the same method identically merged to one entry and validate passed; the same method declared differently produced `dataFlow.viewModel.methods[name=send]: Defined differently in 'ChatCore' and 'ChatStreaming'` from the merger and nothing from validate spec, which is why the page says which tool sees a conflict; the parent's structure.notes survived the merge and notes concatenated parent-first.",
+    "The migration section states that output is expected to grow rather than match, because the parent's declarations were being discarded before. Upstream had circulated the opposite (delete them, the merged output is byte-identical) and corrected it; the page is written so a reader who deletes instead of moving is warned before they do it."
   ]
 }

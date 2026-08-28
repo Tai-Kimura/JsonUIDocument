@@ -10263,8 +10263,8 @@
       "ja": "親 spec + 子 spec"
     },
     "lead": {
-      "en": "Pattern 2 of spec splitting, in detail. One screen, multiple spec files — the parent owns the visual tree and the shared types, and each sub owns a slice of state for one region of the screen. Fits dashboards and settings pages where 20+ state variables partition cleanly per area.",
-      "ja": "spec 分割パターン 2 の詳細版。1 画面を複数の spec ファイルに分ける — 親が視覚ツリーと共通型を持ち、子が画面の 1 領域の状態を所有する構造です。20+ 個の状態が領域ごとに綺麗に分かれる dashboard や設定画面に向きます。"
+      "en": "Pattern 2 of spec splitting, in detail. One screen, several spec files: since jsonui-cli 1.7.6 the parent is a pure container — it names the sub-specs and little else — and every section that describes behaviour is supplied by the subs. Declaring one of those in the parent is now an error rather than a section that quietly did nothing. Fits screens whose state partitions cleanly by region.",
+      "ja": "spec 分割のパターン 2 の詳細。1 画面・複数 spec ファイル: jsonui-cli 1.7.6 から、親は純粋なコンテナ — サブスペックを名指しする以外はほとんど持ちません — で、振る舞いを記述する節はすべてサブスペックが供給します。それらを親に書くことは、黙って何も起きない状態ではなくエラーになりました。状態が領域ごとにきれいに分かれる画面に向きます。"
     },
     "read_time": {
       "en": "~12 min read",
@@ -10283,32 +10283,32 @@
       "ja": "親 spec"
     },
     "section_parent_body": {
-      "en": "`type: 'screen_parent_spec'` changes the shape. Required top-level fields become `type` / `version` / `metadata` / `subSpecs` — `structure` is optional (auto-imported when `metadata.layoutFile` is set) and `stateManagement` is absent by design (state lives in the subs). `subSpecs[]` is the roster: each entry is `{ file, name }` where `file` is a relative path to the sub-spec on disk and `name` should match the child's `metadata.name`.",
-      "ja": "`type: 'screen_parent_spec'` で形が変わります。必須トップレベルは `type` / `version` / `metadata` / `subSpecs` — `structure` は任意（`metadata.layoutFile` 指定時に自動取り込み）、`stateManagement` は設計上不在（状態は子側で持つ）。`subSpecs[]` はロスター: 各 entry は `{ file, name }` で、`file` は子 spec へのディスク上の相対パス、`name` は子の `metadata.name` と一致させます。"
+      "en": "`type: 'screen_parent_spec'` changes the shape, and since 1.7.6 it narrows it. What a parent owns is `type`, `version`, `metadata`, the `subSpecs` roster, `structure.notes`, `relatedFiles` and `notes` — that list is the whole of it. `subSpecs[]` entries are `{ file, name }`, where `file` is a path relative to the parent and `name` matches the child's `metadata.name`. `metadata.layoutFile` still lives here, and the subs inherit it.",
+      "ja": "`type: 'screen_parent_spec'` は形を変えますが、1.7.6 からはそれを狭めます。親が持つのは `type` / `version` / `metadata` / `subSpecs` の名簿 / `structure.notes` / `relatedFiles` / `notes` — この列挙で全部です。`subSpecs[]` の各要素は `{ file, name }` で、`file` は親からの相対パス、`name` は子の `metadata.name` に一致させます。`metadata.layoutFile` は引き続き親に置き、サブスペックが継承します。"
     },
     "section_sub_heading": {
       "en": "The sub spec",
       "ja": "子 spec"
     },
     "section_sub_body": {
-      "en": "`type: 'screen_sub_spec'` + `metadata.parentSpec` pointing at the parent. Relative paths are resolved from the sub-spec's own directory — the `../home.spec.json` form below is typical. Each sub carries its own `stateManagement.uiVariables`, `stateManagement.eventHandlers`, `dataFlow.viewModel`, `userActions`, and `transitions`. The generator emits a separate ViewModel class per sub, named after `metadata.name`.",
-      "ja": "`type: 'screen_sub_spec'` + 親を指す `metadata.parentSpec`。相対パスは子 spec 自身のディレクトリ基準なので、下例の `../home.spec.json` が典型パターン。各子は自身の `stateManagement.uiVariables` / `stateManagement.eventHandlers` / `dataFlow.viewModel` / `userActions` / `transitions` を持ちます。ジェネレータは子ごとに別 ViewModel クラスを emit し、名前は `metadata.name` に従います。"
+      "en": "`type: 'screen_sub_spec'` plus `metadata.parentSpec` pointing back at the parent; relative paths resolve from the sub-spec's own directory. Everything describing behaviour lives here: `structure.components` and `rootComponents`, the whole of `stateManagement`, `dataFlow` including `viewModel`, `userActions`, `transitions`, `branchContracts`, `error_handling`, `task_cancellation`. Keep a feature's parts together — a `branchContracts` entry belongs in the same sub-spec as the viewModel method it constrains. Before 1.7.6 that pairing had no legal home at all: `viewModel` only took effect in the parent while `branchContracts` was dropped there, so the two could not sit together anywhere.",
+      "ja": "`type: 'screen_sub_spec'` と、親を指す `metadata.parentSpec`。相対パスはサブスペック自身のディレクトリから解決されます。振る舞いを記述するものはすべてここに置きます: `structure.components` と `rootComponents`、`stateManagement` の全体、`viewModel` を含む `dataFlow`、`userActions`、`transitions`、`branchContracts`、`error_handling`、`task_cancellation`。1 つの機能に属するものはまとめてください — `branchContracts` の項目は、それが縛る viewModel メソッドと同じサブスペックに置きます。1.7.6 より前はこの組み合わせに合法な置き場所が存在しませんでした: `viewModel` は親でしか効かず、`branchContracts` は親では捨てられていたので、2 つを同じ場所に置けなかったからです。"
     },
     "section_inherited_heading": {
       "en": "Inherited vs owned",
       "ja": "継承されるもの vs 子が所有するもの"
     },
     "section_inherited_body": {
-      "en": "The validator (`document_tools/.../validator.py:_parent_spec_has_layout_file`) enforces exactly one inheritance rule today: a sub-spec may omit `structure.components` if its parent declares a `metadata.layoutFile`. Everything else is either inherited at merge time (parent's layoutFile, customTypes, platforms) or owned by the sub (its own stateManagement slice). The table below is the ground truth.",
-      "ja": "validator（`document_tools/.../validator.py:_parent_spec_has_layout_file`）が今強制するのは 1 つの継承ルール — 親が `metadata.layoutFile` を宣言していれば、子は `structure.components` を省略してよい、という規約。それ以外はマージ時に親から継承される（親の layoutFile / customTypes / platforms）か、子が自前で所有するか（stateManagement のスライス）のどちらか。下の表が事実関係の正本。"
+      "en": "The table below is derived from the tool rather than written by hand: each section is placed in a sub-spec, run through the merger, and checked for whether it reaches the merged spec. Three groups. Sub-supplied sections are an error in the parent. `structure.notes` is the reverse — parent only. `relatedFiles` and `notes` accept both and concatenate, parent first. One invariant holds the shape together, and the tool's own tests walk the forbidden list to enforce it: every section the rules forbid in the parent can be supplied from a sub-spec. Being told to move something you cannot move is therefore not a state this can reach — which it did reach once, in 1.7.3, for four of six sections.",
+      "ja": "下の表は手書きではなくツールから導出したものです: 各節をサブスペックに置いて merger を通し、merged spec に届くかを検査しています。3 グループあります。サブスペックが供給する節は、親では​エラー​。`structure.notes` は逆で​親のみ​。`relatedFiles` と `notes` は両方を受け付け、親を先頭に連結します。全体を支える不変条件が 1 つあり、ツール自身のテストが禁止リストを走査してそれを強制しています: ​規則が親で禁じる節は、すべてサブスペックから供給できる​。したがって「移せ」と言われて移せない状態には到達しません — 1.7.3 では 6 節中 4 節でそこに到達していました。"
     },
     "section_merge_heading": {
       "en": "What jui build does",
       "ja": "jui build の動き"
     },
     "section_merge_body": {
-      "en": "At build time, the parent's `subSpecs[]` roster drives the per-sub merge: each sub is stitched into a virtual full-screen spec (parent's structure + sub's state), `layout_importer` runs on that merged shape, and the generator emits one ViewModel class per sub. The parent itself doesn't produce a runnable VM — it's a composition spec. Apps render the screen by mounting the parent's Layout and deciding which sub's VM to bind per region.",
-      "ja": "build 時、親の `subSpecs[]` ロスターが子ごとのマージを駆動します: 各子は仮想の full-screen spec に綴じられ（親の structure + 子の state）、その上で `layout_importer` が動き、ジェネレータが子ごとの ViewModel クラスを emit する。親自体は実行可能な VM を生成しない — 合成用の spec です。アプリ側は親の Layout をマウントし、領域ごとにどの子 VM を bind するかを決めます。"
+      "en": "At build time the parent's roster drives the merge: the subs supply their sections, the parent supplies its identity, and one merged spec comes out. Sections keyed by name — `viewModel.methods` and `vars`, `repositories`, `useCases`, `apiEndpoints`, `branchContracts`, `task_cancellation` — are matched across subs: two subs declaring the same thing identically merge to one entry, and two declaring it differently are reported as a conflict, with generation continuing on the first one seen. `error_handling`, `rootComponents`, `userActions` and `transitions` concatenate instead. The conflict is reported by the merger, which means `jui build` sees it and `jsonui-doc validate spec` does not.",
+      "ja": "ビルド時、親の名簿が統合を駆動します: サブスペックが自分の節を供給し、親は同一性を供給して、1 つの merged spec が出ます。名前をキーに持つ節 — `viewModel.methods` と `vars`、`repositories`、`useCases`、`apiEndpoints`、`branchContracts`、`task_cancellation` — はサブスペック間で照合され、2 つのサブスペックが同じものを同一に宣言していれば 1 エントリに統合、違えば conflict として報告され、生成は先に見つかった方で続行します。`error_handling` / `rootComponents` / `userActions` / `transitions` は連結です。conflict を報告するのは merger なので、`jui build` では見え、`jsonui-doc validate spec` では見えません。"
     },
     "section_antipatterns_heading": {
       "en": "When NOT to use it",
@@ -10317,6 +10317,30 @@
     "section_antipatterns_body": {
       "en": "Three anti-patterns. (1) Over-splitting: five+ subs rarely ships — the merge queue becomes the itemneck instead of the file. Two or three subs is the sweet spot. (2) Using it to share a Layout between screens — that's Pattern 1 (two specs referencing the same `layoutFile`), not parent + sub. (3) Using it to share a type across screens — that's Pattern 4 (`dataFlow.customTypes` + `.jsonui-type-map.json`). Parent + sub only makes sense when the thing you're splitting is the *state of a single screen*.",
       "ja": "3 つの anti-pattern。(1) 過剰分割: 子が 5 個以上になるケースは実運用が辛くなる — ファイルの代わりに merge queue がボトルネックになる。2〜3 子が sweet spot。(2) 画面間で Layout を共有したいからという理由で使う — それはパターン 1（2 つの spec が同じ `layoutFile` を指す）で、parent + sub ではない。(3) 画面間で型を共有したいから使う — それはパターン 4（`dataFlow.customTypes` + `.jsonui-type-map.json`）。parent + sub が意味を持つのは、分けたい対象が *単一画面の状態* であるときだけ。"
+    },
+    "section_migrate_heading": {
+      "en": "Moving an existing parent",
+      "ja": "既存の親スペックを移行する"
+    },
+    "section_migrate_body": {
+      "en": "If you have a parent written before 1.7.6, validate it first: the forbidden sections come back as a list, one error per section, each naming what to do with it. Move each section into the sub-spec whose feature it belongs to, then build and read the diff. That last step matters, because the obvious expectation is wrong in a specific way: the generated output before and after is not expected to match. What the parent declared was being discarded, so moving it makes the output grow — on one real screen, uiVariables went from 64 back to 80 and eleven rootComponents took effect for the first time. Deleting those sections instead of moving them would have been the quiet, byte-identical option, and it would have thrown the content away.",
+      "ja": "1.7.6 より前に書かれた親スペックがあるなら、まず検証してください: 禁止された節が一覧で返り、1 節につき 1 エラー、それぞれが何をすべきかを述べます。各節を、その内容が属する機能のサブスペックへ移し、それからビルドして diff を読んでください。最後の手順が重要なのは、自然に期待してしまう内容が特定の形で誤っているからです: 移行の前後で生成物が一致することは期待されていません。親に書かれていた内容は元から捨てられていたので、移せば​生成物は増えます​ — 実際のある画面では uiVariables が 64 から 80 に戻り、rootComponents 11 件が初めて反映されました。移さずに削除すれば、静かでバイト一致な選択肢になりますが、内容を捨てることになります。"
+    },
+    "section_migrate_caption": {
+      "en": "Three steps, in this order:",
+      "ja": "3 手順、この順で:"
+    },
+    "section_migrate_bullet_error": {
+      "en": "• The error is worded for the move, not for the deletion: `a screen_parent_spec cannot declare 'dataFlow.viewModel' — it is a container, and the merger builds this section from the sub-specs in `subSpecs`. Anything written here is discarded, silently, and the generated code keeps whatever the sub-specs say. Move the declaration into the sub-spec it belongs to.`",
+      "ja": "• エラー文言は削除ではなく移動を前提に書かれています: `a screen_parent_spec cannot declare 'dataFlow.viewModel' — it is a container, and the merger builds this section from the sub-specs in `subSpecs`. Anything written here is discarded, silently, and the generated code keeps whatever the sub-specs say. Move the declaration into the sub-spec it belongs to.`"
+    },
+    "section_migrate_bullet_silent": {
+      "en": "• What made this worth changing is that the old behaviour was invisible from the spec. A parent's list sections were dropped, its `dataFlow.viewModel` won over the subs, and `branchContracts`, `error_handling` and `task_cancellation` were read from neither side — with no warning in any case. On one project nine repository method declarations sat in a parent for months, edited and reviewed, affecting nothing.",
+      "ja": "• 変更に値したのは、旧挙動が spec からは見えなかったからです。親のリスト節は捨てられ、`dataFlow.viewModel` は親がサブスペックに勝ち、`branchContracts` / `error_handling` / `task_cancellation` はどちらからも読まれない — いずれも警告なしでした。あるプロジェクトでは repository のメソッド宣言 9 個が親に数か月置かれ、編集もレビューもされながら、何にも影響していませんでした。"
+    },
+    "toc_row_migrate": {
+      "en": "Moving an existing parent",
+      "ja": "既存の親スペックを移行する"
     },
     "next_heading": {
       "en": "Keep going",
@@ -11501,6 +11525,10 @@
     "section_divergence_bullet_limits": {
       "en": "• Two more rules, both measured: `reason` must be non-empty (`canonicalDivergence needs a non-empty 'reason'`), and it cannot sit on a method that uses a mark — `a method using '@canonical' has no divergence to declare — the mark follows the canon by construction`.",
       "ja": "• もう 2 つ、いずれも実測: `reason` は空にできず(`canonicalDivergence needs a non-empty 'reason'`)、マークを使っているメソッドには置けません — `a method using '@canonical' has no divergence to declare — the mark follows the canon by construction`。"
+    },
+    "section_divergence_bullet_case": {
+      "en": "• Write `renamed` keys in whatever spelling `canonical_param_case` produces, not the canon's raw one: with `camelCase` set, `\"pageSize\": \"pageLimit\"` matches and `\"page_size\": \"pageLimit\"` errors with `'renamed' maps 'page_size', which the operation does not declare`. Both sides of the map are read after the convention is applied. This is worth checking against your version — before 1.7.6, a project whose canon and convention came from different config files expanded under one spelling and compared under the other, and neither spelling passed.",
+      "ja": "• `renamed` のキーは、正本の生綴りではなく `canonical_param_case` が生む綴りで書きます: `camelCase` を設定していれば `\"pageSize\": \"pageLimit\"` が一致し、`\"page_size\": \"pageLimit\"` は `'renamed' maps 'page_size', which the operation does not declare` でエラーになります。写像の両側とも、規約適用後に読まれます。使っている版を確かめる価値があります — 1.7.6 より前は、canon と規約が別々の config から来る構成で、展開は一方の綴り・照合はもう一方の綴りとなり、どちらで書いても通りませんでした。"
     },
     "section_agreement_heading": {
       "en": "9. One method, several specs",

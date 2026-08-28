@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `Parent + sub specs — JsonUI`,
-  description: `Pattern 2 of spec splitting, in detail. One screen, multiple spec files — the parent owns the visual tree and the shared types, and each sub owns a slice of…`,
+  description: `Pattern 2 of spec splitting, in detail. One screen, several spec files: since jsonui-cli 1.7.6 the parent is a pure container — it names the sub-specs and…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
