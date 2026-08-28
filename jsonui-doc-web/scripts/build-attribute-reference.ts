@@ -158,6 +158,25 @@ async function writeText(p: string, text: string): Promise<void> {
   await fs.writeFile(p, text, "utf8");
 }
 
+// Dates describe the page, not the run. Re-stamping both on every
+// regeneration rewrote all 39 generated reference specs on the first build of
+// each new day — churn that reads like a content change in review, and an
+// `updatedAt` that answers "when did this script last run" rather than "when
+// did this page last change". `createdAt` is read back from the file being
+// replaced; `updatedAt` moves only when the rest of the document does.
+async function datedSpec(p: string, build: (createdAt: string, updatedAt: string) => any): Promise<unknown> {
+  const now = today();
+  let prior: any = null;
+  try { prior = JSON.parse(await fs.readFile(p, "utf8")); } catch { prior = null; }
+  const createdAt = typeof prior?.metadata?.createdAt === "string" && prior.metadata.createdAt
+    ? prior.metadata.createdAt : now;
+  const priorUpdatedAt = typeof prior?.metadata?.updatedAt === "string" && prior.metadata.updatedAt
+    ? prior.metadata.updatedAt : now;
+  const candidate = build(createdAt, priorUpdatedAt);
+  if (prior && JSON.stringify(candidate) === JSON.stringify(prior)) return candidate;
+  return build(createdAt, now);
+}
+
 async function fileExists(p: string): Promise<boolean> {
   try { await fs.stat(p); return true; } catch { return false; }
 }
@@ -386,7 +405,7 @@ function mergeCategory(args: {
 // Spec generation
 // ---------------------------------------------------------------------------
 
-function componentSpec(merged: MergedComponent): unknown {
+function componentSpec(merged: MergedComponent, createdAt: string, updatedAt: string): unknown {
   const layoutFile = `reference/components/${merged.kebab}`;
   return {
     type: "screen_spec",
@@ -398,8 +417,8 @@ function componentSpec(merged: MergedComponent): unknown {
       description: merged.description.en || `Reference > Components > ${merged.name}.`,
       platforms: ["web"],
       layoutFile,
-      createdAt: today(),
-      updatedAt: today(),
+      createdAt,
+      updatedAt,
     },
     structure: { components: [], layout: {}, collection: null, tabView: null },
     stateManagement: {
@@ -453,7 +472,7 @@ function componentSpec(merged: MergedComponent): unknown {
   };
 }
 
-function categorySpec(merged: MergedCategory): unknown {
+function categorySpec(merged: MergedCategory, createdAt: string, updatedAt: string): unknown {
   const layoutFile = `reference/attributes/${merged.category}`;
   return {
     type: "screen_spec",
@@ -465,8 +484,8 @@ function categorySpec(merged: MergedCategory): unknown {
       description: merged.description.en || `Reference > Attributes > ${merged.category}.`,
       platforms: ["web"],
       layoutFile,
-      createdAt: today(),
-      updatedAt: today(),
+      createdAt,
+      updatedAt,
     },
     structure: { components: [], layout: {}, collection: null, tabView: null },
     stateManagement: {
@@ -2875,7 +2894,8 @@ async function main() {
       descriptionsDict,
     });
 
-    await writeJson(path.join(PATHS.specComponentsDir, `${merged.kebab}.spec.json`), componentSpec(merged));
+    const componentSpecPath = path.join(PATHS.specComponentsDir, `${merged.kebab}.spec.json`);
+    await writeJson(componentSpecPath, await datedSpec(componentSpecPath, (c, u) => componentSpec(merged, c, u)));
     await writeJson(path.join(PATHS.layoutComponentsDir, `${merged.kebab}.json`), componentLayout(merged));
     await writeJson(path.join(PATHS.runtimeComponentsDir, `${merged.kebab}.json`), componentRuntimeData(merged, categoryMap));
     await writeText(path.join(PATHS.appComponentsDir, merged.kebab, "page.tsx"), componentPage(merged));
@@ -2904,7 +2924,8 @@ async function main() {
       continue;
     }
 
-    await writeJson(path.join(PATHS.specAttributesDir, `${cat}.spec.json`), categorySpec(merged));
+    const categorySpecPath = path.join(PATHS.specAttributesDir, `${cat}.spec.json`);
+    await writeJson(categorySpecPath, await datedSpec(categorySpecPath, (c, u) => categorySpec(merged, c, u)));
     await writeJson(path.join(PATHS.layoutAttributesDir, `${cat}.json`), categoryLayout(merged));
     await writeJson(path.join(PATHS.runtimeAttributesDir, `${cat}.json`), categoryRuntimeData(merged));
     await writeText(path.join(PATHS.appAttributesDir, cat, "page.tsx"), categoryPage(merged));

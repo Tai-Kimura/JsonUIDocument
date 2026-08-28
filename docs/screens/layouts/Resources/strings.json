@@ -11276,5 +11276,195 @@
       "en": "© JsonUI docs",
       "ja": "© JsonUI docs"
     }
+  },
+  "guides_canonical_marks": {
+    "breadcrumb": {
+      "en": "← Guides",
+      "ja": "← Guides"
+    },
+    "title": {
+      "en": "Referencing the API canon from a spec",
+      "ja": "spec から API 正本を参照する"
+    },
+    "lead": {
+      "en": "A dataFlow method that declares an `endpoint` is already pointing at an operation in your OpenAPI documents. Since jsonui-cli 1.7.0 it can reference that operation instead of restating it: `\"params\": \"@canonical\"` expands to the operation's parameters at build and validate time, and `\"returnType\": \"@canonical.wire\"` lifts the schema name its success response carries. Whatever the canon does not describe stays hand-written beside the mark.",
+      "ja": "`endpoint` を宣言した dataFlow メソッドは、OpenAPI ドキュメント上の operation を既に指しています。jsonui-cli 1.7.0 から、その operation を書き写す代わりに参照できます: `\"params\": \"@canonical\"` はビルド時・検証時に operation の引数へ展開され、`\"returnType\": \"@canonical.wire\"` は成功応答が名指しするスキーマ名を持ち上げます。正本が記述していないものは、マークの横に手書きのまま残ります。"
+    },
+    "read_time": {
+      "en": "~7 min read",
+      "ja": "約 7 分"
+    },
+    "section_what_heading": {
+      "en": "1. What a mark is",
+      "ja": "1. マークとは何か"
+    },
+    "section_what_body": {
+      "en": "Two marks, each a string standing in the position it replaces. `@canonical` stands in for a method's `params` and expands to the operation's `parameters` plus the properties of a JSON `requestBody` — POST-shaped methods usually carry their arguments in the body, so a version of this feature that read only `parameters` would find a fraction of what is there. A parameter the canon marks `required` becomes a non-optional type; everything else gets the optional spelling. `@canonical.wire` stands in for `returnType` and resolves to the schema name the success response references.",
+      "ja": "マークは 2 つ、どちらも置き換える位置に書く文字列です。`@canonical` はメソッドの `params` の位置に立ち、operation の `parameters` と JSON `requestBody` のプロパティへ展開されます — POST 系のメソッドは引数のほとんどが body 側にあるので、`parameters` だけを読む実装なら実在する引数の一部しか拾えません。正本で `required` が付いた引数は非オプショナル型に、それ以外はオプショナル表記になります。`@canonical.wire` は `returnType` の位置に立ち、成功応答が参照するスキーマ名へ解決されます。"
+    },
+    "section_what_caption": {
+      "en": "Reference instead of restating:",
+      "ja": "書き写す代わりに参照する:"
+    },
+    "section_what_bullet_where": {
+      "en": "• Marks are read in `dataFlow.repositories[].methods[]` and `dataFlow.useCases[].methods[]` — the sections that describe transport. A mark written elsewhere in dataFlow is not expanded, and because the schema accepts the same method shape in every section, validate does not object either. Check which section you are in before concluding the canon is at fault.",
+      "ja": "• マークが読まれるのは `dataFlow.repositories[].methods[]` と `dataFlow.useCases[].methods[]` — 通信を記述する節です。dataFlow の他の場所に書いたマークは展開されず、スキーマがどの節でも同じメソッド形を受け付けるため検証も異議を唱えません。正本のせいだと結論する前に、自分がどの節にいるかを確かめてください。"
+    },
+    "section_what_bullet_same": {
+      "en": "• Both tools expand marks through one implementation, so `jui build`, which writes the repository stubs, and `jsonui-doc`, which validates the spec and renders its HTML, cannot disagree about what a mark meant.",
+      "ja": "• 2 つのツールは同一実装でマークを展開します。Repository スタブを書く `jui build` と、spec を検証し HTML を描く `jsonui-doc` が、マークの意味について食い違うことはありません。"
+    },
+    "section_expand_heading": {
+      "en": "2. What expansion produces",
+      "ja": "2. 展開結果"
+    },
+    "section_expand_body": {
+      "en": "Expansion yields a plain parameter list, written into the document before anything else reads it — the HTML, the other spec checks and the generated stubs all see the expanded list rather than the marker. Below is one operation with a required query parameter and an optional one, and one carrying a JSON body. The types are the spec's Swift-style spelling, which each platform then maps.",
+      "ja": "展開結果は普通の引数リストで、他の何かが文書を読む前に書き込まれます — HTML も他の spec 検査も生成されるスタブも、マーカーではなく展開済みのリストを見ます。下は必須クエリ 1 つと任意クエリ 1 つを持つ operation、および JSON body を持つ operation の例です。型は spec の Swift 風表記で、各プラットフォームがそこから写像します。"
+    },
+    "section_expand_caption": {
+      "en": "Measured against the fixture above:",
+      "ja": "上の fixture に対する実測:"
+    },
+    "section_mix_heading": {
+      "en": "3. Mixing hand-written entries in",
+      "ja": "3. 手書きを混ぜる"
+    },
+    "section_mix_body": {
+      "en": "A method rarely takes exactly the canon's arguments and nothing else. Write the mark as one entry of a list and put your own entries beside it: the mark expands where you wrote it, so the surrounding order is yours. If a hand-written entry has the same name as a canonical one, yours wins and the canonical entry is dropped — that is how a stricter type survives, and how a client-side argument the API never declares gets in. Name comparison ignores case, so `pageSize` beside a canonical `page_size` is one argument, not two.",
+      "ja": "メソッドが正本の引数とぴったり一致することは稀です。マークをリストの 1 要素として書き、自分のエントリをその横に並べてください: マークは書いた位置で展開されるので、前後の順序はあなたのものです。手書きエントリが正本のエントリと同名なら手書きが勝ち、正本側は落ちます — より厳しい型を残す手段であり、API が宣言しないクライアント側の引数を足す手段でもあります。名前の比較は大小文字差を無視するので、正本の `page_size` の横に書いた `pageSize` は 2 つではなく 1 つの引数です。"
+    },
+    "section_mix_caption": {
+      "en": "The mark is an entry, not a mode:",
+      "ja": "マークはモードではなく 1 要素:"
+    },
+    "section_case_heading": {
+      "en": "4. How the names are spelled",
+      "ja": "4. 名前の綴り"
+    },
+    "section_case_body": {
+      "en": "APIs and client code often disagree about casing, and the canon's spelling would otherwise become the argument label in generated code on three platforms. `spec.canonical_param_case` in jui.config.json decides: `asIs` (the default) keeps the canon's spelling, `camelCase` and `snake_case` convert it. It affects only names that came from a mark — hand-written entries are never re-spelled. Set it before converting a spec rather than after: it changes which canonical name collides with which hand-written one, and therefore which entries survive.",
+      "ja": "API とクライアントのコードは綴りの規約が食い違いがちで、放っておくと正本の綴りが 3 プラットフォームの生成コードの引数ラベルになります。jui.config.json の `spec.canonical_param_case` が決めます: `asIs`(既定)は正本の綴りのまま、`camelCase` と `snake_case` は変換します。効くのはマーク由来の名前だけで、手書きエントリが綴り直されることはありません。設定は spec を変換する前に行ってください — どの正本名がどの手書き名と衝突するか、つまりどのエントリが残るかが変わります。"
+    },
+    "section_case_caption": {
+      "en": "Same operation, three settings:",
+      "ja": "同じ operation、3 つの設定:"
+    },
+    "section_return_heading": {
+      "en": "5. Why returnType is different",
+      "ja": "5. returnType だけ別扱いな理由"
+    },
+    "section_return_body": {
+      "en": "`returnType` does not accept `@canonical`; written there it is left alone rather than expanded. The two documents describe different layers and both are right: a spec's return type is the domain type the app works in (`[ItemSummary]`, `UserProfile`), while the canon's is the wire type the endpoint returns (`ItemSearchResponse`, `UserProfileResponse`). Lifting the wire type into every spec would quietly redefine what the method returns. `@canonical.wire` is the explicit opt-in — it says the wire type is the return type here — and it resolves only when the success response names a schema. An operation describing its body inline has no name to lift, and says so instead of inventing one.",
+      "ja": "`returnType` は `@canonical` を受け付けず、書いても展開されずそのまま残ります。2 つの文書は別の層を記述していて、どちらも正しいからです: spec の戻り値はアプリが扱う Domain 型(`[ItemSummary]` / `UserProfile`)、正本の戻り値はエンドポイントが返す wire 型(`ItemSearchResponse` / `UserProfileResponse`)。wire 型を全 spec に持ち上げれば、メソッドが何を返すのかを黙って再定義することになります。`@canonical.wire` はその明示的な opt-in で(「ここでは wire 型が戻り値でよい」の意)、成功応答がスキーマを名指ししているときだけ解決します。body をインラインで書いている operation には持ち上げる名前が無く、名前を捏造せずその旨を告げます。"
+    },
+    "section_return_caption": {
+      "en": "The message when there is no name to lift:",
+      "ja": "持ち上げる名前が無いときの文言:"
+    },
+    "section_traps_heading": {
+      "en": "6. Three things that look like marks and are not",
+      "ja": "6. マークに見えてマークでないもの 3 つ"
+    },
+    "section_traps_body": {
+      "en": "Each is a place where a reader's expectation and the tool's behavior can part company, and each is pinned by the tool's own tests.",
+      "ja": "いずれも読者の期待とツールの挙動がずれ得る箇所で、いずれもツール側のテストで固定されています。"
+    },
+    "section_traps_bullet_omission": {
+      "en": "• Omitting `params` is not a mark. A method with no `params` key takes no arguments — that predates this feature and still means the same thing. If you want the canon's arguments, write the mark.",
+      "ja": "• `params` の省略はマークではありません。`params` キーの無いメソッドは引数を取らないという意味で、この機能より前からそうであり、今もそうです。正本の引数が欲しいならマークを書いてください。"
+    },
+    "section_traps_bullet_error": {
+      "en": "• A mark that cannot be resolved is an error, never an empty list. Falling back to nothing would generate an argument-less method on three platforms and complain nowhere. The message names the reason: no `endpoint` on the method, an endpoint that is not an HTTP route, one not spelled `<VERB> /path`, a path the canon declares but not for that verb, or a path no document under `api_directory` declares at all.",
+      "ja": "• 解決できないマークはエラーで、空リストにはなりません。空へフォールバックすれば、3 プラットフォームで引数ゼロのメソッドが生成され、どこにも苦情が出ません。文言は理由を名指しします: メソッドに `endpoint` が無い / HTTP ルートでない / `<VERB> /path` 形式でない / 正本にそのパスはあるがその verb には無い / `api_directory` 配下のどの文書にもそのパスが無い。"
+    },
+    "section_traps_bullet_wire": {
+      "en": "• On `returnType` only `@canonical.wire` does anything. A plain `@canonical` there stays as written — the section above explains why the distinction is deliberate.",
+      "ja": "• `returnType` で効くのは `@canonical.wire` だけです。平の `@canonical` は書いたまま残ります — この区別が意図的である理由は前節のとおりです。"
+    },
+    "section_traps_caption": {
+      "en": "Every unresolved-mark message, verbatim:",
+      "ja": "解決できないマークの文言(すべて実測):"
+    },
+    "section_when_heading": {
+      "en": "7. When not to use a mark",
+      "ja": "7. マークを使わない方がよい場面"
+    },
+    "section_when_body": {
+      "en": "A method that cannot take a mark is usually not a defect. Across four real projects, 320 endpoint-declaring methods were resolved against their canon and 63% could reference it; most of the rest were deliberate — a spec folding seven flat body fields into one `profile` argument, a method carrying a client-side progress callback, a return type stated in domain terms. That is the spec saying something the canon does not, which is what a spec is for. But not all of them: some are a spec that quietly fell behind the canon, missing a `limit` or a filter the API has had for months. Converting is how you find out which kind you have, because the mark expands to what the canon actually declares and the difference becomes visible. Read the declaration before deciding — the tool cannot tell these two apart, and neither can a reviewer working from the diff alone.",
+      "ja": "マークを使えないメソッドは、たいてい欠陥ではありません。実プロジェクト 4 面で、endpoint を宣言した 320 メソッドを正本に照合したところ 63% が参照化可能でした。残りの多くは意図的なもの — フラットな body 7 フィールドを `profile` 1 引数に畳んでいる spec、クライアント側の進捗コールバックを持つメソッド、Domain 語彙で述べた戻り値。これは正本が言っていないことを spec が言っている状態で、spec とはそのためのものです。ただし全部ではありません: 一部は spec が正本に静かに遅れをとっているだけで、API が何か月も前から持っている `limit` やフィルタが欠けています。どちらなのかは変換してみると分かります — マークは正本が実際に宣言しているものへ展開されるので、差が目に見えるからです。決める前に宣言を読んでください。ツールにこの 2 つは区別できませんし、diff だけを見るレビュアーにも区別できません。"
+    },
+    "section_when_bullet_scope": {
+      "en": "• `useCases[].methods[].endpoint` is accepted and marks resolve there the same way, but no project in that census had one — the pattern is untried rather than unsupported.",
+      "ja": "• `useCases[].methods[].endpoint` も受け付けられ、マークも同様に解決しますが、census の対象プロジェクトには 1 件もありませんでした — 未サポートではなく実績が無い、という状態です。"
+    },
+    "section_when_bullet_desc": {
+      "en": "• A canon carries no `description` or `label` for its parameters, so expansion does not produce them. A parameter that needs prose gets a hand-written entry beside the mark; it wins on name and keeps its description.",
+      "ja": "• 正本は引数に `description` や `label` を持たないので、展開でそれらは付きません。散文が要る引数はマークの横に手書きで書いてください — 同名なら手書きが勝ち、description も保たれます。"
+    },
+    "next_heading": {
+      "en": "Keep reading",
+      "ja": "次に読む"
+    },
+    "next_api_models_title": {
+      "en": "API data models",
+      "ja": "API データモデル"
+    },
+    "next_api_models_description": {
+      "en": "Where the OpenAPI documents live, and how DTOs are generated from them.",
+      "ja": "OpenAPI ドキュメントの置き場所と、そこから DTO が生成される仕組み。"
+    },
+    "next_verifying_title": {
+      "en": "Verifying implementation against docs",
+      "ja": "ドキュメントと実装の照合"
+    },
+    "next_verifying_description": {
+      "en": "The checker that compares your backend's OpenAPI with the committed one.",
+      "ja": "backend の OpenAPI とコミット済みの OpenAPI を比較するチェッカー。"
+    },
+    "next_first_spec_title": {
+      "en": "Writing your first spec",
+      "ja": "はじめての spec"
+    },
+    "next_first_spec_description": {
+      "en": "The dataFlow section these marks live in, from the beginning.",
+      "ja": "マークが置かれる dataFlow 節を、最初から。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページ"
+    },
+    "toc_row_what": {
+      "en": "1. What a mark is",
+      "ja": "1. マークとは何か"
+    },
+    "toc_row_expand": {
+      "en": "2. What expansion produces",
+      "ja": "2. 展開結果"
+    },
+    "toc_row_mix": {
+      "en": "3. Mixing hand-written entries in",
+      "ja": "3. 手書きを混ぜる"
+    },
+    "toc_row_case": {
+      "en": "4. How the names are spelled",
+      "ja": "4. 名前の綴り"
+    },
+    "toc_row_return": {
+      "en": "5. Why returnType is different",
+      "ja": "5. returnType だけ別扱いな理由"
+    },
+    "toc_row_traps": {
+      "en": "6. Marks that are not marks",
+      "ja": "6. マークでないもの"
+    },
+    "toc_row_when": {
+      "en": "7. When not to use a mark",
+      "ja": "7. 使わない方がよい場面"
+    }
   }
 }

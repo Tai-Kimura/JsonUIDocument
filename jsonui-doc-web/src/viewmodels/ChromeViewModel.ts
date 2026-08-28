@@ -116,6 +116,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "writing-your-first-spec", titleKey: "guides_writing_your_first_spec_title", titleEn: "Writing your first spec",     url: "/guides/writing-your-first-spec" },
       { id: "api-data-models",         titleKey: "guides_api_data_models_title",         titleEn: "API data models (cookbook)",  url: "/guides/api-data-models" },
       { id: "verifying-implementation-against-docs", titleKey: "guides_verifying_implementation_against_docs_title", titleEn: "Verifying implementation against docs", url: "/guides/verifying-implementation-against-docs" },
+      { id: "canonical-marks",         titleKey: "guides_canonical_marks_title",         titleEn: "Referencing the API canon",   url: "/guides/canonical-marks" },
       { id: "branch-contracts",        titleKey: "guides_branch_contracts_title",        titleEn: "Branch contracts",            url: "/guides/branch-contracts" },
       { id: "branch-tests",            titleKey: "guides_branch_tests_title",            titleEn: "Branch tests",                url: "/guides/branch-tests" },
       { id: "writing-layouts",         titleKey: "guides_writing_layouts_title",         titleEn: "Writing layouts",             url: "/guides/writing-layouts" },
