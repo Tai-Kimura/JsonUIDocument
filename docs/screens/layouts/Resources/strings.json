@@ -11538,6 +11538,10 @@
       "en": "• Every clause is checked against the canon, and the declaration subtracts from the comparison rather than exempting the method from it. Naming something the canon does not declare fails (`'omitted' names 'legacyFlag', which the operation does not declare — there is nothing here to leave out`), and so does a declaration that covers only part of the difference: `the declared divergence does not account for the whole difference: after applying 'renamed', this method adds 'pageSize'. A declaration subtracts from the comparison, it does not exempt the method from it.`",
       "ja": "• どの句も正本に照合され、宣言は比較から差し引くだけで、メソッドを比較の対象外にはしません。正本が宣言していないものを名指しすれば失敗し(`'omitted' names 'legacyFlag', which the operation does not declare — there is nothing here to leave out`)、差の一部しか覆っていない宣言も失敗します: `the declared divergence does not account for the whole difference: after applying 'renamed', this method adds 'pageSize'. A declaration subtracts from the comparison, it does not exempt the method from it.`"
     },
+    "section_divergence_bullet_before": {
+      "en": "• Check the implementation before you write one. The tool can tell you whether the difference you declared is the difference that is there; it cannot tell you whether that difference is intent or defect. One team, about to declare forty-eight of these in a sweep, found two real omissions first — written as they stood, those two would have been filed as deliberate divergence and stopped being findable.",
+      "ja": "• 書く前に実装と突き合わせてください。ツールが言えるのは「宣言した差が実際にある差か」までで、「その差が意図なのか欠陥なのか」は言えません。ある現場では 48 件を一括で宣言する直前に本物の取りこぼし 2 件が見つかりました — そのまま書いていれば、その 2 件は意図的な差として台帳に載り、見つけられなくなっていました。"
+    },
     "section_divergence_bullet_case": {
       "en": "• Write `renamed` keys in whatever spelling `canonical_param_case` produces, not the canon's raw one: with `camelCase` set, `\"pageSize\": \"pageLimit\"` matches and `\"page_size\": \"pageLimit\"` errors with `'renamed' maps 'page_size', which the operation does not declare`. Both sides of the map are read after the convention is applied. This is worth checking against your version — before 1.7.6, a project whose canon and convention came from different config files expanded under one spelling and compared under the other, and neither spelling passed.",
       "ja": "• `renamed` のキーは、正本の生綴りではなく `canonical_param_case` が生む綴りで書きます: `camelCase` を設定していれば `\"pageSize\": \"pageLimit\"` が一致し、`\"page_size\": \"pageLimit\"` は `'renamed' maps 'page_size', which the operation does not declare` でエラーになります。写像の両側とも、規約適用後に読まれます。使っている版を確かめる価値があります — 1.7.6 より前は、canon と規約が別々の config から来る構成で、展開は一方の綴り・照合はもう一方の綴りとなり、どちらで書いても通りませんでした。"
@@ -11589,6 +11593,18 @@
     "toc_row_config": {
       "en": "10. Which config answers",
       "ja": "10. どの config が答えるか"
+    },
+    "section_config_bullet_broken": {
+      "en": "• A stub that points nowhere is an error, because the settings it was supposed to bring do not arrive and the generated output changes: `'extends' names no file ('../../nope/jui.config.json') — the settings it points at, including `spec.canonical_param_case`, are not being read. Fix the path, or remove the key if this project does not use one.`",
+      "ja": "• 指す先が無いスタブはエラーです。持ってくるはずだった設定が届かず、生成物が変わるからです: `'extends' names no file ('../../nope/jui.config.json') — the settings it points at, including `spec.canonical_param_case`, are not being read. Fix the path, or remove the key if this project does not use one.`"
+    },
+    "section_config_bullet_key": {
+      "en": "• Misspelling the key is a different failure and gets a different treatment. `extend` instead of `extends` is not a broken reference — it is a key nothing reads, so the file looks like one that declares nothing. Since 1.7.10 any unrecognised key warns, `extends` included: `no tool reads 'extend'. Did you mean 'extends'? A key nothing recognises is silently ignored, so the settings under it never arrive and the run looks like one that never configured them. Prefix a key with '_' if it is a note.` A key starting with `_` is a note and is left alone, which is what `_note` and `_comment` are for.",
+      "ja": "• キーの綴り違いは別の失敗で、扱いも別です。`extends` を `extend` と書いたものは壊れた参照ではなく、どのツールも読まないキー — つまりそのファイルは何も宣言していないファイルに見えます。1.7.10 から、認識されないキーは `extends` を含めて警告されます: `no tool reads 'extend'. Did you mean 'extends'? A key nothing recognises is silently ignored, so the settings under it never arrive and the run looks like one that never configured them. Prefix a key with '_' if it is a note.` `_` で始まるキーは注釈として扱われ、そのままにされます — `_note` や `_comment` はそのためのものです。"
+    },
+    "section_config_bullet_severity": {
+      "en": "• The split between the two is deliberate: a broken `extends` value changes what is generated, so it is an error; an unread key changes nothing by itself, and the harm is that someone believes it does — so it is a warning. Diagnostics cover every config the run consulted along the way, not only the first one it stopped at (1.7.11), so a typo in the repository-root file surfaces even when a nearer stub answered the question.",
+      "ja": "• 2 つを分けているのは意図的です: `extends` の値が壊れていれば生成物が変わるのでエラー、読まれないキーはそれ自体が何も変えず、害は「書いた人が変わると思っていること」なので警告です。診断は、最初に止まった config だけでなく、run が経路上で参照した config すべてを覆います(1.7.11)。近いスタブが答えを出した場合でも、リポジトリルート側の綴り違いは表に出ます。"
     },
     "toc_row_when": {
       "en": "7. When not to use a mark",
