@@ -278,6 +278,9 @@
                     { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_divergence_bullet_switch" },
                     { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_divergence_bullet_stale" },
                     { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_divergence_bullet_limits" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_divergence_bullet_clauses" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_divergence_bullet_omitted" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_divergence_bullet_subtract" },
                     { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_divergence_bullet_case" }
                   ]
                 },
@@ -305,6 +308,33 @@
                       "copyable": false
                     },
                     { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "text": "section_agreement_bullet_platforms" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_config",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_config_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_config_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 13, "fontColor": "#64748B", "text": "section_config_caption" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 8,
+                      "code": "// docs/web/jui.config.json — a stub on the spec's own ancestry,\n// naming the config that owns this face\n{ \"extends\": \"../../web/jui.config.json\" }\n\n// web/jui.config.json — the owner: canon and convention together\n{ \"api_directory\": \"../docs/api\",\n  \"spec\": { \"canonical_param_case\": \"camelCase\" } }\n\nwith the stub     convention = camelCase   (every entry point tried)\nwithout it        convention = unset, canon from the root config",
+                      "language": "json",
+                      "filename": "split tree",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "text": "section_config_bullet_measured" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_config_bullet_shape" }
                   ]
                 },
                 {
@@ -383,7 +413,8 @@
                         { "id": "toc_traps", "label": "toc_row_traps", "anchor": "section_traps", "level": 1 },
                         { "id": "toc_when", "label": "toc_row_when", "anchor": "section_when", "level": 1 },
                         { "id": "toc_divergence", "label": "toc_row_divergence", "anchor": "section_divergence", "level": 1 },
-                        { "id": "toc_agreement", "label": "toc_row_agreement", "anchor": "section_agreement", "level": 1 }
+                        { "id": "toc_agreement", "label": "toc_row_agreement", "anchor": "section_agreement", "level": 1 },
+                        { "id": "toc_config", "label": "toc_row_config", "anchor": "section_config", "level": 1 }
                       ],
                       "stickyOffset": 80
                     }

@@ -9813,8 +9813,8 @@
           "ja": "ファイルと探索"
       },
       "section_file_body": {
-          "en": "jui.config.json lives at the project root and is the single project-level configuration for the whole toolchain — jui, the platform builders it drives, jsonui-test and jsonui-doc all resolve it. Commands look for it in the current directory and upward; MCP tools take an explicit project_dir (or the JUI_PROJECT_DIR environment variable) instead. `jui init` writes the initial file.",
-          "ja": "jui.config.json はプロジェクトルートに置かれ、ツールチェーン全体 — jui・各プラットフォームビルダー・jsonui-test・jsonui-doc — が参照する唯一のプロジェクト設定です。コマンドはカレントから上方向に探索し、MCP ツールは明示の project_dir（または JUI_PROJECT_DIR 環境変数）を使います。初期ファイルは `jui init` が書き出します。"
+          "en": "jui.config.json lives at the project root and is the single project-level configuration for the whole toolchain — jui, the platform builders it drives, jsonui-test and jsonui-doc all resolve it. Commands look for it in the current directory and upward; MCP tools take an explicit project_dir (or the JUI_PROJECT_DIR environment variable) instead. `jui init` writes the initial file. One project can hold several of these. When specs sit in one subtree and the config that owns them in another, put a stub on the specs' own ancestry naming its owner — `{ \"extends\": \"../../web/jui.config.json\" }` — and the run resolves the API documents and the naming convention from that one file rather than from whichever partial config happens to be nearest (jsonui-cli 1.7.8; see Referencing the API canon from a spec).",
+          "ja": "jui.config.json はプロジェクトルートに置かれ、ツールチェーン全体 — jui・各プラットフォームビルダー・jsonui-test・jsonui-doc — が参照する唯一のプロジェクト設定です。コマンドはカレントから上方向に探索し、MCP ツールは明示の project_dir（または JUI_PROJECT_DIR 環境変数）を使います。初期ファイルは `jui init` が書き出します。 1 つのプロジェクトが複数持つこともあります。spec が 1 つのサブツリーに、それらを所有する config が別のサブツリーにある場合は、spec 自身の系譜上にスタブを置いて所有者を名指しします — `{ \"extends\": \"../../web/jui.config.json\" }` — こうすると run は API ドキュメントと綴り規約を、たまたま最も近い部分的な config ではなく、その 1 ファイルから解決します(jsonui-cli 1.7.8。詳細は「spec から API 正本を参照する」)。"
       },
       "section_directories_heading": {
           "en": "Core directories",
@@ -11526,6 +11526,18 @@
       "en": "• Two more rules, both measured: `reason` must be non-empty (`canonicalDivergence needs a non-empty 'reason'`), and it cannot sit on a method that uses a mark — `a method using '@canonical' has no divergence to declare — the mark follows the canon by construction`.",
       "ja": "• もう 2 つ、いずれも実測: `reason` は空にできず(`canonicalDivergence needs a non-empty 'reason'`)、マークを使っているメソッドには置けません — `a method using '@canonical' has no divergence to declare — the mark follows the canon by construction`。"
     },
+    "section_divergence_bullet_clauses": {
+      "en": "• `renamed` is one of four clauses, and on its own it covers less than it looks: in one real corpus it could describe 7 of 37 hand-written declarations, and the ones left out were the longest — the methods folding twenty or thirty canonical fields into a few arguments, which are exactly the ones where a canon change is hardest to notice. `omitted` names a parameter the caller never chooses (a build constant, an environment value). `wrapped` maps one argument to the several canonical fields it carries. `added` names an argument the canon does not declare at all.",
+      "ja": "• `renamed` は 4 つの句の 1 つで、単独では見た目より狭い範囲しか覆いません: 実際のコーパスでは手書き宣言 37 件のうち 7 件しか記述できず、漏れたのは最も長い宣言 — 正本の 20〜30 フィールドを数個の引数に畳んでいるメソッド、つまり正本の変更に最も気づきにくいものでした。`omitted` は呼び手が選ばない引数(ビルド定数・環境値)を名指しします。`wrapped` は 1 つの引数を、それが運ぶ複数の正本フィールドへ写像します。`added` は正本が全く宣言していない引数を名指しします。"
+    },
+    "section_divergence_bullet_omitted": {
+      "en": "• `omitted` earns its place by removing a bad incentive. Without it, the way to make a check pass is to add the parameter — and a contract that grew an argument to satisfy a checker is worse than the check catching nothing. On one project a group of methods looked like a real bug (values the client was not sending) until the implementation was read: every one of them was sending a constant, correctly.",
+      "ja": "• `omitted` が要るのは、悪い誘因を消すからです。これが無いと、検査を通す方法は「引数を足すこと」になります — 検査を満たすために引数が増えた契約は、検査が何も捕まえないより悪い。あるプロジェクトでは、一群のメソッドが実バグ(クライアントが値を送っていない)に見え、直しに行きかけたところで実装を読むと、全部が定数を送っていて正しかった、という例があります。"
+    },
+    "section_divergence_bullet_subtract": {
+      "en": "• Every clause is checked against the canon, and the declaration subtracts from the comparison rather than exempting the method from it. Naming something the canon does not declare fails (`'omitted' names 'legacyFlag', which the operation does not declare — there is nothing here to leave out`), and so does a declaration that covers only part of the difference: `the declared divergence does not account for the whole difference: after applying 'renamed', this method adds 'pageSize'. A declaration subtracts from the comparison, it does not exempt the method from it.`",
+      "ja": "• どの句も正本に照合され、宣言は比較から差し引くだけで、メソッドを比較の対象外にはしません。正本が宣言していないものを名指しすれば失敗し(`'omitted' names 'legacyFlag', which the operation does not declare — there is nothing here to leave out`)、差の一部しか覆っていない宣言も失敗します: `the declared divergence does not account for the whole difference: after applying 'renamed', this method adds 'pageSize'. A declaration subtracts from the comparison, it does not exempt the method from it.`"
+    },
     "section_divergence_bullet_case": {
       "en": "• Write `renamed` keys in whatever spelling `canonical_param_case` produces, not the canon's raw one: with `camelCase` set, `\"pageSize\": \"pageLimit\"` matches and `\"page_size\": \"pageLimit\"` errors with `'renamed' maps 'page_size', which the operation does not declare`. Both sides of the map are read after the convention is applied. This is worth checking against your version — before 1.7.6, a project whose canon and convention came from different config files expanded under one spelling and compared under the other, and neither spelling passed.",
       "ja": "• `renamed` のキーは、正本の生綴りではなく `canonical_param_case` が生む綴りで書きます: `camelCase` を設定していれば `\"pageSize\": \"pageLimit\"` が一致し、`\"page_size\": \"pageLimit\"` は `'renamed' maps 'page_size', which the operation does not declare` でエラーになります。写像の両側とも、規約適用後に読まれます。使っている版を確かめる価値があります — 1.7.6 より前は、canon と規約が別々の config から来る構成で、展開は一方の綴り・照合はもう一方の綴りとなり、どちらで書いても通りませんでした。"
@@ -11553,6 +11565,30 @@
     "toc_row_agreement": {
       "en": "9. One method, several specs",
       "ja": "9. 1 つのメソッド、複数の spec"
+    },
+    "section_config_heading": {
+      "en": "10. Which config answers",
+      "ja": "10. どの config が答えるか"
+    },
+    "section_config_body": {
+      "en": "Two questions have to be answered from the same place: where the API documents are, and which spelling convention applies. A single-tree project never notices — one `jui.config.json` at the root answers both. A split tree does: specs under `docs/<face>/` while the build config lives in `<face>/`. There, the config nearest the spec is whichever partial one happens to sit on that path, and the face's own settings are not consulted at all. Since 1.7.8 a stub on the spec's own ancestry can name its owner, and the run resolves both answers from that one file.",
+      "ja": "2 つの問いは同じ場所から答えられなければなりません: API ドキュメントがどこにあるか、そしてどの綴り規約が適用されるか。単一ツリーのプロジェクトはこれに気づきません — ルートの `jui.config.json` 1 つが両方に答えます。split tree では気づきます: spec は `docs/<face>/` 配下、ビルド config は `<face>/` にある構成です。この場合、spec に最も近い config はその経路にたまたま在る部分的なもので、face 自身の設定は参照されません。1.7.8 から、spec の系譜上に置いたスタブが所有者を名指しでき、run は両方の答えをその 1 ファイルから解決します。"
+    },
+    "section_config_caption": {
+      "en": "The stub, and what it changes:",
+      "ja": "スタブと、それが変えるもの:"
+    },
+    "section_config_bullet_measured": {
+      "en": "• Measured on a split-tree fixture: with the stub, the face's `camelCase` answers from every entry point tried; without it, the convention comes back unset while the canon still resolves from the repository-root config — the two answers coming from different files is the failure this closes.",
+      "ja": "• split tree の fixture で実測: スタブが在れば、試したどの入口からも face の `camelCase` が答えます。無ければ規約は未設定として返り、canon はリポジトリルートの config から解決されます — 2 つの答えが別々のファイルから来ることが、これが塞いだ失敗です。"
+    },
+    "section_config_bullet_shape": {
+      "en": "• The absence of a stub is not a defect, it is a project that has not adopted this yet. It is also the third time the same shape has been fixed: a declaration losing to a path walk. The mock directory, the parameter convention, and now the config that owns a tree — each was resolved by a search until a declaration was given precedence over it.",
+      "ja": "• スタブが無いことは不具合ではなく、まだ採用していないプロジェクトというだけです。そして同じ形の修正はこれで 3 回目です: 宣言が経路探索に負ける、という形。モックディレクトリ、引数の綴り規約、そして今回のツリー所有者 — いずれも探索で解決されていたものが、宣言を優先する形に変わりました。"
+    },
+    "toc_row_config": {
+      "en": "10. Which config answers",
+      "ja": "10. どの config が答えるか"
     },
     "toc_row_when": {
       "en": "7. When not to use a mark",
