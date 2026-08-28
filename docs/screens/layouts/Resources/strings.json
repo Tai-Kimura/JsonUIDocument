@@ -11307,8 +11307,8 @@
       "ja": "書き写す代わりに参照する:"
     },
     "section_what_bullet_where": {
-      "en": "• Marks are read in `dataFlow.repositories[].methods[]` and `dataFlow.useCases[].methods[]` — the sections that describe transport. A mark written elsewhere in dataFlow is not expanded, and because the schema accepts the same method shape in every section, validate does not object either. Check which section you are in before concluding the canon is at fault.",
-      "ja": "• マークが読まれるのは `dataFlow.repositories[].methods[]` と `dataFlow.useCases[].methods[]` — 通信を記述する節です。dataFlow の他の場所に書いたマークは展開されず、スキーマがどの節でも同じメソッド形を受け付けるため検証も異議を唱えません。正本のせいだと結論する前に、自分がどの節にいるかを確かめてください。"
+      "en": "• Marks are read in `dataFlow.repositories[].methods[]` and `dataFlow.useCases[].methods[]` — the sections that describe transport. A mark on a ViewModel method is an error, not a silent no-op: `'@canonical' is not expanded here. A ViewModel method does not declare a transport — an endpoint belongs on a repository method, and the ViewModel calls that. Move the declaration, or write the value out.` Until 1.7.2 the same spec passed validation with the marker left in place as the parameter list, which is worth knowing if you have specs written against an earlier version.",
+      "ja": "• マークが読まれるのは `dataFlow.repositories[].methods[]` と `dataFlow.useCases[].methods[]` — 通信を記述する節です。ViewModel のメソッドに書いたマークは黙って無視されるのではなくエラーになります: `'@canonical' is not expanded here. A ViewModel method does not declare a transport — an endpoint belongs on a repository method, and the ViewModel calls that. Move the declaration, or write the value out.` 1.7.2 より前は同じ spec が検証を通り、マーカー文字列がそのまま引数リストとして残っていました。以前のバージョンで書かれた spec がある場合は知っておく価値があります。"
     },
     "section_what_bullet_same": {
       "en": "• Both tools expand marks through one implementation, so `jui build`, which writes the repository stubs, and `jsonui-doc`, which validates the spec and renders its HTML, cannot disagree about what a mark meant.",
@@ -11473,6 +11473,58 @@
     "toc_row_traps": {
       "en": "6. Marks that are not marks",
       "ja": "6. マークでないもの"
+    },
+    "section_divergence_heading": {
+      "en": "8. Declaring how you differ",
+      "ja": "8. どう違うかを宣言する"
+    },
+    "section_divergence_body": {
+      "en": "Writing the parameters out by hand is already a statement that this method is not the canon's — that is what the previous section is about. Since 1.7.4 you can say how it differs and have the tool hold you to it. `canonicalDivergence` sits beside a hand-written `params` and names the difference: `renamed` maps a canonical name to yours, `reason` says why. Validate then compares the difference you declared with the difference that is actually there, and errors when they part company.",
+      "ja": "引数を手で書くこと自体が「このメソッドは正本のものではない」という表明です — 前節の話がそれです。1.7.4 からは、どう違うのかを宣言し、その宣言にツールが縛りをかけられるようになりました。`canonicalDivergence` は手書きの `params` の横に置き、差を名指しします: `renamed` が正本の名前を自分の名前に写像し、`reason` が理由を述べます。検証は、宣言された差と実際にある差を突き合わせ、食い違えばエラーにします。"
+    },
+    "section_divergence_caption": {
+      "en": "Declared, and held to it:",
+      "ja": "宣言し、それに縛られる:"
+    },
+    "section_divergence_bullet_why": {
+      "en": "• Why not simply warn on every difference: a hand-written declaration is how a spec says the canon is not the whole story, so turning every difference red would delete the means of saying it — in one real corpus it would have turned 115 hand-written declarations red at once. The question worth asking is not whether a difference exists, but whether the difference that exists is the one you declared.",
+      "ja": "• 差があるだけで一律に警告しない理由: 手書きの宣言は「正本が全てではない」と spec が言う手段そのものなので、差を一律に赤くするとその表明手段が消えます — 実際のコーパスでは手書き宣言 115 件が一斉に赤になるところでした。問うべきは差の有無ではなく、実際にある差が宣言した差かどうかです。"
+    },
+    "section_divergence_bullet_switch": {
+      "en": "• The declaration is the switch. A method that declares nothing is checked for nothing — a divergence you never mentioned passes silently, which is what lets you adopt this one method at a time instead of in one sweep.",
+      "ja": "• 宣言がスイッチです。何も宣言しないメソッドは何も検査されません — 言及しなかった差は黙って通ります。だからこそ一斉導入ではなく 1 メソッドずつ採用できます。"
+    },
+    "section_divergence_bullet_stale": {
+      "en": "• A stale declaration is the error that matters. If the canon is renamed and the difference disappears, the note outlives what it described: `'renamed' says the canon's 'page_size' appears here as 'pageLimit', but 'page_size' is what the params actually say — the divergence this describes is gone. Update the params, or drop the entry.`",
+      "ja": "• 効くのは stale な宣言の方です。正本が改名されて差が消えると、注記だけが対象より長生きします: `'renamed' says the canon's 'page_size' appears here as 'pageLimit', but 'page_size' is what the params actually say — the divergence this describes is gone. Update the params, or drop the entry.`"
+    },
+    "section_divergence_bullet_limits": {
+      "en": "• Two more rules, both measured: `reason` must be non-empty (`canonicalDivergence needs a non-empty 'reason'`), and it cannot sit on a method that uses a mark — `a method using '@canonical' has no divergence to declare — the mark follows the canon by construction`.",
+      "ja": "• もう 2 つ、いずれも実測: `reason` は空にできず(`canonicalDivergence needs a non-empty 'reason'`)、マークを使っているメソッドには置けません — `a method using '@canonical' has no divergence to declare — the mark follows the canon by construction`。"
+    },
+    "section_agreement_heading": {
+      "en": "9. One method, several specs",
+      "ja": "9. 1 つのメソッド、複数の spec"
+    },
+    "section_agreement_body": {
+      "en": "A method reached from a shared component is declared in every screen spec that uses that component. The reason is traceability rather than generation — and structurally, a component spec has no `dataFlow` of its own, so the shared component cannot declare it. The consequence is that the same method legitimately appears in several specs, and only a disagreement between them is wrong: one implementation cannot satisfy two signatures. Since 1.7.5 validate compares them and names the files that disagree. It is visible only when you validate a directory — pointed at a single file, the other declaration is out of view and the file passes.",
+      "ja": "共有コンポーネントから呼ばれるメソッドは、そのコンポーネントを使う全ての画面 spec で宣言します。理由は生成ではなく追跡可能性で、構造的にも、コンポーネント spec には `dataFlow` が無いため共有コンポーネント自身は宣言できません。結果として同じメソッドが複数の spec に現れるのは正当で、異常なのは食い違いの方です — 1 つの実装が 2 つのシグネチャを満たせないからです。1.7.5 から検証はそれらを突き合わせ、食い違うファイルを名指しします。見えるのはディレクトリを検証したときだけで、単一ファイルを指定すると他方の宣言が視野に入らず、そのファイルは通ります。"
+    },
+    "section_agreement_caption": {
+      "en": "The same two files, two ways:",
+      "ja": "同じ 2 ファイル、2 通りの実行:"
+    },
+    "section_agreement_bullet_platforms": {
+      "en": "• Platform-scoped declarations are not disagreements. Two specs declaring the same method with `platforms: [\"ios\"]` and `platforms: [\"android\"]` describe one implementation per platform, so `UIImage` against `Bitmap` is not a conflict. A version of this check that ignored `platforms` produced four false positives on a project with no real ones — which would have been the whole of its output there.",
+      "ja": "• プラットフォーム別の宣言は食い違いではありません。同じメソッドを `platforms: [\"ios\"]` と `platforms: [\"android\"]` で宣言している 2 つの spec は、プラットフォームごとに 1 つの実装を述べているので、`UIImage` 対 `Bitmap` は衝突ではありません。`platforms` を見ない版は、実欠陥が 1 件も無いプロジェクトで偽陽性 4 件を出しました — それがその面の出力の全部になるところでした。"
+    },
+    "toc_row_divergence": {
+      "en": "8. Declaring how you differ",
+      "ja": "8. どう違うかを宣言する"
+    },
+    "toc_row_agreement": {
+      "en": "9. One method, several specs",
+      "ja": "9. 1 つのメソッド、複数の spec"
     },
     "toc_row_when": {
       "en": "7. When not to use a mark",

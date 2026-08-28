@@ -254,6 +254,61 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
+                  "id": "section_divergence",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_divergence_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_divergence_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 13, "fontColor": "#64748B", "text": "section_divergence_caption" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 8,
+                      "code": "\"params\": [ { \"name\": \"pageLimit\", \"type\": \"Int\" },\n            { \"name\": \"cursor\",    \"type\": \"String?\" } ],\n\"canonicalDivergence\": {\n  \"renamed\": { \"page_size\": \"pageLimit\" },\n  \"reason\": \"The canon abbreviates; the app spells it out.\"\n}",
+                      "language": "json",
+                      "filename": "a hand-written method that says how it differs",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "text": "section_divergence_bullet_why" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_divergence_bullet_switch" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_divergence_bullet_stale" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6, "fontSize": 14, "fontColor": "#475467", "text": "section_divergence_bullet_limits" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_agreement",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_agreement_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_agreement_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 13, "fontColor": "#64748B", "text": "section_agreement_caption" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 8,
+                      "code": "$ jsonui-doc validate spec docs/screens/json/a.spec.json\nResult: PASSED\n\n$ jsonui-doc validate spec docs/screens/json\n[ERROR] BadgeRepository.loadBadge is declared differently by 2 spec(s) —\n        one implementation cannot match more than one of them:\n    a.spec.json: () -> BadgeCount\n    b.spec.json: () -> Int\nResult: FAILED (0 of 2 spec file(s), 1 cross-spec disagreement(s))",
+                      "language": "text",
+                      "filename": "validate spec",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 14, "fontColor": "#475467", "text": "section_agreement_bullet_platforms" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
                   "id": "guides_canonical_marks_next",
                   "width": "matchParent",
                   "height": "wrapContent",
@@ -325,7 +380,9 @@
                         { "id": "toc_case", "label": "toc_row_case", "anchor": "section_case", "level": 1 },
                         { "id": "toc_return", "label": "toc_row_return", "anchor": "section_return", "level": 1 },
                         { "id": "toc_traps", "label": "toc_row_traps", "anchor": "section_traps", "level": 1 },
-                        { "id": "toc_when", "label": "toc_row_when", "anchor": "section_when", "level": 1 }
+                        { "id": "toc_when", "label": "toc_row_when", "anchor": "section_when", "level": 1 },
+                        { "id": "toc_divergence", "label": "toc_row_divergence", "anchor": "section_divergence", "level": 1 },
+                        { "id": "toc_agreement", "label": "toc_row_agreement", "anchor": "section_agreement", "level": 1 }
                       ],
                       "stickyOffset": 80
                     }
