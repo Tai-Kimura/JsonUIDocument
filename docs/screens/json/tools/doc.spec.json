@@ -138,71 +138,195 @@
         },
         {
           "name": "onSelectSampleTab",
-          "params": [{ "name": "id", "type": "String" }],
+          "params": [
+            {
+              "name": "id",
+              "type": "String"
+            }
+          ],
           "description": "Set `activeSampleTab` to the tapped TabHeaderCell.id, then assign `sampleTabs = buildSampleTabs(id)` so the active/inactive palettes swap without a full re-seed. displayLogic derives jsonSamplePanelVisibility / htmlSamplePanelVisibility from activeSampleTab; the VM does not set those — the generated component does via the layout's visibility bindings."
         },
         {
           "name": "onNavigate",
-          "params": [{ "name": "url", "type": "String" }],
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
           "description": "router.push(url). Bound to the 'View this page live' CTA (target: /learn/hello-world) and to each NextReadLink card."
         },
         {
           "name": "buildSampleTabs",
-          "params": [{ "name": "activeId", "type": "String" }],
+          "params": [
+            {
+              "name": "activeId",
+              "type": "String"
+            }
+          ],
           "description": "Helper that returns [TabHeaderCell] with exactly 2 entries (id='json' / id='html'). For the row whose id === activeId it sets bgColor: 'var(--color-accent)', fgColor: 'var(--color-on-accent)', borderColor: 'var(--color-accent)'; for the other row it sets bgColor: 'var(--color-surface)', fgColor: 'var(--color-ink)', borderColor: 'var(--color-border)'. Each row's onSelect is wired to () => this.onSelectSampleTab(id). Mirrors LearnHelloWorldViewModel.buildPlatformTabs exactly so a maintainer who has read one has read both."
         }
       ],
       "vars": [
-        { "name": "commandInitRows",     "type": "Array(CommandRow)",       "observable": true, "description": "2-row init catalog (`init spec`, `init component`)." },
-        { "name": "commandValidateRows", "type": "Array(CommandRow)",       "observable": true, "description": "2-row validate catalog (`validate spec`, `validate component`)." },
-        { "name": "commandGenerateRows", "type": "Array(CommandRow)",       "observable": true, "description": "6-row generate catalog (`generate html` / `mermaid` / `adapter` / `doc` / `spec` / `component`)." },
-        { "name": "commandFigmaRows",    "type": "Array(CommandRow)",       "observable": true, "description": "2-row figma catalog (`figma fetch`, `figma images`)." },
-        { "name": "figmaThrottleRows",   "type": "Array(FigmaThrottleRow)", "observable": true, "description": "4-row throttle table (starter / pro / org / enterprise)." },
-        { "name": "sampleTabs",          "type": "Array(TabHeaderCell)",    "observable": true, "description": "2-row tab header for the live-sample section, rebuilt on every selection." },
-        { "name": "helloWorldSpecJson",  "type": "String",                  "observable": true, "description": "Literal JSON text of the hello-world spec, displayed in a CodeBlock on the 'Spec JSON' tab." },
-        { "name": "nextReadLinks",       "type": "Array(NextReadLink)",     "observable": true, "description": "2 closing cards (/tools/mcp, /reference/cli-commands)." },
-        { "name": "activeSampleTab",    "type": "String",                  "observable": true, "description": "Currently visible sample tab id; 'html' by default." },
-        { "name": "jsonSamplePanelVisibility", "type": "String",            "observable": true, "description": "Derived visibility from displayLogic; set by the layout's binding, not the VM." },
-        { "name": "htmlSamplePanelVisibility", "type": "String",            "observable": true, "description": "Same as above — mirrors activeSampleTab == 'html'." }
+        {
+          "name": "commandInitRows",
+          "type": "Array(CommandRow)",
+          "observable": true,
+          "description": "2-row init catalog (`init spec`, `init component`)."
+        },
+        {
+          "name": "commandValidateRows",
+          "type": "Array(CommandRow)",
+          "observable": true,
+          "description": "2-row validate catalog (`validate spec`, `validate component`)."
+        },
+        {
+          "name": "commandGenerateRows",
+          "type": "Array(CommandRow)",
+          "observable": true,
+          "description": "6-row generate catalog (`generate html` / `mermaid` / `adapter` / `doc` / `spec` / `component`)."
+        },
+        {
+          "name": "commandFigmaRows",
+          "type": "Array(CommandRow)",
+          "observable": true,
+          "description": "2-row figma catalog (`figma fetch`, `figma images`)."
+        },
+        {
+          "name": "figmaThrottleRows",
+          "type": "Array(FigmaThrottleRow)",
+          "observable": true,
+          "description": "4-row throttle table (starter / pro / org / enterprise)."
+        },
+        {
+          "name": "sampleTabs",
+          "type": "Array(TabHeaderCell)",
+          "observable": true,
+          "description": "2-row tab header for the live-sample section, rebuilt on every selection."
+        },
+        {
+          "name": "helloWorldSpecJson",
+          "type": "String",
+          "observable": true,
+          "description": "Literal JSON text of the hello-world spec, displayed in a CodeBlock on the 'Spec JSON' tab."
+        },
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "2 closing cards (/tools/mcp, /reference/cli-commands)."
+        },
+        {
+          "name": "activeSampleTab",
+          "type": "String",
+          "observable": true,
+          "description": "Currently visible sample tab id; 'html' by default."
+        },
+        {
+          "name": "jsonSamplePanelVisibility",
+          "type": "String",
+          "observable": true,
+          "description": "Derived visibility from displayLogic; set by the layout's binding, not the VM."
+        },
+        {
+          "name": "htmlSamplePanelVisibility",
+          "type": "String",
+          "observable": true,
+          "description": "Same as above — mirrors activeSampleTab == 'html'."
+        }
       ]
     },
     "customTypes": [
       {
         "name": "CommandRow",
         "properties": [
-          { "name": "id",             "type": "String" },
-          { "name": "commandKey",     "type": "String" },
-          { "name": "descriptionKey", "type": "String" },
-          { "name": "flagsKey",       "type": "String" }
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "commandKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "flagsKey",
+            "type": "String"
+          }
         ]
       },
       {
         "name": "FigmaThrottleRow",
         "properties": [
-          { "name": "id",        "type": "String" },
-          { "name": "planKey",   "type": "String" },
-          { "name": "limitKey",  "type": "String" },
-          { "name": "intervalKey", "type": "String" }
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "planKey",
+            "type": "String"
+          },
+          {
+            "name": "limitKey",
+            "type": "String"
+          },
+          {
+            "name": "intervalKey",
+            "type": "String"
+          }
         ]
       },
       {
         "name": "TabHeaderCell",
         "properties": [
-          { "name": "id",          "type": "String" },
-          { "name": "labelKey",    "type": "String" },
-          { "name": "bgColor",     "type": "String" },
-          { "name": "fgColor",     "type": "String" },
-          { "name": "borderColor", "type": "String" },
-          { "name": "onSelect",    "type": "(() -> Void)?" }
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "labelKey",
+            "type": "String"
+          },
+          {
+            "name": "bgColor",
+            "type": "String"
+          },
+          {
+            "name": "fgColor",
+            "type": "String"
+          },
+          {
+            "name": "borderColor",
+            "type": "String"
+          },
+          {
+            "name": "onSelect",
+            "type": "(() -> Void)?"
+          }
         ]
       },
       {
         "name": "NextReadLink",
         "properties": [
-          { "name": "id",             "type": "String" },
-          { "name": "titleKey",       "type": "String" },
-          { "name": "descriptionKey", "type": "String" },
-          { "name": "url",            "type": "String" }
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
         ]
       }
     ]
@@ -303,6 +427,7 @@
     "All user-visible strings flow through @string/tools_doc_* keys into Resources/strings.json for en+ja. No paragraph exceeds ~100 chars in v1 so docs/content/{en,ja}/ is not needed.",
     "Cross-links seeded by this same define pass: (1) strings.json tools_cli.cli_jsonui_doc_body appended with 'See /tools/doc for full reference.' en+ja; (2) strings.json tools_mcp.tool_doc_generate_{spec,component,html}_role appended with '(wraps jsonui-doc CLI — see /tools/doc)' en+ja; (3) NAV_CATALOG 'tools' section in jsonui-doc-web/src/viewmodels/ChromeViewModel.ts received a new entry { id: 'doc', titleKey: 'tools_doc_title', url: '/tools/doc' }.",
     "onSelectSampleTab was added to .jsonui-doc-rules.json eventHandlers.allowedNames during this define pass.",
-    "2026-05 update (swagger-driven Data Models): document_tools/.../swagger.py — the original Python OpenAPI -> per-platform-model generator — was ported into the jsonui-cli core and is now reached through `jui g api`. The jsonui-doc body copy is updated with ONE sentence noting this heritage so a reader who knows the old path lands on the right new entry point. No catalog row added (jui g api lives under /tools/cli, not here)."
+    "2026-05 update (swagger-driven Data Models): document_tools/.../swagger.py — the original Python OpenAPI -> per-platform-model generator — was ported into the jsonui-cli core and is now reached through `jui g api`. The jsonui-doc body copy is updated with ONE sentence noting this heritage so a reader who knows the old path lands on the right new entry point. No catalog row added (jui g api lives under /tools/cli, not here).",
+    "2026-08-31 — removed a literal '**v1.6.13 以降**' from the JA install text, same cause as the api-mock one: markdown bold reaches the screen as asterisks. A full scan of strings.json now leaves two '**' occurrences, both of which are the subject of their sentence (documenting that glob '**' is unsupported) rather than emphasis."
   ]
 }
