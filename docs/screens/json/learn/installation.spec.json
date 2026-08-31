@@ -150,90 +150,30 @@
         },
         {
           "name": "onToggleExpand",
-          "params": [
-            {
-              "name": "id",
-              "type": "String"
-            }
-          ],
+          "params": [{ "name": "id", "type": "String" }],
           "description": "Flip membership of id in the private _expandedIds Set. Then (a) re-hydrate troubleshootRows so each cell's rowVisibility flag reflects the new state, (b) re-derive the four section-level *BodyVisibility strings via sectionVisibilityFromExpandedIds, and (c) push both in a single updateData call. Called from the four section headers AND from each TroubleshootRow cell — the single handler covers both surface types because expandedIds is a flat Set keyed by id."
         },
         {
           "name": "onCopyCode",
-          "params": [
-            {
-              "name": "code",
-              "type": "String"
-            }
-          ],
+          "params": [{ "name": "code", "type": "String" }],
           "description": "Optional analytics hook invoked when a CodeBlock's copy button fires. Not wired in v1 (copying itself is built into the CodeBlock converter). Declared here so future analytics can bind to a stable method name."
         },
         {
           "name": "onNavigate",
-          "params": [
-            {
-              "name": "url",
-              "type": "String"
-            }
-          ],
+          "params": [{ "name": "url", "type": "String" }],
           "description": "router.push(url). Funnels RelatedLink taps + the 'next: Hello World' CTA (wired as onNavigateHelloWorld). Every destination is listed in transitions; the method is agnostic to which surface fired."
         }
       ],
       "vars": [
-        {
-          "name": "installTargets",
-          "type": "Array(InstallTargetCard)",
-          "observable": true,
-          "description": "3 'what gets installed' cards (CLI / MCP / Agents)."
-        },
-        {
-          "name": "prerequisites",
-          "type": "Array(PrereqRow)",
-          "observable": true,
-          "description": "5 prerequisite rows with required/optional tier."
-        },
-        {
-          "name": "verifyRows",
-          "type": "Array(VerifyRow)",
-          "observable": true,
-          "description": "3 post-install verification rows."
-        },
-        {
-          "name": "troubleshootRows",
-          "type": "Array(TroubleshootRow)",
-          "observable": true,
-          "description": "6 expandable troubleshooting rows; each carries its own rowVisibility derived from _expandedIds."
-        },
-        {
-          "name": "relatedLinks",
-          "type": "Array(RelatedLink)",
-          "observable": true,
-          "description": "5 related-link cards at the bottom."
-        },
-        {
-          "name": "partialUpdateBodyVisibility",
-          "type": "String",
-          "observable": true,
-          "description": "Derived from _expandedIds (displayLogic target)."
-        },
-        {
-          "name": "customPathBodyVisibility",
-          "type": "String",
-          "observable": true,
-          "description": "Derived from _expandedIds."
-        },
-        {
-          "name": "individualInstallBodyVisibility",
-          "type": "String",
-          "observable": true,
-          "description": "Derived from _expandedIds."
-        },
-        {
-          "name": "uninstallBodyVisibility",
-          "type": "String",
-          "observable": true,
-          "description": "Derived from _expandedIds."
-        }
+        { "name": "installTargets",                "type": "Array(InstallTargetCard)",  "observable": true, "description": "3 'what gets installed' cards (CLI / MCP / Agents)." },
+        { "name": "prerequisites",                 "type": "Array(PrereqRow)",          "observable": true, "description": "5 prerequisite rows with required/optional tier." },
+        { "name": "verifyRows",                    "type": "Array(VerifyRow)",          "observable": true, "description": "3 post-install verification rows." },
+        { "name": "troubleshootRows",              "type": "Array(TroubleshootRow)",    "observable": true, "description": "6 expandable troubleshooting rows; each carries its own rowVisibility derived from _expandedIds." },
+        { "name": "relatedLinks",                  "type": "Array(RelatedLink)",        "observable": true, "description": "5 related-link cards at the bottom." },
+        { "name": "partialUpdateBodyVisibility",   "type": "String",                    "observable": true, "description": "Derived from _expandedIds (displayLogic target)." },
+        { "name": "customPathBodyVisibility",      "type": "String",                    "observable": true, "description": "Derived from _expandedIds." },
+        { "name": "individualInstallBodyVisibility","type": "String",                   "observable": true, "description": "Derived from _expandedIds." },
+        { "name": "uninstallBodyVisibility",       "type": "String",                    "observable": true, "description": "Derived from _expandedIds." }
       ]
     },
     "customTypes": [

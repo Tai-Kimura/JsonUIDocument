@@ -130,80 +130,25 @@
         },
         {
           "name": "onSelectTab",
-          "params": [
-            {
-              "name": "id",
-              "type": "String"
-            }
-          ],
+          "params": [{ "name": "id", "type": "String" }],
           "description": "Set `activeTab` to the tapped PlatformTab.id ('swift' | 'kotlin' | 'react'). The displayLogic block derives three *PanelVisibility strings from activeTab so exactly one platform's steps are visible at a time; the VM doesn't set those explicitly — the generated component does via the layout's visibility bindings."
         },
         {
           "name": "onNavigate",
-          "params": [
-            {
-              "name": "url",
-              "type": "String"
-            }
-          ],
+          "params": [{ "name": "url", "type": "String" }],
           "description": "router.push(url). Hit by NextStepLink and BreadcrumbItem taps."
         }
       ],
       "vars": [
-        {
-          "name": "breadcrumbItems",
-          "type": "Array(BreadcrumbItem)",
-          "observable": true,
-          "description": "2-row breadcrumb."
-        },
-        {
-          "name": "prerequisites",
-          "type": "Array(Prerequisite)",
-          "observable": true,
-          "description": "3 required-tool rows rendered above the tabs."
-        },
-        {
-          "name": "commonSteps",
-          "type": "Array(QuickstartStep)",
-          "observable": true,
-          "description": "5 cross-platform steps rendered above the platform tabs."
-        },
-        {
-          "name": "platformTabs",
-          "type": "Array(PlatformTab)",
-          "observable": true,
-          "description": "3 tab-header rows; each owns its own *platform-specific* steps list (ViewModel + run + live-reload)."
-        },
-        {
-          "name": "activeTab",
-          "type": "String",
-          "observable": true,
-          "description": "Currently visible tab id. Defaults to 'react' (the web-shipping platform)."
-        },
-        {
-          "name": "nextSteps",
-          "type": "Array(NextStepLink)",
-          "observable": true,
-          "description": "2–3 follow-up tutorial cards below the platform panels."
-        },
-        {
-          "name": "swiftPanelVisibility",
-          "type": "String",
-          "observable": true,
-          "description": "Derived visibility from displayLogic; set by the layout's binding, not the VM."
-        },
-        {
-          "name": "kotlinPanelVisibility",
-          "type": "String",
-          "observable": true,
-          "description": "Same as above."
-        },
-        {
-          "name": "reactPanelVisibility",
-          "type": "String",
-          "observable": true,
-          "description": "Same as above."
-        }
+        { "name": "breadcrumbItems",         "type": "Array(BreadcrumbItem)", "observable": true, "description": "2-row breadcrumb." },
+        { "name": "prerequisites",           "type": "Array(Prerequisite)",   "observable": true, "description": "3 required-tool rows rendered above the tabs." },
+        { "name": "commonSteps",             "type": "Array(QuickstartStep)", "observable": true, "description": "5 cross-platform steps rendered above the platform tabs." },
+        { "name": "platformTabs",            "type": "Array(PlatformTab)",    "observable": true, "description": "3 tab-header rows; each owns its own *platform-specific* steps list (ViewModel + run + live-reload)." },
+        { "name": "activeTab",               "type": "String",                "observable": true, "description": "Currently visible tab id. Defaults to 'react' (the web-shipping platform)." },
+        { "name": "nextSteps",               "type": "Array(NextStepLink)",   "observable": true, "description": "2–3 follow-up tutorial cards below the platform panels." },
+        { "name": "swiftPanelVisibility",    "type": "String",                "observable": true, "description": "Derived visibility from displayLogic; set by the layout's binding, not the VM." },
+        { "name": "kotlinPanelVisibility",   "type": "String",                "observable": true, "description": "Same as above." },
+        { "name": "reactPanelVisibility",    "type": "String",                "observable": true, "description": "Same as above." }
       ]
     },
     "customTypes": [
