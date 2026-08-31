@@ -167,9 +167,9 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "docs/screens/json/Items.spec.json\n  [WARNING] dataFlow: 2 endpoint declaration(s) were not checked: no OpenAPI\n            document was found under api_directory ('…/sub/docs/api', from\n            '…/sub/jui.config.json'). This is not 'every route matches' —\n            nothing was compared.\n\nResult: PASSED (1 spec file(s))\nErrors: 0, Warnings: 1\n\n# the same fixture, same broken api_directory, on v1.7.16:\n  [WARNING] ...methods[0].endpoint: Endpoint 'GET /api/items' is not declared in any\n            OpenAPI document under api_directory — update the spec to the canonical\n            route, or document the route\n  [WARNING] ...methods[1].endpoint: Endpoint 'POST /api/items' is not declared ...",
+                      "code": "docs/screens/json/Items.spec.json\n  [WARNING] dataFlow: 2 endpoint(s), declared in 4 place(s), were not checked: no\n            OpenAPI document was found under api_directory ('…/sub/docs/api', from\n            '…/sub/jui.config.json'). This is not 'every route matches' — nothing\n            was compared.\n\n# drop the apiEndpoints block — the same two routes, half the places:\n  [WARNING] dataFlow: 2 endpoint(s), declared in 2 place(s), were not checked: ...\n\n# the same fixture, same broken api_directory, on v1.7.16 — your routes blamed:\n  [WARNING] ...methods[0].endpoint: Endpoint 'GET /api/items' is not declared in any\n            OpenAPI document under api_directory — update the spec to the canonical\n            route, or document the route\n  [WARNING] ...methods[1].endpoint: Endpoint 'POST /api/items' is not declared ...",
                       "language": "text",
-                      "filename": "a broken api_directory: named once (1.7.17) vs your routes blamed twice (1.7.16)",
+                      "filename": "two units, and what a broken api_directory looked like before it was named",
                       "showLineNumbers": false,
                       "copyable": false
                     },
