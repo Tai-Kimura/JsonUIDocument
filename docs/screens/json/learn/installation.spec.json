@@ -150,30 +150,90 @@
         },
         {
           "name": "onToggleExpand",
-          "params": [{ "name": "id", "type": "String" }],
+          "params": [
+            {
+              "name": "id",
+              "type": "String"
+            }
+          ],
           "description": "Flip membership of id in the private _expandedIds Set. Then (a) re-hydrate troubleshootRows so each cell's rowVisibility flag reflects the new state, (b) re-derive the four section-level *BodyVisibility strings via sectionVisibilityFromExpandedIds, and (c) push both in a single updateData call. Called from the four section headers AND from each TroubleshootRow cell — the single handler covers both surface types because expandedIds is a flat Set keyed by id."
         },
         {
           "name": "onCopyCode",
-          "params": [{ "name": "code", "type": "String" }],
+          "params": [
+            {
+              "name": "code",
+              "type": "String"
+            }
+          ],
           "description": "Optional analytics hook invoked when a CodeBlock's copy button fires. Not wired in v1 (copying itself is built into the CodeBlock converter). Declared here so future analytics can bind to a stable method name."
         },
         {
           "name": "onNavigate",
-          "params": [{ "name": "url", "type": "String" }],
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
           "description": "router.push(url). Funnels RelatedLink taps + the 'next: Hello World' CTA (wired as onNavigateHelloWorld). Every destination is listed in transitions; the method is agnostic to which surface fired."
         }
       ],
       "vars": [
-        { "name": "installTargets",                "type": "Array(InstallTargetCard)",  "observable": true, "description": "3 'what gets installed' cards (CLI / MCP / Agents)." },
-        { "name": "prerequisites",                 "type": "Array(PrereqRow)",          "observable": true, "description": "5 prerequisite rows with required/optional tier." },
-        { "name": "verifyRows",                    "type": "Array(VerifyRow)",          "observable": true, "description": "3 post-install verification rows." },
-        { "name": "troubleshootRows",              "type": "Array(TroubleshootRow)",    "observable": true, "description": "6 expandable troubleshooting rows; each carries its own rowVisibility derived from _expandedIds." },
-        { "name": "relatedLinks",                  "type": "Array(RelatedLink)",        "observable": true, "description": "5 related-link cards at the bottom." },
-        { "name": "partialUpdateBodyVisibility",   "type": "String",                    "observable": true, "description": "Derived from _expandedIds (displayLogic target)." },
-        { "name": "customPathBodyVisibility",      "type": "String",                    "observable": true, "description": "Derived from _expandedIds." },
-        { "name": "individualInstallBodyVisibility","type": "String",                   "observable": true, "description": "Derived from _expandedIds." },
-        { "name": "uninstallBodyVisibility",       "type": "String",                    "observable": true, "description": "Derived from _expandedIds." }
+        {
+          "name": "installTargets",
+          "type": "Array(InstallTargetCard)",
+          "observable": true,
+          "description": "3 'what gets installed' cards (CLI / MCP / Agents)."
+        },
+        {
+          "name": "prerequisites",
+          "type": "Array(PrereqRow)",
+          "observable": true,
+          "description": "5 prerequisite rows with required/optional tier."
+        },
+        {
+          "name": "verifyRows",
+          "type": "Array(VerifyRow)",
+          "observable": true,
+          "description": "3 post-install verification rows."
+        },
+        {
+          "name": "troubleshootRows",
+          "type": "Array(TroubleshootRow)",
+          "observable": true,
+          "description": "6 expandable troubleshooting rows; each carries its own rowVisibility derived from _expandedIds."
+        },
+        {
+          "name": "relatedLinks",
+          "type": "Array(RelatedLink)",
+          "observable": true,
+          "description": "5 related-link cards at the bottom."
+        },
+        {
+          "name": "partialUpdateBodyVisibility",
+          "type": "String",
+          "observable": true,
+          "description": "Derived from _expandedIds (displayLogic target)."
+        },
+        {
+          "name": "customPathBodyVisibility",
+          "type": "String",
+          "observable": true,
+          "description": "Derived from _expandedIds."
+        },
+        {
+          "name": "individualInstallBodyVisibility",
+          "type": "String",
+          "observable": true,
+          "description": "Derived from _expandedIds."
+        },
+        {
+          "name": "uninstallBodyVisibility",
+          "type": "String",
+          "observable": true,
+          "description": "Derived from _expandedIds."
+        }
       ]
     },
     "customTypes": [
@@ -326,43 +386,38 @@
     },
     {
       "type": "Layout",
-      "path": "docs/screens/layouts/learn/installation/cells/install_target_card.json",
+      "path": "docs/screens/layouts/cells/install_target_card.json",
       "description": "InstallTargetCard cell layout. Props: id, titleKey, locationKey, bodyKey, iconName."
     },
     {
       "type": "Layout",
-      "path": "docs/screens/layouts/learn/installation/cells/prereq_row.json",
+      "path": "docs/screens/layouts/cells/prereq_row.json",
       "description": "PrereqRow cell layout. Props: id, labelKey, toolKey, requiredTier ('required' | 'optional'), noteKey."
     },
     {
       "type": "Layout",
-      "path": "docs/screens/layouts/learn/installation/cells/verify_row.json",
+      "path": "docs/screens/layouts/cells/verify_row.json",
       "description": "VerifyRow cell layout. Props: id, commandKey, expectKey."
     },
     {
       "type": "Layout",
-      "path": "docs/screens/layouts/learn/installation/cells/troubleshoot_row.json",
+      "path": "docs/screens/layouts/cells/troubleshoot_row.json",
       "description": "TroubleshootRow cell layout. Props: id, symptomKey, causeKey, fixKey. Cell is self-expanding: its cause+fix body binds visibility to `@{expandedIds contains id}`, and its header onClick invokes onToggleExpand(id)."
     },
     {
       "type": "Layout",
-      "path": "docs/screens/layouts/learn/installation/cells/related_link.json",
+      "path": "docs/screens/layouts/cells/related_link.json",
       "description": "RelatedLink cell layout. Props: id, labelKey, url. Row onClick invokes onNavigate(url)."
     },
     {
       "type": "ViewModel",
-      "path": "jsonui-doc-web/src/viewmodels/LearnInstallationViewModel.ts",
+      "path": "jsonui-doc-web/src/viewmodels/learn/InstallationViewModel.ts",
       "description": "Generated by jui g project. Exposes currentLanguage, installTargets, prerequisites, verifyRows, troubleshootRows, relatedLinks, expandedIds, and the four derived *BodyVisibility strings; implements onAppear / onToggleExpand / onCopyCode / onNavigate / onToggleLanguage."
     },
     {
       "type": "View",
       "path": "jsonui-doc-web/src/app/learn/installation/page.tsx",
       "description": "Next.js App Router page. Dynamic-imports the generated LearnInstallationView (thin wrapper; navigation lives in jsonui-navigation-web)."
-    },
-    {
-      "type": "Model",
-      "path": "jsonui-doc-web/src/models/InstallTargetCard.ts",
-      "description": "Generated TypeScript types for InstallTargetCard and the four other custom types declared in dataFlow.customTypes (PrereqRow, VerifyRow, TroubleshootRow, RelatedLink)."
     },
     {
       "type": "Component",
