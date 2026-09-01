@@ -2877,6 +2877,37 @@ async function main() {
     process.exit(1);
   }
 
+  // The other direction, which had no check: an attribute the SSoT declares
+  // but the category map does not name. Page assembly filters with
+  // `categoryMap[k] === category`, so such an attribute matches no category
+  // and is dropped from the reference SILENTLY — the build stays green and
+  // the attribute simply is not published.
+  //
+  // Measured on jsonui-cli 1.7.53, which added `alert`: after sync_tool the
+  // vendored definitions carried it, and the generated reference did not
+  // mention it anywhere, with no warning on the way through. Its sibling
+  // `confirmationDialog` was present, which is what made the absence legible
+  // at all. Every future attribute would have gone the same way.
+  //
+  // Exit 1 rather than warn. The set can only change when the pinned
+  // toolchain changes, which is a deliberate act with a review attached, and
+  // a warning here would be read by nobody at exactly the moment it matters.
+  const uncategorized = Object.keys(commonDefs)
+    .filter((k) => !k.startsWith("_") && !categoryMap[k])
+    .sort();
+  if (uncategorized.length > 0) {
+    console.error(
+      `build-attribute-reference: ${uncategorized.length} attribute(s) declared by the SSoT but absent from ` +
+        `docs/data/attribute-categories.json, so they would be published nowhere:`,
+    );
+    for (const name of uncategorized) console.error(`  ${name}`);
+    console.error(
+      "Add each to the category map (and an override summary if it needs one). " +
+        "This usually means the pinned toolchain gained an attribute.",
+    );
+    process.exit(1);
+  }
+
   console.log(`→ ${componentNames.length} components, ${Object.keys(commonDefs).length} common attributes, ${Object.keys(descriptionsDict).length} translated attribute descriptions`);
 
   // 1. Components
