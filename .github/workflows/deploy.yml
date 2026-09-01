@@ -37,9 +37,95 @@ env:
   # Bump procedure: pick the new jsonui-cli main SHA, replace this value, and
   # review the regenerated reference pages in that deploy — the SHA bump is
   # the review point for reference updates.
-  JSONUI_CLI_REF: 96468e42b5007d11208c1cc8cd724fa85d64ded7 # v1.7.51
+  JSONUI_CLI_REF: 945d4fd0f26d2cd3186d5b5ecaca26e9bab91067 # v1.7.52
 
 jobs:
+  # REPORTING ONLY — `deploy` does not depend on this job, and a failure here
+  # does not stop a deploy.
+  #
+  # Six gates run before every push to this repository and none of them has
+  # ever run in CI: lint-strings, verify --fail-on-diff, validate:strings,
+  # tsc --noEmit, jsonui-doc validate spec, jsonui-test validate. They are a
+  # procedure, not a mechanism — skip the local run and nothing catches it.
+  # All six report zero findings locally, but CI is a fresh checkout with a
+  # --clean build and the toolchain fetched at the pin, so a local zero is
+  # not a CI zero. This job measures that before any of them is enforced.
+  #
+  # Every gate prints its own exit code. A gate that could not run must not
+  # read as a gate that passed, so the verdict is `exit=N` per gate and a
+  # count at the end, never silence.
+  gates-report:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: jsonui-doc-web/package-lock.json
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2.2"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Fetch jsonui-cli toolchain
+        run: |
+          git init "$RUNNER_TEMP/jsonui-cli"
+          git -C "$RUNNER_TEMP/jsonui-cli" remote add origin \
+            https://github.com/Tai-Kimura/jsonui-cli.git
+          git -C "$RUNNER_TEMP/jsonui-cli" fetch --depth 1 origin "${JSONUI_CLI_REF}"
+          git -C "$RUNNER_TEMP/jsonui-cli" checkout --detach FETCH_HEAD
+          echo "JSONUI_CLI_PATH=$RUNNER_TEMP/jsonui-cli" >> "$GITHUB_ENV"
+
+      - name: Prepare toolchain and generated sources
+        run: |
+          python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" sync_tool
+          python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" build --web-only --clean
+          # If this install fails, the two Python gates below report a
+          # non-zero exit for that reason rather than for findings. The
+          # distinction is the point of running this job at all.
+          python3 -m pip install -q -e "$JSONUI_CLI_PATH/test_tools" -e "$JSONUI_CLI_PATH/document_tools" || echo "NOTE: pip install failed"
+
+      - name: Install JS dependencies
+        working-directory: jsonui-doc-web
+        run: npm ci
+
+      - name: Run the six local-only gates (reporting only)
+        run: |
+          set +e
+          fail=0
+          run_gate() {
+            name="$1"; shift
+            echo "::group::$name"
+            "$@"; rc=$?
+            echo "GATE $name: exit=$rc"
+            [ "$rc" -ne 0 ] && fail=$((fail + 1))
+            echo "::endgroup::"
+          }
+          JUI="python3 $JSONUI_CLI_PATH/jui_tools/bin/jui"
+          run_gate lint-strings           $JUI lint-strings
+          run_gate verify-fail-on-diff    $JUI verify --fail-on-diff
+          run_gate validate-strings       npm --prefix jsonui-doc-web run validate:strings
+          run_gate tsc-noEmit             npx --prefix jsonui-doc-web tsc --noEmit \
+                                            --project jsonui-doc-web/tsconfig.json
+          run_gate jsonui-doc-validate    python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" \
+                                            validate spec docs/screens/json
+          # Directory argument, not a `find` expansion: a partial argument list
+          # is the shape that used to uninstall the tests it did not name, and
+          # --no-install removes the install step from this reporting run
+          # entirely.
+          run_gate jsonui-test-validate   python3 "$JSONUI_CLI_PATH/test_tools/jsonui-test" \
+                                            validate --no-install tests/screens
+          echo "----"
+          echo "gates with a non-zero exit: $fail of 6"
+          echo "This job is reporting only; the deploy job is unaffected either way."
+
   deploy:
     runs-on: ubuntu-latest
     steps:
