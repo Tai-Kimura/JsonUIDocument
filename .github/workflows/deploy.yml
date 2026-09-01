@@ -96,6 +96,17 @@ jobs:
         working-directory: jsonui-doc-web
         run: npm ci
 
+      # `tsc --noEmit` resolves `@/data/*.json`, which `prebuild` writes into
+      # the gitignored `src/data/`. Locally those files survive from an
+      # earlier build, so tsc passes; the first CI run of this job reported
+      # `error TS2307: Cannot find module '@/data/cli-commands.json'` for
+      # exactly that reason. That is the difference the job was added to find,
+      # and it is an ordering fact about the checkout, not a finding about the
+      # code — so the fix is to generate the inputs, not to drop the gate.
+      - name: Generate prebuild artifacts (inputs to tsc)
+        working-directory: jsonui-doc-web
+        run: npm run prebuild
+
       - name: Run the six local-only gates (reporting only)
         run: |
           set +e
