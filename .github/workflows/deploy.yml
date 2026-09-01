@@ -40,23 +40,23 @@ env:
   JSONUI_CLI_REF: ed19638d39d606ea37d1d6224896374a4fd23bfa # v1.7.53
 
 jobs:
-  # REPORTING ONLY — `deploy` does not depend on this job, and a failure here
-  # does not stop a deploy.
+  # ENFORCING — `deploy` depends on this job; a red gate stops the deploy
+  # before anything is published, and the site stays on its previous version.
   #
-  # Six gates run before every push to this repository and none of them has
-  # ever run in CI: lint-strings, verify --fail-on-diff, validate:strings,
-  # tsc --noEmit, jsonui-doc validate spec, jsonui-test validate. They are a
-  # procedure, not a mechanism — skip the local run and nothing catches it.
-  # All six report zero findings locally, but CI is a fresh checkout with a
-  # --clean build and the toolchain fetched at the pin, so a local zero is
-  # not a CI zero. This job measures that before any of them is enforced.
+  # Six gates run before every push to this repository and used to run only
+  # in the maintainer's hands: lint-strings, verify --fail-on-diff,
+  # validate:strings, tsc --noEmit, jsonui-doc validate spec, jsonui-test
+  # validate. As a local procedure they were not a mechanism — skip the run
+  # and nothing catches it. This job ran in reporting-only mode first and
+  # measured two facts before being switched to enforcing: a local zero was
+  # not a CI zero (tsc needed the prebuild artifacts a fresh checkout lacks),
+  # and after that fix, two consecutive runs reported 0 of 6.
   #
-  # Every gate prints its own exit code. A gate that could not run must not
-  # read as a gate that passed, so the verdict is `exit=N` per gate and a
-  # count at the end, never silence.
-  gates-report:
+  # All six gates run even when one fails, so a red run names everything that
+  # is red, and every gate prints its own exit code — a gate that could not
+  # run must not read as a gate that passed.
+  gates:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
@@ -135,9 +135,18 @@ jobs:
                                             validate --no-install tests/screens
           echo "----"
           echo "gates with a non-zero exit: $fail of 6"
-          echo "This job is reporting only; the deploy job is unaffected either way."
+          if [ "$fail" -ne 0 ]; then
+            echo "FAILING this job: the deploy job depends on it and will not run."
+            exit 1
+          fi
 
   deploy:
+    # Enforced by `needs`: platform semantics skip this job unless every gate
+    # above exited 0. Note the blocking arm itself has not been fired on main
+    # — proving it would mean pushing a red commit to the deploy branch — so
+    # this rests on GitHub Actions' documented `needs` behaviour, not on a
+    # measurement from this repository.
+    needs: gates
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
