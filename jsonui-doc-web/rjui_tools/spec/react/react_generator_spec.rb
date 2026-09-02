@@ -111,6 +111,27 @@ RSpec.describe RjuiTools::React::ReactGenerator do
       generator.generate('Index', minimal_json, subdir: './learn')
       expect(config['_current_json_name']).to eq('learn_index')
     end
+    it 'kebab namespace_stem owns the normalized spelling first, raw trailing' do
+      generator.generate('TestRunner', minimal_json, subdir: 'tools', namespace_stem: 'test-runner')
+      expect(config['_current_json_name']).to eq('tools_test_runner')
+      expect(config['_current_namespaces']).to eq(
+        ['test_runner', 'tools_test_runner', 'test-runner', 'tools_test-runner']
+      )
+    end
+
+    it 'a variant namespace_stem folds into the base spelling (canonical @-strip)' do
+      generator.generate('HomeRegular', minimal_json, namespace_stem: 'home@regular')
+      expect(config['_current_json_name']).to eq('home')
+      expect(config['_current_namespaces']).to include('home')
+    end
+
+    it 'conventional snake names keep their historical candidate list' do
+      generator.generate('HeroSectionCell', minimal_json, subdir: 'item_detail',
+                         namespace_stem: 'hero_section_cell')
+      expect(config['_current_namespaces']).to eq(
+        ['hero_section_cell', 'item_detail_hero_section_cell']
+      )
+    end
   end
 
   describe '#generate_component_file StringManager import emission' do
@@ -499,5 +520,138 @@ RSpec.describe RjuiTools::React::ReactGenerator, 'relative positioning' do
     ] })
     expect(out).to include('const bodyRelRef = useRef(null);')
     expect(out).not_to include('useRef<')
+  end
+end
+
+# autoShrink / minimumScaleFactor. CSS can size text against the viewport but
+# never against the element's own box, so the fit is measured at runtime: the
+# converter attaches a ref and the generator hoists the effect that fits it.
+RSpec.describe RjuiTools::React::ReactGenerator, 'autoShrink' do
+  let(:generator) do
+    described_class.new({ 'use_tailwind' => true, 'typescript' => true,
+                          'layouts_directory' => '/tmp/x', 'generated_directory' => '/tmp/x/out' })
+  end
+
+  def screen(child, name: 'ShrinkScreen')
+    generator.generate(name, { 'type' => 'View', 'child' => [child] })
+  end
+
+  it 'hoists a ref and a fit effect per shrinking label' do
+    out = screen({ 'type' => 'Label', 'id' => 'title', 'text' => 'Long text',
+                   'autoShrink' => true, 'fontSize' => 16, 'minimumScaleFactor' => 0.25 })
+    expect(out).to include("import { applyAutoShrink } from '@/generated/autoShrink';")
+    expect(out).to include('const titleShrinkRef = useRef<HTMLElement | null>(null);')
+    expect(out).to include(
+      'useEffect(() => applyAutoShrink(titleShrinkRef.current, ' \
+      '{ fontSize: 16, minimumScaleFactor: 0.25 }), []);'
+    )
+    expect(out).to include('ref={titleShrinkRef}')
+  end
+
+  # A bound size or factor is the effect's dependency, so the text re-fits when
+  # the data moves. The old viewport clamp could not express this at all: it
+  # multiplied the two in Ruby and raised on a bound value.
+  it 'makes a bound factor a dependency' do
+    out = screen({ 'type' => 'Label', 'id' => 'title', 'text' => 'Long text',
+                   'autoShrink' => true, 'fontSize' => 16,
+                   'minimumScaleFactor' => '@{minScale}' })
+    expect(out).to include(
+      'useEffect(() => applyAutoShrink(titleShrinkRef.current, ' \
+      '{ fontSize: 16, minimumScaleFactor: data.minScale }), [data.minScale]);'
+    )
+  end
+
+  # `autoShrink: "@{flag}"` cannot be resolved at build time; the ref is
+  # attached and the helper decides at runtime whether anything overflows.
+  it 'hoists for a bound autoShrink flag' do
+    out = screen({ 'type' => 'Label', 'id' => 'title', 'text' => 'Long text',
+                   'autoShrink' => '@{shrink}' })
+    expect(out).to include('const titleShrinkRef = useRef<HTMLElement | null>(null);')
+  end
+
+  it 'hoists nothing for a label that does not declare it' do
+    out = screen({ 'type' => 'Label', 'id' => 'title', 'text' => 'Long text' })
+    expect(out).not_to include('applyAutoShrink')
+    expect(out).not_to include('ShrinkRef')
+  end
+
+  # A JS project emits .jsx, where the type parameter is a syntax error.
+  it 'omits the type parameter for a JavaScript project' do
+    js = described_class.new({ 'use_tailwind' => true, 'layouts_directory' => '/tmp/x',
+                               'generated_directory' => '/tmp/x/out' })
+    out = js.generate('ShrinkScreenJs', { 'type' => 'View', 'child' => [
+      { 'type' => 'Label', 'id' => 'title', 'text' => 'Long text', 'autoShrink' => true }
+    ] })
+    expect(out).to include('const titleShrinkRef = useRef(null);')
+    expect(out).not_to include('useRef<')
+  end
+end
+
+# `defaultScrollAnchor` is declared for ScrollView as well as Collection, and
+# only Collection read it. Where a scroll view STARTS is not a CSS property —
+# the offset has to be written once on mount — so the ScrollView reuses the
+# Collection anchor helper (it takes any scrollable element).
+RSpec.describe RjuiTools::React::ReactGenerator, 'ScrollView defaultScrollAnchor' do
+  let(:generator) do
+    described_class.new({ 'use_tailwind' => true, 'typescript' => true,
+                          'layouts_directory' => '/tmp/x', 'generated_directory' => '/tmp/x/out' })
+  end
+
+  def screen(node)
+    generator.generate('AnchorScreen', { 'type' => 'View', 'child' => [node] })
+  end
+
+  it 'hoists the anchor effect for a ScrollView' do
+    out = screen({ 'type' => 'ScrollView', 'id' => 'feed', 'defaultScrollAnchor' => 'bottom',
+                   'child' => [{ 'type' => 'View', 'id' => 'c', 'height' => 600 }] })
+    expect(out).to include("import { applyCollectionDefaultAnchor } from '@/generated/collectionScroll';")
+    expect(out).to include("useEffect(() => { applyCollectionDefaultAnchor(feedRef.current, 'bottom', false); }, []);")
+    expect(out).to include('ref={feedRef}')
+  end
+
+  it 'reads the horizontal axis from horizontalScroll as well as orientation' do
+    out = screen({ 'type' => 'ScrollView', 'id' => 'feed', 'defaultScrollAnchor' => 'bottom',
+                   'horizontalScroll' => true })
+    expect(out).to include("applyCollectionDefaultAnchor(feedRef.current, 'bottom', true)")
+  end
+
+  # The item-addressing helpers are Collection-only: a ScrollView has no items.
+  it 'hoists nothing else for a ScrollView' do
+    out = screen({ 'type' => 'ScrollView', 'id' => 'feed', 'defaultScrollAnchor' => 'top',
+                   'scrollTo' => '@{index}', 'currentPage' => '@{page}' })
+    expect(out).not_to include('scrollCollectionToItem')
+    expect(out).not_to include('currentCollectionPage')
+  end
+
+  it 'hoists nothing for a ScrollView that does not declare an anchor' do
+    out = screen({ 'type' => 'ScrollView', 'id' => 'feed' })
+    expect(out).not_to include('applyCollectionDefaultAnchor')
+  end
+end
+
+# A bound autoShrink operand references `data.` from its HOISTED effect, which
+# is not in the JSX scan — so `uses_data` stayed false, `data` remained an
+# optional prop with no Partial-merge, and the effect read `data.x` off
+# possibly-undefined (TS18048 in an @generated file; 51-A urgent).
+RSpec.describe RjuiTools::React::ReactGenerator, 'autoShrink data merge' do
+  let(:generator) do
+    described_class.new({ 'use_tailwind' => true, 'typescript' => true,
+                          'layouts_directory' => '/tmp/x', 'generated_directory' => '/tmp/x/out' })
+  end
+
+  it 'merges data when an autoShrink operand is bound' do
+    out = generator.generate('ShrinkBound', { 'type' => 'View', 'child' => [
+      { 'type' => 'Label', 'id' => 'title', 'text' => 'Long text',
+        'autoShrink' => true, 'minimumScaleFactor' => '@{minScale}' }
+    ] })
+    expect(out).to include('const data: ShrinkBoundData = { ...createShrinkBoundData(), ...dataProp };')
+  end
+
+  it 'keeps a fully static autoShrink on the plain optional-data shape' do
+    out = generator.generate('ShrinkStatic', { 'type' => 'View', 'child' => [
+      { 'type' => 'Label', 'id' => 'title', 'text' => 'Long text',
+        'autoShrink' => true, 'fontSize' => 16, 'minimumScaleFactor' => 0.25 }
+    ] })
+    expect(out).not_to include('...createShrinkStaticData()')
   end
 end

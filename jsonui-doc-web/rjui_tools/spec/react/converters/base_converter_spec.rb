@@ -440,4 +440,161 @@ RSpec.describe RjuiTools::React::Converters::BaseConverter do
       end
     end
   end
+
+  describe 'bound dimensions' do
+    it 'routes a bound height into the inline style as px' do
+      converter = create_converter({ 'type' => 'View', 'height' => '@{barHeight}' })
+      classes = converter.send(:build_class_name)
+      expect(classes).not_to include('h-[')
+      expect(converter.send(:build_style_attr)).to include('height: `${data.barHeight}px`')
+    end
+
+    it 'routes a bound width into the inline style as px' do
+      converter = create_converter({ 'type' => 'View', 'width' => '@{barWidth}' })
+      classes = converter.send(:build_class_name)
+      expect(classes).not_to include('w-[')
+      expect(converter.send(:build_style_attr)).to include('width: `${data.barWidth}px`')
+    end
+
+    it 'treats a bound size as explicit, so it does not shrink' do
+      converter = create_converter({ 'type' => 'View', 'height' => '@{barHeight}' })
+      expect(converter.send(:build_class_name)).to include('shrink-0')
+    end
+
+    it 'routes bound min/max bounds into the inline style' do
+      converter = create_converter({
+        'type' => 'View',
+        'minHeight' => '@{minH}', 'maxHeight' => '@{maxH}',
+        'minWidth' => '@{minW}', 'maxWidth' => '@{maxW}'
+      })
+      classes = converter.send(:build_class_name)
+      style = converter.send(:build_style_attr)
+      expect(classes).not_to include('min-h-[')
+      expect(classes).not_to include('max-w-[')
+      expect(style).to include('minHeight: `${data.minH}px`')
+      expect(style).to include('maxHeight: `${data.maxH}px`')
+      expect(style).to include('minWidth: `${data.minW}px`')
+      expect(style).to include('maxWidth: `${data.maxW}px`')
+    end
+
+    it 'leaves literal dimensions on the Tailwind class path' do
+      converter = create_converter({ 'type' => 'View', 'height' => 140, 'width' => 'matchParent' })
+      classes = converter.send(:build_class_name)
+      expect(classes).to include('h-[140px]')
+      expect(classes).to include('w-full')
+      expect(converter.send(:build_style_attr)).to eq('')
+    end
+  end
+
+  # The SSoT declares `["number", "binding"]` for all sixteen per-side
+  # spacing attributes, and a bound value used to reach `closest_padding`,
+  # which does `(k - value).abs` over the spacing scale: `jui build` ABORTED
+  # with a TypeError on a layout written exactly the way the declaration
+  # describes (plan 41 codegen differential).
+  describe 'bound per-side spacing' do
+    it 'routes a bound padding into the inline style as px' do
+      converter = create_converter({ 'type' => 'View', 'paddingTop' => '@{gap}' })
+      expect(converter.send(:build_class_name)).not_to include('pt-')
+      expect(converter.send(:build_style_attr)).to include('paddingTop: `${data.gap}px`')
+    end
+
+    it 'reads the alternate spelling of the same side' do
+      converter = create_converter({ 'type' => 'View', 'topPadding' => '@{gap}' })
+      converter.send(:build_class_name)
+      expect(converter.send(:build_style_attr)).to include('paddingTop: `${data.gap}px`')
+    end
+
+    it 'routes a bound margin into the inline style as px' do
+      converter = create_converter({ 'type' => 'View', 'bottomMargin' => '@{gap}' })
+      expect(converter.send(:build_class_name)).not_to include('mb-')
+      expect(converter.send(:build_style_attr)).to include('marginBottom: `${data.gap}px`')
+    end
+
+    it 'keeps the RTL spellings logical rather than physical' do
+      converter = create_converter({
+        'type' => 'View', 'paddingStart' => '@{lead}', 'endMargin' => '@{trail}'
+      })
+      converter.send(:build_class_name)
+      style = converter.send(:build_style_attr)
+      expect(style).to include('paddingInlineStart: `${data.lead}px`')
+      expect(style).to include('marginInlineEnd: `${data.trail}px`')
+    end
+
+    it 'covers every side of both properties' do
+      converter = create_converter({
+        'type' => 'View',
+        'paddingTop' => '@{a}', 'paddingRight' => '@{b}',
+        'paddingBottom' => '@{c}', 'paddingLeft' => '@{d}',
+        'topMargin' => '@{e}', 'rightMargin' => '@{f}',
+        'bottomMargin' => '@{g}', 'leftMargin' => '@{h}'
+      })
+      converter.send(:build_class_name)
+      style = converter.send(:build_style_attr)
+      %w[paddingTop paddingRight paddingBottom paddingLeft
+         marginTop marginRight marginBottom marginLeft].each do |property|
+        expect(style).to include("#{property}: `${data.")
+      end
+    end
+
+    # The whole point of routing the binding out BEFORE `closest_padding`:
+    # that function is the road every static padding travels, and moving it
+    # would move every fixture in the conformance suite.
+    it 'leaves static spacing on the Tailwind class path, untouched' do
+      converter = create_converter({
+        'type' => 'View', 'paddingTop' => 8, 'topMargin' => 16,
+        'paddingStart' => 4, 'leftPadding' => 12
+      })
+      classes = converter.send(:build_class_name)
+      expect(classes).to include('pt-2')
+      expect(classes).to include('pl-3')
+      expect(classes).to include('ps-1')
+      expect(classes).to include('mt-4')
+      expect(converter.send(:build_style_attr)).to eq('')
+    end
+  end
+
+  describe '#build_style_attr with CSS custom properties' do
+    it 'asserts React.CSSProperties when a custom property is present' do
+      converter = create_converter({ 'type' => 'View' })
+      converter.instance_variable_set(:@dynamic_styles, { '--pv-color' => "'#FF0000'" })
+      expect(converter.send(:build_style_attr))
+        .to eq(" style={{ '--pv-color': '#FF0000' } as React.CSSProperties}")
+    end
+
+    it 'leaves a plain style object uncast' do
+      converter = create_converter({ 'type' => 'View' })
+      converter.instance_variable_set(:@dynamic_styles, { 'backgroundColor' => "'#FF0000'" })
+      expect(converter.send(:build_style_attr))
+        .to eq(" style={{ backgroundColor: '#FF0000' }}")
+    end
+  end
+end
+
+# offsetX / offsetY were interpolated into the transform as literals, so a
+# bound offset emitted `translate(@{x}px, 0px)` — a string CSS discards, i.e.
+# the element never moved. Same defect class plan 41 catalogued as
+# bound-literal-leak; the arithmetic belongs in the emitted expression.
+RSpec.describe RjuiTools::React::Converters::BaseConverter, 'bound offset' do
+  def style_for(attrs)
+    c = RjuiTools::React::Converters::ViewConverter.new(
+      { 'class' => 'View', 'id' => 'v' }.merge(attrs), { 'use_tailwind' => true }
+    )
+    c.send(:build_class_name)
+    c.send(:build_style_attr)
+  end
+
+  it 'emits a runtime expression for a bound offset' do
+    style = style_for('offsetX' => '@{dx}', 'offsetY' => '@{dy}')
+    expect(style).to include('transform: `translate(${data.dx}px, ${data.dy}px)`')
+    expect(style).not_to include('@{')
+  end
+
+  it 'keeps a static offset byte-identical' do
+    expect(style_for('offsetX' => 10, 'offsetY' => 20))
+      .to include("transform: 'translate(10px, 20px)'")
+  end
+
+  it 'mixes a bound axis with a static one' do
+    expect(style_for('offsetX' => '@{dx}')).to include('translate(${data.dx}px, ${0}px)')
+  end
 end

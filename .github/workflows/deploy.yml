@@ -37,10 +37,11 @@ env:
   # Bump procedure: pick the new jsonui-cli main SHA, replace this value, and
   # review the regenerated reference pages in that deploy — the SHA bump is
   # the review point for reference updates.
-  JSONUI_CLI_REF: 604b2931103745537b5c138b43cbca43e6a6e2a3 # v1.8.5
-  # Not v1.8.6: its `jui build` crashes on `from ..core.version import
+  JSONUI_CLI_REF: 289038afcaf7c4fee244eeb584c9a5bb549d53ee # v1.8.7
+  # v1.8.6 was skipped: its `jui build` crashed on `from ..core.version import
   # toolchain_version` (the module is at jui_cli/version.py, not under core/).
-  # Measured on this repository against 1.8.4 / 1.8.5 / 1.8.6; filed upstream.
+  # 1.8.7 fixes exactly that line; measured here against 1.8.5 and 1.8.6 as
+  # controls — 1.8.6 exits 1, 1.8.5 and 1.8.7 build successfully.
 
 jobs:
   # ENFORCING — `deploy` depends on this job; a red gate stops the deploy
@@ -65,7 +66,7 @@ jobs:
   # version's help. The second half never judges whether a card is right, only
   # whether it was read; unstamped cards are counted, never red.
   #
-  # All seven gates run even when one fails, so a red run names everything that
+  # All eight gates run even when one fails, so a red run names everything that
   # is red, and every gate prints its own exit code — a gate that could not
   # run must not read as a gate that passed.
   gates:
@@ -124,7 +125,7 @@ jobs:
         working-directory: jsonui-doc-web
         run: npm run prebuild
 
-      - name: Run the seven gates (enforcing — a red one stops the deploy)
+      - name: Run the eight gates (enforcing — a red one stops the deploy)
         run: |
           set +e
           fail=0
@@ -163,8 +164,31 @@ jobs:
           # the binaries or when the stampability classification is missing, so
           # "could not compare" never reads as "agreed".
           run_gate cli-coverage           npm --prefix jsonui-doc-web run check:cli-coverage
+          # The committed rjui_tools must BE what the pinned toolchain syncs.
+          # `jui sync_tool` resolves its source as $JSONUI_CLI_PATH > ~/.jsonui-cli
+          # (measured 2026-09-03 with a control pair: env set to 1.8.5 while the
+          # home install was 1.8.7 vendored 1.8.5; unset vendored 1.8.7). CI always
+          # sets the env, so by the time this runs the working copy IS the pin's —
+          # which makes a diff against the commit the exact question: did the
+          # committed tree come from the pin? A maintainer who builds locally
+          # without the env vendors whatever the home install holds, and that is
+          # how a tree stamped 1.8.6 with content older still was committed under
+          # a 1.8.5 pin. Content, not just the VERSION stamp: a stamp can be right
+          # while the files behind it are stale. sync_tool is idempotent (measured:
+          # a second run changes nothing), so a clean tree here is a real answer.
+          run_gate vendored-matches-pin sh -c '
+            echo "committed rjui_tools stamp: $(git show HEAD:jsonui-doc-web/rjui_tools/VERSION 2>/dev/null | tr -d "[:space:]")"
+            echo "pinned toolchain:           $(cat "$JSONUI_CLI_PATH/VERSION" | tr -d "[:space:]")"
+            changed=$(git status --porcelain -- jsonui-doc-web/rjui_tools | wc -l | tr -d " ")
+            if [ "$changed" -ne 0 ]; then
+              echo "the committed vendored toolchain is not what this pin syncs ($changed path(s) differ):"
+              git status --porcelain -- jsonui-doc-web/rjui_tools | head -20
+              echo "re-run: JSONUI_CLI_PATH=<pinned checkout> jui sync_tool, and commit the result"
+              exit 1
+            fi
+            echo "the committed vendored tree matches the pin, file for file"'
           echo "----"
-          echo "gates with a non-zero exit: $fail of 7"
+          echo "gates with a non-zero exit: $fail of 8"
           if [ "$fail" -ne 0 ]; then
             echo "FAILING this job: the deploy job depends on it and will not run."
             exit 1

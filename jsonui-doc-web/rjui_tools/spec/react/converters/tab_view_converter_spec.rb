@@ -63,8 +63,8 @@ RSpec.describe RjuiTools::React::Converters::TabViewConverter do
           ]
         })
         result = converter.convert
-        expect(result).to include('data.currentTab === 0')
-        expect(result).to include('data.currentTab === 1')
+        expect(result).to include('(data.currentTab ?? 0) === 0')
+        expect(result).to include('(data.currentTab ?? 0) === 1')
       end
     end
 
@@ -293,6 +293,37 @@ RSpec.describe RjuiTools::React::Converters::TabViewConverter do
         expect(result).to include('<nav')
         expect(result).not_to include('<button')
       end
+    end
+  end
+
+  # The unbound tab state must be spelled the way the data model declares it —
+  # a different spelling references a property no generated Data interface has,
+  # which is a type error the consumer cannot fix in an @generated file.
+  describe 'implicit tab state' do
+    let(:tabs) do
+      [{ 'title' => 'Home', 'icon' => 'house', 'view' => 'home' },
+       { 'title' => 'Profile', 'icon' => 'person', 'view' => 'profile' }]
+    end
+
+    it 'reads and writes selectedTabIndex when selectedIndex is not bound' do
+      result = create_converter({ 'type' => 'TabView', 'tabs' => tabs }).convert
+
+      expect(result).to include('data.selectedTabIndex ?? 0')
+      expect(result).to include('data.setSelectedTabIndex?.(')
+      expect(result).not_to include('data.selectedTab ')
+    end
+
+    it 'seeds the state from a literal selectedIndex' do
+      result = create_converter({ 'type' => 'TabView', 'tabs' => tabs, 'selectedIndex' => 1 }).convert
+
+      expect(result).to include('data.selectedTabIndex ?? 1')
+    end
+
+    it 'uses the declared property when selectedIndex is bound' do
+      result = create_converter({ 'type' => 'TabView', 'tabs' => tabs, 'selectedIndex' => '@{currentTab}' }).convert
+
+      expect(result).to include('data.currentTab ?? 0')
+      expect(result).to include('data.setCurrentTab?.(')
     end
   end
 

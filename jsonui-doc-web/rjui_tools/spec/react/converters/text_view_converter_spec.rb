@@ -136,13 +136,17 @@ RSpec.describe RjuiTools::React::Converters::TextViewConverter do
     end
 
     context 'with hintColor' do
-      it 'adds placeholder color via Tailwind class' do
+      # `placeholder-#999999` is not a Tailwind class — it resolves to
+      # nothing, and the conformance fixture measured pixel-identical to its
+      # control. These examples used to pin that spelling.
+      it 'adds placeholder color as an arbitrary Tailwind value' do
         converter = create_converter({
           'type' => 'TextView',
           'hintColor' => '#999999'
         })
         result = converter.send(:build_class_name)
-        expect(result).to include('placeholder-#999999')
+        expect(result).to include('placeholder-[#999999]')
+        expect(result).not_to include('placeholder-#999999')
       end
     end
 
@@ -153,7 +157,7 @@ RSpec.describe RjuiTools::React::Converters::TextViewConverter do
           'hintAttributes' => { 'fontColor' => '#888888' }
         })
         result = converter.send(:build_class_name)
-        expect(result).to include('placeholder-#888888')
+        expect(result).to include('placeholder-[#888888]')
       end
     end
 
@@ -386,8 +390,18 @@ RSpec.describe RjuiTools::React::Converters::TextViewConverter do
       result = create_converter({ 'type' => 'TextView', 'pattern' => '[a-z]+' }).convert
 
       expect(result).not_to include('pattern="')
-      expect(result).to include("new RegExp('^(?:[a-z]+)$').test(e.target.value)")
+      expect(result).to include("new RegExp('^(?:[a-z]+)$').test(e.currentTarget.value)")
       expect(result).to include('setCustomValidity(')
+    end
+
+    # onInput carries a FormEvent, whose `target` is a bare EventTarget: reading
+    # `.value` off it fails a strict consumer's tsc, and @generated is unfixable
+    # downstream.
+    it 'reads the validated value off currentTarget so the emit typechecks' do
+      result = create_converter({ 'type' => 'TextView', 'pattern' => '[a-z]+' }).convert
+
+      expect(result).to include('e.currentTarget.setCustomValidity(')
+      expect(result).not_to include('e.target.')
     end
 
     it 'escapes backslashes and quotes so the emitted JS literal stays valid' do

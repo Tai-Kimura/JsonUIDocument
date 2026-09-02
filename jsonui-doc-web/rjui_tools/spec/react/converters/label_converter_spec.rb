@@ -58,6 +58,36 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         expect(classes).to include('line-clamp-3')
       end
 
+      # `line-clamp-N` IS a display utility (`display: -webkit-box`), and so is
+      # `flex`. Same specificity, so the winner is decided by their order in
+      # the generated stylesheet — measured `.line-clamp-2` at offset 7010 and
+      # `.flex` at 7130, so flex won and the cap did nothing. The conformance
+      # fixture rendered all five lines with `line-clamp-2` in its class list.
+      it 'does not emit a competing display utility beside the clamp' do
+        converter = create_converter({
+          'type' => 'Label',
+          'text' => 'Test',
+          'lines' => 3
+        })
+        classes = converter.send(:build_class_name)
+        expect(classes).to include('line-clamp-3')
+        expect(classes.split).not_to include('flex')
+        expect(classes.split).not_to include('block')
+      end
+
+      it 'keeps the flex box for an unclamped label' do
+        converter = create_converter({ 'type' => 'Label', 'text' => 'Test' })
+        expect(converter.send(:build_class_name).split).to include('flex')
+      end
+
+      it 'keeps the flex box for a single-line truncate' do
+        # `truncate` sets no display of its own, so it does not collide.
+        converter = create_converter({ 'type' => 'Label', 'text' => 'Test', 'lines' => 1 })
+        classes = converter.send(:build_class_name)
+        expect(classes).to include('truncate')
+        expect(classes.split).to include('flex')
+      end
+
       it 'does not add line clamp for zero lines' do
         converter = create_converter({
           'type' => 'Label',
@@ -67,6 +97,50 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         classes = converter.send(:build_class_name)
         expect(classes).not_to include('truncate')
         expect(classes).not_to match(/line-clamp/)
+      end
+
+      # `lines` is declared `["number", "binding"]`, and `"@{n}" > 0` raised
+      # `ArgumentError: comparison of String with 0 failed` — `jui build`
+      # aborted on the declared spelling (plan 41). A runtime cap cannot be a
+      # `line-clamp-N` class, so it becomes the four declarations that class
+      # expands to.
+      it 'routes a bound line cap into the inline style' do
+        converter = create_converter({
+          'type' => 'Label',
+          'text' => 'Test',
+          'lines' => '@{maxLines}'
+        })
+        expect(converter.send(:build_class_name)).not_to match(/line-clamp|truncate/)
+        style = converter.send(:build_style_attr)
+        expect(style).to include("display: '-webkit-box'")
+        expect(style).to include("WebkitBoxOrient: 'vertical'")
+        expect(style).to include('WebkitLineClamp: data.maxLines')
+        expect(style).to include("overflow: 'hidden'")
+      end
+
+      it 'does not force nowrap on a bound cap' do
+        # The runtime number decides how many lines; `nowrap` would defeat
+        # any cap above one, and the comparison that used to make this
+        # decision raised on a bound value.
+        converter = create_converter({
+          'type' => 'Label',
+          'text' => 'Test',
+          'lines' => '@{maxLines}',
+          'lineBreakMode' => 'Tail'
+        })
+        converter.send(:build_class_name)
+        expect(converter.send(:build_style_attr)).not_to include("whiteSpace: 'nowrap'")
+      end
+
+      it 'still forces nowrap on a single static line' do
+        converter = create_converter({
+          'type' => 'Label',
+          'text' => 'Test',
+          'lines' => 1,
+          'lineBreakMode' => 'Tail'
+        })
+        converter.send(:build_class_name)
+        expect(converter.send(:build_style_attr)).to include("whiteSpace: 'nowrap'")
       end
     end
 
@@ -91,6 +165,60 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         })
         classes = converter.send(:build_class_name)
         expect(classes).to include('line-through')
+      end
+    end
+
+    # The object face. Contract: attribute_semantics.json -> textDecoration.
+    # The presence test this replaces was `if attributes['underline']`, and a
+    # Hash is truthy in Ruby, so every object — including the one that means
+    # "draw nothing" — drew the same plain line.
+    context 'with a styled text decoration' do
+      def classes_for(attrs)
+        create_converter({ 'type' => 'Label', 'text' => 'Styled' }.merge(attrs)).send(:build_class_name)
+      end
+
+      it 'draws nothing for lineStyle None' do
+        expect(classes_for('underline' => { 'lineStyle' => 'None' })).not_to include('underline')
+        expect(classes_for('strikethrough' => { 'lineStyle' => 'None' })).not_to include('line-through')
+      end
+
+      it 'draws the plain line for an object that styles nothing' do
+        expect(classes_for('underline' => {})).to include('underline')
+      end
+
+      it 'maps each declared lineStyle' do
+        expect(classes_for('underline' => { 'lineStyle' => 'Single' })).to include('decoration-solid')
+        expect(classes_for('underline' => { 'lineStyle' => 'Double' })).to include('decoration-double')
+        expect(classes_for('underline' => { 'lineStyle' => 'Thick' })).to include('decoration-2')
+      end
+
+      it 'colours the line without touching the text colour' do
+        classes = classes_for('underline' => { 'color' => '#FF0000' })
+        expect(classes).to include('decoration-[#FF0000]')
+        expect(classes).not_to include('text-[#FF0000]')
+      end
+
+      it 'routes a bound colour through a custom property' do
+        converter = create_converter({ 'type' => 'Label', 'text' => 'Styled',
+                                       'underline' => { 'color' => '@{lineColor}' } })
+        expect(converter.send(:build_class_name)).to include('decoration-[var(--jui-underline-color)]')
+        expect(converter.send(:build_style_attr)).to include('--jui-underline-color')
+      end
+
+      # lineOffset is declared on underline only, and strikethrough must not
+      # invent one.
+      it 'applies lineOffset to underline and never to strikethrough' do
+        expect(classes_for('underline' => { 'lineOffset' => 3 })).to include('underline-offset-[3px]')
+        expect(classes_for('strikethrough' => { 'lineOffset' => 3 })).not_to include('underline-offset')
+      end
+
+      # Two utilities, one CSS property: as classes, whichever the stylesheet
+      # orders last would win and the other line would vanish.
+      it 'keeps both lines when a label asks for both' do
+        converter = create_converter({ 'type' => 'Label', 'text' => 'Both',
+                                       'underline' => true, 'strikethrough' => true })
+        converter.send(:build_class_name)
+        expect(converter.send(:build_style_attr)).to include("textDecorationLine: 'underline line-through'")
       end
     end
 
@@ -271,57 +399,74 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
       end
     end
 
+    # The style object used to carry `min(<size>px, max(<size*factor>px, 1vw))`
+    # for autoShrink. That sizes text against the VIEWPORT, which says nothing
+    # about whether the text fits its box: a 16px Label rendered at 8px on a
+    # 375px-wide phone, and on a wide viewport the 1vw term outran both floors
+    # so minimumScaleFactor changed nothing (measured 0 differing px against
+    # the control — plan 51-A). The fit is measured at runtime now.
     context 'with autoShrink' do
-      it 'uses CSS min() for font scaling' do
+      it 'writes no font size into the style object' do
         converter = create_converter({
-          'type' => 'Label',
-          'text' => 'Test',
-          'autoShrink' => true,
-          'fontSize' => 20,
-          'minimumScaleFactor' => 0.5
+          'type' => 'Label', 'id' => 'shrinking', 'text' => 'Test',
+          'autoShrink' => true, 'fontSize' => 20, 'minimumScaleFactor' => 0.5
         })
         converter.send(:build_class_name)
-        result = converter.send(:build_style_attr)
-        expect(result).to include("fontSize: 'min(20px, max(10px, 1vw))'")
+        expect(converter.send(:build_style_attr)).not_to include('1vw')
       end
 
-      it 'uses default minimumScaleFactor of 0.5' do
+      it 'attaches the ref the hoisted fit effect writes through' do
         converter = create_converter({
-          'type' => 'Label',
-          'text' => 'Test',
-          'autoShrink' => true,
-          'fontSize' => 16
+          'type' => 'Label', 'id' => 'shrinking_label', 'text' => 'Test',
+          'autoShrink' => true, 'fontSize' => 20, 'minimumScaleFactor' => 0.25
         })
-        converter.send(:build_class_name)
-        result = converter.send(:build_style_attr)
-        expect(result).to include("fontSize: 'min(16px, max(8px, 1vw))'")
+        expect(converter.convert).to include('ref={shrinkingLabelShrinkRef}')
+      end
+
+      # A literal id is what ties the ref to the hoisted declaration, exactly
+      # as for the focus and collection-scroll helpers.
+      it 'attaches no ref without a literal id' do
+        converter = create_converter({
+          'type' => 'Label', 'text' => 'Test', 'autoShrink' => true
+        })
+        expect(converter.convert).not_to include('ShrinkRef')
+      end
+
+      it 'attaches no ref when autoShrink is off' do
+        converter = create_converter({
+          'type' => 'Label', 'id' => 'plain', 'text' => 'Test', 'autoShrink' => false
+        })
+        expect(converter.convert).not_to include('ShrinkRef')
       end
     end
   end
 
+  # Canon since rjui-label-linkable-binding-renders-raw: the converter no
+  # longer splits literals at build time — detection (URL AND phone), tel:
+  # sanitization and newline preservation live in the LinkifyText runtime so
+  # literal and bound text share one implementation. The anchor-tag contract
+  # (target/_blank, noopener) is pinned on the template in label_linkable_spec.
   describe 'linkable text rendering' do
-    it 'renders URLs as anchor tags' do
+    it 'routes literal text through the LinkifyText runtime' do
       converter = create_converter({
         'type' => 'Label',
         'text' => 'Visit https://example.com today',
         'linkable' => true
       })
       result = converter.convert
-      expect(result).to include('<a href="https://example.com"')
-      expect(result).to include('target="_blank"')
-      expect(result).to include('rel="noopener noreferrer"')
-      expect(result).to include('data-linkable="true"')
+      expect(result).to include('<LinkifyText')
+      expect(result).to include('text={`Visit https://example.com today`}')
+      expect(result).not_to include('<a href')
     end
 
-    it 'handles multiple URLs' do
+    it 'hands multiple URLs over intact for runtime detection' do
       converter = create_converter({
         'type' => 'Label',
         'text' => 'Check https://foo.com and https://bar.com',
         'linkable' => true
       })
       result = converter.convert
-      expect(result).to include('href="https://foo.com"')
-      expect(result).to include('href="https://bar.com"')
+      expect(result).to include('text={`Check https://foo.com and https://bar.com`}')
     end
   end
 

@@ -38,11 +38,77 @@ RSpec.describe RjuiTools::React::Converters::CollectionConverter do
       end
     end
 
+    context 'with flow layout' do
+      # 33 acceptance: Collection/layout__flow(_2) measured web-only inert —
+      # flow fell through to the single-column list and rendered ≡ vertical.
+      it 'generates a wrapping row instead of the vertical list' do
+        converter = create_converter({ 'class' => 'Collection', 'layout' => 'flow', 'cellClasses' => ['ItemCell'] })
+        result = converter.convert
+        expect(result).to include('flex flex-row flex-wrap content-start')
+        expect(result).not_to include('flex flex-col')
+      end
+
+      it "accepts the declared 'Flow' spelling case-insensitively" do
+        converter = create_converter({ 'class' => 'Collection', 'layout' => 'Flow', 'cellClasses' => ['ItemCell'] })
+        expect(converter.convert).to include('flex-wrap')
+      end
+
+      # 2026-08-03 unification: LeftAligned IS flow; the accepted spellings
+      # survive as aliases.
+      it "treats the 'leftAligned' / 'LeftAligned' aliases as flow" do
+        %w[leftAligned LeftAligned].each do |spelling|
+          converter = create_converter({ 'class' => 'Collection', 'layout' => spelling, 'cellClasses' => ['ItemCell'] })
+          expect(converter.convert).to include('flex-wrap'), "expected layout: #{spelling} to wrap"
+        end
+      end
+
+      it 'maps lineSpacing to the line gap and itemSpacing to the in-line gap' do
+        converter = create_converter({ 'class' => 'Collection', 'layout' => 'flow',
+                                       'lineSpacing' => 4, 'itemSpacing' => 8, 'cellClasses' => ['ItemCell'] })
+        expect(converter.convert).to include('gap-x-[8px] gap-y-[4px]')
+      end
+
+      it 'wins over the horizontalScroll boolean (declared layout first, like sjui/kjui)' do
+        converter = create_converter({ 'class' => 'Collection', 'layout' => 'flow',
+                                       'horizontalScroll' => true, 'cellClasses' => ['ItemCell'] })
+        result = converter.convert
+        expect(result).to include('flex-wrap')
+        expect(result).not_to include('overflow-x-auto')
+      end
+    end
+
     context 'with itemSpacing' do
       it 'applies gap spacing' do
         converter = create_converter({ 'class' => 'Collection', 'cellClasses' => ['ItemCell'], 'itemSpacing' => 8 })
         result = converter.convert
         expect(result).to include('gap-[8px]')
+      end
+    end
+
+    # `columnSpacing` is the SSoT's name for the column gap, and it was read
+    # only in the horizontal branch — so every Collection that declares
+    # `columns` (the grid branch) ignored it. Plan 34 measured the fixture
+    # pixel-identical to its control on web while both mobile platforms
+    # honoured it.
+    context 'with columnSpacing' do
+      it 'applies it as the column gap of a grid' do
+        converter = create_converter({ 'class' => 'Collection', 'cellClasses' => ['ItemCell'],
+                                       'columns' => 2, 'columnSpacing' => 8 })
+        expect(converter.convert).to include('gap-[8px]')
+      end
+
+      it 'applies it as the in-line gap of a flow layout' do
+        converter = create_converter({ 'class' => 'Collection', 'cellClasses' => ['ItemCell'],
+                                       'layout' => 'flow', 'columnSpacing' => 8, 'lineSpacing' => 4 })
+        expect(converter.convert).to include('gap-x-[8px] gap-y-[4px]')
+      end
+
+      it 'is read ahead of the legacy itemSpacing spelling' do
+        converter = create_converter({ 'class' => 'Collection', 'cellClasses' => ['ItemCell'],
+                                       'columns' => 2, 'columnSpacing' => 8, 'itemSpacing' => 16 })
+        result = converter.convert
+        expect(result).to include('gap-[8px]')
+        expect(result).not_to include('gap-[16px]')
       end
     end
 

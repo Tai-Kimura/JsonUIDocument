@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'tmpdir'
+require 'fileutils'
+
 require_relative '../spec_helper'
 require 'react/data_model_generator'
 
@@ -126,6 +129,24 @@ RSpec.describe RjuiTools::React::DataModelGenerator do
 
       expect(content).to include('handleTap?: () => void;')
       expect(content).to include('handleSubmit?: () => void;')
+    end
+
+    # `"onclick": "handleTap"` names a data property exactly as `@{handleTap}`
+    # does, so a layout is entitled to declare it — and then the synthesized
+    # twin collided with the declaration: duplicate identifier in the
+    # interface, duplicate key in the factory literal. The declaration wins.
+    it 'does not re-emit an onclick action the data section already declares' do
+      data_properties = [
+        { 'name' => 'handleTap', 'class' => '(String) -> Void',
+          'tsType' => '((arg0: string) => void) | undefined' }
+      ]
+
+      content = generator.send(:generate_typescript_content, 'Home', data_properties, ['handleTap'])
+
+      expect(content.scan(/^\s*handleTap\??:.*;$/).size).to eq(1)   # interface
+      expect(content.scan(/^\s*handleTap: .*,$/).size).to eq(1)     # factory literal
+      expect(content).to include('handleTap?: ((arg0: string) => void) | undefined;')
+      expect(content).not_to include('handleTap?: () => void;')
     end
   end
 
@@ -333,6 +354,70 @@ RSpec.describe RjuiTools::React::DataModelGenerator do
     end
   end
 end
+# The CANONICAL selection spellings. Each of these converters reads its own
+# spelling and emits both a `data.<prop>` reference and a report-back handler
+# call derived from it, so a binding the data model does not declare becomes
+# TS2339 inside an @generated file the consumer cannot patch — the same shape
+# as the Radio TS2367 that blocked plan 49's push, reported by lane D.
+#
+# The conformance fixture corpus does NOT exercise these spellings (adding them
+# moved zero generated files), so these pins are the only thing guarding them.
+RSpec.describe RjuiTools::React::DataModelGenerator, 'canonical selection bindings' do
+  let(:generator) { described_class.new }
+
+  def bindings_for(node)
+    generator.send(:extract_value_bindings, node)
+  end
+
+  it 'declares a SelectBox selectedDate as a string' do
+    b = bindings_for({ 'type' => 'SelectBox', 'id' => 's', 'selectItemType' => 'Date',
+                       'selectedDate' => '@{pickedDate}' })
+    expect(b['pickedDate']).to include(type: 'string')
+  end
+
+  it 'declares a SelectBox selectedValue as a string' do
+    b = bindings_for({ 'type' => 'SelectBox', 'id' => 's', 'selectedValue' => '@{choice}' })
+    expect(b['choice']).to include(type: 'string')
+  end
+
+  it 'declares a Radio selectedValue, reported back through set<Prop>' do
+    b = bindings_for({ 'type' => 'Radio', 'id' => 'r', 'selectedValue' => '@{picked}' })
+    expect(b['picked']).to include(type: 'string', handler: :setter)
+    expect(generator.send(:value_binding_handler_name, 'picked', b['picked'])).to eq('setPicked')
+  end
+
+  it 'declares a Segment selectedIndex as a NUMBER, reported back through set<Prop>' do
+    b = bindings_for({ 'type' => 'Segment', 'id' => 'g', 'selectedIndex' => '@{tab}' })
+    expect(b['tab']).to include(type: 'number', handler: :setter)
+    expect(generator.send(:value_binding_handler_name, 'tab', b['tab'])).to eq('setTab')
+  end
+
+  # The two converters already emitted these handlers into the JSX; nothing
+  # declared them, so every bound-selectedIndex SelectBox/TabView was TS2551
+  # in an @generated file the consumer cannot patch (51-A urgent).
+  it 'declares a SelectBox selectedIndex as a NUMBER with the on<Prop>Change convention' do
+    b = bindings_for({ 'type' => 'SelectBox', 'id' => 's', 'items' => %w[A B],
+                       'selectedIndex' => '@{pick}' })
+    expect(b['pick']).to include(type: 'number')
+    expect(generator.send(:value_binding_handler_name, 'pick', b['pick'])).to eq('onPickChange')
+  end
+
+  it 'declares a TabView selectedIndex as a NUMBER, reported back through set<Prop>' do
+    b = bindings_for({ 'type' => 'TabView', 'id' => 't', 'selectedIndex' => '@{tab}' })
+    expect(b['tab']).to include(type: 'number', handler: :setter)
+    expect(generator.send(:value_binding_handler_name, 'tab', b['tab'])).to eq('setTab')
+  end
+
+  it 'keeps the on<Prop>Change convention for everything else' do
+    b = bindings_for({ 'type' => 'SelectBox', 'id' => 's', 'selectedValue' => '@{choice}' })
+    expect(generator.send(:value_binding_handler_name, 'choice', b['choice'])).to eq('onChoiceChange')
+  end
+
+  it 'leaves a static selection alone — only bindings become data properties' do
+    expect(bindings_for({ 'type' => 'Radio', 'id' => 'r', 'selectedValue' => 'alpha' })).to be_empty
+  end
+end
+
 RSpec.describe RjuiTools::React::DataModelGenerator, 'focus-state value bindings' do
   let(:generator) { described_class.new }
 
@@ -382,7 +467,7 @@ RSpec.describe RjuiTools::React::DataModelGenerator, 'focus-state value bindings
     end
 
     it 'emits a type import resolved from the web platform entry' do
-      props = [{ 'name' => 'parkingScopeOptions', 'class' => '[SelectOption]' }]
+      props = [{ 'name' => 'regionScopeOptions', 'class' => '[SelectOption]' }]
       lines = generator.send(:collect_type_map_imports, props)
       expect(lines).to eq(["import type { SelectOption } from '@/types/SelectOption';"])
     end
@@ -398,10 +483,118 @@ RSpec.describe RjuiTools::React::DataModelGenerator, 'focus-state value bindings
     end
 
     it 'wires the import into generated TypeScript content' do
-      props = [{ 'name' => 'parkingScopeOptions', 'class' => '[SelectOption]', 'defaultValue' => nil }]
-      content = generator.send(:generate_typescript_content, 'AdminTopbar', props)
+      props = [{ 'name' => 'regionScopeOptions', 'class' => '[SelectOption]', 'defaultValue' => nil }]
+      content = generator.send(:generate_typescript_content, 'HeaderBar', props)
       expect(content).to include("import type { SelectOption } from '@/types/SelectOption';")
-      expect(content).to include('parkingScopeOptions?: SelectOption[];')
+      expect(content).to include('regionScopeOptions?: SelectOption[];')
+    end
+  end
+  # A String defaultValue whose key the layout's OWN strings.json section
+  # declares resolves to a bare StringManager expression (with the import);
+  # a sentinel that only foreign sections declare stays literal and SILENT —
+  # the data-default canon the sjui face carries since 1.6.3, unified here.
+  describe 'string defaultValue resolution (data-default canon)' do
+    let(:temp_dir) { Dir.mktmpdir('rjui_data_default') }
+    let(:layouts_dir) { File.join(temp_dir, 'Layouts') }
+    let(:data_dir) { File.join(temp_dir, 'src/generated/data') }
+
+    before do
+      @original_dir = Dir.pwd
+      Dir.chdir(temp_dir)
+      FileUtils.mkdir_p(File.join(layouts_dir, 'Resources'))
+      allow(RjuiTools::Core::ConfigManager).to receive(:load_config).and_return({
+        'source_path' => temp_dir,
+        'layouts_directory' => 'Layouts',
+        'data_directory' => 'src/generated/data'
+      })
+      File.write(File.join(layouts_dir, 'Resources', 'strings.json'), JSON.generate({
+        'note_input' => { 'register' => 'Register' },
+        'venue_detail' => { 'today' => 'Today' }
+      }))
+    end
+
+    after do
+      Dir.chdir(@original_dir)
+      FileUtils.rm_rf(temp_dir)
+    end
+
+    it 'resolves an own-section key to a StringManager expression, with import, silently' do
+      File.write(File.join(layouts_dir, 'note_input.json'), JSON.generate({
+        'type' => 'View',
+        'child' => [
+          { 'data' => [{ 'name' => 'label', 'class' => 'String', 'defaultValue' => 'register' }] },
+          { 'type' => 'Label', 'text' => '@{label}' }
+        ]
+      }))
+
+      generator = described_class.new
+      expect { generator.update_data_models }.not_to output(/Bare key/).to_stdout
+
+      content = File.read(File.join(data_dir, 'NoteInputData.ts'))
+      expect(content).to include('label: StringManager.currentLanguage.noteInputRegister,')
+      expect(content).to include("import { StringManager } from '../StringManager';")
+    end
+
+    it 'keeps a foreign-declared sentinel literal, with no warning and no import' do
+      File.write(File.join(layouts_dir, 'note_input.json'), JSON.generate({
+        'type' => 'View',
+        'child' => [
+          { 'data' => [{ 'name' => 'selectedDateValue', 'class' => 'String', 'defaultValue' => 'today' }] },
+          { 'type' => 'Label', 'text' => '@{selectedDateValue}' }
+        ]
+      }))
+
+      generator = described_class.new
+      expect { generator.update_data_models }.not_to output(/Bare key/).to_stdout
+
+      content = File.read(File.join(data_dir, 'NoteInputData.ts'))
+      expect(content).to include('selectedDateValue: "today",')
+      expect(content).not_to include('StringManager.currentLanguage')
+      expect(content).not_to include("import { StringManager }")
+    end
+  end
+  # A kebab-case layout owns the NORMALIZED section spelling the extractor
+  # writes (kebab-widget.json -> kebab_widget) — the canonical
+  # namespace_candidates route; the hand-rolled spelling this replaced
+  # produced "kebab-widget" and silently failed to own it.
+  describe 'kebab-case own-section resolution (canonical namespace_candidates)' do
+    let(:temp_dir) { Dir.mktmpdir('rjui_kebab_default') }
+    let(:layouts_dir) { File.join(temp_dir, 'Layouts') }
+    let(:data_dir) { File.join(temp_dir, 'src/generated/data') }
+
+    before do
+      @original_dir = Dir.pwd
+      Dir.chdir(temp_dir)
+      FileUtils.mkdir_p(File.join(layouts_dir, 'Resources'))
+      allow(RjuiTools::Core::ConfigManager).to receive(:load_config).and_return({
+        'source_path' => temp_dir,
+        'layouts_directory' => 'Layouts',
+        'data_directory' => 'src/generated/data'
+      })
+      File.write(File.join(layouts_dir, 'Resources', 'strings.json'), JSON.generate({
+        'kebab_widget' => { 'headline' => 'Headline' }
+      }))
+    end
+
+    after do
+      Dir.chdir(@original_dir)
+      FileUtils.rm_rf(temp_dir)
+    end
+
+    it 'resolves a kebab layout data default against its normalized section' do
+      File.write(File.join(layouts_dir, 'kebab-widget.json'), JSON.generate({
+        'type' => 'View',
+        'child' => [
+          { 'data' => [{ 'name' => 'title', 'class' => 'String', 'defaultValue' => 'headline' }] },
+          { 'type' => 'Label', 'text' => '@{title}' }
+        ]
+      }))
+
+      generator = described_class.new
+      expect { generator.update_data_models }.not_to output(/Bare key/).to_stdout
+
+      content = File.read(File.join(data_dir, 'KebabWidgetData.ts'))
+      expect(content).to include('title: StringManager.currentLanguage.kebabWidgetHeadline,')
     end
   end
 end

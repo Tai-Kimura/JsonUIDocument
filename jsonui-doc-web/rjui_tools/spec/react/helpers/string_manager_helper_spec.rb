@@ -98,6 +98,84 @@ RSpec.describe RjuiTools::React::Helpers::StringManagerHelper do
     end
   end
 
+  # A bare key resolves ONLY in sections the layout owns; cross-section
+  # reach is the fully-qualified '<section>_<key>' spelling. The old
+  # "all other files as fallback" phase resolved a bare key through
+  # whatever section happened to declare it (asymmetric-resolution
+  # filing, 2026-08-11).
+  describe 'bare keys and the own-section canon' do
+    it 'does not resolve a bare key only foreign sections declare, and says so' do
+      host = host_class.new(
+        '_current_json_name' => 'settings',
+        '_current_namespaces' => %w[settings]
+      )
+      allow(RjuiTools::Core::Logger).to receive(:warn)
+      expect(host.convert_string_key('lang_toggle')).to be_nil
+      expect(RjuiTools::Core::Logger).to have_received(:warn)
+        .with(a_string_matching(
+          /foreign strings\.json section\(s\) learn_hello_world, learn_installation/
+        ))
+    end
+
+    it 'owns both the basename and the relative-path spelling' do
+      host = host_class.new(
+        '_current_json_name' => 'learn_installation',
+        '_current_namespaces' => %w[installation learn_installation]
+      )
+      expect(host.convert_string_key('lang_toggle'))
+        .to eq('{StringManager.currentLanguage.learnInstallationLangToggle}')
+    end
+
+    it 'reaches a foreign section through the fully-qualified spelling, silently' do
+      host = host_class.new(
+        '_current_json_name' => 'settings',
+        '_current_namespaces' => %w[settings]
+      )
+      allow(RjuiTools::Core::Logger).to receive(:warn)
+      expect(host.convert_string_key('learn_installation_lang_toggle'))
+        .to eq('{StringManager.currentLanguage.learnInstallationLangToggle}')
+      expect(RjuiTools::Core::Logger).not_to have_received(:warn)
+    end
+  end
+
+  # The extractor truncates long ASCII text to 31 chars, which can leave a
+  # trailing underscore ("dont_have_an_account_apply_for_"). Such a key is as
+  # declared as any other; the old snake_case gate rejected the spelling, and
+  # a legacy poison entry whose VALUE is the raw key hijacked the value
+  # lookup on the sjui face (downstream login screen, 2026-08-09).
+  describe 'declared trailing-underscore keys and key-over-value precedence' do
+    before do
+      strings_path = File.join('docs', 'screens', 'layouts', 'Resources', 'strings.json')
+      extra = JSON.parse(File.read(strings_path))
+      extra['login'] = {
+        'dont_have_an_account_apply_for_' => "Don't have an account? Apply for Membership",
+        # Legacy poison: a key whose value IS the other key's spelling.
+        'dont_have_an_account_apply_for' => 'dont_have_an_account_apply_for_'
+      }
+      File.write(strings_path, JSON.generate(extra))
+    end
+
+    let(:host) { host_class.new('_current_json_name' => 'login') }
+
+    it 'resolves a declared trailing-underscore key as the key itself' do
+      expect(host.get_text_with_string_manager('dont_have_an_account_apply_for_'))
+        .to eq('{StringManager.currentLanguage.loginDontHaveAnAccountApplyFor}')
+    end
+
+    it 'prefers key membership over a value reverse-lookup hit' do
+      # Without key-first ordering the poison entry's value match wins.
+      # Both resolutions camelize to the same accessor spelling here, so pin
+      # the ORDER instead: value lookup must not even be consulted.
+      expect(host).not_to receive(:lookup_string_manager_by_value)
+      host.get_text_with_string_manager('dont_have_an_account_apply_for_')
+    end
+
+    it 'still falls back to value lookup for display text' do
+      expect(host.get_text_with_string_manager("Don't have an account? Apply for Membership"))
+        .to eq('{StringManager.currentLanguage.loginDontHaveAnAccountApplyFor}')
+    end
+  end
+
   describe '#rewrite_json_string_values' do
     let(:host) { host_class.new('_current_json_name' => 'learn_installation') }
 

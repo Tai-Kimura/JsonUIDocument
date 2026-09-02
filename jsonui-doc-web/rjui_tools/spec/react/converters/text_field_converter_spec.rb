@@ -223,13 +223,26 @@ RSpec.describe RjuiTools::React::Converters::TextFieldConverter do
     end
 
     context 'with hintColor' do
-      it 'adds placeholder color via Tailwind class' do
+      # `placeholder-#999999` is not a Tailwind class. The conformance host
+      # generates a `.placeholder-dark_red::placeholder` shim, so the
+      # palette-named spelling rendered and hid this — the hex spelling every
+      # consumer writes resolved to nothing.
+      it 'adds placeholder color as an arbitrary Tailwind value' do
         converter = create_converter({
           'type' => 'TextField',
           'hintColor' => '#999999'
         })
         result = converter.send(:build_class_name)
-        expect(result).to include('placeholder-#999999')
+        expect(result).to include('placeholder-[#999999]')
+        expect(result).not_to include('placeholder-#999999')
+      end
+
+      it 'reads placeholderColor as the alias of hintColor' do
+        converter = create_converter({
+          'type' => 'TextField',
+          'placeholderColor' => '#999999'
+        })
+        expect(converter.send(:build_class_name)).to include('placeholder-[#999999]')
       end
     end
 
@@ -579,5 +592,23 @@ RSpec.describe RjuiTools::React::Converters::TextFieldConverter, 'nextFocus' do
   it 'skips a binding target and emits nothing when absent' do
     expect(field('nextFocus' => '@{nextId}')).not_to include('onKeyDown')
     expect(field({})).not_to include('onKeyDown')
+  end
+end
+
+# Declared for TextField as well as TextView (SSoT), and only TextView read it.
+# `::placeholder` is a pseudo-element, so the class variant is the only surface
+# that reaches it — the same one TextViewConverter uses.
+RSpec.describe RjuiTools::React::Converters::TextFieldConverter, 'hintLineHeightMultiple' do
+  def field(extra)
+    described_class.new({ 'class' => 'TextField', 'id' => 'email', 'hint' => 'Sample' }.merge(extra),
+                        { 'use_tailwind' => true }).convert(2)
+  end
+
+  it 'carries the placeholder line height' do
+    expect(field('hintLineHeightMultiple' => 3)).to include('placeholder:leading-[3]')
+  end
+
+  it 'emits nothing when it is not declared' do
+    expect(field({})).not_to include('placeholder:leading')
   end
 end

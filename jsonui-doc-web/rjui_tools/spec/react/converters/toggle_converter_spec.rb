@@ -101,6 +101,28 @@ RSpec.describe RjuiTools::React::Converters::ToggleConverter do
         result = converter.convert
         expect(result).to include("accentColor: '#FF5500'")
       end
+
+      it 'resolves a palette token instead of emitting it as a colour' do
+        # 'primary' is a colors.json token, not CSS — the raw spelling made
+        # `accent-color: primary` an invalid declaration the browser drops.
+        converter = create_converter({ 'class' => 'CheckBox', 'tintColor' => 'primary' })
+        result = converter.convert
+        expect(result).to include("accentColor: ColorManager.resolveColor('primary')")
+        expect(result).not_to include("accentColor: 'primary'")
+      end
+
+      it 'resolves the token when declared as checkedColor (the consumer spelling)' do
+        # Both field reports declared `checkedColor` — the canonical name the
+        # converter's onTintColor read reaches through TypedAttributes' alias
+        # map. `type` must be present: module resolution falls back to the
+        # converter class name (Toggle) without it, and Toggle does not
+        # declare the checkedColor row.
+        converter = create_converter(
+          { 'type' => 'CheckBox', 'class' => 'CheckBox', 'checkedColor' => 'primary' }
+        )
+        result = converter.convert
+        expect(result).to include("accentColor: ColorManager.resolveColor('primary')")
+      end
     end
 
     context 'with testId' do
