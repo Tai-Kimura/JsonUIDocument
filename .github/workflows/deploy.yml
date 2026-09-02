@@ -105,7 +105,24 @@ jobs:
       - name: Prepare toolchain and generated sources
         run: |
           python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" sync_tool
-          python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" build --web-only --clean
+          build_log=$(mktemp)
+          # pipefail, or `tee` reports 0 for a build that failed — the same
+          # shape as the defect this guard is here to catch.
+          set -o pipefail
+          python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" build --web-only --clean 2>&1 | tee "$build_log"
+          # `jui build` can log a caught exception as `[ERROR] Error processing
+          # <file>` and still exit 0 with a success line — measured upstream on
+          # 1.8.13 and fixed in 1.8.15, which makes the final line say a stage
+          # did not complete. NOT reproduced here (an unparseable layout exits 1
+          # on this project, which is a different path), so this guards a class
+          # someone else measured. It is version-independent on purpose: a
+          # healthy build of this site prints zero [ERROR] lines, measured, so
+          # any is a partial tree and a partial tree must not be deployed.
+          if grep -q "\[ERROR\]" "$build_log"; then
+            echo "jui build logged [ERROR] while exiting 0 — refusing to deploy a partial tree:"
+            grep "\[ERROR\]" "$build_log" | head -20
+            exit 1
+          fi
           # If this install fails, the two Python gates below report a
           # non-zero exit for that reason rather than for findings. The
           # distinction is the point of running this job at all.
@@ -255,7 +272,23 @@ jobs:
         run: python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" sync_tool
 
       - name: Generate Layout + TSX (src/generated/*)
-        run: python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" build --web-only --clean
+        run: |
+          build_log=$(mktemp)
+          set -o pipefail
+          python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" build --web-only --clean 2>&1 | tee "$build_log"
+          # `jui build` can log a caught exception as `[ERROR] Error processing
+          # <file>` and still exit 0 with a success line — measured upstream on
+          # 1.8.13 and fixed in 1.8.15, which makes the final line say a stage
+          # did not complete. NOT reproduced here (an unparseable layout exits 1
+          # on this project, which is a different path), so this guards a class
+          # someone else measured. It is version-independent on purpose: a
+          # healthy build of this site prints zero [ERROR] lines, measured, so
+          # any is a partial tree and a partial tree must not be deployed.
+          if grep -q "\[ERROR\]" "$build_log"; then
+            echo "jui build logged [ERROR] while exiting 0 — refusing to deploy a partial tree:"
+            grep "\[ERROR\]" "$build_log" | head -20
+            exit 1
+          fi
 
       - name: Install JS dependencies
         working-directory: jsonui-doc-web
