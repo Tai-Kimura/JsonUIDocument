@@ -37,11 +37,12 @@ env:
   # Bump procedure: pick the new jsonui-cli main SHA, replace this value, and
   # review the regenerated reference pages in that deploy — the SHA bump is
   # the review point for reference updates.
-  JSONUI_CLI_REF: 289038afcaf7c4fee244eeb584c9a5bb549d53ee # v1.8.7
-  # v1.8.6 was skipped: its `jui build` crashed on `from ..core.version import
-  # toolchain_version` (the module is at jui_cli/version.py, not under core/).
-  # 1.8.7 fixes exactly that line; measured here against 1.8.5 and 1.8.6 as
-  # controls — 1.8.6 exits 1, 1.8.5 and 1.8.7 build successfully.
+  JSONUI_CLI_REF: 51e245fed48e81a87e334678ab68e99dd2134afc # v1.8.9
+  # Two releases were skipped on the way here. v1.8.6's `jui build` crashed on
+  # `from ..core.version import toolchain_version` (the module is at
+  # jui_cli/version.py, not under core/), and v1.8.8 was withdrawn upstream for
+  # manifest churn. Both measured here against their neighbours as controls
+  # before being skipped.
 
 jobs:
   # ENFORCING — `deploy` depends on this job; a red gate stops the deploy

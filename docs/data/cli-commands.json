@@ -746,7 +746,24 @@
       "seeAlso": [
         "jui build"
       ],
-      "aliases": []
+      "aliases": [],
+      "verifiedAgainst": {
+        "version": "1.8.9",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "dfaa43391ac8242a8a6a6673e8c3b159b9709d358cd228590cd5e9191e76e72d",
+        "cardHash": "4d8e512a7b4f9682e63cb39e9d5506478240a949d553f6e9a3f7fe738dbad44d",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "a838805baf4b",
+          "synopsis": "edd58b94530d",
+          "purpose": "a733250b148e",
+          "options": "cc91a11a5974",
+          "examples": "43f617275b98",
+          "seeAlso": "2c7f782f45a2",
+          "aliases": "98edafdd23a8"
+        }
+      }
     },
     {
       "binary": "jui",
@@ -820,19 +837,19 @@
     {
       "binary": "jui",
       "command": "migrate-layouts",
-      "synopsis": "jui migrate-layouts [--from PATH] [--dry-run]",
+      "synopsis": "jui migrate-layouts [--from ios|android|web] [--dry-run]",
       "purpose": {
-        "en": "One-shot migration for breaking changes between JsonUI versions. Applies AST transforms to all Layout JSON files.",
-        "ja": "JsonUI バージョン間の破壊的変更に対する一括移行。全 Layout JSON に AST 変換を適用。"
+        "en": "One-shot adoption helper: copy the Layout JSON that already lives under a platform project into the shared `layouts_directory`, so an existing app can move to the shared tree without hand-copying. `--from` selects which platform to copy out of, not a path.",
+        "ja": "導入時の一度きりのヘルパー: 既にプラットフォーム側プロジェクトに置かれている Layout JSON を、共有の `layouts_directory` へコピーする。既存アプリを手作業なしで共有ツリーへ移すためのもの。`--from` はコピー元のプラットフォームを選ぶオプションで、パスではない。"
       },
       "options": [
         {
           "name": "--from",
-          "type": "path",
-          "default": "—",
+          "type": "enum",
+          "default": "ios",
           "description": {
-            "en": "Source layouts directory.",
-            "ja": "移行元 layouts ディレクトリ。"
+            "en": "Which platform project to copy the layouts out of: `ios`, `android` or `web`.",
+            "ja": "どのプラットフォームのプロジェクトから layout をコピーするか: `ios` / `android` / `web`。"
           }
         },
         {
@@ -854,7 +871,24 @@
       "aliases": [],
       "seeAlso": [
         "jui init"
-      ]
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.9",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "12203494eea5aa54727ef771cd67f85b724c457310a7d73fe3cb815f9fa337a2",
+        "cardHash": "fc47c6e4b9d32c82d0fa6cd56729a33c2f6898fb0c7f96ea55f237bb50a72caa",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "4cafff443354",
+          "synopsis": "34cede50fbb8",
+          "purpose": "a9dc7ceac3ad",
+          "options": "29ba2658b80e",
+          "examples": "0b23ee0e890e",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "0313f54b0152"
+        }
+      }
     },
     {
       "binary": "jui",
@@ -1984,13 +2018,56 @@
             "en": "Port to listen on.",
             "ja": "待ち受けポート。"
           }
+        },
+        {
+          "name": "--mock-dir",
+          "type": "path",
+          "default": "mock.mockDir or tests/mocks",
+          "description": {
+            "en": "Directory of mock files to serve.",
+            "ja": "配信するモックファイルのディレクトリ。"
+          }
+        },
+        {
+          "name": "--config",
+          "type": "path",
+          "default": "jui.config.json",
+          "description": {
+            "en": "Config file to read the mock settings from.",
+            "ja": "モック設定を読む設定ファイル。"
+          }
+        },
+        {
+          "name": "--artifacts",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "After an ios/android run target finishes, pull its artifacts automatically (the same collection `jsonui-test artifacts pull` performs).",
+            "ja": "ios/android の run target が終わるたびに artifacts を自動で回収する（`jsonui-test artifacts pull` と同じ回収）。"
+          }
         }
       ],
       "examples": [],
       "seeAlso": [
         "jsonui-test mock generate",
         "jsonui-test artifacts pull"
-      ]
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.9",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "69ade3f85c935437a119f1739bb8b05655babe563c25092cf17b4d25a752d6b4",
+        "cardHash": "26e5c2a8fc704ad6444fd35dc383d5502199a5aa0325c54c15939daa6b718811",
+        "fieldHashes": {
+          "binary": "3b2560767fdf",
+          "command": "c380c430965e",
+          "synopsis": "4a3025c4ee8c",
+          "purpose": "1589ec7afd1b",
+          "options": "ea29419b085b",
+          "examples": "2b8fdc789d3b",
+          "seeAlso": "fea52e56f095"
+        }
+      }
     },
     {
       "binary": "jsonui-test",
