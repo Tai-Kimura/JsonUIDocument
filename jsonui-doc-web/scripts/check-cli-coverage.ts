@@ -94,11 +94,17 @@ function main(): void {
   const classification = JSON.parse(fs.readFileSync(STAMPABILITY, "utf8")) as {
     measuredAt: string;
     columns: number;
+    python?: string;
     nodes: Record<string, { stampable: boolean; reason?: string }>;
   };
+  const versionFile = path.join(toolchain, "VERSION");
+  const toolchainVersion = fs.existsSync(versionFile)
+    ? fs.readFileSync(versionFile, "utf8").trim()
+    : "unknown";
 
   const problems: string[] = [];
   const notes: string[] = [];
+  const unclassified = new Set<string>();
   const counts: string[] = [];
   let totalLeaves = 0;
   let stampableCards = 0;
@@ -150,6 +156,7 @@ function main(): void {
       const id = `${bin.name} ${card.command}`;
       const covered = [...nodesUnder(tree, cardPath).keys()];
       const unknown = covered.filter((n) => classification.nodes[`${bin.name} ${n}`] === undefined);
+      for (const n of unknown) unclassified.add(`${bin.name} ${n}`);
       const unstampableNodes = covered.filter(
         (n) => classification.nodes[`${bin.name} ${n}`]?.stampable === false,
       );
@@ -238,6 +245,25 @@ function main(): void {
       `  An unstamped card is NOT verified: nobody has read it against this binary's --help.\n` +
       `  This check never judges whether a card is RIGHT — only whether a human read it.`,
   );
+  // A classification measured against another version is not wrong by itself —
+  // help that did not move is still classified correctly — but a version that
+  // ADDS a subcommand leaves nodes unclassified, and an unclassified node
+  // quietly costs its card its stampability. Say both, every run: this check
+  // exists because things that go quiet are the ones nobody fixes.
+  if (classification.measuredAt !== toolchainVersion) {
+    console.log(
+      `  stampability was classified at ${classification.measuredAt}, the toolchain is ` +
+        `${toolchainVersion} — re-run \`npm run classify:help-stampability -- <treeA> <treeB>\` ` +
+        "when the help of a classified node moves.",
+    );
+  }
+  if (unclassified.size > 0) {
+    console.log(
+      `  ${unclassified.size} node(s) have no classification, so every card covering them counts as ` +
+        "not stampable: " + [...unclassified].slice(0, 5).join(", ") +
+        (unclassified.size > 5 ? ", ..." : ""),
+    );
+  }
   for (const n of notes) console.log(`  ${n}`);
 }
 
