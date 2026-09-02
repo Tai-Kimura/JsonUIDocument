@@ -596,10 +596,10 @@
     {
       "binary": "jui",
       "command": "verify",
-      "synopsis": "jui verify [--fail-on-diff] [--file SPEC] [--platform <p>]",
+      "synopsis": "jui verify [--fail-on-diff] [--file SPEC] [--platform <p>] [--detail] [--json PATH]",
       "purpose": {
-        "en": "Compare generated Layout JSON against the committed Layouts to detect spec drift. --fail-on-diff exits non-zero for CI (JsonUI invariant #2).",
-        "ja": "生成 Layout JSON とコミット済み Layout を突き合わせて spec drift を検出。--fail-on-diff は CI 用に非ゼロ終了（JsonUI 不変条件 #2）。"
+        "en": "Compare generated Layout JSON against the committed Layouts to detect spec drift. `--fail-on-diff` exits non-zero for CI (JsonUI invariant #2). Since jsonui-cli 1.8.5 the summary names its denominator — `verified N of M screen(s)`, with the skipped ones and why — so a green run no longer hides how much it actually compared: a screen whose layout is authored by hand rather than generated is skipped, and a project where every screen is skipped reports `verified 0 of M` while still exiting 0.",
+        "ja": "生成された Layout JSON を commit 済みの Layouts と比較して spec drift を検出する。`--fail-on-diff` は CI 用に非 0 で終了（JsonUI 不変条件 #2）。jsonui-cli 1.8.5 からはサマリが分母を名乗る — `verified N of M screen(s)` と skip されたものとその理由 — ので、緑の実行が「実際に何枚比べたか」を隠さなくなった: 生成ではなく手で書かれた layout を持つ画面は skip され、全画面が skip されたプロジェクトは `verified 0 of M` と報告しながら exit 0 を返す。"
       },
       "options": [
         {
@@ -637,18 +637,43 @@
             "en": "Target platform.",
             "ja": "対象プラットフォーム。"
           }
+        },
+        {
+          "name": "--json",
+          "type": "path",
+          "description": {
+            "en": "Write the counts (`verified` / `skipped` / `total`, with `skippedByReason`) to PATH as JSON, for automation that cannot read the report.",
+            "ja": "件数（`verified` / `skipped` / `total` と `skippedByReason`）を JSON として PATH に書き出す。レポート本文を読めない自動化向け。"
+          }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ jui verify --fail-on-diff"
+          "code": "$ jui verify --fail-on-diff\n**Total: match=0, missing=0, extra=0, type_mismatch=0**\n\n**verified 0 of 2 screen(s)** — 2 skipped (layout authored externally)\n\n$ jui verify --json counts.json && cat counts.json\n{ \"verified\": 0, \"skipped\": 2, \"total\": 2, \"skippedByReason\": { \"layout authored externally\": 2 } }"
         }
       ],
       "aliases": [],
       "seeAlso": [
         "jui build"
-      ]
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.5",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "cef4857adc6919ab2fed436c32f4ac005e4d0a1944b9e29537ba8a33ddee698a",
+        "cardHash": "09b50363e31f0b52c2c10c7bd869e48abfd3853a47302a489d266d3af8b08e6c",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "b90c5b69cbb6",
+          "synopsis": "17d634e84baf",
+          "purpose": "911c9b49ac85",
+          "options": "04b732f9d18e",
+          "examples": "f5662f26ca1c",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "2c7f782f45a2"
+        }
+      }
     },
     {
       "binary": "jui",

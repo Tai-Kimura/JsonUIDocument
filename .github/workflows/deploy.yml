@@ -37,7 +37,10 @@ env:
   # Bump procedure: pick the new jsonui-cli main SHA, replace this value, and
   # review the regenerated reference pages in that deploy — the SHA bump is
   # the review point for reference updates.
-  JSONUI_CLI_REF: ddaba8f459b82ba4784ac10ac56e13ae2855dc4f # v1.8.4
+  JSONUI_CLI_REF: 604b2931103745537b5c138b43cbca43e6a6e2a3 # v1.8.5
+  # Not v1.8.6: its `jui build` crashes on `from ..core.version import
+  # toolchain_version` (the module is at jui_cli/version.py, not under core/).
+  # Measured on this repository against 1.8.4 / 1.8.5 / 1.8.6; filed upstream.
 
 jobs:
   # ENFORCING — `deploy` depends on this job; a red gate stops the deploy
@@ -135,7 +138,16 @@ jobs:
           }
           JUI="python3 $JSONUI_CLI_PATH/jui_tools/bin/jui"
           run_gate lint-strings           $JUI lint-strings
+          # This gate verifies NOTHING in this repository, and said so only once
+          # the CLI learned to name its denominator (jsonui-cli 1.8.5): every
+          # screen here has a hand-authored layout, so verify skips all of them
+          # and exits 0 over an empty comparison. Kept, because it costs one run
+          # and would speak the moment a generated layout appears — but the
+          # scope line is printed next to it so that "exit=0" is never read as
+          # "checked something".
           run_gate verify-fail-on-diff    $JUI verify --fail-on-diff
+          verify_scope=$($JUI verify 2>/dev/null | sed -n 's/.*\*\*\(verified [0-9]* of [0-9]* screen(s)\)\*\*.*/\1/p' | head -1)
+          echo "GATE verify-fail-on-diff: scope=${verify_scope:-could not read the denominator}"
           run_gate validate-strings       npm --prefix jsonui-doc-web run validate:strings
           run_gate tsc-noEmit             npx --prefix jsonui-doc-web tsc --noEmit \
                                             --project jsonui-doc-web/tsconfig.json
