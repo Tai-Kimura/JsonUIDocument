@@ -1271,6 +1271,66 @@
     },
     {
       "binary": "jui",
+      "command": "conformance parity",
+      "synopsis": "jui conformance parity --platform ios|android|web [--env <key>] [--update]",
+      "purpose": {
+        "en": "Compare one platform's codegen artifacts against the dynamic baseline recorded for a render environment. `--update` records the measured deviations, preserving the reasons and notes already reviewed on surviving entries and marking new ones unreviewed.",
+        "ja": "あるプラットフォームの codegen 成果物を、レンダー環境ごとに記録された dynamic ベースラインと比較する。`--update` は実測した差分を記録し、既にレビュー済みのエントリの理由・注記は保持したまま、新規エントリを未レビュー扱いにする。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": [
+        "jui conformance baseline update",
+        "jui conformance report"
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "conformance cross-effect",
+      "synopsis": "jui conformance cross-effect [--platform ios|android|web]... [--update]",
+      "purpose": {
+        "en": "Compare whether each attribute is active across platforms. At least two platforms are required — activeness agreement measured on one platform compares nothing.",
+        "ja": "各属性が効いているかどうかをプラットフォーム間で比較する。最低 2 プラットフォームが必要 — 1 つだけでの「一致」は何も比較していない。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": [
+        "jui conformance effect",
+        "jui conformance inert-audit"
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "conformance inert-audit",
+      "synopsis": "jui conformance inert-audit [--platform ios|android|web]... [--untriaged-only] [--json <out>]",
+      "purpose": {
+        "en": "The triage queue of attributes measured inert. Attribution is per platform, but every item is reported with its full cross-platform picture so a single-platform verdict is not read as a general one.",
+        "ja": "効いていないと実測された属性のトリアージ待ち行列。帰属はプラットフォームごとだが、各項目はクロスプラットフォームの全体像つきで報告される — 1 プラットフォームの判定を全体の判定と読まないため。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": [
+        "jui conformance cross-effect",
+        "jui conformance coverage"
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "conformance codegen-effect",
+      "synopsis": "jui conformance codegen-effect [--platform ios|android|web] [--check C0|C1|C2|C3] [--paired] [--update]",
+      "purpose": {
+        "en": "For every declared (component, attribute, platform), run the production converter over a layout hash four times and compare the emitted source text: C0 is the spelling read at all, C1 does the `@{...}` binding form survive, C2 is the value read or is a constant emitted. This is the codegen stage only — it proves the converter puts the attribute in its output, never that the library then honours it. UIKit and the dynamic renderers have no codegen output to compare and are scoped out with a reason.",
+        "ja": "宣言済みの (コンポーネント, 属性, プラットフォーム) ごとに、production の converter を layout hash に対して 4 回走らせ、出力ソースを比較する: C0 = その綴りが読まれているか、C1 = `@{...}` の binding 形が生き残るか、C2 = 値が読まれているか定数が出ているか。これは codegen 段階だけを見る — converter が属性を出力に入れることは証明するが、ライブラリがそれを尊重することは証明しない。UIKit と dynamic レンダラは比較対象の codegen 出力を持たないため、理由つきで対象外。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": [
+        "jui conformance effect",
+        "jui conformance parity"
+      ]
+    },
+    {
+      "binary": "jui",
       "command": "lint-strings",
       "synopsis": "jui lint-strings [--json] [--usage] [--update-allowlist] [--allowlist <path>]",
       "purpose": {
@@ -2127,6 +2187,50 @@
     },
     {
       "binary": "jsonui-doc",
+      "command": "generate doc",
+      "synopsis": "jsonui-doc generate doc [-f <test file>] [-o <out>] [--format markdown|html] [--schema]",
+      "purpose": {
+        "en": "Generate documentation for a test file, in Markdown or HTML. `--schema` generates the schema reference instead of test documentation.",
+        "ja": "テストファイルのドキュメントを Markdown または HTML で生成する。`--schema` を付けるとテストドキュメントではなくスキーマリファレンスを生成する。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": [
+        "jsonui-doc generate html",
+        "jsonui-test generate"
+      ]
+    },
+    {
+      "binary": "jsonui-doc",
+      "command": "generate mermaid",
+      "synopsis": "jsonui-doc generate mermaid <tests dir> [-o <out.html>] [-t <title>] [--layouts-dir <dir>]",
+      "purpose": {
+        "en": "Draw a Mermaid flow diagram from a tests directory (the one holding `flows/` and `screens/`). Without `-o` the Mermaid source goes to stdout. `--layouts-dir` is what lets it tell screens from Collection cells and partials, so sub-areas are not drawn as screens.",
+        "ja": "テストディレクトリ（`flows/` と `screens/` を持つ方）から Mermaid のフロー図を描く。`-o` を省くと Mermaid ソースを標準出力へ。`--layouts-dir` は画面と Collection セル / partial を見分けるために使われ、これが無いとサブエリアが画面として描かれる。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": [
+        "jsonui-doc generate doc",
+        "jsonui-test generate"
+      ]
+    },
+    {
+      "binary": "jsonui-doc",
+      "command": "generate adapter",
+      "synopsis": "jsonui-doc generate adapter ios|android|web [-o <dir>] [-n <name>] [-a <actions.json>]",
+      "purpose": {
+        "en": "Emit the platform adapter scaffold for one target. `-n` namespaces the generated project, `-a` points at a JSON file defining custom actions.",
+        "ja": "1 ターゲット分のプラットフォームアダプタの雛形を出力する。`-n` は生成物の名前空間、`-a` はカスタムアクションを定義した JSON ファイルを指す。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": [
+        "jsonui-doc generate component"
+      ]
+    },
+    {
+      "binary": "jsonui-doc",
       "command": "validate spec",
       "synopsis": "jsonui-doc validate spec <spec-file>",
       "purpose": {
@@ -2141,6 +2245,21 @@
     },
     {
       "binary": "jsonui-doc",
+      "command": "validate component",
+      "synopsis": "jsonui-doc validate component <file>",
+      "purpose": {
+        "en": "Validate one component specification file (`.component.json`).",
+        "ja": "コンポーネント仕様ファイル（`.component.json`）を 1 つ検証する。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": [
+        "jsonui-doc validate spec",
+        "jsonui-doc init component"
+      ]
+    },
+    {
+      "binary": "jsonui-doc",
       "command": "rules",
       "synopsis": "jsonui-doc rules <init|show>",
       "purpose": {
@@ -2150,6 +2269,48 @@
       "options": [],
       "examples": [],
       "seeAlso": []
+    },
+    {
+      "binary": "jsonui-doc",
+      "command": "figma fetch",
+      "synopsis": "jsonui-doc figma fetch [<file key>] [--url <url>] [-o <out.json>] [-t <token>] [--node-ids ...] [--pages] [--images]",
+      "purpose": {
+        "en": "Fetch a Figma file into JSON. The file key can come from `--url` directly. The token defaults to the `FIGMA_TOKEN` environment variable; `--plan` throttles requests to the rate limit of your Figma plan.",
+        "ja": "Figma のファイルを JSON として取得する。file key は `--url` から自動抽出できる。トークンの既定は環境変数 `FIGMA_TOKEN`。`--plan` は Figma プランのレート制限に合わせてリクエストを絞る。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": [
+        "jsonui-doc figma images"
+      ]
+    },
+    {
+      "binary": "jsonui-doc",
+      "command": "figma images",
+      "synopsis": "jsonui-doc figma images <figma.json> [-k <file key>] [-t <token>] [--plan starter|pro|org|enterprise]",
+      "purpose": {
+        "en": "Download the images referenced by a fetched Figma JSON file. The file key defaults to the one inferred from the filename.",
+        "ja": "取得済みの Figma JSON が参照している画像をダウンロードする。file key の既定はファイル名から推定したもの。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": [
+        "jsonui-doc figma fetch"
+      ]
+    },
+    {
+      "binary": "jsonui-doc",
+      "command": "check",
+      "synopsis": "jsonui-doc check [<filter>] [--list] [-p <project>]",
+      "purpose": {
+        "en": "Run the declared contract checks — a real database or an implementation's OpenAPI document against the docs. It executes only the commands declared in jui.config.json, and `--list` shows what would run (name, type, exact command) without running it. The filter restricts the run to `db` / `api` / `db:<name>` / a declared check name.",
+        "ja": "宣言済みの契約チェック — 実データベースや実装側 OpenAPI をドキュメントと突き合わせる — を実行する。実行するのは jui.config.json に宣言されたコマンドだけで、`--list` は走らせずに実行内容（名前・種別・実際のコマンド）を表示する。フィルタで `db` / `api` / `db:<name>` / 宣言済みチェック名に限定できる。"
+      },
+      "options": [],
+      "examples": [],
+      "seeAlso": [
+        "jsonui-doc validate spec"
+      ]
     }
   ]
 }

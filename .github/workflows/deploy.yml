@@ -43,16 +43,23 @@ jobs:
   # ENFORCING — `deploy` depends on this job; a red gate stops the deploy
   # before anything is published, and the site stays on its previous version.
   #
-  # Six gates run before every push to this repository and used to run only
-  # in the maintainer's hands: lint-strings, verify --fail-on-diff,
-  # validate:strings, tsc --noEmit, jsonui-doc validate spec, jsonui-test
-  # validate. As a local procedure they were not a mechanism — skip the run
-  # and nothing catches it. This job ran in reporting-only mode first and
-  # measured two facts before being switched to enforcing: a local zero was
-  # not a CI zero (tsc needed the prebuild artifacts a fresh checkout lacks),
-  # and after that fix, two consecutive runs reported 0 of 6.
+  # Six of these gates used to run only in the maintainer's hands:
+  # lint-strings, verify --fail-on-diff, validate:strings, tsc --noEmit,
+  # jsonui-doc validate spec, jsonui-test validate. As a local procedure they
+  # were not a mechanism — skip the run and nothing catches it. This job ran
+  # in reporting-only mode first and measured two facts before being switched
+  # to enforcing: a local zero was not a CI zero (tsc needed the prebuild
+  # artifacts a fresh checkout lacks), and after that fix, two consecutive
+  # runs reported 0 of 6.
   #
-  # All six gates run even when one fails, so a red run names everything that
+  # A seventh joined them on 2026-09-02: check:cli-coverage compares the CLI
+  # reference against each binary's --help in both directions. It is a gate
+  # rather than part of `prebuild` because it must measure the PINNED
+  # toolchain — JSONUI_CLI_PATH below — and a local install can be any
+  # version. It was added the day a card for a subcommand that never existed
+  # was found on the page, four months after it was published.
+  #
+  # All seven gates run even when one fails, so a red run names everything that
   # is red, and every gate prints its own exit code — a gate that could not
   # run must not read as a gate that passed.
   gates:
@@ -107,7 +114,7 @@ jobs:
         working-directory: jsonui-doc-web
         run: npm run prebuild
 
-      - name: Run the six gates (enforcing — a red one stops the deploy)
+      - name: Run the seven gates (enforcing — a red one stops the deploy)
         run: |
           set +e
           fail=0
@@ -133,8 +140,11 @@ jobs:
           # entirely.
           run_gate jsonui-test-validate   python3 "$JSONUI_CLI_PATH/test_tools/jsonui-test" \
                                             validate --no-install tests/screens
+          # Reads JSONUI_CLI_PATH itself; refuses to pass when it cannot run
+          # the binaries, so "could not compare" never reads as "agreed".
+          run_gate cli-coverage           npm --prefix jsonui-doc-web run check:cli-coverage
           echo "----"
-          echo "gates with a non-zero exit: $fail of 6"
+          echo "gates with a non-zero exit: $fail of 7"
           if [ "$fail" -ne 0 ]; then
             echo "FAILING this job: the deploy job depends on it and will not run."
             exit 1
