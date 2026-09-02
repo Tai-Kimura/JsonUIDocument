@@ -7605,8 +7605,8 @@
       "ja": "• 条件とフラグ: `when` は `platform` (ios / android / web / all)・`responsive` (compact / regular などの size-class バケット、または window サイズの min/max 境界)・`state` パス・`visible` / `notVisible` で step を制御。`optional: true` は失敗を warning に格下げ。`label` はログ・レポートでの step 名。 `openedUrl` や `emitHook` のような web 専用 step は、モバイルのドライバに届き得る限り警告が出ます。1.7.7 からは文言が宣言内容に追随します: ゲートなしなら `gate it with 'when': {'platform': 'web'} in cross-platform tests`、iOS にゲートしてあるなら `this step is gated onto ios, where it does not run` — どこで動かしたいかは既に述べられており、要点はそこでは動かないことだからです。web にゲートすれば何も言いません。"
     },
     "section_advanced_bullet_launch": {
-      "en": "• launch: `clearState` (reset app data), `permissions` (camera / microphone / location / notifications / photos / contacts / calendar / bluetooth → allow / deny / unset), and `arguments` (launch arguments) — applied once before the first step.",
-      "ja": "• launch: `clearState` (アプリデータをリセット)、`permissions` (camera / microphone / location / notifications / photos / contacts / calendar / bluetooth → allow / deny / unset)、`arguments` (起動引数) — 最初の step の前に 1 度適用。"
+      "en": "• launch: `clearState` (reset app data), `permissions` (camera / microphone / location / notifications / photos / contacts / calendar / bluetooth → allow / deny / unset), and `arguments` (launch arguments) — applied once before the first step. On Android, `arguments` actually reaches the app from driver 1.8.4 — earlier drivers logged the value without attaching it to the launch.",
+      "ja": "• launch: `clearState` (アプリデータをリセット)、`permissions` (camera / microphone / location / notifications / photos / contacts / calendar / bluetooth → allow / deny / unset)、`arguments` (起動引数) — 最初の step の前に 1 度適用。Android で `arguments` が実際にアプリへ届くのは driver 1.8.4 から — それ以前はログに出すだけで起動に載せていませんでした。"
     },
     "section_advanced_bullet_results": {
       "en": "• teardown & results: `teardown` steps run even when a case fails, so cleanup is guaranteed. The result is `{ format: 'jsonui-test-results', version: 1, platform, suites[] }` with per-case `status` (passed / failed / skipped), `error`, `warnings`, and `durationMs`.",

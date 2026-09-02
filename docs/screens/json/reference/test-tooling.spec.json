@@ -143,6 +143,8 @@
   "notes": [
     "Live Reference entry (added 2026-07-09 for the test-tooling doc pass). Added to ChromeViewModel NAV_CATALOG reference + ReferenceIndexViewModel CATALOG.",
     "Matrix rows are source-verified against jsonui-test-runner driver code, deliberately correcting stale docs: Web element id is the HTML id (#id), not data-testid; pass/fail is result.allPassed on iOS + Android (computed property on TestSuiteResult) but the allPassed(result) function on Web.",
-    "Companion to /guides/testing (DSL) and /guides/api-mock (mocks). Tables are monospace CodeBlocks (no new Collection cell needed)."
+    "Companion to /guides/testing (DSL) and /guides/api-mock (mocks). Tables are monospace CodeBlocks (no new Collection cell needed).",
+    "2026-09-02, driver android 1.8.4 (d990624): the matrix Android clearState cell pm clear -> in-process wipe [fn2]. Measured on the driver source: instrumentation runs in the target package's process, so pm clear force-stopped the process running the tests; 1.8.4 wipes files/shared_prefs/databases/cache/code_cache in-process and relaunches — persisted state only, process memory survives. Boundary carried in footnote [fn2].",
+    "Same pass: the [fn] marker on the Web pass/fail cell had no rendered body anywhere on the page since 2026-07-09 (the intent lived only in these notes). Footnote block added at the bottom of the matrix CodeBlock; [fn] body states property-vs-function."
   ]
 }
