@@ -1,0 +1,211 @@
+# Testing - Writing screen tests
+
+## Overview
+
+Guides > Writing screen tests. Eight sections + TOC + next-reads. There is no `jui test` command — the CLI is `jsonui-test`, shipped inside jsonui-cli. Walks where tests live, screen vs flow test anatomy with real JSON, the full action/assert DSL from the runtime schemas (incl. scrollUntilVisible / readText / repeat / retry / setLocation / addMedia, assertion auto-wait, and the screenshot visual-regression assert), the three published drivers (SPM / Maven Central / npm 1.0.0 — XCUITest / Espresso / Playwright with verified run-APIs), the jsonui-test CLI sub-commands (validate incl. flatten-install side-effect, generate, report, mock), CI wiring, and section 8 (launch / when / optional / teardown / results JSON + test.install config).
+
+| | |
+|---|---|
+| Created | 2026-04-23 |
+| Updated | 2026-07-09 |
+
+## Screen Structure
+
+### UI Components
+
+| Component | ID | Platform | Description | Initial State | Notes |
+|---|---|---|---|---|---|
+| View | `guides_testing_root` | - | - | - | - |
+| &nbsp;&nbsp;↳ Scroll | `guides_testing_scroll` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_testing_header` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_testing_content_with_rail` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_testing_body_column` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_where` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_screen` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_flow` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_dsl` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_drivers` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_cli` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_recording` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_ci` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_advanced` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_testing_next` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Collection | `guides_testing_next_collection` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_testing_footer` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_testing_rail_column` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_testing_toc_wrap` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ TableOfContents | `-` | - | - | - | - |
+
+### Layout Structure
+
+```
+guides_testing_root
+└── guides_testing_scroll
+```
+
+## Data Flow
+
+```mermaid
+flowchart TD
+    VIEW --> VM
+```
+
+### ViewModel
+
+#### Methods
+
+| Signature | Platforms | Description |
+|---|---|---|
+| `onAppear()` | all | Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_test_runner -> /tools/test-runner, next_navigation -> /guides/navigation) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the guides_testing_ namespace prefix. |
+| `onNavigate(url: String)` | all | Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /tools/test-runner, /guides/navigation. |
+
+#### Vars
+
+| Declaration | Flags | Platforms | Description |
+|---|---|---|---|
+| `var nextReadLinks: Array(NextReadLink)` | observable | all | Two closing 'read next' cards pointing at /tools/test-runner and /guides/navigation. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage. |
+
+## State Management
+
+### UI Data Variables
+
+| Variable Name | Type | Description | Notes |
+|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
+
+### View-local Event Handlers
+
+_Handlers kept inside the View layer. ViewModel public API lives under `dataFlow.viewModel`._
+
+| Handler | Description | Notes |
+|---|---|---|
+| `onAppear` | Seed nextReadLinks. | - |
+| `onNavigate` | Client-side navigation. | - |
+| `onNavigateGuides` |  | - |
+
+## User Actions
+
+| Action | Processing | Destination | Notes |
+|---|---|---|---|
+| Tap a TOC entry | TOC-internal scroll. | - | - |
+| Tap a NextReadLink card | onNavigate(url). | - | - |
+
+## Validation
+
+## Transitions
+
+| Condition | Destination | Notes |
+|---|---|---|
+| url is spec-mapped | Target screen or tab | - |
+
+## Related Files
+
+| Type | File Path | Notes |
+|---|---|---|
+| Layout | `docs/screens/layouts/guides/testing.json` | - |
+| ViewModel | `jsonui-doc-web/src/viewmodels/guides/TestingViewModel.ts` | - |
+| View | `jsonui-doc-web/src/app/guides/testing/page.tsx` | - |
+
+## Notes
+
+- Live Guides entry. Flip GUIDES_ENTRIES row for 'testing' to 'live' in HomeViewModel when shipping.
+- Eight sections: (1) where tests live (tree excerpt), (2) screen test anatomy with real JSON, (3) flow test anatomy with real JSON (sources + checkpoints + screen discriminator), (4) action/assert DSL as 2 bullets sourced from schemas/actions.schema.json (updated 2026-07: scrollUntilVisible / readText→@{var} / repeat / retry / setLocation / addMedia / setMocks; asserts gain screenshot + the auto-wait/poll note), (5) drivers bullets — published at 1.0.0 (iOS SPM jsonui-test-runner-ios / Android Maven Central io.github.tai-kimura:jsonui-test-runner-android / Web npm jsonui-test-runner-web) with verified run-APIs and id-mapping (iOS accessibilityIdentifier / Android resource-id via testTag / Web HTML id — NOT data-testid), (6) jsonui-test CLI (install / validate incl. flatten-install / generate / report / mock), (7) CI, (8) launch + when/optional/teardown + results JSON + test.install config, with a jui.config.json + *.test.json code example.
+- 2026-07-09 refresh: CLI is `jsonui-test` shipped inside jsonui-cli (NOT a separate jsonui-test-runner package — that repo now holds only schemas/drivers/examples). Driver run-API examples verified against jsonui-test-runner driver source: pass/fail is `result.allPassed` on iOS + Android (computed property on TestSuiteResult) but the module function `allPassed(result)` on Web.
+- Deprecated dead strings removed 2026-07-09: toc_row_runner deleted (section_runner_* were already gone). No section_runner_* / toc_row_runner entries remain in strings.json.
+- 2026-09-01 — the screen-test section now states that source is required (1.7.36) and that its paths are existence-checked (1.7.37), and that the two shipped apart. Both halves measured here rather than transcribed: this lane filed the blind check on 1.7.33, having shot it by pointing source.layout and source.document at files that do not exist and getting PASSED with 0 errors and 0 warnings both times. Re-shot the same two arms on 1.7.37 — each now warns, names the directories searched (the declared one and the repository root), and states that it becomes an error once counts reach zero; exit stays 0 for now. So the green this repo's 32 test files return is a measured green on both sides for the first time; before, it only meant the files parsed. The window sentence is on the page because a reader who filled source in during 1.7.36 has a green that did not check anything, and nothing in their tree says so. The readiness consequence is repeated here rather than left on the screen-identity page alone, because this is where a reader is told to write the field, and the field reads like metadata.
+- 2026-09-01 — jsonui-cli 1.7.48 makes the declared-path check say whether it ran. Measured on a scratchpad fixture: one test file declaring a layout and a document that do not exist, with nothing changed between arms but the presence of the two directories, and the directory state printed as a control before each run. Both present: Warnings: 2, no suffix. Layouts removed: Warnings: 1, 'Path checks skipped: layout'. Both removed: Warnings: 0, 'Path checks skipped: document, layout'. The same file and the same declarations therefore produce a clean zero when the check cannot run, and the suffix is what distinguishes it from a checked zero. The suffix follows the conditional convention of the other summary fields, so its absence is the positive statement. Result stayed PASSED in all three arms, so the exit code carries none of this. Measured on this project too: both configured directories exist and the run prints no suffix, so this site's own Warnings: 0 covers both path kinds — a measured zero, not a declined one. Upstream reports that the release also found one of its own red-checks proving nothing here: the note naming the absent directory derived the config key with a two-way conditional, so both kinds answered correctly and no mutation could be detected; a third kind is unreachable through the note loop. That is the same shape as the footnote branch filed from this lane on 1.7.47 — a check that is valid and unreachable are two different properties.
+- 2026-09-01 — jsonui-cli 1.7.50 makes the install step's full sync conditional on the run having seen everything. Measured on a three-test fixture with one resolving install target: the directory run installed 3 and cleaned 0; the subsequent one-file run installed 1, deleted nothing, and printed 'partial run — stale files left in place: this run covered 1 of 3 declared test(s)'. Before this, passing a subset removed the rest from the destination. This page's install bullet had said 'full-sync (stale *.test.json removed first)' unconditionally, which was a third affected sentence beyond the two identified in advance — found by measuring rather than by working from the predicted list. Building the fixture took three tries: test.testDir and test.install.web.dest both resolved zero targets; the accepted destination keys are target_dir/assets_dir/dir/path under test.install.<platform>, read from install.py rather than guessed. Each attempt printed resolve_targets as a control, so no arm was read as a behaviour result.
+- 2026-09-02, driver android 1.8.4: the launch bullet's 'arguments — applied once before the first step' was false on Android until 1.8.4 — 1.8.3 built and logged JSONUI_TEST_ARGS without attaching it to any intent (measured on driver source at 67fcbad vs e1893f1). Bullet now carries the from-1.8.4 qualifier in both languages.
+- 2026-09-02, cli 1.8.0: the pregrant bullet grew the Android arm. Measured on scratchpad fixtures against the pinned (v1.7.54) and v1.8.0 trees: both arms run by default and each prints its own count; --platform limits to one; deny declarations are counted per file and unset is not counted (0 across 1 file on an unset-only fixture); an app absent from the connected device makes the arm refuse with exit 1 instead of reporting a vacuous success; the exit code is 1 when either arm fails. Not measured (no installed app on the emulator): the revoke itself and the 'permission not requested by the app' note — both are described from the command's own printed strings. The launch bullet also gained the driver-1.8.5 deny-is-an-assert sentence in both languages.

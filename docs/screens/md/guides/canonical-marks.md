@@ -1,0 +1,157 @@
+# CanonicalMarks - Referencing the API canon from a spec
+
+## Overview
+
+Guides > Referencing the API canon from a spec. The `@canonical` / `@canonical.wire` marks introduced in jsonui-cli 1.7.0, which let a dataFlow method that declares an `endpoint` reference the OpenAPI operation instead of restating it. Seven sections: what a mark is and which dataFlow sections are walked, what expansion produces (parameters + JSON requestBody properties, required -> non-optional), the mixed form and same-name precedence, `spec.canonical_param_case`, why returnType takes only `@canonical.wire` (domain type vs wire type), the three non-marks (omission, unresolved = error with all five messages verbatim, plain `@canonical` on returnType), when a hand-written declaration is the right answer, `canonicalDivergence` (1.7.4) for saying how a hand-written declaration differs and being held to it, and the cross-spec agreement check (1.7.5) with its platform-scoped exemption.
+
+| | |
+|---|---|
+| Created | 2026-08-28 |
+| Updated | 2026-08-28 |
+
+## Screen Structure
+
+### UI Components
+
+| Component | ID | Platform | Description | Initial State | Notes |
+|---|---|---|---|---|---|
+| View | `guides_canonical_marks_root` | - | - | - | - |
+| &nbsp;&nbsp;↳ Scroll | `guides_canonical_marks_scroll` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_canonical_marks_header` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_canonical_marks_content_with_rail` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_canonical_marks_body_column` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_what` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_expand` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_mix` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_case` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_return` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_traps` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_when` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_divergence` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_agreement` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_config` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_canonical_marks_next` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Collection | `guides_canonical_marks_next_collection` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_canonical_marks_footer` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_canonical_marks_rail_column` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_canonical_marks_toc_wrap` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ TableOfContents | `-` | - | - | - | - |
+
+### Layout Structure
+
+```
+guides_canonical_marks_root
+└── guides_canonical_marks_scroll
+```
+
+## State Management
+
+### UI Data Variables
+
+| Variable Name | Type | Description | Notes |
+|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | Three closing cards: API data models (where the canon lives), verifying implementation against docs (the checker that compares canon and backend), writing your first spec (the dataFlow section marks live in). | - |
+
+### View-local Event Handlers
+
+_Handlers kept inside the View layer. ViewModel public API lives under `dataFlow.viewModel`._
+
+| Handler | Description | Notes |
+|---|---|---|
+| `onAppear` | Seed nextReadLinks. | - |
+| `onNavigate` | Client-side navigation. | - |
+| `onNavigateGuides` |  | - |
+
+## Notes
+
+- 2026-08-28 — New page for the v1.7.0 uptake. The feature has no home on an existing page: /guides/api-data-models covers where the OpenAPI documents live and DTO generation, /guides/writing-your-first-spec covers dataFlow itself, and neither is about referencing the canon from a method declaration.
+- Canonical sources: shared/core/openapi_canonical.py (module docstring, iter_marked_methods, resolve_params, resolve_return_type, miss_reason, param_case_for) and the screen_spec schema's params/returnType/endpoint descriptions.
+- Every code block on this page is measured output, not illustration: the expansion samples, the three casing rows, the wire-lift error and all five unresolved-mark messages were produced by running the shipped shared/core against a fixture OpenAPI document (a required + an optional query parameter, and a JSON requestBody with one required property).
+- 2026-08-28 (v1.7.1) — two facts added to section 2 after measuring them: path variables are expanded as arguments (the expansion does not filter on a parameter's `in`, while route matching normalizes variable names away, so a rename moves the signature without moving the resolution), and `required` on a body property is an AND with `requestBody.required` (1.7.1 warns rather than leaving it to be noticed). The section 1 sentence about `required` was published before this was known and now carries a forward reference instead of an unqualified claim.
+- The `section_what_bullet_where` sentence records a measured limit rather than a documented one: marks are walked only in dataFlow.repositories[] and dataFlow.useCases[], while the schema accepts the same method shape (endpoint, params, returnType) under dataFlow.viewModel.methods[]. A mark written there is left as the literal string and validate reports nothing. Filed upstream separately; the sentence stays until the walk or the schema changes.
+- Census figures (320 endpoint-declaring methods across four projects, 63% referenceable) are quoted from the upstream release report; this lane did not measure them and the page attributes them as a count from real projects rather than as a property of the tool.
+- This site declares no endpoints and has no docs/api, so nothing here could be converted to marks — the page is written from fixtures, which is also why the fixtures are described in the prose.
+- Upstream confirmed the viewModel-mark filing and chose to make it an error rather than to walk that section (specification-rules.md rule 14 already says a ViewModel does not call an API directly). When that ships, the `section_what_bullet_where` sentence changes from 'not expanded and validate does not object' to whatever the error says.
+- 2026-08-28 (v1.7.2/1.7.4/1.7.5) — three updates, each measured before publishing: the ViewModel-mark sentence now quotes the error that 1.7.2 introduced (this page previously described the silence, which was correct for 1.7.0-1.7.1 and is not now); section 8 documents canonicalDivergence including the negative side (an undeclared divergence still passes, which is what makes the declaration a per-method switch); section 9 documents the cross-spec agreement check, which is visible only when validate is pointed at a directory — measured both ways on a two-file fixture.
+- This site is unaffected by all three: no endpoint declarations, no docs/api, and `jsonui-doc validate spec` is not part of the deploy workflow at all (checked the workflow file), so the changed `Result:` line cannot break a CI parse here.
+- 2026-08-28 (v1.7.8) — section 8 gained the other three canonicalDivergence clauses (omitted / wrapped / added) and section 10 covers `extends`. Measured: each clause passes when it matches, a clause naming something the canon does not declare errors, and a declaration covering only part of the difference errors with the subtract-not-exempt wording. For `extends`, a split-tree fixture answers camelCase from every entry point tried with the stub present and returns an unset convention without it, while the canon still resolves from the repository-root config — the two answers coming from different files being the failure it closes.
+- 2026-08-28 — section 8 gained the evidence asymmetry between the clauses, reported upstream after two teams made the same mistake independently. Measured here rather than transcribed: claiming `omitted` for a parameter the method still takes fails the residual check, while claiming a wrapper carries a field it does not carry passes, because both names exist in the canon and nothing inspects the wrapper. That contrast is why the page says a wrong `wrapped` files a real gap as a deliberate difference.
+- 2026-08-28 (v1.7.13 + v1.7.14) — the wrapped location check was narrowed to path variables only (a list endpoint's filters live in the query and a screen holding them as one object is the same shape as a body wrapper), and the casing defect this lane filed was fixed, so the check now fires for projects that configure a convention. Both re-measured before the page was changed: camelCase plus a wrapped path variable errors, camelCase plus a wrapped query parameter passes. The catch rate moved from one of four reported mistakes to two.
+- The bullet that used to record the limit now records why the first version of that check passed its own audit: it was validated against a corpus where every project set a naming convention, which is exactly the condition under which the check did not run. An over-broad rule and the defect that stopped it from running cancelled out and produced green. Kept because it is the clearest instance on this site of a green that two explanations predict.
+- 2026-08-31 — section_case_body gains the 1.7.18 ruling on the value of canonical_param_case: anything outside asIs/camelCase/snake_case is now an error naming the config file and listing the three. Measured on a fixture config: 'camelcase' raises [ERROR] jui.config.json: … is 'camelcase', which no tool reads — the run proceeds as 'asIs' … Valid values: asIs, camelCase, snake_case; restoring 'camelCase' returns zero errors with everything else unchanged. Worth stating because the failure it replaces was silent and green.

@@ -1,0 +1,115 @@
+# GeneratedCode - Generated code
+
+## Overview
+
+Reference > Generated code. What `jui build` writes, the size bounds every generated view function is held to, and the full set of knobs. Covers the artifact table (who writes what, what is hand-editable, what carries the @generated sentinel), the depth-5 hard / 250-line soft bounds and how they are measured, why iOS erases every section boundary to AnyView (opaque `some View` is transparent to type-metadata instantiation; the runtime decodes it on a 1 MB device stack), why Android has no counterpart (the dex 65,535 code-unit cap is a hard compile error, so oversized Compose functions are not warned about), `jui lint-generated` with its two signals and exit codes (0/1/2/3), the `.jui-size-waivers` ratchet, the three places knobs live (jui.config.json build.normalizeLayouts + lint.exclude_*, CLI flags --max-depth/--max-lines/--fail-on, KJUI_SECTION_WAIVER_WARNINGS) plus what is deliberately not configurable, and a table of the build diagnostics with their severity. Eight H2 sections + TOC + next-reads. ~7-min read.
+
+| | |
+|---|---|
+| Created | 2026-07-28 |
+| Updated | 2026-07-28 |
+
+## Screen Structure
+
+### UI Components
+
+| Component | ID | Platform | Description | Initial State | Notes |
+|---|---|---|---|---|---|
+| View | `reference_generated_code_root` | - | - | - | - |
+| &nbsp;&nbsp;↳ Scroll | `reference_generated_code_scroll` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_generated_code_header` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_generated_code_content_with_rail` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_generated_code_body_column` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_artifacts` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_bounds` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_erasure` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_android` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_lint` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_ratchet` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_knobs` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_warnings` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_generated_code_next` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Collection | `reference_generated_code_next_collection` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_generated_code_footer` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_generated_code_rail_column` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_generated_code_toc_wrap` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ TableOfContents | `-` | - | - | - | - |
+
+### Layout Structure
+
+```
+reference_generated_code_root
+└── reference_generated_code_scroll
+```
+
+## State Management
+
+### UI Data Variables
+
+| Variable Name | Type | Description | Notes |
+|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | Three closing cards: CLI reference, SwiftJsonUI, KotlinJsonUI. | - |
+
+### View-local Event Handlers
+
+_Handlers kept inside the View layer. ViewModel public API lives under `dataFlow.viewModel`._
+
+| Handler | Description | Notes |
+|---|---|---|
+| `onAppear` | Seed nextReadLinks. | - |
+| `onNavigate` | Client-side navigation. | - |
+| `onNavigateReference` |  | - |
+
+## Notes
+
+- 2026-07-28 — New page. Created after the generated-function depth-bounding batch (sjui SectionBounder + kjui SectionExtractor) and the Android size-warning policy change, which between them moved the per-platform prose past what a 'Production caveats' bullet can carry.
+- Section 1 — section_artifacts: who writes each artifact, which are hand-editable, which carry the @generated sentinel. Generated view files are the exception (hand-edit markers inside instead), which is why the linter walks them separately.
+- Section 2 — section_bounds: depth 5 HARD measured on braces with literals/comments stripped (indentation over-reads); 250 lines SOFT; a function with no safe cut becomes a declared waiver, never a silent pass. Cutting is scope-aware.
+- Section 3 — section_erasure: opaque `some View` does not truncate type-metadata recursion, so `some View` helpers do not prevent the overflow; only value-level erasure does. Placement is structural so an edit near a threshold cannot flip AnyView on a sibling and change its transition identity.
+- Section 4 — section_android: bounds are iOS-calibrated, Compose has no counterpart, dex 65,535 code units is a hard compile error (measured worst case 12.6 %), so no build warning; KJUI_SECTION_WAIVER_WARNINGS=1 restores them for extractor debugging.
+- Section 5 — section_lint: not part of jui build; two signals, exit codes 0 clean / 1 could not run / 2 size-ratchet regression / 3 artifact health; --fail-on narrows the gating signal.
+- Section 6 — section_ratchet: --update-size-baseline writes .jui-size-waivers; entries may leave freely, a new entry is the regression signal; identity is path + function name so depth/line wobble does not trip it; opt-in.
+- Section 7 — section_knobs: jui.config.json (build.normalizeLayouts, lint.exclude_dir_names, lint.exclude_files, and since 2026-07-28 lint.max_depth / lint.max_lines) / CLI flags (--max-depth, --max-lines, --fail-on) / env (KJUI_SECTION_WAIVER_WARNINGS, JSONUI_CLI_DIR family), and the explicit statement that the generators' own bounds are constants, not settings. Resolution order is flag > jui.config.json lint > the built-in 5 and 250; the size flags default to None rather than the number, so an explicitly typed built-in still beats a stricter config.
+- Section 8 — section_warnings: diagnostics table with severity — canonical binding rules are errors, business logic / unknown attribute / off-palette colour / unused data property are warnings, oversized function is a warning on iOS only, missing marker is a lint finding.
+- Canonical sources: sjui_tools/lib/swiftui/section_bounder.rb (bounds + AnyView rationale), jui_tools/jui_cli/commands/lint_generated_cmd.py (exit codes, ratchet, lint config keys), kjui_tools/lib/compose/compose_builder.rb (the env-var switch), rjui_tools/lib/core/{binding,attribute}_validator.rb and react/tailwind_mapper.rb (warning families).
+- 2026-07-28 — lint.max_depth / lint.max_lines landed upstream (report: lint-size-bounds-config) from this site's own filing; before it the bounds were argparse defaults with no config path at all. Verified against lint_generated_cmd.py _resolve_size_bounds: int only (bool excluded), a non-int value falls back to the built-in silently, and a value looser than the built-in is refused with a warning naming .jui-size-waivers. The clamp guards the config path only — a looser number passed as a flag is still honoured, so section 7 attributes the refusal to the config key, not to the flag.

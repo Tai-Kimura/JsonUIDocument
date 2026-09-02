@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResponsiveDesign - Responsive design</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --code-bg: #f1f5f9;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 { color: var(--text-color); margin-bottom: 1.5rem; font-size: 2rem; }
+        h2 { color: var(--text-color); margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); }
+        h3 { color: var(--text-color); margin: 1.5rem 0 0.75rem; }
+        h4 { color: #64748b; margin: 1rem 0 0.5rem; }
+        section { margin-bottom: 2rem; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:hover { background: #f8fafc; }
+        code { background: var(--code-bg); padding: 0.2em 0.4em; border-radius: 4px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9em; }
+        pre { background: var(--code-bg); padding: 1rem; border-radius: 8px; overflow-x: auto; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9em; line-height: 1.5; }
+        .meta-table { width: auto; }
+        .meta-table th { background: transparent; border: none; padding: 0.25rem 1rem 0.25rem 0; }
+        .meta-table td { border: none; padding: 0.25rem 0; }
+        .component-type { background: var(--bg-color); color: var(--text-color); padding: 0.2em 0.5em; border-radius: 4px; font-size: 0.85em; border: 1px solid var(--border-color); }
+        .platform-badge { display: inline-block; padding: 0.15em 0.5em; margin-right: 0.25em; border-radius: 3px; font-size: 0.75em; font-weight: 600; }
+        .platform-ios { background: #dbeafe; color: #1e40af; }
+        .platform-android { background: #dcfce7; color: #166534; }
+        .platform-web { background: #fef3c7; color: #92400e; }
+        .platform-override { opacity: 0.75; font-style: italic; }
+        /* ViewModel / event-handler collapsible sections */
+        details.vm-section { margin: 1rem 0; }
+        details.vm-section > summary {
+            cursor: pointer;
+            font-size: 1.15em;
+            font-weight: 600;
+            padding: 0.4rem 0.5rem;
+            border-left: 3px solid var(--border-color);
+            background: var(--code-bg);
+            border-radius: 0 4px 4px 0;
+            user-select: none;
+            margin-bottom: 0.5rem;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4em;
+        }
+        details.vm-section > summary::-webkit-details-marker { display: none; }
+        details.vm-section > summary::before {
+            content: "\25B6";
+            font-size: 0.75em;
+            transition: transform 0.15s ease;
+            display: inline-block;
+            color: var(--text-color);
+            opacity: 0.5;
+        }
+        details.vm-section[open] > summary::before {
+            transform: rotate(90deg);
+        }
+        details.vm-section > summary:hover { border-left-color: #3b82f6; }
+        .count-badge {
+            display: inline-block;
+            padding: 0.1em 0.55em;
+            border-radius: 10px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.78em;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            margin-left: auto;
+        }
+        .flag-chip {
+            display: inline-block;
+            padding: 0.1em 0.45em;
+            margin-right: 0.25em;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-weight: 500;
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        .flag-observable { background: #ede9fe; color: #5b21b6; border-color: #ddd6fe; }
+        .flag-optional   { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .flag-readonly   { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+        .section-intro   { color: #64748b; font-size: 0.9em; margin: 0.25rem 0 0.5rem; }
+        .layout-tree { background: #1e293b; color: #e2e8f0; padding: 1.5rem; }
+        .display-logic { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        .notes { color: #64748b; font-style: italic; margin-top: 0.5rem; }
+        .http-method { padding: 0.2em 0.5em; border-radius: 4px; font-weight: 600; font-size: 0.85em; }
+        .method-get { background: #22c55e; color: white; }
+        .method-post { background: #3b82f6; color: white; }
+        .method-put { background: #f59e0b; color: white; }
+        .method-patch { background: #8b5cf6; color: white; }
+        .method-delete { background: #ef4444; color: white; }
+        .json { background: #1e293b; color: #e2e8f0; }
+        .mermaid { background: white; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin: 1rem 0; }
+        ul { margin: 0.5rem 0; padding-left: 1.5rem; }
+        li { margin: 0.25rem 0; }
+        .custom-component-name { background: #fef3c7; color: #92400e; padding: 0.2em 0.5em; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
+        .component-link { color: var(--primary-color); text-decoration: none; }
+        .component-link:hover { text-decoration: underline; }
+        .swatch { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .swatch > i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.15); background-clip: padding-box; flex-shrink: 0; }
+        .swatch > code { background: var(--code-bg); padding: 0.1em 0.35em; font-size: 0.85em; }
+        .swatch-hex { color: #64748b; font-family: 'SF Mono', Monaco, monospace; font-size: 0.8em; }
+        .style-rows { display: flex; flex-direction: column; gap: 0.2rem; }
+        .style-row { display: flex; gap: 0.5rem; align-items: flex-start; line-height: 1.5; flex-wrap: wrap; }
+        .style-key { color: #64748b; font-weight: 600; font-size: 0.7rem; min-width: 56px; text-transform: uppercase; letter-spacing: 0.04em; padding-top: 0.15rem; flex-shrink: 0; }
+        .style-lbl { color: #94a3b8; font-size: 0.75rem; margin-right: 2px; }
+        .bind-cell { display: flex; flex-direction: column; gap: 3px; font-size: 0.8rem; line-height: 1.6; }
+        .bind-badge { display: inline-block; padding: 0 0.4em; border-radius: 3px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; vertical-align: baseline; }
+        .bind-event { background: #fef3c7; color: #92400e; }
+        .bind-data { background: #dbeafe; color: #1e40af; }
+        .tree-table-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1.5rem 0 0.5rem; }
+        .tree-table-header h3 { margin: 0; }
+        .tree-controls button { font: inherit; font-size: 0.8rem; padding: 0.25em 0.75em; margin-left: 0.4rem; border: 1px solid var(--border-color); background: white; color: var(--text-color); border-radius: 4px; cursor: pointer; }
+        .tree-controls button:hover { background: var(--bg-color); border-color: #94a3b8; }
+        .tree-col { white-space: nowrap; }
+        .tree-indent { display: inline-block; vertical-align: middle; }
+        .tree-toggle { display: inline-block; width: 16px; text-align: center; cursor: pointer; color: #64748b; font-size: 0.7em; transition: transform 0.15s ease; user-select: none; margin-right: 4px; }
+        .tree-toggle:hover { color: var(--primary-color); }
+        .tree-toggle.expanded { transform: rotate(90deg); }
+        .tree-spacer { display: inline-block; width: 16px; margin-right: 4px; }
+        tr.tree-group > td { background: #f8fafc; font-weight: 600; }
+        tr.tree-group .tree-group-name { color: var(--text-color); }
+        tr.tree-group .tree-group-count { display: inline-block; margin-left: 0.4rem; padding: 0.05em 0.5em; background: var(--border-color); color: #475569; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
+        
+    </style>
+</head>
+<body>
+
+<div class="container">
+<h1>ResponsiveDesign - Responsive design</h1>
+<section id="overview">
+<h2>Overview</h2>
+<p>Essay: how the `responsive` block flips attribute values per size class so the same Layout JSON adapts to phones, tablets, split-screen, and landscape. Six H2 sections covering taxonomy, the resolution rules, generated-mode wrapper functions, dynamic-mode tree resolution, and when to choose `responsive` vs `platforms` vs separate variants. ~6-min read.</p>
+<table class="meta-table">
+<tr><th>Created</th><td>2026-05-08</td></tr>
+<tr><th>Updated</th><td>2026-05-08</td></tr>
+</table>
+</section>
+<section id="structure">
+<h2>Screen Structure</h2>
+<div class="tree-wrapper" data-initial-depth="2">
+<div class="tree-table-header">
+<h3>UI Components</h3>
+<div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
+</div>
+<table class="tree-table">
+<thead><tr><th>Component</th><th>ID</th><th>Platform</th><th>Description</th><th>Bindings</th><th>Notes</th></tr></thead>
+<tbody>
+<tr data-row-id="1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:0px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>concepts_responsive_design_root</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=matchParent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1" data-parent-id="1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">Scroll</span></td>
+<td><code>concepts_responsive_design_scroll</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent weight=1</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1" data-parent-id="1-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>concepts_responsive_design_header</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-1" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=wrapContent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#64748B"></i><code>#64748B</code></span></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-event">event</span> <code>onClick</code> → <code>onNavigateConcepts</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-2" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>36</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-3" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>17</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-4" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#64748B"></i><code>#64748B</code></span></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2" data-parent-id="1-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>concepts_responsive_design_content_with_rail</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=horizontal</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1" data-parent-id="1-1-2" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>concepts_responsive_design_body_column</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>H=wrapContent weight=1</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-1" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_problem</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-1-1" data-parent-id="1-1-2-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-1-2" data-parent-id="1-1-2-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_taxonomy</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-1" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-2" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-3" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-4" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-5" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-6" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-7" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_block</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-1" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-2" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-3" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_priority</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-1" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-2" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-3" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_generated</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-1" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-2" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-3" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-4" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-5" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_dynamic</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6-1" data-parent-id="1-1-2-1-6">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6-2" data-parent-id="1-1-2-1-6">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_variants</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-1" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-2" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-3" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-4" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_when</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-1" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-2" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-3" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>15</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-4" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>15</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-5" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>15</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-6" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>15</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-7" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>15</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-8" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>15</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>concepts_responsive_design_next</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9-1" data-parent-id="1-1-2-1-9">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>chrome_ink</code></div><div class="style-row"><span class="style-key">Font</span>24</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9-2" data-parent-id="1-1-2-1-9">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
+<td><code>concepts_responsive_design_next_collection</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=20</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>nextReadLinks</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-10" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>concepts_responsive_design_footer</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-10-1" data-parent-id="1-1-2-1-10">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#94A3B8"></i><code>#94A3B8</code></span></div><div class="style-row"><span class="style-key">Font</span>12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-2" data-parent-id="1-1-2" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>concepts_responsive_design_rail_column</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=260 H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-2-1" data-parent-id="1-1-2-2" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>concepts_responsive_design_toc_wrap</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-2-1-1" data-parent-id="1-1-2-2-1">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">TableOfContents</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody></table>
+</div>
+<h3>Layout Structure</h3>
+<pre class="layout-tree">
+concepts_responsive_design_root
+└── concepts_responsive_design_scroll
+</pre>
+</section>
+<section id="dataflow">
+<h2>Data Flow</h2>
+<pre class="mermaid">
+flowchart TD
+    VIEW[ResponsiveDesignView] --> VM[ResponsiveDesignViewModel]
+    VM -- nextReadLinks --> VIEW
+</pre>
+<h3>ViewModel</h3>
+<details class="vm-section" open><summary class="vm-section-header">Methods <span class="count-badge">2</span></summary>
+<table>
+<thead><tr><th>Signature</th><th>Platforms</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>onAppear()</code></td><td><em title="Imported into all platforms">all</em></td><td>Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_one_layout_json -&gt; /concepts/one-layout-json, next_hot_reload -&gt; /concepts/hot-reload). Each row&#x27;s titleKey / descriptionKey is resolved through StringManager with the concepts_responsive_design_ namespace prefix.</td></tr>
+<tr><td><code>onNavigate(url: String)</code></td><td><em title="Imported into all platforms">all</em></td><td>Client-side navigation via router.push(url). Destinations are the spec-mapped concept URLs enumerated in transitions: /concepts, /concepts/one-layout-json, /concepts/hot-reload.</td></tr>
+</tbody></table>
+</details>
+<details class="vm-section" open><summary class="vm-section-header">Vars <span class="count-badge">1</span></summary>
+<table>
+<thead><tr><th>Declaration</th><th>Flags</th><th>Platforms</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>var nextReadLinks: Array(NextReadLink)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Two closing &#x27;read next&#x27; cards pointing at /concepts/one-layout-json and /concepts/hot-reload. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog.</td></tr>
+</tbody></table>
+</details>
+</section>
+<section id="state">
+<h2>State Management</h2>
+<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">1</span></summary>
+<table>
+<thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td>Two follow-up cards.</td><td>-</td></tr>
+</tbody></table>
+</details>
+<details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">3</span></summary>
+<p class="section-intro">Handlers kept inside the View layer. ViewModel public API lives under <code>dataFlow.viewModel</code>.</p>
+<table>
+<thead><tr><th>Handler</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>onAppear</code></td><td>Seed nextReadLinks.</td><td>-</td></tr>
+<tr><td><code>onNavigate</code></td><td>Client-side navigation.</td><td>-</td></tr>
+<tr><td><code>onNavigateConcepts</code></td><td></td><td>-</td></tr>
+</tbody></table>
+</details>
+</section>
+<section id="actions">
+<h2>User Actions</h2>
+<table>
+<thead><tr><th>Action</th><th>Processing</th><th>Destination</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Tap a TOC entry</td><td>TOC-internal scroll.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap a NextReadLink card</td><td>onNavigate(url).</td><td>-</td><td>-</td></tr>
+</tbody></table>
+</section>
+<section id="validation">
+<h2>Validation</h2>
+</section>
+<section id="transitions">
+<h2>Transitions</h2>
+<table>
+<thead><tr><th>Condition</th><th>Destination</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>url is a spec-mapped concept URL or /concepts</td><td>Target spec screen or tab</td><td>-</td></tr>
+</tbody></table>
+</section>
+<section id="files">
+<div class="tree-wrapper" data-initial-depth="0">
+<div class="tree-table-header">
+<h2>Related Files</h2>
+<div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
+</div>
+<table class="tree-table">
+<thead><tr><th>Type</th><th>File Path</th><th>Notes</th></tr></thead>
+<tbody>
+<tr class="tree-group" data-row-id="1" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">Layout</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="1-1" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/concepts/responsive-design.json</code></td><td>Essay layout.</td></tr>
+<tr class="tree-group" data-row-id="2" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">ViewModel</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="2-1" data-parent-id="2"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>ViewModel</code></td><td><code>jsonui-doc-web/src/viewmodels/concepts/ResponsiveDesignViewModel.ts</code></td><td>Same shape as HotReloadViewModel — seeds nextReadLinks.</td></tr>
+<tr class="tree-group" data-row-id="3" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">View</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="3-1" data-parent-id="3"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>View</code></td><td><code>jsonui-doc-web/src/app/concepts/responsive-design/page.tsx</code></td><td>Next.js route.</td></tr>
+</tbody></table>
+</div>
+</section>
+<section id="notes">
+<h2>Notes</h2>
+<ul>
+<li>Sixth concepts essay. Adds responsive-design between hot-reload and the natural follow-ups (one-layout-json revisits the multi-platform story; hot-reload shows how size-class changes get picked up at runtime).</li>
+<li>Focus on the *mechanism* of size-class resolution, not on Tailwind-specific UI tricks. The reader should leave understanding when to use `responsive`, when `platforms` is enough, and when neither fits and a layout-file split is the right answer.</li>
+<li>Pairs with /reference/attributes/responsive — the reference page documents the attribute shape, this concept page documents the runtime behavior.</li>
+</ul>
+</section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+
+
+<script>
+(function() {
+  function initWrapper(wrapper) {
+    const table = wrapper.querySelector('table.tree-table');
+    if (!table) return;
+    const expanded = new Set();
+    const initialDepth = parseInt(wrapper.dataset.initialDepth || '2', 10);
+    function rowById(id) { return table.querySelector('tr[data-row-id="' + id + '"]'); }
+    function visible(tr) {
+      let pid = tr.dataset.parentId;
+      while (pid) {
+        if (!expanded.has(pid)) return false;
+        const p = rowById(pid);
+        pid = p ? p.dataset.parentId : null;
+      }
+      return true;
+    }
+    function apply() {
+      table.querySelectorAll('tr[data-parent-id]').forEach(tr => {
+        tr.style.display = visible(tr) ? '' : 'none';
+      });
+    }
+    function updateChevrons() {
+      table.querySelectorAll('tr[data-has-children] .tree-toggle').forEach(t => {
+        const id = t.closest('tr').dataset.rowId;
+        t.classList.toggle('expanded', expanded.has(id));
+      });
+    }
+    function expandAll() {
+      table.querySelectorAll('tr[data-has-children]').forEach(tr => expanded.add(tr.dataset.rowId));
+      apply(); updateChevrons();
+    }
+    function collapseAll() { expanded.clear(); apply(); updateChevrons(); }
+    // Initial: expand rows whose depth is < initialDepth (row-id dashes < initialDepth)
+    table.querySelectorAll('tr[data-has-children]').forEach(tr => {
+      const depth = (tr.dataset.rowId.match(/-/g) || []).length;
+      if (depth < initialDepth) expanded.add(tr.dataset.rowId);
+    });
+    table.querySelectorAll('tr[data-has-children] .tree-toggle').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = btn.closest('tr').dataset.rowId;
+        if (expanded.has(id)) expanded.delete(id); else expanded.add(id);
+        apply(); updateChevrons();
+      });
+    });
+    wrapper.querySelectorAll('.tree-expand-all').forEach(b => b.addEventListener('click', expandAll));
+    wrapper.querySelectorAll('.tree-collapse-all').forEach(b => b.addEventListener('click', collapseAll));
+    apply(); updateChevrons();
+  }
+  function init() {
+    document.querySelectorAll('.tree-wrapper').forEach(initWrapper);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>

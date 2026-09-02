@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BranchContracts - Branch contracts</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --code-bg: #f1f5f9;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 { color: var(--text-color); margin-bottom: 1.5rem; font-size: 2rem; }
+        h2 { color: var(--text-color); margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); }
+        h3 { color: var(--text-color); margin: 1.5rem 0 0.75rem; }
+        h4 { color: #64748b; margin: 1rem 0 0.5rem; }
+        section { margin-bottom: 2rem; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:hover { background: #f8fafc; }
+        code { background: var(--code-bg); padding: 0.2em 0.4em; border-radius: 4px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9em; }
+        pre { background: var(--code-bg); padding: 1rem; border-radius: 8px; overflow-x: auto; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9em; line-height: 1.5; }
+        .meta-table { width: auto; }
+        .meta-table th { background: transparent; border: none; padding: 0.25rem 1rem 0.25rem 0; }
+        .meta-table td { border: none; padding: 0.25rem 0; }
+        .component-type { background: var(--bg-color); color: var(--text-color); padding: 0.2em 0.5em; border-radius: 4px; font-size: 0.85em; border: 1px solid var(--border-color); }
+        .platform-badge { display: inline-block; padding: 0.15em 0.5em; margin-right: 0.25em; border-radius: 3px; font-size: 0.75em; font-weight: 600; }
+        .platform-ios { background: #dbeafe; color: #1e40af; }
+        .platform-android { background: #dcfce7; color: #166534; }
+        .platform-web { background: #fef3c7; color: #92400e; }
+        .platform-override { opacity: 0.75; font-style: italic; }
+        /* ViewModel / event-handler collapsible sections */
+        details.vm-section { margin: 1rem 0; }
+        details.vm-section > summary {
+            cursor: pointer;
+            font-size: 1.15em;
+            font-weight: 600;
+            padding: 0.4rem 0.5rem;
+            border-left: 3px solid var(--border-color);
+            background: var(--code-bg);
+            border-radius: 0 4px 4px 0;
+            user-select: none;
+            margin-bottom: 0.5rem;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4em;
+        }
+        details.vm-section > summary::-webkit-details-marker { display: none; }
+        details.vm-section > summary::before {
+            content: "\25B6";
+            font-size: 0.75em;
+            transition: transform 0.15s ease;
+            display: inline-block;
+            color: var(--text-color);
+            opacity: 0.5;
+        }
+        details.vm-section[open] > summary::before {
+            transform: rotate(90deg);
+        }
+        details.vm-section > summary:hover { border-left-color: #3b82f6; }
+        .count-badge {
+            display: inline-block;
+            padding: 0.1em 0.55em;
+            border-radius: 10px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.78em;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            margin-left: auto;
+        }
+        .flag-chip {
+            display: inline-block;
+            padding: 0.1em 0.45em;
+            margin-right: 0.25em;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-weight: 500;
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        .flag-observable { background: #ede9fe; color: #5b21b6; border-color: #ddd6fe; }
+        .flag-optional   { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .flag-readonly   { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+        .section-intro   { color: #64748b; font-size: 0.9em; margin: 0.25rem 0 0.5rem; }
+        .layout-tree { background: #1e293b; color: #e2e8f0; padding: 1.5rem; }
+        .display-logic { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        .notes { color: #64748b; font-style: italic; margin-top: 0.5rem; }
+        .http-method { padding: 0.2em 0.5em; border-radius: 4px; font-weight: 600; font-size: 0.85em; }
+        .method-get { background: #22c55e; color: white; }
+        .method-post { background: #3b82f6; color: white; }
+        .method-put { background: #f59e0b; color: white; }
+        .method-patch { background: #8b5cf6; color: white; }
+        .method-delete { background: #ef4444; color: white; }
+        .json { background: #1e293b; color: #e2e8f0; }
+        .mermaid { background: white; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin: 1rem 0; }
+        ul { margin: 0.5rem 0; padding-left: 1.5rem; }
+        li { margin: 0.25rem 0; }
+        .custom-component-name { background: #fef3c7; color: #92400e; padding: 0.2em 0.5em; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
+        .component-link { color: var(--primary-color); text-decoration: none; }
+        .component-link:hover { text-decoration: underline; }
+        .swatch { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .swatch > i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.15); background-clip: padding-box; flex-shrink: 0; }
+        .swatch > code { background: var(--code-bg); padding: 0.1em 0.35em; font-size: 0.85em; }
+        .swatch-hex { color: #64748b; font-family: 'SF Mono', Monaco, monospace; font-size: 0.8em; }
+        .style-rows { display: flex; flex-direction: column; gap: 0.2rem; }
+        .style-row { display: flex; gap: 0.5rem; align-items: flex-start; line-height: 1.5; flex-wrap: wrap; }
+        .style-key { color: #64748b; font-weight: 600; font-size: 0.7rem; min-width: 56px; text-transform: uppercase; letter-spacing: 0.04em; padding-top: 0.15rem; flex-shrink: 0; }
+        .style-lbl { color: #94a3b8; font-size: 0.75rem; margin-right: 2px; }
+        .bind-cell { display: flex; flex-direction: column; gap: 3px; font-size: 0.8rem; line-height: 1.6; }
+        .bind-badge { display: inline-block; padding: 0 0.4em; border-radius: 3px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; vertical-align: baseline; }
+        .bind-event { background: #fef3c7; color: #92400e; }
+        .bind-data { background: #dbeafe; color: #1e40af; }
+        .tree-table-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1.5rem 0 0.5rem; }
+        .tree-table-header h3 { margin: 0; }
+        .tree-controls button { font: inherit; font-size: 0.8rem; padding: 0.25em 0.75em; margin-left: 0.4rem; border: 1px solid var(--border-color); background: white; color: var(--text-color); border-radius: 4px; cursor: pointer; }
+        .tree-controls button:hover { background: var(--bg-color); border-color: #94a3b8; }
+        .tree-col { white-space: nowrap; }
+        .tree-indent { display: inline-block; vertical-align: middle; }
+        .tree-toggle { display: inline-block; width: 16px; text-align: center; cursor: pointer; color: #64748b; font-size: 0.7em; transition: transform 0.15s ease; user-select: none; margin-right: 4px; }
+        .tree-toggle:hover { color: var(--primary-color); }
+        .tree-toggle.expanded { transform: rotate(90deg); }
+        .tree-spacer { display: inline-block; width: 16px; margin-right: 4px; }
+        tr.tree-group > td { background: #f8fafc; font-weight: 600; }
+        tr.tree-group .tree-group-name { color: var(--text-color); }
+        tr.tree-group .tree-group-count { display: inline-block; margin-left: 0.4rem; padding: 0.05em 0.5em; background: var(--border-color); color: #475569; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
+        
+    </style>
+</head>
+<body>
+
+<div class="container">
+<h1>BranchContracts - Branch contracts</h1>
+<section id="overview">
+<h2>Overview</h2>
+<p>Guides &gt; Branch contracts. How the opt-in `branchContracts` section of a screen spec declares machine-checkable branch tables for VM/UseCase methods (jsonui-cli 1.6.18). Nine sections: what the section is, a complete worked example, named conditions with witnesses, the when vocabulary, the then vocabulary, platform-scoped branches (`platforms`, jsonui-cli 1.6.22), what validate enforces (error/warning/skip), what the generated HTML shows (decision tables), and a summary + link to the dedicated Branch tests guide for test generation (user-directed split, 2026-08-24). ~8-min read.</p>
+<table class="meta-table">
+<tr><th>Created</th><td>2026-08-24</td></tr>
+<tr><th>Updated</th><td>2026-08-24</td></tr>
+</table>
+</section>
+<section id="structure">
+<h2>Screen Structure</h2>
+<div class="tree-wrapper" data-initial-depth="2">
+<div class="tree-table-header">
+<h3>UI Components</h3>
+<div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
+</div>
+<table class="tree-table">
+<thead><tr><th>Component</th><th>ID</th><th>Platform</th><th>Description</th><th>Bindings</th><th>Notes</th></tr></thead>
+<tbody>
+<tr data-row-id="1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:0px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_branch_contracts_root</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=matchParent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1" data-parent-id="1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">Scroll</span></td>
+<td><code>guides_branch_contracts_scroll</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent weight=1</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1" data-parent-id="1-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_branch_contracts_header</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-1" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=wrapContent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#64748B"></i><code>#64748B</code></span></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-event">event</span> <code>onClick</code> → <code>onNavigateGuides</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-2" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>36</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-3" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>17</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-4" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#64748B"></i><code>#64748B</code></span></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2" data-parent-id="1-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_branch_contracts_content_with_rail</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=horizontal</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1" data-parent-id="1-1-2" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_branch_contracts_body_column</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>H=wrapContent weight=1</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-1" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_what</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-1-1" data-parent-id="1-1-2-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-1-2" data-parent-id="1-1-2-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_example</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-1" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-2" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-3" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_conditions</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-1" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-2" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-3" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-4" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_when</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-1" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-2" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-3" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_then</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-1" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-2" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-3" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-4" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-5" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-6" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_scoped</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6-1" data-parent-id="1-1-2-1-6">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6-2" data-parent-id="1-1-2-1-6">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6-3" data-parent-id="1-1-2-1-6">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_validate</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-1" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-2" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-3" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-4" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-5" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-6" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-7" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-8" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-9" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_render</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-1" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-2" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-3" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_generate</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9-1" data-parent-id="1-1-2-1-9">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9-2" data-parent-id="1-1-2-1-9">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9-3" data-parent-id="1-1-2-1-9">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>accent</code></div><div class="style-row"><span class="style-key">Font</span>15</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-event">event</span> <code>onClick</code> → <code>onNavigateBranchTests</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-10" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_branch_contracts_next</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-10-1" data-parent-id="1-1-2-1-10">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>chrome_ink</code></div><div class="style-row"><span class="style-key">Font</span>24</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-10-2" data-parent-id="1-1-2-1-10">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
+<td><code>guides_branch_contracts_next_collection</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=20</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>nextReadLinks</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-11" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_branch_contracts_footer</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-11-1" data-parent-id="1-1-2-1-11">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#94A3B8"></i><code>#94A3B8</code></span></div><div class="style-row"><span class="style-key">Font</span>12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-2" data-parent-id="1-1-2" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_branch_contracts_rail_column</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=260 H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-2-1" data-parent-id="1-1-2-2" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_branch_contracts_toc_wrap</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-2-1-1" data-parent-id="1-1-2-2-1">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">TableOfContents</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody></table>
+</div>
+<h3>Layout Structure</h3>
+<pre class="layout-tree">
+guides_branch_contracts_root
+└── guides_branch_contracts_scroll
+</pre>
+</section>
+<section id="state">
+<h2>State Management</h2>
+<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">1</span></summary>
+<table>
+<thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td>Three closing cards: writing your first spec, verifying implementation against docs, writing screen tests.</td><td>-</td></tr>
+</tbody></table>
+</details>
+<details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">4</span></summary>
+<p class="section-intro">Handlers kept inside the View layer. ViewModel public API lives under <code>dataFlow.viewModel</code>.</p>
+<table>
+<thead><tr><th>Handler</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>onAppear</code></td><td>Seed nextReadLinks.</td><td>-</td></tr>
+<tr><td><code>onNavigate</code></td><td>Client-side navigation.</td><td>-</td></tr>
+<tr><td><code>onNavigateGuides</code></td><td></td><td>-</td></tr>
+<tr><td><code>onNavigateBranchTests</code></td><td></td><td>-</td></tr>
+</tbody></table>
+</details>
+</section>
+<section id="notes">
+<h2>Notes</h2>
+<ul>
+<li>2026-08-24 — New page, requested alongside the jsonui-cli 1.6.18 uptake: branchContracts is the first machine-checked slice of a screen spec&#x27;s behavioral prose, so it gets a dedicated authoring guide.</li>
+<li>Canonical source: document_tools/jsonui_doc_cli/spec_doc/screen_spec_schema.py (branchContracts + branchCondition + branchMethodContract + branchEntry $defs; the descriptions there are the primary vocabulary definition) and spec_doc/validator.py (_validate_branch_contracts and its collectors define the error/warning/skip boundary).</li>
+<li>Every validate message and the rendered decision-table text on this page were measured against the shipped 1.6.18 tools with a neutral fixture spec (ProfileScreen), not transcribed from release notes: each error/warning class was triggered one mutation at a time, and the HTML summary line (declared/note-only counts) comes from the actual generator output.</li>
+<li>This page&#x27;s layout file is kebab-case (branch-contracts.json); own-section string resolution for kebab basenames requires jsonui-cli &gt;= 1.6.5.</li>
+<li>2026-08-24 — Section 8 added for the v1.6.19 uptake (branchContracts P2). Canonical source: test_tools/jsonui_test_cli/branch_tests.py (the module docstring is the contract description). The command output, the generated it-block, and all four hard generation errors on the page were measured with a neutral fixture project (spec + jui.config.json + tests/mocks) against the shipped 1.6.19 tools; regeneration behavior (harness kept, @generated rewritten) was also exercised. The P1-era sentence &#x27;the scenario name is not checked against any declaration today&#x27; was revised, since generation-time binding now checks it.</li>
+<li>2026-08-24 — Section 9 added for the v1.6.20 uptake (branchContracts P3, Android/JVM). Measured with the same neutral fixture: android outputs 3 files under &lt;out-dir&gt;/&lt;package-path&gt;, regeneration keeps the harness, --package absence and the shared binding errors were exercised, and --platform rejects anything but web/android (the basis for the &#x27;iOS is not supported yet&#x27; sentence). The generated @Test block on the page is verbatim generator output.</li>
+<li>2026-08-24 — Promotion caution added to the validate section (adoption feedback, no upstream change): when declaring a previously-undeclared field, `observable` must match the implementation&#x27;s actual shape (observable: true demands @Published / StateFlow / Data-object form per the viewModelVar schema description), and `platforms` limits a single-platform field (omit = all, [] = nowhere + warning). Backed by screen_spec_schema.py&#x27;s viewModelVar observable/platforms descriptions.</li>
+<li>2026-08-24 — v1.6.22 restructure per user direction: sections 8-9 (web/android generation) moved to the new /guides/branch-tests page; this page keeps declaration/validate/decision-table, gains section 6 (platform-scoped branches — validate error measured verbatim) and section 9 (generation summary + link). Data prop onNavigateBranchTests added for the link.</li>
+<li>2026-08-24 — Cross-face warnings documented for the v1.6.23 uptake: both seams, the whole-spec difference-set definition, the prose-absence-is-legal principle, and structural opt-in. All five behaviors measured with the neutral fixture (orphan token warning / elsewhere-known token silence / orphan transition warning / non-contracted-action decoy silence / no-branchContracts silence); the two warning messages on the page are verbatim validator output. Existing docsite specs re-validated: 96/96 PASSED, 0 cross-face warnings.</li>
+<li>2026-08-24 — Promotion caution extended with the visibility half (adoption feedback): a declared var becomes a generated-protocol requirement, which a private field cannot satisfy; typical fix is private(set). Backed by reading the ios generator: the emitted &lt;Screen&gt;ViewModelProtocol lists declared vars as protocol requirements (jui_cli/generators/ios_generator.py protocol emission).</li>
+<li>2026-08-24 — v1.6.24 uptake: the decision-table platforms gap (our filed seed) is closed upstream — section 8 documents the conditional Platforms column + scoped-count summary (both directions measured: column and &#x27;2 branch(es) are scoped&#x27; with platforms, byte-stable without), section 6 cross-references it, and the promote bullet records that protocol-sync now accepts private(set) forms directly (backed by the unified _ACCESS_MODIFIER vocabulary in protocol_sync/method_extractor).</li>
+<li>2026-08-24 — v1.6.26 uptake: section 3 documents the condition usage warnings (declared-but-ungated / used-polarity witness absent — validate now says first what test generation already hard-errors on, only used polarities required / identical witnesses) plus the honest limit (the predicate exists only as meaning prose, so witness self-testing was rejected, not half-promised) and the fix-the-asset principle. All three warnings measured verbatim with the neutral fixture; positive-only-use silence and no-double-finding-on-unknown-cond also measured.</li>
+<li>2026-08-24 — v1.6.27 uptake: the then-vocabulary section documents `null` as a legal data.&lt;field&gt; value (returns-to-unset, distinct from empty string) with the optimistic-update rollback contract as its canonical use.</li>
+<li>2026-08-25 — v1.6.29 uptake: the then-vocabulary section documents @response.&lt;path&gt; (server-chosen values that neither a literal nor @key can express; resolved at generation time from the named scenario&#x27;s response body, so nothing reaches the runtime and all three platforms share the path) alongside a side-by-side of the three @ forms, its exactly-one-scenario precondition, the validate warning, and the three hard errors — all measured verbatim with the fixture (resolution to a literal confirmed in the emitted test; one-scenario case measured silent). Section 1 also records that the note count is an instrument: the census of escaped branches is what produced this vocabulary.</li>
+<li>2026-08-25 — v1.6.30 uptake: the when-vocabulary section states that arg.&lt;name&gt; binds only to dataFlow.viewModel.methods[].params, with the reason (eventHandlers have no params because they are View-layer; the ViewModel&#x27;s public API is what dataFlow declares) and the 1.6.30 change from silent drop to error. Backed by the schema definition, not just the release note.</li>
+<li>2026-08-25 — The passthrough paragraph states the form&#x27;s boundary as a settled decision (not a pending one): client-produced values (an SDK&#x27;s own message, a library exception) are not determined by the scenario, so they stay notes — the only available claim would be &#x27;non-empty&#x27;, which would stay green while an unlocalized library string reaches the screen. Recorded after a scan confirmed the site carried no future-tense hedging on this or on branch-test CI integration.</li>
+<li>2026-08-25 — when-vocabulary records that data.* values are scalar literals (measured verbatim: &#x27;when data.* value must be a scalar literal (string/number/bool/null), got dict&#x27;), with wholesale state substitution belonging to a named condition&#x27;s witness. Section 1 notes the side effect that writing a contract surfaces rot in the surrounding prose.</li>
+<li>2026-08-25 — v1.6.34 uptake: the promote bullet now warns that a declaration changes the app&#x27;s own API — the generated protocol grows a requirement on every platform the screen targets, so one platform&#x27;s green gates are not evidence — and that when a declaration exists only to let a test reach a state, changing how the test reaches it (arrange through a declared field, let the harness drive the real interaction) beats publishing an internal flag.</li>
+<li>2026-08-25 — Two independent decisions made explicit: whether a screen deserves a spec (is it an independent thing to declare) and whether it deserves a contract (are there failure paths worth pinning). A display-only screen can answer yes then no; recording that reason in the spec&#x27;s notes makes it read as a decision rather than an oversight. Section 1 also notes that the prose-rot side effect crosses platforms — a correctness written down on one face makes the same mistake recognizable on the other.</li>
+<li>2026-08-25 — The cross-platform side effect now carries its operational form: a contract pins a property rather than one implementation, so after writing one, sweep for the same judgement elsewhere. Illustrated with the reported shape (one rule written out four times, wrong in two, the wrong ones diagonal across platform and project) in neutral terms — from one face it reads as a slip, across both it is a duplicated judgement.</li>
+<li>2026-08-31 — section_then_body gains the 1.7.24 empty-list outcome. Measured on one fixture spec, four arms: then {data.rows: []} PASSES on v1.7.24 and is an ERROR on v1.7.23 (&#x27;Value must be a scalar literal ... got list&#x27;); a non-empty [&quot;a&quot;] is refused on 1.7.24 with the longer message that names the accepted set and the reason element-by-element matching is out of scope; and the same [] written under api.fetch.request.ids in the same branch is still refused, with the short message that does not mention the exception. That last arm is the one worth keeping — it shows the exception is scoped to the leaf rather than to the value, and it was measured alongside a passing data.&lt;field&gt; [] in the same spec, so nothing about the run explains the difference except the leaf. The companion 1.7.24 change (mock route index union for test-side scenario references) is NOT documented here: the scenario-reference check never fired in the fixture — every arm, including a decoy scenario declared in neither half, reported &#x27;Unchecked mocks: 2&#x27; — so there was no measurement to publish.</li>
+<li>2026-09-01 — section_then_body gains branchContracts.seedableState (jsonui-cli 1.7.29). Four arms measured: a declared name with when {state.canRead: false} validates clean on 1.7.29; the same spec on 1.7.28 is rejected with &#x27;Unknown branchContracts key&#x27; plus &#x27;Unknown when key state.canRead&#x27;; removing the seedableState block makes the name an ERROR naming the section to declare it in; and, in one spec carrying both, an undeclared state.* is an error while an undeclared data.* is only a warning. That last pair is the one published with its reason, because the asymmetry looks arbitrary otherwise: a data field the spec does not list may exist on a platform this spec does not describe, whereas internal state is arranged by the generated test itself, so an undeclared name seeds nothing and the branch runs from whatever state it started in — green for a reason unrelated to the implementation.</li>
+</ul>
+</section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+
+
+<script>
+(function() {
+  function initWrapper(wrapper) {
+    const table = wrapper.querySelector('table.tree-table');
+    if (!table) return;
+    const expanded = new Set();
+    const initialDepth = parseInt(wrapper.dataset.initialDepth || '2', 10);
+    function rowById(id) { return table.querySelector('tr[data-row-id="' + id + '"]'); }
+    function visible(tr) {
+      let pid = tr.dataset.parentId;
+      while (pid) {
+        if (!expanded.has(pid)) return false;
+        const p = rowById(pid);
+        pid = p ? p.dataset.parentId : null;
+      }
+      return true;
+    }
+    function apply() {
+      table.querySelectorAll('tr[data-parent-id]').forEach(tr => {
+        tr.style.display = visible(tr) ? '' : 'none';
+      });
+    }
+    function updateChevrons() {
+      table.querySelectorAll('tr[data-has-children] .tree-toggle').forEach(t => {
+        const id = t.closest('tr').dataset.rowId;
+        t.classList.toggle('expanded', expanded.has(id));
+      });
+    }
+    function expandAll() {
+      table.querySelectorAll('tr[data-has-children]').forEach(tr => expanded.add(tr.dataset.rowId));
+      apply(); updateChevrons();
+    }
+    function collapseAll() { expanded.clear(); apply(); updateChevrons(); }
+    // Initial: expand rows whose depth is < initialDepth (row-id dashes < initialDepth)
+    table.querySelectorAll('tr[data-has-children]').forEach(tr => {
+      const depth = (tr.dataset.rowId.match(/-/g) || []).length;
+      if (depth < initialDepth) expanded.add(tr.dataset.rowId);
+    });
+    table.querySelectorAll('tr[data-has-children] .tree-toggle').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = btn.closest('tr').dataset.rowId;
+        if (expanded.has(id)) expanded.delete(id); else expanded.add(id);
+        apply(); updateChevrons();
+      });
+    });
+    wrapper.querySelectorAll('.tree-expand-all').forEach(b => b.addEventListener('click', expandAll));
+    wrapper.querySelectorAll('.tree-collapse-all').forEach(b => b.addEventListener('click', collapseAll));
+    apply(); updateChevrons();
+  }
+  function init() {
+    document.querySelectorAll('.tree-wrapper').forEach(initWrapper);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>

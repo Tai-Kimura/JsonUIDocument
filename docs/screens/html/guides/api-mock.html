@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApiMock - Mocking APIs in tests</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --code-bg: #f1f5f9;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 { color: var(--text-color); margin-bottom: 1.5rem; font-size: 2rem; }
+        h2 { color: var(--text-color); margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); }
+        h3 { color: var(--text-color); margin: 1.5rem 0 0.75rem; }
+        h4 { color: #64748b; margin: 1rem 0 0.5rem; }
+        section { margin-bottom: 2rem; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:hover { background: #f8fafc; }
+        code { background: var(--code-bg); padding: 0.2em 0.4em; border-radius: 4px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9em; }
+        pre { background: var(--code-bg); padding: 1rem; border-radius: 8px; overflow-x: auto; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9em; line-height: 1.5; }
+        .meta-table { width: auto; }
+        .meta-table th { background: transparent; border: none; padding: 0.25rem 1rem 0.25rem 0; }
+        .meta-table td { border: none; padding: 0.25rem 0; }
+        .component-type { background: var(--bg-color); color: var(--text-color); padding: 0.2em 0.5em; border-radius: 4px; font-size: 0.85em; border: 1px solid var(--border-color); }
+        .platform-badge { display: inline-block; padding: 0.15em 0.5em; margin-right: 0.25em; border-radius: 3px; font-size: 0.75em; font-weight: 600; }
+        .platform-ios { background: #dbeafe; color: #1e40af; }
+        .platform-android { background: #dcfce7; color: #166534; }
+        .platform-web { background: #fef3c7; color: #92400e; }
+        .platform-override { opacity: 0.75; font-style: italic; }
+        /* ViewModel / event-handler collapsible sections */
+        details.vm-section { margin: 1rem 0; }
+        details.vm-section > summary {
+            cursor: pointer;
+            font-size: 1.15em;
+            font-weight: 600;
+            padding: 0.4rem 0.5rem;
+            border-left: 3px solid var(--border-color);
+            background: var(--code-bg);
+            border-radius: 0 4px 4px 0;
+            user-select: none;
+            margin-bottom: 0.5rem;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4em;
+        }
+        details.vm-section > summary::-webkit-details-marker { display: none; }
+        details.vm-section > summary::before {
+            content: "\25B6";
+            font-size: 0.75em;
+            transition: transform 0.15s ease;
+            display: inline-block;
+            color: var(--text-color);
+            opacity: 0.5;
+        }
+        details.vm-section[open] > summary::before {
+            transform: rotate(90deg);
+        }
+        details.vm-section > summary:hover { border-left-color: #3b82f6; }
+        .count-badge {
+            display: inline-block;
+            padding: 0.1em 0.55em;
+            border-radius: 10px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.78em;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            margin-left: auto;
+        }
+        .flag-chip {
+            display: inline-block;
+            padding: 0.1em 0.45em;
+            margin-right: 0.25em;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-weight: 500;
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        .flag-observable { background: #ede9fe; color: #5b21b6; border-color: #ddd6fe; }
+        .flag-optional   { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .flag-readonly   { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+        .section-intro   { color: #64748b; font-size: 0.9em; margin: 0.25rem 0 0.5rem; }
+        .layout-tree { background: #1e293b; color: #e2e8f0; padding: 1.5rem; }
+        .display-logic { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        .notes { color: #64748b; font-style: italic; margin-top: 0.5rem; }
+        .http-method { padding: 0.2em 0.5em; border-radius: 4px; font-weight: 600; font-size: 0.85em; }
+        .method-get { background: #22c55e; color: white; }
+        .method-post { background: #3b82f6; color: white; }
+        .method-put { background: #f59e0b; color: white; }
+        .method-patch { background: #8b5cf6; color: white; }
+        .method-delete { background: #ef4444; color: white; }
+        .json { background: #1e293b; color: #e2e8f0; }
+        .mermaid { background: white; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin: 1rem 0; }
+        ul { margin: 0.5rem 0; padding-left: 1.5rem; }
+        li { margin: 0.25rem 0; }
+        .custom-component-name { background: #fef3c7; color: #92400e; padding: 0.2em 0.5em; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
+        .component-link { color: var(--primary-color); text-decoration: none; }
+        .component-link:hover { text-decoration: underline; }
+        .swatch { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .swatch > i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.15); background-clip: padding-box; flex-shrink: 0; }
+        .swatch > code { background: var(--code-bg); padding: 0.1em 0.35em; font-size: 0.85em; }
+        .swatch-hex { color: #64748b; font-family: 'SF Mono', Monaco, monospace; font-size: 0.8em; }
+        .style-rows { display: flex; flex-direction: column; gap: 0.2rem; }
+        .style-row { display: flex; gap: 0.5rem; align-items: flex-start; line-height: 1.5; flex-wrap: wrap; }
+        .style-key { color: #64748b; font-weight: 600; font-size: 0.7rem; min-width: 56px; text-transform: uppercase; letter-spacing: 0.04em; padding-top: 0.15rem; flex-shrink: 0; }
+        .style-lbl { color: #94a3b8; font-size: 0.75rem; margin-right: 2px; }
+        .bind-cell { display: flex; flex-direction: column; gap: 3px; font-size: 0.8rem; line-height: 1.6; }
+        .bind-badge { display: inline-block; padding: 0 0.4em; border-radius: 3px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; vertical-align: baseline; }
+        .bind-event { background: #fef3c7; color: #92400e; }
+        .bind-data { background: #dbeafe; color: #1e40af; }
+        .tree-table-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1.5rem 0 0.5rem; }
+        .tree-table-header h3 { margin: 0; }
+        .tree-controls button { font: inherit; font-size: 0.8rem; padding: 0.25em 0.75em; margin-left: 0.4rem; border: 1px solid var(--border-color); background: white; color: var(--text-color); border-radius: 4px; cursor: pointer; }
+        .tree-controls button:hover { background: var(--bg-color); border-color: #94a3b8; }
+        .tree-col { white-space: nowrap; }
+        .tree-indent { display: inline-block; vertical-align: middle; }
+        .tree-toggle { display: inline-block; width: 16px; text-align: center; cursor: pointer; color: #64748b; font-size: 0.7em; transition: transform 0.15s ease; user-select: none; margin-right: 4px; }
+        .tree-toggle:hover { color: var(--primary-color); }
+        .tree-toggle.expanded { transform: rotate(90deg); }
+        .tree-spacer { display: inline-block; width: 16px; margin-right: 4px; }
+        tr.tree-group > td { background: #f8fafc; font-weight: 600; }
+        tr.tree-group .tree-group-name { color: var(--text-color); }
+        tr.tree-group .tree-group-count { display: inline-block; margin-left: 0.4rem; padding: 0.05em 0.5em; background: var(--border-color); color: #475569; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
+        
+    </style>
+</head>
+<body>
+
+<div class="container">
+<h1>ApiMock - Mocking APIs in tests</h1>
+<section id="overview">
+<h2>Overview</h2>
+<p>Guides &gt; Mocking APIs in tests. Six sections + TOC + next-reads. How jsonui-test mocks a backend for tests: mock definition files generated from OpenAPI (*.mock.json, one per operationId, multiple scenarios), `mock generate` (+ --check drift), `mock serve` (local server + /__jsonui__/panel control panel, 127.0.0.1 bind + per-launch token + Host/DNS-rebind + path-traversal hardening, CLI-only / not MCP), per-test scenario selection (root `mocks` + `setMocks` step; screen per-file, flow per-transition), and driver MockClient integration (mockServerURL + token; admin API /__jsonui__/scenario-set + /__jsonui__/reset with X-JsonUI-Token). mock.schema.json is editor/doc-only.</p>
+<table class="meta-table">
+<tr><th>Created</th><td>2026-07-09</td></tr>
+<tr><th>Updated</th><td>2026-07-09</td></tr>
+</table>
+</section>
+<section id="structure">
+<h2>Screen Structure</h2>
+<div class="tree-wrapper" data-initial-depth="2">
+<div class="tree-table-header">
+<h3>UI Components</h3>
+<div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
+</div>
+<table class="tree-table">
+<thead><tr><th>Component</th><th>ID</th><th>Platform</th><th>Description</th><th>Bindings</th><th>Notes</th></tr></thead>
+<tbody>
+<tr data-row-id="1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:0px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_mock_root</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=matchParent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1" data-parent-id="1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">Scroll</span></td>
+<td><code>guides_api_mock_scroll</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent weight=1</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1" data-parent-id="1-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_mock_header</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-1" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=wrapContent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#64748B"></i><code>#64748B</code></span></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-event">event</span> <code>onClick</code> → <code>onNavigateGuides</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-2" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>36</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-3" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>17</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-4" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#64748B"></i><code>#64748B</code></span></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2" data-parent-id="1-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_mock_content_with_rail</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=horizontal</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1" data-parent-id="1-1-2" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_mock_body_column</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>H=wrapContent weight=1</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-1" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_what</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-1-1" data-parent-id="1-1-2-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-1-2" data-parent-id="1-1-2-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_files</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-1" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-2" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-3" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-4" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_generate</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-1" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-2" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-3" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_checks</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>surface_muted</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-1" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-2" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-3" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-4" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-5" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-6" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-7" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-8" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_serve</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-1" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-2" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-3" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-4" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_scenarios</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6-1" data-parent-id="1-1-2-1-6">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6-2" data-parent-id="1-1-2-1-6">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6-3" data-parent-id="1-1-2-1-6">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6-4" data-parent-id="1-1-2-1-6">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_drivers</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-1" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-2" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-3" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_mock_next</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-1" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>chrome_ink</code></div><div class="style-row"><span class="style-key">Font</span>24</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-2" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
+<td><code>guides_api_mock_next_collection</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=20</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>nextReadLinks</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_mock_footer</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9-1" data-parent-id="1-1-2-1-9">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#94A3B8"></i><code>#94A3B8</code></span></div><div class="style-row"><span class="style-key">Font</span>12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-2" data-parent-id="1-1-2" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_mock_rail_column</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=260 H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-2-1" data-parent-id="1-1-2-2" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_mock_toc_wrap</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-2-1-1" data-parent-id="1-1-2-2-1">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">TableOfContents</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody></table>
+</div>
+<h3>Layout Structure</h3>
+<pre class="layout-tree">
+guides_api_mock_root
+└── guides_api_mock_scroll
+</pre>
+</section>
+<section id="dataflow">
+<h2>Data Flow</h2>
+<pre class="mermaid">
+flowchart TD
+    VIEW --> VM
+</pre>
+<h3>ViewModel</h3>
+<details class="vm-section" open><summary class="vm-section-header">Methods <span class="count-badge">2</span></summary>
+<table>
+<thead><tr><th>Signature</th><th>Platforms</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>onAppear()</code></td><td><em title="Imported into all platforms">all</em></td><td>Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_testing -&gt; /guides/testing, next_cli -&gt; /reference/cli-commands). Each row&#x27;s titleKey / descriptionKey is resolved through StringManager with the guides_api_mock_ namespace prefix.</td></tr>
+<tr><td><code>onNavigate(url: String)</code></td><td><em title="Imported into all platforms">all</em></td><td>Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /guides/testing, /reference/cli-commands.</td></tr>
+</tbody></table>
+</details>
+<details class="vm-section" open><summary class="vm-section-header">Vars <span class="count-badge">1</span></summary>
+<table>
+<thead><tr><th>Declaration</th><th>Flags</th><th>Platforms</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>var nextReadLinks: Array(NextReadLink)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Two closing &#x27;read next&#x27; cards pointing at /guides/testing and /reference/cli-commands. Seeded by onAppear and re-seeded by mountLanguage.</td></tr>
+</tbody></table>
+</details>
+</section>
+<section id="state">
+<h2>State Management</h2>
+<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">1</span></summary>
+<table>
+<thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td>Two closing cards: /guides/testing (the test DSL) + /reference/cli-commands (the mock subcommands).</td><td>-</td></tr>
+</tbody></table>
+</details>
+<details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">3</span></summary>
+<p class="section-intro">Handlers kept inside the View layer. ViewModel public API lives under <code>dataFlow.viewModel</code>.</p>
+<table>
+<thead><tr><th>Handler</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>onAppear</code></td><td>Seed nextReadLinks.</td><td>-</td></tr>
+<tr><td><code>onNavigate</code></td><td>Client-side navigation.</td><td>-</td></tr>
+<tr><td><code>onNavigateGuides</code></td><td></td><td>-</td></tr>
+</tbody></table>
+</details>
+</section>
+<section id="actions">
+<h2>User Actions</h2>
+<table>
+<thead><tr><th>Action</th><th>Processing</th><th>Destination</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Tap a TOC entry</td><td>TOC-internal scroll.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap a NextReadLink card</td><td>onNavigate(url).</td><td>-</td><td>-</td></tr>
+</tbody></table>
+</section>
+<section id="validation">
+<h2>Validation</h2>
+</section>
+<section id="transitions">
+<h2>Transitions</h2>
+<table>
+<thead><tr><th>Condition</th><th>Destination</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>url is spec-mapped</td><td>Target screen or tab</td><td>-</td></tr>
+</tbody></table>
+</section>
+<section id="files">
+<div class="tree-wrapper" data-initial-depth="0">
+<div class="tree-table-header">
+<h2>Related Files</h2>
+<div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
+</div>
+<table class="tree-table">
+<thead><tr><th>Type</th><th>File Path</th><th>Notes</th></tr></thead>
+<tbody>
+<tr class="tree-group" data-row-id="1" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">Layout</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="1-1" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/guides/api-mock.json</code></td><td>Layout.</td></tr>
+<tr class="tree-group" data-row-id="2" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">ViewModel</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="2-1" data-parent-id="2"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>ViewModel</code></td><td><code>jsonui-doc-web/src/viewmodels/guides/ApiMockViewModel.ts</code></td><td>VM.</td></tr>
+<tr class="tree-group" data-row-id="3" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">View</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="3-1" data-parent-id="3"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>View</code></td><td><code>jsonui-doc-web/src/app/guides/api-mock/page.tsx</code></td><td>Page.</td></tr>
+</tbody></table>
+</div>
+</section>
+<section id="notes">
+<h2>Notes</h2>
+<ul>
+<li>Live Guides entry (added 2026-07-09 for the test-tooling doc pass). Added to ChromeViewModel NAV_CATALOG guides + GuidesIndexViewModel CATALOG.</li>
+<li>Six sections: (1) what API mocks are, (2) mock definition files (*.mock.json, multi-scenario) with a code example, (3) mock generate (+ --check drift / MCP test_mock_generate), (4) mock serve + control panel + hardening (CLI-only), (5) per-test scenario selection (root mocks + setMocks; screen per-file / flow per-transition) with a code example, (6) driver MockClient + admin API.</li>
+<li>Companion to /guides/testing (the test DSL) and /reference/test-tooling (the support matrix + ownership table). Sample data is neutral (products / items) per public-repo hygiene.</li>
+<li>2026-07-30 — new section 4 &#x27;Contract checks&#x27;, and sections 5-7 renumbered. Three claims on the page had gone stale with the upstream mock-contract work: generation no longer &#x27;skips existing files&#x27; (it clears and rewrites &lt;mockDir&gt;/generated/, while hand-written files live outside it and overlay per scenario), --check no longer compares only method and path (it matches scenario bodies against the schema for their status code — types, required including nested and array elements, enum, nullable respected — and identifies scenarios by route, not filename), and neither check has to be invoked by hand (jsonui-test validate runs the contract check and regenerates generated/ when missing or older than the swagger). New on the page: request-side validation in mock serve, on by default, which records violations and exits non-zero without rejecting the request. Escape hatches documented: --no-mock-check, mock.validateRequests=false, --no-validate-requests, per-scenario skipRequestValidation.</li>
+<li>The same edits landed on the pages that repeat the claim: guides_testing.section_cli_bullet_mock, tools_mcp.tool_test_mock_generate_role, reference_cli_commands.section_test_tools_body. docs/data/cli-commands.json gained jsonui-test mock generate / mock serve entries and --no-mock-check on validate, so the catalogue on /reference/cli-commands carries the flags too.</li>
+<li>2026-08-31 — section_files_body corrected for jsonui-cli 1.7.22. The overlay paragraph has described the thin-overlay shape (a hand-written file carrying only the scenarios its tests drive, routine ones filling in from the generated side) since it was written, and that was the intent rather than the behaviour. Measured on a fixture with one hand-written overlay carrying a single scenario and no activeScenario: v1.7.21 mock generate printed &#x27;Generated 0 mock file(s) ...; 1 route(s) already served by a hand-written mock&#x27; and left no generated copy for that route, and jsonui-test validate on the identical tree failed with activeScenario &#x27;default&#x27; is not among scenarios: [&#x27;two_items&#x27;]; v1.7.23 prints &#x27;1 route(s) overlaid by hand-written mock(s)&#x27;, keeps the generated copy, and raises no activeScenario error. One variable between the two runs, the tool version. Fixture note for anyone repeating it: the merged-view check needs the generated counterpart to exist, so a tree whose generated/ was last written by the older tool reproduces the old error for a different reason.</li>
+<li>2026-08-31 — while editing section_files_body, removed a literal &#x27;**シナリオ単位**&#x27; from its JA text. Prose Labels print markdown verbatim on this site, so the asterisks were reaching the screen; it had survived because probes read the EN rendering and the earlier sweep classified this file&#x27;s remaining &#x27;**&#x27; as glob patterns without separating the JA case.</li>
+<li>2026-08-31 — section_files_body extended for the mock route index union (1.7.24) and the stale-generated visibility (1.7.25). The union is published through the observable that shows which index answered: with a generated half declaring default/empty/error_403 and an overlay declaring only two_items, a name in neither errors with available: [&#x27;default&#x27;,&#x27;empty&#x27;,&#x27;error_403&#x27;,&#x27;two_items&#x27;] on 1.7.24 and with the generated three alone on 1.7.23. Getting the check to fire took two corrections to the fixture, both recorded because they are the kind of thing that reads as &#x27;the check found nothing&#x27;: a screen test&#x27;s mocks block belongs at the file root (inside a case it is silently &#x27;Unknown case key: mocks&#x27;), and without mock.swagger declared the run prints &#x27;Unchecked mocks: N&#x27; and compares nothing. An earlier attempt reported no difference between versions purely because of those two, and the full output — not the grepped lines — is what said so. For 1.7.25: a stale body in the generated half of a route with NO overlay warns and the summary separates the halves, where 1.7.24 said No drift; exit stays 0 in both, which is why the published sentence says the exit code cannot see it. Measured but NOT published: on an overlaid route the same stale generated body is still reported as No drift on 1.7.25. That may well be intended (the generated copy is rewritten wholesale), so it is raised upstream as an observation rather than written up as a rule.</li>
+<li>2026-08-31 — the overlaid-route gap is now stated on the page rather than left implied. The previous wording scoped the 1.7.25 improvement to &#x27;a route with no overlay&#x27;, which is accurate but invites the reader to supply a reason for the scope, and the available reason (&#x27;generated copies of overlaid routes are rewritten wholesale, so their bodies do not matter&#x27;) is wrong: upstream confirmed it as a defect after this page asked, with a fix expected in a later release. Written as a limitation with its status rather than as a rule, so the replacement when the fix ships is one sentence. The measurement behind it is this lane&#x27;s: same tree, breaking the hand-written half raises a finding while breaking the generated half of the same overlaid route reports No drift.</li>
+<li>2026-08-31 — the limitation note gains the sort-order asymmetry, measured here after upstream pointed out that this lane&#x27;s fixture could not observe it. The earlier fixture used a tag directory named &#x27;items&#x27;, which sorts after &#x27;generated&#x27;, so only the generated half could go unchecked. Renaming that one directory and changing nothing else — same file, same swagger, same command — flips the outcome: under &#x27;items&#x27; a drifted hand-written default body prints &#x27;[BODY] ... Drift detected&#x27; and exits 1, under &#x27;aitems&#x27; the same file prints &#x27;No drift&#x27; and exits 0. The exit code flipping on a directory name is why this is published rather than held for the fix: a green --check on 1.7.25 and earlier is only as good as the naming happened to be. Not filed separately upstream — it is the same phenomenon already in flight for the next release, and the bugs README asks for one file per phenomenon; the measurement was sent to that lane instead.</li>
+<li>2026-08-31 — the limitation block now names its command and states what the other one does. The paragraph already said &#x27;mock generate --check&#x27;, but a reader who gates on jsonui-test validate would reasonably expect the same warning there. Measured on a tree where only the generated half is stale: validate prints Result: PASSED, exits 0, and leaves the file unchanged, while a drifted hand-written body on the same tree stops it with [BODY] Mock contract drift. Published as an absence that proves nothing — the warning is not in validate&#x27;s output and its absence is not evidence the generated half is fresh. The mechanism was NOT published: one run printed &#x27;Regenerated 2 mock file(s)&#x27; which suggested validate refreshes generated/ first, but re-staling the file and re-running left it byte-identical, so the regeneration hypothesis did not survive its own check and only the observable behaviour is stated.</li>
+<li>2026-08-31 — the mechanism behind validate&#x27;s silence is now published, after being measured here rather than taken from the upstream lane that offered it. The observable is the generated file&#x27;s md5, not the result line: with the swagger untouched, editing a generated body and running validate leaves the hash identical and prints no Regenerated line; touching the swagger and running the same command prints &#x27;Regenerated 2 mock file(s)&#x27; and changes the hash. Both runs print Result: PASSED. That is the reverse of the hypothesis dropped one edit earlier — validate does not refresh a content-stale tree, it refreshes on the swagger&#x27;s mtime — so a stale generated body survives indefinitely while the swagger is unchanged. Worth recording that the earlier hypothesis was not merely unproven but backwards, and that the run that suggested it had simply followed a swagger write. [2026-09-03 addendum: the quoted output is what jsonui-cli printed when this was measured (1.7.x). From 1.8.11 the line carries a reason suffix — `Regenerated N mock file(s) into mocks/generated/ — &lt;why&gt;` — so the quotation above is a substring of the real output, not the whole line. The measurement it records still stands; only the transcript is abridged.]</li>
+<li>2026-08-31 — the 1.7.25 limitation block is replaced wholesale for v1.7.26, which is what keeping it to one block was for. Five arms measured here, of which two were shot in both sort directions on purpose because the upstream lane reported them once: hand-written drift under a tag sorting before &#x27;generated&#x27; and again after it, both [BODY] + exit 1 (on 1.7.25 that same rename flipped it to No drift + exit 0); generated-only drift in both directions, [WARN] + exit 0 both times; both halves broken in both directions, [BODY] and [WARN] together with exit 1. The two-halves-at-once arm is the one that distinguishes &#x27;the index sees both&#x27; from &#x27;the index sees one at a time and both single arms happened to hit&#x27;, and it also pins the weights staying per-file. Fifth arm: jsonui-test validate now carries a standing &#x27;mock contract: 6 scenario(s) compared, 1 generated body(ies) stale&#x27; line, and prints the compared count even with nothing stale — measured both ways, because a denominator that only appears when something is wrong is not a denominator. The published text keeps the mtime fact, which the fix does not change.</li>
+<li>2026-09-01 — the quoted denominator line is updated for v1.7.27, which leads with the total and closes the buckets. The A/B is this lane&#x27;s own fixture, unchanged between runs: v1.7.26 prints &#x27;mock contract: 6 scenario(s) compared, 1 generated body(ies) stale&#x27; and v1.7.27 prints &#x27;mock contract: 7 scenario(s) — 6 compared, 1 not compared (no JSON body), 1 generated body(ies) stale&#x27;. Enumerating the tree confirms seven scenarios exist and all seven carry a body, so the uncomparable one is uncomparable on the contract side: the swagger declares that status with no response schema. Worth having as a worked example because the previous line was not wrong about the six — it simply did not say there was a seventh, and a bucket line that does not close on the total reads as though the printed buckets were the whole. Published as the general point alongside the version fact, since the same shape is what made this page&#x27;s earlier &#x27;0 endpoint declarations, zero warnings&#x27; worth qualifying as an empty denominator.</li>
+<li>2026-09-01 — removed four markdown bolds this lane had just written into the JA of section_files_body. This site prints Prose Label markdown verbatim, and the rule has been enforced on other people&#x27;s text on this very page; writing it anyway is worth recording rather than quietly fixing. It was caught by the probe, not by review — the JA arm added after the last incident is what found it, on its first outing where the new text was Japanese. The EN arm was clean, which is exactly the blind spot that let the earlier ones live for months.</li>
+<li>2026-09-01 — the serve route-identity item, deferred twice, is now measured and published for the half that reproduced. Fixture: swagger declares /api/items/{item_id}; the hand-written mock declares /api/items/{id}. On v1.7.27 the server prints &#x27;loaded 1 endpoint(s)&#x27; and &#x27;1 hand-written mock(s) overlay the generated tree:&#x27; naming the file; on v1.7.25 the same tree prints &#x27;loaded 2 endpoint(s)&#x27; with no overlay line. mock generate reports &#x27;1 route(s) overlaid&#x27; on BOTH versions, so generate is the wrong surface to probe this on — the divergence is serve&#x27;s. What did NOT reproduce: on 1.7.25 the request still returned the hand-written body, under the original tag directory and again under one renamed to sort after &#x27;generated&#x27;, so this lane never observed the generated copy answering instead. Published as the startup-line check plus an explicit statement that the answering-registration question was not settled here, rather than describing a failure from the outside. Fifth time today that a fixture&#x27;s incidental choices decided which direction was observable.</li>
+<li>2026-09-01 — two corrections in one pass, both from measurement. (a) The denominator quote moves to v1.7.28, whose uncompared bucket names its kind: &#x27;no response body declared&#x27; (a debt — the status is declared, the payload contract is missing, which is this fixture&#x27;s 403) versus &#x27;declared non-JSON response&#x27; (a correct silence). The published caveat that the second label reports what the contract says rather than what the endpoint returns is kept, because a framework that defaults its declared content type to JSON while streaming a file lands in the debt bucket — a limitation stated where its scope is, per this page&#x27;s own habit. (b) The route-identity paragraph is rewritten: this lane had published &#x27;this fixture could not settle it&#x27; after trying only /api/items/{id}, which is the spelling that wins. The server sorts routes by path, so on 1.7.25 a hand-written {id} is served and a hand-written {uid} is not — the generated stub answers and the startup lines name neither as an overlay. Measured here before publishing, against a mechanism the upstream lane supplied as a falsifiable prediction. The page now says it first reported this as not reproducible, because the earlier sentence is live and a silent rewrite would leave readers who saw it with no way to know it changed.</li>
+<li>2026-09-01 — the denominator&#x27;s unit is now named on the page, after an upstream thread where two lanes&#x27; counts disagreed and turned out to be the same set in different units (operations vs scenarios). Enumerated this lane&#x27;s own fixture to publish the composition rather than the claim: 3 files, 2 operations, 7 scenarios — listItems contributing 3 generated plus 2 hand-written, listOthers contributing 2 — which is what the line&#x27;s 7 counts. Published because a total that looks large next to an endpoint count reads as a defect otherwise, and because this page has now spent three edits on the same lesson: a number without its unit gets read in the reader&#x27;s unit.</li>
+<li>2026-09-01 — the third uncompared label, published with the limit that the first two did not have. jsonui-cli 1.7.33 adds &#x27;not compared (declared but absent)&#x27;. Measured on this lane&#x27;s own fixture (swagger declares 200 and 403 on one route; scenarios default/200, empty/200, error_403/403), holding the hand-written overlay constant and changing one scenario per arm. Deleting error_403 — the only scenario serving a declared status — holds the total at 7 and moves one into the new bucket: FAILED, exit 1, and [ABSENT] from mock generate --check, exit 1. Deleting empty — a second scenario on a status default still covers — takes the total from 7 to 6 with every bucket at zero, &#x27;No drift&#x27; from --check, and both exiting 0. So the closure is against declared statuses, not against generator output: mock generate restores empty, which is what proves it is the generator&#x27;s and not a hand-addition. The first arm shot was the wrong one and nearly settled it the wrong way — deleting error_403 alone shows the total holding at 7 and looks like a complete fix, because that scenario was already the fixture&#x27;s &#x27;no response body declared&#x27; entry; the label changed while compared and total both stayed put. The second arm is what separates &#x27;the denominator is fixed&#x27; from &#x27;the denominator is fixed for whole statuses&#x27;. Filed upstream. Also reproduced independently, not published: the [ABSENT] run&#x27;s summary reads &#x27;Drift detected: 0 missing, 0 orphaned, 0 drifted, 0 stale body(ies)&#x27; — four zeros while exiting 1, because [ABSENT] feeds no counter. Another lane had already reported it; recorded as an independent reproduction rather than a transcription.</li>
+<li>2026-09-01 — the closure limit published earlier today is corrected, because jsonui-cli 1.7.36 removed it. The correction keeps the old limit in view rather than deleting it, since it is what says what the closure is against. Measured on 1.7.36 with the fixture state asserted immediately before and after every run: deleting the same-status variant now prints &#x27;empty: generation produces this scenario (status 200), and this file does not have it&#x27; and exits 1, and adding a scenario generation does not produce prints &#x27;handmade: generation does not produce this scenario (status 200), and the next mock generate will drop it&#x27; and exits 1. Both were filed from this lane. The published sentences name the scenario rather than the status because the status-shaped wording, which shipped first, stated something false in the delete case — the status was still served by another scenario — and that was caught by shooting the true case and the false case side by side rather than accepting the one that fired. Not published, and filed instead: the same deletion is order-dependent under `jsonui-test validate`. On a tree where validate has not run yet it silently regenerates the missing scenario and reports nothing, exit 0; once validate has run there, the same deletion reports &#x27;not compared (declared but absent)&#x27; and exits 1. A fresh checkout — CI&#x27;s condition — is the silent side. An intact-tree validate rewrites generated/ (mtimes advance, content identical), which is the mechanism as far as it could be established; forcing the mock file&#x27;s mtime to 2030 did not change the outcome, so it is not simply that file&#x27;s age, and the trigger is not identified. Nothing about it goes on the page until it is. This was first read as a shipped regression, because the local checkout reported it and the release did not; both behave identically and what differed was the tree&#x27;s history before the measurement. Arms now print the scenario list immediately before and after each run rather than relying on the sequence of commands believed to have run.</li>
+<li>2026-09-01 — jsonui-cli 1.7.47 adds three printed surfaces to `jsonui-test validate`, and one of them cannot fire from that command. Measured on this lane&#x27;s fixture (swagger declares 200 and 403 on /api/items, 200 on /api/others), one mutation per arm, with the mutation asserted on disk before each run and the raw unfiltered output captured. (1) A scope note prints under the mock contract line on every run that reaches the gate, including a clean one. (2) A convention line — not failing is the rule, as for orphans — prints only when a stale generated body is actually present; both inputs had to be aged (swagger and hand-written mock), since regeneration watches both. (3) A footnote &#x27;N finding(s) above are not counted in Warnings:&#x27; prints after the summary and is absent at zero. Its three reasons are not equally reachable: &#x27;a status no operation declares&#x27; fired (status 418, form B) and &#x27;the scenario declares its own undeclaredStatus&#x27; fired (status 403 on the operation whose twin does not declare it, form C, with an object-form reason). The third — &#x27;a scenario with no status at all&#x27;, the one the footnote calls clearable — did not fire and structurally cannot: such a scenario is itself an error (&#x27;status&#x27; must be an HTTP status int, got: None), the gate runs only when total errors are zero, and every mock under the configured mockDir is validated. Measured on both halves: removing status from the hand-written scenario and from the generated one each produced the error and skipped the gate. The finding exists and is printed by the other command — mock generate --check shows [WARN] … two_items: no status — not compared, exit 0 — and that command prints no footnote. Two arms of this measurement were void before they were read: the first pair mutated nothing because the fixture path variable was not exported, and the undeclaredStatus arm used a bare true, which the checker ignores by design (object form with a non-empty reason only). Both were caught by printing a control of the mutated value in the same invocation as the run, not by reading the output.</li>
+<li>2026-09-01 — jsonui-cli 1.7.50 puts the classification footnote on the command each finding appears on, and the published contrast between the two commands is gone. Measured on four fixtures, both commands each, raw output captured. `mock generate --check` now opens with the same `mock contract:` denominator line and closes with a sentence carrying the uncompared count (&#x27;No drift in the 5 scenario(s) compared; 1 scenario(s) were not compared&#x27;) rather than a bare all-clear, so the sentence saying validate carries a standing denominator &#x27;instead&#x27; was rewritten. The footnote&#x27;s first line branches per command: &#x27;are not counted in Warnings:&#x27; on validate, &#x27;do not fail this check:&#x27; on --check, which has no warnings counter. The no-status class — the one this lane filed as unreachable on 1.7.47 — now prints its sentence, on --check and only there. Two predictions did not hold and are recorded because they say what the change is not: it is an addition rather than a move (validate still prints its own footnote for the two classes it can reach), and validate&#x27;s note that misnamed files and optional-field omissions appear only in --check was predicted to reverse but is still printed and still true.</li>
+<li>2026-09-01 (correction, same day) — the first version of the sentence above said --check &#x27;closes with a sentence that carries the uncompared count rather than a bare all-clear&#x27;. That was generalised from one fixture which happened to have an uncompared scenario, and it was published before being checked against a fixture without one. Re-measured on three: with nothing uncompared and nothing stale the closing line is still the old unconditional &#x27;No drift: mocks are in sync with swagger.&#x27;; an uncompared scenario gives the compared/not-compared sentence; a stale generated body gives a third form naming the refresh command. The claim is data-dependent, not a version fact. Also measured while correcting it: the closing line&#x27;s &#x27;not compared&#x27; counts only findings listed above it, while the denominator&#x27;s &#x27;not compared&#x27; bucket is wider — the pristine fixture prints &#x27;1 not compared (no response body declared)&#x27; on the contract line and the bare all-clear underneath, so the two lines disagree by construction and neither is wrong. The failure here was the one this page keeps documenting in other people&#x27;s tools: a conclusion whose real subject was one fixture, published with the subject of a release.</li>
+<li>2026-09-01 — jsonui-cli 1.7.51 registers `skipRequestValidation`, a scenario key the mock server had always honoured at serve time but the validator did not know. This page had been recommending it as the per-scenario escape hatch since before it was registered, so the advice as written produced a warning the reader could only clear by abandoning the feature. Measured across the two shipped trees on one fixture, the key asserted on disk as a control before each run: Warnings: 1 with `[WARN] Unknown scenario key: skipRequestValidation` on 1.7.50, Warnings: 0 on 1.7.51. Negative control: a one-character variant (`skipRequestValidationn`) still warns on 1.7.51, so the unknown-key check was narrowed, not switched off. Eight other arms (validate and --check over four fixtures) were byte-identical between the two versions with a decoy confirming the comparator was live — and none of them contained the key, which is why the identical result said nothing about the only thing that changed. The arm that mattered was the one that inverted the property the release touched. Upstream measured zero occurrences of this key across its own corpus; that counts usage, not exposure — this site was publishing the recommendation regardless.</li>
+<li>2026-09-01 — jsonui-cli 1.7.52 changes the mock scenario vocabulary twice, and both are warnings that leave the run at exit 0. Measured by A/B of the shipped 1.7.51 and 1.7.52 trees on one scenario carrying both a bare `undeclaredStatus: true` and a `headers` key, each asserted on disk as a control: Warnings: 0 on 1.7.51, Warnings: 2 on 1.7.52, Result: PASSED and captured exit 0 on both. Upstream first announced the headers removal as an error and corrected it to a warning; measured here independently before the correction arrived. The `undeclaredStatus` warning is the more useful of the two because being ignored was previously silent, which is what cost readers time — this page had documented the silence as deliberate, and now documents that it ends in 1.7.52. Second finding, from the exposure check rather than the release: the editor&#x27;s `mock.schema.json` is a distributed COPY declaring additionalProperties:false, so it marks unknown keys invalid while the CLI only warns — and a stale copy marks a NEWLY ADDED key invalid, giving an author a red squiggle on a correct declaration. `skipRequestValidation`, which this page began recommending at 1.7.51, is exactly that case. The page now says to check the copy&#x27;s date and re-sync rather than delete the key. Exposure check run before writing any of this: of six identifiers, three were exposed and one hit (`headers` in learn_what_is_jsonui) was unrelated English prose about layout headers — the name flagged it and the content cleared it, which is why the check has two stages.</li>
+<li>2026-09-03 — inventory of published quotations of tool output, prompted by an upstream notice that assumed the note above was published prose (it is not; this ledger is internal). The site quotes tool output in 7 published string keys (summary/Result lines, [WARN]/[NOTE] levels, two checkmark transcripts) and in 8 CodeBlocks across 8 layout files. Nothing checks any of them against the real output — the read-stamp mechanism covers CLI reference cards only. When a release changes an output line, those 15 places are the exposure, and the way to keep them honest is to re-measure them during that release&#x27;s uptake.</li>
+</ul>
+</section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+
+
+<script>
+(function() {
+  function initWrapper(wrapper) {
+    const table = wrapper.querySelector('table.tree-table');
+    if (!table) return;
+    const expanded = new Set();
+    const initialDepth = parseInt(wrapper.dataset.initialDepth || '2', 10);
+    function rowById(id) { return table.querySelector('tr[data-row-id="' + id + '"]'); }
+    function visible(tr) {
+      let pid = tr.dataset.parentId;
+      while (pid) {
+        if (!expanded.has(pid)) return false;
+        const p = rowById(pid);
+        pid = p ? p.dataset.parentId : null;
+      }
+      return true;
+    }
+    function apply() {
+      table.querySelectorAll('tr[data-parent-id]').forEach(tr => {
+        tr.style.display = visible(tr) ? '' : 'none';
+      });
+    }
+    function updateChevrons() {
+      table.querySelectorAll('tr[data-has-children] .tree-toggle').forEach(t => {
+        const id = t.closest('tr').dataset.rowId;
+        t.classList.toggle('expanded', expanded.has(id));
+      });
+    }
+    function expandAll() {
+      table.querySelectorAll('tr[data-has-children]').forEach(tr => expanded.add(tr.dataset.rowId));
+      apply(); updateChevrons();
+    }
+    function collapseAll() { expanded.clear(); apply(); updateChevrons(); }
+    // Initial: expand rows whose depth is < initialDepth (row-id dashes < initialDepth)
+    table.querySelectorAll('tr[data-has-children]').forEach(tr => {
+      const depth = (tr.dataset.rowId.match(/-/g) || []).length;
+      if (depth < initialDepth) expanded.add(tr.dataset.rowId);
+    });
+    table.querySelectorAll('tr[data-has-children] .tree-toggle').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = btn.closest('tr').dataset.rowId;
+        if (expanded.has(id)) expanded.delete(id); else expanded.add(id);
+        apply(); updateChevrons();
+      });
+    });
+    wrapper.querySelectorAll('.tree-expand-all').forEach(b => b.addEventListener('click', expandAll));
+    wrapper.querySelectorAll('.tree-collapse-all').forEach(b => b.addEventListener('click', collapseAll));
+    apply(); updateChevrons();
+  }
+  function init() {
+    document.querySelectorAll('.tree-wrapper').forEach(initWrapper);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>

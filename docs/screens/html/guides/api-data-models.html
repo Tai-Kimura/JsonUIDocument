@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApiDataModels - API data models</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --code-bg: #f1f5f9;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 { color: var(--text-color); margin-bottom: 1.5rem; font-size: 2rem; }
+        h2 { color: var(--text-color); margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); }
+        h3 { color: var(--text-color); margin: 1.5rem 0 0.75rem; }
+        h4 { color: #64748b; margin: 1rem 0 0.5rem; }
+        section { margin-bottom: 2rem; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:hover { background: #f8fafc; }
+        code { background: var(--code-bg); padding: 0.2em 0.4em; border-radius: 4px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9em; }
+        pre { background: var(--code-bg); padding: 1rem; border-radius: 8px; overflow-x: auto; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9em; line-height: 1.5; }
+        .meta-table { width: auto; }
+        .meta-table th { background: transparent; border: none; padding: 0.25rem 1rem 0.25rem 0; }
+        .meta-table td { border: none; padding: 0.25rem 0; }
+        .component-type { background: var(--bg-color); color: var(--text-color); padding: 0.2em 0.5em; border-radius: 4px; font-size: 0.85em; border: 1px solid var(--border-color); }
+        .platform-badge { display: inline-block; padding: 0.15em 0.5em; margin-right: 0.25em; border-radius: 3px; font-size: 0.75em; font-weight: 600; }
+        .platform-ios { background: #dbeafe; color: #1e40af; }
+        .platform-android { background: #dcfce7; color: #166534; }
+        .platform-web { background: #fef3c7; color: #92400e; }
+        .platform-override { opacity: 0.75; font-style: italic; }
+        /* ViewModel / event-handler collapsible sections */
+        details.vm-section { margin: 1rem 0; }
+        details.vm-section > summary {
+            cursor: pointer;
+            font-size: 1.15em;
+            font-weight: 600;
+            padding: 0.4rem 0.5rem;
+            border-left: 3px solid var(--border-color);
+            background: var(--code-bg);
+            border-radius: 0 4px 4px 0;
+            user-select: none;
+            margin-bottom: 0.5rem;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4em;
+        }
+        details.vm-section > summary::-webkit-details-marker { display: none; }
+        details.vm-section > summary::before {
+            content: "\25B6";
+            font-size: 0.75em;
+            transition: transform 0.15s ease;
+            display: inline-block;
+            color: var(--text-color);
+            opacity: 0.5;
+        }
+        details.vm-section[open] > summary::before {
+            transform: rotate(90deg);
+        }
+        details.vm-section > summary:hover { border-left-color: #3b82f6; }
+        .count-badge {
+            display: inline-block;
+            padding: 0.1em 0.55em;
+            border-radius: 10px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.78em;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            margin-left: auto;
+        }
+        .flag-chip {
+            display: inline-block;
+            padding: 0.1em 0.45em;
+            margin-right: 0.25em;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-weight: 500;
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        .flag-observable { background: #ede9fe; color: #5b21b6; border-color: #ddd6fe; }
+        .flag-optional   { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .flag-readonly   { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+        .section-intro   { color: #64748b; font-size: 0.9em; margin: 0.25rem 0 0.5rem; }
+        .layout-tree { background: #1e293b; color: #e2e8f0; padding: 1.5rem; }
+        .display-logic { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        .notes { color: #64748b; font-style: italic; margin-top: 0.5rem; }
+        .http-method { padding: 0.2em 0.5em; border-radius: 4px; font-weight: 600; font-size: 0.85em; }
+        .method-get { background: #22c55e; color: white; }
+        .method-post { background: #3b82f6; color: white; }
+        .method-put { background: #f59e0b; color: white; }
+        .method-patch { background: #8b5cf6; color: white; }
+        .method-delete { background: #ef4444; color: white; }
+        .json { background: #1e293b; color: #e2e8f0; }
+        .mermaid { background: white; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin: 1rem 0; }
+        ul { margin: 0.5rem 0; padding-left: 1.5rem; }
+        li { margin: 0.25rem 0; }
+        .custom-component-name { background: #fef3c7; color: #92400e; padding: 0.2em 0.5em; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
+        .component-link { color: var(--primary-color); text-decoration: none; }
+        .component-link:hover { text-decoration: underline; }
+        .swatch { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .swatch > i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.15); background-clip: padding-box; flex-shrink: 0; }
+        .swatch > code { background: var(--code-bg); padding: 0.1em 0.35em; font-size: 0.85em; }
+        .swatch-hex { color: #64748b; font-family: 'SF Mono', Monaco, monospace; font-size: 0.8em; }
+        .style-rows { display: flex; flex-direction: column; gap: 0.2rem; }
+        .style-row { display: flex; gap: 0.5rem; align-items: flex-start; line-height: 1.5; flex-wrap: wrap; }
+        .style-key { color: #64748b; font-weight: 600; font-size: 0.7rem; min-width: 56px; text-transform: uppercase; letter-spacing: 0.04em; padding-top: 0.15rem; flex-shrink: 0; }
+        .style-lbl { color: #94a3b8; font-size: 0.75rem; margin-right: 2px; }
+        .bind-cell { display: flex; flex-direction: column; gap: 3px; font-size: 0.8rem; line-height: 1.6; }
+        .bind-badge { display: inline-block; padding: 0 0.4em; border-radius: 3px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; vertical-align: baseline; }
+        .bind-event { background: #fef3c7; color: #92400e; }
+        .bind-data { background: #dbeafe; color: #1e40af; }
+        .tree-table-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1.5rem 0 0.5rem; }
+        .tree-table-header h3 { margin: 0; }
+        .tree-controls button { font: inherit; font-size: 0.8rem; padding: 0.25em 0.75em; margin-left: 0.4rem; border: 1px solid var(--border-color); background: white; color: var(--text-color); border-radius: 4px; cursor: pointer; }
+        .tree-controls button:hover { background: var(--bg-color); border-color: #94a3b8; }
+        .tree-col { white-space: nowrap; }
+        .tree-indent { display: inline-block; vertical-align: middle; }
+        .tree-toggle { display: inline-block; width: 16px; text-align: center; cursor: pointer; color: #64748b; font-size: 0.7em; transition: transform 0.15s ease; user-select: none; margin-right: 4px; }
+        .tree-toggle:hover { color: var(--primary-color); }
+        .tree-toggle.expanded { transform: rotate(90deg); }
+        .tree-spacer { display: inline-block; width: 16px; margin-right: 4px; }
+        tr.tree-group > td { background: #f8fafc; font-weight: 600; }
+        tr.tree-group .tree-group-name { color: var(--text-color); }
+        tr.tree-group .tree-group-count { display: inline-block; margin-left: 0.4rem; padding: 0.05em 0.5em; background: var(--border-color); color: #475569; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
+        
+    </style>
+</head>
+<body>
+
+<div class="container">
+<h1>ApiDataModels - API data models</h1>
+<section id="overview">
+<h2>Overview</h2>
+<p>Guides &gt; API data models. Cookbook companion to /concepts/data-models-from-openapi. Fifteen H2 sections covering setup (docs/api/), the add-schema/build/proxy loop, path + schema filter syntax, the two skip_domain levels, MCP-driven preview + discovery, the Repository return-type rule, the four Domain customization patterns, the Android serializer and Web case-convention picks, migrating hand-written models, reserved-word collisions, cycle rules, drift detection in CI, and the ERROR-halt table. ~18-min read.</p>
+<table class="meta-table">
+<tr><th>Created</th><td>2026-05-27</td></tr>
+<tr><th>Updated</th><td>2026-07-07</td></tr>
+</table>
+</section>
+<section id="structure">
+<h2>Screen Structure</h2>
+<div class="tree-wrapper" data-initial-depth="2">
+<div class="tree-table-header">
+<h3>UI Components</h3>
+<div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
+</div>
+<table class="tree-table">
+<thead><tr><th>Component</th><th>ID</th><th>Platform</th><th>Description</th><th>Bindings</th><th>Notes</th></tr></thead>
+<tbody>
+<tr data-row-id="1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:0px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_data_models_root</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=matchParent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1" data-parent-id="1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">Scroll</span></td>
+<td><code>guides_api_data_models_scroll</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent weight=1</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1" data-parent-id="1-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_data_models_header</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-1" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=wrapContent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#64748B"></i><code>#64748B</code></span></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-event">event</span> <code>onClick</code> → <code>onNavigateGuides</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-2" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>36</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-3" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>17</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-1-4" data-parent-id="1-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#64748B"></i><code>#64748B</code></span></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2" data-parent-id="1-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_data_models_content_with_rail</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=horizontal</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1" data-parent-id="1-1-2" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_data_models_body_column</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>H=wrapContent weight=1</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-1" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_setup</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-1-1" data-parent-id="1-1-2-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-1-2" data-parent-id="1-1-2-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-1-3" data-parent-id="1-1-2-1-1">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_add_schema</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-1" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-2" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-3" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_filter</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-1" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-2" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-3" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=20</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>15</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-4" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
+<td><code>guides_api_data_models_filter_config_collection</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>filterConfigRows</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-5" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=20</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>15</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-6" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
+<td><code>guides_api_data_models_filter_eval_collection</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>filterEvalRows</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-7" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-3-8" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_skip_domain</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-1" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-2" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-3" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
+<td><code>guides_api_data_models_skip_domain_collection</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>skipDomainCompareRows</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-4-4" data-parent-id="1-1-2-1-4">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_mcp_preview</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-1" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-2" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-3" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-4" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
+<td><code>guides_api_data_models_mcp_preview_collection</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>mcpPreviewFields</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-5-5" data-parent-id="1-1-2-1-5">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_mcp_discovery</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6-1" data-parent-id="1-1-2-1-6">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6-2" data-parent-id="1-1-2-1-6">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-6-3" data-parent-id="1-1-2-1-6">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
+<td><code>guides_api_data_models_mcp_discovery_collection</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>mcpDiscoveryFields</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_return_type</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-1" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-2" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-3" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_customize</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-1" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-2" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-3" data-parent-id="1-1-2-1-8">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
+<td><code>guides_api_data_models_domain_pattern_tabs</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>domainPatternTabs</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-4" data-parent-id="1-1-2-1-8" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>domain_pattern_panel_proxy</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>visibility</code> ↔ <code>proxyPatternPanelVisibility</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-4-1" data-parent-id="1-1-2-1-8-4">
+<td class="tree-col"><span class="tree-indent" style="width:96px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-5" data-parent-id="1-1-2-1-8" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>domain_pattern_panel_type_conv</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>visibility</code> ↔ <code>typeConvPatternPanelVisibility</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-5-1" data-parent-id="1-1-2-1-8-5">
+<td class="tree-col"><span class="tree-indent" style="width:96px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-6" data-parent-id="1-1-2-1-8" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>domain_pattern_panel_computed</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>visibility</code> ↔ <code>computedPatternPanelVisibility</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-6-1" data-parent-id="1-1-2-1-8-6">
+<td class="tree-col"><span class="tree-indent" style="width:96px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-7" data-parent-id="1-1-2-1-8" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>domain_pattern_panel_stored</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>visibility</code> ↔ <code>storedPatternPanelVisibility</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-8-7-1" data-parent-id="1-1-2-1-8-7">
+<td class="tree-col"><span class="tree-indent" style="width:96px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_android</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9-1" data-parent-id="1-1-2-1-9">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9-2" data-parent-id="1-1-2-1-9">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9-3" data-parent-id="1-1-2-1-9">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
+<td><code>guides_api_data_models_android_collection</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>androidSerializerRows</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9-4" data-parent-id="1-1-2-1-9">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-9-5" data-parent-id="1-1-2-1-9">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F3F4F6"></i><code>#F3F4F6</code></span> <span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-10" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_web_case</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-10-1" data-parent-id="1-1-2-1-10">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-10-2" data-parent-id="1-1-2-1-10">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-10-3" data-parent-id="1-1-2-1-10">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
+<td><code>guides_api_data_models_web_case_collection</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>webCaseRows</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-11" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_migrate</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-11-1" data-parent-id="1-1-2-1-11">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-11-2" data-parent-id="1-1-2-1-11">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-11-3" data-parent-id="1-1-2-1-11">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-11-4" data-parent-id="1-1-2-1-11">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F3F4F6"></i><code>#F3F4F6</code></span> <span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-12" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_reserved</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-12-1" data-parent-id="1-1-2-1-12">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-12-2" data-parent-id="1-1-2-1-12">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-13" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_cycles</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-13-1" data-parent-id="1-1-2-1-13">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-13-2" data-parent-id="1-1-2-1-13">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-13-3" data-parent-id="1-1-2-1-13">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-14" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_ci</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-14-1" data-parent-id="1-1-2-1-14">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-14-2" data-parent-id="1-1-2-1-14">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-14-3" data-parent-id="1-1-2-1-14">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-15" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>section_halt_table</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-15-1" data-parent-id="1-1-2-1-15">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-15-2" data-parent-id="1-1-2-1-15">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-15-3" data-parent-id="1-1-2-1-15">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
+<td><code>guides_api_data_models_halt_collection</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>haltRows</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-16" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_data_models_next</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-16-1" data-parent-id="1-1-2-1-16">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>chrome_ink</code></div><div class="style-row"><span class="style-key">Font</span>24</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-16-2" data-parent-id="1-1-2-1-16">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
+<td><code>guides_api_data_models_next_collection</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=20</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>nextReadLinks</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-17" data-parent-id="1-1-2-1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_data_models_footer</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-17-1" data-parent-id="1-1-2-1-17">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#94A3B8"></i><code>#94A3B8</code></span></div><div class="style-row"><span class="style-key">Font</span>12</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-2" data-parent-id="1-1-2" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_data_models_rail_column</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=260 H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-2-1" data-parent-id="1-1-2-2" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>guides_api_data_models_toc_wrap</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-2-1-1" data-parent-id="1-1-2-2-1">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">TableOfContents</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody></table>
+</div>
+<h3>Layout Structure</h3>
+<pre class="layout-tree">
+guides_api_data_models_root
+└── guides_api_data_models_scroll
+</pre>
+</section>
+<section id="dataflow">
+<h2>Data Flow</h2>
+<pre class="mermaid">
+flowchart TD
+    VIEW[ApiDataModelsView] --> VM[ApiDataModelsViewModel]
+    VM -- filterConfigRows --> VIEW
+    VM -- filterEvalRows --> VIEW
+    VM -- skipDomainCompareRows --> VIEW
+    VM -- mcpPreviewFields --> VIEW
+    VM -- mcpDiscoveryFields --> VIEW
+    VM -- androidSerializerRows --> VIEW
+    VM -- webCaseRows --> VIEW
+    VM -- haltRows --> VIEW
+    VM -- domainPatternTabs --> VIEW
+    VM -- activeDomainPattern --> VIEW
+    VM -- nextReadLinks --> VIEW
+    VIEW -- onAppear --> VM
+    VIEW -- onSelectCodeTab(id) --> VM
+    VIEW -- onNavigate(url) --> VM
+</pre>
+<h3>ViewModel</h3>
+<details class="vm-section" open><summary class="vm-section-header">Methods <span class="count-badge">4</span></summary>
+<table>
+<thead><tr><th>Signature</th><th>Platforms</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>onAppear()</code></td><td><em title="Imported into all platforms">all</em></td><td>Seed every public observable from module-scope static catalogs: filterConfigRows (5 rows from the api.schemas.* settings reference), filterEvalRows (4 rows of evaluation-order), skipDomainCompareRows (3 rows comparing schema-side vs app-side skip_domain), mcpPreviewFields (4 rows for preview_api_model_sync output), mcpDiscoveryFields (~6 rows across list_api_specs and list_api_models output), androidSerializerRows (3 rows: moshi default / kotlinx / none), webCaseRows (3 rows: snake_case default / camelCase), haltRows (6 ERROR-halt rows), nextReadLinks (3 cards). Every string field is resolved through StringManager with the guides_api_data_models_ prefix family. Finally calls buildDomainPatternTabs(&#x27;proxy&#x27;) to populate domainPatternTabs; activeDomainPattern stays at its &#x27;proxy&#x27; initial value.</td></tr>
+<tr><td><code>onSelectCodeTab(id: String)</code></td><td><em title="Imported into all platforms">all</em></td><td>Set activeDomainPattern = id and assign domainPatternTabs = buildDomainPatternTabs(id). displayLogic derives the four *PatternPanelVisibility strings from activeDomainPattern.</td></tr>
+<tr><td><code>onNavigate(url: String)</code></td><td><em title="Imported into all platforms">all</em></td><td>router.push(url). Hit by NextReadLink card taps and the breadcrumb.</td></tr>
+<tr><td><code>buildDomainPatternTabs(activeId: String)</code></td><td><em title="Imported into all platforms">all</em></td><td>Helper that returns [TabHeaderCell] with 4 entries (id=&#x27;proxy&#x27; / &#x27;type_conv&#x27; / &#x27;computed&#x27; / &#x27;stored&#x27;). The row whose id === activeId gets the accent palette; the others get surface. Each row&#x27;s onSelect is wired to () =&gt; this.onSelectCodeTab(id). Mirrors LearnHelloWorldViewModel.buildPlatformTabs.</td></tr>
+</tbody></table>
+</details>
+<details class="vm-section" open><summary class="vm-section-header">Vars <span class="count-badge">15</span></summary>
+<table>
+<thead><tr><th>Declaration</th><th>Flags</th><th>Platforms</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>var filterConfigRows: Array(FilterConfigRow)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>5-row api.schemas.* settings reference for §3.</td></tr>
+<tr><td><code>var filterEvalRows: Array(FilterEvalRow)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>4-row filter evaluation-order table for §3.</td></tr>
+<tr><td><code>var skipDomainCompareRows: Array(ComparisonRow)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>3-row skip_domain comparison for §4.</td></tr>
+<tr><td><code>var mcpPreviewFields: Array(McpFieldRow)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>4-row preview_api_model_sync field table for §5.</td></tr>
+<tr><td><code>var mcpDiscoveryFields: Array(McpFieldRow)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>~6-row list_api_specs / list_api_models field table for §6.</td></tr>
+<tr><td><code>var androidSerializerRows: Array(ComparisonRow)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>3-row moshi / kotlinx / none comparison for §9.</td></tr>
+<tr><td><code>var webCaseRows: Array(ComparisonRow)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>3-row snake_case / camelCase comparison for §10.</td></tr>
+<tr><td><code>var haltRows: Array(HaltRow)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>6-row ERROR-halt cookbook table for §15.</td></tr>
+<tr><td><code>var domainPatternTabs: Array(TabHeaderCell)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>4-row tab header for the §8 Domain-customization switcher.</td></tr>
+<tr><td><code>var activeDomainPattern: String</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Currently visible §8 pattern tab id; &#x27;proxy&#x27; by default.</td></tr>
+<tr><td><code>var nextReadLinks: Array(NextReadLink)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>3 closing cards.</td></tr>
+<tr><td><code>var proxyPatternPanelVisibility: String</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Derived from activeDomainPattern via displayLogic.</td></tr>
+<tr><td><code>var typeConvPatternPanelVisibility: String</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Derived from activeDomainPattern via displayLogic.</td></tr>
+<tr><td><code>var computedPatternPanelVisibility: String</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Derived from activeDomainPattern via displayLogic.</td></tr>
+<tr><td><code>var storedPatternPanelVisibility: String</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Derived from activeDomainPattern via displayLogic.</td></tr>
+</tbody></table>
+</details>
+</section>
+<section id="state">
+<h2>State Management</h2>
+<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">15</span></summary>
+<table>
+<thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>filterConfigRows</code></td><td>[FilterConfigRow]</td><td>Five rows for the §3 &#x27;api.schemas.* settings reference&#x27; table: include_paths, exclude_paths, include_schemas, exclude_schemas, skip_domain. Each row carries keyKey + typeKey + defaultKey + globKey + descriptionKey under the guides_api_data_models_filter_ namespace.</td><td>-</td></tr>
+<tr><td><code>filterEvalRows</code></td><td>[FilterEvalRow]</td><td>Four rows for the §3 evaluation-order table (path includes -&gt; path excludes -&gt; schema includes -&gt; schema excludes). Each row has orderKey + ruleKey + bodyKey.</td><td>-</td></tr>
+<tr><td><code>skipDomainCompareRows</code></td><td>[ComparisonRow]</td><td>Three rows for the §4 skip_domain comparison table (where it lives / scope / when to pick which). Each row has labelKey + schemaSideKey + appSideKey under the guides_api_data_models_skip_domain_ namespace.</td><td>-</td></tr>
+<tr><td><code>mcpPreviewFields</code></td><td>[McpFieldRow]</td><td>Four rows for §5 documenting the preview_api_model_sync output shape (kept_schemas, filtered_out, skip_domain_matches, halts). Each carries fieldKey + typeKey + bodyKey under the guides_api_data_models_mcp_preview_ namespace.</td><td>-</td></tr>
+<tr><td><code>mcpDiscoveryFields</code></td><td>[McpFieldRow]</td><td>Rows for §6 documenting list_api_specs and list_api_models output shapes. Two tools, ~6 rows total. Keys under the guides_api_data_models_mcp_discovery_ namespace.</td><td>-</td></tr>
+<tr><td><code>androidSerializerRows</code></td><td>[ComparisonRow]</td><td>Three rows for the §9 Android-serializer comparison table (moshi / kotlinx / none). labelKey + moshiKey + kotlinxKey + noneKey — note this row type has 4 columns not 3; rendered with the comparison_4col cell rather than comparison_row. See customTypes below.</td><td>-</td></tr>
+<tr><td><code>webCaseRows</code></td><td>[ComparisonRow]</td><td>Three rows for the §10 Web case-convention comparison (snake_case default zero-cost / camelCase runtime conversion). Reuses ComparisonRow since it&#x27;s a 3-col compare (label + snake / camel).</td><td>-</td></tr>
+<tr><td><code>haltRows</code></td><td>[HaltRow]</td><td>Six rows for the §15 ERROR-halt table (mirror of the concept page&#x27;s section 9 but more recipe-flavored: each row has triggerKey + behaviorKey + workaroundKey, where workaround is a concrete code or config patch hint).</td><td>-</td></tr>
+<tr><td><code>domainPatternTabs</code></td><td>[TabHeaderCell]</td><td>Four T6-pattern tab headers for the §8 Domain-customization switcher (id=&#x27;proxy&#x27; | &#x27;type_conv&#x27; | &#x27;computed&#x27; | &#x27;stored&#x27;). Initial active is &#x27;proxy&#x27;. Rebuilt by buildDomainPatternTabs(id) on every onSelectCodeTab call.</td><td>-</td></tr>
+<tr><td><code>activeDomainPattern</code></td><td>String</td><td>Id of the currently selected Domain-customization pattern in §8 (&#x27;proxy&#x27; | &#x27;type_conv&#x27; | &#x27;computed&#x27; | &#x27;stored&#x27;). Drives displayLogic for the four §8 sample panels.</td><td>-</td></tr>
+<tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td>Three closing &#x27;read next&#x27; cards: /concepts/data-models-from-openapi (back to the concept), /reference/cli-commands (jui g api / jui ls api-* details), /tools/mcp (MCP Group E tool reference). Seeded in onAppear.</td><td>-</td></tr>
+<tr><td><code>proxyPatternPanelVisibility</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>typeConvPatternPanelVisibility</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>computedPatternPanelVisibility</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>storedPatternPanelVisibility</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+</tbody></table>
+</details>
+<details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">4</span></summary>
+<p class="section-intro">Handlers kept inside the View layer. ViewModel public API lives under <code>dataFlow.viewModel</code>.</p>
+<table>
+<thead><tr><th>Handler</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>onAppear</code></td><td>Seed filterConfigRows (5), filterEvalRows (4), skipDomainCompareRows (3), mcpPreviewFields (4), mcpDiscoveryFields (~6), androidSerializerRows (3), webCaseRows (3), haltRows (6), and nextReadLinks (3) from module-scope catalogs, then call buildDomainPatternTabs(&#x27;proxy&#x27;) to populate domainPatternTabs. Every string flows through StringManager with the guides_api_data_models_ prefix (and the sub-prefixes _filter_ / _skip_domain_ / _mcp_preview_ / _mcp_discovery_ / _return_type_ where applicable).</td><td>-</td></tr>
+<tr><td><code>onSelectCodeTab</code></td><td>T6-pattern tab toggle for the §8 Domain-pattern switcher. Sets activeDomainPattern = id, then assigns domainPatternTabs = buildDomainPatternTabs(id). displayLogic derives proxyPatternPanelVisibility / typeConvPatternPanelVisibility / computedPatternPanelVisibility / storedPatternPanelVisibility from activeDomainPattern.</td><td>-</td></tr>
+<tr><td><code>onNavigate</code></td><td>Client-side navigation via router.push(url). Bound to each NextReadLink card and any inline cross-link CTAs to /concepts/data-models-from-openapi / /reference/cli-commands / /tools/mcp / /learn/installation.</td><td>-</td></tr>
+<tr><td><code>onNavigateGuides</code></td><td></td><td>-</td></tr>
+</tbody></table>
+</details>
+<h3>Display Logic</h3>
+<pre class="display-logic">
+activeDomainPattern == &#x27;proxy&#x27;:
+  - domain_pattern_panel_proxy: visible [variable: proxyPatternPanelVisibility]
+
+activeDomainPattern == &#x27;type_conv&#x27;:
+  - domain_pattern_panel_type_conv: visible [variable: typeConvPatternPanelVisibility]
+
+activeDomainPattern == &#x27;computed&#x27;:
+  - domain_pattern_panel_computed: visible [variable: computedPatternPanelVisibility]
+
+activeDomainPattern == &#x27;stored&#x27;:
+  - domain_pattern_panel_stored: visible [variable: storedPatternPanelVisibility]
+
+</pre>
+</section>
+<section id="actions">
+<h2>User Actions</h2>
+<table>
+<thead><tr><th>Action</th><th>Processing</th><th>Destination</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Tap a TOC entry</td><td>TOC-internal scroll.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap a §8 Domain-pattern tab</td><td>onSelectCodeTab(id) flips activeDomainPattern; displayLogic swaps the visible domain_pattern_panel_*.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap a CodeBlock copy button</td><td>Copy handled inside the CodeBlock converter. No VM involvement.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap a NextReadLink card</td><td>onNavigate(url) with the bound NextReadLink.url.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap an inline cross-link</td><td>onNavigate(url) to /concepts/data-models-from-openapi or /reference/cli-commands or /tools/mcp or /learn/installation.</td><td>-</td><td>-</td></tr>
+</tbody></table>
+</section>
+<section id="validation">
+<h2>Validation</h2>
+</section>
+<section id="transitions">
+<h2>Transitions</h2>
+<table>
+<thead><tr><th>Condition</th><th>Destination</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>url is /guides, /concepts/data-models-from-openapi, /reference/cli-commands, /tools/mcp, or /learn/installation</td><td>Target spec screen</td><td>-</td></tr>
+</tbody></table>
+</section>
+<section id="files">
+<div class="tree-wrapper" data-initial-depth="0">
+<div class="tree-table-header">
+<h2>Related Files</h2>
+<div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
+</div>
+<table class="tree-table">
+<thead><tr><th>Type</th><th>File Path</th><th>Notes</th></tr></thead>
+<tbody>
+<tr class="tree-group" data-row-id="1" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">Layout</span><span class="tree-group-count">8</span></td></tr>
+<tr data-row-id="1-1" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/guides/api-data-models.json</code></td><td>Guide layout. ScrollView root with 15 H2 sections, one T6-pattern code-tab switcher (§8 Domain patterns), eight Collections (filter config / filter eval / skip_domain compare / mcp preview fields / mcp discovery fields / android serializer / web case / halts), and a closing NextRead Collection.</td></tr>
+<tr data-row-id="1-2" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/cells/filter_config_row.json</code></td><td>FilterConfigRow cell layout: key (monospace) + type pill + default + glob-allowed pill + description paragraph.</td></tr>
+<tr data-row-id="1-3" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/cells/filter_eval_row.json</code></td><td>FilterEvalRow cell layout: order index + rule label + body paragraph.</td></tr>
+<tr data-row-id="1-4" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/cells/comparison_row.json</code></td><td>Reused for skipDomainCompareRows (3-col) and webCaseRows (3-col). Same cell layout as concept page; the leftKey / rightKey / thirdKey columns adapt to the row&#x27;s domain.</td></tr>
+<tr data-row-id="1-5" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/cells/comparison_4col_row.json</code></td><td>Used by androidSerializerRows (4-col: label + moshi + kotlinx + none). Distinct cell because the column count differs.</td></tr>
+<tr data-row-id="1-6" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/cells/mcp_field_row.json</code></td><td>McpFieldRow cell layout: tool name pill + field (monospace) + type pill + body paragraph. Used in both §5 and §6 Collections.</td></tr>
+<tr data-row-id="1-7" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/cells/halt_row.json</code></td><td>HaltRow cell layout: trigger pill + behavior column + workaround column. Same cell as concept page §9 but populated with cookbook-flavored workaround strings here.</td></tr>
+<tr data-row-id="1-8" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/cells/tab_header.json</code></td><td>Reused button-style tab header driven by bgColor / fgColor / borderColor.</td></tr>
+<tr class="tree-group" data-row-id="2" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">ViewModel</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="2-1" data-parent-id="2"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>ViewModel</code></td><td><code>jsonui-doc-web/src/viewmodels/guides/ApiDataModelsViewModel.ts</code></td><td>Hand-written VM body. Seeds every static catalog in onAppear, owns activeDomainPattern, and implements buildDomainPatternTabs with the same palette-swap shape as the project&#x27;s other code-tab helpers.</td></tr>
+<tr class="tree-group" data-row-id="3" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">View</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="3-1" data-parent-id="3"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>View</code></td><td><code>jsonui-doc-web/src/app/guides/api-data-models/page.tsx</code></td><td>Next.js App Router page. Dynamic-imports the generated ApiDataModelsView.</td></tr>
+<tr class="tree-group" data-row-id="4" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">Component</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="4-1" data-parent-id="4"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Component</code></td><td><code>docs/components/json/codeblock.component.json</code></td><td>Used for every inline code sample: jui.config.json filter snippets, include_paths examples, x-jui-skip-domain example, preview_api_model_sync JSON output, list_api_specs / list_api_models JSON outputs, Swift / Kotlin / TS Repository return-type examples, the four §8 Domain-customization patterns, the Android moshi ksp setup snippet, the §14 CI jui-verify YAML snippet, and the §15 error-message hint snippets.</td></tr>
+</tbody></table>
+</div>
+</section>
+<section id="notes">
+<h2>Notes</h2>
+<ul>
+<li>Cookbook companion to /concepts/data-models-from-openapi. Concept explains why; this page is how-to with copy-pasteable recipes.</li>
+<li>Fifteen H2 sections per plan 2026-05-27 swagger-models-doc-additions §2.2: (1) Set up docs/api/, (2) Add a new schema + run build + write proxies, (3) Scope what gets generated — path/schema filter, (4) Two levels of skip_domain, (5) Preview filter changes via MCP preview_api_model_sync, (6) Inspect current state via list_api_specs / list_api_models, (7) DTO vs Domain — Repository return type, (8) Customize Domain — 4 patterns, (9) Android serializer pick, (10) Web case convention pick, (11) Migrating hand-written models, (12) Reserved word collisions, (13) Cycles — what fails what&#x27;s allowed, (14) Drift detection in CI, (15) Error-halt cookbook table.</li>
+<li>All schema names in code examples are generic: User, Order, LoginRequest. All paths in filter examples are generic: /api/auth/*, /api/users/*, /api/admin/*, /api/internal/*. NEVER use a real consumer-project schema or path — per the project&#x27;s no-local-project-refs memory rule.</li>
+<li>§3 is the canonical filter reference for the entire site. The 5-row api.schemas.* settings table lives ONLY here; the concept page §6 links to this section instead of duplicating. Same for §4 (skip_domain two-level OR), §5 (preview_api_model_sync), §6 (list_api_specs / list_api_models).</li>
+<li>§7 Repository return-type rule: when a Repository method declares its returnType as a swagger schema name (e.g. &#x27;User&#x27;), the codegen auto-resolves it to the Domain type. To get the raw DTO instead, write &#x27;UserDto&#x27; explicitly. The Swift code sample shows both shapes side-by-side.</li>
+<li>§8 uses a 4-tab T6-pattern switcher (proxy / type_conv / computed / stored). Each panel holds a complete Swift snippet showing the corresponding Domain customization. Kotlin / TS variants are linked from the §8 lead but not inlined — single-platform sample keeps the section readable.</li>
+<li>§9 Android serializer comparison: moshi (default; requires ksp plugin), kotlinx (no ksp; @Serializable annotations), none (no annotations; reader supplies their own deserializer). The §9 lead links to /learn/installation for the ksp setup steps.</li>
+<li>§10 Web case convention: snake_case is the default and is zero-cost (no runtime conversion); camelCase requires a runtime case transform on every (de)serialize. The lead recommends snake_case unless the rest of the codebase uses camelCase pervasively.</li>
+<li>§11 Migrating hand-written models: §4 skip_domain is the per-schema escape hatch — set x-jui-skip-domain: true on the schema (everyone-skips) or list it in api.schemas.skip_domain (per-app overlay) to keep your hand-written model and not generate a Domain scaffold for that schema. The DTO is still generated; the migration is gradual.</li>
+<li>§13 cycles: direct self-reference ($ref to the same schema at the property level) is ERROR-halt. Collection-mediated cycles (e.g. Node with children: array of Node) are allowed because the cycle is broken by the array boundary.</li>
+<li>§14 CI: drift detection runs jui verify --fail-on-diff. Filter changes that prune schemas + a normal build are SEMANTICALLY identical to the verify step&#x27;s reconciliation; filter is lenient (warns on 0-schema match), parser is strict (halts on bad schema). The 14-line YAML snippet is GitHub Actions-style.</li>
+<li>§15 halt table: cookbook-flavored — each row carries a concrete workaround (e.g. &#x27;replace oneOf with separate endpoints&#x27; or &#x27;inline the $ref-ed schema into the main file&#x27;). Recipes, not just diagnoses.</li>
+<li>Strings prefix: guides_api_data_models_ with sub-namespaces _filter_ (§3) / _skip_domain_ (§4) / _mcp_preview_ (§5) / _mcp_discovery_ (§6) / _return_type_ (§7). Estimated 140-180 keys. en + ja content is jsonui-implement / jsonui-localize&#x27;s responsibility.</li>
+<li>Only CodeBlock referenced as a custom component (already whitelisted). The 7 cell layouts authored alongside the page Layout are standard JsonUI cells, not custom component types.</li>
+<li>2026-07-07 — Contract check awareness (Renderer SSoT + doc-contract-check rollout). Extend `section_ci_body` with 1-2 sentences noting: &#x27;Since 2026-07, docs↔ implementation drift can also be machine-verified via `jsonui-doc check` (which runs a builtin:openapi-diff between the impl-declared OpenAPI and docs/api/). This complements `jui verify --fail-on-diff` (which verifies DTO regeneration is byte-stable against the docs) — verify catches DTO drift within the doc→code pipeline, check catches API drift between docs and the running server.&#x27; Update `section_ci_heading` if needed to reflect both. Do NOT add a link to /guides/verifying-implementation-against-docs yet — that page is authored in a follow-up session. The addition is body-copy only, no new sections or TOC entries. ja も対応。</li>
+</ul>
+</section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+
+
+<script>
+(function() {
+  function initWrapper(wrapper) {
+    const table = wrapper.querySelector('table.tree-table');
+    if (!table) return;
+    const expanded = new Set();
+    const initialDepth = parseInt(wrapper.dataset.initialDepth || '2', 10);
+    function rowById(id) { return table.querySelector('tr[data-row-id="' + id + '"]'); }
+    function visible(tr) {
+      let pid = tr.dataset.parentId;
+      while (pid) {
+        if (!expanded.has(pid)) return false;
+        const p = rowById(pid);
+        pid = p ? p.dataset.parentId : null;
+      }
+      return true;
+    }
+    function apply() {
+      table.querySelectorAll('tr[data-parent-id]').forEach(tr => {
+        tr.style.display = visible(tr) ? '' : 'none';
+      });
+    }
+    function updateChevrons() {
+      table.querySelectorAll('tr[data-has-children] .tree-toggle').forEach(t => {
+        const id = t.closest('tr').dataset.rowId;
+        t.classList.toggle('expanded', expanded.has(id));
+      });
+    }
+    function expandAll() {
+      table.querySelectorAll('tr[data-has-children]').forEach(tr => expanded.add(tr.dataset.rowId));
+      apply(); updateChevrons();
+    }
+    function collapseAll() { expanded.clear(); apply(); updateChevrons(); }
+    // Initial: expand rows whose depth is < initialDepth (row-id dashes < initialDepth)
+    table.querySelectorAll('tr[data-has-children]').forEach(tr => {
+      const depth = (tr.dataset.rowId.match(/-/g) || []).length;
+      if (depth < initialDepth) expanded.add(tr.dataset.rowId);
+    });
+    table.querySelectorAll('tr[data-has-children] .tree-toggle').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = btn.closest('tr').dataset.rowId;
+        if (expanded.has(id)) expanded.delete(id); else expanded.add(id);
+        apply(); updateChevrons();
+      });
+    });
+    wrapper.querySelectorAll('.tree-expand-all').forEach(b => b.addEventListener('click', expandAll));
+    wrapper.querySelectorAll('.tree-collapse-all').forEach(b => b.addEventListener('click', collapseAll));
+    apply(); updateChevrons();
+  }
+  function init() {
+    document.querySelectorAll('.tree-wrapper').forEach(initWrapper);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>

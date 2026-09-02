@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome - Site chrome</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --code-bg: #f1f5f9;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 { color: var(--text-color); margin-bottom: 1.5rem; font-size: 2rem; }
+        h2 { color: var(--text-color); margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); }
+        h3 { color: var(--text-color); margin: 1.5rem 0 0.75rem; }
+        h4 { color: #64748b; margin: 1rem 0 0.5rem; }
+        section { margin-bottom: 2rem; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:hover { background: #f8fafc; }
+        code { background: var(--code-bg); padding: 0.2em 0.4em; border-radius: 4px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9em; }
+        pre { background: var(--code-bg); padding: 1rem; border-radius: 8px; overflow-x: auto; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9em; line-height: 1.5; }
+        .meta-table { width: auto; }
+        .meta-table th { background: transparent; border: none; padding: 0.25rem 1rem 0.25rem 0; }
+        .meta-table td { border: none; padding: 0.25rem 0; }
+        .component-type { background: var(--bg-color); color: var(--text-color); padding: 0.2em 0.5em; border-radius: 4px; font-size: 0.85em; border: 1px solid var(--border-color); }
+        .platform-badge { display: inline-block; padding: 0.15em 0.5em; margin-right: 0.25em; border-radius: 3px; font-size: 0.75em; font-weight: 600; }
+        .platform-ios { background: #dbeafe; color: #1e40af; }
+        .platform-android { background: #dcfce7; color: #166534; }
+        .platform-web { background: #fef3c7; color: #92400e; }
+        .platform-override { opacity: 0.75; font-style: italic; }
+        /* ViewModel / event-handler collapsible sections */
+        details.vm-section { margin: 1rem 0; }
+        details.vm-section > summary {
+            cursor: pointer;
+            font-size: 1.15em;
+            font-weight: 600;
+            padding: 0.4rem 0.5rem;
+            border-left: 3px solid var(--border-color);
+            background: var(--code-bg);
+            border-radius: 0 4px 4px 0;
+            user-select: none;
+            margin-bottom: 0.5rem;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4em;
+        }
+        details.vm-section > summary::-webkit-details-marker { display: none; }
+        details.vm-section > summary::before {
+            content: "\25B6";
+            font-size: 0.75em;
+            transition: transform 0.15s ease;
+            display: inline-block;
+            color: var(--text-color);
+            opacity: 0.5;
+        }
+        details.vm-section[open] > summary::before {
+            transform: rotate(90deg);
+        }
+        details.vm-section > summary:hover { border-left-color: #3b82f6; }
+        .count-badge {
+            display: inline-block;
+            padding: 0.1em 0.55em;
+            border-radius: 10px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.78em;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            margin-left: auto;
+        }
+        .flag-chip {
+            display: inline-block;
+            padding: 0.1em 0.45em;
+            margin-right: 0.25em;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-weight: 500;
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        .flag-observable { background: #ede9fe; color: #5b21b6; border-color: #ddd6fe; }
+        .flag-optional   { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .flag-readonly   { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+        .section-intro   { color: #64748b; font-size: 0.9em; margin: 0.25rem 0 0.5rem; }
+        .layout-tree { background: #1e293b; color: #e2e8f0; padding: 1.5rem; }
+        .display-logic { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        .notes { color: #64748b; font-style: italic; margin-top: 0.5rem; }
+        .http-method { padding: 0.2em 0.5em; border-radius: 4px; font-weight: 600; font-size: 0.85em; }
+        .method-get { background: #22c55e; color: white; }
+        .method-post { background: #3b82f6; color: white; }
+        .method-put { background: #f59e0b; color: white; }
+        .method-patch { background: #8b5cf6; color: white; }
+        .method-delete { background: #ef4444; color: white; }
+        .json { background: #1e293b; color: #e2e8f0; }
+        .mermaid { background: white; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin: 1rem 0; }
+        ul { margin: 0.5rem 0; padding-left: 1.5rem; }
+        li { margin: 0.25rem 0; }
+        .custom-component-name { background: #fef3c7; color: #92400e; padding: 0.2em 0.5em; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
+        .component-link { color: var(--primary-color); text-decoration: none; }
+        .component-link:hover { text-decoration: underline; }
+        .swatch { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .swatch > i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.15); background-clip: padding-box; flex-shrink: 0; }
+        .swatch > code { background: var(--code-bg); padding: 0.1em 0.35em; font-size: 0.85em; }
+        .swatch-hex { color: #64748b; font-family: 'SF Mono', Monaco, monospace; font-size: 0.8em; }
+        .style-rows { display: flex; flex-direction: column; gap: 0.2rem; }
+        .style-row { display: flex; gap: 0.5rem; align-items: flex-start; line-height: 1.5; flex-wrap: wrap; }
+        .style-key { color: #64748b; font-weight: 600; font-size: 0.7rem; min-width: 56px; text-transform: uppercase; letter-spacing: 0.04em; padding-top: 0.15rem; flex-shrink: 0; }
+        .style-lbl { color: #94a3b8; font-size: 0.75rem; margin-right: 2px; }
+        .bind-cell { display: flex; flex-direction: column; gap: 3px; font-size: 0.8rem; line-height: 1.6; }
+        .bind-badge { display: inline-block; padding: 0 0.4em; border-radius: 3px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; vertical-align: baseline; }
+        .bind-event { background: #fef3c7; color: #92400e; }
+        .bind-data { background: #dbeafe; color: #1e40af; }
+        .tree-table-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1.5rem 0 0.5rem; }
+        .tree-table-header h3 { margin: 0; }
+        .tree-controls button { font: inherit; font-size: 0.8rem; padding: 0.25em 0.75em; margin-left: 0.4rem; border: 1px solid var(--border-color); background: white; color: var(--text-color); border-radius: 4px; cursor: pointer; }
+        .tree-controls button:hover { background: var(--bg-color); border-color: #94a3b8; }
+        .tree-col { white-space: nowrap; }
+        .tree-indent { display: inline-block; vertical-align: middle; }
+        .tree-toggle { display: inline-block; width: 16px; text-align: center; cursor: pointer; color: #64748b; font-size: 0.7em; transition: transform 0.15s ease; user-select: none; margin-right: 4px; }
+        .tree-toggle:hover { color: var(--primary-color); }
+        .tree-toggle.expanded { transform: rotate(90deg); }
+        .tree-spacer { display: inline-block; width: 16px; margin-right: 4px; }
+        tr.tree-group > td { background: #f8fafc; font-weight: 600; }
+        tr.tree-group .tree-group-name { color: var(--text-color); }
+        tr.tree-group .tree-group-count { display: inline-block; margin-left: 0.4rem; padding: 0.05em 0.5em; background: var(--border-color); color: #475569; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
+        
+    </style>
+</head>
+<body>
+
+<div class="container">
+<h1>Chrome - Site chrome</h1>
+<section id="overview">
+<h2>Overview</h2>
+<p>Site-wide chrome composition: mounts the TopBar (sticky header with brand, Search, language toggle, mobile-menu button) and the Sidebar (persistent left rail grouping every documentation route into 6 collapsible category sections). Not a page — rendered by the Next.js RootLayout as a sibling of {children}. The ViewModel owns the static nav catalog, the per-section collapse state, the mobile-drawer open flag, and the active-route mirror that comes from Next.js&#x27;s usePathname().</p>
+<table class="meta-table">
+<tr><th>Created</th><td>2026-04-23</td></tr>
+<tr><th>Updated</th><td>2026-04-23</td></tr>
+</table>
+</section>
+<section id="structure">
+<h2>Screen Structure</h2>
+<div class="tree-wrapper" data-initial-depth="2">
+<div class="tree-table-header">
+<h3>UI Components</h3>
+<div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
+</div>
+<table class="tree-table">
+<thead><tr><th>Component</th><th>ID</th><th>Platform</th><th>Description</th><th>Bindings</th><th>Notes</th></tr></thead>
+<tbody>
+<tr data-row-id="1" data-has-children="true">
+<td class="tree-col"><span class="tree-indent" style="width:0px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
+<td><code>chrome_root</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1" data-parent-id="1">
+<td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><span class="component-type">TopBar</span></td>
+<td><code>chrome_topbar</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>currentLanguage</code> ↔ <code>currentLanguage</code></div><div><span class="bind-badge bind-data">bind</span> <code>currentColorMode</code> ↔ <code>currentColorMode</code></div><div><span class="bind-badge bind-data">bind</span> <code>onToggleLanguage</code> ↔ <code>onToggleLanguage</code></div><div><span class="bind-badge bind-data">bind</span> <code>onToggleColorMode</code> ↔ <code>onToggleColorMode</code></div><div><span class="bind-badge bind-data">bind</span> <code>onToggleMobileMenu</code> ↔ <code>onToggleMobileMenu</code></div></div></td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-2" data-parent-id="1">
+<td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><span class="component-type">Sidebar</span></td>
+<td><code>chrome_sidebar</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>navItems</code></div><div><span class="bind-badge bind-data">bind</span> <code>activeUrl</code> ↔ <code>activeUrl</code></div><div><span class="bind-badge bind-data">bind</span> <code>collapsedIds</code> ↔ <code>collapsedIds</code></div><div><span class="bind-badge bind-data">bind</span> <code>mobileOpen</code> ↔ <code>mobileOpen</code></div><div><span class="bind-badge bind-data">bind</span> <code>onToggleSection</code> ↔ <code>onToggleSection</code></div><div><span class="bind-badge bind-data">bind</span> <code>onLinkTap</code> ↔ <code>onLinkTap</code></div></div></td>
+<td>-</td>
+</tr>
+</tbody></table>
+</div>
+<h3>Layout Structure</h3>
+<pre class="layout-tree">
+chrome_root
+├── chrome_topbar
+└── chrome_sidebar
+</pre>
+</section>
+<section id="dataflow">
+<h2>Data Flow</h2>
+<pre class="mermaid">
+flowchart TD
+    VIEW[ChromeView] --> VM[ChromeViewModel]
+    VM -- navItems --> VIEW
+    VM -- activeUrl --> VIEW
+    VM -- collapsedIds --> VIEW
+    VM -- mobileOpen --> VIEW
+    VM -- currentLanguage --> VIEW
+    VIEW -- onAppear --> VM
+    VIEW -- onRouteChange(url) --> VM
+    VIEW -- onToggleSection(id) --> VM
+    VIEW -- onToggleMobileMenu --> VM
+    VIEW -- onToggleLanguage --> VM
+    VIEW -- onLinkTap(url) --> VM
+</pre>
+<h3>ViewModel</h3>
+<details class="vm-section" open><summary class="vm-section-header">Methods <span class="count-badge">7</span></summary>
+<table>
+<thead><tr><th>Signature</th><th>Platforms</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>onAppear()</code></td><td><em title="Imported into all platforms">all</em></td><td>Seed navItems from the module-scope NAV_CATALOG constant. Resolve every section.label via StringManager.getString(&#x27;chrome_nav_&lt;id&gt;_label&#x27;) and every entry.label via StringManager.getString(entry.titleKey). Also mirror StringManager.language into currentLanguage and ColorManager.currentMode into currentColorMode.</td></tr>
+<tr><td><code>onRouteChange(url: String)</code></td><td><em title="Imported into all platforms">all</em></td><td>Update activeUrl and auto-expand the containing section. Called from the ChromeWrapper&#x27;s useEffect when usePathname() changes — this is the only public method NOT bound in the layout&#x27;s data block.</td></tr>
+<tr><td><code>onToggleSection(id: String)</code></td><td><em title="Imported into all platforms">all</em></td><td>Toggle id&#x27;s membership in collapsedIds. Pure state update.</td></tr>
+<tr><td><code>onToggleMobileMenu()</code></td><td><em title="Imported into all platforms">all</em></td><td>Flip mobileOpen. Pure state update.</td></tr>
+<tr><td><code>onToggleLanguage()</code></td><td><em title="Imported into all platforms">all</em></td><td>StringManager.setLanguage(next) → onAppear() for re-seed → dispatchEvent(new CustomEvent(&#x27;chrome:languagechange&#x27;)). The dispatchEvent lets already-mounted generated pages (which cache their string reads per-render) hook a listener and force a re-render if they need to.</td></tr>
+<tr><td><code>onToggleColorMode()</code></td><td><em title="Imported into all platforms">all</em></td><td>Set ColorManager.followSystemMode = false, then ColorManager.setMode(current === &#x27;dark&#x27; ? &#x27;light&#x27; : &#x27;dark&#x27;). The VM subscribes to ColorManager in the constructor, so setMode triggers a notify → the listener re-seeds currentColorMode → React re-renders the toggle icon.</td></tr>
+<tr><td><code>onLinkTap(url: String)</code></td><td><em title="Imported into all platforms">all</em></td><td>If mobileOpen is true, flip it to false — closes the drawer as the next page mounts. No preventDefault, no router.push (Next.js &lt;Link&gt; handles navigation).</td></tr>
+</tbody></table>
+</details>
+<details class="vm-section" open><summary class="vm-section-header">Vars <span class="count-badge">6</span></summary>
+<table>
+<thead><tr><th>Declaration</th><th>Flags</th><th>Platforms</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>var navItems: Array(SidebarSection)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Nav catalog, seeded in onAppear, re-seeded on language toggle.</td></tr>
+<tr><td><code>var activeUrl: String</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Current route; ChromeWrapper pushes it via onRouteChange.</td></tr>
+<tr><td><code>var collapsedIds: Array(String)</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Collapsed section ids.</td></tr>
+<tr><td><code>var mobileOpen: Bool</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Mobile drawer open flag.</td></tr>
+<tr><td><code>var currentLanguage: String</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Mirror of StringManager.language.</td></tr>
+<tr><td><code>var currentColorMode: String</code></td><td><span class="flag-chip flag-observable">observable</span></td><td><em title="Imported into all platforms">all</em></td><td>Mirror of ColorManager.currentMode, &#x27;light&#x27; or &#x27;dark&#x27;.</td></tr>
+</tbody></table>
+</details>
+</section>
+<section id="state">
+<h2>State Management</h2>
+<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">11</span></summary>
+<table>
+<thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>navItems</code></td><td>[SidebarSection]</td><td>Ordered nav catalog — six SidebarSection entries (learn / guides / concepts / reference / platforms / tools). Seeded by onAppear from the module-scope NAV_CATALOG constant; each entry&#x27;s label + every row&#x27;s label is pre-resolved through StringManager so the Sidebar component receives display-ready strings.</td><td>-</td></tr>
+<tr><td><code>activeUrl</code></td><td>String</td><td>Mirror of the current route. Set by the Chrome wrapper via onRouteChange(pathname) whenever Next.js&#x27;s usePathname() changes. Drives the aria-current=&#x27;page&#x27; highlight on the matching Sidebar row.</td><td>-</td></tr>
+<tr><td><code>collapsedIds</code></td><td>[String]</td><td>Section ids currently collapsed. onToggleSection flips membership. onRouteChange auto-removes the containing section so the user always sees the current route&#x27;s siblings without an extra click.</td><td>-</td></tr>
+<tr><td><code>mobileOpen</code></td><td>Bool</td><td>Mobile drawer open flag. True on viewports &lt;1024px when the user has tapped the top-bar menu button. Tapping any Sidebar link (onLinkTap) and tapping Escape both flip it back to false.</td><td>-</td></tr>
+<tr><td><code>currentLanguage</code></td><td>String</td><td>Mirror of StringManager.language. Drives the TopBar&#x27;s language-toggle display label (shows the OTHER language as an invitation to switch). Re-seeded inside onAppear on every language toggle so the chrome re-localizes in lockstep with generated pages.</td><td>-</td></tr>
+<tr><td><code>currentColorMode</code></td><td>String</td><td>Mirror of ColorManager.currentMode. Drives the TopBar&#x27;s theme-toggle icon (sun when the current mode is &#x27;light&#x27;, moon when &#x27;dark&#x27;). Seeded from ColorManager at construction and re-synced via ColorManager.subscribe() whenever the mode changes (manual toggle or prefers-color-scheme media query).</td><td>-</td></tr>
+<tr><td><code>onToggleLanguage</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>onToggleColorMode</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>onToggleMobileMenu</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>onToggleSection</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>onLinkTap</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+</tbody></table>
+</details>
+<details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">7</span></summary>
+<p class="section-intro">Handlers kept inside the View layer. ViewModel public API lives under <code>dataFlow.viewModel</code>.</p>
+<table>
+<thead><tr><th>Handler</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>onAppear</code></td><td>Build navItems from NAV_CATALOG, pre-resolving each section.label and each entry.label through StringManager with the chrome_nav_&lt;id&gt;_label and screen-specific title keys. Also seed currentLanguage from StringManager.language.</td><td>-</td></tr>
+<tr><td><code>onRouteChange</code></td><td>Mirror the current Next.js pathname into activeUrl. Additionally auto-expand the containing section (remove its id from collapsedIds) so the user immediately sees the current route highlighted inside an open section — no manual expansion required.</td><td>-</td></tr>
+<tr><td><code>onToggleSection</code></td><td>Toggle membership of id in collapsedIds. Fired by the Sidebar when the user taps a section header.</td><td>-</td></tr>
+<tr><td><code>onToggleMobileMenu</code></td><td>Flip mobileOpen. Fired by the TopBar&#x27;s hamburger button, which CSS media-queries hide on wide viewports.</td><td>-</td></tr>
+<tr><td><code>onToggleLanguage</code></td><td>Flip StringManager.language between the configured languages, then re-run onAppear so every cached label re-resolves. Also dispatches a &#x27;chrome:languagechange&#x27; CustomEvent so already-rendered generated pages can listen + force-refresh if they cache their own labels.</td><td>-</td></tr>
+<tr><td><code>onToggleColorMode</code></td><td>Flip ColorManager.currentMode between &#x27;light&#x27; and &#x27;dark&#x27; and disable followSystemMode so the manual choice sticks. ColorManager.subscribe notifies the VM to re-seed currentColorMode, which re-renders the toggle icon.</td><td>-</td></tr>
+<tr><td><code>onLinkTap</code></td><td>Invoked by the Sidebar after a link is clicked — NO preventDefault, the &lt;a&gt; still navigates. On mobile viewports, flips mobileOpen to false so the drawer closes as the next page mounts.</td><td>-</td></tr>
+</tbody></table>
+</details>
+</section>
+<section id="actions">
+<h2>User Actions</h2>
+<table>
+<thead><tr><th>Action</th><th>Processing</th><th>Destination</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Tap a section header</td><td>onToggleSection(id) — flip membership in collapsedIds.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap a nav link</td><td>Next.js &lt;Link&gt; navigates. Chrome fires onLinkTap(url); on mobile, drawer closes.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap the hamburger</td><td>onToggleMobileMenu — flip mobileOpen.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap the language toggle</td><td>onToggleLanguage — StringManager.setLanguage + re-seed + dispatch &#x27;chrome:languagechange&#x27;.</td><td>-</td><td>-</td></tr>
+<tr><td>Tap the theme toggle</td><td>onToggleColorMode — ColorManager.setMode flips light↔dark, subscribe callback re-seeds currentColorMode.</td><td>-</td><td>-</td></tr>
+<tr><td>Type ⌘+K (anywhere)</td><td>Search modal opens; unrelated to chrome state.</td><td>-</td><td>-</td></tr>
+</tbody></table>
+</section>
+<section id="validation">
+<h2>Validation</h2>
+</section>
+<section id="files">
+<div class="tree-wrapper" data-initial-depth="0">
+<div class="tree-table-header">
+<h2>Related Files</h2>
+<div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
+</div>
+<table class="tree-table">
+<thead><tr><th>Type</th><th>File Path</th><th>Notes</th></tr></thead>
+<tbody>
+<tr class="tree-group" data-row-id="1" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">Layout</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="1-1" data-parent-id="1"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Layout</code></td><td><code>docs/screens/layouts/chrome.json</code></td><td>Chrome layout composing TopBar + Sidebar.</td></tr>
+<tr class="tree-group" data-row-id="2" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">Component</span><span class="tree-group-count">2</span></td></tr>
+<tr data-row-id="2-1" data-parent-id="2"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Component</code></td><td><code>docs/components/json/topbar.component.json</code></td><td>TopBar custom component spec.</td></tr>
+<tr data-row-id="2-2" data-parent-id="2"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Component</code></td><td><code>docs/components/json/sidebar.component.json</code></td><td>Sidebar custom component spec.</td></tr>
+<tr class="tree-group" data-row-id="3" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">ViewModel</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="3-1" data-parent-id="3"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>ViewModel</code></td><td><code>jsonui-doc-web/src/viewmodels/ChromeViewModel.ts</code></td><td>Hand-written VM body with the NAV_CATALOG constant.</td></tr>
+<tr class="tree-group" data-row-id="4" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">Wrapper</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="4-1" data-parent-id="4"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>Wrapper</code></td><td><code>jsonui-doc-web/src/components/chrome/ChromeMount.tsx</code></td><td>Client wrapper that instantiates the VM via the generated hook, bridges usePathname() into onRouteChange, and mounts the generated Chrome component.</td></tr>
+<tr class="tree-group" data-row-id="5" data-has-children="true"><td colspan="3"><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="tree-group-name">View</span><span class="tree-group-count">1</span></td></tr>
+<tr data-row-id="5-1" data-parent-id="5"><td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><code>View</code></td><td><code>jsonui-doc-web/src/app/layout.tsx</code></td><td>Next.js RootLayout — mounts ChromeMount as a sibling of {children}.</td></tr>
+</tbody></table>
+</div>
+</section>
+<section id="notes">
+<h2>Notes</h2>
+<ul>
+<li>Not a page: no src/app/chrome/page.tsx. The generated Chrome.tsx is consumed ONLY by ChromeMount, which RootLayout renders site-wide.</li>
+<li>The layout never renders a &#x27;slot&#x27; for page content. RootLayout places {children} beside the generated Chrome; CSS in globals.css reserves topbar/sidebar space via padding on .site-main.</li>
+<li>onRouteChange is the only public method on the VM that is NOT surfaced as a layout data binding — it is called only from the ChromeWrapper via the generated hook.</li>
+</ul>
+</section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+
+
+<script>
+(function() {
+  function initWrapper(wrapper) {
+    const table = wrapper.querySelector('table.tree-table');
+    if (!table) return;
+    const expanded = new Set();
+    const initialDepth = parseInt(wrapper.dataset.initialDepth || '2', 10);
+    function rowById(id) { return table.querySelector('tr[data-row-id="' + id + '"]'); }
+    function visible(tr) {
+      let pid = tr.dataset.parentId;
+      while (pid) {
+        if (!expanded.has(pid)) return false;
+        const p = rowById(pid);
+        pid = p ? p.dataset.parentId : null;
+      }
+      return true;
+    }
+    function apply() {
+      table.querySelectorAll('tr[data-parent-id]').forEach(tr => {
+        tr.style.display = visible(tr) ? '' : 'none';
+      });
+    }
+    function updateChevrons() {
+      table.querySelectorAll('tr[data-has-children] .tree-toggle').forEach(t => {
+        const id = t.closest('tr').dataset.rowId;
+        t.classList.toggle('expanded', expanded.has(id));
+      });
+    }
+    function expandAll() {
+      table.querySelectorAll('tr[data-has-children]').forEach(tr => expanded.add(tr.dataset.rowId));
+      apply(); updateChevrons();
+    }
+    function collapseAll() { expanded.clear(); apply(); updateChevrons(); }
+    // Initial: expand rows whose depth is < initialDepth (row-id dashes < initialDepth)
+    table.querySelectorAll('tr[data-has-children]').forEach(tr => {
+      const depth = (tr.dataset.rowId.match(/-/g) || []).length;
+      if (depth < initialDepth) expanded.add(tr.dataset.rowId);
+    });
+    table.querySelectorAll('tr[data-has-children] .tree-toggle').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = btn.closest('tr').dataset.rowId;
+        if (expanded.has(id)) expanded.delete(id); else expanded.add(id);
+        apply(); updateChevrons();
+      });
+    });
+    wrapper.querySelectorAll('.tree-expand-all').forEach(b => b.addEventListener('click', expandAll));
+    wrapper.querySelectorAll('.tree-collapse-all').forEach(b => b.addEventListener('click', collapseAll));
+    apply(); updateChevrons();
+  }
+  function init() {
+    document.querySelectorAll('.tree-wrapper').forEach(initWrapper);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>
