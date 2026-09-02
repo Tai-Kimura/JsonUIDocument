@@ -37,7 +37,7 @@ env:
   # Bump procedure: pick the new jsonui-cli main SHA, replace this value, and
   # review the regenerated reference pages in that deploy — the SHA bump is
   # the review point for reference updates.
-  JSONUI_CLI_REF: 3b49fc0f2ff4fbc0d34e0aec22477d55fc5647bc # v1.8.0
+  JSONUI_CLI_REF: ddaba8f459b82ba4784ac10ac56e13ae2855dc4f # v1.8.4
 
 jobs:
   # ENFORCING — `deploy` depends on this job; a red gate stops the deploy
@@ -52,12 +52,15 @@ jobs:
   # artifacts a fresh checkout lacks), and after that fix, two consecutive
   # runs reported 0 of 6.
   #
-  # A seventh joined them on 2026-09-02: check:cli-coverage compares the CLI
-  # reference against each binary's --help in both directions. It is a gate
-  # rather than part of `prebuild` because it must measure the PINNED
-  # toolchain — JSONUI_CLI_PATH below — and a local install can be any
-  # version. It was added the day a card for a subcommand that never existed
-  # was found on the page, four months after it was published.
+  # A seventh joined them on 2026-09-02: check:cli-coverage reads each
+  # binary's --help at the PINNED toolchain (JSONUI_CLI_PATH below — a local
+  # install can be any version, which is why this is a gate and not part of
+  # `prebuild`) and does two things with it. It compares the subcommand SET
+  # with the reference both ways — added the day a card for a subcommand that
+  # never existed was found, four months after it was published — and it
+  # checks the read-stamps: whether a human has read each card against this
+  # version's help. The second half never judges whether a card is right, only
+  # whether it was read; unstamped cards are counted, never red.
   #
   # All seven gates run even when one fails, so a red run names everything that
   # is red, and every gate prints its own exit code — a gate that could not
@@ -141,7 +144,8 @@ jobs:
           run_gate jsonui-test-validate   python3 "$JSONUI_CLI_PATH/test_tools/jsonui-test" \
                                             validate --no-install tests/screens
           # Reads JSONUI_CLI_PATH itself; refuses to pass when it cannot run
-          # the binaries, so "could not compare" never reads as "agreed".
+          # the binaries or when the stampability classification is missing, so
+          # "could not compare" never reads as "agreed".
           run_gate cli-coverage           npm --prefix jsonui-doc-web run check:cli-coverage
           echo "----"
           echo "gates with a non-zero exit: $fail of 7"
