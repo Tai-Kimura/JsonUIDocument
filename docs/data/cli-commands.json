@@ -544,7 +544,7 @@
     {
       "binary": "jui",
       "command": "build",
-      "synopsis": "jui build [--clean] [--ios-only|--android-only|--web-only] [--lint-strings]",
+      "synopsis": "jui build [--clean] [--ios-only|--android-only|--web-only | --platform ios|android|web] [--lint-strings]",
       "purpose": {
         "en": "Build all configured platforms (or one with the --*-only flags). Must pass with zero warnings (JsonUI invariant #1).",
         "ja": "設定済み全プラットフォーム（--*-only で単一）をビルド。警告ゼロで通過必須（JsonUI 不変条件 #1）。"
@@ -587,6 +587,14 @@
           }
         },
         {
+          "name": "--platform",
+          "type": "enum",
+          "description": {
+            "en": "Build one platform: `ios`, `android` or `web`. Equivalent to the matching `--*-only` flag — it exists so the CLI and the MCP `jui_build` tool share one vocabulary (since jsonui-cli 1.8.10).",
+            "ja": "1 プラットフォームだけをビルドする: `ios` / `android` / `web`。対応する `--*-only` と等価で、CLI と MCP の `jui_build` ツールで語彙を揃えるために追加された（jsonui-cli 1.8.10 から）。"
+          }
+        },
+        {
           "name": "--lint-strings",
           "type": "flag",
           "default": "false",
@@ -610,17 +618,17 @@
         "jui lint-generated"
       ],
       "verifiedAgainst": {
-        "version": "1.8.4",
+        "version": "1.8.10",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "0823d3c632f280eca47926b6dcfbae295f5b10ca3e52207fc8b046f4f7abb153",
-        "cardHash": "e8d54d9095cd7984d68d4b63716c2e4dfbc33e6b952d25ac85a291ee431c52b1",
+        "helpHash": "1e8dd3a6ed5a3858c0e562683cde2f46190ff7896d6c551a246be3288d0c788d",
+        "cardHash": "7fa665b5e6e3bb3944cbc0bf161ce1a96872342273d2cb0cc606ce998b036cbc",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "672f5de73f32",
-          "synopsis": "75370e9ee8c7",
+          "synopsis": "d75070d2cf40",
           "purpose": "5bc73f469fc2",
-          "options": "451509e7bbcd",
+          "options": "a4640385cb54",
           "examples": "9fc8f3499be3",
           "aliases": "1663eff2143e",
           "seeAlso": "235e294708c1"
@@ -1537,7 +1545,23 @@
       "seeAlso": [
         "jui build",
         "jui lint-generated"
-      ]
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.10",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "b9743186335303f9a384a86239b7c327d819105246a9840d2e0e927130f92dfa",
+        "cardHash": "4d02ca621605c2fcefc61f3b3fd43ae9231fd96a34bda32b0bff8c7ed99e9ec2",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "057ad9bd183a",
+          "synopsis": "bae13071b40d",
+          "purpose": "4b1bb9c51969",
+          "options": "4b5b64fd4dc6",
+          "examples": "cf86a4e56168",
+          "seeAlso": "0a2eb0d60b1a"
+        }
+      }
     },
     {
       "binary": "jui",
@@ -1927,7 +1951,7 @@
     {
       "binary": "jsonui-test",
       "command": "validate",
-      "synopsis": "jsonui-test validate <path> [--no-mock-check]",
+      "synopsis": "jsonui-test validate <path>... [--no-install] [--no-mock-check] [--config <file>]",
       "purpose": {
         "en": "Validate test JSON files (schema, reference integrity, element ID existence). Since 2026-07-30 it also runs the mock contract check, and regenerates `<mockDir>/generated/` when it is missing or older than the swagger — a fresh clone or a first CI run therefore starts from a complete mock set. If that regeneration fails the suite does not run, because an empty `generated/` turns into a confusing pile of 404s.",
         "ja": "テスト JSON ファイル検証（スキーマ、参照整合性、要素 ID の存在）。2026-07-30 以降はモックの契約検査も実行し、`<mockDir>/generated/` が無い、または swagger より古い場合は再生成する — クローン直後でも CI 初回でも完全なモック一式から始められる。再生成に失敗した場合はスイートを走らせずに落とす（空の `generated/` で走ると分かりにくい 404 の山になるため）。"
@@ -1941,6 +1965,24 @@
             "en": "Skip the mock contract check. The check is on by default deliberately: `mock generate --check` existed for a long time while nothing called it, which is why stale mocks survived unnoticed.",
             "ja": "モックの契約検査をスキップする。既定で有効なのは意図的で、`mock generate --check` は長らく存在していたのに誰も呼んでおらず、それが古いモックの生き残った理由だったため。"
           }
+        },
+        {
+          "name": "--no-install",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Validate only: skip the flatten-install even when `test.install` is configured.",
+            "ja": "検証のみ: `test.install` が設定されていても flatten-install を行わない。"
+          }
+        },
+        {
+          "name": "--config",
+          "type": "path",
+          "default": "jui.config.json",
+          "description": {
+            "en": "Config file the `test.install` destinations are read from.",
+            "ja": "`test.install` の配布先を読む設定ファイル。"
+          }
         }
       ],
       "examples": [
@@ -1952,7 +1994,23 @@
       "seeAlso": [
         "jsonui-test mock generate",
         "jsonui-test report"
-      ]
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.10",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "edfa2ba64d06649ea07d2dbf9ae6f4a6939ce579bf894913b37a70376d8ab7c9",
+        "cardHash": "a70a21ed55d41e49f71473bc5331487de871c34551de36e839f690969d3d2d3e",
+        "fieldHashes": {
+          "binary": "3b2560767fdf",
+          "command": "c7be693cdf56",
+          "synopsis": "479ac9a8a8d2",
+          "purpose": "01c2f05955a9",
+          "options": "d42590c0caae",
+          "examples": "7ad67fb2ac5c",
+          "seeAlso": "74effaa0de48"
+        }
+      }
     },
     {
       "binary": "jsonui-test",
@@ -2431,14 +2489,48 @@
     {
       "binary": "jsonui-doc",
       "command": "generate component",
-      "synopsis": "jsonui-doc generate component <component-spec>",
+      "synopsis": "jsonui-doc generate component <spec-or-directory> [-o <out>] [--format markdown|html]",
       "purpose": {
-        "en": "Generate an HTML document from a component spec.",
-        "ja": "component spec から HTML 文書を生成。"
+        "en": "Generate documentation for a component spec. The argument is a `.component.json` file or a directory of them (batch). The format defaults to Markdown — inferred from the output path when one is given, and `--format html` asks for HTML explicitly.",
+        "ja": "コンポーネント仕様のドキュメントを生成する。引数は `.component.json` ファイルか、それらを含むディレクトリ（一括処理）。形式の既定は Markdown で、出力パスが与えられればそこから推測し、`--format html` で HTML を明示指定する。"
       },
-      "options": [],
+      "options": [
+        {
+          "name": "--output",
+          "type": "path",
+          "description": {
+            "en": "Output file (single spec) or output directory (batch). Short form `-o`.",
+            "ja": "出力ファイル（単一仕様）または出力ディレクトリ（一括）。短縮形は `-o`。"
+          }
+        },
+        {
+          "name": "--format",
+          "type": "enum",
+          "default": "inferred from the output path, else markdown",
+          "description": {
+            "en": "`markdown` or `html`.",
+            "ja": "`markdown` か `html`。"
+          }
+        }
+      ],
       "examples": [],
-      "seeAlso": []
+      "seeAlso": [],
+      "verifiedAgainst": {
+        "version": "1.8.10",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "60d3a8d16fa66198a63138c8e9e5c25fce3e69c6bd65f952f76cff9a5bdad85f",
+        "cardHash": "cecb4687fba526c14bb517ebac9bf1bdca2684ed2cdbb734759aad3446784aff",
+        "fieldHashes": {
+          "binary": "f9476e5a629c",
+          "command": "57e0362d6d85",
+          "synopsis": "f4ca018f9461",
+          "purpose": "8dc07c1c4981",
+          "options": "0da80284e233",
+          "examples": "2b8fdc789d3b",
+          "seeAlso": "b085f4c343e7"
+        }
+      }
     },
     {
       "binary": "jsonui-doc",
