@@ -31,7 +31,15 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { BINARIES, HELP_COLUMNS, Node, nodesUnder, walk } from "./lib/cli-help";
+import {
+  BINARIES,
+  HELP_COLUMNS,
+  HELP_PYTHON_VERSION,
+  Node,
+  helpPython,
+  nodesUnder,
+  walk,
+} from "./lib/cli-help";
 
 const CWD = process.cwd();
 const OUT = path.resolve(CWD, "..", "docs/data/cli-help-stampability.json");
@@ -39,6 +47,7 @@ const OUT = path.resolve(CWD, "..", "docs/data/cli-help-stampability.json");
 interface Classification {
   measuredAt: string;
   columns: number;
+  python: string;
   axes: string[];
   note: string;
   nodes: Record<string, { stampable: boolean; reason?: string }>;
@@ -62,15 +71,23 @@ function main(): void {
     );
     process.exit(1);
   }
+  if (helpPython() === null) {
+    console.error(
+      `classify-help-stampability: no Python ${HELP_PYTHON_VERSION} on PATH — a classification is only ` +
+        "valid for the renderer that produced it.",
+    );
+    process.exit(1);
+  }
   const altCwd = path.dirname(treeB);
   const altHome = treeB;
 
   const result: Classification = {
     measuredAt: version(treeA),
     columns: Number(HELP_COLUMNS),
+    python: HELP_PYTHON_VERSION,
     axes: ["checkout", "cwd", "home"],
     note:
-      "A node is stampable when its --help is byte-identical across all three axes. " +
+      "A node is stampable when its --help is byte-identical across all three axes, read under the pinned Python and COLUMNS. " +
       "Produced by scripts/classify-help-stampability.ts; re-run it when the classification goes stale.",
     nodes: {},
   };
@@ -110,7 +127,7 @@ function main(): void {
   fs.writeFileSync(OUT, `${JSON.stringify(result, null, 2)}\n`, "utf8");
   console.log(
     `classify-help-stampability: ${yes}/${entries.length} nodes stampable at ` +
-      `${result.measuredAt} (COLUMNS=${result.columns}, axes: ${result.axes.join(", ")})`,
+      `${result.measuredAt} (Python ${result.python}, COLUMNS=${result.columns}, axes: ${result.axes.join(", ")})`,
   );
   for (const [name, v] of entries) if (!v.stampable) console.log(`  not stampable: ${name} — ${v.reason}`);
 }

@@ -27,8 +27,10 @@ import path from "node:path";
 import {
   BINARIES,
   HELP_COLUMNS,
+  HELP_PYTHON_VERSION,
   cardHashFor,
   helpHashFor,
+  helpPython,
   normalize,
   walk,
 } from "./lib/cli-help";
@@ -62,6 +64,13 @@ function main(): void {
   const toolchain = process.env.JSONUI_CLI_PATH;
   if (!toolchain || !fs.existsSync(toolchain)) {
     console.error("stamp-cli-card: JSONUI_CLI_PATH must point at the toolchain you read the help from.");
+    process.exit(1);
+  }
+  if (helpPython() === null) {
+    console.error(
+      `stamp-cli-card: no Python ${HELP_PYTHON_VERSION} on PATH. The help you read is rendered by the ` +
+        "interpreter, so a stamp taken under another one would not match the gate's.",
+    );
     process.exit(1);
   }
   const version = fs.readFileSync(path.join(toolchain, "VERSION"), "utf8").trim();
@@ -101,6 +110,7 @@ function main(): void {
     card.verifiedAgainst = {
       version,
       columns: Number(HELP_COLUMNS),
+      python: HELP_PYTHON_VERSION,
       helpHash: helpHashFor(tree, cardPath),
       cardHash: cardHashFor(card as Record<string, unknown>),
       fieldHashes: fieldHashes(card),

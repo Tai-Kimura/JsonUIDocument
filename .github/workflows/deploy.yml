@@ -82,7 +82,11 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          # 3.12 on purpose: the cli-coverage gate hashes `--help` output, and
+          # argparse changed how it lists short+long options in 3.13. The
+          # interpreter is pinned in scripts/lib/cli-help.ts and recorded in
+          # every stamp; CI and the maintainer must read under the same one.
+          python-version: "3.12"
 
       - name: Fetch jsonui-cli toolchain
         run: |
@@ -178,7 +182,11 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          # 3.12 on purpose: the cli-coverage gate hashes `--help` output, and
+          # argparse changed how it lists short+long options in 3.13. The
+          # interpreter is pinned in scripts/lib/cli-help.ts and recorded in
+          # every stamp; CI and the maintainer must read under the same one.
+          python-version: "3.12"
 
       - name: Fetch jsonui-cli toolchain
         # fetch-by-SHA instead of clone --branch: --branch only accepts

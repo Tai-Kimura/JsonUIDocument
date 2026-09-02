@@ -33,8 +33,10 @@ import path from "node:path";
 import {
   BINARIES,
   HELP_COLUMNS,
+  HELP_PYTHON_VERSION,
   cardHashFor,
   helpHashFor,
+  helpPython,
   leavesOf,
   Node,
   nodesUnder,
@@ -51,6 +53,7 @@ const NOT_CHECKED = ["sjui", "kjui", "rjui"];
 interface Stamp {
   version: string;
   columns: number;
+  python?: string;
   helpHash: string;
   cardHash: string;
   fieldHashes?: Record<string, string>;
@@ -72,6 +75,13 @@ function main(): void {
     console.error("check-cli-coverage: cannot compare — JSONUI_CLI_PATH is unset or missing.");
     console.error("  Point it at a jsonui-cli checkout (the gates job sets it to the pinned SHA).");
     console.error("  Refusing to pass: a check that could not look must not read as a check that agreed.");
+    process.exit(1);
+  }
+  if (helpPython() === null) {
+    console.error(
+      `check-cli-coverage: cannot compare — no Python ${HELP_PYTHON_VERSION} on PATH. argparse renders ` +
+        "help differently across interpreters, so reading it under another one would compare a different text.",
+    );
     process.exit(1);
   }
   if (!fs.existsSync(STAMPABILITY)) {
@@ -160,6 +170,12 @@ function main(): void {
       stampableCards += 1;
       if (!stamp) {
         unstamped.push({ id, why: "never stamped" });
+        continue;
+      }
+      if (stamp.python !== undefined && stamp.python !== HELP_PYTHON_VERSION) {
+        // Same treatment as columns: an environment difference must not read as
+        // verification, and must not redden the whole set either.
+        unstamped.push({ id, why: `stamped under Python ${stamp.python}, this run reads under ${HELP_PYTHON_VERSION}` });
         continue;
       }
       if (stamp.columns !== Number(HELP_COLUMNS)) {
