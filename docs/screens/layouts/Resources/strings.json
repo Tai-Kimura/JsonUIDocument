@@ -9179,8 +9179,8 @@
       "ja": "CLI コマンドリファレンス"
     },
     "lead": {
-      "en": "Every jui / sjui / kjui / rjui / jsonui-test / jsonui-doc subcommand with its synopsis and purpose, the flags this reference records, and the exit codes and environment variables the binaries share. Hand-maintained against each binary's `--help`, which stays the authority if the two ever disagree.",
-      "ja": "jui / sjui / kjui / rjui / jsonui-test / jsonui-doc の全サブコマンドを、synopsis と目的、このリファレンスが記録しているフラグ、そして各バイナリ共通の exit code と環境変数とともに掲載しています。各バイナリの `--help` を見ながら手で維持しているので、食い違ったときは `--help` が正です。"
+      "en": "Every jui / sjui / kjui / rjui / jsonui-test / jsonui-doc subcommand with its synopsis and purpose, the flags this reference records, and the exit codes and environment variables the binaries share. What is checked, and what is not: for `jui`, `jsonui-test` and `jsonui-doc`, a deploy gate compares this catalogue with the binary's `--help` at the pinned version in both directions, so a subcommand with no card — or a card for a command the binary no longer accepts — stops the deploy. The three platform CLIs are not checked that way. Nothing checks the wording: each card's synopsis and purpose are written by hand from `--help`, which stays the authority whenever the two disagree.",
+      "ja": "jui / sjui / kjui / rjui / jsonui-test / jsonui-doc の全サブコマンドを、synopsis と目的、このリファレンスが記録しているフラグ、そして各バイナリ共通の exit code と環境変数とともに掲載しています。何が検査され、何が検査されていないか: `jui` / `jsonui-test` / `jsonui-doc` については、デプロイのゲートが pin した版の `--help` とこのカタログを両方向で突き合わせます — カードの無いサブコマンドも、バイナリがもう受け付けないコマンドのカードも、デプロイを止めます。プラットフォーム別 CLI 3 本はこの検査の対象外です。文面は検査されません: 各カードの synopsis と目的は `--help` を見て手で書いたものなので、食い違ったときは `--help` が正です。"
     },
     "read_time": {
       "en": "reference",
@@ -9199,8 +9199,8 @@
       "ja": "レイアウト構成"
     },
     "section_layout_body": {
-      "en": "The catalogue below runs binary by binary — `jui` first, then sjui, kjui, rjui, jsonui-test and jsonui-doc — with one card per subcommand carrying its synopsis, what the command is for, its flags, an example invocation, and the related commands worth reading next. Coverage is deliberately uneven: every `jui` subcommand lists its flags, while most of the platform CLIs currently carry synopsis and purpose only and their own `--help` remains the fuller source. Exit codes, environment variables and the stability policy are shared across binaries, so they get their own sections instead of being repeated on every card.",
-      "ja": "下のカタログはバイナリ順に並んでいます — `jui` から始まり、sjui / kjui / rjui / jsonui-test / jsonui-doc。サブコマンドごとに 1 枚のカードがあり、synopsis、そのコマンドの目的、フラグ、実行例、関連コマンドを載せています。網羅度は意図的に均一ではありません — `jui` のサブコマンドはすべてフラグまで記載していますが、プラットフォーム別 CLI の多くは現状 synopsis と目的のみで、詳細はそれぞれの `--help` の方が充実しています。exit code・環境変数・安定性ポリシーはバイナリ共通なので、カードごとに繰り返さず独立した節にしています。"
+      "en": "The catalogue below runs binary by binary — `jui` first, then sjui, kjui, rjui, jsonui-test and jsonui-doc — with one card per subcommand carrying its synopsis, what the command is for, its flags, an example invocation, and the related commands worth reading next. Flag coverage is uneven on purpose: most `jui` and `jsonui-test` cards list their flags, while the platform CLIs and most `jsonui-doc` cards carry synopsis and purpose only. For flags, each binary's own `--help` is always the fuller source — the gate that keeps this catalogue honest compares which subcommands exist, never which flags they take. Exit codes, environment variables and the stability policy are shared across binaries, so they get their own sections instead of being repeated on every card.",
+      "ja": "下のカタログはバイナリ順に並んでいます — `jui` から始まり、sjui / kjui / rjui / jsonui-test / jsonui-doc。サブコマンドごとに 1 枚のカードがあり、synopsis、そのコマンドの目的、フラグ、実行例、関連コマンドを載せています。フラグの網羅度は意図的に均一ではありません — `jui` と `jsonui-test` のカードは多くがフラグまで記載していますが、プラットフォーム別 CLI と `jsonui-doc` のカードの大半は synopsis と目的のみです。フラグについては常にそれぞれの `--help` の方が充実しています — このカタログを正しく保つゲートが見ているのは「どのサブコマンドが在るか」であって、「どのフラグを取るか」ではありません。exit code・環境変数・安定性ポリシーはバイナリ共通なので、カードごとに繰り返さず独立した節にしています。"
     },
     "section_exit_heading": {
       "en": "Exit code conventions",
