@@ -1724,8 +1724,8 @@
         }
       ],
       "seeAlso": [
-        "jsonui-test run",
-        "jsonui-test mock generate"
+        "jsonui-test mock generate",
+        "jsonui-test report"
       ]
     },
     {
@@ -1797,7 +1797,7 @@
       "examples": [],
       "seeAlso": [
         "jsonui-test mock generate",
-        "jsonui-test run"
+        "jsonui-test artifacts pull"
       ]
     },
     {
@@ -1816,27 +1816,240 @@
     },
     {
       "binary": "jsonui-test",
-      "command": "run",
-      "synopsis": "jsonui-test run [--driver <driver>] [<spec>]",
+      "command": "report",
+      "synopsis": "jsonui-test report --format junit|html [-o <out>] <results.json>...",
       "purpose": {
-        "en": "Run tests against the specified driver. `--driver` = `web` (Playwright) / `ios` (XCUITest) / `android` (UIAutomator).",
-        "ja": "指定 driver でテストを実行。`--driver` = `web`（Playwright）/ `ios`（XCUITest）/ `android`（UIAutomator）。"
+        "en": "Convert the drivers' results JSON (results.schema.json) into a JUnit XML or an HTML report for CI. Several input files merge into one report.",
+        "ja": "ドライバの結果 JSON（results.schema.json）を CI 向けの JUnit XML または HTML レポートに変換する。複数の入力ファイルは 1 つのレポートに統合される。"
       },
       "options": [
         {
-          "name": "--driver",
+          "name": "--format",
           "type": "string",
           "required": true,
           "description": {
-            "en": "`web` / `ios` / `android`.",
-            "ja": "`web` / `ios` / `android`。"
+            "en": "`junit` or `html`. Short form `-f`.",
+            "ja": "`junit` か `html`。短縮形は `-f`。"
+          }
+        },
+        {
+          "name": "--output",
+          "type": "string",
+          "default": "report.xml / report.html",
+          "description": {
+            "en": "Output file path. Short form `-o`.",
+            "ja": "出力先ファイル。短縮形は `-o`。"
           }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ jsonui-test run --driver web --spec tests/screens/hello-world.test.json"
+          "code": "$ jsonui-test report tests/artifacts/web/latest/results.json --format junit -o report.xml"
+        }
+      ],
+      "seeAlso": [
+        "jsonui-test validate",
+        "jsonui-test artifacts pull"
+      ]
+    },
+    {
+      "binary": "jsonui-test",
+      "command": "artifacts pull",
+      "synopsis": "jsonui-test artifacts pull [--platform ios|android|web|all] [--xcresult <path>] [--serial <serial>] [--out <dir>] [--config <file>] [--clean] [--json]",
+      "purpose": {
+        "en": "Collect run evidence — iOS xcresult attachments, Android on-device files, web Playwright videos / traces / screenshots — into `tests/artifacts/<platform>/<stamp>/` and refresh the `latest` symlink. Configured under `test.artifacts` in jui.config.json; `mock serve --artifacts` runs it after each run-target.",
+        "ja": "実行証跡 — iOS の xcresult 添付、Android のデバイス上ファイル、web の Playwright 録画 / trace / スクリーンショット — を `tests/artifacts/<platform>/<stamp>/` に回収し、`latest` symlink を更新する。設定は jui.config.json の `test.artifacts`。`mock serve --artifacts` は run-target ごとにこれを実行する。"
+      },
+      "options": [
+        {
+          "name": "--platform",
+          "type": "string",
+          "default": "all",
+          "description": {
+            "en": "Platform to pull from: `ios` / `android` / `web` / `all`.",
+            "ja": "回収元プラットフォーム: `ios` / `android` / `web` / `all`。"
+          }
+        },
+        {
+          "name": "--xcresult",
+          "type": "string",
+          "description": {
+            "en": "Explicit .xcresult path or glob (overrides `test.artifacts.ios.xcresult`).",
+            "ja": "明示的な .xcresult のパスまたは glob（`test.artifacts.ios.xcresult` を上書き）。"
+          }
+        },
+        {
+          "name": "--serial",
+          "type": "string",
+          "description": {
+            "en": "adb device serial (overrides `test.artifacts.android.serial`).",
+            "ja": "adb のデバイスシリアル（`test.artifacts.android.serial` を上書き）。"
+          }
+        },
+        {
+          "name": "--out",
+          "type": "string",
+          "default": "tests/artifacts",
+          "description": {
+            "en": "Output dir (overrides `test.artifacts.dir`).",
+            "ja": "出力先ディレクトリ（`test.artifacts.dir` を上書き）。"
+          }
+        },
+        {
+          "name": "--config",
+          "type": "string",
+          "default": "jui.config.json",
+          "description": {
+            "en": "Config file.",
+            "ja": "設定ファイル。"
+          }
+        },
+        {
+          "name": "--clean",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Remove the pulled artifact dirs from the Android device after pulling.",
+            "ja": "回収後に Android デバイス側の artifact ディレクトリを削除する。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Print the result as a single JSON object.",
+            "ja": "結果を 1 つの JSON オブジェクトとして印字する。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-test artifacts pull --platform web"
+        }
+      ],
+      "seeAlso": [
+        "jsonui-test artifacts status",
+        "jsonui-test report"
+      ]
+    },
+    {
+      "binary": "jsonui-test",
+      "command": "artifacts status",
+      "synopsis": "jsonui-test artifacts status [--config <file>] [--json]",
+      "purpose": {
+        "en": "Show the resolved artifacts config — artifacts dir, iOS xcresult source, Android app id and serial — and how many files already exist there.",
+        "ja": "解決済みの artifacts 設定 — artifacts ディレクトリ、iOS の xcresult 取得元、Android の app id とシリアル — と、既にそこにあるファイル数を表示する。"
+      },
+      "options": [
+        {
+          "name": "--config",
+          "type": "string",
+          "default": "jui.config.json",
+          "description": {
+            "en": "Config file.",
+            "ja": "設定ファイル。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Print the status as a single JSON object.",
+            "ja": "状態を 1 つの JSON オブジェクトとして印字する。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-test artifacts status"
+        }
+      ],
+      "seeAlso": [
+        "jsonui-test artifacts pull"
+      ]
+    },
+    {
+      "binary": "jsonui-test",
+      "command": "pregrant",
+      "synopsis": "jsonui-test pregrant [--platform ios|android] [--app-id <id>] [--serial <serial>] [--bundle-id <id>] [--udid <udid>] [--config <file>] [--force] [<paths>...]",
+      "purpose": {
+        "en": "Prepare the device before a run so the `launch` declarations in your tests can hold. iOS arm: grants the simulator photo permission (`photos-add`) to the UITest runner for every reachable `addMedia` step, so no permission dialog interrupts the run. Android arm (cli 1.8.0): collects every `deny` under `launch.permissions` across the scanned files (`unset` is not collected) and runs `pm revoke` for those permissions on the app before the instrumentation starts — the per-run denied baseline that driver 1.8.5's `deny` assertion checks against. Both arms run by default and each prints its own count; the exit code is non-zero when either arm fails. When the app is not installed on the device, the Android arm refuses rather than guesses, so an unrelated `pm` failure never reads as a satisfied `deny`; a permission the app does not request is reported as vacuously satisfied.",
+        "ja": "テストの `launch` 宣言が成り立つように、ラン前にデバイスを整える。iOS アーム: 到達可能な `addMedia` ステップごとに UITest ランナーへシミュレータの写真権限（`photos-add`）を付与し、権限ダイアログがランに割り込まないようにする。Android アーム（cli 1.8.0）: 走査したファイル群の `launch.permissions` から `deny` を集め（`unset` は集めない）、instrumentation が始まる前にアプリに対して `pm revoke` を実行する — driver 1.8.5 の `deny` assert が照合する、ランごとの拒否基線。既定では両アームが走り、それぞれ自分の件数を印字する。どちらかが失敗すれば exit code は非 0。アプリがデバイスに入っていない場合、Android アームは推測せず拒否する（無関係な `pm` の失敗が「deny 充足」に化けないため）。アプリが要求していない権限は「空虚に充足」と注記される。"
+      },
+      "options": [
+        {
+          "name": "--platform",
+          "type": "string",
+          "default": "both",
+          "description": {
+            "en": "Limit the run to one platform: `ios` or `android`. Default: both — each arm no-ops when its scan finds nothing.",
+            "ja": "片方のプラットフォームに限定する: `ios` か `android`。既定は両方 — 各アームは走査で何も見つからなければ no-op。"
+          }
+        },
+        {
+          "name": "--app-id",
+          "type": "string",
+          "description": {
+            "en": "Android application id to revoke on. Default: `test.install.android.applicationId`, falling back to `test.artifacts.android.appId`.",
+            "ja": "revoke 対象の Android application id。既定は `test.install.android.applicationId`、無ければ `test.artifacts.android.appId`。"
+          }
+        },
+        {
+          "name": "--serial",
+          "type": "string",
+          "description": {
+            "en": "adb device serial. Default: `test.artifacts.android.serial`, or the single connected device — with several devices connected and no serial, the arm stops and lists them.",
+            "ja": "adb のデバイスシリアル。既定は `test.artifacts.android.serial`、無ければ接続中の唯一のデバイス — 複数接続でシリアル未指定なら一覧を出して止まる。"
+          }
+        },
+        {
+          "name": "--bundle-id",
+          "type": "string",
+          "description": {
+            "en": "UITest target bundle id (`.xctrunner` is appended automatically). Default: `test.install.ios.uitestBundleId` from the config.",
+            "ja": "UITest ターゲットの bundle id（`.xctrunner` は自動付加）。既定は config の `test.install.ios.uitestBundleId`。"
+          }
+        },
+        {
+          "name": "--udid",
+          "type": "string",
+          "description": {
+            "en": "Simulator UDID. Default: the single booted simulator.",
+            "ja": "シミュレータの UDID。既定は起動中の唯一のシミュレータ。"
+          }
+        },
+        {
+          "name": "--config",
+          "type": "string",
+          "default": "jui.config.json",
+          "description": {
+            "en": "Config file.",
+            "ja": "設定ファイル。"
+          }
+        },
+        {
+          "name": "--force",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "iOS arm: grant even when no `addMedia` usage is found.",
+            "ja": "iOS アーム: `addMedia` の使用が見つからなくても付与する。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-test pregrant --platform android tests/\npregrant(android): revoked 1 permission(s) on com.example.myapp: android.permission.ACCESS_FINE_LOCATION (1 test file(s) declare deny)\n\n$ jsonui-test pregrant tests/\npregrant: granted photos-add to com.example.myapp.UITests.xctrunner on 1A2B3C4D-0000-0000-0000-000000000000 (2 test file(s) use addMedia)\npregrant(android): 0 deny declaration(s) across 3 file(s) — nothing to revoke"
+        },
+        {
+          "language": "bash",
+          "code": "$ jsonui-test pregrant --platform android tests/\npregrant(android): cannot determine which permissions 'com.example.myapp' requests on emulator-5554 — is the app installed? Install it first, then pregrant. Refusing to guess: an unrelated pm failure must not read as a vacuously-satisfied deny.\n$ echo $?\n1"
         }
       ],
       "seeAlso": [
