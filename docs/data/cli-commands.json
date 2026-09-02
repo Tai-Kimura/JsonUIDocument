@@ -2463,28 +2463,86 @@
     {
       "binary": "jsonui-doc",
       "command": "init",
-      "synopsis": "jsonui-doc init <project>",
+      "synopsis": "jsonui-doc init spec|component",
       "purpose": {
-        "en": "Initialize a JsonUI documentation site at the given path.",
-        "ja": "指定パスに JsonUI ドキュメントサイトを初期化。"
+        "en": "Create a specification template: `init spec` writes a new screen specification, `init component` a new component specification. The argument is the kind of template, not a path — there is no project-level initialisation here (that is `jui init`).",
+        "ja": "仕様テンプレートを作成する: `init spec` は新しい画面仕様、`init component` は新しいコンポーネント仕様。引数はテンプレートの種類であってパスではない — プロジェクト全体の初期化はこのコマンドではなく `jui init` の仕事。"
       },
       "options": [],
       "examples": [],
-      "seeAlso": []
+      "seeAlso": [],
+      "verifiedAgainst": {
+        "version": "1.8.11",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "0afb39a2b7c4ebefe3cddb70e15e7650efe3b04de64e9bc8a6b009bdbca01f21",
+        "cardHash": "f49e8f183070ceaf082abc4c440b026a3cc6afedd3df866ef1b6774d181db5bb",
+        "fieldHashes": {
+          "binary": "f9476e5a629c",
+          "command": "81710c409c77",
+          "synopsis": "d4a5fc9aa433",
+          "purpose": "93de94c02d59",
+          "options": "357b9e47f539",
+          "examples": "2b8fdc789d3b",
+          "seeAlso": "b085f4c343e7"
+        }
+      }
     },
     {
       "binary": "jsonui-doc",
       "command": "generate spec",
-      "synopsis": "jsonui-doc generate spec <spec-file>",
+      "synopsis": "jsonui-doc generate spec <spec-or-directory> [-o <out>] [--format markdown|html] [--layouts-dir <dir>]",
       "purpose": {
-        "en": "Generate an HTML document from a screen spec.",
-        "ja": "screen spec から HTML 文書を生成。"
+        "en": "Generate documentation for a screen spec. The argument is a `.spec.json` file or a directory of them (batch). The format defaults to Markdown — inferred from the output path when one is given, and `--format html` asks for HTML explicitly.",
+        "ja": "画面仕様のドキュメントを生成する。引数は `.spec.json` ファイルか、それらを含むディレクトリ（一括処理）。形式の既定は Markdown で、出力パスが与えられればそこから推測し、`--format html` で HTML を明示指定する。"
       },
-      "options": [],
+      "options": [
+        {
+          "name": "--output",
+          "type": "path",
+          "description": {
+            "en": "Output file (single spec) or output directory (batch). Short form `-o`.",
+            "ja": "出力ファイル（単一仕様）または出力ディレクトリ（一括）。短縮形は `-o`。"
+          }
+        },
+        {
+          "name": "--format",
+          "type": "enum",
+          "default": "inferred from the output path, else markdown",
+          "description": {
+            "en": "`markdown` or `html`.",
+            "ja": "`markdown` か `html`。"
+          }
+        },
+        {
+          "name": "--layouts-dir",
+          "type": "path",
+          "description": {
+            "en": "Shared layouts directory, for resolving `layoutFile` imports. Auto-detected from jui.config.json when omitted.",
+            "ja": "`layoutFile` の import を解決するための共有 layouts ディレクトリ。省略時は jui.config.json から自動検出。"
+          }
+        }
+      ],
       "examples": [],
       "seeAlso": [
         "jsonui-doc validate spec"
-      ]
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.11",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "27bd819464e0158403b3f13b879f71771a53de3082c180ff8abd572f58cce35a",
+        "cardHash": "ab977eb6ca01b114a620b4b931f0c8ad3b69b55f3a76a6f48f8353e0b261e9cc",
+        "fieldHashes": {
+          "binary": "f9476e5a629c",
+          "command": "36cc04ed917e",
+          "synopsis": "423a3990f8f2",
+          "purpose": "bf9b1b2ee6ae",
+          "options": "e7e54d267180",
+          "examples": "2b8fdc789d3b",
+          "seeAlso": "fb0c54cc44ab"
+        }
+      }
     },
     {
       "binary": "jsonui-doc",
@@ -2718,7 +2776,23 @@
       },
       "options": [],
       "examples": [],
-      "seeAlso": []
+      "seeAlso": [],
+      "verifiedAgainst": {
+        "version": "1.8.11",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "56652e8c5d1c72c222a3d5e57e246d22a59011a698804748cac1c4700c374a05",
+        "cardHash": "1a88fb5f365c11af692619c041e7059d94e7d935d17c206cb074ff7fc248de9d",
+        "fieldHashes": {
+          "binary": "f9476e5a629c",
+          "command": "5b022281fedb",
+          "synopsis": "d1ddd8b40c8b",
+          "purpose": "a069d6e79183",
+          "options": "357b9e47f539",
+          "examples": "2b8fdc789d3b",
+          "seeAlso": "b085f4c343e7"
+        }
+      }
     },
     {
       "binary": "jsonui-doc",
