@@ -2038,6 +2038,50 @@
             "en": "Rewrite only the `default` body and the `source` route of existing files, leaving every other scenario byte-identical so test-driven data survives. `source.swagger` is preserved, so running from a different directory does not churn every file.",
             "ja": "既存ファイルの `default` 本文と `source` の経路だけを書き換え、他のシナリオは 1 バイトも変えない（テストが駆動するデータが残る）。`source.swagger` も保持するので、別ディレクトリから実行しても全ファイルが churn しない。"
           }
+        },
+        {
+          "name": "--swagger",
+          "type": "path",
+          "description": {
+            "en": "Path to an OpenAPI file; repeatable.",
+            "ja": "OpenAPI ファイルのパス。複数指定可。"
+          }
+        },
+        {
+          "name": "--out",
+          "type": "path",
+          "default": "mock.mockDir or tests/mocks",
+          "description": {
+            "en": "Output mock directory.",
+            "ja": "モックの出力ディレクトリ。"
+          }
+        },
+        {
+          "name": "--config",
+          "type": "path",
+          "default": "jui.config.json",
+          "description": {
+            "en": "Config file.",
+            "ja": "設定ファイル。"
+          }
+        },
+        {
+          "name": "--strict",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "With `--check`, treat a missing OPTIONAL field as drift too. Off by default: omitting an optional field is a valid instance, and failing on it buries the real violations.",
+            "ja": "`--check` と併用時、省略可能フィールドの欠落もドリフト扱いにする。既定は off — 省略可能フィールドを省くのは妥当なインスタンスであり、それで落とすと本当の違反が埋もれるため。"
+          }
+        },
+        {
+          "name": "--dry-run",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "With `--update-default`, report what would change without writing.",
+            "ja": "`--update-default` と併用時、書き込まずに変更内容だけ報告する。"
+          }
         }
       ],
       "examples": [
@@ -2049,7 +2093,23 @@
       "seeAlso": [
         "jsonui-test mock serve",
         "jsonui-test validate"
-      ]
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.12",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "6578a4c5c923584c33bef1fc29e301b3fc50e85d1d70c4290b56004f92b5e363",
+        "cardHash": "9385ad19dd4603f1933fe04b5ffe98661ad71a60130d68eee506022d080754a5",
+        "fieldHashes": {
+          "binary": "3b2560767fdf",
+          "command": "a9e02e338852",
+          "synopsis": "89e74b29c032",
+          "purpose": "78340c53da70",
+          "options": "c36dd0957841",
+          "examples": "f9a1d9705e79",
+          "seeAlso": "07296879e456"
+        }
+      }
     },
     {
       "binary": "jsonui-test",
@@ -2593,7 +2653,7 @@
     {
       "binary": "jsonui-doc",
       "command": "generate html",
-      "synopsis": "jsonui-doc generate html --input-dir <dir> --output-dir <dir> [--allow-partial] [--with-checks]",
+      "synopsis": "jsonui-doc generate html <input-dir> [-o <out>] [-t <title>] [-d <docs>] [--app NAME:DIR] [--layouts-dir <dir>] [--allow-partial] [--with-checks]",
       "purpose": {
         "en": "Render the whole documentation site — test files, specs, API docs, Figma assets — as static HTML. Since 2026-07-29 a page that fails to generate no longer passes silently: every page is still attempted, the intact ones are written, and the run ends with a summary naming each failure, the input file behind it, and a non-zero exit code. Failed pages get a placeholder carrying the reason, so a link in the index never dead-ends.",
         "ja": "テストファイル・spec・API ドキュメント・Figma アセットからドキュメントサイト全体を静的 HTML として生成する。2026-07-29 以降、ページ単位の生成失敗が黙って通ることはない — 全ページを試行し、壊れていないものは出力したうえで、末尾に失敗の一覧（原因と入力ファイル）を出して非 0 で終了する。失敗したページは理由を載せたプレースホルダになるので、index からのリンクが行き止まりにならない。"
@@ -2616,6 +2676,58 @@
             "en": "Run the doc contract checks during generation and put the drift onto the page. Independent of `--allow-partial`: this is about drift being reported, that one is about the page existing at all.",
             "ja": "生成時に doc contract check を実行し、drift をページに載せる。`--allow-partial` とは独立 — こちらは drift を報告する話、あちらはページ自体が出ているかの話。"
           }
+        },
+        {
+          "name": "--output",
+          "type": "path",
+          "default": "html",
+          "description": {
+            "en": "Output directory. Short form `-o`.",
+            "ja": "出力ディレクトリ。短縮形は `-o`。"
+          }
+        },
+        {
+          "name": "--title",
+          "type": "string",
+          "default": "JsonUI Test Documentation",
+          "description": {
+            "en": "Title for the index page. Short form `-t`.",
+            "ja": "インデックスページのタイトル。短縮形は `-t`。"
+          }
+        },
+        {
+          "name": "--docs",
+          "type": "path",
+          "description": {
+            "en": "Directory holding OpenAPI / Swagger files; repeatable. Short form `-d`.",
+            "ja": "OpenAPI / Swagger ファイルのディレクトリ。複数指定可。短縮形は `-d`。"
+          }
+        },
+        {
+          "name": "--figma",
+          "type": "path",
+          "default": "auto-detected: figma/ next to the input",
+          "description": {
+            "en": "Directory holding Figma JSON files. Short form `-fig`.",
+            "ja": "Figma JSON ファイルのディレクトリ。短縮形は `-fig`。"
+          }
+        },
+        {
+          "name": "--app",
+          "type": "string",
+          "description": {
+            "en": "An app and its docs directory as `name:path`; repeatable, for multi-app documentation.",
+            "ja": "アプリとその docs ディレクトリを `name:path` 形式で指定。複数指定可（複数アプリのドキュメント用）。"
+          }
+        },
+        {
+          "name": "--layouts-dir",
+          "type": "path",
+          "default": "auto-detected per spec from jui.config.json",
+          "description": {
+            "en": "Override the layouts directory used to resolve `layoutFile` imports.",
+            "ja": "`layoutFile` の import を解決する layouts ディレクトリを上書きする。"
+          }
         }
       ],
       "examples": [
@@ -2627,7 +2739,23 @@
       "seeAlso": [
         "jsonui-doc generate spec",
         "jsonui-doc validate spec"
-      ]
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.12",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "4c5dd864d81af299cf27ca21a4968497ee8a59ea8a44f3f2285e511a10d7141d",
+        "cardHash": "41f6ecad3344220681fb7319541fcf825b2f2f280860f3d143ae0c8e94556560",
+        "fieldHashes": {
+          "binary": "f9476e5a629c",
+          "command": "5cd68944d8a8",
+          "synopsis": "7e5960dfe816",
+          "purpose": "96fdaa00f616",
+          "options": "6e8d4799eeef",
+          "examples": "23506115c730",
+          "seeAlso": "639afb3fa358"
+        }
+      }
     },
     {
       "binary": "jsonui-doc",
@@ -2724,16 +2852,32 @@
     {
       "binary": "jsonui-doc",
       "command": "validate spec",
-      "synopsis": "jsonui-doc validate spec <spec-file>",
+      "synopsis": "jsonui-doc validate spec <spec-or-directory>",
       "purpose": {
-        "en": "Verify that a spec and its generated HTML document are in sync.",
-        "ja": "spec と生成 HTML 文書の整合性を検証。"
+        "en": "Validate a screen specification against the schema and the project's rules. The argument is a `.spec.json` file or a directory, in which case every spec under it is validated. This checks the spec itself — it does not compare it with any generated document.",
+        "ja": "画面仕様をスキーマとプロジェクトのルールに対して検証する。引数は `.spec.json` ファイルかディレクトリで、後者なら配下の全仕様を検証する。検証対象は仕様そのもので、生成済みドキュメントとの照合は行わない。"
       },
       "options": [],
       "examples": [],
       "seeAlso": [
         "jsonui-doc generate spec"
-      ]
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.12",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "6e8f0e6eaf54a0c85feebe01824fd33aa95241aee7bd16f3c7f3b8532dbf14c9",
+        "cardHash": "ec229885ca55f859754dcffe242d13a98520a52a445479d47664963ece04c4e6",
+        "fieldHashes": {
+          "binary": "f9476e5a629c",
+          "command": "65bb1c28dd6d",
+          "synopsis": "a305f9c62598",
+          "purpose": "b9a51d968f2a",
+          "options": "357b9e47f539",
+          "examples": "2b8fdc789d3b",
+          "seeAlso": "0d7b11d9c20a"
+        }
+      }
     },
     {
       "binary": "jsonui-doc",
