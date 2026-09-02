@@ -157,6 +157,14 @@ function main(): void {
       if (typeof e.code !== "string" || e.code === "") fail(ew, "missing code");
       if (typeof e.language !== "string" || e.language === "") fail(ew, "missing language");
     });
+    // The page renders examples[0] only (CliCommandsViewModel reads one
+    // example per card), so a second entry passes this build and is
+    // published nowhere. Found 2026-09-02: two cards carried two examples
+    // each and nobody could see the second. Fail rather than warn, for the
+    // same reason build:attrs does — a green build must not hide data.
+    if (examples.length > 1) {
+      fail(where, `${examples.length} examples, but the page renders one — merge them into a single code block`);
+    }
   });
 
   if (errors.length > 0) {
