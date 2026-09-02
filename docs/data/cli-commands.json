@@ -1859,15 +1859,16 @@
     {
       "binary": "jsonui-test",
       "command": "generate",
-      "synopsis": "jsonui-test generate <screen|flow|action> <name>",
+      "synopsis": "jsonui-test generate test screen|flow <name> | generate description screen|flow <name> <case> | generate branch-tests <screen>",
       "purpose": {
-        "en": "Create a skeleton test file from a screen spec or flow definition.",
-        "ja": "screen spec または flow 定義からテストファイル雛形を生成。"
+        "en": "Scaffold test files. `generate test screen|flow <name>` writes a skeleton test file, `generate description screen|flow <name> <case>` writes the description JSON for one case, and `generate branch-tests <screen>` emits unit tests from the screen spec's branchContracts (see the branch tests guide). `-p` picks the platform, `--path` the destination.",
+        "ja": "テストファイルの雛形を作る。`generate test screen|flow <name>` はテストファイルの骨組み、`generate description screen|flow <name> <case>` は 1 ケース分の description JSON、`generate branch-tests <screen>` は画面仕様の branchContracts からユニットテストを出力する（branch tests ガイド参照）。`-p` でプラットフォーム、`--path` で出力先を指定。"
       },
       "options": [],
       "examples": [],
       "seeAlso": [
-        "jsonui-test validate"
+        "jsonui-test validate",
+        "jsonui-doc generate doc"
       ]
     },
     {
