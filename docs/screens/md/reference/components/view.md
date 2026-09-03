@@ -7,7 +7,7 @@ Generic container that arranges child components vertically or horizontally. The
 | | |
 |---|---|
 | Created | 2026-08-25 |
-| Updated | 2026-08-25 |
+| Updated | 2026-09-03 |
 
 ## Screen Structure
 

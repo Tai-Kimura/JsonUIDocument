@@ -10,22 +10,34 @@
   },
   "examples": [
     {
-      "title": { "en": "Vertical stack", "ja": "垂直スタック" },
+      "title": {
+        "en": "Vertical stack",
+        "ja": "垂直スタック"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/title\", \"fontSize\": 24 },\n    { \"type\": \"Label\", \"text\": \"@string/subtitle\", \"fontSize\": 16 },\n    { \"type\": \"Button\", \"text\": \"@string/action\", \"onClick\": \"@{onAction}\" }\n  ]\n}"
     },
     {
-      "title": { "en": "Horizontal with weight", "ja": "水平 + weight で中央を伸ばす" },
+      "title": {
+        "en": "Horizontal with weight",
+        "ja": "水平 + weight で中央を伸ばす"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"horizontal\",\n  \"child\": [\n    { \"type\": \"Image\", \"source\": \"avatar\", \"width\": 40, \"height\": 40 },\n    { \"type\": \"Label\", \"text\": \"@{userName}\", \"weight\": 1 },\n    { \"type\": \"Label\", \"text\": \"@{timestamp}\", \"fontColor\": \"#9CA3AF\" }\n  ]\n}"
     },
     {
-      "title": { "en": "Card with background and corners", "ja": "背景色 + 角丸のカード" },
+      "title": {
+        "en": "Card with background and corners",
+        "ja": "背景色 + 角丸のカード"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"View\",\n  \"background\": \"#F3F4F6\",\n  \"cornerRadius\": 12,\n  \"paddings\": [16, 16, 16, 16],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/card_body\" }\n  ]\n}"
     },
     {
-      "title": { "en": "Conditional show/hide", "ja": "条件付き表示" },
+      "title": {
+        "en": "Conditional show/hide",
+        "ja": "条件付き表示"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{errorVisibility}\",\n  \"background\": \"#FEE2E2\",\n  \"paddings\": [12, 12, 12, 12],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@{errorMessage}\", \"fontColor\": \"#991B1B\" }\n  ]\n}",
       "note": {
@@ -34,7 +46,10 @@
       }
     },
     {
-      "title": { "en": "Linear gradient background", "ja": "線形グラデーション背景" },
+      "title": {
+        "en": "Linear gradient background",
+        "ja": "線形グラデーション背景"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"View\",\n  \"gradient\": [\"#6366F1\", \"#8B5CF6\"],\n  \"gradientDirection\": \"vertical\",\n  \"paddings\": [24, 24, 24, 24]\n}"
     }
@@ -48,8 +63,8 @@
     },
     "child": {
       "note": {
-        "en": "Array of child components. Order determines layout order. For dynamic repetition from a bound array, use Collection instead of `child`.",
-        "ja": "子要素の配列。順序がレイアウト順序を決定。バインドされた配列からの動的繰り返しは `child` ではなく Collection を使う。"
+        "en": "Array of child components. Order determines layout order. A single node is accepted as a one-element array. For dynamic repetition from a bound array, use Collection instead of `child`.",
+        "ja": "子要素の配列。単一ノードは 1 要素の配列として受け付ける。順序がレイアウト順序を決定。バインドされた配列からの動的繰り返しは `child` ではなく Collection を使う。"
       }
     },
     "distribution": {
@@ -115,5 +130,10 @@
       }
     }
   },
-  "relatedComponents": ["SafeAreaView", "ScrollView", "Collection", "GradientView"]
+  "relatedComponents": [
+    "SafeAreaView",
+    "ScrollView",
+    "Collection",
+    "GradientView"
+  ]
 }

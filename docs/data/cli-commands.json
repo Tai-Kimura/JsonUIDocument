@@ -1930,13 +1930,55 @@
     {
       "binary": "sjui",
       "command": "build",
-      "synopsis": "sjui build",
+      "synopsis": "sjui build [--mode all|uikit|swiftui] [--clean] [--no-validate] [--strict]",
       "purpose": {
-        "en": "xcodebuild wrapper that first runs JsonUI pre-processing (strings merge, asset expansion).",
-        "ja": "JsonUI の前処理（strings マージ、asset 展開）を実行してから xcodebuild を呼ぶラッパ。"
+        "en": "Generate the SwiftJsonUI files for the project's layouts: extracts strings, validates every layout's attributes and bindings, then builds the UIKit binding files and/or the SwiftUI views for the mode in sjui.config.json (or --mode). Validation warnings are printed; canonical binding errors always fail the build, other validation errors fail it only with --strict. It does not run xcodebuild.",
+        "ja": "プロジェクトの layout から SwiftJsonUI のファイルを生成する: strings を抽出し、各 layout の属性と binding を検証し、sjui.config.json（または --mode）の mode に応じて UIKit の binding ファイル / SwiftUI の view を生成する。検証の警告は印字され、正準の binding エラーは常にビルドを止め、その他の検証エラーは --strict のときだけ止める。xcodebuild は実行しない。"
       },
-      "options": [],
-      "examples": [],
+      "options": [
+        {
+          "name": "--mode",
+          "type": "enum",
+          "default": "detected from sjui.config.json",
+          "description": {
+            "en": "Build mode (all, uikit, swiftui).",
+            "ja": "ビルドモード（all, uikit, swiftui）。"
+          }
+        },
+        {
+          "name": "--clean",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Clean cache before building.",
+            "ja": "ビルド前にキャッシュを消す。"
+          }
+        },
+        {
+          "name": "--no-validate",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Skip JSON attribute validation.",
+            "ja": "JSON 属性の検証を飛ばす。"
+          }
+        },
+        {
+          "name": "--strict",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Fail the build on validation errors.",
+            "ja": "検証エラーでビルドを失敗させる。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ sjui build --strict\n# the tool's own examples (sjui --help):\n$ sjui build                   # Build UIKit/SwiftUI files\n$ sjui build --quiet           # Build with only error output"
+        }
+      ],
       "seeAlso": [
         "jui build"
       ]
@@ -1944,12 +1986,49 @@
     {
       "binary": "sjui",
       "command": "convert",
-      "synopsis": "sjui convert <layout.json>",
+      "synopsis": "sjui convert <input.json> [output.swift] [--from json] [--to swiftui]",
       "purpose": {
-        "en": "Convert a single Layout JSON to Swift source code. Useful for inspecting Dynamic Mode output.",
-        "ja": "単一 Layout JSON を Swift ソースに変換。Dynamic Mode 出力の確認に便利。"
+        "en": "Convert one Layout JSON into SwiftUI source code (the only conversion the tool supports: --from json --to swiftui). The output path is optional. A second form, `sjui convert to-group [--force]`, converts a UIKit project's file references to group references.",
+        "ja": "Layout JSON 1 本を SwiftUI のソースコードに変換する（対応する変換は --from json --to swiftui のみ）。出力パスは省略可。もう 1 つの形 `sjui convert to-group [--force]` は UIKit プロジェクトのファイル参照をグループ参照に変換する。"
       },
-      "options": [],
+      "options": [
+        {
+          "name": "<input.json>",
+          "type": "positional",
+          "required": true,
+          "description": {
+            "en": "The layout to convert.",
+            "ja": "変換する layout。"
+          }
+        },
+        {
+          "name": "[output.swift]",
+          "type": "positional",
+          "required": false,
+          "description": {
+            "en": "Where to write the SwiftUI source.",
+            "ja": "SwiftUI ソースの出力先。"
+          }
+        },
+        {
+          "name": "--from",
+          "type": "enum",
+          "default": "json",
+          "description": {
+            "en": "Input format (json).",
+            "ja": "入力形式（json）。"
+          }
+        },
+        {
+          "name": "--to",
+          "type": "enum",
+          "default": "swiftui",
+          "description": {
+            "en": "Output format (swiftui).",
+            "ja": "出力形式（swiftui）。"
+          }
+        }
+      ],
       "examples": [],
       "seeAlso": [
         "sjui validate"
@@ -1958,13 +2037,37 @@
     {
       "binary": "sjui",
       "command": "validate",
-      "synopsis": "sjui validate",
+      "synopsis": "sjui validate [files...] [--verbose]",
       "purpose": {
-        "en": "Validate all Layout JSON files against the SwiftJsonUI attribute schema.",
-        "ja": "全 Layout JSON を SwiftJsonUI の属性スキーマで検証。"
+        "en": "Validate Layout JSON files against the SwiftJsonUI attribute schema: every JSON file in the layouts directory when no argument is given, or the files and patterns named.",
+        "ja": "Layout JSON を SwiftJsonUI の属性スキーマで検証する: 引数なしなら layouts ディレクトリの全 JSON、引数があれば名指ししたファイルやパターン。"
       },
-      "options": [],
-      "examples": [],
+      "options": [
+        {
+          "name": "[files...]",
+          "type": "positional",
+          "required": false,
+          "description": {
+            "en": "Files or glob patterns; default is every JSON under the layouts directory.",
+            "ja": "ファイルか glob パターン。既定は layouts ディレクトリ配下の全 JSON。"
+          }
+        },
+        {
+          "name": "--verbose",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Show detailed error messages. Short form `-v`.",
+            "ja": "詳細なエラーメッセージを表示。短縮形は `-v`。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "# the tool's own examples (sjui validate --help):\n$ sjui validate                           # Validate all JSON files in layouts directory\n$ sjui validate Layouts/main.json        # Validate specific file\n$ sjui validate Layouts/**/*.json        # Validate files matching pattern"
+        }
+      ],
       "seeAlso": [
         "jui verify"
       ]
