@@ -37,7 +37,7 @@ env:
   # Bump procedure: pick the new jsonui-cli main SHA, replace this value, and
   # review the regenerated reference pages in that deploy — the SHA bump is
   # the review point for reference updates.
-  JSONUI_CLI_REF: b1f5f88058cd4dfd725c62f80e47821e370e00c5 # v1.8.17
+  JSONUI_CLI_REF: 81b67cdddef68693772dca8025248718a8bb4e0d # v1.8.18
   # Two releases were skipped on the way here. v1.8.6's `jui build` crashed on
   # `from ..core.version import toolchain_version` (the module is at
   # jui_cli/version.py, not under core/), and v1.8.8 was withdrawn upstream for
@@ -67,7 +67,7 @@ jobs:
   # version's help. The second half never judges whether a card is right, only
   # whether it was read; unstamped cards are counted, never red.
   #
-  # All eight gates run even when one fails, so a red run names everything that
+  # All nine gates run even when one fails, so a red run names everything that
   # is red, and every gate prints its own exit code — a gate that could not
   # run must not read as a gate that passed.
   gates:
@@ -143,7 +143,7 @@ jobs:
         working-directory: jsonui-doc-web
         run: npm run prebuild
 
-      - name: Run the eight gates (enforcing — a red one stops the deploy)
+      - name: Run the nine gates (enforcing — a red one stops the deploy)
         run: |
           set +e
           fail=0
@@ -187,6 +187,28 @@ jobs:
               *"Result: PASSED"*) exit 0 ;;
               *) echo "no Result: line in the output — refusing to read that as a pass"; exit 1 ;;
             esac'
+          # docs/screens/html and docs/screens/md are tracked but derived from
+          # the specs, and nothing here regenerated or compared them: on
+          # 2026-09-03 one page was eight ledger entries behind its spec. Both
+          # trees are regenerated into a scratch directory and compared byte
+          # for byte — the spec pages carry no timestamp, so a difference is a
+          # stale commit, never the clock. Needs jsonui-cli 1.8.18: before it,
+          # batch mode ignored --format and wrote HTML into .md-shaped trees.
+          run_gate spec-docs-match sh -c '
+            tmp=$(mktemp -d)
+            python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" generate spec docs/screens/json -o "$tmp/html" --format html > "$tmp/gen-html.log" 2>&1 || { cat "$tmp/gen-html.log"; exit 1; }
+            python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" generate spec docs/screens/json -o "$tmp/md" --format markdown > "$tmp/gen-md.log" 2>&1 || { cat "$tmp/gen-md.log"; exit 1; }
+            n=$(find "$tmp/html" "$tmp/md" -type f | wc -l | tr -d " ")
+            [ "$n" -gt 0 ] || { echo "the generator wrote nothing — refusing to read an empty comparison as a match"; exit 1; }
+            fail=0
+            diff -r "$tmp/html" docs/screens/html > "$tmp/html.diff" || fail=1
+            diff -r "$tmp/md"   docs/screens/md   > "$tmp/md.diff"   || fail=1
+            if [ "$fail" -ne 0 ]; then
+              echo "the tracked spec docs are not what the specs generate — regenerate and commit them:"
+              grep -E "^(diff|Only in)" "$tmp/html.diff" "$tmp/md.diff" | head -20
+              exit 1
+            fi
+            echo "docs/screens/html and docs/screens/md match their specs ($n generated files compared)"'
           # Directory argument, not a `find` expansion: a partial argument list
           # is the shape that used to uninstall the tests it did not name, and
           # --no-install removes the install step from this reporting run
@@ -221,7 +243,7 @@ jobs:
             fi
             echo "the committed vendored tree matches the pin, file for file"'
           echo "----"
-          echo "gates with a non-zero exit: $fail of 8"
+          echo "gates with a non-zero exit: $fail of 9"
           if [ "$fail" -ne 0 ]; then
             echo "FAILING this job: the deploy job depends on it and will not run."
             exit 1

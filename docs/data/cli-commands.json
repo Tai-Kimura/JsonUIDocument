@@ -1827,8 +1827,8 @@
       "command": "setup",
       "synopsis": "sjui setup",
       "purpose": {
-        "en": "Resolve CocoaPods / SPM dependencies and configure Hot Loader. Run once after `sjui init`.",
-        "ja": "CocoaPods / SPM 依存を解決し、Hot Loader を設定。`sjui init` の後に 1 回実行。"
+        "en": "Wire an existing Xcode project up for SwiftJsonUI, in the mode sjui.config.json declares. Ensures an SPM workspace, creates the layout/style/view-model directories, adds the library package references to the project, installs the Hot Loader hook (an AppDelegate hook in UIKit mode, a HotLoaderSetup.swift in SwiftUI mode), and in UIKit mode removes the storyboard references from Info.plist. The packages themselves download on the next Xcode build. Requires a .xcodeproj; run once after `sjui init`.",
+        "ja": "既存の Xcode プロジェクトを、sjui.config.json が宣言する mode で SwiftJsonUI 向けに配線する。SPM 用の workspace を確保し、layout / style / view-model のディレクトリを作り、ライブラリのパッケージ参照をプロジェクトに追加し、Hot Loader のフック（UIKit では AppDelegate、SwiftUI では HotLoaderSetup.swift）を入れ、UIKit では Info.plist の storyboard 参照を外す。パッケージ本体は次の Xcode ビルドで取得される。.xcodeproj が必要。`sjui init` の後に 1 回実行。"
       },
       "options": [],
       "examples": [],
@@ -1842,19 +1842,19 @@
       "aliases": [
         "g"
       ],
-      "synopsis": "sjui generate <type> <name>",
+      "synopsis": "sjui generate <subcommand> <name> [options]",
       "purpose": {
-        "en": "Scaffold a new view / view-controller / cell / style. `<type>` = `view` / `viewcontroller` / `cell` / `style`.",
-        "ja": "view / view-controller / cell / style の scaffold を生成。`<type>` = `view` / `viewcontroller` / `cell` / `style`。"
+        "en": "Generate SwiftJsonUI files in the current iOS project. Subcommands from the tool's own help: `view` (a view with JSON and binding), `partial`, `collection`, `binding`, `converter` (a custom converter; `--attributes` and, for UIKit, `--class-name` / `--import-module`), and `adapter` (an adapter for an existing view in Dynamic mode). Requires an Xcode project or Package.swift; `g` is the alias.",
+        "ja": "現在の iOS プロジェクトに SwiftJsonUI のファイルを生成する。サブコマンドはツール自身の help のとおり: `view`（JSON と binding を持つ view）、`partial`、`collection`、`binding`、`converter`（カスタム converter。`--attributes`、UIKit では `--class-name` / `--import-module`）、`adapter`（Dynamic mode で既存 view に被せる adapter）。Xcode プロジェクトか Package.swift が必要。`g` は別名。"
       },
       "options": [
         {
-          "name": "<type>",
+          "name": "<subcommand>",
           "type": "positional",
           "required": true,
           "description": {
-            "en": "`view` / `viewcontroller` / `cell` / `style`.",
-            "ja": "`view` / `viewcontroller` / `cell` / `style`。"
+            "en": "`view` / `partial` / `collection` / `binding` / `converter` / `adapter`.",
+            "ja": "`view` / `partial` / `collection` / `binding` / `converter` / `adapter`。"
           }
         },
         {
@@ -1862,15 +1862,24 @@
           "type": "positional",
           "required": true,
           "description": {
-            "en": "PascalCase name.",
-            "ja": "PascalCase 名。"
+            "en": "PascalCase name; `collection` takes `Parent/Cell`.",
+            "ja": "PascalCase 名。`collection` は `Parent/Cell` の形。"
+          }
+        },
+        {
+          "name": "--root",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "`view` only: make the generated view the root view.",
+            "ja": "`view` のみ: 生成した view を root にする。"
           }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ sjui generate view HomeView\n✓ Created Layouts/home_view.json\n✓ Created ViewControllers/HomeViewController.swift"
+          "code": "# the tool's own examples (sjui generate --help):\n$ sjui g view HomeView           # Generate a view\n$ sjui g view RootView --root    # Generate root view\n$ sjui g partial Header          # Generate a partial\n$ sjui g collection Post/Cell    # Generate collection cell\n$ sjui g converter MyConverter --attributes text:String,color:Color\n$ sjui g adapter Home            # Creates HomeViewAdapter for HomeView"
         }
       ],
       "seeAlso": [
@@ -1882,13 +1891,40 @@
       "command": "destroy",
       "synopsis": "sjui destroy <type> <name>",
       "purpose": {
-        "en": "Remove files previously created by `sjui generate`. Inverse of `generate`.",
-        "ja": "`sjui generate` で作成されたファイルを削除。`generate` の逆操作。"
+        "en": "Delete the files `sjui generate` created for a view, partial, collection or binding (the ViewController, JSON and binding as applicable). The tool asks for confirmation first; the deletion is permanent. `d` is the alias.",
+        "ja": "`sjui generate` が作った view / partial / collection / binding のファイル（該当する ViewController・JSON・binding）を削除する。実行前に確認を求め、削除は取り消せない。`d` は別名。"
       },
-      "options": [],
-      "examples": [],
+      "options": [
+        {
+          "name": "<type>",
+          "type": "positional",
+          "required": true,
+          "description": {
+            "en": "`view` / `partial` / `collection` / `binding`.",
+            "ja": "`view` / `partial` / `collection` / `binding`。"
+          }
+        },
+        {
+          "name": "<name>",
+          "type": "positional",
+          "required": true,
+          "description": {
+            "en": "The generated name, nested paths allowed (`home/dashboard`).",
+            "ja": "生成時の名前。入れ子パス可（`home/dashboard`）。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "# the tool's own examples (sjui destroy --help):\n$ sjui destroy view splash\n$ sjui destroy view home/dashboard\n$ sjui destroy partial header\n$ sjui destroy collection product_list\n$ sjui destroy binding custom"
+        }
+      ],
       "seeAlso": [
         "sjui generate"
+      ],
+      "aliases": [
+        "d"
       ]
     },
     {
@@ -2704,8 +2740,8 @@
       "command": "generate spec",
       "synopsis": "jsonui-doc generate spec <spec-or-directory> [-o <out>] [--format markdown|html] [--layouts-dir <dir>]",
       "purpose": {
-        "en": "Generate documentation for a screen spec. The argument is a `.spec.json` file or a directory of them (batch). For a single file the format follows the output path's extension, and `--format` chooses it explicitly. Batch mode is measured to write HTML into `.html` files whatever `--format` says (1.8.15 and 1.8.17; reported upstream), so use single-file runs when Markdown is what you need.",
-        "ja": "画面仕様のドキュメントを生成する。引数は `.spec.json` ファイルか、それらを含むディレクトリ（一括処理）。単一ファイルでは出力パスの拡張子に形式が従い、`--format` で明示指定できる。一括処理は `--format` の指定に関わらず `.html` に HTML を書くことが実測されている（1.8.15 / 1.8.17、上流に報告済み）ので、Markdown が必要なら単一ファイルで実行する。"
+        "en": "Generate documentation for a screen spec. The argument is a `.spec.json` file or a directory of them (batch). For a single file the format is inferred from the output extension, else Markdown; for a directory it is HTML unless `--format markdown` is given. Before 1.8.18 batch mode ignored `--format` and always wrote HTML.",
+        "ja": "画面仕様のドキュメントを生成する。引数は `.spec.json` ファイルか、それらを含むディレクトリ（一括処理）。単一ファイルでは出力拡張子から形式を推測し、無ければ Markdown。ディレクトリでは `--format markdown` を与えない限り HTML。1.8.18 より前の一括処理は `--format` を無視して常に HTML を書いていた。"
       },
       "options": [
         {
@@ -2719,10 +2755,10 @@
         {
           "name": "--format",
           "type": "enum",
-          "default": "inferred from the output path (single file)",
+          "default": "single file: inferred from the output extension, else markdown; directory: html",
           "description": {
-            "en": "`markdown` or `html`. Honoured for a single file; ignored by batch mode as of 1.8.17 (see purpose).",
-            "ja": "`markdown` か `html`。単一ファイルでは有効。一括処理では 1.8.17 時点で無視される（purpose 参照）。"
+            "en": "`markdown` or `html`. Honoured for a single file and, since 1.8.18, for a directory.",
+            "ja": "`markdown` か `html`。単一ファイルで有効、1.8.18 からはディレクトリでも有効。"
           }
         },
         {
@@ -2737,25 +2773,25 @@
       "examples": [
         {
           "language": "bash",
-          "code": "$ jsonui-doc generate spec docs/screens/json/chrome.spec.json -o chrome.md\n# chrome.md starts with the spec's Markdown heading\n\n$ jsonui-doc generate spec docs/screens/json -o out --format markdown\nGenerated: 103 files\n# out/ holds 103 .html files (HTML), not Markdown — measured at 1.8.17"
+          "code": "$ jsonui-doc generate spec docs/screens/json -o out --format markdown\nGenerating markdown for 103 spec files...\nGenerated: 103 files\n\n$ jsonui-doc generate spec docs/screens/json -o out\nGenerating html for 103 spec files...\nGenerated: 103 files"
         }
       ],
       "seeAlso": [
         "jsonui-doc validate spec"
       ],
       "verifiedAgainst": {
-        "version": "1.8.17",
+        "version": "1.8.18",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "27bd819464e0158403b3f13b879f71771a53de3082c180ff8abd572f58cce35a",
-        "cardHash": "aad1cc6a45b7a8f1a5373d2c1c0b80418af6b3641da0a651a7651721494d2746",
+        "helpHash": "0f0ccd9ced9f793155b6af93f76a2bcd05073c9e3b1c741824cbb16a420c34ed",
+        "cardHash": "2e733d42a1d5d26d0f79f932f6afbae07c6b69aa61177c083e1099dc001b44e3",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "36cc04ed917e",
           "synopsis": "423a3990f8f2",
-          "purpose": "dfca0d8e189d",
-          "options": "d9cc3e5e671f",
-          "examples": "7007fcfd0d6b",
+          "purpose": "a66cf0475638",
+          "options": "02dec26dcb07",
+          "examples": "0e1dc59ddd48",
           "seeAlso": "fb0c54cc44ab"
         }
       }
@@ -2765,8 +2801,8 @@
       "command": "generate component",
       "synopsis": "jsonui-doc generate component <spec-or-directory> [-o <out>] [--format markdown|html]",
       "purpose": {
-        "en": "Generate documentation for a component spec. The argument is a `.component.json` file or a directory of them (batch). For a single file the format follows the output path's extension, and `--format` chooses it explicitly. Batch mode is measured to write HTML into `.html` files whatever `--format` says (1.8.17; reported upstream together with `generate spec`), so use single-file runs when Markdown is what you need.",
-        "ja": "コンポーネント仕様のドキュメントを生成する。引数は `.component.json` ファイルか、それらを含むディレクトリ（一括処理）。単一ファイルでは出力パスの拡張子に形式が従い、`--format` で明示指定できる。一括処理は `--format` の指定に関わらず `.html` に HTML を書くことが実測されている（1.8.17、`generate spec` と併せて上流に報告済み）ので、Markdown が必要なら単一ファイルで実行する。"
+        "en": "Generate documentation for a component spec. The argument is a `.component.json` file or a directory of them (batch). For a single file the format is inferred from the output extension, else Markdown; for a directory it is HTML unless `--format markdown` is given. Before 1.8.18 batch mode ignored `--format` and always wrote HTML.",
+        "ja": "コンポーネント仕様のドキュメントを生成する。引数は `.component.json` ファイルか、それらを含むディレクトリ（一括処理）。単一ファイルでは出力拡張子から形式を推測し、無ければ Markdown。ディレクトリでは `--format markdown` を与えない限り HTML。1.8.18 より前の一括処理は `--format` を無視して常に HTML を書いていた。"
       },
       "options": [
         {
@@ -2780,33 +2816,33 @@
         {
           "name": "--format",
           "type": "enum",
-          "default": "inferred from the output path (single file)",
+          "default": "single file: inferred from the output extension, else markdown; directory: html",
           "description": {
-            "en": "`markdown` or `html`. Honoured for a single file; ignored by batch mode as of 1.8.17 (see purpose).",
-            "ja": "`markdown` か `html`。単一ファイルでは有効。一括処理では 1.8.17 時点で無視される（purpose 参照）。"
+            "en": "`markdown` or `html`. Honoured for a single file and, since 1.8.18, for a directory.",
+            "ja": "`markdown` か `html`。単一ファイルで有効、1.8.18 からはディレクトリでも有効。"
           }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ jsonui-doc generate component docs/components/json/codeblock.component.json -o code_block.md\n# code_block.md starts with the component's Markdown heading\n\n$ jsonui-doc generate component docs/components/json -o out --format markdown\nGenerating HTML for 6 component files...\n# out/ holds 6 .html files (HTML), not Markdown — measured at 1.8.17"
+          "code": "$ jsonui-doc generate component docs/components/json -o out --format markdown\nGenerating markdown for 6 component files...\nGenerated: 6 files"
         }
       ],
       "seeAlso": [],
       "verifiedAgainst": {
-        "version": "1.8.17",
+        "version": "1.8.18",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "60d3a8d16fa66198a63138c8e9e5c25fce3e69c6bd65f952f76cff9a5bdad85f",
-        "cardHash": "6aa468ecb336c9dbbf52f25d5473c41a9ba6db22d5a040d09c1ba5a3d86e7d44",
+        "helpHash": "b4a663541d96e957aae1b3e4f40e1e77063686b9b0ce0d7bfe7e3d256246c423",
+        "cardHash": "09115671f0ca0cfdf7736dfbc41601b691288990ae23dc285b6d39f5c9709141",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "57e0362d6d85",
           "synopsis": "f4ca018f9461",
-          "purpose": "09258c3c0026",
-          "options": "8eb90784d1fb",
-          "examples": "e1b073be9168",
+          "purpose": "15b17ad4ed86",
+          "options": "926f4799030c",
+          "examples": "8d51730f50f2",
           "seeAlso": "b085f4c343e7"
         }
       }
