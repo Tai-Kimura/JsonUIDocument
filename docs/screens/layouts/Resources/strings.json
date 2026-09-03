@@ -6928,7 +6928,7 @@
       "en": "• lazy — the Collection's container mode: `'lazy'` (default; virtualized, scrolls itself), `'eager'` (every row rendered inside a scroll container) or `'none'` (no scroll container of its own — the parent must scroll; use it inside a page-level Scroll, the common case). The value is a string or a binding; a boolean is not accepted, and the build warns `Attribute 'lazy' in 'Collection' expects string or binding, got boolean` (measured at 1.8.20). For `layout: \"flow\"` the rule since jsonui-cli 1.8.20: with lazy in effect (`'lazy'` or `'eager'`) the flow Collection scrolls vertically inside its own bounds; with `'none'` it only wraps.",
       "ja": "• lazy — Collection の容器モード: `'lazy'`（既定。仮想化し自分でスクロール）、`'eager'`（全行をスクロール容器の中に描画）、`'none'`（自分のスクロール容器を持たず親に任せる。ページ全体が Scroll で包まれている通常ケースはこれ）。値は文字列かバインディングで、真偽値は受け付けず、ビルドが `Attribute 'lazy' in 'Collection' expects string or binding, got boolean` と警告します（1.8.20 で実測）。`layout: \"flow\"` では jsonui-cli 1.8.20 からの規則: lazy が効いていれば（`'lazy'` か `'eager'`）flow の Collection は自分の bounds の中で縦にスクロールし、`'none'` なら折り返すだけです。"
     },
-    "section_collection_basic_bullet_scrollEnabled": {
+    "section_collection_basic_bullet_scrollenabled": {
       "en": "• scrollEnabled — false disables the Collection's own scroll gesture entirely; useful when the Collection should size to its content exactly and not intercept the parent's scroll (every platform honours this the same way).",
       "ja": "• scrollEnabled — false で Collection 自身のスクロールジェスチャを完全に無効化。Collection がコンテンツぴったりに伸び、親のスクロールを奪わないようにしたいときに有用 (全プラットフォーム同じ扱い)。"
     },
@@ -6995,14 +6995,6 @@
     "section_pitfalls_bullet_basename": {
       "en": "• Duplicate layout basenames. Layout file basenames must be unique across the whole project: Data models and generated components are emitted flat per basename on every platform (SummaryRowData.swift / .kt / .ts), so `sales/summary_row.json` and `dashboard/summary_row.json` collide. `jui build` detects duplicates and aborts with the full pair list — fix by renaming one file (e.g. `sales_summary_row.json`) and updating its references. Cell layouts shared by several screens are the usual place this bites.",
       "ja": "• layout ファイル名 (basename) の重複。basename はプロジェクト全体で一意である必要があります: Data モデルと生成コンポーネントは全プラットフォームで basename ごとにフラットに出力されるため (SummaryRowData.swift / .kt / .ts)、`sales/summary_row.json` と `dashboard/summary_row.json` は衝突します。`jui build` は重複を検出しペア一覧付きで停止します — どちらかをリネームして参照を更新してください (例: `sales_summary_row.json`)。複数画面で共有する cell layout が典型的な発生箇所です。"
-    },
-    "next_custom_components_title": {
-      "en": "Building a custom component",
-      "ja": "カスタムコンポーネントを作る"
-    },
-    "next_custom_components_description": {
-      "en": "Package a recurring layout pattern behind a single spec.",
-      "ja": "繰り返し出てくる layout パターンを 1 つの spec の裏に包む。"
     },
     "next_first_spec_title": {
       "en": "Writing your first spec",
@@ -7254,7 +7246,7 @@
       "en": "• A child view inside the content closure that uses its own long-press gesture (context menus, draggable items) — on iOS the container uses `.simultaneousGesture` so both fire, which can register Dynamic Mode toggles you didn't intend. Either disable the container on that subflow with `enabled: false`, or give the child's long-press a shorter `minimumDuration` so it eats the event first.",
       "ja": "• content closure 内の子ビューが独自の長押しジェスチャを使っている（コンテキストメニューやドラッグ可能アイテム）— iOS では container が `.simultaneousGesture` を使っているので両方発火し、意図しない Dynamic Mode トグルが起きる可能性があります。そのサブフローでは `enabled: false` で container を無効化するか、子の長押しを短い `minimumDuration` にして先に event を拾わせます。"
     },
-    "section_pitfalls_bullet_displayName": {
+    "section_pitfalls_bullet_displayname": {
       "en": "• Returning an empty string from `name` (iOS) / `displayName` (Android) — the sheet still renders the row, but it's a blank, unclickable-looking tap target. Always return a human-readable label; the enum's `rawValue` (Swift) or `this.name` (Kotlin) is the quickest default.",
       "ja": "• `name` (iOS) / `displayName` (Android) が空文字 — シートは行を描画しますが、見た目上クリック不能に見える blank なタップターゲットになります。必ず人間可読な文字列を返します。enum の `rawValue`（Swift）や `this.name`（Kotlin）が最も手早いデフォルトです。"
     },
@@ -7822,14 +7814,14 @@
       "en": "• Findings under `generated/` are warnings — regenerating fixes them. Findings outside it are errors, because a human has to decide what the right body is.",
       "ja": "• `generated/` 配下の指摘は警告です（再生成すれば直るため）。その外の指摘はエラーです — 正しい本文が何かを人が決める必要があるからです。"
     },
-      "section_checks_bullet_matching": {
-        "en": "• Mocks are paired with operations by position-normalized route since jsonui-cli 1.6.46: `/api/items/{id}`, `/api/items/{item_id}` and a trailing slash are one key. A path variable's name is not part of the URL space, and OpenAPI forbids two paths that differ only in that name, so normalizing cannot merge two real routes. Before it, matching compared `source.path` as a string — renaming a variable in the contract detached every mock on that route, each was reported as an orphan, and the body comparison for those operations quietly stopped while the summary still read PASSED. A mock that matches nothing is still an orphan; only the spelling stopped mattering. Findings print the spelling each side actually wrote, not the normalized form, so the path you read is the path in the file.",
-        "ja": "• jsonui-cli 1.6.46 から、モックと操作の対応づけは​位置正規化した経路​で行われます: `/api/items/{id}` と `/api/items/{item_id}`、末尾スラッシュの有無は同じキー。パス変数の名前は URL 空間の一部ではなく、変数名だけが違う 2 パスの併存は OpenAPI 上そもそも不正なので、正規化しても別々の経路が混ざることはありません。それ以前は `source.path` の文字列比較だったため、契約側で変数名を改名するとその経路のモックが全部外れ、1 件ずつ orphan として報告され、該当操作のボディ照合が黙って止まっていました — 集計行は PASSED のまま。どこにも当たらないモックが orphan であることは変わらず、綴りが効かなくなっただけです。所見に出るのは正規化後の形ではなく​各ファイルが実際に書いた綴り​なので、読んだパスがそのままファイル内のパスです。"
-      },
-      "section_checks_bullet_summary": {
-        "en": "• The summary line states what the run actually checked, and its two mock fields follow one rule: each appears only when it has something to say, so the absence of a field is itself information. `Orphan mocks: K` appears when the gate ran. An orphan is a mock whose body is compared to nothing — a check quietly shrinking its own scope is the one failure a pass/fail line cannot otherwise show. `Unchecked mocks: N` appears when mock files were validated but nothing was declared to check them against. A warning names them too, but a summary line without the field is byte-identical to one from a project that has no mocks at all, and a reader who greps the last line would see no difference — silence is not information. Its value is a count or the word `unknown`: since 1.6.50, a `mock.mockDir` that is declared but does not resolve prints `Unchecked mocks: unknown`, because the mocks are wherever they were moved to and the config no longer points at them — the number cannot be known from here, and leaving the field out would let the line read clean again. If `.mock.json` files did turn up under the paths you handed to `validate`, since 1.6.51 the warning says how many — as a second fact, not as the field's value, because whether those are the files the declaration meant is not knowable from here either. Two facts side by side, neither borrowing the other's authority. Since 1.6.52 a project that declares nothing at all is partly covered: the run looks for a conventional `mocks/` or `tests/mocks/` directory, bounded by the project — the directory holding the config `validate` actually read, or the `.git` root when there is none. Since 1.6.54 it looks from two starting points, your test definitions and that config's own directory, so a project whose tests live in one tree and whose mocks sit beside its config is covered too. The bound is the point. Unbounded, one stray `mocks/` above a workspace resolves for every project beneath it, and the projects it would then talk about are the ones with no mocks at all. Two limits stay, and both are silent: a mock directory under a name the convention does not know, and mocks that sit above the boundary — a monorepo keeping them beside the parent, say, while the config that was read belongs to a child. Both close the same way, with one line: the boundary and the name convention constrain discovery only, never a declaration. A declared `mockDir` and `swagger` can point above the config that declares them — measured, a child project pointing at `../shared/mocks` and `../shared/openapi.json` runs the gate normally — because a declaration carries the authority a guess does not. The same order decides where the reference check builds its index, the one that resolves the `mocks` map in a test to real operation ids: since 1.6.55 a declared directory wins, and the convention is consulted only when nothing is declared. Before that a decoy `tests/mocks/` beside a project that declares `api-mocks/` was enough to make every declared operation id read as unknown. Finding nothing is still not evidence of nothing — there is no `Unchecked mocks: 0` — so read the absence of both fields as this run had nothing declared and found nothing, not as proof that the project has no mocks. The count stays out of `Warnings:`, which counts per-file findings, so a project gating on `Warnings: 0` does not fail on a finding deliberately left off the gate. Since 1.7.47 the run says so itself: under the summary line, `N finding(s) above are not counted in Warnings:` and then one sentence per reason — a status no operation declares, for which no remedy exists, and a scenario declaring its own `undeclaredStatus`, where clearing it would undo a decision somebody made on purpose. Both measured firing, and the block is absent when the count is zero, so it is not a standing line. A third reason is in the code and cannot reach you from this command: a scenario with no status at all. That scenario is itself a validation error (`'status' must be an HTTP status int, got: None`), the mock gate runs only on a run with zero errors, and every mock under the configured mockDir is validated — measured on both halves, hand-written and generated. It surfaces in `jsonui-test mock generate --check` as `[WARN] … : no status — not compared`. Until 1.7.50 that command printed no footnote, so the one class the footnote called clearable was the one you could not see explained anywhere. 1.7.50 puts the footnote on the command each finding actually appears on, with a first line matching that command's denominator — `N finding(s) above are not counted in Warnings:` on `validate`, `N finding(s) above do not fail this check:` on `--check`, which has no warnings counter to speak of. Measured: the no-status class now prints its sentence, on `--check` and only there. Note what did not change — `validate` still prints its own footnote for the two classes it can reach, so this is an addition rather than a move, and `validate`'s note that misnamed files and optional-field omissions appear only in `--check` is still printed and still true. One spelling trap sits on the same path: `undeclaredStatus` silences the gate only as an object with a non-empty `reason`, and a bare `true` is ignored by design — measured, the same scenario gated as `[STATUS]` with `true` and moved into the uncounted footnote once given a reason. Being ignored was also silent until 1.7.52, which is the part that cost people time; from that version the bare form warns and names the shape it wants — ``'undeclaredStatus' is honoured only as {\"reason\": \"<why>\"} with a non-empty reason — as written it does not suppress anything``. Measured across the two versions on one scenario: `Warnings: 0` on 1.7.51, `Warnings: 2` on 1.7.52. It is a warning, not an error, and the run still exits 0. The exit code is unchanged: keeping mocks only to feed a dev server, with no contract to check them against, is a legitimate setup — this asks, it does not decide. Neither field is ever printed as a zero, because `Orphan mocks: 0` from a run that never looked is the same sentence as a clean result. A failing mock gate flips the headline to `FAILED`; before 1.6.46 only the exit code dropped, so a run could print `PASSED` and exit 1, and a reader who trusted the word never saw it. Regeneration is counted before the summary rather than after, and its trigger watches your hand-written mocks as well as the swagger — adding one retires the generated copy of that operation immediately instead of at the next schema change — so `Files:` reads the same across a rename and its follow-up instead of alternating between two values for the same healthy state.",
-        "ja": "• 集計行は​その run が実際に何を検査したか​を述べます。モック関連の 2 欄は同じ規約に従います: ​言うことがあるときだけ出る​ — したがって​欄が無いこと自体が情報​です。`Orphan mocks: K` はゲートが走ったときに出ます。orphan とはボディが何とも照合されていないモックのことで、検査が自分の範囲を黙って縮めるという失敗は、pass/fail の一行では他に見えようがありません。`Unchecked mocks: N` は、モックファイルを検証したのに照合先が何も宣言されていないときに出ます。warning も別に出ますが、この欄が無いと​集計行はモックを 1 本も持たないプロジェクトのそれと一字も変わらず​、最終行だけを読む(あるいは grep する)読者には差が見えません — ​無表示は無情報​です。値は件数か、`unknown` という語です: 1.6.50 から、`mock.mockDir` に値が書いてあるのに解決できない場合は `Unchecked mocks: unknown` になります — モックは移動先に在り、config はもうそこを指していないので、ここからは数を知りようがない。欄ごと省くと集計行がまた clean に読めてしまいます。`validate` に渡したパスの配下に `.mock.json` が実際に見つかった場合、1.6.51 からは warning がその件数を伝えます — ただし​欄の値としてではなく 2 つ目の事実として​です。それが宣言の意図していた集合かどうかも、ここからは分からないからです。2 つの事実を並べ、どちらも他方の権威を借りない形になっています。1.6.52 から、何も宣言していないプロジェクトも部分的にカバーされます: 規約どおりの `mocks/` または `tests/mocks/` を探しにいき、範囲は​プロジェクト境界​ — `validate` が実際に読んだ config のあるディレクトリ、config が無ければ `.git` のルート — で止まります。1.6.54 からは起点が 2 つになり(テスト定義と、その config 自身のディレクトリ)、テストが別ツリーにありモックは config の隣にある構成もカバーされます。この境界が要点です。境界が無いと、ワークスペースの 1 つ上に置かれた `mocks/` が配下の全プロジェクトに解決してしまい、しかもそこで語られる対象は​モックを 1 つも持たないプロジェクト​になります。限界は 2 つ残り、どちらも沈黙します: 規約が知らない名前のモックディレクトリと、境界より上にあるモック(読まれた config が子で、モックは親の隣に集約されている構成など)です。どちらも 1 行で塞げます: 境界も名前規約も​探索にだけ​掛かり、宣言には掛かりません。宣言された `mockDir` と `swagger` は、それを宣言している config より上を指せます — 実測でも、子プロジェクトが `../shared/mocks` と `../shared/openapi.json` を指した構成でゲートは通常どおり走りました。宣言は、推測が持たない権威を持つからです。同じ順位が、参照検査(テストの `mocks` マップを実在の operationId に解決する検査)が index をどこから作るかも決めます: 1.6.55 から​宣言されたディレクトリが優先​され、規約が参照されるのは何も宣言されていないときだけです。それ以前は、`api-mocks/` を宣言しているプロジェクトの隣に囮の `tests/mocks/` が 1 つあるだけで、宣言された operationId が全て未知として読まれていました。見つからないことは依然として​無いことの証拠ではありません​ — `Unchecked mocks: 0` は出ません。2 欄とも無いことは「この run は何も宣言されておらず、何も見つけなかった」と読むべきで、「このプロジェクトにモックが無い」証明ではありません。件数を `Warnings:` に混ぜないのは、そちらがファイル単位の所見を数える欄だからで、`Warnings: 0` をゲートにしているプロジェクトが​ゲート対象外と決めた所見​で落ちないようにするためです。1.7.47 からは run 自身がそう言います — 集計行の下に `N finding(s) above are not counted in Warnings:` が出て、理由ごとに 1 文ずつ続きます。どの operation も宣言していないステータス(remedy が存在しない)と、シナリオが自分で `undeclaredStatus` を宣言している場合(消すと誰かが意図して下した判断を取り消すことになる)の 2 つです。どちらも発火を実測し、件数が 0 のときはブロックごと出ない(= 常設行ではない)ことも確認しました。コードにはもう 1 つ理由が書かれていますが、​このコマンドからは届きません​ — ステータスを持たないシナリオです。それ自体が検証エラー(`'status' must be an HTTP status int, got: None`)であり、モックゲートはエラー 0 件の run でしか走らず、設定された mockDir 配下のモックは全て検証されます(手書き側・generated 側の両方で実測)。この件は `jsonui-test mock generate --check` の側に `[WARN] … : no status — not compared` として出ます。1.7.50 まではそちらのコマンドが脚注を出さなかったので、​脚注が「解消できる」と呼ぶ唯一の分類の説明が、どこにも出ない​状態でした。1.7.50 からは​その finding が実際に出るコマンドの側に脚注が付き​、先頭行はそのコマンドの分母に合わせて分岐します — `validate` では `N finding(s) above are not counted in Warnings:`、`--check` では `N finding(s) above do not fail this check:`(こちらには warnings のカウンタ自体が無いため)。実測 — no-status の分類は​`--check` 側でだけ​その文を印字するようになりました。変わっていない点も挙げておくと: `validate` は到達できる 2 分類について​依然として自分の脚注を出す​ので、これは移動ではなく​追加​です。また `validate` の「misnamed / optional-field は `--check` にしか出ない」という注記も、今も印字され、今も正しいままです。同じ経路に綴りの罠が 1 つあります — `undeclaredStatus` がゲートを黙らせるのは空でない `reason` を持つオブジェクト形式のときだけで、素の `true` は意図的に無視されます(実測: 同じシナリオが `true` では `[STATUS]` でゲートし、reason を与えると uncounted 脚注へ移りました)。そして​無視されることが 1.7.52 まで無言だった​のが、いちばん時間を溶かす部分でした。1.7.52 からは素の形が警告を出し、求めている形まで名乗ります —— ``'undeclaredStatus' is honoured only as {\"reason\": \"<why>\"} with a non-empty reason — as written it does not suppress anything``。同一シナリオを 2 版に当てて実測 — 1.7.51 で `Warnings: 0`、1.7.52 で `Warnings: 2`。​エラーではなく警告で、run は exit 0 のまま​です。終了コードも変わりません: dev server に食わせるためだけにモックを持ち、照合先の契約を持たない構成は正当です — これは問いかけであって、判定ではありません。どちらの欄も 0 としては出ません。走らなかった run の `Orphan mocks: 0` は、きれいな結果とまったく同じ文になるからです。モックゲートが落ちたときは見出しも `FAILED` になります — 1.6.46 より前は終了コードだけが落ちていたため、`PASSED` と表示して exit 1 という run があり得ました。語の方を読んだ人には見えません。再生成の計数は集計の​前​に移り、その引き金は swagger だけでなく​手書きモックも入力として見ます​ — 手書きを 1 つ足せば、その操作の生成コピーは次のスキーマ変更を待たずその場で退役します。おかげで `Files:` は改名とその追随を挟んでも、同じ健全状態で 2 つの値を行き来しません。"
-      },
+    "section_checks_bullet_matching": {
+      "en": "• Mocks are paired with operations by position-normalized route since jsonui-cli 1.6.46: `/api/items/{id}`, `/api/items/{item_id}` and a trailing slash are one key. A path variable's name is not part of the URL space, and OpenAPI forbids two paths that differ only in that name, so normalizing cannot merge two real routes. Before it, matching compared `source.path` as a string — renaming a variable in the contract detached every mock on that route, each was reported as an orphan, and the body comparison for those operations quietly stopped while the summary still read PASSED. A mock that matches nothing is still an orphan; only the spelling stopped mattering. Findings print the spelling each side actually wrote, not the normalized form, so the path you read is the path in the file.",
+      "ja": "• jsonui-cli 1.6.46 から、モックと操作の対応づけは​位置正規化した経路​で行われます: `/api/items/{id}` と `/api/items/{item_id}`、末尾スラッシュの有無は同じキー。パス変数の名前は URL 空間の一部ではなく、変数名だけが違う 2 パスの併存は OpenAPI 上そもそも不正なので、正規化しても別々の経路が混ざることはありません。それ以前は `source.path` の文字列比較だったため、契約側で変数名を改名するとその経路のモックが全部外れ、1 件ずつ orphan として報告され、該当操作のボディ照合が黙って止まっていました — 集計行は PASSED のまま。どこにも当たらないモックが orphan であることは変わらず、綴りが効かなくなっただけです。所見に出るのは正規化後の形ではなく​各ファイルが実際に書いた綴り​なので、読んだパスがそのままファイル内のパスです。"
+    },
+    "section_checks_bullet_summary": {
+      "en": "• The summary line states what the run actually checked, and its two mock fields follow one rule: each appears only when it has something to say, so the absence of a field is itself information. `Orphan mocks: K` appears when the gate ran. An orphan is a mock whose body is compared to nothing — a check quietly shrinking its own scope is the one failure a pass/fail line cannot otherwise show. `Unchecked mocks: N` appears when mock files were validated but nothing was declared to check them against. A warning names them too, but a summary line without the field is byte-identical to one from a project that has no mocks at all, and a reader who greps the last line would see no difference — silence is not information. Its value is a count or the word `unknown`: since 1.6.50, a `mock.mockDir` that is declared but does not resolve prints `Unchecked mocks: unknown`, because the mocks are wherever they were moved to and the config no longer points at them — the number cannot be known from here, and leaving the field out would let the line read clean again. If `.mock.json` files did turn up under the paths you handed to `validate`, since 1.6.51 the warning says how many — as a second fact, not as the field's value, because whether those are the files the declaration meant is not knowable from here either. Two facts side by side, neither borrowing the other's authority. Since 1.6.52 a project that declares nothing at all is partly covered: the run looks for a conventional `mocks/` or `tests/mocks/` directory, bounded by the project — the directory holding the config `validate` actually read, or the `.git` root when there is none. Since 1.6.54 it looks from two starting points, your test definitions and that config's own directory, so a project whose tests live in one tree and whose mocks sit beside its config is covered too. The bound is the point. Unbounded, one stray `mocks/` above a workspace resolves for every project beneath it, and the projects it would then talk about are the ones with no mocks at all. Two limits stay, and both are silent: a mock directory under a name the convention does not know, and mocks that sit above the boundary — a monorepo keeping them beside the parent, say, while the config that was read belongs to a child. Both close the same way, with one line: the boundary and the name convention constrain discovery only, never a declaration. A declared `mockDir` and `swagger` can point above the config that declares them — measured, a child project pointing at `../shared/mocks` and `../shared/openapi.json` runs the gate normally — because a declaration carries the authority a guess does not. The same order decides where the reference check builds its index, the one that resolves the `mocks` map in a test to real operation ids: since 1.6.55 a declared directory wins, and the convention is consulted only when nothing is declared. Before that a decoy `tests/mocks/` beside a project that declares `api-mocks/` was enough to make every declared operation id read as unknown. Finding nothing is still not evidence of nothing — there is no `Unchecked mocks: 0` — so read the absence of both fields as this run had nothing declared and found nothing, not as proof that the project has no mocks. The count stays out of `Warnings:`, which counts per-file findings, so a project gating on `Warnings: 0` does not fail on a finding deliberately left off the gate. Since 1.7.47 the run says so itself: under the summary line, `N finding(s) above are not counted in Warnings:` and then one sentence per reason — a status no operation declares, for which no remedy exists, and a scenario declaring its own `undeclaredStatus`, where clearing it would undo a decision somebody made on purpose. Both measured firing, and the block is absent when the count is zero, so it is not a standing line. A third reason is in the code and cannot reach you from this command: a scenario with no status at all. That scenario is itself a validation error (`'status' must be an HTTP status int, got: None`), the mock gate runs only on a run with zero errors, and every mock under the configured mockDir is validated — measured on both halves, hand-written and generated. It surfaces in `jsonui-test mock generate --check` as `[WARN] … : no status — not compared`. Until 1.7.50 that command printed no footnote, so the one class the footnote called clearable was the one you could not see explained anywhere. 1.7.50 puts the footnote on the command each finding actually appears on, with a first line matching that command's denominator — `N finding(s) above are not counted in Warnings:` on `validate`, `N finding(s) above do not fail this check:` on `--check`, which has no warnings counter to speak of. Measured: the no-status class now prints its sentence, on `--check` and only there. Note what did not change — `validate` still prints its own footnote for the two classes it can reach, so this is an addition rather than a move, and `validate`'s note that misnamed files and optional-field omissions appear only in `--check` is still printed and still true. One spelling trap sits on the same path: `undeclaredStatus` silences the gate only as an object with a non-empty `reason`, and a bare `true` is ignored by design — measured, the same scenario gated as `[STATUS]` with `true` and moved into the uncounted footnote once given a reason. Being ignored was also silent until 1.7.52, which is the part that cost people time; from that version the bare form warns and names the shape it wants — ``'undeclaredStatus' is honoured only as {\"reason\": \"<why>\"} with a non-empty reason — as written it does not suppress anything``. Measured across the two versions on one scenario: `Warnings: 0` on 1.7.51, `Warnings: 2` on 1.7.52. It is a warning, not an error, and the run still exits 0. The exit code is unchanged: keeping mocks only to feed a dev server, with no contract to check them against, is a legitimate setup — this asks, it does not decide. Neither field is ever printed as a zero, because `Orphan mocks: 0` from a run that never looked is the same sentence as a clean result. A failing mock gate flips the headline to `FAILED`; before 1.6.46 only the exit code dropped, so a run could print `PASSED` and exit 1, and a reader who trusted the word never saw it. Regeneration is counted before the summary rather than after, and its trigger watches your hand-written mocks as well as the swagger — adding one retires the generated copy of that operation immediately instead of at the next schema change — so `Files:` reads the same across a rename and its follow-up instead of alternating between two values for the same healthy state.",
+      "ja": "• 集計行は​その run が実際に何を検査したか​を述べます。モック関連の 2 欄は同じ規約に従います: ​言うことがあるときだけ出る​ — したがって​欄が無いこと自体が情報​です。`Orphan mocks: K` はゲートが走ったときに出ます。orphan とはボディが何とも照合されていないモックのことで、検査が自分の範囲を黙って縮めるという失敗は、pass/fail の一行では他に見えようがありません。`Unchecked mocks: N` は、モックファイルを検証したのに照合先が何も宣言されていないときに出ます。warning も別に出ますが、この欄が無いと​集計行はモックを 1 本も持たないプロジェクトのそれと一字も変わらず​、最終行だけを読む(あるいは grep する)読者には差が見えません — ​無表示は無情報​です。値は件数か、`unknown` という語です: 1.6.50 から、`mock.mockDir` に値が書いてあるのに解決できない場合は `Unchecked mocks: unknown` になります — モックは移動先に在り、config はもうそこを指していないので、ここからは数を知りようがない。欄ごと省くと集計行がまた clean に読めてしまいます。`validate` に渡したパスの配下に `.mock.json` が実際に見つかった場合、1.6.51 からは warning がその件数を伝えます — ただし​欄の値としてではなく 2 つ目の事実として​です。それが宣言の意図していた集合かどうかも、ここからは分からないからです。2 つの事実を並べ、どちらも他方の権威を借りない形になっています。1.6.52 から、何も宣言していないプロジェクトも部分的にカバーされます: 規約どおりの `mocks/` または `tests/mocks/` を探しにいき、範囲は​プロジェクト境界​ — `validate` が実際に読んだ config のあるディレクトリ、config が無ければ `.git` のルート — で止まります。1.6.54 からは起点が 2 つになり(テスト定義と、その config 自身のディレクトリ)、テストが別ツリーにありモックは config の隣にある構成もカバーされます。この境界が要点です。境界が無いと、ワークスペースの 1 つ上に置かれた `mocks/` が配下の全プロジェクトに解決してしまい、しかもそこで語られる対象は​モックを 1 つも持たないプロジェクト​になります。限界は 2 つ残り、どちらも沈黙します: 規約が知らない名前のモックディレクトリと、境界より上にあるモック(読まれた config が子で、モックは親の隣に集約されている構成など)です。どちらも 1 行で塞げます: 境界も名前規約も​探索にだけ​掛かり、宣言には掛かりません。宣言された `mockDir` と `swagger` は、それを宣言している config より上を指せます — 実測でも、子プロジェクトが `../shared/mocks` と `../shared/openapi.json` を指した構成でゲートは通常どおり走りました。宣言は、推測が持たない権威を持つからです。同じ順位が、参照検査(テストの `mocks` マップを実在の operationId に解決する検査)が index をどこから作るかも決めます: 1.6.55 から​宣言されたディレクトリが優先​され、規約が参照されるのは何も宣言されていないときだけです。それ以前は、`api-mocks/` を宣言しているプロジェクトの隣に囮の `tests/mocks/` が 1 つあるだけで、宣言された operationId が全て未知として読まれていました。見つからないことは依然として​無いことの証拠ではありません​ — `Unchecked mocks: 0` は出ません。2 欄とも無いことは「この run は何も宣言されておらず、何も見つけなかった」と読むべきで、「このプロジェクトにモックが無い」証明ではありません。件数を `Warnings:` に混ぜないのは、そちらがファイル単位の所見を数える欄だからで、`Warnings: 0` をゲートにしているプロジェクトが​ゲート対象外と決めた所見​で落ちないようにするためです。1.7.47 からは run 自身がそう言います — 集計行の下に `N finding(s) above are not counted in Warnings:` が出て、理由ごとに 1 文ずつ続きます。どの operation も宣言していないステータス(remedy が存在しない)と、シナリオが自分で `undeclaredStatus` を宣言している場合(消すと誰かが意図して下した判断を取り消すことになる)の 2 つです。どちらも発火を実測し、件数が 0 のときはブロックごと出ない(= 常設行ではない)ことも確認しました。コードにはもう 1 つ理由が書かれていますが、​このコマンドからは届きません​ — ステータスを持たないシナリオです。それ自体が検証エラー(`'status' must be an HTTP status int, got: None`)であり、モックゲートはエラー 0 件の run でしか走らず、設定された mockDir 配下のモックは全て検証されます(手書き側・generated 側の両方で実測)。この件は `jsonui-test mock generate --check` の側に `[WARN] … : no status — not compared` として出ます。1.7.50 まではそちらのコマンドが脚注を出さなかったので、​脚注が「解消できる」と呼ぶ唯一の分類の説明が、どこにも出ない​状態でした。1.7.50 からは​その finding が実際に出るコマンドの側に脚注が付き​、先頭行はそのコマンドの分母に合わせて分岐します — `validate` では `N finding(s) above are not counted in Warnings:`、`--check` では `N finding(s) above do not fail this check:`(こちらには warnings のカウンタ自体が無いため)。実測 — no-status の分類は​`--check` 側でだけ​その文を印字するようになりました。変わっていない点も挙げておくと: `validate` は到達できる 2 分類について​依然として自分の脚注を出す​ので、これは移動ではなく​追加​です。また `validate` の「misnamed / optional-field は `--check` にしか出ない」という注記も、今も印字され、今も正しいままです。同じ経路に綴りの罠が 1 つあります — `undeclaredStatus` がゲートを黙らせるのは空でない `reason` を持つオブジェクト形式のときだけで、素の `true` は意図的に無視されます(実測: 同じシナリオが `true` では `[STATUS]` でゲートし、reason を与えると uncounted 脚注へ移りました)。そして​無視されることが 1.7.52 まで無言だった​のが、いちばん時間を溶かす部分でした。1.7.52 からは素の形が警告を出し、求めている形まで名乗ります —— ``'undeclaredStatus' is honoured only as {\"reason\": \"<why>\"} with a non-empty reason — as written it does not suppress anything``。同一シナリオを 2 版に当てて実測 — 1.7.51 で `Warnings: 0`、1.7.52 で `Warnings: 2`。​エラーではなく警告で、run は exit 0 のまま​です。終了コードも変わりません: dev server に食わせるためだけにモックを持ち、照合先の契約を持たない構成は正当です — これは問いかけであって、判定ではありません。どちらの欄も 0 としては出ません。走らなかった run の `Orphan mocks: 0` は、きれいな結果とまったく同じ文になるからです。モックゲートが落ちたときは見出しも `FAILED` になります — 1.6.46 より前は終了コードだけが落ちていたため、`PASSED` と表示して exit 1 という run があり得ました。語の方を読んだ人には見えません。再生成の計数は集計の​前​に移り、その引き金は swagger だけでなく​手書きモックも入力として見ます​ — 手書きを 1 つ足せば、その操作の生成コピーは次のスキーマ変更を待たずその場で退役します。おかげで `Files:` は改名とその追随を挟んでも、同じ健全状態で 2 つの値を行き来しません。"
+    },
     "section_checks_bullet_requests": {
       "en": "• The server checks what your app sends, too. `mock serve` validates request bodies and query parameters against the contract, merging the path-level `parameters` an operation inherits. It does not reject the request: a violation means the implementation does not satisfy the contract, not that the screen should render an error, and answering 422 would rewrite what every test touching that endpoint is testing. Violations are deduplicated, summarized at the end of the run and set a non-zero exit code; you can also read them live at `/__jsonui__/contract-violations`.",
       "ja": "• サーバはアプリが送る側も検査します。`mock serve` はリクエストボディとクエリパラメータを契約に突き合わせます（operation が継承するパスレベルの `parameters` もマージします）。リクエスト自体は通します — 違反は「実装が契約を満たしていない」ことであって「画面がエラーを表示すべき」ことではなく、422 を返すとその endpoint に触る全テストの意味が書き換わってしまうためです。違反は重複排除のうえ実行の最後にまとめて出力され、終了コードが非 0 になります。実行中は `/__jsonui__/contract-violations` でも読めます。"
@@ -9796,146 +9788,146 @@
     }
   },
   "reference_jui_config": {
-      "breadcrumb": {
-          "en": "← Reference",
-          "ja": "← Reference"
-      },
-      "title": {
-          "en": "jui.config.json",
-          "ja": "jui.config.json"
-      },
-      "lead": {
-          "en": "Every key the toolchain reads from jui.config.json, in one place: core directories, platform roots, build normalization, API model generation, test install targets, doc contract checks, and lint bounds. Until now these were scattered across the pages that use them.",
-          "ja": "ツールチェーンが jui.config.json から読む全キーを 1 ページに集約: コアディレクトリ、プラットフォームルート、build 正規化、API モデル生成、テストのインストール先、ドキュメント契約チェック、lint 境界。これまで各機能のページに散在していた情報です。"
-      },
-      "read_time": {
-          "en": "hand-maintained",
-          "ja": "手書き管理"
-      },
-      "section_file_heading": {
-          "en": "The file and how it is found",
-          "ja": "ファイルと探索"
-      },
-      "section_file_body": {
-          "en": "jui.config.json lives at the project root and is the single project-level configuration for the whole toolchain — jui, the platform builders it drives, jsonui-test and jsonui-doc all resolve it. Commands look for it in the current directory and upward; MCP tools take an explicit project_dir (or the JUI_PROJECT_DIR environment variable) instead. `jui init` writes the initial file. One project can hold several of these. When specs sit in one subtree and the config that owns them in another, put a stub on the specs' own ancestry naming its owner — `{ \"extends\": \"../../web/jui.config.json\" }` — and the run resolves the API documents and the naming convention from that one file rather than from whichever partial config happens to be nearest (jsonui-cli 1.7.8; see Referencing the API canon from a spec).",
-          "ja": "jui.config.json はプロジェクトルートに置かれ、ツールチェーン全体 — jui・各プラットフォームビルダー・jsonui-test・jsonui-doc — が参照する唯一のプロジェクト設定です。コマンドはカレントから上方向に探索し、MCP ツールは明示の project_dir（または JUI_PROJECT_DIR 環境変数）を使います。初期ファイルは `jui init` が書き出します。 1 つのプロジェクトが複数持つこともあります。spec が 1 つのサブツリーに、それらを所有する config が別のサブツリーにある場合は、spec 自身の系譜上にスタブを置いて所有者を名指しします — `{ \"extends\": \"../../web/jui.config.json\" }` — こうすると run は API ドキュメントと綴り規約を、たまたま最も近い部分的な config ではなく、その 1 ファイルから解決します(jsonui-cli 1.7.8。詳細は「spec から API 正本を参照する」)。"
-      },
-      "section_directories_heading": {
-          "en": "Core directories",
-          "ja": "コアディレクトリ"
-      },
-      "section_directories_body": {
-          "en": "The top-level string keys point the toolchain at your spec, layout, style, image, component-spec and swagger directories. The values below are the built-in defaults — a key you omit falls back to exactly these. strings_file has no default: localization is off until you point it at a strings.json. document_tools_path is only needed when jsonui-doc is not importable from the standard install.",
-          "ja": "トップレベルの文字列キーが spec / layout / style / image / component spec / swagger の各ディレクトリを指します。以下は組み込みデフォルト — 省略したキーはこの値に落ちます。strings_file にデフォルトは無く、strings.json を指すまでローカライズは無効です。document_tools_path は jsonui-doc が標準インストールから import できない場合のみ必要です。"
-      },
-      "section_platforms_heading": {
-          "en": "platforms.*",
-          "ja": "platforms.*"
-      },
-      "section_platforms_body": {
-          "en": "One block per shipped platform. `root` is the platform project directory; `layoutsDir` / `imagesDir` are where `jui build` distributes layouts and images inside that root. iOS additionally takes `xcassetsDir`, Android `drawableDir`. A platform without a block simply is not built. The web block below is this documentation site's real configuration.",
-          "ja": "出荷プラットフォームごとに 1 ブロック。`root` はプラットフォームプロジェクトのディレクトリ、`layoutsDir` / `imagesDir` は `jui build` が layout と画像を配布する先です。iOS は `xcassetsDir`、Android は `drawableDir` を追加で取ります。ブロックの無いプラットフォームは単にビルドされません。以下の web ブロックはこのドキュメントサイト自身の実設定です。"
-      },
-      "section_build_heading": {
-          "en": "build.normalizeLayouts",
-          "ja": "build.normalizeLayouts"
-      },
-      "section_build_body": {
-          "en": "Default true: `jui build` distributes L1-canonicalized layouts (aliases rewritten to canonical names) and stamps the $jui marker on each distributed file. Set false for byte-identical-to-legacy distribution — the escape hatch, not the recommendation.",
-          "ja": "デフォルト true: `jui build` は L1 正準化済み layout（エイリアスを正準名に書き換え）を配布し、各配布ファイルに $jui マーカーを刻印します。false にするとレガシーとバイト一致の配布になります — 逃げ道であって推奨ではありません。"
-      },
-      "section_api_heading": {
-          "en": "api.*",
-          "ja": "api.*"
-      },
-      "section_api_body": {
-          "en": "Drives `jui g api` (swagger → DTO + Domain models). `api.platforms.<p>` sets the output locations per platform — the values below are the built-in defaults (Android's serializer accepts moshi / kotlinx / none, web's case_convention accepts snake_case / camelCase). `api.schemas` is the endpoint/schema filter: include/exclude path globs pick endpoints, include/exclude schema globs adjust the schema set, and skip_domain names schemas that emit DTOs only. format_mapping opts into OpenAPI format-driven type mapping, with format_mapping_exclude as its per-format opt-out list.",
-          "ja": "`jui g api`（swagger → DTO + Domain モデル）を制御します。`api.platforms.<p>` はプラットフォーム別の出力先 — 以下は組み込みデフォルトです（Android の serializer は moshi / kotlinx / none、web の case_convention は snake_case / camelCase）。`api.schemas` はエンドポイント/スキーマのフィルタ: パスのグロブで対象エンドポイントを選び、スキーマ名のグロブで対象スキーマ集合を調整し、skip_domain に挙げたスキーマは DTO のみ生成します。format_mapping は OpenAPI の format による型マッピングのオプトインで、format_mapping_exclude が format 単位の除外リストです。"
-      },
-      "section_test_heading": {
-          "en": "test.*",
-          "ja": "test.*"
-      },
-      "section_test_body": {
-          "en": "`test.appOwnedScreens` names screens the app implements by hand — a splash or a legal page with no JsonUI layout behind it — so `jui screens` classifies them correctly. They are ids, not layouts, which is also why the spec-coverage check leaves them alone: it looks for layouts with no spec. `test.install` gives jsonui-test its copy targets: when present, a passing `jsonui-test validate` also installs the validated test JSON into each platform's test bundle (iOS additionally takes uitestBundleId for the pre-grant step; a platform value can be a plain path string).",
-          "ja": "`test.appOwnedScreens` はアプリが手書きで実装する画面 — スプラッシュや法務ページなど、背後に JsonUI レイアウトを持たないもの — を宣言し、`jui screens` の分類を正します。これらは layout ではなく id であり、spec 網羅検査が対象外とするのもそのためです（検査が探すのは「layout があるのに spec が無い」状態です）。`test.install` は jsonui-test のコピー先: これがあると `jsonui-test validate` の成功時に検証済みテスト JSON を各プラットフォームのテストバンドルへ自動インストールします（iOS は pre-grant 用の uitestBundleId を追加で取り、値は素のパス文字列でも可）。"
-      },
-      "section_checks_heading": {
-          "en": "checks[] + databases{}",
-          "ja": "checks[] + databases{}"
-      },
-      "section_checks_body": {
-          "en": "Declarations for `jsonui-doc check` — the doc-contract checker. Each entry has a name, a type (builtin:db-schema, builtin:openapi-diff, or checker for a custom script) and an optional timeout_seconds (default 60). db-schema entries reference a database from databases{} (each declares its dialect) and may pin a dump_command plus ignore_tables; openapi-diff entries must declare impl_openapi_command and may narrow with ignore_paths / ignore_response_codes / scope (all | generated). Since jsonui-cli 1.6.10 they may also set per-comparison-key severity: ignore_schema_keys drops the comparison entirely, downgrade_to_warning keeps the finding with its expected/actual detail but takes it off the gate. Both take names from a closed set — type, nullable, enum, required, format, format_presence — so a typo is a config error rather than a silently ineffective filter, and listing the same key in both is an error too (a dropped comparison cannot be reported). The two format keys stand in an umbrella relation: format_presence covers only annotation differences, where one side declares a format and the other says nothing (docs pinning uuid against a plain string, or an impl declaring email) — the type, the wire value and the generated DTO all agree, so this is docs being deliberately stricter rather than drift. Plain format covers that plus the contradictions, where both sides declare a format and the values disagree (date-time against uuid), which is a genuine type drift. Writing format therefore still means what it meant before the split. The useful setting is downgrade_to_warning: [\"format_presence\"], which silences the annotation noise while leaving real format contradictions on the gate. Credentials never go in this file — connection info comes from environment variables, and declared commands must resolve inside the project.",
-          "ja": "`jsonui-doc check`（ドキュメント契約チェッカー）の宣言です。各エントリは name・type（builtin:db-schema / builtin:openapi-diff / カスタムスクリプト用の checker）・任意の timeout_seconds（デフォルト 60）を持ちます。db-schema は databases{}（各 DB が dialect を宣言）を参照し、dump_command と ignore_tables を指定可能。openapi-diff は impl_openapi_command が必須で、ignore_paths / ignore_response_codes / scope（all | generated）で絞り込めます。jsonui-cli 1.6.10 からは比較キー単位の severity も指定でき、ignore_schema_keys は比較自体を落とし、downgrade_to_warning は expected/actual の詳細を残したままゲートから外します。どちらも type / nullable / enum / required / format / format_presence の閉じた集合から指定します — タイポは「黙って効かないフィルタ」ではなく設定エラーになり、同じキーを両方に書くのもエラーです（落とした比較は報告できないため）。format 系の 2 キーは傘の関係にあります: format_presence は注釈差だけ、つまり片側だけが format を宣言している状態（docs が uuid を指定して impl は素の文字列、あるいは impl が email を宣言）を指し、型も wire を流れる値も生成される DTO も一致している — ドリフトではなく docs が意図的に厳密なだけです。素の format はそれに加えて矛盾、つまり両側が format を宣言していて値が食い違う状態（date-time 対 uuid）も覆い、こちらは本物の型ドリフトです。したがって format と書けば分割前と同じ意味のままです。実用的な設定は downgrade_to_warning: [\"format_presence\"] で、注釈差のノイズだけを黙らせ、本物の format 矛盾はゲートに残します。認証情報はこのファイルに書かない — 接続情報は環境変数から、宣言コマンドはプロジェクト内に解決されるものだけです。"
-      },
-      "section_lint_heading": {
-          "en": "lint.*",
-          "ja": "lint.*"
-      },
-      "section_lint_body": {
-          "en": "Bounds for `jui lint-generated`. lint.max_depth and lint.max_lines can only tighten below the generator's own cut points (depth 5 / 250 lines) — a looser value is clamped with a warning, so the config can never mask what the generators enforce. exclude_dir_names and exclude_files take extra paths out of the scan (extensions/ trees, vendored files).",
-          "ja": "`jui lint-generated` の境界値です。lint.max_depth / lint.max_lines はジェネレータ自身のカット値（depth 5 / 250 行）より厳しくすることしかできません — 緩い値は警告付きでクランプされ、ジェネレータの強制を設定で覆い隠せない設計です。exclude_dir_names / exclude_files は走査から外す追加パス（extensions/ ツリーや vendored ファイル）を指定します。"
-      },
-      "next_heading": {
-          "en": "Keep reading",
-          "ja": "次に読む"
-      },
-      "next_cli_title": {
-          "en": "CLI command reference",
-          "ja": "CLI コマンドリファレンス"
-      },
-      "next_cli_description": {
-          "en": "The commands that read every key on this page.",
-          "ja": "このページの全キーを読むコマンド群。"
-      },
-      "next_db_check_title": {
-          "en": "DB schema check",
-          "ja": "DB スキーマチェック"
-      },
-      "next_db_check_description": {
-          "en": "What checks[] declarations actually verify.",
-          "ja": "checks[] 宣言が実際に検証するもの。"
-      },
-      "toc_title": {
-          "en": "On this page",
-          "ja": "このページ"
-      },
-      "toc_row_file": {
-          "en": "The file",
-          "ja": "ファイルと探索"
-      },
-      "toc_row_directories": {
-          "en": "Core directories",
-          "ja": "コアディレクトリ"
-      },
-      "toc_row_platforms": {
-          "en": "platforms.*",
-          "ja": "platforms.*"
-      },
-      "toc_row_build": {
-          "en": "build.normalizeLayouts",
-          "ja": "build.normalizeLayouts"
-      },
-      "toc_row_api": {
-          "en": "api.*",
-          "ja": "api.*"
-      },
-      "toc_row_test": {
-          "en": "test.*",
-          "ja": "test.*"
-      },
-      "toc_row_checks": {
-          "en": "checks[] + databases{}",
-          "ja": "checks[] + databases{}"
-      },
-      "toc_row_lint": {
-          "en": "lint.*",
-          "ja": "lint.*"
-      },
-      "footer_copyright": {
-          "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
-          "ja": "© 2026 JsonUI contributors. このサイト自身が、ここで解説しているツールチェーンで構築されています。"
-      }
+    "breadcrumb": {
+      "en": "← Reference",
+      "ja": "← Reference"
+    },
+    "title": {
+      "en": "jui.config.json",
+      "ja": "jui.config.json"
+    },
+    "lead": {
+      "en": "Every key the toolchain reads from jui.config.json, in one place: core directories, platform roots, build normalization, API model generation, test install targets, doc contract checks, and lint bounds. Until now these were scattered across the pages that use them.",
+      "ja": "ツールチェーンが jui.config.json から読む全キーを 1 ページに集約: コアディレクトリ、プラットフォームルート、build 正規化、API モデル生成、テストのインストール先、ドキュメント契約チェック、lint 境界。これまで各機能のページに散在していた情報です。"
+    },
+    "read_time": {
+      "en": "hand-maintained",
+      "ja": "手書き管理"
+    },
+    "section_file_heading": {
+      "en": "The file and how it is found",
+      "ja": "ファイルと探索"
+    },
+    "section_file_body": {
+      "en": "jui.config.json lives at the project root and is the single project-level configuration for the whole toolchain — jui, the platform builders it drives, jsonui-test and jsonui-doc all resolve it. Commands look for it in the current directory and upward; MCP tools take an explicit project_dir (or the JUI_PROJECT_DIR environment variable) instead. `jui init` writes the initial file. One project can hold several of these. When specs sit in one subtree and the config that owns them in another, put a stub on the specs' own ancestry naming its owner — `{ \"extends\": \"../../web/jui.config.json\" }` — and the run resolves the API documents and the naming convention from that one file rather than from whichever partial config happens to be nearest (jsonui-cli 1.7.8; see Referencing the API canon from a spec).",
+      "ja": "jui.config.json はプロジェクトルートに置かれ、ツールチェーン全体 — jui・各プラットフォームビルダー・jsonui-test・jsonui-doc — が参照する唯一のプロジェクト設定です。コマンドはカレントから上方向に探索し、MCP ツールは明示の project_dir（または JUI_PROJECT_DIR 環境変数）を使います。初期ファイルは `jui init` が書き出します。 1 つのプロジェクトが複数持つこともあります。spec が 1 つのサブツリーに、それらを所有する config が別のサブツリーにある場合は、spec 自身の系譜上にスタブを置いて所有者を名指しします — `{ \"extends\": \"../../web/jui.config.json\" }` — こうすると run は API ドキュメントと綴り規約を、たまたま最も近い部分的な config ではなく、その 1 ファイルから解決します(jsonui-cli 1.7.8。詳細は「spec から API 正本を参照する」)。"
+    },
+    "section_directories_heading": {
+      "en": "Core directories",
+      "ja": "コアディレクトリ"
+    },
+    "section_directories_body": {
+      "en": "The top-level string keys point the toolchain at your spec, layout, style, image, component-spec and swagger directories. The values below are the built-in defaults — a key you omit falls back to exactly these. strings_file has no default: localization is off until you point it at a strings.json. document_tools_path is only needed when jsonui-doc is not importable from the standard install.",
+      "ja": "トップレベルの文字列キーが spec / layout / style / image / component spec / swagger の各ディレクトリを指します。以下は組み込みデフォルト — 省略したキーはこの値に落ちます。strings_file にデフォルトは無く、strings.json を指すまでローカライズは無効です。document_tools_path は jsonui-doc が標準インストールから import できない場合のみ必要です。"
+    },
+    "section_platforms_heading": {
+      "en": "platforms.*",
+      "ja": "platforms.*"
+    },
+    "section_platforms_body": {
+      "en": "One block per shipped platform. `root` is the platform project directory; `layoutsDir` / `imagesDir` are where `jui build` distributes layouts and images inside that root. iOS additionally takes `xcassetsDir`, Android `drawableDir`. A platform without a block simply is not built. The web block below is this documentation site's real configuration.",
+      "ja": "出荷プラットフォームごとに 1 ブロック。`root` はプラットフォームプロジェクトのディレクトリ、`layoutsDir` / `imagesDir` は `jui build` が layout と画像を配布する先です。iOS は `xcassetsDir`、Android は `drawableDir` を追加で取ります。ブロックの無いプラットフォームは単にビルドされません。以下の web ブロックはこのドキュメントサイト自身の実設定です。"
+    },
+    "section_build_heading": {
+      "en": "build.normalizeLayouts",
+      "ja": "build.normalizeLayouts"
+    },
+    "section_build_body": {
+      "en": "Default true: `jui build` distributes L1-canonicalized layouts (aliases rewritten to canonical names) and stamps the $jui marker on each distributed file. Set false for byte-identical-to-legacy distribution — the escape hatch, not the recommendation.",
+      "ja": "デフォルト true: `jui build` は L1 正準化済み layout（エイリアスを正準名に書き換え）を配布し、各配布ファイルに $jui マーカーを刻印します。false にするとレガシーとバイト一致の配布になります — 逃げ道であって推奨ではありません。"
+    },
+    "section_api_heading": {
+      "en": "api.*",
+      "ja": "api.*"
+    },
+    "section_api_body": {
+      "en": "Drives `jui g api` (swagger → DTO + Domain models). `api.platforms.<p>` sets the output locations per platform — the values below are the built-in defaults (Android's serializer accepts moshi / kotlinx / none, web's case_convention accepts snake_case / camelCase). `api.schemas` is the endpoint/schema filter: include/exclude path globs pick endpoints, include/exclude schema globs adjust the schema set, and skip_domain names schemas that emit DTOs only. format_mapping opts into OpenAPI format-driven type mapping, with format_mapping_exclude as its per-format opt-out list.",
+      "ja": "`jui g api`（swagger → DTO + Domain モデル）を制御します。`api.platforms.<p>` はプラットフォーム別の出力先 — 以下は組み込みデフォルトです（Android の serializer は moshi / kotlinx / none、web の case_convention は snake_case / camelCase）。`api.schemas` はエンドポイント/スキーマのフィルタ: パスのグロブで対象エンドポイントを選び、スキーマ名のグロブで対象スキーマ集合を調整し、skip_domain に挙げたスキーマは DTO のみ生成します。format_mapping は OpenAPI の format による型マッピングのオプトインで、format_mapping_exclude が format 単位の除外リストです。"
+    },
+    "section_test_heading": {
+      "en": "test.*",
+      "ja": "test.*"
+    },
+    "section_test_body": {
+      "en": "`test.appOwnedScreens` names screens the app implements by hand — a splash or a legal page with no JsonUI layout behind it — so `jui screens` classifies them correctly. They are ids, not layouts, which is also why the spec-coverage check leaves them alone: it looks for layouts with no spec. `test.install` gives jsonui-test its copy targets: when present, a passing `jsonui-test validate` also installs the validated test JSON into each platform's test bundle (iOS additionally takes uitestBundleId for the pre-grant step; a platform value can be a plain path string).",
+      "ja": "`test.appOwnedScreens` はアプリが手書きで実装する画面 — スプラッシュや法務ページなど、背後に JsonUI レイアウトを持たないもの — を宣言し、`jui screens` の分類を正します。これらは layout ではなく id であり、spec 網羅検査が対象外とするのもそのためです（検査が探すのは「layout があるのに spec が無い」状態です）。`test.install` は jsonui-test のコピー先: これがあると `jsonui-test validate` の成功時に検証済みテスト JSON を各プラットフォームのテストバンドルへ自動インストールします（iOS は pre-grant 用の uitestBundleId を追加で取り、値は素のパス文字列でも可）。"
+    },
+    "section_checks_heading": {
+      "en": "checks[] + databases{}",
+      "ja": "checks[] + databases{}"
+    },
+    "section_checks_body": {
+      "en": "Declarations for `jsonui-doc check` — the doc-contract checker. Each entry has a name, a type (builtin:db-schema, builtin:openapi-diff, or checker for a custom script) and an optional timeout_seconds (default 60). db-schema entries reference a database from databases{} (each declares its dialect) and may pin a dump_command plus ignore_tables; openapi-diff entries must declare impl_openapi_command and may narrow with ignore_paths / ignore_response_codes / scope (all | generated). Since jsonui-cli 1.6.10 they may also set per-comparison-key severity: ignore_schema_keys drops the comparison entirely, downgrade_to_warning keeps the finding with its expected/actual detail but takes it off the gate. Both take names from a closed set — type, nullable, enum, required, format, format_presence — so a typo is a config error rather than a silently ineffective filter, and listing the same key in both is an error too (a dropped comparison cannot be reported). The two format keys stand in an umbrella relation: format_presence covers only annotation differences, where one side declares a format and the other says nothing (docs pinning uuid against a plain string, or an impl declaring email) — the type, the wire value and the generated DTO all agree, so this is docs being deliberately stricter rather than drift. Plain format covers that plus the contradictions, where both sides declare a format and the values disagree (date-time against uuid), which is a genuine type drift. Writing format therefore still means what it meant before the split. The useful setting is downgrade_to_warning: [\"format_presence\"], which silences the annotation noise while leaving real format contradictions on the gate. Credentials never go in this file — connection info comes from environment variables, and declared commands must resolve inside the project.",
+      "ja": "`jsonui-doc check`（ドキュメント契約チェッカー）の宣言です。各エントリは name・type（builtin:db-schema / builtin:openapi-diff / カスタムスクリプト用の checker）・任意の timeout_seconds（デフォルト 60）を持ちます。db-schema は databases{}（各 DB が dialect を宣言）を参照し、dump_command と ignore_tables を指定可能。openapi-diff は impl_openapi_command が必須で、ignore_paths / ignore_response_codes / scope（all | generated）で絞り込めます。jsonui-cli 1.6.10 からは比較キー単位の severity も指定でき、ignore_schema_keys は比較自体を落とし、downgrade_to_warning は expected/actual の詳細を残したままゲートから外します。どちらも type / nullable / enum / required / format / format_presence の閉じた集合から指定します — タイポは「黙って効かないフィルタ」ではなく設定エラーになり、同じキーを両方に書くのもエラーです（落とした比較は報告できないため）。format 系の 2 キーは傘の関係にあります: format_presence は注釈差だけ、つまり片側だけが format を宣言している状態（docs が uuid を指定して impl は素の文字列、あるいは impl が email を宣言）を指し、型も wire を流れる値も生成される DTO も一致している — ドリフトではなく docs が意図的に厳密なだけです。素の format はそれに加えて矛盾、つまり両側が format を宣言していて値が食い違う状態（date-time 対 uuid）も覆い、こちらは本物の型ドリフトです。したがって format と書けば分割前と同じ意味のままです。実用的な設定は downgrade_to_warning: [\"format_presence\"] で、注釈差のノイズだけを黙らせ、本物の format 矛盾はゲートに残します。認証情報はこのファイルに書かない — 接続情報は環境変数から、宣言コマンドはプロジェクト内に解決されるものだけです。"
+    },
+    "section_lint_heading": {
+      "en": "lint.*",
+      "ja": "lint.*"
+    },
+    "section_lint_body": {
+      "en": "Bounds for `jui lint-generated`. lint.max_depth and lint.max_lines can only tighten below the generator's own cut points (depth 5 / 250 lines) — a looser value is clamped with a warning, so the config can never mask what the generators enforce. exclude_dir_names and exclude_files take extra paths out of the scan (extensions/ trees, vendored files).",
+      "ja": "`jui lint-generated` の境界値です。lint.max_depth / lint.max_lines はジェネレータ自身のカット値（depth 5 / 250 行）より厳しくすることしかできません — 緩い値は警告付きでクランプされ、ジェネレータの強制を設定で覆い隠せない設計です。exclude_dir_names / exclude_files は走査から外す追加パス（extensions/ ツリーや vendored ファイル）を指定します。"
+    },
+    "next_heading": {
+      "en": "Keep reading",
+      "ja": "次に読む"
+    },
+    "next_cli_title": {
+      "en": "CLI command reference",
+      "ja": "CLI コマンドリファレンス"
+    },
+    "next_cli_description": {
+      "en": "The commands that read every key on this page.",
+      "ja": "このページの全キーを読むコマンド群。"
+    },
+    "next_db_check_title": {
+      "en": "DB schema check",
+      "ja": "DB スキーマチェック"
+    },
+    "next_db_check_description": {
+      "en": "What checks[] declarations actually verify.",
+      "ja": "checks[] 宣言が実際に検証するもの。"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページ"
+    },
+    "toc_row_file": {
+      "en": "The file",
+      "ja": "ファイルと探索"
+    },
+    "toc_row_directories": {
+      "en": "Core directories",
+      "ja": "コアディレクトリ"
+    },
+    "toc_row_platforms": {
+      "en": "platforms.*",
+      "ja": "platforms.*"
+    },
+    "toc_row_build": {
+      "en": "build.normalizeLayouts",
+      "ja": "build.normalizeLayouts"
+    },
+    "toc_row_api": {
+      "en": "api.*",
+      "ja": "api.*"
+    },
+    "toc_row_test": {
+      "en": "test.*",
+      "ja": "test.*"
+    },
+    "toc_row_checks": {
+      "en": "checks[] + databases{}",
+      "ja": "checks[] + databases{}"
+    },
+    "toc_row_lint": {
+      "en": "lint.*",
+      "ja": "lint.*"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイト自身が、ここで解説しているツールチェーンで構築されています。"
+    }
   },
   "spec_index": {
     "eyebrow": {
