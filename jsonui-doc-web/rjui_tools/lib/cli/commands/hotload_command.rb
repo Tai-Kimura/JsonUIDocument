@@ -2,8 +2,13 @@
 
 require_relative '../../core/config_manager'
 require_relative '../../core/logger'
-require_relative '../../core/file_watcher'
 require_relative 'build_command'
+# NOT file_watcher: it requires the `listen` gem, which needs ffi >= Ruby
+# 3.0 and so cannot be installed on the oldest ruby these tools are
+# vendored into (2.6, the system ruby on macOS). Required at the top of the
+# file it made `rjui hotload stop` and `status` raise LoadError before doing
+# anything on those consumers — the two subcommands that need no watcher at
+# all. `run_listen` requires it where it is used.
 
 module RjuiTools
   module CLI
@@ -45,6 +50,10 @@ module RjuiTools
         private
 
         def run_listen
+          # Here rather than at the top of the file: only listening needs a
+          # watcher, and the gem behind it does not exist on ruby 2.6.
+          require_relative '../../core/file_watcher'
+
           Core::Logger.info('Starting HotLoader development environment...')
 
           layouts_dir = @config['layouts_directory']
@@ -119,10 +128,22 @@ module RjuiTools
             File.delete(PID_FILE)
           end
 
-          # Also try to kill by process name
-          system("pkill -f 'rjui.*hotload.*listen' 2>/dev/null")
-          system("pkill -f 'rjui.*watch' 2>/dev/null")
-
+          # No name-matching sweep here, deliberately. `pkill -f` matches the
+          # whole command line, so 'rjui.*watch' signals ANY process whose
+          # command line happens to contain both words — another lane's
+          # script, an editor task, a tool invoked with that string as an
+          # argument. It cannot tell whether it owns what it kills, which is
+          # the one thing a stop command must know. (Measured on the
+          # maintainer's machine: those two patterns matched nothing that
+          # day, while a control pattern matched 64 unrelated processes —
+          # the zero was the day's process list, not a property of the
+          # patterns. On the same machine, an outside SIGTERM mid-run turned
+          # a consumer's E2E suite red three times.)
+          #
+          # The PID file is the only record of ownership this command has —
+          # `hotload listen` watches directories and binds no port, so there
+          # is no listener to look up either. No PID file means the owner is
+          # unknown, and an unknown owner is not something to kill.
           Core::Logger.success('HotLoader stopped')
         end
 

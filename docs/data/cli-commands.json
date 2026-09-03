@@ -2131,12 +2131,15 @@
       "command": "setup",
       "synopsis": "kjui setup",
       "purpose": {
-        "en": "Resolve Gradle dependencies and configure Navigation.",
-        "ja": "Gradle 依存を解決し、Navigation を設定。"
+        "en": "Set up the current Android project for KotlinJsonUI in the mode kjui.config.json declares. Creates the directory structure and base files (Theme.kt, MainActivity.kt in Compose mode) and adds the framework's dependencies to build.gradle. It does not resolve them — that happens on the next Gradle build — and it does not configure Navigation. Run after `kjui init`.",
+        "ja": "現在の Android プロジェクトを、kjui.config.json が宣言する mode で KotlinJsonUI 向けに設定する。ディレクトリ構造と基本ファイル（Compose モードでは Theme.kt・MainActivity.kt）を作り、build.gradle に依存を追記する。依存の解決は行わない（次の Gradle ビルドで行われる）し、Navigation の設定も行わない。`kjui init` の後に実行する。"
       },
       "options": [],
       "examples": [],
-      "seeAlso": []
+      "seeAlso": [
+        "kjui init",
+        "kjui generate"
+      ]
     },
     {
       "binary": "kjui",
@@ -2144,29 +2147,66 @@
       "aliases": [
         "g"
       ],
-      "synopsis": "kjui generate <type> <name>",
+      "synopsis": "kjui generate [<subcommand> <name>] [--mode xml|compose] [options]",
       "purpose": {
-        "en": "Scaffold a fragment / activity / view / cell / style.",
-        "ja": "fragment / activity / view / cell / style の scaffold を生成。"
+        "en": "Generate KotlinJsonUI files. With no subcommand it generates everything for the configured mode (all XML layouts, or all Compose views). Subcommands from the tool's own help: `view`, `partial`, `collection` (alias `cell`), `binding`, `converter`, `adapter`. In XML mode a view can be an Activity (default) or a Fragment. `g` is the alias.",
+        "ja": "KotlinJsonUI のファイルを生成する。サブコマンドを付けなければ、設定された mode の全体を生成する（XML レイアウト全部、または Compose view 全部）。サブコマンドはツール自身の help のとおり: `view` / `partial` / `collection`（別名 `cell`）/ `binding` / `converter` / `adapter`。XML モードでは view を Activity（既定）にも Fragment にもできる。`g` は別名。"
       },
-      "options": [],
-      "examples": [],
+      "options": [
+        {
+          "name": "--mode",
+          "type": "enum",
+          "default": "from kjui.config.json",
+          "description": {
+            "en": "Override the mode (xml / compose). Short form `-m`.",
+            "ja": "mode を上書き（xml / compose）。短縮形は `-m`。"
+          }
+        },
+        {
+          "name": "--activity",
+          "type": "flag",
+          "default": "true",
+          "description": {
+            "en": "XML mode, `view`: generate as an Activity.",
+            "ja": "XML モードの `view`: Activity として生成。"
+          }
+        },
+        {
+          "name": "--fragment",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "XML mode, `view`: generate as a Fragment.",
+            "ja": "XML モードの `view`: Fragment として生成。"
+          }
+        },
+        {
+          "name": "--type",
+          "type": "enum",
+          "description": {
+            "en": "XML mode, `view`: activity or fragment.",
+            "ja": "XML モードの `view`: activity か fragment。"
+          }
+        },
+        {
+          "name": "--force",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Overwrite existing files. Short form `-f`.",
+            "ja": "既存ファイルを上書き。短縮形は `-f`。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "# the tool's own examples (kjui generate --help):\n$ kjui g                     # Generate all (based on config mode)\n$ kjui g --mode xml          # Generate all XML layouts\n$ kjui g view HomeView --mode xml --activity  # Generate Activity\n$ kjui g view ProfileView --mode xml --fragment # Generate Fragment\n$ kjui g view MainView --mode compose  # Generate Compose view\n$ kjui g adapter Home            # Creates HomeViewAdapter for HomeView"
+        }
+      ],
       "seeAlso": [
-        "kjui destroy",
-        "kjui generate-xml"
+        "kjui setup"
       ]
-    },
-    {
-      "binary": "kjui",
-      "command": "generate-xml",
-      "synopsis": "kjui generate-xml <layout.json>",
-      "purpose": {
-        "en": "Convert a Layout JSON to Android XML (for projects not using Compose).",
-        "ja": "Layout JSON を Android XML に変換（Compose を使わないプロジェクト向け）。"
-      },
-      "options": [],
-      "examples": [],
-      "seeAlso": []
     },
     {
       "binary": "kjui",
