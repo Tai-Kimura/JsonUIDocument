@@ -278,7 +278,7 @@
         "jui verify"
       ],
       "verifiedAgainst": {
-        "version": "1.8.4",
+        "version": "1.8.22",
         "columns": 80,
         "python": "3.12",
         "helpHash": "c7dd6e9d0e25ba5cd14d97dbc99fd1b6ad79c97fbefda04cd50dbe927fe51e09",
@@ -2213,12 +2213,19 @@
       "command": "watch",
       "synopsis": "kjui watch",
       "purpose": {
-        "en": "File watcher. Regenerates Kotlin code and pushes to the Hot Loader.",
-        "ja": "ファイル監視。Kotlin コードを再生成し Hot Loader に送信。"
+        "en": "Advertised by the tool's own command list as \"Watch for file changes\", but not implemented: running it prints `Watch command not yet implemented` and exits (measured at jsonui-cli 1.8.22). For hot reloading, run `jui hotload listen` from the project root.",
+        "ja": "ツール自身のコマンド一覧には「Watch for file changes」と載っているが未実装で、実行すると `Watch command not yet implemented` と出て終わる（jsonui-cli 1.8.22 で実測）。ホットリロードはプロジェクトルートで `jui hotload listen` を使う。"
       },
       "options": [],
-      "examples": [],
-      "seeAlso": []
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ kjui watch\nWatch command not yet implemented"
+        }
+      ],
+      "seeAlso": [
+        "jui hotload listen"
+      ]
     },
     {
       "binary": "rjui",
@@ -2521,6 +2528,80 @@
           "options": "ea29419b085b",
           "examples": "2b8fdc789d3b",
           "seeAlso": "fea52e56f095"
+        }
+      }
+    },
+    {
+      "binary": "jsonui-test",
+      "command": "mock identity",
+      "synopsis": "jsonui-test mock identity [--port P] [--config FILE] [--expect-root DIR] [--any-project]",
+      "purpose": {
+        "en": "Ask the mock server that is listening whose corpus it serves, and fail when it is not this project's. Exit codes carry the answer: 0 this project, 1 another project, 2 nothing answered, 3 answered without an identity. It selects the server by PORT — the one thing a name match cannot do — which is what makes it safe to run while several projects have a mock server up.",
+        "ja": "待ち受けている mock サーバに「どのプロジェクトのコーパスを配っているか」を尋ね、この プロジェクトのものでなければ失敗する。答えは終了コードで返る: 0 = このプロジェクト、1 = 別のプロジェクト、2 = 応答なし、3 = 応答したが素性を名乗らない。選択は**ポート**で行う（名前一致にはできないこと）ので、複数プロジェクトが mock サーバを立てている機械でも安全に実行できる。"
+      },
+      "options": [
+        {
+          "name": "--port",
+          "type": "number",
+          "default": "mock.server.port or 8790",
+          "description": {
+            "en": "Port to ask.",
+            "ja": "問い合わせるポート。"
+          }
+        },
+        {
+          "name": "--config",
+          "type": "path",
+          "default": "jui.config.json",
+          "description": {
+            "en": "Config file to read the port and project root from.",
+            "ja": "ポートとプロジェクトルートを読む config。"
+          }
+        },
+        {
+          "name": "--expect-root",
+          "type": "path",
+          "default": "this project's root",
+          "description": {
+            "en": "The project root to require of the answer.",
+            "ja": "応答に求めるプロジェクトルート。"
+          }
+        },
+        {
+          "name": "--any-project",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Report the identity without failing on a mismatch.",
+            "ja": "素性を報告するだけで、不一致でも失敗しない。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "# measured on a project with no mock server running:\n$ jsonui-test mock identity\nmock identity: nothing answered on port 8790 (<urlopen error [Errno 61] Connection refused>)\n$ echo $?\n2"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jsonui-test mock serve"
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.22",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "f3f9b38f8ccb42c237d1d6e1ea54950a847eb5f7f8b25f44730fcfbc5892f520",
+        "cardHash": "30b999644bbaef64bd972989a8cd3874c5bfe108fafc3713567083fd2267d6ad",
+        "fieldHashes": {
+          "binary": "3b2560767fdf",
+          "command": "ad7a7f9307eb",
+          "synopsis": "d6c97acb5c6d",
+          "purpose": "a47dcd0d4bc4",
+          "options": "4be07c8273a7",
+          "examples": "3d5a82715e63",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "07a1251a3bb5"
         }
       }
     },
@@ -3260,26 +3341,54 @@
     {
       "binary": "jsonui-doc",
       "command": "rules",
-      "synopsis": "jsonui-doc rules <init|show>",
+      "synopsis": "jsonui-doc rules init [-o DIR] [--flutter] | jsonui-doc rules show [-d DIR]",
       "purpose": {
-        "en": "Manage project-local documentation rules. `init` creates `.jsonui-doc-rules.json`; `show` prints the effective ruleset.",
-        "ja": "プロジェクトローカルの doc ルールを管理。`init` で `.jsonui-doc-rules.json` を作成、`show` で有効ルールを表示。"
+        "en": "Manage project-local documentation rules. `init` writes a template `.jsonui-doc-rules.json`; `show` prints the effective ruleset (base plus custom).",
+        "ja": "プロジェクトローカルの doc ルールを管理する。`init` はテンプレートの `.jsonui-doc-rules.json` を書き、`show` は有効なルール（base + custom）を表示する。"
       },
-      "options": [],
+      "options": [
+        {
+          "name": "--output",
+          "type": "path",
+          "default": "current directory",
+          "description": {
+            "en": "`init` only: where to write the file. Short form `-o`.",
+            "ja": "`init` のみ: 書き出し先。短縮形は `-o`。"
+          }
+        },
+        {
+          "name": "--flutter",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "`init` only: include Flutter-specific rules (Scaffold, AppBar, lifecycle methods).",
+            "ja": "`init` のみ: Flutter 固有のルール（Scaffold, AppBar, ライフサイクルメソッド）を含める。"
+          }
+        },
+        {
+          "name": "--directory",
+          "type": "path",
+          "default": "current directory",
+          "description": {
+            "en": "`show` only: directory to search for the config file. Short form `-d`.",
+            "ja": "`show` のみ: config を探すディレクトリ。短縮形は `-d`。"
+          }
+        }
+      ],
       "examples": [],
       "seeAlso": [],
       "verifiedAgainst": {
-        "version": "1.8.11",
+        "version": "1.8.22",
         "columns": 80,
         "python": "3.12",
         "helpHash": "56652e8c5d1c72c222a3d5e57e246d22a59011a698804748cac1c4700c374a05",
-        "cardHash": "1a88fb5f365c11af692619c041e7059d94e7d935d17c206cb074ff7fc248de9d",
+        "cardHash": "9acc921f5991605779dac14f79400e6a989f524cc54c1af2813492d6e29e63f0",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "5b022281fedb",
-          "synopsis": "d1ddd8b40c8b",
-          "purpose": "a069d6e79183",
-          "options": "357b9e47f539",
+          "synopsis": "6067e15f1dbf",
+          "purpose": "94364a3c8d6d",
+          "options": "99174dd7a279",
           "examples": "2b8fdc789d3b",
           "seeAlso": "b085f4c343e7"
         }
