@@ -891,7 +891,24 @@
       "aliases": [],
       "seeAlso": [
         "jui g api"
-      ]
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.17",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "1c1daef10973d14f4195a4d64bb770533479ddf0e24e40cc50e920aa9f3759f0",
+        "cardHash": "102d3b1f4b2c343624ef28919b4ba8245b69fa38e505f16bba6ca2a7934826a3",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "5194a4831570",
+          "synopsis": "f024056c15a3",
+          "purpose": "32b245e98862",
+          "options": "74b48506b9f0",
+          "examples": "6fdc3b048f52",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "594c544668ff"
+        }
+      }
     },
     {
       "binary": "jui",
@@ -952,10 +969,10 @@
     {
       "binary": "jui",
       "command": "sync_tool",
-      "synopsis": "jui sync_tool [--platform <p>] [--prune] [--dry-run]",
+      "synopsis": "jui sync_tool [--from <dir>] [--platform android|ios|web] [--prune] [--dry-run]",
       "purpose": {
-        "en": "Sync project-local platform tools (sjui_tools / kjui_tools / rjui_tools) from the home install (~/.jsonui-cli), preserving each tool's extensions/.",
-        "ja": "プロジェクト内のプラットフォームツール（sjui_tools / kjui_tools / rjui_tools）を home インストール（~/.jsonui-cli）から同期。各ツールの extensions/ は保持。"
+        "en": "Sync the project-local platform tools (sjui_tools / kjui_tools / rjui_tools) from the source tree given by --from, which defaults to $JSONUI_CLI_PATH or, when that is unset, to the home install (~/.jsonui-cli). Each tool's extensions/ is preserved.",
+        "ja": "プロジェクト内のプラットフォームツール（sjui_tools / kjui_tools / rjui_tools）を --from の同期元から同期。--from の既定は $JSONUI_CLI_PATH、未設定なら home インストール（~/.jsonui-cli）。各ツールの extensions/ は保持。"
       },
       "options": [
         {
@@ -1004,7 +1021,24 @@
       "aliases": [],
       "seeAlso": [
         "jui build"
-      ]
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.17",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "2f2ae4a55637e448f1f18cdf5f8402156e53a56e1312a7638cc3a24cba6c59a4",
+        "cardHash": "0da084d82a3b7c818c547250e696e0d9984bb538fbafb07eb5707d4388afcb64",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "4369ca7e24d6",
+          "synopsis": "2c67fbce7131",
+          "purpose": "c6174e28123c",
+          "options": "dad21d6c2b5f",
+          "examples": "7409300e848d",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "2c7f782f45a2"
+        }
+      }
     },
     {
       "binary": "jui",
@@ -1761,13 +1795,28 @@
     {
       "binary": "sjui",
       "command": "init",
-      "synopsis": "sjui init",
+      "synopsis": "sjui init [--mode all|uikit|swiftui]",
       "purpose": {
-        "en": "Add the SwiftJsonUI extension to the current iOS project. Creates sjui.config.json and installs scaffolding.",
-        "ja": "現在の iOS プロジェクトに SwiftJsonUI 拡張を追加。sjui.config.json を作成し、scaffold を配置。"
+        "en": "Initialize the current iOS project for SwiftJsonUI: writes sjui.config.json for the chosen mode (all, uikit or swiftui; detected when --mode is omitted). An existing sjui.config.json is kept, and only an empty source_directory is filled in. Libraries and base files are installed by sjui setup, not here.",
+        "ja": "現在の iOS プロジェクトを SwiftJsonUI 用に初期化: 選んだ mode（all / uikit / swiftui、--mode 省略時は自動判定）で sjui.config.json を書く。既存の sjui.config.json は保持し、空の source_directory だけ補完する。ライブラリと基本ファイルの導入は sjui setup であり、ここでは行わない。"
       },
-      "options": [],
-      "examples": [],
+      "options": [
+        {
+          "name": "--mode",
+          "type": "enum",
+          "default": "detected",
+          "description": {
+            "en": "Initialize mode (all, uikit, swiftui).",
+            "ja": "初期化モード（all, uikit, swiftui）。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ sjui init --mode swiftui\nInitializing SwiftJsonUI project in swiftui mode...\nCreated config file: sjui.config.json\nHotloader is now managed centrally — run 'jui hotload listen' from the project root.\nInitialization complete!\n\nSwiftUI mode initialized. Use SwiftUI-specific commands for your project.\n\n# run again where the file already exists:\n$ sjui init --mode swiftui\nInitializing SwiftJsonUI project in swiftui mode...\nConfig file already exists: sjui.config.json\nInitialization complete!"
+        }
+      ],
       "seeAlso": [
         "sjui setup",
         "sjui generate"
@@ -2655,8 +2704,8 @@
       "command": "generate spec",
       "synopsis": "jsonui-doc generate spec <spec-or-directory> [-o <out>] [--format markdown|html] [--layouts-dir <dir>]",
       "purpose": {
-        "en": "Generate documentation for a screen spec. The argument is a `.spec.json` file or a directory of them (batch). The format defaults to Markdown — inferred from the output path when one is given, and `--format html` asks for HTML explicitly.",
-        "ja": "画面仕様のドキュメントを生成する。引数は `.spec.json` ファイルか、それらを含むディレクトリ（一括処理）。形式の既定は Markdown で、出力パスが与えられればそこから推測し、`--format html` で HTML を明示指定する。"
+        "en": "Generate documentation for a screen spec. The argument is a `.spec.json` file or a directory of them (batch). For a single file the format follows the output path's extension, and `--format` chooses it explicitly. Batch mode is measured to write HTML into `.html` files whatever `--format` says (1.8.15 and 1.8.17; reported upstream), so use single-file runs when Markdown is what you need.",
+        "ja": "画面仕様のドキュメントを生成する。引数は `.spec.json` ファイルか、それらを含むディレクトリ（一括処理）。単一ファイルでは出力パスの拡張子に形式が従い、`--format` で明示指定できる。一括処理は `--format` の指定に関わらず `.html` に HTML を書くことが実測されている（1.8.15 / 1.8.17、上流に報告済み）ので、Markdown が必要なら単一ファイルで実行する。"
       },
       "options": [
         {
@@ -2670,10 +2719,10 @@
         {
           "name": "--format",
           "type": "enum",
-          "default": "inferred from the output path, else markdown",
+          "default": "inferred from the output path (single file)",
           "description": {
-            "en": "`markdown` or `html`.",
-            "ja": "`markdown` か `html`。"
+            "en": "`markdown` or `html`. Honoured for a single file; ignored by batch mode as of 1.8.17 (see purpose).",
+            "ja": "`markdown` か `html`。単一ファイルでは有効。一括処理では 1.8.17 時点で無視される（purpose 参照）。"
           }
         },
         {
@@ -2685,23 +2734,28 @@
           }
         }
       ],
-      "examples": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-doc generate spec docs/screens/json/chrome.spec.json -o chrome.md\n# chrome.md starts with the spec's Markdown heading\n\n$ jsonui-doc generate spec docs/screens/json -o out --format markdown\nGenerated: 103 files\n# out/ holds 103 .html files (HTML), not Markdown — measured at 1.8.17"
+        }
+      ],
       "seeAlso": [
         "jsonui-doc validate spec"
       ],
       "verifiedAgainst": {
-        "version": "1.8.11",
+        "version": "1.8.17",
         "columns": 80,
         "python": "3.12",
         "helpHash": "27bd819464e0158403b3f13b879f71771a53de3082c180ff8abd572f58cce35a",
-        "cardHash": "ab977eb6ca01b114a620b4b931f0c8ad3b69b55f3a76a6f48f8353e0b261e9cc",
+        "cardHash": "aad1cc6a45b7a8f1a5373d2c1c0b80418af6b3641da0a651a7651721494d2746",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "36cc04ed917e",
           "synopsis": "423a3990f8f2",
-          "purpose": "bf9b1b2ee6ae",
-          "options": "e7e54d267180",
-          "examples": "2b8fdc789d3b",
+          "purpose": "dfca0d8e189d",
+          "options": "d9cc3e5e671f",
+          "examples": "7007fcfd0d6b",
           "seeAlso": "fb0c54cc44ab"
         }
       }
