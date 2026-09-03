@@ -2765,8 +2765,8 @@
       "command": "generate component",
       "synopsis": "jsonui-doc generate component <spec-or-directory> [-o <out>] [--format markdown|html]",
       "purpose": {
-        "en": "Generate documentation for a component spec. The argument is a `.component.json` file or a directory of them (batch). The format defaults to Markdown — inferred from the output path when one is given, and `--format html` asks for HTML explicitly.",
-        "ja": "コンポーネント仕様のドキュメントを生成する。引数は `.component.json` ファイルか、それらを含むディレクトリ（一括処理）。形式の既定は Markdown で、出力パスが与えられればそこから推測し、`--format html` で HTML を明示指定する。"
+        "en": "Generate documentation for a component spec. The argument is a `.component.json` file or a directory of them (batch). For a single file the format follows the output path's extension, and `--format` chooses it explicitly. Batch mode is measured to write HTML into `.html` files whatever `--format` says (1.8.17; reported upstream together with `generate spec`), so use single-file runs when Markdown is what you need.",
+        "ja": "コンポーネント仕様のドキュメントを生成する。引数は `.component.json` ファイルか、それらを含むディレクトリ（一括処理）。単一ファイルでは出力パスの拡張子に形式が従い、`--format` で明示指定できる。一括処理は `--format` の指定に関わらず `.html` に HTML を書くことが実測されている（1.8.17、`generate spec` と併せて上流に報告済み）ので、Markdown が必要なら単一ファイルで実行する。"
       },
       "options": [
         {
@@ -2780,28 +2780,33 @@
         {
           "name": "--format",
           "type": "enum",
-          "default": "inferred from the output path, else markdown",
+          "default": "inferred from the output path (single file)",
           "description": {
-            "en": "`markdown` or `html`.",
-            "ja": "`markdown` か `html`。"
+            "en": "`markdown` or `html`. Honoured for a single file; ignored by batch mode as of 1.8.17 (see purpose).",
+            "ja": "`markdown` か `html`。単一ファイルでは有効。一括処理では 1.8.17 時点で無視される（purpose 参照）。"
           }
         }
       ],
-      "examples": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-doc generate component docs/components/json/codeblock.component.json -o code_block.md\n# code_block.md starts with the component's Markdown heading\n\n$ jsonui-doc generate component docs/components/json -o out --format markdown\nGenerating HTML for 6 component files...\n# out/ holds 6 .html files (HTML), not Markdown — measured at 1.8.17"
+        }
+      ],
       "seeAlso": [],
       "verifiedAgainst": {
-        "version": "1.8.10",
+        "version": "1.8.17",
         "columns": 80,
         "python": "3.12",
         "helpHash": "60d3a8d16fa66198a63138c8e9e5c25fce3e69c6bd65f952f76cff9a5bdad85f",
-        "cardHash": "cecb4687fba526c14bb517ebac9bf1bdca2684ed2cdbb734759aad3446784aff",
+        "cardHash": "6aa468ecb336c9dbbf52f25d5473c41a9ba6db22d5a040d09c1ba5a3d86e7d44",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "57e0362d6d85",
           "synopsis": "f4ca018f9461",
-          "purpose": "8dc07c1c4981",
-          "options": "0da80284e233",
-          "examples": "2b8fdc789d3b",
+          "purpose": "09258c3c0026",
+          "options": "8eb90784d1fb",
+          "examples": "e1b073be9168",
           "seeAlso": "b085f4c343e7"
         }
       }
