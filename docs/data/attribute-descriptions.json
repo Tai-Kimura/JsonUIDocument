@@ -470,8 +470,8 @@
     "ja": "`true`（かつ `cellIdProperty` 指定時）で `<primary>_<hash>` 形式の cellId を自動計算し、差分更新を hashForCell なしで動かす。`cellIdProperty` 未指定時は build warning が出てインデックスベース identity にフォールバック。"
   },
   "lazy": {
-    "en": "Outer container shape for the Collection. Accepts `'lazy'` (default), `'eager'`, `'none'`, or a binding `@{prop}`. `'lazy'` → ScrollView+LazyVStack/LazyHStack on iOS, LazyColumn/LazyRow on Android — virtualized cell rendering. `'eager'` → ScrollView+VStack/HStack on iOS, Column(verticalScroll)/Row(horizontalScroll) on Android — no virtualization, smooth scrolling for heavy cells (markdown / images / attributed text) where LazyVStack re-evaluation hurts. `'none'` → VStack/HStack only, no scroll container — use when the parent is already scrollable. Legacy boolean is accepted: `true` → 'lazy', `false` → 'none'. Bindings are resolved at runtime via the wrapper's mode parameter so toggling between modes preserves view identity. Sticky headers and paging require `'lazy'`.",
-    "ja": "Collection 外側コンテナの形状。`'lazy'`（既定）／`'eager'`／`'none'`、または binding `@{プロパティ}` を受け付ける。`'lazy'` は ScrollView+LazyVStack/LazyHStack（iOS）・LazyColumn/LazyRow（Android）で仮想化レンダリング。`'eager'` は ScrollView+VStack/HStack（iOS）・Column(verticalScroll)/Row(horizontalScroll)（Android）で仮想化なし。重い cell（markdown / 画像 / attributed text）で LazyVStack の再評価が問題になる場合に使う。`'none'` は VStack/HStack のみでスクロールコンテナなし、親が既にスクロール可能なときに使う。レガシー boolean も互換維持：`true` → 'lazy'、`false` → 'none'。binding は wrapper の mode 引数経由で実行時解決されるため、モード切替時にも view identity を保つ。sticky header・paging は `'lazy'` 必須。"
+    "en": "Outer container shape for the Collection. Accepts `'lazy'` (default), `'eager'`, `'none'`, or a binding `@{prop}`. `'lazy'` → ScrollView+LazyVStack/LazyHStack on iOS, LazyColumn/LazyRow on Android — virtualized cell rendering. `'eager'` → ScrollView+VStack/HStack on iOS, Column(verticalScroll)/Row(horizontalScroll) on Android — no virtualization, smooth scrolling for heavy cells (markdown / images / attributed text) where LazyVStack re-evaluation hurts. `'none'` → VStack/HStack only, no scroll container — use when the parent is already scrollable. Legacy boolean is accepted: `true` → 'lazy', `false` → 'none'. Bindings are resolved at runtime via the wrapper's mode parameter so toggling between modes preserves view identity. Sticky headers and paging require `'lazy'`. For `layout: 'flow'`, `'none'` is the only value that removes the Collection's own vertical scroll (jsonui-cli 1.8.20).",
+    "ja": "Collection 外側コンテナの形状。`'lazy'`（既定）／`'eager'`／`'none'`、または binding `@{プロパティ}` を受け付ける。`'lazy'` は ScrollView+LazyVStack/LazyHStack（iOS）・LazyColumn/LazyRow（Android）で仮想化レンダリング。`'eager'` は ScrollView+VStack/HStack（iOS）・Column(verticalScroll)/Row(horizontalScroll)（Android）で仮想化なし。重い cell（markdown / 画像 / attributed text）で LazyVStack の再評価が問題になる場合に使う。`'none'` は VStack/HStack のみでスクロールコンテナなし、親が既にスクロール可能なときに使う。レガシー boolean も互換維持：`true` → 'lazy'、`false` → 'none'。binding は wrapper の mode 引数経由で実行時解決されるため、モード切替時にも view identity を保つ。sticky header・paging は `'lazy'` 必須。 `layout: 'flow'` では、Collection 自身の縦スクロールを外す値は `'none'` だけ（jsonui-cli 1.8.20）。"
   },
   "paging": {
     "en": "Enable paging.",
@@ -942,8 +942,8 @@
     "ja": "セーフエリアインセット対象エッジ。"
   },
   "layout": {
-    "en": "Layout type (flow: wrapping layout, LeftAligned: left-aligned wrapping).",
-    "ja": "レイアウトタイプ（`flow`: 折返し、`LeftAligned`: 左寄せ折返し）。"
+    "en": "Layout type: `vertical` | `horizontal` | `flow` (wrapping, packed to the leading edge). `Flow` / `LeftAligned` / `leftAligned` are accepted spellings of `flow`. Scroll rule for flow since jsonui-cli 1.8.20: with `lazy` in effect (the default `'lazy'`, or `'eager'`) a flow Collection scrolls vertically inside its own bounds; with `lazy: 'none'` it only wraps and the parent must scroll.",
+    "ja": "レイアウトタイプ: `vertical` | `horizontal` | `flow`（先頭寄せで折り返す）。`Flow` / `LeftAligned` / `leftAligned` は `flow` の別綴りとして受け付ける。flow のスクロール規則（jsonui-cli 1.8.20 から）: `lazy` が効いていれば（既定の `'lazy'` か `'eager'`）flow の Collection は自分の bounds の中で縦にスクロールし、`lazy: 'none'` なら折り返すだけで親がスクロールする。"
   },
   "caretAttributes": {
     "en": "Caret/arrow styling attributes.",

@@ -10,27 +10,42 @@
   },
   "examples": [
     {
-      "title": { "en": "Simple vertical list", "ja": "単純な垂直リスト" },
+      "title": {
+        "en": "Simple vertical list",
+        "ja": "単純な垂直リスト"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{users}\",\n  \"cellIdProperty\": \"id\",\n  \"sections\": [ { \"cell\": \"cells/user_row\" } ]\n}"
     },
     {
-      "title": { "en": "2-column grid", "ja": "2 カラムグリッド" },
+      "title": {
+        "en": "2-column grid",
+        "ja": "2 カラムグリッド"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{photos}\",\n  \"columnCount\": 2,\n  \"itemSpacing\": 8,\n  \"lineSpacing\": 8,\n  \"sections\": [ { \"cell\": \"cells/photo_card\" } ]\n}"
     },
     {
-      "title": { "en": "Sectioned with headers", "ja": "ヘッダ付きセクション" },
+      "title": {
+        "en": "Sectioned with headers",
+        "ja": "ヘッダ付きセクション"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{sectionedMessages}\",\n  \"headerClasses\": [\"cells/date_header\"],\n  \"cellClasses\": [\"cells/message_row\"],\n  \"sections\": [\n    {\n      \"header\": \"cells/date_header\",\n      \"cell\": \"cells/message_row\"\n    }\n  ]\n}"
     },
     {
-      "title": { "en": "Horizontal carousel", "ja": "水平カルーセル" },
+      "title": {
+        "en": "Horizontal carousel",
+        "ja": "水平カルーセル"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{featuredProducts}\",\n  \"orientation\": \"horizontal\",\n  \"horizontalScroll\": true,\n  \"sections\": [ { \"cell\": \"cells/product_card\" } ]\n}"
     },
     {
-      "title": { "en": "Infinite scroll (load more)", "ja": "無限スクロール" },
+      "title": {
+        "en": "Infinite scroll (load more)",
+        "ja": "無限スクロール"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{articles}\",\n  \"onItemAppear\": \"@{onItemAppear}\",\n  \"sections\": [ { \"cell\": \"cells/article_row\" } ]\n}",
       "note": {
@@ -39,7 +54,10 @@
       }
     },
     {
-      "title": { "en": "Eager mode for heavy cells", "ja": "重い cell に eager モード" },
+      "title": {
+        "en": "Eager mode for heavy cells",
+        "ja": "重い cell に eager モード"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{messages}\",\n  \"lazy\": \"eager\",\n  \"sections\": [ { \"cell\": \"cells/markdown_message\" } ]\n}",
       "note": {
@@ -48,7 +66,10 @@
       }
     },
     {
-      "title": { "en": "None mode (parent already scrolls)", "ja": "親が既にスクロール（none モード）" },
+      "title": {
+        "en": "None mode (parent already scrolls)",
+        "ja": "親が既にスクロール（none モード）"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"ScrollView\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"Header\" },\n    {\n      \"type\": \"Collection\",\n      \"items\": \"@{shortList}\",\n      \"lazy\": \"none\",\n      \"sections\": [ { \"cell\": \"cells/row\" } ]\n    },\n    { \"type\": \"Label\", \"text\": \"Footer\" }\n  ]\n}",
       "note": {
@@ -57,7 +78,10 @@
       }
     },
     {
-      "title": { "en": "Mode bound to ViewModel state", "ja": "モードを ViewModel の状態にバインド" },
+      "title": {
+        "en": "Mode bound to ViewModel state",
+        "ja": "モードを ViewModel の状態にバインド"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{rows}\",\n  \"lazy\": \"@{collectionMode}\",\n  \"sections\": [ { \"cell\": \"cells/row\" } ]\n}",
       "note": {
@@ -66,7 +90,10 @@
       }
     },
     {
-      "title": { "en": "Column count bound to ViewModel state", "ja": "カラム数を ViewModel の状態にバインド" },
+      "title": {
+        "en": "Column count bound to ViewModel state",
+        "ja": "カラム数を ViewModel の状態にバインド"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{photos}\",\n  \"columns\": \"@{gridColumnCount}\",\n  \"itemSpacing\": 8,\n  \"lineSpacing\": 8,\n  \"sections\": [ { \"cell\": \"cells/photo_card\" } ]\n}",
       "note": {
@@ -120,8 +147,8 @@
     },
     "lazy": {
       "note": {
-        "en": "Three modes (string enum): `'lazy'` (default) virtualizes via LazyVStack/LazyColumn — use for unbounded or long lists. `'eager'` renders all rows inside a non-lazy ScrollView+VStack/Column — use when LazyVStack re-evaluation hurts performance for heavy cells (markdown, attributed text, large images). `'none'` skips the scroll container entirely — use only when the parent is already scrollable. Bindings (`@{mode}`) are resolved at runtime so toggling preserves view identity. Legacy boolean is accepted: `true` → `'lazy'`, `false` → `'none'`. Sticky headers and paging require `'lazy'`.",
-        "ja": "3 種類のモード（string enum）：`'lazy'`（既定）は LazyVStack/LazyColumn で仮想化（長い／無限リストに使う）。`'eager'` は ScrollView+VStack/Column で全行を非 lazy に描画（重い cell — markdown・attributed text・大きな画像など — で LazyVStack の再評価が遅い場合に使う）。`'none'` はスクロールコンテナを持たない（親が既にスクロール可能な場合のみ使う）。binding（`@{mode}`）は実行時解決されるためモード切替で view identity が保たれる。レガシー boolean も互換：`true` → `'lazy'`、`false` → `'none'`。sticky header / paging は `'lazy'` 必須。"
+        "en": "Three modes (string enum): `'lazy'` (default) virtualizes via LazyVStack/LazyColumn — use for unbounded or long lists. `'eager'` renders all rows inside a non-lazy ScrollView+VStack/Column — use when LazyVStack re-evaluation hurts performance for heavy cells (markdown, attributed text, large images). `'none'` skips the scroll container entirely — use only when the parent is already scrollable. Bindings (`@{mode}`) are resolved at runtime so toggling preserves view identity. Legacy boolean is accepted: `true` → `'lazy'`, `false` → `'none'`. Sticky headers and paging require `'lazy'`. With `layout: 'flow'` the Collection scrolls inside its own bounds whenever lazy is in effect (`'lazy'` or `'eager'`); `'none'` is the only value that leaves scrolling to the parent (jsonui-cli 1.8.20).",
+        "ja": "3 種類のモード（string enum）：`'lazy'`（既定）は LazyVStack/LazyColumn で仮想化（長い／無限リストに使う）。`'eager'` は ScrollView+VStack/Column で全行を非 lazy に描画（重い cell — markdown・attributed text・大きな画像など — で LazyVStack の再評価が遅い場合に使う）。`'none'` はスクロールコンテナを持たない（親が既にスクロール可能な場合のみ使う）。binding（`@{mode}`）は実行時解決されるためモード切替で view identity が保たれる。レガシー boolean も互換：`true` → `'lazy'`、`false` → `'none'`。sticky header / paging は `'lazy'` 必須。 `layout: 'flow'` では lazy が効いていれば（`'lazy'` か `'eager'`）Collection は自分の bounds の中でスクロールし、スクロールを親に任せる値は `'none'` だけ（jsonui-cli 1.8.20）。"
       }
     },
     "orientation": {
@@ -167,5 +194,8 @@
       }
     }
   },
-  "relatedComponents": ["ScrollView", "View"]
+  "relatedComponents": [
+    "ScrollView",
+    "View"
+  ]
 }

@@ -1833,7 +1833,7 @@
       "options": [],
       "examples": [],
       "seeAlso": [
-        "sjui hotload"
+        "jui hotload listen"
       ]
     },
     {
@@ -2075,46 +2075,53 @@
     {
       "binary": "sjui",
       "command": "watch",
-      "synopsis": "sjui watch",
+      "synopsis": "sjui watch [--mode all|uikit|swiftui]",
       "purpose": {
-        "en": "File watcher. On layout / string / style change, regenerates Swift code and pushes to the Hot Loader.",
-        "ja": "ファイル監視。layout / strings / style 変更時に Swift コードを再生成し Hot Loader に送信。"
+        "en": "Watch the layouts and styles directories for JSON changes and re-run the SwiftJsonUI build for the mode (an initial build runs first; Ctrl+C stops). It does not talk to the Hot Loader — that runs centrally as `jui hotload listen`.",
+        "ja": "layouts / styles ディレクトリの JSON 変更を監視し、mode に応じた SwiftJsonUI のビルドを再実行する（最初に 1 回ビルドし、Ctrl+C で停止）。Hot Loader とは通信しない — それは `jui hotload listen` が一括で担う。"
       },
-      "options": [],
-      "examples": [],
-      "seeAlso": [
-        "sjui hotload"
-      ]
-    },
-    {
-      "binary": "sjui",
-      "command": "hotload",
-      "synopsis": "sjui hotload [start|stop|status]",
-      "purpose": {
-        "en": "Control the local Hot Loader WebSocket server. `start` / `stop` / `status` subcommands.",
-        "ja": "ローカル Hot Loader WebSocket サーバーを制御。`start` / `stop` / `status` のサブコマンド。"
-      },
-      "options": [],
-      "examples": [
+      "options": [
         {
-          "language": "bash",
-          "code": "$ sjui hotload start\nHot Loader server running on ws://localhost:8080"
+          "name": "--mode",
+          "type": "enum",
+          "default": "detected from sjui.config.json",
+          "description": {
+            "en": "Watch mode (all, uikit, swiftui).",
+            "ja": "監視モード（all, uikit, swiftui）。"
+          }
         }
       ],
+      "examples": [],
       "seeAlso": [
-        "sjui watch"
+        "sjui build",
+        "jui hotload listen"
       ]
     },
     {
       "binary": "kjui",
       "command": "init",
-      "synopsis": "kjui init",
+      "synopsis": "kjui init [--mode all|xml|compose]",
       "purpose": {
-        "en": "Add the KotlinJsonUI extension to the current Gradle project. Creates kjui.config.json.",
-        "ja": "現在の Gradle プロジェクトに KotlinJsonUI 拡張を追加。kjui.config.json を作成。"
+        "en": "Initialize the current Android project for KotlinJsonUI: writes kjui.config.json for the chosen mode (all, xml or compose; detected when --mode is omitted) and prints the next steps. Directories and base files are created by `kjui setup`, not here. Measured at 1.8.19 and 1.8.20: `--mode compose` stops with 'uninitialized constant KjuiTools::Core::Resources' and writes nothing (reported upstream); xml and all work.",
+        "ja": "現在の Android プロジェクトを KotlinJsonUI 用に初期化する: 選んだ mode（all / xml / compose、--mode 省略時は自動判定）で kjui.config.json を書き、次の手順を印字する。ディレクトリと基本ファイルの作成は `kjui setup` であり、ここでは行わない。1.8.19 / 1.8.20 で実測: `--mode compose` は 'uninitialized constant KjuiTools::Core::Resources' で止まり何も書かない（上流に報告済み）。xml と all は動く。"
       },
-      "options": [],
-      "examples": [],
+      "options": [
+        {
+          "name": "--mode",
+          "type": "enum",
+          "default": "detected",
+          "description": {
+            "en": "Initialize mode (all, xml, compose).",
+            "ja": "初期化モード（all, xml, compose）。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ kjui init --mode xml\nInitializing KotlinJsonUI project in xml mode...\nCreated config file: kjui.config.json\nInitialization complete!\n\nNext steps:\n  1. Edit kjui.config.json to customize paths if needed\n  2. Run 'kjui setup' to create directories and base files\n  3. Run 'kjui g view HomeView' to generate your first view"
+        }
+      ],
       "seeAlso": [
         "kjui setup"
       ]
