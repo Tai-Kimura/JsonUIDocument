@@ -26,25 +26,31 @@ import fs from "node:fs";
 import path from "node:path";
 
 const CWD = process.cwd();
-const VENDORED = path.resolve(CWD, "rjui_tools");
-const TOOL = "rjui_tools";
+
+// Every vendored tool tree, discovered rather than named. This face declares only
+// the web platform today, so `rjui_tools` is the only one — but naming it in the
+// script would mean that adding an ios or android platform to jui.config.json
+// vendors a tree this gate silently does not look at. A gate that covers "the tool
+// I happened to write down" is the shape this lane keeps finding elsewhere.
+function vendoredTools(): string[] {
+  return fs
+    .readdirSync(CWD, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && /_tools$/.test(e.name))
+    .map((e) => e.name)
+    .sort();
+}
 
 const SKIP_DIRS = new Set([".git", "__pycache__", ".rspec_status", "node_modules", ".pytest_cache"]);
 const SKIP_FILES = new Set([".DS_Store"]);
 const SKIP_SUFFIXES = [".pyc", ".pyo", ".gem", ".log", ".tmp"];
 
-function sourceRoot(): string {
+function pinnedRoot(): string {
   const root = process.env.JSONUI_CLI_PATH;
   if (!root) {
     console.error("check-vendored-tree: JSONUI_CLI_PATH is not set — there is nothing to compare the vendored tree against. Refusing.");
     process.exit(1);
   }
-  const p = path.join(root, TOOL);
-  if (!fs.existsSync(p)) {
-    console.error(`check-vendored-tree: ${p} does not exist. Refusing to compare against a source that is not there.`);
-    process.exit(1);
-  }
-  return p;
+  return root;
 }
 
 function relFiles(root: string): Set<string> {
@@ -88,42 +94,59 @@ function sharedCorePayloads(root: string): Map<string, string> {
   return out;
 }
 
-const src = sourceRoot();
-const sourceRootDir = process.env.JSONUI_CLI_PATH as string;
-const payloads = sharedCorePayloads(sourceRootDir);
-const a = relFiles(src);
-for (const rel of payloads.keys()) a.add(rel);
-const b = relFiles(VENDORED);
-
-if (a.size === 0 || b.size === 0) {
-  console.error(`check-vendored-tree: ${a.size} file(s) in the pin and ${b.size} vendored — refusing to read an empty comparison as a match.`);
+const root = pinnedRoot();
+const payloads = sharedCorePayloads(root);
+const tools = vendoredTools();
+if (tools.length === 0) {
+  console.error("check-vendored-tree: no *_tools directory is vendored here — refusing to read an empty scan as a match.");
   process.exit(1);
 }
 
-const missing = [...a].filter((f) => !b.has(f)).sort();
-const extra = [...b].filter((f) => !a.has(f)).sort();
-const differ: string[] = [];
-for (const f of [...a].filter((x) => b.has(x)).sort()) {
-  const from = payloads.get(f) ?? path.join(src, f);
-  const x = fs.readFileSync(from);
-  const y = fs.readFileSync(path.join(VENDORED, f));
-  if (!x.equals(y)) differ.push(f);
-}
-
-const show = (label: string, list: string[], hint: string) => {
+const show = (tool: string, label: string, list: string[], hint: string) => {
   if (list.length === 0) return;
-  console.error(`  ${list.length} ${label}:`);
+  console.error(`  ${tool}: ${list.length} ${label}:`);
   for (const f of list.slice(0, 20)) console.error(`    ${f}`);
   if (list.length > 20) console.error(`    … and ${list.length - 20} more`);
   console.error(`    ${hint}`);
 };
 
-if (missing.length || extra.length || differ.length) {
-  console.error("check-vendored-tree: the vendored tree is not what the pinned toolchain ships.");
-  show("in the pin but not vendored", missing, "run `JSONUI_CLI_PATH=<pinned checkout> jui sync_tool` and commit the result");
-  show("vendored but not in the pin", extra, "the pin no longer ships these; sync_tool never deletes, so remove them by hand and commit");
-  show("present in both but different", differ, "run sync_tool and commit the result");
-  process.exit(1);
+let failed = false;
+let total = 0;
+for (const tool of tools) {
+  const src = path.join(root, tool);
+  if (!fs.existsSync(src)) {
+    console.error(`check-vendored-tree: ${tool} is vendored here but the pin has no ${tool}/ — refusing to compare against a source that is not there.`);
+    failed = true;
+    continue;
+  }
+  const a = relFiles(src);
+  for (const rel of payloads.keys()) a.add(rel);
+  const b = relFiles(path.resolve(CWD, tool));
+  if (a.size === 0 || b.size === 0) {
+    console.error(`check-vendored-tree: ${tool}: ${a.size} file(s) in the pin and ${b.size} vendored — refusing to read an empty comparison as a match.`);
+    failed = true;
+    continue;
+  }
+  total += a.size;
+
+  const missing = [...a].filter((f) => !b.has(f)).sort();
+  const extra = [...b].filter((f) => !a.has(f)).sort();
+  const differ: string[] = [];
+  for (const f of [...a].filter((x) => b.has(x)).sort()) {
+    const from = payloads.get(f) ?? path.join(src, f);
+    if (!fs.existsSync(from)) continue;
+    if (!fs.readFileSync(from).equals(fs.readFileSync(path.join(CWD, tool, f)))) differ.push(f);
+  }
+  if (missing.length || extra.length || differ.length) {
+    if (!failed) console.error("check-vendored-tree: a vendored tree is not what the pinned toolchain ships.");
+    show(tool, "in the pin but not vendored", missing, "run `JSONUI_CLI_PATH=<pinned checkout> jui sync_tool` and commit the result");
+    show(tool, "vendored but not in the pin", extra, "the pin no longer ships these; sync_tool never deletes, so remove them by hand and commit");
+    show(tool, "present in both but different", differ, "run sync_tool and commit the result");
+    failed = true;
+  }
 }
 
-console.log(`check-vendored-tree: OK — ${a.size} file(s), byte for byte, minus extensions/ and the tool's own skip list.`);
+if (failed) process.exit(1);
+console.log(
+  `check-vendored-tree: OK — ${tools.join(", ")} (${total} file(s)), byte for byte, minus extensions/ and the tool's own skip list.`,
+);
