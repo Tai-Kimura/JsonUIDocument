@@ -33,8 +33,8 @@
   "attributes": {
     "items": {
       "note": {
-        "en": "Canonically an array of **strings** — the string IS the value — or a binding to a ViewModel string array. This is the shape that works on all three platforms. On Web only, entries may also be objects (`{ value, text }` / `{ id, label }`) — a web extension; keep object items out of cross-platform layouts. When `datePickerMode` is set, `items` is ignored in favor of date range attributes.",
-        "ja": "正準形は**文字列**の配列 — 文字列そのものが値 — または ViewModel の文字列配列へのバインド。この形が 3 プラットフォーム全てで動きます。Web に限りオブジェクト要素（`{ value, text }` / `{ id, label }`）も受理されますが web 拡張です — クロスプラットフォームの layout ではオブジェクト items を使わないこと。`datePickerMode` 指定時は `items` は無視され日付範囲属性が優先される。"
+        "en": "Canonically an array of **strings** — the string IS the value — or a binding to a ViewModel string array. This is the shape that works on all three platforms. On Web only, entries may also be objects (`{ value, text }` / `{ id, label }`) — a web extension; keep object items out of cross-platform layouts. When `datePickerMode` is set, `items` is ignored in favor of date range attributes. Entries are data, not strings keys. The attribute definition has said so outright since jsonui-cli 1.8.38, and the web face agrees when measured: a key that is registered in strings.json, written as an item, renders as the key text itself. Translate the list in the view model before binding it.",
+        "ja": "正準形は**文字列**の配列 — 文字列そのものが値 — または ViewModel の文字列配列へのバインド。この形が 3 プラットフォーム全てで動きます。Web に限りオブジェクト要素（`{ value, text }` / `{ id, label }`）も受理されますが web 拡張です — クロスプラットフォームの layout ではオブジェクト items を使わないこと。`datePickerMode` 指定時は `items` は無視され日付範囲属性が優先される。　エントリはデータであって strings のキーではありません。jsonui-cli 1.8.38 から属性宣言がそう明記しており、web 面で実測しても、strings.json に登録済みのキーを item に書くとキー文字列のまま描画されます。翻訳は bind する前に ViewModel 側で済ませてください。"
       }
     },
     "selectedValue": {

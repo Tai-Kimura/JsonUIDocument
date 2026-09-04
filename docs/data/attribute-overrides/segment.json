@@ -28,8 +28,8 @@
   "attributes": {
     "items": {
       "note": {
-        "en": "Array of `{ label?, icon?, value }`. At least `label` or `icon` is required per entry.",
-        "ja": "`{ label?, icon?, value }` の配列。各エントリで `label` または `icon` のいずれかが必須。"
+        "en": "Array of `{ label?, icon?, value }`. At least `label` or `icon` is required per entry. As of jsonui-cli 1.8.38 the object form does not survive code generation on any face: the web build writes a file that does not parse, while iOS and Android compile and render the raw `{\"label\"=>...}` text into the control. Measured on all three and reported upstream; a plain string entry is the form that renders today. The examples above keep the object form because that is the shape the attribute is declared to take.",
+        "ja": "`{ label?, icon?, value }` の配列。各エントリで `label` または `icon` のいずれかが必須。　jsonui-cli 1.8.38 時点では、オブジェクト形はどの面でもコード生成を通り抜けません: web はパースできないファイルが出力され、iOS と Android はコンパイルこそ通るものの `{\"label\"=>...}` という文字列がそのままコントロールに表示されます。3 面とも実測し、上流に報告済みです。今日時点で描画される形は文字列エントリです。上の例がオブジェクト形のままなのは、属性宣言がその形を取ると定めているためです。"
       }
     },
     "selectedIndex": {
