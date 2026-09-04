@@ -67,7 +67,7 @@ jobs:
   # version's help. The second half never judges whether a card is right, only
   # whether it was read; unstamped cards are counted, never red.
   #
-  # All eleven gates run even when one fails, so a red run names everything that
+  # All twelve gates run even when one fails, so a red run names everything that
   # is red, and every gate prints its own exit code — a gate that could not
   # run must not read as a gate that passed.
   gates:
@@ -143,7 +143,7 @@ jobs:
         working-directory: jsonui-doc-web
         run: npm run prebuild
 
-      - name: Run the eleven gates (enforcing — a red one stops the deploy)
+      - name: Run the twelve gates (enforcing — a red one stops the deploy)
         run: |
           set +e
           fail=0
@@ -236,6 +236,15 @@ jobs:
           # upstream cannot go unmentioned here. It refuses a toolchain with no
           # rules module rather than passing on an empty read.
           run_gate parent-sub-sections    npm --prefix jsonui-doc-web run check:parent-sub-sections
+          # A string `partialAttributes[].range` that is absent from the text it
+          # decorates is SKIPPED at runtime — no error, no warning, the link or
+          # emphasis simply is not there. This site is bilingual and the match is
+          # per locale, so the shape that matters is asymmetric: a phrase reworded
+          # in one language leaves the link working in the other. Nothing else here
+          # sees it — the build is silent by design and the live probe checks that
+          # the STRING is on the page, which it still is, with the link missing
+          # from inside it.
+          run_gate partial-ranges         npm --prefix jsonui-doc-web run check:partial-ranges
           run_gate cli-coverage           npm --prefix jsonui-doc-web run check:cli-coverage
           # The committed rjui_tools must BE what the pinned toolchain syncs.
           # `jui sync_tool` resolves its source as $JSONUI_CLI_PATH > ~/.jsonui-cli
@@ -261,7 +270,7 @@ jobs:
             fi
             echo "the committed vendored tree matches the pin, file for file"'
           echo "----"
-          echo "gates with a non-zero exit: $fail of 11"
+          echo "gates with a non-zero exit: $fail of 12"
           if [ "$fail" -ne 0 ]; then
             echo "FAILING this job: the deploy job depends on it and will not run."
             exit 1
