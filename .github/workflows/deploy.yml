@@ -37,7 +37,7 @@ env:
   # Bump procedure: pick the new jsonui-cli main SHA, replace this value, and
   # review the regenerated reference pages in that deploy — the SHA bump is
   # the review point for reference updates.
-  JSONUI_CLI_REF: 0a4d862df65631e141b02b2d297d58560f8c64d9 # v1.8.28
+  JSONUI_CLI_REF: f3e34730e2de6f130d8ada86b1306f245d09bdd9 # v1.8.29
   # Two releases were skipped on the way here. v1.8.6's `jui build` crashed on
   # `from ..core.version import toolchain_version` (the module is at
   # jui_cli/version.py, not under core/), and v1.8.8 was withdrawn upstream for
@@ -67,7 +67,7 @@ jobs:
   # version's help. The second half never judges whether a card is right, only
   # whether it was read; unstamped cards are counted, never red.
   #
-  # All ten gates run even when one fails, so a red run names everything that
+  # All eleven gates run even when one fails, so a red run names everything that
   # is red, and every gate prints its own exit code — a gate that could not
   # run must not read as a gate that passed.
   gates:
@@ -143,7 +143,7 @@ jobs:
         working-directory: jsonui-doc-web
         run: npm run prebuild
 
-      - name: Run the ten gates (enforcing — a red one stops the deploy)
+      - name: Run the eleven gates (enforcing — a red one stops the deploy)
         run: |
           set +e
           fail=0
@@ -227,6 +227,15 @@ jobs:
           # scans what the pinned toolchain actually emitted, and refuses an empty
           # scan rather than reporting success for a tree it never read.
           run_gate raw-string-keys        npm --prefix jsonui-doc-web run check:raw-string-keys
+          # The parent/sub-spec page carries a hand-written list of what a
+          # sub-spec supplies. Since jsonui-cli 1.8.29 that list has a canonical
+          # source (`shared/core/parent_spec_rules.py`), which an upstream test
+          # walks through a real merge. This checks COVERAGE, not derivation:
+          # the sentence stays editorial — two of the names are read from the
+          # parent too and belong elsewhere on the page — while a section added
+          # upstream cannot go unmentioned here. It refuses a toolchain with no
+          # rules module rather than passing on an empty read.
+          run_gate parent-sub-sections    npm --prefix jsonui-doc-web run check:parent-sub-sections
           run_gate cli-coverage           npm --prefix jsonui-doc-web run check:cli-coverage
           # The committed rjui_tools must BE what the pinned toolchain syncs.
           # `jui sync_tool` resolves its source as $JSONUI_CLI_PATH > ~/.jsonui-cli
@@ -252,7 +261,7 @@ jobs:
             fi
             echo "the committed vendored tree matches the pin, file for file"'
           echo "----"
-          echo "gates with a non-zero exit: $fail of 10"
+          echo "gates with a non-zero exit: $fail of 11"
           if [ "$fail" -ne 0 ]; then
             echo "FAILING this job: the deploy job depends on it and will not run."
             exit 1
