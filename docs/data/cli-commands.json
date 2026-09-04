@@ -1396,7 +1396,7 @@
     {
       "binary": "jui",
       "command": "conformance baseline update",
-      "synopsis": "jui conformance baseline update --platform <p> [--artifacts DIR]",
+      "synopsis": "jui conformance baseline update --platform ios|android|web [--dir DIR] [--artifacts DIR] [--env ENV] [--only-new] [--fail-on-moved] [--rendered-by NAME=SHA] [--threshold T]",
       "purpose": {
         "en": "Hash artifacts/<platform>/*.png into baselines/<platform>.hashes.json (perceptual-hash screenshot baselines).",
         "ja": "artifacts/<platform>/*.png をハッシュ化して baselines/<platform>.hashes.json に記録（perceptual-hash ベースライン）。"
@@ -1428,6 +1428,51 @@
           "description": {
             "en": "Artifacts directory.",
             "ja": "artifacts ディレクトリ。"
+          }
+        },
+        {
+          "name": "--env",
+          "type": "string",
+          "default": "",
+          "description": {
+            "en": "Render-environment key to bake the baseline under.",
+            "ja": "baseline を焼くレンダー環境キー。"
+          }
+        },
+        {
+          "name": "--only-new",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Bake only fixtures that have no baseline yet, leaving existing ones untouched.",
+            "ja": "baseline がまだ無い fixture だけを焼き、既存はそのまま残す。"
+          }
+        },
+        {
+          "name": "--fail-on-moved",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Exit non-zero if a fixture that already had a baseline moved, instead of rebaking it silently.",
+            "ja": "既に baseline を持つ fixture が動いていたら、黙って焼き直さずに非ゼロで終わる。"
+          }
+        },
+        {
+          "name": "--rendered-by",
+          "type": "string",
+          "default": "",
+          "description": {
+            "en": "Metadata only (NAME=SHA): recorded in the manifest, never part of a comparison. A local bake does not know what CI would have used, so nothing looks it up.",
+            "ja": "メタデータのみ（NAME=SHA）。manifest に記録されるだけで比較には使われない。ローカルの bake は CI が使う値を知らないので、何も参照しない。"
+          }
+        },
+        {
+          "name": "--threshold",
+          "type": "number",
+          "default": "the shared calibrated value",
+          "description": {
+            "en": "Comparison threshold stored in this manifest. Recalibrate per (env, platform) by measuring the renderer's repeat-run noise first.",
+            "ja": "この manifest に保存する比較しきい値。(env, platform) ごとに、レンダラの再実行ノイズを測ってから較正する。"
           }
         }
       ],
@@ -2601,10 +2646,10 @@
         "jsonui-doc generate doc"
       ],
       "verifiedAgainst": {
-        "version": "1.8.4",
+        "version": "1.8.24",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "01ee3d9b5ad7390a3419a86c099fd2f11e501d54479408be8f7b5688f425bddd",
+        "helpHash": "81a343535fdbef82da99d39bee65ad2a6bc3a20a6982fb560e11872a4bc3b806",
         "cardHash": "1ff7f83e2af1305f4dfc379f028acfbf502638f6c2ed3d2f4f206b828e32ee21",
         "fieldHashes": {
           "binary": "3b2560767fdf",
@@ -2614,6 +2659,71 @@
           "options": "357b9e47f539",
           "examples": "2b8fdc789d3b",
           "seeAlso": "92515ad67a0c"
+        }
+      }
+    },
+    {
+      "binary": "jsonui-test",
+      "command": "generate unit-stubs",
+      "synopsis": "jsonui-test generate unit-stubs [--check] [--dry-run] [--spec-dir DIR]",
+      "purpose": {
+        "en": "Hold a spec's `unitContracts` block and the hand-written unit tests to each other. `--check` compares the declared set with the implemented one per platform and exits non-zero on drift in any of three directions: declared with no implementation, implemented but declared nowhere, and declared for two platforms while present on one. It does not write the test bodies — only stubs for cases that have none.",
+        "ja": "spec の `unitContracts` ブロックと、手書きのユニットテストを互いに突き合わせる。`--check` はプラットフォームごとに宣言集合と実装集合を比較し、3 方向のいずれかにずれがあれば非ゼロで終わる: 宣言があって実装が無い / 実装があって宣言が無い / 2 プラットフォームに宣言があって片方にしか無い。テスト本体は書かない（実装の無いケースの stub だけ）。"
+      },
+      "options": [
+        {
+          "name": "--check",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Compare and exit non-zero on drift. Writes nothing.",
+            "ja": "比較し、ずれがあれば非ゼロ終了。何も書かない。"
+          }
+        },
+        {
+          "name": "--dry-run",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Report what would be written without writing it.",
+            "ja": "書き込まずに、書く内容を報告する。"
+          }
+        },
+        {
+          "name": "--spec-dir",
+          "type": "path",
+          "default": "spec_directory from jui.config.json",
+          "description": {
+            "en": "Spec directory to scan.",
+            "ja": "走査する spec ディレクトリ。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "# measured on a fixture: 2 cases declared, two platforms\n$ jsonui-test generate unit-stubs --check          # neither side implemented\nunit contracts: 2 case(s) declared across 1 spec(s) scanned\nandroid: declared 2, implemented 0, missing 2, undeclared 0 (0 file(s) read)\n    MISSING     sendsOnTap  (declared, no implementation)\n$ echo $?\n1\n\n$ jsonui-test generate unit-stubs --check          # implemented on one platform only\nios: declared 2, implemented 2, missing 0, undeclared 0 (1 file(s) read)\nandroid: declared 2, implemented 0, missing 2, undeclared 0 (0 file(s) read)   -> exit 1\n\n$ jsonui-test generate unit-stubs --check          # a test the spec does not name\nandroid: declared 2, implemented 3, missing 0, undeclared 1 (1 file(s) read)\n    UNDECLARED  zzUndeclared  (implemented, declared nowhere)   -> exit 1\n\n$ jsonui-test generate unit-stubs --check          # both sides agree\nandroid: declared 2, implemented 2, missing 0, undeclared 0 (1 file(s) read)   -> exit 0\n\n# on a project that declares none, it says so rather than reporting success:\nunit contracts: 0 case(s) declared across 103 spec(s) scanned\nno platforms to compare — nothing was checked (not: nothing drifted)"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jsonui-test validate"
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.24",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "7881d3e51083ca2fc3635050077a523a5771c31be293b1b76e616a806a7e663b",
+        "cardHash": "88efe2a72062966114b27faab540ceed45e6ae7eaabb34e5c2d950c4ee84bec4",
+        "fieldHashes": {
+          "binary": "3b2560767fdf",
+          "command": "de17a5e5e1a7",
+          "synopsis": "8685434e384c",
+          "purpose": "a8703964b859",
+          "options": "67c74512f703",
+          "examples": "8fd4c048a424",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "390d25a7bcf7"
         }
       }
     },
