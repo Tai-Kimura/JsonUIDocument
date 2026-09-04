@@ -580,8 +580,8 @@
       "command": "build",
       "synopsis": "jui build [--clean] [--ios-only|--android-only|--web-only | --platform ios|android|web] [--lint-strings]",
       "purpose": {
-        "en": "Build all configured platforms (or one with the --*-only flags). Must pass with zero warnings (JsonUI invariant #1).",
-        "ja": "設定済み全プラットフォーム（--*-only で単一）をビルド。警告ゼロで通過必須（JsonUI 不変条件 #1）。"
+        "en": "Build all configured platforms (or one with --platform / the --*-only flags). Diagnostics are printed, not gated: validation warnings and localize findings leave the exit code at 0. It exits non-zero on the failures that stop the run instead — no jui.config.json, a layout that is not valid JSON, a responsive-variant contract violation, an @canonical mark that does not resolve. Running clean is a rule in the agent rulebook, not something this command enforces.",
+        "ja": "設定済み全プラットフォーム（--platform か --*-only で単一）をビルド。診断は出力されるだけでゲートしません — 検証 warning もローカライズの指摘も exit code は 0 のままです。非 0 になるのは実行そのものが止まる失敗のほう（jui.config.json が無い / レイアウトが壊れた JSON / レスポンシブ variant の契約違反 / 解決できない @canonical マーク）。警告ゼロで通すのはエージェント向け規約の規則で、このコマンドが強制するものではありません。"
       },
       "options": [
         {
@@ -633,8 +633,8 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Run the localize gate (`jui lint-strings`) as part of the build and report its findings as build warnings. Also settable as `\"lint\": {\"strings\": true}` in jui.config.json.",
-            "ja": "ローカライズゲート（`jui lint-strings`）をビルドの一部として実行し、結果をビルド警告として報告する。jui.config.json の `\"lint\": {\"strings\": true}` でも指定できる。"
+            "en": "Run the localize scan (`jui lint-strings`) as part of the build and report its findings as build warnings — the flag's own --help calls it a gate, but the findings are printed only and the build's exit code is unchanged. To fail on them, run `jui lint-strings` directly: it exits 2. Also settable as `\"lint\": {\"strings\": true}` in jui.config.json.",
+            "ja": "ローカライズ検査（`jui lint-strings`）をビルドの一部として実行し、結果をビルド警告として報告する — フラグ自身の --help は gate と呼ぶが、指摘は表示されるだけでビルドの exit code は変わらない。落としたいなら `jui lint-strings` を直接実行する（exit 2）。jui.config.json の `\"lint\": {\"strings\": true}` でも指定できる。"
           }
         }
       ],
@@ -652,17 +652,17 @@
         "jui lint-generated"
       ],
       "verifiedAgainst": {
-        "version": "1.8.10",
+        "version": "1.8.36",
         "columns": 80,
         "python": "3.12",
         "helpHash": "1e8dd3a6ed5a3858c0e562683cde2f46190ff7896d6c551a246be3288d0c788d",
-        "cardHash": "7fa665b5e6e3bb3944cbc0bf161ce1a96872342273d2cb0cc606ce998b036cbc",
+        "cardHash": "ad4fe79d802dd35f90d7a697bdfcc57fd2d8186676c81e4197d019e102aab299",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "672f5de73f32",
           "synopsis": "d75070d2cf40",
-          "purpose": "5bc73f469fc2",
-          "options": "a4640385cb54",
+          "purpose": "2d700420a92e",
+          "options": "504072daa8f0",
           "examples": "9fc8f3499be3",
           "aliases": "1663eff2143e",
           "seeAlso": "235e294708c1"
