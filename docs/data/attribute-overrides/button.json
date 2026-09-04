@@ -10,22 +10,34 @@
   },
   "examples": [
     {
-      "title": { "en": "Text-only", "ja": "テキストのみ" },
+      "title": {
+        "en": "Text-only",
+        "ja": "テキストのみ"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Button\",\n  \"text\": \"@string/action_save\",\n  \"onClick\": \"@{onSave}\",\n  \"style\": \"primary_button\"\n}"
     },
     {
-      "title": { "en": "Icon + Label composite", "ja": "アイコン + ラベルの組合わせ" },
+      "title": {
+        "en": "Icon + Label composite",
+        "ja": "アイコン + ラベルの組合わせ"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onFavorite}\",\n  \"child\": [\n    {\n      \"type\": \"IconLabel\",\n      \"iconName\": \"heart\",\n      \"iconPosition\": \"leading\",\n      \"text\": \"@string/favorite\",\n      \"fontSize\": 14\n    }\n  ]\n}"
     },
     {
-      "title": { "en": "Disabled state via binding", "ja": "binding で disabled 状態" },
+      "title": {
+        "en": "Disabled state via binding",
+        "ja": "binding で disabled 状態"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Button\",\n  \"text\": \"@string/submit\",\n  \"onClick\": \"@{onSubmit}\",\n  \"enabled\": \"@{formValid}\"\n}"
     },
     {
-      "title": { "en": "Loading spinner inside", "ja": "ローディング中はスピナー" },
+      "title": {
+        "en": "Loading spinner inside",
+        "ja": "ローディング中はスピナー"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Button\",\n  \"onClick\": \"@{onRefresh}\",\n  \"enabled\": \"@{!loading}\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"visibility\": \"@{spinnerVisibility}\" },\n    { \"type\": \"Label\", \"text\": \"@string/refresh\", \"visibility\": \"@{labelVisibility}\" }\n  ]\n}",
       "note": {
@@ -34,12 +46,18 @@
       }
     },
     {
-      "title": { "en": "Long-press handler", "ja": "長押しハンドラ" },
+      "title": {
+        "en": "Long-press handler",
+        "ja": "長押しハンドラ"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Button\",\n  \"text\": \"@string/delete\",\n  \"onClick\": \"@{onDelete}\",\n  \"onLongPress\": \"@{onConfirmDelete}\"\n}"
     },
     {
-      "title": { "en": "With image (iOS UIButton style)", "ja": "画像付き（iOS UIButton 風）" },
+      "title": {
+        "en": "With image (iOS UIButton style)",
+        "ja": "画像付き（iOS UIButton 風）"
+      },
       "language": "json",
       "code": "{\n  \"type\": \"Button\",\n  \"image\": \"icon_share\",\n  \"text\": \"@string/share\",\n  \"onClick\": \"@{onShare}\"\n}"
     }
@@ -80,6 +98,12 @@
         "en": "Text color when `enabled` is `false`. If omitted, `fontColor` is dimmed to ~40% on most platforms.",
         "ja": "`enabled: false` のときのテキスト色。省略時は `fontColor` が約 40% に減光される。"
       }
+    },
+    "partialAttributes": {
+      "note": {
+        "en": "Same attribute as on Label, and the range semantics are documented there: `range` may be a `[start, end]` pair, a text pattern, a strings key or a binding, and a pattern that does not occur in the resolved text is skipped rather than raised. See the Label reference.",
+        "ja": "Label と同じ属性で、`range` の意味論はそちらに書いてあります: `range` には `[start, end]` の組・テキストパターン・strings キー・バインディングを書け、解決後の本文に無いパターンはエラーではなく skip されます。Label のリファレンスを参照。"
+      }
     }
   },
   "commonAttributes": {
@@ -102,5 +126,9 @@
       }
     }
   },
-  "relatedComponents": ["IconLabel", "Label", "Indicator"]
+  "relatedComponents": [
+    "IconLabel",
+    "Label",
+    "Indicator"
+  ]
 }
