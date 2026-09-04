@@ -42,7 +42,7 @@
   "copyTypeVisibility": "visible",
   "aliasCalloutVisibility": "gone",
   "aliasLinkUrl": "",
-  "canonicalCode": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{filterIndex}\",\n  \"items\": [\n    { \"label\": \"@string/all\", \"value\": \"all\" },\n    { \"label\": \"@string/active\", \"value\": \"active\" },\n    { \"label\": \"@string/done\", \"value\": \"done\" }\n  ],\n  \"onValueChange\": \"@{onFilterChanged}\"\n}",
+  "canonicalCode": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{filterIndex}\",\n  \"items\": [\"All\", \"Active\", \"Done\"],\n  \"onValueChange\": \"@{onFilterChanged}\"\n}",
   "canonicalLanguage": "json",
   "statRequired": "1",
   "statOptional": "8",
@@ -157,8 +157,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Array of `{ label?, icon?, value }`. At least `label` or `icon` is required per entry. As of jsonui-cli 1.8.38 the object form does not survive code generation on any face: the web build writes a file that does not parse, while iOS and Android compile and render the raw `{\"label\"=>...}` text into the control. Measured on all three and reported upstream; a plain string entry is the form that renders today. The examples above keep the object form because that is the shape the attribute is declared to take.",
-                "ja": "`{ label?, icon?, value }` の配列。各エントリで `label` または `icon` のいずれかが必須。　jsonui-cli 1.8.38 時点では、オブジェクト形はどの面でもコード生成を通り抜けません: web はパースできないファイルが出力され、iOS と Android はコンパイルこそ通るものの `{\"label\"=>...}` という文字列がそのままコントロールに表示されます。3 面とも実測し、上流に報告済みです。今日時点で描画される形は文字列エントリです。上の例がオブジェクト形のままなのは、属性宣言がその形を取ると定めているためです。"
+                "en": "An array of strings, and static: the declaration is `type: array` with no binding, unlike the item lists on SelectBox, Radio and Collection, which declare `[array, binding]`. An entry may be a strings key, which the declaration says every face resolves at render time — measured on the web face at jsonui-cli 1.8.38 a registered key came through as its own text, so treat cross-face resolution as declared rather than confirmed here. This page used to document an object form, `{ label?, icon?, value }`, with three examples. That shape has no source: across jsonui-cli 1.4.1, 1.6.0 and 1.8.38 the declaration carries no element type at all, no converter on any face reads those keys, and the wording dates from this site's first commit. At 1.8.38 an object entry survives code generation on none of the three faces — the web build writes a file that does not parse, while iOS and Android compile and render the raw `{\"label\"=>...}` text into the control — and from 1.8.39 it is refused with a warning instead. There is also no supported way to put an icon in a Segment: the component declares nine attributes and `icon` is not among them, which is why the icon example is gone rather than rewritten.",
+                "ja": "文字列の配列で、静的です: 宣言は `type: array` のみで binding を持ちません（SelectBox / Radio / Collection の item 系が `[array, binding]` を宣言しているのとは異なります）。エントリは strings のキーでもよく、宣言は「どの面でも描画時に解決される」と 述べていますが、jsonui-cli 1.8.38 の web 面で実測したところ登録済みのキーがそのまま文字列として出ました。面をまたぐ解決は「宣言されている」であって、ここで確認できたわけではありません。このページは以前 `{ label?, icon?, value }` というオブジェクト形を 3 つの例つきで説明していました。**この形には出所がありません**: jsonui-cli 1.4.1 / 1.6.0 / 1.8.38 のいずれでも宣言に要素型は無く、どの面の converter もそれらのキーを読まず、記述は当サイトの最初のコミットから変わっていませんでした。1.8.38 時点ではオブジェクト要素は 3 面ともコード生成を通り抜けません — web はパースできないファイルを出力し、iOS と Android はコンパイルこそ通るものの `{\"label\"=>...}` がそのまま表示されます — 1.8.39 からは warning つきで拒否されます。アイコンを Segment に入れる正式な方法もありません: このコンポーネントが宣言している属性は 9 つで `icon` は含まれないため、アイコンの例は書き換えではなく削除しました。"
               },
               "type": "array",
               "required": "required"
@@ -901,7 +901,7 @@
               "languagePill": "json",
               "languagePillVisibility": "visible",
               "activeLanguage": "json",
-              "activeCode": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{filterIndex}\",\n  \"items\": [\n    { \"label\": \"@string/all\", \"value\": \"all\" },\n    { \"label\": \"@string/active\", \"value\": \"active\" },\n    { \"label\": \"@string/done\", \"value\": \"done\" }\n  ],\n  \"onValueChange\": \"@{onFilterChanged}\"\n}",
+              "activeCode": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{filterIndex}\",\n  \"items\": [\"All\", \"Active\", \"Done\"],\n  \"onValueChange\": \"@{onFilterChanged}\"\n}",
               "note": {
                 "en": "",
                 "ja": ""
@@ -910,59 +910,16 @@
               "_variants": [
                 {
                   "language": "json",
-                  "code": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{filterIndex}\",\n  \"items\": [\n    { \"label\": \"@string/all\", \"value\": \"all\" },\n    { \"label\": \"@string/active\", \"value\": \"active\" },\n    { \"label\": \"@string/done\", \"value\": \"done\" }\n  ],\n  \"onValueChange\": \"@{onFilterChanged}\"\n}"
+                  "code": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{filterIndex}\",\n  \"items\": [\"All\", \"Active\", \"Done\"],\n  \"onValueChange\": \"@{onFilterChanged}\"\n}"
                 }
               ],
               "language": "json",
-              "code": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{filterIndex}\",\n  \"items\": [\n    { \"label\": \"@string/all\", \"value\": \"all\" },\n    { \"label\": \"@string/active\", \"value\": \"active\" },\n    { \"label\": \"@string/done\", \"value\": \"done\" }\n  ],\n  \"onValueChange\": \"@{onFilterChanged}\"\n}",
+              "code": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{filterIndex}\",\n  \"items\": [\"All\", \"Active\", \"Done\"],\n  \"onValueChange\": \"@{onFilterChanged}\"\n}",
               "required": ""
             },
             {
               "id": "example_2",
               "anchorId": "example-2",
-              "title": {
-                "en": "Icon-only segment",
-                "ja": "アイコンのみセグメント"
-              },
-              "description": {
-                "en": "",
-                "ja": ""
-              },
-              "descriptionVisibility": "gone",
-              "filePath": "",
-              "filePathVisibility": "gone",
-              "tabs": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "tabsVisibility": "gone",
-              "languagePill": "json",
-              "languagePillVisibility": "visible",
-              "activeLanguage": "json",
-              "activeCode": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{viewModeIndex}\",\n  \"items\": [\n    { \"icon\": \"list.bullet\", \"value\": \"list\" },\n    { \"icon\": \"square.grid.2x2\", \"value\": \"grid\" }\n  ]\n}",
-              "note": {
-                "en": "",
-                "ja": ""
-              },
-              "noteVisibility": "gone",
-              "_variants": [
-                {
-                  "language": "json",
-                  "code": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{viewModeIndex}\",\n  \"items\": [\n    { \"icon\": \"list.bullet\", \"value\": \"list\" },\n    { \"icon\": \"square.grid.2x2\", \"value\": \"grid\" }\n  ]\n}"
-                }
-              ],
-              "language": "json",
-              "code": "{\n  \"type\": \"Segment\",\n  \"selectedIndex\": \"@{viewModeIndex}\",\n  \"items\": [\n    { \"icon\": \"list.bullet\", \"value\": \"list\" },\n    { \"icon\": \"square.grid.2x2\", \"value\": \"grid\" }\n  ]\n}",
-              "required": ""
-            },
-            {
-              "id": "example_3",
-              "anchorId": "example-3",
               "title": {
                 "en": "Momentary (action bar)",
                 "ja": "momentary（アクションバー）"
@@ -987,7 +944,7 @@
               "languagePill": "json",
               "languagePillVisibility": "visible",
               "activeLanguage": "json",
-              "activeCode": "{\n  \"type\": \"Segment\",\n  \"momentary\": true,\n  \"items\": [\n    { \"label\": \"B\", \"value\": \"bold\" },\n    { \"label\": \"I\", \"value\": \"italic\" },\n    { \"label\": \"U\", \"value\": \"underline\" }\n  ],\n  \"onValueChange\": \"@{onFormat}\"\n}",
+              "activeCode": "{\n  \"type\": \"Segment\",\n  \"momentary\": true,\n  \"items\": [\"B\", \"I\", \"U\"],\n  \"onValueChange\": \"@{onFormat}\"\n}",
               "note": {
                 "en": "",
                 "ja": ""
@@ -996,11 +953,11 @@
               "_variants": [
                 {
                   "language": "json",
-                  "code": "{\n  \"type\": \"Segment\",\n  \"momentary\": true,\n  \"items\": [\n    { \"label\": \"B\", \"value\": \"bold\" },\n    { \"label\": \"I\", \"value\": \"italic\" },\n    { \"label\": \"U\", \"value\": \"underline\" }\n  ],\n  \"onValueChange\": \"@{onFormat}\"\n}"
+                  "code": "{\n  \"type\": \"Segment\",\n  \"momentary\": true,\n  \"items\": [\"B\", \"I\", \"U\"],\n  \"onValueChange\": \"@{onFormat}\"\n}"
                 }
               ],
               "language": "json",
-              "code": "{\n  \"type\": \"Segment\",\n  \"momentary\": true,\n  \"items\": [\n    { \"label\": \"B\", \"value\": \"bold\" },\n    { \"label\": \"I\", \"value\": \"italic\" },\n    { \"label\": \"U\", \"value\": \"underline\" }\n  ],\n  \"onValueChange\": \"@{onFormat}\"\n}",
+              "code": "{\n  \"type\": \"Segment\",\n  \"momentary\": true,\n  \"items\": [\"B\", \"I\", \"U\"],\n  \"onValueChange\": \"@{onFormat}\"\n}",
               "required": ""
             }
           ]
@@ -1071,8 +1028,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Array of `{ label?, icon?, value }`. At least `label` or `icon` is required per entry. As of jsonui-cli 1.8.38 the object form does not survive code generation on any face: the web build writes a file that does not parse, while iOS and Android compile and render the raw `{\"label\"=>...}` text into the control. Measured on all three and reported upstream; a plain string entry is the form that renders today. The examples above keep the object form because that is the shape the attribute is declared to take.",
-                "ja": "`{ label?, icon?, value }` の配列。各エントリで `label` または `icon` のいずれかが必須。　jsonui-cli 1.8.38 時点では、オブジェクト形はどの面でもコード生成を通り抜けません: web はパースできないファイルが出力され、iOS と Android はコンパイルこそ通るものの `{\"label\"=>...}` という文字列がそのままコントロールに表示されます。3 面とも実測し、上流に報告済みです。今日時点で描画される形は文字列エントリです。上の例がオブジェクト形のままなのは、属性宣言がその形を取ると定めているためです。"
+                "en": "An array of strings, and static: the declaration is `type: array` with no binding, unlike the item lists on SelectBox, Radio and Collection, which declare `[array, binding]`. An entry may be a strings key, which the declaration says every face resolves at render time — measured on the web face at jsonui-cli 1.8.38 a registered key came through as its own text, so treat cross-face resolution as declared rather than confirmed here. This page used to document an object form, `{ label?, icon?, value }`, with three examples. That shape has no source: across jsonui-cli 1.4.1, 1.6.0 and 1.8.38 the declaration carries no element type at all, no converter on any face reads those keys, and the wording dates from this site's first commit. At 1.8.38 an object entry survives code generation on none of the three faces — the web build writes a file that does not parse, while iOS and Android compile and render the raw `{\"label\"=>...}` text into the control — and from 1.8.39 it is refused with a warning instead. There is also no supported way to put an icon in a Segment: the component declares nine attributes and `icon` is not among them, which is why the icon example is gone rather than rewritten.",
+                "ja": "文字列の配列で、静的です: 宣言は `type: array` のみで binding を持ちません（SelectBox / Radio / Collection の item 系が `[array, binding]` を宣言しているのとは異なります）。エントリは strings のキーでもよく、宣言は「どの面でも描画時に解決される」と 述べていますが、jsonui-cli 1.8.38 の web 面で実測したところ登録済みのキーがそのまま文字列として出ました。面をまたぐ解決は「宣言されている」であって、ここで確認できたわけではありません。このページは以前 `{ label?, icon?, value }` というオブジェクト形を 3 つの例つきで説明していました。**この形には出所がありません**: jsonui-cli 1.4.1 / 1.6.0 / 1.8.38 のいずれでも宣言に要素型は無く、どの面の converter もそれらのキーを読まず、記述は当サイトの最初のコミットから変わっていませんでした。1.8.38 時点ではオブジェクト要素は 3 面ともコード生成を通り抜けません — web はパースできないファイルを出力し、iOS と Android はコンパイルこそ通るものの `{\"label\"=>...}` がそのまま表示されます — 1.8.39 からは warning つきで拒否されます。アイコンを Segment に入れる正式な方法もありません: このコンポーネントが宣言している属性は 9 つで `icon` は含まれないため、アイコンの例は書き換えではなく削除しました。"
               },
               "type": "array",
               "required": "required"
