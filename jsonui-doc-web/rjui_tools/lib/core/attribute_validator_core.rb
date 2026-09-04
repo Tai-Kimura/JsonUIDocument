@@ -469,6 +469,7 @@ module JsonUIShared
 
       # Check for invalid binding syntax
       check_invalid_binding_syntax(value, current_path, component_type)
+      check_scalar_items(name, value, current_path, component_type)
 
       # Check if value is a binding expression (full-string @{...} only —
       # a string merely containing @{ is template text and still validates)
@@ -773,6 +774,77 @@ module JsonUIShared
     #: denominator that means anything here.
     BINDING_JUXTAPOSED_VALUES = /[A-Za-z0-9_$)\]"']\s+[A-Za-z0-9_$"']/.freeze
 
+    #: Array attributes whose elements the SSoT declares as plain labels —
+    #: no element sub-schema, so nothing else here checks them.
+    #:
+    #: `Segment.items` is "Static labels; an entry may be a strings key".
+    #: An object element is therefore undeclared, and every generator used
+    #: to stringify it: iOS and Android shipped `Text("{\"label\"=>\"opt_a\",
+    #: …}")` on screen and web wrote a Ruby hash into JSX, which does not
+    #: parse (measured 2026-09-04). Both dynamic runtimes already drop such
+    #: an element — Android `DynamicSegmentComponent` keeps primitives only,
+    #: iOS `asStrings` compacts to String/NSNumber — so dropping it in the
+    #: generators is what makes the four agree.
+    #:
+    #: Deliberately NOT a general rule over every element-schema-less array:
+    #: `Collection.items` is a data source, where an object element is
+    #: exactly what a face may legitimately pass. Widening this needs its
+    #: own measurement.
+    #: A `null` element passed this rule when it only named Hash and Array,
+    #: and web emitted an empty `<button>` whose id was real — so every
+    #: later `s_tab_n` sat one index off the runtimes, which drop it
+    #: (reported by the rjui lane, 2026-09-04).
+    SCALAR_ITEM_ATTRIBUTES = { 'Segment' => %w[items].freeze }.freeze
+
+    #: True when a labels-only attribute was given a binding string.
+    #:
+    #: `Segment.items` is declared `type: "array"` — no binding — yet kjui
+    #: resolved `@{options}` into a `forEachIndexed` and sjui raised
+    #: `NoMethodError: undefined method 'each_with_index' for String`
+    #: (measured 2026-09-04). One face invented a feature, the other
+    #: crashed, and nothing warned: the type check lets a binding string
+    #: stand in for any declared type. Usage across seven faces: 0.
+    def self.binding_in_scalar_items?(component_type, attribute_name, value)
+      return false unless SCALAR_ITEM_ATTRIBUTES[component_type.to_s]&.include?(attribute_name.to_s)
+
+      value.is_a?(String) && value.strip.start_with?('@{') && value.strip.end_with?('}')
+    end
+
+    #: Indices of elements a generator must not emit. Public so the
+    #: converters decide with the same predicate that warns — a warning and
+    #: an emit that disagree is how this defect stayed invisible.
+    def self.non_scalar_item_indices(component_type, attribute_name, value)
+      return [] unless SCALAR_ITEM_ATTRIBUTES[component_type.to_s]&.include?(attribute_name.to_s)
+      return [] unless value.is_a?(Array)
+
+      value.each_index.reject { |index| scalar_item?(value[index]) }
+    end
+
+    #: What both runtimes keep: a JSON scalar. Android tests
+    #: `element.isJsonPrimitive` (string, number, boolean — Gson's JsonNull
+    #: is not one) and iOS casts to `String` / `NSNumber` (a Bool bridges to
+    #: NSNumber, an NSNull casts to neither).
+    #:
+    #: Booleans are kept deliberately, though `[true]` renders "true" on web
+    #: and Android and "1" on iOS: BOTH runtimes render it, so dropping it
+    #: here would make the generated screen show fewer tabs than the running
+    #: one — the divergence this rule exists to close. That rendering split
+    #: is a real defect, and it belongs to whoever owns the declaration and
+    #: the runtimes, not to a unilateral drop in the generators.
+    def self.scalar_item?(item)
+      item.is_a?(String) || item.is_a?(Numeric) || item == true || item == false
+    end
+
+    #: The word the warning uses for what was found.
+    def self.item_kind(item)
+      case item
+      when nil then 'null'
+      when Hash then 'an object'
+      when Array then 'an array'
+      else item.class.name.downcase
+      end
+    end
+
     # The delimiters were only ever half the check.
     #
     # `@{ bad name }` closes correctly, so the old check passed it, and each
@@ -794,6 +866,28 @@ module JsonUIShared
       return :juxtaposed if text.match?(BINDING_JUXTAPOSED_VALUES)
 
       nil
+    end
+
+    #: Name every undeclared element by index: the generator drops it, and
+    #: a segment that silently renders one fewer tab is worse than a named
+    #: warning.
+    def check_scalar_items(name, value, path, component_type)
+      if self.class.binding_in_scalar_items?(component_type, name, value)
+        add_warning(
+          "Attribute '#{path}' in '#{component_type}' is a binding; items are static labels " \
+          "per the declaration (type: array, no binding) — ignored, and no items are generated"
+        )
+        return
+      end
+
+      self.class.non_scalar_item_indices(component_type, name, value).each do |index|
+        add_warning(
+          "Attribute '#{path}[#{index}]' in '#{component_type}' is " \
+          "#{self.class.item_kind(value[index])}; items are string labels (literal text or a " \
+          "strings key) per the declaration — dropped from the generated output, as both " \
+          "runtimes already drop it"
+        )
+      end
     end
 
     def check_binding_content(content, path, component_type)
