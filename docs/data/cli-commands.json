@@ -2014,8 +2014,8 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Fail the build on validation errors.",
-            "ja": "検証エラーでビルドを失敗させる。"
+            "en": "Fail the build on validation errors. Measured on 1.8.36: that counter holds attribute warnings only. A layout whose findings are all binding warnings — an undefined variable, a binding on a component with no `id` — still exits 0 under `--strict`, while a canonical binding-rule error (`@{a ?? b ?? c}`, say) fails the build whether or not you pass the flag.",
+            "ja": "検証エラーでビルドを失敗させる。1.8.36 で計測: このカウンタに入るのは attribute warning だけ。指摘が binding warning しかないレイアウト（未定義変数、`id` の無いコンポーネントへの binding）は `--strict` でも exit 0 になり、正準の binding ルール違反（例 `@{a ?? b ?? c}`）はフラグの有無に関わらずビルドを止める。"
           }
         }
       ],
