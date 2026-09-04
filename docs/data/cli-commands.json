@@ -2787,8 +2787,8 @@
       "command": "artifacts pull",
       "synopsis": "jsonui-test artifacts pull [--platform ios|android|web|all] [--xcresult <path>] [--serial <serial>] [--out <dir>] [--config <file>] [--clean] [--json]",
       "purpose": {
-        "en": "Collect run evidence — iOS xcresult attachments, Android on-device files, web Playwright videos / traces / screenshots — into `tests/artifacts/<platform>/<stamp>/` and refresh the `latest` symlink. Configured under `test.artifacts` in jui.config.json; `mock serve --artifacts` runs it after each run-target.",
-        "ja": "実行証跡 — iOS の xcresult 添付、Android のデバイス上ファイル、web の Playwright 録画 / trace / スクリーンショット — を `tests/artifacts/<platform>/<stamp>/` に回収し、`latest` symlink を更新する。設定は jui.config.json の `test.artifacts`。`mock serve --artifacts` は run-target ごとにこれを実行する。"
+        "en": "Collect run evidence — iOS xcresult attachments, Android on-device files, web Playwright videos / traces / screenshots — into `tests/artifacts/<platform>/<stamp>/` and refresh the `latest` symlink. Configured under `test.artifacts` in jui.config.json; `mock serve --artifacts` runs it after each run-target. The Android leg is scoped to one app since jsonui-cli 1.8.32 and requires `test.artifacts.android.appId`; without it the command stops with a config error rather than guessing.",
+        "ja": "実行証跡 — iOS の xcresult 添付、Android のデバイス上ファイル、web の Playwright 録画 / trace / スクリーンショット — を `tests/artifacts/<platform>/<stamp>/` に回収し、`latest` symlink を更新する。設定は jui.config.json の `test.artifacts`。`mock serve --artifacts` は run-target ごとにこれを実行する。Android 側は jsonui-cli 1.8.32 から 1 つのアプリにスコープされ、`test.artifacts.android.appId` が必須。無ければ推測せず config エラーで止まる。"
       },
       "options": [
         {
@@ -2812,8 +2812,8 @@
           "name": "--serial",
           "type": "string",
           "description": {
-            "en": "adb device serial (overrides `test.artifacts.android.serial`).",
-            "ja": "adb のデバイスシリアル（`test.artifacts.android.serial` を上書き）。"
+            "en": "adb device serial (overrides `test.artifacts.android.serial`). Selects the device, not the app — see `--clean`.",
+            "ja": "adb のデバイスシリアル（`test.artifacts.android.serial` を上書き）。選ぶのはデバイスであってアプリではない（`--clean` 参照）。"
           }
         },
         {
@@ -2839,8 +2839,8 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Remove the pulled artifact dirs from the Android device after pulling.",
-            "ja": "回収後に Android デバイス側の artifact ディレクトリを削除する。"
+            "en": "After pulling, remove the app's OWN artifact directories from the Android device — its external files dir and the uninstall-surviving mirror `/data/local/tmp/jsonui-artifacts/<appId>`, which android driver 1.8.9 and later write. A device still running an older driver mirrors into the flat root instead. It never removes the flat legacy mirror `/data/local/tmp/jsonui-artifacts`, which has no app dimension: on a shared device that path holds every app's suites side by side, and one project's `pull --clean` was measured taking 74 directories and 71 MB of another project's runs off the device. `--serial` does not help there — it narrows the device, not the app.",
+            "ja": "回収後、そのアプリ自身の artifact ディレクトリ（app 専用の external files ディレクトリと、アンインストールしても残るミラー `/data/local/tmp/jsonui-artifacts/<appId>`。これを書くのは android driver 1.8.9 以降で、それ未満の driver を積んだデバイスは平らな root に書く）をデバイスから削除する。フラットな旧ミラー `/data/local/tmp/jsonui-artifacts` は決して削除しない — このパスにはアプリの次元が無く、共有デバイスでは全アプリの suite が並ぶ。あるプロジェクトの `pull --clean` が別プロジェクトの 74 ディレクトリ・71 MB を消したのが実測されている。`--serial` では防げない（絞るのはデバイスであって、アプリではない）。"
           }
         },
         {
