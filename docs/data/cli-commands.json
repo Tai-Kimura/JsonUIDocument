@@ -2839,8 +2839,8 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "After pulling, remove the app's OWN artifact directories from the Android device — its external files dir and the uninstall-surviving mirror `/data/local/tmp/jsonui-artifacts/<appId>`, which android driver 1.8.9 and later write. A device still running an older driver mirrors into the flat root instead. It never removes the flat legacy mirror `/data/local/tmp/jsonui-artifacts`, which has no app dimension: on a shared device that path holds every app's suites side by side, and one project's `pull --clean` was measured taking 74 directories and 71 MB of another project's runs off the device. `--serial` does not help there — it narrows the device, not the app.",
-            "ja": "回収後、そのアプリ自身の artifact ディレクトリ（app 専用の external files ディレクトリと、アンインストールしても残るミラー `/data/local/tmp/jsonui-artifacts/<appId>`。これを書くのは android driver 1.8.9 以降で、それ未満の driver を積んだデバイスは平らな root に書く）をデバイスから削除する。フラットな旧ミラー `/data/local/tmp/jsonui-artifacts` は決して削除しない — このパスにはアプリの次元が無く、共有デバイスでは全アプリの suite が並ぶ。あるプロジェクトの `pull --clean` が別プロジェクトの 74 ディレクトリ・71 MB を消したのが実測されている。`--serial` では防げない（絞るのはデバイスであって、アプリではない）。"
+            "en": "After pulling, remove the app's OWN artifact directories from the Android device — its external files dir and the uninstall-surviving mirror `/data/local/tmp/jsonui-artifacts/<appId>`, which android driver 1.8.9 and later write. A device still running an older driver mirrors into the flat root instead. It never removes the flat legacy mirror `/data/local/tmp/jsonui-artifacts`, which has no app dimension: on a shared device that path holds every app's suites side by side, and one project's `pull --clean` was measured taking 74 directories and 71 MB of another project's runs off the device. `--serial` does not help there — it narrows the device, not the app. `artifacts prune-legacy` is the one command that empties that mirror, and it lists before it deletes.",
+            "ja": "回収後、そのアプリ自身の artifact ディレクトリ（app 専用の external files ディレクトリと、アンインストールしても残るミラー `/data/local/tmp/jsonui-artifacts/<appId>`。これを書くのは android driver 1.8.9 以降で、それ未満の driver を積んだデバイスは平らな root に書く）をデバイスから削除する。フラットな旧ミラー `/data/local/tmp/jsonui-artifacts` は決して削除しない — このパスにはアプリの次元が無く、共有デバイスでは全アプリの suite が並ぶ。あるプロジェクトの `pull --clean` が別プロジェクトの 74 ディレクトリ・71 MB を消したのが実測されている。`--serial` では防げない（絞るのはデバイスであって、アプリではない）。 そのミラーを空にする唯一のコマンドは `artifacts prune-legacy` で、削除の前に一覧します。"
           }
         },
         {
@@ -2860,23 +2860,24 @@
         }
       ],
       "seeAlso": [
+        "jsonui-test artifacts prune-legacy",
         "jsonui-test artifacts status",
         "jsonui-test report"
       ],
       "verifiedAgainst": {
-        "version": "1.8.4",
+        "version": "1.8.34",
         "columns": 80,
         "python": "3.12",
         "helpHash": "d9ba96ae0b4dc65c0343548b33c8cf91ad378eae2c4c2085caf8023217e19b55",
-        "cardHash": "c41f4990c8b79d11d580e927909b1dee34a88b247453eb3574310fc3e3fc6d69",
+        "cardHash": "0a5ab87f3ae25658c2156dbf13f72e07b7777d3c30d19b500292299f37891c59",
         "fieldHashes": {
           "binary": "3b2560767fdf",
           "command": "10e53383f8c7",
           "synopsis": "0ab4b25d8137",
-          "purpose": "ab55ccf6ea3e",
-          "options": "5ce847bf2129",
+          "purpose": "b4a845bf5978",
+          "options": "c6e9ae22af89",
           "examples": "31897fe43209",
-          "seeAlso": "443520f2cea8"
+          "seeAlso": "7d6463bc83c2"
         }
       }
     },
@@ -2931,6 +2932,80 @@
           "options": "69d29f5c463b",
           "examples": "1bcf428c6122",
           "seeAlso": "340ec94877c5"
+        }
+      }
+    },
+    {
+      "binary": "jsonui-test",
+      "command": "artifacts prune-legacy",
+      "synopsis": "jsonui-test artifacts prune-legacy [--serial <serial>] [--yes] [--config <file>] [--json]",
+      "purpose": {
+        "en": "The one deliberate exit from the flat legacy Android mirror `/data/local/tmp/jsonui-artifacts`. `artifacts pull --clean` never touches that path — it has no app dimension, so on a shared device its entries can belong to any app that ran with an android driver below 1.8.9 — and a device still running such a driver keeps refilling it. Once every app on the device writes the scoped mirror, a person runs this to close the migration. The default is a dry run that lists what would go; `--yes` deletes. Only suite-shaped entries are removed: package-shaped entries are other apps' scoped mirrors, and neither they nor the root are ever touched. The command cannot tell whether an older driver is still in use on the device — that judgement is why the dry run is the default.",
+        "ja": "平らな旧 Android ミラー `/data/local/tmp/jsonui-artifacts` からの、唯一の意図された出口。`artifacts pull --clean` はこのパスに決して触れません（アプリの次元が無く、共有デバイスでは android driver 1.8.9 未満で走ったどのアプリのものでもあり得るため）。そして古い driver を積んだデバイスは、このパスを埋め続けます。デバイス上の全アプリがスコープ付きミラーを書くようになった時点で、人がこれを実行して移行を閉じます。既定は dry run で、消える対象を一覧するだけ。`--yes` で削除します。削除されるのは suite 形のエントリだけで、package 形（他アプリのスコープ付きミラー）と root は決して触れません。古い driver がまだ使われているかをコマンドは判定できず、それが dry run を既定にしている理由です。"
+      },
+      "options": [
+        {
+          "name": "--serial",
+          "type": "string",
+          "description": {
+            "en": "adb device serial (overrides `test.artifacts.android.serial`). Required when more than one device or emulator is attached — adb refuses to choose.",
+            "ja": "adb のデバイスシリアル（`test.artifacts.android.serial` を上書き）。デバイスやエミュレータが複数つながっているときは必須（adb は選んでくれません）。"
+          }
+        },
+        {
+          "name": "--yes",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Actually delete the listed suite directories. Without it the command only lists them.",
+            "ja": "一覧された suite ディレクトリを実際に削除する。付けなければ一覧するだけ。"
+          }
+        },
+        {
+          "name": "--config",
+          "type": "path",
+          "default": "jui.config.json",
+          "description": {
+            "en": "Config file to read `test.artifacts.android` from.",
+            "ja": "`test.artifacts.android` を読む config ファイル。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Print the result as a single JSON object (`root`, `suites`, `packages`, `deleted`, `dryRun`, `skipped`).",
+            "ja": "結果を 1 つの JSON オブジェクトで出力する（`root` / `suites` / `packages` / `deleted` / `dryRun` / `skipped`）。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-test artifacts prune-legacy          # dry run: lists the suite dirs it would delete\nLegacy mirror: /data/local/tmp/jsonui-artifacts\n  suite dirs: none\n  skipped (adb: adb: more than one device/emulator)\n$ echo $?\n1\n# measured on a machine with several devices attached: adb refuses to choose, so the\n# listing is never reached and --serial is required. Deleting (--yes) is not shown here\n# because it was deliberately not run on a shared device."
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jsonui-test artifacts pull",
+        "jsonui-test artifacts status"
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.34",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "e6deb6833dd0ad105d4ac4c0e50386068040e2d9e6ae169548a6ce79b5d161ab",
+        "cardHash": "3d9ce363833b2d46057e7fd30752d3793e803580d7b0740e4a1bdd84da8c75df",
+        "fieldHashes": {
+          "binary": "3b2560767fdf",
+          "command": "68933f927dbd",
+          "synopsis": "8b0f63a3ffc4",
+          "purpose": "78f0b1d89a8e",
+          "options": "4fa3f2e25450",
+          "examples": "25f37b7e0982",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "10e36c44bdc5"
         }
       }
     },
