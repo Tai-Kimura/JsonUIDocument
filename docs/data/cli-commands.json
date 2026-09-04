@@ -3248,7 +3248,7 @@
     {
       "binary": "jsonui-doc",
       "command": "generate html",
-      "synopsis": "jsonui-doc generate html <input-dir> [-o <out>] [-t <title>] [-d <docs>] [--app NAME:DIR] [--layouts-dir <dir>] [--allow-partial] [--with-checks]",
+      "synopsis": "jsonui-doc generate html <input-dir> [-o <out>] [-t <title>] [-d <docs>] [--app NAME:DIR] [--config <path>] [--layouts-dir <dir>] [--allow-partial] [--with-checks]",
       "purpose": {
         "en": "Render the whole documentation site — test files, specs, API docs, Figma assets — as static HTML. Since 2026-07-29 a page that fails to generate no longer passes silently: every page is still attempted, the intact ones are written, and the run ends with a summary naming each failure, the input file behind it, and a non-zero exit code. Failed pages get a placeholder carrying the reason, so a link in the index never dead-ends.",
         "ja": "テストファイル・spec・API ドキュメント・Figma アセットからドキュメントサイト全体を静的 HTML として生成する。2026-07-29 以降、ページ単位の生成失敗が黙って通ることはない — 全ページを試行し、壊れていないものは出力したうえで、末尾に失敗の一覧（原因と入力ファイル）を出して非 0 で終了する。失敗したページは理由を載せたプレースホルダになるので、index からのリンクが行き止まりにならない。"
@@ -3311,8 +3311,17 @@
           "name": "--app",
           "type": "string",
           "description": {
-            "en": "An app and its docs directory as `name:path`; repeatable, for multi-app documentation.",
-            "ja": "アプリとその docs ディレクトリを `name:path` 形式で指定。複数指定可（複数アプリのドキュメント用）。"
+            "en": "An app and its docs directory as `name:path`; repeatable, for multi-app documentation. Each app resolves its own `jui.config.json` from its directory rather than sharing one found above the tests tree — the `--config` help names that as the default alongside the walk-up.",
+            "ja": "アプリとその docs ディレクトリを `name:path` 形式で指定。複数指定可（複数アプリのドキュメント用）。app ごとに自分のディレクトリから `jui.config.json` を解決し、tests ツリーの上で見つかった 1 つを共有しない（`--config` の help が walk-up と並べてその既定を名乗っている）。"
+          }
+        },
+        {
+          "name": "--config",
+          "type": "path",
+          "default": "walk up from the input directory, or per --app directory",
+          "description": {
+            "en": "The `jui.config.json` to read `unitContracts` from. Name it when the config governing the specs is not the first one above the tests tree — the released help gives the split-tree case, where an unrelated config sits at the repository root. Since jsonui-cli 1.8.41.",
+            "ja": "`unitContracts` を読む `jui.config.json` を名指しする。specs を統べる config が tests ツリーの直上に無いときに使う — リリースの help は分割ツリーの例を挙げていて、リポジトリ直下に無関係な config がある形。jsonui-cli 1.8.41 から。"
           }
         },
         {
@@ -3336,17 +3345,17 @@
         "jsonui-doc validate spec"
       ],
       "verifiedAgainst": {
-        "version": "1.8.12",
+        "version": "1.8.41",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "4c5dd864d81af299cf27ca21a4968497ee8a59ea8a44f3f2285e511a10d7141d",
-        "cardHash": "ffa4258f44430d1987e43c70c1576d4a0decef7217696f4f39eea0c584a2e6b5",
+        "helpHash": "3a8fa5d18641a458da9ebe102c70e3fc6f8d7e8f47884dc784bf39cde8f84acb",
+        "cardHash": "77744257cfdf6385f6e21ce593ebedadf42a384d84da2bebe982f2943bc3418c",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "5cd68944d8a8",
-          "synopsis": "7e5960dfe816",
+          "synopsis": "7728fa3d0d43",
           "purpose": "96fdaa00f616",
-          "options": "6e8d4799eeef",
+          "options": "11dc93814743",
           "examples": "a15eeff27a4c",
           "seeAlso": "639afb3fa358"
         }
