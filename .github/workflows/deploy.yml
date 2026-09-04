@@ -67,7 +67,7 @@ jobs:
   # version's help. The second half never judges whether a card is right, only
   # whether it was read; unstamped cards are counted, never red.
   #
-  # All twelve gates run even when one fails, so a red run names everything that
+  # All thirteen gates run even when one fails, so a red run names everything that
   # is red, and every gate prints its own exit code — a gate that could not
   # run must not read as a gate that passed.
   gates:
@@ -143,7 +143,7 @@ jobs:
         working-directory: jsonui-doc-web
         run: npm run prebuild
 
-      - name: Run the twelve gates (enforcing — a red one stops the deploy)
+      - name: Run the thirteen gates (enforcing — a red one stops the deploy)
         run: |
           set +e
           fail=0
@@ -258,6 +258,16 @@ jobs:
           # a 1.8.5 pin. Content, not just the VERSION stamp: a stamp can be right
           # while the files behind it are stale. sync_tool is idempotent (measured:
           # a second run changes nothing), so a clean tree here is a real answer.
+          # vendored-matches-pin (below) asks whether the COMMITTED tree equals
+          # what a sync produces: it syncs, then reads `git status`. That cannot
+          # see a file the pin stopped shipping — `jui sync_tool` copies and never
+          # deletes, so the leftover sits there, the sync does not touch it, and
+          # git reports nothing. Measured 2026-09-04 in a scratch copy: delete a
+          # tracked vendored file from the source, sync, and git status is empty.
+          # This gate compares the two TREES instead — in the pin but not vendored,
+          # vendored but not in the pin, and byte differences — so the two together
+          # cover committed-vs-synced and synced-vs-pin. Neither alone does.
+          run_gate vendored-tree          npm --prefix jsonui-doc-web run check:vendored-tree
           run_gate vendored-matches-pin sh -c '
             echo "committed rjui_tools stamp: $(git show HEAD:jsonui-doc-web/rjui_tools/VERSION 2>/dev/null | tr -d "[:space:]")"
             echo "pinned toolchain:           $(cat "$JSONUI_CLI_PATH/VERSION" | tr -d "[:space:]")"
@@ -270,7 +280,7 @@ jobs:
             fi
             echo "the committed vendored tree matches the pin, file for file"'
           echo "----"
-          echo "gates with a non-zero exit: $fail of 12"
+          echo "gates with a non-zero exit: $fail of 13"
           if [ "$fail" -ne 0 ]; then
             echo "FAILING this job: the deploy job depends on it and will not run."
             exit 1
