@@ -2023,8 +2023,8 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Fail the build on validation errors. Measured on 1.8.36: that counter holds attribute warnings only. A layout whose findings are all binding warnings — an undefined variable, a binding on a component with no `id` — still exits 0 under `--strict`, while a canonical binding-rule error (`@{a ?? b ?? c}`, say) fails the build whether or not you pass the flag.",
-            "ja": "検証エラーでビルドを失敗させる。1.8.36 で計測: このカウンタに入るのは attribute warning だけ。指摘が binding warning しかないレイアウト（未定義変数、`id` の無いコンポーネントへの binding）は `--strict` でも exit 0 になり、正準の binding ルール違反（例 `@{a ?? b ?? c}`）はフラグの有無に関わらずビルドを止める。"
+            "en": "Fail the build on validation findings. Since jsonui-cli 1.8.43 that includes binding warnings, not attribute ones alone: measured on 1.8.44, a layout whose only findings are two undefined-variable binding warnings exits 0 plain and 1 under `--strict`. A canonical binding-rule error (`@{a ?? b ?? c}`, say) fails the build whether or not you pass the flag. Before 1.8.43 the counter held attribute warnings alone, and a binding-only layout passed `--strict`.",
+            "ja": "検証の指摘でビルドを失敗させる。jsonui-cli 1.8.43 からは attribute だけでなく binding warning も数えます: 1.8.44 で計測すると、指摘が未定義変数の binding warning 2 件だけのレイアウトは plain で exit 0、`--strict` で exit 1 になります。正準の binding ルール違反（例 `@{a ?? b ?? c}`）はフラグの有無に関わらずビルドを止めます。1.8.43 より前はカウンタが attribute warning だけを見ており、binding のみのレイアウトは `--strict` を通過していました。"
           }
         }
       ],
