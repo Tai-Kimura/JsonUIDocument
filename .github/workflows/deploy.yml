@@ -112,12 +112,20 @@ jobs:
           python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" build --web-only --clean 2>&1 | tee "$build_log"
           # `jui build` can log a caught exception as `[ERROR] Error processing
           # <file>` and still exit 0 with a success line — measured upstream on
-          # 1.8.13 and fixed in 1.8.15, which makes the final line say a stage
-          # did not complete. NOT reproduced here (an unparseable layout exits 1
-          # on this project, which is a different path), so this guards a class
-          # someone else measured. It is version-independent on purpose: a
-          # healthy build of this site prints zero [ERROR] lines, measured, so
-          # any is a partial tree and a partial tree must not be deployed.
+          # 1.8.13. 1.8.15 changed the final line to name the incomplete stage;
+          # it did NOT change the exit code. This comment used to say the class
+          # was not reproduced here. It is now, measured on 1.8.42 with a
+          # control: a Collection given a binding for `sections` (declared
+          # `type: array`, no binding) raises a Ruby NoMethodError, the screen is
+          # not generated, four [ERROR] lines print, and the command exits 0,
+          # while a valid layout in the same position generates and prints none.
+          # Filed upstream — their own doc generator defaults to failing on a
+          # dropped page and makes exit-0 opt-in via --allow-partial, which is
+          # what `jui build` lacks. So this grep is not standing in for someone
+          # else's measurement any more: it is the only thing between a partial
+          # tree and the bucket. Version-independent on purpose: a healthy build
+          # of this site prints zero [ERROR] lines, measured, so any is a partial
+          # tree and a partial tree must not be deployed.
           if grep -q "\[ERROR\]" "$build_log"; then
             echo "jui build logged [ERROR] while exiting 0 — refusing to deploy a partial tree:"
             grep "\[ERROR\]" "$build_log" | head -20
@@ -337,12 +345,20 @@ jobs:
           python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" build --web-only --clean 2>&1 | tee "$build_log"
           # `jui build` can log a caught exception as `[ERROR] Error processing
           # <file>` and still exit 0 with a success line — measured upstream on
-          # 1.8.13 and fixed in 1.8.15, which makes the final line say a stage
-          # did not complete. NOT reproduced here (an unparseable layout exits 1
-          # on this project, which is a different path), so this guards a class
-          # someone else measured. It is version-independent on purpose: a
-          # healthy build of this site prints zero [ERROR] lines, measured, so
-          # any is a partial tree and a partial tree must not be deployed.
+          # 1.8.13. 1.8.15 changed the final line to name the incomplete stage;
+          # it did NOT change the exit code. This comment used to say the class
+          # was not reproduced here. It is now, measured on 1.8.42 with a
+          # control: a Collection given a binding for `sections` (declared
+          # `type: array`, no binding) raises a Ruby NoMethodError, the screen is
+          # not generated, four [ERROR] lines print, and the command exits 0,
+          # while a valid layout in the same position generates and prints none.
+          # Filed upstream — their own doc generator defaults to failing on a
+          # dropped page and makes exit-0 opt-in via --allow-partial, which is
+          # what `jui build` lacks. So this grep is not standing in for someone
+          # else's measurement any more: it is the only thing between a partial
+          # tree and the bucket. Version-independent on purpose: a healthy build
+          # of this site prints zero [ERROR] lines, measured, so any is a partial
+          # tree and a partial tree must not be deployed.
           if grep -q "\[ERROR\]" "$build_log"; then
             echo "jui build logged [ERROR] while exiting 0 — refusing to deploy a partial tree:"
             grep "\[ERROR\]" "$build_log" | head -20
