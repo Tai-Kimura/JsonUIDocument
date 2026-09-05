@@ -475,7 +475,18 @@ module JsonUIShared
       # a string merely containing @{ is template text and still validates)
       is_binding = value.is_a?(String) && value.start_with?('@{') && value.end_with?('}')
 
-      # Skip validation for binding expressions
+      # A binding where the declaration does not allow one. The early return
+      # below skips the type check for EVERY binding, so an attribute
+      # declared `type: array` with no `binding` accepted a String and handed
+      # it to a converter that calls `.each` on it: measured as
+      # `NoMethodError: undefined method 'each' for "@{secs}":String` on
+      # `Collection.sections`, which killed that one screen while `jui build`
+      # still exited 0. Same hole 1.8.39 closed for `Segment.items`, but
+      # stated once from the declaration instead of per attribute.
+      # Skip validation for binding expressions. A binding the declaration
+      # does not allow is reported by LayoutValidator instead, at :error —
+      # reported here too it would say the same thing twice, once at a level
+      # that does not stop the build.
       return if is_binding
 
       # `acceptsSingle` on an array attribute declares that a single node
@@ -796,20 +807,6 @@ module JsonUIShared
     #: (reported by the rjui lane, 2026-09-04).
     SCALAR_ITEM_ATTRIBUTES = { 'Segment' => %w[items].freeze }.freeze
 
-    #: True when a labels-only attribute was given a binding string.
-    #:
-    #: `Segment.items` is declared `type: "array"` — no binding — yet kjui
-    #: resolved `@{options}` into a `forEachIndexed` and sjui raised
-    #: `NoMethodError: undefined method 'each_with_index' for String`
-    #: (measured 2026-09-04). One face invented a feature, the other
-    #: crashed, and nothing warned: the type check lets a binding string
-    #: stand in for any declared type. Usage across seven faces: 0.
-    def self.binding_in_scalar_items?(component_type, attribute_name, value)
-      return false unless SCALAR_ITEM_ATTRIBUTES[component_type.to_s]&.include?(attribute_name.to_s)
-
-      value.is_a?(String) && value.strip.start_with?('@{') && value.strip.end_with?('}')
-    end
-
     #: Indices of elements a generator must not emit. Public so the
     #: converters decide with the same predicate that warns — a warning and
     #: an emit that disagree is how this defect stayed invisible.
@@ -868,18 +865,17 @@ module JsonUIShared
       nil
     end
 
-    #: Name every undeclared element by index: the generator drops it, and
+    #: Name every undeclared ELEMENT by index: the generator drops it, and
     #: a segment that silently renders one fewer tab is worse than a named
     #: warning.
+    #:
+    #: A BINDING in `items` is no longer handled here. It used to warn
+    #: "ignored, and no items are generated" and let the build go green
+    #: with an empty Segment on screen — a declaration violation reported
+    #: at a level that stops nothing. `check_undeclared_bindings` now
+    #: refuses it at `:error` like every other `type: array` attribute with
+    #: no binding, so the two rules cannot disagree about the same value.
     def check_scalar_items(name, value, path, component_type)
-      if self.class.binding_in_scalar_items?(component_type, name, value)
-        add_warning(
-          "Attribute '#{path}' in '#{component_type}' is a binding; items are static labels " \
-          "per the declaration (type: array, no binding) — ignored, and no items are generated"
-        )
-        return
-      end
-
       self.class.non_scalar_item_indices(component_type, name, value).each do |index|
         add_warning(
           "Attribute '#{path}[#{index}]' in '#{component_type}' is " \
@@ -888,6 +884,24 @@ module JsonUIShared
           "runtimes already drop it"
         )
       end
+    end
+
+    #: Attributes that take a list and never a string. Derived from the
+    #: declaration, never from a hand-written list of names: the defect this
+    #: catches is exactly "the declaration says one thing and the tool
+    #: assumed another", so a second list of names would be a second thing
+    #: to keep in step.
+    #:
+    #: `string` in the declared types is the exemption that matters. A
+    #: binding IS a string, so an attribute that legitimately accepts one —
+    #: `common.onclick`, `common.gravity`, `Collection.insets` — must not be
+    #: reported here. Only an attribute that can accept no string at all is
+    #: unambiguously receiving something undeclared.
+    def self.binding_disallowed_by_declaration?(definition)
+      return false unless definition.is_a?(Hash)
+
+      types = Array(definition['type']).map(&:to_s)
+      types.include?('array') && !types.include?('binding') && !types.include?('string')
     end
 
     def check_binding_content(content, path, component_type)

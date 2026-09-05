@@ -578,7 +578,7 @@
     {
       "binary": "jui",
       "command": "build",
-      "synopsis": "jui build [--clean] [--ios-only|--android-only|--web-only | --platform ios|android|web] [--lint-strings]",
+      "synopsis": "jui build [--clean] [--ios-only|--android-only|--web-only | --platform ios|android|web] [--allow-partial] [--lint-strings]",
       "purpose": {
         "en": "Build all configured platforms (or one with --platform / the --*-only flags). Diagnostics are printed, not gated: validation warnings and localize findings leave the exit code at 0. It exits non-zero on the failures that stop the run instead — no jui.config.json, a layout that is not valid JSON, a responsive-variant contract violation, an @canonical mark that does not resolve. Running clean is a rule in the agent rulebook, not something this command enforces.",
         "ja": "設定済み全プラットフォーム（--platform か --*-only で単一）をビルド。診断は出力されるだけでゲートしません — 検証 warning もローカライズの指摘も exit code は 0 のままです。非 0 になるのは実行そのものが止まる失敗のほう（jui.config.json が無い / レイアウトが壊れた JSON / レスポンシブ variant の契約違反 / 解決できない @canonical マーク）。警告ゼロで通すのはエージェント向け規約の規則で、このコマンドが強制するものではありません。"
@@ -629,6 +629,15 @@
           }
         },
         {
+          "name": "--allow-partial",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Exit 0 even when a screen failed to generate. Without it a failed stage fails the command, which is the default since jsonui-cli 1.8.43 — an exit-0 run that dropped a screen ships a tree with a hole in it, and a CI gating on the exit code goes green over it. Measured before that release: a layout that could not be generated printed four `[ERROR]` lines, wrote no file, and exited 0.",
+            "ja": "画面の生成に失敗しても exit 0 にする。付けなければ失敗した stage がコマンドを失敗させる（jsonui-cli 1.8.43 からの既定）— 画面が 1 枚抜けた木をそのまま配ると、exit code で門を作っている CI が緑で通ってしまうため。この版より前に実測: 生成できなかった layout は `[ERROR]` を 4 行出し、ファイルを書かず、exit 0 で終わっていた。"
+          }
+        },
+        {
           "name": "--lint-strings",
           "type": "flag",
           "default": "false",
@@ -653,17 +662,17 @@
         "jui lint-strings"
       ],
       "verifiedAgainst": {
-        "version": "1.8.38",
+        "version": "1.8.43",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "b2871385e82ce99cfa2e278a9ecc0519138688b76f65a0bdbd7beb2c52c3eaf1",
-        "cardHash": "e80b2b995497fa18e5c5c98b3bdceba0978f23c1e006bf21714f5016bcafb2d4",
+        "helpHash": "c2bfbf2979b9b487eb08fc3a8079c892fbac94cc628315cea34543e0eeb03d7c",
+        "cardHash": "660588127b2f5960ff86f2c1ff5d4d3275c7ddfc1e5e9d514096bdb53eee0b38",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "672f5de73f32",
-          "synopsis": "d75070d2cf40",
+          "synopsis": "ecd88745df24",
           "purpose": "2d700420a92e",
-          "options": "f8356ecc2994",
+          "options": "5345a171ea23",
           "examples": "9fc8f3499be3",
           "aliases": "1663eff2143e",
           "seeAlso": "9d3fad3619a3"
