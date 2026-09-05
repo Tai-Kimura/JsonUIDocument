@@ -123,8 +123,8 @@
     },
     "cellClasses": {
       "note": {
-        "en": "Array of cell layout paths. Used when a section uses multiple cell types conditionally (e.g., sponsored vs organic).",
-        "ja": "cell レイアウトパスの配列。セクションが条件によって複数種の cell を使う場合（例: スポンサーと通常）に使う。"
+        "en": "Array of cell layout paths. Used when a section uses multiple cell types conditionally (e.g., sponsored vs organic). With `items` and no `sections`, a single cellClass renders every item; two or more need `sections[].cell` to assign them, and since jsonui-cli 1.8.44 declaring several without sections is refused: `2 cellClasses declared without sections — only the first would render`, the screen is not generated, and the build exits 1. Measured — at 1.8.42 the same layout built silently and shipped a Collection where only the first cell class was ever used.",
+        "ja": "cell レイアウトパスの配列。セクションが条件によって複数種の cell を使う場合（例: スポンサーと通常）に使う。 `items` があって `sections` が無い場合、単一の cellClass が全ての item を描画します。2 つ以上なら `sections[].cell` で割り当てが要り、jsonui-cli 1.8.44 からは sections 無しで複数宣言すると拒否されます: `2 cellClasses declared without sections — only the first would render` が出て、その画面は生成されず build は exit 1。実測 — 1.8.42 では同じレイアウトが無言で通り、最初の cell class しか使われない Collection がそのまま配られていました。"
       }
     },
     "columnCount": {
