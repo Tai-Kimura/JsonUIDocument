@@ -1264,6 +1264,15 @@
             "en": "Report output path.",
             "ja": "レポート出力先。"
           }
+        },
+        {
+          "name": "--env",
+          "type": "string",
+          "default": "local",
+          "description": {
+            "en": "Render-environment key for the visual comparison — baselines are read from `baselines/<env>/`. A baseline is a fact about one renderer, so CI lanes pass their own key and never compare against developer-machine bakes.",
+            "ja": "ビジュアル比較のレンダー環境キー。baseline は `baselines/<env>/` から読まれる。**baseline は 1 つのレンダラーについての事実**なので、CI のレーンは自分のキーを渡し、開発機で焼いたものとは比較しない。"
+          }
         }
       ],
       "examples": [
@@ -1622,6 +1631,24 @@
             "en": "Rewrite coverage.json from the current gaps.",
             "ja": "現状の gap から coverage.json を再生成。"
           }
+        },
+        {
+          "name": "--binding",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Report the BINDING lane instead: attributes the SSoT declares a `@{...}` form for that no fixture ever writes in that form, so no platform's behaviour on it is measured. Reporting only — it cannot gate until the queue is consumed.",
+            "ja": "**binding のレーン**を報告する: SSoT が `@{...}` 形を宣言しているのに、どの fixture もその形で書いていない属性 — つまり**どのプラットフォームの挙動も測られていない**もの。報告専用で、キューが消化されるまでゲートにはできない。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "path",
+          "default": "—",
+          "description": {
+            "en": "With `--binding`, write the queue to this path as JSON.",
+            "ja": "`--binding` と併用時、キューを JSON でここに書く。"
+          }
         }
       ],
       "examples": [
@@ -1680,6 +1707,15 @@
             "en": "Record fixtures that differ from control into control_diff.json (existing entries kept).",
             "ja": "control と異なる fixture を control_diff.json に記録（既存エントリは保持）。"
           }
+        },
+        {
+          "name": "--env",
+          "type": "string",
+          "default": "local",
+          "description": {
+            "en": "Render-environment key, passed through to the fixture-vs-control comparison so that environment's system chrome bands are excluded — the Android CI status bar's clock ticks between a pair's two captures and otherwise reads as the attribute having had an effect.",
+            "ja": "レンダー環境のキー。fixture と対照の比較に渡され、その環境のシステム chrome 帯を除外する — Android CI のステータスバーの時計は 1 組の 2 枚の撮影の間に進むため、除外しないと**属性が効いた**ように読めてしまう。"
+          }
         }
       ],
       "examples": [
@@ -1701,7 +1737,53 @@
         "en": "Compare one platform's codegen artifacts against the dynamic baseline recorded for a render environment. `--update` records the measured deviations, preserving the reasons and notes already reviewed on surviving entries and marking new ones unreviewed.",
         "ja": "あるプラットフォームの codegen 成果物を、レンダー環境ごとに記録された dynamic ベースラインと比較する。`--update` は実測した差分を記録し、既にレビュー済みのエントリの理由・注記は保持したまま、新規エントリを未レビュー扱いにする。"
       },
-      "options": [],
+      "options": [
+        {
+          "name": "--platform",
+          "type": "enum",
+          "default": "—",
+          "description": {
+            "en": "Platform whose codegen artifacts to measure.",
+            "ja": "codegen 生成物を測る対象プラットフォーム。"
+          }
+        },
+        {
+          "name": "--env",
+          "type": "string",
+          "default": "local",
+          "description": {
+            "en": "Render-environment key of the dynamic baseline to compare against.",
+            "ja": "比較先となる dynamic baseline のレンダー環境キー。"
+          }
+        },
+        {
+          "name": "--dir",
+          "type": "path",
+          "default": "conformance/",
+          "description": {
+            "en": "Conformance directory.",
+            "ja": "conformance ディレクトリ。"
+          }
+        },
+        {
+          "name": "--codegen-artifacts",
+          "type": "path",
+          "default": "<dir>/artifacts/<platform>-codegen",
+          "description": {
+            "en": "Codegen screenshots directory.",
+            "ja": "codegen のスクリーンショット置き場。"
+          }
+        },
+        {
+          "name": "--update",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Record the measured deviations into `codegen_parity.json`: reasons and notes on surviving entries are preserved and new entries get the unreviewed marker. Without it, unrecorded deviations and stale entries exit non-zero — the same check that `gate --parity` runs.",
+            "ja": "測定したずれを `codegen_parity.json` に記録する。残る項目の理由と注記は保持され、新規は未レビュー印がつく。付けなければ、未記録のずれも古くなった記録も非 0 で終わる — `gate --parity` と同じ検査。"
+          }
+        }
+      ],
       "examples": [],
       "seeAlso": [
         "jui conformance baseline update",
@@ -1716,7 +1798,71 @@
         "en": "Compare whether each attribute is active across platforms. At least two platforms are required — activeness agreement measured on one platform compares nothing.",
         "ja": "各属性が効いているかどうかをプラットフォーム間で比較する。最低 2 プラットフォームが必要 — 1 つだけでの「一致」は何も比較していない。"
       },
-      "options": [],
+      "options": [
+        {
+          "name": "--platform",
+          "type": "enum (repeatable)",
+          "default": "all three",
+          "description": {
+            "en": "Platform to include in the comparison. At least two are required — activeness agreement across one platform compares nothing.",
+            "ja": "比較に含めるプラットフォーム（繰り返し指定可）。**2 つ以上必要** — 1 面だけでは活性の一致を比べる相手がいない。"
+          }
+        },
+        {
+          "name": "--dir",
+          "type": "path",
+          "default": "conformance/",
+          "description": {
+            "en": "Conformance directory.",
+            "ja": "conformance ディレクトリ。"
+          }
+        },
+        {
+          "name": "--results",
+          "type": "path",
+          "default": "<dir>/results",
+          "description": {
+            "en": "Results directory.",
+            "ja": "結果ディレクトリ。"
+          }
+        },
+        {
+          "name": "--definitions",
+          "type": "path",
+          "default": "shared/core/attribute_definitions.json",
+          "description": {
+            "en": "Path to the attribute declarations, for the uniformly-inert check.",
+            "ja": "属性宣言のパス。「どこでも inert」の検査に使う。"
+          }
+        },
+        {
+          "name": "--semantics",
+          "type": "path",
+          "default": "shared/core/attribute_semantics.json",
+          "description": {
+            "en": "Path to the attribute-semantics contract; adjudicated rulings are verified from it instead of from the ledger.",
+            "ja": "属性 semantics 契約のパス。裁定済みの判断は台帳ではなくこちらから検証される。"
+          }
+        },
+        {
+          "name": "--update",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Record the measured findings into `cross_effect.json`: reasons and notes are preserved where the fact still holds, new entries get the unreviewed marker, and entries no longer supported are pruned. Without it, unrecorded findings and stale entries exit non-zero — the same check that `gate --cross-effect` runs.",
+            "ja": "測定した所見を `cross_effect.json` に記録する。事実がまだ成り立つ項目の理由と注記は保持され、新規は未レビュー印がつき、支持されなくなった項目は削除される。付けなければ、未記録の所見も古くなった記録も非 0 で終わる — `gate --cross-effect` と同じ検査。"
+          }
+        },
+        {
+          "name": "--env",
+          "type": "string",
+          "default": "local",
+          "description": {
+            "en": "Render-environment key, passed through to the fixture-vs-control comparison so that environment's system chrome bands are excluded — the Android CI status bar's clock ticks between a pair's two captures and otherwise reads as the attribute having had an effect.",
+            "ja": "レンダー環境のキー。fixture と対照の比較に渡され、その環境のシステム chrome 帯を除外する — Android CI のステータスバーの時計は 1 組の 2 枚の撮影の間に進むため、除外しないと**属性が効いた**ように読めてしまう。"
+          }
+        }
+      ],
       "examples": [],
       "seeAlso": [
         "jui conformance effect",
@@ -1731,7 +1877,89 @@
         "en": "The triage queue of attributes measured inert. Attribution is per platform, but every item is reported with its full cross-platform picture so a single-platform verdict is not read as a general one.",
         "ja": "効いていないと実測された属性のトリアージ待ち行列。帰属はプラットフォームごとだが、各項目はクロスプラットフォームの全体像つきで報告される — 1 プラットフォームの判定を全体の判定と読まないため。"
       },
-      "options": [],
+      "options": [
+        {
+          "name": "--platform",
+          "type": "enum (repeatable)",
+          "default": "all three",
+          "description": {
+            "en": "Platform to audit. Attribution is per platform, but the queue reports every item's full cross-platform picture.",
+            "ja": "監査対象のプラットフォーム（繰り返し指定可）。帰属はプラットフォーム単位だが、キューは各項目の**全プラットフォームの図**を報告する。"
+          }
+        },
+        {
+          "name": "--dir",
+          "type": "path",
+          "default": "conformance/",
+          "description": {
+            "en": "Conformance directory.",
+            "ja": "conformance ディレクトリ。"
+          }
+        },
+        {
+          "name": "--results",
+          "type": "path",
+          "default": "<dir>/results",
+          "description": {
+            "en": "Results directory.",
+            "ja": "結果ディレクトリ。"
+          }
+        },
+        {
+          "name": "--definitions",
+          "type": "path",
+          "default": "shared/core/attribute_definitions.json",
+          "description": {
+            "en": "Path to the attribute declarations, for the declared-value and value-is-default triage.",
+            "ja": "属性宣言のパス。「宣言された値」「値が既定値」のトリアージに使う。"
+          }
+        },
+        {
+          "name": "--semantics",
+          "type": "path",
+          "default": "shared/core/attribute_semantics.json",
+          "description": {
+            "en": "Path to the attribute-semantics contract; fixtures it declares an observable for are attributed to the contract.",
+            "ja": "属性 semantics 契約のパス。観測可能量が宣言されている fixture は契約に帰属される。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "path",
+          "default": "—",
+          "description": {
+            "en": "Write the adjudication queue here as JSON. The file is a report, not a ledger — nothing reads it back.",
+            "ja": "裁定キューを JSON でここに書く。**このファイルは報告であって台帳ではない** — 誰も読み返さない。"
+          }
+        },
+        {
+          "name": "--untriaged-only",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "List only the items no mechanical triage family closes.",
+            "ja": "機械的なトリアージのどの分類でも閉じない項目だけを並べる。"
+          }
+        },
+        {
+          "name": "--update",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Record the unattributed inert verdicts into `inert_audit.json` — the ledger that `gate --inert-complete` reads. Reasons already written are kept as long as the platform set still holds; entries the measurement no longer supports are dropped.",
+            "ja": "帰属のつかない inert 判定を `inert_audit.json` に記録する — `gate --inert-complete` が読む台帳。既に書かれた理由は、プラットフォームの集合が変わらない限り保持され、測定が支持しなくなった項目は落とされる。"
+          }
+        },
+        {
+          "name": "--env",
+          "type": "string",
+          "default": "local",
+          "description": {
+            "en": "Render-environment key, passed through to the fixture-vs-control comparison so that environment's system chrome bands are excluded.",
+            "ja": "レンダー環境のキー。fixture と対照の比較に渡され、その環境のシステム chrome 帯を除外する。"
+          }
+        }
+      ],
       "examples": [],
       "seeAlso": [
         "jui conformance cross-effect",
@@ -1746,7 +1974,98 @@
         "en": "For every declared (component, attribute, platform), run the production converter over a layout hash four times and compare the emitted source text: C0 is the spelling read at all, C1 does the `@{...}` binding form survive, C2 is the value read or is a constant emitted. This is the codegen stage only — it proves the converter puts the attribute in its output, never that the library then honours it. UIKit and the dynamic renderers have no codegen output to compare and are scoped out with a reason.",
         "ja": "宣言済みの (コンポーネント, 属性, プラットフォーム) ごとに、production の converter を layout hash に対して 4 回走らせ、出力ソースを比較する: C0 = その綴りが読まれているか、C1 = `@{...}` の binding 形が生き残るか、C2 = 値が読まれているか定数が出ているか。これは codegen 段階だけを見る — converter が属性を出力に入れることは証明するが、ライブラリがそれを尊重することは証明しない。UIKit と dynamic レンダラは比較対象の codegen 出力を持たないため、理由つきで対象外。"
       },
-      "options": [],
+      "options": [
+        {
+          "name": "--platform",
+          "type": "enum (repeatable)",
+          "default": "all three",
+          "description": {
+            "en": "Limit to a platform. UIKit and the dynamic renderers have no codegen output to compare and are scoped out with a reason.",
+            "ja": "対象プラットフォームを絞る（繰り返し指定可）。UIKit と dynamic レンダラーは比較すべき codegen 出力を持たないため、理由つきで対象外。"
+          }
+        },
+        {
+          "name": "--definitions",
+          "type": "path",
+          "default": "shared/core/attribute_definitions.json",
+          "description": {
+            "en": "Path to the attribute declarations the run enumerates.",
+            "ja": "実行が列挙する属性宣言のパス。"
+          }
+        },
+        {
+          "name": "--repo-root",
+          "type": "path",
+          "default": "the toolchain root",
+          "description": {
+            "en": "Repo root holding the three tool trees.",
+            "ja": "3 つの tool ツリーを含むリポジトリのルート。"
+          }
+        },
+        {
+          "name": "--ruby",
+          "type": "path",
+          "default": "ruby",
+          "description": {
+            "en": "Ruby interpreter used to run the probe scripts.",
+            "ja": "probe スクリプトの実行に使う Ruby インタプリタ。"
+          }
+        },
+        {
+          "name": "--check",
+          "type": "enum (repeatable)",
+          "default": "all",
+          "description": {
+            "en": "Report only these judgements: `C0` attribute-vs-control (is the spelling read at all), `C1` bound-vs-control (does the `@{...}` form survive), `C2` value1-vs-value2 (is the value read, or is a constant emitted).",
+            "ja": "報告する判定を絞る: `C0` 属性 vs 対照（綴りが読まれているか）、`C1` bound vs 対照（`@{...}` 形が生き残るか）、`C2` 値 1 vs 値 2（値が読まれているか、定数が出ているか）。"
+          }
+        },
+        {
+          "name": "--paired",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Paired probe: write the COMPANION attributes the adjudication ledger says an attribute needs onto the control and onto every case alike, so they cancel and the attribute under test is again the only difference. Without it, an attribute the ledger rules inert on its own — `borderWidth` needs `borderColor` — can only ever measure the ruling. The companion sets are derived from the semantics contract, never listed by hand.",
+            "ja": "対を作って撃つ: 裁定台帳が「この属性にはこれが要る」と言う**随伴属性**を、対照にも各ケースにも同じように書き込み、打ち消し合わせて**試験対象の属性だけが差**になるようにする。付けないと、単独では inert と裁定される属性（`borderWidth` には `borderColor` が要る）は**裁定そのものしか測れない**。随伴の集合は semantics 契約から導出され、手で並べない。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "path",
+          "default": "—",
+          "description": {
+            "en": "Write the full queue — findings, evidence and the scope ledger — here.",
+            "ja": "所見・根拠・スコープ台帳を含むキュー全体をここに書き出す。"
+          }
+        },
+        {
+          "name": "--limit",
+          "type": "number",
+          "default": "40",
+          "description": {
+            "en": "How many findings to print. The JSON holds them all.",
+            "ja": "表示する所見の件数。JSON には全件入る。"
+          }
+        },
+        {
+          "name": "--update",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Record the measured defects into `codegen_effect.json` (owners and reasons on surviving entries are preserved) instead of judging against it. Without it, unrecorded defects and stale entries both exit non-zero — the same check that `gate --codegen-effect` runs.",
+            "ja": "測定した欠陥を `codegen_effect.json` に**記録する**（残る項目の owner と理由は保持）。判定する代わりに記録する動作。付けなければ、未記録の欠陥も古くなった記録も非 0 で終わる — `gate --codegen-effect` が走らせるのと同じ検査。"
+          }
+        },
+        {
+          "name": "--conformance-dir",
+          "type": "path",
+          "default": "conformance/",
+          "description": {
+            "en": "Where `codegen_effect.json` lives.",
+            "ja": "`codegen_effect.json` の置き場所。"
+          }
+        }
+      ],
       "examples": [],
       "seeAlso": [
         "jui conformance effect",
