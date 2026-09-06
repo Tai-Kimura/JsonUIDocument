@@ -1280,7 +1280,7 @@
     {
       "binary": "jui",
       "command": "conformance gate",
-      "synopsis": "jui conformance gate --platform <p> [--platform <p>...] [--no-visual]",
+      "synopsis": "jui conformance gate --platform <p> [--platform <p>...] [--dir <dir>] [--results <dir>] [--out <path>] [--no-visual] [--env <key>] [--value-discrimination] [--no-ledger-keys] [--rendered-by NAME=SHA] [--codegen-effect] [--parity] [--inert-complete] [--cross-effect]",
       "purpose": {
         "en": "Render REPORT.md and fail on regressions — the CI gate, runnable locally.",
         "ja": "REPORT.md を生成しリグレッションで失敗させる — CI ゲート（ローカル実行可）。"
@@ -1291,8 +1291,8 @@
           "type": "enum (repeatable)",
           "default": "—",
           "description": {
-            "en": "Platform whose results this gate judges.",
-            "ja": "このゲートが判定するプラットフォーム。"
+            "en": "Platform whose results this gate judges; repeatable. Cross-platform mismatches are judged only when all three platforms are selected — with fewer, the results for the unselected ones are committed snapshots rather than this run's.",
+            "ja": "このゲートが判定する対象プラットフォーム（繰り返し指定可）。プラットフォーム間の不一致が判定されるのは 3 面すべてを選んだときだけで、それより少ないと、選ばれなかった面の結果は commit 済みのスナップショットであって、この実行のものではない。"
           },
           "required": true
         },
@@ -1328,8 +1328,80 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Skip screenshot-dependent checks (for lanes that cannot compare renders).",
-            "ja": "スクリーンショット依存の検査を省略（レンダ比較できないレーン用）。"
+            "en": "Skip the screenshot-dependent checks — baseline comparison, attribute effect, artifact ratchets. For lanes that cannot compare renders: the per-push web lane runs on a different OS than the committed baselines were rendered on.",
+            "ja": "スクリーンショットに依存する検査（baseline 比較・attribute effect・artifact ratchet）を省略する。描画を比較できないレーン向けで、push ごとに回る web のレーンは commit 済み baseline を描いた OS とは別の OS で走る。"
+          }
+        },
+        {
+          "name": "--env",
+          "type": "string",
+          "default": "local",
+          "description": {
+            "en": "Render-environment key. Visual checks compare against `baselines/<env>/` and use that environment's ratchet ceilings. Severity is env-dependent: the attribute-effect ledger fails the gate only under `local`, where it is asserted, and is reported as a notice elsewhere.",
+            "ja": "レンダー環境のキー。ビジュアル検査は `baselines/<env>/` と比較し、その環境の ratchet 上限を使う。重大度は環境依存で、attribute-effect の台帳がゲートを落とすのは `local` のときだけ（そこでは表明扱い）。他の環境では notice として報告される。"
+          }
+        },
+        {
+          "name": "--value-discrimination",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Also judge that two declared VALUES of one attribute draw different pictures. This is the only check that can see a collapse: every other one compares a fixture to its control, to another platform, or to the codegen's render of itself, so an attribute that maps every value onto the same layout passes all of them. Collapses must be recorded in `value_discrimination.json` with an owner and a reason, and stale entries fail too.",
+            "ja": "1 つの属性の**宣言された値どうし**が違う絵を描くことも判定する。潰れ（collapse）を見られるのはこの検査だけで、他の検査は fixture を対照・他プラットフォーム・codegen 自身の描画と比べるため、**どの値でも同じレイアウトになる属性は全部を通過する**。潰れは `value_discrimination.json` に owner と理由つきで記録が要り、古くなった項目も失敗する。"
+          }
+        },
+        {
+          "name": "--no-ledger-keys",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Skip the check that every ledger key still names a fixture the manifest has. That check runs by DEFAULT, and this is the opt-out: a rename leaves the row pointing nowhere, the entry still looks live, the gate keeps running, and nothing that row claims is ever checked again. Dangling rows are reported, never deleted. Use it only on a checkout mid-rename.",
+            "ja": "台帳の各キーが manifest に在る fixture を指しているか、の検査を飛ばす。**この検査は既定で走り**、本フラグはその opt-out。リネームすると行の指す先が消えるが、**項目は生きているように見え、ゲートは走り続け、その行が主張することは二度と検査されない**。宙に浮いた行は報告されるだけで、削除はされない。リネーム途中の checkout でのみ使う。"
+          }
+        },
+        {
+          "name": "--rendered-by",
+          "type": "string (NAME=SHA, repeatable)",
+          "default": "—",
+          "description": {
+            "en": "Which library drew this run's screenshots, e.g. `swiftjsonui=<sha>`. Compared against what the baseline records; when a regression is reported against a baseline drawn by a different library, the gate says so out loud. That is a notice, not a failure — the library is meant to move and the baseline is meant to be rebaked.",
+            "ja": "この実行のスクリーンショットをどのライブラリが描いたか（例 `swiftjsonui=<sha>`、繰り返し指定可）。baseline が記録している値と比較され、**別のライブラリが描いた baseline に対して回帰が報告された場合はその旨が明示される**。これは失敗ではなく notice — ライブラリは動くもので、baseline は焼き直すものだから。"
+          }
+        },
+        {
+          "name": "--codegen-effect",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Also judge the codegen differential (C0/C1/C2/C3) against `codegen_effect.json`: defects must be recorded with an owner and a reason, and recorded entries must still measure — unrecorded defects and stale entries both fail. Needs no renders, so `--no-visual` does not affect it.",
+            "ja": "codegen の差分判定（C0/C1/C2/C3）も `codegen_effect.json` に対して判定する。欠陥は owner と理由つきの記録が必要で、記録済みの項目も**まだ再現すること**が要る — 未記録の欠陥と、古くなった記録の両方が失敗する。描画を必要としないので `--no-visual` の影響を受けない。"
+          }
+        },
+        {
+          "name": "--parity",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Also judge dynamic ≡ codegen: the codegen-host screenshots (`artifacts/<platform>-codegen`) must match the dynamic baseline within its threshold, deviations must be recorded in `codegen_parity.json`, and recorded entries must still measure — unrecorded drift and stale entries fail.",
+            "ja": "dynamic ≡ codegen も判定する。codegen ホストのスクリーンショット（`artifacts/<platform>-codegen`）が dynamic の baseline と閾値内で一致すること、ずれは `codegen_parity.json` に記録すること、記録済みの項目も**まだ再現すること** — 未記録のずれと古くなった記録が失敗する。"
+          }
+        },
+        {
+          "name": "--inert-complete",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Also judge inert COMPLETENESS: every fixture that renders identically to its control must be accounted for by some ledger or contract, or recorded in `inert_audit.json`. This is what catches an attribute that silently stops rendering — it looks exactly like an unrecorded inert verdict, and no other check can see it. Unrecorded verdicts and stale entries fail under env `local` and are a notice elsewhere. Needs the visual checks.",
+            "ja": "inert の**網羅性**も判定する。対照と同じ絵になる fixture は、どれかの台帳か契約で説明されるか、`inert_audit.json` に記録されていなければならない。**黙って描画しなくなった属性を捕まえられるのはこれだけ** — その姿は「未記録の inert 判定」と見分けがつかず、他のどの検査にも見えない。未記録の判定と古くなった記録は env `local` で失敗し、他では notice。ビジュアル検査が要る。"
+          }
+        },
+        {
+          "name": "--cross-effect",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Also judge cross-platform activeness agreement: a fixture's control-diff verdict (active or inert) must agree across the selected platforms its attribute is declared for, and values enumerated by the SSoT must not be inert everywhere. Findings must be recorded in `cross_effect.json`, and recorded entries must still measure — unrecorded findings and stale entries fail under env `local`, a notice elsewhere. Needs at least two selected platforms and the visual checks.",
+            "ja": "プラットフォーム間の**活性の一致**も判定する。fixture の対照差分の判定（active / inert）は、その属性が宣言されている選択中のプラットフォームの間で一致しなければならず、SSoT が列挙する値がどこでも inert であってはならない。所見は `cross_effect.json` に記録が要り、記録済みの項目も**まだ再現すること**が要る — 未記録の所見と古くなった記録は env `local` で失敗し、他では notice。**2 つ以上のプラットフォーム**とビジュアル検査が要る。"
           }
         }
       ],
