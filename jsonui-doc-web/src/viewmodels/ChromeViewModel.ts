@@ -119,6 +119,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "canonical-marks",         titleKey: "guides_canonical_marks_title",         titleEn: "Referencing the API canon",   url: "/guides/canonical-marks" },
       { id: "branch-contracts",        titleKey: "guides_branch_contracts_title",        titleEn: "Branch contracts",            url: "/guides/branch-contracts" },
       { id: "branch-tests",            titleKey: "guides_branch_tests_title",            titleEn: "Branch tests",                url: "/guides/branch-tests" },
+      { id: "unit-contracts",          titleKey: "guides_unit_contracts_title",          titleEn: "Unit contracts",              url: "/guides/unit-contracts" },
       { id: "writing-layouts",         titleKey: "guides_writing_layouts_title",         titleEn: "Writing layouts",             url: "/guides/writing-layouts" },
       { id: "navigation",              titleKey: "guides_navigation_title",              titleEn: "Navigation between screens", url: "/guides/navigation" },
       { id: "testing",                 titleKey: "guides_testing_title",                 titleEn: "Writing screen tests",        url: "/guides/testing" },

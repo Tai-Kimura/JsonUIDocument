@@ -3279,6 +3279,184 @@
       "ja": "red-check と再生成"
     }
   },
+  "guides_unit_contracts": {
+    "breadcrumb": {
+      "en": "Guides",
+      "ja": "ガイド"
+    },
+    "title": {
+      "en": "Unit contracts",
+      "ja": "ユニットテスト契約"
+    },
+    "lead": {
+      "en": "The spec declares which unit test cases exist and on which platforms; `jsonui-test generate unit-stubs` writes the missing ones as failing stubs, and `--check` fails when the declared set and the implemented set disagree. The bodies stay hand-written — this mechanism is about the SET, not the code. This page covers the declaration, what the config must supply, the generation contract (append-only, and why that had to be fixed), the three kinds of drift, and the iOS naming rule that decides whether a test runs at all.",
+      "ja": "spec 側に「どのユニットテストが存在し、どの面に存在するか」を宣言し、`jsonui-test generate unit-stubs` が未実装のものを失敗するスタブとして書き出します。`--check` は宣言側と実装側の集合が食い違ったときに失敗します。本文は手書きのままです — この仕組みが扱うのはコードではなく集合です。このページでは、宣言の形、config が供給しなければならないもの、生成の契約（追記のみ。なぜそれを直す必要があったか）、3 種類のドリフト、そして「テストがそもそも走るか」を決める iOS の命名規則を扱います。"
+    },
+    "read_time": {
+      "en": "10 min read",
+      "ja": "10 分で読めます"
+    },
+    "section_what_heading": {
+      "en": "1. What the spec carries, and what it does not",
+      "ja": "1. spec が持つもの・持たないもの"
+    },
+    "section_what_body": {
+      "en": "A unit contract declares the SET of test cases a screen's unit tests must contain — their names, their intent, and which platforms they belong to. It does not generate a body. That was tried and measured upstream before this shape was chosen: generating tests from `branchContracts` moved the covered line count on the contracted methods by 4.3 points, while the untested declared-method bodies across 32 uncontracted screens came to 331 lines, 3.3% of one face's untouched total. Reaching 80% needed the ViewModel and Model bodies written by hand — roughly 6,000 lines on one face and 8,500 on another. So the bodies are yours; what the spec pins is the inventory.",
+      "ja": "ユニットテスト契約が宣言するのは、その画面のユニットテストが含むべきケースの「集合」です — 名前、意図、そしてどの面に属するか。本文は生成しません。この形に決まる前に、上流で実際に測って捨てられた選択肢です: `branchContracts` からテストを生成しても、契約のあるメソッドのカバレッジは 4.3 ポイントしか動かず、一方で契約の無い 32 画面の宣言済みメソッド本文は 331 行、ある面の未着手分の 3.3% にすぎませんでした。80% に届かせるには ViewModel と Model の本文を手で書く必要があり、それは一方の面で約 6,000 行、もう一方で 8,500 行です。だから本文はあなたのもので、spec が固定するのは目録の側です。"
+    },
+    "section_what_why": {
+      "en": "The reason to pin an inventory at all is that two faces implementing the same screen from the same spec drift apart silently. A case gets written on one side, renamed on the other, and nothing compares them — because the only thing that could is a person reading both trees. A declared set is the thing a machine can compare.",
+      "ja": "そもそも目録を固定する理由は、同じ spec から同じ画面を実装している 2 つの面が、黙って離れていくからです。片方でケースが書かれ、もう片方で名前が変わり、それを比べるものが何もない — 比べられるのは両方の木を読む人間だけだからです。宣言された集合は、機械が比較できる唯一の形です。"
+    },
+    "section_declare_heading": {
+      "en": "2. The declaration",
+      "ja": "2. 宣言の形"
+    },
+    "section_declare_body": {
+      "en": "`unitContracts` is a top-level array on a screen spec. Each entry names a `target` — the class under test — and a list of `cases`, each with a `name`, an `intent`, and an optional `platforms`. The name is an explicit string rather than a convention, so the scanner matches the name itself instead of guessing at a naming scheme. The intent is what lands in the stub's failure message, which is the only place a reader meets it before the body exists.",
+      "ja": "`unitContracts` は screen spec のトップレベル配列です。各エントリは `target`（テスト対象のクラス）と `cases` のリストを持ち、各ケースは `name`・`intent`・任意の `platforms` を持ちます。名前は規約ではなく明示的な文字列なので、スキャナは命名規則を推測せず名前そのものを照合します。`intent` はスタブの失敗メッセージに載る文言で、本文ができるまでは読み手がそれに出会う唯一の場所です。"
+    },
+    "section_declare_platforms": {
+      "en": "An unstated `platforms` means every platform the project builds — not 'none' and not 'web only'. Measured on one spec declaring four cases with one of them scoped to `[\"ios\"]`, against a config declaring all three faces: the run reports `ios: declared 4` and `android: declared 3` / `web: declared 3`. The scoped case is counted for iOS and is absent from the other two denominators entirely, rather than being counted and then excused.",
+      "ja": "`platforms` を書かない場合は「そのプロジェクトがビルドする全プラットフォーム」の意味です — 「なし」でも「web だけ」でもありません。3 面すべてを宣言した config に対し、4 ケース（うち 1 つを `[\"ios\"]` に限定）を宣言した spec 1 本で実測: 実行結果は `ios: declared 4`、`android: declared 3` / `web: declared 3` と出ます。限定されたケースは iOS では数えられ、他の 2 面では分母から丸ごと消えます — 数えたうえで免除されるのではありません。"
+    },
+    "section_config_heading": {
+      "en": "3. What the config must supply",
+      "ja": "3. config が供給しなければならないもの"
+    },
+    "section_config_body": {
+      "en": "The spec says which cases exist; it does not say where a face keeps its test files, because that would put the same fact in two places. So the directories come from `jui.config.json`: `platforms.<p>.unitTestsDir`, resolved under that platform's `root`. Two more are needed only for generation — `platforms.ios.testModule` for `@testable import`, and `platforms.android.testPackage` for the file's `package` line. Neither is derivable from `target`, which is a class name, and generation refuses without them rather than emitting a file that does not compile.",
+      "ja": "spec が言うのは「どのケースが在るか」だけで、「その面がテストファイルをどこに置くか」は言いません — 同じ事実を 2 箇所に書くことになるからです。ディレクトリは `jui.config.json` から来ます: `platforms.<p>.unitTestsDir`（その面の `root` 配下として解決）。生成にだけ必要なものがあと 2 つあります — `@testable import` のための `platforms.ios.testModule` と、ファイルの `package` 行のための `platforms.android.testPackage` です。どちらも `target`（クラス名）からは導けないので、無い場合、生成はコンパイルできないファイルを吐くのではなく拒否します。"
+    },
+    "section_config_missing": {
+      "en": "An undeclared `unitTestsDir` is reported, not skipped. Measured by removing `platforms.web.unitTestsDir` from a config whose spec declares three web cases: the run prints `web: NOT CHECKED — platforms.web.unitTestsDir is not declared in jui.config.json, so the 3 case(s) declared for it cannot be compared against anything`, and exits 1. That is the right direction: scanning the wrong directory finds nothing and reports every declared case as unimplemented, which reads like drift and is a configuration error — so the tool says which one it is instead of producing a number.",
+      "ja": "`unitTestsDir` が未宣言の場合、skip ではなく報告されます。web に 3 ケースを宣言した spec に対し config から `platforms.web.unitTestsDir` を消して実測: 実行結果は `web: NOT CHECKED — platforms.web.unitTestsDir is not declared in jui.config.json, so the 3 case(s) declared for it cannot be compared against anything` と印字し、exit 1 になります。向きとして正しい挙動です: 間違ったディレクトリを走査すれば何も見つからず、宣言済みの全ケースが未実装として報告されます。それはドリフトのように読めますが実際は設定ミスなので、ツールは数字を出さずにどちらなのかを言います。"
+    },
+    "section_generate_heading": {
+      "en": "4. Generation is append-only",
+      "ja": "4. 生成は追記のみ"
+    },
+    "section_generate_body": {
+      "en": "`jsonui-test generate unit-stubs` writes a stub file per target per platform, in that platform's convention — `<Target>ContractTests.swift`, `<Target>ContractTest.kt`, `<Target>.contract.test.ts` — with the generated cases inside a marker region delimited by `// >>> GENERATED_STUBS_START` and `// <<< GENERATED_STUBS_END`. The stub body is a deliberate failure (`XCTFail` / `fail` / `throw new Error`), carrying the declared intent. A stub that passed would be a case reporting success without a body, which is worse than a missing one, because it is counted. `--dry-run` prints the same report with `[would write]` instead of `[wrote]` and leaves nothing on disk — measured at 0 files after a dry run on a fresh project.",
+      "ja": "`jsonui-test generate unit-stubs` は、target × プラットフォームごとに、その面の作法でスタブファイルを書きます — `<Target>ContractTests.swift` / `<Target>ContractTest.kt` / `<Target>.contract.test.ts`。生成されたケースは `// >>> GENERATED_STUBS_START` と `// <<< GENERATED_STUBS_END` で挟まれたマーカー領域に入ります。スタブの本文は意図的な失敗（`XCTFail` / `fail` / `throw new Error`）で、宣言された intent を持ちます。通ってしまうスタブは「本文が無いのに成功を報告するケース」であり、欠けているより悪い — 数えられてしまうからです。`--dry-run` は `[wrote]` の代わりに `[would write]` と印字して同じ報告を出し、ディスクには何も残しません（新規プロジェクトで dry-run 後のファイル数 0 と実測）。"
+    },
+    "section_generate_append": {
+      "en": "The region is only ever added to. A case already inside it — stub or hand-written body — is left exactly as it is, and nothing is ever removed. That is a fix, not a founding property: until jsonui-cli 1.8.48 the run REPLACED the region with what it had generated, and it generates only the cases that are missing. Measured here as an A/B of the two shipped trees over one probe, in the order that reaches it — generate a four-case file, hand-write one body inside the markers, then declare a fifth case. On 1.8.47 the first run left one case in the file and the hand-written body was gone; the file then oscillated with period two, md5 alternating between exactly two values across five runs, and `--check` exited 1 on every one of them. On 1.8.49 the same probe adds the fifth case on run 1, keeps the hand-written body on all three faces, and runs 2 through 5 are byte-identical no-ops with `--check` at 0.",
+      "ja": "この領域は追記されるだけです。すでに領域内にあるケースは — スタブでも手書き本文でも — そのまま残り、何も削除されません。これは元からの性質ではなく修正です: jsonui-cli 1.8.48 より前は、実行のたびに領域を「その回の生成物」で置換していました。そして生成されるのは欠けているケースだけです。配布された 2 つの木を 1 つの probe で A/B 実測しました（欠陥に到達する順序で — 4 ケースのファイルを生成し、マーカー内に本文を 1 つ手書きし、その後 5 つ目のケースを宣言する）。1.8.47 では 1 回目の実行後にファイルに残ったケースは 1 つだけで、手書き本文は消えていました。その後ファイルは周期 2 で振動し、5 回の実行で md5 はちょうど 2 値を往復し、`--check` は毎回 exit 1 でした。1.8.49 では同じ probe が 1 回目で 5 つ目を追加し、手書き本文は 3 面とも保持され、2〜5 回目はバイト単位で同一の no-op、`--check` は 0 です。"
+    },
+    "section_generate_never_deletes": {
+      "en": "Nothing is removed includes a case the spec no longer declares. `check` reports those as `undeclared`, and deleting a test because a spec edit stopped naming it is a different act from filling in a stub — it is the author's. Measured: with a case removed from the spec, its test is still on disk after a generate run. The same restraint covers a file whose markers the author deleted — it is returned untouched, because overwriting on that basis would destroy work. Measured with a case removed from such a file so the tool had a stub it wanted to add: the run reports the file as `unchanged` and its md5 does not move.",
+      "ja": "「何も削除されない」には、spec がもう宣言していないケースも含まれます。`check` はそれを `undeclared` として報告します。spec の編集で名前が消えたことを理由にテストを削除するのは、スタブを埋めるのとは別の行為で、著者の仕事です。実測: spec からケースを消しても、そのテストは generate 実行後もディスクに残ります。同じ抑制は、著者がマーカーを消したファイルにも及びます — 手つかずで返されます。その判断で上書きすれば作業物を壊すからです。ツールが追加したいスタブを持つ状態（そのファイルからケースを 1 つ消した状態）で実測: 実行は当該ファイルを `unchanged` と報告し、md5 は動きません。"
+    },
+    "section_check_heading": {
+      "en": "5. The three kinds of drift",
+      "ja": "5. 3 種類のドリフト"
+    },
+    "section_check_body": {
+      "en": "`--check` compares the declared set against the implemented one, writes nothing, and exits non-zero on drift. Three findings: `MISSING` (declared, no implementation), `UNDECLARED` (implemented, declared nowhere), and `NEVER RUNS` (the method exists but the platform's runner will not execute it). Measured both ways on one fixture — a converged project exits 0, and the same project with one case dropped from the spec exits 1 with an `UNDECLARED` line naming it.",
+      "ja": "`--check` は宣言側の集合と実装側の集合を比較し、何も書かず、ドリフトがあれば非 0 で終了します。所見は 3 つ: `MISSING`（宣言済み・実装なし）、`UNDECLARED`（実装済み・どこにも宣言なし）、`NEVER RUNS`（メソッドは在るが、その面のランナーが実行しない）。1 つの fixture で両方向に実測 — 収束したプロジェクトは exit 0、同じプロジェクトから spec のケースを 1 つ落とすと、それを名指しする `UNDECLARED` 行つきで exit 1 になります。"
+    },
+    "section_check_denominator": {
+      "en": "Every line names a denominator, and that is worth reading rather than skipping: `android: declared 3, implemented 0, missing 3, undeclared 0 (0 file(s) read)`. `0 drifted` over an empty scan and `0 drifted` over forty cases are the same sentence and opposite facts. The `file(s) read` count is what tells them apart — a zero there with a non-zero `declared` means the scan found no files, not that the face agrees.",
+      "ja": "どの行も分母を名乗ります。読み飛ばさずに読む価値があります: `android: declared 3, implemented 0, missing 3, undeclared 0 (0 file(s) read)`。空の走査に対する `0 drifted` と、40 ケースに対する `0 drifted` は同じ文で正反対の事実です。両者を分けるのが `file(s) read` の数です — ここが 0 で `declared` が非 0 なら、それは「面が一致している」ではなく「走査がファイルを見つけていない」です。"
+    },
+    "section_ios_heading": {
+      "en": "6. The iOS prefix, and the test that never runs",
+      "ja": "6. iOS の接頭辞と、走らないテスト"
+    },
+    "section_ios_body": {
+      "en": "Declared names stay platform-neutral. On iOS the generated method gets a `test_` prefix, because XCTest discovers only `test`-prefixed methods: a method named exactly as declared compiles, is counted by any name-matching scan, and executes zero times — the mechanism manufacturing the very failure the contract exists to prevent. The scanner understands the prefix, so `save_whenOffline_setsError` in the spec and `test_save_whenOffline_setsError` in the file are the same case.",
+      "ja": "宣言する名前はプラットフォーム中立のままです。iOS では生成されるメソッドに `test_` 接頭辞が付きます。XCTest が発見するのは `test` で始まるメソッドだけだからです: 宣言どおりの名前のメソッドはコンパイルが通り、名前照合のスキャンからは「在る」と数えられ、実行回数は 0 になります — 契約が防ぐために存在する失敗を、仕組みの側が製造してしまう形です。スキャナは接頭辞を理解するので、spec の `save_whenOffline_setsError` とファイルの `test_save_whenOffline_setsError` は同じケースです。"
+    },
+    "section_ios_neverruns": {
+      "en": "A hand-written method that forgets the prefix is what `NEVER RUNS` is for. Measured by planting `func save_whenRenamed_keepsDraft()` in the test class: the check reports `NEVER RUNS save_whenRenamed_keepsDraft (method exists but the runner will not discover it — XCTest needs a 'test' prefix; it compiles, reads as present, and executes zero times)`. Two limits of that scan are worth knowing, both of them fixes. Only functions inside an `XCTestCase` subclass are scanned, because a file-scope helper is not a mis-named test — an earlier cut flagged one, and a line that is always wrong teaches the reader to skip it, taking the next real finding with it. And since jsonui-cli 1.8.48 a local function inside a test method is no longer counted either: measured on one file carrying `func poll()` inside a `test_`-prefixed method, 1.8.47 reports one NEVER RUNS for it and 1.8.49 reports none.",
+      "ja": "接頭辞を忘れた手書きメソッドのためにあるのが `NEVER RUNS` です。テストクラスに `func save_whenRenamed_keepsDraft()` を植えて実測: check は `NEVER RUNS save_whenRenamed_keepsDraft (method exists but the runner will not discover it — XCTest needs a 'test' prefix; it compiles, reads as present, and executes zero times)` と報告します。この走査には知っておく価値のある限界が 2 つあり、どちらも修正の結果です。走査対象は `XCTestCase` サブクラスの中の関数だけです — ファイルスコープのヘルパは名前を間違えたテストではないからです。初期版はそれを検出してしまいました。常に誤っている行は読み手に「読み飛ばす」ことを教え、次の本物の所見まで一緒に持っていきます。もう 1 つ、jsonui-cli 1.8.48 からはテストメソッド内のローカル関数も数えません: `test_` 接頭辞つきメソッドの中に `func poll()` を持つファイル 1 本で実測すると、1.8.47 はそれに対し NEVER RUNS を 1 件報告し、1.8.49 は 0 件です。"
+    },
+    "section_misspell_heading": {
+      "en": "7. A misspelled key does not drop the declaration",
+      "ja": "7. キーの綴り間違いは宣言を落とさない"
+    },
+    "section_misspell_body": {
+      "en": "The one failure this mechanism must not have is silently declaring nothing. Measured by renaming `cases` to `caes` in one block: the run prints three PROBLEM lines — the unknown key with the expected set, `'cases' is missing — this block declares nothing`, and `1 spec(s) carry a 'unitContracts' block but no case could be read from any of them — a misspelled key drops the declaration silently, which is the one failure this mechanism must not have` — and exits 1. The third line is the one that matters: it fires on the aggregate, so a typo cannot leave a project reporting a clean zero over a contract nobody is reading.",
+      "ja": "この仕組みが持ってはいけない唯一の失敗は、黙って何も宣言しない状態になることです。1 つのブロックで `cases` を `caes` に書き換えて実測: 実行は PROBLEM 行を 3 本印字します — 期待されるキー集合つきの unknown key、`'cases' is missing — this block declares nothing`、そして `1 spec(s) carry a 'unitContracts' block but no case could be read from any of them — a misspelled key drops the declaration silently, which is the one failure this mechanism must not have` — そして exit 1 になります。重要なのは 3 本目です: 全体に対して発火するので、綴り間違いが「誰も読んでいない契約に対して 0 件と報告するプロジェクト」を残すことができません。"
+    },
+    "section_limits_heading": {
+      "en": "8. What this does not give you",
+      "ja": "8. これが与えないもの"
+    },
+    "section_limits_body": {
+      "en": "The contract compares names, so it is silent about everything a name does not carry. Two cases with the same name on two faces satisfy it while asserting different things; a case whose body was emptied to a bare `XCTAssertTrue(true)` satisfies it too, because it is present and it runs. `--check` is a set comparison, not a review. It also says nothing about a case that exists on neither face and was never declared — the inventory pins what the spec knows, so a branch nobody thought of is not a gap this can see. Where a case's correctness needs pinning rather than its existence, that is `branchContracts` and the generated branch tests, not this.",
+      "ja": "この契約が比べるのは名前なので、名前が運ばないものについては何も言いません。2 つの面で同名のケースが別のことを assert していても契約は満たされますし、本文が `XCTAssertTrue(true)` だけに空洞化されたケースも満たします — 在って、走るからです。`--check` は集合の比較であってレビューではありません。どちらの面にも存在せず、宣言もされたことがないケースについても何も言いません — 目録が固定するのは spec が知っていることなので、誰も思いつかなかった分岐はこれで見える隙間ではありません。ケースの「存在」ではなく「正しさ」を固定したいなら、それは `branchContracts` と生成される分岐テストの仕事で、こちらではありません。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_contracts_title": {
+      "en": "Branch contracts",
+      "ja": "分岐コントラクト"
+    },
+    "next_contracts_description": {
+      "en": "The declaration side: vocabulary, validate, and the rendered decision tables.",
+      "ja": "宣言の側: 語彙・validate・決定表の描画。"
+    },
+    "next_tests_title": {
+      "en": "Branch tests",
+      "ja": "分岐テスト生成"
+    },
+    "next_tests_description": {
+      "en": "The other generator: real-stack unit tests on three platforms from one branch table.",
+      "ja": "もう 1 つの生成器: 1 つの分岐表から 3 面の実スタックユニットテスト。"
+    },
+    "next_testing_title": {
+      "en": "Testing",
+      "ja": "テスト"
+    },
+    "next_testing_description": {
+      "en": "The whole test story: screen tests, flow tests, and where unit tests sit in it.",
+      "ja": "テスト全体像: 画面テスト・フローテストと、その中でのユニットテストの位置。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI",
+      "ja": "© 2026 JsonUI"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの内容"
+    },
+    "toc_row_what": {
+      "en": "Set, not body",
+      "ja": "本文ではなく集合"
+    },
+    "toc_row_declare": {
+      "en": "The declaration",
+      "ja": "宣言の形"
+    },
+    "toc_row_config": {
+      "en": "Config",
+      "ja": "config"
+    },
+    "toc_row_generate": {
+      "en": "Append-only generation",
+      "ja": "追記のみの生成"
+    },
+    "toc_row_check": {
+      "en": "Three kinds of drift",
+      "ja": "3 種類のドリフト"
+    },
+    "toc_row_ios": {
+      "en": "The iOS prefix",
+      "ja": "iOS の接頭辞"
+    },
+    "toc_row_misspell": {
+      "en": "Misspelled keys",
+      "ja": "綴り間違い"
+    },
+    "toc_row_limits": {
+      "en": "Limits",
+      "ja": "限界"
+    }
+  },
   "guides_branch_contracts": {
     "breadcrumb": {
       "en": "Guides",
