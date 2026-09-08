@@ -37,7 +37,7 @@ env:
   # Bump procedure: pick the new jsonui-cli main SHA, replace this value, and
   # review the regenerated reference pages in that deploy — the SHA bump is
   # the review point for reference updates.
-  JSONUI_CLI_REF: 4af8a7762d3bfd4b127eb4dfc2779b9c29016d8d # v1.8.52
+  JSONUI_CLI_REF: 8a601961299bfd32b495d5d97a48da062b75240c # v1.8.55
   # Two releases were skipped on the way here. v1.8.6's `jui build` crashed on
   # `from ..core.version import toolchain_version` (the module is at
   # jui_cli/version.py, not under core/), and v1.8.8 was withdrawn upstream for
@@ -202,15 +202,29 @@ jobs:
           # for byte — the spec pages carry no timestamp, so a difference is a
           # stale commit, never the clock. Needs jsonui-cli 1.8.18: before it,
           # batch mode ignored --format and wrote HTML into .md-shaped trees.
+          # Since jsonui-cli 1.8.55 a component link is emitted ONLY when the
+          # output tree sits inside the source tree; writing to a bare temp
+          # directory renders each entry as text instead, because no link from
+          # there would resolve. Measured 2026-09-08: with the old shape below,
+          # the only tracked tree that could match was one that had lost its
+          # links, so the gate forced a choice between the right artifact and a
+          # green run. The face is copied and generated IN PLACE instead. That
+          # is still a real answer rather than a machine-dependent one: two
+          # independent copies generate byte-identical trees (measured, with a
+          # decoy proving the comparison can fail). The copied html/md trees are
+          # removed first so that a file the specs stopped producing shows up as
+          # "Only in" rather than surviving as a leftover.
           run_gate spec-docs-match sh -c '
             tmp=$(mktemp -d)
-            python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" generate spec docs/screens/json -o "$tmp/html" --format html > "$tmp/gen-html.log" 2>&1 || { cat "$tmp/gen-html.log"; exit 1; }
-            python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" generate spec docs/screens/json -o "$tmp/md" --format markdown > "$tmp/gen-md.log" 2>&1 || { cat "$tmp/gen-md.log"; exit 1; }
-            n=$(find "$tmp/html" "$tmp/md" -type f | wc -l | tr -d " ")
+            rsync -a --exclude .git --exclude node_modules --exclude .next --exclude out ./ "$tmp/face/"
+            rm -rf "$tmp/face/docs/screens/html" "$tmp/face/docs/screens/md"
+            ( cd "$tmp/face" && python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" generate spec docs/screens/json -o docs/screens/html --format html ) > "$tmp/gen-html.log" 2>&1 || { cat "$tmp/gen-html.log"; exit 1; }
+            ( cd "$tmp/face" && python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" generate spec docs/screens/json -o docs/screens/md --format markdown ) > "$tmp/gen-md.log" 2>&1 || { cat "$tmp/gen-md.log"; exit 1; }
+            n=$(find "$tmp/face/docs/screens/html" "$tmp/face/docs/screens/md" -type f | wc -l | tr -d " ")
             [ "$n" -gt 0 ] || { echo "the generator wrote nothing — refusing to read an empty comparison as a match"; exit 1; }
             fail=0
-            diff -r "$tmp/html" docs/screens/html > "$tmp/html.diff" || fail=1
-            diff -r "$tmp/md"   docs/screens/md   > "$tmp/md.diff"   || fail=1
+            diff -r "$tmp/face/docs/screens/html" docs/screens/html > "$tmp/html.diff" || fail=1
+            diff -r "$tmp/face/docs/screens/md"   docs/screens/md   > "$tmp/md.diff"   || fail=1
             if [ "$fail" -ne 0 ]; then
               echo "the tracked spec docs are not what the specs generate — regenerate and commit them:"
               grep -E "^(diff|Only in)" "$tmp/html.diff" "$tmp/md.diff" | head -20
