@@ -129,3 +129,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - v1 uses hand-curated RECENT_CHANGES in the ViewModel. Adding a DocChangelogRepository later is a pure additive change and does not alter the ViewModel's public contract.
 - featuredLinks count = 3 (Get started / AI agents / Cross-platform showcase). platformCards count = 3 (Swift / Kotlin / React). recentChanges count = 3–6 (3 new May 2026 entries appended for the swagger-driven Data Models feature; the spec only confirms ChangelogCard supports these — actual entries live in HomeViewModel.RECENT_CHANGES).
 - All user-visible strings flow through StringManager keys under the home_* namespace.
+
+<!-- jsonui-doc-producer: spec-batch -->

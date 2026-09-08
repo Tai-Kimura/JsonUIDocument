@@ -128,3 +128,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 
 - Phase 2 article 5/5 — closes the per-pattern detail round.
 - Uses this site's real cells (e.g. next_step_card, prereq_row, quickstart_step) as exemplars — 28 cells currently live under docs/screens/layouts/cells/.
+
+<!-- jsonui-doc-producer: spec-batch -->

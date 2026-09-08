@@ -121,3 +121,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 
 - Fourth live entry under the Tools tab.
 - Essay layout (no Collection). Two CodeBlocks illustrate: (a) a test file shape, (b) the CI invocation pattern.
+
+<!-- jsonui-doc-producer: spec-batch -->

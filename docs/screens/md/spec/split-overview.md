@@ -136,3 +136,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 
 - Second article under the new Spec section (docs/plans/spec-authoring-deep-dive.md).
 - v1 scaffold: intro + 5 pattern sections + next-reads. Per-pattern detail (parent-sub-spec, layout-file, component-spec, custom-types, cell-classes) becomes its own article in Phase 2.
+
+<!-- jsonui-doc-producer: spec-batch -->

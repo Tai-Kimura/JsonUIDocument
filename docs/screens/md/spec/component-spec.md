@@ -128,3 +128,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 ## Notes
 
 - Phase 2 article 3/5. Uses the real CodeBlock component_spec as the exemplar — this site ships five today (CodeBlock, Sidebar, TableOfContents, TopBar, DocSamplePreview).
+
+<!-- jsonui-doc-producer: spec-batch -->

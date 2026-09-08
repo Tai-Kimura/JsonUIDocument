@@ -127,3 +127,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 
 - Phase 2 article: first of the five per-pattern detail walkthroughs from docs/plans/spec-authoring-deep-dive.md.
 - Linked from /spec/split-overview Pattern 1; introduces the writer-facing mechanics that anatomy only summarizes.
+
+<!-- jsonui-doc-producer: spec-batch -->

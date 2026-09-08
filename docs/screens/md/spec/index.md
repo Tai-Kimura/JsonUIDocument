@@ -102,3 +102,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - The spec section shipped its eight articles before it had an index; /spec was the only section root without a landing page. This screen closes that gap.
 - Strings prefix: `spec_index_*` (namespace derives from the layoutFile `spec/index`).
 - 2026-08-25 — layoutFile corrected from 'spec/index' to 'spec_index': the layout has always lived at the flat path, and the stale nested spelling meant the spec claimed a layout that does not exist. Surfaced by the spec-coverage check added in jsonui-cli 1.6.35 — no earlier gate compared these two sides.
+
+<!-- jsonui-doc-producer: spec-batch -->

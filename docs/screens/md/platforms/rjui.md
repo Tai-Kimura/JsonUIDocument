@@ -119,3 +119,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 
 - Third and final Platforms entry. Flip PLATFORMS_ENTRIES row 3 (react) to 'live' — that completes the tab.
 - Meta-audience: web engineers who want to use rjui to dogfood JsonUI for their web-only product. The 'this site' angle makes the pitch tangible: 'if the output did not look and feel native you would not be reading this on it'.
+
+<!-- jsonui-doc-producer: spec-batch -->

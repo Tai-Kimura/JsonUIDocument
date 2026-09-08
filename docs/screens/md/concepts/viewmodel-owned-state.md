@@ -123,3 +123,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 
 - Fourth live essay. Flipping CONCEPTS_ENTRIES row 3 to 'live' is the last step.
 - Closing next-reads: Data binding (already live), Hot reload (upcoming).
+
+<!-- jsonui-doc-producer: spec-batch -->

@@ -151,3 +151,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Sixth concepts essay. Adds responsive-design between hot-reload and the natural follow-ups (one-layout-json revisits the multi-platform story; hot-reload shows how size-class changes get picked up at runtime).
 - Focus on the *mechanism* of size-class resolution, not on Tailwind-specific UI tricks. The reader should leave understanding when to use `responsive`, when `platforms` is enough, and when neither fits and a layout-file split is the right answer.
 - Pairs with /reference/attributes/responsive — the reference page documents the attribute shape, this concept page documents the runtime behavior.
+
+<!-- jsonui-doc-producer: spec-batch -->

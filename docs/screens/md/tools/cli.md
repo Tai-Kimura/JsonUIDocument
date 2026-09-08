@@ -128,3 +128,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Third live entry under the Tools tab. Flipping TOOLS_ENTRIES row 1 (cli) from 'upcoming' to 'live' in HomeViewModel finishes the task.
 - Sub-CLI row is a richer cell than agent_row / mcp_tool_row because the per-tool role is a full sentence (not a short one-liner). Keeping it separate avoids forcing agent_row to grow.
 - 2026-05 update (swagger-driven Data Models): the `jui` row's body adds one sentence noting the new `g api` subcommand (DTO + Domain codegen) and the new `ls` group (`ls api-specs`, `ls api-models`). The generate group description gains one line: 'Generate steps honor `api.schemas.{include_paths, exclude_paths, include_schemas, exclude_schemas, skip_domain}` when scoping schema codegen for shared swaggers.' Detail links to /guides/api-data-models §3 (filter syntax) and /reference/cli-commands (the full flag reference). No new uiVariable / customType added — the change is body-copy only inside the existing tools_cli_cli_jsonui_body, tools_cli_cli_jui_body, and a new tools_cli_cli_jui_ls_intro string.
+
+<!-- jsonui-doc-producer: spec-batch -->

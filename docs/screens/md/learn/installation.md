@@ -260,3 +260,5 @@ expandedIds contains 'uninstall':
 - The home hero CTA currently navigates to /learn/hello-world; the implementer for this page is expected to rewire the home hero CTA to /learn/installation per plan 18 §8. That change belongs to the home screen's Layout (not this spec).
 - Standard components + CodeBlock only. No TabView (this page sits inside one of the home TabView tabs — single root ScrollView per plan 18 §3 structure).
 - 2026-05 update (swagger-driven Data Models): the prerequisites Collection's body copy for the Android tier (or a footnote on the Android troubleshooting row) gains ONE sentence noting 'If you plan to consume OpenAPI schemas on Android with the default Moshi serializer, also add the ksp Gradle plugin — see /guides/api-data-models §9 for the exact setup.' No new uiVariable / customType / row — single-string addition wired into the existing PrereqRow noteKey or a new related-link row pointing at /guides/api-data-models §9.
+
+<!-- jsonui-doc-producer: spec-batch -->

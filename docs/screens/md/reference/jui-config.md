@@ -136,3 +136,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 
 - Key facts sourced from jui_tools ConfigManager (DEFAULT_CONFIG, API_PLATFORM_DEFAULTS), lint_generated_cmd, test_tools install resolution, and jsonui-doc project_config — verify against those when the config surface changes.
 - Strings prefix: `reference_jui_config_*`.
+
+<!-- jsonui-doc-producer: spec-batch -->

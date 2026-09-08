@@ -127,3 +127,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 ## Notes
 
 - Phase 2 article 4/5. Uses this site's real customTypes (NextReadLink, ActivityRow, QuickstartStep) as exemplars.
+
+<!-- jsonui-doc-producer: spec-batch -->

@@ -122,3 +122,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 
 - Third live entry under the Learn tab. Flipping LEARN_ENTRIES row 5 (what-is) to 'live' in HomeViewModel finishes.
 - Intro essay — no Collection, no custom component beyond CodeBlock + TOC. The reader has not installed anything yet; do not ask them to run commands here — link to /learn/installation for that.
+
+<!-- jsonui-doc-producer: spec-batch -->

@@ -53,3 +53,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 ## Notes
 
 - 2026-08-25 — Authored when the spec-coverage check (jsonui-cli 1.6.35) reported this index layout as a screen with no spec. The index pages are real screens (they render at their own URL and inside the home TabView), so they are declared as screens rather than marked `"role": "cell"`. The catalog itself is seeded in the owning ViewModel; this spec records the screen's shape and its one data surface.
+
+<!-- jsonui-doc-producer: spec-batch -->

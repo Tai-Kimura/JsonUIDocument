@@ -106,3 +106,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - v1 ships 5 catalog entries, 2 live. The upcoming 3 are placeholders that give the reader a sense of the curriculum ahead; their spec files will be authored in separate tasks.
 - Strings prefix: `learn_index_*` (per first-prefix-fix, the namespace derives from the directory + basename, so the `learn/index.json` layout resolves its bare-text keys under `learn_index.*`).
 - 2026-08-25 — layoutFile corrected from 'learn/index' to 'learn_index': the layout has always lived at the flat path, and the stale nested spelling meant the spec claimed a layout that does not exist. Surfaced by the spec-coverage check added in jsonui-cli 1.6.35 — no earlier gate compared these two sides.
+
+<!-- jsonui-doc-producer: spec-batch -->

@@ -172,3 +172,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - The closing troubleshooting block is inline (not a Collection) — six common 'it didn't work' situations with symptom + cause + fix, each pointing at the actual validator / verify error string.
 - The guide's subject matter IS the framework's core flow (author spec → jui doc validate → jui generate → jui build → jui verify → iterate). Treating it as the Guides tab's keystone entry makes 'start here' obvious to a reader who already knows what JsonUI is but hasn't written one yet.
 - Deprecated strings: step5_heading / step5_body / toc_row_step5 remain in strings.json as unreferenced dead entries to minimise cross-session merge risk. Removing them is safe once the guides-deepening batch merges.
+
+<!-- jsonui-doc-producer: spec-batch -->

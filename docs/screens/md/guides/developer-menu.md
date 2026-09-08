@@ -162,3 +162,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - CodeBlocks use language: 'swift' and 'kotlin' — both are in the Shiki preloaded list. Examples are illustrative skeletons (App.swift wraps the SwiftUI App root; MainActivity.kt wraps setContent around the NavHost).
 - Web (ReactJsonUI) has no DeveloperMenuContainer equivalent. The lead states this explicitly, and Sidebar / GuidesIndex display [iOS] [Android] platform pills (Phase 0 infrastructure added alongside this guide) so readers see the platform scope before opening the page.
 - 2026-09-03, section_pitfalls_bullet_displayName was published as its own key name, not as text: rjui's converter does not recognise a string key containing an uppercase letter and emits it as literal text, silently. Renamed to lowercase with its layout reference; the same defect hit one bullet on the writing-layouts page. See that spec's note and the upstream filing.
+
+<!-- jsonui-doc-producer: spec-batch -->

@@ -135,3 +135,5 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Fourth live entry under the Learn tab. Flipping LEARN_ENTRIES row 4 (data-binding) to 'live' in HomeViewModel finishes.
 - Practical pair to /concepts/data-binding — the essay there covers 'why', this one covers 'how'. Each section builds on the previous one, so the reader ends up with a Counter spec + layout + ViewModel that does all three binding kinds.
 - Four CodeBlocks total: (1) the skeleton spec + layout before any binding, (2) adding @{count} as a value binding, (3) adding @{statusVisibility} as a visibility binding, (4) adding @{onIncrement} / @{onDecrement} as event bindings — in that order.
+
+<!-- jsonui-doc-producer: spec-batch -->
