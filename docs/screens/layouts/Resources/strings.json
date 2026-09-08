@@ -8438,25 +8438,53 @@
       "en": "The spec lists every prop (name, type, default, description), every exposed event, and — if it can contain children — the allowed slots. `jui doc init component --name Foo` scaffolds a skeleton; `jui doc validate component --file …` confirms the shape. One file, three readers: MCP agents consume it to plan work, the docs generator renders it to the reference page, the scaffolder emits the converter from it. Keep it honest — there is no second source of truth.",
       "ja": "spec は全 prop (name, type, default, description) と露出イベント、子を持てるなら allowed slots を列挙します。`jui doc init component --name Foo` で skeleton を生成、`jui doc validate component --file …` で shape を確認。1 ファイルに 3 人の読者: MCP エージェントは作業計画に、docs ジェネレータは reference ページ描画に、scaffolder は converter 生成に使います。これ以外に source of truth は無いので、正直に保ってください。"
     },
+    "section_identity_heading": {
+      "en": "3. Identity: metadata.name, and nothing else",
+      "ja": "3. identity — component の名前は spec が決める"
+    },
+    "section_identity_body": {
+      "en": "A custom component's identity is the `metadata.name` inside its own spec. It is required, and nothing is substituted when it is missing. A screen that declares the component writes the same string in its customComponents entry — the component spec is the authority and the screen has to agree with it. This is less a new rule than a line the tools already drew: every renderer that shows a name falls back to a placeholder when one is absent, and the single place that matches on identity refuses to fall back and reports the gap instead. Both errors surface when you run `jsonui-test generate unit-stubs`.",
+      "ja": "custom component の identity は、その component spec 自身の `metadata.name` です。必須で、欠けていても既定値は当てられません。その component を宣言する画面は、customComponents の entry に同じ文字列を書きます — 権威は component spec の側にあり、画面がそれに合わせます。これは新しい規則というより、道具が既に引いていた線です。名前を表示する描画側は、名前が無ければプレースホルダに落とします。一方 identity を照合する唯一の箇所は、落とすことを拒んで欠落として報告します。どちらのエラーも `jsonui-test generate unit-stubs` で出ます。"
+    },
+    "section_identity_bullet_required": {
+      "en": "• Required, with no default. An unnamed component is not given one, because every unnamed component would then answer to the same identity and merge silently into a single owner.",
+      "ja": "• 必須。既定値は当てません。当ててしまうと、名前の無い component が全て同じ identity を名乗り、所有者が黙って 1 つに融合するからです。"
+    },
+    "section_identity_bullet_match": {
+      "en": "• The screen's customComponents entry carries name and specFile. Its name must equal the component spec's metadata.name; when the two spellings drift, ownership is computed from the wrong one.",
+      "ja": "• 画面の customComponents entry は name と specFile を持ちます。その name は component spec の metadata.name と一致していなければなりません。綴りがずれると、所有者は誤った方から計算されます。"
+    },
+    "section_identity_bullet_display": {
+      "en": "• Display may substitute; matching may not. A heading that reads 'Component' because a name was missing is harmless. An identity resolved to a substituted value is not — it points ownership at something that was never declared.",
+      "ja": "• 表示は既定値を当ててよく、照合は当ててはいけません。名前が無いために見出しが 'Component' と出るのは無害です。identity が既定値で解決されるのは無害ではありません — 宣言されていないものを所有者として指してしまいます。"
+    },
+    "section_identity_bullet_green": {
+      "en": "• A green run is not proof that you comply. The check names which ownership sources it consulted and marks that set complete or partial. Sources complete is not targets covered: a target that no source resolves has zero owners, which is neither exactly one nor two or more, so neither direction reports it. Read the unowned count rather than the absence of red.",
+      "ja": "• 緑は準拠の証拠ではありません。この検査は参照した所有元を名乗り、その集合が complete か partial かを印します。SOURCES complete は TARGETS covered ではありません — どの所有元でも解決しない target は所有者 0 で、これは「ちょうど 1」でも「2 以上」でもないため、どちらの向きからも報告されません。赤が無いことではなく、未所有の件数を読んでください。"
+    },
+    "toc_row_identity": {
+      "en": "3. Identity",
+      "ja": "3. identity"
+    },
     "section_project_heading": {
-      "en": "3. Register with the project",
-      "ja": "3. プロジェクトに登録する"
+      "en": "4. Register with the project",
+      "ja": "4. プロジェクトに登録する"
     },
     "section_project_body": {
       "en": "Once the spec validates, add the component's type name to .jsonui-doc-rules.json → rules.componentTypes.screen. This whitelist is enforced by the Layout JSON validator; an unregistered type fails with 'Invalid component type: X'. It is also the source of truth the docs site uses to auto-enumerate 'available custom components' on the reference page, which is how CodeBlock, TableOfContents, and Search show up there.",
       "ja": "spec が validate を通ったら、.jsonui-doc-rules.json の rules.componentTypes.screen にコンポーネント型名を追加します。この whitelist は Layout JSON validator が強制し、未登録の型は 'Invalid component type: X' で落ちます。reference ページが 'available custom components' を自動列挙する時も、この whitelist が source of truth — CodeBlock / TableOfContents / Search が reference に載っているのはこれ経由です。"
     },
     "section_platform_heading": {
-      "en": "4. Register with each platform",
-      "ja": "4. 各プラットフォームに登録する"
+      "en": "5. Register with each platform",
+      "ja": "5. 各プラットフォームに登録する"
     },
     "section_platform_body": {
       "en": "Each platform keeps its own converter registry. The scaffold appends one line for you, but knowing the map makes debugging easier: Web → rjui_tools/lib/react/converters/extensions/converter_mappings.rb, iOS → sjui_tools/lib/swiftui/views/extensions/converter_mappings.rb, Android → kjui_tools/lib/compose/components/extensions/component_mappings.rb. The key in each Hash is the spec's type name (must match exactly); the value is the converter class name. If the Hash is missing your entry, the type reaches the layout validator and fails there — not at build time.",
       "ja": "各プラットフォームは独自の converter registry を持ちます。scaffold が 1 行追記してくれますが、対応関係を知っておくと debug が楽: Web → rjui_tools/lib/react/converters/extensions/converter_mappings.rb、iOS → sjui_tools/lib/swiftui/views/extensions/converter_mappings.rb、Android → kjui_tools/lib/compose/components/extensions/component_mappings.rb。各 Hash の key は spec の type 名 (完全一致必須)、value は converter クラス名。Hash にエントリが無いと、型は layout validator で落ちます — build 時ではなく validate 時に。"
     },
     "section_scaffold_heading": {
-      "en": "5. What the scaffold writes",
-      "ja": "5. scaffold が書くもの"
+      "en": "6. What the scaffold writes",
+      "ja": "6. scaffold が書くもの"
     },
     "section_scaffold_body": {
       "en": "`jui generate converter --from docs/components/json/<name>.component.json` writes nine files total — three per platform. Re-running the scaffold is safe: the converter file is protected from overwrite once it exists; only attribute_definitions and the mappings entry are touched. Pass `--skip-existing` to make the whole run a no-op when the converter already exists (useful in CI: the command exits 0 instead of erroring on conflict). Each platform gets three artifacts, all living under that platform's extensions/ directory:",
@@ -8475,8 +8503,8 @@
       "ja": "• converter_mappings.rb — プラットフォーム毎の Hash で、type 名を解決可能にします。scaffold は 1 行追記、既存エントリは触らない。"
     },
     "section_handedit_heading": {
-      "en": "6. Hand-edit boundaries",
-      "ja": "6. 手編集の境界"
+      "en": "7. Hand-edit boundaries",
+      "ja": "7. 手編集の境界"
     },
     "section_handedit_body": {
       "en": "Which files survive a re-scaffold, which get overwritten, and which you never touch. This is the map most first-time authors wish they had printed on their wall:",
@@ -8499,8 +8527,8 @@
       "ja": "• 絶対に触らない (@generated バナー付き): Layout JSON, ViewModelBase, Hook, Data interface, StringManager。全部 jui build のたびに再生成されます。"
     },
     "section_type_map_heading": {
-      "en": "7. .jsonui-type-map.json ≠ component whitelist",
-      "ja": "7. .jsonui-type-map.json ≠ コンポーネント whitelist"
+      "en": "8. .jsonui-type-map.json ≠ component whitelist",
+      "ja": "8. .jsonui-type-map.json ≠ コンポーネント whitelist"
     },
     "section_type_map_body": {
       "en": "Two different files, two different jobs, one common confusion. .jsonui-type-map.json maps custom data types (TypeScript interfaces / Swift structs / Kotlin data classes) across platforms — things like NextReadLink or ReferenceAttributeRow. .jsonui-doc-rules.json registers custom UI component types — things like CodeBlock or TableOfContents. A 'Unregistered custom types' warning from jui verify points at the type-map; an 'Invalid component type' error points at the doc-rules. Learn to read the error string and you will reach for the right file first time.",
@@ -8543,24 +8571,24 @@
       "ja": "2. コンポーネント spec"
     },
     "toc_row_project": {
-      "en": "3. Register with project",
-      "ja": "3. プロジェクトに登録"
+      "en": "4. Register with project",
+      "ja": "4. プロジェクトに登録"
     },
     "toc_row_platform": {
-      "en": "4. Register with platforms",
-      "ja": "4. 各プラットフォームに登録"
+      "en": "5. Register with platforms",
+      "ja": "5. 各プラットフォームに登録"
     },
     "toc_row_scaffold": {
-      "en": "5. What the scaffold writes",
-      "ja": "5. scaffold が書くもの"
+      "en": "6. What the scaffold writes",
+      "ja": "6. scaffold が書くもの"
     },
     "toc_row_handedit": {
-      "en": "6. Hand-edit boundaries",
-      "ja": "6. 手編集の境界"
+      "en": "7. Hand-edit boundaries",
+      "ja": "7. 手編集の境界"
     },
     "toc_row_type_map": {
-      "en": "7. type-map ≠ whitelist",
-      "ja": "7. type-map ≠ whitelist"
+      "en": "8. type-map ≠ whitelist",
+      "ja": "8. type-map ≠ whitelist"
     },
     "toc_row_spec_first": {
       "en": "Spec first",

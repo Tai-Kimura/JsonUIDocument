@@ -185,6 +185,87 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
+                  "id": "section_identity",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_identity_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_identity_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_identity_bullet_required"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_identity_bullet_match"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_identity_bullet_display"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_identity_bullet_green"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// docs/components/json/badge.component.json — the authority\n{ \"metadata\": { \"name\": \"Badge\" } }\n\n// docs/screens/json/<screen>.spec.json — must agree with it\n{ \"structure\": { \"customComponents\": [\n    { \"name\": \"Badge\",\n      \"specFile\": \"badge.component.json\",\n      \"description\": \"Small status pill.\" }\n] } }\n\n// a disagreement is reported, not resolved:\n// PROBLEM <screen>: declares component 'Badgee' but\n//         badge.component.json names itself 'Badge'.",
+                      "language": "json",
+                      "filename": "identity must agree on both sides",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
                   "id": "section_project",
                   "width": "matchParent",
                   "height": "wrapContent",
@@ -574,6 +655,12 @@
                           "id": "toc_spec",
                           "label": "toc_row_spec",
                           "anchor": "section_spec",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_identity",
+                          "label": "toc_row_identity",
+                          "anchor": "section_identity",
                           "level": 1
                         },
                         {

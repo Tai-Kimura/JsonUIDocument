@@ -32,6 +32,14 @@ Guides > Building a custom component. Task-focused walk-through of the three-lay
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_identity` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_project` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
@@ -143,3 +151,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Seven sections: (1) why spec-first / 79873ec plan, (2) component_spec.json shape with CodeBlock examples + init/validate commands, (3) .jsonui-doc-rules.json whitelist with excerpt, (4) per-platform converter_mappings.rb with Ruby excerpt, (5) jui generate converter outputs (3 bullets per-file explaining what each file is), (6) hand-edit boundaries (4 bullets: you / scaffold-once / overwritten / @generated), (7) .jsonui-type-map.json ≠ component whitelist (side-by-side CodeBlock).
 - Running exemplar: CodeBlock, the docs site's own custom component. Its converter lives at jsonui-doc-web/rjui_tools/lib/react/converters/extensions/code_block_converter.rb, its attribute defs at the adjacent attribute_definitions/CodeBlock.json, its spec at docs/components/json/codeblock.component.json.
 - Deprecated strings: section_spec_first_* / section_whitelist_* / toc_row_spec_first / toc_row_whitelist remain in strings.json as unreferenced dead entries to minimise cross-session merge risk. Removing them is safe once the guides-deepening batch merges.
+- Identity section added 2026-09-08 as section 3, which renumbered the former 3-7 to 4-8 in both the headings and the table of contents. It states that a custom component's identity is its own spec's metadata.name, required with no substituted default, and that a screen's customComponents entry must spell it the same way. The rule is enforced by jsonui-test generate unit-stubs; jsonui-doc validate spec does not check it, so a green run here says nothing about compliance -- measured on this face by mutating a declared name and by removing a component spec's metadata.name, both of which left validate spec reporting PASSED with zero errors.
