@@ -3650,8 +3650,8 @@
       "command": "generate html",
       "synopsis": "jsonui-doc generate html <input-dir> [-o <out>] [-t <title>] [-d <docs>] [--app NAME:DIR] [--config <path>] [--layouts-dir <dir>] [--allow-partial] [--with-checks]",
       "purpose": {
-        "en": "Render the whole documentation site — test files, specs, API docs, Figma assets — as static HTML. Since 2026-07-29 a page that fails to generate no longer passes silently: every page is still attempted, the intact ones are written, and the run ends with a summary naming each failure, the input file behind it, and a non-zero exit code. Failed pages get a placeholder carrying the reason, so a link in the index never dead-ends.",
-        "ja": "テストファイル・spec・API ドキュメント・Figma アセットからドキュメントサイト全体を静的 HTML として生成する。2026-07-29 以降、ページ単位の生成失敗が黙って通ることはない — 全ページを試行し、壊れていないものは出力したうえで、末尾に失敗の一覧（原因と入力ファイル）を出して非 0 で終了する。失敗したページは理由を載せたプレースホルダになるので、index からのリンクが行き止まりにならない。"
+        "en": "Render the whole documentation site — test files, specs, API docs, Figma assets — as static HTML. Since 2026-07-29 a page that fails to generate no longer passes silently: every page is still attempted, the intact ones are written, and the run ends with a summary naming each failure, the input file behind it, and a non-zero exit code. Failed pages get a placeholder carrying the reason, so a link in the index never dead-ends. This command also writes OUTSIDE `-o`: before building the site it regenerates, in the SOURCE tree, `<docs>/<screens|requirements>/html/` and `.../md/`, plus `<docs>/components/html/` and `.../md/` — for the root scope and for every `--app` passed in the same run. Two lanes pointing `-o` at different directories are therefore NOT isolated from each other: whichever runs last leaves its version in the source tree. The paths actually written are printed at the end of the run. The help declares this since jsonui-cli 1.8.52.",
+        "ja": "テストファイル・spec・API ドキュメント・Figma アセットからドキュメントサイト全体を静的 HTML として生成する。2026-07-29 以降、ページ単位の生成失敗が黙って通ることはない — 全ページを試行し、壊れていないものは出力したうえで、末尾に失敗の一覧（原因と入力ファイル）を出して非 0 で終了する。失敗したページは理由を載せたプレースホルダになるので、index からのリンクが行き止まりにならない。　このコマンドは `-o` の外にも書き込む — サイトを組み立てる前に、ソースツリーの `<docs>/<screens|requirements>/html/` と `.../md/`、および `<docs>/components/html/` と `.../md/` を再生成する。対象はルートスコープと、同じ実行で渡された全ての `--app`。したがって `-o` を別々のディレクトリに向けた 2 つのレーンは互いに独立していない — 後に走った方の版がソースツリーに残る。実際に書いた経路は実行の最後に印字される。help がこれを名乗るのは jsonui-cli 1.8.52 から。"
       },
       "options": [
         {
@@ -3677,8 +3677,8 @@
           "type": "path",
           "default": "html",
           "description": {
-            "en": "Output directory. Short form `-o`.",
-            "ja": "出力ディレクトリ。短縮形は `-o`。"
+            "en": "Site output directory. Short form `-o`. NOT the only place this command writes — the run also regenerates doc trees in the source tree; see the purpose above.",
+            "ja": "サイトの出力ディレクトリ。短縮形は `-o`。このコマンドが書き込む唯一の場所ではない — 実行はソースツリーの doc ツリーも再生成する。上の説明を参照。"
           }
         },
         {
@@ -3745,17 +3745,17 @@
         "jsonui-doc validate spec"
       ],
       "verifiedAgainst": {
-        "version": "1.8.41",
+        "version": "1.8.52",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "3a8fa5d18641a458da9ebe102c70e3fc6f8d7e8f47884dc784bf39cde8f84acb",
-        "cardHash": "77744257cfdf6385f6e21ce593ebedadf42a384d84da2bebe982f2943bc3418c",
+        "helpHash": "8d2213378834833c04e5f87ef0f9cab721c411dc8ca90ce12caf78a2d085b70b",
+        "cardHash": "514504a00ad8aa73e853f9343e2183029ffd2bf7e9cb00fa4012ce2f0d4642bd",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "5cd68944d8a8",
           "synopsis": "7728fa3d0d43",
-          "purpose": "96fdaa00f616",
-          "options": "11dc93814743",
+          "purpose": "110478995fc4",
+          "options": "1edf5d1c7067",
           "examples": "a15eeff27a4c",
           "seeAlso": "639afb3fa358"
         }
