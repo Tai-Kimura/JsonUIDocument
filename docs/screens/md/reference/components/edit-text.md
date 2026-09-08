@@ -192,4 +192,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Do not hand-edit — update docs/data/attribute-overrides/<name>.json and re-run `npm run build:attrs`.
 - Alias of TextField. Runtime data redirects to the aliased component.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

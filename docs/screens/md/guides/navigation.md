@@ -145,4 +145,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Corrects prior implicit false claim that the generator writes navigation code or that jsonui-navigation-ios/android agents 'emit the platform-specific navigation call' — those agents assist authoring, but the code lands as hand-written VM impl / Route enums / NavHost definitions, not @generated.
 - Deprecated strings: section_spec_* and toc_row_spec remain in strings.json as unreferenced dead entries to minimise cross-session merge risk (section_contract is the new equivalent).
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

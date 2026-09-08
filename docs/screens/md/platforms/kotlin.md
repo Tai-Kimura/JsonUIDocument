@@ -126,4 +126,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - 2026-07-07 — Update `section_dual_body` to soften the 'XML for laggards' framing and add a forward pointer to `section_mode_policy` (1 sentence: '2026-07 以降の運用方針は次節を参照')。既存の技術的説明 (Compose recomposition・Dynamic mode) は変更しない。
 - 2026-07-07 — Update `lead` 微修正: 'Jetpack Compose by default, XML Views where legacy codebases need it.' の trailing clause を softer に (例: 'Jetpack Compose is the primary target; XML Views are maintenance-only for legacy migrations.') ja も同様。
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

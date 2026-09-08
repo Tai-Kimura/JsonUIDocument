@@ -250,4 +250,4 @@ activeDomainTab == 'ts':
 - Only CodeBlock is referenced as a custom component (already whitelisted). The four cell layouts (comparison_row / lifecycle_step_row / halt_row / mcp_tool_cell) are standard Layout JSON authored alongside the page Layout — they are not custom JsonUI types.
 - 2026-08-31 — section_dto_body gains the 1.7.25 description escaping. Measured on a one-field schema whose description contains both '/*' and '*/': the v1.7.24 generated .ts fails to compile (TS1131 plus five more errors on the comment line, from tsc run directly on the file), and the v1.7.25 output contains '/api/admin/ *' and '* /' inside an intact comment and type-checks. The web half was measured here rather than transcribed because the upstream report is Kotlin-first — nesting is the Kotlin hazard, while on web the closing marker alone is enough, and the two need different sentences.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

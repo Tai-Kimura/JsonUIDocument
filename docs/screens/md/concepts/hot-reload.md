@@ -127,4 +127,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Focus on the *mechanism*, not the UX — this page is for readers who want to understand why changing a JSON in an editor causes their iPhone simulator to re-render.
 - Web section is framework-neutral by measurement (2026-08-25): the hotload server's supported platforms are ios and android only (web is build-step only), Next.js App Router is merely the default web_framework adapter, and the toolchain's own web conformance host is Vite + React with no Next dependency. Do not re-frame this section as Next-specific.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

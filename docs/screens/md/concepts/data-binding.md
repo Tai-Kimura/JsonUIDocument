@@ -130,4 +130,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - The closing next-reads point at WhySpecFirst (back) and ViewModel-owned state (upcoming sibling).
 - 2026-04-24 rewrite: the four section bodies were rewritten against the real SwiftJsonUI / KotlinJsonUI / ReactJsonUI implementations — see docs/plans/concepts-data-binding-rewrite.md. Key correction: form inputs (TextField / CheckBox / Switch / Toggle / Slider / SelectBox / Segment) are effectively two-way on every platform (SwiftUI $binding, Android LaunchedEffect + updateData, Web auto-generated onChange); the optional onXxxChange handler is a notification hook that fires AFTER the VM field has already updated, not a gate. Non-input bindings (Label text, visibility, src, colors, items) remain read-only.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

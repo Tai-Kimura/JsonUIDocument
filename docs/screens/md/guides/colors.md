@@ -106,4 +106,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Canonical sources: rjui_tools/lib/core/resources/color_manager.rb (schema, extraction, key generation, ColorManager + theme.css emission), the sjui / kjui copies of the same class for the Swift and Kotlin emitters, rjui_tools/lib/react/tailwind_mapper.rb (mode-complete gating and the off-palette warning), the generated src/generated/ColorManager.ts (color / resolveColor / setMode / followSystemMode), and jui_tools/jui_cli/commands/build_cmd.py (Resources distribution).
 - resolveColor landed 2026-07-28 (report: web-inline-color-token-resolution); before it, bound colours were passed through raw on web while iOS and Android already resolved them by name.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

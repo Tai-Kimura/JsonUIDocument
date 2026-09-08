@@ -130,4 +130,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - 2026-08-25 — v1.6.36 uptake: the coverage paragraph gains the operable criterion for deciding a finding — a screen owns a ViewModel, a fragment is drawn inside its parent and does not; neither directory nor naming convention decides it, since layouts exist at the top level that are fragments and under a parent's folder that are screens. Also records that hand-written app-owned screens are outside the check (no layout to be missing a spec for).
 - 2026-08-25 — Criterion refined after adoption: the deciding question is whether the thing has state and an entry point of its own; 'does it have its own ViewModel' is kept as a fast first read but demoted to a proxy, since a sheet can own a ViewModel that only re-shelves the parent's dictionary and is therefore not a screen.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

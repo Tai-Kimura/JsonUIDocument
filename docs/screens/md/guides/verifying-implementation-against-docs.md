@@ -150,4 +150,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - CodeBlocks needed: (1) jui.config.json checks 宣言 jsonc, (2) FastAPI export スクリプト python 5–8 行, (3) shell — 他 framework の 3 行 hint, (4) shell — jsonui-doc check --list / check api / exit code, (5) yaml — GitHub Actions 6–8 行 CI ステップ, (6) json — mismatch レポート行の例, (7) jsonc — フルチェッカー宣言, (8) python — httpx フルチェッカー 8–10 行 outline. Total: 8 CodeBlocks. すべて汎用ドメインで書く。
 - Cross-links from other pages: (a) home RECENT_CHANGES entry to be added for both new pages, (b) /reference/cli-commands section_checks_body's '具体 cookbook は今後追加予定' phrasing to be updated post-launch to link here (follow-up edit), (c) /concepts/implementation-contract-check next-reads points here (implemented in that spec).
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

@@ -261,4 +261,4 @@ expandedIds contains 'uninstall':
 - Standard components + CodeBlock only. No TabView (this page sits inside one of the home TabView tabs — single root ScrollView per plan 18 §3 structure).
 - 2026-05 update (swagger-driven Data Models): the prerequisites Collection's body copy for the Android tier (or a footnote on the Android troubleshooting row) gains ONE sentence noting 'If you plan to consume OpenAPI schemas on Android with the default Moshi serializer, also add the ksp Gradle plugin — see /guides/api-data-models §9 for the exact setup.' No new uiVariable / customType / row — single-string addition wired into the existing PrereqRow noteKey or a new related-link row pointing at /guides/api-data-models §9.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

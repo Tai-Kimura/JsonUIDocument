@@ -121,4 +121,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Fifth and final live entry under the Tools tab.
 - Publisher `jsonui`, extension id `jsonui.jsonui-helper`, v0.1.0. The page links to the Marketplace entry via the install CodeBlock.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

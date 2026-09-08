@@ -140,4 +140,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Public repo hygiene: no consumer project names; generic domain examples only (users / plans).
 - Cross-links: /concepts/implementation-contract-check gained a third next-read card pointing here (next_db_schema).
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

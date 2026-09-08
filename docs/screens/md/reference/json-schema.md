@@ -120,4 +120,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Live Reference entry. Flip REFERENCE_ENTRIES row for 'json-schema' to 'live' in HomeViewModel when shipping.
 - v1 is hand-authored overview. Auto-generation from the upstream artifact is a future pass.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

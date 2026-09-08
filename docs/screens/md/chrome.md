@@ -132,4 +132,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - The layout never renders a 'slot' for page content. RootLayout places {children} beside the generated Chrome; CSS in globals.css reserves topbar/sidebar space via padding on .site-main.
 - onRouteChange is the only public method on the VM that is NOT surfaced as a layout data binding — it is called only from the ChromeWrapper via the generated hook.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

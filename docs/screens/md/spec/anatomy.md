@@ -127,4 +127,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - v1 scaffold: header + 5 section headings (top-level, metadata, stateManagement, dataFlow, structure) + next-reads. Prose bodies and CodeBlocks expand in Phase 1b.
 - Purpose: complement the Reference > JSON Schema lookup view with a writer-facing walk through every top-level spec field.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

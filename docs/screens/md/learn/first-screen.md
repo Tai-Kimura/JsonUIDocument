@@ -149,4 +149,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - The ViewModel section (section_wire) is a 3-platform tabbed view — Swift / Kotlin / TypeScript — so the walkthrough shows the same onAppear contract across iOS (SwiftJsonUI), Android (KotlinJsonUI), and Web (ReactJsonUI). Tabs use the same cells/tab_header pattern as LearnHelloWorld.
 - Eight CodeBlocks in total: (1) the spec with uiVariables + events + customType (platforms: ios + android + web), (2) the root layout JSON with header + hero + collection frames, (3) the activity_row cell, (4–6) the Swift / Kotlin / TypeScript ViewModel seed (one per platform, toggled by codeTabs), (7) the page route, (8) the final jui build + verify commands to ship.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

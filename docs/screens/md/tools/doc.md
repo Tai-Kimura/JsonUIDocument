@@ -214,4 +214,4 @@ activeSampleTab == 'html':
 - 2026-05 update (swagger-driven Data Models): document_tools/.../swagger.py — the original Python OpenAPI -> per-platform-model generator — was ported into the jsonui-cli core and is now reached through `jui g api`. The jsonui-doc body copy is updated with ONE sentence noting this heritage so a reader who knows the old path lands on the right new entry point. No catalog row added (jui g api lives under /tools/cli, not here).
 - 2026-08-31 — removed a literal '**v1.6.13 以降**' from the JA install text, same cause as the api-mock one: markdown bold reaches the screen as asterisks. A full scan of strings.json now leaves two '**' occurrences, both of which are the subject of their sentence (documenting that glob '**' is unsupported) rather than emphasis.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

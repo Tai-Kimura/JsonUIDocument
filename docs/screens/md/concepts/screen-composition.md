@@ -145,4 +145,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Focus on the *trade-off* between the three composition primitives — when each is the right answer, not how to write each one. The reference page (/reference/components/embed) documents the attribute shape; this page documents the choice.
 - Pairs with /spec/split-overview Pattern 6 — that page introduces Embed as a splitting pattern; this page explains why it differs from include and TabView.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

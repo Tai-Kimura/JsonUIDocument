@@ -153,4 +153,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Deprecated strings: section_spec_first_* / section_whitelist_* / toc_row_spec_first / toc_row_whitelist remain in strings.json as unreferenced dead entries to minimise cross-session merge risk. Removing them is safe once the guides-deepening batch merges.
 - Identity section added 2026-09-08 as section 3, which renumbered the former 3-7 to 4-8 in both the headings and the table of contents. It states that a custom component's identity is its own spec's metadata.name, required with no substituted default, and that a screen's customComponents entry must spell it the same way. The rule is enforced by jsonui-test generate unit-stubs; jsonui-doc validate spec does not check it, so a green run here says nothing about compliance -- measured on this face by mutating a declared name and by removing a component spec's metadata.name, both of which left validate spec reporting PASSED with zero errors.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

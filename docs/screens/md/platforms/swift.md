@@ -120,4 +120,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - First live Platforms entry. Flip PLATFORMS_ENTRIES row 1 (swift) to 'live' in HomeViewModel.
 - Audience: iOS engineers evaluating JsonUI vs staying on hand-written SwiftUI. Copy emphasises 'native output, no runtime interpreter' and the Dynamic mode hot-reload story — which is SwiftUI's biggest weakness.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

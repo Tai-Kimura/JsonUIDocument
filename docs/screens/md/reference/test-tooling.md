@@ -122,4 +122,4 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Same pass: the [fn] marker on the Web pass/fail cell had no rendered body anywhere on the page since 2026-07-09 (the intent lived only in these notes). Footnote block added at the bottom of the matrix CodeBlock; [fn] body states property-vs-function.
 - 2026-09-02, driver android 1.8.5 (183e8ae) + cli 1.8.0 (3b49fc0f): the matrix Android permissions cell 'pm grant / pm revoke' -> 'grant / deny->assert [fn3]'. Measured on the driver source: allow still runs pm grant; deny asserts the arriving state and fails the file when granted (no pm revoke is executed — the driver's own comment and the schema at jsonui-test-runner b2a042e declare that an in-run revoke kills the instrumented process; that runtime claim is attributed, not re-measured here); unset executes nothing. Prescription in the footnote: jsonui-test pregrant --platform android.
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

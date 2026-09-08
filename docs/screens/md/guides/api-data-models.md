@@ -272,4 +272,4 @@ activeDomainPattern == 'stored':
 - Only CodeBlock referenced as a custom component (already whitelisted). The 7 cell layouts authored alongside the page Layout are standard JsonUI cells, not custom component types.
 - 2026-07-07 — Contract check awareness (Renderer SSoT + doc-contract-check rollout). Extend `section_ci_body` with 1-2 sentences noting: 'Since 2026-07, docs↔ implementation drift can also be machine-verified via `jsonui-doc check` (which runs a builtin:openapi-diff between the impl-declared OpenAPI and docs/api/). This complements `jui verify --fail-on-diff` (which verifies DTO regeneration is byte-stable against the docs) — verify catches DTO drift within the doc→code pipeline, check catches API drift between docs and the running server.' Update `section_ci_heading` if needed to reflect both. Do NOT add a link to /guides/verifying-implementation-against-docs yet — that page is authored in a follow-up session. The addition is body-copy only, no new sections or TOC entries. ja も対応。
 
-<!-- jsonui-doc-producer: spec-batch -->
+<!-- jsonui-doc-producer: jsonui-doc:spec -->
