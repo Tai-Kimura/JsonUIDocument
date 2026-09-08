@@ -10030,6 +10030,14 @@
       "en": "The top-level string keys point the toolchain at your spec, layout, style, image, component-spec and swagger directories. The values below are the built-in defaults — a key you omit falls back to exactly these. strings_file has no default: localization is off until you point it at a strings.json. document_tools_path is only needed when jsonui-doc is not importable from the standard install.",
       "ja": "トップレベルの文字列キーが spec / layout / style / image / component spec / swagger の各ディレクトリを指します。以下は組み込みデフォルト — 省略したキーはこの値に落ちます。strings_file にデフォルトは無く、strings.json を指すまでローカライズは無効です。document_tools_path は jsonui-doc が標準インストールから import できない場合のみ必要です。"
     },
+    "section_directories_caveat_dtp": {
+      "en": "⚠️ document_tools_path changes where the tools come from, which the sentence above does not say. Point it at a directory that exists and `document_tools` resolves to that working copy instead of the installed distribution — so `jui --version` no longer describes what is running, and an edit in that copy silently becomes the toolchain. Point it at a directory that does not exist and the setting does nothing at all: the import falls back to the installed CLI. Both cases were silent until jsonui-cli 1.8.58; each now prints a NOTE on stderr naming which of the two happened.",
+      "ja": "⚠️ document_tools_path は道具の出どころを変えます — 上の一文はそこまで言っていません。実在するディレクトリを指すと `document_tools` は配布物ではなくその作業コピーから解決されるので、`jui --version` は走っている物を説明しなくなり、そのコピーへの編集が黙ってツールチェーンになります。実在しないディレクトリを指した場合は設定そのものが効かず、import は入っている CLI に落ちます。どちらも jsonui-cli 1.8.58 までは無言でした。現在はどちらが起きたかを名指しする NOTE が stderr に出ます。"
+    },
+    "section_directories_caveat_dtp_silent": {
+      "en": "The notice is not printed by every command. `jui build` reports the broken case, because a path that does not exist is a fact about the setting and is true no matter what runs — but it stays silent when the path exists, because it never prepends it. A command that did not do the work does not report having done it.",
+      "ja": "この通知は全コマンドが出すわけではありません。`jui build` は壊れている側だけを報告します — パスが実在しないことは設定についての事実で、何が走っていても真だからです。パスが実在する場合は無言です（`jui build` はそれを sys.path に挿さないため）。やっていない処理を、やったとは報告しない、という切り分けです。"
+    },
     "section_platforms_heading": {
       "en": "platforms.*",
       "ja": "platforms.*"

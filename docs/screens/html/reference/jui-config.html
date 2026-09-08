@@ -292,6 +292,22 @@
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-2-3" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-4" data-parent-id="1-1-2-1-2">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-2-5" data-parent-id="1-1-2-1-2">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
 <td><code>-</code></td>
 <td>-</td>
@@ -647,6 +663,7 @@ flowchart TD
 <ul>
 <li>Key facts sourced from jui_tools ConfigManager (DEFAULT_CONFIG, API_PLATFORM_DEFAULTS), lint_generated_cmd, test_tools install resolution, and jsonui-doc project_config — verify against those when the config surface changes.</li>
 <li>Strings prefix: `reference_jui_config_*`.</li>
+<li>document_tools_path caveat added 2026-09-09 to the core-directories section. The page had stated only when the key is NEEDED (jsonui-doc not importable from the standard install) and said nothing about what setting it DOES: with a path that exists, document_tools resolves to that working copy rather than the installed distribution, so jui --version stops describing what runs; with a path that does not exist the setting has no effect at all. Both were silent before jsonui-cli 1.8.58, which now prints a NOTE on stderr naming which case occurred. The second paragraph records that jui build reports only the broken case and stays silent when the path exists, because it never prepends it -- a command that did not do the work does not report having done it.</li>
 </ul>
 </section>
 </div>
