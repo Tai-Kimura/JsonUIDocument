@@ -231,6 +231,33 @@ jobs:
               exit 1
             fi
             echo "docs/screens/html and docs/screens/md match their specs ($n generated files compared)"'
+          # The same check for the component trees, which the arm above does not
+          # reach. It regenerates only docs/screens/**, so docs/components/{html,md}
+          # were tracked derived output that nothing compared against its
+          # generator: the producer mark landed on the screens trees at 1.8.58 and
+          # its value changed at 1.8.59, and the component trees took neither,
+          # silently, for two releases (found 2026-09-09 by an unrelated A/B whose
+          # baseline arm came back non-zero here and zero for screens). A gate only
+          # ever speaks for its own set, so the fix is another arm, not a wider
+          # claim by the existing one. Kept separate rather than folded in above:
+          # that arm is measured and proven, and this one fails with its own name.
+          run_gate component-docs-match sh -c '
+            tmp=$(mktemp -d)
+            rsync -a --exclude .git --exclude node_modules --exclude .next --exclude out ./ "$tmp/face/"
+            rm -rf "$tmp/face/docs/components/html" "$tmp/face/docs/components/md"
+            ( cd "$tmp/face" && python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" generate component docs/components/json -o docs/components/html --format html ) > "$tmp/gen-ch.log" 2>&1 || { cat "$tmp/gen-ch.log"; exit 1; }
+            ( cd "$tmp/face" && python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" generate component docs/components/json -o docs/components/md --format markdown ) > "$tmp/gen-cm.log" 2>&1 || { cat "$tmp/gen-cm.log"; exit 1; }
+            n=$(find "$tmp/face/docs/components/html" "$tmp/face/docs/components/md" -type f | wc -l | tr -d " ")
+            [ "$n" -gt 0 ] || { echo "the generator wrote nothing — refusing to read an empty comparison as a match"; exit 1; }
+            fail=0
+            diff -r "$tmp/face/docs/components/html" docs/components/html > "$tmp/ch.diff" || fail=1
+            diff -r "$tmp/face/docs/components/md"   docs/components/md   > "$tmp/cm.diff" || fail=1
+            if [ "$fail" -ne 0 ]; then
+              echo "the tracked component docs are not what the component specs generate — regenerate and commit them:"
+              grep -E "^(diff|Only in|[<>])" "$tmp/ch.diff" "$tmp/cm.diff" | head -20
+              exit 1
+            fi
+            echo "docs/components/html and docs/components/md match their specs ($n generated files compared)"'
           # Directory argument, not a `find` expansion: a partial argument list
           # is the shape that used to uninstall the tests it did not name, and
           # --no-install removes the install step from this reporting run
