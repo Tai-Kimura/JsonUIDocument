@@ -24,3 +24,4 @@ Embedded preview of a generated jsonui-doc HTML artifact. Renders a hand-pasted 
 
 - /tools/doc
 
+<!-- jsonui-doc-producer: jsonui-doc:component -->

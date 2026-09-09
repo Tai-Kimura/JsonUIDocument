@@ -29,3 +29,4 @@ Site-wide search. Renders as an inline trigger (a narrow button with a magnifier
 {'layoutSnippet': '{\n  "type": "Search",\n  "placeholder": "search_placeholder",\n  "shortcut": "cmd+k"\n}'}
 ```
 
+<!-- jsonui-doc-producer: jsonui-doc:component -->

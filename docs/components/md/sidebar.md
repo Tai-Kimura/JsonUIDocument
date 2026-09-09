@@ -29,3 +29,4 @@ Site-wide left-rail navigation. Renders a persistent vertical column that lists 
 {'layoutSnippet': '{\n  "type": "Sidebar",\n  "items": "@{navItems}",\n  "activeUrl": "@{activeUrl}",\n  "collapsedIds": "@{collapsedIds}",\n  "mobileOpen": "@{mobileOpen}",\n  "onToggleSection": "@{onToggleSection}",\n  "onLinkTap": "@{onLinkTap}"\n}'}
 ```
 
+<!-- jsonui-doc-producer: jsonui-doc:component -->

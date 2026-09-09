@@ -45,3 +45,4 @@ Compact, accessible 'On this page' navigation that lists the section anchors of 
 {'layoutSnippet': {'type': 'TableOfContents', 'title': 'On this page', 'sticky': True, 'stickyOffset': 80, 'maxDepth': 2, 'items': [{'id': 'toc_overview', 'label': 'Overview', 'anchor': 'overview', 'level': 1}, {'id': 'toc_prerequisites', 'label': 'Prerequisites', 'anchor': 'prerequisites', 'level': 1}, {'id': 'toc_install_cli', 'label': 'Install CLI', 'anchor': 'install-cli', 'level': 2}, {'id': 'toc_install_mcp', 'label': 'Install MCP', 'anchor': 'install-mcp', 'level': 2}, {'id': 'toc_next_steps', 'label': 'Next steps', 'anchor': 'next-steps', 'level': 1}]}, 'description': "Minimal TableOfContents usage inside a /learn/installation Layout JSON. Authored items mirror the page's heading structure; level 2 rows are filtered out if maxDepth is set to 1."}
 ```
 
+<!-- jsonui-doc-producer: jsonui-doc:component -->

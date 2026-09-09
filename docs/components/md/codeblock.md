@@ -49,3 +49,4 @@ Syntax-highlighted fenced code block with optional filename caption, line number
 {'layoutSnippet': {'type': 'CodeBlock', 'language': 'bash', 'code': 'jui init', 'filename': 'shell', 'showLineNumbers': False, 'copyable': True}, 'description': 'Minimal CodeBlock usage inside a Layout JSON. See docs/plans/17-spec-templates.md §T4 for a fuller CLI-page context.'}
 ```
 
+<!-- jsonui-doc-producer: jsonui-doc:component -->

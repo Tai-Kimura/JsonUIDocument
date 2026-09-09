@@ -29,3 +29,4 @@ Site-wide sticky header. Renders as a 56px fixed bar at the viewport top contain
 {'layoutSnippet': '{\n  "type": "TopBar",\n  "brandLabel": "chrome_brand_name",\n  "currentLanguage": "@{currentLanguage}",\n  "onToggleLanguage": "@{onToggleLanguage}",\n  "onToggleMobileMenu": "@{onToggleMobileMenu}"\n}'}
 ```
 
+<!-- jsonui-doc-producer: jsonui-doc:component -->
