@@ -37,7 +37,7 @@ env:
   # Bump procedure: pick the new jsonui-cli main SHA, replace this value, and
   # review the regenerated reference pages in that deploy — the SHA bump is
   # the review point for reference updates.
-  JSONUI_CLI_REF: 7e6628bd7a760b94ab7b1dc8812c35efe1fd6f7b # v1.8.59
+  JSONUI_CLI_REF: d4ac93fb0c492b075fc7334007611c431439d149 # v1.8.61
   # Two releases were skipped on the way here. v1.8.6's `jui build` crashed on
   # `from ..core.version import toolchain_version` (the module is at
   # jui_cli/version.py, not under core/), and v1.8.8 was withdrawn upstream for
@@ -67,7 +67,7 @@ jobs:
   # version's help. The second half never judges whether a card is right, only
   # whether it was read; unstamped cards are counted, never red.
   #
-  # All thirteen gates run even when one fails, so a red run names everything that
+  # All fourteen gates run even when one fails, so a red run names everything that
   # is red, and every gate prints its own exit code — a gate that could not
   # run must not read as a gate that passed.
   gates:
@@ -151,7 +151,7 @@ jobs:
         working-directory: jsonui-doc-web
         run: npm run prebuild
 
-      - name: Run the thirteen gates (enforcing — a red one stops the deploy)
+      - name: Run the fourteen gates (enforcing — a red one stops the deploy)
         run: |
           set +e
           fail=0
@@ -329,7 +329,7 @@ jobs:
             fi
             echo "the committed vendored tree matches the pin, file for file"'
           echo "----"
-          echo "gates with a non-zero exit: $fail of 13"
+          echo "gates with a non-zero exit: $fail of 14"
           if [ "$fail" -ne 0 ]; then
             echo "FAILING this job: the deploy job depends on it and will not run."
             exit 1
