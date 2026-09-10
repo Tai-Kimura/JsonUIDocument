@@ -59,7 +59,11 @@ const CLAIMS: Claim[] = [
     ],
   },
   {
-    where: "section 8 (en) — `none` is recognised from Japanese wording only",
+    // The paragraph names the release this site pins ("In 1.8.70, the release
+    // this site pins, `none` is recognised from Japanese wording only"). So a
+    // pin bump to a tree with the English vocabulary reds here BY DESIGN: the
+    // sentence names a release the site no longer ships against.
+    where: "section 8 (en) — what `none` recognises in the release this page names as pinned",
     anchor: "recognised from Japanese wording only",
     cases: [
       k("遷移なし", "none"),
@@ -72,7 +76,7 @@ const CLAIMS: Claim[] = [
     ],
   },
   {
-    where: "section 8 (ja) — `none` は日本語の文言からしか認識されません",
+    where: "section 8 (ja) — 同じ主張の日本語側（pin している版について述べている）",
     anchor: "日本語の文言からしか認識されません",
     cases: [k("遷移なし", "none"), k("none", "unknown")],
   },
