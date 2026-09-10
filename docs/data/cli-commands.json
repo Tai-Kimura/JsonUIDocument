@@ -3650,8 +3650,8 @@
       "command": "generate html",
       "synopsis": "jsonui-doc generate html <input-dir> [-o <out>] [-t <title>] [-d <docs>] [--app NAME:DIR] [--config <path>] [--layouts-dir <dir>] [--allow-partial] [--with-checks]",
       "purpose": {
-        "en": "Render the whole documentation site — test files, specs, API docs, Figma assets — as static HTML. Since 2026-07-29 a page that fails to generate no longer passes silently: every page is still attempted, the intact ones are written, and the run ends with a summary naming each failure, the input file behind it, and a non-zero exit code. Failed pages get a placeholder carrying the reason, so a link in the index never dead-ends. This command also writes OUTSIDE `-o`: before building the site it regenerates, in the SOURCE tree, `<docs>/<screens|requirements>/html/` and `.../md/`, plus `<docs>/components/html/` and `.../md/` — for the root scope and for every `--app` passed in the same run. Two lanes pointing `-o` at different directories are therefore NOT isolated from each other: whichever runs last leaves its version in the source tree. The paths actually written are printed at the end of the run. The help declares this since jsonui-cli 1.8.52.",
-        "ja": "テストファイル・spec・API ドキュメント・Figma アセットからドキュメントサイト全体を静的 HTML として生成する。2026-07-29 以降、ページ単位の生成失敗が黙って通ることはない — 全ページを試行し、壊れていないものは出力したうえで、末尾に失敗の一覧（原因と入力ファイル）を出して非 0 で終了する。失敗したページは理由を載せたプレースホルダになるので、index からのリンクが行き止まりにならない。　このコマンドは `-o` の外にも書き込む — サイトを組み立てる前に、ソースツリーの `<docs>/<screens|requirements>/html/` と `.../md/`、および `<docs>/components/html/` と `.../md/` を再生成する。対象はルートスコープと、同じ実行で渡された全ての `--app`。したがって `-o` を別々のディレクトリに向けた 2 つのレーンは互いに独立していない — 後に走った方の版がソースツリーに残る。実際に書いた経路は実行の最後に印字される。help がこれを名乗るのは jsonui-cli 1.8.52 から。"
+        "en": "Render the whole documentation site — test files, specs, API docs, Figma assets — as static HTML. Since 2026-07-29 a page that fails to generate no longer passes silently: every page is still attempted, the intact ones are written, and the run ends with a summary naming each failure, the input file behind it, and a non-zero exit code. Failed pages get a placeholder carrying the reason, so a link in the index never dead-ends. This command also writes OUTSIDE `-o`: before building the site it regenerates, in the SOURCE tree, `<docs>/<screens|requirements>/html/` and `.../md/`, plus `<docs>/components/html/` and `.../md/` — for the root scope and for every `--app` passed in the same run. Two lanes pointing `-o` at different directories are therefore NOT isolated from each other: whichever runs last leaves its version in the source tree. The paths actually written are printed at the end of the run. The help declares this since jsonui-cli 1.8.52. Since jsonui-cli 1.8.66 the flow diagram on the site is drawn from the screen specs and the flow tests are checked against it: a forward transition a flow test performs that no spec declares prints one `ERROR [doc-diagram]:` line per transition after every page is written, and the command exits 1 — `--allow-partial` does not cover it, since that flag accepts a missing page and this is a wrong spec. The closing line ends with `warnings N`, the tool's own tally, printed even at 0.",
+        "ja": "テストファイル・spec・API ドキュメント・Figma アセットからドキュメントサイト全体を静的 HTML として生成する。2026-07-29 以降、ページ単位の生成失敗が黙って通ることはない — 全ページを試行し、壊れていないものは出力したうえで、末尾に失敗の一覧（原因と入力ファイル）を出して非 0 で終了する。失敗したページは理由を載せたプレースホルダになるので、index からのリンクが行き止まりにならない。　このコマンドは `-o` の外にも書き込む — サイトを組み立てる前に、ソースツリーの `<docs>/<screens|requirements>/html/` と `.../md/`、および `<docs>/components/html/` と `.../md/` を再生成する。対象はルートスコープと、同じ実行で渡された全ての `--app`。したがって `-o` を別々のディレクトリに向けた 2 つのレーンは互いに独立していない — 後に走った方の版がソースツリーに残る。実際に書いた経路は実行の最後に印字される。help がこれを名乗るのは jsonui-cli 1.8.52 から。 jsonui-cli 1.8.66 からは、サイト上のフロー図は画面 spec から描かれ、flow test はそれに対して照合される: flow test が実行する forward 遷移のうち、どの spec も宣言していないものは、全ページを書いた後に遷移ごとに `ERROR [doc-diagram]:` を 1 行印字し、コマンドは exit 1 で終わる — `--allow-partial` はこれを覆わない。あのフラグが受け入れるのはページの欠落であり、これは spec の誤りだからだ。閉じ行は `warnings N` で終わる。道具自身の集計で、0 でも印字される。"
       },
       "options": [
         {
@@ -3745,16 +3745,16 @@
         "jsonui-doc validate spec"
       ],
       "verifiedAgainst": {
-        "version": "1.8.52",
+        "version": "1.8.66",
         "columns": 80,
         "python": "3.12",
         "helpHash": "8d2213378834833c04e5f87ef0f9cab721c411dc8ca90ce12caf78a2d085b70b",
-        "cardHash": "514504a00ad8aa73e853f9343e2183029ffd2bf7e9cb00fa4012ce2f0d4642bd",
+        "cardHash": "569bdfd36f276791562f89e73d219786e5529d6d52357658ced118e0e04b42af",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "5cd68944d8a8",
           "synopsis": "7728fa3d0d43",
-          "purpose": "110478995fc4",
+          "purpose": "a2d9c66e315c",
           "options": "1edf5d1c7067",
           "examples": "a15eeff27a4c",
           "seeAlso": "639afb3fa358"
@@ -3795,31 +3795,82 @@
     {
       "binary": "jsonui-doc",
       "command": "generate mermaid",
-      "synopsis": "jsonui-doc generate mermaid <tests dir> [-o <out.html>] [-t <title>] [--layouts-dir <dir>]",
+      "synopsis": "jsonui-doc generate mermaid <tests dir> [-o <out.html>] [-t <title>] [-s <screens dir>] [--specs <spec dir>] [--layouts-dir <dir>]",
       "purpose": {
-        "en": "Draw a Mermaid flow diagram from a tests directory (the one holding `flows/` and `screens/`). Without `-o` the Mermaid source goes to stdout. `--layouts-dir` is what lets it tell screens from Collection cells and partials, so sub-areas are not drawn as screens.",
-        "ja": "テストディレクトリ（`flows/` と `screens/` を持つ方）から Mermaid のフロー図を描く。`-o` を省くと Mermaid ソースを標準出力へ。`--layouts-dir` は画面と Collection セル / partial を見分けるために使われ、これが無いとサブエリアが画面として描かれる。"
+        "en": "Draw the Mermaid flow diagram from the screen SPECS — each spec's `transitions[].destination`, plus `test.appOwnedScreens[].transitions` for a screen with no spec — and check the flow tests under the tests directory against it. Since jsonui-cli 1.8.66; before it the diagram was drawn from the flow tests and a face with none got no diagram. A forward transition a flow test performs that no spec declares is an `ERROR [doc-diagram]:` line and the command exits 1. Without `-o` the Mermaid source goes to stdout. `--layouts-dir` is what lets it tell screens from Collection cells and partials, so sub-areas are not drawn as screens. The diagram needs the classifier from `jui_cli`; where that package cannot be imported the command exits 1.",
+        "ja": "画面 SPEC から Mermaid のフロー図を描き — 各 spec の `transitions[].destination` と、spec を持たない画面のための `test.appOwnedScreens[].transitions` — テストディレクトリ配下の flow test をそれに対して照合する。jsonui-cli 1.8.66 から。それ以前は図が flow test から描かれ、flow test の無い面には図が出なかった。flow test が実行する forward 遷移のうち、どの spec も宣言していないものは `ERROR [doc-diagram]:` の行になり、コマンドは exit 1 で終わる。`-o` を省くと Mermaid ソースを標準出力へ。`--layouts-dir` は画面と Collection セル / partial を見分けるために使われ、これが無いとサブエリアが画面として描かれる。図は `jui_cli` の classifier を必要とし、そのパッケージを import できない環境では exit 1。"
       },
-      "options": [],
-      "examples": [],
+      "options": [
+        {
+          "name": "--specs",
+          "type": "path",
+          "default": "`spec_directory` of the governing jui.config.json",
+          "description": {
+            "en": "The screen spec directory the diagram is drawn from. Flow tests under the input directory are checked against it. Since jsonui-cli 1.8.66.",
+            "ja": "図の描画元となる画面 spec のディレクトリ。入力ディレクトリ配下の flow test はこれに対して照合される。jsonui-cli 1.8.66 から。"
+          }
+        },
+        {
+          "name": "--output",
+          "type": "path",
+          "description": {
+            "en": "Output HTML file path. Short form `-o`. Without it the Mermaid source is written to stdout.",
+            "ja": "出力 HTML ファイルのパス。短縮形は `-o`。省くと Mermaid ソースを標準出力へ書く。"
+          }
+        },
+        {
+          "name": "--title",
+          "type": "string",
+          "default": "Flow Diagram",
+          "description": {
+            "en": "Title of the diagram page. Short form `-t`.",
+            "ja": "図のページのタイトル。短縮形は `-t`。"
+          }
+        },
+        {
+          "name": "--screens",
+          "type": "path",
+          "default": "auto-detected",
+          "description": {
+            "en": "Path to the screens directory. Short form `-s`.",
+            "ja": "screens ディレクトリのパス。短縮形は `-s`。"
+          }
+        },
+        {
+          "name": "--layouts-dir",
+          "type": "path",
+          "default": "auto-detected from jui.config.json",
+          "description": {
+            "en": "Path to the layout tree, used to tell screens from Collection cells and partials so sub-areas are not drawn as screens.",
+            "ja": "layout ツリーのパス。画面と Collection セル / partial を見分けるために使われ、サブエリアが画面として描かれるのを防ぐ。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-doc generate mermaid tests --specs docs/screens/json -o diagram.html\n\n# a flow test that reaches a screen its spec does not declare:\n  ERROR [doc-diagram]: flow test \"checkout\" (flows/checkout.test.json) transitions item_detail -> cart: item_detail's spec declares no transition to cart\n$ echo $?\n1"
+        }
+      ],
       "seeAlso": [
+        "jsonui-doc generate html",
         "jsonui-doc generate doc",
         "jsonui-test generate"
       ],
       "verifiedAgainst": {
-        "version": "1.8.4",
+        "version": "1.8.66",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "949a4551b995e51fd2d9527646c78c2da9c576dec1e420e7a474b252235d0054",
-        "cardHash": "9a81af7080fc558e081f751ad085f49180910fe926e098ab04497072d9e1272b",
+        "helpHash": "94f101eb991d0274f32ba2184fd16f1c49f558cca1cd719e7ad19efc3d0e4d20",
+        "cardHash": "ac97730abe4e75def8b46a6d6f5c6ac9bc175d62f3a2670a72d34228a99e62a1",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "f3c37a660792",
-          "synopsis": "195023231359",
-          "purpose": "5c89b6fd6e28",
-          "options": "357b9e47f539",
-          "examples": "2b8fdc789d3b",
-          "seeAlso": "4aac47ecabee"
+          "synopsis": "3a277da0f420",
+          "purpose": "b0db192e68c3",
+          "options": "58217bcdbcd1",
+          "examples": "1fcbb30b3b4a",
+          "seeAlso": "a61c3ad14d37"
         }
       }
     },
