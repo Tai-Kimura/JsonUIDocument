@@ -67,7 +67,7 @@ jobs:
   # version's help. The second half never judges whether a card is right, only
   # whether it was read; unstamped cards are counted, never red.
   #
-  # All seventeen gates run even when one fails, so a red run names everything that
+  # All eighteen gates run even when one fails, so a red run names everything that
   # is red, and every gate prints its own exit code — a gate that could not
   # run must not read as a gate that passed.
   gates:
@@ -151,7 +151,7 @@ jobs:
         working-directory: jsonui-doc-web
         run: npm run prebuild
 
-      - name: Run the seventeen gates (enforcing — a red one stops the deploy)
+      - name: Run the eighteen gates (enforcing — a red one stops the deploy)
         run: |
           set +e
           fail=0
@@ -334,6 +334,20 @@ jobs:
           # sentences. Resolution stops at the first leaf, so `jsonui-doc check
           # db` passes with `db` as the positional filter it is.
           run_gate cli-invocations        npm --prefix jsonui-doc-web run check:cli-invocations
+          # And what the ARTICLES claim the library does. Until this arm, the
+          # gates read flags, invocations and output shapes — never a sentence
+          # asserting that `external browser` in lower case does not match. The
+          # vocabulary exists in ONE place in the implementation and the article
+          # is a second copy of it, made by hand; second copies diverge. This
+          # runs the article's assertions against the PINNED classifier, so the
+          # copy is answerable to the original on every deploy.
+          # A red here means a published sentence is now false, and it names the
+          # sentence: every claim is anchored to the text it backs, and a
+          # rewritten paragraph fails loudly rather than leaving the check
+          # guarding words nobody publishes. Verified against a simulated next
+          # release (English `none` + IGNORECASE): it reddens and names both the
+          # en and ja paragraphs.
+          run_gate article-claims         npm --prefix jsonui-doc-web run check:article-claims
           # The committed rjui_tools must BE what the pinned toolchain syncs.
           # `jui sync_tool` resolves its source as $JSONUI_CLI_PATH > ~/.jsonui-cli
           # (measured 2026-09-03 with a control pair: env set to 1.8.5 while the
@@ -368,7 +382,7 @@ jobs:
             fi
             echo "the committed vendored tree matches the pin, file for file"'
           echo "----"
-          echo "gates with a non-zero exit: $fail of 17"
+          echo "gates with a non-zero exit: $fail of 18"
           if [ "$fail" -ne 0 ]; then
             echo "FAILING this job: the deploy job depends on it and will not run."
             exit 1
