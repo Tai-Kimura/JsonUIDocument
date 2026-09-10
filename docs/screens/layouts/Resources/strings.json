@@ -3725,8 +3725,8 @@
       "ja": "5a. 検証"
     },
     "step5a_body": {
-      "en": "Before spending time on generation, run the schema validator. jui doc validate has two sub-commands: spec (for screen_spec.json files) and component (for component_spec.json files under docs/components/). Exit code 0 means the spec's shape is good enough to hand to the generator; exit 1 lists every violation.",
-      "ja": "生成に時間を割く前に、まず schema validator を走らせます。jui doc validate には spec (screen_spec.json 用) と component (docs/components/ 配下の component_spec.json 用) の 2 つのサブコマンドがあります。exit 0 なら shape はジェネレータに渡せる状態、exit 1 なら違反を列挙します。"
+      "en": "Before spending time on generation, run the schema validator. `jsonui-doc validate` has two sub-commands: spec (for screen_spec.json files) and component (for component_spec.json files under docs/components/). Each takes the file as a positional argument — there is no `--file`. Exit code 0 means the spec's shape is good enough to hand to the generator; exit 1 lists every violation.",
+      "ja": "生成に時間を割く前に、まず schema validator を走らせます。`jsonui-doc validate` には spec (screen_spec.json 用) と component (docs/components/ 配下の component_spec.json 用) の 2 つのサブコマンドがあります。ファイルは位置引数で渡します — `--file` はありません。exit 0 なら shape はジェネレータに渡せる状態、exit 1 なら違反を列挙します。"
     },
     "step5b_heading": {
       "en": "5b. Generate",
@@ -8435,8 +8435,8 @@
       "ja": "2. コンポーネント spec"
     },
     "section_spec_body": {
-      "en": "The spec lists every prop (name, type, default, description), every exposed event, and — if it can contain children — the allowed slots. `jui doc init component --name Foo` scaffolds a skeleton; `jui doc validate component --file …` confirms the shape. One file, three readers: MCP agents consume it to plan work, the docs generator renders it to the reference page, the scaffolder emits the converter from it. Keep it honest — there is no second source of truth.",
-      "ja": "spec は全 prop (name, type, default, description) と露出イベント、子を持てるなら allowed slots を列挙します。`jui doc init component --name Foo` で skeleton を生成、`jui doc validate component --file …` で shape を確認。1 ファイルに 3 人の読者: MCP エージェントは作業計画に、docs ジェネレータは reference ページ描画に、scaffolder は converter 生成に使います。これ以外に source of truth は無いので、正直に保ってください。"
+      "en": "The spec lists every prop (name, type, default, description), every exposed event, and — if it can contain children — the allowed slots. `jsonui-doc init component Foo` scaffolds a skeleton; `jsonui-doc validate component <file>` confirms the shape. One file, three readers: MCP agents consume it to plan work, the docs generator renders it to the reference page, the scaffolder emits the converter from it. Keep it honest — there is no second source of truth.",
+      "ja": "spec は全 prop (name, type, default, description) と露出イベント、子を持てるなら allowed slots を列挙します。`jsonui-doc init component Foo` で skeleton を生成、`jsonui-doc validate component <file>` で shape を確認。1 ファイルに 3 人の読者: MCP エージェントは作業計画に、docs ジェネレータは reference ページ描画に、scaffolder は converter 生成に使います。これ以外に source of truth は無いので、正直に保ってください。"
     },
     "section_identity_heading": {
       "en": "3. Identity: metadata.name, and nothing else",
