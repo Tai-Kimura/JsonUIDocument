@@ -411,6 +411,14 @@
 <td>-</td>
 <td>-</td>
 </tr>
+<tr data-row-id="1-1-2-1-3-5" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+</tr>
 <tr data-row-id="1-1-2-1-4" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_declare</code></td>
@@ -739,6 +747,7 @@ diagram_from_specs_root
 <h2>Notes</h2>
 <ul>
 <li>2026-09-10 - Page created on the release that changed the rule, jsonui-cli 1.8.66, as the first article of a new top-level section. Every claim is taken from the library&#x27;s own canon (`shared/core/screen_identity.json`, `diagram` section) and from the upstream release record, with the reporting projects&#x27; names, screen names and per-project counts left out; the four unresolved rates quoted in section 6 are the canon&#x27;s own figures. Three things on the page were checked against the shipped 1.8.66 tree rather than transcribed: the kind the classifier assigns to each example destination, the field names of an `appOwnedScreens` object entry, and the format of the `ERROR [doc-diagram]:` line and the closing `warnings N` line. This site does not run `generate html` or `generate mermaid` itself, so the exit-1 behaviour is stated from the canon&#x27;s `flowTestCheck.severity` and the upstream acceptance, not from a run here — the site&#x27;s own gates regenerate spec and component documents only.</li>
+<li>2026-09-10 - Updated for jsonui-cli 1.8.67, which changed three things this page describes. Section 3 gains the id-collision paragraph: two raw ids that normalize alike are one screen to the classifier, the winner is now decided by provenance (layout id, then an app-owned declaration, then a spec&#x27;s file name) instead of by iteration order, and the pair is named in a WARNING. Section 7 gains the screen spec&#x27;s own `metadata.group` as a group source, with the order test &gt; spec &gt; app-owned, the `sg_` namespace on the All tab&#x27;s subgraph ids, and the two clauses the closing line can now carry. What was RUN against the shipped 1.8.67 tree rather than transcribed: the collision WARNING, in both of its shapes (the site run prefixes the owner and advises a rename; `generate mermaid` prints the short form) - a first draft would have shown the site&#x27;s wording for the standalone command; that a `metadata.group` list puts one screen in EVERY tab it names; the `sg_` prefix and the relative `Back to Index` link, read out of the generated HTML; and both closing-line clauses, the structural one from a run that writes outside -o and the gate-expression one from a run whose shared document slot echoed two token-bearing test names - the line quoted in section 7 is that run&#x27;s, unedited. What was READ rather than run: the precedence between the three group sources, which comes from the generator&#x27;s own source and its test suite (10 of those tests were executed here and pass at 1.8.67), and the count of faces whose All tab could not be drawn before the `sg_` change, which is upstream&#x27;s and is not repeated on the page.</li>
 </ul>
 </section>
 </div>
