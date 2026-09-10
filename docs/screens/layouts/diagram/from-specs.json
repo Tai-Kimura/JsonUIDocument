@@ -1,0 +1,207 @@
+{
+  "type": "View",
+  "id": "diagram_from_specs_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks", "class": "CollectionDataSource" },
+        { "name": "onNavigateDiagram", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "diagram_from_specs_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "diagram_from_specs_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 24, 32],
+          "child": [
+            { "type": "Label", "height": "wrapContent", "width": "wrapContent", "fontSize": 13, "fontWeight": "semibold", "fontColor": "#64748B", "tapBackground": "#F3F4F6", "onClick": "@{onNavigateDiagram}", "text": "breadcrumb" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 36, "fontWeight": "bold", "fontColor": "#0B1220", "text": "title" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 16, "fontSize": 17, "fontColor": "#475467", "text": "lead" },
+            { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 13, "fontColor": "#64748B", "text": "read_time" }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "diagram_from_specs_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "diagram_from_specs_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_source", "width": "matchParent", "height": "wrapContent", "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_source_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_source_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_source_rule" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_source_why" }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_kinds", "width": "matchParent", "height": "wrapContent", "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_kinds_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_kinds_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_kinds_bullet_screen" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 8, "fontSize": 14, "fontColor": "#475467", "text": "section_kinds_bullet_route" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 8, "fontSize": 14, "fontColor": "#475467", "text": "section_kinds_bullet_external" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 8, "fontSize": 14, "fontColor": "#475467", "text": "section_kinds_bullet_none" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 8, "fontSize": 14, "fontColor": "#475467", "text": "section_kinds_bullet_back" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 8, "fontSize": 14, "fontColor": "#475467", "text": "section_kinds_bullet_unknown" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_kinds_note" },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 12,
+                      "code": "\"transitions\": [\n  { \"condition\": \"tap a row\",             \"destination\": \"ItemDetail\" },\n  { \"condition\": \"tap 'Terms of use'\",    \"destination\": \"External Browser\" },\n  { \"condition\": \"switch the filter tab\", \"destination\": \"遷移なし（タブ切替）\" },\n  { \"condition\": \"tap 'Close'\",           \"destination\": \"dismiss\" },\n  { \"condition\": \"tap 'Help'\",            \"destination\": \"/help\" }\n]",
+                      "language": "json",
+                      "filename": "ItemListScreen.spec.json — five kinds in one column: screen, external, none, back, route",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_resolve", "width": "matchParent", "height": "wrapContent", "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_resolve_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_resolve_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_resolve_multiple" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_resolve_when" }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_declare", "width": "matchParent", "height": "wrapContent", "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_declare_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_declare_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_declare_appowned" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_declare_scope" },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 12,
+                      "code": "{\n  \"spec\": {\n    \"transitionAliases\": [\n      { \"position\": \"prefix\", \"affix\": \"Web\" },\n      { \"position\": \"suffix\", \"affix\": \"画面\" },\n      { \"position\": \"suffix\", \"affix\": \"View\" }\n    ]\n  },\n  \"test\": {\n    \"appOwnedScreens\": [\n      \"splash\",\n      { \"id\": \"account_chooser\", \"group\": \"entry\",\n        \"transitions\": [\n          { \"condition\": \"an account is picked\", \"destination\": \"Home\" },\n          { \"condition\": \"tap 'Cancel'\",         \"destination\": \"back\" }\n        ] }\n    ]\n  }\n}",
+                      "language": "json",
+                      "filename": "jui.config.json — the two declaration points; a bare id and the object form side by side",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_check", "width": "matchParent", "height": "wrapContent", "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_check_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_check_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_check_exempt" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_check_report" },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 12,
+                      "code": "  ERROR [doc-diagram]: MyApp: flow test \"checkout\" (flows/checkout.test.json) transitions item_detail -> cart: item_detail's spec declares no transition to cart; 1 of its destination(s) could not be resolved and count as absent: 'Basket'\n  ERROR [doc-diagram]: MyApp: flow test \"first_run\" (flows/first_run.test.json) transitions splash -> home: the app-owned screen splash declares no transition to home (jui.config.json test.appOwnedScreens[].transitions)",
+                      "language": "text",
+                      "filename": "generate html — the line shape, with illustrative values: two of the three reasons, the first naming the likely fix",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_absent", "width": "matchParent", "height": "wrapContent", "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_absent_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_absent_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_absent_none" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_absent_perface" }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_page", "width": "matchParent", "height": "wrapContent", "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_page_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_page_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_page_ungrouped" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_page_closing" },
+                    {
+                      "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 12,
+                      "code": "    diagram MyApp: specs 11 / transitions 24 / spec edges 21 (all in the All tab) / none inferred from wording 1 / flow tests 14 in tests/flows (declared test root) checked 14 transition(s), absent 0\nGenerated 63 HTML files (screens 11 / flows 14 / unitContracts not read / warnings 1)",
+                      "language": "text",
+                      "filename": "generate html — the per-owner diagram line and the closing line; shapes from the shipped source, values illustrative",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "section_limits", "width": "matchParent", "height": "wrapContent", "paddings": [24, 32, 24, 32], "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_limits_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_limits_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_limits_vocab" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_limits_pip" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_limits_floor" }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "diagram_from_specs_next", "width": "matchParent", "height": "wrapContent", "paddings": [32, 32, 32, 32], "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 24, "fontWeight": "bold", "fontColor": "chrome_ink", "text": "next_heading" },
+                    { "type": "Collection", "id": "diagram_from_specs_next_collection", "width": "matchParent", "height": "wrapContent", "topMargin": 20, "columnCount": 3, "lineSpacing": 16, "itemSpacing": 16, "lazy": "none", "scrollEnabled": false, "items": "@{nextReadLinks}", "cellIdProperty": "id", "sections": [ { "cell": "cells/next_step_card" } ] }
+                  ]
+                },
+                {
+                  "type": "View", "orientation": "vertical", "id": "diagram_from_specs_footer", "width": "matchParent", "height": "wrapContent", "paddings": [24, 32, 32, 32], "background": "chrome_fill",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 12, "fontColor": "#94A3B8", "text": "footer_copyright" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "diagram_from_specs_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [24, 16, 24, 16],
+              "child": [
+                {
+                  "type": "View", "orientation": "vertical", "id": "diagram_from_specs_toc_wrap", "width": "matchParent", "height": "wrapContent", "paddings": [24, 32, 0, 32], "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents", "width": "matchParent", "height": "wrapContent", "title": "toc_title", "sticky": true, "maxDepth": 1,
+                      "items": [
+                        { "id": "toc_source",  "label": "toc_row_source",  "anchor": "section_source",  "level": 1 },
+                        { "id": "toc_kinds",   "label": "toc_row_kinds",   "anchor": "section_kinds",   "level": 1 },
+                        { "id": "toc_resolve", "label": "toc_row_resolve", "anchor": "section_resolve", "level": 1 },
+                        { "id": "toc_declare", "label": "toc_row_declare", "anchor": "section_declare", "level": 1 },
+                        { "id": "toc_check",   "label": "toc_row_check",   "anchor": "section_check",   "level": 1 },
+                        { "id": "toc_absent",  "label": "toc_row_absent",  "anchor": "section_absent",  "level": 1 },
+                        { "id": "toc_page",    "label": "toc_row_page",    "anchor": "section_page",    "level": 1 },
+                        { "id": "toc_limits",  "label": "toc_row_limits",  "anchor": "section_limits",  "level": 1 }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

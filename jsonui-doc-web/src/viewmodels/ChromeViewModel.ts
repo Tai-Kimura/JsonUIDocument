@@ -54,7 +54,7 @@ interface SidebarSection {
  * post-mount useEffect instead.
  */
 const NAV_CATALOG: ReadonlyArray<{
-  id: "learn" | "concepts" | "spec" | "guides" | "reference" | "platforms" | "tools";
+  id: "learn" | "concepts" | "spec" | "guides" | "reference" | "platforms" | "tools" | "diagram";
   iconName: string;
   labelEn: string;
   entries: ReadonlyArray<{ id: string; titleKey: string; titleEn: string; url: string; platforms?: PlatformCode[] }>;
@@ -167,6 +167,17 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "test-runner", titleKey: "tools_test_runner_title", titleEn: "jsonui-test-runner",        url: "/tools/test-runner" },
       { id: "agents",      titleKey: "tools_agents_title",      titleEn: "Agents for Claude / Codex", url: "/tools/agents" },
       { id: "helper",      titleKey: "tools_helper_title",      titleEn: "jsonui-helper (VS Code)",   url: "/tools/helper" },
+    ],
+  },
+  {
+    // Flow diagram section — its own top-level menu, added 2026-09-10 on
+    // jsonui-cli 1.8.66, the release that made the diagram a statement about
+    // the specs rather than about the flow tests. One article today.
+    id: "diagram",
+    iconName: "diagram",
+    labelEn: "Flow diagram",
+    entries: [
+      { id: "from-specs", titleKey: "diagram_from_specs_title", titleEn: "Drawn from the specs, checked against the flow tests", url: "/diagram/from-specs" },
     ],
   },
 ];

@@ -9995,6 +9995,10 @@
     "nav_tools_label": {
       "en": "Tools",
       "ja": "ツール"
+    },
+    "nav_diagram_label": {
+      "en": "Flow diagram",
+      "ja": "フロー図"
     }
   },
   "reference_jui_config": {
@@ -11847,6 +11851,266 @@
     "toc_row_when": {
       "en": "7. When not to use a mark",
       "ja": "7. 使わない方がよい場面"
+    }
+  },
+  "diagram_index": {
+    "eyebrow": {
+      "en": "Flow diagram",
+      "ja": "Flow diagram"
+    },
+    "headline": {
+      "en": "The flow diagram",
+      "ja": "フロー図"
+    },
+    "subcopy": {
+      "en": "Where the screen-transition diagram comes from, what it checks, and how to read it. One article today, written on the release that changed the rule; the section grows with the mechanism.",
+      "ja": "画面遷移図がどこから描かれ、何を照合し、どう読むか。今日は 1 本、規則が変わったリリースに合わせて書いています。仕組みが育つのに合わせてこのセクションも増えます。"
+    },
+    "catalog_heading": {
+      "en": "Articles",
+      "ja": "一覧"
+    },
+    "catalog_subheading": {
+      "en": "Each article covers the mechanism as shipped, with its claims checked against that release.",
+      "ja": "各記事は出荷された仕組みをそのまま扱い、主張はそのリリースに対して検算しています。"
+    }
+  },
+  "diagram_from_specs": {
+    "breadcrumb": {
+      "en": "Flow diagram",
+      "ja": "フロー図"
+    },
+    "title": {
+      "en": "Drawn from the specs, checked against the flow tests",
+      "ja": "spec から描き、flow test で照合する"
+    },
+    "lead": {
+      "en": "Since jsonui-cli 1.8.66 the screen-transition diagram is drawn from one source — what each screen spec declares under `transitions[].destination` — and the flow tests are checked against it rather than drawn from. A forward transition a flow test performs that no spec declares is an error: `jsonui-doc generate html` still writes every page, prints one `ERROR [doc-diagram]:` line per transition, and exits 1. This page covers the rule and why it replaced the old one, the closed vocabulary a destination can belong to, how prose becomes a screen id, the two places a face declares what a spec cannot, what the check accepts, what is listed without being an error, how to read the page, and what the mechanism does not do.",
+      "ja": "jsonui-cli 1.8.66 から、画面遷移図の出所は 1 つになりました — 各画面 spec が `transitions[].destination` に宣言しているもの — そして flow test はそこから描かれるのではなく、それに対して照合されます。flow test が実行する forward 遷移のうち、どの spec も宣言していないものはエラーです: `jsonui-doc generate html` は全ページを書いたうえで、遷移ごとに `ERROR [doc-diagram]:` を 1 行印字し、exit 1 で終わります。このページでは、規則と旧規則を置き換えた理由、destination が属し得る閉じた語彙、散文が画面 id になるまで、spec には書けないものを面が宣言する 2 つの場所、照合が受理するもの、列挙はされるがエラーではないもの、ページの読み方、そしてこの仕組みが与えないものを扱います。"
+    },
+    "read_time": {
+      "en": "9 min read",
+      "ja": "9 分で読めます"
+    },
+    "section_source_heading": {
+      "en": "1. One source, and a check",
+      "ja": "1. 出所は 1 つ、flow test は照合"
+    },
+    "section_source_body": {
+      "en": "Before 1.8.66 the diagram was drawn from the flow tests, so a face with no flow tests got a page saying `No flow tests found` however many specs it held. The canon had declared two sources — the flow tests' screen values and the specs' `transitions[].destination` — but the generator read only the first, and nothing failed, because a declaration with no reader is a sentence rather than a rule. Measured on the way to this release: the number of places in the document generator that read spec transitions was zero.",
+      "ja": "1.8.66 より前、図は flow test から描かれていました。だから flow test を持たない面は、spec を何本持っていても `No flow tests found` と書かれたページを受け取っていました。canon は出所を 2 つ宣言していました — flow test の screen 値と、spec の `transitions[].destination` — が、生成器が読んでいたのは前者だけで、しかも何も落ちませんでした。読み手のない宣言は規則ではなく文だからです。このリリースに向かう途中で測った値: ドキュメント生成器の中で spec の transitions を読んでいる箇所は 0 でした。"
+    },
+    "section_source_rule": {
+      "en": "Since 1.8.66 there is one source. The diagram is drawn from the specs — every screen spec's `transitions[].destination`, plus `test.appOwnedScreens[].transitions` for a screen that has no spec — and the flow tests are the check. They are still walked (resolve, canonicalize, collapse consecutive duplicates, build edges), but the result is compared with what the specs declare rather than drawn. A face with no flow tests gets a diagram anyway; a face whose flow tests wander outside its specs gets errors that name the wandering.",
+      "ja": "1.8.66 からは出所が 1 つです。図は spec から描かれます — 各画面 spec の `transitions[].destination` と、spec を持たない画面のための `test.appOwnedScreens[].transitions` — そして flow test は照合役です。flow test は今も歩かれます（解決 → 正規化 → 連続する重複の畳み込み → 辺の構築）が、その結果は描かれるのではなく、spec の宣言と比較されます。flow test の無い面にも図が出ます。flow test が spec の外へはみ出す面には、はみ出しを名指しするエラーが出ます。"
+    },
+    "section_source_why": {
+      "en": "The check is an error and not a warning because of the direction of the mistake. A flow test that reaches a screen no spec declares is either a test of behaviour the product does not have, or a spec that is silent about a transition the product does have. Both are wrong specs in a spec-first project, and a diagram that quietly drew the test's version would have been the tool taking the test's side.",
+      "ja": "照合が warning でなく error なのは、誤りの向きのためです。どの spec も宣言していない画面に到達する flow test は、製品に無い挙動のテストか、製品にある遷移について沈黙している spec か、どちらかです。spec-first のプロジェクトではどちらも「誤った spec」であり、テスト側の版を黙って描く図は、道具がテストの肩を持つことになります。"
+    },
+    "section_kinds_heading": {
+      "en": "2. What a destination can be",
+      "ja": "2. destination が取り得る種類"
+    },
+    "section_kinds_body": {
+      "en": "A spec's `transitions[].destination` is free prose — the validator has only ever required that the key exist — so one column holds several kinds of value. Rather than treat everything that is not a screen id as a defect, the classifier assigns each destination one of a closed set of kinds, and each kind draws differently.",
+      "ja": "spec の `transitions[].destination` は自由な散文です — validator が要求してきたのはキーの存在だけです — ので、1 つの列に何種類もの値が入っています。画面 id でないものをすべて欠陥として扱う代わりに、classifier は各 destination に閉じた集合の中の 1 種類を割り当て、種類ごとに描き方が違います。"
+    },
+    "section_kinds_bullet_screen": {
+      "en": "• `screen` — resolves to a screen id in this face's id space. Draws a node and an edge.",
+      "ja": "• `screen` — この面の id 空間の画面 id に解決する。ノードと辺を描く。"
+    },
+    "section_kinds_bullet_route": {
+      "en": "• `route` — a URL path owned by a web router, such as `/admin/login`. Draws nothing until the route is mapped to a screen; until then it is listed with the unknowns and treated as absent.",
+      "ja": "• `route` — web ルータが持つ URL パス。`/admin/login` など。ルートが画面に対応づけられるまでは何も描かず、それまでは unknown と並べて列挙され、「無い」扱いになる。"
+    },
+    "section_kinds_bullet_external": {
+      "en": "• `external` — leaves the app entirely: an `https://`, `tel:` or `mailto:` value, `External Browser`, `Phone app`, a maps app, a mailer. Draws a terminal node, never a screen.",
+      "ja": "• `external` — アプリの外へ出る: `https://`・`tel:`・`mailto:` の値、`External Browser`、`Phone app`、地図アプリ、メーラー。終端ノードを描き、画面としては描かない。"
+    },
+    "section_kinds_bullet_none": {
+      "en": "• `none` — declares that no screen transition happens: an in-page tab switch, a state change, staying on the same screen. Draws nothing. This is a positive declaration, not a missing value.",
+      "ja": "• `none` — 画面遷移が起きないことを宣言する: ページ内のタブ切替、状態変化、同じ画面に留まる。何も描かない。これは肯定的な宣言であって、値の欠落ではない。"
+    },
+    "section_kinds_bullet_back": {
+      "en": "• `back` — returns through the navigation stack: `back`, `dismiss`, `pop`, `previous screen`. Draws a dotted return edge to every screen that has a forward edge into the declaring screen, derived from the specs.",
+      "ja": "• `back` — ナビゲーションスタックを戻る: `back`、`dismiss`、`pop`、`previous screen`。宣言元の画面へ forward 辺を持つすべての画面に向けて、点線の戻り辺を描く。spec から導出される。"
+    },
+    "section_kinds_bullet_unknown": {
+      "en": "• `unknown` — none of the above matched. Draws nothing, and is counted and listed per face with the raw value and the reason.",
+      "ja": "• `unknown` — 上のどれにも当たらなかった。何も描かず、面ごとに生の値と理由つきで数えられ、列挙される。"
+    },
+    "section_kinds_note": {
+      "en": "The vocabulary exists so that a destination which is not a screen id stops being reported as a defect. Declaring only `screen` would have turned 119 of the 271 destinations measured across four faces into spec errors when they were other kinds of transition — a reporting gap becoming a rejection of correct input, which is the worse direction. The block below classifies as `screen`, `external`, `none`, `back` and `route`, in that order, checked against the shipped 1.8.66 classifier rather than written from the description.",
+      "ja": "この語彙は、画面 id でない destination が欠陥として報告されるのをやめるために在ります。`screen` だけを宣言していたら、4 つの面で測った 271 の destination のうち 119 が spec エラーになっていました — 実際には別の種類の遷移なのに。報告の欠落が正しい入力の拒否に化ける、より悪い向きです。下のブロックは上から順に `screen`・`external`・`none`・`back`・`route` に分類されます。説明文から書いたのではなく、出荷された 1.8.66 の classifier に対して確認しています。"
+    },
+    "section_resolve_heading": {
+      "en": "3. How prose becomes a screen id",
+      "ja": "3. 散文が画面 id になるまで"
+    },
+    "section_resolve_body": {
+      "en": "Resolution is a pipeline applied in order, and every step lives in one place rather than at a call site — a rule that lives at one call site is absent from the other two. First, compare case-insensitively with whitespace, `_` and `-` removed. Then strip a trailing parenthetical, full-width or half-width, counting depth rather than matching a pattern: a flat pattern consumes up to the inner close of `Name (a=b / onNavigate(Screen.X))`, leaves the outer one, and produces a candidate that resolves to nothing — measured on five nested destinations, three of which were unresolvable for that reason alone. Then split on ` or `, `/` and `、` and try each part. Then apply the face's declared aliases.",
+      "ja": "解決は順に適用されるパイプラインで、各段は呼び出し側ではなく 1 か所に住んでいます — 1 つの呼び出し側に住む規則は、残り 2 つの呼び出し側には無いからです。まず、大文字小文字を無視し、空白・`_`・`-` を除いて比較します。次に末尾の括弧書きを、全角でも半角でも、パターン一致ではなく深さを数えて剥がします: 平坦なパターンは `Name (a=b / onNavigate(Screen.X))` の内側の閉じ括弧までを飲み込み、外側を残し、何にも解決しない候補を作ります — 入れ子になった 5 つの destination で測ると、そのうち 3 つはこの理由だけで未解決でした。次に ` or `・`/`・`、` で分割し、各片を試します。最後に、面が宣言した alias を適用します。"
+    },
+    "section_resolve_multiple": {
+      "en": "A destination whose split parts resolve to more than one screen — `ItemDetail or Cart（depends on source）` — declares a transition to each: the classifier returns the first match, and the diagram asks for the parts and classifies every one. A parent spec carries no transitions of its own; its sub specs do, and the diagram merges them under the parent's screen id. Reading the parent alone produced false errors for dozens of flow tests on the face where this was measured.",
+      "ja": "分割した片が 2 つ以上の画面に解決する destination — `ItemDetail or Cart（depends on source）` — は、それぞれへの遷移を宣言します: classifier は最初の一致を返し、図は片を取り出して全部を分類します。親 spec は自分の transitions を持たず、sub spec が持ちます。図はそれらを親の画面 id の下に併合します。親だけを読むと、これを測った面では数十本の flow test に偽のエラーが出ました。"
+    },
+    "section_resolve_when": {
+      "en": "For the check, a flow test runs once per context. A step gated by `when.platform` or `when.responsive` — any `when` key with a string or list-of-strings value — runs only in its own, so two sibling steps gated ios and android are never consecutive. The sequence is built once per combination of the `when` values the flow uses and the edges are the union. Measured before this was fixed: three invented transitions on one face.",
+      "ja": "照合のうえでは、flow test はコンテキストごとに 1 回走ります。`when.platform` や `when.responsive` — 文字列か文字列の配列を値に持つ任意の `when` キー — で条件づけられた step は自分のコンテキストでしか走らないので、ios と android で条件づけられた兄弟 step が連続することはありません。列は flow が使う `when` の値の組み合わせごとに作られ、辺はその和集合です。直す前に測った値: ある面で 3 本の、実際には存在しない遷移。"
+    },
+    "section_declare_heading": {
+      "en": "4. Two things a spec cannot say",
+      "ja": "4. spec には書けない 2 つのこと"
+    },
+    "section_declare_body": {
+      "en": "Two declaration points live in `jui.config.json`, because the spec is the wrong place for both. `spec.transitionAliases` declares an affix the face's prose habitually attaches to a screen name — a `prefix` or a `suffix` — so that `WebLogin`, or `Web Login`, resolves to `login`, and `CartView` to `cart`. Each entry is `{ position, affix }`, and a `position` outside those two is refused: the run fails naming the entry. It is never skipped, because an alias that silently does not fire looks exactly like a face that declared nothing.",
+      "ja": "宣言口は 2 つ、どちらも `jui.config.json` に在ります。spec はどちらにとっても置き場所として誤りだからです。`spec.transitionAliases` は、面の散文が画面名に習慣的に付ける接辞 — `prefix` か `suffix` — を宣言します。これで `WebLogin` も `Web Login` も `login` に、`CartView` は `cart` に解決します。各項目は `{ position, affix }` で、その 2 つ以外の `position` は拒否されます: 実行は項目を名指しして失敗します。読み飛ばされることはありません。黙って発火しない alias は、何も宣言していない面と見分けがつかないからです。"
+    },
+    "section_declare_appowned": {
+      "en": "`test.appOwnedScreens[].transitions` declares transitions for a screen that has no spec — an app-owned screen, with no layout and no spec to write them in. Without it, every flow test that leaves such a screen would be an error with nowhere to put the fix. An entry may still be a bare id; the object form is `{ \"id\", \"group\", \"transitions\" }`, and each transition is the same `{ condition, destination }` a spec carries, classified by the same classifier.",
+      "ja": "`test.appOwnedScreens[].transitions` は、spec を持たない画面 — layout も spec も無い、アプリ側が持つ画面 — の遷移を宣言します。これが無いと、そういう画面から出ていく flow test はすべてエラーになり、直しを書く場所がありません。項目は今までどおり id だけでも書けます。オブジェクト形は `{ \"id\", \"group\", \"transitions\" }` で、各遷移は spec が持つのと同じ `{ condition, destination }` であり、同じ classifier で分類されます。"
+    },
+    "section_declare_scope": {
+      "en": "Aliases are per face, and the reason is worth stating precisely because the counts could not decide it. Applying an affix to all four measured faces unconditionally changed not one count — the other faces resolved nothing either way, because they had no id that matched after the strip, so the corpus cannot tell a per-face declaration from a global rule. What can be measured is how close a global rule is to going wrong: an id that begins with the affix already exists in the corpus, and stripping it yields a name that is nobody's screen today. The distance is one id. Per face because of that, and not because the numbers said so.",
+      "ja": "alias は面ごとです。その理由は、数では決められなかったからこそ正確に書いておく価値があります。ある接辞を測った 4 面すべてに無条件で適用しても、数は 1 つも変わりませんでした — 他の面は剥がした後に一致する id を持っていないので、どちらにせよ何も解決しません。つまりコーパスは、面ごとの宣言と全体規則を区別できません。測れるのは、全体規則がどれだけ誤りに近いかです: その接辞で始まる id はコーパスに既に在り、接辞を剥がすと、今日は誰の画面でもない名前になります。距離は id 1 つ分です。面ごとにしたのはそのためで、数がそう言ったからではありません。"
+    },
+    "section_check_heading": {
+      "en": "5. What the check accepts",
+      "ja": "5. 照合が受理するもの"
+    },
+    "section_check_body": {
+      "en": "Every forward transition a flow test performs — consecutive distinct screens after resolve, canonicalize and collapse — must be an edge the specs declare. Two shapes qualify: a forward edge, or the return edge derived from a `back` declaration. The second is what makes sheets work: a flow that leaves a sheet by tapping save and lands on its opener performs that return as a forward step, and the sheet's spec declared `dismiss`, not the opener's name. The return edge derived from `dismiss` — to every screen with a forward edge into the sheet — is the edge that step is checked against.",
+      "ja": "flow test が実行するすべての forward 遷移 — 解決・正規化・畳み込みの後で連続する、相異なる画面 — は、spec が宣言する辺でなければなりません。受理される形は 2 つ: forward 辺か、`back` 宣言から導出された戻り辺です。後者は sheet のために在ります: 保存をタップして sheet を離れ、開いた元の画面に着地する flow は、その戻りを forward step として実行しますが、sheet の spec が宣言したのは `dismiss` であって、開いた元の画面名ではありません。`dismiss` から導出された戻り辺 — sheet へ forward 辺を持つすべての画面へ向かう辺 — が、その step が照合される相手です。"
+    },
+    "section_check_exempt": {
+      "en": "Back steps, action `back`, are exempt. A return through the stack is the inverse of a transition the check already saw, and a spec's `back` declaration has no target to compare with.",
+      "ja": "back step — action が `back` の step — は照合の対象外です。スタックを戻ることは照合が既に見た遷移の逆向きであり、spec の `back` 宣言には比較する向き先がありません。"
+    },
+    "section_check_report": {
+      "en": "Each error names the owner, the flow test's name and file, the from screen, the to screen, and one of three reasons: the from screen has no spec; its spec declares no transition to that screen; or the app-owned screen declares none in `test.appOwnedScreens[].transitions`. When the from screen also has destinations the classifier could not resolve, the line lists them, because that is usually the fix. A count without the list is not a report. `generate html` writes every page first — the diagram page carries the same list — then prints one `ERROR [doc-diagram]:` line per transition and exits 1. `--allow-partial` does not cover it: that flag accepts a missing page, and this is a wrong spec. `generate mermaid` exits 1 the same way.",
+      "ja": "各エラーは、owner、flow test の名前とファイル、遷移元の画面、遷移先の画面、そして 3 つの理由のうち 1 つを名指しします: 遷移元に spec が無い、その spec がその画面への遷移を宣言していない、あるいは app-owned な画面が `test.appOwnedScreens[].transitions` に宣言していない。遷移元に classifier が解決できなかった destination もあるときは、行がそれらを列挙します。たいていはそれが直しだからです。一覧の無い件数は報告ではありません。`generate html` はまず全ページを書き — 図のページにも同じ一覧が載ります — それから遷移ごとに `ERROR [doc-diagram]:` を 1 行印字し、exit 1 で終わります。`--allow-partial` はこれを覆いません: あのフラグが受け入れるのはページの欠落であり、これは spec の誤りです。`generate mermaid` も同じく exit 1 です。"
+    },
+    "section_absent_heading": {
+      "en": "6. Listed, not failed",
+      "ja": "6. 列挙されるが、失敗ではないもの"
+    },
+    "section_absent_body": {
+      "en": "A destination the classifier cannot resolve — kind `unknown`, or a `route` with no mapping — is treated as absent. It is not drawn, it is not an error by itself, and it is listed per face with the raw value and the reason the classifier gave. It becomes an error only when a flow test performs the transition the unresolved destination was meant to declare, and then the error names the unresolved destinations on that source.",
+      "ja": "classifier が解決できない destination — 種類が `unknown`、または対応づけの無い `route` — は「無い」ものとして扱われます。描かれず、それ自体はエラーでもなく、面ごとに生の値と classifier が返した理由つきで列挙されます。エラーになるのは、その未解決 destination が宣言するはずだった遷移を flow test が実際に行ったときだけで、そのときのエラーは遷移元にある未解決 destination を名指しします。"
+    },
+    "section_absent_none": {
+      "en": "A `none` inferred from wording is counted on the closing line as `none inferred from wording N` and listed on the diagram page under INFO, separately from the unknowns, so a positive declaration of no transition can be told from a destination the classifier gave up on. A flow group with no spec directory anywhere gets one `WARNING [doc-diagram]` naming how many flow test files went unchecked, and no diagram: absence of the directory is a configuration state, not a spec omission.",
+      "ja": "文言から推定された `none` は、閉じ行に `none inferred from wording N` として数えられ、図のページでは INFO として unknown とは別に列挙されます。遷移が無いという肯定的な宣言と、classifier が諦めた destination を区別するためです。spec ディレクトリがどこにも無い flow group には、照合されなかった flow test ファイルの数を名指しする `WARNING [doc-diagram]` が 1 本出て、図は出ません: ディレクトリの不在は設定の状態であって、spec の書き漏らしではないからです。"
+    },
+    "section_absent_perface": {
+      "en": "The unresolved count is reported per face, never only as a total, together with the scanned total it came from. Measured unresolved rates on four faces were 28%, 61%, 50% and 100%. Summed, the face at 100% disappears into the average — and a face that resolves nothing looks exactly like a face with nothing to resolve. A bare zero, or a bare average, cannot tell an instrument that found nothing from one that never reached the corpus.",
+      "ja": "未解決の件数は面ごとに、合計だけでは決して報告されず、その母数となる走査総数と一緒に出ます。4 つの面で測った未解決率は 28%・61%・50%・100% でした。合計すると 100% の面は平均に埋もれます — そして何も解決しない面は、解決するものが何も無い面とまったく同じに見えます。裸の 0 や裸の平均では、何も見つけなかった計器と、コーパスに届いていなかった計器を区別できません。"
+    },
+    "section_page_heading": {
+      "en": "7. Reading the page",
+      "ja": "7. ページの読み方"
+    },
+    "section_page_body": {
+      "en": "The diagram page opens on an All tab that draws every edge, followed by one tab per group. Groups come from the screen tests covering a node (`metadata.group`), or for an app-owned screen from its `jui.config.json` declaration. The All tab exists because a group tab draws only the edges inside its group: before it, an edge between two groups appeared on no tab and in no list, and one face's closing line counted 29 resolved edges while the page drew 19.",
+      "ja": "図のページは、すべての辺を描く All タブで開き、その後に group ごとのタブが続きます。group はノードを覆う画面テスト（`metadata.group`）から、app-owned な画面については `jui.config.json` の宣言から来ます。All タブが在るのは、group タブが group 内の辺しか描かないからです: All タブが無かった頃、2 つの group をまたぐ辺はどのタブにもどの一覧にも現れず、ある面では閉じ行が 29 本の解決済み辺を数える一方でページには 19 本しか描かれていませんでした。"
+    },
+    "section_page_ungrouped": {
+      "en": "Nodes with no group land in a catch-all bucket that keeps reading as undeclared. A screen with no way to declare a group would otherwise live there forever and hide the ones that simply have not been declared yet.",
+      "ja": "group の無いノードは受け皿の bucket に入り、その bucket は「未宣言」と読めるままにしてあります。group を宣言する手段の無い画面がそこに永久に住みつくと、単にまだ宣言されていないだけの画面を隠してしまうからです。"
+    },
+    "section_page_closing": {
+      "en": "The closing line of `generate html` ends with `warnings N`, printed even when N is 0, and the number is the tool's own tally — every warning goes through one function — rather than something a reader greps out of the log. Above it, one line per owner reports the diagram's denominators: specs read, transitions found, spec edges drawn, `none` inferred from wording, and the flow tests checked with how many transitions were absent. A face that had been counting `Warning:` for itself with a capital W finds those lines respelled `WARNING [doc-...]:` in this same release, and the tally is what replaces the grep.",
+      "ja": "`generate html` の閉じ行は `warnings N` で終わります。N が 0 でも印字され、その数は道具自身の集計 — すべての warning が 1 つの関数を通ります — であって、読み手がログから grep で拾うものではありません。その上には owner ごとに 1 行、図の分母が並びます: 読んだ spec、見つけた transitions、描いた spec 辺、文言から推定した `none`、そして照合した flow test と「無かった」遷移の数。大文字の W で `Warning:` を自分で数えていた面は、同じリリースでそれらの行が `WARNING [doc-...]:` に綴り直されているのを見つけます。grep の代わりになるのが、この集計です。"
+    },
+    "section_limits_heading": {
+      "en": "8. What this does not give you",
+      "ja": "8. この仕組みが与えないもの"
+    },
+    "section_limits_body": {
+      "en": "The check compares screen identities, not what happened between them: a flow test that reaches the declared screen by the wrong route, or performs the right transition for the wrong reason, passes. Aliases cover the two positions observed so far, prefix and suffix; infix and partial matches are not covered, and saying which is which matters — a generalization that names its coverage makes the third example a counterexample that asks for a redesign, while one that says all makes the same example an exception pushed in sideways.",
+      "ja": "照合が比べるのは画面の同一性であって、その間に何が起きたかではありません: 誤った経路で宣言どおりの画面に到達する flow test も、誤った理由で正しい遷移を行う flow test も通ります。alias が覆うのは、これまでに観測された 2 つの位置 — prefix と suffix — だけです。infix と部分一致は覆っておらず、どちらがどちらかを言っておくことに意味があります — 覆う範囲を名乗る一般化は、3 つ目の例を再設計を求める反例にしますが、「すべて」と言う一般化は同じ例を横から押し込まれる例外にしてしまいます。"
+    },
+    "section_limits_vocab": {
+      "en": "The kind vocabulary is a fixed word list, and today it is uneven across languages. `none` is recognised from Japanese wording only — `遷移なし`, `画面内`, `タブ切替`, `そのまま`, a leading `なし` — so an English destination reading `none` or `stays on this screen` classifies as `unknown` and is listed as absent. `external` matches `https://`, `tel:`, `mailto:`, `External Browser`, `Phone app`, `App Store`, the maps apps and their Japanese names, case-sensitively: `external browser` in lower case does not match. Checked against the shipped 1.8.66 classifier; the words are the library's, so this paragraph goes stale the day they change.",
+      "ja": "種類の語彙は固定の語のリストで、今日の時点では言語間で不均一です。`none` は日本語の文言からしか認識されません — `遷移なし`・`画面内`・`タブ切替`・`そのまま`・先頭の `なし` — ので、英語で `none` や `stays on this screen` と書かれた destination は `unknown` に分類され、「無い」ものとして列挙されます。`external` は `https://`・`tel:`・`mailto:`・`External Browser`・`Phone app`・`App Store`・地図アプリ類とその日本語名に、大文字小文字を区別して一致します: 小文字の `external browser` は一致しません。出荷された 1.8.66 の classifier に対して確認しました。語はライブラリのものなので、語が変わった日にこの段落は古くなります。"
+    },
+    "section_limits_pip": {
+      "en": "The diagram needs the classifier from `jui_cli`. In an environment where that package cannot be imported — a bare `pip` install of `document_tools` alone — `generate html` draws no diagram and prints one `WARNING [doc-diagram]`, and `generate mermaid` exits 1. A face that installed through the bootstrap script has the package beside it and is unaffected.",
+      "ja": "図は `jui_cli` の classifier を必要とします。そのパッケージを import できない環境 — `document_tools` だけを素の `pip` で入れた環境 — では、`generate html` は図を描かずに `WARNING [doc-diagram]` を 1 本印字し、`generate mermaid` は exit 1 になります。bootstrap スクリプト経由で入れた面はパッケージが隣に在るので、影響を受けません。"
+    },
+    "section_limits_floor": {
+      "en": "Everything on this page is stated from jsonui-cli 1.8.66, and this site does not run `generate html` or `generate mermaid` itself: the exit-1 behaviour is stated from the canon and the upstream acceptance, the classifier results from the shipped tree. A diagram from before this release was drawn from the flow tests, said `No flow tests found` on a face full of specs, and exited 0 on every wandering test — it is not a statement about the specs.",
+      "ja": "このページの記述はすべて jsonui-cli 1.8.66 に対するものです。またこのサイト自身は `generate html` も `generate mermaid` も走らせていません: exit 1 の挙動は canon と上流の受入から、classifier の結果は出荷されたツリーから述べています。このリリースより前の図は flow test から描かれ、spec で満ちた面に `No flow tests found` と言い、はみ出したテストのすべてに対して exit 0 でした — それは spec についての主張ではありません。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_testing_title": {
+      "en": "Writing screen tests",
+      "ja": "画面テストを書く"
+    },
+    "next_testing_description": {
+      "en": "Screen tests and flow tests — the files the check walks, and the `when` gates that decide which steps are consecutive.",
+      "ja": "画面テストと flow test — 照合が歩くファイルと、どの step が連続するかを決める `when` の条件。"
+    },
+    "next_identity_title": {
+      "en": "Screen identity",
+      "ja": "画面の同一性"
+    },
+    "next_identity_description": {
+      "en": "Where a screen id comes from, and how a transition is asserted at runtime.",
+      "ja": "画面 id がどこから来るか、そして遷移が実行時にどう検証されるか。"
+    },
+    "next_navigation_title": {
+      "en": "Navigation between screens",
+      "ja": "画面間のナビゲーション"
+    },
+    "next_navigation_description": {
+      "en": "How a spec's transitions are meant to be written in the first place.",
+      "ja": "spec の transitions がそもそもどう書かれるべきか。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI",
+      "ja": "© 2026 JsonUI"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの内容"
+    },
+    "toc_row_source": {
+      "en": "One source",
+      "ja": "出所は 1 つ"
+    },
+    "toc_row_kinds": {
+      "en": "The kinds",
+      "ja": "種類"
+    },
+    "toc_row_resolve": {
+      "en": "Resolution",
+      "ja": "解決"
+    },
+    "toc_row_declare": {
+      "en": "Two declarations",
+      "ja": "2 つの宣言口"
+    },
+    "toc_row_check": {
+      "en": "The check",
+      "ja": "照合"
+    },
+    "toc_row_absent": {
+      "en": "Listed, not failed",
+      "ja": "列挙と失敗"
+    },
+    "toc_row_page": {
+      "en": "Reading the page",
+      "ja": "ページの読み方"
+    },
+    "toc_row_limits": {
+      "en": "Limits",
+      "ja": "限界"
     }
   }
 }

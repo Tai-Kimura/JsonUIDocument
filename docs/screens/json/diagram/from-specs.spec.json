@@ -1,0 +1,75 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "FromSpecs",
+    "displayName": "Drawn from the specs",
+    "description": "Flow diagram > Drawn from the specs, checked against the flow tests. The screen-transition diagram since jsonui-cli 1.8.66: drawn from one source — each screen spec's `transitions[].destination`, plus `test.appOwnedScreens[].transitions` for a screen with no spec — with the flow tests checked against it rather than drawn from. Eight sections: why one source replaced two (a declaration with no reader), the closed vocabulary of destination kinds (screen / route / external / none / back / unknown) and what each draws, the resolution pipeline from prose to a screen id (case and separators, depth-counted parentheticals, splitting on or / slash / 、, aliases, multiple screens, parent and sub specs, `when`-gated siblings), the two declaration points in jui.config.json (`spec.transitionAliases` with a refused wrong position, `test.appOwnedScreens[].transitions`) and why aliases are per face, what the check accepts (forward edges and the return edge derived from `back`; back steps exempt; the three reasons; exit 1 after every page is written, outside `--allow-partial`), what is listed without being an error (unresolved as absent, inferred `none` at INFO, no spec directory as one warning, per-face counts), how to read the page (the All tab, groups, the ungrouped bucket, the `warnings N` closing line), and what the mechanism does not give. ~9-min read.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "diagram/from-specs",
+    "createdAt": "2026-09-10",
+    "updatedAt": "2026-09-10"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Three closing cards: testing (the files the check reads), screen identity (where a screen id comes from), navigation (how transitions are meant to be written)."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "customTypes": [
+    {
+      "name": "NextReadLink",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String"
+        },
+        {
+          "name": "titleKey",
+          "type": "String"
+        },
+        {
+          "name": "descriptionKey",
+          "type": "String"
+        },
+        {
+          "name": "url",
+          "type": "String"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "2026-09-10 - Page created on the release that changed the rule, jsonui-cli 1.8.66, as the first article of a new top-level section. Every claim is taken from the library's own canon (`shared/core/screen_identity.json`, `diagram` section) and from the upstream release record, with the reporting projects' names, screen names and per-project counts left out; the four unresolved rates quoted in section 6 are the canon's own figures. Three things on the page were checked against the shipped 1.8.66 tree rather than transcribed: the kind the classifier assigns to each example destination, the field names of an `appOwnedScreens` object entry, and the format of the `ERROR [doc-diagram]:` line and the closing `warnings N` line. This site does not run `generate html` or `generate mermaid` itself, so the exit-1 behaviour is stated from the canon's `flowTestCheck.severity` and the upstream acceptance, not from a run here — the site's own gates regenerate spec and component documents only."
+  ]
+}
