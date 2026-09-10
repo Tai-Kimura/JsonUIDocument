@@ -67,7 +67,7 @@ jobs:
   # version's help. The second half never judges whether a card is right, only
   # whether it was read; unstamped cards are counted, never red.
   #
-  # All fifteen gates run even when one fails, so a red run names everything that
+  # All sixteen gates run even when one fails, so a red run names everything that
   # is red, and every gate prints its own exit code — a gate that could not
   # run must not read as a gate that passed.
   gates:
@@ -151,7 +151,7 @@ jobs:
         working-directory: jsonui-doc-web
         run: npm run prebuild
 
-      - name: Run the fifteen gates (enforcing — a red one stops the deploy)
+      - name: Run the sixteen gates (enforcing — a red one stops the deploy)
         run: |
           set +e
           fail=0
@@ -309,6 +309,19 @@ jobs:
           # It covers 5 of the ~73 quoted-output lines in the reference; the
           # script says so itself rather than letting a green tick imply more.
           run_gate cli-example-shapes     npm --prefix jsonui-doc-web run check:cli-example-shapes
+          # And the flags. `cli-coverage` prints "Flags are not compared either —
+          # the page records a selection of them on purpose", which was true and
+          # left 206 documented flags never once put to a binary. This arm asks
+          # one direction only: a flag the page DOCUMENTS must be one the binary
+          # DECLARES. The reverse stays unenforced deliberately — a flag that
+          # exists and is not on the page is an editorial choice, and requiring
+          # it would redden the deploy every time upstream adds one.
+          # A card may document a PARENT whose flags live on its children
+          # (`jsonui-doc rules` is exactly that), so a card is compared against
+          # its node AND everything under it; reading only the parent reports
+          # three false defects. Flags come from argparse's declaration lines,
+          # never from prose, so a flag named in a description cannot satisfy it.
+          run_gate cli-flags              npm --prefix jsonui-doc-web run check:cli-flags
           # The committed rjui_tools must BE what the pinned toolchain syncs.
           # `jui sync_tool` resolves its source as $JSONUI_CLI_PATH > ~/.jsonui-cli
           # (measured 2026-09-03 with a control pair: env set to 1.8.5 while the
@@ -343,7 +356,7 @@ jobs:
             fi
             echo "the committed vendored tree matches the pin, file for file"'
           echo "----"
-          echo "gates with a non-zero exit: $fail of 15"
+          echo "gates with a non-zero exit: $fail of 16"
           if [ "$fail" -ne 0 ]; then
             echo "FAILING this job: the deploy job depends on it and will not run."
             exit 1
