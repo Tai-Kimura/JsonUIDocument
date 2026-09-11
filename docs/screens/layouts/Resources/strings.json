@@ -1,40 +1,40 @@
 {
   "home": {
     "meta_title": {
-      "en": "JsonUI — Declarative cross-platform UI",
-      "ja": "JsonUI — 宣言的クロスプラットフォームUI"
+      "en": "JsonUI — Spec-first, machine-verified apps",
+      "ja": "JsonUI — Spec を契約に、機械が検証するアプリ開発"
     },
     "hero_eyebrow": {
-      "en": "Cross-platform declarative UI",
-      "ja": "クロスプラットフォームの宣言的UI"
+      "en": "Spec-first · generated · verified",
+      "ja": "Spec が源泉 · 生成 · 検証"
     },
     "hero_title": {
-      "en": "One spec. Native iOS, Android, and Web.",
-      "ja": "ひとつの仕様で、iOS・Android・Webを描く。"
+      "en": "Write the spec. Generate the code. Verify nothing drifted.",
+      "ja": "spec を書く。コードを生成する。逸れていないことを検証する。"
     },
     "hero_subtitle": {
-      "en": "Author screens once in JSON. JsonUI generates SwiftUI, Compose, and React with ViewModels, bindings, and localization built in.",
-      "ja": "画面をJSONで一度書くだけ。JsonUIがSwiftUI・Compose・Reactを生成し、ViewModel・バインディング・多言語化まで組み込み済みです。"
+      "en": "screen_spec.json declares a screen's state, events, data flow and transitions. From it and a Layout JSON, JsonUI generates SwiftUI, Jetpack Compose and React natively — ViewModels, bindings and localization included — and then holds the result to the spec: jui build validates every attribute against one definition, jui verify diffs the generated tree against the spec and exits non-zero on drift, jsonui-doc validate checks the spec itself. Built for codebases where AI writes more than a reviewer can read.",
+      "ja": "screen_spec.json が画面の状態・イベント・データフロー・遷移を宣言します。それと Layout JSON から、JsonUI は SwiftUI・Jetpack Compose・React をネイティブに生成し — ViewModel・バインディング・ローカライズ込みで — 生成結果を spec に縛ります: jui build は全属性を 1 つの定義に照合し、jui verify は生成ツリーを spec と diff して逸れていれば非ゼロで終了し、jsonui-doc validate は spec 自体を検査します。AI がレビュアーの読める量より多く書くコードベースのために。"
     },
     "hero_cta_primary": {
       "en": "Install in one line",
       "ja": "ワンライナーで導入"
     },
     "hero_cta_secondary": {
+      "en": "See what the verifiers refuse",
+      "ja": "検証器が拒否するものを見る"
+    },
+    "hero_cta_tertiary": {
       "en": "Explore AI agents",
       "ja": "AIエージェントを見る"
     },
-    "hero_cta_tertiary": {
-      "en": "See it on every platform",
-      "ja": "すべてのプラットフォームで見る"
-    },
     "featured_heading": {
-      "en": "Featured",
-      "ja": "注目のトピック"
+      "en": "Start here",
+      "ja": "ここから"
     },
     "featured_subheading": {
-      "en": "Start here to learn, build, and ship with JsonUI.",
-      "ja": "JsonUIで学び、作り、届けるための最初のトピック。"
+      "en": "Install the CLI, render one screen on three platforms, then hand the spec to the agents.",
+      "ja": "CLI を入れ、1 画面を 3 面に描画し、それから spec をエージェントに渡す。"
     },
     "featured_get_started_title": {
       "en": "Get started in 10 minutes",
@@ -49,8 +49,8 @@
       "ja": "AIファーストのワークフロー"
     },
     "featured_ai_agents_description": {
-      "en": "Let the define, implement, navigation, and test agents carry specs to running UI.",
-      "ja": "define・implement・navigation・testの各エージェントが、仕様から動くUIまで運びます。"
+      "en": "define, implement, navigation and test agents take a spec to running UI, and run the same build and verify commands before reporting done.",
+      "ja": "define・implement・navigation・test の各エージェントが spec を動く UI まで運び、完了を報告する前に同じ build と verify を走らせます。"
     },
     "featured_showcase_title": {
       "en": "Cross-platform showcase",
@@ -61,12 +61,12 @@
       "ja": "同じ仕様がSwiftUI・Compose・Reactとして並ぶ様子をご覧ください。"
     },
     "platforms_heading": {
-      "en": "For every platform",
-      "ja": "すべてのプラットフォームに"
+      "en": "Native on every platform",
+      "ja": "すべての面でネイティブ"
     },
     "platforms_subheading": {
-      "en": "JsonUI speaks each stack natively — no shared runtime, no UI compromises.",
-      "ja": "JsonUIは各スタックをネイティブに扱います。共通ランタイムも妥協も不要です。"
+      "en": "SwiftUI, Jetpack Compose and React, each generated from the same Layout JSON and spec. No shared runtime, no lowest-common-denominator widgets.",
+      "ja": "SwiftUI・Jetpack Compose・React を、同じ Layout JSON と spec から生成します。共有ランタイムも、最小公倍数のウィジェットもありません。"
     },
     "platform_swift_title": {
       "en": "Swift / SwiftUI",
@@ -227,6 +227,194 @@
     "whats_new_implementation_contract_check_cta": {
       "en": "Read the concept",
       "ja": "concept を読む"
+    },
+    "hero_transcript_caption": {
+      "en": "Actual output. The spec declares a save button; the Layout JSON on disk gained a nickname field and lost the button. jui verify --fail-on-diff lists both and exits 1.",
+      "ja": "実際の出力。spec は保存ボタンを宣言し、ディスク上の Layout JSON には nickname 欄が増えてボタンが消えている。jui verify --fail-on-diff は両方を列挙して exit 1 で終了します。"
+    },
+    "refuses_heading": {
+      "en": "What the verifiers refuse",
+      "ja": "検証器が拒否するもの"
+    },
+    "refuses_subheading": {
+      "en": "Each of these is a non-zero exit, not a lint suggestion. Four of them, with the actual output of the pinned toolchain on a fixture.",
+      "ja": "いずれも lint の提案ではなく、非ゼロの終了です。そのうち 4 つを、pin されたツールチェーンが fixture に対して出した実際の出力とともに。"
+    },
+    "refuse_build_kind": {
+      "en": "Layout",
+      "ja": "レイアウト"
+    },
+    "refuse_build_title": {
+      "en": "An attribute no platform can render",
+      "ja": "どの面も描画できない属性"
+    },
+    "refuse_build_desc": {
+      "en": "Every attribute in a Layout JSON is checked against attribute_definitions.json, the single definition the three renderers share. A warning fails the build under the zero-warning invariant. This one was planted on this page's own title.",
+      "ja": "Layout JSON の全属性は、3 つのレンダラーが共有する唯一の定義 attribute_definitions.json に照合されます。警告は zero-warning の不変条件によりビルド失敗です。これはこのページ自身のタイトルに植えたものです。"
+    },
+    "refuse_verify_kind": {
+      "en": "Drift",
+      "ja": "ドリフト"
+    },
+    "refuse_verify_title": {
+      "en": "A green that says what it did not measure",
+      "ja": "測っていないものを名乗る緑"
+    },
+    "refuse_verify_desc": {
+      "en": "A screen whose layout is hand-authored has no generated counterpart to diff, so verify skips it and prints the count with the reason. This is the line this site prints for itself: 0 verified, 2 skipped — not 'no differences'.",
+      "ja": "レイアウトを手書きしている画面には diff する生成側が無いので、verify は飛ばし、件数と理由を印字します。これはこのサイト自身に対して出る行です: verified 0、skipped 2 — 「差分なし」ではありません。"
+    },
+    "refuse_validate_kind": {
+      "en": "Spec",
+      "ja": "Spec"
+    },
+    "refuse_validate_title": {
+      "en": "A contract for a method the ViewModel never declares",
+      "ja": "ViewModel が宣言していないメソッドへの契約"
+    },
+    "refuse_validate_desc": {
+      "en": "branchContracts may only reference methods declared in dataFlow.viewModel.methods or stateManagement.eventHandlers. A name outside that set fails validation before any generator runs.",
+      "ja": "branchContracts が参照できるのは dataFlow.viewModel.methods か stateManagement.eventHandlers に宣言されたメソッドだけです。その集合の外の名前は、どの生成器が走るより前に validate で失敗します。"
+    },
+    "refuse_tests_kind": {
+      "en": "Tests",
+      "ja": "テスト"
+    },
+    "refuse_tests_title": {
+      "en": "A branch whose state no test could arrange",
+      "ja": "どのテストも状態を用意できない分岐"
+    },
+    "refuse_tests_desc": {
+      "en": "jsonui-test generates unit tests from the spec's branch table for vitest, JUnit and XCTest. A condition a branch depends on needs a witness that arranges the state; without one, generation stops rather than emitting a test that could not fail.",
+      "ja": "jsonui-test は spec の分岐表から vitest・JUnit・XCTest のユニットテストを生成します。分岐が依存する条件には状態を用意する witness が要り、無ければ失敗しようのないテストを出す代わりに生成を止めます。"
+    },
+    "refuses_footnote": {
+      "en": "Every line above was produced by the pinned toolchain on a fixture — none was written by hand.",
+      "ja": "上の各行は、pin されたツールチェーンが fixture に対して出力したもので、手で書いたものは 1 行もありません。"
+    },
+    "why_heading": {
+      "en": "Why verification, not a better prompt",
+      "ja": "より良いプロンプトではなく、検証である理由"
+    },
+    "why_p1": {
+      "en": "Generated code volume scales with model speed; review capacity does not. Prompting for accuracy raises the average and does nothing for the cases it misses, which are the ones that reach production. So the useful layer is the one that rejects a wrong artifact mechanically: reduce the surface that has to be free-form (the spec fixes state, events and transitions; layouts are declarative), generate deterministically what can be derived (ViewModels, bindings, DTOs from OpenAPI, tests from branch tables), and verify what can be compared (attributes, drift, contracts, live schemas). What remains for a person is the spec, the UX and the business logic.",
+      "ja": "生成されるコード量はモデルの速度に比例して増え、レビューできる量は増えません。精度を上げるプロンプトは平均を上げますが、取りこぼした事例には何もせず、本番に届くのはその事例です。だから役に立つ層は、誤った成果物を機械的に拒否する層です: 自由記述でなければならない面を減らし（spec が状態・イベント・遷移を固定し、レイアウトは宣言的）、導出できるものは決定論的に生成し（ViewModel、バインディング、OpenAPI からの DTO、分岐表からのテスト）、比較できるものは検証する（属性、ドリフト、契約、稼働中のスキーマ）。人間に残るのは spec と UX とビジネスロジックです。"
+    },
+    "why_p2": {
+      "en": "What that buys, precisely: conformance, not correctness. verify proves the code matches the spec; validate proves the spec is well-formed; neither proves the spec is what you wanted. That makes the spec the artifact to review, and the artifact where discipline has to live — a verifier that can be satisfied by loosening the contract checks nothing. Changes to specs are the changes a person reads.",
+      "ja": "それが買うものを正確に言うと、正しさではなく適合です。verify はコードが spec に一致することを、validate は spec が整形されていることを証明し、どちらも spec が望んだものであることは証明しません。だから spec がレビューすべき成果物であり、規律が住むべき成果物です — 契約を緩めれば満たせる検証器は何も検査していません。spec の変更こそ、人間が読む変更です。"
+    },
+    "why_scope": {
+      "en": "Scope, honestly: the spec layer costs something up front. It pays back on products with many screens of similar shape, maintained over time by several people or agents. It is not a good fit for a one-off page.",
+      "ja": "適用範囲を正直に: spec 層には初期コストがあります。似た形の画面が多く、複数の人やエージェントが長期に保守するプロダクトで元が取れます。1 回きりのページには向きません。"
+    },
+    "eco_heading": {
+      "en": "What the JsonUI ecosystem is",
+      "ja": "JsonUI というエコシステムは何か"
+    },
+    "eco_lead": {
+      "en": "JsonUI is a spec-first toolchain for iOS, Android and Web. A screen is declared once — screen_spec.json for the contract, a Layout JSON for the view tree — and from those files the CLI generates native SwiftUI, Compose and React with their ViewModels, bindings and strings, while a set of verifiers keeps generated and hand-written code consistent with the spec. The agents, the test runners and the documentation generator all read those same files.",
+      "ja": "JsonUI は iOS・Android・Web のための spec-first なツールチェーンです。画面は 1 度だけ宣言します — 契約は screen_spec.json、ビューツリーは Layout JSON — そのファイルから CLI が SwiftUI・Compose・React を ViewModel・バインディング・文字列ごとネイティブに生成し、一連の検証器が生成コードと手書きコードを spec と整合させ続けます。エージェントもテストランナーもドキュメント生成器も、同じファイルを読みます。"
+    },
+    "eco_origin": {
+      "en": "It began as a JSON UI library for iOS — a replacement for storyboards, whose XML could not be diffed or reviewed — and later gained Android and Web renderers. The properties that made it useful to people (structured, diffable, generatable, checkable) are the ones an AI-driven pipeline needs, so the spec layer, the CLI, the MCP server and the agents were built on top of it. The name kept the history.",
+      "ja": "始まりは iOS 向けの JSON UI ライブラリでした — XML の diff もレビューもできない storyboard の置き換えとして — その後 Android と Web のレンダラーが加わりました。人間にとって有用だった性質（構造化されている、diff が取れる、生成できる、検査できる）はそのまま AI 駆動のパイプラインが必要とする性質だったので、その上に spec 層・CLI・MCP サーバー・エージェントを積みました。名前はその歴史ごと引き継いでいます。"
+    },
+    "eco_contract_kind": {
+      "en": "Contract",
+      "ja": "契約"
+    },
+    "eco_contract_title": {
+      "en": "Specs",
+      "ja": "Spec"
+    },
+    "eco_contract_desc": {
+      "en": "screen_spec.json declares state, events, data flow, transitions and branch contracts; OpenAPI declares the API and its DTOs. Generators, verifiers, agents and tests all derive from these files and are not allowed to disagree with them.",
+      "ja": "screen_spec.json が状態・イベント・データフロー・遷移・分岐契約を宣言し、OpenAPI が API と DTO を宣言します。生成器・検証器・エージェント・テストはすべてこれらのファイルから導出され、これらと食い違うことは許されません。"
+    },
+    "eco_contract_parts": {
+      "en": "screen_spec.json · component specs · OpenAPI · DB models",
+      "ja": "screen_spec.json · コンポーネント spec · OpenAPI · DB モデル"
+    },
+    "eco_renderers_kind": {
+      "en": "Renderers",
+      "ja": "レンダラー"
+    },
+    "eco_renderers_title": {
+      "en": "Native on three platforms",
+      "ja": "3 面でネイティブ"
+    },
+    "eco_renderers_desc": {
+      "en": "The same Layout JSON renders as SwiftUI, Jetpack Compose and React. There is no shared runtime: each renderer emits its stack's own idioms, and the ViewModel protocol, bindings and string tables are generated next to it.",
+      "ja": "同じ Layout JSON が SwiftUI・Jetpack Compose・React として描画されます。共有ランタイムは無く、各レンダラーがそのスタック固有の書き方で出力し、ViewModel のプロトコル・バインディング・文字列テーブルが隣に生成されます。"
+    },
+    "eco_renderers_parts": {
+      "en": "SwiftJsonUI · KotlinJsonUI · ReactJsonUI (built into the CLI)",
+      "ja": "SwiftJsonUI · KotlinJsonUI · ReactJsonUI（CLI 内蔵）"
+    },
+    "eco_tools_kind": {
+      "en": "Toolchain",
+      "ja": "ツールチェーン"
+    },
+    "eco_tools_title": {
+      "en": "Generate, build, verify — deterministically",
+      "ja": "生成・ビルド・検証を決定論的に"
+    },
+    "eco_tools_desc": {
+      "en": "jsonui-cli carries the generators and the verifiers; jsonui-mcp-server exposes the same operations as MCP tools. A terminal and an agent session run the identical pipeline, and the result is deterministic for the same inputs.",
+      "ja": "jsonui-cli が生成器と検証器を担い、jsonui-mcp-server が同じ操作を MCP ツールとして公開します。ターミナルとエージェントのセッションは同一のパイプラインを走らせ、同じ入力には同じ結果を返します。"
+    },
+    "eco_tools_parts": {
+      "en": "jsonui-cli (jui · jsonui-doc · jsonui-test) · jsonui-mcp-server · VS Code helper",
+      "ja": "jsonui-cli（jui · jsonui-doc · jsonui-test）· jsonui-mcp-server · VS Code ヘルパー"
+    },
+    "eco_gates_kind": {
+      "en": "Gates",
+      "ja": "門"
+    },
+    "eco_gates_title": {
+      "en": "Verifiers with non-zero exits",
+      "ja": "非ゼロで終了する検証器"
+    },
+    "eco_gates_desc": {
+      "en": "jui build validates every attribute against attribute_definitions.json and treats a warning as failure. jui verify diffs the spec's declared components against the Layout JSON and exits 1 on drift. jsonui-doc validate checks the spec: transitions, dataFlow endpoints against OpenAPI, branch contracts. jsonui-doc check diffs the docs against a live OpenAPI or DB schema. Each runs the same in CI, in a terminal and under an agent.",
+      "ja": "jui build は全属性を attribute_definitions.json に照合し、警告を失敗として扱います。jui verify は spec が宣言するコンポーネントを Layout JSON と diff し、逸れていれば exit 1。jsonui-doc validate は spec を検査します: 遷移、OpenAPI に対する dataFlow の endpoint、分岐契約。jsonui-doc check はドキュメントを稼働中の OpenAPI や DB スキーマと diff します。どれも CI・ターミナル・エージェント下で同じに動きます。"
+    },
+    "eco_gates_parts": {
+      "en": "jui build · jui verify · jsonui-doc validate · jsonui-doc check",
+      "ja": "jui build · jui verify · jsonui-doc validate · jsonui-doc check"
+    },
+    "eco_agents_kind": {
+      "en": "Agents",
+      "ja": "エージェント"
+    },
+    "eco_agents_title": {
+      "en": "Role-separated, inside the gates",
+      "ja": "責務分離、門の内側で"
+    },
+    "eco_agents_desc": {
+      "en": "A conductor agent routes work to define, ground, implement, navigation, test and debug agents. Each is declared with only the tools its role needs — debug has no write tool — and each runs build and verify before it reports done.",
+      "ja": "conductor エージェントが仕事を define・ground・implement・navigation・test・debug の各エージェントに振り分けます。それぞれは役割に必要なツールだけを宣言され — debug は書き込みツールを持ちません — 完了を報告する前に build と verify を走らせます。"
+    },
+    "eco_agents_parts": {
+      "en": "JsonUI-Agents for Claude Code · for Codex",
+      "ja": "JsonUI-Agents for Claude Code · for Codex"
+    },
+    "eco_tests_kind": {
+      "en": "Tests & docs",
+      "ja": "テストとドキュメント"
+    },
+    "eco_tests_title": {
+      "en": "Read the same contract",
+      "ja": "同じ契約を読む"
+    },
+    "eco_tests_desc": {
+      "en": "Tests are JSON, executed on real devices through XCUITest, UIAutomator and Playwright, with API mocks and recording also declared in JSON. Unit tests (vitest, JUnit, XCTest) are generated from the spec's branch table. Screen, ER, API and test documentation is generated from the same specs and diffed against the running backend.",
+      "ja": "テストは JSON で、XCUITest・UIAutomator・Playwright を通して実機で実行され、API モックと録画も JSON で宣言します。ユニットテスト（vitest・JUnit・XCTest）は spec の分岐表から生成。画面・ER・API・テストのドキュメントは同じ spec から生成され、稼働中のバックエンドと diff されます。"
+    },
+    "eco_tests_parts": {
+      "en": "jsonui-test-runner (XCUITest · UIAutomator · Playwright) · jsonui-doc generate",
+      "ja": "jsonui-test-runner（XCUITest · UIAutomator · Playwright）· jsonui-doc generate"
     }
   },
   "learn_hello_world": {

@@ -152,8 +152,17 @@ export class HomeViewModel extends HomeViewModelBase {
   protected initializeEventHandlers = () => {
     this.updateData({
       onHeroInstallTap: () => this.navigate("/learn/installation"),
+      // The hero's second CTA points at the proof section on this same page.
+      // Generated markup carries the layout id, so an in-page scroll is the
+      // honest target; if that ever stops being true, the nearest page that
+      // shows a gate refusing is the fallback rather than a dead click.
+      onHeroRefusesTap: () => {
+        const el =
+          typeof document !== "undefined" ? document.getElementById("home_refuses") : null;
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        else this.navigate("/guides/branch-contracts");
+      },
       onHeroAiAgentsTap: () => this.navigate("/tools/agents"),
-      onHeroShowcaseTap: () => this.navigate("/platforms"),
     });
   };
 

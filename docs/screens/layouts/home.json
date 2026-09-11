@@ -29,7 +29,7 @@
           "class": "() -> Void"
         },
         {
-          "name": "onHeroShowcaseTap",
+          "name": "onHeroRefusesTap",
           "class": "() -> Void"
         }
       ]
@@ -46,63 +46,841 @@
           "style": "hero_section",
           "child": [
             {
-              "type": "Label",
-              "width": "matchParent",
-              "height": "wrapContent",
-              "fontSize": 13,
-              "fontWeight": "semibold",
-              "fontColor": "eyebrow",
-              "text": "hero_eyebrow"
-            },
-            {
-              "type": "Label",
-              "id": "home_hero_title",
-              "width": "matchParent",
-              "height": "wrapContent",
-              "topMargin": 16,
-              "fontSize": 44,
-              "fontWeight": "bold",
-              "fontColor": "chrome_ink",
-              "text": "hero_title"
-            },
-            {
-              "type": "Label",
-              "width": "matchParent",
-              "height": "wrapContent",
-              "topMargin": 16,
-              "fontSize": 18,
-              "fontColor": "chrome_ink_muted",
-              "text": "hero_subtitle"
-            },
-            {
               "type": "View",
-              "id": "home_hero_ctas",
+              "id": "home_hero_columns",
               "orientation": "horizontal",
               "width": "matchParent",
               "height": "wrapContent",
-              "topMargin": 28,
-              "spacing": 3,
+              "spacing": 40,
               "child": [
                 {
-                  "type": "Button",
-                  "id": "home_hero_cta_primary",
-                  "style": "primary_button",
-                  "text": "hero_cta_primary",
-                  "onClick": "@{onHeroInstallTap}"
+                  "type": "View",
+                  "id": "home_hero_copy",
+                  "orientation": "vertical",
+                  "height": "wrapContent",
+                  "weight": 3,
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 13,
+                      "fontWeight": "semibold",
+                      "fontColor": "eyebrow",
+                      "text": "hero_eyebrow"
+                    },
+                    {
+                      "type": "Label",
+                      "id": "home_hero_title",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 44,
+                      "fontWeight": "bold",
+                      "fontColor": "chrome_ink",
+                      "text": "hero_title"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 18,
+                      "fontColor": "chrome_ink_muted",
+                      "text": "hero_subtitle"
+                    },
+                    {
+                      "type": "View",
+                      "id": "home_hero_ctas",
+                      "orientation": "horizontal",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 28,
+                      "spacing": 3,
+                      "child": [
+                        {
+                          "type": "Button",
+                          "id": "home_hero_cta_primary",
+                          "style": "primary_button",
+                          "text": "hero_cta_primary",
+                          "onClick": "@{onHeroInstallTap}"
+                        },
+                        {
+                          "type": "Button",
+                          "id": "home_hero_cta_secondary",
+                          "style": "ghost_button",
+                          "text": "hero_cta_secondary",
+                          "onClick": "@{onHeroRefusesTap}"
+                        },
+                        {
+                          "type": "Button",
+                          "id": "home_hero_cta_tertiary",
+                          "style": "ghost_button",
+                          "text": "hero_cta_tertiary",
+                          "onClick": "@{onHeroAiAgentsTap}"
+                        }
+                      ]
+                    }
+                  ]
                 },
                 {
-                  "type": "Button",
-                  "id": "home_hero_cta_secondary",
-                  "style": "ghost_button",
-                  "text": "hero_cta_secondary",
-                  "onClick": "@{onHeroAiAgentsTap}"
+                  "type": "View",
+                  "id": "home_hero_proof",
+                  "orientation": "vertical",
+                  "height": "wrapContent",
+                  "weight": 2,
+                  "child": [
+                    {
+                      "type": "CodeBlock",
+                      "id": "home_hero_transcript",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "code": "$ jui verify --fail-on-diff --detail\n# jui verify report\n| Screen         | Expected | Actual | Match | Missing | Extra | TypeMM | %   |\n|----------------|----------|--------|-------|---------|-------|--------|-----|\n| profile_screen | 2        | 2      | 1     | 1       | 1     | 0      | 33% |\n**Total: match=1, missing=1, extra=1, type_mismatch=0**\n## profile_screen\n**Missing (in spec but not in Layout JSON):**\n- save (Button)\n**Extra (in Layout JSON but not in spec):**\n- nickname (TextField)\n**verified 1 of 1 screen(s)**\n$ echo $?\n1",
+                      "language": "text",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 13,
+                      "fontColor": "chrome_ink_subtle",
+                      "text": "hero_transcript_caption"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "home_ecosystem",
+          "style": "home_section",
+          "background": "surface",
+          "child": [
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "style": "section_heading",
+              "text": "eco_heading"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 17,
+              "fontColor": "ink_muted",
+              "text": "eco_lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 15,
+              "fontColor": "ink_subtle",
+              "text": "eco_origin"
+            },
+            {
+              "type": "View",
+              "orientation": "horizontal",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 32,
+              "spacing": 24,
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "height": "wrapContent",
+                  "weight": 1,
+                  "child": [
+                    {
+                      "type": "View",
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 12,
+                          "fontWeight": "semibold",
+                          "fontColor": "accent",
+                          "text": "eco_contract_kind"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_title",
+                          "topMargin": 8,
+                          "text": "eco_contract_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_description",
+                          "text": "eco_contract_desc"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "fontSize": 13,
+                          "fontColor": "ink_subtle",
+                          "text": "eco_contract_parts"
+                        }
+                      ]
+                    }
+                  ]
                 },
                 {
-                  "type": "Button",
-                  "id": "home_hero_cta_tertiary",
-                  "style": "ghost_button",
-                  "text": "hero_cta_tertiary",
-                  "onClick": "@{onHeroShowcaseTap}"
+                  "type": "View",
+                  "orientation": "vertical",
+                  "height": "wrapContent",
+                  "weight": 1,
+                  "child": [
+                    {
+                      "type": "View",
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 12,
+                          "fontWeight": "semibold",
+                          "fontColor": "accent",
+                          "text": "eco_renderers_kind"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_title",
+                          "topMargin": 8,
+                          "text": "eco_renderers_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_description",
+                          "text": "eco_renderers_desc"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "fontSize": 13,
+                          "fontColor": "ink_subtle",
+                          "text": "eco_renderers_parts"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "height": "wrapContent",
+                  "weight": 1,
+                  "child": [
+                    {
+                      "type": "View",
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 12,
+                          "fontWeight": "semibold",
+                          "fontColor": "accent",
+                          "text": "eco_tools_kind"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_title",
+                          "topMargin": 8,
+                          "text": "eco_tools_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_description",
+                          "text": "eco_tools_desc"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "fontSize": 13,
+                          "fontColor": "ink_subtle",
+                          "text": "eco_tools_parts"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "horizontal",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "spacing": 24,
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "height": "wrapContent",
+                  "weight": 1,
+                  "child": [
+                    {
+                      "type": "View",
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 12,
+                          "fontWeight": "semibold",
+                          "fontColor": "accent",
+                          "text": "eco_gates_kind"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_title",
+                          "topMargin": 8,
+                          "text": "eco_gates_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_description",
+                          "text": "eco_gates_desc"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "fontSize": 13,
+                          "fontColor": "ink_subtle",
+                          "text": "eco_gates_parts"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "height": "wrapContent",
+                  "weight": 1,
+                  "child": [
+                    {
+                      "type": "View",
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 12,
+                          "fontWeight": "semibold",
+                          "fontColor": "accent",
+                          "text": "eco_agents_kind"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_title",
+                          "topMargin": 8,
+                          "text": "eco_agents_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_description",
+                          "text": "eco_agents_desc"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "fontSize": 13,
+                          "fontColor": "ink_subtle",
+                          "text": "eco_agents_parts"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "height": "wrapContent",
+                  "weight": 1,
+                  "child": [
+                    {
+                      "type": "View",
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 12,
+                          "fontWeight": "semibold",
+                          "fontColor": "accent",
+                          "text": "eco_tests_kind"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_title",
+                          "topMargin": 8,
+                          "text": "eco_tests_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_description",
+                          "text": "eco_tests_desc"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "fontSize": 13,
+                          "fontColor": "ink_subtle",
+                          "text": "eco_tests_parts"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "home_refuses",
+          "style": "home_section",
+          "background": "surface_muted",
+          "child": [
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "style": "section_heading",
+              "text": "refuses_heading"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "style": "section_subheading",
+              "text": "refuses_subheading"
+            },
+            {
+              "type": "View",
+              "orientation": "horizontal",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 32,
+              "spacing": 24,
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "height": "wrapContent",
+                  "weight": 1,
+                  "child": [
+                    {
+                      "type": "View",
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "spacing": 8,
+                          "child": [
+                            {
+                              "type": "View",
+                              "width": 10,
+                              "height": 10,
+                              "topMargin": 4,
+                              "cornerRadius": 5,
+                              "background": "traffic_red"
+                            },
+                            {
+                              "type": "Label",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "fontSize": 12,
+                              "fontWeight": "semibold",
+                              "fontColor": "ink_subtle",
+                              "text": "refuse_build_kind"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_title",
+                          "topMargin": 12,
+                          "text": "refuse_build_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_description",
+                          "text": "refuse_build_desc"
+                        },
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 16,
+                          "code": "[WARN] Validation warnings found: 1\n    ⚠️  [id=home_hero_title] Unknown attribute 'glowIntensity' for component type 'Label'",
+                          "language": "text",
+                          "filename": "$ jui build --web-only",
+                          "showLineNumbers": false,
+                          "copyable": false
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "height": "wrapContent",
+                  "weight": 1,
+                  "child": [
+                    {
+                      "type": "View",
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "spacing": 8,
+                          "child": [
+                            {
+                              "type": "View",
+                              "width": 10,
+                              "height": 10,
+                              "topMargin": 4,
+                              "cornerRadius": 5,
+                              "background": "traffic_red"
+                            },
+                            {
+                              "type": "Label",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "fontSize": 12,
+                              "fontWeight": "semibold",
+                              "fontColor": "ink_subtle",
+                              "text": "refuse_verify_kind"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_title",
+                          "topMargin": 12,
+                          "text": "refuse_verify_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_description",
+                          "text": "refuse_verify_desc"
+                        },
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 16,
+                          "code": "**verified 0 of 2 screen(s)** — 2 skipped (layout authored externally)",
+                          "language": "text",
+                          "filename": "$ jui verify --fail-on-diff",
+                          "showLineNumbers": false,
+                          "copyable": false
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "horizontal",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "spacing": 24,
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "height": "wrapContent",
+                  "weight": 1,
+                  "child": [
+                    {
+                      "type": "View",
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "spacing": 8,
+                          "child": [
+                            {
+                              "type": "View",
+                              "width": 10,
+                              "height": 10,
+                              "topMargin": 4,
+                              "cornerRadius": 5,
+                              "background": "traffic_red"
+                            },
+                            {
+                              "type": "Label",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "fontSize": 12,
+                              "fontWeight": "semibold",
+                              "fontColor": "ink_subtle",
+                              "text": "refuse_validate_kind"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_title",
+                          "topMargin": 12,
+                          "text": "refuse_validate_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_description",
+                          "text": "refuse_validate_desc"
+                        },
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 16,
+                          "code": "[ERROR] branchContracts.methods.onTapSubmit: Method 'onTapSubmit' not found in\n        dataFlow.viewModel.methods or stateManagement.eventHandlers\nResult: FAILED",
+                          "language": "text",
+                          "filename": "$ jsonui-doc validate spec docs/specs/profile_screen.spec.json",
+                          "showLineNumbers": false,
+                          "copyable": false
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "height": "wrapContent",
+                  "weight": 1,
+                  "child": [
+                    {
+                      "type": "View",
+                      "style": "card_surface",
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "spacing": 8,
+                          "child": [
+                            {
+                              "type": "View",
+                              "width": 10,
+                              "height": 10,
+                              "topMargin": 4,
+                              "cornerRadius": 5,
+                              "background": "traffic_red"
+                            },
+                            {
+                              "type": "Label",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "fontSize": 12,
+                              "fontWeight": "semibold",
+                              "fontColor": "ink_subtle",
+                              "text": "refuse_tests_kind"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_title",
+                          "topMargin": 12,
+                          "text": "refuse_tests_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "style": "card_description",
+                          "text": "refuse_tests_desc"
+                        },
+                        {
+                          "type": "CodeBlock",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 16,
+                          "code": "Error: condition 'formValid' has no witness_true — test generation needs a witness\n       to arrange the state",
+                          "language": "text",
+                          "filename": "$ jsonui-test generate branch-tests profile_screen",
+                          "showLineNumbers": false,
+                          "copyable": false
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "fontSize": 13,
+              "fontColor": "ink_subtle",
+              "text": "refuses_footnote"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "home_why",
+          "style": "home_section",
+          "background": "surface",
+          "child": [
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "style": "section_heading",
+              "text": "why_heading"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 16,
+              "fontColor": "ink_muted",
+              "text": "why_p1"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 16,
+              "fontColor": "ink_muted",
+              "text": "why_p2"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 14,
+              "fontColor": "ink_subtle",
+              "text": "why_scope"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "home_platforms",
+          "style": "home_section",
+          "background": "#FFFFFF",
+          "child": [
+            {
+              "type": "Label",
+              "style": "section_heading",
+              "text": "platforms_heading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Label",
+              "style": "section_subheading",
+              "text": "platforms_subheading",
+              "width": "matchParent"
+            },
+            {
+              "type": "Collection",
+              "id": "home_platforms_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 32,
+              "columnCount": 3,
+              "lineSpacing": 24,
+              "itemSpacing": 24,
+              "lazy": "none",
+              "scrollEnabled": false,
+              "items": "@{platformCards}",
+              "cellIdProperty": "id",
+              "sections": [
+                {
+                  "cell": "cells/platform_card"
                 }
               ]
             }
@@ -142,45 +920,6 @@
               "sections": [
                 {
                   "cell": "cells/featured_card"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "View",
-          "id": "home_platforms",
-          "style": "home_section",
-          "background": "#FFFFFF",
-          "child": [
-            {
-              "type": "Label",
-              "style": "section_heading",
-              "text": "platforms_heading",
-              "width": "matchParent"
-            },
-            {
-              "type": "Label",
-              "style": "section_subheading",
-              "text": "platforms_subheading",
-              "width": "matchParent"
-            },
-            {
-              "type": "Collection",
-              "id": "home_platforms_collection",
-              "width": "matchParent",
-              "height": "wrapContent",
-              "topMargin": 32,
-              "columnCount": 3,
-              "lineSpacing": 24,
-              "itemSpacing": 24,
-              "lazy": "none",
-              "scrollEnabled": false,
-              "items": "@{platformCards}",
-              "cellIdProperty": "id",
-              "sections": [
-                {
-                  "cell": "cells/platform_card"
                 }
               ]
             }
