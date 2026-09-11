@@ -67,7 +67,7 @@ jobs:
   # version's help. The second half never judges whether a card is right, only
   # whether it was read; unstamped cards are counted, never red.
   #
-  # All nineteen gates run even when one fails, so a red run names everything that
+  # All twenty gates run even when one fails, so a red run names everything that
   # is red, and every gate prints its own exit code — a gate that could not
   # run must not read as a gate that passed.
   gates:
@@ -151,7 +151,7 @@ jobs:
         working-directory: jsonui-doc-web
         run: npm run prebuild
 
-      - name: Run the nineteen gates (enforcing — a red one stops the deploy)
+      - name: Run the twenty gates (enforcing — a red one stops the deploy)
         run: |
           set +e
           fail=0
@@ -364,6 +364,19 @@ jobs:
           # Fired against four inputs that must fail: the pre-fix page, a wrong
           # branch count, a flag the binary rejects, and an empty harvest.
           run_gate branch-transcripts     npm --prefix jsonui-doc-web run check:branch-transcripts
+          # And the MARKDOWN the prose must not contain. Labels print markdown
+          # literally, so `**bold**` reaches the reader as asterisks and
+          # `[text](url)` as brackets; only a bare https URL is linkified. That
+          # was guarded by a remembered number — "the literal `**` count is 8" —
+          # re-grepped by hand before each commit, and the number was the wrong
+          # question twice over. All 8 sit INSIDE BACKTICKS (`Layouts/**/*.json`,
+          # `docs/**/.check-report.json`, and a sentence saying globs have no
+          # `**`), so the rule was never the count; it was code voice versus
+          # prose voice. And a count cannot see a SWAP: drop one glob mention,
+          # add one bold marker, and 8 is still 8 — the check passes the exact
+          # edit it exists to catch. Fired against that swap, a bold marker, a
+          # markdown link, and an empty scan.
+          run_gate prose-markdown         npm --prefix jsonui-doc-web run check:prose-markdown
           # The committed rjui_tools must BE what the pinned toolchain syncs.
           # `jui sync_tool` resolves its source as $JSONUI_CLI_PATH > ~/.jsonui-cli
           # (measured 2026-09-03 with a control pair: env set to 1.8.5 while the
@@ -398,7 +411,7 @@ jobs:
             fi
             echo "the committed vendored tree matches the pin, file for file"'
           echo "----"
-          echo "gates with a non-zero exit: $fail of 19"
+          echo "gates with a non-zero exit: $fail of 20"
           if [ "$fail" -ne 0 ]; then
             echo "FAILING this job: the deploy job depends on it and will not run."
             exit 1
