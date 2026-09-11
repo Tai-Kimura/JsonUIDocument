@@ -33,6 +33,16 @@
 // Change the example's screen name, route, or branch counts and this gate goes
 // red until the fixture follows — loudly, which is the point, but it is a real
 // coupling and not an accident.
+//
+// ⚠️ And because the fixture is HAND-BUILT, it bounds what this gate can observe:
+// it exercises the shapes it plants and no others. The clearest instance is on
+// this gate's own page. A block quoting tool output WITHOUT a `$ …` line above it
+// is not reached at all — the `note: N other generated test file(s) share this
+// runtime …` fragment is quoted there, and with no command to re-run, and a
+// single-screen fixture that could never emit that line, nothing here compares it.
+// It was measured by hand on a two-screen fixture the day it was written, and
+// that is the whole of its verification. 3 blocks on that page are covered; the
+// fragment is not.
 
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
