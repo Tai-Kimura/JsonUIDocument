@@ -59,26 +59,44 @@ const CLAIMS: Claim[] = [
     ],
   },
   {
-    // The paragraph names the release this site pins ("In 1.8.70, the release
-    // this site pins, `none` is recognised from Japanese wording only"). So a
-    // pin bump to a tree with the English vocabulary reds here BY DESIGN: the
-    // sentence names a release the site no longer ships against.
+    // The paragraph NAMES the release this site pins ("In 1.8.71, the release
+    // this site pins, …"), so a pin bump to a tree whose vocabulary differs reds
+    // here BY DESIGN: the sentence would be naming a release the site no longer
+    // ships against. That is what happened at the 1.8.70 -> 1.8.71 bump, and it
+    // is what forced this paragraph to be rewritten rather than carried over.
     where: "section 8 (en) — what `none` recognises in the release this page names as pinned",
-    anchor: "recognised from Japanese wording only",
+    anchor: "In 1.8.71, the release this site pins",
     cases: [
       k("遷移なし", "none"),
       k("画面内", "none"),
       k("タブ切替", "none"),
       k("そのまま", "none"),
       k("なし（タブ切替）", "none"),
-      k("none", "unknown"),
-      k("stays on this screen", "unknown"),
+      k("none", "none"),
+      k("NONE", "none"), // the English half ignores case; the page says so
+      k("stays on this screen", "none"),
+      k("no transition", "none"),
+      k("tab switch", "none"),
     ],
   },
   {
     where: "section 8 (ja) — 同じ主張の日本語側（pin している版について述べている）",
-    anchor: "日本語の文言からしか認識されません",
-    cases: [k("遷移なし", "none"), k("none", "unknown")],
+    anchor: "このサイトが pin している 1.8.71 では",
+    cases: [k("遷移なし", "none"), k("none", "none"), k("NONE", "none")],
+  },
+  {
+    // The page does not only say what matches — it says where the vocabulary
+    // STOPS, and names three near misses to show it. A rule stated without its
+    // negative side is the half a reader cannot check, and these are the cases
+    // that would quietly start matching if an alternative were ever unanchored.
+    where: "section 8 — the near misses the vocabulary must NOT swallow",
+    anchor: "Every English alternative is multi-word or anchored to the whole value",
+    cases: [
+      k("Target screen or tab", "unknown"), // carries `tab`, not `tab switch`
+      k("Login none required", "unknown"), // carries `none`, unanchored
+      k("state change", "unknown"),
+      k("stay", "unknown"), // `stays on` is the alternative, not a bare `stay`
+    ],
   },
   {
     where: "section 8 (en) — `external` matches case-sensitively",
