@@ -23,6 +23,9 @@
 //     honest limit of the whole approach.
 //   - it does not check that a claim is well WORDED, only that the behaviour it
 //     asserts is the behaviour the pinned classifier has.
+//   - it does not choose the cases. It counts that both POLARITIES survive (see
+//     MIN_KINDS / MIN_UNKNOWN) but cannot tell whether the ones present are the
+//     interesting ones.
 //   - it says nothing about the platform libraries, only about the classifier
 //     reachable from the pinned jui_tools.
 
@@ -192,6 +195,38 @@ function main(): void {
   const norms = CLAIMS.flatMap((c) => (c.normalizeAlike ?? []).map((p) => ({ claim: c, pair: p })));
   if (cases.length === 0 && norms.length === 0) {
     console.error("check-article-claims: no claims encoded — refusing to read that as agreement.");
+    process.exit(1);
+  }
+
+  // BOTH POLARITIES, counted — because this table had both BY ACCIDENT. The
+  // `unknown` cases arrived as a by-product of an editorial decision (section 8
+  // publishes the vocabulary's near misses beside its matches), not from a rule,
+  // and a property nobody counts is one the next edit removes in silence.
+  //
+  // Each polarity catches a different death, which is why one of them is not
+  // enough:
+  //   - only-matching: a vocabulary that GREW until it swallows everything still
+  //     satisfies every case. `Login none required` becoming `none` is invisible.
+  //   - only-unknown: a classifier that is dead, or one whose vocabulary SHRANK
+  //     to nothing, answers `unknown` to everything and passes.
+  // Floors are tied to what the page claims rather than to today's count, so an
+  // editorial trim is allowed and a collapse is not: the article documents five
+  // kinds, and section 8 names three families of near miss (a fragment of a
+  // multi-word alternative, an unanchored bare word, a word outside the list).
+  const MIN_KINDS = 4; // distinct non-unknown kinds asserted somewhere
+  const MIN_UNKNOWN = 3; // cases that must NOT match
+  const kinds = new Set(cases.map((c) => c.expect).filter((k) => k !== "unknown"));
+  const negatives = cases.filter((c) => c.expect === "unknown").length;
+  if (kinds.size < MIN_KINDS || negatives < MIN_UNKNOWN) {
+    console.error("check-article-claims: the table lost a polarity, so it can no longer");
+    console.error("  tell a live classifier from a broken one:");
+    console.error(
+      `    distinct kinds asserted: ${kinds.size} (need ${MIN_KINDS}) — [${[...kinds].sort().join(", ")}]`,
+    );
+    console.error(`    cases that must stay 'unknown': ${negatives} (need ${MIN_UNKNOWN})`);
+    console.error("  A table of matches alone passes when the vocabulary grows until it");
+    console.error("  swallows everything; a table of unknowns alone passes when the");
+    console.error("  classifier is dead. Restore the missing side, do not lower the floor.");
     process.exit(1);
   }
 
