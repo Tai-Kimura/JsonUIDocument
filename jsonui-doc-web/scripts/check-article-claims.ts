@@ -39,7 +39,7 @@ const ROOT = path.resolve(CWD, "..");
 const STRINGS = path.join(ROOT, "docs/screens/layouts/Resources/strings.json");
 const LAYOUTS = path.join(ROOT, "docs/screens/layouts");
 
-type Case = { raw: string; knownIds: string[]; expect: string };
+type Case = { raw: string; knownIds: string[]; expect: string; why?: string };
 type Claim = {
   where: string; // named in the red message, so an editor knows what to rewrite
   anchor: string; // published text this claim backs
@@ -48,6 +48,8 @@ type Claim = {
 };
 
 const k = (raw: string, expect: string, knownIds: string[] = []): Case => ({ raw, knownIds, expect });
+/** A case that must NOT match, labelled with the family of near miss it stands for. */
+const n = (raw: string, why: string): Case => ({ raw, knownIds: [], expect: "unknown", why });
 
 const CLAIMS: Claim[] = [
   {
@@ -95,10 +97,10 @@ const CLAIMS: Claim[] = [
     where: "section 8 — the near misses the vocabulary must NOT swallow",
     anchor: "Every English alternative is multi-word or anchored to the whole value",
     cases: [
-      k("Target screen or tab", "unknown"), // carries `tab`, not `tab switch`
-      k("Login none required", "unknown"), // carries `none`, unanchored
-      k("state change", "unknown"),
-      k("stay", "unknown"), // `stays on` is the alternative, not a bare `stay`
+      n("Target screen or tab", "fragment"), // carries `tab`, not `tab switch`
+      n("Login none required", "unanchored"), // carries `none`, inside prose
+      n("state change", "outside"), // says how, not whether
+      n("stay", "outside"), // `stays on` is the alternative, not a bare `stay`
     ],
   },
   {
@@ -213,20 +215,30 @@ function main(): void {
   // editorial trim is allowed and a collapse is not: the article documents five
   // kinds, and section 8 names three families of near miss (a fragment of a
   // multi-word alternative, an unanchored bare word, a word outside the list).
-  const MIN_KINDS = 4; // distinct non-unknown kinds asserted somewhere
-  const MIN_UNKNOWN = 3; // cases that must NOT match
-  const kinds = new Set(cases.map((c) => c.expect).filter((k) => k !== "unknown"));
-  const negatives = cases.filter((c) => c.expect === "unknown").length;
-  if (kinds.size < MIN_KINDS || negatives < MIN_UNKNOWN) {
-    console.error("check-article-claims: the table lost a polarity, so it can no longer");
-    console.error("  tell a live classifier from a broken one:");
-    console.error(
-      `    distinct kinds asserted: ${kinds.size} (need ${MIN_KINDS}) — [${[...kinds].sort().join(", ")}]`,
-    );
-    console.error(`    cases that must stay 'unknown': ${negatives} (need ${MIN_UNKNOWN})`);
-    console.error("  A table of matches alone passes when the vocabulary grows until it");
-    console.error("  swallows everything; a table of unknowns alone passes when the");
-    console.error("  classifier is dead. Restore the missing side, do not lower the floor.");
+  // SETS, not counts. The first version of this arm used floors — four distinct
+  // kinds, three negatives — and an aggregate cannot see a redistribution inside
+  // itself: deleting the single `route` case left four kinds and passed, while
+  // `route` classification went unasserted by anything. A count is defeated by a
+  // swap; membership is not.
+  const REQUIRED_KINDS = ["screen", "route", "external", "none", "back"]; // section 2's five
+  const REQUIRED_NEAR_MISSES = ["fragment", "unanchored", "outside"]; // section 8's three
+  const kinds = new Set(cases.map((c) => c.expect).filter((x) => x !== "unknown"));
+  const families = new Set(cases.filter((c) => c.expect === "unknown").map((c) => c.why));
+  const missingKinds = REQUIRED_KINDS.filter((x) => !kinds.has(x));
+  const missingFamilies = REQUIRED_NEAR_MISSES.filter((x) => !families.has(x));
+  if (missingKinds.length > 0 || missingFamilies.length > 0) {
+    console.error("check-article-claims: the table no longer exercises what the article");
+    console.error("  documents, so it cannot tell a live classifier from a broken one:");
+    if (missingKinds.length > 0) {
+      console.error(`    kinds the page names but nothing asserts: ${missingKinds.join(", ")}`);
+    }
+    if (missingFamilies.length > 0) {
+      console.error(`    near-miss families with no case: ${missingFamilies.join(", ")}`);
+    }
+    console.error("  Both directions are needed. A table of matches alone passes when the");
+    console.error("  vocabulary GROWS until it swallows everything; a table of unknowns");
+    console.error("  alone passes when the classifier is dead or its vocabulary SHRANK.");
+    console.error("  Restore the missing case — do not relax the requirement.");
     process.exit(1);
   }
 
