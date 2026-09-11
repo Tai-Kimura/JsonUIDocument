@@ -67,7 +67,7 @@ jobs:
   # version's help. The second half never judges whether a card is right, only
   # whether it was read; unstamped cards are counted, never red.
   #
-  # All eighteen gates run even when one fails, so a red run names everything that
+  # All nineteen gates run even when one fails, so a red run names everything that
   # is red, and every gate prints its own exit code — a gate that could not
   # run must not read as a gate that passed.
   gates:
@@ -151,7 +151,7 @@ jobs:
         working-directory: jsonui-doc-web
         run: npm run prebuild
 
-      - name: Run the eighteen gates (enforcing — a red one stops the deploy)
+      - name: Run the nineteen gates (enforcing — a red one stops the deploy)
         run: |
           set +e
           fail=0
@@ -348,6 +348,22 @@ jobs:
           # release (English `none` + IGNORECASE): it reddens and names both the
           # en and ja paragraphs.
           run_gate article-claims         npm --prefix jsonui-doc-web run check:article-claims
+          # And the TRANSCRIPTS. A code block opening `$ jsonui-test generate
+          # branch-tests …` is not an illustration — a reader compares their
+          # terminal to it. Three of them had quietly lost two lines the tool
+          # prints: the `routes:` qualifier saying the list comes from the
+          # dataFlow endpoint declarations and NOT from the contract's api
+          # references, and the closing line naming the toolchain that generated
+          # the files. No release moved underneath them; the drift was already
+          # there at the pin, which is what makes it this class of defect.
+          # cli-example-shapes structurally cannot see it: that arm reads the
+          # reference cards, one line family, jsonui-doc only. This one runs the
+          # command the page shows against a fixture mirroring the page's own
+          # example and compares EVERY line — paths relative and the version as
+          # `<version>`, both of which the page states; wrapping is not compared.
+          # Fired against four inputs that must fail: the pre-fix page, a wrong
+          # branch count, a flag the binary rejects, and an empty harvest.
+          run_gate branch-transcripts     npm --prefix jsonui-doc-web run check:branch-transcripts
           # The committed rjui_tools must BE what the pinned toolchain syncs.
           # `jui sync_tool` resolves its source as $JSONUI_CLI_PATH > ~/.jsonui-cli
           # (measured 2026-09-03 with a control pair: env set to 1.8.5 while the
@@ -382,7 +398,7 @@ jobs:
             fi
             echo "the committed vendored tree matches the pin, file for file"'
           echo "----"
-          echo "gates with a non-zero exit: $fail of 18"
+          echo "gates with a non-zero exit: $fail of 19"
           if [ "$fail" -ne 0 ]; then
             echo "FAILING this job: the deploy job depends on it and will not run."
             exit 1
