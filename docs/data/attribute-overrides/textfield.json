@@ -40,6 +40,12 @@
     }
   ],
   "attributes": {
+    "input": {
+      "note": {
+        "en": "Cross-platform keyboard hint. The date family (`date` / `time` / `datetime`) reaches a native keyboard only in Android's generated code on Compose 1.12 or newer: the Android dynamic renderer has no case for them and shows a plain text keyboard, iOS has no matching keyboard type and falls back to the default one, and web changes the input element's type instead of setting an input mode. `signedDecimal` shares its web `inputmode` with `decimal`, so on web the two are indistinguishable; iOS maps it to the punctuation keyboard because the decimal pad has no minus key. A project that declares a Compose version below 1.12.0 gets exactly these four degraded to plain text; one that declares nothing and builds against an older Compose gets a compile error instead, because the generated Kotlin names the member.",
+        "ja": "クロスプラットフォームのキーボード指定。`date` / `time` / `datetime` の 3 つがネイティブのキーボードになるのは、Compose 1.12 以降の Android 生成コードだけ: Android の dynamic レンダラーには分岐が無くプレーンなテキストになり、iOS には対応するキーボード種別が無いので既定に落ち、web は input mode ではなく要素の type が変わる。`signedDecimal` は web では `decimal` と `inputmode` を共有するため区別がつかない。iOS は記号キーボードに割り当てる — decimal pad にマイナスキーが無いため。Compose のバージョンを 1.12.0 未満と宣言したプロジェクトでは、この 4 つだけがプレーンなテキストに縮退する。何も宣言せず古い Compose でビルドした場合は縮退ではなくコンパイルエラーになる — 生成された Kotlin がそのメンバーを名指しするため。"
+      }
+    },
     "text": {
       "note": {
         "en": "Always two-way. Must bind to a mutable ViewModel property. Use `onTextChange` for non-binding side effects.",

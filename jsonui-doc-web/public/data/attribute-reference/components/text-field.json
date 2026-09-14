@@ -1644,8 +1644,8 @@
                 ]
               },
               "description": {
-                "en": "Apply liquid glass effect.",
-                "ja": "liquid glass エフェクトを適用する。"
+                "en": "Apply liquid glass effect. Superseded by the common `glass` attribute, but both spellings are still live: no conversion from this one to `glass` exists yet.",
+                "ja": "liquid glass エフェクトを適用する。共通属性 `glass` に置き換えられたが、変換はまだ無く、両方の綴りが有効。"
               },
               "platformMatrixVisibility": "visible",
               "platformIosLabel": {
@@ -2113,8 +2113,8 @@
                 ]
               },
               "description": {
-                "en": "Glass effect style.",
-                "ja": "glass エフェクトのスタイル。"
+                "en": "Glass effect style. Superseded by `glass.style`, with the same caveat: both spellings are still live.",
+                "ja": "glass エフェクトのスタイル。`glass.style` に置き換えられたが、同じ理由で両方の綴りが有効。"
               },
               "platformMatrixVisibility": "visible",
               "platformIosLabel": {
@@ -2534,7 +2534,7 @@
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "visible",
               "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
                   {
@@ -2609,6 +2609,30 @@
                           "label": "decimal",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_9",
+                          "label": "signedDecimal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_10",
+                          "label": "date",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_11",
+                          "label": "time",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_12",
+                          "label": "datetime",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
                         }
                       ]
                     }
@@ -2633,8 +2657,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "Cross-platform keyboard hint. The date family (`date` / `time` / `datetime`) reaches a native keyboard only in Android's generated code on Compose 1.12 or newer: the Android dynamic renderer has no case for them and shows a plain text keyboard, iOS has no matching keyboard type and falls back to the default one, and web changes the input element's type instead of setting an input mode. `signedDecimal` shares its web `inputmode` with `decimal`, so on web the two are indistinguishable; iOS maps it to the punctuation keyboard because the decimal pad has no minus key. A project that declares a Compose version below 1.12.0 gets exactly these four degraded to plain text; one that declares nothing and builds against an older Compose gets a compile error instead, because the generated Kotlin names the member.",
+                "ja": "クロスプラットフォームのキーボード指定。`date` / `time` / `datetime` の 3 つがネイティブのキーボードになるのは、Compose 1.12 以降の Android 生成コードだけ: Android の dynamic レンダラーには分岐が無くプレーンなテキストになり、iOS には対応するキーボード種別が無いので既定に落ち、web は input mode ではなく要素の type が変わる。`signedDecimal` は web では `decimal` と `inputmode` を共有するため区別がつかない。iOS は記号キーボードに割り当てる — decimal pad にマイナスキーが無いため。Compose のバージョンを 1.12.0 未満と宣言したプロジェクトでは、この 4 つだけがプレーンなテキストに縮退する。何も宣言せず古い Compose でビルドした場合は縮退ではなくコンパイルエラーになる — 生成された Kotlin がそのメンバーを名指しするため。"
               },
               "type": "string",
               "required": ""
@@ -6689,8 +6713,8 @@
                 ]
               },
               "description": {
-                "en": "Apply liquid glass effect.",
-                "ja": "liquid glass エフェクトを適用する。"
+                "en": "Apply liquid glass effect. Superseded by the common `glass` attribute, but both spellings are still live: no conversion from this one to `glass` exists yet.",
+                "ja": "liquid glass エフェクトを適用する。共通属性 `glass` に置き換えられたが、変換はまだ無く、両方の綴りが有効。"
               },
               "platformMatrixVisibility": "visible",
               "platformIosLabel": {
@@ -7329,8 +7353,8 @@
                 ]
               },
               "description": {
-                "en": "Glass effect style.",
-                "ja": "glass エフェクトのスタイル。"
+                "en": "Glass effect style. Superseded by `glass.style`, with the same caveat: both spellings are still live.",
+                "ja": "glass エフェクトのスタイル。`glass.style` に置き換えられたが、同じ理由で両方の綴りが有効。"
               },
               "platformMatrixVisibility": "visible",
               "platformIosLabel": {
@@ -7750,7 +7774,7 @@
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "visible",
               "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
                   {
@@ -7825,6 +7849,30 @@
                           "label": "decimal",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_9",
+                          "label": "signedDecimal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_10",
+                          "label": "date",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_11",
+                          "label": "time",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_12",
+                          "label": "datetime",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
                         }
                       ]
                     }
@@ -7849,8 +7897,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "Cross-platform keyboard hint. The date family (`date` / `time` / `datetime`) reaches a native keyboard only in Android's generated code on Compose 1.12 or newer: the Android dynamic renderer has no case for them and shows a plain text keyboard, iOS has no matching keyboard type and falls back to the default one, and web changes the input element's type instead of setting an input mode. `signedDecimal` shares its web `inputmode` with `decimal`, so on web the two are indistinguishable; iOS maps it to the punctuation keyboard because the decimal pad has no minus key. A project that declares a Compose version below 1.12.0 gets exactly these four degraded to plain text; one that declares nothing and builds against an older Compose gets a compile error instead, because the generated Kotlin names the member.",
+                "ja": "クロスプラットフォームのキーボード指定。`date` / `time` / `datetime` の 3 つがネイティブのキーボードになるのは、Compose 1.12 以降の Android 生成コードだけ: Android の dynamic レンダラーには分岐が無くプレーンなテキストになり、iOS には対応するキーボード種別が無いので既定に落ち、web は input mode ではなく要素の type が変わる。`signedDecimal` は web では `decimal` と `inputmode` を共有するため区別がつかない。iOS は記号キーボードに割り当てる — decimal pad にマイナスキーが無いため。Compose のバージョンを 1.12.0 未満と宣言したプロジェクトでは、この 4 つだけがプレーンなテキストに縮退する。何も宣言せず古い Compose でビルドした場合は縮退ではなくコンパイルエラーになる — 生成された Kotlin がそのメンバーを名指しするため。"
               },
               "type": "string",
               "required": ""

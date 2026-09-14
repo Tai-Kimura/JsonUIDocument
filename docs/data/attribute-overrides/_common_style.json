@@ -99,6 +99,12 @@
         "en": "Visual effect preset. Used by Blur; platform-specific blur / material style value.",
         "ja": "視覚効果のプリセット。Blur で使用、プラットフォーム固有のぼかし／マテリアルスタイル値。"
       }
+    },
+    "glass": {
+      "summary": {
+        "en": "Liquid Glass. Write `true` for the default treatment, or an object: `style` (`regular` / `clear` / `identity`), `tint`, `interactive`, and `shape` (`capsule` / `circle` / `rect`, or `rounded(N)` for a radius). Swift only, and the two Swift modes render it differently: SwiftUI calls `.glassEffect()`, UIKit uses `UIGlassEffect`. Two values SwiftUI honours and UIKit cannot. `style: identity` has no UIKit member, so the UIKit path applies no effect at all rather than a different one; and `shape` is a SwiftUI argument, so under UIKit the glass takes the shape of the view it sits on and the value you wrote is not read.",
+        "ja": "Liquid Glass。既定の見た目なら `true`、細かく指定するならオブジェクトで `style`（`regular` / `clear` / `identity`）、`tint`、`interactive`、`shape`（`capsule` / `circle` / `rect`、半径を指定するなら `rounded(N)`）。Swift のみで、2 つの Swift モードは別々に描画する: SwiftUI は `.glassEffect()`、UIKit は `UIGlassEffect`。SwiftUI が解釈して UIKit が解釈できない値が 2 つある。`style: identity` に対応する UIKit のメンバーが無いため、UIKit では別の効果になるのではなく効果が一切かからない。`shape` は SwiftUI の引数なので、UIKit では下敷きのビューの形になり、書いた値は読まれない。"
+      }
     }
   }
 }
