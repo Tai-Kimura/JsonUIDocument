@@ -1544,8 +1544,8 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Exit non-zero when a fixture that already had a baseline moved. Which of two behaviours you get is decided by the jui version the machine resolves, and by nothing else — not the flag, not a project setting. From jsonui-cli 1.8.85 the command refuses before writing and the baseline file is left untouched. Up to 1.8.84 it wrote the file first and chose the exit code afterwards, so a run stopped there had already replaced the baseline: restore it from version control before re-running, and do not read the non-zero exit as \"nothing was written\".",
-            "ja": "既に baseline を持つ fixture が動いていたら非ゼロで終わる。2 つの挙動のどちらになるかは、その機械が解決する jui の版だけで決まる — 旗でもプロジェクト設定でもない。jsonui-cli 1.8.85 以降は書き込みの前に拒否し、baseline ファイルは 1 バイトも動かない。1.8.84 までは先にファイルを書き、終了コードはその後で決めていたため、そこで止まった実行では既に baseline が置き換わっている: 再実行の前にバージョン管理から戻し、非ゼロ終了を「何も書かれていない」と読まないこと。"
+            "en": "Exit non-zero when a fixture that already had a baseline moved. Which of two behaviours you get is decided by the jui version the machine resolves, and by nothing else — not the flag, not a project setting. From jsonui-cli 1.8.85 the command refuses before writing, so the baseline file is left untouched; up to 1.8.84 it wrote the file first and chose the exit code afterwards, so a run stopped there had already replaced the baseline — restore it from version control before re-running, and do not read the non-zero exit as \"nothing was written\". Pairing this with `--only-new` turns the refusal off: that combination writes entries for fixtures that had no baseline, and only leaves the existing ones alone.",
+            "ja": "既に baseline を持つ fixture が動いていたら非ゼロで終わる。2 つの挙動のどちらになるかは、その機械が解決する jui の版だけで決まる — 旗でもプロジェクト設定でもない。jsonui-cli 1.8.85 以降は書き込みの前に拒否するので、baseline ファイルは動かない。1.8.84 までは先にファイルを書き、終了コードはその後で決めていたため、そこで止まった実行では既に baseline が置き換わっている — 再実行の前にバージョン管理から戻し、非ゼロ終了を「何も書かれていない」と読まないこと。`--only-new` と併用するとこの拒否は無効になる: その組み合わせでは baseline を持たない fixture の entry は書かれ、既存の entry だけが据え置かれる。"
           }
         },
         {
