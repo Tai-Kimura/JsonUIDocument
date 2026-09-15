@@ -1544,8 +1544,8 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Exit non-zero if a fixture that already had a baseline moved, instead of rebaking it silently.",
-            "ja": "既に baseline を持つ fixture が動いていたら、黙って焼き直さずに非ゼロで終わる。"
+            "en": "Exit non-zero when a fixture that already had a baseline moved. It does not hold back the re-bake: as of jsonui-cli 1.8.84 the baseline file is written first and the exit code is decided afterwards, so a run stopped by this flag has already replaced the file. Restore it from version control before re-running, and do not read the non-zero exit as \"nothing was written\".",
+            "ja": "既に baseline を持つ fixture が動いていたら非ゼロで終わる。焼き直しを止める旗ではない: jsonui-cli 1.8.84 時点では baseline ファイルを先に書き、終了コードはその後で決まるため、この旗で止まった実行では既にファイルが置き換わっている。再実行の前にバージョン管理から戻すこと。非ゼロ終了を「何も書かれていない」と読まないこと。"
           }
         },
         {
