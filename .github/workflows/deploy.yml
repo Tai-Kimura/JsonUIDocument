@@ -151,7 +151,7 @@ jobs:
         working-directory: jsonui-doc-web
         run: npm run prebuild
 
-      - name: Run the twenty gates (enforcing — a red one stops the deploy)
+      - name: Run the twenty-one gates (enforcing — a red one stops the deploy)
         run: |
           set +e
           fail=0
@@ -410,8 +410,49 @@ jobs:
               exit 1
             fi
             echo "the committed vendored tree matches the pin, file for file"'
+          # Twenty-one. Every gate above compares one artifact against its
+          # source. This one asks the reverse question about the run that
+          # already happened: steps 5 and 7 regenerate the whole derived tree
+          # — sync_tool, `jui build --web-only --clean`, `npm run prebuild` —
+          # so by the time the gates start, every tracked file a generator
+          # owns has been rewritten. If a committed copy was stale, git says
+          # so here and nowhere else. The gap that prompted it: 132 tracked
+          # files under jsonui-doc-web/public/data and src/app/reference are
+          # produced by build:attrs, and nothing regenerated and compared
+          # them — the two *-docs-match gates cover docs/ only, and a stale
+          # copy there deployed correctly anyway because CI regenerates
+          # before building, so the staleness was invisible rather than
+          # harmful. Found by deriving the set of tracked generated files
+          # instead of trusting the four this repository already watched.
+          #
+          # The population is every tracked file, derived rather than named,
+          # so a generator that starts writing somewhere new is covered the
+          # day it does. Untracked counts too: a generator that emits a new
+          # page must have that page committed. rjui_tools is included and
+          # also has its own gate, which reports the same staleness with a
+          # better message.
+          #
+          # Measured 2026-09-16 on a clean checkout: a full prebuild + build
+          # leaves 0 of the tracked files modified, so a non-empty status is
+          # a real answer rather than ambient noise. Fired once against a
+          # staged stale copy of a generated file, which it reports.
+          #
+          # /!\ What this does NOT check: that the generators are right —
+          # only that the commit carries what they produce. A file no
+          # generator writes can be wrong here and stay green.
+          run_gate regenerated-outputs-committed sh -c '
+            tracked=$(git ls-files | wc -l | tr -d " ")
+            [ "$tracked" -gt 0 ] || { echo "0 tracked files — refusing to read an empty comparison as agreement"; exit 1; }
+            changed=$(git status --porcelain | wc -l | tr -d " ")
+            if [ "$changed" -ne 0 ]; then
+              echo "regenerating left $changed path(s) differing from the commit:"
+              git status --porcelain | head -20
+              echo "Run npm run prebuild and jui build --web-only, then commit what they write."
+              exit 1
+            fi
+            echo "all $tracked tracked file(s) survived a full regeneration unchanged"'
           echo "----"
-          echo "gates with a non-zero exit: $fail of 20"
+          echo "gates with a non-zero exit: $fail of 21"
           if [ "$fail" -ne 0 ]; then
             echo "FAILING this job: the deploy job depends on it and will not run."
             exit 1
