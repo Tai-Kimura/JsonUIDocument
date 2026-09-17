@@ -28,8 +28,8 @@
   "attributes": {
     "url": {
       "note": {
-        "en": "Absolute URL. Changes trigger navigation. Use `html` for inline content instead.",
-        "ja": "絶対 URL。変更で遷移発生。インライン HTML は `html` を使う。"
+        "en": "Absolute URL. Changes trigger navigation. Use `html` for inline content instead. On Android the Compose codegen followed a bound url only from jsonui-cli 1.8.103: before that the generated view loaded the first value and emitted no `update`, so a url set after the first composition never reached it, while the web face, SwiftJsonUI and the dynamic runtimes followed the binding all along. Read from the converter change; not measured here.",
+        "ja": "絶対 URL。変更で遷移発生。インライン HTML は `html` を使う。Android の Compose codegen が bound な url を追うようになったのは jsonui-cli 1.8.103 から: それ以前は生成されたビューが最初の値を読み込むだけで `update` を出さず、初回 composition 後に設定した url はビューに届かなかった（web 面、SwiftJsonUI、dynamic ランタイムは以前から追っていた）。コンバータの変更を読んだもので、こちらでは未測定。"
       }
     },
     "html": {
