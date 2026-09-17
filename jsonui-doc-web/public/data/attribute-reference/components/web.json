@@ -139,16 +139,16 @@
                 ]
               },
               "description": {
-                "en": "Image URL (alias, binding supported).",
-                "ja": "画像の URL（`src` のエイリアス、binding 可）。"
+                "en": "Web page URL (binding supported).",
+                "ja": "Web ページの URL（binding 可）。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Absolute URL. Changes trigger navigation. Use `html` for inline content instead. On Android the Compose codegen followed a bound url only from jsonui-cli 1.8.103: before that the generated view loaded the first value and emitted no `update`, so a url set after the first composition never reached it, while the web face, SwiftJsonUI and the dynamic runtimes followed the binding all along. Read from the converter change; not measured here.",
-                "ja": "絶対 URL。変更で遷移発生。インライン HTML は `html` を使う。Android の Compose codegen が bound な url を追うようになったのは jsonui-cli 1.8.103 から: それ以前は生成されたビューが最初の値を読み込むだけで `update` を出さず、初回 composition 後に設定した url はビューに届かなかった（web 面、SwiftJsonUI、dynamic ランタイムは以前から追っていた）。コンバータの変更を読んだもので、こちらでは未測定。"
+                "en": "Absolute URL. Changes trigger navigation. Use `html` for inline content instead. On Android a bound url has been followed since the first release, but until jsonui-cli 1.8.105 it could also reload when it had not changed. The Compose codegen called `loadUrl` on every run of the view's update block. Dynamic mode compared against the view's current url, which follows redirects, so a page that redirected reloaded the same way. A reload discards scroll position, form input and page state. From 1.8.105, and KotlinJsonUI 2.35.0 for dynamic mode, both compare against the url the view last loaded and reload only when it moved. That is upstream's record, from the converter change and its unit tests; this site renders no Web on Android, so it is not measured here. Until 2026-09-17 this note said Android followed a bound url only from 1.8.103. That release changed the separate WebView converter, not `type: \"Web\"`.",
+                "ja": "絶対 URL。変更で遷移発生。インライン HTML は `html` を使う。Android では bound な url は最初の版から追われていましたが、jsonui-cli 1.8.105 より前は値が変わっていなくても再読み込みが起き得ました。Compose codegen はビューの update ブロックが走るたびに `loadUrl` を呼んでいました。dynamic モードはビューの現在の url と比べており、これは redirect 先を指すので、redirect するページは同じように読み直されました。再読み込みはスクロール位置、フォーム入力、ページの状態を捨てます。1.8.105（dynamic モードは KotlinJsonUI 2.35.0）からは、どちらもビューが最後に読み込んだ url と比べ、動いたときだけ読み直します。これは上流の記録（コンバータの変更とその単体テスト）で、このサイトは Android で Web を描画しないため、ここでは未測定です。2026-09-17 まで、この注記は「Android が bound url を追うのは 1.8.103 から」と書いていました。その版が変えたのは別の WebView コンバータで、`type: \"Web\"` ではありません。"
               },
               "type": "string | binding",
               "required": ""
@@ -807,16 +807,16 @@
                 ]
               },
               "description": {
-                "en": "Image URL (alias, binding supported).",
-                "ja": "画像の URL（`src` のエイリアス、binding 可）。"
+                "en": "Web page URL (binding supported).",
+                "ja": "Web ページの URL（binding 可）。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Absolute URL. Changes trigger navigation. Use `html` for inline content instead. On Android the Compose codegen followed a bound url only from jsonui-cli 1.8.103: before that the generated view loaded the first value and emitted no `update`, so a url set after the first composition never reached it, while the web face, SwiftJsonUI and the dynamic runtimes followed the binding all along. Read from the converter change; not measured here.",
-                "ja": "絶対 URL。変更で遷移発生。インライン HTML は `html` を使う。Android の Compose codegen が bound な url を追うようになったのは jsonui-cli 1.8.103 から: それ以前は生成されたビューが最初の値を読み込むだけで `update` を出さず、初回 composition 後に設定した url はビューに届かなかった（web 面、SwiftJsonUI、dynamic ランタイムは以前から追っていた）。コンバータの変更を読んだもので、こちらでは未測定。"
+                "en": "Absolute URL. Changes trigger navigation. Use `html` for inline content instead. On Android a bound url has been followed since the first release, but until jsonui-cli 1.8.105 it could also reload when it had not changed. The Compose codegen called `loadUrl` on every run of the view's update block. Dynamic mode compared against the view's current url, which follows redirects, so a page that redirected reloaded the same way. A reload discards scroll position, form input and page state. From 1.8.105, and KotlinJsonUI 2.35.0 for dynamic mode, both compare against the url the view last loaded and reload only when it moved. That is upstream's record, from the converter change and its unit tests; this site renders no Web on Android, so it is not measured here. Until 2026-09-17 this note said Android followed a bound url only from 1.8.103. That release changed the separate WebView converter, not `type: \"Web\"`.",
+                "ja": "絶対 URL。変更で遷移発生。インライン HTML は `html` を使う。Android では bound な url は最初の版から追われていましたが、jsonui-cli 1.8.105 より前は値が変わっていなくても再読み込みが起き得ました。Compose codegen はビューの update ブロックが走るたびに `loadUrl` を呼んでいました。dynamic モードはビューの現在の url と比べており、これは redirect 先を指すので、redirect するページは同じように読み直されました。再読み込みはスクロール位置、フォーム入力、ページの状態を捨てます。1.8.105（dynamic モードは KotlinJsonUI 2.35.0）からは、どちらもビューが最後に読み込んだ url と比べ、動いたときだけ読み直します。これは上流の記録（コンバータの変更とその単体テスト）で、このサイトは Android で Web を描画しないため、ここでは未測定です。2026-09-17 まで、この注記は「Android が bound url を追うのは 1.8.103 から」と書いていました。その版が変えたのは別の WebView コンバータで、`type: \"Web\"` ではありません。"
               },
               "type": "string | binding",
               "required": ""
