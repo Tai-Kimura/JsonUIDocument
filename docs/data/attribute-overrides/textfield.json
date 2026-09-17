@@ -40,6 +40,8 @@
     }
   ],
   "attributes": {
+    "hideOnFocused": { "summary": { "en": "Hide other elements while the field is focused.", "ja": "フィールドにフォーカスがある間、他の要素を隠す。" } },
+    "placeholder": { "summary": { "en": "Placeholder text (alias for `hint`).", "ja": "プレースホルダー文字列（`hint` のエイリアス）。" } },
     "input": {
       "note": {
         "en": "Cross-platform keyboard hint. The date family (`date` / `time` / `datetime`) reaches a native keyboard only in Android's generated code on Compose 1.12 or newer: the Android dynamic renderer has no case for them and shows a plain text keyboard, iOS has no matching keyboard type and falls back to the default one, and web changes the input element's type instead of setting an input mode. `signedDecimal` shares its web `inputmode` with `decimal`, so on web the two are indistinguishable; iOS maps it to the punctuation keyboard because the decimal pad has no minus key. A project that declares a Compose version below 1.12.0 gets exactly these four degraded to plain text; one that declares nothing and builds against an older Compose gets a compile error instead, because the generated Kotlin names the member.",

@@ -43,12 +43,14 @@
       }
     },
     "value": {
+      "summary": { "en": "The value associated with this option when it is selected.", "ja": "この選択肢が選ばれたときに対応付く値。" },
       "note": {
         "en": "The value this Radio represents when selected. Bind `selectedValue` on the parent (or the ViewModel) to track which value is chosen.",
         "ja": "この Radio が選ばれたときの値。親（または ViewModel）で `selectedValue` をバインドして選択値を管理。"
       }
     },
     "checked": {
+      "summary": { "en": "Seeds which option starts selected; it is not the group's live state and it is not two-way. A bound `selectedValue` on the group wins, then a literal `selectedValue`, then `checked`.", "ja": "どの選択肢が最初に選ばれているかの初期値。グループの現在の状態ではなく、two-way でもない。グループの bound な `selectedValue` が最優先、次にリテラルの `selectedValue`、最後に `checked`。" },
       "note": {
         "en": "Boolean binding. Expressions are not allowed inside `@{…}` — if you need a per-option boolean, derive it in the ViewModel (e.g. `get isMediumSelected() { return this.size === \"M\"; }`). Tapping sets all other Radios in the same `group` to `false`. Binding `selectedValue` is usually the simpler pattern.",
         "ja": "Boolean binding。`@{…}` 内に式は書けない — 選択肢ごとの boolean が必要なら ViewModel で導出する（例: `get isMediumSelected() { return this.size === \"M\"; }`）。タップで同 `group` の他の Radio は `false` になる。通常は `selectedValue` を使う方が簡潔。"
@@ -67,6 +69,7 @@
       }
     },
     "label": {
+      "summary": { "en": "Radio label (binding supported).", "ja": "ラジオのラベル（binding 可）。" },
       "note": {
         "en": "Inline label rendered to the right of the radio icon. For custom label layout, omit `label` and wrap Radio + Label in a horizontal View.",
         "ja": "ラジオアイコンの右に表示するインラインラベル。独自配置が必要なら `label` を省略し、水平 View で Radio + Label を並べる。"
