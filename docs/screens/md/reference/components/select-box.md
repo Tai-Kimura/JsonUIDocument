@@ -2,12 +2,12 @@
 
 ## Overview
 
-Picker for choosing one value from a discrete list, or a date/time picker when `datePickerMode` is set. Renders as native picker on iOS/Android, `<select>` on Web.
+Picker for choosing one value from a discrete list, or a date/time picker when `selectItemType` is `Date` (`datePickerMode` then picks date / time / dateAndTime). Renders as native picker on iOS/Android, `<select>` on Web.
 
 | | |
 |---|---|
 | Created | 2026-08-25 |
-| Updated | 2026-08-25 |
+| Updated | 2026-09-17 |
 
 ## Screen Structure
 

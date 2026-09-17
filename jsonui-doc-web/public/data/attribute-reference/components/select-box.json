@@ -4,12 +4,12 @@
   "aliasOf": null,
   "title": "SelectBox",
   "description": {
-    "en": "Picker for choosing one value from a discrete list, or a date/time picker when `datePickerMode` is set. Renders as native picker on iOS/Android, `<select>` on Web.",
-    "ja": "離散的な選択肢から 1 件を選ぶピッカー。`datePickerMode` 指定時は日付／時刻ピッカーになる。iOS/Android ではネイティブピッカー、Web では `<select>`。"
+    "en": "Picker for choosing one value from a discrete list, or a date/time picker when `selectItemType` is `Date` (`datePickerMode` then picks date / time / dateAndTime). Renders as native picker on iOS/Android, `<select>` on Web.",
+    "ja": "離散的な選択肢から 1 件を選ぶピッカー。`selectItemType` が `Date` のとき日付／時刻ピッカーになる（`datePickerMode` はその中で date / time / dateAndTime を選ぶ）。iOS/Android ではネイティブピッカー、Web では `<select>`。"
   },
   "usage": {
-    "en": "Use SelectBox when the option count is >= 5 or the options are long strings. For 2-4 short options prefer Segment. For date/time input, set `datePickerMode` to `date` / `time` / `dateAndTime`.",
-    "ja": "選択肢が 5 件以上、または各項目が長い場合に使う。2〜4 件の短い選択肢なら Segment。日付／時刻入力は `datePickerMode` に `date` / `time` / `dateAndTime` を指定。"
+    "en": "Use SelectBox when the option count is >= 5 or the options are long strings. For 2-4 short options prefer Segment. For date/time input, set `selectItemType` to `Date` and `datePickerMode` to `date` / `time` / `dateAndTime`.",
+    "ja": "選択肢が 5 件以上、または各項目が長い場合に使う。2〜4 件の短い選択肢なら Segment。日付／時刻入力は `selectItemType` に `Date`、`datePickerMode` に `date` / `time` / `dateAndTime` を指定。"
   },
   "aliasNotice": null,
   "kicker": "Component · Reference",
@@ -283,8 +283,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Canonically an array of **strings** — the string IS the value — or a binding to a ViewModel string array. This is the shape that works on all three platforms. On Web only, entries may also be objects (`{ value, text }` / `{ id, label }`) — a web extension; keep object items out of cross-platform layouts. When `datePickerMode` is set, `items` is ignored in favor of date range attributes. Entries are data, not strings keys. The attribute definition has said so outright since jsonui-cli 1.8.38, and the web face agrees when measured: a key that is registered in strings.json, written as an item, renders as the key text itself. Translate the list in the view model before binding it.",
-                "ja": "正準形は**文字列**の配列 — 文字列そのものが値 — または ViewModel の文字列配列へのバインド。この形が 3 プラットフォーム全てで動きます。Web に限りオブジェクト要素（`{ value, text }` / `{ id, label }`）も受理されますが web 拡張です — クロスプラットフォームの layout ではオブジェクト items を使わないこと。`datePickerMode` 指定時は `items` は無視され日付範囲属性が優先される。　エントリはデータであって strings のキーではありません。jsonui-cli 1.8.38 から属性宣言がそう明記しており、web 面で実測しても、strings.json に登録済みのキーを item に書くとキー文字列のまま描画されます。翻訳は bind する前に ViewModel 側で済ませてください。"
+                "en": "Canonically an array of **strings** — the string IS the value — or a binding to a ViewModel string array. This is the shape that works on all three platforms. On Web only, entries may also be objects (`{ value, text }` / `{ id, label }`) — a web extension; keep object items out of cross-platform layouts. When `selectItemType` is `Date`, `items` is ignored in favor of the date range attributes. Entries are data, not strings keys. The attribute definition has said so outright since jsonui-cli 1.8.38, and the web face agrees when measured: a key that is registered in strings.json, written as an item, renders as the key text itself. Translate the list in the view model before binding it.",
+                "ja": "正準形は**文字列**の配列 — 文字列そのものが値 — または ViewModel の文字列配列へのバインド。この形が 3 プラットフォーム全てで動きます。Web に限りオブジェクト要素（`{ value, text }` / `{ id, label }`）も受理されますが web 拡張です — クロスプラットフォームの layout ではオブジェクト items を使わないこと。`selectItemType` が `Date` のとき `items` は無視され日付範囲属性が優先される。　エントリはデータであって strings のキーではありません。jsonui-cli 1.8.38 から属性宣言がそう明記しており、web 面で実測しても、strings.json に登録済みのキーを item に書くとキー文字列のまま描画されます。翻訳は bind する前に ViewModel 側で済ませてください。"
               },
               "type": "array | binding",
               "required": ""
@@ -542,8 +542,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Absent, every platform keeps its native indicator at its native inset, so existing layouts do not move. Present, the face draws the caret itself from these keys — the attribute reference does not list the keys of an object separately, so they are named here. `src` is optional: without it the face draws its own default chevron, so `{\"rightMargin\": 12}` alone moves a native-looking arrow 12 pt / dp / px in from the trailing edge. `rightMargin` defaults to 0, the caret flush against the edge, which is the UIKit contract the object came from. `tintColor` colours the default glyph and a template `src`; `background` fills the caret's own width × height box, not the select. Until jsonui-cli 1.8.101 this object was declared UIKit-only and only SJUISelectBox read it; from 1.8.101 the declaration is cross-platform and SwiftUI (SwiftJsonUI 10.25.0), Compose (KotlinJsonUI 2.33.0) and the web `<select>` draw it too, while a runtime older than those keeps showing its native indicator. Measured on the web face with the pinned toolchain: without the object the generated class list is the previous one, byte for byte; with it the native arrow is removed (`appearance-none`) and the caret is painted as background layers at `right <rightMargin>px center`, the text's right padding following the caret; a `multiple` list box and a `selectItemType: Date` picker leave no caret in the output. Two web limits: a raster `src` is drawn as-is, so `tintColor` does not reach it; and `datePickerMode` alone does not put the web face into date-picker mode — only `selectItemType: Date` does — so a caret declared next to a bare `datePickerMode` is still drawn on web.",
-                "ja": "未指定なら各プラットフォームはネイティブの矢印をネイティブの位置に描き続けるので、既存レイアウトは動きません。指定すると面がこのキー群から自前でキャレットを描きます — 属性リファレンスはオブジェクトのキーを個別に列挙しないため、ここに挙げます。`src` は省略可: 無ければ面の既定シェブロンが描かれるので、`{\"rightMargin\": 12}` だけでネイティブ風の矢印が末尾端から 12 pt / dp / px 内側に寄ります。`rightMargin` の既定は 0（端にぴったり付く）で、これはこのオブジェクトの出自である UIKit の契約です。`tintColor` は既定グリフとテンプレート `src` に効き、`background` はキャレット自身の width × height の箱を塗るもので select 全体ではありません。jsonui-cli 1.8.101 より前、このオブジェクトは UIKit 限定として宣言され SJUISelectBox だけが読んでいました。1.8.101 からは宣言がクロスプラットフォームになり、SwiftUI（SwiftJsonUI 10.25.0）、Compose（KotlinJsonUI 2.33.0）、web の `<select>` も描きます。それより古いランタイムはネイティブの矢印を出し続けます。pin されたツールチェーンで web 面を実測: オブジェクト無しでは生成されるクラス列は従来とバイト単位で同一、有りではネイティブ矢印が消え（`appearance-none`）、キャレットは背景レイヤーとして `right <rightMargin>px center` に描かれ、テキストの右パディングがキャレットに追従します。`multiple` のリストボックスと `selectItemType: Date` のピッカーでは出力にキャレットが残りません。web の制限が 2 つ: ラスターの `src` はそのまま描かれ `tintColor` は届かない。そして `datePickerMode` 単独では web 面は日付ピッカーにならず（`selectItemType: Date` のみが切り替える）、素の `datePickerMode` の横に書いたキャレットは web では描かれます。"
+                "en": "Absent, every platform keeps its native indicator at its native inset, so existing layouts do not move. Present, the face draws the caret itself from these keys — the attribute reference does not list the keys of an object separately, so they are named here. `src` is optional: without it the face draws its own default chevron, so `{\"rightMargin\": 12}` alone moves a native-looking arrow 12 pt / dp / px in from the trailing edge. `rightMargin` defaults to 0, the caret flush against the edge, which is the UIKit contract the object came from. `tintColor` colours the default glyph and a template `src`; `background` fills the caret's own width × height box, not the select. Until jsonui-cli 1.8.101 this object was declared UIKit-only and only SJUISelectBox read it; from 1.8.101 the declaration is cross-platform and SwiftUI (SwiftJsonUI 10.25.0), Compose (KotlinJsonUI 2.33.0) and the web `<select>` draw it too, while a runtime older than those keeps showing its native indicator. Measured on the web face with the pinned toolchain: without the object the generated class list is the previous one, byte for byte; with it the native arrow is removed (`appearance-none`) and the caret is painted as background layers at `right <rightMargin>px center`, the text's right padding following the caret; a `multiple` list box and a `selectItemType: Date` picker leave no caret in the output. One web limit: a raster `src` is drawn as-is, so `tintColor` does not reach it. And one thing the exclusion does not say: date mode is declared with `selectItemType: Date` on every face and `datePickerMode` only chooses the picker inside it, so a caret declared next to a bare `datePickerMode` is still drawn.",
+                "ja": "未指定なら各プラットフォームはネイティブの矢印をネイティブの位置に描き続けるので、既存レイアウトは動きません。指定すると面がこのキー群から自前でキャレットを描きます — 属性リファレンスはオブジェクトのキーを個別に列挙しないため、ここに挙げます。`src` は省略可: 無ければ面の既定シェブロンが描かれるので、`{\"rightMargin\": 12}` だけでネイティブ風の矢印が末尾端から 12 pt / dp / px 内側に寄ります。`rightMargin` の既定は 0（端にぴったり付く）で、これはこのオブジェクトの出自である UIKit の契約です。`tintColor` は既定グリフとテンプレート `src` に効き、`background` はキャレット自身の width × height の箱を塗るもので select 全体ではありません。jsonui-cli 1.8.101 より前、このオブジェクトは UIKit 限定として宣言され SJUISelectBox だけが読んでいました。1.8.101 からは宣言がクロスプラットフォームになり、SwiftUI（SwiftJsonUI 10.25.0）、Compose（KotlinJsonUI 2.33.0）、web の `<select>` も描きます。それより古いランタイムはネイティブの矢印を出し続けます。pin されたツールチェーンで web 面を実測: オブジェクト無しでは生成されるクラス列は従来とバイト単位で同一、有りではネイティブ矢印が消え（`appearance-none`）、キャレットは背景レイヤーとして `right <rightMargin>px center` に描かれ、テキストの右パディングがキャレットに追従します。`multiple` のリストボックスと `selectItemType: Date` のピッカーでは出力にキャレットが残りません。web の制限が 1 つ: ラスターの `src` はそのまま描かれ `tintColor` は届かない。そして除外条件が言っていないこと: Date モードはどの面でも `selectItemType: Date` で宣言し、`datePickerMode` はその中のピッカー種別を選ぶだけなので、素の `datePickerMode` の横に書いたキャレットは描かれます。"
               },
               "type": "object",
               "required": ""
@@ -706,16 +706,16 @@
                 ]
               },
               "description": {
-                "en": "Date picker mode.",
-                "ja": "日付ピッカーモード（`date` / `time` / `dateAndTime` / `countDownTimer`）。"
+                "en": "Which picker a date-mode SelectBox shows: `date` / `time` / `dateAndTime` / `countDown` (`datetime` is a declared synonym of `dateAndTime`). Date mode itself is declared with `selectItemType: Date`.",
+                "ja": "Date モードの SelectBox が出すピッカー: `date` / `time` / `dateAndTime` / `countDown`（`datetime` は `dateAndTime` の宣言済み同義語）。Date モード自体は `selectItemType: Date` で宣言する。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "`date` / `time` / `dateAndTime` / `countDownTimer`. Switches SelectBox into date/time picker mode.",
-                "ja": "`date` / `time` / `dateAndTime` / `countDownTimer`。SelectBox を日付／時刻ピッカーモードに切り替える。"
+                "en": "Which picker a date-mode SelectBox shows. The declaration enumerates `date` / `time` / `dateAndTime` / `countDown`, with `datetime` a declared synonym of `dateAndTime`. It does not enter date mode by itself: every face branches on `selectItemType: Date` (measured on the web face, read in the SwiftUI and Compose converters), and a `datePickerMode` written alone leaves an ordinary select. This page said the opposite until 2026-09-17.",
+                "ja": "Date モードの SelectBox がどのピッカーを出すか。宣言の列挙は `date` / `time` / `dateAndTime` / `countDown` で、`datetime` は `dateAndTime` の宣言済み同義語。これ単独では Date モードに入りません: どの面も `selectItemType: Date` で分岐し（web 面は実測、SwiftUI と Compose のコンバータはソースを読んで確認）、`datePickerMode` だけを書いた SelectBox は通常の select のままです。このページは 2026-09-17 まで逆のことを書いていました。"
               },
               "type": "string",
               "required": ""
@@ -1425,8 +1425,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Earliest selectable date. ISO 8601 string or date binding. Use with `datePickerMode`.",
-                "ja": "選択可能な最早日付。ISO 8601 文字列または日付バインド。`datePickerMode` と併用。"
+                "en": "Earliest selectable date. ISO 8601 string or date binding. Use with `selectItemType: Date`.",
+                "ja": "選択可能な最早日付。ISO 8601 文字列または日付バインド。`selectItemType: Date` と併用。"
               },
               "type": "string | binding",
               "required": ""
@@ -1771,7 +1771,7 @@
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "visible",
               "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
                   {
@@ -1820,16 +1820,16 @@
                 ]
               },
               "description": {
-                "en": "Select item type.",
-                "ja": "選択アイテムのタイプ。"
+                "en": "The switch into date mode: `Normal` (default) is a list picker, `Date` a date/time picker, on every face.",
+                "ja": "Date モードへの切り替え: `Normal`（既定）はリストのピッカー、`Date` は日付／時刻ピッカー。どの面でも同じ。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "`datePickerMode`, `datePickerStyle`, `minimumDate` / `maximumDate`, `minuteInterval`, `dateStringFormat` and `selectedDate` all describe the `Date` mode; none of them declares it. The three converters branch on this attribute (the web face measured with the pinned toolchain, the SwiftUI and Compose converters read), and the conformance fixtures for `datePickerMode` carry `selectItemType: Date` beside it for the same reason.",
+                "ja": "`datePickerMode` / `datePickerStyle` / `minimumDate` / `maximumDate` / `minuteInterval` / `dateStringFormat` / `selectedDate` はどれも `Date` モードの中身を記述する属性で、モードを宣言するものではありません。3 つのコンバータはこの属性で分岐します（web 面は pin されたツールチェーンで実測、SwiftUI と Compose のコンバータはソースを読んで確認）。conformance の `datePickerMode` fixture も同じ理由で `selectItemType: Date` を同伴しています。"
               },
               "type": "string",
               "required": ""
@@ -2568,7 +2568,7 @@
               "languagePill": "json",
               "languagePillVisibility": "visible",
               "activeLanguage": "json",
-              "activeCode": "{\n  \"type\": \"SelectBox\",\n  \"datePickerMode\": \"date\",\n  \"selectedDate\": \"@{birthDate}\",\n  \"minimumDate\": \"1900-01-01\",\n  \"maximumDate\": \"2025-12-31\",\n  \"dateStringFormat\": \"yyyy-MM-dd\"\n}",
+              "activeCode": "{\n  \"type\": \"SelectBox\",\n  \"selectItemType\": \"Date\",\n  \"datePickerMode\": \"date\",\n  \"selectedDate\": \"@{birthDate}\",\n  \"minimumDate\": \"1900-01-01\",\n  \"maximumDate\": \"2025-12-31\",\n  \"dateStringFormat\": \"yyyy-MM-dd\"\n}",
               "note": {
                 "en": "",
                 "ja": ""
@@ -2577,11 +2577,11 @@
               "_variants": [
                 {
                   "language": "json",
-                  "code": "{\n  \"type\": \"SelectBox\",\n  \"datePickerMode\": \"date\",\n  \"selectedDate\": \"@{birthDate}\",\n  \"minimumDate\": \"1900-01-01\",\n  \"maximumDate\": \"2025-12-31\",\n  \"dateStringFormat\": \"yyyy-MM-dd\"\n}"
+                  "code": "{\n  \"type\": \"SelectBox\",\n  \"selectItemType\": \"Date\",\n  \"datePickerMode\": \"date\",\n  \"selectedDate\": \"@{birthDate}\",\n  \"minimumDate\": \"1900-01-01\",\n  \"maximumDate\": \"2025-12-31\",\n  \"dateStringFormat\": \"yyyy-MM-dd\"\n}"
                 }
               ],
               "language": "json",
-              "code": "{\n  \"type\": \"SelectBox\",\n  \"datePickerMode\": \"date\",\n  \"selectedDate\": \"@{birthDate}\",\n  \"minimumDate\": \"1900-01-01\",\n  \"maximumDate\": \"2025-12-31\",\n  \"dateStringFormat\": \"yyyy-MM-dd\"\n}",
+              "code": "{\n  \"type\": \"SelectBox\",\n  \"selectItemType\": \"Date\",\n  \"datePickerMode\": \"date\",\n  \"selectedDate\": \"@{birthDate}\",\n  \"minimumDate\": \"1900-01-01\",\n  \"maximumDate\": \"2025-12-31\",\n  \"dateStringFormat\": \"yyyy-MM-dd\"\n}",
               "required": ""
             },
             {
@@ -2872,8 +2872,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Canonically an array of **strings** — the string IS the value — or a binding to a ViewModel string array. This is the shape that works on all three platforms. On Web only, entries may also be objects (`{ value, text }` / `{ id, label }`) — a web extension; keep object items out of cross-platform layouts. When `datePickerMode` is set, `items` is ignored in favor of date range attributes. Entries are data, not strings keys. The attribute definition has said so outright since jsonui-cli 1.8.38, and the web face agrees when measured: a key that is registered in strings.json, written as an item, renders as the key text itself. Translate the list in the view model before binding it.",
-                "ja": "正準形は**文字列**の配列 — 文字列そのものが値 — または ViewModel の文字列配列へのバインド。この形が 3 プラットフォーム全てで動きます。Web に限りオブジェクト要素（`{ value, text }` / `{ id, label }`）も受理されますが web 拡張です — クロスプラットフォームの layout ではオブジェクト items を使わないこと。`datePickerMode` 指定時は `items` は無視され日付範囲属性が優先される。　エントリはデータであって strings のキーではありません。jsonui-cli 1.8.38 から属性宣言がそう明記しており、web 面で実測しても、strings.json に登録済みのキーを item に書くとキー文字列のまま描画されます。翻訳は bind する前に ViewModel 側で済ませてください。"
+                "en": "Canonically an array of **strings** — the string IS the value — or a binding to a ViewModel string array. This is the shape that works on all three platforms. On Web only, entries may also be objects (`{ value, text }` / `{ id, label }`) — a web extension; keep object items out of cross-platform layouts. When `selectItemType` is `Date`, `items` is ignored in favor of the date range attributes. Entries are data, not strings keys. The attribute definition has said so outright since jsonui-cli 1.8.38, and the web face agrees when measured: a key that is registered in strings.json, written as an item, renders as the key text itself. Translate the list in the view model before binding it.",
+                "ja": "正準形は**文字列**の配列 — 文字列そのものが値 — または ViewModel の文字列配列へのバインド。この形が 3 プラットフォーム全てで動きます。Web に限りオブジェクト要素（`{ value, text }` / `{ id, label }`）も受理されますが web 拡張です — クロスプラットフォームの layout ではオブジェクト items を使わないこと。`selectItemType` が `Date` のとき `items` は無視され日付範囲属性が優先される。　エントリはデータであって strings のキーではありません。jsonui-cli 1.8.38 から属性宣言がそう明記しており、web 面で実測しても、strings.json に登録済みのキーを item に書くとキー文字列のまま描画されます。翻訳は bind する前に ViewModel 側で済ませてください。"
               },
               "type": "array | binding",
               "required": ""
@@ -3131,8 +3131,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Absent, every platform keeps its native indicator at its native inset, so existing layouts do not move. Present, the face draws the caret itself from these keys — the attribute reference does not list the keys of an object separately, so they are named here. `src` is optional: without it the face draws its own default chevron, so `{\"rightMargin\": 12}` alone moves a native-looking arrow 12 pt / dp / px in from the trailing edge. `rightMargin` defaults to 0, the caret flush against the edge, which is the UIKit contract the object came from. `tintColor` colours the default glyph and a template `src`; `background` fills the caret's own width × height box, not the select. Until jsonui-cli 1.8.101 this object was declared UIKit-only and only SJUISelectBox read it; from 1.8.101 the declaration is cross-platform and SwiftUI (SwiftJsonUI 10.25.0), Compose (KotlinJsonUI 2.33.0) and the web `<select>` draw it too, while a runtime older than those keeps showing its native indicator. Measured on the web face with the pinned toolchain: without the object the generated class list is the previous one, byte for byte; with it the native arrow is removed (`appearance-none`) and the caret is painted as background layers at `right <rightMargin>px center`, the text's right padding following the caret; a `multiple` list box and a `selectItemType: Date` picker leave no caret in the output. Two web limits: a raster `src` is drawn as-is, so `tintColor` does not reach it; and `datePickerMode` alone does not put the web face into date-picker mode — only `selectItemType: Date` does — so a caret declared next to a bare `datePickerMode` is still drawn on web.",
-                "ja": "未指定なら各プラットフォームはネイティブの矢印をネイティブの位置に描き続けるので、既存レイアウトは動きません。指定すると面がこのキー群から自前でキャレットを描きます — 属性リファレンスはオブジェクトのキーを個別に列挙しないため、ここに挙げます。`src` は省略可: 無ければ面の既定シェブロンが描かれるので、`{\"rightMargin\": 12}` だけでネイティブ風の矢印が末尾端から 12 pt / dp / px 内側に寄ります。`rightMargin` の既定は 0（端にぴったり付く）で、これはこのオブジェクトの出自である UIKit の契約です。`tintColor` は既定グリフとテンプレート `src` に効き、`background` はキャレット自身の width × height の箱を塗るもので select 全体ではありません。jsonui-cli 1.8.101 より前、このオブジェクトは UIKit 限定として宣言され SJUISelectBox だけが読んでいました。1.8.101 からは宣言がクロスプラットフォームになり、SwiftUI（SwiftJsonUI 10.25.0）、Compose（KotlinJsonUI 2.33.0）、web の `<select>` も描きます。それより古いランタイムはネイティブの矢印を出し続けます。pin されたツールチェーンで web 面を実測: オブジェクト無しでは生成されるクラス列は従来とバイト単位で同一、有りではネイティブ矢印が消え（`appearance-none`）、キャレットは背景レイヤーとして `right <rightMargin>px center` に描かれ、テキストの右パディングがキャレットに追従します。`multiple` のリストボックスと `selectItemType: Date` のピッカーでは出力にキャレットが残りません。web の制限が 2 つ: ラスターの `src` はそのまま描かれ `tintColor` は届かない。そして `datePickerMode` 単独では web 面は日付ピッカーにならず（`selectItemType: Date` のみが切り替える）、素の `datePickerMode` の横に書いたキャレットは web では描かれます。"
+                "en": "Absent, every platform keeps its native indicator at its native inset, so existing layouts do not move. Present, the face draws the caret itself from these keys — the attribute reference does not list the keys of an object separately, so they are named here. `src` is optional: without it the face draws its own default chevron, so `{\"rightMargin\": 12}` alone moves a native-looking arrow 12 pt / dp / px in from the trailing edge. `rightMargin` defaults to 0, the caret flush against the edge, which is the UIKit contract the object came from. `tintColor` colours the default glyph and a template `src`; `background` fills the caret's own width × height box, not the select. Until jsonui-cli 1.8.101 this object was declared UIKit-only and only SJUISelectBox read it; from 1.8.101 the declaration is cross-platform and SwiftUI (SwiftJsonUI 10.25.0), Compose (KotlinJsonUI 2.33.0) and the web `<select>` draw it too, while a runtime older than those keeps showing its native indicator. Measured on the web face with the pinned toolchain: without the object the generated class list is the previous one, byte for byte; with it the native arrow is removed (`appearance-none`) and the caret is painted as background layers at `right <rightMargin>px center`, the text's right padding following the caret; a `multiple` list box and a `selectItemType: Date` picker leave no caret in the output. One web limit: a raster `src` is drawn as-is, so `tintColor` does not reach it. And one thing the exclusion does not say: date mode is declared with `selectItemType: Date` on every face and `datePickerMode` only chooses the picker inside it, so a caret declared next to a bare `datePickerMode` is still drawn.",
+                "ja": "未指定なら各プラットフォームはネイティブの矢印をネイティブの位置に描き続けるので、既存レイアウトは動きません。指定すると面がこのキー群から自前でキャレットを描きます — 属性リファレンスはオブジェクトのキーを個別に列挙しないため、ここに挙げます。`src` は省略可: 無ければ面の既定シェブロンが描かれるので、`{\"rightMargin\": 12}` だけでネイティブ風の矢印が末尾端から 12 pt / dp / px 内側に寄ります。`rightMargin` の既定は 0（端にぴったり付く）で、これはこのオブジェクトの出自である UIKit の契約です。`tintColor` は既定グリフとテンプレート `src` に効き、`background` はキャレット自身の width × height の箱を塗るもので select 全体ではありません。jsonui-cli 1.8.101 より前、このオブジェクトは UIKit 限定として宣言され SJUISelectBox だけが読んでいました。1.8.101 からは宣言がクロスプラットフォームになり、SwiftUI（SwiftJsonUI 10.25.0）、Compose（KotlinJsonUI 2.33.0）、web の `<select>` も描きます。それより古いランタイムはネイティブの矢印を出し続けます。pin されたツールチェーンで web 面を実測: オブジェクト無しでは生成されるクラス列は従来とバイト単位で同一、有りではネイティブ矢印が消え（`appearance-none`）、キャレットは背景レイヤーとして `right <rightMargin>px center` に描かれ、テキストの右パディングがキャレットに追従します。`multiple` のリストボックスと `selectItemType: Date` のピッカーでは出力にキャレットが残りません。web の制限が 1 つ: ラスターの `src` はそのまま描かれ `tintColor` は届かない。そして除外条件が言っていないこと: Date モードはどの面でも `selectItemType: Date` で宣言し、`datePickerMode` はその中のピッカー種別を選ぶだけなので、素の `datePickerMode` の横に書いたキャレットは描かれます。"
               },
               "type": "object",
               "required": ""
@@ -3295,16 +3295,16 @@
                 ]
               },
               "description": {
-                "en": "Date picker mode.",
-                "ja": "日付ピッカーモード（`date` / `time` / `dateAndTime` / `countDownTimer`）。"
+                "en": "Which picker a date-mode SelectBox shows: `date` / `time` / `dateAndTime` / `countDown` (`datetime` is a declared synonym of `dateAndTime`). Date mode itself is declared with `selectItemType: Date`.",
+                "ja": "Date モードの SelectBox が出すピッカー: `date` / `time` / `dateAndTime` / `countDown`（`datetime` は `dateAndTime` の宣言済み同義語）。Date モード自体は `selectItemType: Date` で宣言する。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "`date` / `time` / `dateAndTime` / `countDownTimer`. Switches SelectBox into date/time picker mode.",
-                "ja": "`date` / `time` / `dateAndTime` / `countDownTimer`。SelectBox を日付／時刻ピッカーモードに切り替える。"
+                "en": "Which picker a date-mode SelectBox shows. The declaration enumerates `date` / `time` / `dateAndTime` / `countDown`, with `datetime` a declared synonym of `dateAndTime`. It does not enter date mode by itself: every face branches on `selectItemType: Date` (measured on the web face, read in the SwiftUI and Compose converters), and a `datePickerMode` written alone leaves an ordinary select. This page said the opposite until 2026-09-17.",
+                "ja": "Date モードの SelectBox がどのピッカーを出すか。宣言の列挙は `date` / `time` / `dateAndTime` / `countDown` で、`datetime` は `dateAndTime` の宣言済み同義語。これ単独では Date モードに入りません: どの面も `selectItemType: Date` で分岐し（web 面は実測、SwiftUI と Compose のコンバータはソースを読んで確認）、`datePickerMode` だけを書いた SelectBox は通常の select のままです。このページは 2026-09-17 まで逆のことを書いていました。"
               },
               "type": "string",
               "required": ""
@@ -4014,8 +4014,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Earliest selectable date. ISO 8601 string or date binding. Use with `datePickerMode`.",
-                "ja": "選択可能な最早日付。ISO 8601 文字列または日付バインド。`datePickerMode` と併用。"
+                "en": "Earliest selectable date. ISO 8601 string or date binding. Use with `selectItemType: Date`.",
+                "ja": "選択可能な最早日付。ISO 8601 文字列または日付バインド。`selectItemType: Date` と併用。"
               },
               "type": "string | binding",
               "required": ""
@@ -4488,7 +4488,7 @@
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "visible",
               "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
                   {
@@ -4537,16 +4537,16 @@
                 ]
               },
               "description": {
-                "en": "Select item type.",
-                "ja": "選択アイテムのタイプ。"
+                "en": "The switch into date mode: `Normal` (default) is a list picker, `Date` a date/time picker, on every face.",
+                "ja": "Date モードへの切り替え: `Normal`（既定）はリストのピッカー、`Date` は日付／時刻ピッカー。どの面でも同じ。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "`datePickerMode`, `datePickerStyle`, `minimumDate` / `maximumDate`, `minuteInterval`, `dateStringFormat` and `selectedDate` all describe the `Date` mode; none of them declares it. The three converters branch on this attribute (the web face measured with the pinned toolchain, the SwiftUI and Compose converters read), and the conformance fixtures for `datePickerMode` carry `selectItemType: Date` beside it for the same reason.",
+                "ja": "`datePickerMode` / `datePickerStyle` / `minimumDate` / `maximumDate` / `minuteInterval` / `dateStringFormat` / `selectedDate` はどれも `Date` モードの中身を記述する属性で、モードを宣言するものではありません。3 つのコンバータはこの属性で分岐します（web 面は pin されたツールチェーンで実測、SwiftUI と Compose のコンバータはソースを読んで確認）。conformance の `datePickerMode` fixture も同じ理由で `selectItemType: Date` を同伴しています。"
               },
               "type": "string",
               "required": ""
