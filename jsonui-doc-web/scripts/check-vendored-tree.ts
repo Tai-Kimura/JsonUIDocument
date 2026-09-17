@@ -15,8 +15,9 @@
 // Excluded, deliberately:
 //   extensions/  — this face's own converters, which sync_tool preserves by design
 //   the tool's own skip list (__pycache__, .git, .rspec_status, .DS_Store,
-//   *.pyc/.pyo/.gem/.log/.tmp), because sync never copies those and their presence
-//   or absence says nothing about the pin.
+//   *.pyc/.pyo/.gem/.log/.tmp), because their presence or absence says nothing
+//   about the pin. "sync never copies those" was the claim here until 2026-09-17;
+//   it copies `.rspec_status`, see SKIP_FILES below.
 //
 // It does NOT check the OTHER vendored trees (sjui_tools / kjui_tools are not
 // vendored on this web-only face), nor that the pinned checkout is itself the
@@ -40,8 +41,16 @@ function vendoredTools(): string[] {
     .sort();
 }
 
-const SKIP_DIRS = new Set([".git", "__pycache__", ".rspec_status", "node_modules", ".pytest_cache"]);
-const SKIP_FILES = new Set([".DS_Store"]);
+const SKIP_DIRS = new Set([".git", "__pycache__", "node_modules", ".pytest_cache"]);
+// `.rspec_status` is a FILE (RSpec's example-status persistence), and it used to
+// sit in SKIP_DIRS here, copied from upstream's SKIP_DIR_NAMES where it is also
+// misfiled. Measured 2026-09-17 against a pinned checkout that had run rspec:
+// sync_tool COPIED it (`copied: 1`, `?? rjui_tools/spec/.rspec_status`), and this
+// gate then reported it as "in the pin but not vendored" once the copy was
+// removed — the same list, wrong on both sides. CI fetches a fresh clone, which
+// never has the file, so the run artifact says nothing about the pin. Reported
+// upstream as a sync_tool defect; skipped here by name whatever its type.
+const SKIP_FILES = new Set([".DS_Store", ".rspec_status"]);
 const SKIP_SUFFIXES = [".pyc", ".pyo", ".gem", ".log", ".tmp"];
 
 function pinnedRoot(): string {

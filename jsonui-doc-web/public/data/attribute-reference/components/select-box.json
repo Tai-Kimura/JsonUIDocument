@@ -498,7 +498,7 @@
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
               "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
                   {
@@ -534,19 +534,16 @@
                 ]
               },
               "description": {
-                "en": "Caret/arrow styling attributes.",
-                "ja": "キャレット／矢印のスタイル属性。"
+                "en": "Styling for the closed select's caret (the arrow): `src`, `width`, `height`, `tintColor`, `background`, `rightMargin`.",
+                "ja": "閉じた状態の select のキャレット（矢印）のスタイル: `src` / `width` / `height` / `tintColor` / `background` / `rightMargin`。"
               },
-              "platformMatrixVisibility": "visible",
-              "platformIosLabel": {
-                "en": "✓ (UIKit mode only)",
-                "ja": "✓（UIKit モードのみ）"
-              },
-              "platformAndroidLabel": "—",
-              "platformWebLabel": "—",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "Absent, every platform keeps its native indicator at its native inset, so existing layouts do not move. Present, the face draws the caret itself from these keys — the attribute reference does not list the keys of an object separately, so they are named here. `src` is optional: without it the face draws its own default chevron, so `{\"rightMargin\": 12}` alone moves a native-looking arrow 12 pt / dp / px in from the trailing edge. `rightMargin` defaults to 0, the caret flush against the edge, which is the UIKit contract the object came from. `tintColor` colours the default glyph and a template `src`; `background` fills the caret's own width × height box, not the select. Until jsonui-cli 1.8.101 this object was declared UIKit-only and only SJUISelectBox read it; from 1.8.101 the declaration is cross-platform and SwiftUI (SwiftJsonUI 10.25.0), Compose (KotlinJsonUI 2.33.0) and the web `<select>` draw it too, while a runtime older than those keeps showing its native indicator. Measured on the web face with the pinned toolchain: without the object the generated class list is the previous one, byte for byte; with it the native arrow is removed (`appearance-none`) and the caret is painted as background layers at `right <rightMargin>px center`, the text's right padding following the caret; a `multiple` list box and a `selectItemType: Date` picker leave no caret in the output. Two web limits: a raster `src` is drawn as-is, so `tintColor` does not reach it; and `datePickerMode` alone does not put the web face into date-picker mode — only `selectItemType: Date` does — so a caret declared next to a bare `datePickerMode` is still drawn on web.",
+                "ja": "未指定なら各プラットフォームはネイティブの矢印をネイティブの位置に描き続けるので、既存レイアウトは動きません。指定すると面がこのキー群から自前でキャレットを描きます — 属性リファレンスはオブジェクトのキーを個別に列挙しないため、ここに挙げます。`src` は省略可: 無ければ面の既定シェブロンが描かれるので、`{\"rightMargin\": 12}` だけでネイティブ風の矢印が末尾端から 12 pt / dp / px 内側に寄ります。`rightMargin` の既定は 0（端にぴったり付く）で、これはこのオブジェクトの出自である UIKit の契約です。`tintColor` は既定グリフとテンプレート `src` に効き、`background` はキャレット自身の width × height の箱を塗るもので select 全体ではありません。jsonui-cli 1.8.101 より前、このオブジェクトは UIKit 限定として宣言され SJUISelectBox だけが読んでいました。1.8.101 からは宣言がクロスプラットフォームになり、SwiftUI（SwiftJsonUI 10.25.0）、Compose（KotlinJsonUI 2.33.0）、web の `<select>` も描きます。それより古いランタイムはネイティブの矢印を出し続けます。pin されたツールチェーンで web 面を実測: オブジェクト無しでは生成されるクラス列は従来とバイト単位で同一、有りではネイティブ矢印が消え（`appearance-none`）、キャレットは背景レイヤーとして `right <rightMargin>px center` に描かれ、テキストの右パディングがキャレットに追従します。`multiple` のリストボックスと `selectItemType: Date` のピッカーでは出力にキャレットが残りません。web の制限が 2 つ: ラスターの `src` はそのまま描かれ `tintColor` は届かない。そして `datePickerMode` 単独では web 面は日付ピッカーにならず（`selectItemType: Date` のみが切り替える）、素の `datePickerMode` の横に書いたキャレットは web では描かれます。"
               },
               "type": "object",
               "required": ""
@@ -2629,6 +2626,49 @@
               "language": "json",
               "code": "{\n  \"type\": \"SelectBox\",\n  \"multiple\": true,\n  \"items\": \"@{tagOptions}\",\n  \"selectedValue\": \"@{selectedTags}\"\n}",
               "required": ""
+            },
+            {
+              "id": "example_5",
+              "anchorId": "example-5",
+              "title": {
+                "en": "Custom caret",
+                "ja": "キャレットのカスタマイズ"
+              },
+              "description": {
+                "en": "No `src`: the face's default chevron, tinted, 12 pt / dp / px in from the trailing edge. Omit the object and the native arrow stays where it was.",
+                "ja": "`src` 無し: 面の既定シェブロンに色を付け、末尾端から 12 pt / dp / px 内側へ。オブジェクトを書かなければネイティブの矢印は元の位置のまま。"
+              },
+              "descriptionVisibility": "visible",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"SelectBox\",\n  \"selectedValue\": \"@{country}\",\n  \"items\": [\"Japan\", \"United States\", \"United Kingdom\"],\n  \"caretAttributes\": { \"tintColor\": \"#555555\", \"rightMargin\": 12 }\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"SelectBox\",\n  \"selectedValue\": \"@{country}\",\n  \"items\": [\"Japan\", \"United States\", \"United Kingdom\"],\n  \"caretAttributes\": { \"tintColor\": \"#555555\", \"rightMargin\": 12 }\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"SelectBox\",\n  \"selectedValue\": \"@{country}\",\n  \"items\": [\"Japan\", \"United States\", \"United Kingdom\"],\n  \"caretAttributes\": { \"tintColor\": \"#555555\", \"rightMargin\": 12 }\n}",
+              "required": ""
             }
           ]
         }
@@ -3047,7 +3087,7 @@
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
               "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
                   {
@@ -3083,19 +3123,16 @@
                 ]
               },
               "description": {
-                "en": "Caret/arrow styling attributes.",
-                "ja": "キャレット／矢印のスタイル属性。"
+                "en": "Styling for the closed select's caret (the arrow): `src`, `width`, `height`, `tintColor`, `background`, `rightMargin`.",
+                "ja": "閉じた状態の select のキャレット（矢印）のスタイル: `src` / `width` / `height` / `tintColor` / `background` / `rightMargin`。"
               },
-              "platformMatrixVisibility": "visible",
-              "platformIosLabel": {
-                "en": "✓ (UIKit mode only)",
-                "ja": "✓（UIKit モードのみ）"
-              },
-              "platformAndroidLabel": "—",
-              "platformWebLabel": "—",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "Absent, every platform keeps its native indicator at its native inset, so existing layouts do not move. Present, the face draws the caret itself from these keys — the attribute reference does not list the keys of an object separately, so they are named here. `src` is optional: without it the face draws its own default chevron, so `{\"rightMargin\": 12}` alone moves a native-looking arrow 12 pt / dp / px in from the trailing edge. `rightMargin` defaults to 0, the caret flush against the edge, which is the UIKit contract the object came from. `tintColor` colours the default glyph and a template `src`; `background` fills the caret's own width × height box, not the select. Until jsonui-cli 1.8.101 this object was declared UIKit-only and only SJUISelectBox read it; from 1.8.101 the declaration is cross-platform and SwiftUI (SwiftJsonUI 10.25.0), Compose (KotlinJsonUI 2.33.0) and the web `<select>` draw it too, while a runtime older than those keeps showing its native indicator. Measured on the web face with the pinned toolchain: without the object the generated class list is the previous one, byte for byte; with it the native arrow is removed (`appearance-none`) and the caret is painted as background layers at `right <rightMargin>px center`, the text's right padding following the caret; a `multiple` list box and a `selectItemType: Date` picker leave no caret in the output. Two web limits: a raster `src` is drawn as-is, so `tintColor` does not reach it; and `datePickerMode` alone does not put the web face into date-picker mode — only `selectItemType: Date` does — so a caret declared next to a bare `datePickerMode` is still drawn on web.",
+                "ja": "未指定なら各プラットフォームはネイティブの矢印をネイティブの位置に描き続けるので、既存レイアウトは動きません。指定すると面がこのキー群から自前でキャレットを描きます — 属性リファレンスはオブジェクトのキーを個別に列挙しないため、ここに挙げます。`src` は省略可: 無ければ面の既定シェブロンが描かれるので、`{\"rightMargin\": 12}` だけでネイティブ風の矢印が末尾端から 12 pt / dp / px 内側に寄ります。`rightMargin` の既定は 0（端にぴったり付く）で、これはこのオブジェクトの出自である UIKit の契約です。`tintColor` は既定グリフとテンプレート `src` に効き、`background` はキャレット自身の width × height の箱を塗るもので select 全体ではありません。jsonui-cli 1.8.101 より前、このオブジェクトは UIKit 限定として宣言され SJUISelectBox だけが読んでいました。1.8.101 からは宣言がクロスプラットフォームになり、SwiftUI（SwiftJsonUI 10.25.0）、Compose（KotlinJsonUI 2.33.0）、web の `<select>` も描きます。それより古いランタイムはネイティブの矢印を出し続けます。pin されたツールチェーンで web 面を実測: オブジェクト無しでは生成されるクラス列は従来とバイト単位で同一、有りではネイティブ矢印が消え（`appearance-none`）、キャレットは背景レイヤーとして `right <rightMargin>px center` に描かれ、テキストの右パディングがキャレットに追従します。`multiple` のリストボックスと `selectItemType: Date` のピッカーでは出力にキャレットが残りません。web の制限が 2 つ: ラスターの `src` はそのまま描かれ `tintColor` は届かない。そして `datePickerMode` 単独では web 面は日付ピッカーにならず（`selectItemType: Date` のみが切り替える）、素の `datePickerMode` の横に書いたキャレットは web では描かれます。"
               },
               "type": "object",
               "required": ""
