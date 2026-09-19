@@ -2307,8 +2307,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Fires after the user confirms a selection. Receives the new value as a String on every platform — declare the handler as `((String) -> Void)?` (index-callback signatures are not part of the contract).",
-                "ja": "選択確定後に発火。全プラットフォームで新しい値を **String** として受け取る — ハンドラ宣言は `((String) -> Void)?` にする（index コールバックの規約は存在しない）。"
+                "en": "Fires after the user confirms a selection. The handler receives the new value of the selection binding, the same on every platform: with `selectedIndex` bound it is the Int index — declare `((Int) -> Void)?` (Kotlin `((Int) -> Unit)?`), or `((String, Int) -> Void)?` for viewId + index; with `selectedItem` / `selectedValue` bound it is the String item — declare `((String, String) -> Void)?` for viewId + item. A lone `(String)` parameter is read as the viewId, not the item. `(() -> Void)?` receives nothing and the ViewModel reads the bound value back. The Android Compose codegen follows this rule from jsonui-cli 1.8.106: before that it passed the String item even with `selectedIndex` bound, so an `((Int) -> Unit)?` handler never received the index there. Read from the converter change and the upstream fix report, not measured here.",
+                "ja": "選択確定後に発火。handler は選択 binding の新しい値を受け取り、全プラットフォームで同じ: `selectedIndex` を束縛していれば Int の index — 宣言は `((Int) -> Void)?`（Kotlin は `((Int) -> Unit)?`）、viewId 付きなら `((String, Int) -> Void)?`。`selectedItem` / `selectedValue` を束縛していれば String の item — viewId 付きの `((String, String) -> Void)?` で宣言する。単独の `(String)` 引数は item ではなく viewId と読まれる。`(() -> Void)?` は何も受け取らず、ViewModel が束縛値を読み戻す。Android の Compose codegen がこの規則に従うのは jsonui-cli 1.8.106 から: それ以前は `selectedIndex` 束縛でも String の item を渡していたため、`((Int) -> Unit)?` の handler には index が届かなかった。コンバータの変更と上流の修正レポートを読んだもので、こちらでは未測定。"
               },
               "type": "binding",
               "required": ""
@@ -4273,8 +4273,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Fires after the user confirms a selection. Receives the new value as a String on every platform — declare the handler as `((String) -> Void)?` (index-callback signatures are not part of the contract).",
-                "ja": "選択確定後に発火。全プラットフォームで新しい値を **String** として受け取る — ハンドラ宣言は `((String) -> Void)?` にする（index コールバックの規約は存在しない）。"
+                "en": "Fires after the user confirms a selection. The handler receives the new value of the selection binding, the same on every platform: with `selectedIndex` bound it is the Int index — declare `((Int) -> Void)?` (Kotlin `((Int) -> Unit)?`), or `((String, Int) -> Void)?` for viewId + index; with `selectedItem` / `selectedValue` bound it is the String item — declare `((String, String) -> Void)?` for viewId + item. A lone `(String)` parameter is read as the viewId, not the item. `(() -> Void)?` receives nothing and the ViewModel reads the bound value back. The Android Compose codegen follows this rule from jsonui-cli 1.8.106: before that it passed the String item even with `selectedIndex` bound, so an `((Int) -> Unit)?` handler never received the index there. Read from the converter change and the upstream fix report, not measured here.",
+                "ja": "選択確定後に発火。handler は選択 binding の新しい値を受け取り、全プラットフォームで同じ: `selectedIndex` を束縛していれば Int の index — 宣言は `((Int) -> Void)?`（Kotlin は `((Int) -> Unit)?`）、viewId 付きなら `((String, Int) -> Void)?`。`selectedItem` / `selectedValue` を束縛していれば String の item — viewId 付きの `((String, String) -> Void)?` で宣言する。単独の `(String)` 引数は item ではなく viewId と読まれる。`(() -> Void)?` は何も受け取らず、ViewModel が束縛値を読み戻す。Android の Compose codegen がこの規則に従うのは jsonui-cli 1.8.106 から: それ以前は `selectedIndex` 束縛でも String の item を渡していたため、`((Int) -> Unit)?` の handler には index が届かなかった。コンバータの変更と上流の修正レポートを読んだもので、こちらでは未測定。"
               },
               "type": "binding",
               "required": ""
