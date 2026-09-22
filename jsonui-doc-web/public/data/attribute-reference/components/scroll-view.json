@@ -45,15 +45,15 @@
   "canonicalCode": "{\n  \"type\": \"ScrollView\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}",
   "canonicalLanguage": "json",
   "statRequired": "0",
-  "statOptional": "22",
+  "statOptional": "23",
   "statEvents": "0",
   "statRequiredText": {
     "en": "0 required",
     "ja": "必須 0"
   },
   "statOptionalText": {
-    "en": "22 optional",
-    "ja": "任意 22"
+    "en": "23 optional",
+    "ja": "任意 23"
   },
   "statEventsText": {
     "en": "0 events",
@@ -1403,6 +1403,70 @@
                 "ja": ""
               },
               "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_keyboardAvoidancePadding",
+              "name": "keyboardAvoidancePadding",
+              "anchorId": "attr-keyboardAvoidancePadding",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "default: 20",
+              "defaultChipVisibility": "visible",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Clearance, in points/dp, that a focused text field keeps from the ScrollView's visible bottom edge while the soft keyboard is up.",
+                "ja": "ソフトキーボード表示中、フォーカス中のテキストフィールドが ScrollView の見えている下端から保つ余白（pt / dp）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Number. Absent means 20, not 0. The visible bottom edge is whatever bounds the scroll area at that moment: the top of a fixed footer laid out below the ScrollView, or the keyboard itself when the ScrollView meets it directly. iOS applies it as a bottom safe-area inset while the keyboard is visible (KeyboardAvoidanceConfiguration.additionalPadding; reaches the screen from SwiftJsonUI 10.27.0, earlier versions read the value and applied nothing). Android adds it as bottom padding after imePadding() while the IME is visible, so bringIntoView stops that far above the keyboard. Ignored when `keyboardAvoidance` is `false`: the Android Compose codegen reads that flag too, although the declared surface of `keyboardAvoidance` is iOS only. Not applicable on Web, which has no soft-keyboard avoidance. Declared in jsonui-cli 1.8.108; read from the codegen and the upstream report, not measured here.",
+                "ja": "Number。書かなければ 20 であって 0 ではない。「見えている下端」はその瞬間にスクロール領域を区切っているもの: ScrollView の下に置いた固定フッターの上端、または ScrollView がキーボードに直接接しているならキーボードそのもの。iOS ではキーボード表示中の bottom safe-area inset として適用（KeyboardAvoidanceConfiguration.additionalPadding。画面に届くのは SwiftJsonUI 10.27.0 から。それ以前は値を読んでも何にも適用されなかった）。Android では IME 表示中に imePadding() の後の bottom padding として足され、bringIntoView がその分だけキーボードの上で止まる。`keyboardAvoidance` が `false` なら無視される: Android の Compose codegen もこのフラグを読むが、`keyboardAvoidance` の宣言面は iOS のみ。Web は非対応（ソフトキーボード回避が無い）。jsonui-cli 1.8.108 で宣言。codegen と上流の修正レポートを読んだもので、こちらでは未測定。"
+              },
+              "type": "number",
               "required": ""
             },
             {
@@ -3264,6 +3328,70 @@
                 "ja": ""
               },
               "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_keyboardAvoidancePadding",
+              "name": "keyboardAvoidancePadding",
+              "anchorId": "attr-keyboardAvoidancePadding",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "default: 20",
+              "defaultChipVisibility": "visible",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Clearance, in points/dp, that a focused text field keeps from the ScrollView's visible bottom edge while the soft keyboard is up.",
+                "ja": "ソフトキーボード表示中、フォーカス中のテキストフィールドが ScrollView の見えている下端から保つ余白（pt / dp）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Number. Absent means 20, not 0. The visible bottom edge is whatever bounds the scroll area at that moment: the top of a fixed footer laid out below the ScrollView, or the keyboard itself when the ScrollView meets it directly. iOS applies it as a bottom safe-area inset while the keyboard is visible (KeyboardAvoidanceConfiguration.additionalPadding; reaches the screen from SwiftJsonUI 10.27.0, earlier versions read the value and applied nothing). Android adds it as bottom padding after imePadding() while the IME is visible, so bringIntoView stops that far above the keyboard. Ignored when `keyboardAvoidance` is `false`: the Android Compose codegen reads that flag too, although the declared surface of `keyboardAvoidance` is iOS only. Not applicable on Web, which has no soft-keyboard avoidance. Declared in jsonui-cli 1.8.108; read from the codegen and the upstream report, not measured here.",
+                "ja": "Number。書かなければ 20 であって 0 ではない。「見えている下端」はその瞬間にスクロール領域を区切っているもの: ScrollView の下に置いた固定フッターの上端、または ScrollView がキーボードに直接接しているならキーボードそのもの。iOS ではキーボード表示中の bottom safe-area inset として適用（KeyboardAvoidanceConfiguration.additionalPadding。画面に届くのは SwiftJsonUI 10.27.0 から。それ以前は値を読んでも何にも適用されなかった）。Android では IME 表示中に imePadding() の後の bottom padding として足され、bringIntoView がその分だけキーボードの上で止まる。`keyboardAvoidance` が `false` なら無視される: Android の Compose codegen もこのフラグを読むが、`keyboardAvoidance` の宣言面は iOS のみ。Web は非対応（ソフトキーボード回避が無い）。jsonui-cli 1.8.108 で宣言。codegen と上流の修正レポートを読んだもので、こちらでは未測定。"
+              },
+              "type": "number",
               "required": ""
             },
             {
