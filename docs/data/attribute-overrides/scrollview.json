@@ -56,9 +56,10 @@
       }
     },
     "keyboardAvoidance": {
+      "default": "true",
       "note": {
-        "en": "Boolean. When `true`, the ScrollView auto-scrolls so the focused TextField is above the keyboard.",
-        "ja": "Boolean。`true` でフォーカス中の TextField がキーボードの上に来るよう自動スクロール。"
+        "en": "Boolean, default `true`: absent means on. When on, the ScrollView keeps the focused text field above the soft keyboard. iOS uses the keyboard-avoiding scroll view and disables its configuration when `false`. Android emits imePadding() and the `keyboardAvoidancePadding` clearance only when not `false`. The SSoT declared this attribute iOS-only until jsonui-cli 1.8.109 although the Android Compose codegen had read it all along, so the platform matrix on this page showed Android as unsupported before that version. Read from the codegen and the upstream report, not measured here.",
+        "ja": "Boolean、既定 `true`: 書かなければ有効。有効ならフォーカス中のテキストフィールドがソフトキーボードの上に来るよう ScrollView が保つ。iOS はキーボード回避付きの scroll view を使い、`false` で構成を無効化。Android は `false` でない場合だけ imePadding() と `keyboardAvoidancePadding` の余白を生成する。SSoT がこの属性を iOS のみと宣言していたのは jsonui-cli 1.8.109 まで。Android の Compose codegen は最初から読んでいたため、このページの platform 行列は当該版まで Android を非対応と表示していた。codegen と上流の修正レポートを読んだもので、こちらでは未測定。"
       }
     },
     "keyboardAvoidancePadding": {
@@ -68,8 +69,8 @@
       },
       "default": "20",
       "note": {
-        "en": "Number. Absent means 20, not 0. The visible bottom edge is whatever bounds the scroll area at that moment: the top of a fixed footer laid out below the ScrollView, or the keyboard itself when the ScrollView meets it directly. iOS applies it as a bottom safe-area inset while the keyboard is visible (KeyboardAvoidanceConfiguration.additionalPadding; reaches the screen from SwiftJsonUI 10.27.0, earlier versions read the value and applied nothing). Android adds it as bottom padding after imePadding() while the IME is visible, so bringIntoView stops that far above the keyboard. Ignored when `keyboardAvoidance` is `false`: the Android Compose codegen reads that flag too, although the declared surface of `keyboardAvoidance` is iOS only. Not applicable on Web, which has no soft-keyboard avoidance. Declared in jsonui-cli 1.8.108; read from the codegen and the upstream report, not measured here.",
-        "ja": "Number。書かなければ 20 であって 0 ではない。「見えている下端」はその瞬間にスクロール領域を区切っているもの: ScrollView の下に置いた固定フッターの上端、または ScrollView がキーボードに直接接しているならキーボードそのもの。iOS ではキーボード表示中の bottom safe-area inset として適用（KeyboardAvoidanceConfiguration.additionalPadding。画面に届くのは SwiftJsonUI 10.27.0 から。それ以前は値を読んでも何にも適用されなかった）。Android では IME 表示中に imePadding() の後の bottom padding として足され、bringIntoView がその分だけキーボードの上で止まる。`keyboardAvoidance` が `false` なら無視される: Android の Compose codegen もこのフラグを読むが、`keyboardAvoidance` の宣言面は iOS のみ。Web は非対応（ソフトキーボード回避が無い）。jsonui-cli 1.8.108 で宣言。codegen と上流の修正レポートを読んだもので、こちらでは未測定。"
+        "en": "Number. Absent means 20, not 0. The visible bottom edge is whatever bounds the scroll area at that moment: the top of a fixed footer laid out below the ScrollView, or the keyboard itself when the ScrollView meets it directly. iOS applies it as a bottom safe-area inset while the keyboard is visible (KeyboardAvoidanceConfiguration.additionalPadding; reaches the screen from SwiftJsonUI 10.27.0, earlier versions read the value and applied nothing). Android adds it as bottom padding after imePadding() while the IME is visible, so bringIntoView stops that far above the keyboard. Ignored when `keyboardAvoidance` is `false`. Not applicable on Web, which has no soft-keyboard avoidance. Declared in jsonui-cli 1.8.108; read from the codegen and the upstream report, not measured here.",
+        "ja": "Number。書かなければ 20 であって 0 ではない。「見えている下端」はその瞬間にスクロール領域を区切っているもの: ScrollView の下に置いた固定フッターの上端、または ScrollView がキーボードに直接接しているならキーボードそのもの。iOS ではキーボード表示中の bottom safe-area inset として適用（KeyboardAvoidanceConfiguration.additionalPadding。画面に届くのは SwiftJsonUI 10.27.0 から。それ以前は値を読んでも何にも適用されなかった）。Android では IME 表示中に imePadding() の後の bottom padding として足され、bringIntoView がその分だけキーボードの上で止まる。`keyboardAvoidance` が `false` なら無視される。Web は非対応（ソフトキーボード回避が無い）。jsonui-cli 1.8.108 で宣言。codegen と上流の修正レポートを読んだもので、こちらでは未測定。"
       }
     },
     "keyboardDismissMode": {
