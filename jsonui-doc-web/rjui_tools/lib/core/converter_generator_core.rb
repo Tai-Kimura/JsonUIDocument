@@ -35,6 +35,11 @@ module JsonUIShared
   #   - the overwrite prompt reads $stdin.gets&.chomp (rjui semantics):
   #     plain gets crashed on nil at stdin EOF and could read ARGV files;
   #     --force / --skip-existing options work on every tool
+  #     ⚠️ Written 2026-08-01 and FALSE until 1.8.113 for sjui and kjui:
+  #     this core honoured the options, but only rjui's CLI parsed them —
+  #     `sjui/kjui g converter --force` was "invalid option". 1.8.112's
+  #     scaffold header repeated the claim; 1.8.113 made the two CLIs parse
+  #     both flags, so the sentence is now true.
   #   - the extension attribute-definition JSON carries the _generated
   #     marker everywhere (was sjui-only; the file is rewritten on every
   #     run, so the generated-file invariant applies)
@@ -42,6 +47,63 @@ module JsonUIShared
   #     `String?` / `[Int]` from component specs map to real types instead
   #     of falling through to the binding-only branch
   class ConverterGeneratorCore
+    # THE ONE OVERWRITE DECISION for every file a `g converter` run writes:
+    # the converter here, and the files the platform sub-generators write
+    # beside it (the Swift / Kotlin component, adapters, view adapters).
+    # Returns true when `file_path` may be written.
+    #
+    # Until 1.8.112 only the converter came through here. The six
+    # sub-generators each kept their own `print "Overwrite? (y/n)"` +
+    # `gets.chomp`, so `--skip-existing` / JUI_SKIP_EXISTING (which
+    # `jui g converter --skip-existing` exports) and `--force` stopped at the
+    # converter: a re-scaffold still waited on stdin for each existing
+    # component and adapter, and with stdin closed `gets` returned nil and
+    # `nil.chomp` raised (reported 2026-09-24). Here stdin EOF is "n" — the
+    # safe side, since those files are the ones people maintain by hand.
+    #
+    # `noun` / `exists_label` name the file in the two log lines, so the
+    # converter's lines read as they always have.
+    def self.may_write?(file_path, options, logger, noun:, exists_label: nil)
+      return true unless File.exist?(file_path)
+
+      if ENV['JUI_SKIP_EXISTING'] == '1' || options[:skip_existing]
+        logger.info "Skipped existing #{noun}: #{file_path}"
+        return false
+      end
+      return true if options[:force]
+
+      logger.warn "#{exists_label || noun.capitalize} already exists: #{file_path}"
+      print "Overwrite? (y/n): "
+      $stdin.gets&.chomp&.downcase == 'y'
+    end
+
+    # `--attribute-descriptions '<json>'`: {attribute name => description},
+    # the component spec's `props.items[].description`, which `jui g
+    # converter --from / --all` hands down. Returns the Hash, or raises
+    # ArgumentError naming what is wrong (the CLIs print it and exit 1).
+    #
+    # Until 1.8.113 the spec's descriptions never left `jui`: it passed
+    # `name:type` only, and every rewrite of attribute_definitions/<Name>.json
+    # replaced hand-written descriptions with "<key> attribute".
+    def self.parse_attribute_descriptions(json_text)
+      parsed = JSON.parse(json_text.to_s)
+      unless parsed.is_a?(Hash) && parsed.all? { |k, v| k.is_a?(String) && v.is_a?(String) }
+        raise ArgumentError, "--attribute-descriptions takes a JSON object of " \
+                             "{\"attribute\": \"description\"}"
+      end
+      parsed
+    rescue JSON::ParserError => e
+      raise ArgumentError, "--attribute-descriptions is not valid JSON (#{e.message.lines.first&.strip})"
+    end
+
+    # The description an attribute definition carries: the spec's when one
+    # was handed down, the placeholder otherwise.
+    def self.attribute_description(options, key, fallback)
+      descriptions = options && options[:attribute_descriptions]
+      text = descriptions.is_a?(Hash) ? descriptions[key] : nil
+      text.is_a?(String) && !text.strip.empty? ? text : fallback
+    end
+
     private
 
     # ---- platform profile hooks (implemented by the per-tool subclass) ----
@@ -85,23 +147,12 @@ module JsonUIShared
 
       file_path = converter_file_path
 
-      if File.exist?(file_path)
-        # `jui build` (and other non-interactive flows) set JUI_SKIP_EXISTING=1
-        # so the prompt is bypassed and existing converter files are left alone.
-        # `--skip-existing` is the CLI equivalent; `--force` overwrites.
-        if ENV['JUI_SKIP_EXISTING'] == '1' || @options[:skip_existing]
-          @logger.info "Skipped existing converter: #{file_path}"
-          return
-        end
-        unless @options[:force]
-          @logger.warn "Converter file already exists: #{file_path}"
-          print "Overwrite? (y/n): "
-          # gets returns nil on stdin EOF (non-interactive run) — treat
-          # as "n" instead of crashing on nil.chomp.
-          response = $stdin.gets&.chomp&.downcase
-          return unless response == 'y'
-        end
-      end
+      # `jui build` (and other non-interactive flows) set JUI_SKIP_EXISTING=1
+      # so the prompt is bypassed and existing converter files are left alone.
+      # `--skip-existing` is the CLI equivalent; `--force` overwrites.
+      return unless self.class.may_write?(file_path, @options, @logger,
+                                          noun: 'converter',
+                                          exists_label: 'Converter file')
 
       File.write(file_path, converter_template)
       @logger.info "Created converter file: #{file_path}"
@@ -268,7 +319,8 @@ module JsonUIShared
     def build_attribute_definition(actual_key, type)
       {
         "type" => map_type_to_json_type(type),
-        "description" => "#{actual_key} attribute"
+        "description" => self.class.attribute_description(@options, actual_key,
+                                                          "#{actual_key} attribute")
       }
     end
 

@@ -1,7 +1,7 @@
-// ViewModel for Guides > Branch tests.
+// ViewModel for Guides > Contract gaps.
 
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { BranchTestsData } from "@/generated/data/BranchTestsData";
+import { ContractGapsData } from "@/generated/data/ContractGapsData";
 import { CollectionDataSource } from "@/generated/data/CollectionDataSource";
 import { StringManager } from "@/generated/StringManager";
 
@@ -13,20 +13,20 @@ interface NextReadCell {
   onNavigate: () => void;
 }
 
-export class BranchTestsViewModel {
+export class ContractGapsViewModel {
   protected router: AppRouterInstance;
-  protected _getData: () => BranchTestsData;
+  protected _getData: () => ContractGapsData;
   protected _setData: (
-    data: BranchTestsData | ((prev: BranchTestsData) => BranchTestsData),
+    data: ContractGapsData | ((prev: ContractGapsData) => ContractGapsData),
   ) => void;
 
-  get data(): BranchTestsData { return this._getData(); }
+  get data(): ContractGapsData { return this._getData(); }
 
   constructor(
     router: AppRouterInstance,
-    getData: () => BranchTestsData,
+    getData: () => ContractGapsData,
     setData: (
-      data: BranchTestsData | ((prev: BranchTestsData) => BranchTestsData),
+      data: ContractGapsData | ((prev: ContractGapsData) => ContractGapsData),
     ) => void,
   ) {
     this.router = router;
@@ -36,16 +36,15 @@ export class BranchTestsViewModel {
     this.onAppear();
   }
 
-  updateData = (updates: Partial<BranchTestsData>) => {
+  updateData = (updates: Partial<ContractGapsData>) => {
     this._setData((prev) => ({ ...prev, ...updates }));
   };
 
-  setVars = (vars: Partial<BranchTestsData>) => { this.updateData(vars); };
+  setVars = (vars: Partial<ContractGapsData>) => { this.updateData(vars); };
 
   protected initializeEventHandlers = () => {
     this.updateData({
       onNavigateGuides: () => this.navigate("/guides"),
-      onNavigateContractGaps: () => this.navigate("/guides/contract-gaps"),
     });
   };
 
@@ -66,28 +65,28 @@ export class BranchTestsViewModel {
       onNavigate: () => this.navigate("/guides/branch-contracts"),
     },
     {
-      id: "next_testing",
-      titleKey: lookup("next_testing_title"),
-      descriptionKey: lookup("next_testing_description"),
-      url: "/guides/testing",
-      onNavigate: () => this.navigate("/guides/testing"),
+      id: "next_tests",
+      titleKey: lookup("next_tests_title"),
+      descriptionKey: lookup("next_tests_description"),
+      url: "/guides/branch-tests",
+      onNavigate: () => this.navigate("/guides/branch-tests"),
     },
     {
-      id: "next_verifying",
-      titleKey: lookup("next_verifying_title"),
-      descriptionKey: lookup("next_verifying_description"),
-      url: "/guides/verifying-implementation-against-docs",
-      onNavigate: () => this.navigate("/guides/verifying-implementation-against-docs"),
+      id: "next_unit",
+      titleKey: lookup("next_unit_title"),
+      descriptionKey: lookup("next_unit_description"),
+      url: "/guides/unit-contracts",
+      onNavigate: () => this.navigate("/guides/unit-contracts"),
     },
   ];
 
   navigate = (url: string): void => { this.router.push(url); };
 
   private s = (key: string): string =>
-    StringManager.getString(`guides_branch_tests_${key}`);
+    StringManager.getString(`guides_contract_gaps_${key}`);
 
   private sDefault = (key: string): string =>
-    StringManager.getDefaultString(`guides_branch_tests_${key}`);
+    StringManager.getDefaultString(`guides_contract_gaps_${key}`);
 
   private asCollection = <T>(items: T[]): CollectionDataSource<T> => {
     return new CollectionDataSource<T>([{ cells: { data: items } }]);

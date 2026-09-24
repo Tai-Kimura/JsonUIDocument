@@ -128,5 +128,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 ## Notes
 
 - Phase 2 article 3/5. Uses the real CodeBlock component_spec as the exemplar — this site ships five today (CodeBlock, Sidebar, TableOfContents, TopBar, DocSamplePreview).
+- 2026-09-25 — section_emit_body corrected: 'two files per platform' held for web only. Measured through `jui g converter` at 1.8.117 on a fresh project: per platform a converter .rb and a mappings line under the tool's extensions/, plus the app-side stubs — web 1, iOS 3, Android 5. The Building a custom component guide carries the full list and the re-run behaviour.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

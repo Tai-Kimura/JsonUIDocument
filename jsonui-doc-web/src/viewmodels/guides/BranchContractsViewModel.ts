@@ -46,6 +46,7 @@ export class BranchContractsViewModel {
     this.updateData({
       onNavigateGuides: () => this.navigate("/guides"),
       onNavigateBranchTests: () => this.navigate("/guides/branch-tests"),
+      onNavigateContractGaps: () => this.navigate("/guides/contract-gaps"),
     });
   };
 

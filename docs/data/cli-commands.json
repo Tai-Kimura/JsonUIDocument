@@ -355,10 +355,10 @@
     {
       "binary": "jui",
       "command": "g converter",
-      "synopsis": "jui g converter [<Name>] [--from SPEC | --all]",
+      "synopsis": "jui g converter [<Name>] [--from SPEC | --all] [--skip-existing | --force]",
       "purpose": {
-        "en": "Generate a custom-component converter — from a name + --attributes, from a component spec with --from, or from every component spec with --all.",
-        "ja": "カスタムコンポーネントの converter を生成 — 名前 + --attributes、--from で component spec から、--all で全 component spec から。"
+        "en": "Generate a custom-component converter — from a name + --attributes, from a component spec with --from, or from every component spec with --all. Re-running never replaces a converter or implementation stub that already exists unless you ask: on a terminal it asks per file, with no terminal to answer it replaces nothing and exits 0. attribute_definitions/<Name>.json is rewritten from the spec on every run, and the mappings and registration files never are.",
+        "ja": "カスタムコンポーネントの converter を生成 — 名前 + --attributes、--from で component spec から、--all で全 component spec から。再実行は、既にある converter や実装の雛形を、頼まない限り置き換えません: 端末があればファイルごとに聞き、答える端末が無ければ何も置き換えずに exit 0 で終わります。attribute_definitions/<Name>.json は毎回 spec から書き直され、mappings と登録のファイルは書き直されません。"
       },
       "options": [
         {
@@ -375,8 +375,8 @@
           "type": "path",
           "default": "—",
           "description": {
-            "en": "Component spec file (resolved against component_spec_directory).",
-            "ja": "component spec ファイル（component_spec_directory 起点で解決）。"
+            "en": "Component spec — a filename resolved against component_spec_directory, or a path to the spec.",
+            "ja": "component spec — component_spec_directory 起点で解決するファイル名、または spec へのパス。"
           }
         },
         {
@@ -411,15 +411,24 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Skip converters that already exist (used by jui build).",
-            "ja": "既存 converter をスキップ（jui build が使用）。"
+            "en": "Leave existing converter and scaffold files untouched, without asking.",
+            "ja": "既存の converter と雛形のファイルに触れない。確認は出さない。"
+          }
+        },
+        {
+          "name": "--force",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Replace existing converter and scaffold files without asking — including an implementation stub you have written into. The mappings and registration files are still left alone.",
+            "ja": "既存の converter と雛形のファイルを、確認なしで置き換える — 書き込み済みの実装の雛形も含む。mappings と登録のファイルは、これでも触れない。"
           }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "$ jui g converter --from rating-stars.component.json"
+          "code": "$ jui g converter --from rating-stars.component.json\n$ jui g converter --from rating-stars.component.json --skip-existing   # re-run: keep what exists, no questions"
         }
       ],
       "aliases": [],
@@ -427,18 +436,18 @@
         "jui g project"
       ],
       "verifiedAgainst": {
-        "version": "1.8.4",
+        "version": "1.8.117",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "026de608ffb1a7e2a4c11a62cbf8511cb76932bc186daec45a1ebe9bcebfccf9",
-        "cardHash": "762fe25417a1626a47e2d194236755d44317648bc53b4521628b3f022748a59e",
+        "helpHash": "987873e5cb50069b248130da7794575cce67a866a9c3c45d8c1ebdb07bebe294",
+        "cardHash": "fb356904732834f34c859a7f7d7cc4eae57de4e4767b32c4ad3b6a9c6e69063b",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "fcbcb49594f1",
-          "synopsis": "568cd9d96565",
-          "purpose": "17b38499f15e",
-          "options": "4ba8dca60ed2",
-          "examples": "4c8396f95757",
+          "synopsis": "b826a5d176d1",
+          "purpose": "a14d01a51320",
+          "options": "77427e09be8e",
+          "examples": "3cd3dac507ae",
           "aliases": "98edafdd23a8",
           "seeAlso": "a599f9afdfe7"
         }
@@ -3502,6 +3511,72 @@
           "options": "6010b60ae218",
           "examples": "6f6bfaaecdd9",
           "seeAlso": "390d25a7bcf7"
+        }
+      }
+    },
+    {
+      "binary": "jsonui-test",
+      "command": "contracts coverage",
+      "synopsis": "jsonui-test contracts coverage [screen] [--platform web|android|ios ...] [--json]",
+      "purpose": {
+        "en": "For every screen and platform, put each response status that the OpenAPI in `mock.swagger` documents for an operation the screen reaches into one bucket: answered by a branch row, excluded with a reason (`unit` / `unreachable` / `unexpressible`), not evaluated, or uncovered. Not a gate yet. Exit per platform, composed 2 > 1 > 3 > 0: 0 pass, 1 uncovered or a declaration error, 2 cannot start (no `mock.swagger`, no platforms), 3 something could not be evaluated — an endpoint listed only in `dataFlow.apiEndpoints` among them — and nothing is uncovered.",
+        "ja": "画面とプラットフォームごとに、画面が到達する操作について `mock.swagger` の OpenAPI が記載している応答 status を、1 つずつ区分に入れる: 分岐の行が答えた / 理由つきで除外した（`unit` / `unreachable` / `unexpressible`）/ 評価できなかった / 答えていない。まだ門ではない。exit はプラットフォームごとで、2 > 1 > 3 > 0 の順に合成: 0 合格、1 答えていないものか宣言の誤りがある、2 始められない（`mock.swagger` もプラットフォームも無い）、3 評価できなかったものがあり（`dataFlow.apiEndpoints` にだけある endpoint を含む）、答えていないものは無い。"
+      },
+      "options": [
+        {
+          "name": "screen",
+          "type": "positional",
+          "default": "all screens",
+          "description": {
+            "en": "One screen.",
+            "ja": "1 画面だけ。"
+          }
+        },
+        {
+          "name": "--platform",
+          "type": "string",
+          "default": "platforms in jui.config.json",
+          "description": {
+            "en": "Platform block to report: web, android or ios. Repeat it for more than one. Required when jui.config.json declares no platforms.",
+            "ja": "報告するプラットフォーム: web / android / ios。複数なら繰り返す。jui.config.json がプラットフォームを宣言していなければ必須。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Machine-readable output. Per platform it carries the totals, `totals.na_endpoints`, and `floor` — what could not be evaluated when the block also has something uncovered.",
+            "ja": "機械可読の出力。プラットフォームごとに合計・`totals.na_endpoints`・`floor`（答えていないものがあるブロックで、評価できなかったもの）を持つ。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "# measured on a fixture: one screen, one operation documenting 200/401/409/422/500;\n# 409 answered through alsoStatuses, 401 excluded by unit, 422 left unanswered\n$ jsonui-test contracts coverage --platform web\ncontracts coverage  (project platforms: web, android, ios)\napp contracts: docs/screens/json/app_contracts.spec.json · apiOutcomeRules 1\n[platform=web] spec=profile_screen  units 1  contracted methods 1 of 1\n  statuses required 5 = row 3 (alsoStatuses 1) + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 1\n    uncovered 1 = partial 1 + default-only 0 + unattributed 0\n  uncovered  partial       onTapSave × api.updateProfile  PUT /api/items  422\n  info  guard-only 1 · note branches 1 · also_statuses_rows 1 · also_statuses_arrange_differs 0 · side_calls_admitted 0 · reference_holds_on_success_row 0 · route_overlaps 0 · dataFlow methods without endpoint 0\n  outside required 0 = unreached-op 0 + n/a(default response) 0 + n/a(no scenario) 0 + n/a(platform-excluded) 0\n  n/a (E) no mock 0 · not in OpenAPI 0 · unbound endpoint 0 · non-HTTP 0\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 0 (screens 0) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] exit 1 (uncovered)\nexit 1 (composed 2 > 1 > 3 > 0): 1 uncovered — write a row (alsoStatuses if the VM treats it like another status), or an exclusion with a reason"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jsonui-test generate",
+        "jsonui-doc validate spec"
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.117",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "4c234910f54bceb17563c797aaf672e4436034ec69ddd0a61349851aa335dfbb",
+        "cardHash": "370eaa43bf76d70d875e52cdd22cfaeed0c4f3ccd4c010f3c05e80b0360411d6",
+        "fieldHashes": {
+          "binary": "3b2560767fdf",
+          "command": "036d2917ec5d",
+          "synopsis": "707c179b9122",
+          "purpose": "a946e59db929",
+          "options": "16d5ea9604ed",
+          "examples": "cdc2d81fa5c5",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "6c475f3b8393"
         }
       }
     },

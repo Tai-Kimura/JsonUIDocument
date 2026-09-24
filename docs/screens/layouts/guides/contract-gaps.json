@@ -1,6 +1,6 @@
 {
   "type": "View",
-  "id": "guides_branch_contracts_root",
+  "id": "guides_contract_gaps_root",
   "orientation": "vertical",
   "width": "matchParent",
   "height": "matchParent",
@@ -15,27 +15,19 @@
         {
           "name": "onNavigateGuides",
           "class": "() -> Void"
-        },
-        {
-          "name": "onNavigateBranchTests",
-          "class": "() -> Void"
-        },
-        {
-          "name": "onNavigateContractGaps",
-          "class": "() -> Void"
         }
       ]
     },
     {
       "type": "Scroll",
-      "id": "guides_branch_contracts_scroll",
+      "id": "guides_contract_gaps_scroll",
       "width": "matchParent",
       "weight": 1,
       "child": [
         {
           "type": "View",
           "orientation": "vertical",
-          "id": "guides_branch_contracts_header",
+          "id": "guides_contract_gaps_header",
           "width": "matchParent",
           "height": "wrapContent",
           "paddings": [
@@ -88,14 +80,14 @@
         },
         {
           "type": "View",
-          "id": "guides_branch_contracts_content_with_rail",
+          "id": "guides_contract_gaps_content_with_rail",
           "orientation": "horizontal",
           "width": "matchParent",
           "height": "wrapContent",
           "child": [
             {
               "type": "View",
-              "id": "guides_branch_contracts_body_column",
+              "id": "guides_contract_gaps_body_column",
               "orientation": "vertical",
               "weight": 1,
               "height": "wrapContent",
@@ -131,6 +123,15 @@
                       "fontSize": 16,
                       "fontColor": "#475467",
                       "text": "section_what_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_what_prereq"
                     }
                   ]
                 },
@@ -146,7 +147,7 @@
                     24,
                     32
                   ],
-                  "background": "#F9FAFB",
+                  "background": "#FFFFFF",
                   "child": [
                     {
                       "type": "Label",
@@ -171,184 +172,49 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "\"branchContracts\": {\n  \"conditions\": {\n    \"formValid\": {\n      \"meaning\": \"every required field is filled\",\n      \"witness_true\":  { \"form\": { \"nickname\": \"a\" } },\n      \"witness_false\": { \"form\": { \"nickname\": \"\" } }\n    }\n  },\n  \"methods\": {\n    \"onTapSave\": {\n      \"baseline\": { \"isSaving\": false },\n      \"branches\": [\n        { \"when\": { \"cond\": \"!formValid\" },\n          \"then\": { \"data.errorMessage\": \"@profile_screen_invalid\", \"api\": \"none\" } },\n        { \"when\": { \"cond\": \"formValid\", \"api.updateProfile\": \"success\" },\n          \"then\": { \"transition\": \"HomeScreen\",\n                    \"api.updateProfile.request\": { \"nickname\": \"@data.form\" } } },\n        { \"when\": { \"cond\": \"formValid\", \"api.updateProfile\": \"failure\" },\n          \"then\": { \"data.errorMessage\": \"@profile_screen_failed\",\n                    \"api.updateProfile\": \"called\" } },\n        { \"note\": \"double-tap guard: second tap while isSaving is dropped\" }\n      ]\n    }\n  }\n}",
-                      "language": "json",
-                      "filename": "ProfileScreen.spec.json — branchContracts",
-                      "showLineNumbers": false,
-                      "copyable": true
-                    }
-                  ]
-                },
-                {
-                  "type": "View",
-                  "orientation": "vertical",
-                  "id": "section_conditions",
-                  "width": "matchParent",
-                  "height": "wrapContent",
-                  "paddings": [
-                    24,
-                    32,
-                    24,
-                    32
-                  ],
-                  "background": "#FFFFFF",
-                  "child": [
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "fontSize": 26,
-                      "fontWeight": "bold",
-                      "fontColor": "#0B1220",
-                      "text": "section_conditions_heading"
-                    },
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 12,
-                      "fontSize": 16,
-                      "fontColor": "#475467",
-                      "text": "section_conditions_body"
-                    },
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 12,
-                      "fontSize": 14,
-                      "fontColor": "#475467",
-                      "text": "section_conditions_checks"
-                    },
-                    {
-                      "type": "CodeBlock",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 12,
-                      "code": "[WARNING] branchContracts.conditions.hasStock: Condition is declared but no branch\n          gates on it — its witnesses are never exercised\n[WARNING] ...branches[0].when.cond: Condition 'formValid' has no witness_false, so this\n          branch cannot be arranged — test generation fails on it\n[WARNING] branchContracts.conditions.formValid: witness_true and witness_false arrange\n          the same state, so they cannot tell the condition's two sides apart",
-                      "language": "text",
-                      "filename": "condition usage warnings — one seeded mistake each",
-                      "showLineNumbers": false,
-                      "copyable": false
-                    }
-                  ]
-                },
-                {
-                  "type": "View",
-                  "orientation": "vertical",
-                  "id": "section_when",
-                  "width": "matchParent",
-                  "height": "wrapContent",
-                  "paddings": [
-                    24,
-                    32,
-                    24,
-                    32
-                  ],
-                  "background": "#F9FAFB",
-                  "child": [
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "fontSize": 26,
-                      "fontWeight": "bold",
-                      "fontColor": "#0B1220",
-                      "text": "section_when_heading"
-                    },
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 12,
-                      "fontSize": 16,
-                      "fontColor": "#475467",
-                      "text": "section_when_body"
-                    },
-                    {
-                      "type": "CodeBlock",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 12,
-                      "code": "key           | value                          | means\n--------------+--------------------------------+-------------------------------------------------\ndata.<field>  | literal                        | the declared data field holds this value\narg.<name>    | literal                        | the method argument holds this value\napi.<op>      | named mock scenario            | the API operation answers with this scenario\ncond          | condition name ('!' prefix ok) | a named condition from branchContracts.conditions",
-                      "language": "text",
-                      "filename": "when keys",
-                      "showLineNumbers": false,
-                      "copyable": false
-                    }
-                  ]
-                },
-                {
-                  "type": "View",
-                  "orientation": "vertical",
-                  "id": "section_then",
-                  "width": "matchParent",
-                  "height": "wrapContent",
-                  "paddings": [
-                    24,
-                    32,
-                    24,
-                    32
-                  ],
-                  "background": "#FFFFFF",
-                  "child": [
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "fontSize": 26,
-                      "fontWeight": "bold",
-                      "fontColor": "#0B1220",
-                      "text": "section_then_heading"
-                    },
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 12,
-                      "fontSize": 16,
-                      "fontColor": "#475467",
-                      "text": "section_then_body"
-                    },
-                    {
-                      "type": "CodeBlock",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 12,
-                      "code": "key              | value                                    | asserts\n-----------------+------------------------------------------+--------------------------------------------\ndata.<field>     | literal / \"@strings_key\" / \"@data.<field>\" | the field ends up holding this value\ntransition       | destination name                         | the screen navigates there\napi              | \"none\"                                   | no API operation is called at all\napi.<op>         | \"called\" or \"not-called\"                 | whether that operation fires\napi.<op>.request | partial object                           | the request body contains these entries",
-                      "language": "text",
-                      "filename": "then keys",
-                      "showLineNumbers": false,
-                      "copyable": false
-                    },
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 16,
-                      "fontSize": 14,
-                      "fontColor": "#475467",
-                      "text": "section_then_passthrough"
-                    },
-                    {
-                      "type": "CodeBlock",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 12,
-                      "code": "// the three @ forms, side by side\n\"data.title\":        \"@profile_screen_saved\"   // a string from your table\n\"data.previousName\": \"@data.form\"             // a field's value before the act\n\"data.errorMessage\": \"@response.error.message\" // what the server returned\n\n// a passthrough branch names exactly one scenario:\n{ \"when\": { \"api.createOrder\": \"declined\" },\n  \"then\": { \"data.errorMessage\": \"@response.error.message\" } }",
+                      "code": "// mock scenarios: success 200 · failure 500 · conflict 409 · invalid 422 · expired 401\n\"onTapSave\": {\n  \"baseline\": { \"isSaving\": false },\n  \"branches\": [\n    { \"when\": { \"cond\": \"!formValid\" },\n      \"then\": { \"data.errorMessage\": \"@profile_screen_invalid\", \"api\": \"none\" } },\n    { \"when\": { \"cond\": \"formValid\", \"api.updateProfile\": \"success\" },\n      \"then\": { \"transition\": \"HomeScreen\",\n                \"api.updateProfile.request\": { \"nickname\": \"@data.form\" } } },\n    { \"when\": { \"cond\": \"formValid\", \"api.updateProfile\": \"failure\" },\n      \"alsoStatuses\": { \"api.updateProfile\": [\"409\"] },\n      \"then\": { \"data.errorMessage\": \"@profile_screen_failed\",\n                \"api.updateProfile\": \"called\" } },\n    { \"note\": \"double-tap guard: second tap while isSaving is dropped\" }\n  ],\n  \"excludedOutcomes\": {\n    \"api.updateProfile\": {\n      \"401\": { \"by\": \"unit\",\n               \"reason\": \"the session layer signs the user out on 401 for every screen\" }\n    }\n  }\n}",
                       "language": "jsonc",
-                      "filename": "@key / @data.<field> / @response.<path>",
+                      "filename": "ProfileScreen.spec.json — branchContracts.methods",
                       "showLineNumbers": false,
-                      "copyable": true
+                      "copyable": false
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_example_run"
                     },
                     {
                       "type": "CodeBlock",
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "Error: ...branches[2]: '@response.<path>' needs exactly one `api.<op>` in `when` to read\n       the response from, found 0\nError: ...then.data.errorMessage: scenario 'declined' has no 'error.detail' in its response\n       body — at error the available keys are: code, message\nError: ...then.data.errorMessage: 'error' in scenario 'declined' is a dict, and a displayed\n       value must be a scalar\n\n[WARNING] ...branches[2].then: '@response.<path>' reads the response of the branch's own\n          scenario, but `when` names 0 `api.<op>` scenario(s) — test generation needs\n          exactly one",
+                      "code": "$ jsonui-test contracts coverage --platform web\ncontracts coverage  (project platforms: web, android, ios)\napp contracts: docs/screens/json/app_contracts.spec.json · apiOutcomeRules 1\n[platform=web] spec=profile_screen  units 1  contracted methods 1 of 1\n  statuses required 5 = row 3 (alsoStatuses 1) + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 1\n    uncovered 1 = partial 1 + default-only 0 + unattributed 0\n  uncovered  partial       onTapSave × api.updateProfile  PUT /api/items  422\n  info  guard-only 1 · note branches 1 · also_statuses_rows 1 · also_statuses_arrange_differs 0 · side_calls_admitted 0 · reference_holds_on_success_row 0 · route_overlaps 0 · dataFlow methods without endpoint 0\n  outside required 0 = unreached-op 0 + n/a(default response) 0 + n/a(no scenario) 0 + n/a(platform-excluded) 0\n  n/a (E) no mock 0 · not in OpenAPI 0 · unbound endpoint 0 · non-HTTP 0\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 0 (screens 0) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] exit 1 (uncovered)\nexit 1 (composed 2 > 1 > 3 > 0): 1 uncovered — write a row (alsoStatuses if the VM treats it like another status), or an exclusion with a reason",
                       "language": "text",
-                      "filename": "generation stops, and validate warns first",
+                      "filename": "contracts coverage — the example, web block",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_example_fixed"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "// one more row, before the note\n{ \"when\": { \"cond\": \"formValid\", \"api.updateProfile\": \"invalid\" },\n  \"then\": { \"data.errorMessage\": \"@profile_screen_invalid\" } }\n\n$ jsonui-test contracts coverage --platform web\n…\n  statuses required 5 = row 4 (alsoStatuses 1) + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 0\n    uncovered 0 = partial 0 + default-only 0 + unattributed 0\n…\n[platform=web] exit 0 (pass)\nexit 0 (composed 2 > 1 > 3 > 0)",
+                      "language": "jsonc",
+                      "filename": "one row for the 422, and the block again",
                       "showLineNumbers": false,
                       "copyable": false
                     }
@@ -357,7 +223,7 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_scoped",
+                  "id": "section_buckets",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -366,52 +232,7 @@
                     24,
                     32
                   ],
-                  "background": "#F9FAFB",
-                  "child": [
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "fontSize": 26,
-                      "fontColor": "#0B1220",
-                      "text": "section_scoped_heading",
-                      "fontWeight": "bold"
-                    },
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "fontSize": 16,
-                      "fontColor": "#475467",
-                      "text": "section_scoped_body",
-                      "topMargin": 12
-                    },
-                    {
-                      "type": "CodeBlock",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 12,
-                      "code": "{ \"platforms\": [\"ios\"],\n  \"when\": { \"cond\": \"formValid\", \"api.updateProfile\": \"failure\" },\n  \"then\": { \"data.errorMessage\": \"@profile_screen_failed\" } }",
-                      "language": "json",
-                      "filename": "a branch that exists only on iOS",
-                      "showLineNumbers": false,
-                      "copyable": true
-                    }
-                  ]
-                },
-                {
-                  "type": "View",
-                  "orientation": "vertical",
-                  "id": "section_validate",
-                  "width": "matchParent",
-                  "height": "wrapContent",
-                  "paddings": [
-                    24,
-                    32,
-                    24,
-                    32
-                  ],
-                  "background": "#F9FAFB",
+                  "background": "#FFFFFF",
                   "child": [
                     {
                       "type": "Label",
@@ -420,7 +241,7 @@
                       "fontSize": 26,
                       "fontWeight": "bold",
                       "fontColor": "#0B1220",
-                      "text": "section_validate_heading"
+                      "text": "section_buckets_heading"
                     },
                     {
                       "type": "Label",
@@ -429,7 +250,52 @@
                       "topMargin": 12,
                       "fontSize": 16,
                       "fontColor": "#475467",
-                      "text": "section_validate_body"
+                      "text": "section_buckets_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "bucket                    | a status lands here when\nrow                       | a row serves it in `when` by scenario name — the route's default scenario is\n                          | not an answer — and the row's `then` says more than \"the op was reached\";\n                          | an alsoStatuses copy counts here and is reported apart\nunit                      | excludedOutcomes, by: unit — a unit test covers it\nunreachable               | excludedOutcomes, by: unreachable — it cannot arrive here\nunexpressible             | excludedOutcomes, by: unexpressible — only a note branch could say it\nnot-evaluated             | the method's row for the op could not be bound\nuncovered · partial       | the method answers other statuses of the op, not this one\nuncovered · default-only  | the method reaches the op but answers none of its statuses\nuncovered · unattributed  | no method's rows reach the op, and unreachedOps does not say why\noutside required          | unreached-op (unreachedOps says why) · n/a(default response)\n                          | · n/a(no scenario) · n/a(platform-excluded)",
+                      "language": "text",
+                      "filename": "every documented status, exactly one bucket",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_answer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_answer_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_answer_body"
                     },
                     {
                       "type": "Label",
@@ -438,72 +304,61 @@
                       "topMargin": 16,
                       "fontSize": 14,
                       "fontColor": "#475467",
-                      "text": "section_validate_bullet_error"
+                      "text": "section_answer_bullet_row"
                     },
                     {
                       "type": "Label",
                       "width": "matchParent",
                       "height": "wrapContent",
-                      "topMargin": 6,
+                      "topMargin": 12,
                       "fontSize": 14,
                       "fontColor": "#475467",
-                      "text": "section_validate_bullet_warning"
+                      "text": "section_answer_bullet_also"
                     },
                     {
                       "type": "Label",
                       "width": "matchParent",
                       "height": "wrapContent",
-                      "topMargin": 6,
+                      "topMargin": 12,
                       "fontSize": 14,
                       "fontColor": "#475467",
-                      "text": "section_validate_bullet_ambiguous"
+                      "text": "section_answer_bullet_excluded"
                     },
                     {
                       "type": "Label",
                       "width": "matchParent",
                       "height": "wrapContent",
-                      "topMargin": 6,
+                      "topMargin": 12,
                       "fontSize": 14,
                       "fontColor": "#475467",
-                      "text": "section_validate_bullet_promote"
+                      "text": "section_answer_bullet_unreached"
                     },
                     {
                       "type": "Label",
                       "width": "matchParent",
                       "height": "wrapContent",
-                      "topMargin": 6,
+                      "topMargin": 12,
                       "fontSize": 14,
                       "fontColor": "#475467",
-                      "text": "section_validate_bullet_skip"
+                      "text": "section_answer_bullet_platforms"
                     },
                     {
                       "type": "Label",
                       "width": "matchParent",
                       "height": "wrapContent",
-                      "topMargin": 6,
+                      "topMargin": 16,
                       "fontSize": 14,
                       "fontColor": "#475467",
-                      "text": "section_validate_bullet_crossface"
+                      "text": "section_answer_validate"
                     },
                     {
                       "type": "CodeBlock",
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "[ERROR] ...when.flag.debug: Unknown when key 'flag.debug' — allowed: 'data.<field>',\n        'arg.<name>', 'api.<op>', 'cond'\n[ERROR] ...when.cond: cond references undeclared condition 'ghostCondition' — declare it\n        in branchContracts.conditions\n[ERROR] ...branches[3]: A note branch must contain only 'note' (found ['when']). Declare\n        the contract half as a separate {when, then} branch.\n[ERROR] branchContracts.methods.ghostMethod: Method 'ghostMethod' not found in\n        dataFlow.viewModel.methods or stateManagement.eventHandlers\n[ERROR] ...when.api.updateProfile: API operation 'updateProfile' is declared by\n        ProfileRepository.updateProfile and AccountUseCase.updateProfile — the bare\n        name does not say which endpoint this means, and the generator would bind it\n        to one of them. Qualify it, e.g. 'ProfileRepository.updateProfile'\n[WARNING] ...then.data.typoField: Data field 'typoField' is not declared in\n        stateManagement.uiVariables / dataFlow.viewModel.vars / stateManagement.states\n[WARNING] ...when.api.deleteProfile: API operation 'deleteProfile' is not declared in\n        dataFlow.repositories[].methods or dataFlow.useCases[].methods\n[WARNING] ...then.transition: Transition destination 'GhostScreen' does not match any\n        transitions[].destination",
+                      "code": "# excludedOutcomes with by: \"method\"\n[ERROR] branchContracts.methods.onTapSave.excludedOutcomes.api.updateProfile.401.by:\n        'method' is not an exclusion: this method reaches the operation, so its own row\n        can always be written — write the row\n# alsoStatuses with a range\n[ERROR] branchContracts.methods.onTapSave.branches[2].alsoStatuses.api.updateProfile[0]:\n        '4XX' is a range — alsoStatuses takes plain statuses (v1: a range would make the\n        generator read OpenAPI to know which statuses it stands for). List the statuses\n# apiOutcomeRules written into the screen spec\n[ERROR] apiOutcomeRules: apiOutcomeRules belongs in the app_contracts_spec — it admits the\n        calls the app's network layer makes for every screen. A screen's own handling of a\n        status is a row in branchContracts (alsoStatuses for statuses the row treats alike)\n# an app contracts spec with rules and no unitContracts\n[ERROR] unitContracts: Required field 'unitContracts' is missing\n[ERROR] apiOutcomeRules[0].verifiedBy[0]: 'signs_out_on_401' is not a case in this file's\n        unitContracts",
                       "language": "text",
-                      "filename": "jsonui-doc validate spec — findings",
-                      "showLineNumbers": false,
-                      "copyable": false
-                    },
-                    {
-                      "type": "CodeBlock",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 12,
-                      "code": "[WARNING] validation.serverSide[0]: Prose mentions branch-like token 'payment_expired'\n          that branchContracts does not know — declare the branch (or scenario) or\n          update the stale prose\n[WARNING] userActions[0]: Prose routes to transition 'SettingsScreen' but no branch of\n          the contracted method(s) declares `then.transition` to it — declare the\n          branch or update the stale prose",
-                      "language": "text",
-                      "filename": "cross-face warnings — one seeded drift each",
+                      "filename": "jsonui-doc validate spec — one seeded mistake each",
                       "showLineNumbers": false,
                       "copyable": false
                     }
@@ -512,7 +367,7 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_render",
+                  "id": "section_app",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -530,7 +385,7 @@
                       "fontSize": 26,
                       "fontWeight": "bold",
                       "fontColor": "#0B1220",
-                      "text": "section_render_heading"
+                      "text": "section_app_heading"
                     },
                     {
                       "type": "Label",
@@ -539,25 +394,34 @@
                       "topMargin": 12,
                       "fontSize": 16,
                       "fontColor": "#475467",
-                      "text": "section_render_body"
+                      "text": "section_app_body"
                     },
                     {
                       "type": "CodeBlock",
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "Branch Contracts\n1 method(s) — 3 declared branch(es), 1 note-only branch(es) outside the\nmachine-checkable contract.\n\nNamed Conditions\n  Name      | Meaning                        | Witness (true)          | Witness (false)\n  formValid | every required field is filled | form = {\"nickname\":\"a\"} | form = {\"nickname\":\"\"}\n\nonTapSave — Baseline: isSaving = false\n  # | When                                              | Then\n  1 | cond = \"!formValid\"                               | data.errorMessage = \"@profile_screen_invalid\", api = \"none\"\n  2 | cond = \"formValid\", api.updateProfile = \"success\" | transition = \"HomeScreen\", api.updateProfile.request = {...}\n  3 | cond = \"formValid\", api.updateProfile = \"failure\" | data.errorMessage = \"@profile_screen_failed\", api.updateProfile = \"called\"\n  4 | note (not machine-checked): double-tap guard: second tap while isSaving is dropped",
-                      "language": "text",
-                      "filename": "generated HTML — decision table (as text)",
+                      "code": "{\n  \"type\": \"app_contracts_spec\",\n  \"version\": \"1.0\",\n  \"metadata\": { \"name\": \"AppContracts\", \"description\": \"app-wide behaviour\" },\n  \"unitContracts\": [\n    { \"target\": \"SessionInterceptor\",\n      \"cases\": [ { \"name\": \"signs_out_on_401\",\n                   \"intent\": \"a terminal 401 posts a logout and clears the session\" } ] }\n  ],\n  \"apiOutcomeRules\": [\n    { \"id\": \"session-expired\",\n      \"statuses\": [\"401\"],\n      \"sideCalls\": [\"postLogout\"],\n      \"verifiedBy\": [\"signs_out_on_401\"],\n      \"reason\": \"the network layer posts a logout after a terminal 401\" }\n  ]\n}",
+                      "language": "json",
+                      "filename": "app_contracts.spec.json",
                       "showLineNumbers": false,
                       "copyable": false
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_app_effect"
                     }
                   ]
                 },
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_generate",
+                  "id": "section_bound",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -573,58 +437,178 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "fontSize": 26,
+                      "fontWeight": "bold",
                       "fontColor": "#0B1220",
-                      "text": "section_generate_heading",
-                      "fontWeight": "bold"
-                    },
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "fontSize": 16,
-                      "fontColor": "#475467",
-                      "text": "section_generate_body",
-                      "topMargin": 12
+                      "text": "section_bound_heading"
                     },
                     {
                       "type": "Label",
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "fontSize": 15,
-                      "fontWeight": "semibold",
-                      "fontColor": "accent",
-                      "tapBackground": "#F3F4F6",
-                      "onClick": "@{onNavigateBranchTests}",
-                      "text": "section_generate_link"
-                    },
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
                       "fontSize": 16,
                       "fontColor": "#475467",
-                      "text": "section_generate_gaps",
-                      "topMargin": 24
+                      "text": "section_bound_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "  it(\"branch 3: cond=\\\"formValid\\\" & api.updateProfile=\\\"failure\\\" [+409 via conflict]\", async () => {\n    const rec = installFetchMock(ROUTES, {\"updateProfile\": \"conflict\"});\n    try {\n      const h = createHarness();\n      await settle();\n      h.setState({\"isSaving\": false, \"form\": {\"nickname\": \"a\"}});\n      rec.mark();\n      await (h.vm as any).onTapSave();\n      await settle();\n      expect(rec.unexpectedOps([\"updateProfile\"]), \"declared routes called outside what this method's rows reach — if the method makes the call, say so in the row whose act makes it (then api.<op>: \\\"called\\\"); that allows <op> in every row of this method that does not mention it, so a row that must not make the call says api.<op>: \\\"not-called\\\". If the app's network layer makes it, admit it with apiOutcomeRules\").toEqual([]);\n      expect(h.readField(\"errorMessage\")).toEqual(resolveString(h, \"profile_screen_failed\"));\n      expect(rec.countFor(\"updateProfile\")).toBeGreaterThan(0);\n    } finally {\n      rec.restore();\n    }\n  });",
+                      "language": "typescript",
+                      "filename": "profile_screen.branches.test.ts — @generated, web",
+                      "showLineNumbers": false,
+                      "copyable": false
                     },
                     {
                       "type": "Label",
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "fontSize": 15,
-                      "fontWeight": "semibold",
-                      "fontColor": "accent",
-                      "tapBackground": "#F3F4F6",
-                      "onClick": "@{onNavigateContractGaps}",
-                      "text": "section_generate_gaps_link"
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_bound_clear"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_bound_hole"
                     }
                   ]
                 },
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "guides_branch_contracts_next",
+                  "id": "section_exit",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_exit_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_exit_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "# with the 422 row in place\n  n/a (E) no mock 0 · not in OpenAPI 0 · unbound endpoint 1 · non-HTTP 0\n  note  GET /api/items/{id} is in dataFlow.apiEndpoints but is the endpoint of no repositories / useCases method — branch tests do not route it (a call is recorded as (unmatched)); bind it to the method that calls it\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 1 (screens 1) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] exit 3 (unmeasured)\nexit 3 (composed 2 > 1 > 3 > 0): some statuses could not be evaluated — see not-evaluated and n/a above\n\n# without it\n  uncovered  partial       onTapSave × api.updateProfile  PUT /api/items  422\n…\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 1 (screens 1) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] uncovered is a floor: n/a(unbound endpoint) 1 — not evaluated, so more may be uncovered\n[platform=web] exit 1 (uncovered)\nexit 1 (composed 2 > 1 > 3 > 0): 1 uncovered — write a row (alsoStatuses if the VM treats it like another status), or an exclusion with a reason; uncovered is a floor on web\n\n# --json, the same run: \"floor\": {\"unbound\": 1},\n#   \"totals\": {…, \"na_endpoints\": {\"no_mock\": 0, \"not_in_openapi\": 0, \"unbound\": 1, \"non_http\": 0}}",
+                      "language": "text",
+                      "filename": "an endpoint only in dataFlow.apiEndpoints — with the 422 row, then without",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_limits",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_limits_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_limits_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_limits_bullet_gate"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_limits_bullet_claims"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_limits_bullet_document"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_limits_bullet_population"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_limits_bullet_bound"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_contract_gaps_next",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -646,7 +630,7 @@
                     },
                     {
                       "type": "Collection",
-                      "id": "guides_branch_contracts_next_collection",
+                      "id": "guides_contract_gaps_next_collection",
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 20,
@@ -668,7 +652,7 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "guides_branch_contracts_footer",
+                  "id": "guides_contract_gaps_footer",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -693,7 +677,7 @@
             },
             {
               "type": "View",
-              "id": "guides_branch_contracts_rail_column",
+              "id": "guides_contract_gaps_rail_column",
               "orientation": "vertical",
               "width": 260,
               "height": "wrapContent",
@@ -707,7 +691,7 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "guides_branch_contracts_toc_wrap",
+                  "id": "guides_contract_gaps_toc_wrap",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -739,45 +723,39 @@
                           "level": 1
                         },
                         {
-                          "id": "toc_conditions",
-                          "label": "toc_row_conditions",
-                          "anchor": "section_conditions",
+                          "id": "toc_buckets",
+                          "label": "toc_row_buckets",
+                          "anchor": "section_buckets",
                           "level": 1
                         },
                         {
-                          "id": "toc_when",
-                          "label": "toc_row_when",
-                          "anchor": "section_when",
+                          "id": "toc_answer",
+                          "label": "toc_row_answer",
+                          "anchor": "section_answer",
                           "level": 1
                         },
                         {
-                          "id": "toc_then",
-                          "label": "toc_row_then",
-                          "anchor": "section_then",
+                          "id": "toc_app",
+                          "label": "toc_row_app",
+                          "anchor": "section_app",
                           "level": 1
                         },
                         {
-                          "id": "toc_scoped",
-                          "label": "toc_row_scoped",
-                          "anchor": "section_scoped",
+                          "id": "toc_bound",
+                          "label": "toc_row_bound",
+                          "anchor": "section_bound",
                           "level": 1
                         },
                         {
-                          "id": "toc_validate",
-                          "label": "toc_row_validate",
-                          "anchor": "section_validate",
+                          "id": "toc_exit",
+                          "label": "toc_row_exit",
+                          "anchor": "section_exit",
                           "level": 1
                         },
                         {
-                          "id": "toc_render",
-                          "label": "toc_row_render",
-                          "anchor": "section_render",
-                          "level": 1
-                        },
-                        {
-                          "id": "toc_generate",
-                          "label": "toc_row_generate",
-                          "anchor": "section_generate",
+                          "id": "toc_limits",
+                          "label": "toc_row_limits",
+                          "anchor": "section_limits",
                           "level": 1
                         }
                       ],
