@@ -599,6 +599,26 @@
                       "filename": "ProfileScreenBranchHarness.swift — skeleton contract comment",
                       "showLineNumbers": false,
                       "copyable": false
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_harness_conditions"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "// app_contracts.spec.json\n\"harnessConditions\": {\n  \"session\": { \"values\": [\"absent\", \"present\"], \"default\": \"absent\",\n               \"reason\": \"whether a user is signed in; the view model reads it at construction\" }\n}\n\n// a row in the screen spec\n{ \"when\": { \"cond\": \"formValid\", \"harness.session\": \"present\", \"api.updateProfile\": \"success\" },\n  \"then\": { \"transition\": \"HomeScreen\", \"api.updateProfile\": \"called\" } }\n\n// generated (web): the condition is arranged before the harness is built\nconst rec = installFetchMock(ROUTES, {\"updateProfile\": \"success\"});\ntry {\n  await arrangeCondition(\"session\", \"present\");\n  const h = createHarness();\n  await settle();\n  …\n\n// and the two lines generate branch-tests adds to its summary\n  tests/unit/branch-harness/branch-conditions.ts  (NEW harness-conditions hook skeleton, one per app — implement arrangeCondition(); until then every branch test throws in it)\nharnessConditions: session from app_contracts.spec.json — every branch test calls arrangeCondition for each",
+                      "language": "text",
+                      "filename": "a harness condition — declaration, row, generated call (1.8.118)",
+                      "showLineNumbers": false,
+                      "copyable": false
                     }
                   ]
                 },

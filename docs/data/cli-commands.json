@@ -3546,15 +3546,15 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Machine-readable output. Per platform it carries the totals, `totals.na_endpoints`, and `floor` — what could not be evaluated when the block also has something uncovered.",
-            "ja": "機械可読の出力。プラットフォームごとに合計・`totals.na_endpoints`・`floor`（答えていないものがあるブロックで、評価できなかったもの）を持つ。"
+            "en": "Machine-readable output. Per platform it carries `totals` — units, contracted methods, statuses required and the uncovered and outside-required breakdowns (1.8.118), plus `na_endpoints` — and `floor`: what could not be evaluated when the block also has something uncovered.",
+            "ja": "機械可読の出力。プラットフォームごとに `totals`（units・contracted methods・statuses required・uncovered と outside required の内訳（1.8.118）、`na_endpoints`）と、`floor`（答えていないものがあるブロックで、評価できなかったもの）を持つ。"
           }
         }
       ],
       "examples": [
         {
           "language": "bash",
-          "code": "# measured on a fixture: one screen, one operation documenting 200/401/409/422/500;\n# 409 answered through alsoStatuses, 401 excluded by unit, 422 left unanswered\n$ jsonui-test contracts coverage --platform web\ncontracts coverage  (project platforms: web, android, ios)\napp contracts: docs/screens/json/app_contracts.spec.json · apiOutcomeRules 1\n[platform=web] spec=profile_screen  units 1  contracted methods 1 of 1\n  statuses required 5 = row 3 (alsoStatuses 1) + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 1\n    uncovered 1 = partial 1 + default-only 0 + unattributed 0\n  uncovered  partial       onTapSave × api.updateProfile  PUT /api/items  422\n  info  guard-only 1 · note branches 1 · also_statuses_rows 1 · also_statuses_arrange_differs 0 · side_calls_admitted 0 · reference_holds_on_success_row 0 · route_overlaps 0 · dataFlow methods without endpoint 0\n  outside required 0 = unreached-op 0 + n/a(default response) 0 + n/a(no scenario) 0 + n/a(platform-excluded) 0\n  n/a (E) no mock 0 · not in OpenAPI 0 · unbound endpoint 0 · non-HTTP 0\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 0 (screens 0) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] exit 1 (uncovered)\nexit 1 (composed 2 > 1 > 3 > 0): 1 uncovered — write a row (alsoStatuses if the VM treats it like another status), or an exclusion with a reason"
+          "code": "# measured on a fixture: one screen, one operation documenting 200/401/409/422/500;\n# 409 answered through alsoStatuses, 401 excluded by unit, 422 left unanswered\n$ jsonui-test contracts coverage --platform web\ncontracts coverage  (project platforms: web, android, ios)\napp contracts: docs/screens/json/app_contracts.spec.json · apiOutcomeRules 1\n[platform=web] spec=profile_screen  units 1  contracted methods 1 of 1\n  statuses required 5 = row 3 (alsoStatuses 1) + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 1\n    uncovered 1 = partial 1 + default-only 0 + unattributed 0\n  uncovered  partial       onTapSave × api.updateProfile  PUT /api/items  422\n  info  guard-only 1 · note branches 1 · also_statuses_rows 1 · also_statuses_arrange_differs 0 · side_calls_admitted 0 · reference_holds_on_success_row 0 · route_overlaps 0 · dataFlow methods without endpoint 0\n  outside required 0 = unreached-op 0 + n/a(default response) 0 + n/a(no scenario) 0 + n/a(platform-excluded) 0\n  n/a (E) no mock 0 · not in OpenAPI 0 · unbound endpoint 0 · non-HTTP 0\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 0 (screens 0) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] total units 1 · statuses required 5 = row 3 + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 1 (partial 1 + default-only 0 + unattributed 0)\n[platform=web] exit 1 (uncovered)\nexit 1 (composed 2 > 1 > 3 > 0) statuses required 5: 1 uncovered — write a row (alsoStatuses if the VM treats it like another status), or an exclusion with a reason"
         }
       ],
       "aliases": [],
@@ -3563,18 +3563,18 @@
         "jsonui-doc validate spec"
       ],
       "verifiedAgainst": {
-        "version": "1.8.117",
+        "version": "1.8.118",
         "columns": 80,
         "python": "3.12",
         "helpHash": "4c234910f54bceb17563c797aaf672e4436034ec69ddd0a61349851aa335dfbb",
-        "cardHash": "370eaa43bf76d70d875e52cdd22cfaeed0c4f3ccd4c010f3c05e80b0360411d6",
+        "cardHash": "b3319bfbbb3f6712819a78fc42e47e4b1fe542790cf643b51596c40a75af1eae",
         "fieldHashes": {
           "binary": "3b2560767fdf",
           "command": "036d2917ec5d",
           "synopsis": "707c179b9122",
           "purpose": "a946e59db929",
-          "options": "16d5ea9604ed",
-          "examples": "cdc2d81fa5c5",
+          "options": "d97b4c0e8684",
+          "examples": "0c98adc78db0",
           "aliases": "98edafdd23a8",
           "seeAlso": "6c475f3b8393"
         }

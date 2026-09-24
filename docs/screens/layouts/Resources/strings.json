@@ -3477,6 +3477,10 @@
     "section_what_gaps_link": {
       "en": "Contract gaps — which API outcomes the contracts answer →",
       "ja": "契約ギャップ検出 — どの API の応答に契約が答えているか →"
+    },
+    "section_harness_conditions": {
+      "en": "Since jsonui-cli 1.8.118 the harness has a second, app-wide half for preconditions no mock can arrange — a signed-in session, say, which the view model reads at construction. Declare each once in the app contracts spec as `harnessConditions: { \"<name>\": { values, default, reason } }` and name it in a row's `when` as `\"harness.<name>\": \"<value>\"` (not `cond`, which names a witness). Every generated test then calls `arrangeCondition(name, value)` (awaited on web) for every declared condition — the row's value, or the default — after the mock is installed and before the screen's harness is built. The hook is one consumer-owned file per app in the harness directory: `branch-conditions.ts` on web, `BranchConditions.kt` on Android, `BranchConditions.swift` on iOS, each written once as a skeleton that throws for every pair until you implement it, so no row passes on the harness's bare state. Make each pair produce what production would give the view model to observe; the tool cannot see whether it does. Measured on the page's example with a `session` condition and one row naming it: `jsonui-doc validate spec` passes the row, and it also passes a row naming an undeclared condition or a value outside `values` — those are refused by `generate branch-tests` and `contracts coverage` instead (exit 1, naming the condition and the allowed values). With the hook file deleted, `generate branch-tests --check` warns that it is missing and still exits 0. A project that declares no `harnessConditions` gets none of this: its generated files are byte for byte what 1.8.117 wrote (measured on this page's example on all three platforms).",
+      "ja": "jsonui-cli 1.8.118 から、harness にはアプリ全体で共有するもう半分が加わりました — どのモックも arrange できない前提、たとえば view model が構築時に読むサインイン済みのセッションのためのものです。それぞれを app contracts spec で 1 度、`harnessConditions: { \"<name>\": { values, default, reason } }` と宣言し、行の `when` で `\"harness.<name>\": \"<value>\"` と名指しします（witness を名指しする `cond` とは別物です）。生成されたどのテストも、宣言されたすべての条件について `arrangeCondition(name, value)` を呼びます（web では await） — 値はその行のもの、無ければ既定値 — モックを入れた後、画面の harness を組み立てる前に。フックはアプリにつき 1 本、harness ディレクトリに置く利用者所有のファイルです: web は `branch-conditions.ts`、Android は `BranchConditions.kt`、iOS は `BranchConditions.swift`。どれも 1 度だけ雛形として書かれ、実装するまでどの組でも throw するので、harness の素の状態のまま通る行はありません。各組が、本番で view model が観測するものを作り出すようにしてください — それが忠実かどうかは、ツールには見えません。このページの例に `session` 条件と、それを名指しする行 1 本を足して実測しました: `jsonui-doc validate spec` はその行を通し、宣言していない条件や `values` の外の値を名指しする行も通します — それらを拒否するのは `generate branch-tests` と `contracts coverage` で（exit 1、条件と許される値を名指し）。フックのファイルを消すと、`generate branch-tests --check` は無いことを警告し、それでも exit 0 です。`harnessConditions` を宣言しないプロジェクトには何も起きません: 生成物は 1.8.117 が書いたものとバイト単位で同じです（このページの例で 3 プラットフォームとも実測）。"
     }
   },
   "guides_unit_contracts": {
@@ -3703,8 +3707,8 @@
       "ja": "4. when の語彙"
     },
     "section_when_body": {
-      "en": "Four key shapes, nothing else — anything outside this closed set is an error, not a guess. Multiple keys in one when are combined with AND. A `data.<field>` value here is a scalar literal — string, number, boolean, null; swapping in a whole object is rejected (\"when data.* value must be a scalar literal (string/number/bool/null), got dict\"), because a wholesale state substitution is what a named condition's witness is for. `arg.<name>` binds to `dataFlow.viewModel.methods[].params` and nowhere else: eventHandlers have no params in the schema because they belong to the View layer, while the ViewModel's public API is what dataFlow declares — so a contract that fixes an argument requires the method to be part of that public API. Since jsonui-cli 1.6.30 an `arg` with no matching param is an error (test generation stops too); before that the declaration was silently dropped and the test ran with no arguments at all.",
-      "ja": "キーの形は 4 つだけで、それ以外はありません — この閉集合の外はエラーであり、推測はしません。1 つの when に複数のキーを書くと AND になります。ここでの `data.<field>` の値はスカラーのリテラル（文字列・数値・真偽値・null）で、オブジェクトごと差し替える書き方は拒否されます（\"when data.* value must be a scalar literal (string/number/bool/null), got dict\"）。状態をまるごと差し替えるのは、名前つき条件の witness の役目だからです。`arg.<name>` の束縛先は `dataFlow.viewModel.methods[].params` だけです: eventHandlers はスキーマ上 params を持ちません — View 層に属するものだからで、ViewModel の公開 API は dataFlow が宣言する側です。したがって引数を固定する契約は、そのメソッドが公開 API であることを要求します。jsonui-cli 1.6.30 からは対応する param の無い `arg` はエラーです（テスト生成も停止します）。それ以前は宣言が黙って落とされ、引数なしでテストが走っていました。"
+      "en": "Six key shapes, nothing else — anything outside this closed set is an error, not a guess. Two joined the original four: `state.<name>` (jsonui-cli 1.7.29, see the then section on `seedableState`) and `harness.<name>` (1.8.118), which names a precondition the test harness sets up — a signed-in session, say — declared once in the app contracts spec's `harnessConditions`; the Branch tests guide covers it. This page said four until 1.8.118, although the validator's own list had carried five since `state.<name>` arrived. Multiple keys in one when are combined with AND. A `data.<field>` value here is a scalar literal — string, number, boolean, null; swapping in a whole object is rejected (\"when data.* value must be a scalar literal (string/number/bool/null), got dict\"), because a wholesale state substitution is what a named condition's witness is for. `arg.<name>` binds to `dataFlow.viewModel.methods[].params` and nowhere else: eventHandlers have no params in the schema because they belong to the View layer, while the ViewModel's public API is what dataFlow declares — so a contract that fixes an argument requires the method to be part of that public API. Since jsonui-cli 1.6.30 an `arg` with no matching param is an error (test generation stops too); before that the declaration was silently dropped and the test ran with no arguments at all.",
+      "ja": "キーの形は 6 つだけで、それ以外はありません — この閉集合の外はエラーであり、推測はしません。最初の 4 つに 2 つが加わりました: `state.<name>`（jsonui-cli 1.7.29。then の節の `seedableState` を参照）と `harness.<name>`（1.8.118）です。後者はテストの harness が用意する前提 — たとえばサインイン済みのセッション — を名指しし、app contracts spec の `harnessConditions` で 1 度宣言します。詳しくは Branch tests のガイドにあります。このページは 1.8.118 まで「4 つ」と書いていましたが、validator 自身の一覧は `state.<name>` が入ったときから 5 つでした。1 つの when に複数のキーを書くと AND になります。ここでの `data.<field>` の値はスカラーのリテラル（文字列・数値・真偽値・null）で、オブジェクトごと差し替える書き方は拒否されます（\"when data.* value must be a scalar literal (string/number/bool/null), got dict\"）。状態をまるごと差し替えるのは、名前つき条件の witness の役目だからです。`arg.<name>` の束縛先は `dataFlow.viewModel.methods[].params` だけです: eventHandlers はスキーマ上 params を持ちません — View 層に属するものだからで、ViewModel の公開 API は dataFlow が宣言する側です。したがって引数を固定する契約は、そのメソッドが公開 API であることを要求します。jsonui-cli 1.6.30 からは対応する param の無い `arg` はエラーです（テスト生成も停止します）。それ以前は宣言が黙って落とされ、引数なしでテストが走っていました。"
     },
     "section_then_heading": {
       "en": "5. The then vocabulary",
@@ -4183,8 +4187,8 @@
       "ja": "AUTHOR"
     },
     "agent_define_when": {
-      "en": "Authors or edits screen / component specs. Validates via doc_validate_spec + jui_verify.",
-      "ja": "画面・コンポーネント spec を新規 / 編集。doc_validate_spec + jui_verify で検証します。"
+      "en": "Authors or edits screen / component specs. Validates via doc_validate_spec + jui_verify. Also closes contract coverage (Task 6): drafts rows for the statuses `contracts coverage` reports uncovered, from the spec, OpenAPI and mocks only, and writes the ones you accept.",
+      "ja": "画面・コンポーネント spec を新規 / 編集。doc_validate_spec + jui_verify で検証します。 さらに contract coverage を閉じます（Task 6）: `contracts coverage` が答えていないと報告した status について、spec・OpenAPI・モックだけから行を下書きし、あなたが採ったものを書きます。"
     },
     "agent_ground_name": {
       "en": "jsonui-ground",
@@ -12355,8 +12359,8 @@
       "ja": "branch contracts は、列挙した結果についてメソッドが何をするかを述べます。`jsonui-test contracts coverage` はその逆を問います: 画面が到達する操作について OpenAPI が記載している応答 status のうち、どれに契約が答え、どれを理由つきで除外し、どれに誰も答えていないか。jsonui-cli 1.8.116 で、契約が「意図してそうしている」と言うための宣言、そして行が到達しない呼び出しで生成された branch テストを落とす上界と一緒に入りました。"
     },
     "read_time": {
-      "en": "9 min read",
-      "ja": "9 分で読めます"
+      "en": "10 min read",
+      "ja": "10 分で読めます"
     },
     "section_what_heading": {
       "en": "1. What it answers",
@@ -12459,8 +12463,8 @@
       "ja": "7. exit・合計・下限の読み方"
     },
     "section_exit_body": {
-      "en": "Exit is per platform block, composed 2 > 1 > 3 > 0 for the process: 0 pass (or empty, when no screen exists on the platform), 1 something uncovered or a declaration error, 2 cannot start, 3 something could not be evaluated and nothing was found uncovered. Each block ends with its totals — `n/a(no mock)`, `n/a(not in OpenAPI)`, `n/a(unbound endpoint)`, `n/a(non-HTTP)`, each with the number of screens it came from. Read the per-screen `n/a (E)` lines as each screen's own: the one right above a block's exit line is the last screen's, not the total. When a block exits 1 and something could not be evaluated as well, `uncovered` is a floor — the statuses behind the unevaluated part were never counted — and the block says so on its own line. The JSON carries the same per platform as `totals.na_endpoints` and `floor`. Measured by adding an endpoint to `dataFlow.apiEndpoints` only, first with the 422 row in place, then without it:",
-      "ja": "exit はプラットフォームのブロックごとで、プロセスとしては 2 > 1 > 3 > 0 の順に合成されます: 0 合格（またはそのプラットフォームに画面が無い empty）、1 答えていないものか宣言の誤りがある、2 始められない、3 評価できなかったものがあり、答えていないものは見つからなかった。各ブロックの最後には合計が出ます — `n/a(no mock)`・`n/a(not in OpenAPI)`・`n/a(unbound endpoint)`・`n/a(non-HTTP)`、それぞれ何画面から来たかつきで。画面ごとの `n/a (E)` 行は、その画面だけのものとして読んでください: ブロックの exit 行の直上にあるのは最後の画面の値で、合計ではありません。ブロックが exit 1 で、しかも評価できなかったものもあるとき、`uncovered` は下限です — 評価できなかった部分の status は数えられていないからです — そしてブロックはそれを独立した行で言います。JSON もプラットフォームごとに `totals.na_endpoints` と `floor` で同じことを持ちます。`dataFlow.apiEndpoints` にだけ endpoint を足して実測しました。まず 422 の行がある状態で、次にない状態で:"
+      "en": "Exit is per platform block, composed 2 > 1 > 3 > 0 for the process: 0 pass (or empty, when no screen exists on the platform), 1 something uncovered or a declaration error, 2 cannot start, 3 something could not be evaluated and nothing was found uncovered. Each block ends with two totals lines. One carries the n/a counts — `n/a(no mock)`, `n/a(not in OpenAPI)`, `n/a(unbound endpoint)`, `n/a(non-HTTP)`, each with the number of screens it came from. The other, since jsonui-cli 1.8.118, carries the statuses summed over the block's screens — units, statuses required, and its breakdown; measured on a block of two screens with 5 required each, it reads `statuses required 10 = row 7 + unit 2 + … + uncovered 1`. The process's last line repeats the required count. Read the per-screen `n/a (E)` lines as each screen's own: the one right above a block's exit line is the last screen's, not the total. When a block exits 1 and something could not be evaluated as well, `uncovered` is a floor — the statuses behind the unevaluated part were never counted — and the block says so on its own line. The JSON carries the same per platform: `totals` holds units, contracted methods, statuses required, the uncovered and outside-required breakdowns (1.8.118) and `na_endpoints`, next to `floor`. Measured by adding an endpoint to `dataFlow.apiEndpoints` only, first with the 422 row in place, then without it:",
+      "ja": "exit はプラットフォームのブロックごとで、プロセスとしては 2 > 1 > 3 > 0 の順に合成されます: 0 合格（またはそのプラットフォームに画面が無い empty）、1 答えていないものか宣言の誤りがある、2 始められない、3 評価できなかったものがあり、答えていないものは見つからなかった。各ブロックの最後には合計の行が 2 本出ます。1 本は n/a の数です — `n/a(no mock)`・`n/a(not in OpenAPI)`・`n/a(unbound endpoint)`・`n/a(non-HTTP)`、それぞれ何画面から来たかつき。もう 1 本は jsonui-cli 1.8.118 からで、ブロック内の全画面を合算した status の数です — units、statuses required、その内訳。required がそれぞれ 5 の画面 2 枚のブロックで実測すると `statuses required 10 = row 7 + unit 2 + … + uncovered 1` になります。プロセスの最終行も required の数を繰り返します。画面ごとの `n/a (E)` 行は、その画面だけのものとして読んでください: ブロックの exit 行の直上にあるのは最後の画面の値で、合計ではありません。ブロックが exit 1 で、しかも評価できなかったものもあるとき、`uncovered` は下限です — 評価できなかった部分の status は数えられていないからです — そしてブロックはそれを独立した行で言います。JSON もプラットフォームごとに同じことを持ちます: `totals` に units・contracted methods・statuses required・uncovered と outside required の内訳（1.8.118）と `na_endpoints`、その隣に `floor`。`dataFlow.apiEndpoints` にだけ endpoint を足して実測しました。まず 422 の行がある状態で、次にない状態で:"
     },
     "section_limits_heading": {
       "en": "8. What it does not tell you",
@@ -12557,6 +12561,42 @@
     "toc_row_limits": {
       "en": "Limits",
       "ja": "教えてくれないこと"
+    },
+    "section_answer_bullet_harness": {
+      "en": "• A harness condition — for a call the method makes only under a precondition the test harness does not have, such as a signed-in session (jsonui-cli 1.8.118). No mock can arrange that, so an exclusion would not be true of the status and `unreachedOps` would be false. Declare the condition once in the app contracts spec's `harnessConditions` and name it in a row's `when` as `\"harness.<name>\": \"<value>\"`; coverage counts such rows as ordinary rows and reports how many as `condition_rows` (1 for one such row, measured). The Branch tests guide covers the declaration and the hook that arranges it.",
+      "ja": "• harness condition — テストの harness が持っていない前提（サインイン済みのセッションなど）の下でだけメソッドが起こす呼び出しに（jsonui-cli 1.8.118）。どのモックもその前提を arrange できないので、除外はその status について真ではなく、`unreachedOps` は偽になります。条件は app contracts spec の `harnessConditions` で 1 度宣言し、行の `when` で `\"harness.<name>\": \"<value>\"` と名指しします。coverage はそうした行を普通の行として数え、その数を `condition_rows` として報告します（そうした行 1 本で 1、実測）。宣言と、条件を arrange するフックについては Branch tests のガイドにあります。"
+    },
+    "section_agent_heading": {
+      "en": "9. Closing the gaps with an agent",
+      "ja": "9. エージェントで閉じる"
+    },
+    "section_agent_body": {
+      "en": "The agents pack ships the procedure as `jsonui-define`'s Task 6, Close contract coverage. The conductor routes there when coverage reports uncovered outcomes, and `jsonui-test` sends that work there too, because it is spec work. The agent drafts, you decide, and the spec records: every decision lands as a row, an `alsoStatuses`, an `excludedOutcomes`, an `unreachedOps` or an endpoint binding — there is no other place a decision is kept. In four steps:",
+      "ja": "agents pack はこの手順を `jsonui-define` の Task 6「Close contract coverage」として出荷しています。coverage が答えていない結果を報告すると conductor はそこへ振り分け、`jsonui-test` もその仕事をそこへ回します — spec の仕事だからです。エージェントが下書きし、あなたが決め、spec が記録します: どの決定も、行・`alsoStatuses`・`excludedOutcomes`・`unreachedOps`・endpoint の束縛のどれかとして残り、決定を置く場所はほかにありません。4 つの段階で:"
+    },
+    "section_agent_bullet_measure": {
+      "en": "• Measure one screen with the MCP tool `test_contracts_coverage` and read `exit`. 0 is quoted with its units and statuses required — units 0 means nothing was measured. 1 goes on to drafting. 2 is a config problem, and the agent stops. 3 means fixing what could not be evaluated: binding an endpoint, adding a scenario, adding a document to `mock.swagger`. A report whose `exit` is null is never read as a pass.",
+      "ja": "• MCP ツール `test_contracts_coverage` で 1 画面を測り、`exit` を読みます。0 は units と statuses required を添えて伝えます — units 0 は何も測っていないという意味です。1 なら下書きへ進みます。2 は設定の問題で、エージェントは止まります。3 は評価できなかったものを直すという意味です: endpoint を束縛する、シナリオを足す、文書を `mock.swagger` に足す。`exit` が null の報告を合格と読むことはありません。"
+    },
+    "section_agent_bullet_draft": {
+      "en": "• Draft from the spec, the OpenAPI document and the mock files only — the agent does not open ViewModel, Repository or UseCase source to decide how a status is handled. One draft per method, operation and status, in this order: `alsoStatuses` when the spec's own words say the view model treats the status like an existing row's; a new row whose `then` states what the spec says results; an exclusion only when neither can be written; for an unattributed operation, a row in the method that calls it, or `unreachedOps` with a reason; for a call made only under a precondition, a harness condition; and a question to you when the spec does not say. Prose that describes a state no field carries comes back as a gap in the spec, not as a draft.",
+      "ja": "• 下書きは spec・OpenAPI 文書・モックファイルだけから作ります — status の扱いを決めるために、エージェントは ViewModel・Repository・UseCase のソースを開きません。メソッド・操作・status ごとに 1 つ、この順で: spec 自身の言葉が「view model はこの status を既存の行と同じに扱う」と言っていれば `alsoStatuses`。spec が述べる結果を `then` に書いた新しい行。どちらも書けないときだけ除外。どのメソッドも到達していない操作には、それを呼ぶメソッドの行か、理由つきの `unreachedOps`。前提の下でだけ起こる呼び出しには harness condition。そして spec が何も言っていなければ、あなたへの質問。どのフィールドも持たない状態を散文が述べていれば、それは下書きではなく spec の穴として返ってきます。"
+    },
+    "section_agent_bullet_show": {
+      "en": "• Show, then write: one table per screen — method, operation, status, the draft, the JSON to add, the spec words it rests on — and only what you accept is written. What you do not accept stays uncovered, visibly; an exclusion is never added to make the number go down.",
+      "ja": "• 見せてから書く: 画面ごとに 1 枚の表 — メソッド・操作・status・下書き・足す JSON・根拠にした spec の言葉 — を見せ、あなたが採ったものだけを書きます。採らなかったものは、見えるまま uncovered に残ります。数を減らすために除外を足すことはしません。"
+    },
+    "section_agent_bullet_close": {
+      "en": "• Close the loop: validate, measure again, and quote before and after from `platforms[].totals`. A new row that reaches an operation the method did not reach before adds a unit, so statuses required can grow; another round drafts those. Then the work goes to `jsonui-test` to regenerate the branch tests — each new row and each `alsoStatuses` copy is a new test, and one that goes red against the implementation is a finding for `jsonui-debug`, not a row to weaken.",
+      "ja": "• 輪を閉じる: validate し、測り直し、前後の数を `platforms[].totals` から並べて伝えます。メソッドがそれまで到達していなかった操作に到達する新しい行は unit を 1 つ増やすので、statuses required は増えることがあり、それは次の回で下書きします。そのあと `jsonui-test` に回して branch テストを再生成します — 新しい行と `alsoStatuses` の写しはそれぞれ新しいテストになり、実装に対して赤くなったものは、弱める行ではなく `jsonui-debug` への所見です。"
+    },
+    "section_agent_limits": {
+      "en": "The drafts are only as good as the spec: reading the spec rather than the code is the point, so a behaviour the spec never states comes back as a question instead of being read off the implementation. And nothing here runs by itself — the agent takes this up when you ask it to close coverage, or when the MCP tool reports anything other than a pass; the command is still not a gate.",
+      "ja": "下書きの質は spec の質までです: コードではなく spec を読むことが要点なので、spec が一度も述べていない振る舞いは、実装から読み取られるのではなく質問として返ってきます。そして、これは勝手には走りません — エージェントがこれを始めるのは、あなたが coverage を閉じるよう頼んだときか、MCP ツールが合格以外を報告したときです。コマンドはまだ門ではありません。"
+    },
+    "toc_row_agent": {
+      "en": "Closing with an agent",
+      "ja": "エージェントで閉じる"
     }
   }
 }

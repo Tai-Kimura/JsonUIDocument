@@ -192,7 +192,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "$ jsonui-test contracts coverage --platform web\ncontracts coverage  (project platforms: web, android, ios)\napp contracts: docs/screens/json/app_contracts.spec.json · apiOutcomeRules 1\n[platform=web] spec=profile_screen  units 1  contracted methods 1 of 1\n  statuses required 5 = row 3 (alsoStatuses 1) + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 1\n    uncovered 1 = partial 1 + default-only 0 + unattributed 0\n  uncovered  partial       onTapSave × api.updateProfile  PUT /api/items  422\n  info  guard-only 1 · note branches 1 · also_statuses_rows 1 · also_statuses_arrange_differs 0 · side_calls_admitted 0 · reference_holds_on_success_row 0 · route_overlaps 0 · dataFlow methods without endpoint 0\n  outside required 0 = unreached-op 0 + n/a(default response) 0 + n/a(no scenario) 0 + n/a(platform-excluded) 0\n  n/a (E) no mock 0 · not in OpenAPI 0 · unbound endpoint 0 · non-HTTP 0\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 0 (screens 0) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] exit 1 (uncovered)\nexit 1 (composed 2 > 1 > 3 > 0): 1 uncovered — write a row (alsoStatuses if the VM treats it like another status), or an exclusion with a reason",
+                      "code": "$ jsonui-test contracts coverage --platform web\ncontracts coverage  (project platforms: web, android, ios)\napp contracts: docs/screens/json/app_contracts.spec.json · apiOutcomeRules 1\n[platform=web] spec=profile_screen  units 1  contracted methods 1 of 1\n  statuses required 5 = row 3 (alsoStatuses 1) + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 1\n    uncovered 1 = partial 1 + default-only 0 + unattributed 0\n  uncovered  partial       onTapSave × api.updateProfile  PUT /api/items  422\n  info  guard-only 1 · note branches 1 · also_statuses_rows 1 · also_statuses_arrange_differs 0 · side_calls_admitted 0 · reference_holds_on_success_row 0 · route_overlaps 0 · dataFlow methods without endpoint 0\n  outside required 0 = unreached-op 0 + n/a(default response) 0 + n/a(no scenario) 0 + n/a(platform-excluded) 0\n  n/a (E) no mock 0 · not in OpenAPI 0 · unbound endpoint 0 · non-HTTP 0\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 0 (screens 0) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] total units 1 · statuses required 5 = row 3 + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 1 (partial 1 + default-only 0 + unattributed 0)\n[platform=web] exit 1 (uncovered)\nexit 1 (composed 2 > 1 > 3 > 0) statuses required 5: 1 uncovered — write a row (alsoStatuses if the VM treats it like another status), or an exclusion with a reason",
                       "language": "text",
                       "filename": "contracts coverage — the example, web block",
                       "showLineNumbers": false,
@@ -212,7 +212,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "// one more row, before the note\n{ \"when\": { \"cond\": \"formValid\", \"api.updateProfile\": \"invalid\" },\n  \"then\": { \"data.errorMessage\": \"@profile_screen_invalid\" } }\n\n$ jsonui-test contracts coverage --platform web\n…\n  statuses required 5 = row 4 (alsoStatuses 1) + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 0\n    uncovered 0 = partial 0 + default-only 0 + unattributed 0\n…\n[platform=web] exit 0 (pass)\nexit 0 (composed 2 > 1 > 3 > 0)",
+                      "code": "// one more row, before the note\n{ \"when\": { \"cond\": \"formValid\", \"api.updateProfile\": \"invalid\" },\n  \"then\": { \"data.errorMessage\": \"@profile_screen_invalid\" } }\n\n$ jsonui-test contracts coverage --platform web\n…\n  statuses required 5 = row 4 (alsoStatuses 1) + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 0\n    uncovered 0 = partial 0 + default-only 0 + unattributed 0\n…\n[platform=web] total units 1 · statuses required 5 = row 4 + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 0 (partial 0 + default-only 0 + unattributed 0)\n[platform=web] exit 0 (pass)\nexit 0 (composed 2 > 1 > 3 > 0) statuses required 5",
                       "language": "jsonc",
                       "filename": "one row for the 422, and the block again",
                       "showLineNumbers": false,
@@ -341,6 +341,15 @@
                       "fontSize": 14,
                       "fontColor": "#475467",
                       "text": "section_answer_bullet_platforms"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_answer_bullet_harness"
                     },
                     {
                       "type": "Label",
@@ -518,7 +527,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "# with the 422 row in place\n  n/a (E) no mock 0 · not in OpenAPI 0 · unbound endpoint 1 · non-HTTP 0\n  note  GET /api/items/{id} is in dataFlow.apiEndpoints but is the endpoint of no repositories / useCases method — branch tests do not route it (a call is recorded as (unmatched)); bind it to the method that calls it\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 1 (screens 1) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] exit 3 (unmeasured)\nexit 3 (composed 2 > 1 > 3 > 0): some statuses could not be evaluated — see not-evaluated and n/a above\n\n# without it\n  uncovered  partial       onTapSave × api.updateProfile  PUT /api/items  422\n…\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 1 (screens 1) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] uncovered is a floor: n/a(unbound endpoint) 1 — not evaluated, so more may be uncovered\n[platform=web] exit 1 (uncovered)\nexit 1 (composed 2 > 1 > 3 > 0): 1 uncovered — write a row (alsoStatuses if the VM treats it like another status), or an exclusion with a reason; uncovered is a floor on web\n\n# --json, the same run: \"floor\": {\"unbound\": 1},\n#   \"totals\": {…, \"na_endpoints\": {\"no_mock\": 0, \"not_in_openapi\": 0, \"unbound\": 1, \"non_http\": 0}}",
+                      "code": "# with the 422 row in place\n  n/a (E) no mock 0 · not in OpenAPI 0 · unbound endpoint 1 · non-HTTP 0\n  note  GET /api/items/{id} is in dataFlow.apiEndpoints but is the endpoint of no repositories / useCases method — branch tests do not route it (a call is recorded as (unmatched)); bind it to the method that calls it\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 1 (screens 1) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] total units 1 · statuses required 5 = row 4 + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 0 (partial 0 + default-only 0 + unattributed 0)\n[platform=web] exit 3 (unmeasured)\nexit 3 (composed 2 > 1 > 3 > 0) statuses required 5: some statuses could not be evaluated — see not-evaluated and n/a above\n\n# without it\n  uncovered  partial       onTapSave × api.updateProfile  PUT /api/items  422\n…\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 1 (screens 1) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] total units 1 · statuses required 5 = row 3 + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 1 (partial 1 + default-only 0 + unattributed 0)\n[platform=web] uncovered is a floor: n/a(unbound endpoint) 1 — not evaluated, so more may be uncovered\n[platform=web] exit 1 (uncovered)\nexit 1 (composed 2 > 1 > 3 > 0) statuses required 5: 1 uncovered — write a row (alsoStatuses if the VM treats it like another status), or an exclusion with a reason; uncovered is a floor on web\n\n# --json, the same run: \"floor\": {\"unbound\": 1},\n#   \"totals\": {\"units\": 1, \"statuses_required\": 5, …, \"na_endpoints\": {\"no_mock\": 0, \"not_in_openapi\": 0, \"unbound\": 1, \"non_http\": 0}}",
                       "language": "text",
                       "filename": "an endpoint only in dataFlow.apiEndpoints — with the 422 row, then without",
                       "showLineNumbers": false,
@@ -602,6 +611,85 @@
                       "fontSize": 14,
                       "fontColor": "#475467",
                       "text": "section_limits_bullet_bound"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_agent",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_agent_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_agent_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_agent_bullet_measure"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_agent_bullet_draft"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_agent_bullet_show"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_agent_bullet_close"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_agent_limits"
                     }
                   ]
                 },
@@ -756,6 +844,12 @@
                           "id": "toc_limits",
                           "label": "toc_row_limits",
                           "anchor": "section_limits",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_agent",
+                          "label": "toc_row_agent",
+                          "anchor": "section_agent",
                           "level": 1
                         }
                       ],
