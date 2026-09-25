@@ -2733,8 +2733,8 @@
       "command": "validate",
       "synopsis": "jsonui-test validate <path>... [--no-install] [--no-mock-check] [--no-coverage-check] [--config <file>]",
       "purpose": {
-        "en": "Validate test JSON files (schema, reference integrity, element ID existence). Since 2026-07-30 it also runs the mock contract check, and regenerates `<mockDir>/generated/` when it is missing or older than the swagger — a fresh clone or a first CI run therefore starts from a complete mock set. If that regeneration fails the suite does not run, because an empty `generated/` turns into a confusing pile of 404s. Since jsonui-cli 1.8.119 two more sections run. Every element id a step names is looked up in the project's layouts (includes expanded, every platform): an id on no layout is INFO now and a WARNING from 1.8.120, and one the app draws outside every layout is declared in `test.appOwnedIds`. And the run reports `jsonui-test contracts coverage` per platform, compared with the baseline; below 1.8.120 that section never moves the exit code, from 1.8.120 validate fails on entries not in the baseline, on baselined entries that are closed, and on what cannot be baselined.",
-        "ja": "テスト JSON ファイル検証（スキーマ、参照整合性、要素 ID の存在）。2026-07-30 以降はモックの契約検査も実行し、`<mockDir>/generated/` が無い、または swagger より古い場合は再生成する — クローン直後でも CI 初回でも完全なモック一式から始められる。再生成に失敗した場合はスイートを走らせずに落とす（空の `generated/` で走ると分かりにくい 404 の山になるため）。 jsonui-cli 1.8.119 からは節が 2 つ増えた。step が名指す要素 id はすべてプロジェクトの layout（include 展開済み・全プラットフォーム）と照合され、どの layout にも無い id は今は INFO、1.8.120 から WARNING になる。アプリが layout の外で描く id は `test.appOwnedIds` で宣言する。さらに `jsonui-test contracts coverage` をプラットフォームごとに baseline と比べて報告する。1.8.120 より前はこの節が exit code を動かさず、1.8.120 からは baseline に無い項目・閉じたのに baseline に残る項目・baseline にできないもので validate が落ちる。"
+        "en": "Validate test JSON files (schema, reference integrity, element ID existence). Since 2026-07-30 it also runs the mock contract check, and regenerates `<mockDir>/generated/` when it is missing or older than the swagger — a fresh clone or a first CI run therefore starts from a complete mock set. If that regeneration fails the suite does not run, because an empty `generated/` turns into a confusing pile of 404s. Since jsonui-cli 1.8.119 two more sections run. Every element id a step names is looked up in the project's layouts (includes expanded, every platform): an id on no layout is INFO now and a WARNING from 1.8.121, and one the app draws outside every layout is declared in `test.appOwnedIds`. And the run reports `jsonui-test contracts coverage` per platform, compared with the baseline; below 1.8.121 that section never moves the exit code, from 1.8.121 validate fails on entries not in the baseline, on baselined entries that are closed, and on what cannot be baselined.",
+        "ja": "テスト JSON ファイル検証（スキーマ、参照整合性、要素 ID の存在）。2026-07-30 以降はモックの契約検査も実行し、`<mockDir>/generated/` が無い、または swagger より古い場合は再生成する — クローン直後でも CI 初回でも完全なモック一式から始められる。再生成に失敗した場合はスイートを走らせずに落とす（空の `generated/` で走ると分かりにくい 404 の山になるため）。 jsonui-cli 1.8.119 からは節が 2 つ増えた。step が名指す要素 id はすべてプロジェクトの layout（include 展開済み・全プラットフォーム）と照合され、どの layout にも無い id は今は INFO、1.8.121 から WARNING になる。アプリが layout の外で描く id は `test.appOwnedIds` で宣言する。さらに `jsonui-test contracts coverage` をプラットフォームごとに baseline と比べて報告する。1.8.121 より前はこの節が exit code を動かさず、1.8.121 からは baseline に無い項目・閉じたのに baseline に残る項目・baseline にできないもので validate が落ちる。"
       },
       "options": [
         {
@@ -2785,16 +2785,16 @@
         "jsonui-test report"
       ],
       "verifiedAgainst": {
-        "version": "1.8.119",
+        "version": "1.8.120",
         "columns": 80,
         "python": "3.12",
         "helpHash": "29cfc6128f13654d95a71a76829b9ebd2512ddfacf9c2b7197c6bda9e8eb2347",
-        "cardHash": "473941ad91e5bb28cf2a970081d1dc1a8caa3f5038e13e1fe10a8c8da9cf2d6d",
+        "cardHash": "65c66e8803f09dbbfeb024628e53ca44e3536ed0f14f3e7a8518b355c9fb0d64",
         "fieldHashes": {
           "binary": "3b2560767fdf",
           "command": "c7be693cdf56",
           "synopsis": "e9e0027df8ef",
-          "purpose": "d466a3d4f176",
+          "purpose": "0dc3e3511a35",
           "options": "32c0a73a17ba",
           "examples": "7ad67fb2ac5c",
           "seeAlso": "74effaa0de48"
@@ -3528,8 +3528,8 @@
       "command": "contracts baseline",
       "synopsis": "jsonui-test contracts baseline [--initial]",
       "purpose": {
-        "en": "Record the entries that keep `contracts coverage` from exit 0 in `<spec_directory>/contracts_coverage_baseline.json`, which you commit. With no file it writes nothing unless given `--initial` — recording the first baseline accepts every current entry as debt, which is the user's decision. With a file it only shrinks: it keeps what the file and the current run both hold and never adds an entry. From jsonui-cli 1.8.120 `jsonui-test validate` fails on an entry not in the file (new), on a recorded one that is closed (stale), and on one gone from the run (vanished). While anything that can never be baselined is present — a declaration error, a row that could not be evaluated — it writes nothing and exits 1, naming it.",
-        "ja": "`contracts coverage` を exit 0 にさせない項目を `<spec_directory>/contracts_coverage_baseline.json` に記録する（commit する）。ファイルが無いときは `--initial` を付けない限り何も書かない — 最初の baseline の記録は今の項目すべてを負債として受け入れることで、それはユーザーの判断だからだ。ファイルがあるときは縮めるだけ: ファイルと今回の実行の両方にある項目を残し、項目を足すことはしない。jsonui-cli 1.8.120 からは、ファイルに無い項目（new）・記録済みで閉じた項目（stale）・実行から消えた項目（vanished）で `jsonui-test validate` が落ちる。baseline にできないもの — 宣言の誤り、評価できなかった行 — があるあいだは何も書かず、それを名指して exit 1 で終わる。"
+        "en": "Record the entries that keep `contracts coverage` from exit 0 in `<spec_directory>/contracts_coverage_baseline.json`, which you commit. With no file it writes nothing unless given `--initial` — recording the first baseline accepts every current entry as debt, which is the user's decision. With a file it only shrinks: it keeps what the file and the current run both hold and never adds an entry. From jsonui-cli 1.8.121 `jsonui-test validate` fails on an entry not in the file (new), on a recorded one that is closed (stale), and on one gone from the run (vanished). While anything that can never be baselined is present — a declaration error, a row that could not be evaluated — it writes nothing and exits 1, naming it.",
+        "ja": "`contracts coverage` を exit 0 にさせない項目を `<spec_directory>/contracts_coverage_baseline.json` に記録する（commit する）。ファイルが無いときは `--initial` を付けない限り何も書かない — 最初の baseline の記録は今の項目すべてを負債として受け入れることで、それはユーザーの判断だからだ。ファイルがあるときは縮めるだけ: ファイルと今回の実行の両方にある項目を残し、項目を足すことはしない。jsonui-cli 1.8.121 からは、ファイルに無い項目（new）・記録済みで閉じた項目（stale）・実行から消えた項目（vanished）で `jsonui-test validate` が落ちる。baseline にできないもの — 宣言の誤り、評価できなかった行 — があるあいだは何も書かず、それを名指して exit 1 で終わる。"
       },
       "options": [
         {
@@ -3554,16 +3554,16 @@
         "jsonui-test validate"
       ],
       "verifiedAgainst": {
-        "version": "1.8.119",
+        "version": "1.8.120",
         "columns": 80,
         "python": "3.12",
         "helpHash": "6587cb0ca8f3464c335736bc43d7f11aa88158af31fb83d21a7bb72c01fa7f1c",
-        "cardHash": "2f9d5a6c229ae432cd8adfd4879eab58e2be96659f86319d100be7d142cef7f1",
+        "cardHash": "9e4a9589beaaf292ee294a70b07d006dd5eec4560c56e29dc4e3a7ff26386b3d",
         "fieldHashes": {
           "binary": "3b2560767fdf",
           "command": "635970a16ed7",
           "synopsis": "12cc124a5d91",
-          "purpose": "a37d766abbc5",
+          "purpose": "bfc5910eb4fc",
           "options": "a003a870b194",
           "examples": "3aafaf2cc236",
           "aliases": "98edafdd23a8",
@@ -3576,8 +3576,8 @@
       "command": "contracts coverage",
       "synopsis": "jsonui-test contracts coverage [screen] [--platform web|android|ios ...] [--json]",
       "purpose": {
-        "en": "For every screen and platform, put each response status that the OpenAPI in `mock.swagger` documents for an operation the screen reaches into one bucket: answered by a branch row, excluded with a reason (`unit` / `unreachable` / `unexpressible`), not evaluated, or uncovered. Since 1.8.119 `jsonui-test validate` reports it on every run, and from 1.8.120 validate fails on entries not in the baseline (`jsonui-test contracts baseline`). Exit per platform, composed 2 > 1 > 3 > 0: 0 pass, 1 uncovered or a declaration error, 2 cannot start (no `mock.swagger`, no platforms), 3 something could not be evaluated — an endpoint listed only in `dataFlow.apiEndpoints` among them — and nothing is uncovered.",
-        "ja": "画面とプラットフォームごとに、画面が到達する操作について `mock.swagger` の OpenAPI が記載している応答 status を、1 つずつ区分に入れる: 分岐の行が答えた / 理由つきで除外した（`unit` / `unreachable` / `unexpressible`）/ 評価できなかった / 答えていない。1.8.119 からは `jsonui-test validate` が毎回これを報告し、1.8.120 からは baseline（`jsonui-test contracts baseline`）に無い項目で validate が落ちる。exit はプラットフォームごとで、2 > 1 > 3 > 0 の順に合成: 0 合格、1 答えていないものか宣言の誤りがある、2 始められない（`mock.swagger` もプラットフォームも無い）、3 評価できなかったものがあり（`dataFlow.apiEndpoints` にだけある endpoint を含む）、答えていないものは無い。"
+        "en": "For every screen and platform, put each response status that the OpenAPI in `mock.swagger` documents for an operation the screen reaches into one bucket: answered by a branch row, excluded with a reason (`unit` / `unreachable` / `unexpressible`), not evaluated, or uncovered. Since 1.8.119 `jsonui-test validate` reports it on every run, and from 1.8.121 validate fails on entries not in the baseline (`jsonui-test contracts baseline`). Exit per platform, composed 2 > 1 > 3 > 0: 0 pass, 1 uncovered or a declaration error, 2 cannot start (no `mock.swagger`, no platforms), 3 something could not be evaluated — an endpoint listed only in `dataFlow.apiEndpoints` among them — and nothing is uncovered.",
+        "ja": "画面とプラットフォームごとに、画面が到達する操作について `mock.swagger` の OpenAPI が記載している応答 status を、1 つずつ区分に入れる: 分岐の行が答えた / 理由つきで除外した（`unit` / `unreachable` / `unexpressible`）/ 評価できなかった / 答えていない。1.8.119 からは `jsonui-test validate` が毎回これを報告し、1.8.121 からは baseline（`jsonui-test contracts baseline`）に無い項目で validate が落ちる。exit はプラットフォームごとで、2 > 1 > 3 > 0 の順に合成: 0 合格、1 答えていないものか宣言の誤りがある、2 始められない（`mock.swagger` もプラットフォームも無い）、3 評価できなかったものがあり（`dataFlow.apiEndpoints` にだけある endpoint を含む）、答えていないものは無い。"
       },
       "options": [
         {
@@ -3620,16 +3620,16 @@
         "jsonui-doc validate spec"
       ],
       "verifiedAgainst": {
-        "version": "1.8.119",
+        "version": "1.8.120",
         "columns": 80,
         "python": "3.12",
         "helpHash": "4c234910f54bceb17563c797aaf672e4436034ec69ddd0a61349851aa335dfbb",
-        "cardHash": "3ba39c1bd97d6dea1116f05928228836c227080860b200e1420e63cd0a0a47ae",
+        "cardHash": "ce8294a7cb77c90443a584679b49c9f9bfdbd03c7bc0c00a8fb35bcf919a60ed",
         "fieldHashes": {
           "binary": "3b2560767fdf",
           "command": "036d2917ec5d",
           "synopsis": "707c179b9122",
-          "purpose": "e38b72c2a497",
+          "purpose": "a32c243ad380",
           "options": "d97b4c0e8684",
           "examples": "0148bd19d067",
           "aliases": "98edafdd23a8",
