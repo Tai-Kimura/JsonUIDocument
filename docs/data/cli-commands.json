@@ -2731,10 +2731,10 @@
     {
       "binary": "jsonui-test",
       "command": "validate",
-      "synopsis": "jsonui-test validate <path>... [--no-install] [--no-mock-check] [--config <file>]",
+      "synopsis": "jsonui-test validate <path>... [--no-install] [--no-mock-check] [--no-coverage-check] [--config <file>]",
       "purpose": {
-        "en": "Validate test JSON files (schema, reference integrity, element ID existence). Since 2026-07-30 it also runs the mock contract check, and regenerates `<mockDir>/generated/` when it is missing or older than the swagger — a fresh clone or a first CI run therefore starts from a complete mock set. If that regeneration fails the suite does not run, because an empty `generated/` turns into a confusing pile of 404s.",
-        "ja": "テスト JSON ファイル検証（スキーマ、参照整合性、要素 ID の存在）。2026-07-30 以降はモックの契約検査も実行し、`<mockDir>/generated/` が無い、または swagger より古い場合は再生成する — クローン直後でも CI 初回でも完全なモック一式から始められる。再生成に失敗した場合はスイートを走らせずに落とす（空の `generated/` で走ると分かりにくい 404 の山になるため）。"
+        "en": "Validate test JSON files (schema, reference integrity, element ID existence). Since 2026-07-30 it also runs the mock contract check, and regenerates `<mockDir>/generated/` when it is missing or older than the swagger — a fresh clone or a first CI run therefore starts from a complete mock set. If that regeneration fails the suite does not run, because an empty `generated/` turns into a confusing pile of 404s. Since jsonui-cli 1.8.119 two more sections run. Every element id a step names is looked up in the project's layouts (includes expanded, every platform): an id on no layout is INFO now and a WARNING from 1.8.120, and one the app draws outside every layout is declared in `test.appOwnedIds`. And the run reports `jsonui-test contracts coverage` per platform, compared with the baseline; below 1.8.120 that section never moves the exit code, from 1.8.120 validate fails on entries not in the baseline, on baselined entries that are closed, and on what cannot be baselined.",
+        "ja": "テスト JSON ファイル検証（スキーマ、参照整合性、要素 ID の存在）。2026-07-30 以降はモックの契約検査も実行し、`<mockDir>/generated/` が無い、または swagger より古い場合は再生成する — クローン直後でも CI 初回でも完全なモック一式から始められる。再生成に失敗した場合はスイートを走らせずに落とす（空の `generated/` で走ると分かりにくい 404 の山になるため）。 jsonui-cli 1.8.119 からは節が 2 つ増えた。step が名指す要素 id はすべてプロジェクトの layout（include 展開済み・全プラットフォーム）と照合され、どの layout にも無い id は今は INFO、1.8.120 から WARNING になる。アプリが layout の外で描く id は `test.appOwnedIds` で宣言する。さらに `jsonui-test contracts coverage` をプラットフォームごとに baseline と比べて報告する。1.8.120 より前はこの節が exit code を動かさず、1.8.120 からは baseline に無い項目・閉じたのに baseline に残る項目・baseline にできないもので validate が落ちる。"
       },
       "options": [
         {
@@ -2763,6 +2763,15 @@
             "en": "Config file the `test.install` destinations are read from.",
             "ja": "`test.install` の配布先を読む設定ファイル。"
           }
+        },
+        {
+          "name": "--no-coverage-check",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Skip the contracts coverage section. The run says so (`coverage skipped (--no-coverage-check)`) rather than going quiet.",
+            "ja": "contracts coverage の節をスキップする。黙らずに `coverage skipped (--no-coverage-check)` と言う。"
+          }
         }
       ],
       "examples": [
@@ -2776,17 +2785,17 @@
         "jsonui-test report"
       ],
       "verifiedAgainst": {
-        "version": "1.8.10",
+        "version": "1.8.119",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "edfa2ba64d06649ea07d2dbf9ae6f4a6939ce579bf894913b37a70376d8ab7c9",
-        "cardHash": "a70a21ed55d41e49f71473bc5331487de871c34551de36e839f690969d3d2d3e",
+        "helpHash": "29cfc6128f13654d95a71a76829b9ebd2512ddfacf9c2b7197c6bda9e8eb2347",
+        "cardHash": "473941ad91e5bb28cf2a970081d1dc1a8caa3f5038e13e1fe10a8c8da9cf2d6d",
         "fieldHashes": {
           "binary": "3b2560767fdf",
           "command": "c7be693cdf56",
-          "synopsis": "479ac9a8a8d2",
-          "purpose": "01c2f05955a9",
-          "options": "d42590c0caae",
+          "synopsis": "e9e0027df8ef",
+          "purpose": "d466a3d4f176",
+          "options": "32c0a73a17ba",
           "examples": "7ad67fb2ac5c",
           "seeAlso": "74effaa0de48"
         }
@@ -3046,8 +3055,8 @@
       "command": "generate",
       "synopsis": "jsonui-test generate test screen|flow <name> | generate description screen|flow <name> <case> | generate branch-tests <screen>",
       "purpose": {
-        "en": "Scaffold test files. `generate test screen|flow <name>` writes a skeleton test file, `generate description screen|flow <name> <case>` writes the description JSON for one case, and `generate branch-tests <screen>` emits unit tests from the screen spec's branchContracts (see the branch tests guide). `-p` picks the platform, `--path` the destination.",
-        "ja": "テストファイルの雛形を作る。`generate test screen|flow <name>` はテストファイルの骨組み、`generate description screen|flow <name> <case>` は 1 ケース分の description JSON、`generate branch-tests <screen>` は画面仕様の branchContracts からユニットテストを出力する（branch tests ガイド参照）。`-p` でプラットフォーム、`--path` で出力先を指定。"
+        "en": "Scaffold test files. `generate test screen|flow <name>` writes a skeleton test file, `generate description screen|flow <name> <case>` writes the description JSON for one case, and `generate branch-tests <screen>` emits unit tests from the screen spec's branchContracts (see the branch tests guide); since 1.8.119 `--condition-controls` adds, for each row that names a harness condition away from its default, a control that runs the row with every condition at its default and never fails. `-p` picks the platform, `--path` the destination.",
+        "ja": "テストファイルの雛形を作る。`generate test screen|flow <name>` はテストファイルの骨組み、`generate description screen|flow <name> <case>` は 1 ケース分の description JSON、`generate branch-tests <screen>` は画面仕様の branchContracts からユニットテストを出力する（branch tests ガイド参照）。1.8.119 からは `--condition-controls` で、harness condition を既定値から外した行ごとに、全条件を既定値にして同じ行を走らせる、決して落ちない対照を足せる。`-p` でプラットフォーム、`--path` で出力先を指定。"
       },
       "options": [],
       "examples": [],
@@ -3056,16 +3065,16 @@
         "jsonui-doc generate doc"
       ],
       "verifiedAgainst": {
-        "version": "1.8.24",
+        "version": "1.8.119",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "81a343535fdbef82da99d39bee65ad2a6bc3a20a6982fb560e11872a4bc3b806",
-        "cardHash": "1ff7f83e2af1305f4dfc379f028acfbf502638f6c2ed3d2f4f206b828e32ee21",
+        "helpHash": "902838f6b8fcf49baa18e7bc25ff0b56f39b014fef0a2d3e548c09e9ebab4afb",
+        "cardHash": "4e865d5dff3cc8e63545ecd683e0c96724b84209eb52a21f103cc0a88f0961c1",
         "fieldHashes": {
           "binary": "3b2560767fdf",
           "command": "15e1cfa31b69",
           "synopsis": "0b42077c2706",
-          "purpose": "ef679fbb0c8e",
+          "purpose": "676dedfa302a",
           "options": "357b9e47f539",
           "examples": "2b8fdc789d3b",
           "seeAlso": "92515ad67a0c"
@@ -3516,11 +3525,59 @@
     },
     {
       "binary": "jsonui-test",
+      "command": "contracts baseline",
+      "synopsis": "jsonui-test contracts baseline [--initial]",
+      "purpose": {
+        "en": "Record the entries that keep `contracts coverage` from exit 0 in `<spec_directory>/contracts_coverage_baseline.json`, which you commit. With no file it writes nothing unless given `--initial` — recording the first baseline accepts every current entry as debt, which is the user's decision. With a file it only shrinks: it keeps what the file and the current run both hold and never adds an entry. From jsonui-cli 1.8.120 `jsonui-test validate` fails on an entry not in the file (new), on a recorded one that is closed (stale), and on one gone from the run (vanished). While anything that can never be baselined is present — a declaration error, a row that could not be evaluated — it writes nothing and exits 1, naming it.",
+        "ja": "`contracts coverage` を exit 0 にさせない項目を `<spec_directory>/contracts_coverage_baseline.json` に記録する（commit する）。ファイルが無いときは `--initial` を付けない限り何も書かない — 最初の baseline の記録は今の項目すべてを負債として受け入れることで、それはユーザーの判断だからだ。ファイルがあるときは縮めるだけ: ファイルと今回の実行の両方にある項目を残し、項目を足すことはしない。jsonui-cli 1.8.120 からは、ファイルに無い項目（new）・記録済みで閉じた項目（stale）・実行から消えた項目（vanished）で `jsonui-test validate` が落ちる。baseline にできないもの — 宣言の誤り、評価できなかった行 — があるあいだは何も書かず、それを名指して exit 1 で終わる。"
+      },
+      "options": [
+        {
+          "name": "--initial",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Write the first baseline when there is no file. Needed exactly once; without it the command refuses to record debt on its own.",
+            "ja": "ファイルが無いときに最初の baseline を書く。必要なのは 1 回だけで、付けなければコマンドは自分から負債を記録しない。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "# measured on the Contract gaps guide's fixture: 422 unanswered on three platforms\n$ jsonui-test contracts baseline\ncontracts baseline: nothing written — recording the first baseline accepts all current debt (3 entries) — the user's decision; run with --initial\n$ jsonui-test contracts baseline --initial\nwrote docs/screens/json/contracts_coverage_baseline.json\nremoved 0 · kept 3 · new 0 not added\n\n# after a row answers the 422, coverage reports the recorded entries as stale:\n[platform=web] baselined 1 (matched 0 · new 0 · stale 1) — stale entries are closed: run `jsonui-test contracts baseline` to drop them\n$ jsonui-test contracts baseline\nupdated docs/screens/json/contracts_coverage_baseline.json\nremoved 3 · kept 0 · new 0 not added"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jsonui-test contracts coverage",
+        "jsonui-test validate"
+      ],
+      "verifiedAgainst": {
+        "version": "1.8.119",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "6587cb0ca8f3464c335736bc43d7f11aa88158af31fb83d21a7bb72c01fa7f1c",
+        "cardHash": "2f9d5a6c229ae432cd8adfd4879eab58e2be96659f86319d100be7d142cef7f1",
+        "fieldHashes": {
+          "binary": "3b2560767fdf",
+          "command": "635970a16ed7",
+          "synopsis": "12cc124a5d91",
+          "purpose": "a37d766abbc5",
+          "options": "a003a870b194",
+          "examples": "3aafaf2cc236",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "bf7594ab7148"
+        }
+      }
+    },
+    {
+      "binary": "jsonui-test",
       "command": "contracts coverage",
       "synopsis": "jsonui-test contracts coverage [screen] [--platform web|android|ios ...] [--json]",
       "purpose": {
-        "en": "For every screen and platform, put each response status that the OpenAPI in `mock.swagger` documents for an operation the screen reaches into one bucket: answered by a branch row, excluded with a reason (`unit` / `unreachable` / `unexpressible`), not evaluated, or uncovered. Not a gate yet. Exit per platform, composed 2 > 1 > 3 > 0: 0 pass, 1 uncovered or a declaration error, 2 cannot start (no `mock.swagger`, no platforms), 3 something could not be evaluated — an endpoint listed only in `dataFlow.apiEndpoints` among them — and nothing is uncovered.",
-        "ja": "画面とプラットフォームごとに、画面が到達する操作について `mock.swagger` の OpenAPI が記載している応答 status を、1 つずつ区分に入れる: 分岐の行が答えた / 理由つきで除外した（`unit` / `unreachable` / `unexpressible`）/ 評価できなかった / 答えていない。まだ門ではない。exit はプラットフォームごとで、2 > 1 > 3 > 0 の順に合成: 0 合格、1 答えていないものか宣言の誤りがある、2 始められない（`mock.swagger` もプラットフォームも無い）、3 評価できなかったものがあり（`dataFlow.apiEndpoints` にだけある endpoint を含む）、答えていないものは無い。"
+        "en": "For every screen and platform, put each response status that the OpenAPI in `mock.swagger` documents for an operation the screen reaches into one bucket: answered by a branch row, excluded with a reason (`unit` / `unreachable` / `unexpressible`), not evaluated, or uncovered. Since 1.8.119 `jsonui-test validate` reports it on every run, and from 1.8.120 validate fails on entries not in the baseline (`jsonui-test contracts baseline`). Exit per platform, composed 2 > 1 > 3 > 0: 0 pass, 1 uncovered or a declaration error, 2 cannot start (no `mock.swagger`, no platforms), 3 something could not be evaluated — an endpoint listed only in `dataFlow.apiEndpoints` among them — and nothing is uncovered.",
+        "ja": "画面とプラットフォームごとに、画面が到達する操作について `mock.swagger` の OpenAPI が記載している応答 status を、1 つずつ区分に入れる: 分岐の行が答えた / 理由つきで除外した（`unit` / `unreachable` / `unexpressible`）/ 評価できなかった / 答えていない。1.8.119 からは `jsonui-test validate` が毎回これを報告し、1.8.120 からは baseline（`jsonui-test contracts baseline`）に無い項目で validate が落ちる。exit はプラットフォームごとで、2 > 1 > 3 > 0 の順に合成: 0 合格、1 答えていないものか宣言の誤りがある、2 始められない（`mock.swagger` もプラットフォームも無い）、3 評価できなかったものがあり（`dataFlow.apiEndpoints` にだけある endpoint を含む）、答えていないものは無い。"
       },
       "options": [
         {
@@ -3554,7 +3611,7 @@
       "examples": [
         {
           "language": "bash",
-          "code": "# measured on a fixture: one screen, one operation documenting 200/401/409/422/500;\n# 409 answered through alsoStatuses, 401 excluded by unit, 422 left unanswered\n$ jsonui-test contracts coverage --platform web\ncontracts coverage  (project platforms: web, android, ios)\napp contracts: docs/screens/json/app_contracts.spec.json · apiOutcomeRules 1\n[platform=web] spec=profile_screen  units 1  contracted methods 1 of 1\n  statuses required 5 = row 3 (alsoStatuses 1) + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 1\n    uncovered 1 = partial 1 + default-only 0 + unattributed 0\n  uncovered  partial       onTapSave × api.updateProfile  PUT /api/items  422\n  info  guard-only 1 · note branches 1 · also_statuses_rows 1 · also_statuses_arrange_differs 0 · side_calls_admitted 0 · reference_holds_on_success_row 0 · route_overlaps 0 · dataFlow methods without endpoint 0\n  outside required 0 = unreached-op 0 + n/a(default response) 0 + n/a(no scenario) 0 + n/a(platform-excluded) 0\n  n/a (E) no mock 0 · not in OpenAPI 0 · unbound endpoint 0 · non-HTTP 0\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 0 (screens 0) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] total units 1 · statuses required 5 = row 3 + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 1 (partial 1 + default-only 0 + unattributed 0)\n[platform=web] exit 1 (uncovered)\nexit 1 (composed 2 > 1 > 3 > 0) statuses required 5: 1 uncovered — write a row (alsoStatuses if the VM treats it like another status), or an exclusion with a reason"
+          "code": "# measured on a fixture: one screen, one operation documenting 200/401/409/422/500;\n# 409 answered through alsoStatuses, 401 excluded by unit, 422 left unanswered\n$ jsonui-test contracts coverage --platform web\ncontracts coverage  (project platforms: web, android, ios)\napp contracts: docs/screens/json/app_contracts.spec.json · apiOutcomeRules 1\n[platform=web] spec=profile_screen  units 1  contracted methods 1 of 1\n  statuses required 5 = row 3 (alsoStatuses 1) + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 1\n    uncovered 1 = partial 1 + default-only 0 + unattributed 0\n  uncovered  partial       onTapSave × api.updateProfile  PUT /api/items  422\n  info  guard-only 1 · note branches 1 · also_statuses_rows 1 · also_statuses_arrange_differs 0 · side_calls_admitted 0 · reference_holds_on_success_row 0 · route_overlaps 0 · dataFlow methods without endpoint 0\n  outside required 0 = unreached-op 0 + n/a(default response) 0 + n/a(no scenario) 0 + n/a(platform-excluded) 0\n  n/a (E) no mock 0 · not in OpenAPI 0 · unbound endpoint 0 · non-HTTP 0\n[platform=web] total n/a(no mock) 0 (screens 0) · n/a(not in OpenAPI) 0 (screens 0) · n/a(unbound endpoint) 0 (screens 0) · n/a(non-HTTP) 0 (screens 0)\n[platform=web] total units 1 · statuses required 5 = row 3 + unit 1 + unreachable 0 + unexpressible 0 + not-evaluated 0 + uncovered 1 (partial 1 + default-only 0 + unattributed 0)\n[platform=web] baselined 0 (matched 0 · new 1 · stale 0) — no baseline file: every entry is new\n[platform=web] data (report only) units 0 · arranged 0 · produced 0 · neither 0 · screens evaluated 1 of 1 (layout not linked 0 · layout missing 0 · unresolved include 0) · Bool not in layout 1 · visibleElements not in layout 0 (cannot check 0) · cells not bound 0\n[platform=web] exit 1 (uncovered)\nexit 1 (composed 2 > 1 > 3 > 0) statuses required 5: 1 uncovered — write a row (alsoStatuses if the VM treats it like another status), or an exclusion with a reason"
         }
       ],
       "aliases": [],
@@ -3563,18 +3620,18 @@
         "jsonui-doc validate spec"
       ],
       "verifiedAgainst": {
-        "version": "1.8.118",
+        "version": "1.8.119",
         "columns": 80,
         "python": "3.12",
         "helpHash": "4c234910f54bceb17563c797aaf672e4436034ec69ddd0a61349851aa335dfbb",
-        "cardHash": "b3319bfbbb3f6712819a78fc42e47e4b1fe542790cf643b51596c40a75af1eae",
+        "cardHash": "3ba39c1bd97d6dea1116f05928228836c227080860b200e1420e63cd0a0a47ae",
         "fieldHashes": {
           "binary": "3b2560767fdf",
           "command": "036d2917ec5d",
           "synopsis": "707c179b9122",
-          "purpose": "a946e59db929",
+          "purpose": "e38b72c2a497",
           "options": "d97b4c0e8684",
-          "examples": "0c98adc78db0",
+          "examples": "0148bd19d067",
           "aliases": "98edafdd23a8",
           "seeAlso": "6c475f3b8393"
         }

@@ -105,6 +105,12 @@ flowchart TD
 | Variable Name | Type | Description | Notes |
 |---|---|---|---|
 | `nextReadLinks` | [NextReadLink] | Two follow-up cards. | - |
+| `onSeeAllTap` | String | (from binding) | - |
+| `subtitle` | String | (from binding) | - |
+| `title` | String | (from binding) | - |
+| `activeTab` | String | (from binding) | - |
+| `orders` | String | (from binding) | - |
+| `selectedOrderId` | String | (from binding) | - |
 
 ### View-local Event Handlers
 

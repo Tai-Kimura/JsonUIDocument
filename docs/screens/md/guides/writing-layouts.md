@@ -119,6 +119,16 @@ flowchart TD
 | Variable Name | Type | Description | Notes |
 |---|---|---|---|
 | `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
+| `onHeroInstallTap` | String | (from binding) | - |
+| `onBack` | String | (from binding) | - |
+| `label` | String | (from binding) | - |
+| `agents` | String | (from binding) | - |
+| `nameKey` | String | (from binding) | - |
+| `roleKey` | String | (from binding) | - |
+| `whenToUseKey` | String | (from binding) | - |
+| `referenceSections` | String | (from binding) | - |
+| `errorMessage` | String | (from binding) | - |
+| `errorVisibility` | String | (from binding) | - |
 
 ### View-local Event Handlers
 

@@ -84,6 +84,8 @@ flowchart TD
 | Variable Name | Type | Description | Notes |
 |---|---|---|---|
 | `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
+| `name` | String | (from binding) | - |
+| `onTap` | String | (from binding) | - |
 
 ### View-local Event Handlers
 

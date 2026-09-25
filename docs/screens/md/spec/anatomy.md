@@ -88,6 +88,7 @@ flowchart TD
 | Variable Name | Type | Description | Notes |
 |---|---|---|---|
 | `nextReadLinks` | [NextReadLink] | Two follow-up cards pointing at split-overview and writing-your-first-spec. | - |
+| `selectedOrderId` | String | (from binding) | - |
 
 ### View-local Event Handlers
 

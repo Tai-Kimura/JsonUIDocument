@@ -90,6 +90,9 @@ flowchart TD
 | Variable Name | Type | Description | Notes |
 |---|---|---|---|
 | `nextReadLinks` | [NextReadLink] | Follow-up cards. | - |
+| `ctaLabel` | String | (from binding) | - |
+| `headline` | String | (from binding) | - |
+| `onTapCta` | String | (from binding) | - |
 
 ### View-local Event Handlers
 

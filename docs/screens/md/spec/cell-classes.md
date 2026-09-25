@@ -91,6 +91,12 @@ flowchart TD
 | Variable Name | Type | Description | Notes |
 |---|---|---|---|
 | `nextReadLinks` | [NextReadLink] | Follow-up cards. | - |
+| `ads` | String | (from binding) | - |
+| `bodyKey` | String | (from binding) | - |
+| `onTap` | String | (from binding) | - |
+| `posts` | String | (from binding) | - |
+| `rows` | String | (from binding) | - |
+| `titleKey` | String | (from binding) | - |
 
 ### View-local Event Handlers
 

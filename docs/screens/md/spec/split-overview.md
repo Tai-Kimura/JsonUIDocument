@@ -99,6 +99,9 @@ flowchart TD
 | Variable Name | Type | Description | Notes |
 |---|---|---|---|
 | `nextReadLinks` | [NextReadLink] | Follow-up cards pointing at the per-pattern detail articles (anchored to anatomy + the Phase 2 detail articles once they land). | - |
+| `ads` | String | (from binding) | - |
+| `posts` | String | (from binding) | - |
+| `selectedOrderId` | String | (from binding) | - |
 
 ### View-local Event Handlers
 

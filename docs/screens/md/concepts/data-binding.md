@@ -90,6 +90,33 @@ flowchart TD
 | Variable Name | Type | Description | Notes |
 |---|---|---|---|
 | `nextReadLinks` | [NextReadLink] | Two follow-up essays at the bottom. | - |
+| `activeTab` | String | (from binding) | - |
+| `bars` | String | (from binding) | - |
+| `cardBg` | String | (from binding) | - |
+| `coverUrl` | String | (from binding) | - |
+| `emphasis` | String | (from binding) | - |
+| `fadeAlpha` | String | (from binding) | - |
+| `greeting` | String | (from binding) | - |
+| `onEmailChange` | String | (from binding) | - |
+| `onSubmit` | String | (from binding) | - |
+| `panelVisibility` | String | (from binding) | - |
+| `panelWidth` | String | (from binding) | - |
+| `placeholder` | String | (from binding) | - |
+| `status` | String | (from binding) | - |
+| `count` | String | (from binding) | - |
+| `email` | String | (from binding) | - |
+| `a` | String | (from binding) | - |
+| `b` | String | (from binding) | - |
+| `countLabel` | String | (from binding) | - |
+| `displayName` | String | (from binding) | - |
+| `formatName` | String | (from binding) | - |
+| `isReady` | String | (from binding) | - |
+| `isValid` | String | (from binding) | - |
+| `items` | String | (from binding) | - |
+| `nickname` | String | (from binding) | - |
+| `parentProp` | String | (from binding) | - |
+| `sibling` | String | (from binding) | - |
+| `user` | String | (from binding) | - |
 
 ### View-local Event Handlers
 

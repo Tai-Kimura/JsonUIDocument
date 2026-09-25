@@ -92,6 +92,8 @@ flowchart TD
 | Variable Name | Type | Description | Notes |
 |---|---|---|---|
 | `nextReadLinks` | [NextReadLink] | Follow-up cards. | - |
+| `metricsPoints` | String | (from binding) | - |
+| `onSelectPoint` | String | (from binding) | - |
 
 ### View-local Event Handlers
 

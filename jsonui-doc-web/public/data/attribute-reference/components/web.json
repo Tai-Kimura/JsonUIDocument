@@ -45,19 +45,19 @@
   "canonicalCode": "{\n  \"type\": \"Web\",\n  \"url\": \"https://www.example.com/embed/@{placeId}\",\n  \"width\": \"matchParent\",\n  \"height\": 300\n}",
   "canonicalLanguage": "json",
   "statRequired": "0",
-  "statOptional": "6",
-  "statEvents": "0",
+  "statOptional": "8",
+  "statEvents": "1",
   "statRequiredText": {
     "en": "0 required",
     "ja": "必須 0"
   },
   "statOptionalText": {
-    "en": "6 optional",
-    "ja": "任意 6"
+    "en": "8 optional",
+    "ja": "任意 8"
   },
   "statEventsText": {
-    "en": "0 events",
-    "ja": "イベント 0"
+    "en": "1 events",
+    "ja": "イベント 1"
   },
   "usageVisibility": "visible",
   "attributeCategories": {
@@ -72,6 +72,14 @@
                 "ja": "共通"
               },
               "anchorUrl": "#section-common"
+            },
+            {
+              "id": "cat_event",
+              "label": {
+                "en": "Event",
+                "ja": "イベント"
+              },
+              "anchorUrl": "#section-event"
             }
           ]
         }
@@ -410,6 +418,70 @@
               "required": ""
             },
             {
+              "id": "attr_reloadToken",
+              "name": "reloadToken",
+              "anchorId": "attr-reloadToken",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Binding to a plain value (declare it Int) that reloads the component's own source each time the value changes — the current `url`, or `html` when there is no url. Increment it in the ViewModel to retry after `onLoadFailed`. The value present when the view is created loads nothing extra; only a later change does. Writing the same url back does not reload, because a url is compared with the last one loaded — which is why this attribute exists. It reloads the declared source, not a page the user navigated to inside the view. iOS and Android only (SwiftJsonUI 10.28.0, KotlinJsonUI 2.41.0; declared from jsonui-cli 1.8.119): the web face has no `onLoadFailed` to retry after. Not measured here — this site renders no Web on iOS or Android.",
+                "ja": "普通の値（Int として宣言）への binding で、値が変わるたびにコンポーネント自身のソース — いまの `url`、url が無ければ `html` — を読み直します。`onLoadFailed` の後に再試行するには、ViewModel でこの値を増やします。ビューが作られたときの値では余分な読み込みは起きず、その後の変化だけが読み直しになります。同じ url を書き戻しても読み直しません（url は最後に読み込んだものと比べるため）— この属性があるのはそのためです。読み直すのは宣言したソースで、ユーザーがビューの中で移動した先のページではありません。iOS と Android のみ（SwiftJsonUI 10.28.0、KotlinJsonUI 2.41.0。jsonui-cli 1.8.119 から宣言）: web には再試行のきっかけになる `onLoadFailed` がありません。このサイトは iOS / Android で Web を描画しないため、ここでは未測定です。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
               "id": "attr_sandbox",
               "name": "sandbox",
               "anchorId": "attr-sandbox",
@@ -543,12 +615,77 @@
     "sections": [
       {
         "cells": {
-          "data": []
+          "data": [
+            {
+              "id": "attr_onLoadFailed",
+              "name": "onLoadFailed",
+              "anchorId": "attr-onLoadFailed",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Handler called when the main-frame load fails — binding only (`@{functionName}`), called with no arguments, at most once per load. A failure is the navigation itself failing (no connection, timeout, DNS, TLS) or the main-frame response carrying HTTP 4xx/5xx. Never called for a subresource (image, CSS, script) or a subframe, nor for a navigation cancelled because another one replaced it — a `reloadToken` change during a load is exactly that. The page a server returns with a 4xx/5xx is still displayed; to show an error face instead, hide the Web from the handler. iOS and Android only (SwiftJsonUI 10.28.0, KotlinJsonUI 2.41.0; declared from jsonui-cli 1.8.119): an iframe reports neither the HTTP status of its document nor a cross-origin load failure, so the web face could not honour it. Not measured here — this site renders no Web on iOS or Android.",
+                "ja": "メインフレームの読み込みが失敗したときに呼ばれるハンドラ — binding のみ（`@{functionName}`）、引数なし、1 回の読み込みにつき最大 1 回。失敗とは、遷移そのものの失敗（接続なし・タイムアウト・DNS・TLS）か、メインフレームの応答が HTTP 4xx/5xx であることです。サブリソース（画像・CSS・スクリプト）やサブフレームでは呼ばれず、別の遷移に置き換えられて取り消された遷移でも呼ばれません — 読み込み中の `reloadToken` の変化がまさにそれです。サーバーが 4xx/5xx で返したページはそのまま表示されるので、代わりにエラーの面を見せたいときは、ハンドラから Web を隠します。iOS と Android のみ（SwiftJsonUI 10.28.0、KotlinJsonUI 2.41.0。jsonui-cli 1.8.119 から宣言）: iframe は文書の HTTP status も、クロスオリジンの読み込み失敗も報告しないので、web では守れません。このサイトは iOS / Android で Web を描画しないため、ここでは未測定です。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            }
+          ]
         }
       }
     ]
   },
-  "groupEventVisibility": "gone",
+  "groupEventVisibility": "visible",
   "attributesResponsive": {
     "sections": [
       {
@@ -586,6 +723,15 @@
         "ja": "共通"
       },
       "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_event",
+      "label": {
+        "en": "Event",
+        "ja": "イベント"
+      },
+      "anchor": "section-event",
       "level": 1
     },
     {
@@ -1075,6 +1221,134 @@
                 "ja": "インライン HTML 文字列。Markdown→HTML 変換結果やプレビュー描画に便利。"
               },
               "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_onLoadFailed",
+              "name": "onLoadFailed",
+              "anchorId": "attr-onLoadFailed",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Handler called when the main-frame load fails — binding only (`@{functionName}`), called with no arguments, at most once per load. A failure is the navigation itself failing (no connection, timeout, DNS, TLS) or the main-frame response carrying HTTP 4xx/5xx. Never called for a subresource (image, CSS, script) or a subframe, nor for a navigation cancelled because another one replaced it — a `reloadToken` change during a load is exactly that. The page a server returns with a 4xx/5xx is still displayed; to show an error face instead, hide the Web from the handler. iOS and Android only (SwiftJsonUI 10.28.0, KotlinJsonUI 2.41.0; declared from jsonui-cli 1.8.119): an iframe reports neither the HTTP status of its document nor a cross-origin load failure, so the web face could not honour it. Not measured here — this site renders no Web on iOS or Android.",
+                "ja": "メインフレームの読み込みが失敗したときに呼ばれるハンドラ — binding のみ（`@{functionName}`）、引数なし、1 回の読み込みにつき最大 1 回。失敗とは、遷移そのものの失敗（接続なし・タイムアウト・DNS・TLS）か、メインフレームの応答が HTTP 4xx/5xx であることです。サブリソース（画像・CSS・スクリプト）やサブフレームでは呼ばれず、別の遷移に置き換えられて取り消された遷移でも呼ばれません — 読み込み中の `reloadToken` の変化がまさにそれです。サーバーが 4xx/5xx で返したページはそのまま表示されるので、代わりにエラーの面を見せたいときは、ハンドラから Web を隠します。iOS と Android のみ（SwiftJsonUI 10.28.0、KotlinJsonUI 2.41.0。jsonui-cli 1.8.119 から宣言）: iframe は文書の HTTP status も、クロスオリジンの読み込み失敗も報告しないので、web では守れません。このサイトは iOS / Android で Web を描画しないため、ここでは未測定です。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_reloadToken",
+              "name": "reloadToken",
+              "anchorId": "attr-reloadToken",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Binding to a plain value (declare it Int) that reloads the component's own source each time the value changes — the current `url`, or `html` when there is no url. Increment it in the ViewModel to retry after `onLoadFailed`. The value present when the view is created loads nothing extra; only a later change does. Writing the same url back does not reload, because a url is compared with the last one loaded — which is why this attribute exists. It reloads the declared source, not a page the user navigated to inside the view. iOS and Android only (SwiftJsonUI 10.28.0, KotlinJsonUI 2.41.0; declared from jsonui-cli 1.8.119): the web face has no `onLoadFailed` to retry after. Not measured here — this site renders no Web on iOS or Android.",
+                "ja": "普通の値（Int として宣言）への binding で、値が変わるたびにコンポーネント自身のソース — いまの `url`、url が無ければ `html` — を読み直します。`onLoadFailed` の後に再試行するには、ViewModel でこの値を増やします。ビューが作られたときの値では余分な読み込みは起きず、その後の変化だけが読み直しになります。同じ url を書き戻しても読み直しません（url は最後に読み込んだものと比べるため）— この属性があるのはそのためです。読み直すのは宣言したソースで、ユーザーがビューの中で移動した先のページではありません。iOS と Android のみ（SwiftJsonUI 10.28.0、KotlinJsonUI 2.41.0。jsonui-cli 1.8.119 から宣言）: web には再試行のきっかけになる `onLoadFailed` がありません。このサイトは iOS / Android で Web を描画しないため、ここでは未測定です。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
               "required": ""
             },
             {

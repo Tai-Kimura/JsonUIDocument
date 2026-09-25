@@ -288,7 +288,34 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>// A Collection that renders two different cells — feed_card for posts,
+// ad_slot every Nth row — driven by sections[].cell.
+{
+  &quot;type&quot;: &quot;Collection&quot;,
+  &quot;id&quot;:   &quot;feed_collection&quot;,
+  &quot;items&quot;: &quot;@{rows}&quot;,
+  &quot;cellIdProperty&quot;: &quot;id&quot;,
+  &quot;sections&quot;: [
+    { &quot;cell&quot;: &quot;cells/feed_card&quot;, &quot;items&quot;: &quot;@{posts}&quot; },
+    { &quot;cell&quot;: &quot;cells/ad_slot&quot;,   &quot;items&quot;: &quot;@{ads}&quot; }
+  ]
+}
+
+// The two referenced cells live as their own Layout JSON files.
+// docs/screens/layouts/cells/feed_card.json:
+{
+  &quot;type&quot;: &quot;View&quot;, &quot;orientation&quot;: &quot;vertical&quot;,
+  &quot;child&quot;: [
+    { &quot;data&quot;: [
+        { &quot;name&quot;: &quot;titleKey&quot;, &quot;class&quot;: &quot;String&quot; },
+        { &quot;name&quot;: &quot;bodyKey&quot;,  &quot;class&quot;: &quot;String&quot; },
+        { &quot;name&quot;: &quot;onTap&quot;,    &quot;class&quot;: &quot;() -&gt; Void&quot; }
+    ]},
+    { &quot;type&quot;: &quot;Label&quot;,  &quot;text&quot;: &quot;@{titleKey}&quot;, &quot;fontSize&quot;: 18 },
+    { &quot;type&quot;: &quot;Label&quot;,  &quot;text&quot;: &quot;@{bodyKey}&quot;,  &quot;fontSize&quot;: 14, &quot;fontColor&quot;: &quot;#475467&quot; },
+    { &quot;type&quot;: &quot;Button&quot;, &quot;text&quot;: &quot;Open&quot;, &quot;onClick&quot;: &quot;@{onTap}&quot; }
+  ]
+}</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-3" data-parent-id="1-1-2" data-has-children="true">
@@ -352,7 +379,22 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code># What layout_importer does for Collection cell references at generate time
+# (see document_tools/.../layout_importer.py:_expand_collection_refs):
+
+1. Walk the enriched spec looking for Collection nodes
+2. For each `sections[].cell` entry, resolve the path under layouts_directory
+   and read the cell Layout JSON
+3. Inline the cell tree under structure.collection._resolvedCells[&lt;ref&gt;]
+   (keyed by the ref string so the same cell referenced twice is inlined once)
+4. Harvest every binding (@{...}) the cell references as its own uiVariables
+   on the cell data block — these become the cell&#x27;s prop shape
+5. The generator emits one &lt;CellName&gt;.tsx / .swift / .kt per cell, plus a
+   &lt;CellName&gt;Data type for the inlined prop shape (web: src/generated/data/
+   NextStepCardData.ts for next_step_card)
+
+Result: the screen spec references cells by path; the runtime gets real,
+typed components. No duplication, and each cell is testable in isolation.</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-5" data-parent-id="1-1-2" data-has-children="true">
@@ -509,11 +551,17 @@ flowchart TD
 </section>
 <section id="state">
 <h2>State Management</h2>
-<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">1</span></summary>
+<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">7</span></summary>
 <table>
 <thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td>Follow-up cards.</td><td>-</td></tr>
+<tr><td><code>ads</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>bodyKey</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>onTap</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>posts</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>rows</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>titleKey</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
 </tbody></table>
 </details>
 <details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">3</span></summary>

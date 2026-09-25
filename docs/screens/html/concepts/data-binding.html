@@ -272,7 +272,26 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>// 1. TEXT — Label text, TextField hint, CodeBlock filename, etc.
+{ &quot;type&quot;: &quot;Label&quot;,     &quot;text&quot;: &quot;@{greeting}&quot; }
+{ &quot;type&quot;: &quot;TextField&quot;, &quot;hint&quot;: &quot;@{placeholder}&quot; }
+
+// 2. STYLE — colors, opacity, fontWeight, borders
+{ &quot;type&quot;: &quot;View&quot;,  &quot;background&quot;: &quot;@{cardBg}&quot;, &quot;opacity&quot;:     &quot;@{fadeAlpha}&quot; }
+{ &quot;type&quot;: &quot;Label&quot;, &quot;fontColor&quot;:  &quot;@{status}&quot;, &quot;fontWeight&quot;:  &quot;@{emphasis}&quot;  }
+
+// 3. LAYOUT — sizes, visibility (String enum, NOT Bool)
+{ &quot;type&quot;: &quot;View&quot;, &quot;width&quot;:      &quot;@{panelWidth}&quot; }
+{ &quot;type&quot;: &quot;View&quot;, &quot;visibility&quot;: &quot;@{panelVisibility}&quot; }   // &quot;visible&quot; | &quot;invisible&quot; | &quot;gone&quot;
+
+// 4. EVENT handlers — onClick, onTextChange, onValueChanged, onPageChanged, ...
+{ &quot;type&quot;: &quot;Button&quot;,    &quot;onClick&quot;:       &quot;@{onSubmit}&quot; }
+{ &quot;type&quot;: &quot;TextField&quot;, &quot;onTextChange&quot;:  &quot;@{onEmailChange}&quot; }
+
+// 5. COLLECTION / RESOURCE — items, src, currentPage, ...
+{ &quot;type&quot;: &quot;Collection&quot;,   &quot;items&quot;:       &quot;@{bars}&quot; }
+{ &quot;type&quot;: &quot;NetworkImage&quot;, &quot;src&quot;:         &quot;@{coverUrl}&quot; }
+{ &quot;type&quot;: &quot;TabView&quot;,      &quot;currentPage&quot;: &quot;@{activeTab}&quot; }</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-2" data-parent-id="1-1-2-1" data-has-children="true">
@@ -304,7 +323,22 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>// The SAME `@{count}` resolves differently per target.
+
+// ANDROID — compile-time check via DataBinding annotation processor.
+//   Generated XML:   android:text=&quot;@{data.count}&quot;
+//   Bool → Label.text fails at `./gradlew assemble`.
+
+// WEB — compile-time check via TypeScript + generated FooData interface.
+//   Generated JSX:   {data.count}
+//   Bool → Label.text fails at `next build` (tsc error).
+
+// iOS — runtime reflection via SwiftJsonUI.
+//   Generated SwiftUI: Text(&quot;\\(data.count)&quot;)
+//   Bool → Label.text: blank label + console warning; build still succeeds.
+
+// `jui verify --fail-on-diff` is a STRUCTURAL drift check only
+// (generated Layout tree vs spec). It does NOT type-check bindings.</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-3" data-parent-id="1-1-2-1" data-has-children="true">
@@ -336,7 +370,35 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>// NON-INPUT attributes are read-only. The view has no write-back path.
+{ &quot;type&quot;: &quot;Label&quot;, &quot;text&quot;: &quot;@{greeting}&quot; }               // VM pushes; view displays.
+
+// FORM INPUTS emit platform-native TWO-WAY machinery automatically.
+// The author still writes the familiar pair — it LOOKS one-way:
+{
+  &quot;type&quot;: &quot;TextField&quot;,
+  &quot;text&quot;:         &quot;@{email}&quot;,
+  &quot;onTextChange&quot;: &quot;@{onEmailChange}&quot;     // optional — fires AFTER the field updated
+}
+
+// Under the hood the generator emits:
+//   iOS:     TextField(..., text: $data.email)                 // SwiftUI $binding
+//   Android: LaunchedEffect { viewModel.updateData(email=new) } // Compose LaunchedEffect
+//   Web:     &lt;input value={data.email}
+//                   onChange={(e) =&gt; data.onEmailChange?.(e.target.value)} /&gt;
+
+// The VM field updates on every keystroke — BEFORE the handler runs.
+// To reject / trim / transform, do NOT treat the callback as a gate —
+// let the field update, then snap it back to the corrected value:
+onEmailChange = (next: string) =&gt; {
+  const cleaned = next.trim().slice(0, 128);
+  this.updateData({ email: cleaned });   // same binding re-renders the input
+};
+
+// Cross-platform callback signatures:
+//   iOS:     (oldValue: String, newValue: String) -&gt; Void
+//   Android: (newValue: String) -&gt; Unit
+//   Web:     (newValue: string) =&gt; void</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4" data-parent-id="1-1-2-1" data-has-children="true">
@@ -368,7 +430,20 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>// 1. Give the field an id in the layout
+{ &quot;type&quot;: &quot;TextField&quot;, &quot;id&quot;: &quot;email&quot;, &quot;text&quot;: &quot;@{email}&quot;, &quot;onTextChange&quot;: &quot;@{onEmailChange}&quot; }
+
+// 2. The generator adds a two-way focus field to the data model:
+//    emailIsFocused: boolean
+
+// 3. Focus it from the ViewModel — moves focus AND raises the keyboard
+this.updateData({ emailIsFocused: true });
+
+// Reads back on blur / focus. Platform machinery:
+//   iOS     SwiftUI @FocusState        (TextView needs SwiftJsonUI 10.3.0+)
+//   Android Compose FocusRequester
+//   Web     ref + useEffect
+//   UIKit   not covered</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-5" data-parent-id="1-1-2-1" data-has-children="true">
@@ -400,7 +475,34 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>// ALLOWED grammar — exactly seven forms:
+{ &quot;text&quot;:    &quot;@{displayName}&quot; }          // simple property
+{ &quot;text&quot;:    &quot;@{user.profile.handle}&quot; }  // dot-path
+{ &quot;text&quot;:    &quot;@{items[0]}&quot; }             // array index
+{ &quot;text&quot;:    &quot;@{nickname ?? &#x27;guest&#x27;}&quot; }  // ?? default (one literal, max once)
+// ! negation — prefix a flag, whole-value on a boolean attribute (hidden,
+// enabled). Literal form in the prose above: this very code block is a
+// validated JsonUI layout, and embedding the negation here would fail it.
+{ &quot;onClick&quot;: &quot;@{onSubmit}&quot; }             // action binding
+{ &quot;text&quot;:    &quot;@{data.title}&quot; }           // cell-scoped (inside cells/*.json)
+
+// REJECTED — rjui&#x27;s binding_validator.rb catches these with actionable warnings.
+{ &quot;text&quot;: &quot;@{count &gt; 0 ? &#x27;some&#x27; : &#x27;none&#x27;}&quot; }   // ternary
+{ &quot;text&quot;: &quot;@{formatName(user)}&quot; }               // function call
+{ &quot;text&quot;: &quot;@{user.name.toUpperCase()}&quot; }        // method call
+{ &quot;text&quot;: &quot;@{a + b}&quot; }                          // arithmetic
+{ &quot;text&quot;: &quot;@{isReady &amp;&amp; isValid}&quot; }             // logical
+
+// Also not in the grammar:
+{ &quot;text&quot;: &quot;@{^parentProp}&quot; }   // no path-ascent
+{ &quot;text&quot;: &quot;@{../sibling}&quot; }    // no relative navigation
+
+// For derived values, compute in the ViewModel and bind the getter:
+//   get countLabel(): string { return this.count &gt; 0 ? this.s(&#x27;some&#x27;) : this.s(&#x27;none&#x27;); }
+//   { &quot;text&quot;: &quot;@{countLabel}&quot; }
+
+// Note: validator runs on rjui only.
+// iOS and Android currently accept malformed bindings and fail at runtime.</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-6" data-parent-id="1-1-2-1" data-has-children="true">
@@ -501,11 +603,38 @@ flowchart TD
 </section>
 <section id="state">
 <h2>State Management</h2>
-<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">1</span></summary>
+<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">28</span></summary>
 <table>
 <thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td>Two follow-up essays at the bottom.</td><td>-</td></tr>
+<tr><td><code>activeTab</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>bars</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>cardBg</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>coverUrl</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>emphasis</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>fadeAlpha</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>greeting</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>onEmailChange</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>onSubmit</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>panelVisibility</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>panelWidth</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>placeholder</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>status</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>count</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>email</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>a</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>b</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>countLabel</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>displayName</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>formatName</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>isReady</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>isValid</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>items</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>nickname</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>parentProp</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>sibling</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>user</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
 </tbody></table>
 </details>
 <details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">3</span></summary>

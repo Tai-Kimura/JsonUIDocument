@@ -106,6 +106,14 @@ flowchart TD
 | `swiftCodeVisibility` | String | visible/gone toggle for the Swift code panel. Derived from activeCodeTab === 'swift'. Initial is 'visible' because swift is the default active tab. | - |
 | `kotlinCodeVisibility` | String | visible/gone toggle for the Kotlin code panel. Derived from activeCodeTab === 'kotlin'. | - |
 | `typescriptCodeVisibility` | String | visible/gone toggle for the TypeScript code panel. Derived from activeCodeTab === 'typescript'. | - |
+| `activities` | String | (from binding) | - |
+| `emptyVisibility` | String | (from binding) | - |
+| `onRefresh` | String | (from binding) | - |
+| `onToggleLanguage` | String | (from binding) | - |
+| `taglineKey` | String | (from binding) | - |
+| `welcomeKey` | String | (from binding) | - |
+| `detailKey` | String | (from binding) | - |
+| `titleKey` | String | (from binding) | - |
 
 ### View-local Event Handlers
 

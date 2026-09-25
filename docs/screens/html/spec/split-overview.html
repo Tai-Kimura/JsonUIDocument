@@ -416,7 +416,24 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>// A Collection with two cell layouts — each cell lives in its own file.
+{
+  &quot;structure&quot;: {
+    &quot;collection&quot;: {
+      &quot;cellClasses&quot;: [
+        &quot;cells/feed_card&quot;,    // docs/screens/layouts/cells/feed_card.json
+        &quot;cells/ad_slot&quot;       // docs/screens/layouts/cells/ad_slot.json
+      ],
+      &quot;sections&quot;: [
+        { &quot;cell&quot;: &quot;cells/feed_card&quot;, &quot;items&quot;: &quot;@{posts}&quot; },
+        { &quot;cell&quot;: &quot;cells/ad_slot&quot;,   &quot;items&quot;: &quot;@{ads}&quot; }
+      ]
+    }
+  }
+}
+
+// `jui build` inlines each referenced cell layout into the generated
+// component, so the same cell can be reused by any other Collection.</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-7" data-parent-id="1-1-2" data-has-children="true">
@@ -448,7 +465,26 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>// Parent spec hosts an `OrderDetail` screen as a region. The embedded
+// screen is unchanged — only the parent declares the relationship.
+{
+  &quot;metadata&quot;: { &quot;name&quot;: &quot;OrdersDashboard&quot;, &quot;layoutFile&quot;: &quot;orders/dashboard&quot; },
+  &quot;structure&quot;: {
+    &quot;embeds&quot;: [
+      {
+        &quot;regionId&quot;:       &quot;detailPane&quot;,
+        &quot;screen&quot;:         &quot;order_detail&quot;,
+        &quot;params&quot;:         { &quot;orderId&quot;: &quot;@{selectedOrderId}&quot; },
+        &quot;events&quot;:         { &quot;onOrderUpdated&quot;: &quot;handleOrderUpdated&quot; },
+        &quot;navigationMode&quot;: &quot;delegate&quot;
+      }
+    ]
+  }
+}
+
+// Parent Layout JSON places the embed in the tree:
+{ &quot;type&quot;: &quot;Embed&quot;, &quot;id&quot;: &quot;detailPane&quot;, &quot;screen&quot;: &quot;order_detail&quot;,
+  &quot;params&quot;: { &quot;orderId&quot;: &quot;@{selectedOrderId}&quot; }, &quot;weight&quot;: 1 }</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-7-4" data-parent-id="1-1-2-7">
@@ -573,11 +609,14 @@ flowchart TD
 </section>
 <section id="state">
 <h2>State Management</h2>
-<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">1</span></summary>
+<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">4</span></summary>
 <table>
 <thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td>Follow-up cards pointing at the per-pattern detail articles (anchored to anatomy + the Phase 2 detail articles once they land).</td><td>-</td></tr>
+<tr><td><code>ads</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>posts</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>selectedOrderId</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
 </tbody></table>
 </details>
 <details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">3</span></summary>

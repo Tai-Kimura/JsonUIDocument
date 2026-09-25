@@ -184,7 +184,7 @@
 <td><code>chrome_topbar</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
-<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>currentLanguage</code> ↔ <code>currentLanguage</code></div><div><span class="bind-badge bind-data">bind</span> <code>currentColorMode</code> ↔ <code>currentColorMode</code></div><div><span class="bind-badge bind-data">bind</span> <code>onToggleLanguage</code> ↔ <code>onToggleLanguage</code></div><div><span class="bind-badge bind-data">bind</span> <code>onToggleColorMode</code> ↔ <code>onToggleColorMode</code></div><div><span class="bind-badge bind-data">bind</span> <code>onToggleMobileMenu</code> ↔ <code>onToggleMobileMenu</code></div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-event">event</span> <code>onToggleLanguage</code> → <code>onToggleLanguage</code></div><div><span class="bind-badge bind-event">event</span> <code>onToggleColorMode</code> → <code>onToggleColorMode</code></div><div><span class="bind-badge bind-event">event</span> <code>onToggleMobileMenu</code> → <code>onToggleMobileMenu</code></div><div><span class="bind-badge bind-data">bind</span> <code>currentLanguage</code> ↔ <code>currentLanguage</code></div><div><span class="bind-badge bind-data">bind</span> <code>currentColorMode</code> ↔ <code>currentColorMode</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-2" data-parent-id="1">
@@ -192,7 +192,7 @@
 <td><code>chrome_sidebar</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
-<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>navItems</code></div><div><span class="bind-badge bind-data">bind</span> <code>activeUrl</code> ↔ <code>activeUrl</code></div><div><span class="bind-badge bind-data">bind</span> <code>collapsedIds</code> ↔ <code>collapsedIds</code></div><div><span class="bind-badge bind-data">bind</span> <code>mobileOpen</code> ↔ <code>mobileOpen</code></div><div><span class="bind-badge bind-data">bind</span> <code>onToggleSection</code> ↔ <code>onToggleSection</code></div><div><span class="bind-badge bind-data">bind</span> <code>onLinkTap</code> ↔ <code>onLinkTap</code></div></div></td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-event">event</span> <code>onToggleSection</code> → <code>onToggleSection</code></div><div><span class="bind-badge bind-event">event</span> <code>onLinkTap</code> → <code>onLinkTap</code></div><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>navItems</code></div><div><span class="bind-badge bind-data">bind</span> <code>activeUrl</code> ↔ <code>activeUrl</code></div><div><span class="bind-badge bind-data">bind</span> <code>collapsedIds</code> ↔ <code>collapsedIds</code></div><div><span class="bind-badge bind-data">bind</span> <code>mobileOpen</code> ↔ <code>mobileOpen</code></div></div></td>
 <td>-</td>
 </tr>
 </tbody></table>
@@ -259,7 +259,7 @@ flowchart TD
 </section>
 <section id="state">
 <h2>State Management</h2>
-<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">11</span></summary>
+<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">6</span></summary>
 <table>
 <thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
@@ -269,11 +269,6 @@ flowchart TD
 <tr><td><code>mobileOpen</code></td><td>Bool</td><td>Mobile drawer open flag. True on viewports &lt;1024px when the user has tapped the top-bar menu button. Tapping any Sidebar link (onLinkTap) and tapping Escape both flip it back to false.</td><td>-</td></tr>
 <tr><td><code>currentLanguage</code></td><td>String</td><td>Mirror of StringManager.language. Drives the TopBar&#x27;s language-toggle display label (shows the OTHER language as an invitation to switch). Re-seeded inside onAppear on every language toggle so the chrome re-localizes in lockstep with generated pages.</td><td>-</td></tr>
 <tr><td><code>currentColorMode</code></td><td>String</td><td>Mirror of ColorManager.currentMode. Drives the TopBar&#x27;s theme-toggle icon (sun when the current mode is &#x27;light&#x27;, moon when &#x27;dark&#x27;). Seeded from ColorManager at construction and re-synced via ColorManager.subscribe() whenever the mode changes (manual toggle or prefers-color-scheme media query).</td><td>-</td></tr>
-<tr><td><code>onToggleLanguage</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
-<tr><td><code>onToggleColorMode</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
-<tr><td><code>onToggleMobileMenu</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
-<tr><td><code>onToggleSection</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
-<tr><td><code>onLinkTap</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
 </tbody></table>
 </details>
 <details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">7</span></summary>

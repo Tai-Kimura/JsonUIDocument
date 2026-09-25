@@ -89,6 +89,7 @@ flowchart TD
 | Variable Name | Type | Description | Notes |
 |---|---|---|---|
 | `nextReadLinks` | [NextReadLink] | Two follow-up concept essays at the bottom of the page (One Layout JSON / Data binding as contract). Seeded by onAppear. | - |
+| `onSubmit` | String | (from binding) | - |
 
 ### View-local Event Handlers
 

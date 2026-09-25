@@ -296,7 +296,29 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>// recent_activity.json — a stand-alone sub-layout
+{
+  &quot;type&quot;: &quot;View&quot;,
+  &quot;orientation&quot;: &quot;vertical&quot;,
+  &quot;child&quot;: [
+    { &quot;type&quot;: &quot;Label&quot;, &quot;text&quot;: &quot;@{title}&quot;, &quot;fontSize&quot;: 20, &quot;fontWeight&quot;: &quot;bold&quot; },
+    { &quot;type&quot;: &quot;Label&quot;, &quot;text&quot;: &quot;@{subtitle}&quot;, &quot;fontSize&quot;: 14 }
+  ]
+}
+
+// home.json — pulls recent_activity in by reference
+{
+  &quot;type&quot;: &quot;View&quot;,
+  &quot;orientation&quot;: &quot;vertical&quot;,
+  &quot;child&quot;: [
+    { &quot;include&quot;: &quot;recent_activity&quot; },
+    { &quot;type&quot;: &quot;Button&quot;, &quot;text&quot;: &quot;See all&quot;, &quot;onClick&quot;: &quot;@{onSeeAllTap}&quot; }
+  ]
+}
+
+// Codegen expands `include` inline — the resulting View binds to the
+// PARENT VM&#x27;s `@{title}` / `@{subtitle}` / `@{onSeeAllTap}`. There is no
+// second VM. The included file is a code-reuse artifact.</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-2-4" data-parent-id="1-1-2-1-2">
@@ -336,7 +358,19 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>{
+  &quot;type&quot;: &quot;TabView&quot;,
+  &quot;selectedIndex&quot;: &quot;@{activeTab}&quot;,
+  &quot;tabs&quot;: [
+    { &quot;label&quot;: &quot;@string/home&quot;,    &quot;icon&quot;: &quot;house&quot;,        &quot;include&quot;: &quot;home&quot; },
+    { &quot;label&quot;: &quot;@string/search&quot;,  &quot;icon&quot;: &quot;magnifyingglass&quot;,&quot;include&quot;: &quot;search&quot; },
+    { &quot;label&quot;: &quot;@string/profile&quot;, &quot;icon&quot;: &quot;person&quot;,       &quot;include&quot;: &quot;profile&quot; }
+  ]
+}
+
+// One ViewModel drives all three tabs. `@{activeTab}` is owned by that
+// VM; `@string/home` resolves against the same StringManager. The tabs
+// share state — switching tabs does NOT re-create their state.</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-3-4" data-parent-id="1-1-2-1-3">
@@ -376,7 +410,36 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>// Parent spec — declares the embed in structure.embeds[]
+{
+  &quot;metadata&quot;: { &quot;name&quot;: &quot;OrdersDashboard&quot;, &quot;layoutFile&quot;: &quot;orders/dashboard&quot; },
+  &quot;structure&quot;: {
+    &quot;embeds&quot;: [
+      {
+        &quot;regionId&quot;:       &quot;detailPane&quot;,
+        &quot;screen&quot;:         &quot;order_detail&quot;,
+        &quot;params&quot;:         { &quot;orderId&quot;: &quot;@{selectedOrderId}&quot; },
+        &quot;events&quot;:         { &quot;onOrderUpdated&quot;: &quot;handleOrderUpdated&quot; },
+        &quot;navigationMode&quot;: &quot;delegate&quot;
+      }
+    ]
+  }
+}
+
+// Parent layout — places the Embed in the visual tree
+{
+  &quot;type&quot;: &quot;View&quot;,
+  &quot;orientation&quot;: &quot;horizontal&quot;,
+  &quot;child&quot;: [
+    { &quot;type&quot;: &quot;Collection&quot;, &quot;id&quot;: &quot;orderList&quot;, &quot;weight&quot;: 1, &quot;items&quot;: &quot;@{orders}&quot; },
+    { &quot;type&quot;: &quot;Embed&quot;,      &quot;id&quot;: &quot;detailPane&quot;, &quot;screen&quot;: &quot;order_detail&quot;,
+      &quot;params&quot;: { &quot;orderId&quot;: &quot;@{selectedOrderId}&quot; }, &quot;weight&quot;: 2 }
+  ]
+}
+
+// order_detail.json + OrderDetailViewModel are UNCHANGED. The embedded
+// screen does not know it is embedded — it runs the same way it would
+// as a stand-alone screen.</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-4" data-parent-id="1-1-2-1-4">
@@ -621,11 +684,17 @@ flowchart TD
 </section>
 <section id="state">
 <h2>State Management</h2>
-<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">1</span></summary>
+<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">7</span></summary>
 <table>
 <thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td>Two follow-up cards.</td><td>-</td></tr>
+<tr><td><code>onSeeAllTap</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>subtitle</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>title</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>activeTab</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>orders</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>selectedOrderId</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
 </tbody></table>
 </details>
 <details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">3</span></summary>

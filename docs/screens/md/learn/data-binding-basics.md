@@ -96,6 +96,10 @@ flowchart TD
 | Variable Name | Type | Description | Notes |
 |---|---|---|---|
 | `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
+| `count` | String | (from binding) | - |
+| `statusVisibility` | String | (from binding) | - |
+| `onDecrement` | String | (from binding) | - |
+| `onIncrement` | String | (from binding) | - |
 
 ### View-local Event Handlers
 

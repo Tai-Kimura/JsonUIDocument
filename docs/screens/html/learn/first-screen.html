@@ -328,7 +328,27 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>{
+  &quot;type&quot;: &quot;View&quot;,
+  &quot;orientation&quot;: &quot;vertical&quot;,
+  &quot;width&quot;: &quot;matchParent&quot;,
+  &quot;height&quot;: &quot;matchParent&quot;,
+  &quot;child&quot;: [
+    { &quot;type&quot;: &quot;View&quot;, &quot;orientation&quot;: &quot;horizontal&quot;, &quot;paddings&quot;: [16, 24, 16, 24], &quot;background&quot;: &quot;#0B1220&quot;, &quot;child&quot;: [
+      { &quot;type&quot;: &quot;Label&quot;, &quot;weight&quot;: 1, &quot;fontSize&quot;: 20, &quot;fontWeight&quot;: &quot;semibold&quot;, &quot;fontColor&quot;: &quot;#F9FAFB&quot;, &quot;text&quot;: &quot;header_title&quot; },
+      { &quot;type&quot;: &quot;Button&quot;, &quot;style&quot;: &quot;lang_toggle_button&quot;, &quot;text&quot;: &quot;lang_toggle&quot;, &quot;onClick&quot;: &quot;@{onToggleLanguage}&quot; }
+    ]},
+    { &quot;type&quot;: &quot;View&quot;, &quot;style&quot;: &quot;hero_section&quot;, &quot;child&quot;: [
+      { &quot;type&quot;: &quot;Label&quot;, &quot;fontSize&quot;: 32, &quot;fontWeight&quot;: &quot;bold&quot;, &quot;fontColor&quot;: &quot;#F9FAFB&quot;, &quot;text&quot;: &quot;@{welcomeKey}&quot; },
+      { &quot;type&quot;: &quot;Label&quot;, &quot;fontSize&quot;: 15, &quot;fontColor&quot;: &quot;#CBD5F5&quot;, &quot;text&quot;: &quot;@{taglineKey}&quot;, &quot;topMargin&quot;: 8 },
+      { &quot;type&quot;: &quot;Button&quot;, &quot;style&quot;: &quot;primary_button&quot;, &quot;text&quot;: &quot;refresh&quot;, &quot;onClick&quot;: &quot;@{onRefresh}&quot;, &quot;topMargin&quot;: 16 }
+    ]},
+    { &quot;type&quot;: &quot;Collection&quot;, &quot;items&quot;: &quot;@{activities}&quot;, &quot;cellIdProperty&quot;: &quot;id&quot;,
+      &quot;lineSpacing&quot;: 12, &quot;itemSpacing&quot;: 12,
+      &quot;sections&quot;: [ { &quot;cell&quot;: &quot;cells/activity_row&quot; } ] },
+    { &quot;type&quot;: &quot;Label&quot;, &quot;visibility&quot;: &quot;@{emptyVisibility}&quot;, &quot;text&quot;: &quot;empty_state&quot; }
+  ]
+}</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4" data-parent-id="1-1-2-1" data-has-children="true">
@@ -360,7 +380,21 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
-<td>-</td>
+<td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>{
+  &quot;type&quot;: &quot;View&quot;,
+  &quot;orientation&quot;: &quot;vertical&quot;,
+  &quot;style&quot;: &quot;card_surface&quot;,
+  &quot;child&quot;: [
+    { &quot;data&quot;: [
+      { &quot;name&quot;: &quot;titleKey&quot;,  &quot;class&quot;: &quot;String&quot; },
+      { &quot;name&quot;: &quot;detailKey&quot;, &quot;class&quot;: &quot;String&quot; },
+      { &quot;name&quot;: &quot;url&quot;,       &quot;class&quot;: &quot;String&quot; },
+      { &quot;name&quot;: &quot;onNavigate&quot;,&quot;class&quot;: &quot;() -&gt; Void&quot; }
+    ]},
+    { &quot;type&quot;: &quot;Label&quot;, &quot;fontSize&quot;: 16, &quot;fontWeight&quot;: &quot;semibold&quot;, &quot;fontColor&quot;: &quot;#0B1220&quot;, &quot;text&quot;: &quot;@{titleKey}&quot; },
+    { &quot;type&quot;: &quot;Label&quot;, &quot;topMargin&quot;: 4, &quot;fontSize&quot;: 14, &quot;fontColor&quot;: &quot;#475467&quot;, &quot;text&quot;: &quot;@{detailKey}&quot; }
+  ]
+}</code></div></div></td>
 <td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-5" data-parent-id="1-1-2-1" data-has-children="true">
@@ -576,7 +610,7 @@ flowchart TD
 </section>
 <section id="state">
 <h2>State Management</h2>
-<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">5</span></summary>
+<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">13</span></summary>
 <table>
 <thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
@@ -585,6 +619,14 @@ flowchart TD
 <tr><td><code>swiftCodeVisibility</code></td><td>String</td><td>visible/gone toggle for the Swift code panel. Derived from activeCodeTab === &#x27;swift&#x27;. Initial is &#x27;visible&#x27; because swift is the default active tab.</td><td>-</td></tr>
 <tr><td><code>kotlinCodeVisibility</code></td><td>String</td><td>visible/gone toggle for the Kotlin code panel. Derived from activeCodeTab === &#x27;kotlin&#x27;.</td><td>-</td></tr>
 <tr><td><code>typescriptCodeVisibility</code></td><td>String</td><td>visible/gone toggle for the TypeScript code panel. Derived from activeCodeTab === &#x27;typescript&#x27;.</td><td>-</td></tr>
+<tr><td><code>activities</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>emptyVisibility</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>onRefresh</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>onToggleLanguage</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>taglineKey</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>welcomeKey</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>detailKey</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>titleKey</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
 </tbody></table>
 </details>
 <details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">4</span></summary>

@@ -90,6 +90,7 @@ flowchart TD
 | Variable Name | Type | Description | Notes |
 |---|---|---|---|
 | `nextReadLinks` | [NextReadLink] | Two follow-up essays. | - |
+| `onTap` | String | (from binding) | - |
 
 ### View-local Event Handlers
 
