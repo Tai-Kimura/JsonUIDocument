@@ -6,7 +6,7 @@
   },
   "metadata": {
     "name": "Learn > Installation screen",
-    "description": "Verifies the one-line-bootstrap installation page: hero + CTA CodeBlock, 3 install-target cards, 5 prereq rows (required/optional tiers), three static install steps with CodeBlocks, four expandable detail sections (partial update / custom path / individual install / uninstall), six individually-expandable troubleshoot rows, five related-link rows, the 'next: Hello World' CTA, and the header language toggle. Every assertion traces back to a section of learn/installation.spec.json.",
+    "description": "Verifies the one-line-bootstrap installation page: hero + CTA CodeBlock, 3 install-target cards, 5 prereq rows (required/optional tiers), three static install steps with CodeBlocks, four expandable detail sections (partial update / custom path / individual install / uninstall), six individually-expandable troubleshoot rows, five related-link rows, and the 'next: Hello World' CTA. Every assertion traces back to a section of learn/installation.spec.json. The header language toggle this file once covered is gone; the language switch lives in the site-wide TopBar, which no page layout draws.",
     "generatedAt": "2026-04-23T00:00:00Z",
     "generatedBy": "jsonui-test",
     "tags": ["learn", "installation", "smoke", "web"],
@@ -167,27 +167,14 @@
       ]
     },
     {
-      "name": "toc_renders_and_localizes",
-      "description": "The TableOfContents inside learn_installation_toc_wrap renders its title ('On this page') and at least two canonical section labels (Prerequisites / Troubleshooting) seeded by the VM from TOC_ROW_DEFS. Toggling language flips the title to 'このページ' and 'Prerequisites' to '前提条件' — proving that tocTitle and tocItems[].label flow through StringManager on the language change. Traces to stateManagement.uiVariables.tocTitle + tocItems and to the spec's on-page TableOfContents contract.",
+      "name": "toc_renders",
+      "description": "The TableOfContents inside learn_installation_toc_wrap renders its title ('On this page') and at least two canonical section labels (Prerequisites / Troubleshooting) seeded by the VM from TOC_ROW_DEFS. Traces to stateManagement.uiVariables.tocTitle + tocItems and to the spec's on-page TableOfContents contract. The per-page language toggle this case once tapped is gone; the language switch lives in the site-wide TopBar, which no page layout draws.",
       "steps": [
         { "action": "waitFor", "id": "learn_installation_toc_wrap", "timeout": 5000 },
         { "assert": "visible", "id": "learn_installation_toc_wrap" },
         { "assert": "text", "id": "learn_installation_toc_wrap", "contains": "On this page" },
         { "assert": "text", "id": "learn_installation_toc_wrap", "contains": "Prerequisites" },
-        { "assert": "text", "id": "learn_installation_toc_wrap", "contains": "Troubleshooting" },
-        { "action": "tap", "id": "learn_installation_lang_toggle" },
-        { "assert": "text", "id": "learn_installation_toc_wrap", "contains": "このページ" },
-        { "assert": "text", "id": "learn_installation_toc_wrap", "contains": "前提条件" }
-      ]
-    },
-    {
-      "name": "language_toggle_re_seeds",
-      "description": "StringManager.language defaults to 'en' on first render, so learn_installation_title resolves to the English headline 'Install JsonUI in one line'. Tapping learn_installation_lang_toggle invokes onToggleLanguage, which flips StringManager to 'ja' and calls onAppear() again; every @string-bound Label re-resolves in Japanese. The title flips to its ja copy ('JsonUI をワンライナーで導入'), which contains the distinctive 'ワンライナー' fragment. This implicitly verifies that onToggleLanguage -> StringManager.setLanguage('ja') -> onAppear() re-seeds every Collection in the new language. Traces to stateManagement.eventHandlers.onToggleLanguage and stateManagement.uiVariables.currentLanguage plus userActions 'Toggle language'.",
-      "steps": [
-        { "action": "waitFor", "id": "learn_installation_lang_toggle", "timeout": 5000 },
-        { "assert": "text", "id": "learn_installation_title", "contains": "Install JsonUI in one line" },
-        { "action": "tap", "id": "learn_installation_lang_toggle" },
-        { "assert": "text", "id": "learn_installation_title", "contains": "ワンライナー" }
+        { "assert": "text", "id": "learn_installation_toc_wrap", "contains": "Troubleshooting" }
       ]
     }
   ]

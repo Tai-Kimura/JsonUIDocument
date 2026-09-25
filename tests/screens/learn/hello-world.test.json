@@ -6,7 +6,7 @@
   },
   "metadata": {
     "name": "Learn > Hello World screen",
-    "description": "Verifies the five-minute first-screen tutorial: breadcrumb + title + lead, prerequisites collection, inline platform tab switcher (T6 pattern) with default activeTab='react', three platform panels whose visibility is driven by displayLogic, next-steps collection, and the language toggle. Every assertion traces back to a section of learn/hello-world.spec.json.",
+    "description": "Verifies the five-minute first-screen tutorial: breadcrumb + title + lead, prerequisites collection, inline platform tab switcher (T6 pattern) with default activeTab='react', three platform panels whose visibility is driven by displayLogic, and the next-steps collection. Every assertion traces back to a section of learn/hello-world.spec.json. The per-page language toggle this file once covered is gone; the language switch lives in the site-wide TopBar, which no page layout draws.",
     "generatedAt": "2026-04-22T00:00:00Z",
     "generatedBy": "jsonui-test",
     "tags": ["learn", "hello-world", "smoke", "web"],
@@ -22,7 +22,6 @@
         { "assert": "visible", "id": "learn_hello_world_scroll" },
         { "assert": "visible", "id": "learn_hello_world_header" },
         { "assert": "visible", "id": "learn_hello_world_breadcrumb" },
-        { "assert": "visible", "id": "learn_hello_world_lang_toggle" },
         { "assert": "visible", "id": "learn_hello_world_title" },
         { "assert": "text",    "id": "learn_hello_world_title", "contains": "Hello, JsonUI" },
         { "assert": "visible", "id": "learn_hello_world_lead" },
@@ -65,16 +64,6 @@
         { "assert": "visible", "id": "learn_hello_world_kotlin_steps" },
         { "assert": "notVisible", "id": "platform_panel_react" },
         { "assert": "notVisible", "id": "platform_panel_swift" }
-      ]
-    },
-    {
-      "name": "tap_language_toggle_flips_en_to_ja",
-      "description": "StringManager.language defaults to 'en' on first render. Tapping learn_hello_world_lang_toggle invokes onToggleLanguage, which flips StringManager to 'ja' and re-seeds onAppear -> currentLanguage='ja'. The rendered title label switches from the English copy ('Hello, JsonUI — in five minutes') to the Japanese copy ('Hello, JsonUI を5分で'). Traces to stateManagement.eventHandlers.onToggleLanguage and stateManagement.uiVariables.currentLanguage, plus userActions 'Toggle language'.",
-      "steps": [
-        { "action": "waitFor", "id": "learn_hello_world_lang_toggle", "timeout": 5000 },
-        { "assert": "text", "id": "learn_hello_world_title", "contains": "Hello, JsonUI — in five minutes" },
-        { "action": "tap", "id": "learn_hello_world_lang_toggle" },
-        { "assert": "text", "id": "learn_hello_world_title", "contains": "5分" }
       ]
     },
     {
