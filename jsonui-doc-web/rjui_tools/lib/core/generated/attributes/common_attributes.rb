@@ -51,7 +51,7 @@ module JsonUI
         { name: 'aspectWidth', kind: :number, bindable: true }.freeze,
         # Background color - hex string (#RRGGBB or #RRGGBBAA) or color name from colors.json (can be data binding). `backgroundColor` folds here: the genuine layout reads of that spelling all chain with `background` (kjui blurview_component.rb:42 `background || backgroundColor`, kjui segment_component.rb:55 `backgroundColor || background`, rjui blur_converter.rb:58 and circle_view_converter.rb:55). Note the two kjui sites read the pair in OPPOSITE order, so a layout setting both drew two different colours until the normalizer began folding them — the same defect shape as CheckBox's accent chain (plan 51-E). When a `gradient` is also declared on the same view, the GRADIENT wins and this is the fallback fill — not a layer underneath it. Full ruling in attribute_semantics.json -> backgroundFill; do not restate it in toolchain comments.
         { name: 'background', kind: :string, bindable: true }.freeze,
-        # Two-way binding for the component's primary value — Switch/Check isOn, Slider value, Segment selectedIndex, SelectBox selectedValue, Progress progress, Table items. An alternative spelling to each component's own value attribute, which takes precedence when both are set. [binding: two-way]
+        # Two-way binding for the component's primary value — Switch/Check isOn, Slider value, Segment selectedIndex, SelectBox selectedValue (a Date SelectBox: selectedDate), Progress progress, Radio selectedValue, TextField/TextView text. An alternative spelling to each component's own value attribute, which takes precedence when both are set; it is folded on the node a renderer draws, after its style is merged and its responsive branch resolved (shared/core/bind_fold.rb), so a value a style gives counts as set. Not a Collection's data source (Table is a Collection): that is `items`, and the validator says so. `primaryValue` lists, per section, the attribute `bind` stands for (first) and the other spellings of that value: the layout normalizer rewrites a lone `bind` to the first, and drops `bind` with a warning when any of them is set. A section whose value depends on another attribute gives an object instead of a list: `by` names that attribute, `lists` the list for each of its values, and `whenAbsent` the value to take when it is not set (SelectBox by selectItemType: a Date SelectBox's value is selectedDate, and its selectedValue / selectedItem / selectedIndex are read by no path — the validator names each). [binding: two-way]
         { name: 'bind', kind: :binding }.freeze,
         # Legacy UIKit KVC binding: names the data property a view is bound to (SJUIViewCreator sets view.binding / view.bindingSet, and UIKit's Binding class pushes values through it). The object form is also the pre-@{} Table data source ({"data": "@{items}"}). Superseded by '@{...}' in the attribute value itself — use `bind` or the component's own value attribute instead. [accepts: string | object]
         { name: 'binding', kind: :raw }.freeze,
@@ -71,7 +71,7 @@ module JsonUI
         { name: 'bottomMargin', kind: :number, bindable: true }.freeze,
         # Bottom padding (alias for paddingBottom, binding supported)
         { name: 'bottomPadding', kind: :number, bindable: true }.freeze,
-        # Whether component is tappable (binding supported)
+        # SwiftUI / Compose: a gate on the tap — false (or a binding that resolves false) turns onClick / onclick off; absent, there is no gate and the handler alone makes the tap. UIKit: whether the view shows its pressed state (tapBackgroundColor, an image's highlight filter); the tap itself comes from onclick either way.
         { name: 'canTap', kind: :boolean, bindable: true }.freeze,
         # Center horizontally in parent (binding supported)
         { name: 'centerHorizontal', kind: :boolean, bindable: true }.freeze,
@@ -111,7 +111,7 @@ module JsonUI
         { name: 'frame', kind: :object }.freeze,
         # Liquid Glass. true for the default treatment, or an object {style: regular|clear|identity, tint: color, interactive: bool, shape: capsule|rect|circle|rounded(N)}. Declared on common rather than per component because ios.md names View, Button, TextField and Label followed by 'etc' - an open list, and a per-component declaration would make the set of components the acceptance population, so every reading of 'etc' becomes a gap. mode carries BOTH uikit and swiftui because the attribute has two implementations, .glassEffect() on SwiftUI and UIGlassEffect on UIKit; this is the first declaration in the file to pair those two, though five declarations already use an array for mode and both readers accept one (kjui Array(attr_def['mode']), jui isinstance(raw, list)). Leaving mode off would not have meant 'both' - an absent mode means NO restriction at all (kjui attribute_validator_core.rb mode_compatible? returns true when the key is missing), which would let the attribute read as available in modes it has no implementation for. [accepts: boolean | object]
         { name: 'glass', kind: :raw }.freeze,
-        # Content gravity/alignment. A single value names ONE axis; the axis it does not name falls to the container default (top vertically, start horizontally), so in LTR `left` and `top` both resolve to (start, top) and render identically. Use the array form to name both axes. Full ruling in attribute_semantics.json -> gravityDefaults; do not restate it in toolchain comments. [accepts: string | array]
+        # Content gravity/alignment. A single value names ONE axis; the axis it does not name falls to the container default (top vertically, start horizontally), so in LTR `left` and `top` both resolve to (start, top) and render identically. Use the array form to name both axes. On a Button and a TextField textAlign owns the horizontal: their gravity positions the content on the vertical axis only (see their textAlign). On a Label textAlign places the text across when it is declared; gravity's horizontal part places it only when textAlign is not (see Label.textAlign). Full ruling in attribute_semantics.json -> gravityDefaults; do not restate it in toolchain comments. [accepts: string | array]
         { name: 'gravity', kind: :raw }.freeze,
         # Height (number, 'matchParent', 'wrapContent') - binding supported. Not required if weight is specified. [required]
         { name: 'height', kind: :dimension, bindable: true, keywords: ['matchParent', 'wrapContent'].freeze }.freeze,
@@ -121,7 +121,7 @@ module JsonUI
         { name: 'heightWeight', kind: :number, bindable: true }.freeze,
         # Whether the component is hidden: keeps its layout space but is not drawn and is hidden from accessibility (boolean shorthand for visibility:'invisible'; can be a data binding)
         { name: 'hidden', kind: :boolean, bindable: true }.freeze,
-        # Background color when highlighted - hex string or color name from colors.json (binding supported)
+        # Background color while `highlighted` is true (a View; drawn only with both declared). Not the pressed colour, which is tapBackground, and not a focused text field's background. On a Button it is the pressed colour (Button.highlightBackground). Hex string or color name from colors.json (binding supported)
         { name: 'highlightBackground', kind: :string, bindable: true }.freeze,
         # Horizontal content hugging
         { name: 'hugHorizontal', kind: :string }.freeze,
@@ -215,11 +215,11 @@ module JsonUI
         { name: 'offsetX', kind: :number, bindable: true }.freeze,
         # Vertical offset applied after layout, in pt / dp / px. Measurement and sibling placement are unchanged — the layout is computed first and the offset moves only this view. Its INTERACTIVE region moves with it: an offset control is tappable where it is drawn, which is what rules out a draw-only translation. Absolute, not RTL-mirroring, like leftMargin/rightMargin rather than startMargin/endMargin. Pairs with offsetX; either one alone implies 0 for the other. Full ruling (including the android primitive) in attribute_semantics.json -> offset.
         { name: 'offsetY', kind: :number, bindable: true }.freeze,
-        # Lifecycle callback when view appears (SwiftUI/Compose only)
+        # Lifecycle callback when view appears (SwiftUI/Compose only). The handler's name (e.g. "screenAppeared"); written as a binding (`@{screenAppeared}`) or with UIKit's sender mark (`screenAppeared:`, which means nothing in SwiftUI or Compose) it is read as the same name, as the other event handlers are. Called as its declared closure type asks: `()` with nothing, `(String)` with the viewId.
         { name: 'onAppear', kind: :string }.freeze,
-        # Click handler (camelCase) - binding only (@{functionName})
+        # Click handler (camelCase) - binding only (@{functionName}). On a type the SSoT does not declare (an app's own component) JsonUI gives the tap no screen-reader role; the component carries its own.
         { name: 'onClick', kind: :binding }.freeze,
-        # Lifecycle callback when view disappears (SwiftUI/Compose only)
+        # Lifecycle callback when view disappears (SwiftUI/Compose only). The handler's name (e.g. "screenDisappeared"); written as a binding (`@{screenDisappeared}`) or with UIKit's sender mark (`screenDisappeared:`, which means nothing in SwiftUI or Compose) it is read as the same name, as the other event handlers are. Called as its declared closure type asks: `()` with nothing, `(String)` with the viewId.
         { name: 'onDisappear', kind: :string }.freeze,
         # Long press gesture handler (camelCase) - binding only (@{functionName}) [binding: one-way]
         { name: 'onLongPress', kind: :binding }.freeze,
@@ -271,7 +271,7 @@ module JsonUI
         { name: 'style', kind: :string }.freeze,
         # View tag for identification (binding supported)
         { name: 'tag', kind: :number, bindable: true }.freeze,
-        # Background color when tapped - hex string or color name from colors.json (binding supported)
+        # Background color while pressed, on a node with a tap (onClick / onclick) and on a Button: it replaces the background until the press ends. On web a Button also shows it on hover (the web has hover; iOS and Android do not). A node without a tap draws nothing for it. Hex string or color name from colors.json (binding supported)
         { name: 'tapBackground', kind: :string, bindable: true }.freeze,
         # Test ID for testing (data-testid)
         { name: 'testId', kind: :string }.freeze,
@@ -283,8 +283,8 @@ module JsonUI
         { name: 'topMargin', kind: :number, bindable: true }.freeze,
         # Top padding (alias for paddingTop, binding supported)
         { name: 'topPadding', kind: :number, bindable: true }.freeze,
-        # Touch disable mode
-        { name: 'touchDisabledState', kind: :string }.freeze,
+        # The hit-test mode of SJUIView (UIKit). none — as usual; onlyMe — the view itself lets a touch through to what is behind it, its subviews still take theirs; viewsWithoutTouchEnabled — only subviews with isUserInteractionEnabled take a touch; viewsWithoutInList — only the subviews whose id is in touchEnabledViewIds do. SwiftUI, Compose and web do not read it: to stop a view and everything in it, use userInteractionEnabled: false.
+        { name: 'touchDisabledState', kind: :enum, values: ['none', 'onlyMe', 'viewsWithoutTouchEnabled', 'viewsWithoutInList'].freeze }.freeze,
         # IDs of enabled views
         { name: 'touchEnabledViewIds', kind: :array }.freeze,
         # Component type [required]

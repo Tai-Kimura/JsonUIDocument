@@ -44,7 +44,7 @@ module RjuiTools
             if icon_off || icon_on
               off_src = icon_off || icon_on
               control_jsx =
-                "<input type=\"checkbox\"#{value_attr}#{checked_attr}#{on_change}#{disabled_attr} className=\"peer sr-only\" />"                 "<img src=\"#{off_src}\" alt=\"\" className=\"w-6 h-6 peer-checked:hidden\" />"                 "<img src=\"#{icon_on}\" alt=\"\" className=\"w-6 h-6 hidden peer-checked:block\" />"
+                "<input type=\"checkbox\"#{value_attr}#{checked_attr}#{on_change}#{disabled_attr} className=\"peer sr-only\" />"                 "<img#{jsx_attr_text('src', off_src)} alt=\"\" className=\"w-6 h-6 peer-checked:hidden\" />"                 "<img#{jsx_attr_text('src', icon_on)} alt=\"\" className=\"w-6 h-6 hidden peer-checked:block\" />"
               <<~JSX.chomp
                 #{indent_str(indent)}<label#{id_attr} className="#{class_name}"#{style_attr}#{testid_attr}#{tag_attr}#{build_aria_disabled_attr}>
                 #{indent_str(indent + 2)}#{control_jsx}
@@ -107,11 +107,11 @@ module RjuiTools
 
           return " value={#{extract_binding_property(value)}}" if has_binding?(value)
 
-          " value=\"#{value}\""
+          jsx_attr_text('value', value)
         end
 
         def build_checked_attr
-          is_on = with_bind_fallback(attributes['isOn'] || attributes['checked'])
+          is_on = attributes['isOn'] || attributes['checked']
 
           if is_on && has_binding?(is_on)
             prop = extract_binding_property(is_on)
@@ -128,19 +128,21 @@ module RjuiTools
           handler = attributes['onValueChange']
           if handler && has_binding?(handler)
             prop = extract_binding_property(handler)
-            return " onChange={(e) => #{prop}?.(e.target.checked)}"
+            return operation_attr('onChange', '(e)', "#{prop}?.(e.target.checked)")
           end
 
           # Auto-generate onChange from isOn/checked binding property
           # e.g., isOn: "@{isEnabled}" -> onChange={(e) => data.onIsEnabledChange?.(e.target.checked)}
-          is_on = with_bind_fallback(attributes['isOn'] || attributes['checked'])
+          is_on = attributes['isOn'] || attributes['checked']
           if is_on && has_binding?(is_on)
             property_name = extract_raw_binding_property(is_on)
             handler_name = "on#{capitalize_first(property_name)}Change"
-            return " onChange={(e) => data.#{handler_name}?.(e.target.checked)}"
+            return operation_attr('onChange', '(e)', "data.#{handler_name}?.(e.target.checked)")
           end
 
-          ''
+          # No own write-back: the checkbox still toggles, and that is the
+          # operation a declared onClick is called from.
+          operation_attr('onChange', '(e)', nil)
         end
 
         def capitalize_first(str)

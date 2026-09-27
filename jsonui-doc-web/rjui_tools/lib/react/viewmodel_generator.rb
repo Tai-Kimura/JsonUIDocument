@@ -3,6 +3,10 @@
 require 'json'
 require 'fileutils'
 require 'set'
+require_relative '../core/tap_accessibility'
+require_relative '../core/binding_validator_core'
+require_relative '../core/data_item_platform'
+require_relative '../core/type_synonyms'
 require_relative '../core/config_manager'
 require_relative '../core/generated_marker'
 require_relative '../core/frameworks'
@@ -20,7 +24,12 @@ module RjuiTools
         @generated_viewmodels_dir = File.join(@source_path, @config['generated_viewmodels_directory'] || 'src/generated/viewmodels')
         @data_dir = File.join(@source_path, @config['data_directory'] || 'src/generated/data')
         @styles_dir = File.join(@source_path, @config['styles_directory'] || 'Styles')
-        @use_typescript = @config['typescript'] != false
+        # TypeScript only when the project says so — the components are .jsx
+        # otherwise (build_command: `@config['typescript'] ? '.tsx' : '.jsx'`),
+        # and a config without the key is JavaScript (DEFAULT_CONFIG). Until
+        # jsonui-cli 1.9.0 this read `!= false`: a config without the key got
+        # .ts here beside .jsx components.
+        @use_typescript = @config['typescript'] ? true : false
         @framework = Core::Frameworks.for(@config)
       end
 
@@ -306,12 +315,8 @@ module RjuiTools
           # string|array declaration: the `is_a?(String)` guard silently
           # dropped the array face, so the JSX called handlers no stub was
           # generated for.
-          onclick = json_data['onclick']
-          if onclick.is_a?(String)
-            actions.add(onclick)
-          elsif onclick.is_a?(Array)
-            onclick.each { |a| actions.add(a) if a.is_a?(String) }
-          end
+          # An empty or blank name is no action (TapAccessibility.handler_values).
+          JsonUIShared::TapAccessibility.handler_values(json_data['onclick']).each { |a| actions.add(a) }
 
           child = json_data['child'] || json_data['children']
           if child
@@ -330,7 +335,7 @@ module RjuiTools
 
       def extract_text_field_bindings(json_data, bindings = Set.new)
         if json_data.is_a?(Hash)
-          if json_data['type'] == 'TextField' && json_data['text']
+          if JsonUIShared::TypeSynonyms.drawn_type(json_data['type']) == 'TextField' && json_data['text']
             text_value = json_data['text']
             if text_value.is_a?(String) && text_value.start_with?('@{') && text_value.end_with?('}')
               unless json_data['onTextChange'] || json_data['onChange']
@@ -358,10 +363,11 @@ module RjuiTools
       # Extract event handler bindings from components (Switch, SelectBox, etc.)
       def extract_event_handler_bindings(json_data, handlers = {})
         if json_data.is_a?(Hash)
-          component_type = json_data['type']
+          # The type the node is drawn as (shared/core/type_synonyms.rb)
+          component_type = JsonUIShared::TypeSynonyms.drawn_type(json_data['type'])
 
-          # Switch, Toggle - onValueChange with boolean
-          if %w[Switch Toggle].include?(component_type)
+          # Switch - onValueChange with boolean
+          if component_type == 'Switch'
             extract_handler_binding(json_data, 'onValueChange', 'boolean', handlers)
           # Slider - onValueChange with number
           elsif component_type == 'Slider'
@@ -377,6 +383,15 @@ module RjuiTools
           elsif component_type == 'TextView'
             handler_key = json_data['onTextChange'] ? 'onTextChange' : 'onChange'
             extract_handler_binding(json_data, handler_key, 'string', handlers) if json_data[handler_key]
+          # Embed - each event calls the handler it names with the event's
+          # payload (EmbedConverter#build_event_bridge_attr); a value that
+          # names no handler is not called, and is not declared.
+          elsif component_type == 'Embed' && json_data['events'].is_a?(Hash)
+            json_data['events'].each_value do |handler|
+              next if JsonUIShared::BindingValidatorCore.embed_event_handler_problem(handler)
+
+              handlers[handler] ||= { type: 'Record<string, unknown>' }
+            end
           end
 
           # Process children
@@ -410,6 +425,7 @@ module RjuiTools
           if json_data['data'].is_a?(Array)
             json_data['data'].each do |prop|
               next unless prop.is_a?(Hash)
+              next unless JsonUIShared::DataItemPlatform.applies?(prop, 'react')
 
               # Check for event handler type definitions
               prop_class = prop['class']

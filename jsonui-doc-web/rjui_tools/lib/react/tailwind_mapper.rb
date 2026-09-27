@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../core/logger'
+require_relative '../core/enum_spelling'
 
 module RjuiTools
   module React
@@ -236,8 +237,11 @@ module RjuiTools
           end
         end
 
-        def map_text_align(align)
-          case align&.downcase
+        # *type*: the node's — a Button declares Left / Center / Right only.
+        # *attribute*: a path for a textAlign declared inside an object
+        # (%w[highlightAttributes textAlign] — Left / Right / Center only).
+        def map_text_align(align, type = nil, attribute = 'textAlign')
+          case JsonUIShared::EnumSpelling.lowered(align, type || 'Label', attribute)
           when 'center'
             'text-center'
           when 'right'
@@ -250,7 +254,7 @@ module RjuiTools
         end
 
         def map_orientation(orientation)
-          case orientation&.downcase
+          case JsonUIShared::EnumSpelling.lowered(orientation, 'View', 'orientation')
           when 'horizontal'
             'flex flex-row'
           when 'vertical'
@@ -332,7 +336,7 @@ module RjuiTools
         end
 
         def map_border_style(style)
-          case style&.downcase
+          case JsonUIShared::EnumSpelling.lowered(style, 'common', 'borderStyle')
           when 'dashed'
             'border-dashed'
           when 'dotted'
@@ -391,6 +395,61 @@ module RjuiTools
           "gap-#{closest_padding(spacing)}"
         end
 
+        # A single-run Label's alignment classes: it is a flex ROW, so
+        # `items-*` is its vertical and `justify-*` its horizontal. The
+        # vertical is the one gravity names (top / bottom / centerVertical,
+        # center), else the middle; across, textAlign's position, else the
+        # horizontal gravity names (left / right / centerHorizontal, center),
+        # else the start (no class). LabelConverter and a responsive gravity
+        # override (ResponsiveHelper#responsive_gravity_classes) both read it,
+        # so a size class's gravity lands on the same axes as the base one.
+        def map_label_gravity(gravity, text_align = nil)
+          parts = if gravity.is_a?(Array) then gravity.map(&:to_s)
+                  elsif gravity.nil? then []
+                  else gravity.to_s.split('|')
+                  end
+          tokens = parts.map { |g| JsonUIShared::EnumSpelling.lowered(g.strip, 'common', 'gravity') || g.strip.downcase }
+          classes = [if tokens.include?('top') then 'items-start'
+                     elsif tokens.include?('bottom') then 'items-end'
+                     else 'items-center'
+                     end]
+          across = case JsonUIShared::EnumSpelling.lowered(text_align, 'Label', 'textAlign')
+                   when 'center' then 'justify-center'
+                   when 'right' then 'justify-end'
+                   when 'left' then 'justify-start'
+                   else
+                     if (tokens & %w[centerhorizontal center_horizontal center]).any? then 'justify-center'
+                     elsif tokens.include?('right') || tokens.include?('end') then 'justify-end'
+                     elsif tokens.include?('left') || tokens.include?('start') then 'justify-start'
+                     end
+                   end
+          classes << across if across
+          line_align = label_gravity_text_align(gravity, text_align)
+          classes << line_align if line_align
+          classes
+        end
+
+        # The lines of a Label follow its gravity across when it declares no
+        # textAlign (textAlign's own text-* comes from the base converter):
+        # `text-center` for center / centerHorizontal, `text-right` for right,
+        # `text-left` for left; nil otherwise. The flex `justify-*` above
+        # places the text's box; a wrapped or multi-line text fills its row,
+        # and only text-align places its lines (the SSoT's Label.textAlign,
+        # 4f round 6: until jsonui-cli 1.9.0 they stayed at the start).
+        def label_gravity_text_align(gravity, text_align = nil)
+          return nil if text_align.is_a?(String) && !text_align.empty?
+
+          parts = if gravity.is_a?(Array) then gravity.map(&:to_s)
+                  elsif gravity.nil? then []
+                  else gravity.to_s.split('|')
+                  end
+          tokens = parts.map { |g| JsonUIShared::EnumSpelling.lowered(g.strip, 'common', 'gravity') || g.strip.downcase }
+          if (tokens & %w[centerhorizontal center_horizontal center]).any? then 'text-center'
+          elsif tokens.include?('right') || tokens.include?('end') then 'text-right'
+          elsif tokens.include?('left') || tokens.include?('start') then 'text-left'
+          end
+        end
+
         # Map gravity attribute based on orientation
         # Flexbox behavior:
         # - flex-row (horizontal): items-* controls vertical alignment, justify-* controls horizontal alignment
@@ -400,7 +459,7 @@ module RjuiTools
 
           classes = []
           gravity_str = gravity.is_a?(Array) ? gravity.join('|') : gravity.to_s
-          is_horizontal = orientation&.downcase == 'horizontal'
+          is_horizontal = JsonUIShared::EnumSpelling.lowered(orientation, 'View', 'orientation') == 'horizontal'
 
           if is_horizontal
             # orientation: "horizontal" (flex-row)
@@ -496,8 +555,8 @@ module RjuiTools
         # order. So the reverse value has to agree with the orientation, which is
         # why this takes both.
         def map_direction(direction, orientation = nil)
-          d = direction.to_s.downcase
-          o = orientation.to_s.downcase
+          d = JsonUIShared::EnumSpelling.lowered(direction, 'View', 'direction')
+          o = JsonUIShared::EnumSpelling.lowered(orientation, 'View', 'orientation')
           return 'flex-col-reverse' if o == 'vertical' && d == 'bottomtotop'
           return 'flex-row-reverse' if o == 'horizontal' && d == 'righttoleft'
           # No other combination moves anything: the reverse value must agree

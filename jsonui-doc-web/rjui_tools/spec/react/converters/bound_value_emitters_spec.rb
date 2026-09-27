@@ -12,6 +12,7 @@ require 'react/converters/text_view_converter'
 require 'react/converters/text_field_converter'
 require 'react/converters/collection_converter'
 require 'react/converters/blur_converter'
+require 'react/converters/network_image_converter'
 
 # The bound-value emitter series (plan 49 lane A).
 #
@@ -21,7 +22,11 @@ require 'react/converters/blur_converter'
 # These pins hold the two halves of the fix: the binding reaches a CSS property
 # (or a JSX expression), and the STATIC form is untouched.
 RSpec.describe 'bound value emitters' do
-  let(:config) { { 'use_tailwind' => true } }
+  # The assertions below are TypeScript's (a TypeScript project, declared). A
+  # JavaScript project writes none of them — a .jsx does not parse `as`
+  # (spec/react/javascript_mode_output_parses_spec.rb); until jsonui-cli 1.9.0
+  # they were written whatever the project was.
+  let(:config) { { 'use_tailwind' => true, 'typescript' => true } }
 
   def convert(node, klass)
     klass.new(node, config).convert_node(2)
@@ -144,7 +149,11 @@ RSpec.describe 'bound value emitters' do
                     RjuiTools::React::Converters::ImageConverter)
       expect(out).not_to include('@{')
       expect(out).to include("objectFit: (({ 'fit': 'contain'")
-      expect(out).to include('String(data.m).toLowerCase()')
+      # Keyed by each declared spelling and looked up as written (1.9.0):
+      # AspectFill is a key, a lowercased one is not.
+      expect(out).to include("'AspectFill': 'cover'").and include('[String(data.m)]')
+      expect(out).not_to include('toLowerCase()')
+      expect(out).not_to include("'aspectfill':")
     end
 
     # Most CSS properties are unions of string literals in React.CSSProperties,
@@ -309,10 +318,10 @@ RSpec.describe 'bound value emitters' do
     end
 
     it 'leaves Blur to its own richer builder' do
-      out = convert({ 'type' => 'Blur', 'effectStyle' => 'Thin' },
+      out = convert({ 'type' => 'Blur', 'effectStyle' => 'Dark' },
                     RjuiTools::React::Converters::BlurConverter)
       expect(out.scan('backdropFilter').length).to eq(1), 'base and Blur both emitted'
-      expect(out).to include("blur(8px)")
+      expect(out).to include("rgba(0, 0, 0, 0.5)")
     end
 
     # A Blur with no declared style falls back to `regular`, whose radius is

@@ -3,6 +3,13 @@
 require 'json'
 require 'fileutils'
 require 'set'
+require_relative '../core/tap_accessibility'
+require_relative '../core/bind_fold'
+require_relative '../core/logger'
+require_relative '../core/binding_validator_core'
+require_relative '../core/data_item_platform'
+require_relative '../core/type_synonyms'
+require_relative '../core/node_keys'
 require_relative '../core/config_manager'
 require_relative '../core/type_converter'
 require_relative '../core/generated_marker'
@@ -10,6 +17,7 @@ require_relative 'style_loader'
 require_relative '../core/layout_variant'
 require_relative 'helpers/string_manager_helper'
 require_relative '../core/string_manager_core'
+require_relative '../core/string_literals'
 
 module RjuiTools
   module React
@@ -26,7 +34,12 @@ module RjuiTools
         @layouts_dir = File.join(@source_path, @config['layouts_directory'] || 'Layouts')
         @data_dir = File.join(@source_path, @config['data_directory'] || 'src/generated/data')
         @styles_dir = File.join(@source_path, @config['styles_directory'] || 'Styles')
-        @use_typescript = @config['typescript'] != false
+        # TypeScript only when the project says so — the components are .jsx
+        # otherwise (build_command: `@config['typescript'] ? '.tsx' : '.jsx'`),
+        # and a config without the key is JavaScript (DEFAULT_CONFIG). Until
+        # jsonui-cli 1.9.0 this read `!= false`: a config without the key got
+        # .ts here beside .jsx components.
+        @use_typescript = @config['typescript'] ? true : false
       end
 
       def update_data_models
@@ -95,7 +108,10 @@ module RjuiTools
             begin
               @project_type_map = JSON.parse(File.read(path)).fetch('types', {})
             rescue JSON::ParserError => e
-              warn "[DataModelGenerator] Warning: failed to parse #{path}: #{e.message}"
+              # Through rjui's warning logger ("[WARN] "): every custom type
+              # then falls back to its bare name, which a warning count has
+              # to see (a bare `warn` on stderr until jsonui-cli 1.9.0).
+              RjuiTools::Core::Logger.warn "[DataModelGenerator] failed to parse #{path}: #{e.message}"
             end
             break
           end
@@ -142,6 +158,8 @@ module RjuiTools
         # data-default lookup runs with no namespace context (the sjui
         # data face gained the same announcement in 1.6.3).
         announce_own_namespaces(json_file)
+        # The layout a warning about one of its data properties names.
+        @current_layout = json_file.to_s.sub(/\A#{Regexp.escape(@layouts_dir)}\/?/, '')
 
         json_content = File.read(json_file, encoding: 'UTF-8')
         json_data = JSON.parse(json_content)
@@ -183,7 +201,9 @@ module RjuiTools
         return bindings unless json_data.is_a?(Hash) || json_data.is_a?(Array)
 
         if json_data.is_a?(Hash)
-          component_type = json_data['type']
+          # The type the node is drawn as: a synonym or alias spelling
+          # needs the data its drawn type needs (shared/core/type_synonyms.rb)
+          component_type = JsonUIShared::TypeSynonyms.drawn_type(json_data['type'])
 
           # Event attributes to check
           event_attrs = %w[onClick onclick onValueChange onValueChanged onTextChange onChange onLongPress]
@@ -217,12 +237,8 @@ module RjuiTools
         if json_data.is_a?(Hash)
           # Check for onclick attribute (selector format, string|array — the
           # String guard silently dropped the array face's actions)
-          onclick = json_data['onclick']
-          if onclick.is_a?(String)
-            actions.add(onclick)
-          elsif onclick.is_a?(Array)
-            onclick.each { |a| actions.add(a) if a.is_a?(String) }
-          end
+          # An empty or blank name is no action (TapAccessibility.handler_values).
+          JsonUIShared::TapAccessibility.handler_values(json_data['onclick']).each { |a| actions.add(a) }
 
           # Process children
           child = json_data['child'] || json_data['children']
@@ -249,7 +265,7 @@ module RjuiTools
       def extract_text_field_bindings(json_data, bindings = Set.new)
         if json_data.is_a?(Hash)
           # Check for TextField type with text binding
-          if json_data['type'] == 'TextField' && json_data['text']
+          if JsonUIShared::TypeSynonyms.drawn_type(json_data['type']) == 'TextField' && json_data['text']
             text_value = json_data['text']
             # Check if it's a binding (@{propertyName})
             if text_value.is_a?(String) && text_value.start_with?('@{') && text_value.end_with?('}')
@@ -285,15 +301,22 @@ module RjuiTools
       # Returns hash with handler name => { type: value_type, binding: property_name }
       def extract_event_handler_bindings(json_data, handlers = {})
         if json_data.is_a?(Hash)
-          component_type = json_data['type']
+          # The type the node is drawn as: a synonym or alias spelling
+          # needs the data its drawn type needs (shared/core/type_synonyms.rb)
+          component_type = JsonUIShared::TypeSynonyms.drawn_type(json_data['type'])
 
           # Switch, Toggle, Slider, Radio, Segment - onValueChange with boolean/number/string
-          if %w[Switch Toggle].include?(component_type)
+          if component_type == 'Switch'
             extract_handler_binding(json_data, 'onValueChange', 'boolean', handlers)
           elsif component_type == 'Slider'
             extract_handler_binding(json_data, 'onValueChange', 'number', handlers)
           elsif %w[Radio Segment].include?(component_type)
             extract_handler_binding(json_data, 'onValueChange', 'string', handlers)
+          # Collection - the page-change callback, with the new page index
+          # (the definitions' alias spellings too: this reads the raw node)
+          elsif component_type == 'Collection'
+            key = %w[onValueChange onValueChanged onPageChanged].find { |k| json_data[k] }
+            extract_handler_binding(json_data, key, 'number', handlers) if key
           # SelectBox - onValueChanged or onChange with string
           elsif component_type == 'SelectBox'
             handler_key = json_data['onValueChanged'] ? 'onValueChanged' : 'onChange'
@@ -302,6 +325,15 @@ module RjuiTools
           elsif component_type == 'TextView'
             handler_key = json_data['onTextChange'] ? 'onTextChange' : 'onChange'
             extract_handler_binding(json_data, handler_key, 'string', handlers) if json_data[handler_key]
+          # Embed - each event calls the handler it names with the event's
+          # payload (EmbedConverter#build_event_bridge_attr); a value that
+          # names no handler is not called, and is not declared.
+          elsif component_type == 'Embed' && json_data['events'].is_a?(Hash)
+            json_data['events'].each_value do |handler|
+              next if JsonUIShared::BindingValidatorCore.embed_event_handler_problem(handler)
+
+              handlers[handler] ||= { type: 'Record<string, unknown>' }
+            end
           end
 
 
@@ -331,10 +363,9 @@ module RjuiTools
 
       # Extract value bindings from components (Switch, Slider, SelectBox, TextField, TextView, etc.)
       # These are the bound values like @{notificationsEnabled} in Switch isOn attribute
-      # `bind` is the alternative spelling for a component's primary value
-      # binding (see BaseConverter#with_bind_fallback). It has to register here
-      # too, or a layout that uses only `bind` gets JSX referencing a Data
-      # property the model never declared.
+      # `bind` is folded into the attribute it stands for before it is read
+      # (JsonUIShared::BindFold, as at the converter dispatch), so a layout
+      # that uses only `bind` registers the property it binds.
       # The report-back handler a value binding derives. SelectBox and the
       # TextField family derive `on<Prop>Change`; Radio and Segment derive
       # `set<Prop>`. The convention rides on the binding (recorded by
@@ -348,11 +379,17 @@ module RjuiTools
 
       def extract_value_bindings(json_data, bindings = {})
         if json_data.is_a?(Hash)
-          component_type = json_data['type']
+          # The type the node is drawn as: a synonym or alias spelling
+          # needs the data its drawn type needs (shared/core/type_synonyms.rb).
+          # The node the converter draws: `bind` folded into the attribute it
+          # stands for (JsonUIShared::BindFold), as at the dispatch — so a
+          # layout that uses only `bind` registers the property under it
+          component_type = JsonUIShared::TypeSynonyms.drawn_type(json_data['type'])
+          json_data = JsonUIShared::BindFold.fold(json_data, component_type)
 
           # Switch, Toggle - isOn/checked/value binding (boolean)
-          if %w[Switch Toggle].include?(component_type)
-            is_on = json_data['isOn'] || json_data['checked'] || json_data['value'] || json_data['bind']
+          if component_type == 'Switch'
+            is_on = json_data['isOn'] || json_data['checked'] || json_data['value']
             if is_on.is_a?(String) && is_on.start_with?('@{') && is_on.end_with?('}')
               property_name = is_on[2...-1]
               bindings[property_name] = { type: 'boolean', defaultValue: false }
@@ -360,8 +397,8 @@ module RjuiTools
           end
 
           # CheckBox, Check - isOn/checked binding (boolean)
-          if %w[CheckBox Check].include?(component_type)
-            is_on = json_data['isOn'] || json_data['checked'] || json_data['bind']
+          if component_type == 'CheckBox'
+            is_on = json_data['isOn'] || json_data['checked']
             if is_on.is_a?(String) && is_on.start_with?('@{') && is_on.end_with?('}')
               property_name = is_on[2...-1]
               bindings[property_name] = { type: 'boolean', defaultValue: false }
@@ -370,7 +407,7 @@ module RjuiTools
 
           # Slider - value binding (number)
           if component_type == 'Slider'
-            value = json_data['value'] || json_data['bind']
+            value = json_data['value']
             if value.is_a?(String) && value.start_with?('@{') && value.end_with?('}')
               property_name = value[2...-1]
               bindings[property_name] = { type: 'number', defaultValue: 0 }
@@ -393,7 +430,7 @@ module RjuiTools
           # the convention travels with the binding rather than being assumed
           # by the emit loop.
           if %w[Radio Segment SelectBox].include?(component_type)
-            value = json_data['value'] || json_data['bind']
+            value = json_data['value']
             if value.is_a?(String) && value.start_with?('@{') && value.end_with?('}')
               property_name = value[2...-1]
               bindings[property_name] = { type: 'string', defaultValue: '""' }
@@ -403,7 +440,7 @@ module RjuiTools
           # SelectBox — `selectedDate` (date-picker mode) and `selectedValue`.
           # Both reach the <input>/<select> value as a string.
           if component_type == 'SelectBox'
-            selected = json_data['selectedDate'] || json_data['selectedValue']
+            selected = json_data['selectedDate'] || json_data['selectedItem'] || json_data['selectedValue']
             if selected.is_a?(String) && selected.start_with?('@{') && selected.end_with?('}')
               bindings[selected[2...-1]] ||= { type: 'string', defaultValue: '""' }
             end
@@ -460,7 +497,7 @@ module RjuiTools
           # component hoists a ref + effect). The paired optional
           # on<Camel>IsFocusedChange report-back handler is derived from this
           # binding by the value-binding handler loop in update_data_file.
-          if %w[TextField EditText Input TextView].include?(component_type)
+          if %w[TextField TextView].include?(component_type)
             field_id = json_data['id']
             if field_id.is_a?(String) && !field_id.empty? && !field_id.include?('@{')
               camel = snake_to_camel_id(field_id)
@@ -470,7 +507,7 @@ module RjuiTools
 
           # TextField - text binding (string)
           if component_type == 'TextField'
-            text = json_data['text'] || json_data['bind']
+            text = json_data['text']
             if text.is_a?(String) && text.start_with?('@{') && text.end_with?('}')
               property_name = text[2...-1]
               bindings[property_name] = { type: 'string', defaultValue: '""' }
@@ -479,7 +516,7 @@ module RjuiTools
 
           # TextView - text binding (string)
           if component_type == 'TextView'
-            text = json_data['text'] || json_data['bind']
+            text = json_data['text']
             if text.is_a?(String) && text.start_with?('@{') && text.end_with?('}')
               property_name = text[2...-1]
               bindings[property_name] = { type: 'string', defaultValue: '""' }
@@ -507,12 +544,18 @@ module RjuiTools
           # Check for data section
           if json_data['data'] && json_data['data'].is_a?(Array)
             # Extract from root element OR data-only elements (no type, just data key)
-            should_extract = is_root || json_data.keys == ['data'] || (json_data.keys - ['data', 'type']).empty?
+            written = Core::NodeKeys.written(json_data)
+            should_extract = is_root || written == ['data'] || (written - ['data', 'type']).empty?
             if should_extract
               json_data['data'].each do |data_item|
+                # Another platform's item is not this Data type's (read as
+                # `jui build` reads it; until jsonui-cli 1.9.0 rjui did not
+                # read a data item's platform at all).
+                next unless JsonUIShared::DataItemPlatform.applies?(data_item, 'react')
+
                 if data_item.is_a?(Hash)
                   # Normalize type using TypeConverter (mode: react)
-                  normalized = Core::TypeConverter.normalize_data_property(data_item, 'react')
+                  normalized = Core::TypeConverter.normalize_data_property(data_item, 'react', source: @current_layout)
 
                   # Check if this property is bound to an event and has Event type
                   prop_name = normalized['name']
@@ -542,7 +585,7 @@ module RjuiTools
           end
 
           # Check for TabView tabs - generate data properties for each tab's view
-          if json_data['type'] == 'TabView' && json_data['tabs'].is_a?(Array)
+          if JsonUIShared::TypeSynonyms.drawn_type(json_data['type']) == 'TabView' && json_data['tabs'].is_a?(Array)
             # The tab state and its setter. The converter reads the state back
             # (`data.selectedTabIndex ?? 0`) when selectedIndex is not bound, so
             # declaring only the setter left the generated JSX referencing a
@@ -959,13 +1002,12 @@ module RjuiTools
       # Returns the bare TS expression (the helper's JSX braces stripped) or
       # nil.
       def string_default_expression(default_value, ts_type)
-        return nil unless ts_type == 'string'
+        return nil unless ['string', 'string | undefined'].include?(ts_type)
         return nil if default_value.nil?
 
-        v = default_value.to_s
-        return nil if v == "''" || v.empty?
-
-        inner = v.gsub(/^["']|["']$/, '')
+        # The text the spelling means (StringLiterals.default_text) — the
+        # text format_default_value writes when nothing resolves.
+        inner = JsonUIShared::StringLiterals.default_text(default_value)
         return nil if inner.empty? || inner.match?(/^@\{.*\}$/)
 
         resolved = convert_string_key(inner, warnings: false) ||
@@ -982,9 +1024,22 @@ module RjuiTools
           return collection_data_source_literal(value)
         end
 
+        # The text the layout's spelling means ('' / "…" / '…' / bare,
+        # StringLiterals.default_text), as a TS literal, for a String and a
+        # String? alike. Until 1.9.0 a quoted spelling passed through as
+        # written (`'it''s'` was not TS), a bare one was quoted unescaped,
+        # and a String? default was written as it stood, as code. A value
+        # that is not a String (a dictionary given to a String property)
+        # stays on the paths below, which write code that does not parse: a
+        # quoted Hash#to_s would build and show it. A dictionary written per
+        # platform no longer arrives here — the TypeConverter gives it this
+        # platform's value, or the String default "".
+        if json_class.to_s.chomp('?') == 'String' && value.is_a?(String)
+          return JsonUIShared::StringLiterals.ts(JsonUIShared::StringLiterals.default_text(value))
+        end
+
         case ts_type
         when 'string'
-          # Handle '' as empty string (common shorthand)
           if value == "''"
             '""'
           elsif value.is_a?(String) && (value.start_with?('"') || value.start_with?("'"))
@@ -1012,7 +1067,10 @@ module RjuiTools
       # CollectionDataSource defaultValue → constructor call. Shapes
       # (INTERACTIVE_HOST_CONTRACT.md §4): shorthand `[ {...} ]` (one section
       # holding these cell dicts) or explicit
-      # `{"sections" => [{"cell" => name?, "cells" => [...]}]}`. The generated
+      # `{"sections" => [{"cell" => name?, "cells" => [...], "header" => {...}?,
+      # "footer" => {...}?}]}` — a section's header / footer dict is its
+      # header / footer data (from jsonui-cli 1.9.0; until then dropped, and
+      # the header drew with `{}`). The generated
       # collection component reads `items?.sections?.[i]?.cells?.data`, which
       # a plain array literal never satisfies. Cell view names come from the
       # node's own `sections` declaration — the TS section shape carries none.
@@ -1030,7 +1088,9 @@ module RjuiTools
         section_literals = sections.map do |section|
           next nil unless section.is_a?(Hash)
           cells = section['cells'].is_a?(Array) ? section['cells'] : []
-          "{ cells: { data: #{to_js_literal(cells)} } }"
+          header = section['header'].is_a?(Hash) ? "header: #{to_js_literal(section['header'])}, " : ''
+          footer = section['footer'].is_a?(Hash) ? ", footer: #{to_js_literal(section['footer'])}" : ''
+          "{ #{header}cells: { data: #{to_js_literal(cells)} }#{footer} }"
         end.compact
 
         "new CollectionDataSource([#{section_literals.join(', ')}])"

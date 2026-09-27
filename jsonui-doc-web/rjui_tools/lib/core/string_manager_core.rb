@@ -40,7 +40,9 @@ module JsonUIShared
   class StringManagerCore
     # Layout attributes whose String values are user-visible text
     # (mirrors the XML mapper / Compose components / SwiftUI converters).
-    STRING_PROPERTIES = %w[text hint placeholder label prompt].freeze
+    # `alt` is spoken rather than shown, and localized all the same: an
+    # image's screen-reader text (shared/core/image_accessibility.rb).
+    STRING_PROPERTIES = %w[text hint placeholder label prompt alt].freeze
 
     # Array attributes whose String items are user-visible text
     # (e.g. Segment items).
@@ -133,8 +135,9 @@ module JsonUIShared
       return nil if matches.empty?
 
       # map + compact, NOT filter_map. This file is vendored into kjui_tools
-      # and sjui_tools, and kjui runs under the HOST'S SYSTEM RUBY (2.6) in
-      # consumer projects, where Enumerable#filter_map (2.7+) does not exist.
+      # and sjui_tools, and until jsonui-cli 1.9.0 kjui ran under the HOST'S
+      # SYSTEM RUBY (2.6) in consumer projects, where Enumerable#filter_map
+      # (2.7+) does not exist.
       # The failure is worse than a crash: the NoMethodError is swallowed by
       # the per-file rescue as a "Failed to process", which leaves the
       # PREVIOUS generated file on disk — the screen still renders, still
@@ -143,8 +146,9 @@ module JsonUIShared
       #
       # kjui_tools/lib/compose/helpers/section_extractor.rb:625 already
       # carried this warning; it was written at the consuming end, where the
-      # person editing the shared source never sees it. Anything added to
-      # shared/core/ must stay within Ruby 2.6.
+      # person editing the shared source never sees it. Until 1.9.0 anything
+      # added to shared/core/ had to stay within Ruby 2.6; the floor is Ruby
+      # 3.2 from 1.9.0 (each bin/<tool> stops below it).
       owned = own_namespaces.map { |namespace| matches.assoc(namespace) }.compact
       namespace, key = owned.first || matches.first
       {

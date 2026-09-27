@@ -19,9 +19,10 @@ module RjuiTools
           src_attr = if src.start_with?('`')
                        " src={#{src}}"
                      elsif src.include?('{')
-                       " src={#{src.gsub(/[{}]/, '')}}"
+                       # A JSX expression: only its own braces come off.
+                       " src={#{unwrap_jsx_braces(src)}}"
                      else
-                       " src=\"#{src}\""
+                       jsx_attr_text('src', src)
                      end
 
           jsx = "#{indent_str(indent)}<img#{id_attr} className=\"#{class_name}\"#{style_attr}#{src_attr}#{build_alt_attr}#{loading_attr}#{onclick_attr}#{testid_attr}#{tag_attr} />"
@@ -35,7 +36,9 @@ module RjuiTools
           # Priority: srcName > src > url > defaultImage
           if attributes['srcName']
             if has_binding?(attributes['srcName'])
-              binding_prop = extract_binding_property(attributes['srcName'])
+              # attribute_expression: a name with text around the binding
+              # (`icon_@{state}`) is one expression too.
+              binding_prop = attribute_expression(attributes['srcName'])
               "`/images/${#{binding_prop}}`"
             else
               "/images/#{resolve_image_extension(attributes['srcName'])}"
@@ -58,7 +61,9 @@ module RjuiTools
         # (rjui-image-src-bare-name-string-key-collision). Bindings resolve
         # as usual; bare names get a build warning steering to srcName.
         def convert_src_value(value, attr_name)
-          return convert_binding(value) if has_binding?(value)
+          # One expression (attribute_expression), braced as a JSX child is:
+          # convert_binding's child form loses the text around a binding.
+          return "{#{attribute_expression(value)}}" if has_binding?(value)
           return value unless value.is_a?(String)
 
           if bare_image_name?(value)
@@ -83,7 +88,7 @@ module RjuiTools
         # `loading` — the native lazy/eager fetch hint, passed through
         # unchanged when it is one of the two values the browser knows.
         def loading_attr
-          loading = attributes['loading'].to_s.downcase
+          loading = JsonUIShared::EnumSpelling.lowered(attributes['loading'], 'Image', 'loading').to_s
           return '' unless %w[lazy eager].include?(loading)
 
           " loading=\"#{loading}\""
@@ -120,7 +125,7 @@ module RjuiTools
           end
 
           # Clickable cursor
-          if attributes['canTap'] || attributes['onclick'] || attributes['onClick']
+          if attributes['canTap'] || tap_handler?(attributes['onClick'], attributes['onclick'])
             classes << 'cursor-pointer'
           end
 
@@ -142,33 +147,6 @@ module RjuiTools
           # the SPREAD sentinel and the `React.CSSProperties` assertion a
           # custom-property key needs are handled in ONE place.
           style_attr_for(@dynamic_styles)
-        end
-
-        def build_onclick_attr
-          return '' unless attributes['canTap'] || attributes['onclick'] || attributes['onClick']
-
-          onclick = attributes['onclick'] || attributes['onClick']
-          return '' unless onclick
-
-          # The array face first: `end_with?` on an Array is a NoMethodError
-          # (the exact crash kjui's get_event_handler_call had), so the whole
-          # generation died on a declaration the SSoT allows.
-          if onclick.is_a?(Array)
-            expr = onclick_selector_expr(onclick)
-            return expr ? " onClick={#{expr}}" : ''
-          end
-
-          if onclick.end_with?(':')
-            # Selector format: "methodName:"
-            method_name = onclick.chomp(':')
-            " onClick={() => #{method_name}(this)}"
-          elsif has_binding?(onclick)
-            # Binding format: "@{functionName}"
-            handler = extract_binding_property(onclick)
-            " onClick={#{handler}}"
-          else
-            " onClick={#{onclick}}"
-          end
         end
       end
     end

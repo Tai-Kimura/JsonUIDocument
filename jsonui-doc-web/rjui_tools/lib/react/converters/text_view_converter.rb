@@ -71,7 +71,7 @@ module RjuiTools
           elsif (resize_expr = bound_value_expr(resize))
             dynamic_styles['resize'] = resize_expr
           else
-            classes << RESIZE_UTILITIES.fetch(resize.to_s.downcase, 'resize')
+            classes << RESIZE_UTILITIES.fetch(JsonUIShared::EnumSpelling.lowered(resize, 'TextView', 'resize').to_s, 'resize')
           end
 
           # Scrollable
@@ -148,6 +148,10 @@ module RjuiTools
           if attributes['cornerRadius']
             @dynamic_styles['borderRadius'] = "'#{attributes['cornerRadius']}px'"
           end
+
+          # tintColor is the cursor's colour here (the accent of the operable
+          # parts — 1.9.0), as on iOS (.tint) and on the TextField.
+          @dynamic_styles['caretColor'] = color_style_expr(attributes['tintColor']) if attributes['tintColor']
 
           # lineBreakMode — same truncation mapping as Label (a textarea shows
           # its own scrollbar rather than truncating, so this only matters for
@@ -228,7 +232,11 @@ module RjuiTools
           placeholder = attributes['hint'] || attributes['placeholder']
           if placeholder
             resolved = convert_binding(placeholder)
-            if resolved != placeholder && resolved.include?('{')
+            if has_binding?(placeholder)
+              # One expression (attribute_expression): the JSX child form
+              # below loses the text around a binding.
+              attrs << " placeholder={#{attribute_expression(placeholder)}}"
+            elsif resolved != placeholder && resolved.include?('{')
               attrs << " placeholder={#{resolved.gsub(/^\{|\}$/, '')}}"
             elsif (string_resolved = convert_string_key(placeholder))
               # strings.json key -> StringManager, matching sjui's hint
@@ -236,7 +244,7 @@ module RjuiTools
               # and plain literals fall through unchanged.
               attrs << " placeholder=#{string_resolved}"
             else
-              attrs << " placeholder=\"#{placeholder}\""
+              attrs << jsx_attr_text('placeholder', placeholder)
             end
           end
 
@@ -247,11 +255,10 @@ module RjuiTools
           if attributes['text']
             if has_binding?(attributes['text'])
               # Binding present: use controlled component (value + onChange)
-              value = convert_binding(attributes['text'])
-              attrs << " value={#{value.gsub(/[{}]/, '')}}"
+              attrs << " value={#{attribute_expression(attributes['text'])}}"
             else
               # No binding: use uncontrolled component (defaultValue only)
-              attrs << " defaultValue=\"#{attributes['text']}\""
+              attrs << jsx_attr_text('defaultValue', attributes['text'])
             end
           end
 
@@ -291,12 +298,12 @@ module RjuiTools
           # blocks form submission and still drives :invalid.
           attrs << ' required' if attributes['required'] == true || attributes['required'] == 'true'
           if attributes['pattern']
-            escaped = attributes['pattern'].to_s.gsub('\\', '\\\\\\\\').gsub("'", "\\\\'")
+            pattern = JsonUIShared::StringLiterals.ts_single("^(?:#{attributes['pattern']})$")
             # `currentTarget`, not `target`: React types onInput as a FormEvent,
             # whose `target` is a bare EventTarget — reading `.value` off it is
             # a type error in a strict consumer, and the file is @generated.
             attrs << " onInput={(e) => e.currentTarget.setCustomValidity(" \
-                     "new RegExp('^(?:#{escaped})$').test(e.currentTarget.value) ? '' : 'Invalid format')}"
+                     "new RegExp(#{pattern}).test(e.currentTarget.value) ? '' : 'Invalid format')}"
           end
 
           # Soft keyboard. `input` is the TextField spelling of the same idea and
@@ -311,7 +318,7 @@ module RjuiTools
 
         # UIKeyboardType spellings -> the HTML inputmode vocabulary.
         def map_keyboard_type(value)
-          case value.to_s.downcase.sub(/^uikeyboardtype/, '')
+          case JsonUIShared::EnumSpelling.lowered(value, 'TextView', 'keyboardType')
           when 'numberpad', 'number', 'numbersandpunctuation' then 'numeric'
           when 'decimalpad', 'decimal' then 'decimal'
           when 'phonepad', 'phone' then 'tel'
@@ -334,7 +341,8 @@ module RjuiTools
               prop = extract_binding_property(handler)
               # If text binding is present, pass (previousValue, newValue) for (String, String) callbacks
               if attributes['text'] && has_binding?(attributes['text'])
-                text_prop = extract_binding_property(attributes['text'])
+                # The value the textarea shows (build_attributes' value=).
+                text_prop = attribute_expression(attributes['text'])
                 return " onChange={(e) => #{prop}?.(#{text_prop}, e.target.value)}"
               else
                 return " onChange={(e) => #{prop}?.(e.target.value)}"

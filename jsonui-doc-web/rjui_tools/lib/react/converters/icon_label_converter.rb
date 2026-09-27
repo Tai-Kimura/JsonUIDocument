@@ -15,7 +15,7 @@ module RjuiTools
           onclick_attr = build_onclick_attr
 
           text = convert_text_binding(attributes['text'] || '')
-          icon_position = (attributes['iconPosition'] || 'Left').downcase
+          icon_position = JsonUIShared::EnumSpelling.lowered(attributes['iconPosition'] || 'Left', 'IconLabel', 'iconPosition').to_s
           icon_src = get_icon_src
           icon_style = build_icon_style
 
@@ -27,10 +27,15 @@ module RjuiTools
                           else 'flex-row' # left is default
                           end
 
-          icon_element = if icon_src.include?('{')
-            "<img className=\"#{icon_style}\" src={#{icon_src.gsub(/[{}]/, '')}} alt=\"\" />"
+          # get_icon_src returns the selected-state ternary already braced,
+          # or the attribute as written — a binding in it (`@{img}`) was
+          # emitted with its braces taken out, `src={@img}`.
+          icon_element = if icon_src.start_with?('{') && attributes['selected'] && has_binding?(attributes['selected'])
+            "<img className=\"#{icon_style}\" src=#{icon_src} alt=\"\" />"
+          elsif has_binding?(icon_src)
+            "<img className=\"#{icon_style}\" src={#{attribute_expression(icon_src)}} alt=\"\" />"
           else
-            "<img className=\"#{icon_style}\" src=\"#{icon_src}\" alt=\"\" />"
+            "<img className=\"#{icon_style}\"#{jsx_attr_text('src', icon_src)} alt=\"\" />"
           end
 
           text_style = build_text_style
@@ -52,7 +57,7 @@ module RjuiTools
           classes = [super]
 
           # Cursor pointer for clickable items
-          classes << 'cursor-pointer' if attributes['onClick'] || attributes['onclick']
+          classes << 'cursor-pointer' if tap_handler?(attributes['onClick'], attributes['onclick'])
 
           finalize_classes(classes)
         end
@@ -117,7 +122,7 @@ module RjuiTools
             binding_expr = extract_binding_property(attributes['selected'])
             icon_on = attributes['icon_on'] || attributes['iconOn'] || ''
             icon_off = attributes['icon_off'] || attributes['iconOff'] || ''
-            "{#{binding_expr} ? '#{icon_on}' : '#{icon_off}'}"
+            "{#{binding_expr} ? #{JsonUIShared::StringLiterals.ts_single(icon_on)} : #{JsonUIShared::StringLiterals.ts_single(icon_off)}}"
           else
             attributes['icon_off'] || attributes['iconOff'] || attributes['icon_on'] || attributes['iconOn'] || attributes['icon'] || ''
           end
@@ -139,7 +144,7 @@ module RjuiTools
           end
 
           # Icon margin
-          icon_position = (attributes['iconPosition'] || 'Left').downcase
+          icon_position = JsonUIShared::EnumSpelling.lowered(attributes['iconPosition'] || 'Left', 'IconLabel', 'iconPosition').to_s
           # 5 is the cross-platform canonical default (IconLabelView.swift and
           # both mobile dynamic converters) — 4 was an rjui-only deviation.
           margin = attributes['iconMargin'] || attributes['spacing'] || 5

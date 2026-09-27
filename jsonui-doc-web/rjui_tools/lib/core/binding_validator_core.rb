@@ -3,6 +3,8 @@
 
 require 'json'
 require 'set'
+require_relative 'type_synonyms'
+require_relative 'data_item_platform'
 
 module JsonUIShared
   # Validates binding expressions in JSON layouts. Shared body of the three
@@ -22,7 +24,9 @@ module JsonUIShared
   #
   #   platform_id                     'swift' / 'kotlin' / 'react'
   #   log_tag                         'SJUI' / 'KJUI' / 'RJUI'
-  #   data_item_applies?(item)        data[] platform/mode filter
+  #   data_item_applies?(item)        data[] filter: the item's platform is
+  #                                   read here (DataItemPlatform); a profile
+  #                                   adds its mode on top (super)
   #   business_logic_patterns         per-language advisory pattern list
   #   extra_allowed_patterns          per-language additions to the
   #                                   business-logic allowlist
@@ -212,8 +216,11 @@ module JsonUIShared
       raise NotImplementedError, 'platform profile must define log_tag'
     end
 
-    def data_item_applies?(_data_item)
-      true
+    # Whether a data[] item is this platform's: its `platform` read as
+    # `jui build` reads it (DataItemPlatform — comma-separated tokens, any
+    # token of this platform). A profile adds its mode filter on top.
+    def data_item_applies?(data_item)
+      DataItemPlatform.applies?(data_item, platform_id)
     end
 
     # The tool's mode for attribute exclusion ('swiftui' / 'compose');
@@ -294,8 +301,14 @@ module JsonUIShared
       out
     end
 
+    # The section a spelling is validated against: a type synonym's
+    # `canonical` first (type_synonyms.rb — a Text is a Label, a Table a
+    # Collection), then the alias hop above. Read as written, a synonym had no
+    # table of its own here, so its bindings were checked as an unknown type's.
     def resolve_component_alias(component_type)
-      @component_alias_by_type[component_type] || component_type
+      entry = component_type.is_a?(String) && JsonUIShared::TypeSynonyms.entries[component_type]
+      section = entry ? entry['canonical'] : component_type
+      @component_alias_by_type[section] || section
     end
 
     # Per component type, the set of attribute names marked for platforms
@@ -405,6 +418,7 @@ module JsonUIShared
       if component['data'].is_a?(Array)
         component['data'].each do |data_item|
           next unless data_item.is_a?(Hash)
+          note_unread_platform_shape(data_item)
           next unless data_item_applies?(data_item)
           # Skip ViewModel class declarations: either the bare
           # { "class": "MyViewModel" } shape (class without name) or a
@@ -444,11 +458,27 @@ module JsonUIShared
       end
     end
 
+    # A data item's `platform` in a shape nothing reads — a list, a number, a
+    # map whose keys are not all platforms. `jui build` passes it through and
+    # the tools take the item on every platform (DataItemPlatform), so the
+    # author's filter does nothing anywhere; until jsonui-cli 1.9.0 sjui and
+    # kjui instead dropped the item on their own platform, silently.
+    def note_unread_platform_shape(data_item)
+      return unless DataItemPlatform.unread_shape?(data_item['platform'])
+
+      # Collected before any view is visited: the file is the context.
+      context = @current_file ? "[#{@current_file}] " : ''
+      @warnings << "#{context}data '#{data_item['name']}': its platform #{data_item['platform'].to_json} is not read — " \
+                   "a data item's platform is a string of comma-separated platform tokens (\"swift\", \"kotlin, react\"), " \
+                   'or a map of per-platform values keyed ios / android / web. The item is data on every platform.'
+    end
+
     def collect_data_from_array(data_array, in_cell = false)
       return unless data_array.is_a?(Array)
 
       data_array.each do |data_item|
         next unless data_item.is_a?(Hash)
+        note_unread_platform_shape(data_item)
         next unless data_item_applies?(data_item)
         next if data_item['class'] && !data_item['name']
         next if data_item['class'].to_s.end_with?('ViewModel')
@@ -478,13 +508,23 @@ module JsonUIShared
       collect_platform_used_properties(component, component_type)
 
       # Embed-specific structural rules (params tree grammar + navigationMode)
-      validate_embed_component(component) if component_type == 'Embed'
+      validate_embed_component(component) if resolve_component_alias(component_type) == 'Embed'
+
+      # A date SelectBox whose onValueChange is declared to take an index
+      # (date_pick_handler_problem).
+      check_date_pick_handler(component) if resolve_component_alias(component_type) == 'SelectBox'
 
       component.each do |key, value|
         next if key == 'type' || key == 'child' || key == 'children' || key == 'sections'
         next if key == 'data' || key == 'generatedBy' || key == 'include' || key == 'style' || key == 'shared_data'
         next if key == 'bindingScript' # arbitrary platform code, not a binding
-        next if incompatible_attr?(component_type, key)
+        # An Embed's events are handler names, not bindings; validate_embed_component
+        # names any that is not one.
+        next if key == 'events' && resolve_component_alias(component_type) == 'Embed'
+        if incompatible_attr?(component_type, key)
+          note_uses_on_other_platforms(value, key)
+          next
+        end
 
         check_value_for_bindings(value, key, component_type)
         check_selector_declared(value, key, component_type)
@@ -526,6 +566,63 @@ module JsonUIShared
       end
     end
 
+    # An attribute declared for other platforms or modes draws nothing here,
+    # so none of its checks run on this platform — but the data it names is
+    # the layout's all the same, and counted as used. Until jsonui-cli 1.9.0
+    # it was not: a shared layout binding Web.reloadToken / onLoadFailed
+    # (declared for swift and kotlin — an iframe reports neither) warned
+    # "defined but never used" on every web build, and the face had no way
+    # to satisfy both. The same held for any other platform- or mode-
+    # restricted attribute (View.onDrop on sjui / kjui, a UIKit-only one in
+    # SwiftUI mode). Every @{...} in the value counts, and a handler named
+    # without braces (`"onLongPress": "handleHold"`) as it does in
+    # check_selector_declared. Cell scopes are left alone, as
+    # check_undefined_variables leaves them.
+    def note_uses_on_other_platforms(value, attribute_name)
+      return if @cell_depth > 0
+
+      case value
+      when String
+        exprs = value.scan(/@\{([^}]*)\}/).flatten
+        if exprs.empty?
+          name = value.strip
+          if SELECTOR_ATTRS.include?(attribute_name.to_s.split('.').first) && @data_properties.include?(name)
+            @used_properties << name
+          end
+        end
+        exprs.each do |expr|
+          next if expr.start_with?('data.')
+
+          extract_variables(expr).each { |var| @used_properties << var if @data_properties.include?(var) }
+        end
+      when Hash
+        value.each_value { |v| note_uses_on_other_platforms(v, attribute_name) }
+      when Array
+        value.each { |v| note_uses_on_other_platforms(v, attribute_name) }
+      end
+    end
+
+    # Mixed text ("Hi @{who}", contexts.text): each @{...} is interpolated,
+    # so its names are the layout's data in use. Until jsonui-cli 1.9.0 they
+    # were not counted, and 'who' was "defined but never used".
+    # A name data lacks is not named here, as it was not before: whether
+    # text is interpolated is the drawing converter's, and an app's own
+    # converter may keep it literal (JsonUIDocument's CodeBlock.code shows
+    # "@{...}" samples as text — measured 2026-09-27, naming them gave that
+    # face 89 warnings it could not silence: the canon has no escape for
+    # "@{"). Cell scopes are left alone, as check_undefined_variables
+    # leaves them.
+    def note_text_uses(exprs)
+      return if @cell_depth > 0
+
+      exprs.each do |inner|
+        expr = inner.strip
+        next if expr.start_with?('data.')
+
+        extract_variables(expr).each { |var| @used_properties << var if @data_properties.include?(var) }
+      end
+    end
+
     def has_binding?(value)
       case value
       when String
@@ -550,23 +647,32 @@ module JsonUIShared
 
       case value
       when String
-        if value.include?('@{')
-          # Canonical binding-resolution rules (errors) run on every
-          # occurrence, including mixed-text interpolation.
-          check_canonical_binding_rules(value, attribute_name, component_type)
-          check_cell_parent_scope(value, attribute_name, component_type)
+        return unless value.include?('@{')
+
+        # Canonical binding-resolution rules (errors) run on every
+        # occurrence, including mixed-text interpolation.
+        check_canonical_binding_rules(value, attribute_name, component_type)
+        check_cell_parent_scope(value, attribute_name, component_type)
+
+        # A whole binding is a value that is one @{...} and nothing else
+        # (binding_semantics.json contexts.value). Until jsonui-cli 1.9.0 it
+        # was any value that started with "@{" and ended with "}", read
+        # whole: "@{first} and @{second}" was the one expression
+        # "first} and @{second" ('and' "not defined in data").
+        exprs = value.scan(/@\{([^}]*)\}/).flatten
+        unless exprs.length == 1 && value == "@{#{exprs.first}}"
+          note_text_uses(exprs)
+          return
         end
 
-        if value.start_with?('@{') && value.end_with?('}')
-          binding_expr = value[2..-2]
-          @warnings.concat(check_binding(binding_expr, attribute_name, component_type))
+        binding_expr = exprs.first
+        @warnings.concat(check_binding(binding_expr, attribute_name, component_type))
 
-          unless skip_undefined_without_data_section? && !@has_data_definitions
-            check_undefined_variables(binding_expr, attribute_name, component_type)
-          end
-
-          check_color_type(binding_expr, attribute_name, component_type)
+        unless skip_undefined_without_data_section? && !@has_data_definitions
+          check_undefined_variables(binding_expr, attribute_name, component_type)
         end
+
+        check_color_type(binding_expr, attribute_name, component_type)
       when Hash
         value.each do |k, v|
           check_value_for_bindings(v, "#{attribute_name}.#{k}", component_type)
@@ -658,7 +764,7 @@ module JsonUIShared
     end
 
     def embed_params_attr?(component_type, attribute_name)
-      component_type == 'Embed' && attribute_name.to_s.split(/[.\[]/).first == 'params'
+      resolve_component_alias(component_type) == 'Embed' && attribute_name.to_s.split(/[.\[]/).first == 'params'
     end
 
     def add_error(rule_id, message)
@@ -807,6 +913,7 @@ module JsonUIShared
     # - arrays are unsupported anywhere in params.
     # - keys must be camelCase at every level.
     # - navigationMode must be a known enum value ('delegate'/'isolated').
+    # - each events value names a handler (embed_event_handler_problem).
     def validate_embed_component(component)
       mode = component['navigationMode']
       if mode.is_a?(String) && !%w[delegate isolated].include?(mode)
@@ -815,6 +922,71 @@ module JsonUIShared
 
       params = component['params']
       validate_embed_params_node(params, 'params') if params.is_a?(Hash)
+
+      events = component['events']
+      return unless events.is_a?(Hash)
+
+      events.each do |event, handler|
+        problem = self.class.embed_event_handler_problem(handler)
+        @warnings << "#{build_context_prefix}Embed event '#{event}' is not called: #{problem}" if problem
+      end
+    end
+
+    # An Embed event names the handler it calls as it is: a method of the
+    # parent ViewModel (attribute_definitions Embed.events: "parent VM
+    # handler names"), which sjui and kjui call as `viewModel.<name>(payload)`
+    # and rjui — whose component has no ViewModel — as
+    # `data.<name>?.(payload)`. Anything else is not called, by any of the
+    # three, and this says why. `@{name}` is the binding spelling: the
+    # three codegens wrote it into code as it stood (`viewModel.@{name}(…)`,
+    # which does not parse) while the only word the build said was that
+    # 'name' was not in data (ticket
+    # rjui-embed-event-bridge-calls-an-undeclared-view-model). nil for a
+    # name.
+    EMBED_EVENT_HANDLER = /\A[A-Za-z_][A-Za-z0-9_]*\z/.freeze
+
+    def self.embed_event_handler_problem(handler)
+      return nil if handler.is_a?(String) && handler.match?(EMBED_EVENT_HANDLER)
+
+      named = handler.is_a?(String) && handler.strip[/\A@\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\z/, 1]
+      if named
+        "'#{handler}' is a binding; an event names a method of the parent ViewModel as it is: '#{named}'"
+      else
+        "#{handler.is_a?(String) ? "'#{handler}'" : handler.inspect} is not a method name"
+      end
+    end
+
+    # The parameters a handler's declared class takes — `((String, Int) ->
+    # Void)?` is ["String", "Int"], `(() -> Unit)?` is [] — or nil when the
+    # class is not a closure type. What sjui's SelectBox reads to spell its
+    # onValueChange call (selectbox_converter.rb pick_invocation).
+    def self.closure_parameters(klass)
+      inner = klass.to_s[/\(\s*([^()]*?)\s*\)\s*(?:throws\s*)?->/, 1]
+      inner&.split(',')&.map(&:strip)&.reject(&:empty?)
+    end
+
+    DATE_PICK_HAS_NO_INDEX = 'a date SelectBox has no index: declare onValueChange as (String) or (String, String)'
+
+    # A date SelectBox's onValueChange declared to take an Int — `(Int)`,
+    # `(String, Int)` — asks for an index a date does not have (4f's ruling on
+    # control-onclick-is-called-differently-on-every-path, 1.9.0): it is not
+    # called on any path. sjui writes an `// ERROR:` comment where the call
+    # would be, SwiftJsonUI's Dynamic runtime names it once in DEBUG, and the
+    # build says it here. nil for any other declaration.
+    def self.date_pick_handler_problem(klass)
+      params = closure_parameters(klass)
+      params&.include?('Int') ? DATE_PICK_HAS_NO_INDEX : nil
+    end
+
+    def check_date_pick_handler(component)
+      return unless component['selectItemType'] == 'Date'
+
+      handler = component['onValueChange']
+      name = handler.is_a?(String) && handler.strip[/\A@\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\z/, 1]
+      return unless name
+
+      problem = self.class.date_pick_handler_problem(@data_types[name])
+      @warnings << "#{build_context_prefix}'SelectBox.onValueChange' '#{name}' (#{@data_types[name]}) is not called: #{problem}" if problem
     end
 
     def validate_embed_params_node(node, path)

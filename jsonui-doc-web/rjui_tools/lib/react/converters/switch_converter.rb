@@ -124,7 +124,7 @@ module RjuiTools
         end
 
         def build_checked_attr
-          is_on = with_bind_fallback(attributes['isOn'] || attributes['checked'] || attributes['value'])
+          is_on = attributes['isOn'] || attributes['checked'] || attributes['value']
 
           if is_on && has_binding?(is_on)
             prop = extract_binding_property(is_on)
@@ -141,19 +141,21 @@ module RjuiTools
           handler = attributes['onValueChange']
           if handler && has_binding?(handler)
             prop = extract_binding_property(handler)
-            return " onChange={(e) => #{prop}?.(e.target.checked)}"
+            return operation_attr('onChange', '(e)', "#{prop}?.(e.target.checked)")
           end
 
           # Auto-generate onChange from isOn/checked/value binding property
           # e.g., isOn: "@{isEnabled}" -> onChange={(e) => data.onIsEnabledChange?.(e.target.checked)}
-          is_on = with_bind_fallback(attributes['isOn'] || attributes['checked'] || attributes['value'])
+          is_on = attributes['isOn'] || attributes['checked'] || attributes['value']
           if is_on && has_binding?(is_on)
             property_name = extract_raw_binding_property(is_on)
             handler_name = "on#{capitalize_first(property_name)}Change"
-            return " onChange={(e) => data.#{handler_name}?.(e.target.checked)}"
+            return operation_attr('onChange', '(e)', "data.#{handler_name}?.(e.target.checked)")
           end
 
-          ''
+          # No own write-back: the checkbox still toggles, and that is the
+          # operation a declared onClick is called from.
+          operation_attr('onChange', '(e)', nil)
         end
 
         def capitalize_first(str)

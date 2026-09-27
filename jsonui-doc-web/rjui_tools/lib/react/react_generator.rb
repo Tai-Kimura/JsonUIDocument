@@ -1,11 +1,21 @@
 # frozen_string_literal: true
 
 require 'set'
+require_relative '../core/type_synonyms'
 require_relative '../core/type_converter'
+require_relative '../core/bind_fold'
+require_relative '../core/logger'
+require_relative '../core/attribute_validator'
 require_relative '../core/generated_marker'
 require_relative '../core/frameworks'
 require_relative '../core/normalization'
+require_relative '../core/tap_accessibility'
+require 'json'
 require_relative '../core/string_manager_core'
+require_relative '../core/layout_path'
+require_relative 'include_paths'
+require_relative '../core/node_keys'
+require_relative 'component_name'
 require_relative 'converters/base_converter'
 require_relative 'converters/view_converter'
 require_relative 'converters/label_converter'
@@ -31,75 +41,58 @@ require_relative 'converters/circle_view_converter'
 require_relative 'converters/web_converter'
 require_relative 'converters/blur_converter'
 require_relative 'converters/gradient_view_converter'
+require_relative 'converters/converter_table'
 require_relative 'tailwind_mapper'
 require_relative 'responsive_helper'
 require_relative 'helpers/string_manager_helper'
 require_relative 'helpers/lucide_icon_helper'
+require_relative '../core/enum_spelling'
 
 module RjuiTools
   module React
     class ReactGenerator
       include Helpers::StringManagerHelper
 
-      CONVERTERS = {
-        'View' => Converters::ViewConverter,
-        'SafeAreaView' => Converters::ViewConverter,
-        'Label' => Converters::LabelConverter,
-        'Text' => Converters::LabelConverter,
-        'Button' => Converters::ButtonConverter,
-        'Image' => Converters::ImageConverter,
-        'CircleImage' => Converters::ImageConverter,
-        'NetworkImage' => Converters::ImageConverter,
-        'TextField' => Converters::TextFieldConverter,
-        # EditText / Input are aliases for TextField (attribute_definitions
-        # `_alias_of: TextField`; kept for Android / HTML naming compatibility)
-        'EditText' => Converters::TextFieldConverter,
-        'Input' => Converters::TextFieldConverter,
-        'TextView' => Converters::TextViewConverter,
-        'Scroll' => Converters::ScrollViewConverter,
-        'ScrollView' => Converters::ScrollViewConverter,
-        'Collection' => Converters::CollectionConverter,
-        'Table' => Converters::CollectionConverter,
-        # Switch is the primary component name, uses SwitchConverter for iOS-style toggle
-        'Switch' => Converters::SwitchConverter,
-        # Toggle is an alias for Switch (backward compatibility), also uses SwitchConverter
-        'Toggle' => Converters::SwitchConverter,
-        # CheckBox is the primary component name, uses ToggleConverter for simple checkbox
-        'CheckBox' => Converters::ToggleConverter,
-        # Check is an alias for CheckBox (backward compatibility), also uses ToggleConverter
-        'Check' => Converters::ToggleConverter,
-        # Legacy mapping kept for backward compatibility
-        'Checkbox' => Converters::ToggleConverter,
-        'Slider' => Converters::SliderConverter,
-        'Segment' => Converters::SegmentConverter,
-        'Radio' => Converters::RadioConverter,
-        'Progress' => Converters::ProgressConverter,
-        'Indicator' => Converters::IndicatorConverter,
-        'SelectBox' => Converters::SelectBoxConverter,
-        'Include' => Converters::IncludeConverter,
-        'TabView' => Converters::TabViewConverter,
-        'Embed' => Converters::EmbedConverter,
-        # These five ship the same canonical names as BaseConverter's child
-        # dispatch map — the two tables must stay in step or a type renders
-        # differently at root vs nested position.
-        'IconLabel' => Converters::IconLabelConverter,
-        'CircleView' => Converters::CircleViewConverter,
-        'Web' => Converters::WebConverter,
-        'Blur' => Converters::BlurConverter,
-        'GradientView' => Converters::GradientViewConverter
-      }.freeze
+      # The one table, shared with the child dispatch (BaseConverter
+      # #get_converter_class): converters/converter_table.rb. This kept a
+      # second copy until jsonui-cli 1.9.0, and a root NetworkImage / Toggle
+      # rendered differently from a nested one.
+      CONVERTERS = Converters::ConverterTable.table
+
+      # The validator whose sentence a type drawn as nothing says: the build's
+      # own (BuildCommand hands it), else one made the first time such a type
+      # is met — one per build either way. A validator per node read the
+      # definitions again for each, and a copy that left its links dangling
+      # said "attribute_definitions.json not found" once per such node.
+      attr_writer :unknown_type_validator
+
+      def unknown_type_validator
+        @unknown_type_validator ||= Core::AttributeValidator.new(:react)
+      end
 
       def initialize(config)
         @config = config
         @framework = Core::Frameworks.for(config)
         @use_tailwind = config['use_tailwind'] != false
         @extension_converters = load_extension_converters
+        # a spelling the app registers is the app's, for what classifies a
+        # node by its drawn type too (TypeSynonyms.app_types)
+        JsonUIShared::TypeSynonyms.app_types = @extension_converters.keys
         # Store extension converters in config so child converters can access them
         @config['_extension_converters'] = @extension_converters
+        # The validator whose sentences name what no converter draws, for the
+        # child converters too (BaseConverter#type_validator): this build's.
+        @config['_type_validator'] = method(:unknown_type_validator)
         # Stash the component → attribute-definitions map so BaseConverter
         # can suppress Tailwind decoration mapping for keys that a custom
         # component has claimed as a semantic prop (e.g. CodeBlock#maxHeight).
         @config['_attribute_definitions'] = load_attribute_definitions
+      end
+
+      # The spellings this project registers converters of its own for: the
+      # keys of the extensions directory's converter_mappings.rb.
+      def self.extension_types
+        allocate.send(:load_extension_converters).keys
       end
 
       # Load custom converters from extensions directory
@@ -200,6 +193,28 @@ module RjuiTools
         # BaseConverter#layout_normalized? to take the canonical-only
         # attribute lookup path for L1-normalized layouts.
         @config['_layout_normalized'] = Core::Normalization.canonicalized?(json)
+        # Each node's position, for the name its handlers are handed when the
+        # layout gives it no id (JsonUIShared::LayoutPath.view_id) — the rule
+        # the sjui and kjui codegen stamp too. An include is its own
+        # component here, so the nodes in it are stamped from that file's
+        # own root (spec/core/layout_path_spec.rb).
+        JsonUIShared::LayoutPath.stamp!(json) unless JsonUIShared::LayoutPath.stamped?(json)
+        # The classes the layout's data declares, for a handler whose
+        # arguments its declaration decides (SelectBox.onValueChange).
+        @config['_data_classes'] = IncludePaths.declared_data_classes(json)
+        # Whether this layout takes `jsonuiPath`, its root's path in the
+        # include-expanded tree (IncludePaths; `jui build` names them).
+        @config['_path_prop'] = Array(@config['_path_stems']).include?(stem)
+
+        # The layout's declared data classes, raw (`name => class`): the
+        # class-list Collection reads its `items` by what the property
+        # declares (CollectionConverter#legacy_items_list_element).
+        @config['_data_classes'] = declared_data_classes(json)
+
+        # The tap rule's shape of every tap (shared/core/tap_accessibility.rb),
+        # which the converters read for the keyboard's button
+        # (BaseConverter#keyboard_tap_attrs) — on a copy, after validation.
+        json = JsonUIShared::TapAccessibility.annotate!(JSON.parse(JSON.generate(json)))
 
         jsx_content = convert_component(json)
 
@@ -220,14 +235,39 @@ module RjuiTools
 
         type = json['type'] || 'View'
 
-        # First check extension converters, then built-in converters
-        converter_class = @extension_converters[type] || CONVERTERS[type]
+        # First check extension converters (with the spelling as written, and
+        # the node as written), then built-in converters. A type-synonym
+        # spelling (HStack, WebView, …) is drawn as its type, from
+        # shared/core/type_synonyms.json, and a declared alias section
+        # (EditText, Check, Toggle, …: `_alias_of`) as its canonical one; the
+        # map below holds canonical declared sections. A built-in draws the
+        # node with its `bind` folded (the child path,
+        # BaseConverter#create_converter_for_child, does the same).
+        converter_class = @extension_converters[type]
         unless converter_class
-          # sjui renders unknown types as a red "Unsupported component" Text
-          # and swift dynamic as an error box; silently degrading to a plain
-          # View here left react the only face that hid the failure.
-          Core::Logger.warn("Unknown component type '#{type}' — rendering as a plain View (no converter registered)") if defined?(Core::Logger)
-          converter_class = Converters::ViewConverter
+          json = JsonUIShared::ComponentAliases.resolve(JsonUIShared::TypeSynonyms.canonicalize(json))
+          type = json['type'] || 'View'
+          json = JsonUIShared::BindFold.fold(json, type)
+          converter_class = CONVERTERS[type]
+        end
+        unless converter_class
+          # No converter draws it. A type the validator knows (an extension
+          # definition with no converter, say) is named in its own sentence
+          # and drawn as a View, its children in it; an unknown type is named
+          # in the validator's sentence (JsonUIShared::AttributeValidatorCore
+          # .unknown_component_type_message) and drawn as nothing — the
+          # sentence in a JSX comment where the node would be, as kjui and
+          # sjui draw it. It was drawn as a View (4f's ruling, jsonui-cli
+          # 1.9.0). The child path, BaseConverter#create_converter_for_child,
+          # follows the same rule.
+          if unknown_type_validator.known_component_type?(type.to_s)
+            Core::Logger.warn(Core::AttributeValidator.declared_without_drawer_message(type.to_s, 'web')) if defined?(Core::Logger)
+            converter_class = Converters::ViewConverter
+          else
+            sentence = unknown_type_validator.unknown_component_type_message(type.to_s)
+            Core::Logger.warn(sentence) if defined?(Core::Logger)
+            return Converters::UnknownTypeConverter.new(json, @config, sentence).convert_node(indent)
+          end
         end
 
         converter = converter_class.new(json, @config)
@@ -271,8 +311,11 @@ module RjuiTools
         # Props come from 'data' attribute - can be at root level or as first child element
         data = extract_data_from_json(json)
 
-        # Determine if we need useState or "use client"
-        needs_state = !state_vars.empty?
+        # Determine if we need useState or "use client". A control seeded from
+        # a static value (BaseConverter#wrap_seeded) holds its state in the
+        # file's JsonUISeeded.
+        uses_seeded = jsx_content.include?('<JsonUISeeded')
+        needs_state = !state_vars.empty? || uses_seeded
         uses_extensions = !extension_components.empty?
         needs_focus = !focus_fields.empty?
         needs_collection_scroll = !collection_scrolls.empty?
@@ -321,6 +364,11 @@ module RjuiTools
         auto_shrink_import = needs_auto_shrink ?
           "\nimport { applyAutoShrink } from '@/generated/autoShrink';" : ''
         screen_marker_import = screen_id ? "\nimport { screenMarker } from '@/generated/screenMarker';" : ''
+        # userInteractionEnabled false or bound: the stopped element's inert
+        # (BaseConverter#apply_interaction_inert, build_command
+        # emit_interaction_stop_helper).
+        interaction_stop_import = jsx_content.include?("#{Converters::BaseConverter::INERT_HELPER}(") ?
+          "\nimport { #{Converters::BaseConverter::INERT_HELPER} } from '@/generated/interactionStop';" : ''
 
         # partialAttributes are applied at runtime against the resolved
         # string (a pattern range or a localized text cannot be resolved
@@ -539,12 +587,15 @@ module RjuiTools
         include_prefix = @config['_include_id_prefix']
         uses_id_prefix = include_prefix && jsx_content.match?(/\bidPrefix\b/)
         props_interface = generate_data_props_interface(name, uses_data, data_type: data_name,
-                                                                    id_prefix: include_prefix)
+                                                                    id_prefix: include_prefix,
+                                                                    path: @config['_path_prop'])
         # `id` is destructured only when it was injected into the root —
         # the interface always accepts it (call sites can't know), but an
         # unused binding would trip noUnusedParameters setups.
         id_part = root_id_injected ? ', id' : ''
         id_part += ', idPrefix' if uses_id_prefix
+        # A screen (not included) has no path above its root: `0`.
+        id_part += ', jsonuiPath = "0"' if @config['_path_prop'] && jsx_content.match?(/\bjsonuiPath\b/)
         include_id_names = %w[jsonuiIncludeId jsonuiIncludePrefix].select { |f| jsx_content.include?("#{f}(") }
         include_id_import =
           if include_prefix && include_id_names.any?
@@ -577,9 +628,9 @@ module RjuiTools
 
         <<~JSX
           #{use_client}#{marker_header}
-          #{react_import}#{media_query_import}#{link_import}#{string_manager_import}#{cell_id_import}#{collection_scroll_import}#{relative_position_import}#{auto_shrink_import}#{date_format_import}#{screen_marker_import}#{partial_text_import}#{include_id_import}#{configuration_import}#{color_manager_import}#{lucide_import}#{data_import}#{extension_imports}#{component_imports}#{variant_component_imports}
+          #{react_import}#{media_query_import}#{link_import}#{string_manager_import}#{cell_id_import}#{collection_scroll_import}#{relative_position_import}#{auto_shrink_import}#{date_format_import}#{screen_marker_import}#{interaction_stop_import}#{partial_text_import}#{include_id_import}#{configuration_import}#{color_manager_import}#{lucide_import}#{data_import}#{extension_imports}#{component_imports}#{variant_component_imports}
 
-          #{props_interface if @config['typescript']}
+          #{props_interface if @config['typescript']}#{seeded_helper(@config['typescript']) if uses_seeded}
           export const #{name} = (#{props_sig}) => {#{data_merge_declaration}#{state_declarations}#{focus_declarations}#{collection_scroll_declarations}#{relative_position_declarations}#{auto_shrink_declarations}#{landscape_declaration}#{string_manager_declaration}#{variant_dispatch_declaration}
             return (
           #{jsx_content}
@@ -597,13 +648,16 @@ module RjuiTools
       # data-passing includes provide a Partial that the component merges
       # over its createXxxData() defaults, and pages/cells pass the full
       # object (a full XxxData is assignable to Partial<XxxData>).
-      def generate_data_props_interface(name, uses_data = true, data_type: nil, id_prefix: false)
+      def generate_data_props_interface(name, uses_data = true, data_type: nil, id_prefix: false, path: false)
         data_name = data_type || name
         data_field = uses_data ? "data?: Partial<#{data_name}Data>;" : "data?: #{data_name}Data;"
         # `idPrefix`: the include prefix above this component (design U8) —
         # declared only when `jui build` turned it on, so an unchanged build
         # emits unchanged bytes.
         prefix_field = id_prefix ? "\n  idPrefix?: string;" : ''
+        # `jsonuiPath`: this layout's root's position in the include-expanded
+        # tree (IncludePaths) — declared only for a layout that takes it.
+        prefix_field += "\n  jsonuiPath?: string;" if path
         <<~TS
           interface #{name}Props {
             #{data_field}
@@ -677,13 +731,25 @@ module RjuiTools
       # Containers holding at least one sibling-constrained child. MUST stay in
       # sync with ViewConverter#relative_positioned? and
       # #build_relative_position_ref_attr, which attach the ref this targets.
+      # The type a node is drawn as, which the passes below classify on so
+      # they agree with the converter that draws it (they walk the layout as
+      # written): the spelling itself when an app's converter is registered
+      # under it — that node is the app's — else its type-synonym target,
+      # then its alias section's canonical one (shared/core/type_synonyms.rb).
+      def drawn_type_of(json)
+        type = json['type']
+        return type if type && @extension_converters.key?(type)
+
+        JsonUIShared::TypeSynonyms.drawn_type(type)
+      end
+
       def extract_relative_containers(json, found = [])
         return found unless json.is_a?(Hash) || json.is_a?(Array)
 
         if json.is_a?(Hash)
           child = json['child'] || json['children']
           children = child.is_a?(Array) ? child : [child].compact
-          if %w[View SafeAreaView].include?(json['type'].to_s) || json['type'].nil?
+          if %w[View SafeAreaView].include?(drawn_type_of(json).to_s) || json['type'].nil?
             specs = children.map { |c| relative_constraint_for(c) }.compact
             found << { ref: relative_position_ref_name(specs.first['id']), specs: specs } if specs.any?
           end
@@ -717,7 +783,7 @@ module RjuiTools
 
       #: Types whose converter attaches the autoShrink ref. Text-bearing
       #: elements only — shrinking a container has no meaning.
-      AUTO_SHRINK_TYPES = %w[Label Text].freeze
+      AUTO_SHRINK_TYPES = %w[Label].freeze
 
       # Elements declaring autoShrink with a literal id — each gets a hoisted
       # ref + fit effect, matching the ref LabelConverter attaches. A literal
@@ -728,7 +794,7 @@ module RjuiTools
 
         if json.is_a?(Hash)
           id = json['id']
-          if AUTO_SHRINK_TYPES.include?(json['type'].to_s) && truthy_attr?(json['autoShrink']) &&
+          if AUTO_SHRINK_TYPES.include?(drawn_type_of(json).to_s) && truthy_attr?(json['autoShrink']) &&
              id.is_a?(String) && !id.empty? && !id.include?('@{')
             found << {
               ref: auto_shrink_ref_name(id),
@@ -812,7 +878,7 @@ module RjuiTools
 
       #: Scroll containers that are not Collections. They get the anchor effect
       #: only — MUST stay in sync with ScrollViewConverter#build_scroll_ref_attr.
-      SCROLL_CONTAINER_TYPES = %w[ScrollView Scroll].freeze
+      SCROLL_CONTAINER_TYPES = %w[ScrollView].freeze
 
       # Collections declaring scroll control (scrollTo / defaultScrollAnchor /
       # currentPage / onItemAppear). Each one gets a hoisted ref plus the
@@ -829,26 +895,40 @@ module RjuiTools
           # element, so it starts where the layout says without a second
           # implementation. The other three are Collection-only (they address
           # ITEMS; a ScrollView has none).
-          scrollable = json['type'] == 'Collection' ||
-                       (SCROLL_CONTAINER_TYPES.include?(json['type'].to_s) && json['defaultScrollAnchor'])
+          drawn = drawn_type_of(json)
+          scrollable = drawn == 'Collection' ||
+                       (SCROLL_CONTAINER_TYPES.include?(drawn.to_s) && json['defaultScrollAnchor'])
           if scrollable && id.is_a?(String) && !id.empty? && !id.include?('@{')
-            collection = json['type'] == 'Collection'
+            collection = drawn == 'Collection'
             scroll_to = collection ? json['scrollTo'] : nil
             default_anchor = json['defaultScrollAnchor']
             current_page = collection ? json['currentPage'] : nil
             on_item_appear = collection ? json['onItemAppear'] : nil
-            if scroll_to || default_anchor || current_page || on_item_appear
+            # The page-change callback: a paging Collection's, as on sjui and
+            # kjui (both emit it in their paging path only). The raw node here,
+            # so the definitions' alias spellings are looked up too.
+            page_change = if collection && json['paging'] == true
+                            json['onValueChange'] || json['onValueChanged'] || json['onPageChanged']
+                          end
+            if scroll_to || default_anchor || current_page || on_item_appear || page_change
               layout = json['orientation'] || json['layout'] || json['scrollDirection'] || 'vertical'
+              lowered_layout = JsonUIShared::EnumSpelling.lowered(layout, 'Collection', 'layout')
               found << {
+                id: id,
                 camel: snake_to_camel_id(id),
-                horizontal: layout.to_s.downcase == 'horizontal' || !!json['horizontalScroll'],
+                horizontal: lowered_layout == 'horizontal' || !!json['horizontalScroll'],
+                flow: %w[flow leftaligned].include?(lowered_layout),
                 items: json['items'],
+                sections: json['sections'],
+                cell_id_property: json['cellIdProperty'],
+                auto_tracking: json['autoChangeTrackingId'] == true,
                 scroll_to: scroll_to,
                 scroll_anchor: json['scrollAnchor'],
                 scroll_animated: json['scrollAnimated'],
                 default_anchor: default_anchor,
                 current_page: current_page,
-                on_item_appear: on_item_appear
+                on_item_appear: on_item_appear,
+                page_change: page_change
               }
             end
           end
@@ -871,9 +951,11 @@ module RjuiTools
         return '' if collections.empty?
 
         names = []
-        names << 'scrollCollectionToItem' if collections.any? { |c| c[:scroll_to] || c[:current_page] }
+        names << 'scrollCollectionToItem' if collections.any? { |c| c[:current_page] }
+        names << 'scrollCollectionToCell' if collections.any? { |c| scroll_to_binding?(c) }
+        names << 'collectionCellKeys' if collections.any? { |c| scroll_to_binding?(c) && collection_cell_key_lists(c) }
         names << 'applyCollectionDefaultAnchor' if collections.any? { |c| c[:default_anchor] }
-        names << 'currentCollectionPage' if collections.any? { |c| c[:current_page] }
+        names << 'currentCollectionPage' if collections.any? { |c| c[:current_page] || c[:page_change] }
         names << 'observeCollectionItems' if collections.any? { |c| c[:on_item_appear] }
         return '' if names.empty?
 
@@ -894,15 +976,29 @@ module RjuiTools
                    "#{scroll_anchor_expr(anchor)}, #{horizontal}); }, []);"
         end
 
-        # scrollTo: iOS receives a PassthroughSubject, so a repeat send
-        # re-scrolls; a React effect keys on a value, so re-scrolling to the
-        # same index needs the bound value to change.
-        if (target = collection[:scroll_to]) && binding_expression?(target)
-          prop = binding_data_path(target)
+        # scrollTo: the request is a CHANGE of the bound value (the SSoT's
+        # Collection.scrollTo, jsonui-cli 1.9.0) — the value the Collection is
+        # drawn with scrolls nowhere, and sending the same value again does
+        # not re-scroll. The value names a CELL (scrollCollectionToCell): a
+        # number its place among the drawn sections' cells, a string — with
+        # cellIdProperty — the first cell whose key it is, from the keys the
+        # effect reads off the data. The effect runs on mount too, so it
+        # compares with the value it last saw (a ref seeded with the first);
+        # until jsonui-cli 1.9.0 it scrolled on mount to whatever the value
+        # was. `Object.is`, and a ref rather than a "mounted" flag: React's
+        # StrictMode runs a mount effect twice, and the second would have
+        # scrolled.
+        if scroll_to_binding?(collection)
+          prop = binding_data_path(collection[:scroll_to])
+          seen = "#{camel}ScrollToSeen"
           anchor_expr = scroll_anchor_expr(collection[:scroll_anchor] || 'bottom')
-          animated = collection[:scroll_animated] == false ? 'false' : 'true'
-          lines << "  useEffect(() => { scrollCollectionToItem(#{ref}.current, #{prop}, " \
-                   "#{anchor_expr}, #{animated}, #{horizontal}); }, [#{prop}]);"
+          animated = scroll_animated_arg(collection[:scroll_animated])
+          lists = collection_cell_key_lists(collection)
+          keys = lists ? "collectionCellKeys(#{lists}, #{cell_key_property(collection).to_json})" : 'null'
+          lines << "  const #{seen} = useRef(#{prop});"
+          lines << "  useEffect(() => { if (Object.is(#{seen}.current, #{prop})) return; #{seen}.current = #{prop}; " \
+                   "scrollCollectionToCell(#{ref}.current, #{collection[:id].to_json}, #{prop}, " \
+                   "#{keys}, #{anchor_expr}, #{animated}, #{horizontal}); }, [#{prop}]);"
         end
 
         # currentPage: data -> DOM. The DOM -> data direction is the onScroll
@@ -925,8 +1021,73 @@ module RjuiTools
         lines.join("\n")
       end
 
+      def scroll_to_binding?(collection)
+        binding_expression?(collection[:scroll_to])
+      end
+
+      # The drawn cells' lists, in section order, as a JS array expression —
+      # the keys scrollTo matches a string against (a cell's cellId, else its
+      # cellIdProperty value when the Collection has one) — or nil when the
+      # Collection has no items binding. Until jsonui-cli 1.9.0 it was nil
+      # with no cellIdProperty too, so a string never met a cellId there.
+      # The lists are the ones CollectionConverter draws:
+      # each section that declares a cell (its cells enriched with their
+      # cellIds under autoChangeTrackingId); with no sections, the class-list
+      # shape's every data section, the first only on a flow or a horizontal
+      # Collection, or the one list an array-typed items is.
+      def collection_cell_key_lists(collection)
+        prop = cell_key_property(collection)
+        items = collection[:items]
+        return nil unless binding_expression?(items)
+
+        path = binding_data_path(items)
+        sections = collection[:sections]
+        if sections.is_a?(Array) && !sections.empty?
+          lists = sections.each_with_index.select { |section, _| section.is_a?(Hash) && section['cell'] }.map do |_, index|
+            source = "(#{path}?.sections?.[#{index}]?.cells?.data ?? [])"
+            collection[:auto_tracking] && prop ? "enrichCellIds(#{source}, #{prop.to_json})" : source
+          end
+          "[#{lists.join(', ')}]"
+        elsif collection_items_list?(items)
+          "[#{path} ?? []]"
+        elsif collection[:flow] || collection[:horizontal]
+          "[#{path}?.sections?.[0]?.cells?.data ?? []]"
+        else
+          "(#{path}?.sections ?? []).map((section) => section.cells?.data ?? [])"
+        end
+      end
+
+      # The Collection's cellIdProperty, or nil — a cell's key is its cellId
+      # then (the SSoT's Collection.scrollTo).
+      def cell_key_property(collection)
+        prop = collection[:cell_id_property]
+        prop.is_a?(String) && !prop.empty? ? prop : nil
+      end
+
+      # items bound to a property the layout declares as a list (`[T]`,
+      # `Array`) — CollectionConverter#legacy_items_list_element's reading.
+      def collection_items_list?(items)
+        name = items[/\A@\{\s*([A-Za-z_]\w*)\s*\}\z/, 1]
+        return false unless name
+
+        !JsonUIShared::AttributeTypes.list_element((@config['_data_classes'] || {})[name]).nil?
+      end
+
       def scroll_anchor_expr(anchor)
         %w[top center bottom].include?(anchor.to_s) ? "'#{anchor}'" : "'bottom'"
+      end
+
+      # `scrollAnimated` as scrollCollectionToItem's `animated`: a literal
+      # false jumps, absent or true animates (the declared default), and a
+      # binding decides at run time — true only when the bound value is true,
+      # the reading sjui (`(data.x ?? false)`) and kjui (`(data.x ?: false)`)
+      # give an unset bound value. Until 1.9.0 a binding was read as `true`
+      # (measured on 46a54fc3, 2026-09-26; ticket
+      # collection-attributes-declared-but-not-drawn-on-some-paths).
+      def scroll_animated_arg(value)
+        return "(#{binding_data_path(value)}) === true" if binding_expression?(value)
+
+        value == false ? 'false' : 'true'
       end
 
       def binding_expression?(value)
@@ -946,10 +1107,10 @@ module RjuiTools
         return fields unless json.is_a?(Hash) || json.is_a?(Array)
 
         if json.is_a?(Hash)
-          type = json['type']
+          type = drawn_type_of(json)
           id = json['id']
           if id.is_a?(String) && !id.empty? && !id.include?('@{')
-            if %w[TextField EditText Input].include?(type)
+            if type == 'TextField'
               fields << { id: id, camel: snake_to_camel_id(id), element: 'input' }
             elsif type == 'TextView'
               fields << { id: id, camel: snake_to_camel_id(id), element: 'textarea' }
@@ -975,30 +1136,33 @@ module RjuiTools
         parts[0] + parts[1..].map(&:capitalize).join
       end
 
-      def extract_state_variables(json, vars = [])
-        # Check for Segment/Radio that need state
-        type = json['type']
+      # Component-level state hooks. None today: a static Segment / Radio used
+      # to declare `selectedIndex` / `selectedValue` here — one fixed name per
+      # kind, folded by name, and read by no markup — while the controls
+      # stayed where they started (ticket
+      # static-valued-controls-do-not-change-on-a-users-tap). A control's
+      # own state is now the file's JsonUISeeded (#seeded_helper).
+      def extract_state_variables(_json)
+        []
+      end
 
-        if type == 'Segment'
-          id = json['id'] || 'segment'
-          selected = json['selectedIndex'] || json['selectedTabIndex']
-          unless selected.is_a?(String) && selected.start_with?('@{')
-            vars << { name: 'selectedIndex', default: selected || 0 }
-          end
-        elsif type == 'Radio'
-          id = json['id'] || 'radio'
-          selected = json['selectedValue']
-          unless selected.is_a?(String) && selected.start_with?('@{')
-            vars << { name: 'selectedValue', default: '""' }
-          end
-        end
+      # The one holder of every static-seeded control's state in a file:
+      # `seed` starts it, the markup gets the value and its setter.
+      def seeded_helper(typescript)
+        signature = if typescript
+                      '<T,>({ seed, children }: { seed: T; children: (value: T, set: (value: T) => void) => React.ReactNode })'
+                    else
+                      '({ seed, children })'
+                    end
+        <<~TSX.chomp
 
-        # Recurse into children
-        json['child']&.each do |child|
-          extract_state_variables(child, vars) if child.is_a?(Hash)
-        end
-
-        vars.uniq { |v| v[:name] }
+          // A control written with a static value starts there and the user changes it
+          // (the value is a seed, as `defaultChecked` is): its state, handed to its markup.
+          const JsonUISeeded = #{signature} => {
+            const [value, setValue] = useState(seed);
+            return <>{children(value, setValue)}</>;
+          };
+        TSX
       end
 
       def generate_props_signature(props)
@@ -1026,7 +1190,7 @@ module RjuiTools
       # Skips iconType:"resource" — those render as <img> from public/icons.
       def collect_lucide_icons(json, icons = ::Set.new)
         if json.is_a?(Hash)
-          if json['type'] == 'TabView' && json['tabs'].is_a?(Array)
+          if drawn_type_of(json) == 'TabView' && json['tabs'].is_a?(Array)
             json['tabs'].each do |tab|
               next unless tab.is_a?(Hash)
               icon_type = tab['iconType'] || 'system'
@@ -1068,8 +1232,7 @@ module RjuiTools
             class_name = class_ref.is_a?(Hash) ? class_ref['className'] : class_ref
             next unless class_name.is_a?(String)
             parts = class_name.split('/')
-            base_name = parts.last
-            component_name = to_pascal_case(base_name)
+            component_name = ComponentName.for_reference(class_name)
             subdir = parts.length > 1 ? parts[0...-1].join('/') : nil
             components[component_name] ||= subdir
           end
@@ -1083,8 +1246,7 @@ module RjuiTools
             class_name = section[key]
             next unless class_name.is_a?(String)
             parts = class_name.split('/')
-            base_name = parts.last
-            component_name = to_pascal_case(base_name)
+            component_name = ComponentName.for_reference(class_name)
             subdir = parts.length > 1 ? parts[0...-1].join('/') : nil
             components[component_name] ||= subdir
           end
@@ -1103,7 +1265,7 @@ module RjuiTools
         end
 
         # Check for Embed (screen reference)
-        if json['type'] == 'Embed' && json['screen'].is_a?(String)
+        if drawn_type_of(json) == 'Embed' && json['screen'].is_a?(String)
           parts = json['screen'].split('/')
           base_name = parts.last
           component_name = to_pascal_case(base_name)
@@ -1131,6 +1293,7 @@ module RjuiTools
         if type && @extension_converters.key?(type)
           components << type
         end
+        type = drawn_type_of(json)
 
         # Check for NetworkImage type (built-in but requires separate import)
         if type == 'NetworkImage'
@@ -1163,25 +1326,19 @@ module RjuiTools
 
       # Extract cell component types from Collection elements (for TypeScript imports)
       def extract_collection_cell_types(json, types = [])
-        type = json['type']
+        type = drawn_type_of(json)
 
         if type == 'Collection'
           # Modern sections format
           json['sections']&.each do |section|
-            if section['cell']
-              cell_name = section['cell'].split('/').last
-              cell_type = cell_name.match?(/^[A-Z]/) && !cell_name.include?('_') ? cell_name : cell_name.split('_').map(&:capitalize).join
-              types << cell_type
-            end
+            cell_type = ComponentName.for_reference(section['cell'])
+            types << cell_type if cell_type
           end
 
           # Legacy cellClasses format
           json['cellClasses']&.each do |cell_class|
-            cell_name = cell_class.is_a?(Hash) ? cell_class['className'] : cell_class
-            next unless cell_name.is_a?(String)
-            cell_name = cell_name.split('/').last
-            cell_type = cell_name.match?(/^[A-Z]/) && !cell_name.include?('_') ? cell_name : cell_name.split('_').map(&:capitalize).join
-            types << cell_type
+            cell_type = ComponentName.for_reference(cell_class)
+            types << cell_type if cell_type
           end
         end
 
@@ -1232,7 +1389,7 @@ module RjuiTools
 
       def uses_auto_cell_id?(json)
         return false unless json.is_a?(Hash)
-        return true if json['type'] == 'Collection' &&
+        return true if drawn_type_of(json) == 'Collection' &&
                        json['autoChangeTrackingId'] == true &&
                        json['cellIdProperty'] && !json['cellIdProperty'].to_s.empty?
 
@@ -1262,6 +1419,20 @@ module RjuiTools
         false
       end
 
+      # Every `data` declaration in this layout's own tree, raw: name => class.
+      def declared_data_classes(json, found = {})
+        case json
+        when Hash
+          if json['data'].is_a?(Array)
+            json['data'].each { |d| found[d['name']] ||= d['class'] if d.is_a?(Hash) && d['name'].is_a?(String) }
+          end
+          json.each_value { |v| declared_data_classes(v, found) if v.is_a?(Hash) || v.is_a?(Array) }
+        when Array
+          json.each { |v| declared_data_classes(v, found) }
+        end
+        found
+      end
+
       # Extract data from JSON - search for data-only elements in children (recursively)
       # A data-only element is { "data": [...] } with only the data key
       def extract_data_from_json(json)
@@ -1270,7 +1441,7 @@ module RjuiTools
         json['child'].each do |child|
           next unless child.is_a?(Hash)
           # Check if this child has only 'data' key (data-only element)
-          if child.keys == ['data'] && child['data'].is_a?(Array)
+          if data_only_element?(child)
             # Normalize types using TypeConverter (mode: react)
             return Core::TypeConverter.normalize_data_properties(child['data'], 'react')
           end
@@ -1283,9 +1454,11 @@ module RjuiTools
       end
 
       # Check if a child element is a data-only element (should not be rendered)
+      # Its keys are the ones the layout wrote (Core::NodeKeys): the generator's
+      # position stamp is not among them.
       def data_only_element?(child)
         return false unless child.is_a?(Hash)
-        child.keys == ['data'] && child['data'].is_a?(Array)
+        Core::NodeKeys.written(child) == ['data'] && child['data'].is_a?(Array)
       end
 
       # Extract props from 'data' attribute with type information

@@ -16,8 +16,16 @@ interface LinkifyTextProps {
   // kept in lockstep with the built-in props contract spec.
   style?: React.CSSProperties;
   onClick?: () => void;
+  // A tap the tap rule makes a button (BaseConverter#keyboard_tap_attrs):
+  // its role, its tab stop and the keys that click it.
+  role?: string;
+  tabIndex?: number;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLElement>) => void;
   'data-testid'?: string;
   'data-tag'?: string;
+  // tintColor: the links' colour (the accent of the operable parts —
+  // jsonui-cli 1.9.0). The default blue when absent.
+  linkColor?: string;
 }
 
 // Bare http(s) URLs. Trailing sentence punctuation is not part of the link.
@@ -89,8 +97,12 @@ export const LinkifyText = React.forwardRef<HTMLSpanElement, LinkifyTextProps>((
   className = '',
   style,
   onClick,
+  role,
+  tabIndex,
+  onKeyDown,
   'data-testid': dataTestid,
   'data-tag': dataTag,
+  linkColor,
 }, ref) => (
   // whitespace-pre-line preserves newlines carried by bound values — the
   // literal path used to lose them too, so both shapes get it here.
@@ -100,6 +112,9 @@ export const LinkifyText = React.forwardRef<HTMLSpanElement, LinkifyTextProps>((
     className={`${className} whitespace-pre-line`}
     style={style}
     onClick={onClick}
+    role={role}
+    tabIndex={tabIndex}
+    onKeyDown={onKeyDown}
     data-testid={dataTestid}
     data-tag={dataTag}
     data-linkable="true"
@@ -107,14 +122,14 @@ export const LinkifyText = React.forwardRef<HTMLSpanElement, LinkifyTextProps>((
     {segment(text).map((seg, i) => {
       if (seg.kind === 'url') {
         return (
-          <a key={i} href={seg.value} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>
+          <a key={i} href={seg.value} target="_blank" rel="noopener noreferrer" className={LINK_CLASS} style={linkColor ? { color: linkColor } : undefined}>
             {seg.value}
           </a>
         );
       }
       if (seg.kind === 'phone') {
         return (
-          <a key={i} href={telHref(seg.value)} className={LINK_CLASS}>
+          <a key={i} href={telHref(seg.value)} className={LINK_CLASS} style={linkColor ? { color: linkColor } : undefined}>
             {seg.value}
           </a>
         );

@@ -1,17 +1,18 @@
 # frozen_string_literal: true
 
 require_relative 'base_converter'
+require_relative '../../core/layout_path'
 
 module RjuiTools
   module React
     module Converters
       class SelectBoxConverter < BaseConverter
         def convert(indent = 2)
-          # Date picker mode: selectItemType == "Date"
-          select_item_type = attributes['selectItemType']
-          if select_item_type&.downcase == 'date'
-            return generate_date_picker(indent)
-          end
+          # Date picker mode: selectItemType "Date", as declared (the SSoT enum
+          # is ["Normal", "Date"]; every path compares it as written, and the
+          # validator names any other value). It was compared downcased here,
+          # so "date" drew a date input on web and a list on the codegens.
+          return generate_date_picker(indent) if date_picker?
 
           class_name = build_class_name
           style_attr = build_style_attr
@@ -236,7 +237,7 @@ module RjuiTools
         end
 
         def date_picker?
-          attributes['selectItemType'].to_s.downcase == 'date'
+          attributes['selectItemType'] == 'Date'
         end
 
         def apply_caret_attributes(classes)
@@ -347,13 +348,22 @@ module RjuiTools
         # exists when there is a runtime condition to swap on, and
         # build_class_name has to know the same answer to decide whether the
         # hint colour needs a custom property.
+        # The list's selection, declared two-way under three spellings:
+        # `selectedItem` first (the other paths' precedence), then
+        # `selectedValue`, then the legacy `value`. Only `selectedValue` was
+        # read, so a bound selectedItem reached the page as nothing — no value,
+        # no onChange (ticket selectbox-selected-item-binding-is-read-once).
+        def selection_attr
+          attributes['selectedItem'] || attributes['selectedValue'] || attributes['value']
+        end
+
         def selected_value_bound?
-          value_binding = with_bind_fallback(attributes['selectedValue'] || attributes['value'])
+          value_binding = selection_attr
           !!(value_binding && has_binding?(value_binding))
         end
 
         def build_select_class_attr(class_name)
-          value_binding = with_bind_fallback(attributes['selectedValue'] || attributes['value'])
+          value_binding = selection_attr
 
           expressions = []
           if value_binding && has_binding?(value_binding)
@@ -438,7 +448,7 @@ module RjuiTools
           # typeof-narrowing would reduce the object branch to `never` and
           # every property access to TS2339.
           opt_cast =
-            if config['typescript'] != false
+            if typescript?
               ' as string | number | { value?: string | number; id?: string | number; text?: string; label?: string }'
             else
               ''
@@ -460,9 +470,9 @@ module RjuiTools
             if item.is_a?(Hash)
               value = item['value'] || item['id'] || item['text']
               label = item['text'] || item['label'] || value
-              "#{indent_str(indent + 2)}<option value=\"#{value}\">#{label}</option>"
+              "#{indent_str(indent + 2)}<option#{jsx_attr_text('value', value)}>#{JsonUIShared::StringLiterals.jsx_text(label)}</option>"
             else
-              "#{indent_str(indent + 2)}<option value=\"#{item}\">#{item}</option>"
+              "#{indent_str(indent + 2)}<option#{jsx_attr_text('value', item)}>#{JsonUIShared::StringLiterals.jsx_text(item)}</option>"
             end
           end.join("\n")
 
@@ -485,7 +495,7 @@ module RjuiTools
         end
 
         def build_value_attr
-          value = with_bind_fallback(attributes['selectedValue'] || attributes['value'])
+          value = selection_attr
 
           if value && has_binding?(value)
             prop = extract_binding_property(value)
@@ -497,7 +507,7 @@ module RjuiTools
 
             " value={#{prop}}"
           elsif value
-            multiple_select? ? " defaultValue={[\"#{value}\"]}" : " defaultValue=\"#{value}\""
+            multiple_select? ? " defaultValue={[#{JsonUIShared::StringLiterals.ts(value)}]}" : jsx_attr_text('defaultValue', value)
           elsif (index_binding = attributes['selectedIndex']) && has_binding?(index_binding)
             build_index_value_attr(index_binding)
           elsif attributes['selectedIndex'].is_a?(Numeric)
@@ -507,7 +517,7 @@ module RjuiTools
             if items.is_a?(Array)
               item = items[attributes['selectedIndex'].to_i]
               literal = item.is_a?(Hash) ? (item['value'] || item['label']) : item
-              literal ? " defaultValue=\"#{literal}\"" : ''
+              literal ? jsx_attr_text('defaultValue', literal) : ''
             else
               ''
             end
@@ -526,7 +536,7 @@ module RjuiTools
           if items.is_a?(String) && has_binding?(items)
             items_prop = extract_binding_property(items)
             sel_cast =
-              if config['typescript'] != false
+              if typescript?
                 ' as string | number | { value?: string | number; id?: string | number } | undefined'
               else
                 ''
@@ -535,7 +545,7 @@ module RjuiTools
           elsif items.is_a?(Array)
             values = items.map do |item|
               raw = item.is_a?(Hash) ? (item['value'] || item['id'] || item['text']) : item
-              "'#{raw.to_s.gsub("'") { "\\'" }}'"
+              JsonUIShared::StringLiterals.ts_single(raw)
             end
             " value={[#{values.join(', ')}][#{index_prop} ?? -1] ?? ''}"
           else
@@ -547,15 +557,14 @@ module RjuiTools
           handler = attributes['onValueChange'] || attributes['onValueChanged'] || attributes['onChange']
           if handler
             if has_binding?(handler)
-              prop = extract_binding_property(handler)
-              return " onChange={(e) => #{prop}?.(#{changed_value_expr})}"
+              return operation_attr('onChange', '(e)', declared_handler_call(handler, changed_value_expr, selection_index_expr))
             else
-              return " onChange={(e) => #{handler}?.(#{changed_value_expr})}"
+              return operation_attr('onChange', '(e)', "#{handler}?.(#{changed_value_expr})")
             end
           end
 
           # Auto-generate onChange from value binding (two-way binding)
-          value_key = attributes['selectedValue'] || attributes['value']
+          value_key = selection_attr
           index_key = attributes['selectedIndex'] unless value_key
           value_key ||= index_key
           if value_key && has_binding?(value_key)
@@ -570,17 +579,72 @@ module RjuiTools
             # a string, which the declared `(value: number) => void` rejects.)
             if index_key
               index_expr = placeholder_row? ? 'e.target.selectedIndex - 1' : 'e.target.selectedIndex'
-              return " onChange={(e) => data.#{handler_name}?.(#{index_expr})}"
+              return operation_attr('onChange', '(e)', "data.#{handler_name}?.(#{index_expr})")
             end
-            return " onChange={(e) => data.#{handler_name}?.(#{changed_value_expr})}"
+            return operation_attr('onChange', '(e)', "data.#{handler_name}?.(#{changed_value_expr})")
           end
 
-          ''
+          # No own write-back: the selection still happens, and a declared
+          # onClick is called from it.
+          operation_attr('onChange', '(e)', nil)
         end
 
         # `e.target.value` on a multi-select is only the FIRST selected option,
         # which silently loses every other selection — the whole point of the
         # attribute. selectedOptions is the full set.
+        # The call to a declared onValueChange, as the class the layout's data
+        # declares it with says (attribute_definitions SelectBox.onValueChange,
+        # "the same on every platform"):
+        # - `(() -> Void)?` is called with nothing;
+        # - `(String, X)` with the viewId (JsonUIShared::LayoutPath.view_id:
+        #   the id, else `selectBox_<path>`) and the selection's new value —
+        #   the index where selectedIndex is bound, the item otherwise.
+        # web called every one with the value alone, so a declared
+        # `(String, String)` took the value where the viewId goes and a
+        # declared `()` took one it has no place for (TS2554 under strict,
+        # both). An undeclared handler (the build's binding warning asks for
+        # its declaration) and any other shape — a lone `(String)` among them,
+        # whose meaning is 4f's to rule — are called with the value as before.
+        def declared_handler_call(handler, value_expr, index_expr)
+          callee = extract_binding_property(handler)
+          klass = self.class.declared_class(handler, config['_data_classes'] || {})
+          if klass.match?(/\(\s*\)\s*->/)
+            "#{callee}?.()"
+          elsif klass.match?(VIEW_ID_CLASS)
+            "#{callee}?.(#{view_id_expr}, #{index_expr || value_expr})"
+          else
+            "#{callee}?.(#{value_expr})"
+          end
+        end
+
+        # A declared class whose first parameter is the viewId: `(String, X)`.
+        VIEW_ID_CLASS = /\(\s*\(?\s*String\s*,/.freeze
+
+        def self.declared_class(handler, data_classes)
+          name = handler.is_a?(String) && handler[/\A@\{\s*([^}]+?)\s*\}\z/, 1]
+          name ? data_classes[name].to_s : ''
+        end
+
+        # Whether this node hands its handler a viewId: a SelectBox whose
+        # onValueChange the data declares `(String, X)`. The one judgment
+        # the call above and IncludePaths (which layouts take `jsonuiPath`)
+        # both take.
+        def self.hands_view_id?(node, data_classes)
+          return false unless node.is_a?(Hash) && JsonUIShared::TypeSynonyms.drawn_type(node['type'].to_s) == 'SelectBox'
+
+          handler = node['onValueChange'] || node['onValueChanged'] || node['onChange']
+          declared_class(handler, data_classes).match?(VIEW_ID_CLASS)
+        end
+
+        # The new index where selectedIndex is what is bound (no selected
+        # item or value), for a handler declared to take it.
+        def selection_index_expr
+          index = attributes['selectedIndex']
+          return nil if selection_attr || !(index.is_a?(String) && has_binding?(index))
+
+          placeholder_row? ? 'e.target.selectedIndex - 1' : 'e.target.selectedIndex'
+        end
+
         def changed_value_expr
           multiple_select? ? 'Array.from(e.target.selectedOptions).map((o) => o.value)' : 'e.target.value'
         end
@@ -607,15 +671,19 @@ module RjuiTools
           disabled_attr = build_disabled_attr
 
           # Determine input type from datePickerMode
-          date_picker_mode = attributes['datePickerMode']&.downcase
+          date_picker_mode = JsonUIShared::EnumSpelling.lowered(attributes['datePickerMode'], 'SelectBox', 'datePickerMode')
           input_type = case date_picker_mode
                        when 'time' then 'time'
                        when 'datetime', 'dateandtime' then 'datetime-local'
                        else 'date'
                        end
 
-          # Value binding (selectedDate or selectedValue)
-          date_value = attributes['selectedDate'] || attributes['selectedValue'] || attributes['value']
+          # A Date SelectBox's value is its selectedDate alone (4f's ruling,
+          # jsonui-cli 1.9.0; SSoT common.bind primaryValue, by
+          # selectItemType). selectedValue and the undeclared `value` were
+          # read after it here and not by sjui; the shared validator names a
+          # Date box's selectedValue / selectedItem / selectedIndex.
+          date_value = attributes['selectedDate']
           # dateStringFormat is the shape the ViewModel holds; the input only
           # ever speaks ISO (yyyy-MM-dd / HH:mm / yyyy-MM-ddTHH:mm), so the value
           # is converted in both directions rather than silently handing the VM a
@@ -625,12 +693,16 @@ module RjuiTools
                          prop = extract_binding_property(date_value)
                          if format
                            @uses_date_format = true
-                           " value={toIsoDateValue(#{prop}, '#{format}', '#{input_type}')}"
+                           " value={toIsoDateValue(#{prop}, #{JsonUIShared::StringLiterals.ts_single(format)}, '#{input_type}')}"
                          else
                            " value={#{prop} || ''}"
                          end
                        elsif date_value
-                         " value=\"#{date_value}\""
+                         # A static date is where the input starts, and the
+                         # user changes it (ticket static-valued-controls-do-not-
+                         # change-on-a-users-tap): `value` with no onChange held
+                         # it still.
+                         jsx_attr_text('defaultValue', date_value)
                        else
                          ''
                        end
@@ -677,7 +749,7 @@ module RjuiTools
         def build_date_on_change(date_value, input_type = 'date')
           value_expr = if (format = date_string_format)
                          @uses_date_format = true
-                         "formatDateValue(e.target.value, '#{format}', '#{input_type}')"
+                         "formatDateValue(e.target.value, #{JsonUIShared::StringLiterals.ts_single(format)}, '#{input_type}')"
                        else
                          'e.target.value'
                        end
@@ -685,18 +757,18 @@ module RjuiTools
           # Custom handler takes priority
           handler = attributes['onValueChange'] || attributes['onChange']
           if handler && has_binding?(handler)
-            prop = extract_binding_property(handler)
-            return " onChange={(e) => #{prop}?.(#{value_expr})}"
+            return operation_attr('onChange', '(e)', declared_handler_call(handler, value_expr, nil))
           end
 
           # Auto-generate from selectedDate binding
           if date_value && has_binding?(date_value)
             property_name = date_value.match(/@\{(.+)\}/)[1]
             handler_name = "on#{property_name[0].upcase}#{property_name[1..]}Change"
-            return " onChange={(e) => data.#{handler_name}?.(#{value_expr})}"
+            return operation_attr('onChange', '(e)', "data.#{handler_name}?.(#{value_expr})")
           end
 
-          ''
+          # The picked date is the selection a declared onClick follows.
+          operation_attr('onChange', '(e)', nil)
         end
 
         def date_string_format
@@ -710,7 +782,7 @@ module RjuiTools
           return '' unless value
 
           expr = bound_value_expr(value)
-          expr ? " #{name}={#{expr}}" : " #{name}=\"#{value}\""
+          expr ? " #{name}={#{expr}}" : jsx_attr_text(name, value)
         end
 
         # minuteInterval — `step` is in seconds, so the interval is minutes * 60.
@@ -730,7 +802,7 @@ module RjuiTools
         # the field takes focus (HTMLInputElement.showPicker). The wheel styles
         # have no web analogue and fall through to the native control.
         def build_date_picker_style_attr
-          style = attributes['datePickerStyle'].to_s.downcase
+          style = JsonUIShared::EnumSpelling.lowered(attributes['datePickerStyle'], 'SelectBox', 'datePickerStyle').to_s
           return '' unless %w[graphical inline].include?(style)
 
           ' onFocus={(e) => e.currentTarget.showPicker?.()}'

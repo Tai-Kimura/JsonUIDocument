@@ -4,9 +4,11 @@ require 'json'
 require 'fileutils'
 require 'set'
 require_relative '../../core/config_manager'
+require_relative '../../core/node_keys'
 require_relative '../../core/frameworks'
 require_relative '../../core/generated_marker'
 require_relative '../../core/logger'
+require_relative '../../core/templates'
 require_relative '../../core/attribute_validator'
 require_relative '../../core/normalization'
 require_relative '../../core/binding_validator'
@@ -44,6 +46,12 @@ module RjuiTools
         def execute
           Core::Logger.info('Building React components from JSON layouts...')
 
+          # The app's own converter spellings, before anything reads a layout:
+          # the validators and the data model classify a node by the type it
+          # is drawn as, and a registered spelling is drawn as written
+          # (shared/core/type_synonyms.rb, TypeSynonyms.app_types).
+          JsonUIShared::TypeSynonyms.app_types = React::ReactGenerator.extension_types
+
           layouts_dir = @config['layouts_directory']
 
           unless Dir.exist?(layouts_dir)
@@ -68,6 +76,7 @@ module RjuiTools
 
           # Emit the screen-marker helper (screen identity / test support)
           emit_screen_marker_helper
+          emit_interaction_stop_helper
           emit_partial_text_helper
 
           # Emit the Collection scroll-control helper (scrollTo /
@@ -102,6 +111,13 @@ module RjuiTools
 
           if json_files.empty?
             Core::Logger.warn('No JSON layout files found')
+            # Nothing to build is not a failure — but what the stages before
+            # this one could not do still is: it was recorded and then never
+            # written, so the ledger came back empty (measured on 0f7140a3:
+            # SwiftUI, colors.json unparseable, no layouts yet — exit 0, 0
+            # entries). Ticket uikit-build-reports-success-after-a-binding-error.
+            JsonUI::StageFailures.report!(Core::Logger)
+            JsonUI::StageFailures.conclude(Core::Logger, nil) if JsonUI::StageFailures.any?
             return
           end
 
@@ -127,7 +143,22 @@ module RjuiTools
           # Pass component paths to generator for import resolution
           @config['_component_paths'] = component_paths
 
+          # The layouts that take `jsonuiPath`, their root's position in the
+          # include-expanded tree (React::IncludePaths): an included layout
+          # holding a node that hands its handler a viewId without an id. The
+          # include graph is the whole set of layouts, so it is read here,
+          # before any of them is generated.
+          @config['_path_stems'] = React::IncludePaths.stems_taking_path(
+            json_files.each_with_object({}) do |json_file, trees|
+              trees[File.basename(json_file, '.json')] =
+                React::StyleLoader.load_and_merge(JSON.parse(File.read(json_file, encoding: 'UTF-8')))
+            rescue JSON::ParserError
+              next
+            end
+          ).to_a
+
           generator = React::ReactGenerator.new(@config)
+          generator.unknown_type_validator = @validator
 
           # Screen identity: only screens carry a marker (cells and partials
           # render inside a host and would each grow a false one). Built once
@@ -161,7 +192,8 @@ module RjuiTools
 
               # Shared layout checks (autoChangeTrackingId without cellIdProperty, etc.)
               shared_warnings = JsonUIShared::LayoutValidator.validate_layout(
-                json_content, source_path: File.basename(json_file)
+                json_content, source_path: File.basename(json_file),
+                extension_definitions: Core::AttributeValidator.extension_definitions(:react)
               )
               JsonUIShared::LayoutValidator.print_warnings(shared_warnings) unless shared_warnings.empty?
 
@@ -241,7 +273,8 @@ module RjuiTools
                 validate_component(v_json, variant_file)
                 validate_bindings(v_json, variant_file)
                 v_shared_warnings = JsonUIShared::LayoutValidator.validate_layout(
-                  v_json, source_path: File.basename(variant_file)
+                  v_json, source_path: File.basename(variant_file),
+                  extension_definitions: Core::AttributeValidator.extension_definitions(:react)
                 )
                 JsonUIShared::LayoutValidator.print_warnings(v_shared_warnings) unless v_shared_warnings.empty?
 
@@ -308,6 +341,7 @@ module RjuiTools
           prune_orphan_components(expected_component_paths)
           prune_orphan_viewmodel_bases(json_files)
           prune_layout_orphans
+          prune_other_language_copies
 
           # Print all collected warnings at the end
           print_validation_summary
@@ -332,14 +366,7 @@ module RjuiTools
           # is a legitimate outcome here, and stopping it would break the
           # window every consuming project builds in. What was missing is
           # that the last line stops claiming otherwise.
-          if JsonUI::StageFailures.any?
-            Core::Logger.error(
-              "Build finished with #{JsonUI::StageFailures.entries.size} " \
-              'stage(s) incomplete — see above'
-            )
-          else
-            Core::Logger.success('Build completed!')
-          end
+          JsonUI::StageFailures.conclude(Core::Logger, 'Build completed!')
         end
 
         def prune_orphan_components(expected_paths)
@@ -430,6 +457,137 @@ module RjuiTools
           end
         end
 
+        # A project that changed `typescript` keeps what earlier builds wrote
+        # in the other language — `Home.tsx` beside the `Home.jsx` this build
+        # wrote — and both answer `import Home from '.../Home'` (which one a
+        # bundler takes is its extension order). The layout-orphan sweep does
+        # not see them: their layouts are all there. So each file in an
+        # output directory the config declares, in the OTHER language, whose
+        # same-named file in this language exists, is replaced
+        # (GeneratedOrphans.sweep_replaced): deleted when it is the
+        # generator's by the test its own refresh uses — the @generated
+        # sentinel; NetworkImage / LinkifyText the ReactJsonUI header the
+        # built-in refresh reads; useColorMode its sentinel or its pre-banner
+        # line — and named otherwise (Configuration is the user's once written;
+        # any file the user wrote). A ViewModel the user wrote in the other
+        # language is named too: its base and hook are written in its language
+        # (viewmodel_generator follows the file). EmbedContainer is `rjui
+        # init`'s and no build writes it, so nothing in this language replaced
+        # it: when it is init's copy unchanged — the init mark, and the
+        # template of its language byte for byte — this language's copy is
+        # written and the old one deleted; otherwise it is named and kept
+        # (4f ruling 2026-09-26, round 8). The mark alone is not the test here,
+        # as it is for NetworkImage: build refreshes NetworkImage whenever it
+        # differs, so its mark means the tool owns every byte; EmbedContainer
+        # is never refreshed, and an edit below its header comment would be
+        # the user's. Until jsonui-cli 1.9.0 all of them stayed, unnamed.
+        OTHER_LANGUAGE = { '.ts' => '.js', '.tsx' => '.jsx', '.js' => '.ts', '.jsx' => '.tsx' }.freeze
+        BUILTIN_OWNED = {
+          'NetworkImage' => ->(text) { text.include?('Generated by ReactJsonUI') },
+          'LinkifyText' => ->(text) { text.include?('Generated by ReactJsonUI') },
+          'useColorMode' => lambda { |text|
+            text.include?(Core::GeneratedMarker::SENTINEL) || text.include?(LEGACY_USE_COLOR_MODE_MARKER)
+          },
+          'Configuration' => ->(_text) { false },
+          'EmbedContainer' => ->(text) { EMBED_CONTAINER_TEMPLATES.value?(text) }
+        }.freeze
+        # `rjui init`'s mark on the EmbedContainer it writes.
+        EMBED_CONTAINER_MARK = 'Generated by rjui_tools `rjui init`'
+        # The copy init writes, by the extension it takes.
+        EMBED_CONTAINER_TEMPLATES = {
+          '.tsx' => File.read(Core::Templates.path('EmbedContainer.tsx', 'typescript' => true)),
+          '.jsx' => File.read(Core::Templates.path('EmbedContainer.tsx', 'typescript' => false))
+        }.freeze
+
+        def prune_other_language_copies
+          typescript = @config['typescript'] ? true : false
+          stale_exts = typescript ? %w[.js .jsx] : %w[.ts .tsx]
+          dirs = [
+            @config['generated_directory'] || 'src/generated',
+            @config['components_directory'], @config['data_directory'], @config['hooks_directory'],
+            @config['generated_viewmodels_directory'],
+            @config['extensions_directory'] || 'src/components/extensions',
+            @config['lib_directory'] || 'src/lib/jsonui'
+          ].compact.uniq.select { |dir| Dir.exist?(dir) }
+          pairs = dirs.flat_map do |dir|
+            Dir.glob(File.join(dir, '**', '*')).select { |path| File.file?(path) && stale_exts.include?(File.extname(path)) }
+          end.uniq.map do |old|
+            ext = File.extname(old)
+            [old, old.sub(/#{Regexp.escape(ext)}\z/, OTHER_LANGUAGE.fetch(ext))]
+          end
+          unreplaced = replace_embed_container(pairs)
+          pairs -= unreplaced.map { |old, current, _| [old, current] }
+          owned = lambda do |path|
+            head = File.foreach(path).first(JsonUIShared::GeneratedOrphans::HEAD_LINES).join
+            rule = BUILTIN_OWNED[File.basename(path, File.extname(path))]
+            rule ? rule.call(File.read(path)) : head.include?(JsonUIShared::GeneratedOrphans::SENTINEL)
+          end
+          result = JsonUIShared::GeneratedOrphans.sweep_replaced(pairs, owned: owned)
+          language = typescript ? 'TypeScript' : 'JavaScript'
+          unless result.removed.empty?
+            Core::Logger.info("Pruned #{result.removed.size} generated file(s) the #{language} output replaces:")
+            result.removed.each { |old, current| Core::Logger.info("  - #{old} (now #{File.basename(current)})") }
+          end
+          unless result.kept.empty?
+            Core::Logger.warn("#{result.kept.size} file(s) the #{language} output replaces were kept:")
+            result.kept.each do |old, current|
+              Core::Logger.warn("  - #{old}: #{File.basename(current)} replaces it, but it is not marked as the generator's, " \
+                                'so it was not deleted — delete it (or move what you changed into the new one) by hand')
+            end
+          end
+          unreplaced.each do |old, current, reason|
+            if File.exist?(current)
+              Core::Logger.warn("#{old} is in the other language and was kept: #{reason}. #{File.basename(current)} is beside " \
+                                'it and answers the same import — delete it by hand (after moving what you changed into ' \
+                                "#{File.basename(current)}) or keep it.")
+            else
+              Core::Logger.warn("#{old} is in the other language and was kept: #{reason}, so #{File.basename(current)} was not " \
+                                "written in its place — the #{language} screens import it as it is. Replace it by hand " \
+                                "(`rjui init` writes #{File.basename(current)} when it is absent) or keep it.")
+            end
+          end
+          name_other_language_viewmodels(stale_exts, language)
+        end
+
+        # EmbedContainer in the other language: when it is init's copy
+        # unchanged, this language's copy is written (as init writes it) when
+        # there is none, so the sweep replaces the old one; when it is not, it
+        # is returned — [old, this language's copy, why] — to be named and kept
+        # (and taken out of the sweep), and nothing is written beside it (two
+        # copies would answer one import).
+        def replace_embed_container(pairs)
+          # `map { }.compact`, not `filter_map` (Ruby 2.7): spec/react/
+          # ruby_baseline_spec holds lib to 2.6.
+          pairs.map do |old, current|
+            next unless File.basename(old, File.extname(old)) == 'EmbedContainer'
+
+            text = File.read(old)
+            if BUILTIN_OWNED.fetch('EmbedContainer').call(text)
+              File.write(current, File.read(Core::Templates.path('EmbedContainer.tsx', @config))) unless File.exist?(current)
+              next
+            end
+
+            reason = if text.include?(EMBED_CONTAINER_MARK)
+                       "it carries `rjui init`'s mark but is not the copy init writes (edited, or an older template)"
+                     else
+                       "it does not carry `rjui init`'s mark (the user's)"
+                     end
+            [old, current, reason]
+          end.compact
+        end
+
+        def name_other_language_viewmodels(stale_exts, language)
+          dir = @config['viewmodels_directory']
+          return unless dir && Dir.exist?(dir)
+
+          models = Dir.glob(File.join(dir, '**', '*ViewModel*')).select { |path| stale_exts.include?(File.extname(path)) }.sort
+          return if models.empty?
+
+          Core::Logger.warn("#{models.size} ViewModel(s) of this #{language} project are in the other language; " \
+                            'their bases and hooks are written in their language, to match:')
+          models.each { |path| Core::Logger.warn("  - #{path}") }
+        end
+
         def cleanup_empty_dirs(root)
           Dir.glob(File.join(root, '**/*'))
              .select { |p| File.directory?(p) && (Dir.entries(p) - %w[. ..]).empty? }
@@ -450,8 +608,8 @@ module RjuiTools
           extensions_dir = @config['extensions_directory'] || 'src/components/extensions'
           FileUtils.mkdir_p(extensions_dir)
 
-          network_image_path = File.join(extensions_dir, 'NetworkImage.tsx')
-          template_path = File.join(File.dirname(__FILE__), '../../react/templates/network_image.tsx')
+          network_image_path = File.join(extensions_dir, Core::Templates.file_name('NetworkImage.tsx', @config))
+          template_path = Core::Templates.path('network_image.tsx', @config)
           if File.exist?(template_path)
             template = Core::Frameworks.apply_directive(File.read(template_path), Core::Frameworks.for(@config))
             if !File.exist?(network_image_path)
@@ -482,8 +640,8 @@ module RjuiTools
           extensions_dir = @config['extensions_directory'] || 'src/components/extensions'
           FileUtils.mkdir_p(extensions_dir)
 
-          target_path = File.join(extensions_dir, 'LinkifyText.tsx')
-          template_path = File.join(File.dirname(__FILE__), '../../react/templates/linkify_text.tsx')
+          target_path = File.join(extensions_dir, Core::Templates.file_name('LinkifyText.tsx', @config))
+          template_path = Core::Templates.path('linkify_text.tsx', @config)
           return unless File.exist?(template_path)
 
           template = Core::Frameworks.apply_directive(File.read(template_path), Core::Frameworks.for(@config))
@@ -508,10 +666,10 @@ module RjuiTools
           lib_dir = @config['lib_directory'] || 'src/lib/jsonui'
           FileUtils.mkdir_p(lib_dir)
 
-          target_path = File.join(lib_dir, 'Configuration.ts')
+          target_path = File.join(lib_dir, Core::Templates.file_name('Configuration.ts', @config))
           return if File.exist?(target_path)
 
-          template_path = File.join(File.dirname(__FILE__), '../../react/templates/Configuration.ts')
+          template_path = Core::Templates.path('Configuration.ts', @config)
           return unless File.exist?(template_path)
 
           File.write(target_path, File.read(template_path))
@@ -526,7 +684,7 @@ module RjuiTools
           return unless component.is_a?(Hash)
 
           # Skip style-only entries and data declarations
-          return if component.key?('style') && component.keys.size == 1
+          return if component.key?('style') && Core::NodeKeys.written(component).size == 1
           return if component.key?('data') && !component.key?('type')
 
           if component['type']
@@ -539,8 +697,11 @@ module RjuiTools
           # Get this component's orientation for children validation
           # View default orientation is 'vertical' (matches sjui/kjui behavior)
           # If not specified, use default for View types, otherwise inherit from parent
-          current_orientation = component['orientation'] ||
-            (component['type'] == 'View' ? 'vertical' : parent_orientation)
+          # (the node as drawn: an HStack is a View with orientation
+          # horizontal, and its children are laid out so — type_synonyms.rb)
+          drawn = JsonUIShared::TypeSynonyms.drawn(component)
+          current_orientation = drawn['orientation'] ||
+            (drawn['type'] == 'View' ? 'vertical' : parent_orientation)
 
           # Validate children recursively
           if component['child']
@@ -614,6 +775,11 @@ module RjuiTools
           data_generator.update_data_models
         rescue StandardError => e
           Core::Logger.error("Error generating data models: #{e.message}")
+          # The stage stops at the first layout it cannot read, so the ones
+          # after it have no Data model either. Until 1.9.0 this ERROR
+          # scrolled past "Build completed!" (ticket
+          # uikit-build-reports-success-after-a-binding-error).
+          JsonUI::StageFailures.record('data models', "the Data models were not generated: #{e.message}")
         end
 
         def generate_viewmodels
@@ -622,6 +788,7 @@ module RjuiTools
           viewmodel_generator.generate_viewmodels
         rescue StandardError => e
           Core::Logger.error("Error generating viewmodels: #{e.message}")
+          JsonUI::StageFailures.record('viewmodels', "the ViewModels were not generated: #{e.message}")
         end
 
         def generate_hooks
@@ -636,6 +803,7 @@ module RjuiTools
           hook_generator.generate_hooks
         rescue StandardError => e
           Core::Logger.error("Error generating hooks: #{e.message}")
+          JsonUI::StageFailures.record('hooks', "the ViewModel hooks were not generated: #{e.message}")
         end
 
         def update_color_manager(json_files, layouts_dir)
@@ -685,8 +853,8 @@ module RjuiTools
           hooks_dir = @config['hooks_directory'] || 'src/hooks'
           FileUtils.mkdir_p(hooks_dir)
 
-          target_path = File.join(hooks_dir, 'useColorMode.ts')
-          template_path = File.join(File.dirname(__FILE__), '../../react/templates/use_color_mode.ts')
+          target_path = File.join(hooks_dir, Core::Templates.file_name('useColorMode.ts', @config))
+          template_path = Core::Templates.path('use_color_mode.ts', @config)
           return unless File.exist?(template_path)
 
           template = Core::Frameworks.apply_directive(File.read(template_path), Core::Frameworks.for(@config))
@@ -1290,6 +1458,53 @@ module RjuiTools
 
             export function jsonuiIncludePrefix(outer#{opt}, includeId#{s})#{s} {
               return outer ? jsonuiIncludeId(outer, includeId) : jsonuiCamel(includeId);
+            }
+
+            #{marker_footer}
+          JS
+
+          File.write(path, content)
+          Core::Logger.info("Generated: #{path}")
+        end
+
+        # The helper a stopped element spreads (BaseConverter
+        # #apply_interaction_inert): `inert` in the form the running React
+        # takes — a boolean from React 19, a string before it — read from
+        # React.version at run time, so the generated components are the same
+        # under both. Measured in Chromium (18.3.1, 19.2.7): the spread stops
+        # the pointer, the keyboard and the accessibility tree; `inert={true}`
+        # does nothing under 18 and `inert=""` nothing under 19.
+        def emit_interaction_stop_helper
+          generated_dir = @config['generated_directory'] || 'src/generated'
+          FileUtils.mkdir_p(generated_dir)
+          is_ts = @config['typescript']
+          extension = is_ts ? 'ts' : 'js'
+          path = File.join(generated_dir, "interactionStop.#{extension}")
+          stop_type = is_ts ? ': boolean' : ''
+          ret_type = is_ts ? ': Record<string, unknown>' : ''
+
+          marker_header = Core::GeneratedMarker.comment_header(
+            source: "interactionStop (userInteractionEnabled helper)",
+            generator: "rjui build"
+          )
+          marker_footer = Core::GeneratedMarker.comment_footer
+
+          content = <<~JS
+            #{marker_header}
+            import React from 'react';
+
+            // userInteractionEnabled false, or a binding while it is false: the
+            // element and everything in it are inert — no pointer, no keyboard
+            // focus, and out of the accessibility tree. React 19 takes `inert`
+            // as a boolean and treats "" as false; React 18 writes an attribute
+            // it does not know only as a string and drops `true`.
+            const booleanInert = Number(React.version.split('.')[0]) >= 19;
+
+            export function jsonuiInert(stop#{stop_type})#{ret_type} {
+              if (!stop) {
+                return {};
+              }
+              return booleanInert ? { inert: true } : { inert: '' };
             }
 
             #{marker_footer}
@@ -1913,6 +2128,15 @@ module RjuiTools
           behavior_type = is_ts ? ': ScrollBehavior' : ''
           appear_param = is_ts ? ': (index: number) => void' : ''
           cleanup_ret = is_ts ? ': () => void' : ''
+          element_param = is_ts ? ': Element' : ''
+          id_param = is_ts ? ': string' : ''
+          key_prop_param = is_ts ? ': string | null' : ''
+          target_param = is_ts ? ': unknown' : ''
+          keys_param = is_ts ? ': unknown[] | null' : ''
+          lists_param = is_ts ? ': unknown[][]' : ''
+          keys_ret = is_ts ? ': unknown[]' : ''
+          keys_decl = is_ts ? ': unknown[]' : ''
+          record_cast = is_ts ? ' as Record<string, unknown>' : ''
 
           marker_header = Core::GeneratedMarker.comment_header(
             source: "collectionScroll (Collection scroll-control helper)",
@@ -1930,7 +2154,7 @@ module RjuiTools
               return horizontal ? box.left : box.top;
             }
 
-            // scrollTo: bring the cell at `index` to `anchor` within the
+            // currentPage: bring the child at `index` to `anchor` within the
             // collection's own scroll box — NOT the page's.
             export function scrollCollectionToItem(
               container#{el_param},
@@ -1942,6 +2166,74 @@ module RjuiTools
               if (!container || index === undefined || index === null) return;
               const child = container.children[Number(index)];
               if (!child) return;
+              scrollCollectionToElement(container, child, anchor, animated, horizontal);
+            }
+
+            // scrollTo names a CELL (4f ruling 2026-09-27; the SSoT's
+            // Collection.scrollTo): a number is the cell's place among the
+            // cells of every drawn section, in section order — a section's
+            // header or footer, and a section's block, is not a cell; a
+            // string is the first cell, in section order, whose key it is
+            // (`keys`, the drawn cells' keys in that order: a cell's cellId,
+            // else its cellIdProperty value). Anything else — a string no
+            // cell has as its key included — scrolls nowhere; a string of
+            // digits is a key like any other, not an index (only Kotlin reads
+            // the legacy `<digits>` form). The cells are the elements
+            // addressed `<collectionId>_item_<n>`, in document order; a
+            // Collection whose cells carry no address falls back to its
+            // children. Until jsonui-cli 1.9.0 this was the container's
+            // child at the index, which counts a header, a footer and a
+            // section's block; a string was read as a number, and — with no
+            // cellIdProperty — a string of digits as an index while a cellId
+            // was never matched.
+            export function scrollCollectionToCell(
+              container#{el_param},
+              collectionId#{id_param},
+              target#{target_param},
+              keys#{keys_param},
+              anchor#{anchor_param},
+              animated#{animated_param},
+              horizontal#{horizontal_param}
+            ) {
+              if (!container) return;
+              let n = -1;
+              if (typeof target === 'number') {
+                n = target;
+              } else if (typeof target === 'string' && target !== '' && keys) {
+                n = keys.findIndex((key) => key !== null && key !== undefined && String(key) === target);
+              }
+              if (!Number.isInteger(n) || n < 0) return;
+              const prefix = collectionId + '_item_';
+              const cells = Array.from(container.querySelectorAll('[id]')).filter((el) =>
+                el.id.startsWith(prefix) && /^[0-9]+$/.test(el.id.slice(prefix.length))
+              );
+              const cell = cells.length > 0 ? cells[n] : container.children[n];
+              if (!cell) return;
+              scrollCollectionToElement(container, cell, anchor, animated, horizontal);
+            }
+
+            // The keys of the drawn cells, in section order (`lists`, each drawn
+            // section's cells): a cell's `cellId`, else — only when the
+            // Collection has one — its cellIdProperty value, else null; a cell
+            // with neither has no key.
+            export function collectionCellKeys(lists#{lists_param}, cellIdProperty#{key_prop_param})#{keys_ret} {
+              const keys#{keys_decl} = [];
+              for (const cells of lists) {
+                for (const cell of cells ?? []) {
+                  const record = (cell ?? {})#{record_cast};
+                  keys.push(record['cellId'] ?? (cellIdProperty ? record[cellIdProperty] : null) ?? null);
+                }
+              }
+              return keys;
+            }
+
+            function scrollCollectionToElement(
+              container#{is_ts ? ': HTMLElement' : ''},
+              child#{element_param},
+              anchor#{anchor_param},
+              animated#{animated_param},
+              horizontal#{horizontal_param}
+            ) {
               const containerBox = container.getBoundingClientRect();
               const childBox = child.getBoundingClientRect();
               const scrolled = horizontal ? container.scrollLeft : container.scrollTop;

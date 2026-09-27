@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'fileutils'
+require_relative '../../core/attribute_types'
 require_relative '../../core/logger'
 require_relative '../../core/converter_generator_core'
 
@@ -19,11 +20,13 @@ module RjuiTools
         def generate
           @logger.info "Generating React component: #{@name}"
 
-          # Said only when the file was written. It used to follow the call
-          # unconditionally, so a run that kept the file (--skip-existing,
-          # "n", a closed stdin) printed "Skipped existing …" and then
-          # "Created component file" for the same untouched file.
-          @logger.info "Created component file: #{component_file_path}" if create_component_file
+          # Said by the write itself, and only when it wrote: "Created" when
+          # there was no file, "Overwrote" when it replaced one. The line used
+          # to follow the call unconditionally, so a run that kept the file
+          # (--skip-existing, "n", a closed stdin) printed "Skipped existing
+          # …" and then "Created component file" for the same untouched file;
+          # until 1.9.0 a replaced file was "Created" too.
+          create_component_file
         end
 
         private
@@ -46,11 +49,9 @@ module RjuiTools
           # --skip-existing keep, --force replaces, otherwise ask; a closed
           # stdin is "n"). This file kept its own copy of the same rules
           # until 1.8.113 — the same behaviour, a second place to drift.
-          return false unless JsonUIShared::ConverterGeneratorCore.may_write?(
-            file_path, @options, @logger, noun: 'component', exists_label: 'Component file')
-
-          File.write(file_path, component_template)
-          true
+          JsonUIShared::ConverterGeneratorCore.write_scaffold(
+            file_path, @options, @logger, noun: 'component', label: 'component file', exists_label: 'Component file'
+          ) { component_template }
         end
 
         def component_template
@@ -101,9 +102,13 @@ module RjuiTools
           lines << "  children?: React.ReactNode;" unless is_container == false
           lines << "  className?: string;"
 
+          # A binding attribute (`@key`) is the prop `key`: React passes it
+          # one way. Until 1.9.0 it was declared `@key?:`, which is not
+          # TypeScript (TS1131) — ticket
+          # binding-prop-with-a-non-binding-value-does-not-compile.
           @options[:attributes].each do |key, type|
             ts_type = ruby_type_to_typescript(type)
-            lines << "  #{key}?: #{ts_type};"
+            lines << "  #{key.delete_prefix('@')}?: #{ts_type};"
           end
 
           lines << "}"
@@ -117,31 +122,21 @@ module RjuiTools
           # Only include children in destructure if container mode
           props << 'children' unless is_container == false
           props << 'className'
-          props += @options[:attributes].keys
+          props += @options[:attributes].keys.map { |key| key.delete_prefix('@') }
 
           "{ #{props.join(', ')} }"
         end
 
+        # From the shared vocabulary (lib/core/attribute_types.rb), the table
+        # sjui and kjui scaffold from. Until 1.9.0 a Long, a CGFloat, a Color,
+        # `String?` or `[String]` became `any` here without a word (ticket
+        # kjui-sjui-converter-attr-types-do-not-compile). `array`, `object`
+        # and `hash` keep their old answers.
         def ruby_type_to_typescript(type)
-          case type.downcase
-          when 'string'
-            'string'
-          when 'int', 'integer', 'number', 'double', 'float'
-            'number'
-          when 'bool', 'boolean'
-            'boolean'
-          when 'array'
-            'any[]'
-          when 'object', 'hash'
-            'Record<string, any>'
-          when 'callback'
-            # Exposed events from the component spec — param types live in
-            # the spec's stateManagement.exposedEvents; refine when filling
-            # in the scaffold.
-            '(...args: any[]) => void'
-          else
-            # Closure types from props.items (e.g. `((String, String) -> Void)?`)
-            type.include?('->') ? '(...args: any[]) => void' : 'any'
+          case type.to_s.strip.downcase
+          when 'array' then 'any[]'
+          when 'object', 'hash' then 'Record<string, any>'
+          else JsonUIShared::AttributeTypes.ts_type(JsonUIShared::AttributeTypes.parse(type))
           end
         end
 

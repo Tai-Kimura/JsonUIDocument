@@ -6,6 +6,7 @@ require 'set'
 require_relative '../core/config_manager'
 require_relative '../core/generated_marker'
 require_relative '../core/frameworks'
+require_relative '../core/type_synonyms'
 require_relative 'style_loader'
 
 module RjuiTools
@@ -24,7 +25,12 @@ module RjuiTools
         @viewmodels_dir = File.join(@source_path, @config['viewmodels_directory'] || 'src/viewmodels')
         @data_dir = File.join(@source_path, @config['data_directory'] || 'src/generated/data')
         @styles_dir = File.join(@source_path, @config['styles_directory'] || 'Styles')
-        @use_typescript = @config['typescript'] != false
+        # TypeScript only when the project says so — the components are .jsx
+        # otherwise (build_command: `@config['typescript'] ? '.tsx' : '.jsx'`),
+        # and a config without the key is JavaScript (DEFAULT_CONFIG). Until
+        # jsonui-cli 1.9.0 this read `!= false`: a config without the key got
+        # .ts here beside .jsx components.
+        @use_typescript = @config['typescript'] ? true : false
         @framework = Core::Frameworks.for(@config)
       end
 
@@ -86,7 +92,8 @@ module RjuiTools
       # Returns a hash of { property_name => type } where type is 'string', 'boolean', or 'number'
       def extract_text_field_bindings(json_data, bindings = {})
         if json_data.is_a?(Hash)
-          component_type = json_data['type']
+          # The type the node is drawn as (shared/core/type_synonyms.rb)
+          component_type = JsonUIShared::TypeSynonyms.drawn_type(json_data['type'])
 
           # TextField - text binding (string)
           if component_type == 'TextField' && json_data['text']
@@ -110,8 +117,8 @@ module RjuiTools
             end
           end
 
-          # Toggle/CheckBox/Check - isOn/checked binding (boolean)
-          if %w[Toggle CheckBox Check].include?(component_type)
+          # CheckBox - isOn/checked binding (boolean)
+          if component_type == 'CheckBox'
             is_on = json_data['isOn'] || json_data['checked']
             if is_on.is_a?(String) && is_on.start_with?('@{') && is_on.end_with?('}')
               unless json_data['onValueChange']
@@ -290,10 +297,11 @@ module RjuiTools
       # Extract event handler bindings from components (Switch, SelectBox, etc.)
       def extract_event_handler_bindings(json_data, handlers = {})
         if json_data.is_a?(Hash)
-          component_type = json_data['type']
+          # The type the node is drawn as (shared/core/type_synonyms.rb)
+          component_type = JsonUIShared::TypeSynonyms.drawn_type(json_data['type'])
 
-          # Switch, Toggle - onValueChange with boolean
-          if %w[Switch Toggle].include?(component_type)
+          # Switch - onValueChange with boolean
+          if component_type == 'Switch'
             extract_handler_binding(json_data, 'onValueChange', 'boolean', handlers)
           # Slider - onValueChange with number
           elsif component_type == 'Slider'

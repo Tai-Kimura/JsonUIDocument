@@ -15,17 +15,16 @@ module RjuiTools
           # the Fx0375 shape SliderConverter documents. The group shape puts
           # the gap on inner labels the root's style cannot reach, and those
           # carry their own (see item_gap_parts).
-          @root_gap_class = root_item_gap_class if (attributes['items'] || []).empty?
+          @root_gap_class = root_item_gap_class unless radio_group?
           style_attr = build_style_attr
           id_attr = build_id_attr
           testid_attr = build_testid_attr
           tag_attr = build_tag_attr
-          items = attributes['items'] || []
           text = attributes['text'] || attributes['label'] || ''
           group = attributes['group'] || extract_id || 'radioGroup'
 
-          jsx = if items.any?
-            generate_radio_group(indent, id_attr, class_name, style_attr, testid_attr, tag_attr, items, group, text)
+          jsx = if radio_group?
+            generate_radio_group(indent, id_attr, class_name, style_attr, testid_attr, tag_attr, literal_items, group, text)
           else
             generate_single_radio(indent, id_attr, class_name, style_attr, testid_attr, tag_attr, group, text)
           end
@@ -38,7 +37,7 @@ module RjuiTools
         def build_class_name
           classes = [super]
 
-          classes << 'flex flex-col gap-2' if (attributes['items'] || []).any?
+          classes << 'flex flex-col gap-2' if radio_group?
           classes << 'cursor-pointer'
 
           # Disabled state
@@ -54,6 +53,25 @@ module RjuiTools
 
         private
 
+        # `items` is declared ["array", "binding"]: an array is the options,
+        # written out one by one; a binding is a list the data holds, mapped
+        # at render time — what KotlinJsonUI's dynamic renderer does with it.
+        # Until 1.9.0 a bound `items` raised NoMethodError (`any?` on a
+        # String) and took the build down (ticket
+        # kjui-codegen-table-crashes-on-an-items-array).
+        def bound_items
+          items = attributes['items']
+          items.is_a?(String) && has_binding?(items) ? extract_binding_property(items) : nil
+        end
+
+        def literal_items
+          attributes['items'].is_a?(Array) ? attributes['items'] : []
+        end
+
+        def radio_group?
+          !bound_items.nil? || literal_items.any?
+        end
+
         def generate_radio_group(indent, id_attr, class_name, style_attr, testid_attr, tag_attr, items, group, label_text)
           selected_binding = build_selected_binding
           on_change = build_on_change
@@ -61,17 +79,28 @@ module RjuiTools
           tint_color = attributes['tintColor']
 
           gap, gap_style = item_gap_parts
+          input_style = tint_color ? " style={{ accentColor: #{color_style_expr(tint_color)} }}" : ''
           items_jsx = items.map do |item|
-            escaped_item = item.gsub('"', '&quot;')
-            input_style = tint_color ? " style={{ accentColor: #{color_style_expr(tint_color)} }}" : ''
-            state_attrs = build_state_attrs(selected_binding, on_change, escaped_item)
+            state_attrs = build_state_attrs(selected_binding, on_change, item)
             <<~JSX.chomp
               #{indent_str(indent + 2)}<label className="flex items-center #{gap} cursor-pointer"#{gap_style}>
-              #{indent_str(indent + 4)}<input type="radio" name="#{group}" value="#{escaped_item}"#{state_attrs}#{disabled_attr}#{input_style} />
-              #{indent_str(indent + 4)}<span>#{item}</span>
+              #{indent_str(indent + 4)}<input type="radio" name="#{group}"#{jsx_attr_text('value', item)}#{state_attrs}#{disabled_attr}#{input_style} />
+              #{indent_str(indent + 4)}<span>#{JsonUIShared::StringLiterals.jsx_text(item)}</span>
               #{indent_str(indent + 2)}</label>
             JSX
           end.join("\n")
+          if bound_items
+            # The one option, for each item the data holds.
+            state_attrs = build_state_attrs(selected_binding, on_change, nil, expr: 'item')
+            items_jsx = <<~JSX.chomp
+              #{indent_str(indent + 2)}{#{bound_items}.map((item) => (
+              #{indent_str(indent + 4)}<label key={item} className="flex items-center #{gap} cursor-pointer"#{gap_style}>
+              #{indent_str(indent + 6)}<input type="radio" name="#{group}" value={item}#{state_attrs}#{disabled_attr}#{input_style} />
+              #{indent_str(indent + 6)}<span>{item}</span>
+              #{indent_str(indent + 4)}</label>
+              #{indent_str(indent + 2)}))}
+            JSX
+          end
 
           label_jsx = if label_text && !label_text.empty?
                         "#{indent_str(indent + 2)}<span className=\"font-medium\">#{convert_text_binding(label_text)}</span>\n"
@@ -101,7 +130,12 @@ module RjuiTools
           input_style = tint_color ? " style={{ accentColor: #{color_style_expr(tint_color)} }}" : ''
 
           state_attrs = build_state_attrs(selected_binding, on_change, radio_value)
-          state_attrs = checked_attr if state_attrs.empty?
+          # With no group selection the radio's own `checked` is its state,
+          # whatever handler it also has. It used to stand in only for an
+          # EMPTY state, so the handler an onValueChange writes, and from
+          # bae96913 the one a declared onClick writes, took its place: a radio
+          # declared checked started unchecked the moment it had either.
+          state_attrs = "#{checked_attr(operated: !state_attrs.empty?)}#{state_attrs}" unless selected_binding
 
           # Custom icon radio: hidden input + state-swapped images (the kjui/
           # sjui icon path — 33 cross-effect: web rendered the native circle
@@ -112,7 +146,7 @@ module RjuiTools
             off_src = icon_off || icon_on
             on_src = icon_on || icon_off
             control_jsx =
-              "<input type=\"radio\" name=\"#{group}\" value=\"#{radio_value}\"#{state_attrs}#{disabled_attr} className=\"peer sr-only\" />"               "<img src=\"#{off_src}\" alt=\"\" className=\"w-6 h-6 peer-checked:hidden\" />"               "<img src=\"#{on_src}\" alt=\"\" className=\"w-6 h-6 hidden peer-checked:block\" />"
+              "<input type=\"radio\" name=\"#{group}\"#{jsx_attr_text('value', radio_value)}#{state_attrs}#{disabled_attr} className=\"peer sr-only\" />"               "<img#{jsx_attr_text('src', off_src)} alt=\"\" className=\"w-6 h-6 peer-checked:hidden\" />"               "<img#{jsx_attr_text('src', on_src)} alt=\"\" className=\"w-6 h-6 hidden peer-checked:block\" />"
             return <<~JSX.chomp
               #{indent_str(indent)}<label#{id_attr} className="#{class_name} flex items-center #{@root_gap_class}"#{style_attr}#{testid_attr}#{tag_attr}#{build_aria_disabled_attr}>
               #{indent_str(indent + 2)}#{control_jsx}
@@ -123,7 +157,7 @@ module RjuiTools
 
           <<~JSX.chomp
             #{indent_str(indent)}<label#{id_attr} className="#{class_name} flex items-center #{@root_gap_class}"#{style_attr}#{testid_attr}#{tag_attr}#{build_aria_disabled_attr}>
-            #{indent_str(indent + 2)}<input type="radio" name="#{group}" value="#{radio_value}"#{state_attrs}#{disabled_attr}#{input_style} />
+            #{indent_str(indent + 2)}<input type="radio" name="#{group}"#{jsx_attr_text('value', radio_value)}#{state_attrs}#{disabled_attr}#{input_style} />
             #{indent_str(indent + 2)}<span>#{convert_text_binding(text)}</span>
             #{indent_str(indent)}</label>
           JSX
@@ -154,13 +188,14 @@ module RjuiTools
         # the effect check measured the generated input carrying no checked
         # state at all (the fixture rendered identically to its control).
         # Same shape as ToggleConverter: literal -> defaultChecked,
-        # binding -> controlled checked.
-        def checked_attr
-          checked = with_bind_fallback(attributes['checked'])
+        # binding -> controlled checked, `readOnly` only where no handler
+        # (`operated`) answers the change.
+        def checked_attr(operated: false)
+          checked = attributes['checked']
           return '' if checked.nil? || checked == false
 
           if has_binding?(checked)
-            " checked={#{extract_binding_property(checked)}} readOnly"
+            " checked={#{extract_binding_property(checked)}}#{operated ? '' : ' readOnly'}"
           else
             ' defaultChecked'
           end
@@ -173,13 +208,13 @@ module RjuiTools
         #   emitted a bare `selectedValue` identifier which is undefined at
         #   runtime and crashed the component on render)
         def build_selected_binding
-          selected = with_bind_fallback(attributes['selectedValue'])
+          selected = attributes['selectedValue']
           return nil unless selected
 
           if has_binding?(selected)
             extract_binding_property(selected)
           else
-            "\"#{selected.to_s.gsub('"', '&quot;')}\""
+            JsonUIShared::StringLiterals.ts(selected)
           end
         end
 
@@ -192,7 +227,7 @@ module RjuiTools
             extract_binding_property(handler)
           else
             # Generate setter from the raw binding name (without viewModel.data. prefix)
-            selected = with_bind_fallback(attributes['selectedValue'])
+            selected = attributes['selectedValue']
             return nil unless selected && has_binding?(selected)
 
             raw_binding = extract_raw_binding_property(selected)
@@ -211,34 +246,48 @@ module RjuiTools
           selected_binding[/\A"(.*)"\z/m, 1]
         end
 
-        def build_state_attrs(selected_binding, on_change, value_literal)
+        # `expr`: the option is a runtime value (a bound `items`), so there is
+        # no literal to answer the comparison with at codegen time.
+        def build_state_attrs(selected_binding, on_change, value, expr: nil)
+          value_literal = expr || JsonUIShared::StringLiterals.ts(value)
           if selected_binding
-            # A STATIC `selectedValue` puts a string literal on both sides of
-            # the comparison, and TypeScript narrows each to its own literal
-            # type — so `"Beta" === "Alpha"` is TS2367, "these types have no
-            # overlap". That is an error inside an @generated file, which no
-            # consumer can patch, and it fails the host typecheck.
-            #
-            # The converter knows the answer at codegen time, so it emits the
-            # answer instead of the comparison. Only the BOUND form still
-            # compares, and there the left side is a runtime value with no
+            # A STATIC `selectedValue` never reaches a comparison: with a
+            # literal on both sides TypeScript narrows each to its own literal
+            # type, so `"Beta" === "Alpha"` is TS2367 inside an @generated file
+            # no consumer can patch. It seeds instead (below). Only the BOUND
+            # form compares, and there the left side is a runtime value with no
             # literal type to narrow.
             static_selected = static_selected_value(selected_binding)
-            checked =
-              if static_selected
-                " checked={#{static_selected == value_literal}}"
-              else
-                " checked={#{selected_binding} === \"#{value_literal}\"}"
-              end
-            if on_change
-              "#{checked} onChange={() => #{on_change}?.(\"#{value_literal}\")}"
+            if static_selected
+              # A static selection is where the group starts, and the user
+              # changes it (ticket static-valued-controls-do-not-change-on-a-
+              # users-tap): an uncontrolled `defaultChecked` on the item it
+              # names — `checked` + readOnly held the group still.
+              # A bound list's option is a runtime value, so its seed compares
+              # at run time — there is no literal to answer with here, and
+              # leaving it out started the group with nothing chosen.
+              seed =
+                if expr
+                  " defaultChecked={#{selected_binding} === #{expr}}"
+                else
+                  chosen = static_selected == (value.is_a?(String) ? JsonUIShared::StringLiterals.ts_body(value) : value)
+                  chosen ? ' defaultChecked' : ''
+                end
+              return "#{seed}#{operation_attr('onChange', '()', on_change && "#{on_change}?.(#{value_literal})")}"
+            end
+            # A bound selection: the static one returned above. (The branch
+            # that answered a static selection here, `checked={true}` /
+            # `{false}`, was unreachable after that return — 6750135d — and
+            # is gone.)
+            checked = " checked={#{selected_binding} === #{value_literal}}"
+            if on_change || operation_click_call
+              "#{checked}#{operation_attr('onChange', '()', on_change && "#{on_change}?.(#{value_literal})")}"
             else
               "#{checked} readOnly"
             end
-          elsif on_change
-            " onChange={() => #{on_change}?.(\"#{value_literal}\")}"
           else
-            ''
+            # The selection is the operation a declared onClick follows.
+            operation_attr('onChange', '()', on_change && "#{on_change}?.(#{value_literal})")
           end
         end
 

@@ -27,7 +27,7 @@ module RjuiTools
             if attributes['href']
               href = attributes['href']
               link_attr = Core::Frameworks.for(@config).link_href_attribute
-              "#{indent_str(indent)}<Link #{link_attr}=\"#{href}\"><button#{id_attr}#{build_button_type_attr} className=\"#{class_name}\"#{style_attr}#{on_click}#{disabled_attr}#{testid_attr}#{tag_attr}>#{body}</button></Link>"
+              "#{indent_str(indent)}<Link#{jsx_attr_text(link_attr, href)}><button#{id_attr}#{build_button_type_attr} className=\"#{class_name}\"#{style_attr}#{on_click}#{disabled_attr}#{testid_attr}#{tag_attr}>#{body}</button></Link>"
             else
               "#{indent_str(indent)}<button#{id_attr}#{build_button_type_attr} className=\"#{class_name}\"#{style_attr}#{on_click}#{disabled_attr}#{testid_attr}#{tag_attr}>#{body}</button>"
             end
@@ -156,8 +156,10 @@ module RjuiTools
         #
         # A tinted icon is emitted as a masked box rather than an <img>: an
         # <img> cannot take the button's colour, so a `currentColor` SVG on a
-        # dark toolbar stays black. The mask + bg-current pair inherits
-        # `fontColor`, which is the class BaseConverter already emitted.
+        # dark toolbar stays black. The mask is painted with `tintColor` when
+        # declared — the icon's tint, as on iOS (imageTint) and Android
+        # (Icon tint), not the text colour (1.9.0) — else bg-current, which
+        # inherits `fontColor`, the class BaseConverter already emitted.
         def build_image_markup
           image = attributes['image']
           return '' if image.nil? || image.to_s.empty?
@@ -175,11 +177,14 @@ module RjuiTools
               "WebkitMaskRepeat: 'no-repeat'",
               "maskPosition: 'center'",
               "WebkitMaskPosition: 'center'",
-            ].join(', ')
-            %(<span aria-hidden="true" className="#{size} bg-current" ) +
-              %(style={{ #{styles} }} />)
+            ]
+            tint = attributes['tintColor']
+            styles << "backgroundColor: #{color_style_expr(tint)}" if tint
+            fill = tint ? '' : ' bg-current'
+            %(<span aria-hidden="true" className="#{size}#{fill}" ) +
+              %(style={{ #{styles.join(', ')} }} />)
           else
-            %(<img src={`#{src}`} alt="#{image_alt(image)}" ) +
+            %(<img src={`#{src}`}#{jsx_attr_text('alt', image_alt(image))} ) +
               %(className="#{size} object-contain" />)
           end
         end
@@ -187,9 +192,9 @@ module RjuiTools
         # `/images/<name>.<ext>` for a bare name, the binding for a bound one.
         def build_image_src(image)
           if has_binding?(image)
-            "/images/${#{extract_binding_property(image)}}"
+            "/images/${#{attribute_expression(image)}}"
           else
-            "/images/#{resolve_image_extension(image.to_s)}"
+            "/images/#{JsonUIShared::StringLiterals.ts_template_body(resolve_image_extension(image.to_s))}"
           end
         end
 
@@ -281,16 +286,8 @@ module RjuiTools
           # exist. Ruled 2026-09-07.
           classes << 'underline' if partial['underline']
           classes << 'line-through' if partial['strikethrough']
-          classes << 'cursor-pointer' if partial['onclick']
+          classes << 'cursor-pointer' if JsonUIShared::TapAccessibility.range_handler(partial)
           classes.reject { |c| c.nil? || c.empty? }.join(' ')
-        end
-
-        def escape_jsx_text(text)
-          return text unless text.is_a?(String)
-          return text unless text.include?('{') || text.include?('}') || text.include?('<') || text.include?('>')
-
-          escaped = text.gsub('`', '\\`').gsub('${', '\\${')
-          "{`#{escaped}`}"
         end
       end
     end

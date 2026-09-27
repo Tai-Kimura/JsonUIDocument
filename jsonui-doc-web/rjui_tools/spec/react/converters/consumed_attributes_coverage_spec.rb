@@ -23,7 +23,7 @@ RSpec.describe 'Converter consumed-attribute coverage' do
   CONVERTERS_DIR = File.expand_path('../../../lib/react/converters', __dir__)
 
   CONSUMED = {
-    'base_converter.rb' => %w[accessibilityLabel alignBottom alignBottomOfView alignBottomView alignCenterHorizontalView alignCenterVerticalView alignLeft alignLeftOfView alignLeftView alignRight alignRightOfView alignRightView alignTop alignTopOfView alignTopView alt background bind borderColor borderStyle borderWidth bottomMargin bottomPadding canTap centerHorizontal centerInParent centerVertical className clipToBounds cornerRadius direction distribution effectStyle enabled endMargin font fontColor fontFamily fontSize fontWeight gravity height hidden id indexAbove indexBelow insetHorizontal insets key leftMargin leftPadding margins maxHeight maxWidth minHeight minWidth offsetX offsetY onClick onclick opacity orientation padding paddingBottom paddingEnd paddingLeft paddingRight paddingStart paddingTop paddings propertyName rightMargin rightPadding shadow startMargin tag testId textAlign tintColor topMargin topPadding userInteractionEnabled visibility weight width zIndex],
+    'base_converter.rb' => %w[accessibilityLabel alignBottom alignBottomOfView alignBottomView alignCenterHorizontalView alignCenterVerticalView alignLeft alignLeftOfView alignLeftView alignRight alignRightOfView alignRightView alignTop alignTopOfView alignTopView alt background borderColor borderStyle borderWidth bottomMargin bottomPadding canTap centerHorizontal centerInParent centerVertical className clipToBounds contentDescription cornerRadius direction distribution effectStyle enabled endMargin font fontColor fontFamily fontSize fontWeight gravity height hidden id indexAbove indexBelow insetHorizontal insets key leftMargin leftPadding margins maxHeight maxWidth minHeight minWidth offsetX offsetY onClick onclick opacity orientation padding paddingBottom paddingEnd paddingLeft paddingRight paddingStart paddingTop paddings propertyName rightMargin rightPadding shadow startMargin tag tapBackground testId textAlign tintColor topMargin topPadding userInteractionEnabled visibility weight width zIndex],
     'blur_converter.rb' => %w[backgroundColor blurRadius cornerRadius intensity onClick onclick],
     'button_converter.rb' => %w[buttonType cornerRadius disabledBackground disabledFontColor enabled fontColor highlightBackground highlightColor href image partialAttributes tapBackground text tintColor],
     'circle_view_converter.rb' => %w[background backgroundColor borderColor borderStyle borderWidth fillColor onClick onclick shadow strokeColor strokeWidth],
@@ -45,7 +45,9 @@ RSpec.describe 'Converter consumed-attribute coverage' do
       hideSeparator
       horizontalScroll
       id
+      insetHorizontal
       insetVertical
+      insets
       itemSpacing
       items
       layout
@@ -53,11 +55,13 @@ RSpec.describe 'Converter consumed-attribute coverage' do
       lineSpacing
       listStyle
       onItemAppear
+      onValueChange
       orientation
       paging
       scrollDirection
       scrollEnabled
       scrollTo
+      sectionSpacing
       sections
       showsHorizontalScrollIndicator
       showsVerticalScrollIndicator
@@ -141,6 +145,7 @@ RSpec.describe 'Converter consumed-attribute coverage' do
       textAlign
       textShadow
       textTransform
+      tintColor
       underline
     ],
     'network_image_converter.rb' => %w[
@@ -208,10 +213,10 @@ RSpec.describe 'Converter consumed-attribute coverage' do
       tintColor
       valueChange
     ],
-    'select_box_converter.rb' => %w[background borderColor caretAttributes colorScheme datePickerMode datePickerStyle dateStringFormat enabled font fontColor fontSize hint hintColor items labelAttributes maximumDate minimumDate minuteInterval multiple onChange onValueChange onValueChanged placeholder placeholderColor prompt selectItemType selectedDate selectedIndex selectedValue size textAlign value],
+    'select_box_converter.rb' => %w[background borderColor caretAttributes colorScheme datePickerMode datePickerStyle dateStringFormat enabled font fontColor fontSize hint hintColor items labelAttributes maximumDate minimumDate minuteInterval multiple onChange onValueChange onValueChanged placeholder placeholderColor prompt selectItemType selectedDate selectedIndex selectedItem selectedValue size textAlign value],
     'slider_converter.rb' => %w[enabled maximum maximumTrackTintColor minimum minimumTrackTintColor onValueChange progressTintColor range step tintColor trackTintColor value],
     'switch_converter.rb' => %w[checked enabled isOn label offTintColor onTintColor onValueChange text thumbTintColor tint tintColor trackTintColor value],
-    'tab_view_converter.rb' => %w[background height onValueChange selectedIndex showLabels tabBarBackground tabs tintColor unselectedColor width],
+    'tab_view_converter.rb' => %w[background enabled height onValueChange selectedIndex showLabels tabBarBackground tabs tintColor unselectedColor width],
     'text_field_converter.rb' => %w[
       autoFocus
       autocapitalizationType
@@ -254,6 +259,7 @@ RSpec.describe 'Converter consumed-attribute coverage' do
       shadow
       text
       textPaddingLeft
+      tintColor
     ],
     'text_view_converter.rb' => %w[
       autoFocus
@@ -299,14 +305,15 @@ RSpec.describe 'Converter consumed-attribute coverage' do
       scrollEnabled
       selectable
       text
+      tintColor
     ],
     'toggle_converter.rb' => %w[checked enabled icon isOn label onTintColor onValueChange selectedIcon spacing src text tint tintColor value],
-    'view_converter.rb' => %w[bottomPadding centerHorizontal centerInParent centerVertical distribution draggable flexWrap height highlightBackground highlighted leftPadding onClick onDragEnter onDragLeave onDragOver onDragStart onDrop onLongPress onPan onPinch onclick orientation padding paddingBottom paddingEnd paddingLeft paddingRight paddingStart paddingTop paddings rightPadding safeAreaInsetPositions spacing tapBackground topPadding],
+    'view_converter.rb' => %w[bottomPadding centerHorizontal centerInParent centerVertical distribution draggable flexWrap height highlightBackground highlighted leftPadding onClick onDragEnter onDragLeave onDragOver onDragStart onDrop onLongPress onPan onPinch onclick orientation padding paddingBottom paddingEnd paddingLeft paddingRight paddingStart paddingTop paddings rightPadding safeAreaInsetPositions spacing topPadding],
     'web_converter.rb' => %w[accessibilityLabel allow allowCamera allowDownloads allowGeolocation allowMicrophone allowModals allowPopupsToEscapeSandbox allowsFullScreen allowsInlineMediaPlayback html htmlContent javaScriptCanOpenWindowsAutomatically javaScriptEnabled lazyLoad loading sandbox scrollEnabled src title url]
   }.freeze
 
   UNDECLARED = {
-    'base_converter.rb' => %w[accessibilityLabel alt direction font fontColor fontFamily fontSize fontWeight insetHorizontal insets key orientation textAlign zIndex],
+    'base_converter.rb' => %w[accessibilityLabel alt contentDescription direction font fontColor fontFamily fontSize fontWeight insetHorizontal insets key orientation textAlign zIndex],
     'blur_converter.rb' => %w[backgroundColor intensity],
     'button_converter.rb' => %w[href],
     'circle_view_converter.rb' => %w[backgroundColor fillColor strokeColor strokeWidth],

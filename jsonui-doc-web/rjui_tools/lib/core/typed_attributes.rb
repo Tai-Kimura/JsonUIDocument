@@ -47,12 +47,11 @@ module RjuiTools
       # have their own definitions section map to their own module; the
       # remaining converter-supported spellings map to the module of the
       # component the converter treats them as (mirrors
-      # BaseConverter#get_converter_class / ReactGenerator::CONVERTERS).
+      # the one converter table, react/converters/converter_table.rb).
       TYPE_MODULES = {
         'View' => GENERATED::ViewAttributes,
         'SafeAreaView' => GENERATED::SafeAreaViewAttributes,
         'Label' => GENERATED::LabelAttributes,
-        'Text' => GENERATED::LabelAttributes,
         'Button' => GENERATED::ButtonAttributes,
         'Image' => GENERATED::ImageAttributes,
         'CircleImage' => GENERATED::ImageAttributes,
@@ -61,14 +60,11 @@ module RjuiTools
         'EditText' => GENERATED::EditTextAttributes,
         'Input' => GENERATED::InputAttributes,
         'TextView' => GENERATED::TextViewAttributes,
-        'Scroll' => GENERATED::ScrollViewAttributes,
         'ScrollView' => GENERATED::ScrollViewAttributes,
         'Collection' => GENERATED::CollectionAttributes,
-        'Table' => GENERATED::CollectionAttributes,
         'Switch' => GENERATED::SwitchAttributes,
         'Toggle' => GENERATED::ToggleAttributes,
         'CheckBox' => GENERATED::CheckBoxAttributes,
-        'Checkbox' => GENERATED::CheckBoxAttributes,
         'Check' => GENERATED::CheckAttributes,
         'Slider' => GENERATED::SliderAttributes,
         'Segment' => GENERATED::SegmentAttributes,

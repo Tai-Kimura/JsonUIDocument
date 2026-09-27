@@ -45,15 +45,15 @@
   "canonicalCode": "{\n  \"type\": \"Image\",\n  \"srcName\": \"logo\",\n  \"width\": 120,\n  \"height\": 32\n}",
   "canonicalLanguage": "json",
   "statRequired": "0",
-  "statOptional": "15",
+  "statOptional": "14",
   "statEvents": "0",
   "statRequiredText": {
     "en": "0 required",
     "ja": "必須 0"
   },
   "statOptionalText": {
-    "en": "15 optional",
-    "ja": "任意 15"
+    "en": "14 optional",
+    "ja": "任意 14"
   },
   "statEventsText": {
     "en": "0 events",
@@ -72,14 +72,6 @@
                 "ja": "共通"
               },
               "anchorUrl": "#section-common"
-            },
-            {
-              "id": "cat_state",
-              "label": {
-                "en": "State",
-                "ja": "状態"
-              },
-              "anchorUrl": "#section-state"
             }
           ]
         }
@@ -482,7 +474,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
@@ -494,6 +486,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -513,7 +511,20 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "accessibilityLabel",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "al_1",
+                          "label": "contentDescription",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
@@ -522,15 +533,15 @@
                 "en": "Alt text for accessibility.",
                 "ja": "スクリーンリーダー用の代替テキスト。"
               },
-              "platformMatrixVisibility": "visible",
-              "platformIosLabel": "—",
-              "platformAndroidLabel": "—",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Accessibility description. Spoken by screen readers (VoiceOver / TalkBack). Localizable: a registered strings.json key resolves through StringManager just like `text` / `hint`. For decorative images, use an empty string or omit.",
-                "ja": "アクセシビリティ説明文。VoiceOver / TalkBack が読み上げる。ローカライズ対象: 登録済み strings.json キーは `text` / `hint` と同じく StringManager 経由で解決される。装飾画像は空文字または省略。"
+                "en": "What screen readers say for the image: the web `alt`, and since jsonui-cli 1.9.0 VoiceOver and TalkBack too — before 1.9.0 the declaration named the web face only. Also spelled `accessibilityLabel` / `contentDescription`, and it takes a binding. Localizable: a registered strings.json key resolves through StringManager just like `text` / `hint` (measured on web: `alt={$s.homeHeroTitle}`). `\"\"` marks the image decorative, and so does leaving it out — measured on web, where both render `alt=\"\"` on 1.8.120 and 1.9.0 alike — except, per the declaration, on an image that operates a control (a tap handler on it, or the only content of a tappable with no text): that one keeps the id or asset name each platform read before, and the native build names it. Decorative is the default, so give every image that carries meaning an alt. The native half is not measured here: this site draws no Image.",
+                "ja": "スクリーンリーダーが画像について読み上げる内容: web の `alt`、そして jsonui-cli 1.9.0 からは VoiceOver と TalkBack も — 1.9.0 より前の宣言は web だけを挙げていた。`accessibilityLabel` / `contentDescription` とも書け、binding も書ける。ローカライズ対象: 登録済み strings.json キーは `text` / `hint` と同じく StringManager 経由で解決される（web で実測: `alt={$s.homeHeroTitle}`）。`\"\"` は装飾画像の印で、省略しても同じ — web で実測すると、どちらも 1.8.120 でも 1.9.0 でも `alt=\"\"` になる — ただし宣言によれば、操作の対象になる画像（画像自身にタップ、またはテキストの無いタップ可能な要素の唯一の中身）は例外で、各プラットフォームがこれまで読んでいた id や asset 名を保ち、ネイティブのビルドがそれを名指す。既定が装飾なので、意味を持つ画像にはすべて alt を付ける。ネイティブ側はここでは未測定: このサイトは Image を描かない。"
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -1196,77 +1207,12 @@
     "sections": [
       {
         "cells": {
-          "data": [
-            {
-              "id": "attr_canTap",
-              "name": "canTap",
-              "anchorId": "attr-canTap",
-              "requiredChipText": "",
-              "requiredChipVisibility": "gone",
-              "deprecatedChipVisibility": "gone",
-              "accentBarColor": "var(--color-border)",
-              "nameTextStyle": "normal",
-              "nameFontColor": "var(--color-ink)",
-              "defaultChipText": "",
-              "defaultChipVisibility": "gone",
-              "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
-              "typeChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": [
-                        {
-                          "id": "tc_0",
-                          "label": "boolean",
-                          "background": "var(--color-accent_secondary_tint)",
-                          "fontColor": "var(--color-accent_secondary_strong)"
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "enumChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "aliasChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "description": "Enable tap gesture independent of onClick.",
-              "platformMatrixVisibility": "visible",
-              "platformIosLabel": {
-                "en": "✓ (SwiftUI mode only)",
-                "ja": "✓（SwiftUI モードのみ）"
-              },
-              "platformAndroidLabel": "—",
-              "platformWebLabel": "—",
-              "note": {
-                "en": "",
-                "ja": ""
-              },
-              "type": "boolean",
-              "required": ""
-            }
-          ]
+          "data": []
         }
       }
     ]
   },
-  "groupStateVisibility": "visible",
+  "groupStateVisibility": "gone",
   "attributesBinding": {
     "sections": [
       {
@@ -1324,15 +1270,6 @@
         "ja": "共通"
       },
       "anchor": "section-common",
-      "level": 1
-    },
-    {
-      "id": "toc_state",
-      "label": {
-        "en": "State",
-        "ja": "状態"
-      },
-      "anchor": "section-state",
       "level": 1
     },
     {
@@ -1932,7 +1869,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
@@ -1944,6 +1881,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -1963,7 +1906,20 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "accessibilityLabel",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "al_1",
+                          "label": "contentDescription",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
@@ -1972,15 +1928,15 @@
                 "en": "Alt text for accessibility.",
                 "ja": "スクリーンリーダー用の代替テキスト。"
               },
-              "platformMatrixVisibility": "visible",
-              "platformIosLabel": "—",
-              "platformAndroidLabel": "—",
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Accessibility description. Spoken by screen readers (VoiceOver / TalkBack). Localizable: a registered strings.json key resolves through StringManager just like `text` / `hint`. For decorative images, use an empty string or omit.",
-                "ja": "アクセシビリティ説明文。VoiceOver / TalkBack が読み上げる。ローカライズ対象: 登録済み strings.json キーは `text` / `hint` と同じく StringManager 経由で解決される。装飾画像は空文字または省略。"
+                "en": "What screen readers say for the image: the web `alt`, and since jsonui-cli 1.9.0 VoiceOver and TalkBack too — before 1.9.0 the declaration named the web face only. Also spelled `accessibilityLabel` / `contentDescription`, and it takes a binding. Localizable: a registered strings.json key resolves through StringManager just like `text` / `hint` (measured on web: `alt={$s.homeHeroTitle}`). `\"\"` marks the image decorative, and so does leaving it out — measured on web, where both render `alt=\"\"` on 1.8.120 and 1.9.0 alike — except, per the declaration, on an image that operates a control (a tap handler on it, or the only content of a tappable with no text): that one keeps the id or asset name each platform read before, and the native build names it. Decorative is the default, so give every image that carries meaning an alt. The native half is not measured here: this site draws no Image.",
+                "ja": "スクリーンリーダーが画像について読み上げる内容: web の `alt`、そして jsonui-cli 1.9.0 からは VoiceOver と TalkBack も — 1.9.0 より前の宣言は web だけを挙げていた。`accessibilityLabel` / `contentDescription` とも書け、binding も書ける。ローカライズ対象: 登録済み strings.json キーは `text` / `hint` と同じく StringManager 経由で解決される（web で実測: `alt={$s.homeHeroTitle}`）。`\"\"` は装飾画像の印で、省略しても同じ — web で実測すると、どちらも 1.8.120 でも 1.9.0 でも `alt=\"\"` になる — ただし宣言によれば、操作の対象になる画像（画像自身にタップ、またはテキストの無いタップ可能な要素の唯一の中身）は例外で、各プラットフォームがこれまで読んでいた id や asset 名を保ち、ネイティブのビルドがそれを名指す。既定が装飾なので、意味を持つ画像にはすべて alt を付ける。ネイティブ側はここでは未測定: このサイトは Image を描かない。"
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -2204,70 +2160,6 @@
                 "ja": "Web 専用。`eager` / `lazy`。HTML `<img loading>` にマップ。デフォルト `lazy`。"
               },
               "type": "string",
-              "required": ""
-            },
-            {
-              "id": "attr_canTap",
-              "name": "canTap",
-              "anchorId": "attr-canTap",
-              "requiredChipText": "",
-              "requiredChipVisibility": "gone",
-              "deprecatedChipVisibility": "gone",
-              "accentBarColor": "var(--color-border)",
-              "nameTextStyle": "normal",
-              "nameFontColor": "var(--color-ink)",
-              "defaultChipText": "",
-              "defaultChipVisibility": "gone",
-              "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
-              "typeChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": [
-                        {
-                          "id": "tc_0",
-                          "label": "boolean",
-                          "background": "var(--color-accent_secondary_tint)",
-                          "fontColor": "var(--color-accent_secondary_strong)"
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "enumChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "aliasChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "description": "Enable tap gesture independent of onClick.",
-              "platformMatrixVisibility": "visible",
-              "platformIosLabel": {
-                "en": "✓ (SwiftUI mode only)",
-                "ja": "✓（SwiftUI モードのみ）"
-              },
-              "platformAndroidLabel": "—",
-              "platformWebLabel": "—",
-              "note": {
-                "en": "",
-                "ja": ""
-              },
-              "type": "boolean",
               "required": ""
             },
             {

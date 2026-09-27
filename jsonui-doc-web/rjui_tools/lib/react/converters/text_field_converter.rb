@@ -49,7 +49,7 @@ module RjuiTools
 
           # Border style (only when borderWidth is set)
           if attributes['borderWidth'] || attributes['borderStyle']
-            case attributes['borderStyle']&.downcase
+            case JsonUIShared::EnumSpelling.lowered(attributes['borderStyle'], 'TextField', 'borderStyle')
             when 'roundedrect'
               classes << 'rounded-md'
             when 'line'
@@ -117,10 +117,11 @@ module RjuiTools
 
           # Hint/placeholder color is now handled via Tailwind class in build_class_name
 
-          # Caret (cursor) color
-          if attributes['caretAttributes'] && attributes['caretAttributes']['fontColor']
-            @dynamic_styles['caretColor'] = color_style_expr(attributes['caretAttributes']['fontColor'])
-          end
+          # Caret (cursor) color: tintColor — the accent of the operable parts,
+          # the cursor among them (1.9.0), as sjui (.tint) and kjui
+          # (cursorColor) read it — else caretAttributes.fontColor.
+          caret = attributes['tintColor'] || (attributes['caretAttributes'] && attributes['caretAttributes']['fontColor'])
+          @dynamic_styles['caretColor'] = color_style_expr(caret) if caret
 
           # Text padding left
           if attributes['textPaddingLeft']
@@ -163,7 +164,11 @@ module RjuiTools
           placeholder = attributes['hint'] || attributes['placeholder']
           if placeholder
             resolved = convert_binding(placeholder)
-            if resolved != placeholder && resolved.include?('{')
+            if has_binding?(placeholder)
+              # One expression (attribute_expression): the JSX child form
+              # below loses the text around a binding.
+              attrs << " placeholder={#{attribute_expression(placeholder)}}"
+            elsif resolved != placeholder && resolved.include?('{')
               attrs << " placeholder={#{resolved.gsub(/^\{|\}$/, '')}}"
             elsif (string_resolved = convert_string_key(placeholder))
               # strings.json key -> StringManager, matching sjui's hint
@@ -171,22 +176,21 @@ module RjuiTools
               # and plain literals fall through unchanged.
               attrs << " placeholder=#{string_resolved}"
             else
-              attrs << " placeholder=\"#{placeholder}\""
+              attrs << jsx_attr_text('placeholder', placeholder)
             end
           end
 
           # Value handling depends on binding presence. `bind` is the
           # alternative spelling iOS already accepts here
           # (textfield_converter.rb: text || value || bind).
-          text_value = with_bind_fallback(attributes['text'])
+          text_value = attributes['text']
           if text_value
             if has_binding?(text_value)
               # Binding present: use controlled component (value + onChange)
-              value = convert_binding(text_value)
-              attrs << " value={#{value.gsub(/[{}]/, '')}}"
+              attrs << " value={#{attribute_expression(text_value)}}"
             else
               # No binding: use uncontrolled component (defaultValue only)
-              attrs << " defaultValue=\"#{text_value}\""
+              attrs << jsx_attr_text('defaultValue', text_value)
             end
           end
 
@@ -199,8 +203,8 @@ module RjuiTools
           # omits, exactly like the static path's `if autocomplete`.
           content_type = attributes['contentType']
           if (content_type_expr = bound_value_expr(content_type))
-            lookup = js_object_literal(CONTENT_TYPE_AUTOCOMPLETE)
-            attrs << " autoComplete={(#{lookup})[String(#{content_type_expr}).toLowerCase()]}"
+            lookup = js_object_literal(declared_table(CONTENT_TYPE_AUTOCOMPLETE, 'contentType'))
+            attrs << " autoComplete={(#{lookup})[String(#{content_type_expr})]}"
           elsif content_type
             autocomplete = map_content_type(content_type)
             attrs << " autoComplete=\"#{autocomplete}\"" if autocomplete
@@ -227,7 +231,7 @@ module RjuiTools
           # Native browser validation. Both are declared `platform: react`, i.e.
           # they exist FOR the web, so there is no other surface to defer to.
           if attributes['pattern']
-            attrs << " pattern=\"#{escape_attribute(attributes['pattern'])}\""
+            attrs << jsx_attr_text('pattern', attributes['pattern'])
           end
           attrs << ' required' if attributes['required'] == true || attributes['required'] == 'true'
 
@@ -249,7 +253,7 @@ module RjuiTools
 
         # UITextAutocapitalizationType spellings -> the HTML autocapitalize values.
         def map_autocapitalization(value)
-          case value.to_s.downcase.sub(/^uitextautocapitalizationtype/, '')
+          case JsonUIShared::EnumSpelling.lowered(value, 'TextField', 'autocapitalizationType')
           when 'none' then 'off'
           when 'words' then 'words'
           when 'sentences' then 'sentences'
@@ -261,21 +265,17 @@ module RjuiTools
         # `default` is deliberately unmapped: it means "leave it to the platform",
         # and emitting an explicit value would override the browser default.
         def map_autocorrection(value)
-          case value.to_s.downcase.sub(/^uitextautocorrectiontype/, '')
+          case JsonUIShared::EnumSpelling.lowered(value, 'TextField', 'autocorrectionType')
           when 'no', 'off', 'false' then 'off'
           when 'yes', 'on', 'true' then 'on'
           end
         end
 
-        def escape_attribute(value)
-          value.to_s.gsub('"', '&quot;')
-        end
-
         def determine_input_type
           # Secure field takes precedence
-          return 'password' if attributes['secure'] || attributes['input']&.downcase == 'password'
+          return 'password' if attributes['secure'] || JsonUIShared::EnumSpelling.lowered(attributes['input'], 'TextField', 'input') == 'password'
 
-          case attributes['input']&.downcase
+          case JsonUIShared::EnumSpelling.lowered(attributes['input'], 'TextField', 'input')
           when 'email'
             'email'
           # `signedDecimal` is a SIGNED decimal keyboard. HTML has no such
@@ -331,7 +331,7 @@ module RjuiTools
         }.freeze
 
         def map_content_type(type)
-          CONTENT_TYPE_AUTOCOMPLETE[type&.downcase]
+          CONTENT_TYPE_AUTOCOMPLETE[JsonUIShared::EnumSpelling.lowered(type, 'TextField', 'contentType')]
         end
 
 

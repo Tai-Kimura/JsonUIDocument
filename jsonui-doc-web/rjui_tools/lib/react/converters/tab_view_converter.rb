@@ -15,6 +15,10 @@ module RjuiTools
           tag_attr = build_tag_attr
           tabs = attributes['tabs'] || []
 
+          # A static index (or none) seeds the tab view's own state
+          # (wrap_seeded); a page that passes `selectedTabIndex` still drives it.
+          selected_attr = attributes['selectedIndex']
+          @seeded = !(selected_attr && has_binding?(selected_attr))
           selected_binding = build_selected_binding
           on_change = build_on_change
 
@@ -40,6 +44,7 @@ module RjuiTools
             #{indent_str(indent + 2)}</nav>
             #{indent_str(indent)}</div>
           JSX
+          jsx = wrap_seeded(jsx, indent, selected_attr.is_a?(Numeric) ? selected_attr.to_i : 0) if @seeded
 
           wrap_with_visibility(jsx, indent)
         end
@@ -114,6 +119,8 @@ module RjuiTools
 
           # Build button classes
           button_class = build_tab_button_class(index, selected_binding)
+          disabled_attr = tab_disabled_attr
+          button_class += ' disabled:opacity-50 disabled:cursor-not-allowed' unless disabled_attr.empty?
 
           # Build button style for dynamic colors
           button_style = build_tab_button_style(index, selected_binding)
@@ -132,13 +139,32 @@ module RjuiTools
           <<~JSX.chomp
             #{indent_str(6)}<button#{tab_id_attr}
             #{indent_str(8)}className={`#{button_class}`}#{style_attr}
-            #{indent_str(8)}onClick={() => #{on_change}?.(#{index})}
+            #{indent_str(8)}onClick={#{@seeded ? "() => { setSeeded(#{index}); #{tab_change_call(on_change, index)}; }" : "() => #{tab_change_call(on_change, index)}"}}#{disabled_attr}
             #{indent_str(6)}>
             #{indent_str(8)}<div className="relative">
             #{icon_jsx}#{badge_jsx ? "\n#{badge_jsx}" : ''}
             #{indent_str(8)}</div>#{label_jsx}
             #{indent_str(6)}</button>
           JSX
+        end
+
+        # `enabled` (common: boolean or binding). false leaves the tabs where
+        # they are: each tab's button is disabled, and a browser sends no
+        # click to a disabled button, so neither the selection nor its
+        # handler moves — `enabled: false` stops the operation, the rule the
+        # five paths share (ticket control-onclick-is-called-differently-on-
+        # every-path). Until 1.9.0 web read no `enabled` on a TabView and
+        # its tabs switched regardless. A TabView that does not declare it
+        # comes out as it did.
+        def tab_disabled_attr
+          enabled = attributes['enabled']
+          if enabled.is_a?(String) && has_binding?(enabled)
+            " disabled={!#{extract_binding_property(enabled)}}"
+          elsif enabled == false
+            ' disabled'
+          else
+            ''
+          end
         end
 
         def build_tab_button_class(index, selected_binding)
@@ -194,12 +220,22 @@ module RjuiTools
 
         def build_badge(badge)
           if has_binding?(badge)
-            binding_prop = extract_binding_property(badge)
-            "#{indent_str(10)}{#{binding_prop} && <span className=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center\">{#{binding_prop}}</span>}"
+            binding_prop = attribute_expression(badge)
+            span = "<span className=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center\">{#{binding_prop}}</span>"
+            # Text around a binding (a template literal), or a binding that is
+            # not one (a string), always has text: that badge is always drawn,
+            # and a condition on it is one TypeScript rejects as always truthy.
+            return "#{indent_str(10)}#{span}" if binding_prop.start_with?('`', '"')
+
+            # A binding alone draws the badge while it has a value. Anything
+            # but a plain path is parenthesised: `data.n ?? 'D' && <span>`
+            # mixes `??` with `&&`, which JavaScript refuses to parse.
+            condition = binding_prop.match?(/\A[\w$]+(?:\??\.[\w$]+)*\z/) ? binding_prop : "(#{binding_prop})"
+            "#{indent_str(10)}{#{condition} && #{span}}"
           elsif badge.is_a?(Integer) && badge > 0
             "#{indent_str(10)}<span className=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center\">#{badge}</span>"
           elsif badge.is_a?(String) && !badge.empty?
-            "#{indent_str(10)}<span className=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-4 h-4 flex items-center justify-center\">#{badge}</span>"
+            "#{indent_str(10)}<span className=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-4 h-4 flex items-center justify-center\">#{JsonUIShared::StringLiterals.jsx_text(badge)}</span>"
           end
         end
 
@@ -219,7 +255,7 @@ module RjuiTools
             data_prop_name = base_name.split('_').each_with_index.map { |part, i| i == 0 ? part.downcase : part.capitalize }.join + 'Data'
             content = "<#{pascal_name} data={data.#{data_prop_name}!} />"
           else
-            content = "<div className=\"p-4\">#{tab['title'] || "Tab #{index + 1}"} content</div>"
+            content = "<div className=\"p-4\">#{JsonUIShared::StringLiterals.jsx_text("#{tab['title'] || "Tab #{index + 1}"} content")}</div>"
           end
 
           <<~JSX.chomp
@@ -235,16 +271,33 @@ module RjuiTools
 
           if selected && has_binding?(selected)
             "(#{extract_binding_property(selected)} ?? 0)"
-          elsif selected.is_a?(Numeric)
-            # A literal seeds the initial selection (sjui parity 0068644 did
-            # the same on ios); runtime state still overrides.
-            "(data.selectedTabIndex ?? #{selected.to_i})"
           else
-            # Default to tab 0 — `undefined === index` selected NO tab, which
-            # left tintColor with nothing to color (33 cross-effect: TabView
-            # tintColor/selectedIndex web-inert family).
-            '(data.selectedTabIndex ?? 0)'
+            # A literal (or none — tab 0) seeds the tab view's own state; a
+            # page passing `selectedTabIndex` still overrides it. Without the
+            # state the fallback was the literal itself, so a tap on a page
+            # that passes no setter changed nothing.
+            '(data.selectedTabIndex ?? seeded)'
           end
+        end
+
+        # The tab's call: the selection setter with the index, or a bound
+        # onValueChange as the layout's data declares it — `()` with nothing,
+        # `(String, X)` with the viewId first, anything else (and a handler
+        # the data does not declare, which the Data model types as taking
+        # the index) with the index. It was called with the index whatever
+        # it took (TS2554 against a declared `() => void`); sjui and kjui call
+        # it as declared too (get_event_handler_invocation).
+        def tab_change_call(on_change, index)
+          handler = attributes['onValueChange']
+          name = handler.is_a?(String) && has_binding?(handler) ? extract_raw_binding_property(handler).to_s.strip : nil
+          classes = config['_data_classes'] || {}
+          return "#{on_change}?.(#{index})" unless name && classes.key?(name)
+
+          params = self.class.declared_parameters(name, classes)
+          return "#{on_change}?.()" if params.empty?
+          return "#{on_change}?.(#{view_id_expr}, #{index})" if params.size == 2 && params.first == 'String'
+
+          "#{on_change}?.(#{index})"
         end
 
         def build_on_change

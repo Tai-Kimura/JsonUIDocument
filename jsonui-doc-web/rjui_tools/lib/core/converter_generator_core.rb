@@ -2,6 +2,8 @@
 
 require 'fileutils'
 require 'json'
+require_relative 'attribute_validator_core'
+require_relative 'attribute_types'
 
 module JsonUIShared
   # Shared body of the three `<tool> g converter` scaffolders: the
@@ -58,12 +60,35 @@ module JsonUIShared
     # `jui g converter --skip-existing` exports) and `--force` stopped at the
     # converter: a re-scaffold still waited on stdin for each existing
     # component and adapter, and with stdin closed `gets` returned nil and
-    # `nil.chomp` raised (reported 2026-09-24). Here stdin EOF is "n" — the
-    # safe side, since those files are the ones people maintain by hand.
+    # `nil.chomp` raised (reported 2026-09-24). Here an existing file is kept
+    # unless a person on a terminal answers "y" — the safe side, since those
+    # files are the ones people maintain by hand; stdin that is not a terminal
+    # is not read at all (see overwrite_decision).
     #
     # `noun` / `exists_label` name the file in the two log lines, so the
     # converter's lines read as they always have.
+    #
+    # A `g converter` run also records here what it wrote and what it kept
+    # (track_scaffold_files starts the record; the sub-generators get this
+    # options hash or a merge of it, and a merge shares the record), so what
+    # follows the scaffold can read what the kept files say — see
+    # kept_leaf_scaffold.
     def self.may_write?(file_path, options, logger, noun:, exists_label: nil)
+      existed = File.exist?(file_path)
+      write = overwrite_decision(file_path, options, logger, noun: noun, exists_label: exists_label)
+      record = options[:scaffold_files]
+      if record.is_a?(Hash)
+        record[write ? :written : :kept] << file_path
+        (record[:overwritten] ||= []) << file_path if write && existed
+      end
+      write
+    end
+
+    # A file kept by an answer is said, as one kept by --skip-existing is
+    # ("Skipped existing …"): until 1.9.0 an "n" or a closed stdin left the
+    # prompt's line open and said nothing, and the run went on to report the
+    # file as created (ticket g-converter-reports-files-it-did-not-write).
+    def self.overwrite_decision(file_path, options, logger, noun:, exists_label:)
       return true unless File.exist?(file_path)
 
       if ENV['JUI_SKIP_EXISTING'] == '1' || options[:skip_existing]
@@ -72,9 +97,115 @@ module JsonUIShared
       end
       return true if options[:force]
 
+      # Asked only on a terminal. Anything else — a closed stdin, /dev/null,
+      # or a pipe that is open and never written (an MCP server's child, an
+      # agent's shell) — keeps the file without reading stdin. Until 1.9.0
+      # the prompt read whatever stdin was: on an open pipe `gets` waited for
+      # a line that never came, and the caller hung until its own timeout
+      # (`jui g converter` under the MCP server; after 1.9.0's first round,
+      # `g view / partial / collection` too — ticket
+      # generate-commands-overwrite-edited-files-and-ignore-their-flags).
+      unless interactive_stdin?
+        logger.info "Kept existing #{noun}: #{file_path} (stdin is not a terminal; --force replaces it)"
+        return false
+      end
+
       logger.warn "#{exists_label || noun.capitalize} already exists: #{file_path}"
       print "Overwrite? (y/n): "
-      $stdin.gets&.chomp&.downcase == 'y'
+      answer = $stdin.gets
+      puts if answer.nil? # stdin closed: end the prompt's line
+      return true if answer&.chomp&.downcase == 'y'
+
+      logger.info "Kept existing #{noun}: #{file_path}#{answer.nil? ? ' (stdin closed)' : ''}"
+      false
+    end
+    private_class_method :overwrite_decision
+
+    # Whether a person can answer the prompt: stdin is a terminal.
+    def self.interactive_stdin?
+      $stdin.respond_to?(:tty?) && $stdin.tty?
+    rescue IOError
+      false
+    end
+    private_class_method :interactive_stdin?
+
+    # Writes one scaffold file through the overwrite decision above, and says
+    # what it did with the path it wrote: "Created" when there was no file,
+    # "Overwrote" when there was (--force, "y"). A kept file is said by the
+    # decision. The content is built only when it is written. Returns
+    # whether it wrote.
+    #
+    # Every scaffold writer says it through here: until 1.9.0 each wrote
+    # its own "Created …" line, which said "Created" for a file it replaced
+    # (ticket g-converter-reports-files-it-did-not-write).
+    def self.write_scaffold(file_path, options, logger, noun:, label:, exists_label: nil)
+      existed = File.exist?(file_path)
+      return false unless may_write?(file_path, options, logger, noun: noun, exists_label: exists_label)
+
+      File.write(file_path, yield)
+      logger.info "#{existed ? 'Overwrote' : 'Created'} #{label}: #{file_path}"
+      true
+    end
+
+    # ---- the same decision for every other generate command ----
+    #
+    # `g view / partial / collection / adapter / component` (sjui SwiftUI and
+    # UIKit, kjui, rjui) write their scaffold files through write_scaffold too:
+    # a file that is there is the app's, and is replaced only with --force (or
+    # "y" at the prompt, which is shown only on a terminal); --skip-existing,
+    # JUI_SKIP_EXISTING, "n" and a stdin that is not a terminal keep it. Until 1.9.0 each command decided for itself: sjui
+    # SwiftUI `g collection` and UIKit `g view` rewrote a ViewModel / a
+    # ViewController / a layout the app had edited on every run, and the flags
+    # were ignored, refused ("invalid option") or a stack trace, command by
+    # command (ticket generate-commands-overwrite-edited-files-and-ignore-their-flags).
+    # Each run starts a record with scaffold_record and passes it in the
+    # options as :scaffold_files, as a `g converter` run does.
+    def self.scaffold_record
+      { written: [], kept: [], overwritten: [] }
+    end
+
+    # The two flags every generate command of the three tools declares, with
+    # this one meaning (an OptionParser `opts`, the command's options Hash).
+    def self.declare_overwrite_options(opts, options)
+      opts.on('--force', 'Overwrite existing scaffold files without asking') do
+        options[:force] = true
+      end
+      opts.on('--skip-existing', 'Keep existing scaffold files without asking (non-interactive)') do
+        options[:skip_existing] = true
+      end
+    end
+
+    # What the run did to `path`, from the record: :created, :overwritten,
+    # :kept, or nil when it did not decide on the file.
+    def self.scaffold_state(record, path)
+      return :kept if record[:kept].include?(path)
+      return :overwritten if (record[:overwritten] || []).include?(path)
+
+      record[:written].include?(path) ? :created : nil
+    end
+
+    # The files this run created — written, and not there before it. The only
+    # files a rollback may delete: until 1.9.0 sjui UIKit `g view` / `g
+    # collection` deleted every file they listed when the Xcode step raised,
+    # a ViewModel they had kept too.
+    def self.created_scaffold_files(record)
+      record[:written] - (record[:overwritten] || [])
+    end
+
+    # The run's last line, from the record: how many of the files it scaffolds
+    # it created, overwrote and kept (report_scaffold says it for `g
+    # converter`).
+    def self.report_scaffold_record(name, record, logger)
+      overwritten = record[:overwritten] || []
+      created = record[:written] - overwritten
+      kept = record[:kept]
+      counts = "#{created.size} created, #{overwritten.size} overwritten, #{kept.size} kept"
+      if record[:written].empty? && !kept.empty?
+        logger.info "#{name}: every scaffold file already existed and was kept (#{counts}); " \
+                    '--force overwrites them'
+      else
+        logger.success "Scaffolded #{name}: #{counts}"
+      end
     end
 
     # `--attribute-descriptions '<json>'`: {attribute name => description},
@@ -150,12 +281,10 @@ module JsonUIShared
       # `jui build` (and other non-interactive flows) set JUI_SKIP_EXISTING=1
       # so the prompt is bypassed and existing converter files are left alone.
       # `--skip-existing` is the CLI equivalent; `--force` overwrites.
-      return unless self.class.may_write?(file_path, @options, @logger,
-                                          noun: 'converter',
-                                          exists_label: 'Converter file')
-
-      File.write(file_path, converter_template)
-      @logger.info "Created converter file: #{file_path}"
+      self.class.write_scaffold(file_path, @options, @logger,
+                                noun: 'converter', label: 'converter file', exists_label: 'Converter file') do
+        converter_template
+      end
     end
 
     def update_mappings_file
@@ -173,7 +302,7 @@ module JsonUIShared
 
       # Check if mapping already exists
       if content.include?("'#{@name}' =>")
-        @logger.warn "Mapping for '#{@name}' already exists in #{File.basename(mappings_file)}"
+        @logger.info "Unchanged #{mappings_file}: it already maps '#{@name}'"
         return
       end
 
@@ -201,7 +330,7 @@ module JsonUIShared
 
       # Insert the new mapping before the closing brace of the mappings
       # constant (indentation differs per tool — capture and reuse it)
-      content.sub!(/(#{spec[:const]} = \{.*?)(,?)(\s*)([ ]*\}\.freeze)/m) do
+      added = content.sub!(/(#{spec[:const]} = \{.*?)(,?)(\s*)([ ]*\}\.freeze)/m) do
         existing_mappings = $1
         closing = $4
 
@@ -215,8 +344,17 @@ module JsonUIShared
         end
       end
 
+      # Said only when it was added: a file without the `#{spec[:const]} = {…}
+      # .freeze` this looks for was written back unchanged and reported as
+      # updated until 1.9.0.
+      unless added
+        @logger.warn "Could not add the mapping '#{@name}' to #{mappings_file}: it has no " \
+                     "`#{spec[:const]} = { … }.freeze` — add `#{spec[:mapping_line].strip}` by hand"
+        return
+      end
+
       File.write(mappings_file, content)
-      @logger.info "Updated #{File.basename(mappings_file)} with new mapping"
+      @logger.info "Updated #{mappings_file}: added the mapping '#{@name}'"
     end
 
     def create_initial_mappings_file
@@ -225,17 +363,197 @@ module JsonUIShared
       FileUtils.mkdir_p(File.dirname(mappings_file))
 
       File.write(mappings_file, spec[:initial_content])
-      @logger.info "Created #{File.basename(mappings_file)} with initial mapping"
+      @logger.info "Created #{mappings_file} with the mapping '#{@name}'"
+    end
+
+    # Names every attribute whose type is outside the shared vocabulary
+    # (attribute_types.rb) and what it was scaffolded as — the same sentence
+    # on every tool. Not a refusal: faces declare their own model types
+    # (`[AppRow]`, `Date`), and refusing stopped `jui g converter --all` on
+    # three of them (measured 2026-09-26).
+    #
+    # Called AFTER the scaffold: whether it was written or kept is known only
+    # then, and a run that wrote none says "kept" instead of "is scaffolded
+    # as" (until 1.9.0 it was called first and said "is scaffolded as" of
+    # files it went on to keep — ticket converter-attr-types-warning-wording).
+    def warn_outside_attribute_types
+      kept = typed_scaffold_kept?
+      JsonUIShared::AttributeTypes.outside(@options[:attributes]).each do |key, type|
+        @logger.warn JsonUIShared::AttributeTypes.outside_warning(key, type, kept: kept)
+      end
+    end
+
+    # Whether this run kept the files that declare the attribute types (the
+    # component, and the Dynamic adapter / wrapper — not the converter, which
+    # declares none) and wrote none of them. false when nothing was recorded.
+    def typed_scaffold_kept?
+      record = @options[:scaffold_files]
+      return false unless record.is_a?(Hash)
+
+      converter = File.expand_path(converter_file_path)
+      typed = ->(paths) { paths.reject { |path| File.expand_path(path) == converter } }
+      typed.call(record[:written]).empty? && !typed.call(record[:kept]).empty?
+    end
+
+    # `--container` / `--no-container` change what a component declares about
+    # children; a run with neither keeps the declaration it already has. Until
+    # 1.9.0 a run with neither rewrote the definition in the default form
+    # over a leaf's `"_children": "none"` — `jui g converter --all`, with or
+    # without --skip-existing, which does not read a leaf from a component
+    # spec — and the build stopped refusing the leaf's children while its
+    # scaffold went on dropping them, with no warning (measured 2026-09-26).
+    # Called first (after track_scaffold_files), so the converter, the
+    # scaffolds and the definition of this run all follow the kept
+    # declaration.
+    def keep_children_declaration
+      return unless @options[:is_container].nil?
+      return unless declared_children == AttributeValidatorCore::NO_CHILDREN
+
+      @options[:is_container] = false
+      @logger.info "#{@name} is declared a leaf in attribute_definitions/#{@name}.json — kept " \
+                   '(pass --container to change it)'
+    end
+
+    # What attribute_definitions/<Name>.json said about children before this
+    # run wrote it: nil when the file or the key is absent, or the file cannot
+    # be read. Read once (the run writes the file last).
+    def declared_children
+      return @declared_children if defined?(@declared_children)
+
+      @declared_children = read_declared_children
+    end
+
+    def read_declared_children
+      path = File.join(attr_defs_dir, "#{@name}.json")
+      return nil unless File.file?(path)
+
+      definition = JSON.parse(File.read(path))[@name]
+      definition.is_a?(Hash) ? definition[AttributeValidatorCore::CHILDREN_DECLARATION] : nil
+    rescue JSON::ParserError => e
+      @logger.warn "attribute_definitions/#{@name}.json is not JSON (#{e.message.lines.first.to_s.strip}) — " \
+                   'what it declared about children cannot be kept; pass --container or --no-container'
+      nil
+    end
+
+    # Called first by each profile's `generate`: from here on may_write?
+    # records every scaffold file this run writes and every one it keeps.
+    def track_scaffold_files
+      @options[:scaffold_files] = self.class.scaffold_record
+    end
+
+    # The run's last line, from the record may_write? keeps: how many of the
+    # files it scaffolds it created, overwrote and kept. Until 1.9.0 the
+    # run ended "Successfully generated converter" — sjui and kjui adding
+    # "Converter file created at: …" and "Mappings file updated with …" —
+    # whatever it had done: after --skip-existing, "n" or a closed stdin too,
+    # and with a path that was not the file's (sjui's `Leaf_converter.rb` for
+    # `leaf_converter.rb`). Ticket g-converter-reports-files-it-did-not-write.
+    def report_scaffold
+      record = @options[:scaffold_files]
+      return unless record.is_a?(Hash)
+
+      self.class.report_scaffold_record(@name, record, @logger)
+    end
+
+    # What a kept file says when it is in the leaf form: the code
+    # `--no-container` writes, and only it.
+    LEAF_FORMS = [
+      # the converter (sjui / kjui / rjui): draws the component without them
+      [/^\s*is_container = false\s*$/, 'draws %s without the children a layout gives it'],
+      # sjui's Dynamic adapter, kjui's Dynamic wrapper: an error in their place
+      ['var acceptsChildren: Bool { false }', 'refuses children in Dynamic mode'],
+      ['private fun leafRejection(', 'refuses children in Dynamic mode']
+    ].freeze
+
+    # The files this run KEPT (--skip-existing, JUI_SKIP_EXISTING, "n", a
+    # closed stdin) that are in the leaf form while the definition it is about
+    # to write takes children: [[path, what the file does], ...].
+    #
+    # Until 1.9.0 a leaf turned back into a container — `--container`, or
+    # `jui g converter --from` a spec that gained slots — with its scaffold
+    # kept wrote `child` / `children` into the definition while the kept
+    # converter went on drawing the component without them: the build
+    # accepted the children and dropped them, rc 0, not a word (measured on
+    # f16f3a11 on all three tools, 2026-09-26; ticket
+    # leaf-turned-container-keeps-its-leaf-scaffold-silently). Written files
+    # are not read: they are in the form this run asked for.
+    def kept_leaf_scaffold
+      return [] if @options[:is_container] == false
+
+      record = @options[:scaffold_files]
+      return [] unless record.is_a?(Hash)
+
+      record[:kept].map { |path| [path, leaf_form(path)] }.select { |_, form| form }
+    end
+
+    # What `path` does as a leaf, or nil. Read as bytes: the markers are
+    # ASCII, and the file may not be valid in the locale's encoding.
+    def leaf_form(path)
+      text = File.binread(path)
+      LEAF_FORMS.each do |marker, what|
+        found = marker.is_a?(Regexp) ? text.match?(marker) : text.include?(marker)
+        return format(what, @name) if found
+      end
+      kept_view_leaf_form(path, text)
+    rescue SystemCallError, IOError
+      nil
+    end
+
+    # Profile hook: a kept component view that cannot draw children although
+    # nothing in it says "leaf" (rjui's .tsx). nil: none.
+    def kept_view_leaf_form(_path, _text)
+      nil
+    end
+
+    # Names the kept leaf-form files, and answers whether the definition must
+    # stay a leaf because of them. A leaf the build refuses children for is
+    # the one of the two outcomes that is not silent; `--force` (or editing
+    # the files) makes the component take children, `--no-container` keeps it
+    # a leaf without this warning.
+    def keep_leaf_for_kept_scaffold
+      kept = kept_leaf_scaffold
+      return false if kept.empty?
+
+      mode = @options[:is_container] == true ? '--container' : 'the default mode'
+      files = kept.map { |path, form| "#{display_path(path)} (#{form})" }.join(', ')
+      @logger.warn "#{@name} would take children (#{mode}), but this run kept " \
+                   "#{kept.size == 1 ? 'a file' : "#{kept.size} files"} in the leaf form: #{files}. " \
+                   "attribute_definitions/#{@name}.json still declares a leaf, so the build refuses children " \
+                   "given to #{@name} instead of dropping them. To make it take children, run again with " \
+                   '--force (it overwrites them) or change them by hand; to keep it a leaf, pass --no-container.'
+      true
+    end
+
+    def display_path(path)
+      full = File.expand_path(path)
+      base = File.join(File.expand_path(Dir.pwd), '')
+      full.start_with?(base) ? full[base.size..-1] : full
     end
 
     # Generate attribute definition file for validation. Rewritten on every
     # run (unlike the scaffold, which is user-owned once generated), so it
     # carries the _generated marker on every platform.
+    #
+    # It also says whether the component takes children — this file is the
+    # one place outside the user-owned scaffolds that a build reads:
+    #   --container, and the default   `child` / `children` (both scaffold a
+    #                                   content slot; the default's converter
+    #                                   draws the children it is given)
+    #   --no-container                  `"_children": "none"`, a leaf; the
+    #                                   shared LayoutValidator refuses a
+    #                                   layout that gives it children
+    # Until 1.9.0 only --container declared anything, so the default read
+    # as "no children" to the validator ("Unknown attribute 'child'") while
+    # its children were drawn, and a leaf read the same — one sentence for
+    # both outcomes. Written for every mode now, attributes or not: a leaf
+    # with no attributes still has to say it is one.
+    #
+    # Written AFTER the scaffold: a run that takes children but kept files in
+    # the leaf form writes a leaf (keep_leaf_for_kept_scaffold), and only the
+    # scaffold step knows what it kept. Until 1.9.0 sjui wrote it before.
     def generate_attribute_definition_file
-      # Skip if no attributes and not a container
       has_attributes = @options[:attributes] && !@options[:attributes].empty?
-      is_container = @options[:is_container] == true
-      return if !has_attributes && !is_container
+      leaf = @options[:is_container] == false || keep_leaf_for_kept_scaffold
 
       dir = attr_defs_dir
       FileUtils.mkdir_p(dir)
@@ -251,8 +569,9 @@ module JsonUIShared
         end
       end
 
-      # Add child/children for container components
-      if is_container
+      if leaf
+        attributes[AttributeValidatorCore::CHILDREN_DECLARATION] = AttributeValidatorCore::NO_CHILDREN
+      else
         attributes["child"] = { "type" => "array", "description" => "Child component(s)" }
         attributes["children"] = { "type" => "array", "description" => "Child components (alias for child)" }
       end
@@ -269,9 +588,12 @@ module JsonUIShared
 
       # Write to file
       file_path = File.join(dir, "#{@name}.json")
+      existed = File.exist?(file_path)
       File.write(file_path, JSON.pretty_generate(json_content))
 
-      @logger.info "Created attribute definition file: attribute_definitions/#{@name}.json"
+      # "Rewrote" when it was there (it is rewritten on every run), with the
+      # path written — until 1.9.0 "Created …: attribute_definitions/X.json".
+      @logger.info "#{existed ? 'Rewrote' : 'Created'} attribute definition file: #{file_path}"
     end
 
     # Normalize a type string that arrives from component specs (`String?`,

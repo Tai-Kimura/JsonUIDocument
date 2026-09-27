@@ -16,7 +16,7 @@ module RjuiTools
           src = build_src_attr
           content_mode = build_content_mode_attr
           placeholder_attr = build_placeholder_attr
-          error_image = attributes['errorImage'] ? " errorImage=\"#{attributes['errorImage']}\"" : ''
+          error_image = attributes['errorImage'] ? jsx_attr_text('errorImage', attributes['errorImage']) : ''
 
           # Build event handlers
           on_load = build_event_handler('onLoad')
@@ -34,6 +34,13 @@ module RjuiTools
         end
 
         protected
+
+        # The NetworkImage template declares `onClick?: () => void`: a gated
+        # click is `() => { if (gate) … }`, not `(e) => …`, which that prop
+        # does not accept (BaseConverter#can_tap_gated_click).
+        def click_takes_event?
+          false
+        end
 
         def build_class_name
           classes = [super]
@@ -69,7 +76,7 @@ module RjuiTools
           end
 
           # Clickable
-          classes << 'cursor-pointer' if attributes['canTap'] || attributes['onClick'] || attributes['onclick']
+          classes << 'cursor-pointer' if attributes['canTap'] || tap_handler?(attributes['onClick'], attributes['onclick'])
 
           finalize_classes(classes)
         end
@@ -79,9 +86,9 @@ module RjuiTools
           return '' unless src
 
           if has_binding?(src)
-            " src={#{convert_binding(src).gsub(/^\{|\}$/, '')}}"
+            " src={#{attribute_expression(src)}}"
           else
-            " src=\"#{src}\""
+            jsx_attr_text('src', src)
           end
         end
 
@@ -102,10 +109,10 @@ module RjuiTools
           # moves into the emitted expression, asserted through the component's
           # own prop type rather than by restating the union.
           if (expr = bound_value_expr(content_mode))
-            lookup = js_object_literal(CONTENT_MODE_OBJECT_FIT)
-            cast = "React.ComponentProps<typeof NetworkImage>['contentMode']"
-            return " contentMode={((#{lookup})[String(#{expr}).toLowerCase()] ?? " \
-                   "'#{CONTENT_MODE_DEFAULT_FIT}') as #{cast}}"
+            lookup = js_object_literal(declared_table(CONTENT_MODE_OBJECT_FIT, 'contentMode'))
+            cast = typescript? ? " as React.ComponentProps<typeof NetworkImage>['contentMode']" : ''
+            return " contentMode={((#{lookup})[String(#{expr})] ?? " \
+                   "'#{CONTENT_MODE_DEFAULT_FIT}')#{cast}}"
           end
 
           " contentMode=\"#{content_mode_prop(content_mode)}\""
@@ -113,7 +120,7 @@ module RjuiTools
 
         # Native lazy/eager fetch hint, forwarded to the underlying <img>.
         def loading_attr
-          loading = attributes['loading'].to_s.downcase
+          loading = JsonUIShared::EnumSpelling.lowered(attributes['loading'], 'NetworkImage', 'loading').to_s
           return '' unless %w[lazy eager].include?(loading)
 
           " loading=\"#{loading}\""
@@ -131,14 +138,14 @@ module RjuiTools
           if placeholder
             attr +=
               if has_binding?(placeholder)
-                " placeholder={#{convert_binding(placeholder).gsub(/^\{|\}$/, '')}}"
+                " placeholder={#{attribute_expression(placeholder)}}"
               else
-                " placeholder=\"#{placeholder}\""
+                jsx_attr_text('placeholder', placeholder)
               end
           end
           default_image = attributes['defaultImage']
           if default_image && !has_binding?(default_image)
-            attr += " defaultImage=\"#{default_image}\""
+            attr += jsx_attr_text('defaultImage', default_image)
           end
           attr
         end

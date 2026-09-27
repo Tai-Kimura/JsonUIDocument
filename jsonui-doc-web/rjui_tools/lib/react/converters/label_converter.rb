@@ -137,16 +137,12 @@ module RjuiTools
             parts << "color: '#{css}'"
           end
           parts << "fontSize: '#{attrs['fontSize']}px'" if attrs['fontSize']
-          parts << "fontFamily: '#{attrs['font']}'" if attrs['font']
+          parts << "fontFamily: #{JsonUIShared::StringLiterals.ts_single(attrs['font'])}" if attrs['font']
           { text: hint, parts: parts }
         end
 
         def pure_binding_text?(raw)
           raw.is_a?(String) && raw.strip.match?(/\A@\{[^}]+\}\z/)
-        end
-
-        def escape_jsx_text(text)
-          text.to_s.gsub('{', '&#123;').gsub('}', '&#125;').gsub('<', '&lt;')
         end
 
         # The partialAttributes entries, or nil when the label has none. One
@@ -187,17 +183,32 @@ module RjuiTools
         # font classes rather than adding to them.
         def build_class_attr
           base = build_class_name
+          # A bound userInteractionEnabled: `pointer-events-none` while it is
+          # false, on every shape (plain, hint, linkable, partialAttributes) —
+          # the tap rule's gate, as a View takes it (build_responsive_class_attr).
+          # Only the literal `false` reached the Label; a binding was dropped,
+          # so its taps and its links answered whatever the value was (4f
+          # ruling, jsonui-cli 1.9.0).
+          gate = interaction_class_expression
           highlight = highlight_classes
-          return " className=\"#{base}\"" if highlight.empty?
+          return class_literal(base, gate) if highlight.empty?
 
           condition = selected_condition
-          return " className=\"#{base}\"" if condition.nil?
+          return class_literal(base, gate) if condition.nil?
 
           swapped = (base.split(/\s+/) - overridden_font_classes + highlight).join(' ')
           # A literal `selected: true` needs no runtime branch.
-          return " className=\"#{swapped}\"" if condition == 'true'
+          return class_literal(swapped, gate) if condition == 'true'
+
+          return " className={#{condition} ? `#{swapped} #{gate}` : `#{base} #{gate}`}" if gate
 
           " className={#{condition} ? \"#{swapped}\" : \"#{base}\"}"
+        end
+
+        # The className of one class list, with the bound gate appended when
+        # there is one (a template literal — the static list stays a string).
+        def class_literal(classes, gate)
+          gate ? " className={`#{classes} #{gate}`}" : " className=\"#{classes}\""
         end
 
         # Classes for the highlight state, from `highlightAttributes` or, when
@@ -220,7 +231,7 @@ module RjuiTools
               classes << font_class if font_class && !font_class.empty?
             end
             classes << TailwindMapper.map_color(attrs['fontColor'], 'text') if attrs['fontColor']
-            classes.concat(align_classes(attrs['textAlign']))
+            classes.concat(align_classes(attrs['textAlign'], %w[highlightAttributes textAlign]))
           end
 
           classes = classes.reject { |c| c.nil? || c.empty? }
@@ -268,12 +279,15 @@ module RjuiTools
         # `text-*`, and a single-run label is a flex container so this converter
         # also maps it to `justify-*`. A highlight that changes the alignment has
         # to replace both, or the flex justification keeps the old value and wins.
-        def align_classes(value)
+        #
+        # *attribute*: Label.textAlign, or the highlight's own declaration
+        # (%w[highlightAttributes textAlign] — Left / Right / Center only).
+        def align_classes(value, attribute = 'textAlign')
           return [] unless value.is_a?(String)
 
-          classes = [TailwindMapper.map_text_align(value)]
+          classes = [TailwindMapper.map_text_align(value, 'Label', attribute)]
           unless multi_run_text?
-            case value.downcase
+            case JsonUIShared::EnumSpelling.lowered(value, 'Label', attribute)
             when 'center' then classes << 'justify-center'
             when 'right' then classes << 'justify-end'
             when 'left' then classes << 'justify-start'
@@ -314,6 +328,14 @@ module RjuiTools
           nil
         end
 
+        # A label maps its gravity itself (build_class_name): a single-run
+        # label is a flex row, not the column TailwindMapper.map_gravity
+        # assumes; a clamped or multi-run one is a block, where no flex class
+        # does anything.
+        def gravity_classes
+          []
+        end
+
         def build_class_name
           classes = [super]
 
@@ -329,6 +351,9 @@ module RjuiTools
             # So a clamped label emits NO display utility of its own and lets
             # the clamp keep the box it needs. Same reasoning as the multi-run
             # branch below: vertical centering means nothing once text wraps.
+            # Its lines follow gravity across when textAlign is not declared.
+            line_align = TailwindMapper.label_gravity_text_align(attributes['gravity'], attributes['textAlign'])
+            classes << line_align if line_align
           elsif multi_run_text?
             # partialText / linkable emit one node per run (text, span, text…).
             # As flex items every run becomes its own line box, so the whole
@@ -337,34 +362,27 @@ module RjuiTools
             # (web-partial-labels-render-inside-a-flex-row). A multi-run label
             # is a paragraph and wants normal block flow; horizontal alignment
             # already arrives from textAlign as text-* via the base converter,
-            # and vertical centering means nothing once the text wraps.
+            # and vertical centering means nothing once the text wraps. Its
+            # lines follow gravity across when textAlign is not declared
+            # (TailwindMapper.label_gravity_text_align).
             classes << 'block'
+            line_align = TailwindMapper.label_gravity_text_align(attributes['gravity'], attributes['textAlign'])
+            classes << line_align if line_align
           else
-            # Vertical/horizontal alignment with flex
-            # Default: vertically centered. gravity overrides vertical, textAlign overrides horizontal.
+            # A single-run label is a flex ROW: `items-*` is its vertical,
+            # `justify-*` its horizontal. The vertical is the one gravity names
+            # (top / bottom / centerVertical, center), else the middle — the
+            # canon's leafOwnFrameChannel default. The horizontal is
+            # textAlign's, else the one gravity names (left / right /
+            # centerHorizontal, center), else the start. Until jsonui-cli
+            # 1.9.0 the base converter also mapped gravity as a COLUMN's
+            # (`justify-*` its vertical, `items-*` its horizontal) onto this
+            # row, so `right` drew the text at the bottom, `bottom` at the
+            # bottom end, and `centerVertical` / `center` in the middle
+            # across as well (measured in Chromium, a 44px-tall label) —
+            # gravity_classes below keeps that mapping off.
             classes << 'flex'
-            if attributes['gravity']
-              gravity_str = attributes['gravity'].is_a?(Array) ? attributes['gravity'].join('|') : attributes['gravity'].to_s
-              if gravity_str.include?('top')
-                classes << 'items-start'
-              elsif gravity_str.include?('bottom')
-                classes << 'items-end'
-              else
-                classes << 'items-center'
-              end
-            else
-              classes << 'items-center'
-            end
-
-            # textAlign → justify-* for horizontal alignment within flex
-            case attributes['textAlign']&.downcase
-            when 'center'
-              classes << 'justify-center'
-            when 'right'
-              classes << 'justify-end'
-            when 'left'
-              classes << 'justify-start'
-            end
+            classes.concat(TailwindMapper.map_label_gravity(attributes['gravity'], attributes['textAlign']))
           end
 
           # Line clamp for multiple lines
@@ -401,7 +419,7 @@ module RjuiTools
           end
 
           # Cursor pointer for clickable items
-          classes << 'cursor-pointer' if attributes['onClick'] || attributes['onclick']
+          classes << 'cursor-pointer' if tap_handler?(attributes['onClick'], attributes['onclick'])
 
           # Linkable text. The class is shared by both arms of the runtime
           # branch above, so a bound value decides it at runtime too.
@@ -636,7 +654,7 @@ module RjuiTools
             lines << line_class
             next unless spec.is_a?(Hash)
 
-            classes.concat(TEXT_DECORATION_STYLES[spec['lineStyle'].to_s.downcase] || [])
+            classes.concat(TEXT_DECORATION_STYLES[JsonUIShared::EnumSpelling.lowered(spec['lineStyle'], 'Label', %w[underline lineStyle]).to_s] || [])
             # An absent colour means "do not modify" — the line inherits the
             # text colour, which is what CSS does with no decoration-color.
             if spec['color']
@@ -674,7 +692,10 @@ module RjuiTools
         # means "nothing" draw none; everything else draws.
         def decoration_drawn?(spec)
           return false if spec.nil? || spec == false || spec == 'false'
-          return spec['lineStyle'].to_s.casecmp('none') != 0 if spec.is_a?(Hash)
+          # `lineStyle` by its declared spelling (Label.underline / .strikethrough
+          # .lineStyle — the same four, Single / Double / Thick / None), case and
+          # all (1.9.0): an undeclared one is the default, a single line.
+          return JsonUIShared::EnumSpelling.lowered(spec['lineStyle'], 'Label', %w[underline lineStyle]) != 'none' if spec.is_a?(Hash)
 
           true
         end
@@ -704,7 +725,7 @@ module RjuiTools
           classes.concat(text_decoration_classes(underline: partial['underline'],
                                                  strikethrough: partial['strikethrough'],
                                                  element_level: false))
-          classes << 'cursor-pointer' if partial['onclick']
+          classes << 'cursor-pointer' if JsonUIShared::TapAccessibility.range_handler(partial)
           classes.reject { |c| c.nil? || c.empty? }.join(' ')
         end
 
@@ -716,7 +737,14 @@ module RjuiTools
         # sanitization and newline preservation live in the template so both
         # shapes share one implementation and cannot drift.
         def render_linkable_text(indent, id_attr, class_attr, style_attr, onclick_attr, testid_attr, tag_attr)
-          "#{indent_str(indent)}<LinkifyText#{id_attr}#{class_attr}#{style_attr}#{onclick_attr}#{testid_attr}#{tag_attr}#{linkify_text_prop} />"
+          "#{indent_str(indent)}<LinkifyText#{id_attr}#{class_attr}#{style_attr}#{onclick_attr}#{testid_attr}#{tag_attr}#{linkify_text_prop}#{link_color_prop} />"
+        end
+
+        # tintColor is the links' colour (the accent of the operable parts —
+        # 1.9.0), as `.tint` colours them on iOS.
+        def link_color_prop
+          tint = attributes['tintColor']
+          tint ? " linkColor={#{color_style_expr(tint)}}" : ''
         end
 
         # The text prop for LinkifyText: strings.json key, bound expression
@@ -729,18 +757,18 @@ module RjuiTools
           elsif has_binding?(text)
             " text={#{bound_value_expr(text)}}"
           else
-            escaped = text.gsub('\\', '\\\\').gsub('`', '\\`').gsub('${', '\\${')
-            " text={`#{escaped}`}"
+            " text={`#{JsonUIShared::StringLiterals.ts_template_body(text)}`}"
           end
         end
 
+        # The hint as a JSX child: as it is unless JSX reads something in it
+        # (StringLiterals::JSX_TEXT_SPECIAL), else the {`…`} form it has always
+        # been written in, its body escaped by StringLiterals.ts_template_body.
         def escape_jsx_text(text)
           return text unless text.is_a?(String)
-          return text unless text.include?('{') || text.include?('}') || text.include?('<') || text.include?('>')
+          return text unless text.match?(JsonUIShared::StringLiterals::JSX_TEXT_SPECIAL)
 
-          # Wrap in JSX expression with template literal for safe rendering
-          escaped = text.gsub('`', '\\`').gsub('${', '\\${')
-          "{`#{escaped}`}"
+          "{`#{JsonUIShared::StringLiterals.ts_template_body(text)}`}"
         end
       end
     end

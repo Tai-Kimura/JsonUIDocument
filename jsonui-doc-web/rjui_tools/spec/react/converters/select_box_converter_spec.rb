@@ -2,6 +2,7 @@
 
 require_relative '../../spec_helper'
 require 'react/converters/select_box_converter'
+require 'react/converters/view_converter'
 
 RSpec.describe RjuiTools::React::Converters::SelectBoxConverter do
   let(:default_config) { { 'use_tailwind' => true } }
@@ -49,8 +50,12 @@ RSpec.describe RjuiTools::React::Converters::SelectBoxConverter do
       # value ("all items" idiom) stays a valid key/value instead of
       # collapsing to undefined
       # (rjui-selectbox-object-items-empty-value-key-warning).
+      # The cast is TypeScript's (a TypeScript project, declared); a config
+      # without `typescript` is a JavaScript one, as the file extension says
+      # (spec/react/javascript_mode_output_parses_spec.rb). Until jsonui-cli
+      # 1.9.0 this converter alone cast whenever the key was not false.
       it 'supports canonical string-array items via a widened typeof branch' do
-        converter = create_converter({ 'class' => 'SelectBox', 'items' => '@{sortOptions}' })
+        converter = create_converter({ 'class' => 'SelectBox', 'items' => '@{sortOptions}' }, { 'use_tailwind' => true, 'typescript' => true })
         result = converter.convert
         expect(result).to include('const opt = item as string | number | { value?: string | number; id?: string | number; text?: string; label?: string };')
         expect(result).to include("typeof opt === 'object' && opt !== null")
@@ -157,12 +162,35 @@ RSpec.describe RjuiTools::React::Converters::SelectBoxConverter do
       end
     end
 
+    # selectedItem is the same two-way selection, and wins over selectedValue as on the
+    # other paths. It was not read at all: a bound selectedItem reached the page as
+    # nothing (ticket selectbox-selected-item-binding-is-read-once, measured in Chromium).
+    context 'with selectedItem' do
+      it 'binds a bound selectedItem both ways' do
+        result = create_converter({ 'class' => 'SelectBox', 'items' => %w[pp qq], 'selectedItem' => '@{choice}' }).convert
+        expect(result).to include('value={data.choice}')
+        expect(result).to include('data.onChoiceChange?.(')
+      end
+
+      it 'starts at a static selectedItem' do
+        result = create_converter({ 'class' => 'SelectBox', 'items' => %w[pp qq], 'selectedItem' => 'qq' }).convert
+        expect(result).to include('defaultValue="qq"')
+      end
+
+      it 'prefers selectedItem to selectedValue' do
+        result = create_converter({ 'class' => 'SelectBox', 'items' => %w[pp qq], 'selectedItem' => '@{a}', 'selectedValue' => '@{b}' }).convert
+        expect(result).to include('value={data.a}')
+        expect(result).not_to include('data.b')
+      end
+    end
+
     # Regression: rjui-selectbox-selectedindex-binding-not-emitted —
     # selectedIndex is a two-way binding, so the <select> must be controlled:
     # the bound index resolves to the same value string the <option> rows emit.
     context 'with selectedIndex binding' do
       it 'emits a controlled value resolving dynamic items at the bound index' do
-        converter = create_converter({ 'class' => 'SelectBox', 'items' => '@{groupFilterOptions}', 'selectedIndex' => '@{groupFilterIndex}' })
+        converter = create_converter({ 'class' => 'SelectBox', 'items' => '@{groupFilterOptions}', 'selectedIndex' => '@{groupFilterIndex}' },
+                                     { 'use_tailwind' => true, 'typescript' => true })
         result = converter.convert
         expect(result).to include('value={(() => { const sel = data.groupFilterOptions?.[data.groupFilterIndex ?? -1]')
         expect(result).to include("typeof sel === 'object' ? String(sel.value ?? sel.id ?? '') : String(sel ?? '')")
@@ -592,6 +620,60 @@ RSpec.describe RjuiTools::React::Converters::SelectBoxConverter do
         expect(result).to include("value={data.day || ''}")
         expect(result).to include('data.onDayChange?.(e.target.value)')
       end
+
+      # A Date SelectBox's value is its selectedDate alone (4f's ruling,
+      # jsonui-cli 1.9.0): selectedValue and the undeclared `value` were read
+      # after it, and not by sjui.
+      # selectItemType as written (the SSoT enum): "date" is a list box here as
+      # on every path — it was compared downcased and drew a date input on web
+      # only.
+      it 'is a date input for "Date" alone' do
+        expect(picker({})).to include('type="date"')
+        lower = create_converter({ 'class' => 'SelectBox', 'id' => 'when', 'selectItemType' => 'date', 'items' => %w[a b] }).convert
+        expect(lower).not_to include('type="date"')
+        expect(lower).to include('<select')
+      end
+
+      it 'reads its value from selectedDate alone' do
+        %w[selectedValue value].each do |other|
+          bound = picker(other => '@{other}')
+          expect(bound).not_to include('data.other'), other
+          expect(bound).not_to include('onOtherChange'), other
+          expect(picker(other => '2026-01-01')).not_to include('2026-01-01'), other
+        end
+        both = picker('selectedDate' => '@{day}', 'selectedValue' => '@{other}')
+        expect(both).to include("value={data.day || ''}")
+        expect(both).not_to include('data.other')
+      end
     end
+  end
+end
+
+# An enum value is its declared spelling, case and all (1.9.0): a spelling
+# declared in no case is drawn as no declared value is — the default — on
+# every path, as the validator names it. The two values the ruling names:
+# View.orientation declares `horizontal`, SelectBox.selectItemType `Date`.
+RSpec.describe 'rjui: an enum value is its declared spelling, case and all' do
+  let(:config) { { 'use_tailwind' => true } }
+
+  def view_classes(orientation)
+    kids = [{ 'type' => 'Label', 'text' => 'a' }, { 'type' => 'Label', 'text' => 'b' }]
+    RjuiTools::React::Converters::ViewConverter.new({ 'type' => 'View', 'orientation' => orientation, 'child' => kids }, config)
+                                                .send(:build_class_name)
+  end
+
+  def date_picker?(item_type)
+    RjuiTools::React::Converters::SelectBoxConverter.new({ 'class' => 'SelectBox', 'id' => 's', 'selectItemType' => item_type }, config)
+                                                     .send(:date_picker?)
+  end
+
+  it "orientation: 'horizontal' is a flex row; 'Horizontal' is not" do
+    expect(view_classes('horizontal')).to include('flex-row')
+    expect(view_classes('Horizontal')).not_to include('flex-row')
+  end
+
+  it "selectItemType: 'Date' is a date picker; 'date' is not" do
+    expect(date_picker?('Date')).to be(true)
+    expect(date_picker?('date')).to be(false)
   end
 end
