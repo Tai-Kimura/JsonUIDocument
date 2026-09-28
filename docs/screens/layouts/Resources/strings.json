@@ -4465,8 +4465,8 @@
       "ja": "A"
     },
     "tool_lookup_component_role": {
-      "en": "Return a built-in or custom component's attribute schema.",
-      "ja": "Return a built-in or custom component's attribute schema."
+      "en": "Return a built-in or custom component's attribute schema. Since jsonui-mcp-server 2.14.0 a type spelling the build accepts for another component resolves to that component and says so in `typeSynonym` — `ProgressBar` returns Progress, `HStack` returns View with `implies: { orientation: horizontal }`; 2.13.0 answered both as not found.",
+      "ja": "組み込みまたはカスタムコンポーネントの属性スキーマを返す。jsonui-mcp-server 2.14.0 からは、ビルドが別のコンポーネントとして受け付ける型の綴りも、そのコンポーネントに解決して `typeSynonym` でそう言う — `ProgressBar` は Progress を、`HStack` は `implies: { orientation: horizontal }` を付けて View を返す。2.13.0 はどちらも not found と答えていた。"
     },
     "tool_lookup_attribute_name": {
       "en": "lookup_attribute",
@@ -4513,8 +4513,8 @@
       "ja": "A"
     },
     "tool_get_data_source_role": {
-      "en": "Report which attribute_definitions.json / component_metadata.json the server loaded — layer, file mtime, and freshness — so agents can confirm the data is current.",
-      "ja": "サーバが読み込んだ attribute_definitions.json / component_metadata.json の出どころ（layer・file mtime・freshness）を報告し、エージェントがデータの新しさを確認できるようにする。"
+      "en": "Report where the server loaded every canonical data file from — attribute_definitions.json, component_metadata.json, screen_identity.json, binding_semantics.json and the rest, and since 2.14.0 type_synonyms.json — with layer, path, file mtime and freshness, so agents can confirm the data is current.",
+      "ja": "サーバが正典のデータファイルをどこから読み込んだかを報告する — attribute_definitions.json・component_metadata.json・screen_identity.json・binding_semantics.json ほか、2.14.0 からは type_synonyms.json も — layer・パス・file mtime・freshness 付きで、エージェントがデータの新しさを確認できるようにする。"
     },
     "tool_doc_validate_spec_name": {
       "en": "doc_validate_spec",
@@ -4669,8 +4669,8 @@
       "ja": "C"
     },
     "tool_jui_generate_project_role": {
-      "en": "Scaffold Layout + ViewModelBase + hook + navigation stubs from a spec.",
-      "ja": "Scaffold Layout + ViewModelBase + hook + navigation stubs from a spec."
+      "en": "Scaffold Layout + ViewModelBase + hook + navigation stubs from a spec. Since jsonui-cli 1.9.0 a Layout JSON that already exists and differs from what the spec generates is kept and named — `Kept existing layout: … --force replaces it` — where earlier versions rewrote it (measured: a hand edit survives a re-run on 1.9.1 and was lost on 1.8.120). Called over MCP the command never asks, so without force an existing layout is kept.",
+      "ja": "spec から Layout + ViewModelBase + hook + navigation の雛形を作る。jsonui-cli 1.9.0 からは、既にあって spec の生成と違う Layout JSON は残され、名指される — `Kept existing layout: … --force replaces it` — それまでの版は書き直していた（実測: 手で編集した layout は、1.9.1 では再実行しても残り、1.8.120 では失われた）。MCP から呼ぶとコマンドは確認を出さないので、force が無ければ既存の layout は残る。"
     },
     "tool_jui_generate_screen_name": {
       "en": "jui_generate_screen",
@@ -4729,8 +4729,8 @@
       "ja": "D"
     },
     "tool_jui_generate_converter_role": {
-      "en": "Scaffold a custom component converter from its spec.",
-      "ja": "component spec からカスタムコンポーネントの converter を scaffold。"
+      "en": "Scaffold a custom component converter from its spec. Since jsonui-mcp-server 2.14.0 the command's input is closed when it starts, so on an existing component with neither skip_existing nor force it no longer waits on the overwrite prompt until the server's timeout (the server's own record).",
+      "ja": "component spec からカスタムコンポーネントの converter を scaffold。jsonui-mcp-server 2.14.0 からは、コマンドの入力を起動時に閉じるので、skip_existing も force も付けずに既存のコンポーネントに対して呼んでも、上書きの確認でサーバのタイムアウトまで待ち続けることはなくなった（サーバ自身の記録）。"
     },
     "tool_jui_migrate_layouts_name": {
       "en": "jui_migrate_layouts",
@@ -9499,8 +9499,8 @@
       "ja": "• input_dir (string, required) — .test.json ファイルのあるディレクトリ。\n• output_dir (string, optional) — HTML 出力先ディレクトリ。\n• title (string, optional) — 生成 index に表示するタイトル。\n• apps (string[], optional) — NAME:DIR 形式のアプリセクション（繰り返し --app）。マルチアプリ全体サイト生成用。\n• docs_dirs (string[], optional) — 追加の markdown ドキュメントディレクトリ（繰り返し -d/--docs）。\n• figma_dir (string, optional) — Figma アセットのディレクトリ (-fig)。\n• layouts_dir (string, optional) — Layouts ディレクトリの上書き (--layouts-dir)。\n• with_checks (boolean, optional) — 生成時に doc contract check も実行 (--with-checks)。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
     },
     "tool_jui_generate_project_params": {
-      "en": "• force (boolean, optional) — Force overwrite of declaration files.\n• skip_layout (boolean, optional) — Skip Layout JSON generation.\n• dry_run (boolean, optional) — Show what would be generated without writing.\n• platform (enum, optional) — Generate for a single platform only.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
-      "ja": "• force (boolean, optional) — 宣言ファイルを強制上書き。\n• skip_layout (boolean, optional) — Layout JSON の生成をスキップ。\n• dry_run (boolean, optional) — 書き込みなしで生成内容を表示。\n• platform (enum, optional) — 単一プラットフォームのみ生成。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+      "en": "• force (boolean, optional) — Replace the ViewModel declaration files, and each Layout JSON that already exists and differs from what the spec generates (without it such a layout is kept and named). A layout whose data section holds entries the spec does not declare is not replaced even with force; the output names them.\n• skip_layout (boolean, optional) — Skip Layout JSON generation.\n• dry_run (boolean, optional) — Show what would be generated without writing.\n• platform (enum, optional) — Generate for a single platform only.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• force (boolean, optional) — ViewModel の宣言ファイルと、既にあって spec の生成と違う Layout JSON を置き換える（付けなければそうした layout は残され、名指される）。spec が宣言していないエントリを data に持つ layout は、force でも置き換えられず、出力がそれを名指す。\n• skip_layout (boolean, optional) — Layout JSON の生成をスキップ。\n• dry_run (boolean, optional) — 書き込みなしで生成内容を表示。\n• platform (enum, optional) — 単一プラットフォームのみ生成。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
     },
     "tool_jui_generate_screen_params": {
       "en": "• names (string[], required) — Screen names in PascalCase. e.g. ['LoginScreen', 'RegisterScreen'].\n• display_name (string, optional) — Display name (only valid when names has exactly one entry).\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
@@ -9519,8 +9519,8 @@
       "ja": "• platform (enum, optional) — 1 プラットフォームのみ sync（デフォルト: jui.config.json の全プラットフォーム）。\n• dry_run (boolean, optional) — 書き込みなしで差分を表示。\n• from (string, optional) — ソース CLI ルートを上書き（デフォルト: $JSONUI_CLI_PATH もしくは ~/.jsonui-cli/）。\n• project_dir (string, optional) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
     },
     "tool_jui_generate_converter_params": {
-      "en": "• name (string, optional) — Component name, for direct mode (with attributes) instead of a spec.\n• from_spec (string, optional) — Generate from a single component spec file path.\n• all (boolean, optional) — Generate from all component specs in the project.\n• attributes (string, optional) — Attributes as key:type pairs (prop1:String,prop2:Int), for direct mode.\n• container (boolean, optional) — Mark as a container component (accepts child nodes).\n• skip_existing (boolean, optional) — Leave existing converter and scaffold files untouched, without the overwrite prompt. Wins over force when both are set.\n• force (boolean, optional) — Replace existing converter and scaffold files without the overwrite prompt; edits made in them are lost. Needs jsonui-cli 1.8.113 or later.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
-      "ja": "• name (string, 任意) — コンポーネント名。spec を使わない直接モード（attributes と併用）。\n• from_spec (string, 任意) — 単一の component spec ファイルから生成。\n• all (boolean, 任意) — プロジェクト内全 component spec から生成。\n• attributes (string, 任意) — 属性を key:type で列挙（prop1:String,prop2:Int）。直接モード用。\n• container (boolean, 任意) — コンテナコンポーネント（子要素を受け入れる）として扱う。\n• skip_existing (boolean, 任意) — 既存の converter と雛形のファイルに触れない。上書きの確認は出さない。force と両方指定したときはこちらが勝つ。\n• force (boolean, 任意) — 既存の converter と雛形のファイルを、上書きの確認なしで置き換える。そこに書いた編集は失われる。jsonui-cli 1.8.113 以降が必要。\n• project_dir (string, 任意) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
+      "en": "• name (string, optional) — Component name, for direct mode (with attributes) instead of a spec.\n• from_spec (string, optional) — Generate from a single component spec file path.\n• all (boolean, optional) — Generate from all component specs in the project.\n• attributes (string, optional) — Attributes as key:type pairs (prop1:String,prop2:Int), for direct mode.\n• container (boolean, optional) — true: a container (it draws its children). false: a leaf — it takes no children, and a layout that gives it some is refused by name; needs jsonui-cli 1.9.0 or later (an earlier jui rejects --no-container). Absent: the default form. Until jsonui-mcp-server 2.14.0 false passed nothing, so the request was dropped without a word.\n• skip_existing (boolean, optional) — Leave existing converter and scaffold files untouched, without the overwrite prompt. Wins over force when both are set.\n• force (boolean, optional) — Replace existing converter and scaffold files without the overwrite prompt; edits made in them are lost. Needs jsonui-cli 1.8.113 or later.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
+      "ja": "• name (string, 任意) — コンポーネント名。spec を使わない直接モード（attributes と併用）。\n• from_spec (string, 任意) — 単一の component spec ファイルから生成。\n• all (boolean, 任意) — プロジェクト内全 component spec から生成。\n• attributes (string, 任意) — 属性を key:type で列挙（prop1:String,prop2:Int）。直接モード用。\n• container (boolean, 任意) — true: コンテナ（子を描く）。false: 葉 — 子を取らず、子を与えた layout は名指しで拒否される。jsonui-cli 1.9.0 以降が必要（それより前の jui は --no-container を受け付けない）。無指定: 既定の形。jsonui-mcp-server 2.14.0 より前は、false を渡しても何も渡らず、要求は黙って捨てられていた。\n• skip_existing (boolean, 任意) — 既存の converter と雛形のファイルに触れない。上書きの確認は出さない。force と両方指定したときはこちらが勝つ。\n• force (boolean, 任意) — 既存の converter と雛形のファイルを、上書きの確認なしで置き換える。そこに書いた編集は失われる。jsonui-cli 1.8.113 以降が必要。\n• project_dir (string, 任意) — プロジェクトディレクトリ。JUI_PROJECT_DIR 環境変数を上書き。"
     },
     "tool_jui_migrate_layouts_params": {
       "en": "• source_platform (enum, optional) — Platform to copy from: ios | android | web (default: ios).\n• dry_run (boolean, optional) — Show what would be copied without executing.\n• project_dir (string, optional) — Project directory; overrides the JUI_PROJECT_DIR env var.",
