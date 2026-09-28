@@ -765,8 +765,8 @@
       "ja": "Ruby（>= 3.2）"
     },
     "prereq_ruby_note": {
-      "en": "Only required if you will use sjui / kjui / rjui. From jsonui-cli 1.9.0 each of them checks the Ruby it runs on at start and stops below 3.2 with one line naming the version it found and asking for a .ruby-version (measured on Ruby 2.6: all three exit 1). The Ruby that counts is the one the project directory selects — a .ruby-version there, read by rbenv, asdf or mise — not the one your shell starts with.",
-      "ja": "sjui / kjui / rjui を使う場合のみ必要です。jsonui-cli 1.9.0 から、この 3 つは起動時に自分が動く Ruby を確かめ、3.2 未満なら、見つけた版を名指して .ruby-version を置くよう求める 1 行を出して止まります（Ruby 2.6 で実測: 3 つとも exit 1）。効くのはプロジェクトのディレクトリが選ぶ Ruby — そこの .ruby-version を rbenv / asdf / mise が読む — で、シェルが最初に使う Ruby ではありません。"
+      "en": "Only required if you will use sjui / kjui / rjui. From jsonui-cli 1.9.0 each of them checks the Ruby it runs on at start and stops below 3.2 with one line naming the version it found (measured on Ruby 2.6: all three exit 1). The Ruby that counts is the one the directory it runs in selects — `jui init` and `jui sync_tool` write the tools' pin, 3.2.2, into each platform directory's .ruby-version (on this site jsonui-doc-web/.ruby-version), read by rbenv, asdf or mise — not the one your shell starts with.",
+      "ja": "sjui / kjui / rjui を使う場合のみ必要です。jsonui-cli 1.9.0 から、この 3 つは起動時に自分が動く Ruby を確かめ、3.2 未満なら、見つけた版を名指す 1 行を出して止まります（Ruby 2.6 で実測: 3 つとも exit 1）。効くのは、動くディレクトリが選ぶ Ruby です — `jui init` と `jui sync_tool` は各プラットフォームのディレクトリの .ruby-version にツールの pin（3.2.2）を書き（このサイトでは jsonui-doc-web/.ruby-version）、それを rbenv / asdf / mise が読みます — シェルが最初に使う Ruby ではありません。"
     },
     "prereq_python_label": {
       "en": "Developer tools",
@@ -989,8 +989,8 @@
       "ja": "インストーラは、自分が動くシェルの Ruby と Python を確かめ、ツールが必要とする版 — Ruby 3.2（jsonui-cli 1.9.0 から）と Python 3.10 — を下回ると警告します。警告だけなのは、sjui / kjui / rjui がプロジェクトのディレクトリの Ruby で動き、それが別の Ruby かもしれないからです。"
     },
     "trouble_versions_fix": {
-      "en": "Ignore it for a tool you will not use. Otherwise upgrade — for sjui / kjui / rjui, put a .ruby-version naming Ruby 3.2 or later in the project or a directory above it. Without one, they stop with `ERROR: rjui needs Ruby 3.2 or later (jsonui-cli 1.9.0), and this is Ruby 2.6.10 at …` (sjui and kjui print the same with their own name).",
-      "ja": "使わないツールの分は無視して構いません。使うなら版を上げてください — sjui / kjui / rjui は、Ruby 3.2 以上を指す .ruby-version をプロジェクトかその上のディレクトリに置きます。無いと `ERROR: rjui needs Ruby 3.2 or later (jsonui-cli 1.9.0), and this is Ruby 2.6.10 at …` と出して止まります（sjui と kjui も自分の名前で同じ行を出します）。"
+      "en": "Ignore it for a tool you will not use. Otherwise upgrade. For sjui / kjui / rjui, install the Ruby the platform directory's .ruby-version names (3.2.2, written there by `jui init` / `jui sync_tool`) with rbenv, asdf or mise: that file is the nearest pin when a tool runs there, so one you add higher up does not override it. `jui build` asks rbenv for that version only when it is installed. A tool that ends up on a Ruby below 3.2 stops with `ERROR: rjui needs Ruby 3.2 or later (jsonui-cli 1.9.0), and this is Ruby 2.6.10 at …` (sjui and kjui print the same with their own name).",
+      "ja": "使わないツールの分は無視して構いません。使うなら版を上げてください。sjui / kjui / rjui は、プラットフォームのディレクトリの .ruby-version が名指す Ruby（`jui init` / `jui sync_tool` が書く 3.2.2）を rbenv / asdf / mise で入れてください: ツールがそこで動くときはそのファイルがいちばん近い pin なので、上のディレクトリに別の .ruby-version を置いても上書きされません。`jui build` がその版を rbenv に求めるのは、それが入っているときだけです。3.2 未満の Ruby で動いたツールは `ERROR: rjui needs Ruby 3.2 or later (jsonui-cli 1.9.0), and this is Ruby 2.6.10 at …` と出して止まります（sjui と kjui も自分の名前で同じ行を出します）。"
     },
     "related_heading": {
       "en": "Related pages",
