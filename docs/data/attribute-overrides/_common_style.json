@@ -80,8 +80,8 @@
     },
     "tintColor": {
       "summary": {
-        "en": "Color applied to tinted content (monochrome icons, progress tracks, switches). Specific component implementations decide what gets tinted.",
-        "ja": "tint 可能なコンテンツ（モノクロアイコン、progress の track、switch など）に適用される色。何が tint されるかはコンポーネント実装依存。"
+        "en": "The accent of the node's operable parts — a control's accent, a link's colour, the text cursor — never the text colour, and images and icons do not take it (the jsonui-cli 1.9.0 ruling; until then Compose also tinted the text and icons inside a tinted node). Each type says what its accent is (TextField: the cursor; Switch / Slider / Progress: the tint; Segment / TabView: the selected item). A container's tintColor reaches the controls inside it, as SwiftUI's `.tint` does — on Compose from jsonui-cli 1.9.2 with KotlinJsonUI 2.43.0 — and a control's own tintColor wins. On web a View's tintColor renders as CSS `accent-color` (measured).",
+        "ja": "ノードの操作できる部分のアクセント色 — コントロールのアクセント、リンクの色、テキストカーソル — で、文字色には決してならず、画像とアイコンも受けない（jsonui-cli 1.9.0 の裁定。それまで Compose は tint したノードの中の文字とアイコンも染めていた）。何がアクセントかは型ごとに決まる（TextField: カーソル、Switch / Slider / Progress: tint、Segment / TabView: 選択中の項目）。入れ物の tintColor は、SwiftUI の `.tint` と同じく中のコントロールに届く — Compose では jsonui-cli 1.9.2 と KotlinJsonUI 2.43.0 から — そしてコントロール自身の tintColor が優先される。web では View の tintColor は CSS の `accent-color` になる（実測）。"
       }
     },
     "style": {
@@ -96,8 +96,8 @@
     },
     "effectStyle": {
       "summary": {
-        "en": "Visual effect preset. Used by Blur; platform-specific blur / material style value.",
-        "ja": "視覚効果のプリセット。Blur で使用、プラットフォーム固有のぼかし／マテリアルスタイル値。"
+        "en": "Visual effect (blur) style on any node: `Regular` (the default and the fallback) / `Prominent` / `UltraThin` / `Thin` / `Thick` / `Chrome` / `Light` / `Dark` / `ExtraLight`, with `systemMaterial`, `systemUltraThinMaterial` and the other `system*Material` names as aliases of the material ones. Written as declared since jsonui-cli 1.9.0 — `thick` or `light` is an undeclared spelling that draws the default. A Blur takes only Light / Dark / ExtraLight (see Blur).",
+        "ja": "どのノードにも書ける視覚効果（ぼかし）のスタイル: `Regular`（既定値でありフォールバック）/ `Prominent` / `UltraThin` / `Thin` / `Thick` / `Chrome` / `Light` / `Dark` / `ExtraLight`。`systemMaterial`・`systemUltraThinMaterial` などの `system*Material` はマテリアル名の別名。jsonui-cli 1.9.0 から宣言どおりの綴りで書く — `thick` や `light` は宣言に無い綴りとして既定で描かれる。Blur が受けるのは Light / Dark / ExtraLight だけ（Blur 参照）。"
       }
     },
     "glass": {
