@@ -1,0 +1,342 @@
+{
+  "type": "View",
+  "id": "spec_texts_files_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_muted",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateSpec",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "spec_texts_files_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_texts_files_header",
+          "style": "page_header",
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateSpec}",
+              "text": "breadcrumb"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "#475467",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "#64748B",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_texts_files_body",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_why",
+              "style": "home_section",
+              "background": "surface_card",
+              "child": [
+                {
+                  "type": "Label",
+                  "style": "section_heading",
+                  "text": "section_why_heading",
+                  "width": "matchParent"
+                },
+                {
+                  "type": "Label",
+                  "style": "section_subheading",
+                  "text": "section_why_body",
+                  "width": "matchParent"
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_reference",
+              "style": "home_section",
+              "background": "surface_muted",
+              "child": [
+                {
+                  "type": "Label",
+                  "style": "section_heading",
+                  "text": "section_reference_heading",
+                  "width": "matchParent"
+                },
+                {
+                  "type": "Label",
+                  "style": "section_subheading",
+                  "text": "section_reference_body",
+                  "width": "matchParent"
+                },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "// app_contracts.spec.json — a prose field points into the texts file\n{\n  \"metadata\": {\n    \"name\": \"app\",\n    \"description\": { \"md\": \"overview\" }                  // paired file: app_contracts.texts.yaml\n  },\n  \"unitContracts\": [\n    {\n      \"target\": \"UserRepository\",\n      \"cases\": [\n        {\n          \"name\": \"healthCheck_carriesATenSecondPerRequestTimeout\",\n          \"intent\": { \"md\": \"cases.user_repository.health_check_timeout\" }\n        },\n        {\n          \"name\": \"healthCheck_usesTheSharedClient\",\n          \"intent\": \"Short prose stays inline, as plain text.\"\n        }\n      ]\n    }\n  ],\n  \"notes\": [\n    { \"md\": \"shared/network.texts.yaml#timeouts.default\" }   // a named file, relative to the spec\n  ]\n}",
+                  "language": "jsonc",
+                  "filename": "app_contracts.spec.json",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_yaml",
+              "style": "home_section",
+              "background": "surface_card",
+              "child": [
+                {
+                  "type": "Label",
+                  "style": "section_heading",
+                  "text": "section_yaml_heading",
+                  "width": "matchParent"
+                },
+                {
+                  "type": "Label",
+                  "style": "section_subheading",
+                  "text": "section_yaml_body",
+                  "width": "matchParent"
+                },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "# app_contracts.texts.yaml — beside app_contracts.spec.json\noverview: |\n  この面の app が所有し、単一の画面が所有しない unit target の契約。\n\n  ### ネットワーク層の規則\n  **(1)** 426: どの API 要求でも ForceUpdateManager を立てる。\n\n  **(2)** 401（/api/auth/* 以外）: refresh は 1 本にまとめる（single-flight）。\n\ncases:\n  user_repository:\n    health_check_timeout: |\n      **`[api.healthCheck=default]`** GET /api/health は要求単位で **10 秒**。\n\n      - iOS: `URLRequest.timeoutInterval == 10`\n      - Android: chain の connect / read / write timeout が 10 秒\n\n      > 実装前の状態: 両 OS 赤 — 2026-09-25 に実装済み",
+                  "language": "yaml",
+                  "filename": "app_contracts.texts.yaml",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_rendering",
+              "style": "home_section",
+              "background": "surface_muted",
+              "child": [
+                {
+                  "type": "Label",
+                  "style": "section_heading",
+                  "text": "section_rendering_heading",
+                  "width": "matchParent"
+                },
+                {
+                  "type": "Label",
+                  "style": "section_subheading",
+                  "text": "section_rendering_body",
+                  "width": "matchParent"
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_rules",
+              "style": "home_section",
+              "background": "surface_card",
+              "child": [
+                {
+                  "type": "Label",
+                  "style": "section_heading",
+                  "text": "section_rules_heading",
+                  "width": "matchParent"
+                },
+                {
+                  "type": "Label",
+                  "style": "section_subheading",
+                  "text": "section_rules_body",
+                  "width": "matchParent"
+                },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "$ jsonui-doc validate spec app_contracts.spec.json      # measured, one fixture per line\n  [ERROR] texts: unitContracts[0].cases[0].intent: 'app_contracts.texts.yaml#cases.x' is not defined\n  [ERROR] texts: unitContracts[0].cases[1].intent: 'app_contracts.texts.yaml#cases' is a mapping, not a text — name one of its keys\n  [ERROR] texts: unitContracts[0].cases[2].intent: 'gone.texts.yaml#k' — gone.texts.yaml does not exist\n  [ERROR] texts: metadata.name: a text reference is read only in description / notes / intent\n  [ERROR] texts: app_contracts.texts.yaml: key True under 'cases' is a bool, not a string — YAML reads yes / no / on / off / true / false and bare numbers as values; quote the key if it is meant as a name\n  [ERROR] texts: app_contracts.texts.yaml: key 'cases.a.b' contains '.', which is the path separator — nest it as a mapping instead\n  [ERROR] texts: app_contracts.texts.yaml: line 5: duplicate key 'retries' (first at line 4) — YAML would keep only the last\n  [ERROR] texts: app_contracts.texts.yaml: 'cases.list' is a list — a value is a string (use `|` for Markdown) or a mapping of more keys\n  [WARNING] texts: app_contracts.texts.yaml: 1 key(s) no field of this spec references: cases.old",
+                  "language": "bash",
+                  "filename": "jsonui-doc validate spec",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_readers",
+              "style": "home_section",
+              "background": "surface_muted",
+              "child": [
+                {
+                  "type": "Label",
+                  "style": "section_heading",
+                  "text": "section_readers_heading",
+                  "width": "matchParent"
+                },
+                {
+                  "type": "Label",
+                  "style": "section_subheading",
+                  "text": "section_readers_body",
+                  "width": "matchParent"
+                },
+                {
+                  "type": "CodeBlock",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "code": "// read_spec_file (MCP) — each reference comes back with its text\n\"intent\": {\n  \"md\": \"cases.user_repository.health_check_timeout\",\n  \"text\": \"**`[api.healthCheck=default]`** GET /api/health は…\"\n}\n// \"text\" is for reading only. Edit the YAML file; validate refuses a\n// \"text\" key written back into the spec.",
+                  "language": "jsonc",
+                  "filename": "read_spec_file",
+                  "showLineNumbers": false,
+                  "copyable": true
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "orientation": "vertical",
+              "id": "section_when_not",
+              "style": "home_section",
+              "background": "surface_card",
+              "child": [
+                {
+                  "type": "Label",
+                  "style": "section_heading",
+                  "text": "section_when_not_heading",
+                  "width": "matchParent"
+                },
+                {
+                  "type": "Label",
+                  "style": "section_subheading",
+                  "text": "section_when_not_body",
+                  "width": "matchParent"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "spec_texts_files_next",
+          "style": "home_section",
+          "background": "chrome_fill",
+          "child": [
+            {
+              "type": "Label",
+              "style": "section_heading",
+              "text": "next_heading",
+              "width": "matchParent",
+              "fontColor": "chrome_ink"
+            },
+            {
+              "type": "Label",
+              "style": "section_subheading",
+              "text": "next_subheading",
+              "width": "matchParent",
+              "fontColor": "chrome_ink"
+            },
+            {
+              "type": "Collection",
+              "id": "spec_texts_files_next_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 24,
+              "columnCount": 2,
+              "lineSpacing": 16,
+              "itemSpacing": 16,
+              "lazy": "none",
+              "scrollEnabled": false,
+              "items": "@{nextReadLinks}",
+              "cellIdProperty": "id",
+              "sections": [
+                {
+                  "cell": "cells/next_step_card"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "spec_texts_files_footer",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            32,
+            32
+          ],
+          "background": "chrome_fill",
+          "child": [
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "fontSize": 12,
+              "fontColor": "#94A3B8",
+              "text": "footer_copyright"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

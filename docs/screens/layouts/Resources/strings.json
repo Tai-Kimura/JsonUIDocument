@@ -11025,6 +11025,108 @@
       "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
     }
   },
+  "spec_texts_files": {
+    "breadcrumb": {
+      "en": "← Spec",
+      "ja": "← Spec"
+    },
+    "title": {
+      "en": "Long prose: texts files",
+      "ja": "長い説明文: texts ファイル"
+    },
+    "lead": {
+      "en": "A spec's `description`, `notes` and case `intent` can point into a YAML file beside the spec instead of holding the text inline. The text there is written as Markdown and renders as Markdown on the generated pages; an inline string stays plain text. jsonui-cli 1.9.3 and later.",
+      "ja": "spec の `description`・`notes`・ケースの `intent` は、文章を直接持つ代わりに spec の隣の YAML ファイルを指せる。そこに Markdown で書いた文章は、生成されるページで Markdown として表示される。直接書いた文字列はこれまでどおり平文のまま。jsonui-cli 1.9.3 以降。"
+    },
+    "read_time": {
+      "en": "~6 min read",
+      "ja": "約 6 分"
+    },
+    "section_why_heading": {
+      "en": "Why a second file",
+      "ja": "なぜ別ファイルにするのか"
+    },
+    "section_why_body": {
+      "en": "A JSON string has no line breaks of its own: a long description is one line of `\\n` escapes in the file, and it rendered as one paragraph on the page. Specs that carry real contracts — an app contracts spec with a dozen network rules, unit cases whose intent records the rule, both platforms and the state before the fix — reached tens of kilobytes of prose that nobody could read in either place. The texts file moves that prose out of the JSON, into YAML where a `|` block holds Markdown as written. The JSON keeps the structure: targets, cases, rows.",
+      "ja": "JSON の文字列は改行を持てない。長い説明はファイルの中では `\\n` のエスケープだらけの 1 行になり、ページでも 1 つの段落として表示されていた。実際の契約を持つ spec（ネットワーク層の規則が十数本ある app contracts spec や、規則・両 OS の条件・修正前の状態を intent に書くケースなど）では、説明文だけで数十 KB になり、ファイルでもページでも読めなくなっていた。texts ファイルはその説明文を JSON から YAML へ移す。YAML の `|` ブロックなら Markdown をそのまま書ける。JSON には target・ケース・行といった構造だけが残る。"
+    },
+    "section_reference_heading": {
+      "en": "Pointing a field at a text",
+      "ja": "フィールドから文章を指す"
+    },
+    "section_reference_body": {
+      "en": "Write `{\"md\": \"<key>\"}` where the text would go. Without a `#`, the key is read from the spec's paired file: `foo.spec.json` → `foo.texts.yaml` in the same directory (a `.component.json` pairs the same way). With a `#`, the part before it names another file, relative to the spec — for text several specs share. The fields that accept a reference are the prose ones: any `description`, `notes` (or one entry of a `notes` array) and a unit case's `intent`. Anywhere else it is a validation error.",
+      "ja": "文章を書く位置に `{\"md\": \"<キー>\"}` を書く。`#` が無ければ、spec と対になるファイルからキーを読む（`foo.spec.json` → 同じディレクトリの `foo.texts.yaml`。`.component.json` も同じ規則）。`#` があれば、その前の部分が spec から見た別ファイルのパスになる。複数の spec で共有する文章に使う。参照を書けるのは説明文のフィールドだけで、すべての `description`、`notes`（配列ならその各要素）、ユニットケースの `intent` が対象。それ以外の場所に書くと検証エラーになる。"
+    },
+    "section_yaml_heading": {
+      "en": "Writing the YAML",
+      "ja": "YAML の書き方"
+    },
+    "section_yaml_body": {
+      "en": "The key is a `.`-separated path through nested mappings, the way i18n keys are: `cases.user_repository.health_check_timeout` is three levels. The value at the end of the path is a string; write it with `|` so the Markdown needs no escaping and keeps its blank lines. Group keys however reads best — by target, by section of the spec — the tools only follow the path.",
+      "ja": "キーは入れ子のマッピングを `.` でたどるパスで、i18n のキーと同じ書き方をする。`cases.user_repository.health_check_timeout` は 3 階層。パスの先の値は文字列で、`|` を使って書くと Markdown をエスケープなしで、空行も含めてそのまま書ける。キーのまとめ方（target ごと、spec の節ごとなど）は読みやすいように決めてよい。ツールはパスをたどるだけ。"
+    },
+    "section_rendering_heading": {
+      "en": "How it renders",
+      "ja": "どう表示されるか"
+    },
+    "section_rendering_body": {
+      "en": "On the generated spec and unit-test pages, a text from a texts file is rendered as Markdown — headings, lists, code, quotes, tables — styled like the page around it. Raw HTML in it is not rendered, and a `javascript:` link is not made a link. An inline string is still plain text, with one change: its line breaks are now shown. A page with no reference is byte-identical to what it was; the Markdown stylesheet is added only to a page that renders Markdown. The Markdown export of a spec inserts the text as written, and turns its line breaks into `<br>` inside a table cell so the row stays one row.",
+      "ja": "生成される spec のページとユニットテストのページでは、texts ファイルの文章が Markdown として表示される（見出し、リスト、コード、引用、表）。スタイルは周りのページに合わせてある。中に書いた生の HTML は描画されず、`javascript:` のリンクもリンクにはならない。直接書いた文字列は平文のままだが、改行が表示されるようになった点だけ変わった。参照の無いページの出力は 1 バイトも変わらない。Markdown 用のスタイルは、Markdown を表示するページにだけ追加される。spec の Markdown 版の出力には文章がそのまま入り、表のセルの中では行が崩れないよう改行を `<br>` に変える。"
+    },
+    "section_rules_heading": {
+      "en": "What validate checks",
+      "ja": "validate が検査すること"
+    },
+    "section_rules_body": {
+      "en": "`jsonui-doc validate spec` resolves every reference and checks the YAML it reads. Each rule below exists because the permissive reading is a silent wrong answer: YAML reads `yes:` / `on:` as booleans and `1:` as a number, so such a key cannot be named in a reference (quote it); `.` is the path separator, so a key containing one is ambiguous; YAML keeps the last of two equal keys, so the first would vanish; a list has no stable key. A key of the paired file that no field references is a warning — usually a rename done on one side only. A named file may be shared, so its keys are not checked for use.",
+      "ja": "`jsonui-doc validate spec` はすべての参照を解決し、読み込んだ YAML を検査する。下の各規則は、緩く解釈すると気づかないうちに誤った結果になるものばかり。YAML は `yes:` や `on:` を真偽値、`1:` を数値として読むため、そのキーは参照で指定できない（クォートすれば使える）。`.` はパスの区切りなので、キーに含めると曖昧になる。YAML は同じキーが 2 つあると後の方だけを残すので、前の方が消える。配列には安定したキーが無い。対になるファイルのキーをどのフィールドも参照していなければ警告になる。たいていは片側だけを改名したのが原因。別名のファイルは共有されている可能性があるので、未参照のチェックはしない。"
+    },
+    "section_readers_heading": {
+      "en": "Every reader gets the text",
+      "ja": "どのツールも文章を受け取る"
+    },
+    "section_readers_body": {
+      "en": "References are resolved where a spec is read, once, so no reader sees `{\"md\": ...}`: the doc generator, `jui generate` / `build` / `verify`, and `jsonui-test`'s unit-contract check and stub generator (a stub's failure message carries the intent's text). Split specs resolve each sub-spec against its own paired file before the merge. The MCP `read_spec_file` tool returns each reference with its text beside it, so an agent sees both what the field says and where to edit it.",
+      "ja": "参照は spec を読み込むときに 1 回だけ解決するので、`{\"md\": ...}` のまま受け取るツールは無い。対象はドキュメント生成、`jui generate` / `build` / `verify`、`jsonui-test` のユニット契約チェックとテスト雛形の生成（雛形の失敗メッセージには intent の文章が入る）。分割した spec では、統合する前にサブ spec ごとに自分の対のファイルで解決する。MCP の `read_spec_file` は、各参照の横に文章を並べて返す。エージェントには、フィールドの中身と編集する場所の両方が見える。"
+    },
+    "section_when_not_heading": {
+      "en": "When to keep it inline",
+      "ja": "直接書いたままにする場合"
+    },
+    "section_when_not_body": {
+      "en": "A sentence or two stays inline — it reads fine in the JSON and needs no structure. Move a text out when it is longer than a few lines or needs headings, lists or a separate paragraph per rule. Do not move a text back inline to simplify a diff: the page loses its structure and the JSON is one escaped line again. Renaming a key is two edits, the YAML key and every reference to it; validate after either.",
+      "ja": "1〜2 文程度なら直接書いたままでよい。JSON の中でも読めるし、構造も要らない。数行を超えるときや、見出し・リスト・規則ごとの段落が必要なときに外へ出す。差分を小さくするために文章を直接書く形へ戻してはいけない。ページの構造が失われ、JSON もまたエスケープだらけの 1 行に戻る。キーの改名は、YAML のキーとそれを指すすべての参照の 2 か所を直す作業になる。どちらを直した後も validate を実行する。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_subheading": {
+      "en": "Where the rest of a spec is described, and how it is checked.",
+      "ja": "spec の他の部分の説明と、その検査方法。"
+    },
+    "next_anatomy_title": {
+      "en": "The anatomy of a screen spec",
+      "ja": "screen spec の全体像"
+    },
+    "next_anatomy_description": {
+      "en": "Every top-level key of a screen spec and what reads it.",
+      "ja": "screen spec のトップレベルのキーと、それを読むツールの一覧。"
+    },
+    "next_validation_title": {
+      "en": "Validation + drift detection",
+      "ja": "検証と drift 検出"
+    },
+    "next_validation_description": {
+      "en": "What validate and verify check, and when each runs.",
+      "ja": "validate と verify が検査する内容と、それぞれを実行するタイミング。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. このサイトもここで解説されているツールチェーンで構築されています。"
+    }
+  },
   "spec_cell_classes": {
     "breadcrumb": {
       "en": "← Split overview",
