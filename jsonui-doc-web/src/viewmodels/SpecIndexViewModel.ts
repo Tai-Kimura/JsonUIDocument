@@ -33,6 +33,7 @@ const CATALOG: ReadonlyArray<{ id: string; url: string; titleKey: string }> = [
   { id: "component-spec",       url: "/spec/component-spec",       titleKey: "spec_component_spec_title" },
   { id: "custom-types",         url: "/spec/custom-types",         titleKey: "spec_custom_types_title" },
   { id: "cell-classes",         url: "/spec/cell-classes",         titleKey: "spec_cell_classes_title" },
+  { id: "texts-files",          url: "/spec/texts-files",          titleKey: "spec_texts_files_title" },
   { id: "validation-and-drift", url: "/spec/validation-and-drift", titleKey: "spec_validation_and_drift_title" }
 ];
 

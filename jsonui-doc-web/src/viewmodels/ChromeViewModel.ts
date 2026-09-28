@@ -105,6 +105,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "component-spec",       titleKey: "spec_component_spec_title",       titleEn: "Component specs",               url: "/spec/component-spec" },
       { id: "custom-types",         titleKey: "spec_custom_types_title",         titleEn: "Custom types",                  url: "/spec/custom-types" },
       { id: "cell-classes",         titleKey: "spec_cell_classes_title",         titleEn: "Collection cell classes",       url: "/spec/cell-classes" },
+      { id: "texts-files",          titleKey: "spec_texts_files_title",          titleEn: "Long prose: texts files",       url: "/spec/texts-files" },
       { id: "validation-and-drift", titleKey: "spec_validation_and_drift_title", titleEn: "Validation + drift detection",  url: "/spec/validation-and-drift" },
     ],
   },
