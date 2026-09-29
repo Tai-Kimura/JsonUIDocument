@@ -4,13 +4,13 @@
   "metadata": {
     "name": "SpecTextsFiles",
     "displayName": "Long prose: texts files",
-    "description": "Spec article — prose fields (description / notes / intent) that point into a YAML texts file with {\"md\": \"key\"} and render as Markdown. Covers the paired-file rule and named files, dotted key paths, how the text renders on generated pages, the rules jsonui-doc validate enforces (measured output), how every reader receives the text (read_spec_file returns {md, text}), and when to keep prose inline. jsonui-cli 1.9.3+.",
+    "description": "Spec article — prose fields (description / notes / intent / purpose / processing / handling / rule / meaning / note / reason, and a transition's condition) that point into a YAML texts file with {\"md\": \"key\"} and render as Markdown. Covers the paired-file rule and named files (relative, .texts.yaml only), dotted key paths, how the text renders on generated pages (plain-text fallback without markdown-it-py), the rules jsonui-doc validate enforces (measured output), how every reader receives the text (read_spec_file returns {md, text}; jsonui-test refuses an unresolved reference; search_specs does not search texts-file text), and when to keep prose inline. jsonui-cli 1.9.3+.",
     "platforms": [
       "web"
     ],
     "layoutFile": "spec/texts-files",
     "createdAt": "2026-09-28",
-    "updatedAt": "2026-09-28"
+    "updatedAt": "2026-09-29"
   },
   "structure": {
     "components": [],
@@ -142,6 +142,7 @@
   ],
   "notes": [
     "2026-09-28 — written for jsonui-cli 1.9.3 (texts files: jsonui-cli d500411 + 875ad0d; read_spec_file expansion: jsonui-mcp-server on the same branch). The validate block is pasted from runs of that build on a fixture spec with one texts-file defect per run; the page is not pinned to a released version until 1.9.3 is tagged and the deploy pin moves.",
+    "2026-09-29 — re-measured for jsonui-cli 1.9.3's widened fields and stricter validation (jsonui-cli 7e4c183f through 4f99e2bf): the accepted fields now include purpose / processing / handling / rule / meaning / note / reason (not under harnessConditions / canonicalDivergence) and condition (transitions only); a named file must be relative and end in .texts.yaml; an empty file part and YAML merge keys are refused; PyYAML / markdown-it-py are needed only by a spec with a reference; jsonui-test refuses an unresolved reference; a unit page without markdown-it-py falls back to plain text with one warning. The validate block was re-run on that build, one defect per run, with no collateral warning (the fixture's other references stay in use).",
     "The site's own specs do not use texts files yet: the pinned toolchain (v1.9.2) would refuse the references."
   ]
 }
