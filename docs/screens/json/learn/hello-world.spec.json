@@ -10,7 +10,7 @@
     ],
     "layoutFile": "learn/hello-world",
     "createdAt": "2026-04-22",
-    "updatedAt": "2026-04-22"
+    "updatedAt": "2026-09-30"
   },
   "structure": {
     "components": [],
@@ -326,6 +326,7 @@
     "All user-visible strings flow through @string/learn_hello_world_* keys into Resources/strings.json for en+ja localization. No paragraph exceeds ~100 chars, so docs/content/{en,ja}/ is not needed for v1; if later copy grows past that, the implementer can migrate paragraphs to docs/content/{en,ja}/learn/hello-world.json without changing this spec.",
     "v1 seeds breadcrumbItems / prerequisites / platformTabs / nextSteps in onAppear with hardcoded @string/... keys. Adding a DocContentRepository later is a pure additive change and does not alter the ViewModel's public contract.",
     "activeTab defaults to 'react' because web-only readers (the default audience of this site) can reach a running Hello World fastest via rjui + Next.js; Swift and Kotlin tabs still render their CodeBlocks identically and are one click away.",
-    "QuickstartStep.code is optional because Step 5 ('What you should see') is a prose-only step without a CodeBlock; all other steps will carry code + language + filename at layout authoring time."
+    "QuickstartStep.code is optional because Step 5 ('What you should see') is a prose-only step without a CodeBlock; all other steps will carry code + language + filename at layout authoring time.",
+    "2026-09-30 — The React run step said HMR re-runs the build on layout changes; the dev server does not run rjui, so a layout edit needs `jui build --web-only` first (as /concepts/hot-reload already said). The iOS run step now says the WebSocket notifies and the app re-fetches over HTTP. Android is Compose, not 'Compose (or XML)'. The prerequisites line points at Python 3.11+ and Ruby 3.2+ for the CLIs."
   ]
 }

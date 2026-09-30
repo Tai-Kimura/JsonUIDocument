@@ -7,7 +7,7 @@ Learn > Hello World. The five-minute first-screen tutorial. Beginners (audience 
 | | |
 |---|---|
 | Created | 2026-04-22 |
-| Updated | 2026-04-22 |
+| Updated | 2026-09-30 |
 
 ## Screen Structure
 
@@ -170,5 +170,6 @@ activeTab == 'react':
 - v1 seeds breadcrumbItems / prerequisites / platformTabs / nextSteps in onAppear with hardcoded @string/... keys. Adding a DocContentRepository later is a pure additive change and does not alter the ViewModel's public contract.
 - activeTab defaults to 'react' because web-only readers (the default audience of this site) can reach a running Hello World fastest via rjui + Next.js; Swift and Kotlin tabs still render their CodeBlocks identically and are one click away.
 - QuickstartStep.code is optional because Step 5 ('What you should see') is a prose-only step without a CodeBlock; all other steps will carry code + language + filename at layout authoring time.
+- 2026-09-30 — The React run step said HMR re-runs the build on layout changes; the dev server does not run rjui, so a layout edit needs `jui build --web-only` first (as /concepts/hot-reload already said). The iOS run step now says the WebSocket notifies and the app re-fetches over HTTP. Android is Compose, not 'Compose (or XML)'. The prerequisites line points at Python 3.11+ and Ruby 3.2+ for the CLIs.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

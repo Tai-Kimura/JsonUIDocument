@@ -158,7 +158,7 @@
 <p>Learn &gt; Hello World. The five-minute first-screen tutorial. Beginners (audience A) land here from the home hero CTA (/learn/hello-world) and must see text on screen within 5 minutes on at least one of Swift / Kotlin / React. Page is one vertical ScrollView whose per-platform quickstart section is an inline tab switcher driven by activeTab + a Collection of tab headers (T6 pattern, not a root TabView). v1 seeds all content statically in the ViewModel; a DocContentRepository can be added later without changing the public ViewModel contract.</p>
 <table class="meta-table">
 <tr><th>Created</th><td>2026-04-22</td></tr>
-<tr><th>Updated</th><td>2026-04-22</td></tr>
+<tr><th>Updated</th><td>2026-09-30</td></tr>
 </table>
 </section>
 <section id="structure">
@@ -553,6 +553,7 @@ activeTab == &#x27;react&#x27;:
 <li>v1 seeds breadcrumbItems / prerequisites / platformTabs / nextSteps in onAppear with hardcoded @string/... keys. Adding a DocContentRepository later is a pure additive change and does not alter the ViewModel&#x27;s public contract.</li>
 <li>activeTab defaults to &#x27;react&#x27; because web-only readers (the default audience of this site) can reach a running Hello World fastest via rjui + Next.js; Swift and Kotlin tabs still render their CodeBlocks identically and are one click away.</li>
 <li>QuickstartStep.code is optional because Step 5 (&#x27;What you should see&#x27;) is a prose-only step without a CodeBlock; all other steps will carry code + language + filename at layout authoring time.</li>
+<li>2026-09-30 — The React run step said HMR re-runs the build on layout changes; the dev server does not run rjui, so a layout edit needs `jui build --web-only` first (as /concepts/hot-reload already said). The iOS run step now says the WebSocket notifies and the app re-fetches over HTTP. Android is Compose, not &#x27;Compose (or XML)&#x27;. The prerequisites line points at Python 3.11+ and Ruby 3.2+ for the CLIs.</li>
 </ul>
 </section>
 </div>

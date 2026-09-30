@@ -158,7 +158,7 @@
 <p>Guides &gt; Developer menu. How to wrap an iOS (SwiftJsonUI) or Android (KotlinJsonUI) app root in DeveloperMenuContainer so double-tap opens a screen switcher and long-press toggles Dynamic Mode (hot reload). Seven sections + TOC + next-reads. Web (ReactJsonUI) has no equivalent — the lead calls this out. Docs site itself is Web, so platforms = [&quot;web&quot;]; the article TOPIC is iOS/Android but the RENDERING target is Web like every other guide.</p>
 <table class="meta-table">
 <tr><th>Created</th><td>2026-04-24</td></tr>
-<tr><th>Updated</th><td>2026-04-24</td></tr>
+<tr><th>Updated</th><td>2026-09-30</td></tr>
 </table>
 </section>
 <section id="structure">
@@ -820,6 +820,7 @@ flowchart TD
 <li>CodeBlocks use language: &#x27;swift&#x27; and &#x27;kotlin&#x27; — both are in the Shiki preloaded list. Examples are illustrative skeletons (App.swift wraps the SwiftUI App root; MainActivity.kt wraps setContent around the NavHost).</li>
 <li>Web (ReactJsonUI) has no DeveloperMenuContainer equivalent. The lead states this explicitly, and Sidebar / GuidesIndex display [iOS] [Android] platform pills (Phase 0 infrastructure added alongside this guide) so readers see the platform scope before opening the page.</li>
 <li>2026-09-03, section_pitfalls_bullet_displayName was published as its own key name, not as text: rjui&#x27;s converter does not recognise a string key containing an uppercase letter and emits it as literal text, silently. Renamed to lowercase with its layout reference; the same defect hit one bullet on the writing-layouts page. See that spec&#x27;s note and the upstream filing.</li>
+<li>2026-09-30 — The release warning said forgetting enabled = BuildConfig.DEBUG ships a working selector because &#x27;Android trusts you&#x27;; DeveloperMenuContainer returns early unless DynamicModeManager.isDynamicModeAvailable, which reads the host app&#x27;s FLAG_DEBUGGABLE (KotlinJsonUI DeveloperMenuContainer.kt, DynamicModeManager.kt), as this page&#x27;s Android bullet already said. The flag is kept as belt-and-braces.</li>
 </ul>
 </section>
 </div>

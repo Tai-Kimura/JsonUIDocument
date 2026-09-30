@@ -702,8 +702,8 @@
       "command": "verify",
       "synopsis": "jui verify [--fail-on-diff] [--file SPEC] [--platform <p>] [--detail] [--json PATH]",
       "purpose": {
-        "en": "Compare generated Layout JSON against the committed Layouts to detect spec drift. `--fail-on-diff` exits non-zero for CI (JsonUI invariant #2). Since jsonui-cli 1.8.5 the summary names its denominator — `verified N of M screen(s)`, with the skipped ones and why — so a green run no longer hides how much it actually compared: a screen whose layout is authored by hand rather than generated is skipped, and a project where every screen is skipped reports `verified 0 of M` while still exiting 0.",
-        "ja": "生成された Layout JSON を commit 済みの Layouts と比較して spec drift を検出する。`--fail-on-diff` は CI 用に非 0 で終了（JsonUI 不変条件 #2）。jsonui-cli 1.8.5 からはサマリが分母を名乗る — `verified N of M screen(s)` と skip されたものとその理由 — ので、緑の実行が「実際に何枚比べたか」を隠さなくなった: 生成ではなく手で書かれた layout を持つ画面は skip され、全画面が skip されたプロジェクトは `verified 0 of M` と報告しながら exit 0 を返す。"
+        "en": "Compare generated Layout JSON against the committed Layouts to detect spec drift. `--fail-on-diff` exits non-zero for CI (JsonUI invariant #2). Since jsonui-cli 1.8.5 the summary names its denominator — `verified N of M screen(s)`, with the skipped ones and why — so a green run no longer hides how much it actually compared: a screen whose layout is authored by hand rather than generated is skipped, and a project where every screen is skipped reports `verified 0 of M` while still exiting 0. Since jsonui-cli 1.9.1 `--fail-on-diff` also fails on initial values a spec declares that its layout does not carry (the report's WARNING block lists them; an include's data is read under the include id's prefix), so a hand edit to a data entry's default is drift too.",
+        "ja": "生成された Layout JSON を commit 済みの Layouts と比較して spec drift を検出する。`--fail-on-diff` は CI 用に非 0 で終了（JsonUI 不変条件 #2）。jsonui-cli 1.8.5 からはサマリが分母を名乗る — `verified N of M screen(s)` と skip されたものとその理由 — ので、緑の実行が「実際に何枚比べたか」を隠さなくなった: 生成ではなく手で書かれた layout を持つ画面は skip され、全画面が skip されたプロジェクトは `verified 0 of M` と報告しながら exit 0 を返す。 jsonui-cli 1.9.1 からは、spec が宣言した初期値を layout が持っていない場合も `--fail-on-diff` で失敗する（レポートの WARNING ブロックに一覧が出る。include の data は include の id の接頭辞付きで読む）ので、data エントリの既定値を手で書き換えるのもドリフトになる。"
       },
       "options": [
         {
@@ -762,16 +762,16 @@
         "jui build"
       ],
       "verifiedAgainst": {
-        "version": "1.8.5",
+        "version": "1.9.5",
         "columns": 80,
         "python": "3.12",
         "helpHash": "cef4857adc6919ab2fed436c32f4ac005e4d0a1944b9e29537ba8a33ddee698a",
-        "cardHash": "09b50363e31f0b52c2c10c7bd869e48abfd3853a47302a489d266d3af8b08e6c",
+        "cardHash": "3a39b90683bb47ea6a05ffe950a60579b4a35d744d4260b2b97fb7658d686d85",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "b90c5b69cbb6",
           "synopsis": "17d634e84baf",
-          "purpose": "911c9b49ac85",
+          "purpose": "6f5941e5c03d",
           "options": "04b732f9d18e",
           "examples": "f5662f26ca1c",
           "aliases": "98edafdd23a8",
@@ -4050,8 +4050,8 @@
       "command": "validate spec",
       "synopsis": "jsonui-doc validate spec <spec-or-directory>",
       "purpose": {
-        "en": "Validate a screen specification against the schema and the project's rules. The argument is a `.spec.json` file or a directory, in which case every spec under it is validated. This checks the spec itself — it does not compare it with any generated document.",
-        "ja": "画面仕様をスキーマとプロジェクトのルールに対して検証する。引数は `.spec.json` ファイルかディレクトリで、後者なら配下の全仕様を検証する。検証対象は仕様そのもので、生成済みドキュメントとの照合は行わない。"
+        "en": "Validate a screen specification against the schema and the project's rules. The argument is a `.spec.json` file or a directory, in which case every spec under it is validated. This checks the spec itself — it does not compare it with any generated document. Since jsonui-cli 1.9.3 a prose field written as `{\"md\": \"key\"}` is resolved against the spec's texts file and checked with it — a missing file, key or unaccepted field is an error; see /spec/texts-files.",
+        "ja": "画面仕様をスキーマとプロジェクトのルールに対して検証する。引数は `.spec.json` ファイルかディレクトリで、後者なら配下の全仕様を検証する。検証対象は仕様そのもので、生成済みドキュメントとの照合は行わない。 jsonui-cli 1.9.3 からは、`{\"md\": \"key\"}` と書いた説明文のフィールドを spec の texts ファイルで解決し、あわせて検査する — ファイルやキーが無い、受け付けないフィールドに書いた、などはエラーになる。/spec/texts-files を参照。"
       },
       "options": [],
       "examples": [],
@@ -4059,16 +4059,16 @@
         "jsonui-doc generate spec"
       ],
       "verifiedAgainst": {
-        "version": "1.8.12",
+        "version": "1.9.5",
         "columns": 80,
         "python": "3.12",
         "helpHash": "6e8f0e6eaf54a0c85feebe01824fd33aa95241aee7bd16f3c7f3b8532dbf14c9",
-        "cardHash": "ec229885ca55f859754dcffe242d13a98520a52a445479d47664963ece04c4e6",
+        "cardHash": "f6635394434d0edce3ca16945257749468c94572150fb0a416f5c7462d1b6770",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "65bb1c28dd6d",
           "synopsis": "a305f9c62598",
-          "purpose": "b9a51d968f2a",
+          "purpose": "01b8e1fb49b8",
           "options": "357b9e47f539",
           "examples": "2b8fdc789d3b",
           "seeAlso": "0d7b11d9c20a"
