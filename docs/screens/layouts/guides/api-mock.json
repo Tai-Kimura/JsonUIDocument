@@ -190,7 +190,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "// switch scenarios from a screen test\n{\n  \"type\": \"screen\",\n  \"source\": { \"layout\": \"layouts/home.json\" },\n  \"mocks\": { \"listProducts\": \"empty\" },\n  \"cases\": [{\n    \"name\": \"reload surfaces the error state\",\n    \"steps\": [\n      { \"setMocks\": { \"listProducts\": \"error\" } },\n      { \"tap\": \"reload_btn\" },\n      { \"assert\": \"visible\", \"id\": \"error_banner\" }\n    ]\n  }]\n}",
+                      "code": "// switch scenarios from a screen test\n{\n  \"type\": \"screen\",\n  \"source\": { \"layout\": \"layouts/home.json\" },\n  \"metadata\": { \"name\": \"Home — product list errors\" },\n  \"mocks\": { \"listProducts\": \"empty\" },\n  \"cases\": [{\n    \"name\": \"reload surfaces the error state\",\n    \"steps\": [\n      { \"action\": \"setMocks\", \"mocks\": { \"listProducts\": \"error\" } },\n      { \"action\": \"tap\", \"id\": \"reload_btn\" },\n      { \"assert\": \"visible\", \"id\": \"error_banner\" }\n    ]\n  }]\n}",
                       "language": "json",
                       "filename": "scenario-switch.test.json",
                       "showLineNumbers": false,

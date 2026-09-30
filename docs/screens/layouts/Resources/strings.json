@@ -5507,8 +5507,8 @@
       "ja": "テストファイルの形式"
     },
     "section_shape_body": {
-      "en": "A test file targets one screen. Each case is a named sequence of steps. Every step is one of two shapes: an `action` (tap / input / scroll / waitFor / …) or an `assert` (visible / notVisible / text / count / state). The target element is identified by its `id` inside the step — there is no separate lookup verb — and the runner preserves state between steps.",
-      "ja": "1 テストファイルは 1 画面を対象とします。各ケースは名前付きステップ列。各ステップは 2 種類のいずれか: `action`（tap / input / scroll / waitFor など）または `assert`（visible / notVisible / text / count / state）。対象要素はステップ内の `id` で特定し（独立した lookup 動詞はありません）、ランナーはステップ間で状態を保持します。"
+      "en": "A test file targets one screen. Each case is a named sequence of steps. Every step is one of two shapes: an `action` (tap / input / scroll / waitFor / …) or an `assert` (visible / notVisible / enabled / disabled / text / count / state / screen / …). The target element is identified by its `id` inside the step — there is no separate lookup verb — and the runner preserves state between steps.",
+      "ja": "1 テストファイルは 1 画面を対象とします。各ケースは名前付きステップ列。各ステップは 2 種類のいずれか: `action`（tap / input / scroll / waitFor など）または `assert`（visible / notVisible / enabled / disabled / text / count / state / screen など）。対象要素はステップ内の `id` で特定し（独立した lookup 動詞はありません）、ランナーはステップ間で状態を保持します。"
     },
     "section_dsl_heading": {
       "en": "The DSL",
@@ -5523,8 +5523,8 @@
       "ja": "プラットフォーム別ドライバ"
     },
     "section_drivers_body": {
-      "en": "iOS driver talks to XCUITest. Android driver talks to UIAutomator / Compose Semantics. Web driver drives Playwright. The test file is identical; the driver translates each step into the platform-native idiom. Add a platform by implementing the driver contract — the tests you already have come along for free.",
-      "ja": "iOS ドライバは XCUITest、Android ドライバは UIAutomator / Compose Semantics、Web ドライバは Playwright と対話。テストファイルは全プラットフォーム共通で、ドライバが各プラットフォームのネイティブ表現に変換します。プラットフォームを追加するにはドライバ契約を実装するだけ — 既存テストはそのまま動きます。"
+      "en": "iOS driver talks to XCUITest. Android driver is built on Espresso + UI Automator and finds Compose nodes by their testTag, exposed through testTagsAsResourceId. Web driver drives Playwright. The test file is identical; the driver translates each step into the platform-native idiom. Add a platform by implementing the driver contract — the tests you already have come along for free.",
+      "ja": "iOS ドライバは XCUITest、Android ドライバは Espresso + UI Automator（Compose は testTagsAsResourceId で公開した testTag で特定）、Web ドライバは Playwright と対話。テストファイルは全プラットフォーム共通で、ドライバが各プラットフォームのネイティブ表現に変換します。プラットフォームを追加するにはドライバ契約を実装するだけ — 既存テストはそのまま動きます。"
     },
     "section_ci_heading": {
       "en": "CI integration",
@@ -7811,8 +7811,8 @@
       "ja": "• `setLocation` — latitude / longitude。"
     },
     "section_dsl_action_add_media": {
-      "en": "• `addMedia` — Android: pushes media into the gallery; iOS: seeds the photo library via PhotoKit (simulator only; pick via normal picker taps, pre-grant with `jsonui-test pregrant`); web: sets a file input. Use basenames; assert existence/app state, never counts (seeding accumulates).",
-      "ja": "• `addMedia` — Android はギャラリーへ投入、iOS は PhotoKit でフォトライブラリへ投入（simulator 限定・picker 操作は通常の tap、事前許可は `jsonui-test pregrant`）、web は file input へセット。パスは basename 推奨。assert は存在/アプリ状態ベースで件数は不可（投入は累積する）。"
+      "en": "• `addMedia` — Android: pushes media into the gallery; iOS: seeds the photo library via PhotoKit (simulator only; pick via normal picker taps, pre-grant with `jsonui-test pregrant`); web: sets a file input. Use basenames; assert existence/app state, never counts: on iOS seeding accumulates across runs. Since Android driver 1.15.6 the fixture's own rows are removed before it is inserted again (1.15.7 also removes rows an uninstall left behind), but a count still includes whatever else is in the gallery.",
+      "ja": "• `addMedia` — Android はギャラリーへ投入、iOS は PhotoKit でフォトライブラリへ投入（simulator 限定・picker 操作は通常の tap、事前許可は `jsonui-test pregrant`）、web は file input へセット。パスは basename 推奨。assert は存在/アプリ状態ベースで件数は不可。iOS では投入が実行のたびに累積する。Android はドライバ 1.15.6 から、同じフィクスチャの行を消してから投入し直す（1.15.7 からはアンインストールで残った行も消す）が、件数にはギャラリーにある他の画像も入る。"
     },
     "section_dsl_action_alert_tap": {
       "en": "• `alertTap` — tap an alert button (also dismisses iOS SpringBoard system alerts).",
@@ -8129,8 +8129,8 @@
       "ja": "`jsonui-test mock generate --swagger <openapi> --out <dir>` は operation ごとのモックファイルを `generated/` に書き出します。書く前にそのディレクトリを空にするので、中身は常に現在の契約そのものです。手書きファイルはその外にあり、この処理では読まれもしないため、上書きされるものも手でマージするものもありません。契約が変わったら再実行します — あるいは `jsonui-test validate` に任せることもできます（`generated/` が無い、または swagger より古いときに再生成するので、クローン直後でも CI の初回でも完全な状態から始まります）。"
     },
     "section_generate_bullet_check": {
-      "en": "• `--update-default` rewrites only the `default` body and the `source` route of existing files, leaving every other scenario byte-identical — the ones your tests drive keep their data. It preserves `source.swagger` too, so running it from a different directory does not churn every file. Over MCP the same generation is `test_mock_generate` (Group F), with `check: true` for the read-only form.",
-      "ja": "• `--update-default` は既存ファイルのうち `default` の本文と `source` の経路だけを書き換え、他のシナリオは 1 バイトも触りません — テストが駆動しているデータはそのまま残ります。`source.swagger` も保持するので、別のディレクトリから実行しても全ファイルが churn することはありません。MCP では同じ生成が `test_mock_generate`（グループ F）で、読み取り専用の形は `check: true` です。"
+      "en": "• `--update-default` repairs the `default` scenario of existing files in place — it adds the required fields the contract has and the body lacks and refreshes the `source` route, never overwrites a value or removes a field, and leaves every other scenario byte-identical; `--dry-run` reports what it would change without writing — the ones your tests drive keep their data. It preserves `source.swagger` too, so running it from a different directory does not churn every file. Over MCP the same generation is `test_mock_generate` (Group F), with `check: true` for the read-only form.",
+      "ja": "• `--update-default` は既存ファイルの `default` シナリオをその場で補修します — 契約にあって本文に無い必須フィールドを足し、`source` の経路を更新するだけで、既存の値の上書きやフィールドの削除はせず、他のシナリオは 1 バイトも触りません。`--dry-run` を付けると書き込まずに変更内容だけを報告します — テストが駆動しているデータはそのまま残ります。`source.swagger` も保持するので、別のディレクトリから実行しても全ファイルが churn することはありません。MCP では同じ生成が `test_mock_generate`（グループ F）で、読み取り専用の形は `check: true` です。"
     },
     "section_serve_heading": {
       "en": "5. Serving mocks + control panel",
@@ -8165,8 +8165,8 @@
       "ja": "7. ドライバ統合"
     },
     "section_drivers_body": {
-      "en": "Each driver has a `MockClient`. Set `mockServerURL` + `token` on the runner config and the driver points the app at the mock server for the run, then resets scenarios afterward. iOS / Android / Web all speak the same admin API.",
-      "ja": "各 driver は `MockClient` を持ちます。runner の config に `mockServerURL` + `token` を設定すると、その実行の間アプリをモックサーバに向け、実行後にシナリオをリセットします。iOS / Android / Web すべてが同じ admin API を話します。"
+      "en": "Each driver has a `MockClient`. Set the mock server's URL and `mockToken` on the runner config (`mockServerURL` on iOS, `mockServerUrl` on Android and Web) and the driver points the app at the mock server for the run, then resets scenarios afterward. iOS / Android / Web all speak the same admin API.",
+      "ja": "各 driver は `MockClient` を持ちます。runner の config にモックサーバの URL と `mockToken` を設定すると（URL は iOS が `mockServerURL`、Android と Web は `mockServerUrl`）、その実行の間アプリをモックサーバに向け、実行後にシナリオをリセットします。iOS / Android / Web すべてが同じ admin API を話します。"
     },
     "section_drivers_bullet_admin": {
       "en": "• Admin API (all three drivers): POST `/__jsonui__/scenario-set` (body `{ mocks }`) and POST `/__jsonui__/reset`, authenticated with the `X-JsonUI-Token` header. An unknown operationId is rejected, so a typo fails loudly instead of silently serving the wrong data.",
