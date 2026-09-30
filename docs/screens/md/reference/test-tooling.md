@@ -2,12 +2,12 @@
 
 ## Overview
 
-Reference > Test tooling reference. Two sections + TOC + next-reads. (1) Feature support matrix — where the three drivers agree (core actions, all asserts + auto-wait, state via provider, screenshot) and where they differ, source-verified against driver code (id mapping, pass/fail accessor, addMedia, tap.retryTapIfNoChange, launch.permissions/clearState, run command). (2) Source-of-truth ownership — schemas=jsonui-test-runner, validator constants + CLI=jsonui-cli, drivers=each driver repo (1.0.0), mock.schema.json=editor/doc-only, schema<->validator drift-check=jsonui-cli CI. Tables rendered as monospace CodeBlocks.
+Reference > Test tooling reference. Two sections + TOC + next-reads. (1) Feature support matrix — where the three drivers agree (core actions, all asserts + auto-wait, state via provider, screenshot) and where they differ, source-verified against driver code (id mapping, pass/fail accessor, addMedia, tap.retryTapIfNoChange, launch.permissions/clearState, run command). (2) Source-of-truth ownership — schemas=jsonui-test-runner, validator constants + CLI=jsonui-cli, drivers=each driver repo, mock.schema.json=editor/doc-only, schema<->validator drift-check=jsonui-cli CI. Tables rendered as monospace CodeBlocks.
 
 | | |
 |---|---|
 | Created | 2026-07-09 |
-| Updated | 2026-07-09 |
+| Updated | 2026-09-30 |
 
 ## Screen Structure
 
@@ -121,5 +121,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - 2026-09-02, driver android 1.8.4 (d990624): the matrix Android clearState cell pm clear -> in-process wipe [fn2]. Measured on the driver source: instrumentation runs in the target package's process, so pm clear force-stopped the process running the tests; 1.8.4 wipes files/shared_prefs/databases/cache/code_cache in-process and relaunches — persisted state only, process memory survives. Boundary carried in footnote [fn2].
 - Same pass: the [fn] marker on the Web pass/fail cell had no rendered body anywhere on the page since 2026-07-09 (the intent lived only in these notes). Footnote block added at the bottom of the matrix CodeBlock; [fn] body states property-vs-function.
 - 2026-09-02, driver android 1.8.5 (183e8ae) + cli 1.8.0 (3b49fc0f): the matrix Android permissions cell 'pm grant / pm revoke' -> 'grant / deny->assert [fn3]'. Measured on the driver source: allow still runs pm grant; deny asserts the arriving state and fails the file when granted (no pm revoke is executed — the driver's own comment and the schema at jsonui-test-runner b2a042e declare that an in-run revoke kills the instrumented process; that runtime claim is attributed, not re-measured here); unset executes nothing. Prescription in the footnote: jsonui-test pregrant --platform android.
+- 2026-09-30 — Description no longer pins the drivers at 1.0.0 (iOS / Web are 1.12.x, Android 1.15.x).
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

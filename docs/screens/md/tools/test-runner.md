@@ -2,12 +2,12 @@
 
 ## Overview
 
-Tools > test runner overview. JSON-authored tests driving real apps across iOS / Android / Web. Four sections: JSON test file shape / Lookup + interact + assert DSL / Per-platform drivers / CI integration. ~8-min read.
+Tools > test runner overview. JSON-authored tests driving real apps across iOS / Android / Web. Four sections: JSON test file shape / interact + assert DSL (no lookup verb) / Per-platform drivers / CI integration. ~8-min read.
 
 | | |
 |---|---|
 | Created | 2026-04-23 |
-| Updated | 2026-04-23 |
+| Updated | 2026-09-30 |
 
 ## Screen Structure
 
@@ -121,5 +121,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 
 - Fourth live entry under the Tools tab.
 - Essay layout (no Collection). Two CodeBlocks illustrate: (a) a test file shape, (b) the CI invocation pattern.
+- 2026-09-30 — The test-file example had no type / source / metadata and used an `assert: contains` that does not exist; it now validates (assert text + contains). The CI excerpt called `jsonui-test run`, which is not a subcommand; it now validates the tests and runs Playwright. The Android driver line names Espresso + UI Automator with testTagsAsResourceId (jsonuitestrunner/build.gradle.kts), not Compose Semantics. The assert list names enabled / disabled / screen too.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

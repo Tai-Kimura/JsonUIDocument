@@ -155,10 +155,10 @@
 <h1>TestRunner - jsonui-test-runner</h1>
 <section id="overview">
 <h2>Overview</h2>
-<p>Tools &gt; test runner overview. JSON-authored tests driving real apps across iOS / Android / Web. Four sections: JSON test file shape / Lookup + interact + assert DSL / Per-platform drivers / CI integration. ~8-min read.</p>
+<p>Tools &gt; test runner overview. JSON-authored tests driving real apps across iOS / Android / Web. Four sections: JSON test file shape / interact + assert DSL (no lookup verb) / Per-platform drivers / CI integration. ~8-min read.</p>
 <table class="meta-table">
 <tr><th>Created</th><td>2026-04-23</td></tr>
-<tr><th>Updated</th><td>2026-04-23</td></tr>
+<tr><th>Updated</th><td>2026-09-30</td></tr>
 </table>
 </section>
 <section id="structure">
@@ -513,6 +513,7 @@ flowchart TD
 <ul>
 <li>Fourth live entry under the Tools tab.</li>
 <li>Essay layout (no Collection). Two CodeBlocks illustrate: (a) a test file shape, (b) the CI invocation pattern.</li>
+<li>2026-09-30 — The test-file example had no type / source / metadata and used an `assert: contains` that does not exist; it now validates (assert text + contains). The CI excerpt called `jsonui-test run`, which is not a subcommand; it now validates the tests and runs Playwright. The Android driver line names Espresso + UI Automator with testTagsAsResourceId (jsonuitestrunner/build.gradle.kts), not Compose Semantics. The assert list names enabled / disabled / screen too.</li>
 </ul>
 </section>
 </div>
