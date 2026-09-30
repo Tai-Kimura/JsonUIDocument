@@ -2,12 +2,12 @@
 
 ## Overview
 
-Reference > MCP tool API. Overview page. Four sections + TOC + next-reads. Generated via /tmp/gen-reference.js.
+Reference > MCP tool API. All 46 tools of jsonui-mcp-server (as of 2.15.0), grouped A–F, each with its params and a one-line role. Hand-authored: TOOL_IDS in McpToolsViewModel plus the tools_mcp_* / reference_mcp_tools_* strings. Four sections + TOC + next-reads.
 
 | | |
 |---|---|
 | Created | 2026-04-23 |
-| Updated | 2026-07-09 |
+| Updated | 2026-09-30 |
 
 ## Screen Structure
 
@@ -139,5 +139,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - 2026-07-28 — two stale claims corrected. read_time said 'auto-generated', but this catalogue is hand-authored (TOOL_IDS in the ViewModel plus the tools_mcp_* / reference_mcp_tools_* strings); it now reads 'reference', matching the lead, which already said hand-authored. section_groups_body still showed B (6) after get_screen_identity joined group B — measured from TOOL_IDS against the tools_mcp tool_<id>_group keys, the real split is A:8 / B:7 / C:7 / D:9 / E:3 / F:8 = 42, which the lead, tools_mcp.section_catalog_body and learn_installation.card_mcp_body already stated. This one line was the only place left behind. reference_attributes / reference_components keep 'auto-generated' — those pages really are emitted by scripts/build-attribute-reference.ts.
 - 2026-09-25 — test_contracts_coverage added, its params and its exit / envelope contract read from src/tools/test/test_contracts_coverage.ts at 2.13.0. jui_generate_converter's params now list all eight the tool declares: name, attributes and skip_existing had been missing since the entry was written, and force arrived in 2.12.10. Count sentences across the site moved from 45 to 46.
 - 2026-09-28 — jsonui-mcp-server 2.14.0 (npm latest since 09:06 JST) uptake. The published 2.13.0 and 2.14.0 packages were unpacked and compared: the same 46 tools by name (the catalogue did not move), with three definitions changed — jui_generate_converter's container (false now asks for a leaf, --no-container, needs jsonui-cli 1.9.0; before, false passed nothing), jui_generate_project's description and force (an existing layout that differs from the spec is kept and named), get_data_source (adds type_synonyms.json) — and two internals: the CLI child's stdin is closed at start, and the loader resolves type synonyms. Measured: lookup through each version's own loader on its bundled data — ProgressBar and HStack are not found on 2.13.0 and resolve to Progress / View with a typeSynonym (HStack implying orientation horizontal) on 2.14.0, Progress resolving on both as the control; `jui g project` re-run on a hand-edited layout — 1.8.120 overwrote it ('Created:'), 1.9.1 kept it ('Kept existing layout: … --force replaces it') and --force replaced it. The stdin change is the server's own record, not measured here.
+- 2026-09-30 — jsonui-mcp-server 2.14.1 and 2.15.0 uptake. The catalogue did not move: 46 tools by name on both. 2.14.1 re-pins the definitions snapshot to jsonui-cli v1.9.2 and corrects the version its descriptions name for type synonyms and a leaf converter (1.9.0, not the unreleased 1.8.121). 2.15.0 (snapshot pinned to v1.9.3) changes read_spec_file: a spec whose prose fields hold texts-file references ({"md": ...}, in the fields jsonui-cli 1.9.3 accepts) comes back with each one expanded to {"md", "text"} plus a summary block, and a spec without references comes back byte for byte (src/tools/context/read_spec_file.ts at 5a85869; tests/tools_context.test.ts, 31/31 passing). search_specs still matches the spec JSON only, and its role line now says so. npm's latest is still 2.14.1; the installer and install.sh track origin/main, so an install made today gets 2.15.0.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

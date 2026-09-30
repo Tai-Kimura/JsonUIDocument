@@ -4429,8 +4429,8 @@
       "ja": "A"
     },
     "tool_search_specs_role": {
-      "en": "Keyword-search across ALL spec files — screen specs, sub-specs in subdirectories, component specs — returning file + JSON path + snippet per match. The fast way to find which spec (or which sub-spec of a split screen) covers a topic. Added in MCP 2.8.0.",
-      "ja": "全 spec ファイル（screen spec・サブディレクトリの分冊・component spec）をキーワード横断検索し、マッチごとにファイル + JSON パス + スニペットを返します。どの spec（分割画面ならどの分冊）がそのトピックを持つかが一発で分かります。MCP 2.8.0 で追加。"
+      "en": "Keyword-search across ALL spec files — screen specs, sub-specs in subdirectories, component specs — returning file + JSON path + snippet per match. The fast way to find which spec (or which sub-spec of a split screen) covers a topic. Added in MCP 2.8.0. It searches the spec JSON only: text held in a texts file (`.texts.yaml`) is not searched, so a reference's key is found but not the words it points to.",
+      "ja": "全 spec ファイル（screen spec・サブディレクトリの分冊・component spec）をキーワード横断検索し、マッチごとにファイル + JSON パス + スニペットを返します。どの spec（分割画面ならどの分冊）がそのトピックを持つかが一発で分かります。MCP 2.8.0 で追加。検索するのは spec の JSON だけで、texts ファイル（`.texts.yaml`）にある文章は検索しない。参照のキーは見つかるが、キーが指す文章は見つからない。"
     },
     "tool_list_layouts_name": {
       "en": "list_layouts",
@@ -4753,8 +4753,8 @@
       "ja": "D"
     },
     "tool_read_spec_file_role": {
-      "en": "Read a spec file back by path. Used by read-only agents like jsonui-debug.",
-      "ja": "Read a spec file back by path. Used by read-only agents like jsonui-debug."
+      "en": "Read a screen or component spec back by filename. Since jsonui-mcp-server 2.15.0 a spec whose prose fields point into a texts file (`{\"md\": \"key\"}`) comes back with each reference expanded to `{\"md\": …, \"text\": …}`, followed by a summary block naming the texts files it read and any reference it could not resolve; the `text` key is for reading only — edit the YAML file. A spec without references is returned byte for byte, as before. Used by read-only agents like jsonui-debug.",
+      "ja": "screen / component spec をファイル名で読み返す。jsonui-mcp-server 2.15.0 からは、説明文のフィールドが texts ファイルを指している spec（`{\"md\": \"key\"}`）は、各参照を `{\"md\": …, \"text\": …}` に展開して返し、続けて読んだ texts ファイルと解決できなかった参照を並べた要約ブロックを返す。`text` は読むためだけのもので、編集は YAML ファイルで行う。参照の無い spec はこれまでどおりバイト単位でそのまま返す。jsonui-debug など読み取り専用のエージェントが使う。"
     },
     "tool_read_layout_file_name": {
       "en": "read_layout_file",
@@ -11087,8 +11087,8 @@
       "ja": "どのツールも文章を受け取る"
     },
     "section_readers_body": {
-      "en": "References are resolved where a spec is read, once, so no reader sees `{\"md\": ...}`: the doc generator, `jui generate` / `build` / `verify`, and `jsonui-test`'s unit-contract check and stub generator (a stub's failure message carries the intent's text). A reference that cannot be resolved stops `jsonui-test` the same way validate reports it: `generate branch-tests` and `contracts coverage` report it as that spec's problem (exit 1 / not evaluated), and `generate unit-stubs`, with or without `--check`, stops before comparing or writing anything. Split specs resolve each sub-spec against its own texts file only, before the merge. The MCP `read_spec_file` tool returns each reference with its text beside it, so an agent sees both what the field says and where to edit it. The MCP `search_specs` tool does not search texts-file text: it matches the spec JSON only, so it finds a reference's key but not the words the key points to — search the `.texts.yaml` files for those.",
-      "ja": "参照は spec を読み込むときに 1 回だけ解決するので、`{\"md\": ...}` のまま受け取るツールは無い。対象はドキュメント生成、`jui generate` / `build` / `verify`、`jsonui-test` のユニット契約チェックとテスト雛形の生成（雛形の失敗メッセージには intent の文章が入る）。解決できない参照があると、`jsonui-test` は validate と同じ文で止まる。`generate branch-tests` と `contracts coverage` はその spec の問題として報告し（exit 1 / 評価しない）、`generate unit-stubs` は `--check` の有無にかかわらず、比較も書き込みもする前に止まる。分割した spec では、統合する前にサブ spec ごとに自分の texts ファイルだけで解決する。MCP の `read_spec_file` は、各参照の横に文章を並べて返す。エージェントには、フィールドの中身と編集する場所の両方が見える。MCP の `search_specs` は texts ファイルの文章を検索しない。検索するのは spec の JSON だけなので、参照のキーは見つかるが、キーが指す文章は見つからない。文章を探すときは `.texts.yaml` ファイルを直接検索する。"
+      "en": "References are resolved where a spec is read, once, so no reader sees `{\"md\": ...}`: the doc generator, `jui generate` / `build` / `verify`, and `jsonui-test`'s unit-contract check and stub generator (a stub's failure message carries the intent's text). A reference that cannot be resolved stops `jsonui-test` the same way validate reports it: `generate branch-tests` and `contracts coverage` report it as that spec's problem (exit 1 / not evaluated), and `generate unit-stubs`, with or without `--check`, stops before comparing or writing anything. Split specs resolve each sub-spec against its own texts file only, before the merge. The MCP `read_spec_file` tool (jsonui-mcp-server 2.15.0 and later) returns each reference with its text beside it, so an agent sees both what the field says and where to edit it; 2.14.x and earlier return the file as written, `{\"md\": ...}` and all. The MCP `search_specs` tool does not search texts-file text: it matches the spec JSON only, so it finds a reference's key but not the words the key points to — search the `.texts.yaml` files for those.",
+      "ja": "参照は spec を読み込むときに 1 回だけ解決するので、`{\"md\": ...}` のまま受け取るツールは無い。対象はドキュメント生成、`jui generate` / `build` / `verify`、`jsonui-test` のユニット契約チェックとテスト雛形の生成（雛形の失敗メッセージには intent の文章が入る）。解決できない参照があると、`jsonui-test` は validate と同じ文で止まる。`generate branch-tests` と `contracts coverage` はその spec の問題として報告し（exit 1 / 評価しない）、`generate unit-stubs` は `--check` の有無にかかわらず、比較も書き込みもする前に止まる。分割した spec では、統合する前にサブ spec ごとに自分の texts ファイルだけで解決する。MCP の `read_spec_file`（jsonui-mcp-server 2.15.0 以降）は、各参照の横に文章を並べて返す。2.14.x 以前はファイルを書かれたとおり、`{\"md\": ...}` のまま返す。エージェントには、フィールドの中身と編集する場所の両方が見える。MCP の `search_specs` は texts ファイルの文章を検索しない。検索するのは spec の JSON だけなので、参照のキーは見つかるが、キーが指す文章は見つからない。文章を探すときは `.texts.yaml` ファイルを直接検索する。"
     },
     "section_when_not_heading": {
       "en": "When to keep it inline",

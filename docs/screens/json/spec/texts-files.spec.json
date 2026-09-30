@@ -10,7 +10,7 @@
     ],
     "layoutFile": "spec/texts-files",
     "createdAt": "2026-09-28",
-    "updatedAt": "2026-09-29"
+    "updatedAt": "2026-09-30"
   },
   "structure": {
     "components": [],
@@ -143,6 +143,7 @@
   "notes": [
     "2026-09-28 — written for jsonui-cli 1.9.3 (texts files: jsonui-cli d500411 + 875ad0d; read_spec_file expansion: jsonui-mcp-server on the same branch). The validate block is pasted from runs of that build on a fixture spec with one texts-file defect per run; the page is not pinned to a released version until 1.9.3 is tagged and the deploy pin moves.",
     "2026-09-29 — re-measured for jsonui-cli 1.9.3's widened fields and stricter validation (jsonui-cli 7e4c183f through 4f99e2bf): the accepted fields now include purpose / processing / handling / rule / meaning / note / reason (not under harnessConditions / canonicalDivergence) and condition (transitions only); a named file must be relative and end in .texts.yaml; an empty file part and YAML merge keys are refused; PyYAML / markdown-it-py are needed only by a spec with a reference; jsonui-test refuses an unresolved reference; a unit page without markdown-it-py falls back to plain text with one warning. The validate block was re-run on that build, one defect per run, with no collateral warning (the fixture's other references stay in use).",
-    "The site's own specs do not use texts files yet: the pinned toolchain (v1.9.2) would refuse the references."
+    "The site's own specs do not use texts files yet. Since the deploy pin reached v1.9.3 (now v1.9.5) the toolchain would accept them; none has been moved.",
+    "2026-09-30 — read_spec_file's expansion shipped in jsonui-mcp-server 2.15.0 (5a85869); the readers section now names that version and says 2.14.x and earlier return the reference as written. search_specs' role line on /tools/mcp now says it does not search texts-file text, as this page already did."
   ]
 }
