@@ -155,10 +155,10 @@
 <h1>Kotlin - KotlinJsonUI</h1>
 <section id="overview">
 <h2>Overview</h2>
-<p>Platforms &gt; Android deep-dive. KotlinJsonUI + kjui CLI + Dynamic mode. Five sections: What you get / Dual-mode output (Compose + XML Views) / Platform mode policy (Compose is primary, XML frozen 2026-07) / Dynamic mode hot reload / Production caveats. ~10-min read.</p>
+<p>Platforms &gt; Android deep-dive. KotlinJsonUI + kjui CLI + Dynamic mode. Five sections: What you get / Compose output (XML Views frozen) / Platform mode policy (Compose is primary, XML frozen 2026-07) / Dynamic mode hot reload / Production caveats. ~10-min read.</p>
 <table class="meta-table">
 <tr><th>Created</th><td>2026-04-23</td></tr>
-<tr><th>Updated</th><td>2026-07-07</td></tr>
+<tr><th>Updated</th><td>2026-09-30</td></tr>
 </table>
 </section>
 <section id="structure">
@@ -524,6 +524,7 @@ flowchart TD
 <li>2026-07-07 — Platform Mode Policy addition. Add new prose section `section_mode_policy` after `section_dual`. Heading: &#x27;Platform mode policy (2026-07 onward)&#x27; / &#x27;Platform モードポリシー (2026-07 以降)&#x27;. Body describes: KotlinJsonUI 3.0 に向けて Compose (static + dynamic) が primary、XML / Android Views は maintenance-frozen で新機能は Compose のみ、3.0 で削除候補。Compose 消費者への床要件は BOM 2025.04.01 (Compose UI 1.8.0) 以上・KotlinJsonUI 2.9.3+。理由: renderer-SSoT 化に伴い attribute 実装の SSoT を単一化する方針で、複数モードの並行維持コストを解消するため。既存 XML プロジェクトは 3.0 リリースまで動作継続、以降は Compose 移行または 2.x 系にピン留め。TOC row `toc_mode_policy` を追加、`section_dual` と `section_dynamic` の間。</li>
 <li>2026-07-07 — Update `section_dual_body` to soften the &#x27;XML for laggards&#x27; framing and add a forward pointer to `section_mode_policy` (1 sentence: &#x27;2026-07 以降の運用方針は次節を参照&#x27;)。既存の技術的説明 (Compose recomposition・Dynamic mode) は変更しない。</li>
 <li>2026-07-07 — Update `lead` 微修正: &#x27;Jetpack Compose by default, XML Views where legacy codebases need it.&#x27; の trailing clause を softer に (例: &#x27;Jetpack Compose is the primary target; XML Views are maintenance-only for legacy migrations.&#x27;) ja も同様。</li>
+<li>2026-09-30 — The dual-output section still offered XML as a target for laggard screens, and the production caveats said an app below minSdk 23 falls back to XML. XML is maintenance-frozen since 2026-07-03 (KotlinJsonUI CLAUDE.md, Platform Mode Policy) and both modules require minSdk 24 (library/build.gradle.kts); the section now presents Compose as the output and XML as frozen, and the fallback sentence is gone. Same XML-as-option wording removed from platforms/index, platforms/rjui&#x27;s next-read card and learn/hello-world.</li>
 </ul>
 </section>
 </div>

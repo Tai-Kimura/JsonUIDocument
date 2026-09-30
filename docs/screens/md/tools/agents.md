@@ -2,12 +2,12 @@
 
 ## Overview
 
-Tools > Agents overview. Explains the 9-agent + 11-skill + 5-rule pack that teaches Claude Code (or Codex) how to run the spec-first JsonUI workflow. Four H2 sections (What ships / The conductor flow / Per-agent summary / Adding your own). ~10-min read. Secondary audience is the AI-first team (plan 00 priority 2) — the page should read like a control-plane reference, not an essay. Per-agent rows now include 1-line notes for the 2026-05 swagger-driven Data Model awareness: conductor checks list_api_specs at startup; define knows the two-tier skip_domain rule; implement carries the DTO vs Domain return-type convention; debug has the swagger -> DTO -> Domain -> Repository -> ViewModel trace; ground sets api_directory during scaffold; test mentions the DTO mock factory.
+Tools > Agents overview. Explains the 9-agent + 11-skill + 5-rule pack that teaches Claude Code (or Codex) how to run the spec-first JsonUI workflow. Four H2 sections (What ships / The conductor flow / Agent catalog / Adding your own). ~10-min read. Secondary audience is the AI-first team (plan 00 priority 2) — the page should read like a control-plane reference, not an essay. The 2026-05 swagger-driven Data Model awareness (conductor checks list_api_specs, define knows skip_domain, implement's DTO vs Domain rule, debug's swagger -> DTO -> Domain trace) is summarised in the lead; the per-agent rows do not repeat it.
 
 | | |
 |---|---|
 | Created | 2026-04-23 |
-| Updated | 2026-05-27 |
+| Updated | 2026-09-30 |
 
 ## Screen Structure
 
@@ -131,5 +131,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Priority-2 audience (plan 00) is teams running JsonUI through Claude Code / Codex. Copy stays practical: what to type, when to invoke which agent, how conductor dispatches. No brand prose.
 - 2026-05 update (swagger-driven Data Models): each AgentRow's whenToUseKey body gains ONE sentence about its swagger-aware responsibility — (1) conductor whenToUseKey ends '... and pings list_api_specs at startup to know whether the project consumes OpenAPI'; (2) define whenToUseKey notes 'knows the two-tier skip_domain rule (schema-side x-jui-skip-domain vs app-side api.schemas.skip_domain)'; (3) implement whenToUseKey notes 'follows the Repository return-type convention: schema name -> Domain, *Dto suffix -> raw DTO'; (4) debug whenToUseKey notes 'can trace swagger -> DTO -> Domain -> Repository -> ViewModel end-to-end'; (5) ground whenToUseKey notes 'sets api_directory in jui.config.json during scaffold'; (6) test whenToUseKey notes 'generates DTO mock factories from the codegen DTO'. The remaining 3 agents (navigation-ios / -android / -web) are unaffected. No new uiVariable / customType — body-copy change only inside existing tools_agents_*_when_to_use_body strings.
 - 2026-09-25 — jsonui-define's row gains Task 6 (Close contract coverage), shipped in the agents pack on 2026-09-25 (Claude dae3c47): it drafts rows for the statuses contracts coverage reports uncovered, from the spec, OpenAPI and mocks only, and writes the ones the user accepts. The Contract gaps guide carries the procedure.
+- 2026-09-30 — Checked against JsonUI-Agents-for-claude 98d205e and JsonUI-Agents-for-Codex 047efaa. The conductor flow said the session starts with 'Read CLAUDE.md' and a jsonui-workflow skill; that is the Codex entry (Read AGENTS.md). The Claude pack injects .claude/jsonui-workflow.md through a SessionStart hook merged into .claude/settings.json, and /jsonui re-shows the menu (README 'How it works'; install.sh 157-208). What ships said a CLAUDE.md points at everything; the installer never touches CLAUDE.md (install.sh line 5) and installs skills as .claude/skills/<name>/SKILL.md plus commands/jsonui.md and jsonui-workflow.md. Custom agents are routed in jsonui-workflow.md / the conductor, not CLAUDE.md. The jsonui-test row now matches its frontmatter (screen + flow tests, branch tests, test docs, test_validate). The description's per-row swagger claim and H2 name did not match the page.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

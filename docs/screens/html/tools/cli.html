@@ -158,7 +158,7 @@
 <p>Tools &gt; CLI overview. Six sub-CLIs under one install: jui (orchestrator) + sjui / kjui / rjui (per-platform builders) + jsonui-test + jsonui-doc. ~10-min read. Companion to /tools/agents and /tools/mcp — the CLIs are what the MCP tools and agents ultimately delegate to for heavy lifting. Mentions the new `jui g api` subcommand (DTO + Domain codegen from OpenAPI) and the new `jui ls` group (`ls api-specs` / `ls api-models`). All generate-side commands honor the `api.schemas.*` filter when scoping schema codegen.</p>
 <table class="meta-table">
 <tr><th>Created</th><td>2026-04-23</td></tr>
-<tr><th>Updated</th><td>2026-05-27</td></tr>
+<tr><th>Updated</th><td>2026-09-30</td></tr>
 </table>
 </section>
 <section id="structure">
@@ -520,6 +520,7 @@ flowchart TD
 <li>Third live entry under the Tools tab. Flipping TOOLS_ENTRIES row 1 (cli) from &#x27;upcoming&#x27; to &#x27;live&#x27; in HomeViewModel finishes the task.</li>
 <li>Sub-CLI row is a richer cell than agent_row / mcp_tool_row because the per-tool role is a full sentence (not a short one-liner). Keeping it separate avoids forcing agent_row to grow.</li>
 <li>2026-05 update (swagger-driven Data Models): the `jui` row&#x27;s body adds one sentence noting the new `g api` subcommand (DTO + Domain codegen) and the new `ls` group (`ls api-specs`, `ls api-models`). The generate group description gains one line: &#x27;Generate steps honor `api.schemas.{include_paths, exclude_paths, include_schemas, exclude_schemas, skip_domain}` when scoping schema codegen for shared swaggers.&#x27; Detail links to /guides/api-data-models §3 (filter syntax) and /reference/cli-commands (the full flag reference). No new uiVariable / customType added — the change is body-copy only inside the existing tools_cli_cli_jsonui_body, tools_cli_cli_jui_body, and a new tools_cli_cli_jui_ls_intro string.</li>
+<li>2026-09-30 — jsonui-test&#x27;s row said it executes tests against a running app; the CLI validates, generates, reports, mocks, pulls artifacts and reports contract coverage, and the drivers execute (jsonui-test --help at 1.9.5). jui&#x27;s subcommand list gains screens / ls / migrate-layouts / lint-strings / lint-generated / hotload / conformance. The orchestrator paragraph claimed parallel builds across platforms; build_cmd.py builds them in turn. The exit paragraph&#x27;s &#x27;distinct codes&#x27; for a standard set of failure modes did not exist.</li>
 </ul>
 </section>
 </div>

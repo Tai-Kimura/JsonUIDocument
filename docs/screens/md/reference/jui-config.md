@@ -2,12 +2,12 @@
 
 ## Overview
 
-Single-page reference for every key the toolchain reads from jui.config.json: core directories, platforms.*, build.normalizeLayouts, api.*, test.*, checks[] + databases{}, and lint.*. Collects what was previously scattered across the pages that use each key. Content is hand-maintained against jui_tools ConfigManager and each key's consumer.
+Single-page reference for the jui.config.json keys a project most often sets (not every key the toolchain reads — e.g. lint.strings, verify.requireSpecPerScreen, spec.transitionAliases, test.artifacts and mock.* are not listed yet): core directories, platforms.*, build.normalizeLayouts, api.*, test.*, checks[] + databases{}, and lint.*. Collects what was previously scattered across the pages that use each key. Content is hand-maintained against jui_tools ConfigManager and each key's consumer.
 
 | | |
 |---|---|
 | Created | 2026-08-01 |
-| Updated | 2026-08-01 |
+| Updated | 2026-09-30 |
 
 ## Screen Structure
 
@@ -140,5 +140,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Strings prefix: `reference_jui_config_*`.
 - document_tools_path caveat added 2026-09-09 to the core-directories section. The page had stated only when the key is NEEDED (jsonui-doc not importable from the standard install) and said nothing about what setting it DOES: with a path that exists, document_tools resolves to that working copy rather than the installed distribution, so jui --version stops describing what runs; with a path that does not exist the setting has no effect at all. Both were silent before jsonui-cli 1.8.58, which now prints a NOTE on stderr naming which case occurred. The second paragraph records that jui build reports only the broken case and stays silent when the path exists, because it never prepends it -- a command that did not do the work does not report having done it.
 - 2026-09-25 — v1.8.119: test.appOwnedIds (ids the app draws outside every layout; a trailing `*` is a prefix; a declaration no step names is listed) added to the test section and the example; the lint section now names lint.stringsUsage and the new lint.stringsUsageTestPaths. Both keys are read from the shipped README and source. The element-id check they serve was measured on this site's own tests (see the testing guide's note).
+- 2026-09-30 — The lead said 'every key'; the page does not list lint.strings / lint.stringsAllowlist, test.artifacts, verify.requireSpecPerScreen, spec.transitionAliases, mock.* or server.port, which jsonui-cli 1.9.5 reads. The lead is narrowed rather than the keys added in this pass.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

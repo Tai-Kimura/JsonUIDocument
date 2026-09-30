@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `Three platforms, one spec — JsonUI`,
-  description: `The same screen_spec.json renders as SwiftUI/UIKit on iOS, Compose/XML on Android, and Next.js/React on web.`,
+  description: `The same screen_spec.json renders as SwiftUI/UIKit on iOS, Jetpack Compose on Android, and Next.js/React on web.`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

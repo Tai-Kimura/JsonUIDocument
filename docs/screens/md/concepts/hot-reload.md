@@ -7,7 +7,7 @@ Essay: how hot reload works on each platform — Dynamic mode on iOS, Dynamic mo
 | | |
 |---|---|
 | Created | 2026-04-23 |
-| Updated | 2026-04-23 |
+| Updated | 2026-09-30 |
 
 ## Screen Structure
 
@@ -126,5 +126,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Fifth and final concepts essay. Flipping CONCEPTS_ENTRIES row 5 to 'live' completes the Concepts tab.
 - Focus on the *mechanism*, not the UX — this page is for readers who want to understand why changing a JSON in an editor causes their iPhone simulator to re-render.
 - Web section is framework-neutral by measurement (2026-08-25): the hotload server's supported platforms are ios and android only (web is build-step only), Next.js App Router is merely the default web_framework adapter, and the toolchain's own web conformance host is Vite + React with no Next dependency. Do not re-frame this section as Next-specific.
+- 2026-09-30 — iOS: the WebSocket carries a layout_changed event and the app re-fetches GET /ios/layout/<name> over HTTP (hotloader/server.py docstring), as the Android section already said; it does not push the JSON. The 'Expected output' block is replaced by what `jui hotload listen` logs on jsonui-cli 1.9.5, measured in this repo (listening / client IP hint / watching; nothing is logged on connect).
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

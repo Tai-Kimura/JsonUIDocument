@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `jui.config.json — JsonUI`,
-  description: `Every key the toolchain reads from jui.config.json, in one place: core directories, platform roots, build normalization, API model generation, test install…`,
+  description: `The keys the toolchain reads from jui.config.json that a project most often sets, in one place: core directories, platform roots, build normalization, API…`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

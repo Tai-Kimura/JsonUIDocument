@@ -155,10 +155,10 @@
 <h1>CliCommands - CLI command reference</h1>
 <section id="overview">
 <h2>Overview</h2>
-<p>Reference &gt; CLI command reference. Overview page. Eight sections + TOC + next-reads. Sections: layout, exit, env, stability, api_models (added 2026-05 for swagger-driven Data Model), ssot (added 2026-07 for Renderer SSoT: conformance + attr-bindings), checks (added 2026-07 for jsonui-doc check), test_tools (added 2026-07 for jsonui-test validate/generate/report/mock incl. the validate flatten-install side-effect).</p>
+<p>Reference &gt; CLI command reference. Overview page. Ten sections + TOC + next-reads. Sections: binaries, catalog, layout, exit, env, stability, api_models (added 2026-05 for swagger-driven Data Model), ssot (added 2026-07 for Renderer SSoT: conformance + attr-bindings), checks (added 2026-07 for jsonui-doc check), test_tools (added 2026-07 for jsonui-test validate/generate/report/mock incl. the validate flatten-install side-effect).</p>
 <table class="meta-table">
 <tr><th>Created</th><td>2026-04-23</td></tr>
-<tr><th>Updated</th><td>2026-07-09</td></tr>
+<tr><th>Updated</th><td>2026-09-30</td></tr>
 </table>
 </section>
 <section id="structure">
@@ -768,6 +768,7 @@ flowchart TD
 <li>2026-09-25 — v1.8.119 uptake. Help churn against 1.8.118: jsonui-test validate (--no-coverage-check), generate branch-tests (--condition-controls), the contracts parent, and the new contracts baseline; nothing else moved except the conformance checkout paths. cli-coverage went red on exactly the new card and the validate / generate stamps. Updated: the validate, generate and contracts coverage cards; added: contracts baseline, whose example is the measured run on the Contract gaps fixture. All four restamped at 1.8.119, and stampability re-classified (only the new node added).</li>
 <li>2026-09-28 — v1.9.0 uptake. Help churn against 1.8.120: 83 nodes, 13 moved — `jui g project` (--force now also replaces Layout JSON that differs from what the spec generates), `jui g converter` (new --no-container), and 11 conformance nodes whose only change is the checkout path; none added or removed. Updated and restamped at 1.9.0: g project, g converter, and the three cards that named 1.8.121 (validate, contracts coverage, contracts baseline). The validate card&#x27;s example was an illustration the tool never printed (`✓ 12 screen tests valid`); it is now this site&#x27;s own 1.9.0 run. The coverage and baseline examples were re-run under 1.9.0 and did not move.</li>
 <li>2026-09-28 — v1.9.2 uptake. Help churn against 1.9.1: 83 nodes, 12 moved — `jsonui-test validate`&#x27;s --no-install now says a stale mocks generated/ tree is still rebuilt and files no in-scope operation generates are removed, each named (--no-mock-check skips that); the other 11 are conformance checkout paths. The validate card&#x27;s --no-install is updated from that help and restamped at 1.9.2.</li>
+<li>2026-09-30 — The exit section listed a toolchain-wide code table (2 = spec validation, 3 = drift, 4 = build, 5 = test) that no tool implements: verify --fail-on-diff exits 1 (verify_cmd.py), lint-strings 2/1, lint-generated 2/3, jsonui-doc check 1/2 (check/runner.py). It now says the codes are per command. The ssot section spelled the normalizeLayouts opt-out at the top level; only build.normalizeLayouts is read (build_cmd.py). The jui verify card names the 1.9.1 initial-value gate and the jsonui-doc validate spec card the 1.9.3 texts-file check; both re-stamped against 1.9.5 --help.</li>
 </ul>
 </section>
 </div>

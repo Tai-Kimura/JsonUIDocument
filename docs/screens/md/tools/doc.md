@@ -2,12 +2,12 @@
 
 ## Overview
 
-Tools > jsonui-doc (DOC GEN) overview. The Python CLI that generates HTML / Markdown / Mermaid / test adapters / Figma-as-HTML from JsonUI screen specs, component specs, test JSON files, and Figma API responses. 13 subcommands across four groups (init / validate / generate / figma). Companion to /tools/cli and /tools/mcp — the doc_generate_* MCP tools are thin wrappers that delegate here, and the /reference HTML pages on this site are produced by the same binary. 2026-05 note: document_tools/.../swagger.py is no longer the entry point for OpenAPI codegen — its core logic is now in jsonui-cli and is invoked through `jui g api`; jsonui-doc retains only the doc-generation side.
+Tools > jsonui-doc (DOC GEN) overview. The Python CLI that generates HTML / Markdown / Mermaid / test adapters / Figma-as-HTML from JsonUI screen specs, component specs, test JSON files, and Figma API responses. 15 commands: five groups (init / validate / rules / generate / figma) plus check. Companion to /tools/cli and /tools/mcp — the doc_generate_* MCP tools are thin wrappers that delegate here, and the /reference HTML pages on this site are produced by the same binary. 2026-05 note: document_tools/.../swagger.py is no longer the entry point for OpenAPI codegen — its core logic is now in jsonui-cli and is invoked through `jui g api`; jsonui-doc retains only the doc-generation side.
 
 | | |
 |---|---|
 | Created | 2026-04-24 |
-| Updated | 2026-05-27 |
+| Updated | 2026-09-30 |
 
 ## Screen Structure
 
@@ -213,5 +213,6 @@ activeSampleTab == 'html':
 - onSelectSampleTab was added to .jsonui-doc-rules.json eventHandlers.allowedNames during this define pass.
 - 2026-05 update (swagger-driven Data Models): document_tools/.../swagger.py — the original Python OpenAPI -> per-platform-model generator — was ported into the jsonui-cli core and is now reached through `jui g api`. The jsonui-doc body copy is updated with ONE sentence noting this heritage so a reader who knows the old path lands on the right new entry point. No catalog row added (jui g api lives under /tools/cli, not here).
 - 2026-08-31 — removed a literal '**v1.6.13 以降**' from the JA install text, same cause as the api-mock one: markdown bold reaches the screen as asterisks. A full scan of strings.json now leaves two '**' occurrences, both of which are the subject of their sentence (documenting that glob '**' is unsupported) rather than emphasis.
+- 2026-09-30 — Command count re-read from `jsonui-doc --help` at 1.9.5: init 2, validate 2, rules 2, generate 6 (doc / html / mermaid / adapter / spec / component), figma 2, check 1 = 15. The page said 13 across four groups and had no mention of rules or check.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

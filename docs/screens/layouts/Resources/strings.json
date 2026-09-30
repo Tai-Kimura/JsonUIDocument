@@ -439,8 +439,8 @@
       "ja": "はじめる前に"
     },
     "prereq_subheading": {
-      "en": "Three small requirements. The installer handles the `jui` CLI, MCP server, agents, and the per-platform CLIs (sjui / kjui / rjui) that `jui` delegates to internally.",
-      "ja": "これだけあれば OK。インストーラが `jui` CLI、MCP サーバー、エージェント、そして `jui` が内部で委譲する各プラットフォーム CLI（sjui / kjui / rjui）をまとめて入れます。"
+      "en": "A few small requirements (Python 3.11+ and Ruby 3.2+ too, for the CLIs — see /learn/installation). The installer handles the `jui` CLI, MCP server, agents, and the per-platform CLIs (sjui / kjui / rjui) that `jui` delegates to internally.",
+      "ja": "これだけあれば OK（CLI 用に Python 3.11+ と Ruby 3.2+ も必要です。/learn/installation を参照）。インストーラが `jui` CLI、MCP サーバー、エージェント、そして `jui` が内部で委譲する各プラットフォーム CLI（sjui / kjui / rjui）をまとめて入れます。"
     },
     "prereq_node_title": {
       "en": "Node.js 20 or newer",
@@ -531,8 +531,8 @@
       "ja": "iOS アプリを実行"
     },
     "step_run_swift_instruction": {
-      "en": "Open `ios/MyApp.xcodeproj` in Xcode and press ⌘R to launch the simulator — Xcode compiles the Swift that `jui build` produced. For layout live-reload, run `jui hotload listen` in a separate terminal: it watches `docs/screens/layouts/` and pushes the merged, iOS-filtered JSON over WebSocket to the running app. No rebuild needed for layout-only changes.",
-      "ja": "`ios/MyApp.xcodeproj` を Xcode で開き、⌘R でシミュレータを起動すると、Xcode が `jui build` で生成された Swift をコンパイルします。レイアウトのライブリロードには別ターミナルで `jui hotload listen` を実行してください — `docs/screens/layouts/` を watch し、style マージ + iOS 向けフィルタ済みの JSON を WebSocket で実機 / シミュレータに push します。レイアウトだけの変更なら再ビルド不要。"
+      "en": "Open `ios/MyApp.xcodeproj` in Xcode and press ⌘R to launch the simulator — Xcode compiles the Swift that `jui build` produced. For layout live-reload, run `jui hotload listen` in a separate terminal: it watches `docs/screens/layouts/`, tells the running app over WebSocket which layout changed, and the app re-fetches the merged, iOS-filtered JSON over HTTP. No rebuild needed for layout-only changes.",
+      "ja": "`ios/MyApp.xcodeproj` を Xcode で開き、⌘R でシミュレータを起動すると、Xcode が `jui build` で生成された Swift をコンパイルします。レイアウトのライブリロードには別ターミナルで `jui hotload listen` を実行してください — `docs/screens/layouts/` を watch し、どのレイアウトが変わったかを WebSocket で実機 / シミュレータに通知し、アプリは style マージ + iOS 向けフィルタ済みの JSON を HTTP で取り直します。レイアウトだけの変更なら再ビルド不要。"
     },
     "step_run_kotlin_title": {
       "en": "Run the Android app",
@@ -547,16 +547,16 @@
       "ja": "Web アプリを実行"
     },
     "step_run_react_instruction": {
-      "en": "Run `cd web && npm run dev` to start Next.js with Fast Refresh on http://localhost:3000. The web platform is deliberately not a `jui hotload` target — Next.js / Vite's built-in HMR already re-runs the build and reloads the browser on layout changes, so a dedicated hotload protocol would be redundant. Just keep `npm run dev` running as you edit `home.json` or the ViewModel.",
-      "ja": "`cd web && npm run dev` で Next.js を Fast Refresh 付きで起動し http://localhost:3000 にアクセス。Web は意図的に `jui hotload` の対象外です — Next.js / Vite の組み込み HMR がレイアウト変更時にビルドを再実行しブラウザを自動リロードするため、専用の hotload protocol は冗長です。`home.json` や ViewModel を編集する間、`npm run dev` を起動したままで OK。"
+      "en": "Run `cd web && npm run dev` to start Next.js with Fast Refresh on http://localhost:3000. The web platform is deliberately not a `jui hotload` target — Next.js / Vite's built-in HMR reloads the browser when the generated TSX or the ViewModel changes. The dev server does not run rjui, so after editing `home.json` run `jui build --web-only` and HMR picks up the regenerated TSX; ViewModel edits reload directly.",
+      "ja": "`cd web && npm run dev` で Next.js を Fast Refresh 付きで起動し http://localhost:3000 にアクセス。Web は意図的に `jui hotload` の対象外です — 生成された TSX や ViewModel が変わると Next.js / Vite の組み込み HMR がブラウザを再読み込みします。dev サーバは rjui を実行しないので、`home.json` を編集したら `jui build --web-only` を実行すると、HMR が再生成された TSX を拾います。ViewModel の編集はそのまま反映されます。"
     },
     "step_author_title": {
       "en": "Author home.json",
       "ja": "home.json を書く"
     },
     "step_author_instruction": {
-      "en": "This one JSON is the whole UI — it compiles to SwiftUI (or UIKit) on iOS, Compose (or XML) on Android, and React on web. The `data` block at the top declares what the ViewModel must expose: `message` (bound to a Label), `tapCount` (bound inside another Label via string interpolation), and `onTap` (bound to the Button's onClick).",
-      "ja": "この JSON が UI の全て — iOS では SwiftUI（または UIKit）、Android では Compose（または XML）、Web では React にコンパイルされます。冒頭の `data` ブロックは ViewModel が公開すべき項目を宣言: `message`（Label にバインド）、`tapCount`（文字列補間で別の Label に）、`onTap`（Button の onClick にバインド）。"
+      "en": "This one JSON is the whole UI — it compiles to SwiftUI (or UIKit) on iOS, Jetpack Compose on Android, and React on web. The `data` block at the top declares what the ViewModel must expose: `message` (bound to a Label), `tapCount` (bound inside another Label via string interpolation), and `onTap` (bound to the Button's onClick).",
+      "ja": "この JSON が UI の全て — iOS では SwiftUI（または UIKit）、Android では Jetpack Compose、Web では React にコンパイルされます。冒頭の `data` ブロックは ViewModel が公開すべき項目を宣言: `message`（Label にバインド）、`tapCount`（文字列補間で別の Label に）、`onTap`（Button の onClick にバインド）。"
     },
     "step_see_title": {
       "en": "Confirm it works",
@@ -697,8 +697,8 @@
       "ja": "Agents + Skills + Rules"
     },
     "card_agents_location": {
-      "en": "./.claude/ + CLAUDE.md",
-      "ja": "./.claude/ と CLAUDE.md"
+      "en": "./.claude/ (CLAUDE.md untouched)",
+      "ja": "./.claude/（CLAUDE.md は変更しない）"
     },
     "card_agents_body": {
       "en": "9 agents, 11 skills, and 5 rules, installed per project so Claude Code can launch the conductor on demand.",
@@ -709,8 +709,8 @@
       "ja": "事前要件"
     },
     "prereq_subheading": {
-      "en": "Missing items only skip the affected tool — the installer keeps going and prints a warning.",
-      "ja": "足りないものがあっても該当ツールだけスキップ。bootstrap は警告を出して続行します。"
+      "en": "git, curl, Node and npm are required — the bootstrap stops without them. A missing Ruby or Python only skips the tools that need it, with a warning.",
+      "ja": "git・curl・Node・npm は必須で、無ければ bootstrap は止まります。Ruby や Python が無い場合は、それを使うツールだけを警告付きでスキップします。"
     },
     "prereq_required_badge": {
       "en": "REQUIRED",
@@ -773,8 +773,8 @@
       "ja": "開発者向けツール"
     },
     "prereq_python_tool": {
-      "en": "Python 3 (>= 3.10)",
-      "ja": "Python 3（>= 3.10）"
+      "en": "Python 3 (>= 3.11)",
+      "ja": "Python 3（>= 3.11）"
     },
     "prereq_python_note": {
       "en": "Only required if you will use jui / jsonui-test / jsonui-doc.",
@@ -821,8 +821,8 @@
       "ja": "Claude Code を再起動して合言葉を伝える"
     },
     "step3_body": {
-      "en": "Completely restart Claude Code and open your project. The SessionStart hook fires the conductor automatically — or invoke /jsonui at any time. The conductor greets you with the New work / Modify / Investigate / Backend menu.",
-      "ja": "Claude Code を完全に再起動してプロジェクトを開きます。SessionStart フックが conductor を自動で起動します（任意のタイミングで /jsonui を呼び出すのも OK）。conductor が New work / Modify / Investigate / Backend のメニューで応答します。"
+      "en": "Completely restart Claude Code and open your project. The SessionStart hook shows the workflow menu — New work / Modify / Investigate / Backend — at the start of every session, and /jsonui shows it again at any time. Picking 1–3 launches the conductor.",
+      "ja": "Claude Code を完全に再起動してプロジェクトを開きます。SessionStart フックがセッションの開始ごとにワークフローのメニュー（New work / Modify / Investigate / Backend）を表示します。任意のタイミングで /jsonui を呼んでも同じメニューが出ます。1〜3 を選ぶと conductor が起動します。"
     },
     "verify_heading": {
       "en": "Verify it works",
@@ -845,16 +845,16 @@
       "ja": "Claude Code で"
     },
     "verify_mcp_expect": {
-      "en": "→ expect search_components to fire and return 27 components.",
-      "ja": "→ search_components が呼ばれ、27 コンポーネントが返れば OK です。"
+      "en": "→ expect search_components to fire and return the matching components.",
+      "ja": "→ search_components が呼ばれ、該当するコンポーネントが返れば OK です。"
     },
     "verify_conductor_command_caption": {
       "en": "In Claude Code",
       "ja": "Claude Code で"
     },
     "verify_conductor_expect": {
-      "en": "→ expect the conductor agent to greet you with the four-option menu.",
-      "ja": "→ conductor エージェントが 4 つのメニューで応答すれば OK です。"
+      "en": "→ expect the four-option workflow menu; pick 1–3 and the conductor agent takes over.",
+      "ja": "→ 4 つの選択肢のワークフローメニューが出て、1〜3 を選ぶと conductor エージェントが引き継げば OK です。"
     },
     "update_heading": {
       "en": "Updating is the same command",
@@ -909,8 +909,8 @@
       "ja": "アンインストール"
     },
     "uninstall_body": {
-      "en": "There is no unified uninstaller — bootstrap is install-only. MCP is the one component with its own `uninstall.sh` (it clears the entry from `~/.claude.json` and deletes `~/.jsonui-mcp-server` in one pass). CLI and Agents have no scripts: for CLI, pip-uninstall the three editable package registrations before removing the install dir; for Agents, delete only the specific files the installer wrote under `~/.claude/` — never the whole directory, which is your Claude Code user config and holds other projects' settings. The PATH block added to `~/.zshrc` by the installer has to be removed by hand.",
-      "ja": "統合 uninstaller はありません — bootstrap は install only。自前の `uninstall.sh` を持っているのは MCP だけで、`~/.claude.json` のエントリ削除と `~/.jsonui-mcp-server` ディレクトリの撤去までまとめて面倒を見てくれます。CLI と Agents は専用スクリプトなし: CLI は pip editable 登録 3 つを先に剥がしてからインストール先を削除、Agents は installer が `~/.claude/` 下に置いた 個別ファイルだけを削除します（`~/.claude` 全体を消すと Claude Code のユーザ設定と他プロジェクトの設定まで飛ぶので絶対にしないでください）。bootstrap が `~/.zshrc` に追加した PATH ブロックは手動削除です。"
+      "en": "There is no unified uninstaller — bootstrap is install-only. MCP is the one component with its own `uninstall.sh` (it clears the entry from `~/.claude.json` and deletes `~/.jsonui-mcp-server` in one pass). CLI and Agents have no scripts: for CLI, pip-uninstall the three editable package registrations before removing the install dir; for Agents, delete only the specific files the installer wrote under the project's `./.claude/` and remove the SessionStart hook entry it merged into `./.claude/settings.json` — never the whole directory, which also holds your own agents, commands and settings. The installer only prints the PATH block; remove whatever you pasted into your shell rc by hand.",
+      "ja": "統合 uninstaller はありません — bootstrap は install only。自前の `uninstall.sh` を持っているのは MCP だけで、`~/.claude.json` のエントリ削除と `~/.jsonui-mcp-server` ディレクトリの撤去までまとめて面倒を見てくれます。CLI と Agents は専用スクリプトなし: CLI は pip editable 登録 3 つを先に剥がしてからインストール先を削除、Agents はインストーラがプロジェクトの `./.claude/` 下に置いた個別ファイルだけを削除し、`./.claude/settings.json` にマージされた SessionStart フックのエントリを取り除きます（`.claude` 全体を消すと自分のエージェント・コマンド・設定まで飛ぶので絶対にしないでください）。インストーラは PATH ブロックを表示するだけなので、シェル rc に貼り付けた行は手動で削除します。"
     },
     "trouble_heading": {
       "en": "Troubleshooting",
@@ -985,8 +985,8 @@
       "ja": "Ruby / Python が古いと言われる"
     },
     "trouble_versions_cause": {
-      "en": "The installer checks the Ruby and Python of the shell it runs in and warns below what the tools need — Ruby 3.2 (from jsonui-cli 1.9.0) and Python 3.10. It only warns, because sjui / kjui / rjui run on the Ruby of the project directory, which may be another one.",
-      "ja": "インストーラは、自分が動くシェルの Ruby と Python を確かめ、ツールが必要とする版 — Ruby 3.2（jsonui-cli 1.9.0 から）と Python 3.10 — を下回ると警告します。警告だけなのは、sjui / kjui / rjui がプロジェクトのディレクトリの Ruby で動き、それが別の Ruby かもしれないからです。"
+      "en": "The installer checks the Ruby and Python of the shell it runs in and warns below what the tools need — Ruby 3.2 (from jsonui-cli 1.9.0) and Python 3.10. `jui` itself declares Python 3.11 or later (jui_tools/setup.py), so a 3.10 that passes the installer's check still cannot install it. It only warns, because sjui / kjui / rjui run on the Ruby of the project directory, which may be another one.",
+      "ja": "インストーラは、自分が動くシェルの Ruby と Python を確かめ、ツールが必要とする版 — Ruby 3.2（jsonui-cli 1.9.0 から）と Python 3.10 — を下回ると警告します。ただし `jui` 自体は Python 3.11 以上を要求する（jui_tools/setup.py）ので、インストーラの確認を通る 3.10 でも `jui` は入りません。警告だけなのは、sjui / kjui / rjui がプロジェクトのディレクトリの Ruby で動き、それが別の Ruby かもしれないからです。"
     },
     "trouble_versions_fix": {
       "en": "Ignore it for a tool you will not use. Otherwise upgrade. For sjui / kjui / rjui, what counts is the nearest .ruby-version at or above the directory the tool runs in: if the platform directory has one, install the Ruby it names, or change it to 3.2 or later if it is older (`jui sync_tool` names such a pin and leaves it alone); if it has none, put one naming Ruby 3.2 or later there, or install 3.2.2 so `jui sync_tool` writes it. A tool that ends up on a Ruby below 3.2 stops with `ERROR: rjui needs Ruby 3.2 or later (jsonui-cli 1.9.0), and this is Ruby 2.6.10 at …` (sjui and kjui print the same with their own name).",
@@ -1341,8 +1341,8 @@
       "ja": "3 プラットフォームを 1 spec で"
     },
     "subcopy": {
-      "en": "The same screen_spec.json renders as SwiftUI/UIKit on iOS, Compose/XML on Android, and Next.js/React on web.",
-      "ja": "1 つの screen_spec.json が iOS は SwiftUI/UIKit、Android は Compose/XML、Web は Next.js/React として生成されます。"
+      "en": "The same screen_spec.json renders as SwiftUI/UIKit on iOS, Jetpack Compose on Android, and Next.js/React on web.",
+      "ja": "1 つの screen_spec.json が iOS は SwiftUI/UIKit、Android は Jetpack Compose、Web は Next.js/React として生成されます。"
     },
     "catalog_heading": {
       "en": "Platforms",
@@ -1369,8 +1369,8 @@
       "ja": "KotlinJsonUI"
     },
     "article_kotlin_description": {
-      "en": "Android. Compose + XML Views dual mode. kjui_tools CLI. Stable coroutines bridging.",
-      "ja": "Android 向け。Compose と XML Views を両対応。kjui_tools CLI + coroutines bridging。"
+      "en": "Android. Jetpack Compose (XML Views maintenance-frozen since 2026-07). kjui_tools CLI. Stable coroutines bridging.",
+      "ja": "Android 向け。Jetpack Compose（XML Views は 2026-07 から保守凍結）。kjui_tools CLI + coroutines bridging。"
     },
     "article_kotlin_read_time": {
       "en": "~15 min read",
@@ -1987,8 +1987,8 @@
       "ja": "iOS: SwiftJsonUI Dynamic mode"
     },
     "section_ios_body": {
-      "en": "The iOS app, when built with Dynamic mode enabled, does not bake the Layout JSON into the binary. Instead it fetches the JSON from a `jui hotload listen` server on the author's machine at screen-mount time and subscribes to WebSocket push notifications for subsequent edits. When the server detects a change under `docs/screens/layouts/`, it resolves style includes + applies iOS-specific filtering and pushes the flat JSON over `ws://host:8081/ws`; the simulator picks up the change and re-renders without a rebuild. Release builds flip Dynamic mode off and revert to compiled SwiftUI, so production is unaffected.",
-      "ja": "iOS アプリは Dynamic mode 有効でビルドすると Layout JSON をバイナリに埋め込まず、画面マウント時に開発者マシン上の `jui hotload listen` サーバーから JSON を fetch し、以降の編集は WebSocket push で購読します。サーバーが `docs/screens/layouts/` の変更を検知すると、style include を解決し iOS 向けフィルタを適用した上で flat JSON を `ws://host:8081/ws` 経由で push。シミュレータは再ビルドなしに変更を反映します。リリースビルドでは Dynamic mode が off になりコンパイル済み SwiftUI に戻るので、本番には影響なし。"
+      "en": "The iOS app, when built with Dynamic mode enabled, does not bake the Layout JSON into the binary. Instead it fetches the JSON from a `jui hotload listen` server on the author's machine at screen-mount time and subscribes to WebSocket push notifications for subsequent edits. When the server detects a change under `docs/screens/layouts/`, it sends a `layout_changed` event naming the layout over `ws://host:8081/ws`, and the app fetches the flat JSON — style includes resolved, iOS-specific filtering applied — from `GET /ios/layout/<name>`; the simulator picks up the change and re-renders without a rebuild. Release builds flip Dynamic mode off and revert to compiled SwiftUI, so production is unaffected.",
+      "ja": "iOS アプリは Dynamic mode 有効でビルドすると Layout JSON をバイナリに埋め込まず、画面マウント時に開発者マシン上の `jui hotload listen` サーバーから JSON を fetch し、以降の編集は WebSocket push で購読します。サーバーが `docs/screens/layouts/` の変更を検知すると、`ws://host:8081/ws` 経由でレイアウト名を含む `layout_changed` イベントを送り、アプリは style include を解決し iOS 向けフィルタを適用した flat JSON を `GET /ios/layout/<name>` で取得します。シミュレータは再ビルドなしに変更を反映します。リリースビルドでは Dynamic mode が off になりコンパイル済み SwiftUI に戻るので、本番には影響なし。"
     },
     "section_android_heading": {
       "en": "Android: KotlinJsonUI Dynamic mode",
@@ -4131,8 +4131,8 @@
       "ja": "Claude / Codex 向け Agents"
     },
     "lead": {
-      "en": "Nine agents + eleven skills + five rules that teach Claude Code (and Codex) how to run the spec-first JsonUI workflow. Install once, and every project that carries a CLAUDE.md gets the whole pipeline — from 'write a spec' to 'run the tests' — without the operator having to explain it each time. Since 2026-05 the agents also know the DTO + Domain data-model layer: conductor inspects API state at startup, define understands `x-jui-skip-domain` and `api.schemas.skip_domain`, implement applies the DTO-vs-Domain return-type rule, debug traces swagger → DTO → Domain → Repository → VM. See /concepts/data-models-from-openapi.",
-      "ja": "9 エージェント + 11 スキル + 5 ルールで、Claude Code（および Codex）に spec-first JsonUI ワークフローの回し方を教え込む一式。1 回インストールすれば、CLAUDE.md を置いた全プロジェクトで「spec を書く」から「テストを回す」までのパイプライン全体が、毎回オペレータが説明し直さなくても動き始めます。2026-05 以降は DTO + Domain データモデル層もエージェントに織り込み済み: conductor は起動時に API 状態を確認、define は `x-jui-skip-domain` / `api.schemas.skip_domain` を理解、implement は DTO vs Domain の return type ルールを適用、debug は swagger → DTO → Domain → Repository → VM をトレースします。/concepts/data-models-from-openapi を参照。"
+      "en": "Nine agents + eleven skills + five rules that teach Claude Code (and Codex) how to run the spec-first JsonUI workflow. Install once, and every project it is installed into gets the whole pipeline — from 'write a spec' to 'run the tests' — without the operator having to explain it each time. Since 2026-05 the agents also know the DTO + Domain data-model layer: conductor inspects API state at startup, define understands `x-jui-skip-domain` and `api.schemas.skip_domain`, implement applies the DTO-vs-Domain return-type rule, debug traces swagger → DTO → Domain → Repository → VM. See /concepts/data-models-from-openapi.",
+      "ja": "9 エージェント + 11 スキル + 5 ルールで、Claude Code（および Codex）に spec-first JsonUI ワークフローの回し方を教え込む一式。1 回インストールすれば、インストールしたプロジェクトで「spec を書く」から「テストを回す」までのパイプライン全体が、毎回オペレータが説明し直さなくても動き始めます。2026-05 以降は DTO + Domain データモデル層もエージェントに織り込み済み: conductor は起動時に API 状態を確認、define は `x-jui-skip-domain` / `api.schemas.skip_domain` を理解、implement は DTO vs Domain の return type ルールを適用、debug は swagger → DTO → Domain → Repository → VM をトレースします。/concepts/data-models-from-openapi を参照。"
     },
     "read_time": {
       "en": "~10 min read",
@@ -4143,16 +4143,16 @@
       "ja": "同梱物"
     },
     "section_ships_body": {
-      "en": "The install drops three artifacts into your project: .claude/agents/*.md (nine Claude Code agents, each with its own system prompt + tool allow-list), .claude/skills/*.md (eleven skills the agents invoke for specific sub-tasks like localization, data-flow authoring, test runner setup), and .claude/jsonui-rules/*.md (five invariants every agent is expected to honor). A CLAUDE.md at the project root points at all three so the conductor agent is the default entry point.",
-      "ja": "インストールはプロジェクトに 3 種類の成果物を配置します: .claude/agents/*.md（9 つの Claude Code エージェント。各々独自のシステムプロンプト + ツール許可リスト）、.claude/skills/*.md（各エージェントがローカライズ・データフロー記述・テストランナー設定などの特定サブタスクで呼ぶ 11 スキル）、.claude/jsonui-rules/*.md（全エージェントが守る 5 不変条件）。プロジェクトルートの CLAUDE.md が 3 種類全てを指すので、conductor エージェントがデフォルトの入口になります。"
+      "en": "The Claude Code install writes everything under the project's .claude/: .claude/agents/jsonui-*.md (nine agents, each with its own system prompt + tool allow-list), .claude/skills/<name>/SKILL.md with its examples/ (eleven skills the agents invoke for specific sub-tasks like localization, data-flow authoring, test runner setup), .claude/jsonui-rules/*.md (five invariants every agent is expected to honor), .claude/jsonui-workflow.md (the workflow menu and routing table), .claude/commands/jsonui.md (the /jsonui command), and a SessionStart hook merged into .claude/settings.json that makes the menu the default entry point. Your CLAUDE.md is never created or touched. The Codex pack installs the same content as AGENTS.md, .codex/config.toml, agents/*.toml, skills/ and rules/.",
+      "ja": "Claude Code 版のインストールは全てをプロジェクトの .claude/ 以下に書きます: .claude/agents/jsonui-*.md（9 つのエージェント。各々独自のシステムプロンプト + ツール許可リスト）、.claude/skills/<name>/SKILL.md と examples/（各エージェントがローカライズ・データフロー記述・テストランナー設定などの特定サブタスクで呼ぶ 11 スキル）、.claude/jsonui-rules/*.md（全エージェントが守る 5 不変条件）、.claude/jsonui-workflow.md（ワークフローのメニューと振り分け表）、.claude/commands/jsonui.md（/jsonui コマンド）、そして .claude/settings.json にマージされる SessionStart フック。このフックがメニューをデフォルトの入口にします。CLAUDE.md は作成も変更もしません。Codex 版は同じ内容を AGENTS.md・.codex/config.toml・agents/*.toml・skills/・rules/ として入れます。"
     },
     "section_flow_heading": {
       "en": "The conductor flow",
       "ja": "conductor フロー"
     },
     "section_flow_body": {
-      "en": "You never invoke the specialist agents (define / implement / test / debug) directly. You start by telling Claude 'Read CLAUDE.md'. That triggers the jsonui-workflow skill, which asks you one question — what workflow are you here for — and dispatches the jsonui-conductor agent. The conductor inspects the repo through the MCP server (46 typed tools, including `list_api_specs` so it knows whether the project consumes OpenAPI), asks one or two clarifying questions, and hands off to exactly the right specialist with the right context already loaded. Everything flows through that single entry point.",
-      "ja": "specialist エージェント（define / implement / test / debug）を直接呼ぶことはありません。まず Claude に 'Read CLAUDE.md' と伝える。これが jsonui-workflow スキルを発火し、ワークフロー種別を 1 つ質問して jsonui-conductor エージェントに引き継ぐ。conductor は MCP サーバー（型付きツール 46 個。`list_api_specs` も含むので、プロジェクトが OpenAPI を使っているかを最初に把握できる）でリポジトリを精査し、1〜2 個の確認質問をしてから、適切なコンテキストを載せた状態で正しい specialist に引き渡す。全ては単一の入口経由で流れる構造になっています。"
+      "en": "You never invoke the specialist agents (define / implement / test / debug) directly. In Claude Code, a SessionStart hook the installer merges into `.claude/settings.json` puts `.claude/jsonui-workflow.md` into every new session, so Claude opens by asking one question — what workflow are you here for (New work / Modify / Investigate / Backend) — and `/jsonui` asks it again mid-session. Choices 1–3 launch the jsonui-conductor agent. The conductor inspects the repo through the MCP server (46 typed tools, including `list_api_specs` so it knows whether the project consumes OpenAPI), asks one or two clarifying questions, and hands off to exactly the right specialist with the right context already loaded. In Codex the entry is `Read AGENTS.md` (with multi_agent enabled), and the conductor is `/agent conductor`. Everything flows through that single entry point.",
+      "ja": "specialist エージェント（define / implement / test / debug）を直接呼ぶことはありません。Claude Code では、インストーラが `.claude/settings.json` にマージする SessionStart フックが新しいセッションごとに `.claude/jsonui-workflow.md` を読み込ませるので、Claude はまずワークフロー種別（New work / Modify / Investigate / Backend）を 1 つ質問します。セッションの途中でも `/jsonui` で同じ質問を出せます。1〜3 を選ぶと jsonui-conductor エージェントが起動します。conductor は MCP サーバー（型付きツール 46 個。`list_api_specs` も含むので、プロジェクトが OpenAPI を使っているかを最初に把握できる）でリポジトリを精査し、1〜2 個の確認質問をしてから、適切なコンテキストを載せた状態で正しい specialist に引き渡す。Codex では入口が `Read AGENTS.md`（multi_agent を有効にしておく）で、conductor は `/agent conductor` です。全ては単一の入口経由で流れる構造になっています。"
     },
     "section_catalog_heading": {
       "en": "Agent catalog",
@@ -4167,8 +4167,8 @@
       "ja": "独自エージェントを足す"
     },
     "section_custom_body": {
-      "en": "Drop a Markdown file into .claude/agents/your-agent.md with a frontmatter block declaring its name, description, and allowed tools — the same shape the shipped nine agents use. Update CLAUDE.md to tell the conductor when to invoke it. Your agent can call the MCP server just like the built-ins; authoring one is not a special privilege, just a discipline about where its triggering responsibilities live.",
-      "ja": ".claude/agents/your-agent.md という Markdown ファイルを置き、frontmatter で name / description / 許可ツールを宣言するだけ — 同梱の 9 エージェントと同じ形式。CLAUDE.md に conductor がそのエージェントを呼ぶ条件を追加すれば、組み込みエージェントと同様に MCP サーバーを叩けます。独自エージェントの作成は特権ではなく、どこでトリガーを受け持つかの規律の問題です。"
+      "en": "Drop a Markdown file into .claude/agents/your-agent.md with a frontmatter block declaring its name, description, and allowed tools — the same shape the shipped nine agents use. Add a route for it to .claude/jsonui-workflow.md, or tell the conductor when to hand off to it — routing lives there, not in CLAUDE.md. Your agent can call the MCP server just like the built-ins; authoring one is not a special privilege, just a discipline about where its triggering responsibilities live.",
+      "ja": ".claude/agents/your-agent.md という Markdown ファイルを置き、frontmatter で name / description / 許可ツールを宣言するだけ — 同梱の 9 エージェントと同じ形式。振り分けは CLAUDE.md ではなく .claude/jsonui-workflow.md と conductor にあるので、そこにこのエージェントへの経路を足します。組み込みエージェントと同様に MCP サーバーを叩けます。独自エージェントの作成は特権ではなく、どこでトリガーを受け持つかの規律の問題です。"
     },
     "agent_conductor_name": {
       "en": "jsonui-conductor",
@@ -4227,8 +4227,8 @@
       "ja": "TESTER"
     },
     "agent_test_when": {
-      "en": "Authors tests/screens/*.test.json for a given screen. Validates via the jsonui-test runner CLI.",
-      "ja": "対象画面用に tests/screens/*.test.json を作成。jsonui-test ランナー CLI で検証します。"
+      "en": "Authors screen and flow tests (`tests/**/*.test.json`), generates branch tests from a spec's branchContracts, and writes test documentation. Validates through the test_validate MCP tool.",
+      "ja": "screen / flow テスト（`tests/**/*.test.json`）を作成し、spec の branchContracts から branch テストを生成し、テストのドキュメントを書く。検証は MCP の test_validate で行います。"
     },
     "agent_debug_name": {
       "en": "jsonui-debug",
@@ -4999,8 +4999,8 @@
       "ja": "jui オーケストレータ"
     },
     "section_orchestrator_body": {
-      "en": "jui is the single entry point the agents, the MCP tools, and you all use. It resolves jui.config.json, determines which platforms the project targets, and routes each subcommand to the right builder(s). Most projects never need to call sjui / kjui / rjui directly — the orchestrator handles fan-out, including parallelism across platforms when a single build spans iOS, Android, and web.",
-      "ja": "jui は agents / MCP ツール / 手動操作が共通で使う単一のエントリポイント。jui.config.json を解決し、ターゲットプラットフォームを決定し、各サブコマンドを対応する builder に振ります。多くのプロジェクトでは sjui / kjui / rjui を直接呼ぶ必要はありません — オーケストレータが fan-out を処理し、iOS / Android / Web を跨ぐ build ではプラットフォーム間の並列実行まで面倒を見ます。"
+      "en": "jui is the single entry point the agents, the MCP tools, and you all use. It resolves jui.config.json, determines which platforms the project targets, and routes each subcommand to the right builder(s). Most projects never need to call sjui / kjui / rjui directly — the orchestrator handles fan-out, building each platform the project declares in turn when a single build spans iOS, Android, and web.",
+      "ja": "jui は agents / MCP ツール / 手動操作が共通で使う単一のエントリポイント。jui.config.json を解決し、ターゲットプラットフォームを決定し、各サブコマンドを対応する builder に振ります。多くのプロジェクトでは sjui / kjui / rjui を直接呼ぶ必要はありません — オーケストレータが fan-out を処理し、iOS / Android / Web を跨ぐ build では宣言されたプラットフォームを順にビルドします。"
     },
     "section_catalog_heading": {
       "en": "Sub-CLI catalog",
@@ -5015,8 +5015,8 @@
       "ja": "Exit コードと CI"
     },
     "section_exit_body": {
-      "en": "Every CLI returns 0 on success, non-zero on failure. jui build returns non-zero if any platform build fails. jui verify --fail-on-diff returns non-zero on drift — wire this into CI as the drift gate. jsonui-test returns non-zero if any test file fails. The standard set of failure modes (spec validation / schema drift / platform build error / test failure) each have distinct codes, documented in --help per command.",
-      "ja": "全 CLI は成功時 0、失敗時に非 0 を返します。jui build はいずれかのプラットフォームが失敗したら非 0。jui verify --fail-on-diff はドリフトで非 0 — CI にこれをドリフトゲートとして組み込むのが定石。jsonui-test はテストが 1 つでも失敗すれば非 0。標準の失敗モード（spec 検証 / スキーマドリフト / プラットフォームビルドエラー / テスト失敗）はそれぞれ異なるコードを返し、コマンド毎の --help で文書化されています。"
+      "en": "Every CLI returns 0 on success, non-zero on failure. jui build returns non-zero if any platform build fails. jui verify --fail-on-diff returns non-zero on drift — wire this into CI as the drift gate. jsonui-test validate returns non-zero if any test file fails the schema. A few commands use more than one non-zero code (lint-strings, lint-generated, jsonui-doc check); the codes are per command, listed on /reference/cli-commands and in each command's --help.",
+      "ja": "全 CLI は成功時 0、失敗時に非 0 を返します。jui build はいずれかのプラットフォームが失敗したら非 0。jui verify --fail-on-diff はドリフトで非 0 — CI にこれをドリフトゲートとして組み込むのが定石。jsonui-test validate はテストファイルが 1 つでもスキーマに反すれば非 0。複数の非 0 コードを使い分けるコマンド（lint-strings・lint-generated・jsonui-doc check）もありますが、コードはコマンドごとの定義で、/reference/cli-commands と各コマンドの --help に載っています。"
     },
     "cli_jui_name": {
       "en": "jui",
@@ -5027,8 +5027,8 @@
       "ja": "ORCHESTRATOR"
     },
     "cli_jui_body": {
-      "en": "Top-level command. Subcommands: init / generate / build / verify / sync_tool. Reads jui.config.json to fan out to the right platform builder(s). Almost every day's work starts and ends here.",
-      "ja": "トップレベルコマンド。サブコマンド: init / generate / build / verify / sync_tool。jui.config.json を読んで適切なプラットフォーム builder に振り分けます。日常作業のほぼ全てがここから始まり、ここで終わります。"
+      "en": "Top-level command. Subcommands: init / generate / build / verify / sync_tool, plus screens / ls / migrate-layouts / lint-strings / lint-generated / hotload / conformance. Reads jui.config.json to fan out to the right platform builder(s). Almost every day's work starts and ends here.",
+      "ja": "トップレベルコマンド。サブコマンド: init / generate / build / verify / sync_tool、ほかに screens / ls / migrate-layouts / lint-strings / lint-generated / hotload / conformance。jui.config.json を読んで適切なプラットフォーム builder に振り分けます。日常作業のほぼ全てがここから始まり、ここで終わります。"
     },
     "cli_sjui_name": {
       "en": "sjui",
@@ -5075,8 +5075,8 @@
       "ja": "TEST RUNNER"
     },
     "cli_jsonui_test_body": {
-      "en": "Executes tests/screens/*.test.json against a real running app — iOS simulator, Android emulator, or a headless browser. Every step is an action or an assertion, with the target element found by its `id`; tests are JSON, not code.",
-      "ja": "tests/screens/*.test.json を実際に動いているアプリ — iOS シミュレータ / Android エミュレータ / ヘッドレスブラウザ — に対して実行します。各ステップは action か assert で、対象要素は `id` で特定します。テストは JSON であってコードではありません。"
+      "en": "The test tooling CLI: validates `tests/**/*.test.json` against the schema (and installs them into the platform test dirs), generates tests, descriptions, branch tests and unit stubs from specs, converts results to JUnit / HTML, generates and serves API mocks, pulls run artifacts, and reports contract coverage. The tests themselves run through the per-platform drivers — XCUITest, Espresso + UI Automator, Playwright. Every step is an action or an assertion, with the target element found by its `id`; tests are JSON, not code.",
+      "ja": "テストツールの CLI: `tests/**/*.test.json` をスキーマで検証し（プラットフォームのテストディレクトリへのインストールも行う）、spec からテスト・説明・branch テスト・unit stub を生成し、結果を JUnit / HTML に変換し、API モックを生成・配信し、実行成果物を取得し、契約カバレッジを報告します。テストの実行そのものはプラットフォームごとのドライバ — XCUITest・Espresso + UI Automator・Playwright — が担います。各ステップは action か assert で、対象要素は `id` で特定します。テストは JSON であってコードではありません。"
     },
     "cli_jsonui_doc_name": {
       "en": "jsonui-doc",
@@ -5145,8 +5145,8 @@
       "ja": "jsonui-doc"
     },
     "lead": {
-      "en": "The DOC GEN sub-CLI. Python tool that generates HTML, Markdown, Mermaid diagrams, per-platform test adapters, and Figma-as-HTML from JsonUI screen specs, component specs, test JSON files, and Figma API responses. 13 subcommands across four groups: init / validate / generate / figma. The doc_generate_* MCP tools and the /reference HTML pages on this very site are produced by this binary. The swagger-parsing core that originated here (`document_tools/.../swagger.py`) is now also wired into `jui g api` for the swagger-driven DTO + Domain codegen pipeline.",
-      "ja": "DOC GEN サブ CLI。JsonUI の screen spec / component spec / test JSON / Figma API レスポンスから、HTML・Markdown・Mermaid・プラットフォーム別テストアダプタ・Figma-as-HTML を生成する Python ツール。13 サブコマンドを 4 グループ(init / validate / generate / figma)に分類。doc_generate_* MCP ツールも、このサイトの /reference HTML ページも、すべてこのバイナリが生成しています。元来ここに住んでいた swagger パーサ (`document_tools/.../swagger.py`) は現在 `jui g api`（swagger 駆動 DTO + Domain codegen）の裏側にも組み込まれています。"
+      "en": "The DOC GEN sub-CLI. Python tool that generates HTML, Markdown, Mermaid diagrams, per-platform test adapters, and Figma-as-HTML from JsonUI screen specs, component specs, test JSON files, and Figma API responses. 15 commands: five groups — init / validate / rules / generate / figma — plus check. The doc_generate_* MCP tools and the /reference HTML pages on this very site are produced by this binary. The swagger-parsing core that originated here (`document_tools/.../swagger.py`) is now also wired into `jui g api` for the swagger-driven DTO + Domain codegen pipeline.",
+      "ja": "DOC GEN サブ CLI。JsonUI の screen spec / component spec / test JSON / Figma API レスポンスから、HTML・Markdown・Mermaid・プラットフォーム別テストアダプタ・Figma-as-HTML を生成する Python ツール。15 コマンド: 5 グループ（init / validate / rules / generate / figma）と check。doc_generate_* MCP ツールも、このサイトの /reference HTML ページも、すべてこのバイナリが生成しています。元来ここに住んでいた swagger パーサ (`document_tools/.../swagger.py`) は現在 `jui g api`（swagger 駆動 DTO + Domain codegen）の裏側にも組み込まれています。"
     },
     "read_time": {
       "en": "~10 min read",
@@ -5173,8 +5173,8 @@
       "ja": "カテゴリ別コマンド"
     },
     "section_commands_body": {
-      "en": "Four groups totaling 13 subcommands. init and validate lift the spec lifecycle; generate is the largest group and the one day-to-day work lands in; figma covers the two-step 'fetch then images' flow with plan-aware throttling to avoid 429s.",
-      "ja": "4 グループ・計 13 サブコマンド。init / validate が spec ライフサイクルの入り口。generate は最大グループで日常作業のほぼ全てがここ。figma は『fetch して images』の 2 ステップフローを、プラン別スロットリングで HTTP 429 を避けつつ実行します。"
+      "en": "Five groups plus check, 15 commands in all. init and validate lift the spec lifecycle; rules manages a project's custom validation rules (init / show); generate is the largest group and the one day-to-day work lands in; figma covers the two-step 'fetch then images' flow with plan-aware throttling to avoid 429s; check runs the contract checks jui.config.json declares (real DB / implementation OpenAPI against the docs).",
+      "ja": "5 グループと check、計 15 コマンド。init / validate が spec ライフサイクルの入り口。rules はプロジェクト独自の検証ルールを管理（init / show）。generate は最大グループで日常作業のほぼ全てがここ。figma は『fetch して images』の 2 ステップフローを、プラン別スロットリングで HTTP 429 を避けつつ実行します。check は jui.config.json に宣言した契約チェック（実 DB / 実装の OpenAPI とドキュメントの突き合わせ）を実行します。"
     },
     "section_init_heading": {
       "en": "init",
@@ -5955,8 +5955,8 @@
       "ja": "ShipIt"
     },
     "section_ship_body": {
-      "en": "`jui generate project --file recent-activity.spec.json` produces the skeleton Layout + ViewModel base. You fill in the hand-authored halves, run `jui build` after each iteration, use `jui hotload listen` to live-reload iOS + Android while you iterate on the layout (web reloads automatically via `npm run dev`), and close with `jui verify --fail-on-diff` before committing. The commit contains only the spec, the hand-authored layout + cell, the hand-authored ViewModel + page route — everything else is regenerated and gitignored. That's a full screen.",
-      "ja": "`jui generate project --file recent-activity.spec.json` で Layout + ViewModel ベースの雛形が出ます。手書き部分を埋めて、反復のたびに `jui build`、レイアウト編集中は `jui hotload listen` で iOS + Android をライブリロード（Web は `npm run dev` が自動でリロード）、コミット前に `jui verify --fail-on-diff` で drift を閉じる。コミットに入るのは spec・手書き layout + cell・手書き ViewModel + page route だけ — 残りは再生成 + gitignore 対象。これで画面 1 枚がそろいました。"
+      "en": "`jui generate project --file recent-activity.spec.json` produces the skeleton Layout + ViewModel base. You fill in the hand-authored halves, run `jui build` after each iteration, use `jui hotload listen` to live-reload iOS + Android while you iterate on the layout (on web, `jui build --web-only` regenerates the TSX and `npm run dev` reloads it), and close with `jui verify --fail-on-diff` before committing. The commit contains only the spec, the hand-authored layout + cell, the hand-authored ViewModel + page route — everything else is regenerated and gitignored. That's a full screen.",
+      "ja": "`jui generate project --file recent-activity.spec.json` で Layout + ViewModel ベースの雛形が出ます。手書き部分を埋めて、反復のたびに `jui build`、レイアウト編集中は `jui hotload listen` で iOS + Android をライブリロード（Web は `jui build --web-only` で TSX を再生成すれば `npm run dev` がリロード）、コミット前に `jui verify --fail-on-diff` で drift を閉じる。コミットに入るのは spec・手書き layout + cell・手書き ViewModel + page route だけ — 残りは再生成 + gitignore 対象。これで画面 1 枚がそろいました。"
     },
     "next_heading": {
       "en": "Keep going",
@@ -6081,8 +6081,8 @@
       "ja": "本番での注意点"
     },
     "section_prod_body": {
-      "en": "Generated Swift is plain Swift — App Store review sees only the compiled binary, same as hand-written. Two things to know up front: (1) if you use obscure SwiftUI modifiers the generator has not yet learned, you will get a build warning; add the mapping in rjui_tools (sjui_tools) or file it under /learn/installation's troubleshooting. (2) SwiftData and Observation framework work, but the generator's ViewModel emission assumes Combine-first — if you want the new macros you will write a thin adapter for now. (3) Generated views are size-bounded: each function stays within a hard brace depth of 5 and a soft 250-line target, and every extracted section boundary is erased through `AnyView`. The erasure is the point — `some View` is opaque but still composes one giant generic type whose metadata the runtime decodes on a 1 MB device stack, so splitting into `some View` helpers does not stop a stack overflow (measured on a device with an 881-line body that had already been extracted). Anything the bounder cannot split safely is named in a build warning rather than passed over quietly.",
-      "ja": "生成される Swift は普通の Swift — App Store 審査は手書きと同じくコンパイル後のバイナリを見るだけ。先に知っておくべき点が 2 つ: (1) ジェネレータ未対応のマイナーな SwiftUI modifier を使うとビルド warning が出ます。sjui_tools にマッピングを足すか、/learn/installation のトラブルシューティングに項目を追加してください。(2) SwiftData と Observation framework は動きますが、ジェネレータの ViewModel 出力は Combine を前提にしているので、新しいマクロを使いたければ現状は薄い adapter を挟む形です。(3) 生成ビューはサイズ有界です: 関数ごとにブレース深さ 5 がハード上限、250 行はソフト目標で、切り出したセクション境界は必ず `AnyView` で型消去されます。この型消去こそが本質で、`some View` は opaque でも合成された 1 個の巨大なジェネリック型のままです。ランタイムはそのメタデータを 1MB の実機スタック上で展開するため、`some View` のヘルパーに割っただけではスタックオーバーフローは止まりません（切り出し済みの 881 行 body が実機で落ちた実測例あり）。安全に切れなかった箇所は黙って見逃さず、ビルド警告で名指しされます。"
+      "en": "Generated Swift is plain Swift — App Store review sees only the compiled binary, same as hand-written. Two things to know up front: (1) if you use obscure SwiftUI modifiers the generator has not yet learned, you will get a build warning; add a converter in jsonui-cli's sjui_tools (or a project converter extension) or file it under /learn/installation's troubleshooting. (2) SwiftData and Observation framework work, but the generator's ViewModel emission assumes Combine-first — if you want the new macros you will write a thin adapter for now. (3) Generated views are size-bounded: each function stays within a hard brace depth of 5 and a soft 250-line target, and every extracted section boundary is erased through `AnyView`. The erasure is the point — `some View` is opaque but still composes one giant generic type whose metadata the runtime decodes on a 1 MB device stack, so splitting into `some View` helpers does not stop a stack overflow (measured on a device with an 881-line body that had already been extracted). Anything the bounder cannot split safely is named in a build warning rather than passed over quietly.",
+      "ja": "生成される Swift は普通の Swift — App Store 審査は手書きと同じくコンパイル後のバイナリを見るだけ。先に知っておくべき点が 2 つ: (1) ジェネレータ未対応のマイナーな SwiftUI modifier を使うとビルド warning が出ます。jsonui-cli の sjui_tools（またはプロジェクトの converter 拡張）に converter を足すか、/learn/installation のトラブルシューティングに項目を追加してください。(2) SwiftData と Observation framework は動きますが、ジェネレータの ViewModel 出力は Combine を前提にしているので、新しいマクロを使いたければ現状は薄い adapter を挟む形です。(3) 生成ビューはサイズ有界です: 関数ごとにブレース深さ 5 がハード上限、250 行はソフト目標で、切り出したセクション境界は必ず `AnyView` で型消去されます。この型消去こそが本質で、`some View` は opaque でも合成された 1 個の巨大なジェネリック型のままです。ランタイムはそのメタデータを 1MB の実機スタック上で展開するため、`some View` のヘルパーに割っただけではスタックオーバーフローは止まりません（切り出し済みの 881 行 body が実機で落ちた実測例あり）。安全に切れなかった箇所は黙って見逃さず、ビルド警告で名指しされます。"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -6155,12 +6155,12 @@
       "ja": "`jui build` は Kotlin の生成を kjui に委譲します — kjui が spec を読んで Gradle モジュールにそのまま入る Kotlin ファイルを emit します。Activity / Fragment / Compose Navigation のセットアップはあなたの持ち物のまま。kjui は画面の composable と ViewModel ベースクラスを生成し、アプリのシェルと統合ポイントには手を出しません。出力は Android Studio が生成するのと同じバイトコードにコンパイルされます。"
     },
     "section_dual_heading": {
-      "en": "Compose + XML output",
-      "ja": "Compose + XML 出力"
+      "en": "Compose output",
+      "ja": "Compose 出力"
     },
     "section_dual_body": {
-      "en": "New app? Stay on Compose. Large XML Views codebase you are migrating one screen at a time? Point kjui at XML for the laggards. The spec is identical; only the generator's target branch differs. Compose recomposition is what the tooling is built around — Dynamic mode's network-fetched spec feeds straight into a remember { mutableStateOf } cache and the next recomposition picks it up. (See the Platform mode policy section below for the 2026-07-onward operating principle.)",
-      "ja": "新規アプリ? Compose のままで。1 画面ずつ移行中の大規模 XML Views コードベース? 遅れてる画面だけ kjui で XML に向ける。spec は同一、ジェネレータのターゲット分岐 だけが異なります。ツール群は Compose の recomposition を前提に作られている — Dynamic mode がネットワーク取得した spec はそのまま remember { mutableStateOf } キャッシュに 入り、次の recomposition で反映されます。(2026-07 以降の運用方針は次節の Platform mode policy を参照。)"
+      "en": "Compose is the output. The XML Views path still compiles for projects that already use it, but it is maintenance-frozen: no new attributes or components, bug reports closed unless they break the build, and a removal candidate for KotlinJsonUI 3.0 — so it is not a migration target for new screens. Compose recomposition is what the tooling is built around — Dynamic mode's network-fetched spec feeds straight into a remember { mutableStateOf } cache and the next recomposition picks it up. (See the Platform mode policy section below.)",
+      "ja": "出力は Compose です。XML Views の経路は既に使っているプロジェクトのためにコンパイルは通りますが、保守凍結です: 新しい属性やコンポーネントは入らず、ビルドを壊さないバグ報告はクローズされ、KotlinJsonUI 3.0 で削除候補 — 新しい画面の移行先にはなりません。ツール群は Compose の recomposition を前提に作られている — Dynamic mode がネットワーク取得した spec はそのまま remember { mutableStateOf } キャッシュに入り、次の recomposition で反映されます。(運用方針は次節の Platform mode policy を参照。)"
     },
     "section_dynamic_heading": {
       "en": "Dynamic mode",
@@ -6175,8 +6175,8 @@
       "ja": "本番での注意点"
     },
     "section_prod_body": {
-      "en": "Generated Kotlin is plain Kotlin. Two gotchas worth flagging: (1) if your app supports minSdk below 23, the Compose-first emission can fall back to XML under the same spec — but test the fallback early, because design fidelity is not identical. (2) Firebase / third-party library integration sits on your side of the contract; the generator does not opine on DI, so Hilt / Koin / Dagger2 all work but you wire them at the ViewModel layer. (3) Generated Composables are bounded by the same extractor, but the size limits are calibrated for the iOS mechanism and Compose has no counterpart — the real Android ceiling is the dex 65,535 code-unit cap, which is a hard compile error, so a build that succeeds has already proved the point (measured worst case: 12.6 % of the cap). Oversized functions are therefore not a build warning here; `jui lint-generated` lists them, and `--update-size-baseline` records the current set in `.jui-size-waivers` so later runs can single out functions that are newly oversized.",
-      "ja": "生成される Kotlin は普通の Kotlin。注意点 2 つ: (1) minSdk が 23 未満をサポートする場合、同じ spec でも Compose 既定から XML へフォールバックするケースがあります。デザインの忠実度は完全一致しないので早めにテストしてください。(2) Firebase / サードパーティライブラリの統合はあなたの契約側にあります。ジェネレータは DI について意見を持たないので、Hilt / Koin / Dagger2 いずれも動きますが、接続は ViewModel レイヤで行います。(3) 生成 Composable も同じ extractor で有界化されますが、サイズ上限は iOS の機序に較正したもので、Compose に対応する機序はありません。Android で実在する上限は dex の 65,535 code unit で、超えればハードなコンパイルエラーになるため、ビルドが通った時点で証明済みです（実測の最悪ケースで上限の 12.6%）。したがって超過関数はビルド警告にはなりません。`jui lint-generated` が一覧表示し、`--update-size-baseline` で現在の集合を `.jui-size-waivers` に記録しておくと、以降の実行で新たに超過した関数だけを切り分けられます。"
+      "en": "Generated Kotlin is plain Kotlin. Three things worth flagging: (1) KotlinJsonUI requires minSdk 24, and there is no XML fallback for older devices. (2) Firebase / third-party library integration sits on your side of the contract; the generator does not opine on DI, so Hilt / Koin / Dagger2 all work but you wire them at the ViewModel layer. (3) Generated Composables are bounded by the same extractor, but the size limits are calibrated for the iOS mechanism and Compose has no counterpart — the real Android ceiling is the dex 65,535 code-unit cap, which is a hard compile error, so a build that succeeds has already proved the point (measured worst case: 12.6 % of the cap). Oversized functions are therefore not a build warning here; `jui lint-generated` lists them, and `--update-size-baseline` records the current set in `.jui-size-waivers` so later runs can single out functions that are newly oversized.",
+      "ja": "生成される Kotlin は普通の Kotlin。注意点 3 つ: (1) KotlinJsonUI は minSdk 24 が必要で、それより古い端末向けの XML フォールバックはありません。(2) Firebase / サードパーティライブラリの統合はあなたの契約側にあります。ジェネレータは DI について意見を持たないので、Hilt / Koin / Dagger2 いずれも動きますが、接続は ViewModel レイヤで行います。(3) 生成 Composable も同じ extractor で有界化されますが、サイズ上限は iOS の機序に較正したもので、Compose に対応する機序はありません。Android で実在する上限は dex の 65,535 code unit で、超えればハードなコンパイルエラーになるため、ビルドが通った時点で証明済みです（実測の最悪ケースで上限の 12.6%）。したがって超過関数はビルド警告にはなりません。`jui lint-generated` が一覧表示し、`--update-size-baseline` で現在の集合を `.jui-size-waivers` に記録しておくと、以降の実行で新たに超過した関数だけを切り分けられます。"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -6211,8 +6211,8 @@
       "ja": "提供されるもの"
     },
     "toc_row_dual": {
-      "en": "Compose + XML output",
-      "ja": "Compose + XML 出力"
+      "en": "Compose output",
+      "ja": "Compose 出力"
     },
     "toc_row_dynamic": {
       "en": "Dynamic mode",
@@ -6273,8 +6273,8 @@
       "ja": "ジェネレータ出力と Tailwind"
     },
     "section_gen_body": {
-      "en": "Layout attributes map onto Tailwind utility classes by default, so a Layout JSON Button ends up as a span + classes that any React dev recognises. Colours are token-first: names from colors.json (and hex values that match a palette entry) compile to token classes like `bg-surface` / `text-ink`, and `jui build` generates `src/generated/theme.css` — a `@generated` Tailwind v4 `@theme` block mirroring every mode-complete token (ARGB hex becomes `rgba()`; non-base modes re-bind the variables under `:root[data-theme=\"<mode>\"]`). Wire it once by adding the `@import` line the build log prints to your globals.css; after that, token additions flow through automatically. A hex value that is NOT in the palette is emitted inline (`text-[#2563EB]`) — it renders in every mode but never theme-switches, and the build warns about it so you can promote it to a token.",
-      "ja": "Layout の attribute は既定で Tailwind ユーティリティクラスに対応するので、Layout JSON の Button は span + クラス群として出力され、React 開発者なら誰でも読めます。色はトークンファースト: colors.json の名前 (とパレットに一致する hex 値) は `bg-surface` / `text-ink` のようなトークンクラスにコンパイルされ、`jui build` が `src/generated/theme.css` を生成します — mode-complete な全トークンをミラーする `@generated` な Tailwind v4 `@theme` ブロックです (ARGB hex は `rgba()` へ変換、base 以外のモードは `:root[data-theme=\"<mode>\"]` で変数を再束縛)。ビルドログが提示する `@import` 1 行を globals.css に足せば配線完了 — 以後のトークン追加は自動で追従します。パレットに無い hex は inline (`text-[#2563EB]`) で出力され、全モードで描画されますがテーマ切替はされません — ビルド警告が出るので、必要ならトークンへ昇格させてください。"
+      "en": "Layout attributes map onto Tailwind utility classes by default, so a Layout JSON Button ends up as a `<button>` + classes (wrapped in the framework's `<Link>` when it navigates) that any React dev recognises. Colours are token-first: names from colors.json (and hex values that match a palette entry) compile to token classes like `bg-surface` / `text-ink`, and `jui build` generates `src/generated/theme.css` — a `@generated` Tailwind v4 `@theme` block mirroring every mode-complete token (ARGB hex becomes `rgba()`; non-base modes re-bind the variables under `:root[data-theme=\"<mode>\"]`). Wire it once by adding the `@import` line the build log prints to your globals.css; after that, token additions flow through automatically. A hex value that is NOT in the palette is emitted inline (`text-[#2563EB]`) — it renders in every mode but never theme-switches, and the build warns about it so you can promote it to a token.",
+      "ja": "Layout の attribute は既定で Tailwind ユーティリティクラスに対応するので、Layout JSON の Button は `<button>` + クラス群（遷移するときはフレームワークの `<Link>` で包む）として出力され、React 開発者なら誰でも読めます。色はトークンファースト: colors.json の名前 (とパレットに一致する hex 値) は `bg-surface` / `text-ink` のようなトークンクラスにコンパイルされ、`jui build` が `src/generated/theme.css` を生成します — mode-complete な全トークンをミラーする `@generated` な Tailwind v4 `@theme` ブロックです (ARGB hex は `rgba()` へ変換、base 以外のモードは `:root[data-theme=\"<mode>\"]` で変数を再束縛)。ビルドログが提示する `@import` 1 行を globals.css に足せば配線完了 — 以後のトークン追加は自動で追従します。パレットに無い hex は inline (`text-[#2563EB]`) で出力され、全モードで描画されますがテーマ切替はされません — ビルド警告が出るので、必要ならトークンへ昇格させてください。"
     },
     "section_prod_heading": {
       "en": "Production caveats",
@@ -6301,8 +6301,8 @@
       "ja": "KotlinJsonUI"
     },
     "next_kotlin_description": {
-      "en": "The Android sibling — Compose + XML from the same spec.",
-      "ja": "Android 側の兄弟 — 同じ spec から Compose + XML。"
+      "en": "The Android sibling — Jetpack Compose from the same spec.",
+      "ja": "Android 側の兄弟 — 同じ spec から Jetpack Compose。"
     },
     "footer_copyright": {
       "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
@@ -7629,8 +7629,8 @@
       "ja": "• Android — DynamicModeManager は `isDynamicModeAvailable` を StateFlow として公開しています。Release ビルドでは false のままで、container は early return して content だけを描画し、ジェスチャ / オーバーレイのブロックを全てスキップします。"
     },
     "section_release_bullet_warning": {
-      "en": "• Forgetting `enabled = BuildConfig.DEBUG` on Android is the most common way a production build ships with a working screen selector. iOS catches this via `#if DEBUG` in the library; Android trusts you. Double-check this in your CI.",
-      "ja": "• Android で `enabled = BuildConfig.DEBUG` を忘れると、本番ビルドに動作する画面セレクタが残るリスクがあります。iOS はライブラリの `#if DEBUG` で自動的に守られますが、Android は呼び出し側を信頼します。CI でここを必ずチェックしてください。"
+      "en": "• Keep `enabled = BuildConfig.DEBUG` on Android anyway. The library already returns early when the host app is not debuggable (DynamicModeManager reads the app's FLAG_DEBUGGABLE), so a release build does not show the selector — the flag makes the intent explicit and also covers a debuggable build you ship to testers.",
+      "ja": "• Android でも `enabled = BuildConfig.DEBUG` は付けておきましょう。ホストアプリが debuggable でなければライブラリ側で early return する（DynamicModeManager がアプリの FLAG_DEBUGGABLE を読む）ので、リリースビルドにセレクタは出ません。フラグは意図を明示し、テスター向けに配る debuggable ビルドにも効きます。"
     },
     "section_pitfalls_heading": {
       "en": "7. Pitfalls",
@@ -9641,8 +9641,8 @@
       "ja": "Exit code 規約"
     },
     "section_exit_body": {
-      "en": "0 = success. 1 = generic failure. 2 = spec validation failure. 3 = drift detected by verify. 4 = platform build failure. 5 = test failure. Any code ≥128 is a signal termination (not interesting for CI). The point of having distinct codes is letting CI branch on cause without parsing stderr.",
-      "ja": "0 = 成功。1 = 汎用失敗。2 = spec 検証失敗。3 = verify がドリフト検出。4 = プラットフォームビルド失敗。5 = テスト失敗。128 以上はシグナル終了 (CI 判定には不要)。コードを区別する目的は stderr を parse せずに CI が原因で分岐できるようにするため。"
+      "en": "0 = success, 1 = failure is the common case, and there is no toolchain-wide code table: each command defines its own. `jui verify --fail-on-diff` exits 1 on drift. `jui lint-strings` exits 2 on findings and 1 when it cannot run. `jui lint-generated` exits 2 when the size ratchet fails and 3 on a health finding. `jsonui-doc check` exits 1 on a mismatch and 2 when a check cannot run. `jsonui-test validate` exits 1 on a schema violation or a coverage finding. Any code ≥128 is a signal termination. Branch on the codes a command documents in its --help, not on a shared scheme.",
+      "ja": "0 = 成功、1 = 失敗が基本で、ツールチェーン共通のコード表はありません。コードはコマンドごとに決まっています。`jui verify --fail-on-diff` はドリフトで 1。`jui lint-strings` は検出ありで 2、実行できないときは 1。`jui lint-generated` はサイズのラチェット違反で 2、health の検出で 3。`jsonui-doc check` は不一致で 1、チェックを実行できないときは 2。`jsonui-test validate` はスキーマ違反やカバレッジの検出で 1。128 以上はシグナル終了です。CI で分岐するなら、共通の規則ではなく各コマンドの --help が記すコードを使ってください。"
     },
     "section_env_heading": {
       "en": "Environment variables",
@@ -9713,8 +9713,8 @@
       "ja": "Renderer SSoT コマンド (2026-07 追加)"
     },
     "section_ssot_body": {
-      "en": "The Renderer SSoT rollout added the `jui conformance` command family. `jui conformance generate` reads `shared/core/attribute_definitions.json` and emits fixture layouts + screen tests per component × attribute; `jui conformance report` collates the per-platform results into a matrix (rows = fixtures, columns = iOS / Android / Web) and prints where the three implementations disagree; `jui conformance compat-doc --platform android` renders KotlinJsonUI's `attribute_compatibility.md` from the SSoT + latest conformance results, replacing the hand-maintained table with a deterministic `@generated` artifact. `jui conformance coverage` (2026-07-29) answers a different question — not whether a fixture exists, but whether the converter actually reads the attribute — by scanning converter source rather than output, because a fixture for a dropped attribute renders a blank screen that matches its blank baseline and passes. It is a ratchet backed by `conformance/coverage.json`: a gap missing from the ledger fails, and so does a ledger entry whose gap is gone, otherwise the file rots into a list of things that used to be broken. The first measurement reported 209 gaps, and that number turned out to be mostly a declaration problem: attributes with no `platform` narrowing were counted against all three platforms, iOS-only concepts included. What followed (2026-07-31) fixed the input rather than the meter — platform-specific attributes now declare their surface, with a `platform_reasons` field carrying *why* an excluded platform is excluded; the scan became per component × attribute pair instead of matching bare attribute names, which surfaced 62 real gaps the flat scan had been hiding; and that backlog was then implemented. The ledger stood at 15 pairs when that backlog was cleared (5 genuinely unimplemented, UIKit-facing surfaces like the TextField accessory family, and 10 legacy aliases); measured with the tool itself at jsonui-cli 1.8.101, `jui conformance coverage` checks 1145 declared attribute/platform pairs and records 3 gaps (2 unimplemented, 1 legacy alias), each entry carrying the file-level evidence for why it is there. The `mode: uikit` attributes still sit outside the scan — SwiftJsonUI's Swift runtime reads those directly, and the scanner maps `uikit` to no hosted platform on purpose — a blind spot, not a clean bill of health; 85 was their count on 2026-07-31, and the scanner prints no current one. `jui generate attr-bindings [--lang swift|kotlin|ruby|all]` emits typed attribute extractors for the same SSoT — Swift structs / Kotlin data classes / Ruby modules — so converters read typed objects instead of raw JSON. Related: `normalizeLayouts` in `jui.config.json` is default-true since 2026-07 (opt out with `\"normalizeLayouts\": false`); it rewrites aliases to canonical names and stamps a `$jui` marker on distributed layouts, and `attribute_validator` treats that marker as a known key.",
-      "ja": "Renderer SSoT 化に伴い `jui conformance` コマンド群が追加されました。`jui conformance generate` は `shared/core/attribute_definitions.json` を読んでコンポーネント × 属性ごと の fixture layout と screen test を生成し、`jui conformance report` は各プラットフォーム の実行結果を突き合わせてマトリクス (行 = fixture / 列 = iOS・Android・Web) を出力、3 実装 が食い違う行を上部に別表で示します。`jui conformance compat-doc --platform android` は SSoT と最新 conformance 結果から KotlinJsonUI の `attribute_compatibility.md` を決定的に 生成し、手動維持だった表を `@generated` アーティファクトに置き換えます。`jui conformance coverage`（2026-07-29 追加）は別の問いに答えます — fixture があるかではなく、コンバータが実際にその属性を読んでいるか。出力ではなくコンバータのソースを走査します（属性を握り潰している fixture は空の画面が空の baseline と一致して pass してしまうため）。台帳は `conformance/coverage.json` でラチェットです — 台帳に無いギャップでも、解消済みなのに残っているエントリでも落ちます（そうしないと台帳が「昔壊れていたもの一覧」に腐るため）。初回計測は 209 件のギャップを報告しましたが、この数字の大半は宣言側の問題でした — `platform` の絞り込みが無い属性が iOS 固有の概念まで含めて 3 プラットフォームすべてに計上されていたためです。その後（2026-07-31）、計器ではなく入力が直されました。プラットフォーム固有の属性は宣言面を絞り、除外した理由を `platform_reasons` フィールドに持つようになり、走査は属性名の平坦な照合からコンポーネント × 属性の組単位になりました（これにより平坦な照合が隠していた本物のギャップ 62 組が浮上）。そしてそのバックログは実装されました。バックログを消化した時点の台帳は 15 組（本当に未実装の 5 組 — TextField のアクセサリ系など UIKit 向けの面 — と legacy エイリアス 10 組）でした。jsonui-cli 1.8.101 でツール自身で実測すると、`jui conformance coverage` は宣言済みの属性 × プラットフォーム 1145 組を検査し、ギャップ 3 件（未実装 2、legacy エイリアス 1）を記録しており、全エントリが「なぜそこにあるか」のファイルレベルの証跡を持ちます。`mode: uikit` の属性は引き続き走査対象外です（SwiftJsonUI の Swift ランタイムが直接読むため。走査側も `uikit` を意図的にどのプラットフォームにも対応付けていません）— これは「問題なし」ではなく盲点です。85 という数は 2026-07-31 時点の彼らの数で、走査は現在の数を印字しません。`jui generate attr-bindings [--lang swift|kotlin|ruby|all]` は同じ SSoT から 3 言語の 型付き属性抽出コード (Swift の struct / Kotlin の data class / Ruby module) を生成し、converter が生 JSON ではなく型付きオブジェクトを扱えるようにします。関連: `jui.config.json` の `normalizeLayouts` は 2026-07 以降 default true (`\"normalizeLayouts\": false` で opt-out)。配布時にエイリアスを正準名に書き換え、layout 先頭に `$jui` marker を刻印します。`attribute_validator` はその marker を known key として 扱うため zero warnings を維持できます。"
+      "en": "The Renderer SSoT rollout added the `jui conformance` command family. `jui conformance generate` reads `shared/core/attribute_definitions.json` and emits fixture layouts + screen tests per component × attribute; `jui conformance report` collates the per-platform results into a matrix (rows = fixtures, columns = iOS / Android / Web) and prints where the three implementations disagree; `jui conformance compat-doc --platform android` renders KotlinJsonUI's `attribute_compatibility.md` from the SSoT + latest conformance results, replacing the hand-maintained table with a deterministic `@generated` artifact. `jui conformance coverage` (2026-07-29) answers a different question — not whether a fixture exists, but whether the converter actually reads the attribute — by scanning converter source rather than output, because a fixture for a dropped attribute renders a blank screen that matches its blank baseline and passes. It is a ratchet backed by `conformance/coverage.json`: a gap missing from the ledger fails, and so does a ledger entry whose gap is gone, otherwise the file rots into a list of things that used to be broken. The first measurement reported 209 gaps, and that number turned out to be mostly a declaration problem: attributes with no `platform` narrowing were counted against all three platforms, iOS-only concepts included. What followed (2026-07-31) fixed the input rather than the meter — platform-specific attributes now declare their surface, with a `platform_reasons` field carrying *why* an excluded platform is excluded; the scan became per component × attribute pair instead of matching bare attribute names, which surfaced 62 real gaps the flat scan had been hiding; and that backlog was then implemented. The ledger stood at 15 pairs when that backlog was cleared (5 genuinely unimplemented, UIKit-facing surfaces like the TextField accessory family, and 10 legacy aliases); measured with the tool itself at jsonui-cli 1.8.101, `jui conformance coverage` checks 1145 declared attribute/platform pairs and records 3 gaps (2 unimplemented, 1 legacy alias), each entry carrying the file-level evidence for why it is there. The `mode: uikit` attributes still sit outside the scan — SwiftJsonUI's Swift runtime reads those directly, and the scanner maps `uikit` to no hosted platform on purpose — a blind spot, not a clean bill of health; 85 was their count on 2026-07-31, and the scanner prints no current one. `jui generate attr-bindings [--lang swift|kotlin|ruby|all]` emits typed attribute extractors for the same SSoT — Swift structs / Kotlin data classes / Ruby modules — so converters read typed objects instead of raw JSON. Related: `normalizeLayouts` in `jui.config.json` is default-true since 2026-07 (opt out with `\"build\": { \"normalizeLayouts\": false }` — a top-level key is not read); it rewrites aliases to canonical names and stamps a `$jui` marker on distributed layouts, and `attribute_validator` treats that marker as a known key.",
+      "ja": "Renderer SSoT 化に伴い `jui conformance` コマンド群が追加されました。`jui conformance generate` は `shared/core/attribute_definitions.json` を読んでコンポーネント × 属性ごと の fixture layout と screen test を生成し、`jui conformance report` は各プラットフォーム の実行結果を突き合わせてマトリクス (行 = fixture / 列 = iOS・Android・Web) を出力、3 実装 が食い違う行を上部に別表で示します。`jui conformance compat-doc --platform android` は SSoT と最新 conformance 結果から KotlinJsonUI の `attribute_compatibility.md` を決定的に 生成し、手動維持だった表を `@generated` アーティファクトに置き換えます。`jui conformance coverage`（2026-07-29 追加）は別の問いに答えます — fixture があるかではなく、コンバータが実際にその属性を読んでいるか。出力ではなくコンバータのソースを走査します（属性を握り潰している fixture は空の画面が空の baseline と一致して pass してしまうため）。台帳は `conformance/coverage.json` でラチェットです — 台帳に無いギャップでも、解消済みなのに残っているエントリでも落ちます（そうしないと台帳が「昔壊れていたもの一覧」に腐るため）。初回計測は 209 件のギャップを報告しましたが、この数字の大半は宣言側の問題でした — `platform` の絞り込みが無い属性が iOS 固有の概念まで含めて 3 プラットフォームすべてに計上されていたためです。その後（2026-07-31）、計器ではなく入力が直されました。プラットフォーム固有の属性は宣言面を絞り、除外した理由を `platform_reasons` フィールドに持つようになり、走査は属性名の平坦な照合からコンポーネント × 属性の組単位になりました（これにより平坦な照合が隠していた本物のギャップ 62 組が浮上）。そしてそのバックログは実装されました。バックログを消化した時点の台帳は 15 組（本当に未実装の 5 組 — TextField のアクセサリ系など UIKit 向けの面 — と legacy エイリアス 10 組）でした。jsonui-cli 1.8.101 でツール自身で実測すると、`jui conformance coverage` は宣言済みの属性 × プラットフォーム 1145 組を検査し、ギャップ 3 件（未実装 2、legacy エイリアス 1）を記録しており、全エントリが「なぜそこにあるか」のファイルレベルの証跡を持ちます。`mode: uikit` の属性は引き続き走査対象外です（SwiftJsonUI の Swift ランタイムが直接読むため。走査側も `uikit` を意図的にどのプラットフォームにも対応付けていません）— これは「問題なし」ではなく盲点です。85 という数は 2026-07-31 時点の彼らの数で、走査は現在の数を印字しません。`jui generate attr-bindings [--lang swift|kotlin|ruby|all]` は同じ SSoT から 3 言語の 型付き属性抽出コード (Swift の struct / Kotlin の data class / Ruby module) を生成し、converter が生 JSON ではなく型付きオブジェクトを扱えるようにします。関連: `jui.config.json` の `normalizeLayouts` は 2026-07 以降 default true (`\"build\": { \"normalizeLayouts\": false }` で opt-out。トップレベルに書いたキーは読まれない)。配布時にエイリアスを正準名に書き換え、layout 先頭に `$jui` marker を刻印します。`attribute_validator` はその marker を known key として 扱うため zero warnings を維持できます。"
     },
     "section_checks_heading": {
       "en": "Implementation contract checks (since 2026-07)",
@@ -10243,8 +10243,8 @@
       "ja": "jui.config.json"
     },
     "lead": {
-      "en": "Every key the toolchain reads from jui.config.json, in one place: core directories, platform roots, build normalization, API model generation, test install targets, doc contract checks, and lint bounds. Until now these were scattered across the pages that use them.",
-      "ja": "ツールチェーンが jui.config.json から読む全キーを 1 ページに集約: コアディレクトリ、プラットフォームルート、build 正規化、API モデル生成、テストのインストール先、ドキュメント契約チェック、lint 境界。これまで各機能のページに散在していた情報です。"
+      "en": "The keys the toolchain reads from jui.config.json that a project most often sets, in one place: core directories, platform roots, build normalization, API model generation, test install targets, doc contract checks, and lint bounds. Until now these were scattered across the pages that use them.",
+      "ja": "ツールチェーンが jui.config.json から読むキーのうち、プロジェクトがよく設定するものを 1 ページに集約: コアディレクトリ、プラットフォームルート、build 正規化、API モデル生成、テストのインストール先、ドキュメント契約チェック、lint 境界。これまで各機能のページに散在していた情報です。"
     },
     "read_time": {
       "en": "hand-maintained",
