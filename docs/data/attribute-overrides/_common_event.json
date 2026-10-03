@@ -12,7 +12,11 @@
       },
       "examples": [
         { "language": "json", "code": "{ \"type\": \"Button\", \"onClick\": \"@{onSave}\" }" }
-      ]
+      ],
+      "note": {
+        "en": "`onClick` declares a binding only, so a bare handler name (`\"onClick\": \"onSave\"`) is warned as `binding-bare-event` since jsonui-cli 1.9.6 — write `@{onSave}`. An event that also declares a string, such as lowercase `onclick`, still calls a bare name.",
+        "ja": "`onClick` は binding だけを宣言しているので、裸のハンドラ名（`\"onClick\": \"onSave\"`）は jsonui-cli 1.9.6 から `binding-bare-event` として警告されます — `@{onSave}` と書いてください。小文字の `onclick` のように string も宣言しているイベントは、裸の名前でも呼ばれます。"
+      }
     },
     "onclick": {
       "summary": {
