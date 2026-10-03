@@ -134,6 +134,25 @@ module JsonUIShared
     # a finding for the localize gate (`jui lint-strings`), never
     # something to register behind the SSoT's back.
     #
+    # A value is a string, or a string per language (`{"en": …, "ja": …}`,
+    # the shape jsonui-localize writes). A plain string that is the text
+    # wins, in any section, as through jsonui-cli 1.9.7; only when no section
+    # holds one is a per-language value whose language is the text looked
+    # for, and then only in the layout's OWN sections, and never for an empty
+    # text. So every text that resolved before 1.9.8 resolves to the same
+    # key, a text that resolved to nothing may now find its own section's
+    # per-language entry, and no text newly lands in a section the layout
+    # does not own — measured on two consumer apps before these limits: 28
+    # texts would have moved from a plain-string key to a per-language entry
+    # earlier in the same section, `""` resolved to an entry with an empty
+    # language, and a masked-password hint resolved to another screen's
+    # section, each a warning the build had not printed. Through
+    # 1.9.7 only a plain string matched, so sjui and kjui never looked a
+    # per-language entry up by its text while rjui's own lookup did (its
+    # first language, in file order) — ticket
+    # rjui-display-text-is-not-looked-up-by-the-text-a-key-holds, ruling
+    # 2026-10-03: one lookup on every face, through this method.
+    #
     # Returns { 'namespace', 'key', 'foreign', 'candidates' } — `foreign`
     # marks a resolution outside the layout's own spellings, `candidates`
     # lists every section that declared the same text so the caller can
@@ -141,12 +160,10 @@ module JsonUIShared
     def self.resolve_string_reference(strings_data, text, own_namespaces = [])
       return nil unless strings_data.is_a?(Hash)
 
-      matches = []
-      strings_data.each do |namespace, entries|
-        next unless entries.is_a?(Hash)
-
-        key = entries.key(text)
-        matches << [namespace, key] unless key.nil?
+      matches = string_matches(strings_data) { |value| value == text }
+      if matches.empty? && !text.to_s.empty?
+        owned_sections = strings_data.select { |namespace, _| own_namespaces.include?(namespace) }
+        matches = string_matches(owned_sections) { |value| value_holds_text?(value, text) }
       end
       return nil if matches.empty?
 
@@ -173,6 +190,25 @@ module JsonUIShared
         'foreign' => !own_namespaces.include?(namespace),
         'candidates' => matches.map(&:first)
       }
+    end
+
+    # A strings.json value holds `text` when it is that string, or a
+    # per-language Hash one of whose languages is that string.
+    def self.value_holds_text?(value, text)
+      return value == text unless value.is_a?(Hash)
+
+      value.values.include?(text)
+    end
+
+    # [namespace, key] for the first entry of each section whose value the
+    # block accepts, in file order.
+    def self.string_matches(strings_data)
+      strings_data.each_with_object([]) do |(namespace, entries), matches|
+        next unless entries.is_a?(Hash)
+
+        key, = entries.find { |_, value| yield(value) }
+        matches << [namespace, key] unless key.nil?
+      end
     end
 
     private
