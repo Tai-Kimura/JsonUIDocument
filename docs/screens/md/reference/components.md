@@ -6,6 +6,7 @@ Reference > Component reference. Overview page. Four sections + TOC + next-reads
 
 | | |
 |---|---|
+| Layout File | `reference/components` |
 | Created | 2026-04-23 |
 | Updated | 2026-04-23 |
 
@@ -88,10 +89,10 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
-| `componentCatalog` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
+| `componentCatalog` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

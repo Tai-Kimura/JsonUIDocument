@@ -6,6 +6,7 @@ Spec article — prose fields (description / notes / intent / purpose / processi
 
 | | |
 |---|---|
+| Layout File | `spec/texts-files` |
 | Created | 2026-09-28 |
 | Updated | 2026-09-30 |
 
@@ -89,9 +90,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Follow-up cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `[]` | Follow-up cards. | - |
 
 ### View-local Event Handlers
 

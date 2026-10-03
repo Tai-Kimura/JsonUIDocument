@@ -6,6 +6,7 @@ Essay: three ways to compose layouts — `include` (codegen inlines, shared VM),
 
 | | |
 |---|---|
+| Layout File | `concepts/screen-composition` |
 | Created | 2026-05-14 |
 | Updated | 2026-05-14 |
 
@@ -102,15 +103,15 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two follow-up cards. | - |
-| `onSeeAllTap` | String | (from binding) | - |
-| `subtitle` | String | (from binding) | - |
-| `title` | String | (from binding) | - |
-| `activeTab` | String | (from binding) | - |
-| `orders` | String | (from binding) | - |
-| `selectedOrderId` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two follow-up cards. | - |
+| `onSeeAllTap` | String | `-` | (from binding) | - |
+| `subtitle` | String | `-` | (from binding) | - |
+| `title` | String | `-` | (from binding) | - |
+| `activeTab` | String | `-` | (from binding) | - |
+| `orders` | String | `-` | (from binding) | - |
+| `selectedOrderId` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 
@@ -150,5 +151,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Seventh concepts essay. Companion to the Embed feature added in SwiftJsonUI 10.1.0 / KotlinJsonUI 2.8.0.
 - Focus on the *trade-off* between the three composition primitives — when each is the right answer, not how to write each one. The reference page (/reference/components/embed) documents the attribute shape; this page documents the choice.
 - Pairs with /spec/split-overview Pattern 6 — that page introduces Embed as a splitting pattern; this page explains why it differs from include and TabView.
+- 2026-10-02 — section_include_body gains the id prefix and the shared_data/data overlay; section_when_bullet_include no longer says the region's bindings must 'happen to match' the parent VM, since the include's data map binds differing names across. jsonui-cli 1.9.6 settles include semantics (user ruling 2026-10-02, 'follow the declaration; keep the maps as overrides'): an include is an inline expansion; the included layout reads the including screen's data, which that screen's ViewModel owns; an `id` on the include prefixes the included layout's data names; the include's `shared_data` then `data` maps are laid over that data. Web takes this meaning from 1.9.6; before it, a web partial kept defaults of its own.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

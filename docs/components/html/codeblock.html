@@ -163,98 +163,137 @@
 <div class="container">
 <h1>Code block <span class="badge badge-category">display</span></h1>
 <p>Syntax-highlighted fenced code block with optional filename caption, line numbers, line highlighting, copy-to-clipboard button, and scrollable max-height region. Web converter highlights via Shiki at SSG time; iOS/Android may render plain monospace or ship a lighter highlighter later.</p>
+<table class="meta-table">
+<tr><th>Name</th><td><code>CodeBlock</code></td></tr>
+<tr><th>Created</th><td>2026-04-22</td></tr>
+<tr><th>Updated</th><td>2026-04-22</td></tr>
+</table>
 <section id="props">
 <h2>Props</h2>
 <table>
-<thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+<thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>code</code></td>
 <td class="type">String</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Raw source code to render. Rendered verbatim; no interpolation is performed. Multi-line strings are permitted and expected.</td></tr>
+<td>Raw source code to render. Rendered verbatim; no interpolation is performed. Multi-line strings are permitted and expected.</td>
+<td>-</td></tr>
 <tr><td><code>language</code></td>
 <td class="type">String</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Syntax highlighting language identifier (Shiki grammar id). Common values: &#x27;json&#x27;, &#x27;jsonc&#x27;, &#x27;tsx&#x27;, &#x27;ts&#x27;, &#x27;js&#x27;, &#x27;swift&#x27;, &#x27;kotlin&#x27;, &#x27;bash&#x27;, &#x27;html&#x27;, &#x27;css&#x27;. Required for deterministic highlighting; pass &#x27;text&#x27; to disable.</td></tr>
+<td>Syntax highlighting language identifier (Shiki grammar id). Common values: &#x27;json&#x27;, &#x27;jsonc&#x27;, &#x27;tsx&#x27;, &#x27;ts&#x27;, &#x27;js&#x27;, &#x27;swift&#x27;, &#x27;kotlin&#x27;, &#x27;bash&#x27;, &#x27;html&#x27;, &#x27;css&#x27;. Required for deterministic highlighting; pass &#x27;text&#x27; to disable.</td>
+<td>-</td></tr>
 <tr><td><code>filename</code></td>
 <td class="type">String?</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Optional caption rendered above the block (e.g. &#x27;src/app/page.tsx&#x27;). When omitted, no caption is shown.</td></tr>
+<td>Optional caption rendered above the block (e.g. &#x27;src/app/page.tsx&#x27;). When omitted, no caption is shown.</td>
+<td>-</td></tr>
 <tr><td><code>showLineNumbers</code></td>
 <td class="type">Bool</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Render a left-side line-number gutter. Defaults to false.</td></tr>
+<td>Render a left-side line-number gutter. Defaults to false.</td>
+<td>-</td></tr>
 <tr><td><code>startLine</code></td>
 <td class="type">Int?</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>First line number when showLineNumbers is true. Defaults to 1. Useful when showing an excerpt from the middle of a larger file.</td></tr>
+<td>First line number when showLineNumbers is true. Defaults to 1. Useful when showing an excerpt from the middle of a larger file.</td>
+<td>-</td></tr>
 <tr><td><code>highlightLines</code></td>
 <td class="type">[Int]?</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>One-indexed line numbers to visually emphasize (e.g. added/changed lines). Indexing is relative to the code prop itself, not to startLine.</td></tr>
+<td>One-indexed line numbers to visually emphasize (e.g. added/changed lines). Indexing is relative to the code prop itself, not to startLine.</td>
+<td>-</td></tr>
 <tr><td><code>wrapLines</code></td>
 <td class="type">Bool</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Soft-wrap long lines instead of horizontal scrolling. Defaults to false (long lines overflow horizontally with the copy button still pinned).</td></tr>
+<td>Soft-wrap long lines instead of horizontal scrolling. Defaults to false (long lines overflow horizontally with the copy button still pinned).</td>
+<td>-</td></tr>
 <tr><td><code>copyable</code></td>
 <td class="type">Bool</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Render a copy-to-clipboard button in the top-right corner. Copy handling itself is built into the Web converter; this prop only toggles the button&#x27;s visibility. Defaults to true.</td></tr>
+<td>Render a copy-to-clipboard button in the top-right corner. Copy handling itself is built into the Web converter; this prop only toggles the button&#x27;s visibility. Defaults to true.</td>
+<td>-</td></tr>
 <tr><td><code>maxHeight</code></td>
 <td class="type">Int?</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Maximum rendered height in pixels; when set, the code region becomes vertically scrollable once content exceeds this height. Omit for unbounded height.</td></tr>
+<td>Maximum rendered height in pixels; when set, the code region becomes vertically scrollable once content exceeds this height. Omit for unbounded height.</td>
+<td>-</td></tr>
 <tr><td><code>theme</code></td>
 <td class="type">String?</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Optional per-instance Shiki theme override (e.g. &#x27;github-light&#x27;, &#x27;github-dark&#x27;, &#x27;nord&#x27;). Defaults to the project-wide theme pair configured by the converter.</td></tr>
+<td>Optional per-instance Shiki theme override (e.g. &#x27;github-light&#x27;, &#x27;github-dark&#x27;, &#x27;nord&#x27;). Defaults to the project-wide theme pair configured by the converter.</td>
+<td>-</td></tr>
 </tbody></table>
+<p class="notes"><strong>Notes:</strong> [&#x27;All rendering is static at build time on Web (Shiki SSG). No client-side highlighter is shipped.&#x27;, &#x27;iOS/Android initial implementation may render plain monospace text and ignore language/theme/highlightLines; props must still validate against this contract so spec references are portable.&#x27;]</p>
+</section>
+<section id="slots">
+<h2>Slots</h2>
+<table>
+<thead><tr><th>Name</th><th>Required</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+</tbody></table>
+<p class="notes"><strong>Notes:</strong> [&quot;CodeBlock is a leaf component. Children passed in a Layout JSON are ignored. Content is supplied exclusively via the &#x27;code&#x27; prop.&quot;]</p>
 </section>
 <section id="structure">
 <h2>Structure</h2>
+<h3>Layout Structure</h3>
+<pre class="layout-tree">
+code_block_root
+</pre>
 <h3>Components</h3>
 <table>
-<thead><tr><th>Type</th><th>ID</th><th>Description</th></tr></thead>
+<thead><tr><th>Type</th><th>ID</th><th>Bound To Prop</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>View</code></td>
 <td><code>code_block_root</code></td>
-<td>Root container of the code block (caption + code region + copy button)</td></tr>
+<td><code>-</code></td>
+<td>Root container of the code block (caption + code region + copy button)</td>
+<td>-</td></tr>
 </tbody></table>
 </section>
 <section id="state-management">
 <h2>State Management</h2>
 <h3>Internal States</h3>
 <table>
-<thead><tr><th>Name</th><th>Type</th><th>Initial Value</th><th>Description</th></tr></thead>
+<thead><tr><th>Name</th><th>Type</th><th>Initial Value</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>copied</code></td>
 <td class="type">Bool</td>
 <td class="default">-</td>
-<td>True for a short window after the user clicks the copy button; drives the &#x27;Copied!&#x27; affordance. Implementation detail of the converter; not part of the public props contract.</td></tr>
+<td>True for a short window after the user clicks the copy button; drives the &#x27;Copied!&#x27; affordance. Implementation detail of the converter; not part of the public props contract.</td>
+<td>-</td></tr>
 </tbody></table>
 <h3>Exposed Events</h3>
 <table>
-<thead><tr><th>Name</th><th>Parameters</th><th>Description</th></tr></thead>
+<thead><tr><th>Name</th><th>Parameters</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>onCopy</code></td>
 <td class="type">-</td>
-<td>Fired after the copy-to-clipboard action succeeds. Payload is the exact string that was placed on the clipboard. Intended for analytics; copying itself is built into the converter and does not depend on this handler being wired up.</td></tr>
+<td>Fired after the copy-to-clipboard action succeeds. Payload is the exact string that was placed on the clipboard. Intended for analytics; copying itself is built into the converter and does not depend on this handler being wired up.</td>
+<td>-</td></tr>
 </tbody></table>
 </section>
 <section id="usage">
 <h2>Usage</h2>
 <h3>Example</h3>
 <pre><code>{&#x27;layoutSnippet&#x27;: {&#x27;type&#x27;: &#x27;CodeBlock&#x27;, &#x27;language&#x27;: &#x27;bash&#x27;, &#x27;code&#x27;: &#x27;jui init&#x27;, &#x27;filename&#x27;: &#x27;shell&#x27;, &#x27;showLineNumbers&#x27;: False, &#x27;copyable&#x27;: True}, &#x27;description&#x27;: &#x27;Minimal CodeBlock usage inside a Layout JSON. See docs/plans/17-spec-templates.md §T4 for a fuller CLI-page context.&#x27;}</code></pre>
+</section>
+<section id="notes">
+<h2>Notes</h2>
+<ul>
+<li>Spec-first discipline: this spec MUST exist and validate before .jsonui-doc-rules.json registers &#x27;CodeBlock&#x27; in componentTypes.screen; the converter is then generated via `jui g converter --from codeblock.component.json` (later implementer step, not authored here).</li>
+<li>Web converter depends on the &#x27;shiki&#x27; package already present in jsonui-doc-web/package.json.</li>
+</ul>
 </section>
 </div>
 

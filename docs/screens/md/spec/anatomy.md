@@ -6,6 +6,7 @@ Field-by-field dictionary of screen_spec.json: metadata, structure, stateManagem
 
 | | |
 |---|---|
+| Layout File | `spec/anatomy` |
 | Created | 2026-04-24 |
 | Updated | 2026-04-24 |
 
@@ -85,10 +86,10 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two follow-up cards pointing at split-overview and writing-your-first-spec. | - |
-| `selectedOrderId` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two follow-up cards pointing at split-overview and writing-your-first-spec. | - |
+| `selectedOrderId` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

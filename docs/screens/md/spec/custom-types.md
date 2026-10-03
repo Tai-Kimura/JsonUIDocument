@@ -6,6 +6,7 @@ Pattern 4 of spec splitting — deep dive into dataFlow.customTypes. Declare sha
 
 | | |
 |---|---|
+| Layout File | `spec/custom-types` |
 | Created | 2026-04-24 |
 | Updated | 2026-04-24 |
 
@@ -88,9 +89,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Follow-up cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Follow-up cards. | - |
 
 ### View-local Event Handlers
 

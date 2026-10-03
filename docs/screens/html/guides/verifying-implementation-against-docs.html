@@ -157,6 +157,7 @@
 <h2>Overview</h2>
 <p>Cookbook companion to /concepts/implementation-contract-check. Walkthrough for setting up `jsonui-doc check` end-to-end: what OpenAPI diff catches vs skips, how to declare checkers in jui.config.json, a minimal FastAPI adapter script that exports the impl-side OpenAPI, how the same slot works for Spring / NestJS / Rails, running check locally + in CI with exit-code semantics, how results surface in generated HTML, and what still requires the full-checker plugin type (auth-required live-response verification). Seven H2 sections + TOC + next-reads. ~10-min read.</p>
 <table class="meta-table">
+<tr><th>Layout File</th><td><code>guides/verifying-implementation-against-docs</code></td></tr>
 <tr><th>Created</th><td>2026-07-07</td></tr>
 <tr><th>Updated</th><td>2026-07-07</td></tr>
 </table>
@@ -169,13 +170,14 @@
 <div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
 </div>
 <table class="tree-table">
-<thead><tr><th>Component</th><th>ID</th><th>Platform</th><th>Description</th><th>Bindings</th><th>Notes</th></tr></thead>
+<thead><tr><th>Component</th><th>ID</th><th>Platform</th><th>Description</th><th>Initial State</th><th>Bindings</th><th>Notes</th></tr></thead>
 <tbody>
 <tr data-row-id="1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:0px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>guides_verifying_implementation_against_docs_root</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=matchParent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>surface_muted</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -186,6 +188,7 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent weight=1</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-1" data-parent-id="1-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
@@ -194,12 +197,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-1-1" data-parent-id="1-1-1">
 <td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=wrapContent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink_subtle</code></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-event">event</span> <code>onClick</code> → <code>onNavigateGuides</code></div></div></td>
 <td>-</td>
 </tr>
@@ -210,12 +215,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink</code></div><div class="style-row"><span class="style-key">Font</span>36</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-1-3" data-parent-id="1-1-1">
 <td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink_muted</code></div><div class="style-row"><span class="style-key">Font</span>17</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -226,12 +233,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink_subtle</code></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2" data-parent-id="1-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>guides_verifying_implementation_against_docs_content_with_rail</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=horizontal</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -242,12 +251,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>H=wrapContent weight=1</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-1" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_what</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>surface_muted</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -258,12 +269,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink</code></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-1-2" data-parent-id="1-1-2-1-1">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink_muted</code></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -274,12 +287,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>surface_base</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-2-1" data-parent-id="1-1-2-1-2">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink</code></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -290,12 +305,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink_muted</code></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-2-3" data-parent-id="1-1-2-1-2">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -306,12 +323,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>surface_muted</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-3-1" data-parent-id="1-1-2-1-3">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink</code></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -322,12 +341,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink_muted</code></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-3-3" data-parent-id="1-1-2-1-3">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -338,12 +359,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>surface_base</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-1" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink</code></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -354,12 +377,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink_muted</code></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-3" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -370,12 +395,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>surface_muted</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-5-1" data-parent-id="1-1-2-1-5">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink</code></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -386,12 +413,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink_muted</code></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-5-3" data-parent-id="1-1-2-1-5">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -402,12 +431,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-6" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_html</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>surface_base</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -418,12 +449,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink</code></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-6-2" data-parent-id="1-1-2-1-6">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink_muted</code></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -434,12 +467,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-7" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_limits</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>surface_muted</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -450,12 +485,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink</code></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-7-2" data-parent-id="1-1-2-1-7">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink_muted</code></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -466,12 +503,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-7-4" data-parent-id="1-1-2-1-7">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -482,6 +521,7 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-8-1" data-parent-id="1-1-2-1-8">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
@@ -490,12 +530,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>chrome_ink</code></div><div class="style-row"><span class="style-key">Font</span>24</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-8-2" data-parent-id="1-1-2-1-8">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
 <td><code>guides_verifying_implementation_against_docs_next_collection</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=20</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>nextReadLinks</code></div></div></td>
 <td>-</td>
 </tr>
@@ -506,12 +548,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-9-1" data-parent-id="1-1-2-1-9">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>ink_faint</code></div><div class="style-row"><span class="style-key">Font</span>12</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -522,6 +566,7 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=260 H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-2-1" data-parent-id="1-1-2-2" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
@@ -530,12 +575,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>surface_muted</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-2-1-1" data-parent-id="1-1-2-2-1">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">TableOfContents</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -575,9 +622,9 @@ flowchart TD
 <h2>State Management</h2>
 <details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">1</span></summary>
 <table>
-<thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
+<thead><tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
-<tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td>Two follow-up cards: concepts/implementation-contract-check (the concept essay) and guides/api-data-models (the API DTO cookbook).</td><td>-</td></tr>
+<tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td><code>-</code></td><td>Two follow-up cards: concepts/implementation-contract-check (the concept essay) and guides/api-data-models (the API DTO cookbook).</td><td>-</td></tr>
 </tbody></table>
 </details>
 <details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">3</span></summary>
@@ -646,6 +693,7 @@ flowchart TD
 <li>Public repo hygiene: 汎用ドメイン (orders / users / products / items) 以外の具体語彙は使わない。上流の実地検証コーパス由来のテーブル名・カラム名・複合 index 構成を一切引用しない。impl_openapi_command の例は FastAPI 最小サンプル、実 API のパスも `/items` / `/users` に丸める。</li>
 <li>CodeBlocks needed: (1) jui.config.json checks 宣言 jsonc, (2) FastAPI export スクリプト python 5–8 行, (3) shell — 他 framework の 3 行 hint, (4) shell — jsonui-doc check --list / check api / exit code, (5) yaml — GitHub Actions 6–8 行 CI ステップ, (6) json — mismatch レポート行の例, (7) jsonc — フルチェッカー宣言, (8) python — httpx フルチェッカー 8–10 行 outline. Total: 8 CodeBlocks. すべて汎用ドメインで書く。</li>
 <li>Cross-links from other pages: (a) home RECENT_CHANGES entry to be added for both new pages, (b) /reference/cli-commands section_checks_body&#x27;s &#x27;具体 cookbook は今後追加予定&#x27; phrasing to be updated post-launch to link here (follow-up edit), (c) /concepts/implementation-contract-check next-reads points here (implemented in that spec).</li>
+<li>2026-10-03 — pin v1.9.7. Measured: the page&#x27;s CI recipe (`pip install git+…@v1.9.7#subdirectory=document_tools`, Python 3.12 venv) installs jsonui-doc-cli and jsonui-test-cli 1.9.7 with no shared/core in the venv. On this site&#x27;s tests (no branchContracts, no mock.swagger) both that copy and the checkout copy print &#x27;coverage not applicable&#x27; and pass. On a scratch copy with `branchContracts: {}` added to one spec, both fail: the checkout copy because mock.swagger is undeclared (cannot start), the pip copy with &#x27;Coverage: FAILED (gate unreadable in this tool tree)&#x27;. The unreadable line appears only in the pip arm. The section now says so and names the two fixes from the tool&#x27;s own message.</li>
 </ul>
 </section>
 </div>

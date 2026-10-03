@@ -163,78 +163,116 @@
 <div class="container">
 <h1>Table of contents <span class="badge badge-category">navigation</span></h1>
 <p>Compact, accessible &#x27;On this page&#x27; navigation that lists the section anchors of the current screen, visually emphasizes the currently in-view section, and scrolls to the target section on click. Used on long-form content pages (/learn/installation, /learn/hello-world, and eventually /reference/* and /guides/*). Web-only v1: the React converter registers under rjui_tools/lib/react/converters/extensions/.</p>
+<table class="meta-table">
+<tr><th>Name</th><td><code>TableOfContents</code></td></tr>
+<tr><th>Created</th><td>2026-04-23</td></tr>
+<tr><th>Updated</th><td>2026-04-23</td></tr>
+</table>
 <section id="props">
 <h2>Props</h2>
 <table>
-<thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+<thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>items</code></td>
 <td class="type">[TocItem]</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Required. Ordered list of entries to render. Each TocItem has: id (String, stable identifier used as React key and anchor fallback), label (String, user-visible text; may be a strings.json key or a pre-resolved string — implementer decides), anchor (String, the DOM fragment id to scroll to, without the leading &#x27;#&#x27;), level (Int?, 1 or 2, defaults to 1, drives nesting indentation). Authored by the page spec; v1 does NOT auto-extract from DOM headings.</td></tr>
+<td>Required. Ordered list of entries to render. Each TocItem has: id (String, stable identifier used as React key and anchor fallback), label (String, user-visible text; may be a strings.json key or a pre-resolved string — implementer decides), anchor (String, the DOM fragment id to scroll to, without the leading &#x27;#&#x27;), level (Int?, 1 or 2, defaults to 1, drives nesting indentation). Authored by the page spec; v1 does NOT auto-extract from DOM headings.</td>
+<td>-</td></tr>
 <tr><td><code>title</code></td>
 <td class="type">String?</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Optional heading rendered above the list (e.g. &#x27;On this page&#x27;). When omitted, the &lt;nav&gt; has no caption.</td></tr>
+<td>Optional heading rendered above the list (e.g. &#x27;On this page&#x27;). When omitted, the &lt;nav&gt; has no caption.</td>
+<td>-</td></tr>
 <tr><td><code>sticky</code></td>
 <td class="type">Bool?</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>When true, the component uses position: sticky with top: stickyOffset under a sufficiently tall viewport. Responsive behavior (stack at narrow widths) is the React component&#x27;s decision. Defaults to true.</td></tr>
+<td>When true, the component uses position: sticky with top: stickyOffset under a sufficiently tall viewport. Responsive behavior (stack at narrow widths) is the React component&#x27;s decision. Defaults to true.</td>
+<td>-</td></tr>
 <tr><td><code>stickyOffset</code></td>
 <td class="type">Int?</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Offset from viewport top, in pixels, used when sticky is true so the TOC doesn&#x27;t overlap a site header. Defaults to 80.</td></tr>
+<td>Offset from viewport top, in pixels, used when sticky is true so the TOC doesn&#x27;t overlap a site header. Defaults to 80.</td>
+<td>-</td></tr>
 <tr><td><code>activeAnchor</code></td>
 <td class="type">String?</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Binding-only input. When present, the row whose anchor matches this value is emphasized. When absent, the React component runs an IntersectionObserver to self-compute the active anchor. Supply this prop only when the consumer wants authoritative external control (e.g. router-scroll integration).</td></tr>
+<td>Binding-only input. When present, the row whose anchor matches this value is emphasized. When absent, the React component runs an IntersectionObserver to self-compute the active anchor. Supply this prop only when the consumer wants authoritative external control (e.g. router-scroll integration).</td>
+<td>-</td></tr>
 <tr><td><code>maxDepth</code></td>
 <td class="type">Int?</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Items whose level is greater than maxDepth are filtered out before rendering. Allows reusing one rich source list to render a shallow TOC. Defaults to 2.</td></tr>
+<td>Items whose level is greater than maxDepth are filtered out before rendering. Allows reusing one rich source list to render a shallow TOC. Defaults to 2.</td>
+<td>-</td></tr>
 </tbody></table>
+<p class="notes"><strong>Notes:</strong> [&quot;TocItem is an inline structural type described in the &#x27;items&#x27; prop above; it is not a standalone layout component and has no converter of its own.&quot;, &quot;Color, padding, font-size, and narrow-viewport breakpoints are intentionally unspecified and are the React component author&#x27;s call; this spec only pins behavior and data shape.&quot;, &quot;Deferred for a later revision (NOT in v1): autoScan (Bool?) to extract headings from the rendered DOM, collapsible (Bool?) to expand/collapse a level-1 section&#x27;s level-2 children, and any reading-position / progress-bar indicator.&quot;]</p>
+</section>
+<section id="slots">
+<h2>Slots</h2>
+<table>
+<thead><tr><th>Name</th><th>Required</th><th>Description</th><th>Notes</th></tr></thead>
+<tbody>
+</tbody></table>
+<p class="notes"><strong>Notes:</strong> [&quot;TableOfContents is a leaf component. Children passed in a Layout JSON are ignored. All content comes from the &#x27;items&#x27; prop.&quot;]</p>
 </section>
 <section id="structure">
 <h2>Structure</h2>
+<h3>Layout Structure</h3>
+<pre class="layout-tree">
+toc_root
+</pre>
 <h3>Components</h3>
 <table>
-<thead><tr><th>Type</th><th>ID</th><th>Description</th></tr></thead>
+<thead><tr><th>Type</th><th>ID</th><th>Bound To Prop</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>View</code></td>
 <td><code>toc_root</code></td>
-<td>Root &lt;nav aria-label=&#x27;On this page&#x27;&gt; container wrapping the optional title and the ordered anchor list.</td></tr>
+<td><code>-</code></td>
+<td>Root &lt;nav aria-label=&#x27;On this page&#x27;&gt; container wrapping the optional title and the ordered anchor list.</td>
+<td>-</td></tr>
 </tbody></table>
 </section>
 <section id="state-management">
 <h2>State Management</h2>
 <h3>Internal States</h3>
 <table>
-<thead><tr><th>Name</th><th>Type</th><th>Initial Value</th><th>Description</th></tr></thead>
+<thead><tr><th>Name</th><th>Type</th><th>Initial Value</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>computedActiveAnchor</code></td>
 <td class="type">String?</td>
 <td class="default">-</td>
-<td>Self-computed active anchor produced by the React component&#x27;s IntersectionObserver when the &#x27;activeAnchor&#x27; prop is not supplied. Implementation detail; not part of the public props contract.</td></tr>
+<td>Self-computed active anchor produced by the React component&#x27;s IntersectionObserver when the &#x27;activeAnchor&#x27; prop is not supplied. Implementation detail; not part of the public props contract.</td>
+<td>-</td></tr>
 </tbody></table>
 <h3>Exposed Events</h3>
 <table>
-<thead><tr><th>Name</th><th>Parameters</th><th>Description</th></tr></thead>
+<thead><tr><th>Name</th><th>Parameters</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>onSelect</code></td>
 <td class="type">-</td>
-<td>Fired when the user clicks an item. The component invokes onSelect(anchor) first (if wired) and then performs the native scroll-to-anchor. Optional: when not wired, default scroll behavior still runs.</td></tr>
+<td>Fired when the user clicks an item. The component invokes onSelect(anchor) first (if wired) and then performs the native scroll-to-anchor. Optional: when not wired, default scroll behavior still runs.</td>
+<td>-</td></tr>
 </tbody></table>
 </section>
 <section id="usage">
 <h2>Usage</h2>
 <h3>Example</h3>
 <pre><code>{&#x27;layoutSnippet&#x27;: {&#x27;type&#x27;: &#x27;TableOfContents&#x27;, &#x27;title&#x27;: &#x27;On this page&#x27;, &#x27;sticky&#x27;: True, &#x27;stickyOffset&#x27;: 80, &#x27;maxDepth&#x27;: 2, &#x27;items&#x27;: [{&#x27;id&#x27;: &#x27;toc_overview&#x27;, &#x27;label&#x27;: &#x27;Overview&#x27;, &#x27;anchor&#x27;: &#x27;overview&#x27;, &#x27;level&#x27;: 1}, {&#x27;id&#x27;: &#x27;toc_prerequisites&#x27;, &#x27;label&#x27;: &#x27;Prerequisites&#x27;, &#x27;anchor&#x27;: &#x27;prerequisites&#x27;, &#x27;level&#x27;: 1}, {&#x27;id&#x27;: &#x27;toc_install_cli&#x27;, &#x27;label&#x27;: &#x27;Install CLI&#x27;, &#x27;anchor&#x27;: &#x27;install-cli&#x27;, &#x27;level&#x27;: 2}, {&#x27;id&#x27;: &#x27;toc_install_mcp&#x27;, &#x27;label&#x27;: &#x27;Install MCP&#x27;, &#x27;anchor&#x27;: &#x27;install-mcp&#x27;, &#x27;level&#x27;: 2}, {&#x27;id&#x27;: &#x27;toc_next_steps&#x27;, &#x27;label&#x27;: &#x27;Next steps&#x27;, &#x27;anchor&#x27;: &#x27;next-steps&#x27;, &#x27;level&#x27;: 1}]}, &#x27;description&#x27;: &quot;Minimal TableOfContents usage inside a /learn/installation Layout JSON. Authored items mirror the page&#x27;s heading structure; level 2 rows are filtered out if maxDepth is set to 1.&quot;}</code></pre>
+</section>
+<section id="notes">
+<h2>Notes</h2>
+<ul>
+<li>Spec-first discipline (docs/plans/02-tech-stack.md §6.1): this file MUST exist and validate before .jsonui-doc-rules.json registers &#x27;TableOfContents&#x27; in componentTypes.screen; the converter is then generated via `jui g converter --from tableofcontents.component.json` (implementer step — not authored here).</li>
+<li>Sticky rationale: a sticky TOC keeps navigation in view on long-form pages without a persistent sidebar on narrow viewports. The component itself decides how to collapse below the breakpoint; this spec does not pin a pixel value.</li>
+<li>Scroll-spy rationale: &#x27;activeAnchor&#x27; as an optional external input keeps the component self-sufficient (IntersectionObserver fallback) while still allowing integrations (router hash sync, nested scroll containers) to take over when needed.</li>
+<li>Explicit NOT-YET (so the next implementer doesn&#x27;t re-derive): no DOM auto-scan of headings, no collapsible nesting, no reading-position/progress-bar indicator. Each would be a later additive prop with its own ADR.</li>
+<li>Related files (not authored here): jsonui-doc-web/rjui_tools/lib/react/converters/extensions/table_of_contents_converter.rb (converter scaffold target), jsonui-doc-web/rjui_tools/lib/react/converters/extensions/attribute_definitions/TableOfContents.json (attribute-def sidecar, scaffold target), jsonui-doc-web/src/components/extensions/TableOfContents.tsx (React component target).</li>
+</ul>
 </section>
 </div>
 

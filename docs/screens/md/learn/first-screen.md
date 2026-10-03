@@ -6,6 +6,7 @@ Learn > build a real screen. Goes beyond hello-world: the reader constructs a th
 
 | | |
 |---|---|
+| Layout File | `learn/first-screen` |
 | Created | 2026-04-23 |
 | Updated | 2026-04-23 |
 
@@ -99,21 +100,21 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
-| `codeTabs` | [TabHeaderCell] | Three-platform tab row for the ViewModel section (Swift / Kotlin / TypeScript). Active state drives background + foreground + border color on each tab via the shared cells/tab_header cell. | - |
-| `swiftCodeVisibility` | String | visible/gone toggle for the Swift code panel. Derived from activeCodeTab === 'swift'. Initial is 'visible' because swift is the default active tab. | - |
-| `kotlinCodeVisibility` | String | visible/gone toggle for the Kotlin code panel. Derived from activeCodeTab === 'kotlin'. | - |
-| `typescriptCodeVisibility` | String | visible/gone toggle for the TypeScript code panel. Derived from activeCodeTab === 'typescript'. | - |
-| `activities` | String | (from binding) | - |
-| `emptyVisibility` | String | (from binding) | - |
-| `onRefresh` | String | (from binding) | - |
-| `onToggleLanguage` | String | (from binding) | - |
-| `taglineKey` | String | (from binding) | - |
-| `welcomeKey` | String | (from binding) | - |
-| `detailKey` | String | (from binding) | - |
-| `titleKey` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
+| `codeTabs` | [TabHeaderCell] | `-` | Three-platform tab row for the ViewModel section (Swift / Kotlin / TypeScript). Active state drives background + foreground + border color on each tab via the shared cells/tab_header cell. | - |
+| `swiftCodeVisibility` | String | `-` | visible/gone toggle for the Swift code panel. Derived from activeCodeTab === 'swift'. Initial is 'visible' because swift is the default active tab. | - |
+| `kotlinCodeVisibility` | String | `-` | visible/gone toggle for the Kotlin code panel. Derived from activeCodeTab === 'kotlin'. | - |
+| `typescriptCodeVisibility` | String | `-` | visible/gone toggle for the TypeScript code panel. Derived from activeCodeTab === 'typescript'. | - |
+| `activities` | String | `-` | (from binding) | - |
+| `emptyVisibility` | String | `-` | (from binding) | - |
+| `onRefresh` | String | `-` | (from binding) | - |
+| `onToggleLanguage` | String | `-` | (from binding) | - |
+| `taglineKey` | String | `-` | (from binding) | - |
+| `welcomeKey` | String | `-` | (from binding) | - |
+| `detailKey` | String | `-` | (from binding) | - |
+| `titleKey` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

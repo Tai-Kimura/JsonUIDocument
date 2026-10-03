@@ -6,6 +6,7 @@ Catalog page for the Learn section. Lists every learn-track article with status 
 
 | | |
 |---|---|
+| Layout File | `learn_index` |
 | Created | 2026-04-23 |
 | Updated | 2026-08-25 |
 
@@ -61,9 +62,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `articles` | [LearnArticle] | Ordered catalog of learn-track articles. v1 seeds: Installation (live), Hello World (live), First Screen (upcoming), Data Binding Basics (upcoming), What is JsonUI (upcoming). Order is curriculum order — a beginner reads top-to-bottom. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `articles` | [LearnArticle] | `-` | Ordered catalog of learn-track articles. v1 seeds: Installation (live), Hello World (live), First Screen (upcoming), Data Binding Basics (upcoming), What is JsonUI (upcoming). Order is curriculum order — a beginner reads top-to-bottom. | - |
 
 ### View-local Event Handlers
 

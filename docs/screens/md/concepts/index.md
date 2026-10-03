@@ -6,6 +6,7 @@ Catalog page for the Concepts section: one card per concept article with its rea
 
 | | |
 |---|---|
+| Layout File | `concepts_index` |
 | Created | 2026-08-25 |
 | Updated | 2026-08-25 |
 
@@ -37,9 +38,9 @@ concepts_index_root
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `articles` | [CatalogEntry] | Ordered catalog of Concepts entries. Order is editorial, not alphabetical — it is the order a reader should meet them in. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `articles` | [CatalogEntry] | `-` | Ordered catalog of Concepts entries. Order is editorial, not alphabetical — it is the order a reader should meet them in. | - |
 
 ### View-local Event Handlers
 

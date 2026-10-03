@@ -6,6 +6,7 @@ Concept essay: what a screen is, how its id is derived, the runtime marker, and 
 
 | | |
 |---|---|
+| Layout File | `concepts/screen-identity` |
 | Created | 2026-07-27 |
 | Updated | 2026-07-27 |
 
@@ -109,9 +110,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Three follow-up cards: guides/testing (the wider DSL), concepts/screen-composition (co-present screens) and concepts/responsive-design (variants share an id). | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Three follow-up cards: guides/testing (the wider DSL), concepts/screen-composition (co-present screens) and concepts/responsive-design (variants share an id). | - |
 
 ### View-local Event Handlers
 

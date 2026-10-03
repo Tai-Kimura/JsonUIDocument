@@ -163,48 +163,74 @@
 <div class="container">
 <h1>Sidebar <span class="badge badge-category">navigation</span></h1>
 <p>Site-wide left-rail navigation. Renders a persistent vertical column that lists every documentation route grouped by category (Learn / Guides / Concepts / Reference / Platforms / Tools). Each section is a collapsible group with a leading category icon (rendered via the standard `Image` type against docs/screens/images/icon_&lt;sectionId&gt;.svg); under the header an `&lt;ul&gt;` of links where each row carries aria-current=&#x27;page&#x27; when the row URL matches the active route. Consumer (Chrome screen ViewModel) seeds the items catalog, owns the collapse state, and handles the toggle / link-tap events. Component stays presentational — it renders what it&#x27;s given and fires events; all state lives outside.</p>
+<table class="meta-table">
+<tr><th>Name</th><td><code>Sidebar</code></td></tr>
+<tr><th>Created</th><td>2026-04-23</td></tr>
+<tr><th>Updated</th><td>2026-04-24</td></tr>
+</table>
 <section id="props">
 <h2>Props</h2>
 <table>
-<thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+<thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>items</code></td>
 <td class="type">Array(SidebarSection)</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Ordered list of nav sections. Each section is a SidebarSection with id, label, iconName, and a list of entries. The consumer seeds this from a static catalog keyed by URL.</td></tr>
+<td>Ordered list of nav sections. Each section is a SidebarSection with id, label, iconName, and a list of entries. The consumer seeds this from a static catalog keyed by URL.</td>
+<td>-</td></tr>
 <tr><td><code>activeUrl</code></td>
 <td class="type">String</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Current route pathname (e.g. &#x27;/learn/installation&#x27;). The component marks the row whose url matches with aria-current=&#x27;page&#x27; and an accent styling.</td></tr>
+<td>Current route pathname (e.g. &#x27;/learn/installation&#x27;). The component marks the row whose url matches with aria-current=&#x27;page&#x27; and an accent styling.</td>
+<td>-</td></tr>
 <tr><td><code>collapsedIds</code></td>
 <td class="type">Array(String)</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>Ids of sections currently collapsed. Sections not in this list render expanded. Default: empty (all expanded).</td></tr>
+<td>Ids of sections currently collapsed. Sections not in this list render expanded. Default: empty (all expanded).</td>
+<td>-</td></tr>
 <tr><td><code>mobileOpen</code></td>
 <td class="type">Bool</td>
 <td><span class="badge badge-optional">Optional</span></td>
 <td class="default">-</td>
-<td>Under 1024px viewports the sidebar is hidden by default; flip this to true to slide it in as a drawer. CSS handles the transform; the component sets data-mobile-open accordingly.</td></tr>
+<td>Under 1024px viewports the sidebar is hidden by default; flip this to true to slide it in as a drawer. CSS handles the transform; the component sets data-mobile-open accordingly.</td>
+<td>-</td></tr>
 </tbody></table>
 </section>
 <section id="structure">
 <h2>Structure</h2>
+<h3>Layout Structure</h3>
+<pre class="layout-tree">
+sidebar_root
+</pre>
 <h3>Components</h3>
 <table>
-<thead><tr><th>Type</th><th>ID</th><th>Description</th></tr></thead>
+<thead><tr><th>Type</th><th>ID</th><th>Bound To Prop</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>View</code></td>
 <td><code>sidebar_root</code></td>
-<td>&lt;aside&gt; element — the sidebar column.</td></tr>
+<td><code>-</code></td>
+<td>&lt;aside&gt; element — the sidebar column.</td>
+<td>-</td></tr>
 </tbody></table>
 </section>
 <section id="usage">
 <h2>Usage</h2>
 <h3>Example</h3>
 <pre><code>{&#x27;layoutSnippet&#x27;: &#x27;{\n  &quot;type&quot;: &quot;Sidebar&quot;,\n  &quot;items&quot;: &quot;@{navItems}&quot;,\n  &quot;activeUrl&quot;: &quot;@{activeUrl}&quot;,\n  &quot;collapsedIds&quot;: &quot;@{collapsedIds}&quot;,\n  &quot;mobileOpen&quot;: &quot;@{mobileOpen}&quot;,\n  &quot;onToggleSection&quot;: &quot;@{onToggleSection}&quot;,\n  &quot;onLinkTap&quot;: &quot;@{onLinkTap}&quot;\n}&#x27;}</code></pre>
+</section>
+<section id="notes">
+<h2>Notes</h2>
+<ul>
+<li>Icon rendering uses CSS `mask-image: url(/images/icon_&lt;iconName&gt;.svg); background-color: currentColor` so the active / inactive icon colour can flip via CSS `color`. Direct &lt;img&gt; would ignore currentColor.</li>
+<li>Component self-localizes the outer `aria-label` via StringManager.getString(&#x27;chrome_sidebar_aria_label&#x27;) — no prop needed. Consumers can override via the standard aria-label pass-through if desired.</li>
+<li>All state is external. Component does NOT read localStorage, does NOT persist anything. Persistence is the ChromeViewModel&#x27;s concern.</li>
+<li>Responsive behavior is CSS-driven. Under 1024px the sidebar translates off-screen by default; setting mobileOpen=true slides it in. Consumer triggers this via the top-bar menu button.</li>
+<li>Every prop must be bound (`@{name}`). Array + String + Bool + event props all flow through the standard rjui binding pipeline.</li>
+<li>Entry-level `platforms` is optional and backward-compatible. When absent, rows render the way they always have (no pills). Pill labels are resolved through StringManager keys `sidebar_platform_ios` / `sidebar_platform_android` / `sidebar_platform_web` so they localize with the rest of the UI.</li>
+</ul>
 </section>
 </div>
 

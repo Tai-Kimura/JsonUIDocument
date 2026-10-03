@@ -6,6 +6,7 @@ Pattern 1 of spec splitting — deep dive into metadata.layoutFile: why almost e
 
 | | |
 |---|---|
+| Layout File | `spec/layout-file` |
 | Created | 2026-04-24 |
 | Updated | 2026-04-24 |
 
@@ -87,12 +88,12 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Follow-up cards. | - |
-| `ctaLabel` | String | (from binding) | - |
-| `headline` | String | (from binding) | - |
-| `onTapCta` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Follow-up cards. | - |
+| `ctaLabel` | String | `-` | (from binding) | - |
+| `headline` | String | `-` | (from binding) | - |
+| `onTapCta` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

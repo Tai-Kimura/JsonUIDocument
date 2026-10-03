@@ -6,6 +6,7 @@ Reference > MCP tool API. All 46 tools of jsonui-mcp-server (as of 2.15.0), grou
 
 | | |
 |---|---|
+| Layout File | `reference/mcp-tools` |
 | Created | 2026-04-23 |
 | Updated | 2026-09-30 |
 
@@ -83,10 +84,10 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `tools` | CollectionDataSource(McpToolDetail) | 39 MCP tools across 6 groups (A:8 / B:6 / C:7 / D:9 / E:3 / F:6). Each row carries name, group letter, role, and a preformatted parameters block. | - |
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `tools` | CollectionDataSource(McpToolDetail) | `-` | 39 MCP tools across 6 groups (A:8 / B:6 / C:7 / D:9 / E:3 / F:6). Each row carries name, group letter, role, and a preformatted parameters block. | - |
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
 
 ### View-local Event Handlers
 

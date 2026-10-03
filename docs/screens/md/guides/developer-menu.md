@@ -6,6 +6,7 @@ Guides > Developer menu. How to wrap an iOS (SwiftJsonUI) or Android (KotlinJson
 
 | | |
 |---|---|
+| Layout File | `guides/developer-menu` |
 | Created | 2026-04-24 |
 | Updated | 2026-09-30 |
 
@@ -118,9 +119,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
 
 ### View-local Event Handlers
 

@@ -6,6 +6,7 @@ Platforms > Android deep-dive. KotlinJsonUI + kjui CLI + Dynamic mode. Five sect
 
 | | |
 |---|---|
+| Layout File | `platforms/kotlin` |
 | Created | 2026-04-23 |
 | Updated | 2026-09-30 |
 
@@ -81,9 +82,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
 
 ### View-local Event Handlers
 

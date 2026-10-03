@@ -6,6 +6,7 @@ Pattern 3 of spec splitting — deep dive into component_spec.json. How to autho
 
 | | |
 |---|---|
+| Layout File | `spec/component-spec` |
 | Created | 2026-04-24 |
 | Updated | 2026-04-24 |
 
@@ -89,11 +90,11 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Follow-up cards. | - |
-| `metricsPoints` | String | (from binding) | - |
-| `onSelectPoint` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Follow-up cards. | - |
+| `metricsPoints` | String | `-` | (from binding) | - |
+| `onSelectPoint` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

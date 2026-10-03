@@ -6,6 +6,7 @@ Reference > Generated code. What `jui build` writes, the size bounds every gener
 
 | | |
 |---|---|
+| Layout File | `reference/generated-code` |
 | Created | 2026-07-28 |
 | Updated | 2026-07-28 |
 
@@ -86,9 +87,9 @@ reference_generated_code_root
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Three closing cards: CLI reference, SwiftJsonUI, KotlinJsonUI. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Three closing cards: CLI reference, SwiftJsonUI, KotlinJsonUI. | - |
 
 ### View-local Event Handlers
 

@@ -6,6 +6,7 @@ Task-focused guide: author a screen_spec.json end-to-end for a counter screen. C
 
 | | |
 |---|---|
+| Layout File | `guides/writing-your-first-spec` |
 | Created | 2026-04-23 |
 | Updated | 2026-04-24 |
 
@@ -128,9 +129,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two follow-up guides at the bottom (Navigation guide, Testing guide). | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two follow-up guides at the bottom (Navigation guide, Testing guide). | - |
 
 ### View-local Event Handlers
 

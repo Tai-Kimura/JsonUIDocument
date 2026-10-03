@@ -6,6 +6,7 @@ Guides > Contract gaps. Dedicated page (user-directed, with its own sidebar entr
 
 | | |
 |---|---|
+| Layout File | `guides/contract-gaps` |
 | Created | 2026-09-25 |
 | Updated | 2026-09-25 |
 
@@ -106,9 +107,9 @@ guides_contract_gaps_root
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Three closing cards: branch contracts (the declaration side), branch tests (the generated tests and the act window), unit contracts (what verifiedBy points at). | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Three closing cards: branch contracts (the declaration side), branch tests (the generated tests and the act window), unit contracts (what verifiedBy points at). | - |
 
 ### View-local Event Handlers
 

@@ -6,6 +6,7 @@ Learn > Hello World. The five-minute first-screen tutorial. Beginners (audience 
 
 | | |
 |---|---|
+| Layout File | `learn/hello-world` |
 | Created | 2026-04-22 |
 | Updated | 2026-09-30 |
 
@@ -96,20 +97,20 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `breadcrumbItems` | [BreadcrumbItem] | Two-entry breadcrumb row: Learn / Hello World. Seeded by onAppear. | - |
-| `prerequisites` | [Prerequisite] | Three required-tool rows (Node, macOS or JDK, a browser) rendered above the platform tabs. Seeded by onAppear. | - |
-| `commonSteps` | [QuickstartStep] | Steps that are identical across Swift / Kotlin / React: install the CLI, create a platform project (prose-only pointer), run `jui init` with the right flag, author the layout, `jui build` + `jui verify --fail-on-diff`. Rendered above the platform tabs so readers only see platform-specific commands once they pick their stack. | - |
-| `platformTabs` | [PlatformTab] | Tab-header data for the inline platform switcher. Exactly three entries: Swift / Kotlin / React. Each entry carries its own ordered [QuickstartStep] list of *platform-specific* steps only (ViewModel wiring + running the app + live-reload via `jui hotload listen` for mobile); the common install / init / author / build steps live in `commonSteps`. | - |
-| `activeTab` | String | Id of the currently selected platform tab ('swift' | 'kotlin' | 'react'). Defaults to 'react' because the documentation site itself ships web-only (platforms: ['web']) and React is the fastest route to a running Hello World for a web-only reader. Bound by visibility expressions in the layout to reveal exactly one platform's steps. | - |
-| `nextSteps` | [NextStepLink] | Two to three follow-up tutorial cards rendered below the platform tabs (Guides index, First screen, Data binding basics). Seeded by onAppear. | - |
-| `swiftPanelVisibility` | String | (from binding) | - |
-| `swiftSteps` | String | (from binding) | - |
-| `kotlinPanelVisibility` | String | (from binding) | - |
-| `kotlinSteps` | String | (from binding) | - |
-| `reactPanelVisibility` | String | (from binding) | - |
-| `reactSteps` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `breadcrumbItems` | [BreadcrumbItem] | `-` | Two-entry breadcrumb row: Learn / Hello World. Seeded by onAppear. | - |
+| `prerequisites` | [Prerequisite] | `-` | Three required-tool rows (Node, macOS or JDK, a browser) rendered above the platform tabs. Seeded by onAppear. | - |
+| `commonSteps` | [QuickstartStep] | `-` | Steps that are identical across Swift / Kotlin / React: install the CLI, create a platform project (prose-only pointer), run `jui init` with the right flag, author the layout, `jui build` + `jui verify --fail-on-diff`. Rendered above the platform tabs so readers only see platform-specific commands once they pick their stack. | - |
+| `platformTabs` | [PlatformTab] | `-` | Tab-header data for the inline platform switcher. Exactly three entries: Swift / Kotlin / React. Each entry carries its own ordered [QuickstartStep] list of *platform-specific* steps only (ViewModel wiring + running the app + live-reload via `jui hotload listen` for mobile); the common install / init / author / build steps live in `commonSteps`. | - |
+| `activeTab` | String | `-` | Id of the currently selected platform tab ('swift' | 'kotlin' | 'react'). Defaults to 'react' because the documentation site itself ships web-only (platforms: ['web']) and React is the fastest route to a running Hello World for a web-only reader. Bound by visibility expressions in the layout to reveal exactly one platform's steps. | - |
+| `nextSteps` | [NextStepLink] | `-` | Two to three follow-up tutorial cards rendered below the platform tabs (Guides index, First screen, Data binding basics). Seeded by onAppear. | - |
+| `swiftPanelVisibility` | String | `-` | (from binding) | - |
+| `swiftSteps` | String | `-` | (from binding) | - |
+| `kotlinPanelVisibility` | String | `-` | (from binding) | - |
+| `kotlinSteps` | String | `-` | (from binding) | - |
+| `reactPanelVisibility` | String | `-` | (from binding) | - |
+| `reactSteps` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 
@@ -171,5 +172,6 @@ activeTab == 'react':
 - activeTab defaults to 'react' because web-only readers (the default audience of this site) can reach a running Hello World fastest via rjui + Next.js; Swift and Kotlin tabs still render their CodeBlocks identically and are one click away.
 - QuickstartStep.code is optional because Step 5 ('What you should see') is a prose-only step without a CodeBlock; all other steps will carry code + language + filename at layout authoring time.
 - 2026-09-30 — The React run step said HMR re-runs the build on layout changes; the dev server does not run rjui, so a layout edit needs `jui build --web-only` first (as /concepts/hot-reload already said). The iOS run step now says the WebSocket notifies and the app re-fetches over HTTP. Android is Compose, not 'Compose (or XML)'. The prerequisites line points at Python 3.11+ and Ruby 3.2+ for the CLIs.
+- 2026-10-02 — the sample layout bound `"Tapped @{tapCount} times"`, the form jsonui-cli 1.9.6 warns as binding-mixed-text. The data block now declares `tapLabel` (String, "Tapped 0 times"); each sample ViewModel keeps a private tapCount and writes the sentence to tapLabel. step_author_instruction and the two step_viewmodel_* instructions follow. jsonui-cli 1.9.6 adds binding-mixed-text (WARNING, fails under --strict): an SSoT-declared attribute whose value contains `@{` but is not one whole `@{...}`. The user's ruling (2026-10-02) is that a sentence is assembled in the ViewModel and passed as one binding, because a layout-assembled sentence cannot be localized as one string and puts logic in the JSON.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

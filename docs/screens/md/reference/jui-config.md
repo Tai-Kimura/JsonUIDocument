@@ -6,6 +6,7 @@ Single-page reference for the jui.config.json keys a project most often sets (no
 
 | | |
 |---|---|
+| Layout File | `reference/jui-config` |
 | Created | 2026-08-01 |
 | Updated | 2026-09-30 |
 
@@ -99,9 +100,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | CollectionDataSource | Bottom next-read cards (CLI command reference, DB schema check). | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | CollectionDataSource | `-` | Bottom next-read cards (CLI command reference, DB schema check). | - |
 
 ### View-local Event Handlers
 

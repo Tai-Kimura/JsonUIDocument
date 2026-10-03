@@ -6,6 +6,7 @@ Tools > VS Code extension overview. Syntax highlighting, schema-aware completion
 
 | | |
 |---|---|
+| Layout File | `tools/helper` |
 | Created | 2026-04-23 |
 | Updated | 2026-04-23 |
 
@@ -79,9 +80,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
 
 ### View-local Event Handlers
 

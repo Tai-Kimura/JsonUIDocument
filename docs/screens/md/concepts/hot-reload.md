@@ -6,6 +6,7 @@ Essay: how hot reload works on each platform — Dynamic mode on iOS, Dynamic mo
 
 | | |
 |---|---|
+| Layout File | `concepts/hot-reload` |
 | Created | 2026-04-23 |
 | Updated | 2026-09-30 |
 
@@ -84,9 +85,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two follow-up essays. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two follow-up essays. | - |
 
 ### View-local Event Handlers
 

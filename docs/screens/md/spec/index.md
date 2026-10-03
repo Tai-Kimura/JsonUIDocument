@@ -6,6 +6,7 @@ Catalog page for the Spec section. Lists the eight spec-authoring articles (anat
 
 | | |
 |---|---|
+| Layout File | `spec_index` |
 | Created | 2026-08-01 |
 | Updated | 2026-08-25 |
 
@@ -61,9 +62,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `articles` | [SpecArticle] | Ordered catalog of spec-section articles. Order matches the sidebar: anatomy, split-overview, layout-file, parent-sub-spec, component-spec, custom-types, cell-classes, validation-and-drift. All eight are live. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `articles` | [SpecArticle] | `-` | Ordered catalog of spec-section articles. Order matches the sidebar: anatomy, split-overview, layout-file, parent-sub-spec, component-spec, custom-types, cell-classes, validation-and-drift. All eight are live. | - |
 
 ### View-local Event Handlers
 

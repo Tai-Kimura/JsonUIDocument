@@ -6,6 +6,7 @@ Top page. Three sections: hero (brand statement + three CTAs), featured cards (3
 
 | | |
 |---|---|
+| Layout File | `home` |
 | Created | 2026-04-22 |
 | Updated | 2026-05-27 |
 
@@ -167,11 +168,11 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `featuredLinks` | [FeaturedLink] | Three Featured Section cards rendered below the hero: Get started / AI agents / Cross-platform showcase. Hardcoded by the ViewModel in onAppear from the FEATURED_LINKS constant; each row's titleKey and descriptionKey are pre-resolved through StringManager so the cell renders display-ready text. | - |
-| `platformCards` | [PlatformCard] | Three platform cards (Swift / Kotlin / React) that link into each platform section. Hardcoded by the ViewModel in onAppear from the PLATFORM_CARDS constant. | - |
-| `recentChanges` | [ChangelogCard] | Up to 3–6 'What's new' ribbon cards telling a returning reader what landed since their last visit. Seeded by the ViewModel in onAppear from the RECENT_CHANGES constant; no API, no runtime fetch. Each cell carries a formatted date + title + blurb + CTA label, all localized. 2026-05 update (swagger-driven Data Models): three new 'May 2026' entries are appended in HomeViewModel.RECENT_CHANGES — (1) DTO + Domain codegen body -> /concepts/data-models-from-openapi, (2) path filter -> /guides/api-data-models §3, (3) MCP Group E discovery -> /concepts/data-models-from-openapi §7. Each entry stays a distinct row (no bundling) so the discovery surface keeps its own first-class card. The spec only confirms the ChangelogCard structure supports the three rows; the literal RECENT_CHANGES catalog content lives in HomeViewModel.ts and is jsonui-implement's responsibility. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `featuredLinks` | [FeaturedLink] | `-` | Three Featured Section cards rendered below the hero: Get started / AI agents / Cross-platform showcase. Hardcoded by the ViewModel in onAppear from the FEATURED_LINKS constant; each row's titleKey and descriptionKey are pre-resolved through StringManager so the cell renders display-ready text. | - |
+| `platformCards` | [PlatformCard] | `-` | Three platform cards (Swift / Kotlin / React) that link into each platform section. Hardcoded by the ViewModel in onAppear from the PLATFORM_CARDS constant. | - |
+| `recentChanges` | [ChangelogCard] | `-` | Up to 3–6 'What's new' ribbon cards telling a returning reader what landed since their last visit. Seeded by the ViewModel in onAppear from the RECENT_CHANGES constant; no API, no runtime fetch. Each cell carries a formatted date + title + blurb + CTA label, all localized. 2026-05 update (swagger-driven Data Models): three new 'May 2026' entries are appended in HomeViewModel.RECENT_CHANGES — (1) DTO + Domain codegen body -> /concepts/data-models-from-openapi, (2) path filter -> /guides/api-data-models §3, (3) MCP Group E discovery -> /concepts/data-models-from-openapi §7. Each entry stays a distinct row (no bundling) so the discovery surface keeps its own first-class card. The spec only confirms the ChangelogCard structure supports the three rows; the literal RECENT_CHANGES catalog content lives in HomeViewModel.ts and is jsonui-implement's responsibility. | - |
 
 ### View-local Event Handlers
 

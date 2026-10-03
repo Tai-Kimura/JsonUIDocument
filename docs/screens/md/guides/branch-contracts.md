@@ -6,6 +6,7 @@ Guides > Branch contracts. How the opt-in `branchContracts` section of a screen 
 
 | | |
 |---|---|
+| Layout File | `guides/branch-contracts` |
 | Created | 2026-08-24 |
 | Updated | 2026-08-24 |
 
@@ -92,9 +93,9 @@ guides_branch_contracts_root
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Three closing cards: writing your first spec, verifying implementation against docs, writing screen tests. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Three closing cards: writing your first spec, verifying implementation against docs, writing screen tests. | - |
 
 ### View-local Event Handlers
 

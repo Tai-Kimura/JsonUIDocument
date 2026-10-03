@@ -6,6 +6,7 @@ Essay: why a single Layout JSON drives SwiftUI, Jetpack Compose, and Next.js —
 
 | | |
 |---|---|
+| Layout File | `concepts/one-layout-json` |
 | Created | 2026-04-23 |
 | Updated | 2026-07-07 |
 
@@ -87,10 +88,10 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two follow-up essays. | - |
-| `onTap` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two follow-up essays. | - |
+| `onTap` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

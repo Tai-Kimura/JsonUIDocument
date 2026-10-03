@@ -6,6 +6,7 @@ Learn > Installation. The one-line bootstrap page. A beginner (audience A) must 
 
 | | |
 |---|---|
+| Layout File | `learn/installation` |
 | Created | 2026-04-23 |
 | Updated | 2026-09-30 |
 
@@ -170,18 +171,18 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `installTargets` | [InstallTargetCard] | Three 'what gets installed' cards rendered below the hero CTA (CLI / MCP / Agents). Seeded by onAppear from the static v1 catalog. | - |
-| `prerequisites` | [PrereqRow] | Five prerequisite rows (git+curl, Node.js >= 20, npm, Ruby >= 2.7, Python 3 >= 3.10) with a required/optional tier. Seeded by onAppear. | - |
-| `verifyRows` | [VerifyRow] | Three post-install verification rows (shell `jui --help`, MCP `search_components`, `/jsonui` slash command -> conductor). Seeded by onAppear. | - |
-| `troubleshootRows` | [TroubleshootRow] | Six troubleshooting rows; each row is individually expandable via onToggleExpand(row.id) so the cause+fix block is hidden until the user opens it. Seeded by onAppear. | - |
-| `relatedLinks` | [RelatedLink] | Five related-link rows at the bottom of the page (/tools/cli, /tools/mcp, /tools/agents, /learn/hello-world, /tools/mcp/tools/get-data-source). Seeded by onAppear. | - |
-| `expandedIds` | [String] | Canonical expand/collapse state for every expandable surface on this page. Contents: zero or more of the four section ids ('partial_update', 'custom_path', 'individual_install', 'uninstall') and any number of TroubleshootRow ids. onToggleExpand(id) toggles membership. The layout binds per-row visibility via `@{expandedIds contains id}` inside the TroubleshootRow cell, and the ViewModel exposes per-section derived visibility strings (see displayLogic) for the four section bodies. This is the canonical pattern for expandable sections in this project — future screens should reuse it rather than introducing custom Collapse / Details component types. | - |
-| `partialUpdateBodyVisibility` | String | (from binding) | - |
-| `customPathBodyVisibility` | String | (from binding) | - |
-| `individualInstallBodyVisibility` | String | (from binding) | - |
-| `uninstallBodyVisibility` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `installTargets` | [InstallTargetCard] | `-` | Three 'what gets installed' cards rendered below the hero CTA (CLI / MCP / Agents). Seeded by onAppear from the static v1 catalog. | - |
+| `prerequisites` | [PrereqRow] | `-` | Five prerequisite rows (git+curl, Node.js >= 20, npm, Ruby >= 2.7, Python 3 >= 3.10) with a required/optional tier. Seeded by onAppear. | - |
+| `verifyRows` | [VerifyRow] | `-` | Three post-install verification rows (shell `jui --help`, MCP `search_components`, `/jsonui` slash command -> conductor). Seeded by onAppear. | - |
+| `troubleshootRows` | [TroubleshootRow] | `-` | Six troubleshooting rows; each row is individually expandable via onToggleExpand(row.id) so the cause+fix block is hidden until the user opens it. Seeded by onAppear. | - |
+| `relatedLinks` | [RelatedLink] | `-` | Five related-link rows at the bottom of the page (/tools/cli, /tools/mcp, /tools/agents, /learn/hello-world, /tools/mcp/tools/get-data-source). Seeded by onAppear. | - |
+| `expandedIds` | [String] | `-` | Canonical expand/collapse state for every expandable surface on this page. Contents: zero or more of the four section ids ('partial_update', 'custom_path', 'individual_install', 'uninstall') and any number of TroubleshootRow ids. onToggleExpand(id) toggles membership. The layout binds per-row visibility via `@{expandedIds contains id}` inside the TroubleshootRow cell, and the ViewModel exposes per-section derived visibility strings (see displayLogic) for the four section bodies. This is the canonical pattern for expandable sections in this project — future screens should reuse it rather than introducing custom Collapse / Details component types. | - |
+| `partialUpdateBodyVisibility` | String | `-` | (from binding) | - |
+| `customPathBodyVisibility` | String | `-` | (from binding) | - |
+| `individualInstallBodyVisibility` | String | `-` | (from binding) | - |
+| `uninstallBodyVisibility` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

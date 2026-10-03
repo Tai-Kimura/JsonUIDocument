@@ -6,6 +6,7 @@ Guides > Writing screen tests. Nine sections + TOC + next-reads. There is no `ju
 
 | | |
 |---|---|
+| Layout File | `guides/testing` |
 | Created | 2026-04-23 |
 | Updated | 2026-09-30 |
 
@@ -161,9 +162,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
 
 ### View-local Event Handlers
 
@@ -214,5 +215,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - 2026-09-25 — v1.8.119: the validate bullet gains the element-id check and the coverage section. The element-id check was measured on this site. Under the 1.8.119 candidate, 27 steps in three tests named 13 ids no layout had ever carried: a per-page language toggle and a TabView the site no longer has. They were removed rather than declared (commit 9995946), and the line reads 'element ids: 200 named in the steps — 200 on a layout, 0 declared in test.appOwnedIds, 0 on no layout'.
 - 2026-09-28 — v1.9.0: the element-id check's finding is a WARNING since 1.9.0 and the coverage gate fails validate since 1.9.0 (both announced for 1.8.121, which was never released). Measured on a copy of this site with one seeded id under 1.9.0: `[WARN] … Element 'zz_control_no_such_id' is on no layout of this project …`, `Warnings: 1`, `Result: PASSED`, exit 0 — a WARNING does not fail the run. The site's own run is unchanged: 200 of 200 on a layout, coverage not applicable.
 - 2026-09-30 — Examples re-checked against the schemas: the screen anatomy's `{ "tap": ... }` step and the launch example's in-case `teardown` and missing `metadata` did not validate, and the flow anatomy used `cases` (a flow has root `steps`) and a checkpoint step (checkpoints are a root array with afterStep). All rewritten; every JSON example on the page now passes `jsonui-test validate` (jsonui-cli 1.9.5). addMedia's 'seeding accumulates' holds for iOS only: Android driver 1.15.6 re-seeds the fixture's own rows and 1.15.7 also removes rows an uninstall orphaned. The description said eight sections (the page has nine) and 'npm 1.0.0' for the drivers.
+- 2026-10-03 — pin v1.9.7: section_dsl_action_select_tab says a Segment tab is reachable by selectTab since 1.9.7, which gives each tab the id `<id>_tab_<n>` in generated code. Dynamic mode gets those ids in the next SwiftJsonUI / KotlinJsonUI releases (latest today: SwiftJsonUI v10.29.2 tag, KotlinJsonUI 2.43.0 on Maven Central). Per the orchestrator's 1.9.7 notice; not measured here.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

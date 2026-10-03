@@ -6,6 +6,7 @@ Flow diagram > Drawn from the specs, checked against the flow tests. The screen-
 
 | | |
 |---|---|
+| Layout File | `diagram/from-specs` |
 | Created | 2026-09-10 |
 | Updated | 2026-09-10 |
 
@@ -95,9 +96,9 @@ diagram_from_specs_root
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Three closing cards: testing (the files the check reads), screen identity (where a screen id comes from), navigation (how transitions are meant to be written). | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Three closing cards: testing (the files the check reads), screen identity (where a screen id comes from), navigation (how transitions are meant to be written). | - |
 
 ### View-local Event Handlers
 

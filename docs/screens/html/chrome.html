@@ -157,6 +157,7 @@
 <h2>Overview</h2>
 <p>Site-wide chrome composition: mounts the TopBar (sticky header with brand, Search, language toggle, mobile-menu button) and the Sidebar (persistent left rail grouping every documentation route into 6 collapsible category sections). Not a page — rendered by the Next.js RootLayout as a sibling of {children}. The ViewModel owns the static nav catalog, the per-section collapse state, the mobile-drawer open flag, and the active-route mirror that comes from Next.js&#x27;s usePathname().</p>
 <table class="meta-table">
+<tr><th>Layout File</th><td><code>chrome</code></td></tr>
 <tr><th>Created</th><td>2026-04-23</td></tr>
 <tr><th>Updated</th><td>2026-04-23</td></tr>
 </table>
@@ -169,7 +170,7 @@
 <div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
 </div>
 <table class="tree-table">
-<thead><tr><th>Component</th><th>ID</th><th>Platform</th><th>Description</th><th>Bindings</th><th>Notes</th></tr></thead>
+<thead><tr><th>Component</th><th>ID</th><th>Platform</th><th>Description</th><th>Initial State</th><th>Bindings</th><th>Notes</th></tr></thead>
 <tbody>
 <tr data-row-id="1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:0px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
@@ -178,12 +179,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1" data-parent-id="1">
 <td class="tree-col"><span class="tree-indent" style="width:16px"></span><span class="tree-spacer"></span><span class="component-type">TopBar</span></td>
 <td><code>chrome_topbar</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-event">event</span> <code>onToggleLanguage</code> → <code>onToggleLanguage</code></div><div><span class="bind-badge bind-event">event</span> <code>onToggleColorMode</code> → <code>onToggleColorMode</code></div><div><span class="bind-badge bind-event">event</span> <code>onToggleMobileMenu</code> → <code>onToggleMobileMenu</code></div><div><span class="bind-badge bind-data">bind</span> <code>currentLanguage</code> ↔ <code>currentLanguage</code></div><div><span class="bind-badge bind-data">bind</span> <code>currentColorMode</code> ↔ <code>currentColorMode</code></div></div></td>
 <td>-</td>
 </tr>
@@ -192,6 +195,7 @@
 <td><code>chrome_sidebar</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-event">event</span> <code>onToggleSection</code> → <code>onToggleSection</code></div><div><span class="bind-badge bind-event">event</span> <code>onLinkTap</code> → <code>onLinkTap</code></div><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>navItems</code></div><div><span class="bind-badge bind-data">bind</span> <code>activeUrl</code> ↔ <code>activeUrl</code></div><div><span class="bind-badge bind-data">bind</span> <code>collapsedIds</code> ↔ <code>collapsedIds</code></div><div><span class="bind-badge bind-data">bind</span> <code>mobileOpen</code> ↔ <code>mobileOpen</code></div></div></td>
 <td>-</td>
 </tr>
@@ -261,14 +265,14 @@ flowchart TD
 <h2>State Management</h2>
 <details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">6</span></summary>
 <table>
-<thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
+<thead><tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
-<tr><td><code>navItems</code></td><td>[SidebarSection]</td><td>Ordered nav catalog — six SidebarSection entries (learn / guides / concepts / reference / platforms / tools). Seeded by onAppear from the module-scope NAV_CATALOG constant; each entry&#x27;s label + every row&#x27;s label is pre-resolved through StringManager so the Sidebar component receives display-ready strings.</td><td>-</td></tr>
-<tr><td><code>activeUrl</code></td><td>String</td><td>Mirror of the current route. Set by the Chrome wrapper via onRouteChange(pathname) whenever Next.js&#x27;s usePathname() changes. Drives the aria-current=&#x27;page&#x27; highlight on the matching Sidebar row.</td><td>-</td></tr>
-<tr><td><code>collapsedIds</code></td><td>[String]</td><td>Section ids currently collapsed. onToggleSection flips membership. onRouteChange auto-removes the containing section so the user always sees the current route&#x27;s siblings without an extra click.</td><td>-</td></tr>
-<tr><td><code>mobileOpen</code></td><td>Bool</td><td>Mobile drawer open flag. True on viewports &lt;1024px when the user has tapped the top-bar menu button. Tapping any Sidebar link (onLinkTap) and tapping Escape both flip it back to false.</td><td>-</td></tr>
-<tr><td><code>currentLanguage</code></td><td>String</td><td>Mirror of StringManager.language. Drives the TopBar&#x27;s language-toggle display label (shows the OTHER language as an invitation to switch). Re-seeded inside onAppear on every language toggle so the chrome re-localizes in lockstep with generated pages.</td><td>-</td></tr>
-<tr><td><code>currentColorMode</code></td><td>String</td><td>Mirror of ColorManager.currentMode. Drives the TopBar&#x27;s theme-toggle icon (sun when the current mode is &#x27;light&#x27;, moon when &#x27;dark&#x27;). Seeded from ColorManager at construction and re-synced via ColorManager.subscribe() whenever the mode changes (manual toggle or prefers-color-scheme media query).</td><td>-</td></tr>
+<tr><td><code>navItems</code></td><td>[SidebarSection]</td><td><code>-</code></td><td>Ordered nav catalog — six SidebarSection entries (learn / guides / concepts / reference / platforms / tools). Seeded by onAppear from the module-scope NAV_CATALOG constant; each entry&#x27;s label + every row&#x27;s label is pre-resolved through StringManager so the Sidebar component receives display-ready strings.</td><td>-</td></tr>
+<tr><td><code>activeUrl</code></td><td>String</td><td><code>-</code></td><td>Mirror of the current route. Set by the Chrome wrapper via onRouteChange(pathname) whenever Next.js&#x27;s usePathname() changes. Drives the aria-current=&#x27;page&#x27; highlight on the matching Sidebar row.</td><td>-</td></tr>
+<tr><td><code>collapsedIds</code></td><td>[String]</td><td><code>-</code></td><td>Section ids currently collapsed. onToggleSection flips membership. onRouteChange auto-removes the containing section so the user always sees the current route&#x27;s siblings without an extra click.</td><td>-</td></tr>
+<tr><td><code>mobileOpen</code></td><td>Bool</td><td><code>-</code></td><td>Mobile drawer open flag. True on viewports &lt;1024px when the user has tapped the top-bar menu button. Tapping any Sidebar link (onLinkTap) and tapping Escape both flip it back to false.</td><td>-</td></tr>
+<tr><td><code>currentLanguage</code></td><td>String</td><td><code>-</code></td><td>Mirror of StringManager.language. Drives the TopBar&#x27;s language-toggle display label (shows the OTHER language as an invitation to switch). Re-seeded inside onAppear on every language toggle so the chrome re-localizes in lockstep with generated pages.</td><td>-</td></tr>
+<tr><td><code>currentColorMode</code></td><td>String</td><td><code>-</code></td><td>Mirror of ColorManager.currentMode. Drives the TopBar&#x27;s theme-toggle icon (sun when the current mode is &#x27;light&#x27;, moon when &#x27;dark&#x27;). Seeded from ColorManager at construction and re-synced via ColorManager.subscribe() whenever the mode changes (manual toggle or prefers-color-scheme media query).</td><td>-</td></tr>
 </tbody></table>
 </details>
 <details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">7</span></summary>

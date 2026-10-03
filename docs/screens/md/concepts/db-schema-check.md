@@ -6,6 +6,7 @@ Concept essay: the builtin db-schema checker in `jsonui-doc check` — how docs/
 
 | | |
 |---|---|
+| Layout File | `concepts/db-schema-check` |
 | Created | 2026-07-24 |
 | Updated | 2026-07-24 |
 
@@ -89,9 +90,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Three follow-up cards: concepts/implementation-contract-check (umbrella concept), guides/verifying-implementation-against-docs (cookbook) and reference/cli-commands (command details). | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Three follow-up cards: concepts/implementation-contract-check (umbrella concept), guides/verifying-implementation-against-docs (cookbook) and reference/cli-commands (command details). | - |
 
 ### View-local Event Handlers
 

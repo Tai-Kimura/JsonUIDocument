@@ -6,6 +6,7 @@ Segmented control — mutually exclusive horizontal button group. Shows 2–5 op
 
 | | |
 |---|---|
+| Layout File | `reference/components/segment` |
 | Created | 2026-08-25 |
 | Updated | 2026-08-25 |
 
@@ -110,54 +111,56 @@ flowchart TD
 
 #### AttributeReferenceRepository
 
+Fetches merged attribute reference data.
+
 - `async fetchComponent(name: String)` → `RefComponentData` — GET /data/attribute-reference/components/<kebab(name)>.json
 
 ## State Management
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `kicker` | String | (from binding) | - |
-| `badges` | String | (from binding) | - |
-| `kickerParentLabel` | String | (from binding) | - |
-| `title` | String | (from binding) | - |
-| `copyTypeVisibility` | String | (from binding) | - |
-| `aliasCalloutVisibility` | String | (from binding) | - |
-| `aliasNotice` | String | (from binding) | - |
-| `description` | String | (from binding) | - |
-| `canonicalCode` | String | (from binding) | - |
-| `canonicalLanguage` | String | (from binding) | - |
-| `statRequiredText` | String | (from binding) | - |
-| `statOptionalText` | String | (from binding) | - |
-| `statEventsText` | String | (from binding) | - |
-| `usageVisibility` | String | (from binding) | - |
-| `usage` | String | (from binding) | - |
-| `attributeCategories` | String | (from binding) | - |
-| `groupCommonVisibility` | String | (from binding) | - |
-| `attributesCommon` | String | (from binding) | - |
-| `groupStyleVisibility` | String | (from binding) | - |
-| `attributesStyle` | String | (from binding) | - |
-| `groupLayoutVisibility` | String | (from binding) | - |
-| `attributesLayout` | String | (from binding) | - |
-| `groupSpacingVisibility` | String | (from binding) | - |
-| `attributesSpacing` | String | (from binding) | - |
-| `groupAlignmentVisibility` | String | (from binding) | - |
-| `attributesAlignment` | String | (from binding) | - |
-| `groupStateVisibility` | String | (from binding) | - |
-| `attributesState` | String | (from binding) | - |
-| `groupBindingVisibility` | String | (from binding) | - |
-| `attributesBinding` | String | (from binding) | - |
-| `groupEventVisibility` | String | (from binding) | - |
-| `attributesEvent` | String | (from binding) | - |
-| `groupResponsiveVisibility` | String | (from binding) | - |
-| `attributesResponsive` | String | (from binding) | - |
-| `groupMiscVisibility` | String | (from binding) | - |
-| `attributesMisc` | String | (from binding) | - |
-| `examples` | String | (from binding) | - |
-| `relatedComponents` | String | (from binding) | - |
-| `nextReadLinks` | String | (from binding) | - |
-| `tocEntries` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `kicker` | String | `-` | (from binding) | - |
+| `badges` | String | `-` | (from binding) | - |
+| `kickerParentLabel` | String | `-` | (from binding) | - |
+| `title` | String | `-` | (from binding) | - |
+| `copyTypeVisibility` | String | `-` | (from binding) | - |
+| `aliasCalloutVisibility` | String | `-` | (from binding) | - |
+| `aliasNotice` | String | `-` | (from binding) | - |
+| `description` | String | `-` | (from binding) | - |
+| `canonicalCode` | String | `-` | (from binding) | - |
+| `canonicalLanguage` | String | `-` | (from binding) | - |
+| `statRequiredText` | String | `-` | (from binding) | - |
+| `statOptionalText` | String | `-` | (from binding) | - |
+| `statEventsText` | String | `-` | (from binding) | - |
+| `usageVisibility` | String | `-` | (from binding) | - |
+| `usage` | String | `-` | (from binding) | - |
+| `attributeCategories` | String | `-` | (from binding) | - |
+| `groupCommonVisibility` | String | `-` | (from binding) | - |
+| `attributesCommon` | String | `-` | (from binding) | - |
+| `groupStyleVisibility` | String | `-` | (from binding) | - |
+| `attributesStyle` | String | `-` | (from binding) | - |
+| `groupLayoutVisibility` | String | `-` | (from binding) | - |
+| `attributesLayout` | String | `-` | (from binding) | - |
+| `groupSpacingVisibility` | String | `-` | (from binding) | - |
+| `attributesSpacing` | String | `-` | (from binding) | - |
+| `groupAlignmentVisibility` | String | `-` | (from binding) | - |
+| `attributesAlignment` | String | `-` | (from binding) | - |
+| `groupStateVisibility` | String | `-` | (from binding) | - |
+| `attributesState` | String | `-` | (from binding) | - |
+| `groupBindingVisibility` | String | `-` | (from binding) | - |
+| `attributesBinding` | String | `-` | (from binding) | - |
+| `groupEventVisibility` | String | `-` | (from binding) | - |
+| `attributesEvent` | String | `-` | (from binding) | - |
+| `groupResponsiveVisibility` | String | `-` | (from binding) | - |
+| `attributesResponsive` | String | `-` | (from binding) | - |
+| `groupMiscVisibility` | String | `-` | (from binding) | - |
+| `attributesMisc` | String | `-` | (from binding) | - |
+| `examples` | String | `-` | (from binding) | - |
+| `relatedComponents` | String | `-` | (from binding) | - |
+| `nextReadLinks` | String | `-` | (from binding) | - |
+| `tocEntries` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

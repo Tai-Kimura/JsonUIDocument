@@ -6,6 +6,7 @@ Guides > Writing layouts. Task-focused walk-through of how to author layout JSON
 
 | | |
 |---|---|
+| Layout File | `guides/writing-layouts` |
 | Created | 2026-04-24 |
 | Updated | 2026-04-24 |
 
@@ -116,19 +117,19 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
-| `onHeroInstallTap` | String | (from binding) | - |
-| `onBack` | String | (from binding) | - |
-| `label` | String | (from binding) | - |
-| `agents` | String | (from binding) | - |
-| `nameKey` | String | (from binding) | - |
-| `roleKey` | String | (from binding) | - |
-| `whenToUseKey` | String | (from binding) | - |
-| `referenceSections` | String | (from binding) | - |
-| `errorMessage` | String | (from binding) | - |
-| `errorVisibility` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
+| `onHeroInstallTap` | String | `-` | (from binding) | - |
+| `onBack` | String | `-` | (from binding) | - |
+| `label` | String | `-` | (from binding) | - |
+| `agents` | String | `-` | (from binding) | - |
+| `nameKey` | String | `-` | (from binding) | - |
+| `roleKey` | String | `-` | (from binding) | - |
+| `whenToUseKey` | String | `-` | (from binding) | - |
+| `referenceSections` | String | `-` | (from binding) | - |
+| `errorMessage` | String | `-` | (from binding) | - |
+| `errorVisibility` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 
@@ -171,5 +172,7 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Cross-links: the five existing guides' next-reads will be touched in a follow-up so at least custom-components points to this guide as a natural follow-on.
 - 2026-09-03 - section_collection_basic_bullet_lazy was wrong: it described `lazy` as a boolean (true / false) while the attribute SSoT declares a string enum 'lazy' | 'eager' | 'none' (or a binding). Measured at 1.8.20 in a scratch copy: a Collection with lazy:false gets the build warning 'Attribute lazy in Collection expects string or binding, got boolean', and lazy:'none' gets none. Rewritten with the three values and the 1.8.20 flow scroll rule (with lazy in effect a flow Collection scrolls inside its own bounds; 'none' only wraps). Found by comparing the site's words with the SSoT sentence the release changed - the declaration itself reaches no runtime file here.
 - 2026-09-03, a published page was printing an identifier. The full-namespace live check (every key of guides_writing_layouts, both languages) reported section_collection_basic_bullet_scrollEnabled absent; the page was rendering the KEY NAME where the bullet belongs. Cause is upstream: rjui's layout-to-TSX conversion does not recognise a string key containing an uppercase letter and emits it as literal text - the sibling bullets became {$s....BulletLazy} lookups while this one became the bare word. jui build exits 0 with zero warnings and every gate was green, so nothing here could have caught it. Of this site's 1988 string keys exactly two carried an uppercase letter and both were broken and published (the other is on the developer-menu page); renaming them to lowercase, with their layout references, restored the lookup. Filed upstream. Two unseeded leftovers, next_custom_components_title and _description, were removed from this namespace at the same time - the reference_components copies are the ones the view model reads.
+- 2026-10-02 — section_include_body rewritten for 1.9.6. jsonui-cli 1.9.6 settles include semantics (user ruling 2026-10-02, 'follow the declaration; keep the maps as overrides'): an include is an inline expansion; the included layout reads the including screen's data, which that screen's ViewModel owns; an `id` on the include prefixes the included layout's data names; the include's `shared_data` then `data` maps are laid over that data. Web takes this meaning from 1.9.6; before it, a web partial kept defaults of its own. The sentence that said the include 'passes any shared_data / data fields on the include as props' is gone: that was the pre-1.9.6 web convention. section_binding_body: 'starts with @{name}' becomes 'is one whole @{name}', and the mixed form is named as warned. jsonui-cli 1.9.6 adds binding-mixed-text (WARNING, fails under --strict): an SSoT-declared attribute whose value contains `@{` but is not one whole `@{...}`. The user's ruling (2026-10-02) is that a sentence is assembled in the ViewModel and passed as one binding, because a layout-assembled sentence cannot be localized as one string and puts logic in the JSON.
+- 2026-10-02 — section_include_note_depth said include was one level deep, with the included file's includes not followed. That was false before 1.9.6 as well: upstream reports that every expander (sjui / kjui / rjui / Python / the SJUI and KJUI runtimes) expands nesting recursively and stops on a cycle with an error. The bullet now states recursion and the nested data rules: prefixes compose (side + card + title → sideCardTitle); an inner map's values bind in the outer partial's scope, after the outer map; an inner include without a map only takes the prefix. Upstream's word, relayed by the orchestrator; not measured here.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

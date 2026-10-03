@@ -6,6 +6,7 @@ Essay: how the `responsive` block flips attribute values per size class so the s
 
 | | |
 |---|---|
+| Layout File | `concepts/responsive-design` |
 | Created | 2026-05-08 |
 | Updated | 2026-05-08 |
 
@@ -109,9 +110,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two follow-up cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two follow-up cards. | - |
 
 ### View-local Event Handlers
 

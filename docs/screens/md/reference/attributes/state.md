@@ -6,6 +6,7 @@ State attributes control visibility, interaction, and opacity. Most are Boolean;
 
 | | |
 |---|---|
+| Layout File | `reference/attributes/state` |
 | Created | 2026-08-25 |
 | Updated | 2026-08-25 |
 
@@ -73,26 +74,28 @@ flowchart TD
 
 #### AttributeReferenceRepository
 
+Fetches merged attribute reference data.
+
 - `async fetchCategory(category: String)` → `RefCategoryData` — GET /data/attribute-reference/attributes/<category>.json
 
 ## State Management
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `kicker` | String | (from binding) | - |
-| `badges` | String | (from binding) | - |
-| `kickerParentLabel` | String | (from binding) | - |
-| `title` | String | (from binding) | - |
-| `copyTypeVisibility` | String | (from binding) | - |
-| `aliasCalloutVisibility` | String | (from binding) | - |
-| `aliasNotice` | String | (from binding) | - |
-| `description` | String | (from binding) | - |
-| `overviewRows` | String | (from binding) | - |
-| `attributes` | String | (from binding) | - |
-| `nextReadLinks` | String | (from binding) | - |
-| `tocEntries` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `kicker` | String | `-` | (from binding) | - |
+| `badges` | String | `-` | (from binding) | - |
+| `kickerParentLabel` | String | `-` | (from binding) | - |
+| `title` | String | `-` | (from binding) | - |
+| `copyTypeVisibility` | String | `-` | (from binding) | - |
+| `aliasCalloutVisibility` | String | `-` | (from binding) | - |
+| `aliasNotice` | String | `-` | (from binding) | - |
+| `description` | String | `-` | (from binding) | - |
+| `overviewRows` | String | `-` | (from binding) | - |
+| `attributes` | String | `-` | (from binding) | - |
+| `nextReadLinks` | String | `-` | (from binding) | - |
+| `tocEntries` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

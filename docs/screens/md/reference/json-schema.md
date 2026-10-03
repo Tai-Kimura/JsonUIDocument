@@ -6,6 +6,7 @@ Reference > JSON Schema. Overview page. Four sections + TOC + next-reads. Genera
 
 | | |
 |---|---|
+| Layout File | `reference/json-schema` |
 | Created | 2026-04-23 |
 | Updated | 2026-04-23 |
 
@@ -78,9 +79,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
 
 ### View-local Event Handlers
 

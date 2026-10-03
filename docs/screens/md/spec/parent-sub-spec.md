@@ -6,6 +6,7 @@ Pattern 2 of spec splitting — deep dive into screen_parent_spec + screen_sub_s
 
 | | |
 |---|---|
+| Layout File | `spec/parent-sub-spec` |
 | Created | 2026-04-24 |
 | Updated | 2026-08-28 |
 
@@ -93,9 +94,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Follow-up cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Follow-up cards. | - |
 
 ### View-local Event Handlers
 

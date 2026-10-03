@@ -6,6 +6,7 @@ Guides > Navigation between screens. Six sections + TOC + next-reads. Corrects t
 
 | | |
 |---|---|
+| Layout File | `guides/navigation` |
 | Created | 2026-04-23 |
 | Updated | 2026-04-24 |
 
@@ -101,9 +102,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
 
 ### View-local Event Handlers
 

@@ -163,48 +163,73 @@
 <div class="container">
 <h1>TopBar <span class="badge badge-category">navigation</span></h1>
 <p>Site-wide sticky header. Renders as a 56px fixed bar at the viewport top containing (left→right): a hamburger button that is only visible under 1024px (fires onToggleMobileMenu), a brand mark linking to brandHref (usually &#x27;/&#x27;), a flexible spacer, the Search trigger instance (reuses the existing Search component), and a language toggle pill that fires onToggleLanguage. Component self-localizes its aria labels via StringManager; the language-toggle label flips between the two configured language display strings based on currentLanguage.</p>
+<table class="meta-table">
+<tr><th>Name</th><td><code>TopBar</code></td></tr>
+<tr><th>Created</th><td>2026-04-23</td></tr>
+<tr><th>Updated</th><td>2026-04-23</td></tr>
+</table>
 <section id="props">
 <h2>Props</h2>
 <table>
-<thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+<thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>brandLabel</code></td>
 <td class="type">String</td>
 <td><span class="badge badge-optional">Optional</span></td>
 <td class="default">-</td>
-<td>Brand mark label. Passed through StringManager (snake_case key) so the chrome namespace localizes it.</td></tr>
+<td>Brand mark label. Passed through StringManager (snake_case key) so the chrome namespace localizes it.</td>
+<td>-</td></tr>
 <tr><td><code>brandHref</code></td>
 <td class="type">String</td>
 <td><span class="badge badge-optional">Optional</span></td>
 <td class="default">-</td>
-<td>Where the brand link navigates. Almost always &#x27;/&#x27; — exposed as a prop so a future embedded variant can point elsewhere.</td></tr>
+<td>Where the brand link navigates. Almost always &#x27;/&#x27; — exposed as a prop so a future embedded variant can point elsewhere.</td>
+<td>-</td></tr>
 <tr><td><code>currentLanguage</code></td>
 <td class="type">String</td>
 <td><span class="badge badge-required">Required</span></td>
 <td class="default">-</td>
-<td>&#x27;en&#x27; or &#x27;ja&#x27;. Drives the language toggle&#x27;s display label (shows the OTHER language as an invitation to switch).</td></tr>
+<td>&#x27;en&#x27; or &#x27;ja&#x27;. Drives the language toggle&#x27;s display label (shows the OTHER language as an invitation to switch).</td>
+<td>-</td></tr>
 <tr><td><code>currentColorMode</code></td>
 <td class="type">String</td>
 <td><span class="badge badge-optional">Optional</span></td>
 <td class="default">-</td>
-<td>Current ColorManager mode — &#x27;light&#x27; or &#x27;dark&#x27;. Drives which icon (sun / moon) shows on the theme toggle button. If omitted the component defaults to &#x27;light&#x27; for SSR safety.</td></tr>
+<td>Current ColorManager mode — &#x27;light&#x27; or &#x27;dark&#x27;. Drives which icon (sun / moon) shows on the theme toggle button. If omitted the component defaults to &#x27;light&#x27; for SSR safety.</td>
+<td>-</td></tr>
 </tbody></table>
 </section>
 <section id="structure">
 <h2>Structure</h2>
+<h3>Layout Structure</h3>
+<pre class="layout-tree">
+topbar_root
+</pre>
 <h3>Components</h3>
 <table>
-<thead><tr><th>Type</th><th>ID</th><th>Description</th></tr></thead>
+<thead><tr><th>Type</th><th>ID</th><th>Bound To Prop</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>View</code></td>
 <td><code>topbar_root</code></td>
-<td>&lt;header&gt; element — the site top bar.</td></tr>
+<td><code>-</code></td>
+<td>&lt;header&gt; element — the site top bar.</td>
+<td>-</td></tr>
 </tbody></table>
 </section>
 <section id="usage">
 <h2>Usage</h2>
 <h3>Example</h3>
 <pre><code>{&#x27;layoutSnippet&#x27;: &#x27;{\n  &quot;type&quot;: &quot;TopBar&quot;,\n  &quot;brandLabel&quot;: &quot;chrome_brand_name&quot;,\n  &quot;currentLanguage&quot;: &quot;@{currentLanguage}&quot;,\n  &quot;onToggleLanguage&quot;: &quot;@{onToggleLanguage}&quot;,\n  &quot;onToggleMobileMenu&quot;: &quot;@{onToggleMobileMenu}&quot;\n}&#x27;}</code></pre>
+</section>
+<section id="notes">
+<h2>Notes</h2>
+<ul>
+<li>The Search trigger inside the TopBar is the existing Search component. TopBar renders it without passing a placeholder so Search self-localizes against StringManager.getString(&#x27;home_search_placeholder&#x27;) (its built-in fallback).</li>
+<li>Language toggle label: the VM passes currentLanguage; the component shows the OTHER language name as a prompt to switch. Localized copy for both labels lives in the chrome namespace (chrome_lang_toggle_label_en / _ja).</li>
+<li>Component imports StringManager directly for aria labels (same pattern as Search). No aria-label prop is surfaced — callers should trust the component&#x27;s internal localization.</li>
+<li>Hamburger button visibility is CSS media-query driven (visible only under 1024px). No prop controls it.</li>
+<li>The component sits at z-index 40 in the chrome stack. It renders above the sidebar (z-35) so brand + search + language remain clickable while the sidebar drawer is open on narrow viewports.</li>
+</ul>
 </section>
 </div>
 

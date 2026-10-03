@@ -6,6 +6,7 @@ Guides > Building a custom component. Task-focused walk-through of the three-lay
 
 | | |
 |---|---|
+| Layout File | `guides/custom-components` |
 | Created | 2026-04-23 |
 | Updated | 2026-04-24 |
 
@@ -82,6 +83,13 @@ guides_custom_components_root
 └── guides_custom_components_scroll
 ```
 
+### Custom Components
+
+| Component | Specification | Description |
+|---|---|---|
+| CodeBlock | `codeblock.component.json` | Syntax-highlighted fenced code block used throughout this guide. |
+| TableOfContents | `tableofcontents.component.json` | "On this page" rail listing this page's section anchors. |
+
 ## Data Flow
 
 ```mermaid
@@ -108,9 +116,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
 
 ### View-local Event Handlers
 

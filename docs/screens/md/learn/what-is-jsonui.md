@@ -6,6 +6,7 @@ Learn > intro essay. Four H2 sections aimed at a reader who has heard of JsonUI 
 
 | | |
 |---|---|
+| Layout File | `learn/what-is-jsonui` |
 | Created | 2026-04-23 |
 | Updated | 2026-04-23 |
 
@@ -81,11 +82,11 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
-| `name` | String | (from binding) | - |
-| `onTap` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
+| `greeting` | String | `-` | (from binding) | - |
+| `onTap` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 
@@ -125,5 +126,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Third live entry under the Learn tab. Flipping LEARN_ENTRIES row 5 (what-is) to 'live' in HomeViewModel finishes.
 - Intro essay — no Collection, no custom component beyond CodeBlock + TOC. The reader has not installed anything yet; do not ask them to run commands here — link to /learn/installation for that.
 - 2026-09-28 — the sketch's uiVariable used `initial`, which no tool reads; it is now `defaultValue` (see the first-spec guide's note for the measurement).
+- 2026-10-02 — the greeting sketch bound `"Hello, @{name}"`, the form 1.9.6 warns as binding-mixed-text. It now declares `greeting` ("Hello, world") and binds it whole; the three emitted-output sketches follow (Text(vm.greeting), etc.). jsonui-cli 1.9.6 adds binding-mixed-text (WARNING, fails under --strict): an SSoT-declared attribute whose value contains `@{` but is not one whole `@{...}`. The user's ruling (2026-10-02) is that a sentence is assembled in the ViewModel and passed as one binding, because a layout-assembled sentence cannot be localized as one string and puts logic in the JSON.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

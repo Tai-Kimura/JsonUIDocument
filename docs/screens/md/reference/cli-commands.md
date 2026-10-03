@@ -6,6 +6,7 @@ Reference > CLI command reference. Overview page. Ten sections + TOC + next-read
 
 | | |
 |---|---|
+| Layout File | `reference/cli-commands` |
 | Created | 2026-04-23 |
 | Updated | 2026-09-30 |
 
@@ -100,6 +101,8 @@ flowchart TD
 
 #### CliCommandsRepository
 
+Hand-written. Statically imports src/data/cli-commands.json, staged and validated from docs/data/cli-commands.json by scripts/build-cli-commands.ts (npm run build:cli, part of prebuild). No network call — the catalogue is bundled so it renders during the static export.
+
 - `async binaries()` — Every binary in dataset order.
 - `async commands()` — Every command, ordered by the binary order declared in the dataset.
 - `async commandCount()` — Total number of commands.
@@ -109,11 +112,11 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
-| `binaries` | [CliBinaryRow] | One row per binary declared in docs/data/cli-commands.json. | - |
-| `commands` | [CliCommandDetail] | One detail card per subcommand, ordered by the binary order in the dataset. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
+| `binaries` | [CliBinaryRow] | `-` | One row per binary declared in docs/data/cli-commands.json. | - |
+| `commands` | [CliCommandDetail] | `-` | One detail card per subcommand, ordered by the binary order in the dataset. | - |
 
 ### View-local Event Handlers
 

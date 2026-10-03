@@ -155,8 +155,8 @@
                 ]
               },
               "description": {
-                "en": "Text content (binding supported, supports interpolation). Plain text — markdown is not interpreted.",
-                "ja": "表示するテキスト。`@{binding}` と `\"合計: @{count}\"` のような補間をサポート。素のテキストで markdown は解釈しない。"
+                "en": "Text content (binding supported). The value is a literal, one whole `@{binding}`, or a strings key; text around a binding (`\"Total: @{count}\"`) is warned as `binding-mixed-text` since jsonui-cli 1.9.6 — compose the string in the ViewModel and bind it. Plain text — markdown is not interpreted.",
+                "ja": "表示するテキスト。値はリテラル、1 つの `@{binding}`、または strings キー。前後に文字列が付いた束縛（`\"合計: @{count}\"`）は jsonui-cli 1.9.6 から `binding-mixed-text` として警告されます — 文字列は ViewModel で組み立てて束縛してください。素のテキストで markdown は解釈しない。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
@@ -3326,7 +3326,7 @@
               "languagePill": "json",
               "languagePillVisibility": "visible",
               "activeLanguage": "json",
-              "activeCode": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"TextView\", \"text\": \"@{bio}\", \"maxLength\": 160 },\n    { \"type\": \"Label\", \"text\": \"@{bio.length}/160\", \"fontSize\": 12, \"fontColor\": \"#9CA3AF\" }\n  ]\n}",
+              "activeCode": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"TextView\", \"text\": \"@{bio}\", \"maxLength\": 160 },\n    { \"type\": \"Label\", \"text\": \"@{bioCounter}\", \"fontSize\": 12, \"fontColor\": \"#9CA3AF\" }\n  ]\n}",
               "note": {
                 "en": "",
                 "ja": ""
@@ -3335,11 +3335,11 @@
               "_variants": [
                 {
                   "language": "json",
-                  "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"TextView\", \"text\": \"@{bio}\", \"maxLength\": 160 },\n    { \"type\": \"Label\", \"text\": \"@{bio.length}/160\", \"fontSize\": 12, \"fontColor\": \"#9CA3AF\" }\n  ]\n}"
+                  "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"TextView\", \"text\": \"@{bio}\", \"maxLength\": 160 },\n    { \"type\": \"Label\", \"text\": \"@{bioCounter}\", \"fontSize\": 12, \"fontColor\": \"#9CA3AF\" }\n  ]\n}"
                 }
               ],
               "language": "json",
-              "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"TextView\", \"text\": \"@{bio}\", \"maxLength\": 160 },\n    { \"type\": \"Label\", \"text\": \"@{bio.length}/160\", \"fontSize\": 12, \"fontColor\": \"#9CA3AF\" }\n  ]\n}",
+              "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"TextView\", \"text\": \"@{bio}\", \"maxLength\": 160 },\n    { \"type\": \"Label\", \"text\": \"@{bioCounter}\", \"fontSize\": 12, \"fontColor\": \"#9CA3AF\" }\n  ]\n}",
               "required": ""
             },
             {
@@ -3451,8 +3451,8 @@
                 ]
               },
               "description": {
-                "en": "Text content (binding supported, supports interpolation). Plain text — markdown is not interpreted.",
-                "ja": "表示するテキスト。`@{binding}` と `\"合計: @{count}\"` のような補間をサポート。素のテキストで markdown は解釈しない。"
+                "en": "Text content (binding supported). The value is a literal, one whole `@{binding}`, or a strings key; text around a binding (`\"Total: @{count}\"`) is warned as `binding-mixed-text` since jsonui-cli 1.9.6 — compose the string in the ViewModel and bind it. Plain text — markdown is not interpreted.",
+                "ja": "表示するテキスト。値はリテラル、1 つの `@{binding}`、または strings キー。前後に文字列が付いた束縛（`\"合計: @{count}\"`）は jsonui-cli 1.9.6 から `binding-mixed-text` として警告されます — 文字列は ViewModel で組み立てて束縛してください。素のテキストで markdown は解釈しない。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",

@@ -6,6 +6,7 @@ Tools > Agents overview. Explains the 9-agent + 11-skill + 5-rule pack that teac
 
 | | |
 |---|---|
+| Layout File | `tools/agents` |
 | Created | 2026-04-23 |
 | Updated | 2026-09-30 |
 
@@ -84,10 +85,10 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `agents` | [AgentRow] | Nine agent entries (conductor / define / ground / implement / test / debug / navigation-ios / navigation-android / navigation-web) with name + role + when-to-use. | - |
-| `nextReadLinks` | [NextReadLink] | Two closing cards: CLI tools + MCP server overview. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `agents` | [AgentRow] | `-` | Nine agent entries (conductor / define / ground / implement / test / debug / navigation-ios / navigation-android / navigation-web) with name + role + when-to-use. | - |
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards: CLI tools + MCP server overview. | - |
 
 ### View-local Event Handlers
 

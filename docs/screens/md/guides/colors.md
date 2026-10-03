@@ -6,6 +6,7 @@ Guides > Colors and theming. How colors.json feeds every platform, how `jui buil
 
 | | |
 |---|---|
+| Layout File | `guides/colors` |
 | Created | 2026-07-28 |
 | Updated | 2026-07-28 |
 
@@ -84,9 +85,9 @@ guides_colors_root
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Three closing cards: localization guide, style attributes, ReactJsonUI. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Three closing cards: localization guide, style attributes, ReactJsonUI. | - |
 
 ### View-local Event Handlers
 

@@ -6,6 +6,7 @@ Tools > jsonui-doc (DOC GEN) overview. The Python CLI that generates HTML / Mark
 
 | | |
 |---|---|
+| Layout File | `tools/doc` |
 | Created | 2026-04-24 |
 | Updated | 2026-09-30 |
 
@@ -76,6 +77,12 @@ tools_doc_root
 └── tools_doc_scroll
 ```
 
+### Custom Components
+
+| Component | Specification | Description |
+|---|---|---|
+| DocSamplePreview | `doc-sample-preview.component.json` | Embedded preview of a generated jsonui-doc HTML artifact. |
+
 ## Data Flow
 
 ```mermaid
@@ -126,19 +133,19 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `commandInitRows` | [CommandRow] | 2 entries: `init spec`, `init component`. Each CommandRow carries name + description + key flags (-d, -o, -c). Seeded by onAppear from a module-scope static catalog. | - |
-| `commandValidateRows` | [CommandRow] | 2 entries: `validate spec`, `validate component`. Rows rendered inside the 'validate' Collection. | - |
-| `commandGenerateRows` | [CommandRow] | 6 entries: `generate html`, `generate mermaid`, `generate adapter`, `generate doc`, `generate spec`, `generate component`. The largest group — where most day-to-day invocations land. | - |
-| `commandFigmaRows` | [CommandRow] | 2 entries: `figma fetch`, `figma images`. Throttling-sensitive; see figmaThrottleRows below for the companion plan table. | - |
-| `figmaThrottleRows` | [FigmaThrottleRow] | 4 rows mirroring the Figma plan throttling table from document_tools/README.md (starter 10 req/min ~12s, pro 15 req/min ~8s, org 20 req/min ~6s, enterprise unlimited / no throttle). Static; never mutated after onAppear. | - |
-| `sampleTabs` | [TabHeaderCell] | 2 T6-pattern tab headers for the live-sample section: 'Spec JSON' (id='json') and 'Generated HTML' (id='html'). Initial render defaults to id='html' active. Rebuilt on every onSelectSampleTab call by buildSampleTabs(activeId) so the active row carries accent bgColor/fgColor/borderColor and the inactive row carries the surface palette — exactly the same pattern hello-world's buildPlatformTabs uses for the Swift/Kotlin/React switcher. | - |
-| `helloWorldSpecJson` | String | Literal JSON text of docs/screens/json/learn/hello-world.spec.json, inlined at author time as a module-scope constant and read into the VM from onAppear. Rendered inside a CodeBlock (language='json') on the 'Spec JSON' tab. Seeded once; never mutated. | - |
-| `nextReadLinks` | [NextReadLink] | 2 closing cards: /tools/mcp (the MCP server, whose doc_generate_* tools wrap this CLI) and /reference/cli-commands (the broader CLI reference). | - |
-| `activeSampleTab` | String | Id of the currently selected live-sample tab ('json' | 'html'). Defaults to 'html' so a first-time visitor sees the generated preview (the more visually immediate output), with the raw spec one click away. Drives displayLogic for the two sample-panel visibility variables and is fed into buildSampleTabs on each toggle. Matches the naming pattern LearnHelloWorldViewModel uses for `activeTab`. | - |
-| `jsonSamplePanelVisibility` | String | (from binding) | - |
-| `htmlSamplePanelVisibility` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `commandInitRows` | [CommandRow] | `-` | 2 entries: `init spec`, `init component`. Each CommandRow carries name + description + key flags (-d, -o, -c). Seeded by onAppear from a module-scope static catalog. | - |
+| `commandValidateRows` | [CommandRow] | `-` | 2 entries: `validate spec`, `validate component`. Rows rendered inside the 'validate' Collection. | - |
+| `commandGenerateRows` | [CommandRow] | `-` | 6 entries: `generate html`, `generate mermaid`, `generate adapter`, `generate doc`, `generate spec`, `generate component`. The largest group — where most day-to-day invocations land. | - |
+| `commandFigmaRows` | [CommandRow] | `-` | 2 entries: `figma fetch`, `figma images`. Throttling-sensitive; see figmaThrottleRows below for the companion plan table. | - |
+| `figmaThrottleRows` | [FigmaThrottleRow] | `-` | 4 rows mirroring the Figma plan throttling table from document_tools/README.md (starter 10 req/min ~12s, pro 15 req/min ~8s, org 20 req/min ~6s, enterprise unlimited / no throttle). Static; never mutated after onAppear. | - |
+| `sampleTabs` | [TabHeaderCell] | `-` | 2 T6-pattern tab headers for the live-sample section: 'Spec JSON' (id='json') and 'Generated HTML' (id='html'). Initial render defaults to id='html' active. Rebuilt on every onSelectSampleTab call by buildSampleTabs(activeId) so the active row carries accent bgColor/fgColor/borderColor and the inactive row carries the surface palette — exactly the same pattern hello-world's buildPlatformTabs uses for the Swift/Kotlin/React switcher. | - |
+| `helloWorldSpecJson` | String | `-` | Literal JSON text of docs/screens/json/learn/hello-world.spec.json, inlined at author time as a module-scope constant and read into the VM from onAppear. Rendered inside a CodeBlock (language='json') on the 'Spec JSON' tab. Seeded once; never mutated. | - |
+| `nextReadLinks` | [NextReadLink] | `-` | 2 closing cards: /tools/mcp (the MCP server, whose doc_generate_* tools wrap this CLI) and /reference/cli-commands (the broader CLI reference). | - |
+| `activeSampleTab` | String | `-` | Id of the currently selected live-sample tab ('json' | 'html'). Defaults to 'html' so a first-time visitor sees the generated preview (the more visually immediate output), with the raw spec one click away. Drives displayLogic for the two sample-panel visibility variables and is fed into buildSampleTabs on each toggle. Matches the naming pattern LearnHelloWorldViewModel uses for `activeTab`. | - |
+| `jsonSamplePanelVisibility` | String | `-` | (from binding) | - |
+| `htmlSamplePanelVisibility` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

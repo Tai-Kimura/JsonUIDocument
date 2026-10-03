@@ -157,6 +157,7 @@
 <h2>Overview</h2>
 <p>Guides &gt; Writing screen tests. Nine sections + TOC + next-reads. There is no `jui test` command — the CLI is `jsonui-test`, shipped inside jsonui-cli. Walks where tests live, screen vs flow test anatomy with real JSON, the full action/assert DSL from the runtime schemas (incl. scrollUntilVisible / readText / repeat / retry / setLocation / addMedia, assertion auto-wait, and the screenshot visual-regression assert), the three published drivers (SPM / Maven Central / npm — XCUITest / Espresso + UI Automator / Playwright with verified run-APIs), the jsonui-test CLI sub-commands (validate incl. flatten-install side-effect, generate, report, mock), CI wiring, and section 8 (launch / when / optional / teardown / results JSON + test.install config).</p>
 <table class="meta-table">
+<tr><th>Layout File</th><td><code>guides/testing</code></td></tr>
 <tr><th>Created</th><td>2026-04-23</td></tr>
 <tr><th>Updated</th><td>2026-09-30</td></tr>
 </table>
@@ -169,13 +170,14 @@
 <div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
 </div>
 <table class="tree-table">
-<thead><tr><th>Component</th><th>ID</th><th>Platform</th><th>Description</th><th>Bindings</th><th>Notes</th></tr></thead>
+<thead><tr><th>Component</th><th>ID</th><th>Platform</th><th>Description</th><th>Initial State</th><th>Bindings</th><th>Notes</th></tr></thead>
 <tbody>
 <tr data-row-id="1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:0px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>guides_testing_root</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=matchParent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -186,6 +188,7 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent weight=1</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-1" data-parent-id="1-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
@@ -194,12 +197,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-1-1" data-parent-id="1-1-1">
 <td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=wrapContent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#64748B"></i><code>#64748B</code></span></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-event">event</span> <code>onClick</code> → <code>onNavigateGuides</code></div></div></td>
 <td>-</td>
 </tr>
@@ -210,12 +215,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>36</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-1-3" data-parent-id="1-1-1">
 <td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>17</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -226,12 +233,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#64748B"></i><code>#64748B</code></span></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2" data-parent-id="1-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>guides_testing_content_with_rail</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=horizontal</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -242,12 +251,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>H=wrapContent weight=1</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-1" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_where</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -258,12 +269,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-1-2" data-parent-id="1-1-2-1-1">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -274,12 +287,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-2" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_screen</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -290,12 +305,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-2-2" data-parent-id="1-1-2-1-2">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -306,12 +323,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-3" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_flow</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -322,12 +341,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-3-2" data-parent-id="1-1-2-1-3">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -338,12 +359,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_dsl</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -354,12 +377,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-2" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -370,12 +395,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>15</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-4" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=8</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -386,12 +413,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-6" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -402,12 +431,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-8" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -418,12 +449,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-10" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -434,12 +467,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-12" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -450,12 +485,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-14" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -466,12 +503,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-16" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -482,12 +521,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-18" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -498,12 +539,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-20" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -514,12 +557,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-22" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -530,12 +575,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-24" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -546,12 +593,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-26" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -562,12 +611,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-28" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -578,12 +629,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-30" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>15</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -594,12 +647,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=8</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-32" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -610,12 +665,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-34" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -626,12 +683,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-36" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -642,12 +701,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-38" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=4</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -658,12 +719,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-40" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -674,12 +737,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-42" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -690,12 +755,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-5-1" data-parent-id="1-1-2-1-5">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -706,12 +773,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-5-3" data-parent-id="1-1-2-1-5">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -722,12 +791,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-5-5" data-parent-id="1-1-2-1-5">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -738,12 +809,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-6-1" data-parent-id="1-1-2-1-6">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -754,12 +827,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-6-3" data-parent-id="1-1-2-1-6">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -770,12 +845,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-6-5" data-parent-id="1-1-2-1-6">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -786,12 +863,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-6-7" data-parent-id="1-1-2-1-6">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -802,12 +881,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-6-9" data-parent-id="1-1-2-1-6">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -818,12 +899,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-7" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_recording</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -834,12 +917,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-7-2" data-parent-id="1-1-2-1-7">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -850,12 +935,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-7-4" data-parent-id="1-1-2-1-7">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -866,12 +953,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-7-6" data-parent-id="1-1-2-1-7">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -882,12 +971,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-7-8" data-parent-id="1-1-2-1-7">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -898,12 +989,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-8" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_ci</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -914,12 +1007,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-8-2" data-parent-id="1-1-2-1-8">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -930,12 +1025,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-8-4" data-parent-id="1-1-2-1-8">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -946,12 +1043,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-9-1" data-parent-id="1-1-2-1-9">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -962,12 +1061,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-9-3" data-parent-id="1-1-2-1-9">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -978,12 +1079,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-9-5" data-parent-id="1-1-2-1-9">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -994,12 +1097,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-9-7" data-parent-id="1-1-2-1-9">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">CodeBlock</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -1010,6 +1115,7 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-10-1" data-parent-id="1-1-2-1-10">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
@@ -1018,12 +1124,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>chrome_ink</code></div><div class="style-row"><span class="style-key">Font</span>24</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-10-2" data-parent-id="1-1-2-1-10">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
 <td><code>guides_testing_next_collection</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=20</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>nextReadLinks</code></div></div></td>
 <td>-</td>
 </tr>
@@ -1034,12 +1142,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-11-1" data-parent-id="1-1-2-1-11">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#94A3B8"></i><code>#94A3B8</code></span></div><div class="style-row"><span class="style-key">Font</span>12</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -1050,6 +1160,7 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=260 H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-2-1" data-parent-id="1-1-2-2" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
@@ -1058,12 +1169,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-2-1-1" data-parent-id="1-1-2-2-1">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">TableOfContents</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -1102,9 +1215,9 @@ flowchart TD
 <h2>State Management</h2>
 <details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">1</span></summary>
 <table>
-<thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
+<thead><tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
-<tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td>Two closing cards.</td><td>-</td></tr>
+<tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td><code>-</code></td><td>Two closing cards.</td><td>-</td></tr>
 </tbody></table>
 </details>
 <details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">3</span></summary>
@@ -1173,6 +1286,7 @@ flowchart TD
 <li>2026-09-25 — v1.8.119: the validate bullet gains the element-id check and the coverage section. The element-id check was measured on this site. Under the 1.8.119 candidate, 27 steps in three tests named 13 ids no layout had ever carried: a per-page language toggle and a TabView the site no longer has. They were removed rather than declared (commit 9995946), and the line reads &#x27;element ids: 200 named in the steps — 200 on a layout, 0 declared in test.appOwnedIds, 0 on no layout&#x27;.</li>
 <li>2026-09-28 — v1.9.0: the element-id check&#x27;s finding is a WARNING since 1.9.0 and the coverage gate fails validate since 1.9.0 (both announced for 1.8.121, which was never released). Measured on a copy of this site with one seeded id under 1.9.0: `[WARN] … Element &#x27;zz_control_no_such_id&#x27; is on no layout of this project …`, `Warnings: 1`, `Result: PASSED`, exit 0 — a WARNING does not fail the run. The site&#x27;s own run is unchanged: 200 of 200 on a layout, coverage not applicable.</li>
 <li>2026-09-30 — Examples re-checked against the schemas: the screen anatomy&#x27;s `{ &quot;tap&quot;: ... }` step and the launch example&#x27;s in-case `teardown` and missing `metadata` did not validate, and the flow anatomy used `cases` (a flow has root `steps`) and a checkpoint step (checkpoints are a root array with afterStep). All rewritten; every JSON example on the page now passes `jsonui-test validate` (jsonui-cli 1.9.5). addMedia&#x27;s &#x27;seeding accumulates&#x27; holds for iOS only: Android driver 1.15.6 re-seeds the fixture&#x27;s own rows and 1.15.7 also removes rows an uninstall orphaned. The description said eight sections (the page has nine) and &#x27;npm 1.0.0&#x27; for the drivers.</li>
+<li>2026-10-03 — pin v1.9.7: section_dsl_action_select_tab says a Segment tab is reachable by selectTab since 1.9.7, which gives each tab the id `&lt;id&gt;_tab_&lt;n&gt;` in generated code. Dynamic mode gets those ids in the next SwiftJsonUI / KotlinJsonUI releases (latest today: SwiftJsonUI v10.29.2 tag, KotlinJsonUI 2.43.0 on Maven Central). Per the orchestrator&#x27;s 1.9.7 notice; not measured here.</li>
 </ul>
 </section>
 </div>

@@ -128,6 +128,9 @@ module JsonUIShared
       @two_way_attrs_by_type = build_two_way_attrs(defs)
       @boolean_attrs_by_type = build_boolean_attrs(defs)
       @known_attrs_by_type = build_known_attrs(defs)
+      # One read of the SSoT's event declarations, three sets from it
+      # (build_event_tables).
+      @handler_attrs_by_type, @event_attrs_by_type, @binding_only_events_by_type = build_event_tables(defs)
     end
 
     # Validate all bindings in a JSON component tree
@@ -522,11 +525,12 @@ module JsonUIShared
         # names any that is not one.
         next if key == 'events' && resolve_component_alias(component_type) == 'Embed'
         if incompatible_attr?(component_type, key)
-          note_uses_on_other_platforms(value, key)
+          note_uses_on_other_platforms(value, key, component_type)
           next
         end
 
         check_value_for_bindings(value, key, component_type)
+        next if check_bare_event(value, key, component_type)
         check_selector_declared(value, key, component_type)
 
         # UIKit-era advisory: bindings need an id to reference the view.
@@ -578,7 +582,7 @@ module JsonUIShared
     # without braces (`"onLongPress": "handleHold"`) as it does in
     # check_selector_declared. Cell scopes are left alone, as
     # check_undefined_variables leaves them.
-    def note_uses_on_other_platforms(value, attribute_name)
+    def note_uses_on_other_platforms(value, attribute_name, component_type)
       return if @cell_depth > 0
 
       case value
@@ -586,7 +590,7 @@ module JsonUIShared
         exprs = value.scan(/@\{([^}]*)\}/).flatten
         if exprs.empty?
           name = value.strip
-          if SELECTOR_ATTRS.include?(attribute_name.to_s.split('.').first) && @data_properties.include?(name)
+          if handler_attr?(component_type, attribute_name, table: @event_attrs_by_type) && @data_properties.include?(name)
             @used_properties << name
           end
         end
@@ -596,9 +600,9 @@ module JsonUIShared
           extract_variables(expr).each { |var| @used_properties << var if @data_properties.include?(var) }
         end
       when Hash
-        value.each_value { |v| note_uses_on_other_platforms(v, attribute_name) }
+        value.each_value { |v| note_uses_on_other_platforms(v, attribute_name, component_type) }
       when Array
-        value.each { |v| note_uses_on_other_platforms(v, attribute_name) }
+        value.each { |v| note_uses_on_other_platforms(v, attribute_name, component_type) }
       end
     end
 
@@ -661,6 +665,7 @@ module JsonUIShared
         # "first} and @{second" ('and' "not defined in data").
         exprs = value.scan(/@\{([^}]*)\}/).flatten
         unless exprs.length == 1 && value == "@{#{exprs.first}}"
+          check_mixed_text(value, attribute_name, component_type)
           note_text_uses(exprs)
           return
         end
@@ -682,6 +687,32 @@ module JsonUIShared
           check_value_for_bindings(item, "#{attribute_name}[#{index}]", component_type)
         end
       end
+    end
+
+    # binding-mixed-text (warning; ruling 2026-10-02): a value that holds a
+    # binding and is not one binding — `Title: @{x}`, `@{a} / @{b}`,
+    # `https://cdn/@{id}.png`. Composing a string is logic, and a layout holds
+    # none; and a string composed in the layout cannot be localized as one
+    # text. The ViewModel composes it and the layout binds it as one value.
+    # Until jsonui-cli 1.9.6 the SSoT declared this as text interpolation
+    # (binding_semantics.json contexts.text) and nothing said a word; sjui
+    # and rjui interpolated it, kjui drew the first binding alone.
+    #
+    # Only an attribute the SSoT declares for the component (known_attr?): an
+    # undeclared one — an extension component's own attribute — is read as
+    # that component reads it (JsonUIDocument's CodeBlock `code` shows
+    # `@{greeting}` verbatim, as its declaration says). An Embed's params are
+    # validate_embed_params_node's.
+    def check_mixed_text(value, attribute_name, component_type)
+      return if embed_params_attr?(component_type, attribute_name)
+
+      top_attr = attribute_name.to_s.split(/[.\[]/).first
+      return unless known_attr?(component_type, top_attr)
+
+      add_rule_warning('binding-mixed-text',
+                       "'#{component_type}.#{attribute_name}' mixes literal text with a binding (#{value.inspect}). " \
+                       'Compose the string in the ViewModel (it also keeps the text localizable) and bind it as one value — ' \
+                       'a layout holds no logic.')
     end
 
     # Canonical validator rules from shared/core/binding_semantics.json.
@@ -798,15 +829,118 @@ module JsonUIShared
     # and surfaced as a type error in the consumer's tsc, the latest possible
     # place. Advisory only, and only when the file declares data at all: a
     # layout with no data section is validated elsewhere.
-    SELECTOR_ATTRS = %w[
-      onclick onClick onLongPress onPan onPinch
-      onDragStart onDrop onDragEnter onDragLeave onDragOver
-      valueChange onTextChange onChange onItemAppear
-    ].freeze
+    #
+    # Which attributes take a handler's bare name is the SSoT's, per
+    # component type (build_event_tables): an event key — on<Upper> — whose
+    # type takes a string (`string`, or `string | binding`), with its
+    # aliases, and the two UIKit selector keys (LEGACY_SELECTOR_KEYS). One
+    # on<Upper> key takes a string and is no handler: Switch.onTintColor, a
+    # colour (NOT_HANDLER_KEYS). A bare name there is
+    # a declared form the generators call, so it is a use of the data it
+    # names. An event declared binding-only takes `@{name}` only: a bare name
+    # there calls nothing, and is not counted (binding-bare-event names it).
+    #
+    # Until jsonui-cli 1.9.6 this was a hand-kept list of 14 names — with
+    # none of the `string | binding` events but onItemAppear and onTextChange,
+    # with eight binding-only ones, and with `onChange`, which the SSoT
+    # declares nowhere — and its use count sat behind
+    # report_undeclared_selectors?, which no face turns on. So every bare
+    # handler name, `onclick` included, warned "Data property '…' is defined
+    # but never used" (measured on 1.9.5, kjui: View.onclick,
+    # Collection.onItemAppear, TabView.onValueChange, TextField.onTextChange).
+    LEGACY_SELECTOR_KEYS = %w[onclick valueChange].freeze
+    NOT_HANDLER_KEYS = %w[onTintColor].freeze
+
+    # The SSoT's event attributes per component type, read once and split by
+    # what they take (until jsonui-cli 1.9.6 two passes derived the same
+    # thing apart — build_handler_attrs and build_binding_only_events — and
+    # collided in this file):
+    #   handler      an event key (on<Upper>) whose type takes a string, or a
+    #                UIKit selector key (LEGACY_SELECTOR_KEYS): a bare name
+    #                there is a declared form, a use of the data it names;
+    #   binding-only an event key whose type has "binding" and no "string": a
+    #                bare name there calls nothing (binding-bare-event);
+    #   event        both — the set an attribute drawn on another platform
+    #                reads (note_uses_on_other_platforms), which counted a bare
+    #                `"onLongPress": "handleHold"` as a use from 1.9.0: the
+    #                face that does not draw it cannot change it.
+    # Each with its aliases. By the key, not the alias: CheckBox.onSrc is
+    # selectedIcon's alias. Returns [handler, event, binding_only].
+    def build_event_tables(defs)
+      handler = {}
+      binding_only = {}
+      defs.each do |component_type, attrs|
+        next unless attrs.is_a?(Hash)
+
+        takes_name = Set.new
+        binding_events = Set.new
+        attrs.each do |attr_name, attr_def|
+          next unless attr_def.is_a?(Hash)
+
+          types = Array(attr_def['type'])
+          names = [attr_name, *Array(attr_def['aliases'])]
+          event = attr_name.match?(/\Aon[A-Z]/) && !NOT_HANDLER_KEYS.include?(attr_name)
+          if LEGACY_SELECTOR_KEYS.include?(attr_name) || (event && types.include?('string'))
+            takes_name.merge(names)
+          elsif event && types.include?('binding')
+            binding_events.merge(names)
+          end
+        end
+        handler[component_type] = takes_name unless takes_name.empty?
+        binding_only[component_type] = binding_events unless binding_events.empty?
+      end
+      event = (handler.keys | binding_only.keys).to_h do |type|
+        [type, (handler[type] || Set.new) | (binding_only[type] || Set.new)]
+      end
+      [handler, event, binding_only]
+    end
+
+    # A type the SSoT does not declare (a custom component) reads any name
+    # some declared type handles, as the hand-kept list read every name on
+    # every type: narrowing it to `common` would turn its bare handlers into
+    # "never used" warnings.
+    def handler_attr?(component_type, attr_name, table: @handler_attrs_by_type)
+      name = attr_name.to_s.split('.').first
+      return true if lookup_attr_set(table, component_type, name)
+      return false if @attribute_definitions[resolve_component_alias(component_type)].is_a?(Hash)
+
+      table.values.reduce(Set.new, :|).include?(name)
+    end
+
+    # binding-bare-event (warning): a bare name given to an event attribute
+    # the SSoT declares binding-only — `type` "binding" with no "string"
+    # (onClick, onLongPress, Switch / Slider / Segment / CheckBox / Radio /
+    # SelectBox onValueChange, …). The declaration admits no bare name, and
+    # the generators dropped one with no report: measured 2026-10-02 over the
+    # 21 such attributes, 19 lose a bare name on at least one face (sjui,
+    # kjui, rjui), some leaving an ERROR comment in code that still builds.
+    # An attribute declared with "string" (onAppear, onTextChange, a
+    # Collection's onValueChange, …) takes a bare name as a declared form,
+    # so a bare name there is not this rule's — a generator that drops one
+    # is the defect (ticket bare-event-handler-is-dropped-without-a-warning).
+    #
+    # Only types the SSoT declares: an app's own component uses camelCase
+    # keys as props (the known gap binding_semantics.json names). Returns
+    # true when it reported, so the undeclared-selector advice (which asks
+    # for the bare name to be declared in data) is not given as well.
+    def check_bare_event(value, attribute_name, component_type)
+      return false unless value.is_a?(String)
+
+      name = value.strip
+      return false if name.empty? || name.include?('@{')
+
+      section = resolve_component_alias(component_type)
+      return false if section == 'common' || !@attribute_definitions[section].is_a?(Hash)
+      return false unless lookup_attr_set(@binding_only_events_by_type, component_type, attribute_name)
+
+      @warnings << "#{build_context_prefix}'#{component_type}.#{attribute_name}' is the bare name '#{name}', but the attribute " \
+                   "is declared binding-only: write '@{#{name}}'. The generated code calls nothing for a bare name " \
+                   "(binding-bare-event)."
+      true
+    end
 
     def check_selector_declared(value, attribute_name, component_type)
-      return unless report_undeclared_selectors?
-      return unless SELECTOR_ATTRS.include?(attribute_name)
+      return unless handler_attr?(component_type, attribute_name)
       return unless value.is_a?(String)
 
       name = value.strip
@@ -818,6 +952,7 @@ module JsonUIShared
         @used_properties << name
         return
       end
+      return unless report_undeclared_selectors?
 
       @warnings << "#{build_context_prefix}Handler '#{name}' in '#{component_type}.#{attribute_name}' is not defined in data. " \
                    "Add: { \"class\": \"Function\", \"name\": \"#{name}\" }"

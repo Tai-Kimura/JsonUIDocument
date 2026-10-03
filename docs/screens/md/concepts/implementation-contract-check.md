@@ -6,6 +6,7 @@ Concept essay: how `jsonui-doc check` verifies docs (spec / swagger / DB models)
 
 | | |
 |---|---|
+| Layout File | `concepts/implementation-contract-check` |
 | Created | 2026-07-07 |
 | Updated | 2026-07-07 |
 
@@ -87,9 +88,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Three follow-up cards: concepts/db-schema-check (DB-side deep dive), guides/verifying-implementation-against-docs (cookbook) and reference/cli-commands (command details). | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Three follow-up cards: concepts/db-schema-check (DB-side deep dive), guides/verifying-implementation-against-docs (cookbook) and reference/cli-commands (command details). | - |
 
 ### View-local Event Handlers
 

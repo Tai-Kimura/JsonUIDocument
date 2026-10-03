@@ -6,6 +6,7 @@ Catalog page for the Platforms section: one card per platform implementation (Sw
 
 | | |
 |---|---|
+| Layout File | `platforms_index` |
 | Created | 2026-08-25 |
 | Updated | 2026-08-25 |
 
@@ -37,9 +38,9 @@ platforms_index_root
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `articles` | [CatalogEntry] | Ordered catalog of Platforms entries. Order is editorial, not alphabetical — it is the order a reader should meet them in. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `articles` | [CatalogEntry] | `-` | Ordered catalog of Platforms entries. Order is editorial, not alphabetical — it is the order a reader should meet them in. | - |
 
 ### View-local Event Handlers
 

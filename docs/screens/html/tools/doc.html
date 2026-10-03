@@ -157,6 +157,7 @@
 <h2>Overview</h2>
 <p>Tools &gt; jsonui-doc (DOC GEN) overview. The Python CLI that generates HTML / Markdown / Mermaid / test adapters / Figma-as-HTML from JsonUI screen specs, component specs, test JSON files, and Figma API responses. 15 commands: five groups (init / validate / rules / generate / figma) plus check. Companion to /tools/cli and /tools/mcp — the doc_generate_* MCP tools are thin wrappers that delegate here, and the /reference HTML pages on this site are produced by the same binary. 2026-05 note: document_tools/.../swagger.py is no longer the entry point for OpenAPI codegen — its core logic is now in jsonui-cli and is invoked through `jui g api`; jsonui-doc retains only the doc-generation side.</p>
 <table class="meta-table">
+<tr><th>Layout File</th><td><code>tools/doc</code></td></tr>
 <tr><th>Created</th><td>2026-04-24</td></tr>
 <tr><th>Updated</th><td>2026-09-30</td></tr>
 </table>
@@ -169,13 +170,14 @@
 <div class="tree-controls"><button type="button" class="tree-expand-all">Expand all</button><button type="button" class="tree-collapse-all">Collapse all</button></div>
 </div>
 <table class="tree-table">
-<thead><tr><th>Component</th><th>ID</th><th>Platform</th><th>Description</th><th>Bindings</th><th>Notes</th></tr></thead>
+<thead><tr><th>Component</th><th>ID</th><th>Platform</th><th>Description</th><th>Initial State</th><th>Bindings</th><th>Notes</th></tr></thead>
 <tbody>
 <tr data-row-id="1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:0px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>tools_doc_root</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=matchParent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -186,6 +188,7 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent weight=1</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-1" data-parent-id="1-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
@@ -194,12 +197,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-1-1" data-parent-id="1-1-1">
 <td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=wrapContent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#64748B"></i><code>#64748B</code></span></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-event">event</span> <code>onClick</code> → <code>onNavigateTools</code></div></div></td>
 <td>-</td>
 </tr>
@@ -210,12 +215,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>36</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-1-3" data-parent-id="1-1-1">
 <td class="tree-col"><span class="tree-indent" style="width:48px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>17</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -226,12 +233,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#64748B"></i><code>#64748B</code></span></div><div class="style-row"><span class="style-key">Font</span>13</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2" data-parent-id="1-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:32px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>tools_doc_content_with_rail</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=horizontal</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -242,12 +251,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>H=wrapContent weight=1</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-1" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_overview</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -258,12 +269,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-1-2" data-parent-id="1-1-2-1-1">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -274,12 +287,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-2-1" data-parent-id="1-1-2-1-2">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -290,12 +305,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-3" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_commands</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -306,12 +323,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-3-2" data-parent-id="1-1-2-1-3">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -322,12 +341,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=24</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>18</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-3-4" data-parent-id="1-1-2-1-3">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
 <td><code>tools_doc_init_collection</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>commandInitRows</code></div></div></td>
 <td>-</td>
 </tr>
@@ -338,12 +359,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=24</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>18</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-3-6" data-parent-id="1-1-2-1-3">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
 <td><code>tools_doc_validate_collection</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>commandValidateRows</code></div></div></td>
 <td>-</td>
 </tr>
@@ -354,12 +377,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=24</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>18</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-3-8" data-parent-id="1-1-2-1-3">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
 <td><code>tools_doc_generate_collection</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>commandGenerateRows</code></div></div></td>
 <td>-</td>
 </tr>
@@ -370,12 +395,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=24</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>18</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-3-10" data-parent-id="1-1-2-1-3">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
 <td><code>tools_doc_figma_collection</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>commandFigmaRows</code></div></div></td>
 <td>-</td>
 </tr>
@@ -386,12 +413,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-1" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -402,12 +431,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-4-3" data-parent-id="1-1-2-1-4">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
 <td><code>tools_doc_throttle_collection</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=20</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>figmaThrottleRows</code></div></div></td>
 <td>-</td>
 </tr>
@@ -418,12 +449,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-5-1" data-parent-id="1-1-2-1-5">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -434,12 +467,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-6" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_mcp</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#FFFFFF"></i><code>#FFFFFF</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -450,12 +485,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-6-2" data-parent-id="1-1-2-1-6">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -466,12 +503,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-7-1" data-parent-id="1-1-2-1-7">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#0B1220"></i><code>#0B1220</code></span></div><div class="style-row"><span class="style-key">Font</span>26</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -482,12 +521,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=12</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-7-3" data-parent-id="1-1-2-1-7">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=wrapContent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>accent_link</code></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-event">event</span> <code>onClick</code> → <code>onNavigateSampleLive</code></div></div></td>
 <td>-</td>
 </tr>
@@ -496,6 +537,7 @@
 <td><code>tools_doc_sample_tabs</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=20</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>sampleTabs</code></div></div></td>
 <td>-</td>
 </tr>
@@ -504,6 +546,7 @@
 <td><code>sample_panel_json</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=20</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>visibility</code> ↔ <code>jsonSamplePanelVisibility</code></div></div></td>
 <td>-</td>
 </tr>
@@ -512,6 +555,7 @@
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>code</code> ↔ <code>helloWorldSpecJson</code></div></div></td>
 <td>-</td>
 </tr>
@@ -520,6 +564,7 @@
 <td><code>sample_panel_html</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=20</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>visibility</code> ↔ <code>htmlSamplePanelVisibility</code></div></div></td>
 <td>-</td>
 </tr>
@@ -530,12 +575,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-8" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>tools_doc_next</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -546,12 +593,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><code>chrome_ink</code></div><div class="style-row"><span class="style-key">Font</span>24</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-8-2" data-parent-id="1-1-2-1-8">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Collection</span></td>
 <td><code>tools_doc_next_collection</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=20</div></div></td>
+<td>-</td>
 <td><div class="bind-cell"><div><span class="bind-badge bind-data">bind</span> <code>items</code> ↔ <code>nextReadLinks</code></div></div></td>
 <td>-</td>
 </tr>
@@ -562,12 +611,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><code>chrome_fill</code></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-1-9-1" data-parent-id="1-1-2-1-9">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#94A3B8"></i><code>#94A3B8</code></span></div><div class="style-row"><span class="style-key">Font</span>12</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -578,6 +629,7 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=260 H=wrapContent</div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-2-1" data-parent-id="1-1-2-2" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
@@ -586,12 +638,14 @@
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">bg:</span><span class="swatch"><i style="background:#F9FAFB"></i><code>#F9FAFB</code></span></div><div class="style-row"><span class="style-key">Shape</span>dir=vertical</div></div></td>
 <td>-</td>
 <td>-</td>
+<td>-</td>
 </tr>
 <tr data-row-id="1-1-2-2-1-1" data-parent-id="1-1-2-2-1">
 <td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">TableOfContents</span></td>
 <td><code>-</code></td>
 <td>-</td>
 <td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div></div></td>
+<td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
@@ -661,19 +715,19 @@ flowchart TD
 <h2>State Management</h2>
 <details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">11</span></summary>
 <table>
-<thead><tr><th>Variable</th><th>Type</th><th>Description</th><th>Notes</th></tr></thead>
+<thead><tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
-<tr><td><code>commandInitRows</code></td><td>[CommandRow]</td><td>2 entries: `init spec`, `init component`. Each CommandRow carries name + description + key flags (-d, -o, -c). Seeded by onAppear from a module-scope static catalog.</td><td>-</td></tr>
-<tr><td><code>commandValidateRows</code></td><td>[CommandRow]</td><td>2 entries: `validate spec`, `validate component`. Rows rendered inside the &#x27;validate&#x27; Collection.</td><td>-</td></tr>
-<tr><td><code>commandGenerateRows</code></td><td>[CommandRow]</td><td>6 entries: `generate html`, `generate mermaid`, `generate adapter`, `generate doc`, `generate spec`, `generate component`. The largest group — where most day-to-day invocations land.</td><td>-</td></tr>
-<tr><td><code>commandFigmaRows</code></td><td>[CommandRow]</td><td>2 entries: `figma fetch`, `figma images`. Throttling-sensitive; see figmaThrottleRows below for the companion plan table.</td><td>-</td></tr>
-<tr><td><code>figmaThrottleRows</code></td><td>[FigmaThrottleRow]</td><td>4 rows mirroring the Figma plan throttling table from document_tools/README.md (starter 10 req/min ~12s, pro 15 req/min ~8s, org 20 req/min ~6s, enterprise unlimited / no throttle). Static; never mutated after onAppear.</td><td>-</td></tr>
-<tr><td><code>sampleTabs</code></td><td>[TabHeaderCell]</td><td>2 T6-pattern tab headers for the live-sample section: &#x27;Spec JSON&#x27; (id=&#x27;json&#x27;) and &#x27;Generated HTML&#x27; (id=&#x27;html&#x27;). Initial render defaults to id=&#x27;html&#x27; active. Rebuilt on every onSelectSampleTab call by buildSampleTabs(activeId) so the active row carries accent bgColor/fgColor/borderColor and the inactive row carries the surface palette — exactly the same pattern hello-world&#x27;s buildPlatformTabs uses for the Swift/Kotlin/React switcher.</td><td>-</td></tr>
-<tr><td><code>helloWorldSpecJson</code></td><td>String</td><td>Literal JSON text of docs/screens/json/learn/hello-world.spec.json, inlined at author time as a module-scope constant and read into the VM from onAppear. Rendered inside a CodeBlock (language=&#x27;json&#x27;) on the &#x27;Spec JSON&#x27; tab. Seeded once; never mutated.</td><td>-</td></tr>
-<tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td>2 closing cards: /tools/mcp (the MCP server, whose doc_generate_* tools wrap this CLI) and /reference/cli-commands (the broader CLI reference).</td><td>-</td></tr>
-<tr><td><code>activeSampleTab</code></td><td>String</td><td>Id of the currently selected live-sample tab (&#x27;json&#x27; | &#x27;html&#x27;). Defaults to &#x27;html&#x27; so a first-time visitor sees the generated preview (the more visually immediate output), with the raw spec one click away. Drives displayLogic for the two sample-panel visibility variables and is fed into buildSampleTabs on each toggle. Matches the naming pattern LearnHelloWorldViewModel uses for `activeTab`.</td><td>-</td></tr>
-<tr><td><code>jsonSamplePanelVisibility</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
-<tr><td><code>htmlSamplePanelVisibility</code></td><td>String</td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>commandInitRows</code></td><td>[CommandRow]</td><td><code>-</code></td><td>2 entries: `init spec`, `init component`. Each CommandRow carries name + description + key flags (-d, -o, -c). Seeded by onAppear from a module-scope static catalog.</td><td>-</td></tr>
+<tr><td><code>commandValidateRows</code></td><td>[CommandRow]</td><td><code>-</code></td><td>2 entries: `validate spec`, `validate component`. Rows rendered inside the &#x27;validate&#x27; Collection.</td><td>-</td></tr>
+<tr><td><code>commandGenerateRows</code></td><td>[CommandRow]</td><td><code>-</code></td><td>6 entries: `generate html`, `generate mermaid`, `generate adapter`, `generate doc`, `generate spec`, `generate component`. The largest group — where most day-to-day invocations land.</td><td>-</td></tr>
+<tr><td><code>commandFigmaRows</code></td><td>[CommandRow]</td><td><code>-</code></td><td>2 entries: `figma fetch`, `figma images`. Throttling-sensitive; see figmaThrottleRows below for the companion plan table.</td><td>-</td></tr>
+<tr><td><code>figmaThrottleRows</code></td><td>[FigmaThrottleRow]</td><td><code>-</code></td><td>4 rows mirroring the Figma plan throttling table from document_tools/README.md (starter 10 req/min ~12s, pro 15 req/min ~8s, org 20 req/min ~6s, enterprise unlimited / no throttle). Static; never mutated after onAppear.</td><td>-</td></tr>
+<tr><td><code>sampleTabs</code></td><td>[TabHeaderCell]</td><td><code>-</code></td><td>2 T6-pattern tab headers for the live-sample section: &#x27;Spec JSON&#x27; (id=&#x27;json&#x27;) and &#x27;Generated HTML&#x27; (id=&#x27;html&#x27;). Initial render defaults to id=&#x27;html&#x27; active. Rebuilt on every onSelectSampleTab call by buildSampleTabs(activeId) so the active row carries accent bgColor/fgColor/borderColor and the inactive row carries the surface palette — exactly the same pattern hello-world&#x27;s buildPlatformTabs uses for the Swift/Kotlin/React switcher.</td><td>-</td></tr>
+<tr><td><code>helloWorldSpecJson</code></td><td>String</td><td><code>-</code></td><td>Literal JSON text of docs/screens/json/learn/hello-world.spec.json, inlined at author time as a module-scope constant and read into the VM from onAppear. Rendered inside a CodeBlock (language=&#x27;json&#x27;) on the &#x27;Spec JSON&#x27; tab. Seeded once; never mutated.</td><td>-</td></tr>
+<tr><td><code>nextReadLinks</code></td><td>[NextReadLink]</td><td><code>-</code></td><td>2 closing cards: /tools/mcp (the MCP server, whose doc_generate_* tools wrap this CLI) and /reference/cli-commands (the broader CLI reference).</td><td>-</td></tr>
+<tr><td><code>activeSampleTab</code></td><td>String</td><td><code>-</code></td><td>Id of the currently selected live-sample tab (&#x27;json&#x27; | &#x27;html&#x27;). Defaults to &#x27;html&#x27; so a first-time visitor sees the generated preview (the more visually immediate output), with the raw spec one click away. Drives displayLogic for the two sample-panel visibility variables and is fed into buildSampleTabs on each toggle. Matches the naming pattern LearnHelloWorldViewModel uses for `activeTab`.</td><td>-</td></tr>
+<tr><td><code>jsonSamplePanelVisibility</code></td><td>String</td><td><code>-</code></td><td>(from binding)</td><td>-</td></tr>
+<tr><td><code>htmlSamplePanelVisibility</code></td><td>String</td><td><code>-</code></td><td>(from binding)</td><td>-</td></tr>
 </tbody></table>
 </details>
 <details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">5</span></summary>

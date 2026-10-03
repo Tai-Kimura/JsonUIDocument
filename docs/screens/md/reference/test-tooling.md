@@ -6,6 +6,7 @@ Reference > Test tooling reference. Two sections + TOC + next-reads. (1) Feature
 
 | | |
 |---|---|
+| Layout File | `reference/test-tooling` |
 | Created | 2026-07-09 |
 | Updated | 2026-09-30 |
 
@@ -76,9 +77,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards: /guides/testing + /guides/api-mock. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards: /guides/testing + /guides/api-mock. | - |
 
 ### View-local Event Handlers
 

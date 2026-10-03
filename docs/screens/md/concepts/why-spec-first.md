@@ -6,6 +6,7 @@ Short essay explaining the design-side and engineering-side motivations for the 
 
 | | |
 |---|---|
+| Layout File | `concepts/why-spec-first` |
 | Created | 2026-04-23 |
 | Updated | 2026-05-27 |
 
@@ -86,10 +87,10 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two follow-up concept essays at the bottom of the page (One Layout JSON / Data binding as contract). Seeded by onAppear. | - |
-| `onSubmit` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two follow-up concept essays at the bottom of the page (One Layout JSON / Data binding as contract). Seeded by onAppear. | - |
+| `onSubmit` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

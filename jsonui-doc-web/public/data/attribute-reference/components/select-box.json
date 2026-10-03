@@ -45,19 +45,19 @@
   "canonicalCode": "{\n  \"type\": \"SelectBox\",\n  \"selectedValue\": \"@{country}\",\n  \"items\": [\"Japan\", \"United States\", \"United Kingdom\"],\n  \"prompt\": \"@string/select_country\"\n}",
   "canonicalLanguage": "json",
   "statRequired": "0",
-  "statOptional": "31",
-  "statEvents": "2",
+  "statOptional": "30",
+  "statEvents": "1",
   "statRequiredText": {
     "en": "0 required",
     "ja": "必須 0"
   },
   "statOptionalText": {
-    "en": "31 optional",
-    "ja": "任意 31"
+    "en": "30 optional",
+    "ja": "任意 30"
   },
   "statEventsText": {
-    "en": "2 events",
-    "ja": "イベント 2"
+    "en": "1 events",
+    "ja": "イベント 1"
   },
   "usageVisibility": "visible",
   "attributeCategories": {
@@ -2262,7 +2262,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
@@ -2293,7 +2293,14 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "onValueChanged",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
@@ -2309,70 +2316,6 @@
               "note": {
                 "en": "Fires after the user confirms a selection. The handler receives the new value of the selection binding, the same on every platform: with `selectedIndex` bound it is the Int index — declare `((Int) -> Void)?` (Kotlin `((Int) -> Unit)?`), or `((String, Int) -> Void)?` for viewId + index; with `selectedItem` / `selectedValue` bound it is the String item — declare `((String, String) -> Void)?` for viewId + item. A lone `(String)` parameter is read as the viewId, not the item. `(() -> Void)?` receives nothing and the ViewModel reads the bound value back. The Android Compose codegen follows this rule from jsonui-cli 1.8.106: before that it passed the String item even with `selectedIndex` bound, so an `((Int) -> Unit)?` handler never received the index there. Read from the converter change and the upstream fix report, not measured here.",
                 "ja": "選択確定後に発火。handler は選択 binding の新しい値を受け取り、全プラットフォームで同じ: `selectedIndex` を束縛していれば Int の index — 宣言は `((Int) -> Void)?`（Kotlin は `((Int) -> Unit)?`）、viewId 付きなら `((String, Int) -> Void)?`。`selectedItem` / `selectedValue` を束縛していれば String の item — viewId 付きの `((String, String) -> Void)?` で宣言する。単独の `(String)` 引数は item ではなく viewId と読まれる。`(() -> Void)?` は何も受け取らず、ViewModel が束縛値を読み戻す。Android の Compose codegen がこの規則に従うのは jsonui-cli 1.8.106 から: それ以前は `selectedIndex` 束縛でも String の item を渡していたため、`((Int) -> Unit)?` の handler には index が届かなかった。コンバータの変更と上流の修正レポートを読んだもので、こちらでは未測定。"
-              },
-              "type": "binding",
-              "required": ""
-            },
-            {
-              "id": "attr_onValueChanged",
-              "name": "onValueChanged",
-              "anchorId": "attr-onValueChanged",
-              "requiredChipText": "",
-              "requiredChipVisibility": "gone",
-              "deprecatedChipVisibility": "gone",
-              "accentBarColor": "var(--color-border)",
-              "nameTextStyle": "normal",
-              "nameFontColor": "var(--color-ink)",
-              "defaultChipText": "",
-              "defaultChipVisibility": "gone",
-              "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
-              "typeChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": [
-                        {
-                          "id": "tc_0",
-                          "label": "binding",
-                          "background": "var(--color-accent_tint)",
-                          "fontColor": "var(--color-accent_secondary_strong)"
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "enumChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "aliasChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "description": {
-                "en": "Value change handler (alias for onValueChange) — binding only (@{functionName}).",
-                "ja": "値変更時のイベントハンドラ（`onValueChange` のエイリアス）。binding のみ。"
-              },
-              "platformMatrixVisibility": "gone",
-              "platformIosLabel": "✓",
-              "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
-              "note": {
-                "en": "",
-                "ja": ""
               },
               "type": "binding",
               "required": ""
@@ -4228,7 +4171,7 @@
               "defaultChipText": "",
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
               "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
@@ -4259,7 +4202,14 @@
                 "sections": [
                   {
                     "cells": {
-                      "data": []
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "onValueChanged",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
                     }
                   }
                 ]
@@ -4275,70 +4225,6 @@
               "note": {
                 "en": "Fires after the user confirms a selection. The handler receives the new value of the selection binding, the same on every platform: with `selectedIndex` bound it is the Int index — declare `((Int) -> Void)?` (Kotlin `((Int) -> Unit)?`), or `((String, Int) -> Void)?` for viewId + index; with `selectedItem` / `selectedValue` bound it is the String item — declare `((String, String) -> Void)?` for viewId + item. A lone `(String)` parameter is read as the viewId, not the item. `(() -> Void)?` receives nothing and the ViewModel reads the bound value back. The Android Compose codegen follows this rule from jsonui-cli 1.8.106: before that it passed the String item even with `selectedIndex` bound, so an `((Int) -> Unit)?` handler never received the index there. Read from the converter change and the upstream fix report, not measured here.",
                 "ja": "選択確定後に発火。handler は選択 binding の新しい値を受け取り、全プラットフォームで同じ: `selectedIndex` を束縛していれば Int の index — 宣言は `((Int) -> Void)?`（Kotlin は `((Int) -> Unit)?`）、viewId 付きなら `((String, Int) -> Void)?`。`selectedItem` / `selectedValue` を束縛していれば String の item — viewId 付きの `((String, String) -> Void)?` で宣言する。単独の `(String)` 引数は item ではなく viewId と読まれる。`(() -> Void)?` は何も受け取らず、ViewModel が束縛値を読み戻す。Android の Compose codegen がこの規則に従うのは jsonui-cli 1.8.106 から: それ以前は `selectedIndex` 束縛でも String の item を渡していたため、`((Int) -> Unit)?` の handler には index が届かなかった。コンバータの変更と上流の修正レポートを読んだもので、こちらでは未測定。"
-              },
-              "type": "binding",
-              "required": ""
-            },
-            {
-              "id": "attr_onValueChanged",
-              "name": "onValueChanged",
-              "anchorId": "attr-onValueChanged",
-              "requiredChipText": "",
-              "requiredChipVisibility": "gone",
-              "deprecatedChipVisibility": "gone",
-              "accentBarColor": "var(--color-border)",
-              "nameTextStyle": "normal",
-              "nameFontColor": "var(--color-ink)",
-              "defaultChipText": "",
-              "defaultChipVisibility": "gone",
-              "enumChipsVisibility": "gone",
-              "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
-              "typeChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": [
-                        {
-                          "id": "tc_0",
-                          "label": "binding",
-                          "background": "var(--color-accent_tint)",
-                          "fontColor": "var(--color-accent_secondary_strong)"
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "enumChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "aliasChips": {
-                "sections": [
-                  {
-                    "cells": {
-                      "data": []
-                    }
-                  }
-                ]
-              },
-              "description": {
-                "en": "Value change handler (alias for onValueChange) — binding only (@{functionName}).",
-                "ja": "値変更時のイベントハンドラ（`onValueChange` のエイリアス）。binding のみ。"
-              },
-              "platformMatrixVisibility": "gone",
-              "platformIosLabel": "✓",
-              "platformAndroidLabel": "✓",
-              "platformWebLabel": "✓",
-              "note": {
-                "en": "",
-                "ja": ""
               },
               "type": "binding",
               "required": ""

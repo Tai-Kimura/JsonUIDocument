@@ -6,6 +6,7 @@ Guides > Web framework adapters. How `web_framework` in rjui.config.json retarge
 
 | | |
 |---|---|
+| Layout File | `guides/web-framework-adapters` |
 | Created | 2026-08-18 |
 | Updated | 2026-08-18 |
 
@@ -70,9 +71,9 @@ guides_web_framework_adapters_root
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Three closing cards: ReactJsonUI platform page, navigation guide, jui config reference. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Three closing cards: ReactJsonUI platform page, navigation guide, jui config reference. | - |
 
 ### View-local Event Handlers
 

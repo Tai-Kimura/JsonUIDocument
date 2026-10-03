@@ -6,6 +6,7 @@ Guides > Unit contracts. Dedicated page for `unitContracts` and `jsonui-test gen
 
 | | |
 |---|---|
+| Layout File | `guides/unit-contracts` |
 | Created | 2026-09-08 |
 | Updated | 2026-09-08 |
 
@@ -79,9 +80,9 @@ guides_unit_contracts_root
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Three closing cards: branch contracts (the declaration side), branch tests (the other generator), testing (where unit tests sit in the whole test story). | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Three closing cards: branch contracts (the declaration side), branch tests (the other generator), testing (where unit tests sit in the whole test story). | - |
 
 ### View-local Event Handlers
 

@@ -6,6 +6,7 @@ Map article for the six spec-splitting patterns — layoutFile extraction, paren
 
 | | |
 |---|---|
+| Layout File | `spec/split-overview` |
 | Created | 2026-04-24 |
 | Updated | 2026-04-24 |
 
@@ -96,12 +97,12 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Follow-up cards pointing at the per-pattern detail articles (anchored to anatomy + the Phase 2 detail articles once they land). | - |
-| `ads` | String | (from binding) | - |
-| `posts` | String | (from binding) | - |
-| `selectedOrderId` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Follow-up cards pointing at the per-pattern detail articles (anchored to anatomy + the Phase 2 detail articles once they land). | - |
+| `ads` | String | `-` | (from binding) | - |
+| `posts` | String | `-` | (from binding) | - |
+| `selectedOrderId` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

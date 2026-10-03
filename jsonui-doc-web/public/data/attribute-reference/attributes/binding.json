@@ -82,7 +82,7 @@
               "type": "array",
               "summary": {
                 "en": "Declares the ViewModel properties this Layout segment expects. Appears at the top of a Layout as …",
-                "ja": "この Layout セグメントが ViewModel に期待するプロパティを宣言。Layout 先頭に `{ \"data\": [...] }` として現れる。"
+                "ja": "この Layout セグメントが ViewModel に期待するプロパティを宣言。Layout 先頭に `{ \"data\": [...] }` として現れる。include ノードではオブジェク…"
               },
               "anchorUrl": "#attr-data"
             },
@@ -101,8 +101,8 @@
               "name": "shared_data",
               "type": "object",
               "summary": {
-                "en": "Declares data shared with parent screens. Used in include'd partials to propagate state upward.",
-                "ja": "親画面と共有するデータを宣言。include された部分 Layout から状態を上位に伝搬させるのに使う。"
+                "en": "On an include node: a map laid over the including screen's data for the included layout, read bef…",
+                "ja": "include ノードで使う: include 元の画面の data に重ねて include 先の Layout に渡すマップ。`data` より先に読まれます（同じキーは `data` が勝…"
               },
               "anchorUrl": "#attr-shared_data"
             },
@@ -553,8 +553,8 @@
                 ]
               },
               "description": {
-                "en": "Declares the ViewModel properties this Layout segment expects. Appears at the top of a Layout as `{ \"data\": [...] }`.",
-                "ja": "この Layout セグメントが ViewModel に期待するプロパティを宣言。Layout 先頭に `{ \"data\": [...] }` として現れる。"
+                "en": "Declares the ViewModel properties this Layout segment expects. Appears at the top of a Layout as `{ \"data\": [...] }`. On an include node it is an object map instead, laid over the including screen's data after `shared_data`. Since jsonui-cli 1.9.6, the same data name declared with two different types in two places is warned, checked across the whole screen after includes are expanded.",
+                "ja": "この Layout セグメントが ViewModel に期待するプロパティを宣言。Layout 先頭に `{ \"data\": [...] }` として現れる。include ノードではオブジェクトのマップになり、`shared_data` の後に include 元の画面の data に重なる。jsonui-cli 1.9.6 から、同じ data 名を違う型で 2 か所に宣言すると警告される（include を展開した後の画面全体で検査）。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
@@ -684,8 +684,8 @@
                 ]
               },
               "description": {
-                "en": "Declares data shared with parent screens. Used in include'd partials to propagate state upward.",
-                "ja": "親画面と共有するデータを宣言。include された部分 Layout から状態を上位に伝搬させるのに使う。"
+                "en": "On an include node: a map laid over the including screen's data for the included layout, read before `data` (`data` wins on a key both set). Each key is a name the included layout binds; each value is a literal or a binding in the including screen.",
+                "ja": "include ノードで使う: include 元の画面の data に重ねて include 先の Layout に渡すマップ。`data` より先に読まれます（同じキーは `data` が勝つ）。キーは include 先が束縛する名前、値はリテラルか include 元の画面の束縛。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",

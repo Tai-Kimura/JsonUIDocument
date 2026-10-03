@@ -6,6 +6,7 @@ Pattern 5 of spec splitting — deep dive into structure.collection.cellClasses[
 
 | | |
 |---|---|
+| Layout File | `spec/cell-classes` |
 | Created | 2026-04-24 |
 | Updated | 2026-04-24 |
 
@@ -88,15 +89,15 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Follow-up cards. | - |
-| `ads` | String | (from binding) | - |
-| `bodyKey` | String | (from binding) | - |
-| `onTap` | String | (from binding) | - |
-| `posts` | String | (from binding) | - |
-| `rows` | String | (from binding) | - |
-| `titleKey` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Follow-up cards. | - |
+| `ads` | String | `-` | (from binding) | - |
+| `bodyKey` | String | `-` | (from binding) | - |
+| `onTap` | String | `-` | (from binding) | - |
+| `posts` | String | `-` | (from binding) | - |
+| `rows` | String | `-` | (from binding) | - |
+| `titleKey` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

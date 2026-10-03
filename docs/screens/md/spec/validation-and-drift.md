@@ -6,6 +6,7 @@ Phase 3 closer of the Spec section — the two tools that guard specs (`jsonui-d
 
 | | |
 |---|---|
+| Layout File | `spec/validation-and-drift` |
 | Created | 2026-04-24 |
 | Updated | 2026-04-24 |
 
@@ -87,9 +88,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Follow-up cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Follow-up cards. | - |
 
 ### View-local Event Handlers
 

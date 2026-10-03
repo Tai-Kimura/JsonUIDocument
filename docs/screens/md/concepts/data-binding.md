@@ -6,6 +6,7 @@ Essay: why @{variable} is not a template expression but a typed binding to a Vie
 
 | | |
 |---|---|
+| Layout File | `concepts/data-binding` |
 | Created | 2026-04-23 |
 | Updated | 2026-04-24 |
 
@@ -87,36 +88,36 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two follow-up essays at the bottom. | - |
-| `activeTab` | String | (from binding) | - |
-| `bars` | String | (from binding) | - |
-| `cardBg` | String | (from binding) | - |
-| `coverUrl` | String | (from binding) | - |
-| `emphasis` | String | (from binding) | - |
-| `fadeAlpha` | String | (from binding) | - |
-| `greeting` | String | (from binding) | - |
-| `onEmailChange` | String | (from binding) | - |
-| `onSubmit` | String | (from binding) | - |
-| `panelVisibility` | String | (from binding) | - |
-| `panelWidth` | String | (from binding) | - |
-| `placeholder` | String | (from binding) | - |
-| `status` | String | (from binding) | - |
-| `count` | String | (from binding) | - |
-| `email` | String | (from binding) | - |
-| `a` | String | (from binding) | - |
-| `b` | String | (from binding) | - |
-| `countLabel` | String | (from binding) | - |
-| `displayName` | String | (from binding) | - |
-| `formatName` | String | (from binding) | - |
-| `isReady` | String | (from binding) | - |
-| `isValid` | String | (from binding) | - |
-| `items` | String | (from binding) | - |
-| `nickname` | String | (from binding) | - |
-| `parentProp` | String | (from binding) | - |
-| `sibling` | String | (from binding) | - |
-| `user` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two follow-up essays at the bottom. | - |
+| `activeTab` | String | `-` | (from binding) | - |
+| `bars` | String | `-` | (from binding) | - |
+| `cardBg` | String | `-` | (from binding) | - |
+| `coverUrl` | String | `-` | (from binding) | - |
+| `emphasis` | String | `-` | (from binding) | - |
+| `fadeAlpha` | String | `-` | (from binding) | - |
+| `greeting` | String | `-` | (from binding) | - |
+| `onEmailChange` | String | `-` | (from binding) | - |
+| `onSubmit` | String | `-` | (from binding) | - |
+| `panelVisibility` | String | `-` | (from binding) | - |
+| `panelWidth` | String | `-` | (from binding) | - |
+| `placeholder` | String | `-` | (from binding) | - |
+| `status` | String | `-` | (from binding) | - |
+| `count` | String | `-` | (from binding) | - |
+| `email` | String | `-` | (from binding) | - |
+| `a` | String | `-` | (from binding) | - |
+| `b` | String | `-` | (from binding) | - |
+| `countLabel` | String | `-` | (from binding) | - |
+| `displayName` | String | `-` | (from binding) | - |
+| `formatName` | String | `-` | (from binding) | - |
+| `isReady` | String | `-` | (from binding) | - |
+| `isValid` | String | `-` | (from binding) | - |
+| `items` | String | `-` | (from binding) | - |
+| `nickname` | String | `-` | (from binding) | - |
+| `parentProp` | String | `-` | (from binding) | - |
+| `sibling` | String | `-` | (from binding) | - |
+| `user` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 
@@ -156,5 +157,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Second live essay under Concepts. Flipping CONCEPTS_ENTRIES row 4 (data-binding) from 'upcoming' to 'live' in HomeViewModel is the last step.
 - The closing next-reads point at WhySpecFirst (back) and ViewModel-owned state (upcoming sibling).
 - 2026-04-24 rewrite: the four section bodies were rewritten against the real SwiftJsonUI / KotlinJsonUI / ReactJsonUI implementations — see docs/plans/concepts-data-binding-rewrite.md. Key correction: form inputs (TextField / CheckBox / Switch / Toggle / Slider / SelectBox / Segment) are effectively two-way on every platform (SwiftUI $binding, Android LaunchedEffect + updateData, Web auto-generated onChange); the optional onXxxChange handler is a notification hook that fires AFTER the VM field has already updated, not a gate. Non-input bindings (Label text, visibility, src, colors, items) remain read-only.
+- 2026-10-02 — section_no_logic_body and the REJECTED code block gain the mixed-text form (`"Total: @{count}"`). jsonui-cli 1.9.6 adds binding-mixed-text (WARNING, fails under --strict): an SSoT-declared attribute whose value contains `@{` but is not one whole `@{...}`. The user's ruling (2026-10-02) is that a sentence is assembled in the ViewModel and passed as one binding, because a layout-assembled sentence cannot be localized as one string and puts logic in the JSON.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

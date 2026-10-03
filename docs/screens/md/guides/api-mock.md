@@ -6,6 +6,7 @@ Guides > Mocking APIs in tests. Seven sections + TOC + next-reads. How jsonui-te
 
 | | |
 |---|---|
+| Layout File | `guides/api-mock` |
 | Created | 2026-07-09 |
 | Updated | 2026-09-30 |
 
@@ -101,9 +102,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards: /guides/testing (the test DSL) + /reference/cli-commands (the mock subcommands). | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards: /guides/testing (the test DSL) + /reference/cli-commands (the mock subcommands). | - |
 
 ### View-local Event Handlers
 

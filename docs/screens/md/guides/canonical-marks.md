@@ -6,6 +6,7 @@ Guides > Referencing the API canon from a spec. The `@canonical` / `@canonical.w
 
 | | |
 |---|---|
+| Layout File | `guides/canonical-marks` |
 | Created | 2026-08-28 |
 | Updated | 2026-08-28 |
 
@@ -124,9 +125,9 @@ guides_canonical_marks_root
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Three closing cards: API data models (where the canon lives), verifying implementation against docs (the checker that compares canon and backend), writing your first spec (the dataFlow section marks live in). | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Three closing cards: API data models (where the canon lives), verifying implementation against docs (the checker that compares canon and backend), writing your first spec (the dataFlow section marks live in). | - |
 
 ### View-local Event Handlers
 

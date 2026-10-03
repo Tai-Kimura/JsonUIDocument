@@ -6,6 +6,7 @@ Tools > CLI overview. Six sub-CLIs under one install: jui (orchestrator) + sjui 
 
 | | |
 |---|---|
+| Layout File | `tools/cli` |
 | Created | 2026-04-23 |
 | Updated | 2026-09-30 |
 
@@ -84,10 +85,10 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `cliRows` | [CliRow] | Six sub-CLI entries (jui / sjui / kjui / rjui / jsonui-test / jsonui-doc). Each carries name + role + one-line description. | - |
-| `nextReadLinks` | [NextReadLink] | Two closing cards: Agents + MCP server. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `cliRows` | [CliRow] | `-` | Six sub-CLI entries (jui / sjui / kjui / rjui / jsonui-test / jsonui-doc). Each carries name + role + one-line description. | - |
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards: Agents + MCP server. | - |
 
 ### View-local Event Handlers
 

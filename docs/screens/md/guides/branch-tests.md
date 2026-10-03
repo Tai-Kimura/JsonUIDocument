@@ -6,6 +6,7 @@ Guides > Branch tests. Dedicated page (user-directed split from the branch-contr
 
 | | |
 |---|---|
+| Layout File | `guides/branch-tests` |
 | Created | 2026-08-24 |
 | Updated | 2026-08-24 |
 
@@ -126,9 +127,9 @@ guides_branch_tests_root
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Three closing cards: branch contracts (the declaration side), writing screen tests, verifying implementation against docs. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Three closing cards: branch contracts (the declaration side), writing screen tests, verifying implementation against docs. | - |
 
 ### View-local Event Handlers
 

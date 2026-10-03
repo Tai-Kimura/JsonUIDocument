@@ -6,6 +6,7 @@ Site-wide chrome composition: mounts the TopBar (sticky header with brand, Searc
 
 | | |
 |---|---|
+| Layout File | `chrome` |
 | Created | 2026-04-23 |
 | Updated | 2026-04-23 |
 
@@ -26,6 +27,14 @@ chrome_root
 ├── chrome_topbar
 └── chrome_sidebar
 ```
+
+### Custom Components
+
+| Component | Specification | Description |
+|---|---|---|
+| TopBar | `topbar.component.json` | Site-wide sticky header rendered by the chrome shell. |
+| Sidebar | `sidebar.component.json` | Site-wide left-rail navigation rendered by the chrome shell. |
+| Search | `search.component.json` | Site-wide search trigger. Rendered inside TopBar, so no layout names it directly. |
 
 ## Data Flow
 
@@ -74,14 +83,14 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `navItems` | [SidebarSection] | Ordered nav catalog — six SidebarSection entries (learn / guides / concepts / reference / platforms / tools). Seeded by onAppear from the module-scope NAV_CATALOG constant; each entry's label + every row's label is pre-resolved through StringManager so the Sidebar component receives display-ready strings. | - |
-| `activeUrl` | String | Mirror of the current route. Set by the Chrome wrapper via onRouteChange(pathname) whenever Next.js's usePathname() changes. Drives the aria-current='page' highlight on the matching Sidebar row. | - |
-| `collapsedIds` | [String] | Section ids currently collapsed. onToggleSection flips membership. onRouteChange auto-removes the containing section so the user always sees the current route's siblings without an extra click. | - |
-| `mobileOpen` | Bool | Mobile drawer open flag. True on viewports <1024px when the user has tapped the top-bar menu button. Tapping any Sidebar link (onLinkTap) and tapping Escape both flip it back to false. | - |
-| `currentLanguage` | String | Mirror of StringManager.language. Drives the TopBar's language-toggle display label (shows the OTHER language as an invitation to switch). Re-seeded inside onAppear on every language toggle so the chrome re-localizes in lockstep with generated pages. | - |
-| `currentColorMode` | String | Mirror of ColorManager.currentMode. Drives the TopBar's theme-toggle icon (sun when the current mode is 'light', moon when 'dark'). Seeded from ColorManager at construction and re-synced via ColorManager.subscribe() whenever the mode changes (manual toggle or prefers-color-scheme media query). | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `navItems` | [SidebarSection] | `-` | Ordered nav catalog — six SidebarSection entries (learn / guides / concepts / reference / platforms / tools). Seeded by onAppear from the module-scope NAV_CATALOG constant; each entry's label + every row's label is pre-resolved through StringManager so the Sidebar component receives display-ready strings. | - |
+| `activeUrl` | String | `-` | Mirror of the current route. Set by the Chrome wrapper via onRouteChange(pathname) whenever Next.js's usePathname() changes. Drives the aria-current='page' highlight on the matching Sidebar row. | - |
+| `collapsedIds` | [String] | `-` | Section ids currently collapsed. onToggleSection flips membership. onRouteChange auto-removes the containing section so the user always sees the current route's siblings without an extra click. | - |
+| `mobileOpen` | Bool | `-` | Mobile drawer open flag. True on viewports <1024px when the user has tapped the top-bar menu button. Tapping any Sidebar link (onLinkTap) and tapping Escape both flip it back to false. | - |
+| `currentLanguage` | String | `-` | Mirror of StringManager.language. Drives the TopBar's language-toggle display label (shows the OTHER language as an invitation to switch). Re-seeded inside onAppear on every language toggle so the chrome re-localizes in lockstep with generated pages. | - |
+| `currentColorMode` | String | `-` | Mirror of ColorManager.currentMode. Drives the TopBar's theme-toggle icon (sun when the current mode is 'light', moon when 'dark'). Seeded from ColorManager at construction and re-synced via ColorManager.subscribe() whenever the mode changes (manual toggle or prefers-color-scheme media query). | - |
 
 ### View-local Event Handlers
 

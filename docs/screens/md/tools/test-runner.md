@@ -6,6 +6,7 @@ Tools > test runner overview. JSON-authored tests driving real apps across iOS /
 
 | | |
 |---|---|
+| Layout File | `tools/test-runner` |
 | Created | 2026-04-23 |
 | Updated | 2026-09-30 |
 
@@ -80,9 +81,9 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
 
 ### View-local Event Handlers
 

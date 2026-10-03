@@ -6,6 +6,7 @@ Learn > hands-on data binding walkthrough. Builds a Counter screen from scratch 
 
 | | |
 |---|---|
+| Layout File | `learn/data-binding-basics` |
 | Created | 2026-04-23 |
 | Updated | 2026-04-23 |
 
@@ -93,13 +94,13 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `nextReadLinks` | [NextReadLink] | Two closing cards. | - |
-| `count` | String | (from binding) | - |
-| `statusVisibility` | String | (from binding) | - |
-| `onDecrement` | String | (from binding) | - |
-| `onIncrement` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards. | - |
+| `count` | String | `-` | (from binding) | - |
+| `statusVisibility` | String | `-` | (from binding) | - |
+| `onDecrement` | String | `-` | (from binding) | - |
+| `onIncrement` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

@@ -6,6 +6,7 @@ Tools > MCP server overview. The typed API surface the agents use to inspect eve
 
 | | |
 |---|---|
+| Layout File | `tools/mcp` |
 | Created | 2026-04-23 |
 | Updated | 2026-09-30 |
 
@@ -84,10 +85,10 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `tools` | [McpToolRow] | 39 MCP tools. Each entry names the tool, declares its group (A/B/C/D/E/F), and a one-line role. Group E (added 2026-05) holds the 3 API Model Discovery tools: list_api_specs, list_api_models, preview_api_model_sync. Group F (added 2026-07) holds the 6 Test Tooling tools: test_validate, test_generate_screen, test_generate_flow, test_generate_description, test_report, test_mock_generate. | - |
-| `nextReadLinks` | [NextReadLink] | Two closing cards: Agents (client of MCP) + CLI (caller behind jui build). | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `tools` | [McpToolRow] | `-` | 39 MCP tools. Each entry names the tool, declares its group (A/B/C/D/E/F), and a one-line role. Group E (added 2026-05) holds the 3 API Model Discovery tools: list_api_specs, list_api_models, preview_api_model_sync. Group F (added 2026-07) holds the 6 Test Tooling tools: test_validate, test_generate_screen, test_generate_flow, test_generate_description, test_report, test_mock_generate. | - |
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards: Agents (client of MCP) + CLI (caller behind jui build). | - |
 
 ### View-local Event Handlers
 

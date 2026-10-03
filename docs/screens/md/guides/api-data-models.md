@@ -6,6 +6,7 @@ Guides > API data models. Cookbook companion to /concepts/data-models-from-opena
 
 | | |
 |---|---|
+| Layout File | `guides/api-data-models` |
 | Created | 2026-05-27 |
 | Updated | 2026-07-07 |
 
@@ -174,23 +175,23 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `filterConfigRows` | [FilterConfigRow] | Five rows for the §3 'api.schemas.* settings reference' table: include_paths, exclude_paths, include_schemas, exclude_schemas, skip_domain. Each row carries keyKey + typeKey + defaultKey + globKey + descriptionKey under the guides_api_data_models_filter_ namespace. | - |
-| `filterEvalRows` | [FilterEvalRow] | Four rows for the §3 evaluation-order table (path includes -> path excludes -> schema includes -> schema excludes). Each row has orderKey + ruleKey + bodyKey. | - |
-| `skipDomainCompareRows` | [ComparisonRow] | Three rows for the §4 skip_domain comparison table (where it lives / scope / when to pick which). Each row has labelKey + schemaSideKey + appSideKey under the guides_api_data_models_skip_domain_ namespace. | - |
-| `mcpPreviewFields` | [McpFieldRow] | Four rows for §5 documenting the preview_api_model_sync output shape (kept_schemas, filtered_out, skip_domain_matches, halts). Each carries fieldKey + typeKey + bodyKey under the guides_api_data_models_mcp_preview_ namespace. | - |
-| `mcpDiscoveryFields` | [McpFieldRow] | Rows for §6 documenting list_api_specs and list_api_models output shapes. Two tools, ~6 rows total. Keys under the guides_api_data_models_mcp_discovery_ namespace. | - |
-| `androidSerializerRows` | [ComparisonRow] | Three rows for the §9 Android-serializer comparison table (moshi / kotlinx / none). labelKey + moshiKey + kotlinxKey + noneKey — note this row type has 4 columns not 3; rendered with the comparison_4col cell rather than comparison_row. See customTypes below. | - |
-| `webCaseRows` | [ComparisonRow] | Three rows for the §10 Web case-convention comparison (snake_case default zero-cost / camelCase runtime conversion). Reuses ComparisonRow since it's a 3-col compare (label + snake / camel). | - |
-| `haltRows` | [HaltRow] | Six rows for the §15 ERROR-halt table (mirror of the concept page's section 9 but more recipe-flavored: each row has triggerKey + behaviorKey + workaroundKey, where workaround is a concrete code or config patch hint). | - |
-| `domainPatternTabs` | [TabHeaderCell] | Four T6-pattern tab headers for the §8 Domain-customization switcher (id='proxy' | 'type_conv' | 'computed' | 'stored'). Initial active is 'proxy'. Rebuilt by buildDomainPatternTabs(id) on every onSelectCodeTab call. | - |
-| `activeDomainPattern` | String | Id of the currently selected Domain-customization pattern in §8 ('proxy' | 'type_conv' | 'computed' | 'stored'). Drives displayLogic for the four §8 sample panels. | - |
-| `nextReadLinks` | [NextReadLink] | Three closing 'read next' cards: /concepts/data-models-from-openapi (back to the concept), /reference/cli-commands (jui g api / jui ls api-* details), /tools/mcp (MCP Group E tool reference). Seeded in onAppear. | - |
-| `proxyPatternPanelVisibility` | String | (from binding) | - |
-| `typeConvPatternPanelVisibility` | String | (from binding) | - |
-| `computedPatternPanelVisibility` | String | (from binding) | - |
-| `storedPatternPanelVisibility` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `filterConfigRows` | [FilterConfigRow] | `-` | Five rows for the §3 'api.schemas.* settings reference' table: include_paths, exclude_paths, include_schemas, exclude_schemas, skip_domain. Each row carries keyKey + typeKey + defaultKey + globKey + descriptionKey under the guides_api_data_models_filter_ namespace. | - |
+| `filterEvalRows` | [FilterEvalRow] | `-` | Four rows for the §3 evaluation-order table (path includes -> path excludes -> schema includes -> schema excludes). Each row has orderKey + ruleKey + bodyKey. | - |
+| `skipDomainCompareRows` | [ComparisonRow] | `-` | Three rows for the §4 skip_domain comparison table (where it lives / scope / when to pick which). Each row has labelKey + schemaSideKey + appSideKey under the guides_api_data_models_skip_domain_ namespace. | - |
+| `mcpPreviewFields` | [McpFieldRow] | `-` | Four rows for §5 documenting the preview_api_model_sync output shape (kept_schemas, filtered_out, skip_domain_matches, halts). Each carries fieldKey + typeKey + bodyKey under the guides_api_data_models_mcp_preview_ namespace. | - |
+| `mcpDiscoveryFields` | [McpFieldRow] | `-` | Rows for §6 documenting list_api_specs and list_api_models output shapes. Two tools, ~6 rows total. Keys under the guides_api_data_models_mcp_discovery_ namespace. | - |
+| `androidSerializerRows` | [ComparisonRow] | `-` | Three rows for the §9 Android-serializer comparison table (moshi / kotlinx / none). labelKey + moshiKey + kotlinxKey + noneKey — note this row type has 4 columns not 3; rendered with the comparison_4col cell rather than comparison_row. See customTypes below. | - |
+| `webCaseRows` | [ComparisonRow] | `-` | Three rows for the §10 Web case-convention comparison (snake_case default zero-cost / camelCase runtime conversion). Reuses ComparisonRow since it's a 3-col compare (label + snake / camel). | - |
+| `haltRows` | [HaltRow] | `-` | Six rows for the §15 ERROR-halt table (mirror of the concept page's section 9 but more recipe-flavored: each row has triggerKey + behaviorKey + workaroundKey, where workaround is a concrete code or config patch hint). | - |
+| `domainPatternTabs` | [TabHeaderCell] | `-` | Four T6-pattern tab headers for the §8 Domain-customization switcher (id='proxy' | 'type_conv' | 'computed' | 'stored'). Initial active is 'proxy'. Rebuilt by buildDomainPatternTabs(id) on every onSelectCodeTab call. | - |
+| `activeDomainPattern` | String | `-` | Id of the currently selected Domain-customization pattern in §8 ('proxy' | 'type_conv' | 'computed' | 'stored'). Drives displayLogic for the four §8 sample panels. | - |
+| `nextReadLinks` | [NextReadLink] | `-` | Three closing 'read next' cards: /concepts/data-models-from-openapi (back to the concept), /reference/cli-commands (jui g api / jui ls api-* details), /tools/mcp (MCP Group E tool reference). Seeded in onAppear. | - |
+| `proxyPatternPanelVisibility` | String | `-` | (from binding) | - |
+| `typeConvPatternPanelVisibility` | String | `-` | (from binding) | - |
+| `computedPatternPanelVisibility` | String | `-` | (from binding) | - |
+| `storedPatternPanelVisibility` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 

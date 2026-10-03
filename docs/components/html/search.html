@@ -163,48 +163,73 @@
 <div class="container">
 <h1>Search <span class="badge badge-category">navigation</span></h1>
 <p>Site-wide search. Renders as an inline trigger (a narrow button with a magnifier icon and the placeholder copy the author provides). Clicking the trigger opens a full-viewport modal that loads public/search-index.json on first open, pipes it through FlexSearch, and lets the user navigate to any page by title / lead / section heading in either en or ja. Self-contained — the component owns its own open/close state, its own FlexSearch index, and its own router integration; placing it in a layout is a single Search tag with no wiring required.</p>
+<table class="meta-table">
+<tr><th>Name</th><td><code>Search</code></td></tr>
+<tr><th>Created</th><td>2026-04-23</td></tr>
+<tr><th>Updated</th><td>2026-04-23</td></tr>
+</table>
 <section id="props">
 <h2>Props</h2>
 <table>
-<thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+<thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>placeholder</code></td>
 <td class="type">String</td>
 <td><span class="badge badge-optional">Optional</span></td>
 <td class="default">-</td>
-<td>Placeholder copy shown inside the trigger button. Also used as the modal&#x27;s input placeholder until the user focuses it.</td></tr>
+<td>Placeholder copy shown inside the trigger button. Also used as the modal&#x27;s input placeholder until the user focuses it.</td>
+<td>-</td></tr>
 <tr><td><code>shortcut</code></td>
 <td class="type">String</td>
 <td><span class="badge badge-optional">Optional</span></td>
 <td class="default">-</td>
-<td>Keyboard shortcut that toggles the modal. Accepts &#x27;cmd+k&#x27;, &#x27;ctrl+k&#x27;, &#x27;slash&#x27;, or any single printable key. Cross-platform: &#x27;cmd+k&#x27; resolves to ⌘+K on macOS and Ctrl+K elsewhere. Empty string disables the shortcut.</td></tr>
+<td>Keyboard shortcut that toggles the modal. Accepts &#x27;cmd+k&#x27;, &#x27;ctrl+k&#x27;, &#x27;slash&#x27;, or any single printable key. Cross-platform: &#x27;cmd+k&#x27; resolves to ⌘+K on macOS and Ctrl+K elsewhere. Empty string disables the shortcut.</td>
+<td>-</td></tr>
 <tr><td><code>maxResults</code></td>
 <td class="type">Int</td>
 <td><span class="badge badge-optional">Optional</span></td>
 <td class="default">-</td>
-<td>Upper bound on results shown in the modal. Past this limit the UI emits &#x27;Refine your query&#x27; rather than paginating — search is meant to be targeted, not browsed.</td></tr>
+<td>Upper bound on results shown in the modal. Past this limit the UI emits &#x27;Refine your query&#x27; rather than paginating — search is meant to be targeted, not browsed.</td>
+<td>-</td></tr>
 <tr><td><code>indexUrl</code></td>
 <td class="type">String</td>
 <td><span class="badge badge-optional">Optional</span></td>
 <td class="default">-</td>
-<td>URL the component fetches on first open. Defaults to the prebuild output path. Point at a versioned CDN path for cache-busted ship.</td></tr>
+<td>URL the component fetches on first open. Defaults to the prebuild output path. Point at a versioned CDN path for cache-busted ship.</td>
+<td>-</td></tr>
 </tbody></table>
 </section>
 <section id="structure">
 <h2>Structure</h2>
+<h3>Layout Structure</h3>
+<pre class="layout-tree">
+search_root
+</pre>
 <h3>Components</h3>
 <table>
-<thead><tr><th>Type</th><th>ID</th><th>Description</th></tr></thead>
+<thead><tr><th>Type</th><th>ID</th><th>Bound To Prop</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>View</code></td>
 <td><code>search_root</code></td>
-<td>Root container — renders as an inline trigger button, portals the modal overlay when open.</td></tr>
+<td><code>-</code></td>
+<td>Root container — renders as an inline trigger button, portals the modal overlay when open.</td>
+<td>-</td></tr>
 </tbody></table>
 </section>
 <section id="usage">
 <h2>Usage</h2>
 <h3>Example</h3>
 <pre><code>{&#x27;layoutSnippet&#x27;: &#x27;{\n  &quot;type&quot;: &quot;Search&quot;,\n  &quot;placeholder&quot;: &quot;search_placeholder&quot;,\n  &quot;shortcut&quot;: &quot;cmd+k&quot;\n}&#x27;}</code></pre>
+</section>
+<section id="notes">
+<h2>Notes</h2>
+<ul>
+<li>Self-contained v1 — the component owns open/close state, the FlexSearch index, and the router push. No sibling components need to be wired up; dropping `{ &quot;type&quot;: &quot;Search&quot; }` anywhere in a layout is enough.</li>
+<li>Fetch-on-open rather than fetch-on-mount: the index is 20-50 KB in v1 and never needed by readers who do not search. Cost is one round-trip on first open; subsequent opens hit the in-memory copy.</li>
+<li>Keyboard shortcut listens on `document.addEventListener(&#x27;keydown&#x27;, ...)` at component mount. Multiple Search instances on the same page would each install a listener — acceptable for v1 since every current layout places at most one.</li>
+<li>Results rank by FlexSearch&#x27;s built-in relevance over title + lead + section headings. No custom weighting in v1; tune later if search-driven navigation starts missing obvious targets.</li>
+<li>Locale: the current StringManager language decides which of the bilingual fields FlexSearch indexes. Switching language rebuilds the index.</li>
+</ul>
 </section>
 </div>
 

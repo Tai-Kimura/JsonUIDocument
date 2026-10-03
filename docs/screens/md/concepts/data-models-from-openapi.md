@@ -6,6 +6,7 @@ Concept essay: how `jui build` reads OpenAPI files in docs/api/ and emits two la
 
 | | |
 |---|---|
+| Layout File | `concepts/data-models-from-openapi` |
 | Created | 2026-05-27 |
 | Updated | 2026-05-27 |
 
@@ -152,23 +153,23 @@ flowchart TD
 
 ### UI Data Variables
 
-| Variable Name | Type | Description | Notes |
-|---|---|---|---|
-| `dtoVsDomainRows` | [ComparisonRow] | Three rows for the DTO vs Domain comparison table in section 2 (owner / regeneration cadence / what the file holds). Each row carries labelKey + dtoKey + domainKey under the concepts_data_models_from_openapi_ namespace, pre-resolved via StringManager. | - |
-| `platformDtoTabs` | [TabHeaderCell] | Three T6-pattern tab headers for the section 3 'What the DTO looks like' switcher (id='swift' | 'kotlin' | 'ts'). Initial active is 'swift'. Rebuilt on every onSelectDtoTab call by buildDtoTabs(activeId) so the active row picks up the accent palette and the others revert to surface. Mirrors LearnHelloWorldViewModel.buildPlatformTabs exactly. | - |
-| `platformDomainTabs` | [TabHeaderCell] | Same shape as platformDtoTabs but for section 4 ('What the Domain scaffold looks like'). Independent active state so a reader can read DTO/Swift alongside Domain/Kotlin if they want. | - |
-| `lifecycleRows` | [LifecycleStepRow] | Five rows for the section 8 lifecycle list (DTO full regen / Domain skip-if-exists / filter apply / orphan handling / drift check). Each row has stepKey + bodyKey. | - |
-| `halts` | [HaltRow] | Six rows for the section 9 ERROR-halt table (format-aware mapping / oneOf / discriminator / multi-file $ref / YAML / direct self-ref). Each row carries triggerKey + behaviorKey + workaroundKey. The narrative emphasizes 'no silent fallback' — the build halts so the author notices. | - |
-| `mcpGroupETools` | [McpToolCell] | Three rows for the section 7 'Discovery from your agent' card list: list_api_specs, list_api_models, preview_api_model_sync. Each carries nameKey + roleKey + useCaseKey. Cells are informational only — no per-row navigation; the linked detail lives on /guides/api-data-models §5 and §6. | - |
-| `nextReadLinks` | [NextReadLink] | Three closing 'read next' cards: /guides/api-data-models (the cookbook), /concepts/why-spec-first, /concepts/one-layout-json. Seeded in onAppear. | - |
-| `activeDtoTab` | String | Id of the currently selected DTO sample tab ('swift' | 'kotlin' | 'ts'). Drives displayLogic for the three section-3 sample panels. | - |
-| `activeDomainTab` | String | Id of the currently selected Domain sample tab. Drives displayLogic for the three section-4 sample panels. | - |
-| `swiftDtoPanelVisibility` | String | (from binding) | - |
-| `kotlinDtoPanelVisibility` | String | (from binding) | - |
-| `tsDtoPanelVisibility` | String | (from binding) | - |
-| `swiftDomainPanelVisibility` | String | (from binding) | - |
-| `kotlinDomainPanelVisibility` | String | (from binding) | - |
-| `tsDomainPanelVisibility` | String | (from binding) | - |
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `dtoVsDomainRows` | [ComparisonRow] | `-` | Three rows for the DTO vs Domain comparison table in section 2 (owner / regeneration cadence / what the file holds). Each row carries labelKey + dtoKey + domainKey under the concepts_data_models_from_openapi_ namespace, pre-resolved via StringManager. | - |
+| `platformDtoTabs` | [TabHeaderCell] | `-` | Three T6-pattern tab headers for the section 3 'What the DTO looks like' switcher (id='swift' | 'kotlin' | 'ts'). Initial active is 'swift'. Rebuilt on every onSelectDtoTab call by buildDtoTabs(activeId) so the active row picks up the accent palette and the others revert to surface. Mirrors LearnHelloWorldViewModel.buildPlatformTabs exactly. | - |
+| `platformDomainTabs` | [TabHeaderCell] | `-` | Same shape as platformDtoTabs but for section 4 ('What the Domain scaffold looks like'). Independent active state so a reader can read DTO/Swift alongside Domain/Kotlin if they want. | - |
+| `lifecycleRows` | [LifecycleStepRow] | `-` | Five rows for the section 8 lifecycle list (DTO full regen / Domain skip-if-exists / filter apply / orphan handling / drift check). Each row has stepKey + bodyKey. | - |
+| `halts` | [HaltRow] | `-` | Six rows for the section 9 ERROR-halt table (format-aware mapping / oneOf / discriminator / multi-file $ref / YAML / direct self-ref). Each row carries triggerKey + behaviorKey + workaroundKey. The narrative emphasizes 'no silent fallback' — the build halts so the author notices. | - |
+| `mcpGroupETools` | [McpToolCell] | `-` | Three rows for the section 7 'Discovery from your agent' card list: list_api_specs, list_api_models, preview_api_model_sync. Each carries nameKey + roleKey + useCaseKey. Cells are informational only — no per-row navigation; the linked detail lives on /guides/api-data-models §5 and §6. | - |
+| `nextReadLinks` | [NextReadLink] | `-` | Three closing 'read next' cards: /guides/api-data-models (the cookbook), /concepts/why-spec-first, /concepts/one-layout-json. Seeded in onAppear. | - |
+| `activeDtoTab` | String | `-` | Id of the currently selected DTO sample tab ('swift' | 'kotlin' | 'ts'). Drives displayLogic for the three section-3 sample panels. | - |
+| `activeDomainTab` | String | `-` | Id of the currently selected Domain sample tab. Drives displayLogic for the three section-4 sample panels. | - |
+| `swiftDtoPanelVisibility` | String | `-` | (from binding) | - |
+| `kotlinDtoPanelVisibility` | String | `-` | (from binding) | - |
+| `tsDtoPanelVisibility` | String | `-` | (from binding) | - |
+| `swiftDomainPanelVisibility` | String | `-` | (from binding) | - |
+| `kotlinDomainPanelVisibility` | String | `-` | (from binding) | - |
+| `tsDomainPanelVisibility` | String | `-` | (from binding) | - |
 
 ### View-local Event Handlers
 
