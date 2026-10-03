@@ -598,8 +598,8 @@
       "command": "build",
       "synopsis": "jui build [--clean] [--ios-only|--android-only|--web-only | --platform ios|android|web] [--allow-partial] [--lint-strings]",
       "purpose": {
-        "en": "Build all configured platforms (or one with --platform / the --*-only flags). Diagnostics are printed, not gated: validation warnings and localize findings leave the exit code at 0. It exits non-zero on the failures that stop the run instead — no jui.config.json, a layout that is not valid JSON, a responsive-variant contract violation, an @canonical mark that does not resolve. Running clean is a rule in the agent rulebook, not something this command enforces.",
-        "ja": "設定済み全プラットフォーム（--platform か --*-only で単一）をビルド。診断は出力されるだけでゲートしません — 検証 warning もローカライズの指摘も exit code は 0 のままです。非 0 になるのは実行そのものが止まる失敗のほう（jui.config.json が無い / レイアウトが壊れた JSON / レスポンシブ variant の契約違反 / 解決できない @canonical マーク）。警告ゼロで通すのはエージェント向け規約の規則で、このコマンドが強制するものではありません。"
+        "en": "Build all configured platforms (or one with --platform / the --*-only flags). Diagnostics are printed, not gated: validation warnings and localize findings leave the exit code at 0. It exits non-zero on the failures that stop the run instead — no jui.config.json, a layout that is not valid JSON, a responsive-variant contract violation, an @canonical mark that does not resolve, and, since jsonui-cli 1.9.9, a platform asked for with --platform or a --*-only flag that the config it reads does not have (the ERROR names that config and its platforms; until 1.9.8 such a run exited 0). Running clean is a rule in the agent rulebook, not something this command enforces.",
+        "ja": "設定済み全プラットフォーム（--platform か --*-only で単一）をビルド。診断は出力されるだけでゲートしません — 検証 warning もローカライズの指摘も exit code は 0 のままです。非 0 になるのは実行そのものが止まる失敗のほう（jui.config.json が無い / レイアウトが壊れた JSON / レスポンシブ variant の契約違反 / 解決できない @canonical マーク、そして jsonui-cli 1.9.9 からは、読んだ config に無いプラットフォームを --platform か --*-only で求めた場合。ERROR はその config と、そこにあるプラットフォームを名指しします。1.9.8 まではこの実行も exit 0 でした）。警告ゼロで通すのはエージェント向け規約の規則で、このコマンドが強制するものではありません。"
       },
       "options": [
         {
@@ -680,16 +680,16 @@
         "jui lint-strings"
       ],
       "verifiedAgainst": {
-        "version": "1.8.43",
+        "version": "1.9.9",
         "columns": 80,
         "python": "3.12",
         "helpHash": "c2bfbf2979b9b487eb08fc3a8079c892fbac94cc628315cea34543e0eeb03d7c",
-        "cardHash": "660588127b2f5960ff86f2c1ff5d4d3275c7ddfc1e5e9d514096bdb53eee0b38",
+        "cardHash": "1ead3375b9d101817847c7da9affdcfb4206135e54cda4961ea90effa4e2aaa7",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "672f5de73f32",
           "synopsis": "ecd88745df24",
-          "purpose": "2d700420a92e",
+          "purpose": "f1a3d3420282",
           "options": "5345a171ea23",
           "examples": "9fc8f3499be3",
           "aliases": "1663eff2143e",
@@ -1017,8 +1017,8 @@
           "type": "enum",
           "default": "all in config",
           "description": {
-            "en": "Sync only one platform.",
-            "ja": "単一プラットフォームのみ同期。"
+            "en": "Sync only one platform; without it, every platform in jui.config.json. A platform the config does not have is an ERROR and exit 1 (measured at 1.9.8 and 1.9.9; since 1.9.9 the message names the config path and its platforms).",
+            "ja": "単一プラットフォームのみ同期（指定しなければ jui.config.json の全プラットフォーム）。config に無いプラットフォームを指定すると ERROR で exit 1（1.9.8 と 1.9.9 で計測。1.9.9 からはメッセージが config のパスとそのプラットフォームを名指しする）。"
           }
         },
         {
@@ -1051,17 +1051,17 @@
         "jui build"
       ],
       "verifiedAgainst": {
-        "version": "1.8.17",
+        "version": "1.9.9",
         "columns": 80,
         "python": "3.12",
         "helpHash": "2f2ae4a55637e448f1f18cdf5f8402156e53a56e1312a7638cc3a24cba6c59a4",
-        "cardHash": "0da084d82a3b7c818c547250e696e0d9984bb538fbafb07eb5707d4388afcb64",
+        "cardHash": "eae69bed6c19d80c0fe8d252b3fc9ed3777eeda793f143bd097275f98280fd5a",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "4369ca7e24d6",
           "synopsis": "2c67fbce7131",
           "purpose": "c6174e28123c",
-          "options": "dad21d6c2b5f",
+          "options": "1783f4662f37",
           "examples": "7409300e848d",
           "aliases": "98edafdd23a8",
           "seeAlso": "2c7f782f45a2"
