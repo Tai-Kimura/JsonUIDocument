@@ -115,8 +115,8 @@
     },
     "cellIdProperty": {
       "note": {
-        "en": "Key name to use as the stable identifier. Defaults to `id`. Required for correct reordering animations and minimal re-renders.",
-        "ja": "安定 ID として使うキー名。デフォルト `id`。並び替えアニメーションと最小再描画のために必須。"
+        "en": "Key name to use as the stable identifier. There is no default: without it, a cell is known by its place in the list (index), on iOS and web alike. Required for correct reordering animations and minimal re-renders. In iOS generated code since jsonui-cli 1.9.11, the data a cell receives has `cellId` rewritten to `<its cellId, else this property's value, else its place>_<hash of its content>`, so a cell whose key stays fixed redraws when its data changes, while the list still knows the cell by the raw key. A cell that reads `data[\"cellId\"]` as the item's identity now sees that suffixed form, so read this property's field instead. Android already redrew. With `autoChangeTrackingId` the data already had this form.",
+        "ja": "安定 ID として使うキー名。既定値は無く、指定しなければセルはリスト内の位置（index）で識別される（iOS も web も同じ）。並び替えアニメーションと最小再描画のために必須。jsonui-cli 1.9.11 からの iOS の生成コードでは、セルが受け取る data の `cellId` が `<そのセルの cellId、無ければこのプロパティの値、無ければ位置>_<内容のハッシュ>` に書き換えられる。そのため、key が固定のままデータが変わったセルも描き直される。リストはそのセルを元の key で識別したまま。`data[\"cellId\"]` を項目の ID として読むセルには、この接尾辞付きの形が見えるので、このプロパティのフィールドを読むこと。Android はもともと描き直していた。`autoChangeTrackingId` を使う場合、data は以前からこの形だった。"
       }
     },
     "sections": {
