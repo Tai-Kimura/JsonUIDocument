@@ -84,7 +84,13 @@ module RjuiTools
         def build_class_name
           classes = [super]
 
-          classes << 'w-full'
+          # The declared width wins (super maps it). `w-full` used to be added
+          # unconditionally and, later in the stylesheet, beat the declared
+          # width: Slider / Progress / Segment with width 200 drew at the
+          # root's full 1024 (ticket
+          # rjui-slider-progress-segment-ignore-the-declared-width-and-fill-the-row).
+          # Filling is only the fallback for a layout that declares no width.
+          classes << 'w-full' if attributes['width'].nil?
           classes << 'flex'
           classes << 'rounded-lg'
 
@@ -178,7 +184,7 @@ module RjuiTools
           # height may be a keyword ("wrapContent" / "matchParent") — only a
           # numeric height can be translated into vertical padding.
           padding_class = if attributes['height'].is_a?(Numeric)
-            "py-#{TailwindMapper::PADDING_MAP[attributes['height'] / 4] || (attributes['height'] / 4)}"
+            "py-#{TailwindMapper.spacing_value(attributes['height'] / 4)}"
           else
             'py-2'
           end

@@ -147,8 +147,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Accepts a literal string, one whole `@{binding}`, or `@string/key`. Text around a binding — `\"Total: @{count}\"` — is warned as `binding-mixed-text` since jsonui-cli 1.9.6, and `--strict` fails on it: build the sentence in the ViewModel, where it can be localized as one string, and bind the result (`totalLabel` above). Unresolved bindings render as empty string in release builds. The value is plain text: markdown is never interpreted, so `[label](/path)`, `**bold**` and backticks render literally, brackets and all. Emphasise or link part of the string with `partialAttributes`; rendering real markdown is out of scope for Label and belongs in a custom component.",
-                "ja": "リテラル文字列、1 つの `@{binding}`、または `@string/key` を受け付ける。前後に文字列が付いた束縛（`\"合計: @{count}\"`）は jsonui-cli 1.9.6 から `binding-mixed-text` として警告され、`--strict` では失敗する — 文は ViewModel で組み立て（そこなら 1 つの文字列として翻訳できる）、その結果を束縛する（上の例の `totalLabel`）。未解決の binding はリリースビルドで空文字として描画される。値は素のテキストで、markdown は解釈されない — `[label](/path)`・`**bold**`・バッククォートは括弧ごとそのまま出る。一部を強調・リンクにしたい場合は `partialAttributes` を使う。markdown そのものを描画したいなら Label のスコープ外で、カスタムコンポーネントの仕事。"
+                "en": "Accepts a literal string, one whole `@{binding}`, or `@string/key`. Text around a binding — `\"Total: @{count}\"` — is warned as `binding-mixed-text` since jsonui-cli 1.9.6, and `--strict` fails on it: build the sentence in the ViewModel, where it can be localized as one string, and bind the result (`totalLabel` above). Unresolved bindings render as empty string in release builds. The value is plain text: markdown is never interpreted, so `[label](/path)`, `**bold**` and backticks render literally, brackets and all. Emphasise or link part of the string with `partialAttributes`; rendering real markdown is out of scope for Label and belongs in a custom component. A word longer than the box breaks inside it: only the word that does not fit is cut at the box's width and carried to the next line, and where it breaks may differ per OS; a declared lineBreakMode Char / Word keeps its own rule. On web since jsonui-cli 1.9.16 — before, a long URL ran past the box.",
+                "ja": "リテラル文字列、1 つの `@{binding}`、または `@string/key` を受け付ける。前後に文字列が付いた束縛（`\"合計: @{count}\"`）は jsonui-cli 1.9.6 から `binding-mixed-text` として警告され、`--strict` では失敗する — 文は ViewModel で組み立て（そこなら 1 つの文字列として翻訳できる）、その結果を束縛する（上の例の `totalLabel`）。未解決の binding はリリースビルドで空文字として描画される。値は素のテキストで、markdown は解釈されない — `[label](/path)`・`**bold**`・バッククォートは括弧ごとそのまま出る。一部を強調・リンクにしたい場合は `partialAttributes` を使う。markdown そのものを描画したいなら Label のスコープ外で、カスタムコンポーネントの仕事。 箱より長い単語は箱の中で折り返す — 収まらない単語だけが箱の幅で切られて次の行へ送られ、切れる位置は OS ごとに異なりうる。lineBreakMode に Char / Word を宣言した場合はそちらの規則のまま。web では jsonui-cli 1.9.16 から — それまでは長い URL が箱の外へはみ出していた。"
               },
               "type": "string | binding",
               "required": ""
@@ -789,7 +789,7 @@
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
               "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
                   {
@@ -839,8 +839,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "Multiplies the Label's own line, not the font size: every line is m × L, so 1 draws the same lines as declaring nothing. L is one line of a Label that declares no line height, at the same fontSize. iOS draws no multiple on the first line — it stays L, and the lines after it are m × L apart. On web since jsonui-cli 1.9.16 — before, m multiplied the font size, so a layout written for the old reading draws 1.5× looser at the default line (this site rescaled its own 1.55 to 1.0333).",
+                "ja": "フォントサイズではなく Label 自身の 1 行に掛かる: どの行も m × L なので、1 は何も宣言しないのと同じ行になる。L は、行高を宣言しない Label の同じ fontSize での 1 行の高さ。iOS は最初の行に倍率を掛けない — 最初の行は L のままで、2 行目以降が m × L 間隔になる。web では jsonui-cli 1.9.16 から — それまでは m がフォントサイズに掛かっていたため、旧来の読み方で書いたレイアウトは標準の行高で 1.5 倍緩く描かれる（このサイトは自分の 1.55 を 1.0333 に換算した）。"
               },
               "type": "number | binding",
               "required": ""
@@ -859,7 +859,7 @@
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
               "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
                   {
@@ -901,16 +901,16 @@
                 ]
               },
               "description": {
-                "en": "Line spacing (binding supported).",
-                "ja": "行間（binding 可）。"
+                "en": "Space added between lines (binding supported).",
+                "ja": "行と行の間に足す間隔（binding 可）。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "Added between lines only: n lines are n × L + (n − 1) × lineSpacing, and nothing follows the last line. L is one line of a Label that declares no line height, at the same fontSize. On web since jsonui-cli 1.9.16 — before, every line got the spacing, the last one included.",
+                "ja": "行と行の間にだけ足される: n 行は n × L + (n − 1) × lineSpacing で、最後の行の後には何も足されない。L は、行高を宣言しない Label の同じ fontSize での 1 行の高さ。web では jsonui-cli 1.9.16 から — それまでは最後の行も含め、すべての行に間隔が足されていた。"
               },
               "type": "number | binding",
               "required": ""
@@ -2635,8 +2635,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Accepts a literal string, one whole `@{binding}`, or `@string/key`. Text around a binding — `\"Total: @{count}\"` — is warned as `binding-mixed-text` since jsonui-cli 1.9.6, and `--strict` fails on it: build the sentence in the ViewModel, where it can be localized as one string, and bind the result (`totalLabel` above). Unresolved bindings render as empty string in release builds. The value is plain text: markdown is never interpreted, so `[label](/path)`, `**bold**` and backticks render literally, brackets and all. Emphasise or link part of the string with `partialAttributes`; rendering real markdown is out of scope for Label and belongs in a custom component.",
-                "ja": "リテラル文字列、1 つの `@{binding}`、または `@string/key` を受け付ける。前後に文字列が付いた束縛（`\"合計: @{count}\"`）は jsonui-cli 1.9.6 から `binding-mixed-text` として警告され、`--strict` では失敗する — 文は ViewModel で組み立て（そこなら 1 つの文字列として翻訳できる）、その結果を束縛する（上の例の `totalLabel`）。未解決の binding はリリースビルドで空文字として描画される。値は素のテキストで、markdown は解釈されない — `[label](/path)`・`**bold**`・バッククォートは括弧ごとそのまま出る。一部を強調・リンクにしたい場合は `partialAttributes` を使う。markdown そのものを描画したいなら Label のスコープ外で、カスタムコンポーネントの仕事。"
+                "en": "Accepts a literal string, one whole `@{binding}`, or `@string/key`. Text around a binding — `\"Total: @{count}\"` — is warned as `binding-mixed-text` since jsonui-cli 1.9.6, and `--strict` fails on it: build the sentence in the ViewModel, where it can be localized as one string, and bind the result (`totalLabel` above). Unresolved bindings render as empty string in release builds. The value is plain text: markdown is never interpreted, so `[label](/path)`, `**bold**` and backticks render literally, brackets and all. Emphasise or link part of the string with `partialAttributes`; rendering real markdown is out of scope for Label and belongs in a custom component. A word longer than the box breaks inside it: only the word that does not fit is cut at the box's width and carried to the next line, and where it breaks may differ per OS; a declared lineBreakMode Char / Word keeps its own rule. On web since jsonui-cli 1.9.16 — before, a long URL ran past the box.",
+                "ja": "リテラル文字列、1 つの `@{binding}`、または `@string/key` を受け付ける。前後に文字列が付いた束縛（`\"合計: @{count}\"`）は jsonui-cli 1.9.6 から `binding-mixed-text` として警告され、`--strict` では失敗する — 文は ViewModel で組み立て（そこなら 1 つの文字列として翻訳できる）、その結果を束縛する（上の例の `totalLabel`）。未解決の binding はリリースビルドで空文字として描画される。値は素のテキストで、markdown は解釈されない — `[label](/path)`・`**bold**`・バッククォートは括弧ごとそのまま出る。一部を強調・リンクにしたい場合は `partialAttributes` を使う。markdown そのものを描画したいなら Label のスコープ外で、カスタムコンポーネントの仕事。 箱より長い単語は箱の中で折り返す — 収まらない単語だけが箱の幅で切られて次の行へ送られ、切れる位置は OS ごとに異なりうる。lineBreakMode に Char / Word を宣言した場合はそちらの規則のまま。web では jsonui-cli 1.9.16 から — それまでは長い URL が箱の外へはみ出していた。"
               },
               "type": "string | binding",
               "required": ""
@@ -3277,7 +3277,7 @@
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
               "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
                   {
@@ -3327,8 +3327,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "Multiplies the Label's own line, not the font size: every line is m × L, so 1 draws the same lines as declaring nothing. L is one line of a Label that declares no line height, at the same fontSize. iOS draws no multiple on the first line — it stays L, and the lines after it are m × L apart. On web since jsonui-cli 1.9.16 — before, m multiplied the font size, so a layout written for the old reading draws 1.5× looser at the default line (this site rescaled its own 1.55 to 1.0333).",
+                "ja": "フォントサイズではなく Label 自身の 1 行に掛かる: どの行も m × L なので、1 は何も宣言しないのと同じ行になる。L は、行高を宣言しない Label の同じ fontSize での 1 行の高さ。iOS は最初の行に倍率を掛けない — 最初の行は L のままで、2 行目以降が m × L 間隔になる。web では jsonui-cli 1.9.16 から — それまでは m がフォントサイズに掛かっていたため、旧来の読み方で書いたレイアウトは標準の行高で 1.5 倍緩く描かれる（このサイトは自分の 1.55 を 1.0333 に換算した）。"
               },
               "type": "number | binding",
               "required": ""
@@ -3347,7 +3347,7 @@
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
               "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
                   {
@@ -3389,16 +3389,16 @@
                 ]
               },
               "description": {
-                "en": "Line spacing (binding supported).",
-                "ja": "行間（binding 可）。"
+                "en": "Space added between lines (binding supported).",
+                "ja": "行と行の間に足す間隔（binding 可）。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "Added between lines only: n lines are n × L + (n − 1) × lineSpacing, and nothing follows the last line. L is one line of a Label that declares no line height, at the same fontSize. On web since jsonui-cli 1.9.16 — before, every line got the spacing, the last one included.",
+                "ja": "行と行の間にだけ足される: n 行は n × L + (n − 1) × lineSpacing で、最後の行の後には何も足されない。L は、行高を宣言しない Label の同じ fontSize での 1 行の高さ。web では jsonui-cli 1.9.16 から — それまでは最後の行も含め、すべての行に間隔が足されていた。"
               },
               "type": "number | binding",
               "required": ""

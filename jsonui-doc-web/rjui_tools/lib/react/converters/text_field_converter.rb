@@ -40,6 +40,13 @@ module RjuiTools
           @attributes['cornerRadius'] ||= text_field_defaults['cornerRadius']
         end
 
+        # A text input keeps a CSS border: its text stays clear of its own
+        # frame, and its focus ring is the outline (BaseConverter#
+        # border_draws_over_content?).
+        def border_draws_over_content?
+          false
+        end
+
         def build_class_name
           classes = [super]
 
@@ -85,7 +92,7 @@ module RjuiTools
             classes << "placeholder:[font-family:#{hint_font.to_s.gsub(/\s+/, '_')}]"
           end
           if (hint_font_size = attributes['hintFontSize'])
-            classes << "placeholder:[font-size:#{hint_font_size}px]"
+            classes << "placeholder:[font-size:#{TailwindMapper.rem(hint_font_size)}]"
           end
           # Declared for TextField as well as TextView, and only TextView read
           # it — the same pseudo-element reasoning applies, so it takes the
@@ -125,7 +132,7 @@ module RjuiTools
 
           # Text padding left
           if attributes['textPaddingLeft']
-            @dynamic_styles['paddingLeft'] = "'#{attributes['textPaddingLeft']}px'"
+            @dynamic_styles['paddingLeft'] = "'#{TailwindMapper.rem(attributes['textPaddingLeft'])}'"
           end
 
           # Shadow

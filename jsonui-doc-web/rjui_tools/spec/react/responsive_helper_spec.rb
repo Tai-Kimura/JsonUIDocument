@@ -49,8 +49,8 @@ RSpec.describe RjuiTools::React::ResponsiveHelper do
         }
         result = described_class.build_responsive(component)
 
-        expect(result[:classes]).to include('lg:gap-6')
-        expect(result[:classes]).not_to include('gap-2')
+        expect(result[:classes]).to include('lg:gap-[1.5rem]')
+        expect(result[:classes]).not_to include('gap-[0.5rem]')
       end
 
       it 'generates fontSize responsive classes' do
@@ -248,9 +248,12 @@ RSpec.describe RjuiTools::React::ResponsiveHelper do
           }
           result = described_class.build_responsive(component)
 
-          # left in a row = justify-start; base items-center must be reset
+          # left in a row = justify-start; base items-center must be reset —
+          # to a row's default cross-axis start, not the flex default stretch
+          # (gravityDefaults; rjui-stack-stretches-children-on-the-cross-axis)
           expect(result[:classes]).to include('max-md:justify-start')
-          expect(result[:classes]).to include('max-md:items-stretch')
+          expect(result[:classes]).to include('max-md:items-start')
+          expect(result[:classes]).not_to include('max-md:items-stretch')
         end
 
         it 're-emits base gravity when only orientation is overridden' do
@@ -292,9 +295,9 @@ RSpec.describe RjuiTools::React::ResponsiveHelper do
         }
         result = described_class.build_responsive(component)
 
-        expect(result[:classes]).to include('max-md:p-4')
-        expect(result[:classes]).not_to include('p-5')
-        expect(result[:classes]).not_to include('p-4')
+        expect(result[:classes]).to include('max-md:p-[1rem]')
+        expect(result[:classes]).not_to include('p-[1.25rem]')
+        expect(result[:classes]).not_to include('p-[1rem]')
       end
     end
 
@@ -313,15 +316,15 @@ RSpec.describe RjuiTools::React::ResponsiveHelper do
 
         # Medium breakpoint
         expect(result[:classes]).to include('md:flex-row')
-        expect(result[:classes]).to include('md:gap-3')
+        expect(result[:classes]).to include('md:gap-[0.75rem]')
 
         # Regular breakpoint
         expect(result[:classes]).to include('lg:flex-row')
-        expect(result[:classes]).to include('lg:gap-6')
+        expect(result[:classes]).to include('lg:gap-[1.5rem]')
 
         # Base values are NOT re-emitted by the helper
         expect(result[:classes]).not_to include('flex-col')
-        expect(result[:classes]).not_to include('gap-1')
+        expect(result[:classes]).not_to include('gap-[0.25rem]')
       end
     end
 
@@ -379,8 +382,8 @@ RSpec.describe RjuiTools::React::ResponsiveHelper do
         }
         result = described_class.build_responsive(component)
 
-        expect(result[:classes]).to include('lg:p-4')
-        expect(result[:classes]).not_to include('p-2')
+        expect(result[:classes]).to include('lg:p-[1rem]')
+        expect(result[:classes]).not_to include('p-[0.5rem]')
       end
 
       it 'generates padding responsive classes for array values' do
@@ -393,8 +396,8 @@ RSpec.describe RjuiTools::React::ResponsiveHelper do
         }
         result = described_class.build_responsive(component)
 
-        expect(result[:classes]).to include('lg:py-4 lg:px-8')
-        expect(result[:classes]).not_to include('py-2 px-4')
+        expect(result[:classes]).to include('lg:py-[1rem] lg:px-[2rem]')
+        expect(result[:classes]).not_to include('py-[0.5rem] px-[1rem]')
       end
     end
 

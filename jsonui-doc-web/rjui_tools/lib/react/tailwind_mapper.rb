@@ -1,19 +1,12 @@
 # frozen_string_literal: true
 
+require 'bigdecimal'
 require_relative '../core/logger'
 require_relative '../core/enum_spelling'
 
 module RjuiTools
   module React
     class TailwindMapper
-      # Padding mapping (px to Tailwind)
-      PADDING_MAP = {
-        0 => '0', 1 => 'px', 2 => '0.5', 4 => '1', 6 => '1.5',
-        8 => '2', 10 => '2.5', 12 => '3', 14 => '3.5', 16 => '4',
-        20 => '5', 24 => '6', 28 => '7', 32 => '8', 36 => '9',
-        40 => '10', 44 => '11', 48 => '12', 56 => '14', 64 => '16'
-      }.freeze
-
       # Font size mapping
       FONT_SIZE_MAP = {
         12 => 'text-xs', 14 => 'text-sm', 16 => 'text-base',
@@ -72,7 +65,7 @@ module RjuiTools
         def map_padding(padding)
           case padding
           when Numeric
-            "p-#{closest_padding(padding)}"
+            "p-#{spacing_value(padding)}"
           when Array
             map_padding_array(padding)
           else
@@ -83,15 +76,15 @@ module RjuiTools
         def map_padding_array(arr)
           case arr.length
           when 1
-            "p-#{closest_padding(arr[0])}"
+            "p-#{spacing_value(arr[0])}"
           when 2
-            "py-#{closest_padding(arr[0])} px-#{closest_padding(arr[1])}"
+            "py-#{spacing_value(arr[0])} px-#{spacing_value(arr[1])}"
           when 4
             classes = []
-            classes << "pt-#{closest_padding(arr[0])}"
-            classes << "pr-#{closest_padding(arr[1])}"
-            classes << "pb-#{closest_padding(arr[2])}"
-            classes << "pl-#{closest_padding(arr[3])}"
+            classes << "pt-#{spacing_value(arr[0])}"
+            classes << "pr-#{spacing_value(arr[1])}"
+            classes << "pb-#{spacing_value(arr[2])}"
+            classes << "pl-#{spacing_value(arr[3])}"
             classes.join(' ')
           else
             ''
@@ -100,17 +93,17 @@ module RjuiTools
 
         def map_individual_paddings(top, right, bottom, left)
           classes = []
-          classes << "pt-#{closest_padding(top)}" if top
-          classes << "pr-#{closest_padding(right)}" if right
-          classes << "pb-#{closest_padding(bottom)}" if bottom
-          classes << "pl-#{closest_padding(left)}" if left
+          classes << "pt-#{spacing_value(top)}" if top
+          classes << "pr-#{spacing_value(right)}" if right
+          classes << "pb-#{spacing_value(bottom)}" if bottom
+          classes << "pl-#{spacing_value(left)}" if left
           classes.join(' ')
         end
 
         def map_margin(margin)
           case margin
           when Numeric
-            "m-#{closest_padding(margin)}"
+            "m-#{spacing_value(margin)}"
           when Array
             map_margin_array(margin)
           else
@@ -121,15 +114,15 @@ module RjuiTools
         def map_margin_array(arr)
           case arr.length
           when 1
-            "m-#{closest_padding(arr[0])}"
+            "m-#{spacing_value(arr[0])}"
           when 2
-            "my-#{closest_padding(arr[0])} mx-#{closest_padding(arr[1])}"
+            "my-#{spacing_value(arr[0])} mx-#{spacing_value(arr[1])}"
           when 4
             classes = []
-            classes << "mt-#{closest_padding(arr[0])}"
-            classes << "mr-#{closest_padding(arr[1])}"
-            classes << "mb-#{closest_padding(arr[2])}"
-            classes << "ml-#{closest_padding(arr[3])}"
+            classes << "mt-#{spacing_value(arr[0])}"
+            classes << "mr-#{spacing_value(arr[1])}"
+            classes << "mb-#{spacing_value(arr[2])}"
+            classes << "ml-#{spacing_value(arr[3])}"
             classes.join(' ')
           else
             ''
@@ -138,15 +131,15 @@ module RjuiTools
 
         def map_individual_margins(top, right, bottom, left)
           classes = []
-          classes << "mt-#{closest_padding(top)}" if top
-          classes << "mr-#{closest_padding(right)}" if right
-          classes << "mb-#{closest_padding(bottom)}" if bottom
-          classes << "ml-#{closest_padding(left)}" if left
+          classes << "mt-#{spacing_value(top)}" if top
+          classes << "mr-#{spacing_value(right)}" if right
+          classes << "mb-#{spacing_value(bottom)}" if bottom
+          classes << "ml-#{spacing_value(left)}" if left
           classes.join(' ')
         end
 
         def map_font_size(size)
-          FONT_SIZE_MAP[size] || "text-[#{size}px]"
+          FONT_SIZE_MAP[size] || "text-[#{rem(size)}]"
         end
 
         def map_corner_radius(radius)
@@ -335,6 +328,27 @@ module RjuiTools
           end
         end
 
+        # A border drawn OVER the content, inside the box: an outline pulled
+        # in by its own width, so it takes no layout space (user ruling B,
+        # 2026-10-05 — see BaseConverter's border block). Width 0 draws
+        # nothing, as `border-0` did.
+        # A border width as a CSS px length (2 -> "2px", 1.5 -> "1.5px").
+        def css_px(value)
+          number = value.is_a?(Float) && value == value.to_i ? value.to_i : value
+          "#{number}px"
+        end
+
+        def map_border_over_content(border_width, border_color, border_style = nil)
+          return '' if border_width.nil? || border_width.to_f <= 0
+
+          width = border_width.is_a?(Float) && border_width == border_width.to_i ? border_width.to_i : border_width
+          classes = ["outline-[length:#{width}px]", "outline-offset-[-#{width}px]"]
+          classes << map_color(border_color, 'outline') if border_color
+          style_class = map_border_style(border_style).sub('border-', 'outline-')
+          classes << (style_class.empty? ? 'outline-solid' : style_class)
+          classes.compact.reject(&:empty?).join(' ')
+        end
+
         def map_border_style(style)
           case JsonUIShared::EnumSpelling.lowered(style, 'common', 'borderStyle')
           when 'dashed'
@@ -392,7 +406,7 @@ module RjuiTools
         def map_gap(spacing)
           return '' unless spacing
 
-          "gap-#{closest_padding(spacing)}"
+          "gap-#{spacing_value(spacing)}"
         end
 
         # A single-run Label's alignment classes: it is a flex ROW, so
@@ -655,17 +669,51 @@ module RjuiTools
         # RTL-aware paddings (paddingStart -> ps-, paddingEnd -> pe-)
         def map_rtl_paddings(start_pad, end_pad)
           classes = []
-          classes << "ps-#{closest_padding(start_pad)}" if start_pad
-          classes << "pe-#{closest_padding(end_pad)}" if end_pad
+          classes << "ps-#{spacing_value(start_pad)}" if start_pad
+          classes << "pe-#{spacing_value(end_pad)}" if end_pad
           classes.join(' ')
         end
 
         # RTL-aware margins (startMargin -> ms-, endMargin -> me-)
         def map_rtl_margins(start_margin, end_margin)
           classes = []
-          classes << "ms-#{closest_padding(start_margin)}" if start_margin
-          classes << "me-#{closest_padding(end_margin)}" if end_margin
+          classes << "ms-#{spacing_value(start_margin)}" if start_margin
+          classes << "me-#{spacing_value(end_margin)}" if end_margin
           classes.join(' ')
+        end
+
+        # The value part of a spacing class (padding, margin, gap): the
+        # declared length as rem, N / 16 — `[1.625rem]` for 26, `[0.75rem]`
+        # for 12, `[0rem]` for 0 — never a step of Tailwind's spacing scale.
+        # At the default 16px root it is the declared px exactly; a viewer
+        # who raises the browser's default font size gets spacing that grows
+        # with the text, as the scale steps did (the text's own classes are
+        # rem). Division by 16 is exact in decimal (1/16 = 0.0625), and it is
+        # done in BigDecimal, so no length picks up a float tail.
+        #
+        # History: until 1.9.14 every length was rounded to the NEAREST scale
+        # step (22 drew 20px; ticket rjui-spacing-rounds-to-the-tailwind-
+        # scale); 1.9.14 wrote the exact length in px, which stopped spacing
+        # following the browser's font size (ticket
+        # rjui-spacing-px-does-not-follow-the-browser-font-size); 1.9.15
+        # writes the exact length in rem. A non-number passes through as
+        # written.
+        def spacing_value(value)
+          return '[0rem]' if value.nil?
+          return value.to_s unless value.is_a?(Numeric)
+
+          "[#{rem(value)}]"
+        end
+
+        # A spacing length for CSS (an inline style, a calc): N / 16 rem, the
+        # same value spacing_value writes into a class. A numeric string
+        # reads as its number; anything else is written as it always was, in
+        # px.
+        def rem(value)
+          number = value.is_a?(Numeric) ? value : (Float(value.to_s) rescue nil)
+          return "#{value}px" if number.nil?
+
+          "#{(BigDecimal(number.to_s) / 16).to_s('F').sub(/\.0\z/, '')}rem"
         end
 
         # Insets (alternative padding format - same as padding array)
@@ -676,7 +724,7 @@ module RjuiTools
         # Inset horizontal
         def map_inset_horizontal(value)
           return '' unless value
-          "px-#{closest_padding(value)}"
+          "px-#{spacing_value(value)}"
         end
 
         private
@@ -695,12 +743,6 @@ module RjuiTools
           end
         end
 
-        def closest_padding(value)
-          return '0' unless value
-
-          closest = PADDING_MAP.keys.min_by { |k| (k - value).abs }
-          PADDING_MAP[closest]
-        end
       end
     end
   end

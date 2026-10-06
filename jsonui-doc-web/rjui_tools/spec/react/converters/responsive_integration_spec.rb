@@ -47,8 +47,8 @@ RSpec.describe 'Responsive integration with converters' do
         })
         output = converter.convert(2)
 
-        expect(output).to include('gap-2')
-        expect(output).to include('lg:gap-6')
+        expect(output).to include('gap-[0.5rem]')
+        expect(output).to include('lg:gap-[1.5rem]')
       end
     end
 
@@ -126,9 +126,9 @@ RSpec.describe 'Responsive integration with converters' do
         })
         output = converter.convert(2)
 
-        expect(output).to include('p-5')
-        expect(output).to include('max-md:p-4')
-        expect(output.scan(/(?<![-\w:])p-5/).length).to eq(1)
+        expect(output).to include('p-[1.25rem]')
+        expect(output).to include('max-md:p-[1rem]')
+        expect(output.scan(/(?<![-\w:])p-\[1\.25rem\]/).length).to eq(1)
         expect(output).not_to match(/(?<!max-md:)p-4/)
       end
     end

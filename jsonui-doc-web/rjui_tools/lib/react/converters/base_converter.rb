@@ -84,12 +84,29 @@ module RjuiTools
           true
         end
 
+        # Whether this element's children start the cross axis by default
+        # (ViewConverter says yes for a row). No here: a converter that lays
+        # its own parts out as a row — a CheckBox or Radio with a label —
+        # writes its own items-* after this point, and a second items-* class
+        # would be decided by stylesheet order, not by the order written.
+        def cross_axis_start_by_default?(_classes)
+          false
+        end
+
+        # A flex row whose classes so far name no cross-axis alignment.
+        def row_without_cross_axis_class?(classes)
+          lays_out_children? &&
+            JsonUIShared::EnumSpelling.lowered(attributes['orientation'], 'View', 'orientation') == 'horizontal' &&
+            classes.none? { |c| c.to_s.split.any? { |t| t.start_with?('items-') } }
+        end
+
         # The classes that lay the node's children out — orientation, gravity
         # and direction, as build_class_name maps them — for the inner element
         # of a converter whose own box does not (lays_out_children?).
         def children_layout_classes
           classes = [TailwindMapper.map_orientation(attributes['orientation'])]
           classes.concat(gravity_classes) if attributes['gravity']
+          classes << 'items-start' if cross_axis_start_by_default?(classes)
           if attributes['direction'] && attributes['orientation']
             classes << TailwindMapper.map_direction(attributes['direction'], attributes['orientation'])
           end
@@ -111,8 +128,13 @@ module RjuiTools
           # Compute responsive info up front so we know which keys are overridden
           @responsive_result = ResponsiveHelper.build_responsive(json)
 
-          # Overlay child (absolute positioning within parent)
-          if json['_overlay']
+          # Overlay child. A stacked overlay (ViewConverter#stacked_overlay?)
+          # puts every child in the one grid cell; any other overlay positions
+          # it absolutely within the parent.
+          if json['_overlay'] == 'stack'
+            classes << 'col-start-1 row-start-1'
+            classes << stack_position_classes
+          elsif json['_overlay']
             classes << 'absolute'
             position = overlay_position_classes
             classes << position unless position.empty?
@@ -130,7 +152,8 @@ module RjuiTools
             # Use calc to account for margins
             total_margin = (left_margin.is_a?(Numeric) ? left_margin : 0) +
                           (right_margin.is_a?(Numeric) ? right_margin : 0)
-            @dynamic_styles['width'] = "'calc(100% - #{total_margin}px)'"
+            # In rem, as the margins themselves are (TailwindMapper.rem).
+            @dynamic_styles['width'] = "'calc(100% - #{TailwindMapper.rem(total_margin)})'"
           else
             classes << TailwindMapper.map_width(attributes['width'])
           end
@@ -160,6 +183,9 @@ module RjuiTools
             classes << TailwindMapper.map_height(attributes['height'])
           end
 
+          classes << 'max-w-full' if wrap_capped?('width') && !attributes['maxWidth']
+          classes << 'max-h-full' if wrap_capped?('height') && !attributes['maxHeight']
+
           # Prevent flex shrinking when fixed dimensions are specified
           # This ensures elements maintain their specified size in flex containers
           if explicit_size?('width') || explicit_size?('height')
@@ -184,7 +210,7 @@ module RjuiTools
 
           # Padding (array format)
           classes << TailwindMapper.map_padding(
-            bound_length_style('padding', attributes['padding'] || attributes['paddings'])
+            bound_rem_style('padding', attributes['padding'] || attributes['paddings'])
           )
 
           # Individual paddings (topPadding, bottomPadding, leftPadding, rightPadding)
@@ -313,16 +339,16 @@ module RjuiTools
             # Bindings still need a regular CSS prop entry so the runtime
             # value can update; the provider only sees the static spec.
             if font_size_attr && !font_size_attr.is_a?(Numeric) && has_binding?(font_size_attr.to_s)
-              @dynamic_styles['fontSize'] = convert_binding(font_size_attr.to_s)
+              bound_rem_style('fontSize', font_size_attr)
             end
             if font_weight_attr.is_a?(String) && has_binding?(font_weight_attr)
               @dynamic_styles['fontWeight'] = convert_binding(font_weight_attr)
             end
           else
-            # Font size. A bound size is a px inline style — no Tailwind
+            # Font size. A bound size is a rem inline style — no Tailwind
             # class can carry a value that exists only at runtime, and
             # `map_font_size` used to build the dead class `text-[@{v}px]`.
-            font_size_value = bound_length_style('fontSize', font_size_attr)
+            font_size_value = bound_rem_style('fontSize', font_size_attr)
             classes << TailwindMapper.map_font_size(font_size_value) if font_size_value
 
             # Font - can be weight name (bold, semibold) or font family alias (monospace).
@@ -395,30 +421,32 @@ module RjuiTools
           # again). Rulings live once, in attribute_semantics.json, verified
           # by cross-effect (`d119189`); read that file before reasoning from
           # types, enums and defaults.
+          #
+          # WHERE the border is drawn: over the content, inside the box —
+          # it does not push the content inward (user ruling B, 2026-10-05:
+          # "a border does not push the content inward"; iOS and Android
+          # keep the children at (0, 0) and a Label's height unchanged). A CSS
+          # `border` on the element takes layout space, which put the children
+          # at (2, 2) for borderWidth 2 and made a Label 4 taller on web only.
+          # So the border is drawn by the element's ::after, laid over the
+          # whole box (absolute, inset-0, the element's own corner radius,
+          # transparent to taps): no layout space, above the children (an
+          # inset box-shadow would paint UNDER a child touching the edge,
+          # measured), the corner radius in every browser (an outline follows
+          # it only from Safari 16.4), and dashed / dotted as declared. The
+          # element becomes the ::after's containing block (`relative`),
+          # unless it is absolutely positioned already. An element with no
+          # ::after (an <img>) falls back to an outline pulled in by its own
+          # width (pseudo_border_supported?). A text input keeps a CSS border
+          # (border_draws_over_content?).
           if attributes['borderWidth'] && attributes['borderColor']
-            border_width_binding = attributes['borderWidth'] && has_binding?(attributes['borderWidth'])
-            border_color_binding = attributes['borderColor'] && has_binding?(attributes['borderColor'])
-            border_style_binding = attributes['borderStyle'] && has_binding?(attributes['borderStyle'])
-
-            if border_width_binding || border_color_binding || border_style_binding
-              # Dynamic border - use inline styles
-              if border_width_binding
-                prop = attribute_expression(attributes['borderWidth'])
-                @dynamic_styles['borderWidth'] = "`${#{prop}}px`"
-              elsif attributes['borderWidth']
-                @dynamic_styles['borderWidth'] = "'#{attributes['borderWidth']}px'"
-              end
-              if border_color_binding
-                @dynamic_styles['borderColor'] = color_style_expr(attributes['borderColor'])
-              elsif attributes['borderColor']
-                @dynamic_styles['borderColor'] = color_style_expr(attributes['borderColor'])
-              end
-              if border_style_binding
-                @dynamic_styles['borderStyle'] = convert_binding(attributes['borderStyle'])
-              end
-              classes << 'border-solid' unless attributes['borderStyle']
+            if !border_draws_over_content?
+              classes << css_border_classes
+            elsif pseudo_border_supported?
+              classes << pseudo_border_classes
+              classes << 'relative' unless json['_overlay'] == true
             else
-              classes << TailwindMapper.map_border(attributes['borderWidth'], attributes['borderColor'], attributes['borderStyle'])
+              classes << outline_border_classes
             end
           end
 
@@ -513,8 +541,14 @@ module RjuiTools
 
           # The SIZE half of the parent's `distribution`. An explicit `weight`
           # below is the more specific declaration and wins the same axis, the
-          # way an explicit size wins over a bound one.
-          if (parent_distribution = json['_parent_distribution']) && !attributes['weight']
+          # way an explicit size wins over a bound one. So does an explicit
+          # size on the distribution axis (distribution.explicitChildSizeWins:
+          # "fill and fillEqually do not override a declared child size"):
+          # fillEqually's zero basis drew a width-60 child at an equal share,
+          # and fill's grow drew it past 60 (frame-parity inventory
+          # 2026-10-05; ticket rjui-fillequally-overrides-a-childs-declared-width).
+          if (parent_distribution = json['_parent_distribution']) && !attributes['weight'] &&
+             !explicit_size?(parent_row? ? 'width' : 'height')
             classes << DISTRIBUTION_CHILD_CLASS[parent_distribution]
           end
 
@@ -523,6 +557,17 @@ module RjuiTools
           # `flex-none` — the exact opposite of what a weight is for.
           weight = bound_number_style('flexGrow', attributes['weight'])
           classes << TailwindMapper.map_flex_grow(weight) if weight
+          # A bound weight replaces the declared size on its axis the way the
+          # static spelling does (`flex-1` is `flex: 1 1 0%`): grow from a zero
+          # basis. Setting only flexGrow left the basis `auto`, i.e. the
+          # declared width, so two weight-1 siblings split the LEFTOVER space
+          # and came out 412 : 612 instead of equal (ticket
+          # rjui-bound-weight-keeps-the-declared-width-as-a-basis). A weight
+          # that resolves to 0 keeps its basis, as static `flex-none` does.
+          if (weight_expr = bound_value_expr(attributes['weight']))
+            dynamic_styles['flexBasis'] = "Number(#{weight_expr}) > 0 ? 0 : undefined"
+            classes << 'min-w-0 min-h-0'
+          end
 
           # Self-centering (for non-View elements like Image, Label)
           # centerHorizontal: center this element horizontally within parent
@@ -570,6 +615,7 @@ module RjuiTools
 
           # Gravity alignment - pass orientation for correct flexbox mapping
           classes.concat(gravity_classes) if attributes['gravity'] && lays_out_children?
+          classes << 'items-start' if cross_axis_start_by_default?(classes)
 
           # Layout direction — child ORDER, not text direction.
           #
@@ -896,7 +942,8 @@ module RjuiTools
         # The same contract for the per-side spacing attributes, which the SSoT
         # also declares as `["number", "binding"]`.
         #
-        # Without this a bound value reached `TailwindMapper.closest_padding`,
+        # Without this a bound value reached `TailwindMapper.closest_padding`
+        # (TailwindMapper.spacing_value since jsonui-cli 1.9.15),
         # which does `(k - value).abs` over the spacing scale and raised
         # `TypeError: String can't be coerced into Integer` — `jui build` on a
         # layout written exactly the way the SSoT describes ABORTED. Sixteen
@@ -908,8 +955,9 @@ module RjuiTools
         # Returns the value to hand the Tailwind mapper, and nil once the
         # binding has been routed to the inline style. Deliberately additive:
         # a numeric value is returned untouched and takes the byte-identical
-        # path it took before, because `closest_padding` is the road every
-        # STATIC padding travels and moving that would move every fixture.
+        # path it took before, because the spacing mapper is the road every
+        # STATIC padding travels. (Since 1.9.15 that road no longer rounds to
+        # the Tailwind scale: TailwindMapper.spacing_value.)
         #
         # It takes the VALUE, not the attribute names, so the subscript reads
         # stay at the call site. Two scanners look for them there — this tree's
@@ -917,7 +965,7 @@ module RjuiTools
         # the declared-but-unread ledger — and a helper that resolved the names
         # itself would blind both, quietly inventing sixteen coverage gaps.
         def static_spacing(css_property, value)
-          bound_length_style(css_property, value)
+          bound_rem_style(css_property, value)
         end
 
         # ------------------------------------------------------------------
@@ -1018,6 +1066,18 @@ module RjuiTools
           return value unless expr
 
           dynamic_styles[css_property] = "`${#{expr}}px`"
+          nil
+        end
+
+        # A bound length that follows the browser's font size (padding,
+        # margin, gap, fontSize): rem, N / 16, as the static classes are
+        # (TailwindMapper.spacing_value / TailwindMapper.rem; ticket
+        # rjui-spacing-px-does-not-follow-the-browser-font-size).
+        def bound_rem_style(css_property, value)
+          expr = bound_value_expr(value)
+          return value unless expr
+
+          dynamic_styles[css_property] = "`${Number(#{expr}) / 16}rem`"
           nil
         end
 
@@ -1178,6 +1238,104 @@ module RjuiTools
           'equalspacing' => 'justify-between',
           'equalcentering' => 'justify-around'
         }.freeze
+
+        # The border as a CSS border (a text input's), static or bound.
+        def css_border_classes
+          if border_bound?
+            if has_binding?(attributes['borderWidth'])
+              @dynamic_styles['borderWidth'] = "`${#{attribute_expression(attributes['borderWidth'])}}px`"
+            else
+              @dynamic_styles['borderWidth'] = "'#{attributes['borderWidth']}px'"
+            end
+            @dynamic_styles['borderColor'] = color_style_expr(attributes['borderColor'])
+            @dynamic_styles['borderStyle'] = convert_binding(attributes['borderStyle']) if has_binding?(attributes['borderStyle'])
+            attributes['borderStyle'] ? '' : 'border-solid'
+          else
+            TailwindMapper.map_border(attributes['borderWidth'], attributes['borderColor'], attributes['borderStyle'])
+          end
+        end
+
+        # The border drawn by the element's ::after, over the content. A
+        # bound value reaches the pseudo-element through a custom property on
+        # the element (`--jui-border-*`), since an inline style cannot.
+        def pseudo_border_classes
+          width = attributes['borderWidth']
+          color = attributes['borderColor']
+          style = attributes['borderStyle']
+          classes = %w[after:absolute after:inset-0 after:rounded-[inherit] after:pointer-events-none]
+          if has_binding?(width)
+            @dynamic_styles['--jui-border-width'] = "`${#{attribute_expression(width)}}px`"
+            classes << 'after:border-[length:var(--jui-border-width)]'
+          else
+            return '' if width.to_f <= 0
+
+            classes << "after:border-[length:#{TailwindMapper.css_px(width)}]"
+          end
+          # A colour rides a custom property whenever the border goes inline
+          # at all (a bound sibling), or when it is a CSS function (rgba(...)
+          # has spaces no class can hold) — the same values the inline branch
+          # always took, resolved the same way (color_style_expr).
+          if border_bound? || !color.to_s.match?(/\A(#\h+|[\w-]+)\z/)
+            @dynamic_styles['--jui-border-color'] = color_style_expr(color)
+            classes << 'after:border-[color:var(--jui-border-color)]'
+          else
+            classes << TailwindMapper.map_color(color, 'after:border')
+          end
+          if has_binding?(style)
+            @dynamic_styles['--jui-border-style'] = convert_binding(style)
+            classes << 'after:[border-style:var(--jui-border-style)]'
+          else
+            style_class = TailwindMapper.map_border_style(style)
+            classes << (style_class.empty? ? 'after:border-solid' : "after:#{style_class}")
+          end
+          classes.reject(&:empty?).join(' ')
+        end
+
+        # The fallback for an element with no ::after: an outline pulled in by
+        # its own width (it follows the corner radius from Safari 16.4 on).
+        def outline_border_classes
+          if border_bound?
+            if has_binding?(attributes['borderWidth'])
+              prop = attribute_expression(attributes['borderWidth'])
+              @dynamic_styles['outlineWidth'] = "`${#{prop}}px`"
+              @dynamic_styles['outlineOffset'] = "`-${#{prop}}px`"
+            else
+              @dynamic_styles['outlineWidth'] = "'#{attributes['borderWidth']}px'"
+              @dynamic_styles['outlineOffset'] = "'-#{attributes['borderWidth']}px'"
+            end
+            @dynamic_styles['outlineColor'] = color_style_expr(attributes['borderColor'])
+            @dynamic_styles['outlineStyle'] = convert_binding(attributes['borderStyle']) if has_binding?(attributes['borderStyle'])
+            attributes['borderStyle'] ? '' : 'outline-solid'
+          else
+            TailwindMapper.map_border_over_content(attributes['borderWidth'], attributes['borderColor'], attributes['borderStyle'])
+          end
+        end
+
+        def border_bound?
+          %w[borderWidth borderColor borderStyle].any? { |a| attributes[a] && has_binding?(attributes[a]) }
+        end
+
+        # Whether the element this converter renders can carry a ::after —
+        # not a replaced element such as <img>.
+        def pseudo_border_supported?
+          true
+        end
+
+        # Whether a declared border is drawn over the content (an outline
+        # inside the box) rather than as a CSS border that takes layout
+        # space. True for every view (user ruling B); a text input answers
+        # no — its text keeps clear of its own frame, and its focus ring is
+        # the outline.
+        def border_draws_over_content?
+          true
+        end
+
+        # Whether the parent lays its children out as a row (its orientation,
+        # passed down as `_parent_orientation`, in any declared spelling).
+        def parent_row?
+          orientation = json['_parent_orientation']
+          JsonUIShared::EnumSpelling.lowered(orientation, 'View', 'orientation') == 'horizontal'
+        end
 
         # The lowercased SIZE value this container declares, or nil.
         def distribution_size_value
@@ -1591,12 +1749,45 @@ module RjuiTools
             # Skip data-only elements (they define props, not rendered content)
             next nil if data_only_element?(child)
 
-            annotated = child
+            annotated = with_parent_bounds(child)
             annotated = annotated.merge('_parent_orientation' => parent_orientation) if parent_orientation
             annotated = annotated.merge('_parent_distribution' => parent_distribution) if parent_distribution
             converter = create_converter_for_child(annotated)
             converter.convert_node(indent + 2)
           end.compact.join("\n")
+        end
+
+        # A wrapContent box stops at its parent's size when the parent has
+        # one (user ruling 2026-10-05: "Wrapcontent は Android が正しいね。
+        # 親の大きさが固定や matchparent ならその大きさまで"; attribute_semantics
+        # wrapContentCap). The parent has a size on an axis when it declares a
+        # number or matchParent there and does not scroll along it — a
+        # ScrollView's content is unbounded on its scroll axis, as Android
+        # measures it. The child reads `_parent_bounded_width/_height`.
+        def with_parent_bounds(child)
+          return child unless child.is_a?(Hash)
+
+          bounded = lambda do |axis|
+            value = attributes[axis]
+            next false unless value.is_a?(Numeric) || value == 'matchParent'
+
+            scroll_axis != axis
+          end
+          child.merge('_parent_bounded_width' => bounded.call('width'),
+                      '_parent_bounded_height' => bounded.call('height'))
+        end
+
+        # The axis this node scrolls its content along ('width' / 'height'),
+        # or nil. A ScrollView answers (ScrollViewConverter#scroll_axis).
+        def scroll_axis
+          nil
+        end
+
+        # Whether this node's own size on *axis* is its content's (wrapContent,
+        # or undeclared) and its parent has a size there to stop at.
+        def wrap_capped?(axis)
+          value = attributes[axis]
+          (value.nil? || value == 'wrapContent') && json["_parent_bounded_#{axis}"] == true
         end
 
         # Check if a child element is a data-only element (should not be rendered)
@@ -2369,6 +2560,45 @@ module RjuiTools
           end
 
           [vertical, horizontal].compact.join(' ')
+        end
+
+        # The grid-cell spelling of overlay_position_classes, placing a stacked
+        # child where its absolute counterpart sits: an axis with an
+        # instruction aligns that way (left / right physically, as left-0 /
+        # right-0 are); the other axis of a child with an
+        # instruction on one axis only sits at the start, shrunk to fit (the
+        # absolute static position); a child with no instruction fills the
+        # cell (inset-0) unless it is explicitly sized (the static position
+        # again). Both axes are always spelled so a container's gravity
+        # classes cannot move the child the way they never moved an absolute
+        # one.
+        def stack_position_classes
+          center_all = attributes['centerInParent']
+
+          vertical =
+            if center_all || attributes['centerVertical']
+              'self-center'
+            elsif attributes['alignBottom']
+              'self-end'
+            elsif attributes['alignTop']
+              'self-start'
+            end
+
+          horizontal =
+            if center_all || attributes['centerHorizontal']
+              'justify-self-center'
+            elsif attributes['alignRight']
+              '[justify-self:right]'
+            elsif attributes['alignLeft']
+              '[justify-self:left]'
+            end
+
+          if vertical.nil? && horizontal.nil?
+            return 'self-start justify-self-start' if explicitly_sized?
+            return 'self-stretch justify-self-stretch'
+          end
+
+          "#{vertical || 'self-start'} #{horizontal || 'justify-self-start'}"
         end
 
         # Both dimensions declared as concrete numbers — the child cannot be

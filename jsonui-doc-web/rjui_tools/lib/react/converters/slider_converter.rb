@@ -6,6 +6,12 @@ module RjuiTools
   module React
     module Converters
       class SliderConverter < BaseConverter
+        # A replaced element (<input>) has no ::after: a declared border falls
+        # back to an outline (BaseConverter#pseudo_border_supported?).
+        def pseudo_border_supported?
+          false
+        end
+
         def convert(indent = 2)
           class_name = build_class_name
           base_style_attr = build_base_style_attr
@@ -60,7 +66,13 @@ module RjuiTools
         def build_class_name
           classes = [super]
 
-          classes << 'w-full'
+          # The declared width wins (super maps it). `w-full` used to be added
+          # unconditionally and, later in the stylesheet, beat the declared
+          # width: Slider / Progress / Segment with width 200 drew at the
+          # root's full 1024 (ticket
+          # rjui-slider-progress-segment-ignore-the-declared-width-and-fill-the-row).
+          # Filling is only the fallback for a layout that declares no width.
+          classes << 'w-full' if attributes['width'].nil?
           classes << 'cursor-pointer'
 
           # Disabled state

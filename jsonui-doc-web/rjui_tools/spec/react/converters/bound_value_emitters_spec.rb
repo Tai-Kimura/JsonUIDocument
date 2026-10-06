@@ -44,7 +44,7 @@ RSpec.describe 'bound value emitters' do
     it 'sends a bound fontSize to the inline style instead of text-[@{v}px]' do
       out = label('fontSize' => '@{size}')
       expect(out).not_to include('@{')
-      expect(out).to include('fontSize: `${data.size}px`')
+      expect(out).to include('fontSize: `${Number(data.size) / 16}rem`')
     end
 
     it 'sends a bound cornerRadius to borderRadius instead of rounded-[@{v}px]' do
@@ -56,7 +56,7 @@ RSpec.describe 'bound value emitters' do
     it 'sends a bound spacing to gap instead of gap-@{v}' do
       out = view('orientation' => 'horizontal', 'spacing' => '@{gap}')
       expect(out).not_to include('@{')
-      expect(out).to include('gap: `${data.gap}px`')
+      expect(out).to include('gap: `${Number(data.gap) / 16}rem`')
     end
   end
 
@@ -79,9 +79,19 @@ RSpec.describe 'bound value emitters' do
       expect(out).to include('flexGrow: data.w')
     end
 
+    # The static spelling is `flex: 1 1 0%`; a bound weight that sets only
+    # flexGrow keeps the declared width as its basis and splits the leftover
+    # (ticket rjui-bound-weight-keeps-the-declared-width-as-a-basis).
+    it 'grows a bound weight from a zero basis, and keeps the basis for a weight of 0' do
+      out = view('weight' => '@{w}', 'width' => 200)
+      expect(out).to include('flexBasis: Number(data.w) > 0 ? 0 : undefined')
+      expect(out).to include('min-w-0 min-h-0')
+    end
+
     it 'does not freeze a bound lineSpacing to a 1.0 multiplier via to_f' do
       out = label('lineSpacing' => '@{s}', 'fontSize' => 16)
-      expect(out).to include('lineHeight: ((16) + (data.s)) / (16)')
+      # 16 is text-base, whose own line the spacing is added to.
+      expect(out).to include('lineHeight: `calc(var(--text-base--line-height, 1.5) * 1em + ${Number(data.s)}px)`')
     end
 
     it 'lets a bound Collection lazy still reach the none shape' do
@@ -216,8 +226,8 @@ RSpec.describe 'bound value emitters' do
     it 'keeps the static shorthand class and lets the bound side override one edge' do
       out = view('padding' => 8, 'topPadding' => '@{t}')
 
-      expect(out).to include('p-2')
-      expect(out).to include('paddingTop: `${data.t}px`')
+      expect(out).to include('p-[0.5rem]')
+      expect(out).to include('paddingTop: `${Number(data.t) / 16}rem`')
     end
   end
 
@@ -234,8 +244,9 @@ RSpec.describe 'bound value emitters' do
   describe 'border — the pair requests it, neither half does' do
     it 'draws when width and colour are both declared' do
       out = view('borderWidth' => 2, 'borderColor' => '#FF0000')
-      expect(out).to include('border-2')
-      expect(out).to include('border-[#FF0000]')
+      # Drawn over the content, inside the box (user ruling B, 2026-10-05).
+      expect(out).to include('after:border-[length:2px]')
+      expect(out).to include('after:border-[#FF0000]')
     end
 
     it 'draws nothing for a width with no colour — there is no default border colour' do
@@ -373,7 +384,7 @@ RSpec.describe 'bound value emitters' do
     it 'still maps a numeric cornerRadius and spacing to classes' do
       out = view('cornerRadius' => 8, 'orientation' => 'horizontal', 'spacing' => 4)
       expect(out).to include('rounded-lg')
-      expect(out).to include('gap-1')
+      expect(out).to include('gap-[0.25rem]')
       expect(out).not_to include('style={{')
     end
 

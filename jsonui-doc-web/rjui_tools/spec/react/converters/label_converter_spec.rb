@@ -208,7 +208,7 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
       # lineOffset is declared on underline only, and strikethrough must not
       # invent one.
       it 'applies lineOffset to underline and never to strikethrough' do
-        expect(classes_for('underline' => { 'lineOffset' => 3 })).to include('underline-offset-[3px]')
+        expect(classes_for('underline' => { 'lineOffset' => 3 })).to include('underline-offset-[0.1875rem]')
         expect(classes_for('strikethrough' => { 'lineOffset' => 3 })).not_to include('underline-offset')
       end
 
@@ -257,7 +257,82 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         })
         converter.send(:build_class_name)
         result = converter.send(:build_style_attr)
-        expect(result).to include('lineHeight: 1.5')
+        # m x the Label's default line, 1.5 (user ruling B, 2026-10-05)
+        expect(result).to include('lineHeight: 2.25')
+      end
+    end
+
+    # L is the line of a Label of the same font size with no line height:
+    # text-2xl brings 32 at 24px, so 1.5 x L is 48, not 1.5 x 36 = 54
+    # (Label/highlightAttributes__static drew 54).
+    context 'with a font size on Tailwind\'s scale' do
+      it 'multiplies the line the size brings' do
+        converter = create_converter({ 'type' => 'Label', 'text' => 'T', 'fontSize' => 24, 'lineHeightMultiple' => 1.8 })
+        converter.send(:build_class_name)
+        expect(converter.send(:build_style_attr)).to include("lineHeight: 'calc(var(--text-2xl--line-height, 1.3333) * 1.8)'")
+      end
+
+      it 'adds lineSpacing to that line' do
+        converter = create_converter({ 'type' => 'Label', 'text' => 'T', 'fontSize' => 24, 'lineSpacing' => 16 })
+        converter.send(:build_class_name)
+        expect(converter.send(:build_style_attr)).to include("lineHeight: 'calc(var(--text-2xl--line-height, 1.3333) * 1em + 16px)'")
+      end
+
+      it 'multiplies the highlight font size\'s line for the highlight' do
+        result = create_converter({
+          'type' => 'Label', 'text' => 'Hi', 'selected' => true,
+          'highlightAttributes' => { 'fontSize' => 24, 'lineHeightMultiple' => 1.5 }
+        }).convert
+        expect(result).to include("lineHeight: 'calc(var(--text-2xl--line-height, 1.3333) * 1.5)'")
+        expect(result).not_to include('lineHeight: 2.25')
+      end
+
+      it 'keeps the preflight line for a size off the scale' do
+        converter = create_converter({ 'type' => 'Label', 'text' => 'T', 'fontSize' => 17, 'lineHeightMultiple' => 1.8 })
+        converter.send(:build_class_name)
+        expect(converter.send(:build_style_attr)).to include('lineHeight: 2.7')
+      end
+    end
+
+    # hintAttributes: `font` is a weight name or a family, and the hint's own
+    # lineHeightMultiple is m x the line of its size (Label/hintAttributes__static
+    # drew a regular serif hint one line 36 high where android draws bold 24,
+    # two lines of 1.5 x L).
+    context 'with hintAttributes font and lineHeightMultiple' do
+      it 'draws a weight name as a weight and multiplies the hint size\'s line' do
+        out = create_converter({
+          'type' => 'Label', 'width' => 200, 'hint' => 'Conformance Hint',
+          'hintAttributes' => { 'font' => 'bold', 'fontSize' => 24, 'lineHeightMultiple' => 1.5 }
+        }).convert
+        expect(out).to include('fontWeight: 700')
+        expect(out).not_to include("fontFamily: 'bold'")
+        expect(out).to include("lineHeight: 'calc(var(--text-2xl--line-height, 1.3333) * 1.5)'")
+      end
+
+      it 'keeps a family name a family' do
+        out = create_converter({
+          'type' => 'Label', 'hint' => 'H', 'hintAttributes' => { 'font' => 'Georgia' }
+        }).convert
+        expect(out).to include("fontFamily: 'Georgia'")
+        expect(out).not_to include('fontWeight')
+      end
+    end
+
+    # A word longer than the box breaks inside it (user ruling 2026-10-05,
+    # attribute_semantics labelLongWordBreak): web let a long URL run past a
+    # 200-wide Label.
+    context 'with a word longer than the box' do
+      it 'breaks the word inside the box' do
+        out = create_converter({ 'type' => 'Label', 'width' => 200,
+                                 'text' => 'See https://example.com/conformance for details' }).convert
+        expect(out).to include('[overflow-wrap:anywhere]')
+      end
+
+      it 'keeps a declared Char or Word rule' do
+        %w[Char Word].each do |mode|
+          out = create_converter({ 'type' => 'Label', 'text' => 'x', 'lineBreakMode' => mode }).convert
+          expect(out).not_to include('[overflow-wrap:anywhere]'), mode
+        end
       end
     end
 
@@ -271,8 +346,11 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         })
         converter.send(:build_class_name)
         result = converter.send(:build_style_attr)
-        # lineHeight = (16 + 8) / 16 = 1.5
-        expect(result).to include('lineHeight: 1.5')
+        # The Label's own line plus the spacing; the half spacing above the
+        # first line and below the last is taken back by the text's wrapper
+        # (user ruling B, 2026-10-05: between lines only). A size on
+        # Tailwind's scale brings its own line (text-base: its var).
+        expect(result).to include("lineHeight: 'calc(var(--text-base--line-height, 1.5) * 1em + 8px)'")
       end
 
       it 'uses default fontSize of 16 when not specified' do
@@ -283,7 +361,8 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         })
         converter.send(:build_class_name)
         result = converter.send(:build_style_attr)
-        expect(result).to include('lineHeight: 1.5')
+        expect(result).to include("lineHeight: 'calc(1.5em + 8px)'")
+        expect(converter.convert).to include("<span style={{ display: 'block', marginBlock: '-4px' }}>Test</span>")
       end
     end
 
@@ -296,7 +375,7 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         })
         converter.send(:build_class_name)
         result = converter.send(:build_style_attr)
-        expect(result).to include("padding: '10px'")
+        expect(result).to include("padding: '0.625rem'")
       end
 
       it 'handles 2-element array' do
@@ -307,7 +386,7 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         })
         converter.send(:build_class_name)
         result = converter.send(:build_style_attr)
-        expect(result).to include("padding: '10px 20px'")
+        expect(result).to include("padding: '0.625rem 1.25rem'")
       end
 
       it 'handles 4-element array' do
@@ -318,7 +397,7 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         })
         converter.send(:build_class_name)
         result = converter.send(:build_style_attr)
-        expect(result).to include("padding: '10px 20px 30px 40px'")
+        expect(result).to include("padding: '0.625rem 1.25rem 1.875rem 2.5rem'")
       end
 
       it 'handles pipe-separated string' do
@@ -329,7 +408,7 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         })
         converter.send(:build_class_name)
         result = converter.send(:build_style_attr)
-        expect(result).to include("padding: '10px 20px 30px 40px'")
+        expect(result).to include("padding: '0.625rem 1.25rem 1.875rem 2.5rem'")
       end
     end
 
@@ -347,12 +426,38 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
       end
     end
 
+    # An empty Label keeps one line of height (user ruling 2026-10-05,
+    # attribute_semantics emptyLabelHeight); web collapsed it to 0. The line
+    # is held by an invisible zero-wide ::before, outside the text.
+    context 'when empty' do
+      it 'holds one line with an invisible ::before, without an escape in the class' do
+        converter = create_converter({ 'type' => 'Label', 'id' => 'l', 'width' => 200, 'text' => '' })
+        classes = converter.send(:build_class_name)
+        expect(classes).to include("empty:before:content-['x']", 'empty:before:invisible', 'empty:before:w-0')
+        expect(classes).not_to include('\\')
+      end
+    end
+
     context 'with lineBreakMode' do
+      # It chooses how the last ALLOWED line is cut; with no `lines` cap the
+      # text wraps and nothing is cut (user ruling 2026-10-05,
+      # attribute_semantics lineBreakModeLines). Web drew one line where
+      # Android wrapped.
+      %w[Head Middle Tail Clip].each do |mode|
+        it "cuts nothing without a lines cap (#{mode})" do
+          converter = create_converter({ 'type' => 'Label', 'text' => 'Long text', 'lineBreakMode' => mode })
+          converter.send(:build_class_name)
+          result = converter.send(:build_style_attr)
+          expect(result).not_to include('textOverflow', 'whiteSpace', "overflow: 'hidden'")
+        end
+      end
+
       it 'handles Head truncation' do
         converter = create_converter({
           'type' => 'Label',
           'text' => 'Long text that will be truncated',
-          'lineBreakMode' => 'Head'
+          'lineBreakMode' => 'Head',
+          'lines' => 1
         })
         converter.send(:build_class_name)
         result = converter.send(:build_style_attr)
@@ -366,7 +471,8 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         converter = create_converter({
           'type' => 'Label',
           'text' => 'Long text',
-          'lineBreakMode' => 'Tail'
+          'lineBreakMode' => 'Tail',
+          'lines' => 1
         })
         converter.send(:build_class_name)
         result = converter.send(:build_style_attr)
@@ -379,7 +485,8 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         converter = create_converter({
           'type' => 'Label',
           'text' => 'Long text',
-          'lineBreakMode' => 'Middle'
+          'lineBreakMode' => 'Middle',
+          'lines' => 1
         })
         converter.send(:build_class_name)
         result = converter.send(:build_style_attr)
@@ -640,7 +747,7 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         ]
       })
       result = converter.convert
-      expect(result).to include("fontSize: '24px'")
+      expect(result).to include("fontSize: '1.5rem'")
     end
 
     it 'ignores `background`, which partialAttributes does not declare' do
@@ -937,16 +1044,16 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter do
         'selected' => '@{sel}', 'highlightAttributes' => { 'lineHeightMultiple' => 1.5 }
       }).convert
 
-      expect(result).to include('lineHeight: (data.sel ? 1.5 : 1.2)')
+      expect(result).to include('lineHeight: (data.sel ? 2.25 : 1.8)')
     end
 
-    it 'falls back to CSS normal when the base sets no line height' do
+    it 'falls back to the default line when the base sets no line height' do
       result = create_converter({
         'type' => 'Label', 'text' => 'Hi', 'selected' => '@{sel}',
         'highlightAttributes' => { 'lineHeightMultiple' => 1.5 }
       }).convert
 
-      expect(result).to include("lineHeight: (data.sel ? 1.5 : 'normal')")
+      expect(result).to include('lineHeight: (data.sel ? 2.25 : 1.5)')
     end
 
     it 'leaves the class list untouched when there is no driver' do
@@ -988,14 +1095,14 @@ RSpec.describe RjuiTools::React::Converters::LabelConverter, 'web-only text attr
   end
 
   # lineHeight is the CSS property directly, in px.
-  it 'emits lineHeight in px' do
-    expect(label('lineHeight' => 28)).to include("lineHeight: '28px'")
+  it 'emits lineHeight in rem' do
+    expect(label('lineHeight' => 28)).to include("lineHeight: '1.75rem'")
   end
 
   # The cross-platform spellings are the multiplier and the extra spacing, so
   # they win over the web-only literal.
   it 'yields to lineHeightMultiple and lineSpacing' do
-    expect(label('lineHeight' => 28, 'lineHeightMultiple' => 1.5)).to include('lineHeight: 1.5')
+    expect(label('lineHeight' => 28, 'lineHeightMultiple' => 1.5)).to include('lineHeight: 2.25')
     expect(label('lineHeight' => 28, 'lineHeightMultiple' => 1.5)).not_to include('28px')
     expect(label('lineHeight' => 28, 'lineSpacing' => 4, 'fontSize' => 16)).not_to include('28px')
   end

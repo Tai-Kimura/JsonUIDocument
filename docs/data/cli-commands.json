@@ -1307,7 +1307,7 @@
     {
       "binary": "jui",
       "command": "conformance gate",
-      "synopsis": "jui conformance gate --platform <p> [--platform <p>...] [--dir <dir>] [--results <dir>] [--out <path>] [--no-visual] [--env <key>] [--value-discrimination] [--no-ledger-keys] [--rendered-by NAME=SHA] [--codegen-effect] [--parity] [--inert-complete] [--cross-effect]",
+      "synopsis": "jui conformance gate --platform <p> [--platform <p>...] [--dir <dir>] [--results <dir>] [--out <path>] [--no-visual] [--env <key>] [--value-discrimination] [--no-ledger-keys] [--rendered-by NAME=SHA] [--codegen-effect] [--parity] [--inert-complete] [--cross-effect] [--frame-parity]",
       "purpose": {
         "en": "Render REPORT.md and fail on regressions — the CI gate, runnable locally.",
         "ja": "REPORT.md を生成しリグレッションで失敗させる — CI ゲート（ローカル実行可）。"
@@ -1429,6 +1429,15 @@
           "description": {
             "en": "Also judge cross-platform activeness agreement: a fixture's control-diff verdict (active or inert) must agree across the selected platforms its attribute is declared for, and values enumerated by the SSoT must not be inert everywhere. Findings must be recorded in `cross_effect.json`, and recorded entries must still measure — unrecorded findings and stale entries fail under env `local`, a notice elsewhere. Needs at least two selected platforms and the visual checks.",
             "ja": "プラットフォーム間の**活性の一致**も判定する。fixture の対照差分の判定（active / inert）は、その属性が宣言されている選択中のプラットフォームの間で一致しなければならず、SSoT が列挙する値がどこでも inert であってはならない。所見は `cross_effect.json` に記録が要り、記録済みの項目も**まだ再現すること**が要る — 未記録の所見と古くなった記録は env `local` で失敗し、他では notice。**2 つ以上のプラットフォーム**とビジュアル検査が要る。"
+          }
+        },
+        {
+          "name": "--frame-parity",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Also compare where each declared id was drawn across the selected platforms, from the `.frames.json` each driver writes beside a visual fixture's screenshot. A disagreement fails unless `frame_parity.json` accepts it with a reason, and a run that compares nothing fails. Needs at least two selected platforms. New in jsonui-cli 1.9.16.",
+            "ja": "選んだプラットフォーム間で、宣言された各 id がどこに描かれたかも比較する。元データは各ドライバが視覚フィクスチャのスクリーンショットの横に書く `.frames.json`。不一致は `frame_parity.json` が理由付きで受け入れない限り失敗し、何も比較しなかった実行も失敗する。2 つ以上のプラットフォームの選択が必要。jsonui-cli 1.9.16 で追加。"
           }
         }
       ],
@@ -1806,6 +1815,58 @@
       "seeAlso": [
         "jui conformance baseline update",
         "jui conformance report"
+      ]
+    },
+    {
+      "binary": "jui",
+      "command": "conformance frame-parity",
+      "synopsis": "jui conformance frame-parity [--platform ios|android|web]... [--dir <dir>] [--results <dir>] [--update]",
+      "purpose": {
+        "en": "Compare where each declared id was drawn across platforms, from the frames each driver records beside a visual fixture's screenshot. Without `--update` it prints the check that `gate --frame-parity` runs; `--update` writes `frame_parity.json` from the rules in `frame_parity_rules.json`. New in jsonui-cli 1.9.16.",
+        "ja": "宣言された各 id がどこに描かれたかを、各ドライバが視覚フィクスチャのスクリーンショットの横に記録するフレームから、プラットフォーム間で比較する。`--update` なしでは `gate --frame-parity` が実行する検査を表示し、`--update` は `frame_parity_rules.json` のルールから `frame_parity.json` を書く。jsonui-cli 1.9.16 で追加。"
+      },
+      "options": [
+        {
+          "name": "--platform",
+          "type": "enum",
+          "default": "all three",
+          "description": {
+            "en": "Platform to include; repeatable.",
+            "ja": "含めるプラットフォーム。複数指定可。"
+          }
+        },
+        {
+          "name": "--dir",
+          "type": "path",
+          "default": "conformance/",
+          "description": {
+            "en": "Conformance directory.",
+            "ja": "conformance ディレクトリ。"
+          }
+        },
+        {
+          "name": "--results",
+          "type": "path",
+          "default": "<dir>/results",
+          "description": {
+            "en": "Results directory.",
+            "ja": "結果ディレクトリ。"
+          }
+        },
+        {
+          "name": "--update",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Write `frame_parity.json`: every disagreement a rule in `frame_parity_rules.json` matches, with its measured outliers, as long as it differs only on the rule's fields. Matched ids that differ elsewhere are printed and left out.",
+            "ja": "`frame_parity.json` を書く: `frame_parity_rules.json` のルールに一致する不一致を、実測した外れ値とともに記録する — ただしルールのフィールドでだけ異なるものに限る。一致した id でも他で異なるものは表示され、記録からは外される。"
+          }
+        }
+      ],
+      "examples": [],
+      "seeAlso": [
+        "jui conformance gate",
+        "jui conformance parity"
       ]
     },
     {
