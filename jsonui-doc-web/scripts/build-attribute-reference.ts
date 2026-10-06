@@ -116,6 +116,12 @@ type CategoryOverride = {
 const CWD = process.cwd();
 const REPO_ROOT = path.resolve(CWD, "..");
 
+// Prose leading of the generated reference pages. Since jsonui-cli 1.9.16 a
+// Label's lineHeightMultiple multiplies its own line (1.5 at these arbitrary
+// sizes), not the font size, so the 1.55 x fontSize the pages were designed at
+// is 1.55 / 1.5.
+const PROSE_LINE_MULTIPLE = 1.0333;
+
 const PATHS = {
   attrDefs: path.resolve(CWD, "rjui_tools/lib/core/attribute_definitions.json"),
   overridesDir: path.resolve(REPO_ROOT, "docs/data/attribute-overrides"),
@@ -697,7 +703,7 @@ function componentLayout(merged: MergedComponent): unknown {
         height: "wrapContent",
         topMargin: 20,
         fontSize: 17,
-        lineHeightMultiple: 1.55,
+        lineHeightMultiple: PROSE_LINE_MULTIPLE,
         fontColor: "ink_muted",
         text: "@{description}",
       },
@@ -819,7 +825,7 @@ function componentLayout(merged: MergedComponent): unknown {
         height: "wrapContent",
         topMargin: 8,
         fontSize: 15,
-        lineHeightMultiple: 1.55,
+        lineHeightMultiple: PROSE_LINE_MULTIPLE,
         fontColor: "ink_muted",
         text: "@{usage}",
       },
@@ -1289,7 +1295,7 @@ function categoryLayout(merged: MergedCategory): unknown {
         height: "wrapContent",
         topMargin: 20,
         fontSize: 17,
-        lineHeightMultiple: 1.55,
+        lineHeightMultiple: PROSE_LINE_MULTIPLE,
         fontColor: "ink_muted",
         text: "@{description}",
       },
