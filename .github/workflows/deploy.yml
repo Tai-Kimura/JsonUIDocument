@@ -131,10 +131,22 @@ jobs:
             grep "\[ERROR\]" "$build_log" | head -20
             exit 1
           fi
-          # If this install fails, the two Python gates below report a
-          # non-zero exit for that reason rather than for findings. The
-          # distinction is the point of running this job at all.
-          python3 -m pip install -q -e "$JSONUI_CLI_PATH/test_tools" -e "$JSONUI_CLI_PATH/document_tools" || echo "NOTE: pip install failed"
+          # Two steps, and a failure stops the job. This used to be one joint
+          # `pip install -e test_tools -e document_tools` followed by
+          # `|| echo NOTE`. pip refuses that pair: document_tools declares its
+          # sibling as a git URL at the tag, and the editable checkout conflicts
+          # with it. The install failed on every run from at least 2026-09-17
+          # to v1.9.21, and the gates stayed 21/21. The comment here claimed
+          # the opposite, that a failed install would turn the Python gates
+          # red. It could not: they run the launchers in the checkout, which
+          # need no install, and this site has no `.texts.yaml`, so the
+          # missing PyYAML and markdown-it-py were never imported.
+          # --no-deps keeps the sibling the checkout copy, so it is the same
+          # commit as the pin. The two prose dependencies are installed by name.
+          python3 -m pip install -q -e "$JSONUI_CLI_PATH/test_tools"
+          python3 -m pip install -q --no-deps -e "$JSONUI_CLI_PATH/document_tools"
+          python3 -m pip install -q "PyYAML>=6.0" "markdown-it-py>=3.0"
+          python3 -m pip check
 
       - name: Install JS dependencies
         working-directory: jsonui-doc-web
