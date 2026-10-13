@@ -2678,8 +2678,8 @@
                 ]
               },
               "description": {
-                "en": "Binding that requests a programmatic scroll: a plain `Int` (the cell index), or a `String` cell id when `cellIdProperty` is set. Declare the data field as that plain value, not as `PassthroughSubject<Int, Never>`, which this page recommended until 2026-09-17; a Swift transport type in the data section fails the Kotlin build. Each platform delivers the request its own way.",
-                "ja": "プログラムからのスクロールを要求する binding: 素の `Int`（セルのインデックス）、`cellIdProperty` 指定時は `String` のセル id。data のフィールドはその素の値として宣言し、`PassthroughSubject<Int, Never>` にはしない（このページは 2026-09-17 までそれを勧めていた）。Swift の転送型を data セクションに書くと Kotlin のビルドが失敗する。要求の届け方は各プラットフォームが自分で決める。"
+                "en": "Binding that requests a programmatic scroll. Its declared class decides what the value names: an `Int` is a cell's index, a `String` a cell's key, which is its cellId or else its `cellIdProperty` value. `cellIdProperty` does not decide this. A Collection with it may still declare an `Int`, and one without it a `String`, whose keys are then the cells' cellIds (jsonui-cli 1.9.0). Until 2026-10-14 this page said a `String` needed `cellIdProperty`. Declare the data field as that plain value, not as `PassthroughSubject<Int, Never>`, which this page recommended until 2026-09-17; a Swift transport type in the data section fails the Kotlin build. Each platform delivers the request its own way.",
+                "ja": "プログラムからのスクロールを要求する binding。値が何を指すかは、宣言した型で決まる: `Int` ならセルのインデックス、`String` ならセルのキー（セルの cellId、無ければ `cellIdProperty` の値）。`cellIdProperty` の有無では決まらない。`cellIdProperty` のある Collection でも `Int` を宣言でき、無い Collection でも `String` を宣言できる。その場合のキーはセルの cellId（jsonui-cli 1.9.0）。このページは 2026-10-14 まで、`String` には `cellIdProperty` が要ると書いていた。data のフィールドはその素の値として宣言し、`PassthroughSubject<Int, Never>` にはしない（このページは 2026-09-17 までそれを勧めていた）。Swift の転送型を data セクションに書くと Kotlin のビルドが失敗する。要求の届け方は各プラットフォームが自分で決める。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
@@ -6265,8 +6265,8 @@
                 ]
               },
               "description": {
-                "en": "Binding that requests a programmatic scroll: a plain `Int` (the cell index), or a `String` cell id when `cellIdProperty` is set. Declare the data field as that plain value, not as `PassthroughSubject<Int, Never>`, which this page recommended until 2026-09-17; a Swift transport type in the data section fails the Kotlin build. Each platform delivers the request its own way.",
-                "ja": "プログラムからのスクロールを要求する binding: 素の `Int`（セルのインデックス）、`cellIdProperty` 指定時は `String` のセル id。data のフィールドはその素の値として宣言し、`PassthroughSubject<Int, Never>` にはしない（このページは 2026-09-17 までそれを勧めていた）。Swift の転送型を data セクションに書くと Kotlin のビルドが失敗する。要求の届け方は各プラットフォームが自分で決める。"
+                "en": "Binding that requests a programmatic scroll. Its declared class decides what the value names: an `Int` is a cell's index, a `String` a cell's key, which is its cellId or else its `cellIdProperty` value. `cellIdProperty` does not decide this. A Collection with it may still declare an `Int`, and one without it a `String`, whose keys are then the cells' cellIds (jsonui-cli 1.9.0). Until 2026-10-14 this page said a `String` needed `cellIdProperty`. Declare the data field as that plain value, not as `PassthroughSubject<Int, Never>`, which this page recommended until 2026-09-17; a Swift transport type in the data section fails the Kotlin build. Each platform delivers the request its own way.",
+                "ja": "プログラムからのスクロールを要求する binding。値が何を指すかは、宣言した型で決まる: `Int` ならセルのインデックス、`String` ならセルのキー（セルの cellId、無ければ `cellIdProperty` の値）。`cellIdProperty` の有無では決まらない。`cellIdProperty` のある Collection でも `Int` を宣言でき、無い Collection でも `String` を宣言できる。その場合のキーはセルの cellId（jsonui-cli 1.9.0）。このページは 2026-10-14 まで、`String` には `cellIdProperty` が要ると書いていた。data のフィールドはその素の値として宣言し、`PassthroughSubject<Int, Never>` にはしない（このページは 2026-09-17 までそれを勧めていた）。Swift の転送型を data セクションに書くと Kotlin のビルドが失敗する。要求の届け方は各プラットフォームが自分で決める。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
