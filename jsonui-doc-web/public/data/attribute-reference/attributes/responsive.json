@@ -42,7 +42,7 @@
               "type": "object",
               "summary": {
                 "en": "Object whose keys are size-class names (`compact` / `medium` / `regular` / `landscape` / `compact…",
-                "ja": "キーが size class 名（`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `regular-…"
+                "ja": "キーが size class 名（`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `medium-l…"
               },
               "anchorUrl": "#attr-responsive"
             }
@@ -215,8 +215,8 @@
                 ]
               },
               "description": {
-                "en": "Object whose keys are size-class names (`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `regular-landscape`) and values are attribute overrides. Overrides merge into the base attributes when the host matches that size class. Composite keys win over single keys; landscape wins over the width axis.",
-                "ja": "キーが size class 名（`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `regular-landscape`）、値が属性上書きのオブジェクト。ホストがその size class に該当する時、上書きがベース属性にマージされる。複合キーは単独キーより優先され、landscape は width 軸より優先。"
+                "en": "Object whose keys are size-class names (`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `medium-landscape` / `regular-landscape`) or window-width conditions (`minWidth:N` — the window is at least N wide; `maxWidth:N` — narrower than N), and whose values are attribute overrides. One key wins, alone: the first in priority order that holds (composite keys, then landscape, then regular > medium > compact; among width conditions the smallest maxWidth, else the largest minWidth). Only its overrides go onto the base — the other keys add nothing. A block holds size classes or width conditions, never both (`jui build` refuses the mix).",
+                "ja": "キーが size class 名（`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `medium-landscape` / `regular-landscape`）またはウィンドウ幅の条件（`minWidth:N` — 幅が N 以上、`maxWidth:N` — N 未満）、値が属性上書きのオブジェクト。勝つキーは 1 本だけ: 優先順で最初に成立するもの（複合キー、次に landscape、次に regular > medium > compact。幅の条件では成立する最小の maxWidth、無ければ最大の minWidth）。ベースに当たるのはその 1 本の上書きだけで、他のキーは何も足さない。1 つのブロックに size class と幅の条件は混ぜられない（`jui build` が拒否する）。"
               },
               "platformMatrixVisibility": "visible",
               "platformIosLabel": "✓",

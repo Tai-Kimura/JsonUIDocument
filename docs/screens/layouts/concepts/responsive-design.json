@@ -256,7 +256,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 16,
-                      "code": "// Resolution order, highest priority first:\n//   1. composite key  (compact-landscape, regular-landscape)\n//   2. landscape\n//   3. regular\n//   4. medium\n//   5. compact\n//   6. base attributes (no key)\n//\n// Each step OVERWRITES (not deep-merges) keys from earlier steps.\n// On iPad regular-landscape, given the JSON above, the resolver yields:\n//   orientation: \"horizontal\"   ← from regular-landscape\n//   spacing:     32              ← from regular-landscape\n// On iPhone landscape:\n//   orientation: \"vertical\"      ← from base\n//   spacing:     16              ← from landscape\n// On iPhone portrait:\n//   orientation: \"vertical\"      ← from base\n//   spacing:     8               ← from base",
+                      "code": "// One key wins, alone. Priority, highest first:\n//   regular-landscape > medium-landscape > compact-landscape\n//   > landscape > regular > medium > compact > base (no key)\n//\n// Only the winner's overrides go onto the base; the other keys add nothing.\n// Given the JSON above (browser window sizes in CSS px):\n// 1200 x 800  (regular, landscape)  -> regular-landscape wins\n//   orientation: \"horizontal\"   <- regular-landscape\n//   spacing:     32             <- regular-landscape\n// 1200 x 1400 (regular, portrait)   -> regular wins\n//   orientation: \"horizontal\"   <- regular\n//   spacing:     24             <- regular\n// 700 x 400   (compact, landscape)  -> landscape wins\n//   orientation: \"vertical\"     <- base (landscape does not set it)\n//   spacing:     16             <- landscape\n// 390 x 844   (compact, portrait)   -> no key holds\n//   orientation: \"vertical\"     <- base\n//   spacing:     8              <- base\n//\n// Without \"regular-landscape\" in the block, 1200 x 800 goes to landscape\n// alone: orientation \"vertical\" from the base, not regular's \"horizontal\".",
                       "language": "javascript",
                       "filename": "resolution.txt",
                       "showLineNumbers": false,
@@ -267,11 +267,87 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_generated",
+                  "id": "section_width",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [24, 32, 24, 32],
                   "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_width_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_width_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// below 600: 1 column · 600–1199: 2 columns · 1200 and up: 4 columns\n{\n  \"type\": \"Collection\",\n  \"columnCount\": 1,\n  \"responsive\": {\n    \"minWidth:600\":  { \"columnCount\": 2 },\n    \"minWidth:1200\": { \"columnCount\": 4 }\n  }\n}",
+                      "language": "json",
+                      "filename": "layout.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_width_bullet_winner"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_width_bullet_rules"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_width_bullet_sources"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_width_bullet_test_runner"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_generated",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
                   "child": [
                     {
                       "type": "Label",
@@ -307,7 +383,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "// Compose — same pattern. Wrapper is @Composable; children pass through.\n@Composable\nprivate fun ResponsiveContentArea(content: @Composable () -> Unit) {\n    val widthClass = currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass\n    if (widthClass == WindowWidthSizeClass.EXPANDED) {\n        Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) { content() }\n    } else {\n        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }\n    }\n}",
+                      "code": "// Compose — an inline if / else chain at the call site, one branch per key\n// in priority order. No wrapper function: the branch sits in the caller's\n// Row / Column / Box scope and reads data / viewModel directly.\nif (with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp().value.toInt() } >= 840) {\n    Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {\n        // children\n    }\n} else {\n    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {\n        // children\n    }\n}",
                       "language": "kotlin",
                       "filename": "Generated.kt",
                       "showLineNumbers": false,
@@ -318,7 +394,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "{/* React — Tailwind breakpoint prefixes do the work; landscape uses\n    a useMediaQuery hook for the orientation predicate. */}\n<div\n  className={[\n    'flex flex-col gap-2',                  // base / compact\n    'lg:flex-row lg:gap-6',                  // regular\n    isLandscape && 'gap-4',                  // landscape\n    isLandscape && 'lg:flex-row lg:gap-8',   // regular-landscape\n  ]\n    .filter(Boolean)\n    .join(' ')}\n>\n  {children}\n</div>",
+                      "code": "{/* React — the JSON from the priority section. It has landscape keys, so\n    every key is drawn at run time, each under the one condition where it is\n    the winner. A block of size classes alone uses breakpoint classes\n    instead (`lg:` for regular, `md:max-lg:` for medium). */}\nconst isLandscape = useMediaQuery('(orientation: landscape)');\nconst isMinMd = useMediaQuery('(min-width: 768px)');\nconst isMinLg = useMediaQuery('(min-width: 1024px)');\n\n<div\n  className={`flex flex-col gap-[0.5rem] ${!isLandscape && isMinLg ? \"flex-row gap-[1.5rem]\" : \"\"} ${isLandscape && !isMinLg ? \"gap-[1rem]\" : \"\"} ${isLandscape && isMinLg ? \"flex-row gap-[2rem]\" : \"\"}`}\n/>",
                       "language": "tsx",
                       "filename": "Generated.tsx",
                       "showLineNumbers": false,
@@ -333,7 +409,7 @@
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [24, 32, 24, 32],
-                  "background": "#FFFFFF",
+                  "background": "#F9FAFB",
                   "child": [
                     {
                       "type": "Label",
@@ -362,7 +438,7 @@
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [24, 32, 24, 32],
-                  "background": "#F9FAFB",
+                  "background": "#FFFFFF",
                   "child": [
                     {
                       "type": "Label",
@@ -411,7 +487,7 @@
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [24, 32, 24, 32],
-                  "background": "#FFFFFF",
+                  "background": "#F9FAFB",
                   "child": [
                     {
                       "type": "Label",
@@ -577,6 +653,7 @@
                         { "id": "toc_taxonomy",  "label": "toc_row_taxonomy",  "anchor": "section_taxonomy",  "level": 1 },
                         { "id": "toc_block",     "label": "toc_row_block",     "anchor": "section_block",     "level": 1 },
                         { "id": "toc_priority",  "label": "toc_row_priority",  "anchor": "section_priority",  "level": 1 },
+                        { "id": "toc_width",     "label": "toc_row_width",     "anchor": "section_width",     "level": 1 },
                         { "id": "toc_generated", "label": "toc_row_generated", "anchor": "section_generated", "level": 1 },
                         { "id": "toc_dynamic",   "label": "toc_row_dynamic",   "anchor": "section_dynamic",   "level": 1 },
                         { "id": "toc_variants",  "label": "toc_row_variants",  "anchor": "section_variants",  "level": 1 },
