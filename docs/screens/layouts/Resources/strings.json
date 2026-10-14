@@ -7399,8 +7399,8 @@
       "ja": "• 'visible' — 既定。要素は通常どおり描画され、スペースも占める。"
     },
     "section_binding_bullet_invisible": {
-      "en": "• 'invisible' — the element is not painted but still occupies its space, and it disappears from the accessibility tree (useful when you want a placeholder to preserve alignment). Each platform maps this to its own mechanism — visibility: hidden on Web, opacity 0 + accessibility-hidden on SwiftUI, alpha 0 with cleared semantics on Compose — so the consequence is the same everywhere. `hidden: true` is the boolean shorthand for exactly this state (it does NOT collapse the space).",
-      "ja": "• 'invisible' — 描画されないがスペースは残り、アクセシビリティツリーからも消える (プレースホルダとして整列を保ちたいときに有用)。各プラットフォームが相応の機構に変換: Web は visibility: hidden、SwiftUI は opacity 0 + accessibility 非公開、Compose は alpha 0 + semantics クリア。帰結はどのプラットフォームでも同じ。`hidden: true` はまさにこの状態の bool 短縮形です（スペースは潰れません）。"
+      "en": "• 'invisible' — the element is not painted but still occupies its space, and it disappears from the accessibility tree (useful when you want a placeholder to preserve alignment). Each platform maps this to its own mechanism — visibility: hidden on Web, opacity 0 + accessibility-hidden on SwiftUI, alpha 0 with cleared semantics on Compose — so the consequence is the same everywhere. On iOS that reaches UI tests from SwiftJsonUI 10.29.16: before it, VoiceOver skipped the element but XCUITest still found it. `hidden: true` is the boolean shorthand for exactly this state (it does NOT collapse the space).",
+      "ja": "• 'invisible' — 描画されないがスペースは残り、アクセシビリティツリーからも消える (プレースホルダとして整列を保ちたいときに有用)。各プラットフォームが相応の機構に変換: Web は visibility: hidden、SwiftUI は opacity 0 + accessibility 非公開、Compose は alpha 0 + semantics クリア。帰結はどのプラットフォームでも同じ。iOS の UI テストにまで及ぶのは SwiftJsonUI 10.29.16 から: それより前は、VoiceOver は読み飛ばしても XCUITest からは見つかっていた。`hidden: true` はまさにこの状態の bool 短縮形です（スペースは潰れません）。"
     },
     "section_binding_bullet_gone": {
       "en": "• 'gone' — the element leaves the layout tree entirely and its space collapses. Each platform realises this differently — a conditional render on Web, an `if` wrap inside the SwiftUI body, View.GONE in Android XML, or an `if` around the Composable — but the intent is uniform: the neighbours close the gap.",
@@ -7875,8 +7875,8 @@
       "ja": "Asserts"
     },
     "section_dsl_assert_visible": {
-      "en": "• `visible` / `notVisible` — the element is (not) shown.",
-      "ja": "• `visible` / `notVisible` — 要素の表示／非表示。"
+      "en": "• `visible` / `notVisible` — the element is (not) shown in the viewport: at least 1pt / 1px of it on screen, inside every scroll container above it (all three drivers since web and iOS 1.13.0). `notVisible` is the plain negation, so it also passes for an element that is shown but scrolled below the fold. When the test means the element must not exist, scroll to where it would be first, or assert `count` with `equals: 0`.",
+      "ja": "• `visible` / `notVisible` — 要素がビューポートに表示されているか（画面の中、かつ上にあるすべてのスクロール容器の内側に 1pt / 1px 以上。web と iOS の 1.13.0 から 3 driver とも同じ）。`notVisible` は単なる否定なので、表示はされているが折り目の下にスクロールされている要素でも通る。「存在してはいけない」ことを確かめたいときは、先にその要素があるはずの位置までスクロールするか、`count` を `equals: 0` で検証する。"
     },
     "section_dsl_assert_enabled": {
       "en": "• `enabled` / `disabled` — interactivity state.",
