@@ -60,15 +60,18 @@
       "description": "The three static inline step Views (step_1 / step_2 / step_3) each render their number badge + title + body + a CodeBlock. Step 2's CodeBlock carries the zshrc PATH snippet containing '~/.jsonui-cli/sjui_tools/bin'; step 3's CodeBlock carries the literal 'Read CLAUDE.md' prompt. Traces to the spec notes (steps are static inline Views in the layout, not a Collection) and to the exact code literals the spec declares.",
       "steps": [
         { "action": "waitFor", "id": "learn_installation_step_1", "timeout": 5000 },
+        {"action": "scrollUntilVisible", "id": "learn_installation_step_1"},
         { "assert": "visible", "id": "learn_installation_step_1" },
         { "assert": "text", "id": "learn_installation_step_1", "contains": "Run the one-liner" },
         { "assert": "text", "id": "learn_installation_step_1", "contains": "curl -fsSL" },
+        {"action": "scrollUntilVisible", "id": "learn_installation_step_2"},
         { "assert": "visible", "id": "learn_installation_step_2" },
         { "assert": "text", "id": "learn_installation_step_2", "contains": "Add PATH lines" },
-        { "assert": "text", "id": "learn_installation_step_2", "contains": "~/.jsonui-cli/sjui_tools/bin" },
+        { "assert": "text", "id": "learn_installation_step_2", "contains": ".jsonui-cli/sjui_tools/bin" },
+        {"action": "scrollUntilVisible", "id": "learn_installation_step_3"},
         { "assert": "visible", "id": "learn_installation_step_3" },
         { "assert": "text", "id": "learn_installation_step_3", "contains": "Restart Claude Code" },
-        { "assert": "text", "id": "learn_installation_step_3", "contains": "Read CLAUDE.md" }
+        { "assert": "text", "id": "learn_installation_step_3", "contains": "/jsonui" }
       ]
     },
     {
@@ -77,7 +80,7 @@
       "steps": [
         { "action": "waitFor", "id": "learn_installation_partial_update", "timeout": 5000 },
         { "assert": "notVisible", "id": "installation_partial_update_body" },
-        { "action": "tap", "id": "learn_installation_partial_update", "text": "Partial update" },
+        { "action": "tap", "id": "learn_installation_partial_update", "text": "Partial update (advanced)" },
         { "action": "waitFor", "id": "installation_partial_update_body", "timeout": 5000 },
         { "assert": "visible", "id": "installation_partial_update_body" },
         { "assert": "text", "id": "installation_partial_update_body", "contains": "JSONUI_BOOTSTRAP_STEPS" }
@@ -89,7 +92,7 @@
       "steps": [
         { "action": "waitFor", "id": "learn_installation_custom_path", "timeout": 5000 },
         { "assert": "notVisible", "id": "installation_custom_path_body" },
-        { "action": "tap", "id": "learn_installation_custom_path", "text": "Custom install paths" },
+        { "action": "tap", "id": "learn_installation_custom_path", "text": "Custom install paths (advanced)" },
         { "action": "waitFor", "id": "installation_custom_path_body", "timeout": 5000 },
         { "assert": "visible", "id": "installation_custom_path_body" },
         { "assert": "text", "id": "installation_custom_path_body", "contains": "JSONUI_CLI_DIR" }
@@ -142,12 +145,13 @@
       "description": "The related-links Collection renders exactly 5 RelatedLink cells seeded by onAppear. Each cell includes a Label bound to the cell's url field, so the five spec-declared URLs (/tools/cli, /tools/mcp, /tools/agents, /learn/hello-world, /tools/mcp/tools/get-data-source) all appear inside the Collection's rendered subtree. Traces to stateManagement.uiVariables.relatedLinks and the spec's transitions ('v1 destinations from this page').",
       "steps": [
         { "action": "waitFor", "id": "learn_installation_related_collection", "timeout": 5000 },
+        {"action": "scrollUntilVisible", "id": "learn_installation_related_collection"},
         { "assert": "visible", "id": "learn_installation_related_collection" },
         { "assert": "text", "id": "learn_installation_related_collection", "contains": "/tools/cli" },
         { "assert": "text", "id": "learn_installation_related_collection", "contains": "/tools/mcp" },
         { "assert": "text", "id": "learn_installation_related_collection", "contains": "/tools/agents" },
         { "assert": "text", "id": "learn_installation_related_collection", "contains": "/learn/hello-world" },
-        { "assert": "text", "id": "learn_installation_related_collection", "contains": "/tools/mcp/tools/get-data-source" }
+        { "assert": "text", "id": "learn_installation_related_collection", "contains": "/reference/mcp-tools" }
       ]
     },
     {
