@@ -44,6 +44,7 @@
       "description": "The prerequisites Collection renders 5 PrereqRow cells (git+curl, Node.js >= 20, npm, Ruby >= 2.7, Python 3 >= 3.10). The cell layout shows a tier badge (REQUIRED / OPTIONAL) resolved from prereq_required_badge / prereq_optional_badge; at least one of each tier is present in the v1 catalog (git/node/npm required; ruby/python optional). Traces to stateManagement.uiVariables.prerequisites and the spec's PrereqRow custom type (requiredTier). Text narrowing via the parent Collection id because cells have no guaranteed DOM ids.",
       "steps": [
         { "action": "waitFor", "id": "learn_installation_prereq_collection", "timeout": 5000 },
+        {"action": "scrollUntilVisible", "id": "learn_installation_prereq_collection"},
         { "assert": "visible", "id": "learn_installation_prereq_collection" },
         { "assert": "text", "id": "learn_installation_prereq_collection", "contains": "git and curl" },
         { "assert": "text", "id": "learn_installation_prereq_collection", "contains": "Node.js" },
@@ -123,6 +124,7 @@
       "description": "Each TroubleshootRow cell uses onClick -> onToggleExpand(row.id) and binds its cause+fix body's visibility via its own rowVisibility prop (computed by the VM from expandedIds). Tapping one row's symptom expands only that row. Tapping a second row expands it too (both are open simultaneously because expandedIds is a Set). Tapping the first row's symptom again removes it from expandedIds, collapsing only that row while the second stays open. This exercises the Set semantics of expandedIds and the self-contained cell-level toggle pattern described in the spec notes. Text narrowing is used throughout because troubleshoot cells share the same cells/troubleshoot_row layout and have no stable per-instance DOM id.",
       "steps": [
         { "action": "waitFor", "id": "learn_installation_trouble_collection", "timeout": 5000 },
+        {"action": "scrollUntilVisible", "id": "learn_installation_trouble_collection"},
         { "assert": "visible", "id": "learn_installation_trouble_collection" },
         { "assert": "text", "id": "learn_installation_trouble_collection", "contains": "jui: command not found" },
         { "assert": "text", "id": "learn_installation_trouble_collection", "contains": "curl fails or returns 404" },
