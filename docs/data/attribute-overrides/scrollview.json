@@ -33,8 +33,14 @@
   "attributes": {
     "orientation": {
       "note": {
-        "en": "`vertical` (default) / `horizontal`. For both-axis scrolling, nest two ScrollViews.",
-        "ja": "`vertical`（デフォルト）/ `horizontal`。両軸スクロールは 2 つの ScrollView をネスト。"
+        "en": "`vertical` (default) / `horizontal`. For both-axis scrolling, nest two ScrollViews. The axis comes only from this attribute and `horizontalScroll`, never from the children. A ScrollView that writes neither scrolls vertically, even when its only child is a horizontal View, which is then laid out inside a vertical scroll. Up to jsonui-cli 1.9.27 the iOS and Android generators instead took the axis from such a child and scrolled sideways, while the web never did. A layout that relied on that now scrolls vertically everywhere, so write `orientation: \"horizontal\"` on the ScrollView itself (jsonui-cli 1.9.28).",
+        "ja": "`vertical`（デフォルト）/ `horizontal`。両軸スクロールは 2 つの ScrollView をネスト。スクロールの向きは、この属性と `horizontalScroll` だけで決まり、子からは決めない。どちらも書かない ScrollView は縦にスクロールし、唯一の子が横並びの View でも、その子は縦スクロールの中に置かれる。jsonui-cli 1.9.27 までは、iOS と Android の generator がそういう子から向きを取って横にスクロールしていた（web は取らなかった）。それに頼っていたレイアウトは、今はどの環境でも縦にスクロールするので、ScrollView 自身に `orientation: \"horizontal\"` を書く（jsonui-cli 1.9.28）。"
+      }
+    },
+    "horizontalScroll": {
+      "note": {
+        "en": "Boolean. `true` is the same as `orientation: \"horizontal\"`; `false` or absent leaves the axis to `orientation`, which is vertical when it is not written either. Written together with `orientation`, the two must agree: `orientation: \"horizontal\"` with `horizontalScroll: false`, or `\"vertical\"` with `true`, is refused by `jui build` with `ERROR [scrollview]`, under a responsive key too (jsonui-cli 1.9.28).",
+        "ja": "Boolean。`true` は `orientation: \"horizontal\"` と同じ。`false` または書かなければ向きは `orientation` に任され、それも書かなければ縦。`orientation` と一緒に書くときは一致していなければならない: `orientation: \"horizontal\"` に `horizontalScroll: false`、または `\"vertical\"` に `true` を組み合わせると、`jui build` が `ERROR [scrollview]` で拒否する。responsive のキーの中でも同じ（jsonui-cli 1.9.28）。"
       }
     },
     "paging": {
