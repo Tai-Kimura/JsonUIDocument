@@ -3736,16 +3736,16 @@
                 ]
               },
               "description": {
-                "en": "Text change event selector.",
-                "ja": "テキスト変更時のイベントハンドラ。"
+                "en": "Text change handler. Fires only when the user edits the field (typing, paste, the clear button), never when the bound value is changed from elsewhere, such as the ViewModel's updateData or a test's initialState.",
+                "ja": "テキスト変更時のイベントハンドラ。ユーザーが入力欄を編集したとき（入力、貼り付け、消去ボタン）だけ発火し、ViewModel の updateData やテストの initialState など、外から束縛値が変わったときは発火しない。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Fires on every keystroke with the new value. Use sparingly — for two-way binding the `text` attribute already syncs; use `onTextChange` only when additional side effects (validation, debounced search) are needed.",
-                "ja": "キー入力ごとに新しい値で発火。`text` の two-way binding で既に同期されるため、バリデーションや debounce 検索など追加の副作用が必要なときのみ使う。"
+                "en": "Fires on every user edit with the new value: typing, paste or the clear button. It does not fire when the bound value changes from elsewhere, such as the ViewModel's updateData or a test's initialState, so a handler that writes the field back does not call itself. Android and web have always worked this way. iOS does from jsonui-cli 1.9.35 (generated code) and SwiftJsonUI 10.30.1 (Dynamic); before that it fired on every change of the value, from any source. On iOS the handler runs on the main queue's next turn after the edit, so a handler that narrows the value and writes it back (digits only, a length cap) is shown in the field. Use it sparingly: the `text` binding already syncs, so `onTextChange` is for extra side effects such as validation or a debounced search. Read from the sjui converter and SwiftJsonUI's UserEditBinding, not measured here.",
+                "ja": "ユーザーの編集（入力、貼り付け、消去ボタン）ごとに新しい値で発火。ViewModel の updateData やテストの initialState など、外から束縛値が変わったときは発火しないので、入力欄に書き戻す handler が自分自身を呼ぶことはない。Android と web はもともとこの動き。iOS は jsonui-cli 1.9.35（生成コード）と SwiftJsonUI 10.30.1（Dynamic）から。それより前は、どこからでも値が変わるたびに発火していた。iOS では handler は編集の次のメインキューの順番で走るので、値を絞って書き戻す handler（数字だけ、長さの上限）の結果が入力欄に表示される。`text` の binding で既に同期されるので、`onTextChange` はバリデーションや debounce 検索など追加の副作用が要るときだけ使う。sjui のコンバータと SwiftJsonUI の UserEditBinding を読んだもので、こちらでは未測定。"
               },
               "type": "string",
               "required": ""
@@ -5608,16 +5608,16 @@
                 ]
               },
               "description": {
-                "en": "Text change event selector.",
-                "ja": "テキスト変更時のイベントハンドラ。"
+                "en": "Text change handler. Fires only when the user edits the field (typing, paste, the clear button), never when the bound value is changed from elsewhere, such as the ViewModel's updateData or a test's initialState.",
+                "ja": "テキスト変更時のイベントハンドラ。ユーザーが入力欄を編集したとき（入力、貼り付け、消去ボタン）だけ発火し、ViewModel の updateData やテストの initialState など、外から束縛値が変わったときは発火しない。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Fires on every keystroke with the new value. Use sparingly — for two-way binding the `text` attribute already syncs; use `onTextChange` only when additional side effects (validation, debounced search) are needed.",
-                "ja": "キー入力ごとに新しい値で発火。`text` の two-way binding で既に同期されるため、バリデーションや debounce 検索など追加の副作用が必要なときのみ使う。"
+                "en": "Fires on every user edit with the new value: typing, paste or the clear button. It does not fire when the bound value changes from elsewhere, such as the ViewModel's updateData or a test's initialState, so a handler that writes the field back does not call itself. Android and web have always worked this way. iOS does from jsonui-cli 1.9.35 (generated code) and SwiftJsonUI 10.30.1 (Dynamic); before that it fired on every change of the value, from any source. On iOS the handler runs on the main queue's next turn after the edit, so a handler that narrows the value and writes it back (digits only, a length cap) is shown in the field. Use it sparingly: the `text` binding already syncs, so `onTextChange` is for extra side effects such as validation or a debounced search. Read from the sjui converter and SwiftJsonUI's UserEditBinding, not measured here.",
+                "ja": "ユーザーの編集（入力、貼り付け、消去ボタン）ごとに新しい値で発火。ViewModel の updateData やテストの initialState など、外から束縛値が変わったときは発火しないので、入力欄に書き戻す handler が自分自身を呼ぶことはない。Android と web はもともとこの動き。iOS は jsonui-cli 1.9.35（生成コード）と SwiftJsonUI 10.30.1（Dynamic）から。それより前は、どこからでも値が変わるたびに発火していた。iOS では handler は編集の次のメインキューの順番で走るので、値を絞って書き戻す handler（数字だけ、長さの上限）の結果が入力欄に表示される。`text` の binding で既に同期されるので、`onTextChange` はバリデーションや debounce 検索など追加の副作用が要るときだけ使う。sjui のコンバータと SwiftJsonUI の UserEditBinding を読んだもので、こちらでは未測定。"
               },
               "type": "string",
               "required": ""
