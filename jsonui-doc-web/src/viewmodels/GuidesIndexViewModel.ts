@@ -41,6 +41,7 @@ const CATALOG: ReadonlyArray<{ id: string; url: string; titleKey: string; platfo
   { id: "branch-tests", url: "/guides/branch-tests", titleKey: "guides_branch_tests_title" },
   { id: "contract-gaps", url: "/guides/contract-gaps", titleKey: "guides_contract_gaps_title" },
   { id: "unit-contracts", url: "/guides/unit-contracts", titleKey: "guides_unit_contracts_title" },
+  { id: "initial-state", url: "/guides/initial-state", titleKey: "guides_initial_state_title" },
   { id: "canonical-marks", url: "/guides/canonical-marks", titleKey: "guides_canonical_marks_title" }
 ];
 

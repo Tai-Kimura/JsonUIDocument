@@ -1,0 +1,75 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "InitialState",
+    "displayName": "Initial state and the state bridge",
+    "description": "Guides > Initial state. Dedicated page for a test's initialState and the state bridge (jsonui-test-runner v1.14.0 spec §10; drivers iOS 1.15.0 / Android 1.17.0 / web 1.15.0, SwiftJsonUI 10.30.0, KotlinJsonUI 2.44.0, jsonui-cli 1.9.34). Ten sections: what it does and the release it needs, how to write it (file level, case level under caseIsolation reopen, the shallow merge), keys and the class table with the fixed rejection reasons, when the app applies the values and the gate it shares with the screen marker, the receipt the driver waits for and where the bridge lives per platform, reading state back without a provider, flows (viewModels, the removed initialState.screen, ignored references), the launch sequence and the web runner's afterLaunch, what validate checks (output measured on 1.9.34), and what it does not cover. ~11-min read.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "guides/initial-state",
+    "createdAt": "2026-10-17",
+    "updatedAt": "2026-10-17"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Three closing cards: writing screen tests, screen identity, the test tooling reference."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "customTypes": [
+    {
+      "name": "NextReadLink",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String"
+        },
+        {
+          "name": "titleKey",
+          "type": "String"
+        },
+        {
+          "name": "descriptionKey",
+          "type": "String"
+        },
+        {
+          "name": "url",
+          "type": "String"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "2026-10-17 - Page created on the release that made initialState apply (jsonui-cli 1.9.34 train). Facts are read from jsonui-test-runner v1.14.0 specs §5, §6 and §10 and the published drivers; the validate block is output measured on jsonui-cli 1.9.34 against a scratch fixture; the claim that the web bridge is absent from a production bundle was measured on this site's own export (no occurrence of __JSONUI_STATE__)."
+  ]
+}

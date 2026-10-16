@@ -12744,5 +12744,207 @@
       "en": "The baseline",
       "ja": "baseline"
     }
+  },
+  "guides_initial_state": {
+    "breadcrumb": {
+      "en": "Guides",
+      "ja": "ガイド"
+    },
+    "title": {
+      "en": "Initial state and the state bridge",
+      "ja": "initialState と状態ブリッジ"
+    },
+    "lead": {
+      "en": "A test can start a screen with the data it needs. The values in `initialState` go into the screen's Data when the app launches. The app reports which ones it accepted, and the driver fails the test if it did not. The `state` assertion reads the same channel back, so a harness no longer needs a state provider.",
+      "ja": "テストが、必要なデータを持った状態で画面を開けるようになりました。`initialState` に書いた値は、アプリの起動時に画面の Data に入ります。アプリはどの値を受け取ったかを報告し、受け取れなかったときは driver がテストを失敗させます。`state` assertion は同じ経路を逆向きに読むので、ハーネスに state provider を用意する必要もなくなりました。"
+    },
+    "read_time": {
+      "en": "11 min read",
+      "ja": "11 分で読めます"
+    },
+    "section_what_heading": {
+      "en": "What it does",
+      "ja": "何をするものか"
+    },
+    "section_what_body": {
+      "en": "A screen test writes `initialState.viewModel`. A flow writes `initialState.viewModels`, keyed by screen id. At launch the driver hands the values to the app. The generated code checks each one against the Data the layout declares and applies the ones that fit. The screen then publishes what it applied and what it rejected, and the driver waits for that receipt before the first case runs. A value the app rejects fails the test at setup; it is not dropped without a word.",
+      "ja": "screen test は `initialState.viewModel` に、flow は screen id をキーにした `initialState.viewModels` に値を書きます。起動時に driver がその値をアプリに渡し、生成コードがレイアウトの宣言した Data と 1 つずつ照らし合わせて、合うものだけを適用します。画面は適用した値と拒否した値を公開し、driver はその受領を待ってから最初の case を始めます。アプリが拒否した値は、黙って捨てられるのではなく、setup の失敗としてテストを落とします。"
+    },
+    "section_what_versions": {
+      "en": "It needs every piece of one release: the drivers iOS 1.15.0, Android 1.17.0 and web 1.15.0, SwiftJsonUI 10.30.0, KotlinJsonUI 2.44.0, and screens generated with jsonui-cli 1.9.34. There is no transition period. A driver of these versions fails a file whose initialState the app did not confirm, so an app built with an older library fails instead of running on its defaults. Before this release, validate accepted the key and nothing applied it.",
+      "ja": "同じリリースの部品がすべて要ります: driver は iOS 1.15.0・Android 1.17.0・web 1.15.0、ライブラリは SwiftJsonUI 10.30.0・KotlinJsonUI 2.44.0、画面は jsonui-cli 1.9.34 で生成したもの。移行期間はありません。この版の driver は、アプリが受領を返さなかった initialState のファイルを失敗にするので、古いライブラリで作ったアプリは既定値のまま走るのではなく失敗します。このリリースより前は、validate はキーを受け付けても、値を適用するものは何もありませんでした。"
+    },
+    "section_declare_heading": {
+      "en": "Writing it",
+      "ja": "書き方"
+    },
+    "section_declare_body": {
+      "en": "Put the values at the top of the file. They are delivered once, before the first case, and every case starts from them.",
+      "ja": "値はファイルの最上位に書きます。最初の case の前に 1 回届けられ、どの case もその値から始まります。"
+    },
+    "section_declare_cases": {
+      "en": "A case may carry its own `initialState`, but only in a file that declares `caseIsolation: \"reopen\"`. The screen is then opened again before each case, and the case's values are merged into the file's, key by key. The merge is shallow: a case's value replaces the file's value for that key whole, objects included, and a case's `null` is a value that replaces it too. In a shared file (the default) the screen opens only once, so a case-level initialState cannot be delivered. Validate reports an error, and the driver fails that case at setup.",
+      "ja": "case ごとに `initialState` を書くこともできますが、`caseIsolation: \"reopen\"` を宣言したファイルに限ります。その場合は case ごとに画面を開き直し、case の値をファイルの値にキー単位で重ねます。重ね方は浅く、case の値はそのキーのファイルの値をまるごと置き換えます（オブジェクトも同じ）。case に書いた `null` も値として置き換えます。shared（既定）のファイルでは画面を 1 回しか開かないので、case の initialState は届けようがありません。validate はエラーにし、driver はその case を setup で失敗させます。"
+    },
+    "section_keys_heading": {
+      "en": "Keys and types",
+      "ja": "キーと型"
+    },
+    "section_keys_body": {
+      "en": "Keys are the Data names in the layout's `data` section, top level only and case-sensitive. There is no dot notation: `user.name` is one key, and it is not a Data name. A ViewModel property that the layout does not declare cannot be set. Each key is judged on its own, in this order: not a data field, unsupported type, null, type. The keys that pass are applied even when others are rejected.",
+      "ja": "キーはレイアウトの `data` セクションにある Data 名で、最上位だけ、大文字小文字を区別します。ドット記法はありません: `user.name` は 1 つのキーで、Data 名ではありません。レイアウトが宣言していない ViewModel のプロパティは設定できません。キーは 1 つずつ、Data に無いか、扱えない型か、null か、型が合うか、の順に判定され、他のキーが拒否されても、通ったキーは適用されます。"
+    },
+    "section_keys_types": {
+      "en": "The class is read as the layout writes it, with the generators' vocabulary: `Integer` is `Int`, `Number` is `Double`, `Boolean` is `Bool`. A trailing `?` makes it optional, and only then is `null` accepted. `Int` is 32-bit, and `2.0` is accepted, because JavaScript cannot tell it from `2`. `Visibility` cannot be set, because its value differs per platform.",
+      "ja": "型はレイアウトの書いたとおりに、ジェネレータと同じ語彙で読みます: `Integer` は `Int`、`Number` は `Double`、`Boolean` は `Bool`。末尾の `?` があれば optional で、そのときだけ `null` を受け付けます。`Int` は 32bit で、`2.0` は受け付けます（JavaScript では `2` と区別できないため）。`Visibility` は値の形がプラットフォームごとに違うので設定できません。"
+    },
+    "section_when_heading": {
+      "en": "When the values arrive",
+      "ja": "値が入るタイミング"
+    },
+    "section_when_body": {
+      "en": "The app applies them the first time the screen appears after the launch, once per launch and screen. Navigating away and back in the same launch does not apply them again. By then the ViewModel's init or onAppear may already have run with the default values, so a value that onAppear overwrites will not stay. Values that come from an API are made with `mocks`, not with initialState.",
+      "ja": "アプリが値を適用するのは、起動後にその画面が最初に現れたときで、起動 1 回・画面 1 つにつき 1 回です。同じ起動の中で画面を離れて戻っても、もう一度は適用されません。その時点で ViewModel の init や onAppear が既定値のまま走っていることがあるので、onAppear が上書きする値は残りません。API から来る値は initialState ではなく `mocks` で作ります。"
+    },
+    "section_when_gate": {
+      "en": "The app receives values only while the same gate as the screen marker is open: DEBUG or the Info.plist key `com.swiftjsonui.SCREEN_MARKER` on iOS, a debuggable build or the meta-data `com.kotlinjsonui.SCREEN_MARKER` on Android, and a non-production build on web. A release build neither receives values nor publishes state. On web the code is not in the production bundle at all: this site's own production export contains none of it.",
+      "ja": "アプリが値を受け取るのは、screen marker と同じ条件が開いているときだけです: iOS は DEBUG か Info.plist の `com.swiftjsonui.SCREEN_MARKER`、Android は debuggable なビルドか meta-data の `com.kotlinjsonui.SCREEN_MARKER`、web は production 以外のビルド。release ビルドは値を受け取らず、状態も公開しません。web では production の bundle にコード自体が入りません: このサイト自身の production 書き出しにも含まれていません。"
+    },
+    "section_receipt_heading": {
+      "en": "The receipt",
+      "ja": "受領の確認"
+    },
+    "section_receipt_body": {
+      "en": "After a launch that carried values, the driver waits up to `screenReadyTimeout` (15000 ms by default) for the screen to report a receipt with the same launch id. If none arrives, or any key was rejected, the cases fail with `failureReason: \"setup\"`: every case of a shared file, or only that case on a reopen. The message lists each rejected key with its reason. When nothing arrived, it lists the likely causes: a library older than this release, a build with the gate closed, a web page that does not go through the generated hook, or a screen id that does not match.",
+      "ja": "値を載せた起動のあと、driver は `screenReadyTimeout`（既定 15000 ms）まで、同じ launch id の受領が画面から届くのを待ちます。届かないか、拒否されたキーがあれば、case は `failureReason: \"setup\"` で失敗します。shared のファイルなら全 case、reopen ならその case だけです。メッセージには、拒否されたキーと理由が並びます。何も届かなかったときは、考えられる原因が並びます: このリリースより古いライブラリ、条件が閉じたビルド、生成されたフックを通らない web のページ、一致しない screen id。"
+    },
+    "section_receipt_where": {
+      "en": "Where the bridge lives: on iOS, the accessibility value of a transparent leaf with the identifier `__state_<screenId>` (over 32 KB it holds only `{\"truncated\": <bytes>}`); on Android, the semantics key `JsonUIState` on the screen marker node; on web, `window.__JSONUI_STATE__[screenId]`. It is published again every time the Data changes.",
+      "ja": "ブリッジの置き場所: iOS は identifier が `__state_<screenId>` の透明な leaf の accessibility value（32 KB を超えると `{\"truncated\": <bytes>}` だけになる）、Android は screen marker のノードの semantics キー `JsonUIState`、web は `window.__JSONUI_STATE__[screenId]`。Data が変わるたびに公開し直されます。"
+    },
+    "section_state_heading": {
+      "en": "Reading state back",
+      "ja": "状態を読み返す"
+    },
+    "section_state_body": {
+      "en": "The `state` assertion and `when: { state }` resolve their `path` in the same bridge's `data`, so with libraries of this release the harness passes no state provider. `equals: null` asserts a null value. In a screen test the screen is the screen under test. In a flow it is the step's `screen`, or else the last screen an earlier step named. A provider the harness still passes wins. While the bridge is absent or the path does not resolve, the assertion keeps waiting; a truncated iOS bridge fails at once.",
+      "ja": "`state` assertion と `when: { state }` は、同じブリッジの `data` から `path` を引くので、このリリースのライブラリならハーネスは state provider を渡しません。`equals: null` で null を確かめられます。screen test では対象の画面、flow ではその step の `screen`、無ければそれより前の step が最後に名指した画面を読みます。ハーネスが provider を渡せば、そちらが優先されます。ブリッジが無いか path が引けない間は待ち続け、iOS のブリッジが切り詰められていればすぐに失敗します。"
+    },
+    "section_flow_heading": {
+      "en": "Flows",
+      "ja": "flow"
+    },
+    "section_flow_body": {
+      "en": "A flow writes `initialState.viewModels`, keyed by screen id, the same values its steps write in `screen`. Each screen is checked the first time the flow reaches it. A screen in `viewModels` that the flow never reaches is a warning. `initialState.screen` is no longer part of the flow schema, and validate rejects it: the flow starts on whatever screen the app opens. A file or case the flow references runs without its own initialState, because the flow's launch has already happened; validate and the driver both warn about it.",
+      "ja": "flow は screen id をキーにした `initialState.viewModels` に書きます。キーは step が `screen` に書くのと同じ値です。各画面は、flow が最初にそこへ着いた時点で確かめられます。`viewModels` にあって flow が一度も着かない画面は警告になります。`initialState.screen` は flow のスキーマから外れ、validate はエラーにします: flow はアプリが開いた画面から始まります。flow が参照するファイルや case は、それぞれの initialState を使わずに走ります（flow の起動はもう済んでいるため）。validate も driver も、そのことを警告します。"
+    },
+    "section_launch_heading": {
+      "en": "The launch sequence",
+      "ja": "起動の順序"
+    },
+    "section_launch_body": {
+      "en": "When a file has `launch`, `mocks` or a non-empty initialState, every driver launches the app in the same order. An empty initialState is the same as none and is not a reason to launch. With `caseIsolation: \"reopen\"`, the whole sequence runs again before each case.",
+      "ja": "ファイルに `launch`・`mocks`・空でない initialState のどれかがあれば、どの driver も同じ順序でアプリを起動します。空の initialState は無いのと同じで、起動の理由にはなりません。`caseIsolation: \"reopen\"` なら、case ごとにこの順序を最初からやり直します。"
+    },
+    "section_launch_web": {
+      "en": "On web the runner now applies `launch` itself. `clearState` clears cookies and the origin's local and session storage (not IndexedDB), permissions are cleared and granted again, and `arguments` go to sessionStorage. The `applyLaunchConfig` helper that a harness used to call is gone from web driver 1.15.0. To put back something `clearState` removed, such as an auth cookie, give the runner an `afterLaunch(page)` hook. It runs after the arguments and before the initialState is written, on every launch, so per case on a reopen.",
+      "ja": "web では runner が `launch` を自分で適用するようになりました。`clearState` は Cookie と origin の local / session storage を消し（IndexedDB は消さない）、権限は消してから付け直し、`arguments` は sessionStorage に入れます。ハーネスが呼んでいた `applyLaunchConfig` は web driver 1.15.0 で無くなりました。`clearState` が消したもの、たとえば認証の Cookie を戻すときは、runner に `afterLaunch(page)` フックを渡します。arguments のあと、initialState を書く前に、起動のたびに（reopen なら case ごとに）呼ばれます。"
+    },
+    "section_validate_heading": {
+      "en": "What validate checks",
+      "ja": "validate が検査すること"
+    },
+    "section_validate_body": {
+      "en": "`jsonui-test validate` applies the same rules before the run. It reads the Data each layout declares and reports every value the app would reject, a case-level initialState in a shared file, a `viewModels` key that is not a screen id, `initialState.screen` in a flow, and an initialState that a flow reference would ignore. It also warns when the installed driver is older than the one that reads the key, or when it cannot read the driver's version. Measured on jsonui-cli 1.9.34, with a layout declaring `orderNumber: String`, `status: String`, `trackingNumber: String?` and `itemCount: Int`:",
+      "ja": "`jsonui-test validate` は、同じ規則を実行前に当てます。各レイアウトが宣言する Data を読み、アプリが拒否するはずの値、shared のファイルにある case の initialState、screen id でない `viewModels` のキー、flow の `initialState.screen`、flow の参照で使われない initialState を報告します。入っている driver がそのキーを読む版より古いとき、また driver の版が読めないときも警告します。jsonui-cli 1.9.34 で、`orderNumber: String`・`status: String`・`trackingNumber: String?`・`itemCount: Int` を宣言したレイアウトに対して測った結果:"
+    },
+    "section_validate_negative": {
+      "en": "The same file with `caseIsolation: \"reopen\"` and values that fit passes with no errors, including `trackingNumber: null`, because that class ends in `?`.",
+      "ja": "同じファイルに `caseIsolation: \"reopen\"` を書き、型の合う値にすると、エラーなしで通ります。`trackingNumber: null` も、型が `?` で終わるので通ります。"
+    },
+    "section_limits_heading": {
+      "en": "What it does not cover",
+      "ja": "扱わないこと"
+    },
+    "section_limits_body": {
+      "en": "initialState sets the screen's Data at launch and nothing else. It does not set state in the middle of a run, state outside the ViewModel's `data`, or a flow's starting screen. Closures, collections and custom types cannot be set. The drivers deliver `launch.arguments` and `clearState` to the app, but reading them is the app's job; the libraries read only initialState.",
+      "ja": "initialState が設定するのは、起動時の画面の Data だけです。実行の途中での状態の変更、ViewModel の `data` 以外の状態、flow の開始画面は扱いません。クロージャ、コレクション、独自型は設定できません。driver は `launch.arguments` と `clearState` をアプリに届けますが、それを読むのはアプリの役目で、ライブラリが読むのは initialState だけです。"
+    },
+    "next_heading": {
+      "en": "Keep going",
+      "ja": "次に進む"
+    },
+    "next_testing_title": {
+      "en": "Writing screen tests",
+      "ja": "スクリーンテストを書く"
+    },
+    "next_testing_description": {
+      "en": "The test file, the step DSL, caseIsolation and the assertions.",
+      "ja": "テストファイル、step の DSL、caseIsolation、assertion。"
+    },
+    "next_identity_title": {
+      "en": "Screen identity",
+      "ja": "画面の識別"
+    },
+    "next_identity_description": {
+      "en": "Screen ids, the screen marker and the gate this bridge shares with it.",
+      "ja": "screen id、screen marker、このブリッジと共通の条件。"
+    },
+    "next_tooling_title": {
+      "en": "Test tooling reference",
+      "ja": "テストツールのリファレンス"
+    },
+    "next_tooling_description": {
+      "en": "Where the three drivers differ, row by row.",
+      "ja": "3 つの driver が違うところを、行ごとに。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI",
+      "ja": "© 2026 JsonUI"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの内容"
+    },
+    "toc_row_what": {
+      "en": "What it does",
+      "ja": "何をするものか"
+    },
+    "toc_row_declare": {
+      "en": "Writing it",
+      "ja": "書き方"
+    },
+    "toc_row_keys": {
+      "en": "Keys and types",
+      "ja": "キーと型"
+    },
+    "toc_row_when": {
+      "en": "When the values arrive",
+      "ja": "値が入るタイミング"
+    },
+    "toc_row_receipt": {
+      "en": "The receipt",
+      "ja": "受領の確認"
+    },
+    "toc_row_state": {
+      "en": "Reading state back",
+      "ja": "状態を読み返す"
+    },
+    "toc_row_flow": {
+      "en": "Flows",
+      "ja": "flow"
+    },
+    "toc_row_launch": {
+      "en": "The launch sequence",
+      "ja": "起動の順序"
+    },
+    "toc_row_validate": {
+      "en": "What validate checks",
+      "ja": "validate が検査すること"
+    },
+    "toc_row_limits": {
+      "en": "What it does not cover",
+      "ja": "扱わないこと"
+    }
   }
 }

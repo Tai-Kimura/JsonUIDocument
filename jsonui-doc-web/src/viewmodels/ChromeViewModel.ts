@@ -122,6 +122,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "branch-tests",            titleKey: "guides_branch_tests_title",            titleEn: "Branch tests",                url: "/guides/branch-tests" },
       { id: "contract-gaps",           titleKey: "guides_contract_gaps_title",           titleEn: "Contract gaps",               url: "/guides/contract-gaps" },
       { id: "unit-contracts",          titleKey: "guides_unit_contracts_title",          titleEn: "Unit contracts",              url: "/guides/unit-contracts" },
+      { id: "initial-state",           titleKey: "guides_initial_state_title",           titleEn: "Initial state",               url: "/guides/initial-state" },
       { id: "writing-layouts",         titleKey: "guides_writing_layouts_title",         titleEn: "Writing layouts",             url: "/guides/writing-layouts" },
       { id: "navigation",              titleKey: "guides_navigation_title",              titleEn: "Navigation between screens", url: "/guides/navigation" },
       { id: "testing",                 titleKey: "guides_testing_title",                 titleEn: "Writing screen tests",        url: "/guides/testing" },

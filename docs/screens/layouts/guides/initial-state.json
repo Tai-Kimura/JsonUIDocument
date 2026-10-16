@@ -1,0 +1,751 @@
+{
+  "type": "View",
+  "id": "guides_initial_state_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateGuides",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "guides_initial_state_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "guides_initial_state_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            24,
+            32
+          ],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateGuides}",
+              "text": "breadcrumb"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "#475467",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "#64748B",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "guides_initial_state_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "guides_initial_state_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_what",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_what_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_what_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_what_versions"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_declare",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_declare_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_declare_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "{\n  \"type\": \"screen\",\n  \"source\": { \"layout\": \"layouts/order_status.json\" },\n  \"caseIsolation\": \"reopen\",\n  \"initialState\": {\n    \"viewModel\": { \"orderNumber\": \"A-1001\", \"status\": \"processing\", \"trackingNumber\": null }\n  },\n  \"cases\": [\n    { \"name\": \"processing\",\n      \"steps\": [\n        { \"assert\": \"text\", \"id\": \"order_number_label\", \"equals\": \"A-1001\" },\n        { \"assert\": \"hidden\", \"id\": \"tracking_link\" },\n        { \"assert\": \"state\", \"path\": \"trackingNumber\", \"equals\": null } ] },\n    { \"name\": \"shipped\",\n      \"initialState\": { \"viewModel\": { \"status\": \"shipped\", \"trackingNumber\": \"1Z999\" } },\n      \"steps\": [ { \"assert\": \"visible\", \"id\": \"tracking_link\" } ] }\n  ]\n}",
+                      "language": "json",
+                      "filename": "order_status.test.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_declare_cases"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_keys",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_keys_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_keys_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_keys_types"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "data class            accepts\nString                a string\nInt                   a number with no fraction, -2147483648 to 2147483647\n                      (2.0 accepted; 1.5, true, \"1\" and 2147483648 rejected)\nDouble / Float /      any number\nCGFloat / Number\nBool                  true or false (0, 1 and \"true\" rejected)\nColor                 a colour token or hex string\nArray(X) / [X] /      an array whose every element is X (no null elements)\nList<X>\nArray                 an array of strings, numbers or booleans\nObject / Hash         an object whose values are strings, numbers or booleans\nX?                    the same as X, plus null\nanything else         nothing: closures, CollectionDataSource, Visibility,\n                      Image, EdgeInsets, an array of a custom type, ...\n\nrejection reasons\n  not a data field\n  type mismatch: expected <class>\n  null for non-optional <class>\n  unsupported type <class>\n  viewModel has no updateData          (Android only)",
+                      "language": "text",
+                      "filename": "Data classes initialState accepts (jsonui-test-runner spec §10.3)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_when",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_when_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_when_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_when_gate"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_receipt",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_receipt_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_receipt_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "{\n  \"launchId\": \"6F1C2A9E-3B7D-4C1E-9A55-0D2F8E7B4C11\",\n  \"initialState\": {\n    \"applied\": [\"email\"],\n    \"rejected\": [{ \"key\": \"nickname\", \"reason\": \"not a data field\" }]\n  },\n  \"data\": { \"email\": \"test@example.com\", \"password\": \"\" }\n}",
+                      "language": "json",
+                      "filename": "What a screen publishes (the state bridge)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_receipt_where"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_state",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_state_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_state_body"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_flow",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_flow_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_flow_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "{\n  \"type\": \"flow\",\n  \"initialState\": {\n    \"viewModels\": {\n      \"login\": { \"email\": \"test@example.com\" },\n      \"profile\": { \"nickname\": \"Ann\" }\n    }\n  }\n}",
+                      "language": "json",
+                      "filename": "login_to_profile.test.json — initialState",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_launch",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_launch_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_launch_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "1. clearState\n2. permissions\n3. arguments        web: then the harness's afterLaunch(page)\n4. initialState\n5. mocks\n6. launch           iOS app.launch(), Android relaunch, web reload (goto on a reopen)\n7. receipt\n8. setup",
+                      "language": "text",
+                      "filename": "The same order on iOS, Android and web (spec §10.2)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_launch_web"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "const runner = new JsonUITestRunner(page, {\n  afterLaunch: async (page) => {\n    await page.context().addCookies([\n      { name: 'session', value: process.env.TEST_SESSION ?? '', url: 'http://localhost:3000' },\n    ]);\n  },\n});",
+                      "language": "typescript",
+                      "filename": "web harness — seeding a cookie that clearState removed",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_validate",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_validate_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_validate_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "tests/screens/order_status.test.json\n  [ERROR] ...cases[0].initialState: case 'shipped' has its own initialState, but the\n          file's caseIsolation is shared (the default) — the screen opens once, before\n          the first case, so it cannot be delivered and the driver fails this case\n          (setup). Set \"caseIsolation\": \"reopen\", or move the values to the file's\n          initialState (case-initial-state-needs-reopen)\n  [ERROR] ...initialState.viewModel.itemCount: initialState 'itemCount' for screen\n          'order_status': type mismatch: expected Int. The app rejects it and the\n          driver fails the file's cases (setup). ...\n  [ERROR] ...initialState.viewModel.status: initialState 'status' for screen\n          'order_status': null for non-optional String. ...\n  [ERROR] ...initialState.viewModel.customer: initialState 'customer' for screen\n          'order_status': not a data field. ...\n\nResult: FAILED\nFiles: 1, Errors: 4, Warnings: 0",
+                      "language": "text",
+                      "filename": "jsonui-test validate — measured on jsonui-cli 1.9.34 (the repeated hint abridged)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_validate_negative"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_limits",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_limits_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_limits_body"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_initial_state_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    32,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "chrome_ink",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "guides_initial_state_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 3,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/next_step_card"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_initial_state_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "#94A3B8",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "guides_initial_state_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [
+                24,
+                16,
+                24,
+                16
+              ],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_initial_state_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    0,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        {
+                          "id": "toc_what",
+                          "label": "toc_row_what",
+                          "anchor": "section_what",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_declare",
+                          "label": "toc_row_declare",
+                          "anchor": "section_declare",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_keys",
+                          "label": "toc_row_keys",
+                          "anchor": "section_keys",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_when",
+                          "label": "toc_row_when",
+                          "anchor": "section_when",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_receipt",
+                          "label": "toc_row_receipt",
+                          "anchor": "section_receipt",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_state",
+                          "label": "toc_row_state",
+                          "anchor": "section_state",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_flow",
+                          "label": "toc_row_flow",
+                          "anchor": "section_flow",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_launch",
+                          "label": "toc_row_launch",
+                          "anchor": "section_launch",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_validate",
+                          "label": "toc_row_validate",
+                          "anchor": "section_validate",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_limits",
+                          "label": "toc_row_limits",
+                          "anchor": "section_limits",
+                          "level": 1
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
