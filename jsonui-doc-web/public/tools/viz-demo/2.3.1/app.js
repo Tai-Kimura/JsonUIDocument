@@ -538,7 +538,7 @@ function handThing(kind) {
   return g;
 }
 function startGesture(r, kind, t) {
-  if (reduceMotion || !GESTURE_OK.has(r.state) || r.play || (r.call && CALL_ON_LINE.has(r.call.state))) return false;
+  if (reduceMotion || !GESTURE_OK.has(r.state) || r.play || r.solo || (r.call && CALL_ON_LINE.has(r.call.state))) return false;
   endGesture(r);
   if (kind !== 'cheer') { r.hand = handThing(kind); (kind === 'meal' ? r.armL : r.armR).add(r.hand); }
   r.gesture = { kind, t0: t, t1: t + GESTURE_LEN[kind] };
@@ -663,6 +663,53 @@ function playBubble(r, P, t) {
   ctx.fillStyle = '#1f2532'; ctx.font = `700 46px ${FONT_BODY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(hand, 100, 62);
   r.rps.material.map.needsUpdate = true;
+}
+/* Alone in its room (requester, 10-18): r.solo is { kind: 'nap' | 'bento', t0 } while the scene says so. nap: the head
+   sinks and nods, the arms rest, a zzz drifts up; bento: a box on the desk, chopsticks to the mouth. */
+function soloPose(r, p, t) {
+  const u = t - r.solo.t0;
+  if (r.solo.kind === 'nap') {
+    const nod = reduceMotion ? 0 : Math.sin(u * 1.1);
+    p.headX = 0.42 + nod * 0.06; p.headZ = 0.12; p.torsoX = 0.1; p.hipsY = -0.01;
+    p.aLx = -0.9; p.aLz = -0.3; p.aRx = -0.9; p.aRz = 0.3;
+  } else {
+    const bite = 0.5 + 0.5 * Math.sin(u * 4.2);
+    p.aLx = -1.1; p.aLz = -0.35; p.aRx = -1.35 - bite * 0.45; p.aRz = 0.3; p.headX = 0.22 - bite * 0.06;
+  }
+}
+/* White letters with a dark rim: readable on the light floor and on the dark one (jsonuidocument-96, 10-18: the blue zzz
+   all but vanished on the dark floor and walls). */
+function zzzCanvas() {
+  const c = makeCanvas(200, 150), ctx = c.getContext('2d');
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+  [[50, 112, 38], [104, 74, 50], [156, 34, 62]].forEach(([x, y, size]) => {
+    ctx.font = `700 ${size}px ${FONT_DISPLAY}`;
+    ctx.lineWidth = 9; ctx.strokeStyle = '#1f2a44'; ctx.strokeText('z', x, y);
+    ctx.fillStyle = '#ffffff'; ctx.fillText('z', x, y);
+  });
+  return c;
+}
+function bentoBox() {
+  const g = new THREE.Group();
+  // big enough to read from the usual view (96, 10-18: a few pixels even up close): a red box, rice, a side dish, a lid
+  const box = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.12, 0.44), toon('#c0392b'));
+  const rice = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.03, 0.38), toon('#fffaf0')); rice.position.set(-0.14, 0.07, 0);
+  const plum = new THREE.Mesh(new THREE.SphereGeometry(0.04, 10, 8), toon('#d63a5a')); plum.position.set(-0.14, 0.1, 0);
+  const side = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.04, 0.38), toon('#e6a23c')); side.position.set(0.15, 0.07, 0);
+  const lid = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.03, 0.44), toon('#2b2f36')); lid.position.set(0.5, 0.0, 0.05); lid.rotation.z = 0.35;
+  g.add(box, rice, plum, side, lid);
+  g.position.set(0, 0.62, 0.48);
+  return g;
+}
+function soloProps(r, S, t) {
+  const nap = !!S && S.kind === 'nap', bento = !!S && S.kind === 'bento';
+  if (nap && !r.zzz) { r.zzz = new THREE.Sprite(new THREE.SpriteMaterial({ map: texFrom(zzzCanvas()), transparent: true, depthTest: false })); r.zzz.renderOrder = 5; r.zzz.scale.set(1.1, 0.82, 1); r.root.add(r.zzz); }
+  if (r.zzz) {
+    r.zzz.visible = nap;
+    if (nap) { const k = reduceMotion ? 0.4 : ((t - S.t0) * 0.4) % 1; r.zzz.position.set(0.55, 2.0 + k * 0.5, 0.1); r.zzz.material.opacity = 1 - k * 0.5; }
+  }
+  if (bento && !r.bento) { r.bento = bentoBox(); r.root.add(r.bento); }
+  if (r.bento) r.bento.visible = bento;
 }
 function gesturePose(r, p, t) {
   const G = r.gesture, k = Math.min(1, (t - G.t0) / 0.35, (G.t1 - t) / 0.35);   // ease in and out
@@ -903,7 +950,9 @@ function updateRobot(r, t, dt) {
   if (!onCall && !r.gesture && r.needDrink && GESTURE_OK.has(r.state) && startGesture(r, 'drink', t)) r.needDrink = false;
   if (onCall) callPose(p, t);
   else if (r.play) playPose(r, p, t);
+  else if (r.solo) soloPose(r, p, t);
   else if (r.gesture) gesturePose(r, p, t);
+  soloProps(r, onCall ? null : r.solo, t);
   playBubble(r, onCall ? null : r.play, t);
   r.antenna.rotation.x += ((r.tired ? 1.0 : 0) - r.antenna.rotation.x) * Math.min(1, dt * 3);
   r.root.position.y = p.rootY;
@@ -1710,6 +1759,7 @@ const SOURCE = {
     showToast(`${p.who} の ${p.tool} を${behavior === 'deny' ? '拒否' : behavior === 'always' ? '許可し、ルールを追加' : '許可'}した（デモ。実際は Claude Code へ答えを返す）`);
   },
   history() { return Promise.resolve({ ok: false, error: 'demo' }); },   // the demo has no transcripts
+  setWeather() { return Promise.resolve({ ok: false, error: 'demo' }); },   // the demo asks nobody about the weather
 };
 const robotRuns = () => [];   // the demo's one test run is shown by the card's own a2 row
 
@@ -2113,9 +2163,11 @@ function addFrame(cx, cy, z, w, h, mat) {
 
 /* The demo office: three fixed rooms with their boards, the test stand, the document tray and the robots of
    the script (the prototype as it was). The live view builds its rooms from the slices instead (liveSync). */
+// The walls' colour is the --wall token (app.css, light and dark); this is only what a page without the stylesheet gets.
+const WALL_FALLBACK = '#ebe4d9';
 function buildDemoOffice() {
-  const wallMat = toon(readToken('--wall', '#f7f9fc'));
-  roomMats.push([wallMat, '--wall', '#f7f9fc']);
+  const wallMat = toon(readToken('--wall', WALL_FALLBACK));
+  roomMats.push([wallMat, '--wall', WALL_FALLBACK]);
   for (const room of ROOMS) {
     const w = room.x1 - room.x0, d = room.z1 - room.z0, cx = (room.x0 + room.x1) / 2, cz = (room.z0 + room.z1) / 2;
     const floorMat = toon(readToken(room.floor, '#e9eef6'));
@@ -2289,6 +2341,7 @@ function build3D() {
     document.getElementById('floor-up').addEventListener('click', () => step(1));
     document.getElementById('floor-down').addEventListener('click', () => step(-1));
     document.getElementById('floor-building').addEventListener('click', () => (TOWER.on ? towerLeave(LIVE.floor) : towerEnter()));
+    document.getElementById('weather-switch').addEventListener('click', () => { weatherSwitch(); });
     document.getElementById('room-back').addEventListener('click', () => setProject('all'));
   }
   const applyTheme = () => { for (const [mat, token, fallback] of roomMats) mat.color.set(readToken(token, fallback)); };
@@ -2324,8 +2377,8 @@ function disposeTree(root) {
 function liveBuildRoom(room) {
   const g = new THREE.Group();
   const w = room.x1 - room.x0, d = room.z1 - room.z0, cx = (room.x0 + room.x1) / 2, cz = (room.z0 + room.z1) / 2;
-  const wallMat = toon(readToken('--wall', '#f7f9fc')), floorMat = toon(readToken(room.floor, '#e9eef6'));
-  const mats = [[wallMat, '--wall', '#f7f9fc'], [floorMat, room.floor, '#e9eef6']];
+  const wallMat = toon(readToken('--wall', WALL_FALLBACK)), floorMat = toon(readToken(room.floor, '#e9eef6'));
+  const mats = [[wallMat, '--wall', WALL_FALLBACK], [floorMat, room.floor, '#e9eef6']];
   roomMats.push(...mats);
   const floor = new THREE.Mesh(new RoundedBoxGeometry(w, 0.16, d, 2, 0.05), floorMat); floor.position.set(cx, -0.08, cz); g.add(floor);
   const frameMat = toon('#7a5a3c');
@@ -2396,7 +2449,8 @@ function liveBuildRoom(room) {
 function liveDropRoom(id) {
   const R = LIVE3D.rooms[id];
   if (!R) return;
-  scene.remove(R.group); disposeTree(R.group);
+  if (PROPS.room === id) propsClear();   // the floor's own material goes back before the room is disposed
+  scene.remove(R.group); focusRelease(R.group); disposeTree(R.group);   // focusRelease: 50-panel.js, the faint walls (10-18)
   R.rt.el.remove();
   roomTags.splice(roomTags.indexOf(R.rt), 1);
   for (const m of R.mats) roomMats.splice(roomMats.indexOf(m), 1);
@@ -2419,7 +2473,7 @@ function liveAddRobot(d, i) {
   return R;
 }
 function liveDropRobot(R) {
-  scene.remove(R.robot.root); disposeTree(R.robot.root);
+  scene.remove(R.robot.root); focusRelease(R.robot.root); disposeTree(R.robot.root);   // focusRelease: 50-panel.js (10-18)
   const k = fontRedraws.indexOf(R.robot.fontRedraw); if (k >= 0) fontRedraws.splice(k, 1);
   R.tag.remove();
   if (links[R.def.id]) links[R.def.id].set(null, null, false, 0);
@@ -2462,6 +2516,13 @@ function livePlan(R) {
   const rm = PROJECT[d.room], rect = rm ? `${rm.x0},${rm.z0},${rm.x1},${rm.z1}` : '';
   const moved = R.seatKey && R.room === d.room && R.rect && R.rect !== rect;   // its room was laid out again (another slot, the one-room view)
   R.rect = rect;
+  if (R.play) {
+    // At play (2.3.1): the path is the game's. Taking it sent a player to its new desk, and there liveWalk read the
+    // empty path as "at the spot" and it played from its desk (e2e, 1 run in 3). The game ends on its own reasons;
+    // playStop then walks it to this seat (through the doors when the room changed).
+    R.room = d.room; R.seatKey = key;
+    return;
+  }
   if (moved) { root.position.x = d.pos[0]; root.position.z = d.pos[1]; R.path = []; R.jumps = (R.jumps || 0) + 1; }
   else if (R.seatKey && R.room !== d.room) {
     // to another room: finish the step it is on, then through the doors (never a straight line through a wall)
@@ -2527,16 +2588,21 @@ function snackTick(t) {
 }
 /* A call on the robot and on its name tag: a phone mark and the other robot's number, never the message. */
 const CALL_TAG_TEXT = { dialing: '発信中', ringing: '呼び出し中', answered: '通話中' };
+/* Alone at its desk (2.3.1): the name tag says so too — the robot is small in any view, so the zzz and the bento alone
+   were hard to see (jsonuidocument-96, 10-18). The call mark wins; a call stops a nap anyway. */
+const SOLO_TAG_TEXT = { nap: 'zzz 居眠り', bento: '弁当' };
 function liveCallTag(R, call) {
   R.robot.call = call && CALL_ON_LINE.has(call.state) ? call : null;
   const c = R.robot.call;
-  const text = c ? `☎ ${c.role === 'callee' && c.state !== 'answered' ? '着信' : CALL_TAG_TEXT[c.state]}${c.peer ? ` ${c.peer}` : ''}` : '';
+  const text = c ? `☎ ${c.role === 'callee' && c.state !== 'answered' ? '着信' : CALL_TAG_TEXT[c.state]}${c.peer ? ` ${c.peer}` : ''}`
+    : R.solo ? SOLO_TAG_TEXT[R.solo.kind] || '' : '';
   if (text === (R.callText || '')) return;
   R.callText = text;
   if (!R.callEl) { R.callEl = document.createElement('span'); R.callEl.className = 'call-mark'; R.tag.insertBefore(R.callEl, R.text); }
   R.callEl.textContent = text;
   R.callEl.hidden = !text;
-  R.tag.classList.toggle('on-call', !!text);
+  R.callEl.classList.toggle('solo-mark', !c && !!text);
+  R.tag.classList.toggle('on-call', !!c);
 }
 /* Play (requester, 10-18): "同じ部屋で待機が長いロボットが複数いたらロボット同士で遊ぶ", "動きはランダムでいい",
    "遊んだらまた元の場所に戻る", "指示が来たら遊ぶのやめて作業始めて". Looks only: the server, the panel and the tasks
@@ -2550,13 +2616,36 @@ function liveCallTag(R, call) {
    and none in a room with standing robots (a full room: they stand along the front wall, where the game would be).
    None under reduced motion. The e2e build can shorten the times (80-dbg.js). */
 const PLAY_KINDS = ['ball', 'highfive', 'rps'];
-const PLAY = { seed: 20261019, kinds: PLAY_KINDS, idleMs: 180_000, p: 1 / 30, games: 2, minSec: 15, maxSec: 35, restMinSec: 60, restMaxSec: 180,
-  next: 0, rng: null, list: [] };
+/* 2.3.1 (requester, 10-18: "完了とか待機でもあんまり遊ばない"): idle for a minute, about 15 s to start once two are there,
+   shorter rests, three games at a time. A robot that finished (完了) is idle again three seconds later and counts from
+   then. Robots alone in their room nap or eat a bento at their desks (SOLO). Every end is kept with its reason in
+   PLAY.ends (80-dbg.js shows them): the requester saw two walk up and go back without playing. */
+const PLAY = { seed: 20261019, kinds: PLAY_KINDS, idleMs: 60_000, p: 1 / 15, games: 3, minSec: 15, maxSec: 35, restMinSec: 45, restMaxSec: 120,
+  walkSec: 30, next: 0, rng: null, list: [], ends: [] };
+const SOLO_KINDS = ['nap', 'bento'];
+const SOLO = { p: 1 / 20, minSec: 20, maxSec: 60, kinds: SOLO_KINDS };
 const playIdle = (R, st, now) => R.def.kind === 'main' && st.state === 'idle' && Number.isFinite(st.since) && st.since > 0
-  && now - st.since >= PLAY.idleMs && !LIVE.leaving[R.def.id] && !R.robot.call && !R.path.length && !R.playBack && !R.play;
+  && now - st.since >= PLAY.idleMs && !LIVE.leaving[R.def.id] && !R.robot.call && !R.path.length && !R.playBack && !R.play && !R.solo;
+/* Why a robot stops (null: it does not): the reasons the requester's "walked up and went back" can be told by. Only a
+   desk in another room stops it now; a desk that moves within the room (another session came or went and the room
+   was laid out again — common with many sessions) no longer does: it walks back to the new desk afterwards. */
+function playStopReason(R, st, room, since) {
+  if (!robots.includes(R)) return 'gone';
+  if (LIVE.leaving[R.def.id]) return 'leaving';
+  if (R.robot.call) return 'call';
+  if (st.state !== 'idle') return `state:${st.state}`;
+  if (st.since !== since) return 'updated';
+  if (R.def.room !== room) return 'room';
+  return null;
+}
+function playLog(G, reason, nowSec) {
+  PLAY.ends.push({ room: G.room, kind: G.kind, players: G.players.map((R) => R.def.id), reason, playedSec: G.t0 ? +(nowSec - G.t0).toFixed(1) : 0 });
+  if (PLAY.ends.length > 30) PLAY.ends.shift();
+}
 function playStop(R) {
   if (!R.play) return;
   R.play = null; R.robot.play = null; R.playBack = true;
+  if (R.robot.desk) R.robot.desk.visible = false;
   const p = R.robot.root.position, from = roomAtPoint([p.x, p.z]);
   R.path = from && from !== R.def.room ? [...liveRoute(from, R.def.room), R.def.pos] : [R.def.pos];   // never through a wall
 }
@@ -2565,22 +2654,45 @@ function playEnd(G) {
   if (G.ball) { scene.remove(G.ball); G.ball.geometry.dispose(); G.ball.material.dispose(); }
   PLAY.list.splice(PLAY.list.indexOf(G), 1);
 }
+/* The game's room laid out again (another room came or went, its robot count changed its size): the spot and the
+   players move with it, as a jump (the e2e wall check skips jumps, as it does for livePlan's), and the game goes on.
+   Without it the spot and the players stayed where the room had been — inside a wall of the new layout. */
+const playSpotOf = (rm, side) => [(rm.x0 + rm.x1) / 2 + (side ? 0.8 : -0.8), rm.z1 - 0.9];
+function playFollowRoom(G) {
+  const rm = PROJECT[G.room];
+  if (!rm) return;
+  const rect = `${rm.x0},${rm.z0},${rm.x1},${rm.z1}`;
+  if (rect === G.rect) return;
+  G.rect = rect;
+  G.players.forEach((R, i) => {
+    if (!R.play) return;
+    const to = playSpotOf(rm, i), dx = to[0] - R.play.spot[0], dz = to[1] - R.play.spot[1];
+    const root = R.robot.root;
+    root.position.x += dx; root.position.z += dz;
+    R.path = R.path.map((p) => [p[0] + dx, p[1] + dz]);
+    R.play.spot = to;
+    R.jumps = (R.jumps || 0) + 1;
+  });
+}
 function playTick(nowSec, now) {
   // stop at once: every frame
   for (const G of [...PLAY.list]) {
+    playFollowRoom(G);
+    let why = null;
     for (const R of G.players) {
-      const st = robotState[R.def.id] || { state: 'idle' };
       if (!R.play) continue;
-      if (st.state !== 'idle' || st.since !== R.play.since || R.robot.call || LIVE.leaving[R.def.id] || R.seatKey !== R.play.seatKey
-        || !robots.includes(R)) playStop(R);
+      const reason = playStopReason(R, robotState[R.def.id] || { state: 'idle' }, G.room, R.play.since);
+      if (reason) { playStop(R); why = why || `${R.def.id} ${reason}`; }
     }
     const left = G.players.filter((R) => R.play);
-    if (left.length < 2 || nowSec >= G.until) { G.players = left; playEnd(G); continue; }
     const at = left.filter((R) => R.play.phase === 'playing');
-    if (at.length === left.length && !G.t0) {                      // both there: face each other and start
-      G.t0 = nowSec;
+    if (at.length === left.length && left.length >= 2 && !G.t0) {   // all there: the game's clock starts now
+      G.t0 = nowSec; G.until = nowSec + G.len;
       left.forEach((R, i) => { R.robot.play = { kind: G.kind, t0: nowSec, side: i }; });
     }
+    const end = left.length < 2 ? `alone (${why || 'partner stopped'})` : G.t0 && nowSec >= G.until ? 'done'
+      : !G.t0 && nowSec >= G.walkUntil ? 'walk too long' : null;
+    if (end) { playLog(G, end, nowSec); G.players = left; playEnd(G); continue; }
     if (G.t0 && G.kind === 'ball') {
       if (!G.ball) { G.ball = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 8), toon('#ff7a3d')); scene.add(G.ball); }
       const [a, b] = left.map((R) => R.robot.root.position), u = ((nowSec - G.t0) / 1.6) % 1;
@@ -2603,17 +2715,47 @@ function playTick(nowSec, now) {
     if (robots.some((R) => R.def.room === room && R.def.standing)) continue;   // a full room: no aisle to play in
     if (PLAY.rng() >= PLAY.p) continue;
     const a = idle.splice(Math.floor(PLAY.rng() * idle.length), 1)[0], b = idle[Math.floor(PLAY.rng() * idle.length)];
-    const rm = PROJECT[room], cx = (rm.x0 + rm.x1) / 2, cz = rm.z1 - 0.9;
+    const rm = PROJECT[room];
     const kind = PLAY.kinds[Math.floor(PLAY.rng() * PLAY.kinds.length)];
     const len = PLAY.minSec + PLAY.rng() * (PLAY.maxSec - PLAY.minSec);
-    const G = { room, kind, players: [a, b], t0: 0, until: nowSec + len + 20, ball: null };   // +20: the walk there
+    const G = { room, kind, players: [a, b], t0: 0, len, until: 0, walkUntil: nowSec + PLAY.walkSec, ball: null, rect: `${rm.x0},${rm.z0},${rm.x1},${rm.z1}` };
     [a, b].forEach((R, i) => {
-      const spot = [cx + (i ? 0.8 : -0.8), cz];
-      R.play = { phase: 'going', spot, partner: i ? a : b, seatKey: R.seatKey, since: robotState[R.def.id].since, len };
+      const spot = playSpotOf(rm, i);
+      R.play = { phase: 'going', spot, partner: i ? a : b, since: robotState[R.def.id].since, len };
       R.path = [spot];
-      R.restUntil = nowSec + len + 20 + PLAY.restMinSec + PLAY.rng() * (PLAY.restMaxSec - PLAY.restMinSec);
+      R.restUntil = nowSec + PLAY.walkSec + len + PLAY.restMinSec + PLAY.rng() * (PLAY.restMaxSec - PLAY.restMinSec);
     });
     PLAY.list.push(G);
+  }
+  soloTick(nowSec, now);
+}
+/* Alone (requester, 10-18: "一人の部屋のやつはzzzで居眠りしたり弁当食べたりさせてほしい"): a robot idle for long that has
+   no one to play with in its room naps (its head nods, zzz) or eats a bento at its desk, for a while. It stops on the
+   same reasons as a game. The state, its lamp and its label stay as they are; it never leaves its desk. */
+function soloStop(R) { R.solo = null; R.robot.solo = null; }
+function soloTick(nowSec, now) {
+  for (const R of robots) {
+    if (!R.solo) continue;
+    const st = robotState[R.def.id] || { state: 'idle' };
+    const reason = playStopReason(R, st, R.solo.room, R.solo.since) || (nowSec >= R.solo.until ? 'done' : null) || (R.path.length ? 'walking' : null);
+    if (reason) { PLAY.ends.push({ room: R.solo.room, kind: R.solo.kind, players: [R.def.id], reason, playedSec: +(nowSec - R.solo.t0).toFixed(1) }); soloStop(R); }
+  }
+  if (reduceMotion || nowSec < (SOLO.next || 0)) return;
+  SOLO.next = nowSec + 1;
+  const byRoom = {};
+  for (const R of robots) {
+    const st = robotState[R.def.id];
+    if (st && playIdle(R, st, now)) (byRoom[R.def.room] = byRoom[R.def.room] || []).push(R);
+  }
+  for (const [room, idle] of Object.entries(byRoom)) {
+    // with two or more a game comes first; one left over (or alone) may nap or eat
+    if (idle.length !== 1) continue;
+    const R = idle[0];
+    if ((R.restUntil || 0) > nowSec || PLAY.rng() >= SOLO.p) continue;
+    const kind = SOLO.kinds[Math.floor(PLAY.rng() * SOLO.kinds.length)], len = SOLO.minSec + PLAY.rng() * (SOLO.maxSec - SOLO.minSec);
+    R.solo = { kind, room, t0: nowSec, until: nowSec + len, since: robotState[R.def.id].since };
+    R.robot.solo = { kind, t0: nowSec };
+    R.restUntil = nowSec + len + PLAY.restMinSec + PLAY.rng() * (PLAY.restMaxSec - PLAY.restMinSec);
   }
 }
 function liveUpdateRobots(nowSec, dt) {
@@ -2642,6 +2784,7 @@ function liveUpdateRobots(nowSec, dt) {
     if (st.act !== R.act) { R.act = st.act; R.text.textContent = st.act; }
     updateRobot(R.robot, nowSec, dt);
   }
+  propsTick(nowSec, dt);
 }
 /* One room at a time (requester, 10-18): a project picked (its room's tag, its floor in 3D, the menu) lays out only
    that room, wider (layoutRooms, SOLO_GROW), with the way back at the top left. The other rooms' robots keep their
@@ -2658,6 +2801,123 @@ function liveSoloSync() {
   if (!box) return;
   box.hidden = !solo || !has3D || TOWER.on || zoom.zoomed;
   if (solo) setText(document.getElementById('room-solo-name'), PROJECT[solo].name);
+}
+/* ---------- the room up close: a water server, a robot vacuum and a wooden floor (requester, 10-18) ----------
+   Only in the one-room view (room-solo) and only while that room has 10 robots or fewer; built when it is wanted and
+   disposed as soon as it is not (back to the floor, the building, an 11th robot). The floor's own material is swapped
+   for a toon material with a canvas plank texture (512 px, repeated; no image, no light, no shadow) and put back. */
+const PROPS = { max: 10, room: null, geo: null, dark: null, group: null, server: null, vac: null, woodMat: null, woodTex: null, floorMat: null,
+  boxes: [], boxesAt: 0, rng: null, seed: 20261020, speed: 0.45, radius: 0.64, serverScale: 1.9 };   // the robots' scale (they stand about 1 m)
+function woodTexture(dark) {
+  const N = 512, cv = makeCanvas(N, N), ctx = cv.getContext('2d'), W = { rng: snackRandom(PROPS.seed) };   // the same planks every time
+  const base = dark ? [92, 72, 55] : [214, 184, 146], rows = 8, h = N / rows;
+  for (let r = 0; r < rows; r++) {
+    let x = -Math.floor(W.rng() * N);
+    while (x < N) {
+      const len = N * (0.45 + W.rng() * 0.5), k = (W.rng() - 0.5) * (dark ? 14 : 22);
+      ctx.fillStyle = `rgb(${base.map((c) => Math.round(c + k)).join(',')})`;
+      ctx.fillRect(x, r * h, len, h);
+      ctx.globalAlpha = dark ? 0.10 : 0.12;   // a few faint grain lines along the plank
+      ctx.strokeStyle = dark ? '#2b2018' : '#8a6a45'; ctx.lineWidth = 1;
+      for (let g = 0; g < 4; g++) { const y = r * h + 6 + W.rng() * (h - 12); ctx.beginPath(); ctx.moveTo(x, y); ctx.bezierCurveTo(x + len / 3, y + (W.rng() - 0.5) * 6, x + len * 2 / 3, y + (W.rng() - 0.5) * 6, x + len, y); ctx.stroke(); }
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = dark ? '#2a1f17' : '#9c7b55'; ctx.fillRect(x, r * h, 2, h);   // the joint at the plank's end
+      x += len;
+    }
+    ctx.fillStyle = dark ? '#2a1f17' : '#a5845c'; ctx.fillRect(0, r * h, N, 2);       // the seam between rows
+  }
+  const t = texFrom(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  return t;
+}
+function propsWanted() {
+  const solo = liveSolo();
+  if (!solo || !has3D || TOWER.on || !LIVE3D.rooms[solo]) return null;
+  return robots.filter((R) => R.def.room === solo).length <= PROPS.max ? solo : null;
+}
+function propsClear() {
+  if (!PROPS.room) return;
+  const R = LIVE3D.rooms[PROPS.room];
+  if (R && PROPS.floorMat && R.floor.material === PROPS.woodMat) R.floor.material = PROPS.floorMat;
+  if (PROPS.group) { scene.remove(PROPS.group); disposeTree(PROPS.group); }
+  if (PROPS.woodMat) PROPS.woodMat.dispose();
+  if (PROPS.woodTex) PROPS.woodTex.dispose();
+  Object.assign(PROPS, { room: null, geo: null, dark: null, group: null, server: null, vac: null, woodMat: null, woodTex: null, floorMat: null, boxes: [], boxesAt: 0 });
+}
+function propsBuild(id) {
+  const r = PROJECT[id], R = LIVE3D.rooms[id], g = new THREE.Group();
+  PROPS.room = id; PROPS.geo = R.geo; PROPS.dark = isDark(); PROPS.group = g; PROPS.rng = snackRandom(PROPS.seed);
+  // the floor: the same mesh, a wooden material while the room is up close
+  PROPS.woodTex = woodTexture(PROPS.dark); PROPS.woodTex.repeat.set((r.x1 - r.x0) / 2.4, (r.z1 - r.z0) / 2.4);
+  PROPS.woodMat = toon('#ffffff', { map: PROPS.woodTex }); PROPS.floorMat = R.floor.material; R.floor.material = PROPS.woodMat;
+  // the water server: the back-right corner, in sight from the usual view; the back-left one when a back door opens
+  // near the right (doorAt). No desk takes either corner (SEAT.left / SEAT.back / SEAT.aisleR).
+  const sv = new THREE.Group(), body = toon('#eef1f4'), dark = toon('#5b6573');
+  const cab = new THREE.Mesh(new RoundedBoxGeometry(0.42, 0.95, 0.38, 2, 0.04), body); cab.position.y = 0.475; sv.add(cab);
+  const panel = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.22, 0.02), dark); panel.position.set(0, 0.72, 0.2); sv.add(panel);
+  for (const [x, c] of [[-0.07, '#4aa3ff'], [0.07, '#ff6b5b']]) { const tap = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.06), toon(c)); tap.position.set(x, 0.66, 0.22); sv.add(tap); }
+  const tray = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.03, 0.12), dark); tray.position.set(0, 0.5, 0.2); sv.add(tray);
+  const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.42, 20), toon('#8fd0f2', { transparent: true, opacity: 0.82 }));
+  tank.position.y = 0.95 + 0.21; sv.add(tank);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.04, 12), toon('#2f7fd1')); cap.position.y = 1.39; sv.add(cap);
+  const right = !(r.doors && r.doors.back);
+  const k = PROPS.serverScale, off = 0.42 * k;   // built at 1, shown bigger (requester, 10-18: the robots' size)
+  sv.scale.setScalar(k);
+  sv.position.set(right ? r.x1 - off : r.x0 + off, 0, r.z0 + 0.38 * k); sv.rotation.y = right ? -Math.PI / 4 : Math.PI / 4; g.add(sv); PROPS.server = sv;
+  // the robot vacuum: a flat disc with a bumper and a light, on the floor clear of desks, robots and the front aisle
+  const vac = new THREE.Group();
+  const shell = new THREE.Mesh(new THREE.CylinderGeometry(PROPS.radius, PROPS.radius, 0.11, 32), toon('#3a3f47')); shell.position.y = 0.065; vac.add(shell);
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(PROPS.radius * 0.74, PROPS.radius * 0.74, 0.02, 28), toon('#5d6470')); top.position.y = 0.13; vac.add(top);
+  const bumper = new THREE.Mesh(new THREE.CylinderGeometry(PROPS.radius * 1.02, PROPS.radius * 1.02, 0.04, 32, 1, true, -Math.PI / 2, Math.PI), toon('#9aa3ad')); bumper.position.y = 0.05; vac.add(bumper);
+  const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.04, 12, 8), toon('#52e08a')); lamp.position.set(0, 0.145, PROPS.radius * 0.5); vac.add(lamp);
+  vac.userData.heading = PROPS.rng() * Math.PI * 2;
+  g.add(vac); PROPS.vac = vac;
+  propsBoxes(0, true);
+  const start = propsSpot();
+  vac.position.set(start[0], 0, start[1]);
+  scene.add(g);
+}
+// Where the vacuum may go: the room's floor less the front aisle (doors, the play spot, the easel) and the corner of the
+// water server; and never into a robot or its desk (their boxes, kept current while robots come and go).
+function propsArea() {
+  const r = PROJECT[PROPS.room];
+  return { x0: r.x0 + 0.3, x1: r.x1 - 0.3, z0: r.z0 + 0.3, z1: r.z1 - SEAT.aisleF - 0.1 };
+}
+function propsBoxes(nowSec, force) {
+  if (!force && nowSec - PROPS.boxesAt < 0.25) return;
+  PROPS.boxesAt = nowSec;
+  const box = new THREE.Box3();
+  PROPS.boxes = robots.filter((R) => R.robot.root.visible && (R.def.room === PROPS.room || roomAtPoint([R.robot.root.position.x, R.robot.root.position.z]) === PROPS.room))
+    .map((R) => { box.setFromObject(R.robot.root); return [box.min.x, box.max.x, box.min.z, box.max.z]; });
+  const s = PROPS.server.position;
+  const half = 0.42 * PROPS.serverScale;
+  PROPS.boxes.push([s.x - half, s.x + half, s.z - half, s.z + half]);
+}
+function propsClearAt(x, z) {
+  const a = propsArea(), m = PROPS.radius + 0.06;
+  if (x < a.x0 || x > a.x1 || z < a.z0 || z > a.z1) return false;
+  return !PROPS.boxes.some(([x0, x1, z0, z1]) => x > x0 - m && x < x1 + m && z > z0 - m && z < z1 + m);
+}
+function propsSpot() {
+  const a = propsArea();
+  for (let i = 0; i < 200; i++) {
+    const x = a.x0 + PROPS.rng() * (a.x1 - a.x0), z = a.z0 + PROPS.rng() * (a.z1 - a.z0);
+    if (propsClearAt(x, z)) return [x, z];
+  }
+  return [a.x1, a.z1];
+}
+function propsTick(nowSec, dt) {
+  const want = propsWanted();
+  if (PROPS.room && (want !== PROPS.room || LIVE3D.rooms[PROPS.room].geo !== PROPS.geo || isDark() !== PROPS.dark)) propsClear();
+  if (!want) return;
+  if (!PROPS.room) propsBuild(want);
+  propsBoxes(nowSec, false);
+  if (reduceMotion) return;   // placed, not driven
+  const v = PROPS.vac, p = v.position;
+  if (!propsClearAt(p.x, p.z)) { const s = propsSpot(); p.set(s[0], 0, s[1]); return; }   // a robot sat down on it: start elsewhere
+  const step = PROPS.speed * Math.min(dt, 0.1), h = v.userData.heading;
+  const nx = p.x + Math.sin(h) * step, nz = p.z + Math.cos(h) * step;
+  if (propsClearAt(nx, nz)) { p.x = nx; p.z = nz; v.rotation.y = h; }
+  else v.userData.heading = h + Math.PI * (0.5 + PROPS.rng());   // a bump: turn away and try again next frame
 }
 /* A board press in the live office: the project board opens that project's spec board (overview), its lower
    part and the cork board the task board, a robot its card. */
@@ -2784,6 +3044,62 @@ function liveRoomPose(id) {
   const dist = id === 'all' ? Math.max(22, fit(b.size, 0.92)) : Math.max(9, fit(b.size, (camera.aspect || 1) < 1 ? 0.7 : 0.86));   // one room: most of the view (less on a tall screen, where its corners reach out)
   return { p: b.c.clone().add(new THREE.Vector3(6.5, 15.5, 22.5).normalize().multiplyScalar(dist)), t: b.c };
 }
+/* The near weather's switch (10-18), in the building view of a live page. Off by default. Turning it on is the only
+   place that asks the browser for the position — the permission dialog shows inside this click, never on opening the
+   page — and the position is rounded to two decimals (about 1 km) before it leaves the page; the server rounds again
+   and asks Open-Meteo itself (the page never talks to anyone but this server). Turning it off removes the position. */
+const WEATHER_JA = { clear: '晴れ', cloudy: '曇り', fog: '霧', rain: '雨', snow: '雪', thunder: '雷雨' };
+const WEATHER_UI = { busy: false, note: '' };
+const roundCoord = (v) => Math.round(v * 100) / 100;
+/* Two places show the same switch (10-18): the building view's corner, and the side panel's 設定 — the latter for every
+   live page, so the weather can be turned on and its state read with fewer than seven rooms (no building view). */
+function weatherPaint(towerHidden) {
+  const box = document.getElementById('tower-weather'), sec = document.getElementById('sec-settings');
+  if (!box) return;
+  box.hidden = towerHidden;
+  if (sec) sec.hidden = SOURCE.mode !== 'live';
+  if (SOURCE.mode !== 'live') return;   // the demo has no server to ask, and no LIVE.slices
+  const w = LIVE.slices.weather || { on: false };
+  const at = typeof w.at === 'number' ? new Date(w.at).toTimeString().slice(0, 5) : '';
+  const text = WEATHER_UI.note || (!w.on ? 'オフ — 外への通信はしません'
+    : w.kind ? `${WEATHER_JA[w.kind] || w.kind}${typeof w.tempC === 'number' ? ` ${Math.round(w.tempC)}℃` : ''}（最後に取れた時刻 ${at}${w.stale ? '・古い値' : ''}）${w.error ? ` — 失敗: ${w.error}` : ''}`
+      : w.error ? `取れていません — 失敗: ${w.error}` : '取得中…');
+  for (const [b, n, hidden] of [['weather-switch', 'weather-note', towerHidden], ['weather-switch-panel', 'weather-note-panel', !sec || sec.hidden]]) {
+    if (hidden) continue;
+    const btn = document.getElementById(b), note = document.getElementById(n);
+    btn.setAttribute('aria-checked', w.on ? 'true' : 'false');
+    btn.setAttribute('aria-busy', WEATHER_UI.busy ? 'true' : 'false');
+    setText(note, text);
+    note.toggleAttribute('data-error', !!(WEATHER_UI.note || w.error));
+  }
+}
+async function weatherSwitch() {
+  if (WEATHER_UI.busy) return;
+  const on = !(LIVE.slices.weather && LIVE.slices.weather.on);
+  WEATHER_UI.busy = true; WEATHER_UI.note = on ? '位置の許可を待っています…' : '';
+  floorNavSync();
+  try {
+    if (!on) {
+      const ack = await SOURCE.setWeather({ on: false });
+      WEATHER_UI.note = ack.ok ? '' : `オフにできませんでした — ${ack.error || ''}`;
+      return;
+    }
+    if (!navigator.geolocation) { WEATHER_UI.note = 'このブラウザでは位置を取れないため、オフのままです'; return; }
+    const pos = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject,
+      { enableHighAccuracy: false, timeout: 20000, maximumAge: 600000 }));
+    const lat = roundCoord(pos.coords.latitude), lon = roundCoord(pos.coords.longitude);   // about 1 km, before it leaves the page
+    const ack = await SOURCE.setWeather({ on: true, lat, lon });
+    WEATHER_UI.note = ack.ok ? '' : `オンにできませんでした — ${ack.error || ''}`;
+  } catch (err) {
+    const why = err && err.code === 1 ? '位置の利用が許可されませんでした' : err && err.code === 3 ? '位置を取るのに時間がかかりすぎました' : '位置を取れませんでした';
+    WEATHER_UI.note = `${why}。オフのままです`;
+  } finally {
+    WEATHER_UI.busy = false;
+    floorNavSync();
+  }
+}
+// The panel's switch works without 3D too (no WebGL: no building, but the setting and its state are still here).
+{ const btn = document.getElementById('weather-switch-panel'); if (btn) btn.addEventListener('click', () => { weatherSwitch(); }); }
 /* The floor buttons (both views). Hidden while a board, the log, a zoom or a robot card covers the 3D (10-18). The
    demo has one office: its buttons show in the building only, and look at the floors there. */
 function floorNavSync() {
@@ -2793,6 +3109,7 @@ function floorNavSync() {
   const covered = wb.open || tb.open || logState.open || zoom.zoomed || !!rbState.id;
   nav.hidden = !has3D || n < 2 || covered || (SOURCE.mode === 'demo' && !TOWER.on);
   legend.hidden = nav.hidden || !TOWER.on;
+  weatherPaint(!has3D || covered || !TOWER.on || SOURCE.mode !== 'live');
   if (nav.hidden) return;
   setText(document.getElementById('floor-label'), TOWER.on && SOURCE.mode === 'live' ? `全 ${n} 階` : `${k + 1}F / ${n}F`);
   const waits = LIVE.floors.map((f) => f.some((id) => LIVE.rank[id] === 0));
@@ -2849,12 +3166,48 @@ function skyPhase(date) {
   const h = date.getHours() + date.getMinutes() / 60;
   return h >= 5 && h < 7 ? 'dawn' : h >= 7 && h < 16.5 ? 'day' : h >= 16.5 && h < 19 ? 'dusk' : 'night';
 }
-function skySync() {
-  const phase = TOWER.on || SOURCE.mode === 'demo' ? skyPhase(new Date(vizNow())) : '';   // the demo's office has its clock's sky too
-  if ((sceneEl.dataset.sky || '') === phase) return;
-  sceneEl.dataset.sky = phase;
-  sceneEl.style.background = phase ? `linear-gradient(180deg, ${SKY[phase][0]}, ${SKY[phase][1]})` : '';
+/* The outside of the building: the season and, when turned on, the weather near this machine (requester, 10-18).
+   The season comes from the viewer's date (northern hemisphere): spring cherry blossom with a few petals in the air,
+   summer deep green with cicadas on the trunks (no sound), autumn red and orange leaves with a few falling, winter
+   bare branches and a thin snow on the plaza and the roof. Only the trees, the plaza and the roof change; the rooms
+   and the robots do not. The weather (the server's weather slice: off by default, and then nothing is asked of
+   anyone) greys the sky, rains, snows, flashes or fogs over the season. Falling things are capped at OUTSIDE.max and
+   stand still under reduced motion. */
+const OUTSIDE = { max: 160, force: null, weatherForce: null };
+function seasonOf(date) {
+  const m = date.getMonth() + 1;
+  return m >= 3 && m <= 5 ? 'spring' : m >= 6 && m <= 8 ? 'summer' : m >= 9 && m <= 11 ? 'autumn' : 'winter';
 }
+const season = () => OUTSIDE.force || seasonOf(new Date(vizNow()));
+/* The weather to draw: { kind, isDay } or null (off, not read yet, too old, or the demo). */
+function weatherNow() {
+  if (OUTSIDE.weatherForce) return OUTSIDE.weatherForce;
+  const w = SOURCE.mode === 'live' ? LIVE.slices.weather : null;
+  return w && w.on && typeof w.kind === 'string' ? { kind: w.kind, isDay: w.isDay !== false } : null;
+}
+// How far each weather pulls the sky toward its grey (light rain under a dark cloud, a pale fog).
+const SKY_GREY = { cloudy: ['#8d99a8', 0.55], rain: ['#6f7b8a', 0.7], thunder: ['#4c5563', 0.8], fog: ['#c3cad3', 0.7], snow: ['#c9d1dc', 0.55] };
+function skyColors(phase, w) {
+  const base = SKY[phase];
+  const g = w && SKY_GREY[w.kind];
+  if (!g) return base;
+  const mix = (hex) => '#' + new THREE.Color(hex).lerp(new THREE.Color(g[0]), phase === 'night' ? g[1] * 0.4 : g[1]).getHexString();
+  return [mix(base[0]), mix(base[1])];
+}
+function skySync() {
+  if (!TOWER.on && TOWER.flash) { TOWER.flash = false; sceneEl.style.filter = ''; }   // left the building mid-flash
+  const w = weatherNow();
+  let phase = TOWER.on || SOURCE.mode === 'demo' ? skyPhase(new Date(vizNow())) : '';   // the demo's office has its clock's sky too
+  if (phase && w) phase = !w.isDay ? 'night' : phase === 'night' ? 'day' : phase;   // the place's own day and night
+  const key = phase ? `${phase}:${w ? w.kind : ''}` : '';
+  const fog = TOWER.on && w && w.kind === 'fog';
+  if (!!scene.fog !== !!fog) scene.fog = fog ? new THREE.Fog(new THREE.Color(SKY_GREY.fog[0]), 18, 70) : null;
+  if ((sceneEl.dataset.sky || '') === key) return;
+  sceneEl.dataset.sky = key;
+  const c = phase ? skyColors(phase, w) : null;
+  sceneEl.style.background = c ? `linear-gradient(180deg, ${c[0]}, ${c[1]})` : '';
+}
+const outsideKey = () => { const w = weatherNow(); return `${season()}:${w ? w.kind : ''}`; };
 const TOWER = { on: false, look: 0, sign: null, group: null, floors: [], sig: '', theme: null, W: 16, D: 9, H: 3, SLAB: 0.28, LOBBY: 1.1, LAYER: 1, pulse: 1,
   lights: null, actors: null, bayColor: [] };
 const towerBase = (k) => TOWER.LOBBY + k * (TOWER.H + TOWER.SLAB);          // the slab under floor k
@@ -3013,10 +3366,11 @@ function towerSprite(pose, P) {
 const TOWER_POSES = ['type', 'walkA', 'walkB', 'point', 'raise', 'think', 'shadow'];
 function towerBuild() {
   const n = LIVE.floors.length, dark = isDark();
-  if (TOWER.group && TOWER.floors.length === n && TOWER.theme === dark) return;
+  const outside = outsideKey();
+  if (TOWER.group && TOWER.floors.length === n && TOWER.theme === dark && TOWER.outside === outside) return;
   if (TOWER.group) { scene.remove(TOWER.group); disposeTree(TOWER.group); }
   const P = towerPalette(), L = TOWER.LAYER, { W, D, H, SLAB, LOBBY } = TOWER;
-  TOWER.group = new THREE.Group(); TOWER.floors = []; TOWER.sig = ''; TOWER.theme = dark; TOWER.bayColor = [];
+  TOWER.group = new THREE.Group(); TOWER.floors = []; TOWER.sig = ''; TOWER.theme = dark; TOWER.bayColor = []; TOWER.outside = outside;
   const put = (mesh) => { mesh.layers.set(L); TOWER.group.add(mesh); return mesh; };
   for (const o of scene.children) if (o.isLight) o.layers.enable(L);
   const top = towerBase(n), front = D / 2;
@@ -3074,15 +3428,76 @@ function towerBuild() {
   const sign = put(new THREE.Mesh(new THREE.PlaneGeometry(5.2, 1.3), new THREE.MeshBasicMaterial({ map: texFrom(signC), toneMapped: false, side: THREE.DoubleSide })));
   sign.position.set(1.6, top + SLAB + 1.4, front - 0.4);
   TOWER.sign = sign.material;
-  const plaza = put(new THREE.Mesh(new THREE.BoxGeometry(W + 9, 0.2, D + 9), toon(dark ? '#1c2636' : '#cfd8e4')));
-  plaza.position.set(0, -0.1, 0);
+  // the outside: the season, with the weather over it (OUTSIDE above)
+  const sea = season(), w = weatherNow(), snowy = sea === 'winter' || (w && w.kind === 'snow'), wet = w && (w.kind === 'rain' || w.kind === 'thunder');
+  const ground = snowy ? (dark ? '#c3ccd8' : '#f1f5fa') : wet ? (dark ? '#151d2a' : '#b4bfcd') : (dark ? '#1c2636' : '#cfd8e4');
+  const plaza = put(new THREE.Mesh(new THREE.BoxGeometry(W + 9, 0.2, D + 9), toon(ground)));
+  plaza.position.set(0, -0.1, 0); plaza.userData.outside = 'plaza';
   const shadow = put(new THREE.Mesh(new THREE.PlaneGeometry(W + 3, D + 3), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: dark ? 0.35 : 0.14, depthWrite: false })));
   shadow.rotation.x = -Math.PI / 2; shadow.position.set(0.8, 0.01, 0.6);
+  if (snowy) {                                        // a thin snow on the roof, inside the parapet
+    const roofSnow = put(new THREE.Mesh(new THREE.BoxGeometry(W + 0.4, 0.06, D + 0.4), toon(dark ? '#d6dde8' : '#ffffff')));
+    roofSnow.position.set(0, top + SLAB + 0.53, 0); roofSnow.userData.outside = 'roofSnow';
+  }
   const spots = [[-W / 2 - 2.2, front + 2.2], [W / 2 + 2.2, front + 2.2], [-W / 2 - 2.6, -D / 2 + 0.5], [W / 2 + 2.6, -D / 2 + 0.5], [-5.2, front + 3.4], [5.2, front + 3.4]];
   const trunks = put(new THREE.InstancedMesh(new THREE.CylinderGeometry(0.12, 0.16, 0.9, 6), toon('#7a5a3c'), spots.length));
-  const crowns = put(new THREE.InstancedMesh(new THREE.ConeGeometry(0.85, 1.9, 8), toon(dark ? '#3f7a58' : '#5fae7e'), spots.length));
-  spots.forEach(([x, z], i) => { m.makeTranslation(x, 0.45, z); trunks.setMatrixAt(i, m); m.makeTranslation(x, 1.7, z); crowns.setMatrixAt(i, m); });
+  spots.forEach(([x, z], i) => { m.makeTranslation(x, 0.45, z); trunks.setMatrixAt(i, m); });
+  const CROWN = { spring: ['#f6bfd0', '#b98597'], summer: ['#2f8a4e', '#2a6643'], autumn: ['#de7a2e', '#a95a2a'] };
+  if (sea === 'winter') {                             // bare: three branches each, a little snow on top
+    const branches = put(new THREE.InstancedMesh(new THREE.CylinderGeometry(0.035, 0.06, 1.0, 5), toon('#6b4e33'), spots.length * 3));
+    branches.userData.outside = 'branches';
+    const q = new THREE.Quaternion(), e = new THREE.Euler(), one = new THREE.Vector3(1, 1, 1);
+    spots.forEach(([x, z], i) => [-0.5, 0, 0.55].forEach((tilt, j) => {
+      e.set(0, j * 2.1 + i, tilt); q.setFromEuler(e); m.compose(new THREE.Vector3(x + tilt * 0.4, 1.3, z), q, one); branches.setMatrixAt(i * 3 + j, m);
+    }));
+  } else {
+    const crowns = put(new THREE.InstancedMesh(new THREE.ConeGeometry(0.85, 1.9, 8), toon('#ffffff'), spots.length));
+    crowns.userData.outside = 'crowns';
+    const autumn2 = new THREE.Color(dark ? '#8c3424' : '#c8452f');
+    spots.forEach(([x, z], i) => {
+      m.makeTranslation(x, 1.7, z); crowns.setMatrixAt(i, m);
+      crowns.setColorAt(i, sea === 'autumn' && i % 2 ? autumn2 : new THREE.Color(CROWN[sea][dark ? 1 : 0]));
+    });
+    if (sea === 'summer') {                           // a cicada on each trunk, facing out
+      const cicadas = put(new THREE.InstancedMesh(new THREE.BoxGeometry(0.1, 0.15, 0.06), toon('#3d2f1c'), spots.length));
+      cicadas.userData.outside = 'cicadas';
+      spots.forEach(([x, z], i) => { m.makeTranslation(x, 0.62 + (i % 3) * 0.08, z + 0.16); cicadas.setMatrixAt(i, m); });
+    }
+  }
+  // falling things: the weather's (rain, snow) over the season's (petals, leaves); none in a summer or winter calm
+  const fall = wet ? 'rain' : w && w.kind === 'snow' ? 'snow' : sea === 'spring' ? 'petal' : sea === 'autumn' ? 'leaf' : null;
+  TOWER.fall = null;
+  if (fall) {
+    const N = Math.min(OUTSIDE.max, { rain: 160, snow: 120, petal: 50, leaf: 40 }[fall]);
+    const geo = fall === 'rain' ? new THREE.PlaneGeometry(0.025, 0.42) : new THREE.PlaneGeometry(0.13, 0.1);
+    const color = { rain: dark ? '#7f93ad' : '#7d8fa6', snow: '#ffffff', petal: '#ffc2d3', leaf: '#d96a2a' }[fall];
+    const mesh = put(new THREE.InstancedMesh(geo, new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide, transparent: true, opacity: fall === 'rain' ? 0.7 : 0.95, depthWrite: false }), N));
+    mesh.userData.outside = fall;
+    const rnd = snackRandom(20261020), span = [W / 2 + 6, top + 4, D / 2 + 6];
+    const pos = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) { pos[i * 3] = (rnd() * 2 - 1) * span[0]; pos[i * 3 + 1] = rnd() * span[1]; pos[i * 3 + 2] = (rnd() * 2 - 1) * span[2]; }
+    TOWER.fall = { kind: fall, mesh, pos, span, speed: { rain: 9, snow: 0.9, petal: 0.7, leaf: 1.1 }[fall], n: N };
+    fallPlace(0);
+  }
   scene.add(TOWER.group);
+}
+/* The falling things, placed for time t (still under reduced motion: where they were made). */
+function fallPlace(dt, t = 0) {
+  const F = TOWER.fall;
+  if (!F) return;
+  const { m, q, p, s } = towerTmp, e = new THREE.Euler();
+  for (let i = 0; i < F.n; i++) {
+    const k = i * 3;
+    if (dt > 0) {
+      F.pos[k + 1] -= F.speed * dt * (0.8 + (i % 5) * 0.1);
+      if (F.kind !== 'rain') F.pos[k] += Math.sin(t * 0.9 + i) * 0.4 * dt;
+      if (F.pos[k + 1] < 0) F.pos[k + 1] += F.span[1];
+    }
+    e.set(F.kind === 'rain' ? 0 : t * 1.3 + i, F.kind === 'rain' ? 0 : i, F.kind === 'rain' ? 0.15 : t + i * 0.7);
+    q.setFromEuler(e); p.set(F.pos[k], F.pos[k + 1], F.pos[k + 2]); s.set(1, 1, 1);
+    m.compose(p, q, s); F.mesh.setMatrixAt(i, m);
+  }
+  F.mesh.instanceMatrix.needsUpdate = true;
 }
 function towerSync(now = performance.now()) {
   towerBuild();
@@ -3138,6 +3553,10 @@ function towerAnimate(t, dt) {
     TOWER.sign.color.set(night ? c.set('#ffffff').lerp(new THREE.Color('#ffd76a'), glow) : c.set('#ffffff'));
   }
   for (const pose of TOWER_POSES) { const mesh = TOWER.actors[pose]; mesh.count = counts[pose]; mesh.instanceMatrix.needsUpdate = true; }
+  if (!reduceMotion) fallPlace(Math.min(dt, 0.1), t);   // petals, leaves, rain or snow (still under reduced motion)
+  const w = weatherNow();                               // thunder: a short white flash now and then (none under reduced motion)
+  const flash = w && w.kind === 'thunder' && !reduceMotion && (t % 7.3) < 0.12;
+  if (flash !== !!TOWER.flash) { TOWER.flash = flash; sceneEl.style.filter = flash ? 'brightness(1.8)' : ''; }
 }
 /* The room under the pointer in the building: its full name and state, as the canvas's title. */
 const TOWER_STATE_JA = { working: '作業中', thinking: '考え中', waiting: '許可待ち', idle: '待機（消灯）', empty: '空き' };
@@ -4363,17 +4782,130 @@ const rawDetails = (p) => {
 const rbEl = $('rb');
 const rbState = { id: null };
 const CAM_DIR = new THREE.Vector3(0.25, 0.42, 0.87).normalize();
-function robotPose(id) {
-  const R = robots.find((x) => x.def.id === id);
-  const dist = 8, wide = sceneEl.clientWidth > 900;
-  const right = new THREE.Vector3().crossVectors(CAM_DIR.clone().negate(), new THREE.Vector3(0, 1, 0)).normalize();
+/* ---------- the camera on a robot (requester, 10-18: "ズーム中も回転とか拡大縮小とかできるようにしたい",
+   "ロボットの場所によってはこんな感じになって見えない") ----------
+   While the card is open the camera orbits the robot: azimuth, elevation and distance (FOCUS), changed by a drag, the
+   wheel or a pinch. Its first direction is chosen when a robot is focused (opened, ← →, another robot clicked): of 12
+   azimuths × 2 elevations, the one whose lines from the robot (chest, head, knees) to the camera cross the fewest
+   walls, boards and furniture, nearest the usual direction on a tie. What still stands between them is drawn faint
+   until the camera leaves (focusFadeSync, with the card's refresh). */
+const FOCUS = { id: null, az: 0, el: 0, dist: 8, chosen: null, faded: new Map(), drag: null, pinch: null, touches: new Map() };
+const FOCUS_DIST = [4, 18], FOCUS_EL = [0.12, 1.3], FOCUS_FADE = 0.22;
+const FOCUS_BASE = { az: Math.atan2(CAM_DIR.x, CAM_DIR.z), el: Math.asin(CAM_DIR.y) };
+const FOCUS_SAMPLES = [0.55, 1.15, 1.65];   // heights on the robot the camera must see
+const focusRay = new THREE.Raycaster();
+const focusDir = (az, el) => new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
+function focusPose(R, az, el, dist) {
+  const dir = focusDir(az, el), wide = sceneEl.clientWidth > 900;
+  const right = new THREE.Vector3().crossVectors(dir.clone().negate(), new THREE.Vector3(0, 1, 0)).normalize();
   const viewH = 2 * dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), viewW = viewH * camera.aspect;
   const t = R.robot.root.position.clone().add(new THREE.Vector3(0, 1.15, 0));
   // Wide: the card covers the right of the scene, so the robot sits left of centre. Narrow: the card is a
   // bottom sheet, so the robot sits high.
   if (wide) t.add(right.multiplyScalar((Math.min(420, sceneEl.clientWidth - 28) / 2 / sceneEl.clientWidth) * viewW));
   else t.y -= viewH * 0.2;
-  return { p: t.clone().add(CAM_DIR.clone().multiplyScalar(dist)), t };
+  return { p: t.clone().add(dir.multiplyScalar(dist)), t };
+}
+const shownChain = (o) => { for (let x = o; x; x = x.parent) if (!x.visible) return false; return true; };
+const ofRobot = (o) => { for (let x = o; x; x = x.parent) if (x.userData && x.userData.robotId !== undefined) return true; return false; };
+/* The meshes (walls, boards, furniture — not robots, not the selection ring) between the robot's sample points and p. */
+function focusBlockers(R, p) {
+  const out = new Set();
+  for (const y of FOCUS_SAMPLES) {
+    const from = R.robot.root.position.clone().add(new THREE.Vector3(0, y, 0)), dir = p.clone().sub(from), len = dir.length();
+    focusRay.set(from, dir.normalize());
+    focusRay.far = len;
+    focusRay.camera = camera;   // a sprite (a tag, a label) cannot be raycast without it: three.js throws
+    for (const h of focusRay.intersectObject(scene, true)) {
+      const o = h.object;
+      if (o.isMesh && o !== selRing && !ofRobot(o) && shownChain(o)) out.add(o);
+    }
+  }
+  return out;
+}
+function focusChoose(id) {
+  const R = robots.find((x) => x.def.id === id);
+  FOCUS.id = id; FOCUS.dist = 8; FOCUS.az = FOCUS_BASE.az; FOCUS.el = FOCUS_BASE.el; FOCUS.chosen = null;
+  if (!R) return;
+  let best = null;
+  for (const el of [FOCUS_BASE.el, FOCUS_BASE.el + 0.3]) {
+    for (const k of [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6]) {
+      const az = FOCUS_BASE.az + (k * Math.PI) / 6, n = focusBlockers(R, focusPose(R, az, el, FOCUS.dist).p).size;
+      if (!best || n < best.n) best = { az, el, n, k };
+      if (n === 0) break;
+    }
+    if (best.n === 0) break;
+  }
+  FOCUS.az = best.az; FOCUS.el = best.el;
+  FOCUS.chosen = { step: best.k, raised: best.el !== FOCUS_BASE.el, blockers: best.n,
+    usual: focusBlockers(R, focusPose(R, FOCUS_BASE.az, FOCUS_BASE.el, FOCUS.dist).p).size };
+}
+function robotPose(id) {
+  if (FOCUS.id !== id) focusChoose(id);
+  const R = robots.find((x) => x.def.id === id);
+  return focusPose(R, FOCUS.az, FOCUS.el, FOCUS.dist);
+}
+/* Faint what stands between the camera and the focused robot now; give the rest its own material back. */
+function focusFadeSync() {
+  const R = has3D && rbState.id && zoom.zoomed && !rbEl.hidden ? robots.find((x) => x.def.id === rbState.id) : null;
+  const now = R ? focusBlockers(R, camera.position) : new Set();
+  for (const [o, mat] of FOCUS.faded) {
+    if (now.has(o)) continue;
+    const faint = o.material;
+    o.material = mat;
+    for (const m of [].concat(faint)) m.dispose();
+    FOCUS.faded.delete(o);
+  }
+  for (const o of now) {
+    if (FOCUS.faded.has(o)) continue;
+    FOCUS.faded.set(o, o.material);
+    o.material = [].concat(o.material).map((m) => { const c = m.clone(); c.transparent = true; c.opacity = FOCUS_FADE; c.depthWrite = false; return c; });
+    if (!Array.isArray(FOCUS.faded.get(o))) o.material = o.material[0];
+  }
+}
+/* A room or a robot about to be taken down (40-scene.js liveDropRoom / liveDropRobot): what of it is faint gets its
+   own material back first, so disposeTree works as if nothing had been faint — the room's own materials disposed,
+   the shared ones left — and the faint copies go with it. Left faint, disposeTree disposed the copies and never the
+   own materials (5b's review, 10-18). */
+function focusRelease(root) {
+  for (const [o, mat] of FOCUS.faded) {
+    let inside = false;
+    for (let x = o; x; x = x.parent) if (x === root) { inside = true; break; }
+    if (!inside) continue;
+    const faint = o.material;
+    o.material = mat;
+    for (const m of [].concat(faint)) m.dispose();
+    FOCUS.faded.delete(o);
+  }
+}
+const focusing = () => has3D && !!rbState.id && zoom.zoomed && !camTween;
+{
+  // drag: around the robot; wheel and pinch: nearer or farther. Only while a robot's card has the camera.
+  canvas.addEventListener('pointerdown', (e) => {
+    if (!focusing()) return;
+    FOCUS.touches.set(e.pointerId, [e.clientX, e.clientY]);
+    if (FOCUS.touches.size === 2) { const [a, b] = [...FOCUS.touches.values()]; FOCUS.pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), dist: FOCUS.dist }; FOCUS.drag = null; }
+    else FOCUS.drag = { x: e.clientX, y: e.clientY, az: FOCUS.az, el: FOCUS.el };
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!focusing() || !FOCUS.touches.has(e.pointerId)) return;
+    FOCUS.touches.set(e.pointerId, [e.clientX, e.clientY]);
+    if (FOCUS.pinch && FOCUS.touches.size === 2) {
+      const [a, b] = [...FOCUS.touches.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+      FOCUS.dist = Math.min(FOCUS_DIST[1], Math.max(FOCUS_DIST[0], FOCUS.pinch.dist * (FOCUS.pinch.d / Math.max(1, d))));
+    } else if (FOCUS.drag) {
+      FOCUS.az = FOCUS.drag.az - (e.clientX - FOCUS.drag.x) * 0.008;
+      FOCUS.el = Math.min(FOCUS_EL[1], Math.max(FOCUS_EL[0], FOCUS.drag.el + (e.clientY - FOCUS.drag.y) * 0.006));
+    }
+  });
+  const up = (e) => { FOCUS.touches.delete(e.pointerId); if (FOCUS.touches.size < 2) FOCUS.pinch = null; if (!FOCUS.touches.size) FOCUS.drag = null; };
+  canvas.addEventListener('pointerup', up);
+  canvas.addEventListener('pointercancel', up);
+  canvas.addEventListener('wheel', (e) => {
+    if (!focusing()) return;
+    e.preventDefault();
+    FOCUS.dist = Math.min(FOCUS_DIST[1], Math.max(FOCUS_DIST[0], FOCUS.dist * Math.exp(e.deltaY * 0.0015)));
+  }, { passive: false });
 }
 function openRobot(id, opener) {
   if (wb.open) { wb.open = false; hideOverlay(wbEl); }
@@ -4397,8 +4929,48 @@ function closeRobot(keepZoom) {
   rbState.id = null;
   hideOverlay(rbEl);
   histSync();
+  FOCUS.id = null;      // the next robot opened chooses its view afresh
+  focusFadeSync();      // everything faint gets its own material back
   if (!keepZoom) zoomBack();
 }
+/* ← → on the robot card (requester, 10-18: "この画面の時に左右キーとかでロボットを切り替えれるようにできる？"): the
+   robots in view — the project picked, or the rooms of the floor shown — room by room in the rooms' order, then by
+   label; robots leaving are skipped; the ends wrap. The card keeps its tab (55-history.js holds it), and the camera
+   flies with the existing zoomTo (the camera itself is 40-scene.js's). */
+function robotCycle() {
+  const live = SOURCE.mode === 'live';
+  const rooms = ROOMS.filter((r) => inScope(r.id) && (!live || UI.project !== 'all' || !LIVE.shown.length || LIVE.shown.includes(r.id))).map((r) => r.id);
+  return ROBOT_DEFS.filter((d) => rooms.includes(projectOfRobot(d.id)) && !(live && LIVE.leaving[d.id]))
+    .sort((a, b) => rooms.indexOf(projectOfRobot(a.id)) - rooms.indexOf(projectOfRobot(b.id)) || a.id.localeCompare(b.id, 'ja', { numeric: true }))
+    .map((d) => d.id);
+}
+function stepRobot(dir) {
+  const list = robotCycle();
+  if (!rbState.id || list.length < 2) return;
+  const i = list.indexOf(rbState.id);
+  const next = list[i < 0 ? 0 : (i + dir + list.length) % list.length];
+  if (next === rbState.id) return;
+  rbState.id = next;
+  renderRobot(latestModel);
+  if (has3D && robots.some((x) => x.def.id === next)) zoomTo(robotPose(next), null, () => {});
+}
+rbEl.addEventListener('click', (e) => { const b = e.target.closest('[data-rb-step]'); if (b) stepRobot(Number(b.dataset.rbStep)); });
+document.addEventListener('keydown', (e) => {
+  if ((e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  if (!rbState.id || rbEl.hidden || !popEl.hidden || logState.open || alwaysDlg) return;
+  const t = e.target;
+  if (t && (t.isContentEditable || (t.closest && t.closest('input, textarea, select')))) return;   // typing keeps its keys
+  e.preventDefault();
+  const tab = t && t.closest && t.closest('[role="tablist"] [role="tab"]');
+  if (tab) {   // a tab has the focus: ← → move between the tabs (the ARIA tabs pattern), the robot stays
+    const tabs = [...tab.closest('[role="tablist"]').querySelectorAll('[role="tab"]')];
+    const next = tabs[(tabs.indexOf(tab) + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+    next.focus();
+    next.click();
+    return;
+  }
+  stepRobot(e.key === 'ArrowRight' ? 1 : -1);
+});
 function renderRobot(model) {
   const id = rbState.id;
   if (!id || rbEl.hidden) return;
@@ -4414,7 +4986,7 @@ function renderRobot(model) {
       const [c, l] = x.perm ? ['st-waiting', '許可待ち'] : x.col === 'wait' ? [x.waitingFor === 'question' ? 'st-asking' : 'st-waiting', waitLabel(x)] : COL_STATE[x.col];
       return `<li><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="rt-${esc(x.key)}"><span class="state ${esc(c)}">${esc(l)}</span><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${x.harness ? `<span class="h-tag">${esc(x.harness)}</span>` : ''}${esc(x.subject)}</span>${!isMain || !x.owner ? '' : `<span class="rb-owner">${pill(x.owner, DEF[x.owner].role)}</span>`}</button></li>`;
     }).join('')}</ul>` : `<p class="rb-none">${isMain ? 'このセッションのタスク一覧は空' : '担当しているタスクはない'}</p>`;
-    return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? `${id} のメインセッション` : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.agent} · ${room}` : `${ROLE_JA[d.role]} · ${sess} セッションのサブエージェント · ${room}`)}</p></div><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">← 3D に戻る</button></div>
+    return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? `${id} のメインセッション` : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.agent} · ${room}` : `${ROLE_JA[d.role]} · ${sess} セッションのサブエージェント · ${room}`)}</p></div><div class="rb-nav"><button type="button" class="rb-step" data-rb-step="-1" data-fk="rb-prev" aria-label="前のロボット（←）" title="前のロボット（←）">‹</button><button type="button" class="rb-step" data-rb-step="1" data-fk="rb-next" aria-label="次のロボット（→）" title="次のロボット（→）">›</button><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">← 3D に戻る</button></div></div>
 <div class="rb-tabs" role="tablist" aria-label="表示"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">今の様子</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">応答の履歴</button></div>
 <div class="rb-body rb-hist" data-rb-hist hidden aria-label="応答の履歴"></div>
 <div class="rb-body">
@@ -4462,6 +5034,7 @@ ${subs.length ? `<section class="rb-sec" aria-labelledby="rb-h-subs"><h3 id="rb-
   const testsEl = rbEl.querySelector('[data-rb-tests]');
   if (testsEl) setHTML(testsEl, robotTestsHTML(robotRuns(id)));   // rewritten on every refresh while a run moves
   histSync();   // 55-history.js: the tab shown, and the history kept fresh while it is
+  focusFadeSync();   // what stands between the camera and this robot, faint
 }
 
 /* ---------- live: the test run in the side panel (plan 09 §4) ---------- */
@@ -4938,6 +5511,7 @@ function frame(ms) {
 /* ---------- live only: the connection chip, no-session and source-error notes (plan 07 §5) ---------- */
 function liveChrome() {
   if (SOURCE.mode !== 'live') return;
+  renderUsage(vizNow());   // the time to each reset counts down between slices
   const chip = document.querySelector('.chip.demo');
   if (chip) {
     const ok = NET.state === 'connected';

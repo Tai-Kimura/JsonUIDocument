@@ -2322,8 +2322,8 @@
       "command": "viz serve",
       "synopsis": "jui viz serve [--port PORT] [--open] [--record FILE] [--replay FILE] [--speed SPEED] [--no-agents-poll]",
       "purpose": {
-        "en": "Start the jui viz server in the foreground, on 127.0.0.1 only. It shows the Claude Code sessions and subagents on this machine in the browser. Ctrl+C stops it.",
-        "ja": "jui viz のサーバーを前面で起動する（127.0.0.1 のみ）。このマシンの Claude Code のセッションとサブエージェントをブラウザに出す。Ctrl+C で止まる。"
+        "en": "Start the jui viz server in the foreground, on 127.0.0.1 only. It shows the Claude Code sessions and subagents on this machine in the browser. Ctrl+C stops it. From 2.3.1 the server works in jui viz's state folder (~/.local/state/jui-viz), not in the folder it was started from, so a deleted worktree no longer breaks it.",
+        "ja": "jui viz のサーバーを前面で起動する（127.0.0.1 のみ）。このマシンの Claude Code のセッションとサブエージェントをブラウザに出す。Ctrl+C で止まる。2.3.1 からは、サーバーの作業フォルダは起動した場所でなく jui viz の状態フォルダ（~/.local/state/jui-viz）になり、起動した worktree を消しても壊れない。"
       },
       "options": [
         {
@@ -2394,16 +2394,16 @@
         "jui viz doctor"
       ],
       "verifiedAgainst": {
-        "version": "2.0.0",
+        "version": "2.3.1",
         "columns": 80,
         "python": "3.12",
         "helpHash": "809b88bf41ff4b6f933e58271fd518b406f6457d909c21c0807657735b1b77c3",
-        "cardHash": "dfe7ee10a9ddb99986dba4e0e2b8059b1a69e488d166ea898fefd54440f0921a",
+        "cardHash": "2ff499728f67a0c2ce90c206fa7cac4e1545ae442dd372d1435cc61e349694d1",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "b4f064ac32f0",
           "synopsis": "d9155215e594",
-          "purpose": "63f4aba87e07",
+          "purpose": "b9916a9c4f7c",
           "options": "9ac8ff33e008",
           "examples": "c13cea177b19",
           "aliases": "98edafdd23a8",
@@ -2416,8 +2416,8 @@
       "command": "viz start",
       "synopsis": "jui viz start [--port PORT] [--json]",
       "purpose": {
-        "en": "Start the jui viz server in the background, wait until it answers, and print its URL. A server that is already running is reported, not started again.",
-        "ja": "jui viz のサーバーを裏で起動し、応答するのを待って URL を表示する。すでに起動しているときは、それを報告して二重には起動しない。"
+        "en": "Start the jui viz server in the background, wait until it answers, and print its URL. A server that is already running is reported, not started again. From 2.3.1 the server works in jui viz's state folder (~/.local/state/jui-viz), not in the folder it was started from, so a deleted worktree no longer breaks it.",
+        "ja": "jui viz のサーバーを裏で起動し、応答するのを待って URL を表示する。すでに起動しているときは、それを報告して二重には起動しない。2.3.1 からは、サーバーの作業フォルダは起動した場所でなく jui viz の状態フォルダ（~/.local/state/jui-viz）になり、起動した worktree を消しても壊れない。"
       },
       "options": [
         {
@@ -2452,16 +2452,16 @@
         "jui viz stop"
       ],
       "verifiedAgainst": {
-        "version": "2.0.0",
+        "version": "2.3.1",
         "columns": 80,
         "python": "3.12",
         "helpHash": "a13f1df39ede8f687d7d624e472f81f0b1a38c2fc6c56a7e350a3fd04af208b2",
-        "cardHash": "bc954ac1a4c1c01aaadd4915b5cd081eecddd5dfbdfc7f0d9dbd681e2da86226",
+        "cardHash": "5af2f68e680aa769ec0f7a690e4ae6ffb4a5d41a72c058ceffd6e884c9a51602",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "59a2898723a7",
           "synopsis": "567997ebac1f",
-          "purpose": "651428384a9d",
+          "purpose": "4524a3b6c83c",
           "options": "7ed8726195e5",
           "examples": "0f027333accf",
           "aliases": "98edafdd23a8",
@@ -2531,8 +2531,8 @@
       "command": "viz stop",
       "synopsis": "jui viz stop [--port PORT]",
       "purpose": {
-        "en": "Stop the running jui viz server: the one whose pid this tool wrote, and only after it answers as a jui viz server. From 2.2.0, when no state file names a server, it also stops a jui viz server it finds on the port, if that server is this user's: it uses the same state folder, or, for a server from 2.1.0 or earlier, runs with the same HOME. A server left running by an older version is the usual case.",
-        "ja": "起動中の jui viz サーバーを止める。止めるのは、このツールが pid を書いたプロセスで、jui viz のサーバーとして応答したときだけ。2.2.0 からは、状態ファイルがサーバーを名指していなくても、ポートで見つけた jui viz のサーバーを、それが自分のもの（同じ状態フォルダを使っている。2.1.0 以前のサーバーなら同じ HOME で動いている）なら止める。古い版が起動したまま残したサーバーがよくある例。"
+        "en": "Stop the running jui viz server: the one whose pid this tool wrote. From 2.3.1 it stops it even when it does not answer /health, once that pid is checked to be a `jui viz serve` of this HOME (its command line), and sends KILL if TERM has not ended it 5 seconds later; a pid it cannot check as ours gets no signal. When no state file names a server, it also stops a jui viz server it finds on the port, if that server is this user's: it uses the same state folder, or, for a server from 2.1.0 or earlier, runs with the same HOME (from 2.2.0). A server left running by an older version is the usual case.",
+        "ja": "起動中の jui viz サーバーを止める。止めるのは、このツールが pid を書いたプロセス。2.3.1 からは、/health に応答しなくても、その pid が この HOME の `jui viz serve` であることをコマンド行で確かめられれば止め、TERM の 5 秒後に残っていれば KILL する。自分のものと確かめられない pid には、何も送らない。状態ファイルがサーバーを名指していないときは、ポートで見つけた jui viz のサーバーを、それが自分のもの（同じ状態フォルダを使っている。2.1.0 以前のサーバーなら同じ HOME で動いている）なら止める（2.2.0 から）。古い版が起動したまま残したサーバーがよくある例。"
       },
       "options": [
         {
@@ -2557,16 +2557,16 @@
         "jui viz start"
       ],
       "verifiedAgainst": {
-        "version": "2.2.0",
+        "version": "2.3.1",
         "columns": 80,
         "python": "3.12",
         "helpHash": "e36c40e8d53f920fae9b39dba4ee33de7a4a123adb315b4891b6bf313424bc6b",
-        "cardHash": "c890ffd856ff0f95a7e170c68a962eab56052af1a3b7398c9a993a13c7764828",
+        "cardHash": "369b30ec89de6d4e4dfdd15b886e6db19c6d84b131656e534805a8db4f2ca7e5",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "6ff4516befd3",
           "synopsis": "982b80cffd3a",
-          "purpose": "977541c77305",
+          "purpose": "75d649ba6908",
           "options": "8c22c061b484",
           "examples": "3e22534b5181",
           "aliases": "98edafdd23a8",
@@ -2616,8 +2616,8 @@
       "command": "viz doctor",
       "synopsis": "jui viz doctor [--json]",
       "purpose": {
-        "en": "Check the environment for jui viz — Python 3.11 or later, aiohttp and watchdog, the claude command, disableAllHooks, the hooks, the permission relay, the server and the port — and say how to fix what fails. Exits 1 when a check fails.",
-        "ja": "jui viz の環境を確かめる（Python 3.11 以上、aiohttp と watchdog、claude コマンド、disableAllHooks、フック、許可の中継、サーバー、ポート）。駄目なものには直し方を出す。1 つでも駄目なら終了コード 1。"
+        "en": "Check the environment for jui viz — Python 3.11 or later, aiohttp and watchdog, the claude command, disableAllHooks, the hooks, the state folder, where test results are read from, the near weather (on or off, when it was last read, why it failed), the usage-limits statusLine (installed or not, the last value), the permission relay, the server and the port — and say how to fix what fails. Exits 1 when a check fails.",
+        "ja": "jui viz の環境を確かめる。Python 3.11 以上、aiohttp と watchdog、claude コマンド、disableAllHooks、フック、状態フォルダ、テストの結果を読む場所、近所の天気（オンかオフか、最後に取れた時刻、失敗の理由）、上限の表示の statusLine（入っているか、最後の値）、許可の中継、サーバー、ポートを見て、直し方を出す。どれかが失敗なら 1 で終わる。"
       },
       "options": [
         {
@@ -2642,16 +2642,16 @@
         "jui viz status"
       ],
       "verifiedAgainst": {
-        "version": "2.0.0",
+        "version": "2.3.1",
         "columns": 80,
         "python": "3.12",
         "helpHash": "b7565244c9540a31b622d7b0f755511c837c9d39c735a0195e1cd5a901b793db",
-        "cardHash": "6b7eefaa5f3e4ff18f8c4a7420eedc3476d4ff36b63cfc4ebb14d3f88a245d64",
+        "cardHash": "40a6e8c3eef478908bef581cd2276405f4393ee802b06696298a7f4a8a19ad2c",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "c97c2ebb810b",
           "synopsis": "a8380a6299f3",
-          "purpose": "2c95de14b011",
+          "purpose": "790e7a2e489f",
           "options": "aa5b149e7cdf",
           "examples": "a38867cde311",
           "aliases": "98edafdd23a8",
@@ -2799,6 +2799,150 @@
           "examples": "76d84044883b",
           "aliases": "98edafdd23a8",
           "seeAlso": "3b40fa73406c"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz statusline install",
+      "synopsis": "jui viz statusline install [--dry-run]",
+      "purpose": {
+        "en": "Add the statusLine that hands Claude Code's 5-hour and weekly usage limits to jui viz, for the header (from 2.3.1). It writes the statusLine of ~/.claude/settings.json, keeping the file as it was in the backups folder of jui viz's state folder. A statusLine you already have is wrapped, not replaced: it still runs with the same input, and what it prints and its exit status pass through unchanged. The usage values come only from a terminal claude, which runs the statusLine; a VS Code extension session does not update them. One terminal claude running is enough.",
+        "ja": "Claude Code の 5 時間と週の上限の使用率を jui viz に渡す statusLine を入れる（ヘッダの上限の表示、2.3.1 から）。~/.claude/settings.json の statusLine に書き、書き換える前のファイルを jui viz の状態フォルダの backups に保存する。すでにある statusLine は置き換えずに包む。同じ入力で動き、出力と終了コードはそのまま返る。上限の値は、statusLine を起動するターミナルの claude からだけ届く。VS Code 拡張のセッションからは更新されない。ターミナルの claude が 1 つ動いていれば足りる。"
+      },
+      "options": [
+        {
+          "name": "--dry-run",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Show the change, write nothing.",
+            "ja": "変更を表示するだけで、書き込まない。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz statusline install --dry-run\n$ jui viz statusline install"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz statusline uninstall",
+        "jui viz statusline status",
+        "jui viz doctor"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.1",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "2fcfbb8a4b3d56e5a11b451f14330d1d278c9469a9f2cbdf4ab8bab305c30f90",
+        "cardHash": "493e9f1cb34182d3168145393d89ca5f0883099a8ac639d3fd504d476d6cdd61",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "29577fdbb408",
+          "synopsis": "688e9fa403ff",
+          "purpose": "ab307763bfca",
+          "options": "6df17d1e1130",
+          "examples": "836234a51160",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "412587a35e6e"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz statusline uninstall",
+      "synopsis": "jui viz statusline uninstall [--dry-run]",
+      "purpose": {
+        "en": "Take the usage-limits statusLine out of ~/.claude/settings.json. A statusLine it wrapped is put back as it was.",
+        "ja": "上限の表示の statusLine を ~/.claude/settings.json から外す。包んでいた statusLine は、元のとおりに戻す。"
+      },
+      "options": [
+        {
+          "name": "--dry-run",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Show the change, write nothing.",
+            "ja": "変更を表示するだけで、書き込まない。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz statusline uninstall"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz statusline install"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.1",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "9308a6364ee35a293881602e3db6df7f73f375394ae413ea89311078bfe063c5",
+        "cardHash": "8600a0588268274dad4e349f8bf8ee3580cb161e32a314bdb5203deac139b969",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "5b579e8604ed",
+          "synopsis": "5f2e3194543c",
+          "purpose": "bc5f127df2f2",
+          "options": "6df17d1e1130",
+          "examples": "ee991fe56129",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "895b3f370e71"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz statusline status",
+      "synopsis": "jui viz statusline status [--json]",
+      "purpose": {
+        "en": "Report whether the usage-limits statusLine is installed, and the statusLine it wraps, if any. The usage values come only from a terminal claude, which runs the statusLine; a VS Code extension session does not update them. One terminal claude running is enough.",
+        "ja": "上限の表示の statusLine が入っているか、包んでいる statusLine があればそれを表示する。上限の値は、statusLine を起動するターミナルの claude からだけ届く。VS Code 拡張のセッションからは更新されない。ターミナルの claude が 1 つ動いていれば足りる。"
+      },
+      "options": [
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Machine-readable status.",
+            "ja": "機械可読の状態。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz statusline status"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz statusline install",
+        "jui viz doctor"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.1",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "6bb9a1ade77be510f7684b9176241d04cfd58584a4ca8eb3b6b7e5f0b9ca2ab1",
+        "cardHash": "a36098b503f9c75e148e2f75ce610af32822c0ebb377d3687efe3782045c59db",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "55dfe19aaf6b",
+          "synopsis": "df131904833a",
+          "purpose": "be23bbb65a6a",
+          "options": "3f1528c576e4",
+          "examples": "138b4ca53c77",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "3006efa295cd"
         }
       }
     },

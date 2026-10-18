@@ -29,7 +29,7 @@ body { margin: 0; }
   --floor-a: #efe8da;
   --floor-b: #e3ebf5;
   --floor-c: #e6efe3;
-  --wall: #f7f9fc;
+  --wall: #ebe4d9;
   --cloth: #fffdf7;
   --cloth-ink: #d62839;
   /* Boards seen up close (the spec whiteboard and the task board) follow the theme like the rest of the page. */
@@ -93,7 +93,7 @@ body { margin: 0; }
     --floor-a: #3a3a40;
     --floor-b: #24324a;
     --floor-c: #263a33;
-    --wall: #2c384b;
+    --wall: #48423d;
     --wb-bg: #0f1b2c;
     --wb-card: #15243a;
     --wb-rim: #2b3c55;
@@ -152,7 +152,7 @@ body { margin: 0; }
   --floor-a: #3a3a40;
   --floor-b: #24324a;
   --floor-c: #263a33;
-  --wall: #2c384b;
+  --wall: #48423d;
   --wb-bg: #0f1b2c;
   --wb-card: #15243a;
   --wb-rim: #2b3c55;
@@ -702,10 +702,13 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .tbd-raw pre { margin: 4px 0 0; padding: 8px 10px; border-radius: 6px; background: var(--wb-card); font: 500 11.5px/1.55 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere; }
 
 /* a robot up close */
-.rb { position: absolute; top: 14px; right: 14px; bottom: 14px; z-index: 5; display: grid; grid-template-rows: auto minmax(0, 1fr); width: min(420px, calc(100% - 28px)); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); box-shadow: 0 10px 30px var(--shadow); opacity: 0; transform: translateX(16px); transition: opacity 0.2s ease, transform 0.25s ease;
+.rb { position: absolute; top: 14px; right: 14px; bottom: 14px; z-index: 5; display: grid; grid-template-rows: auto auto minmax(0, 1fr); width: min(420px, calc(100% - 28px)); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); box-shadow: 0 10px 30px var(--shadow); opacity: 0; transform: translateX(16px); transition: opacity 0.2s ease, transform 0.25s ease;
   --wb-ink: var(--ink); --wb-soft: var(--ink-soft); --wb-card: var(--bg); --wb-line: var(--line); --wb-blue: var(--info); }
 .rb.show { opacity: 1; transform: none; }
 .rb-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; padding: 12px 14px; border-top: 5px solid var(--c); border-bottom: 1px solid var(--line); }
+.rb-nav { display: flex; align-items: center; gap: 4px; }
+.rb-step { width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: 700 18px/1 var(--font-body); cursor: pointer; }
+.rb-step:hover { background: var(--chip); }
 .rb-badge { display: grid; place-items: center; min-width: 54px; height: 54px; padding: 0 6px; border: 3px solid var(--cloth-ink); border-radius: 12px; background: var(--cloth); color: var(--cloth-ink); font: 400 21px/1 var(--font-display); transform: rotate(-3deg); }
 .rb-name { margin: 0; font: 400 clamp(15px, 4vw, 17px)/1.3 var(--font-display); overflow-wrap: anywhere; }
 .rb-sub { margin: 2px 0 0; color: var(--ink-soft); font: 500 11.5px/1.5 var(--font-body); }
@@ -907,6 +910,18 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .tl-idle { background: #33445e; background-image: repeating-linear-gradient(0deg, transparent 0 4px, rgba(170, 186, 210, 0.35) 4px 6px); }
 .tl-empty { background: #05070b; border-style: dashed; border-color: var(--ink-soft); }
 :root[data-theme="dark"] .tl-idle { background-color: #152238; }
+/* the near weather's switch (10-18): in the building view only, off by default */
+.tower-weather { position: absolute; right: 12px; bottom: 44px; z-index: 6; max-width: 260px; padding: 8px 12px; border-radius: 10px; background: var(--panel); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12); color: var(--ink); }
+.tower-weather[hidden] { display: none; }
+.tw-switch { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px 4px 6px; border: 1px solid var(--line); border-radius: 999px; background: var(--chip); color: var(--ink); font: 700 12.5px/1.4 var(--font-body); cursor: pointer; }
+.tw-switch::before { content: ''; width: 26px; height: 14px; border-radius: 7px; background: var(--line); box-shadow: inset 0 0 0 2px var(--panel); transition: background 0.15s; }
+.tw-switch[aria-checked="true"]::before { background: var(--ok); }
+.tw-switch[aria-busy="true"] { opacity: 0.6; cursor: progress; }
+.tw-note { margin: 6px 0 0; font: 600 12px/1.5 var(--font-body); color: var(--ink-soft); }
+.tw-note[data-error] { color: var(--warn); }
+#sec-settings[hidden] { display: none; }
+.set-weather { margin-top: 6px; }
+.set-hint { margin: 6px 0 0; font: 500 11.5px/1.5 var(--font-body); color: var(--ink-soft); }
 
 /* a robot's tag with nothing to say shows just its name (an empty bubble read as a missing message) */
 .tag > span:empty { display: none; }
@@ -918,3 +933,12 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 /* a phone call on a robot's name tag (SendMessage, 10-18): a mark and the other robot's number */
 .tag .call-mark { flex: none; padding: 0 6px; border-radius: 999px; background: var(--ok-bg); color: var(--ok); font: 700 10px/1.6 var(--font-body); }
 .tag .call-mark[hidden] { display: none; }
+.tag .call-mark.solo-mark { background: var(--info-bg); color: var(--info); }   /* alone at its desk: a nap or a bento (2.3.1) */
+
+/* The plan's usage limits in the header (10-18): the number and its % share one colour, green (0) to red (100). */
+.usage { display: inline-flex; gap: 6px; align-items: center; }
+.usage .uw { padding: 2px 9px; border-radius: 999px; background: var(--chip); color: var(--ink-soft); font: 500 12px/1.6 var(--font-mono); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.usage .uw b { font-weight: 700; }
+.usage .uw .limit { color: var(--ink-soft); opacity: 0.75; font-weight: 700; }
+.usage .uw .note { opacity: 0.8; }
+.usage .none { opacity: 0.7; }
