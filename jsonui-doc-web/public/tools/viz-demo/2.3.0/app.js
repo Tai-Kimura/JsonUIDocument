@@ -36,6 +36,7 @@ const STATES = {
   phone: { name: 'スマホ', lamp: 'busy', face: 'focus' },
   waiting: { name: '許可待ち', lamp: 'waiting', face: 'wide' },
   carry: { name: '運ぶ', lamp: 'busy', face: 'normal' },
+  stroll: { name: '歩く', lamp: 'idle', face: 'normal' },   // to and from play (10-18): no papers; the lamp is the real state's
   done: { name: '完了', lamp: 'done', face: 'happy' },
 };
 const LAMP_TEXT = { idle: '青灰（待機）', busy: '緑（作業中）', think: '淡い緑のゆっくり点滅（考え中）', waiting: '黄（許可待ち）', done: '緑の点滅（完了）', bg: '水色（裏で作業中）' };
@@ -537,7 +538,7 @@ function handThing(kind) {
   return g;
 }
 function startGesture(r, kind, t) {
-  if (reduceMotion || !GESTURE_OK.has(r.state)) return false;
+  if (reduceMotion || !GESTURE_OK.has(r.state) || r.play || (r.call && CALL_ON_LINE.has(r.call.state))) return false;
   endGesture(r);
   if (kind !== 'cheer') { r.hand = handThing(kind); (kind === 'meal' ? r.armL : r.armR).add(r.hand); }
   r.gesture = { kind, t0: t, t1: t + GESTURE_LEN[kind] };
@@ -576,6 +577,92 @@ function setRobotTired(r, on) {
   if (on && !r.tired) r.needDrink = true;
   if (!on) r.needDrink = false;
   r.tired = on;
+}
+/* Phone calls (requester, 10-18: SendMessage between two sessions — the server's calls slice decides). r.call is
+   { role: 'caller' | 'callee', state } or null; like sweat, the state, its lamp and its label stay as they are.
+   The caller holds a handset to its ear while it rings and on the line; the callee's phone rings over its head until
+   it picks up (it reads the message), then it holds the handset too. A call puts a gesture away. Under reduced
+   motion nothing shakes. */
+const CALL_ON_LINE = new Set(['dialing', 'ringing', 'answered']);
+function handset() {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.26, 4, 8), toon('#1f2532'));
+  for (const y of [-0.16, 0.16]) { const cup = new THREE.Mesh(new THREE.SphereGeometry(0.075, 10, 8), toon('#1f2532')); cup.position.y = y; g.add(cup); }
+  g.add(body);
+  g.position.set(0, -0.46, 0.14); g.rotation.x = 0.3;
+  return g;
+}
+function ringBubble() {
+  const canvas = makeCanvas(160, 160), ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#1f2532'; ctx.lineWidth = 6;
+  ctx.beginPath(); ctx.arc(80, 80, 52, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#2f9e5b';   // a handset, tilted
+  ctx.save(); ctx.translate(80, 84); ctx.rotate(-0.6);
+  rr(ctx, -30, -9, 60, 18, 9); ctx.fill();
+  rr(ctx, -34, -9, 18, 28, 7); ctx.fill(); rr(ctx, 16, -9, 18, 28, 7); ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle = '#2f9e5b'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+  for (const rad of [64, 76]) { ctx.beginPath(); ctx.arc(80, 80, rad, -1.2, -0.4); ctx.stroke(); ctx.beginPath(); ctx.arc(80, 80, rad, Math.PI + 0.4, Math.PI + 1.2); ctx.stroke(); }
+  const mat = new THREE.SpriteMaterial({ map: texFrom(canvas), transparent: true });
+  const s = new THREE.Sprite(mat); s.position.set(0, 2.3, 0.1); s.scale.set(0.5, 0.5, 1);
+  return s;
+}
+function callUpdate(r, t) {
+  const c = r.call;
+  const ringing = !!c && c.role === 'callee' && (c.state === 'ringing' || c.state === 'dialing');
+  const onLine = !!c && CALL_ON_LINE.has(c.state) && !ringing;
+  if (ringing && !r.ring) { r.ring = ringBubble(); r.root.add(r.ring); }
+  if (r.ring) {
+    r.ring.visible = ringing;
+    if (ringing && !reduceMotion) { r.ring.material.rotation = Math.sin(t * 38) * 0.22; r.ring.position.y = 2.3 + Math.abs(Math.sin(t * 9)) * 0.06; }
+  }
+  if (onLine && !r.handset) { if (r.gesture) endGesture(r); r.handset = handset(); r.armR.add(r.handset); }
+  if (!onLine && r.handset) { r.handset.parent.remove(r.handset); r.handset.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); r.handset = null; }
+  return onLine;
+}
+function callPose(p, t) {   // the right hand at the ear, the head toward it
+  p.aRx = -2.25; p.aRz = -1.2; p.headZ = 0.16; p.headX = -0.04;
+  if (!reduceMotion) p.headY = Math.sin(t * 1.3) * 0.12;
+}
+/* Play (requester, 10-18: robots idle for long in one room play together; the scene decides who, where and how
+   long). r.play is { kind: 'ball' | 'highfive' | 'rps', t0, side: 0 | 1 } while at the spot; the state stays idle.
+   ball: a throw from the right hand, the two in turn (the ball itself is the scene's); highfive: both hands up,
+   meeting now and then; rps (じゃんけん): three pumps, then a hand over the head. */
+const RPS_HANDS = ['グー', 'チョキ', 'パー'];
+function playPose(r, p, t) {
+  const P = r.play, u = t - P.t0;
+  if (P.kind === 'ball') {
+    const turn = ((u / 1.6) + P.side * 0.5) % 1;           // the two throw half a period apart
+    const throwing = turn < 0.25;
+    p.aRx = throwing ? -2.4 + turn * 6 : -0.9; p.aRz = -0.25; p.aLx = -0.7; p.aLz = 0.3; p.headX = -0.18;
+  } else if (P.kind === 'highfive') {
+    const meet = Math.max(0, Math.sin(u * 2.6));
+    p.aRz = -2.4 - meet * 0.3; p.aRx = -0.2 - meet * 0.4; p.aLz = 0.4; p.rootY = meet * 0.08; p.headX = -0.12;
+  } else {
+    const round = u % 3, pump = round < 1.8 ? Math.abs(Math.sin(round * Math.PI * 1.67)) : 0;
+    p.aRx = -1.2 - pump * 0.5; p.aRz = -0.3; p.aLx = -0.4; p.headX = 0.05;
+  }
+}
+function playBubble(r, P, t) {
+  const show = !!P && P.kind === 'rps' && (t - P.t0) % 3 >= 1.8;
+  if (show && !r.rps) {
+    r.rpsCanvas = makeCanvas(200, 120);
+    r.rps = new THREE.Sprite(new THREE.SpriteMaterial({ map: texFrom(r.rpsCanvas), transparent: true }));
+    r.rps.position.set(0, 2.25, 0.1); r.rps.scale.set(0.6, 0.36, 1); r.root.add(r.rps); r.rpsShown = '';
+  }
+  if (!r.rps) return;
+  r.rps.visible = show;
+  if (!show) return;
+  const hand = RPS_HANDS[(Math.floor((t - P.t0) / 3) * 7 + P.side * 5 + (r.seed | 0)) % 3];
+  if (hand === r.rpsShown) return;
+  r.rpsShown = hand;
+  const ctx = r.rpsCanvas.getContext('2d');
+  ctx.clearRect(0, 0, 200, 120);
+  ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#1f2532'; ctx.lineWidth = 5;
+  rr(ctx, 6, 6, 188, 108, 26); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#1f2532'; ctx.font = `700 46px ${FONT_BODY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(hand, 100, 62);
+  r.rps.material.map.needsUpdate = true;
 }
 function gesturePose(r, p, t) {
   const G = r.gesture, k = Math.min(1, (t - G.t0) / 0.35, (G.t1 - t) / 0.35);   // ease in and out
@@ -778,6 +865,12 @@ function poseFor(state, s) {
       p.aRz = -2.7 + Math.sin(s * 7) * 0.2; p.aRx = -0.1; p.aLz = 0.2;
       p.headX = -0.12; p.headZ = Math.sin(s * 1.6) * 0.06; p.hipsY = Math.abs(Math.sin(s * 3.5)) * 0.02;
       break;
+    case 'stroll': {
+      const w = s * 7;
+      p.lLx = Math.sin(w) * 0.5; p.lRx = -Math.sin(w) * 0.5; p.hipsY = Math.abs(Math.cos(w)) * 0.03;
+      p.aLx = -Math.sin(w) * 0.4; p.aRx = Math.sin(w) * 0.4; p.headX = -0.02;
+      break;
+    }
     case 'carry': {
       const w = s * 7;
       p.lLx = Math.sin(w) * 0.5; p.lRx = -Math.sin(w) * 0.5; p.hipsY = Math.abs(Math.cos(w)) * 0.03; p.torsoY = Math.sin(w) * 0.05;
@@ -806,8 +899,12 @@ function updateRobot(r, t, dt) {
   for (const k in b) p[k] = a[k] + (b[k] - a[k]) * e;
   if (r.tired) { p.headX += 0.2; p.torsoX += 0.08; p.hipsY -= 0.012; p.aLz *= 0.5; p.aRz *= 0.5; }   // head and shoulders down
   if (r.gesture && (!GESTURE_OK.has(r.state) || t >= r.gesture.t1)) endGesture(r);
-  if (!r.gesture && r.needDrink && GESTURE_OK.has(r.state) && startGesture(r, 'drink', t)) r.needDrink = false;
-  if (r.gesture) gesturePose(r, p, t);
+  const onCall = callUpdate(r, t);
+  if (!onCall && !r.gesture && r.needDrink && GESTURE_OK.has(r.state) && startGesture(r, 'drink', t)) r.needDrink = false;
+  if (onCall) callPose(p, t);
+  else if (r.play) playPose(r, p, t);
+  else if (r.gesture) gesturePose(r, p, t);
+  playBubble(r, onCall ? null : r.play, t);
   r.antenna.rotation.x += ((r.tired ? 1.0 : 0) - r.antenna.rotation.x) * Math.min(1, dt * 3);
   r.root.position.y = p.rootY;
   r.hips.position.y = HIPS_Y + p.hipsY;
@@ -819,7 +916,7 @@ function updateRobot(r, t, dt) {
   r.legR.rotation.x = p.lRx;
   r.tails.forEach((tail, i) => tail.rotation.set(0.5 + Math.sin(s * 6.5 + i * 1.3) * 0.12, 0, tail.userData.spread));
 
-  const lampKey = STATES[r.state].lamp;
+  const lampKey = STATES[r.lampState && STATES[r.lampState] ? r.lampState : r.state].lamp;   // play: the real state's lamp
   const lampOn = lampKey === 'think' ? (reduceMotion || Math.sin(s * 1.6) > -0.4)   // thinking: a slow blink
     : lampKey !== 'done' || Math.floor(s * 3) % 2 === 0;
   r.lampMat.color.set(lampOn ? LAMP[lampKey] : LAMP.off);
@@ -899,7 +996,7 @@ const KCOLS = [['todo', '未着手'], ['wait', '待ち'], ['doing', '作業中']
    (TodoWrite, the task hooks, ~/.claude/tasks/). A turn reads 指示 n where a task reads #n. */
 const isTurn = (x) => !!x && x.source === 'turn';
 const taskRef = (x) => (isTurn(x) ? `指示 ${x.turn}` : `#${x.id}`);
-const waitLabel = (x) => (isTurn(x) ? '許可待ち' : x.blockedBy ? `#${x.blockedBy} 待ち` : '待ち');
+const waitLabel = (x) => (isTurn(x) ? (x.waitingFor === 'question' ? '質問に回答待ち' : '許可待ち') : x.blockedBy ? `#${x.blockedBy} 待ち` : '待ち');
 const permSummary = (p) => p.input.command || p.input.file_path || '';
 const ruleCovers = (p, abs) => alwaysRules.has(p.rule) && alwaysRules.get(p.rule) < abs;
 // ---- web/js/30-source-demo.js ----
@@ -1612,7 +1709,9 @@ const SOURCE = {
     tickerItems.unshift(item); logItems.unshift(item);
     showToast(`${p.who} の ${p.tool} を${behavior === 'deny' ? '拒否' : behavior === 'always' ? '許可し、ルールを追加' : '許可'}した（デモ。実際は Claude Code へ答えを返す）`);
   },
+  history() { return Promise.resolve({ ok: false, error: 'demo' }); },   // the demo has no transcripts
 };
+const robotRuns = () => [];   // the demo's one test run is shown by the card's own a2 row
 
 /* ---------- robot states (kept even without WebGL so the panels still run) ---------- */
 const robotState = Object.fromEntries(ROBOT_DEFS.map((d) => [d.id, { state: 'idle', act: '' }]));
@@ -2385,6 +2484,14 @@ function liveWalk(R, dt, nowMs) {
   }
   if (R.out && !R.path.length) { SOURCE.robotGone(d.id); return 'gone'; }
   const next = R.path[0];
+  if (!next && R.play) {                                          // at the play spot: no desk, facing the partner
+    if (R.robot.desk) R.robot.desk.visible = false;
+    R.play.phase = 'playing';
+    const q = R.play.partner.robot.root.position, ry = Math.atan2(q.x - root.position.x, q.z - root.position.z);
+    root.rotation.y += (ry - root.rotation.y) * Math.min(1, dt * 6);
+    return 'playing';
+  }
+  if (!next && R.playBack) R.playBack = false;                    // back at its desk
   if (!next) {
     if (R.robot.desk) R.robot.desk.visible = !d.standing;
     if (Math.abs(root.rotation.y - (d.ry || 0)) > 1e-3) root.rotation.y += ((d.ry || 0) - root.rotation.y) * Math.min(1, dt * 6);
@@ -2401,8 +2508,8 @@ function liveWalk(R, dt, nowMs) {
    one (probability SNACK.p, a seeded generator so a test can repeat it), while at most SNACK.share of the robots
    (at least one) are at it. Never while waiting, thinking or done (startGesture refuses), none under reduced motion. */
 const SNACK = { seed: 20261018, p: 1 / 90, share: 0.15, next: 0, rng: null };
-function snackRandom() {
-  let a = SNACK.seed >>> 0;
+function snackRandom(seed = SNACK.seed) {
+  let a = seed >>> 0;
   return () => { a = (a + 0x6d2b79f5) >>> 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 function snackTick(t) {
@@ -2418,6 +2525,97 @@ function snackTick(t) {
     if (SNACK.rng() < SNACK.p && startGesture(R.robot, SNACK.rng() < 0.5 ? 'coffee' : 'meal', t)) busy += 1;
   }
 }
+/* A call on the robot and on its name tag: a phone mark and the other robot's number, never the message. */
+const CALL_TAG_TEXT = { dialing: '発信中', ringing: '呼び出し中', answered: '通話中' };
+function liveCallTag(R, call) {
+  R.robot.call = call && CALL_ON_LINE.has(call.state) ? call : null;
+  const c = R.robot.call;
+  const text = c ? `☎ ${c.role === 'callee' && c.state !== 'answered' ? '着信' : CALL_TAG_TEXT[c.state]}${c.peer ? ` ${c.peer}` : ''}` : '';
+  if (text === (R.callText || '')) return;
+  R.callText = text;
+  if (!R.callEl) { R.callEl = document.createElement('span'); R.callEl.className = 'call-mark'; R.tag.insertBefore(R.callEl, R.text); }
+  R.callEl.textContent = text;
+  R.callEl.hidden = !text;
+  R.tag.classList.toggle('on-call', !!text);
+}
+/* Play (requester, 10-18): "同じ部屋で待機が長いロボットが複数いたらロボット同士で遊ぶ", "動きはランダムでいい",
+   "遊んだらまた元の場所に戻る", "指示が来たら遊ぶのやめて作業始めて". Looks only: the server, the panel and the tasks
+   still say 待機. Main robots only (a subagent idle for long has usually left). Once a second a room with two robots
+   idle for PLAY.idleMs or more may start a game (probability PLAY.p, a seeded generator): the two walk to the front
+   aisle of their room, play one of PLAY_KINDS for a random while, and walk back to their desks. Any reason to stop —
+   anything the server sets on the robot (an instruction keeps the state idle and changes only its act and updatedAt:
+   jsonuidocument-96, 10-18), the robot no longer idle, its phone rings, it leaves, its seat moves — stops it at once: it
+   walks back with its real lamp (through the doors when its desk is in another room now), and a partner left alone
+   walks back too. A robot that played rests a while before the next game; at most PLAY.games at a time, one to a room,
+   and none in a room with standing robots (a full room: they stand along the front wall, where the game would be).
+   None under reduced motion. The e2e build can shorten the times (80-dbg.js). */
+const PLAY_KINDS = ['ball', 'highfive', 'rps'];
+const PLAY = { seed: 20261019, kinds: PLAY_KINDS, idleMs: 180_000, p: 1 / 30, games: 2, minSec: 15, maxSec: 35, restMinSec: 60, restMaxSec: 180,
+  next: 0, rng: null, list: [] };
+const playIdle = (R, st, now) => R.def.kind === 'main' && st.state === 'idle' && Number.isFinite(st.since) && st.since > 0
+  && now - st.since >= PLAY.idleMs && !LIVE.leaving[R.def.id] && !R.robot.call && !R.path.length && !R.playBack && !R.play;
+function playStop(R) {
+  if (!R.play) return;
+  R.play = null; R.robot.play = null; R.playBack = true;
+  const p = R.robot.root.position, from = roomAtPoint([p.x, p.z]);
+  R.path = from && from !== R.def.room ? [...liveRoute(from, R.def.room), R.def.pos] : [R.def.pos];   // never through a wall
+}
+function playEnd(G) {
+  for (const R of G.players) playStop(R);
+  if (G.ball) { scene.remove(G.ball); G.ball.geometry.dispose(); G.ball.material.dispose(); }
+  PLAY.list.splice(PLAY.list.indexOf(G), 1);
+}
+function playTick(nowSec, now) {
+  // stop at once: every frame
+  for (const G of [...PLAY.list]) {
+    for (const R of G.players) {
+      const st = robotState[R.def.id] || { state: 'idle' };
+      if (!R.play) continue;
+      if (st.state !== 'idle' || st.since !== R.play.since || R.robot.call || LIVE.leaving[R.def.id] || R.seatKey !== R.play.seatKey
+        || !robots.includes(R)) playStop(R);
+    }
+    const left = G.players.filter((R) => R.play);
+    if (left.length < 2 || nowSec >= G.until) { G.players = left; playEnd(G); continue; }
+    const at = left.filter((R) => R.play.phase === 'playing');
+    if (at.length === left.length && !G.t0) {                      // both there: face each other and start
+      G.t0 = nowSec;
+      left.forEach((R, i) => { R.robot.play = { kind: G.kind, t0: nowSec, side: i }; });
+    }
+    if (G.t0 && G.kind === 'ball') {
+      if (!G.ball) { G.ball = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 8), toon('#ff7a3d')); scene.add(G.ball); }
+      const [a, b] = left.map((R) => R.robot.root.position), u = ((nowSec - G.t0) / 1.6) % 1;
+      const k = u < 0.5 ? u * 2 : 2 - u * 2;                          // there and back
+      G.ball.position.set(a.x + (b.x - a.x) * k, 1.25 + Math.sin(Math.PI * (u < 0.5 ? u * 2 : u * 2 - 1)) * 0.9, a.z + (b.z - a.z) * k);
+    }
+  }
+  if (reduceMotion || nowSec < PLAY.next) return;
+  PLAY.next = nowSec + 1;
+  if (!PLAY.rng) PLAY.rng = snackRandom.call(null, PLAY.seed);
+  if (PLAY.list.length >= PLAY.games) return;
+  const byRoom = {};
+  for (const R of robots) {
+    const st = robotState[R.def.id];
+    if (!st || !playIdle(R, st, now) || (R.restUntil || 0) > nowSec) continue;
+    (byRoom[R.def.room] = byRoom[R.def.room] || []).push(R);
+  }
+  for (const [room, idle] of Object.entries(byRoom)) {
+    if (PLAY.list.length >= PLAY.games || idle.length < 2 || PLAY.list.some((G) => G.room === room) || !PROJECT[room]) continue;
+    if (robots.some((R) => R.def.room === room && R.def.standing)) continue;   // a full room: no aisle to play in
+    if (PLAY.rng() >= PLAY.p) continue;
+    const a = idle.splice(Math.floor(PLAY.rng() * idle.length), 1)[0], b = idle[Math.floor(PLAY.rng() * idle.length)];
+    const rm = PROJECT[room], cx = (rm.x0 + rm.x1) / 2, cz = rm.z1 - 0.9;
+    const kind = PLAY.kinds[Math.floor(PLAY.rng() * PLAY.kinds.length)];
+    const len = PLAY.minSec + PLAY.rng() * (PLAY.maxSec - PLAY.minSec);
+    const G = { room, kind, players: [a, b], t0: 0, until: nowSec + len + 20, ball: null };   // +20: the walk there
+    [a, b].forEach((R, i) => {
+      const spot = [cx + (i ? 0.8 : -0.8), cz];
+      R.play = { phase: 'going', spot, partner: i ? a : b, seatKey: R.seatKey, since: robotState[R.def.id].since, len };
+      R.path = [spot];
+      R.restUntil = nowSec + len + 20 + PLAY.restMinSec + PLAY.rng() * (PLAY.restMaxSec - PLAY.restMinSec);
+    });
+    PLAY.list.push(G);
+  }
+}
 function liveUpdateRobots(nowSec, dt) {
   if (SOURCE.layoutRev !== LIVE3D.rev) liveSync();
   liveLinks(latestModel, nowSec);
@@ -2428,13 +2626,18 @@ function liveUpdateRobots(nowSec, dt) {
   LIVE3D.lastWalk = nowMs;
   snackTick(nowSec);
   const now = vizNow();
+  playTick(nowSec, now);
+  const calls = callsByLabel();
   for (const R of [...robots]) {
     const st = robotState[R.def.id] || { state: 'idle', act: '' };
+    liveCallTag(R, calls[R.def.id] || null);
     setRobotTired(R.robot, R.def.kind === 'main' && isTired(sinceOf(R.def.id), now));
     R.robot.heavy = heavyOf(R.def.id);   // fast typing and sweat while it works (the robot decides when)
     const how = liveWalk(R, walkDt, nowMs);
     if (how === 'gone') continue;
-    const vis = how === 'walking' ? 'carry' : st.state;
+    const playing = !!(R.play || R.playBack);
+    R.robot.lampState = playing ? st.state : null;   // to, at and back from play: the real state's lamp
+    const vis = how === 'walking' ? (playing ? 'stroll' : 'carry') : how === 'playing' ? 'idle' : st.state;
     if (vis !== R.robot.state) setRobotState(R.robot, vis);
     if (st.act !== R.act) { R.act = st.act; R.text.textContent = st.act; }
     updateRobot(R.robot, nowSec, dt);
@@ -3130,7 +3333,8 @@ const setText = (el, text) => { if (el && el.textContent !== text) el.textConten
 const STATUS_CLASS = { idle: 'st-idle', write: 'st-write', written: 'st-idle', impl: 'st-impl', verify: 'st-verify', 'impl-done': 'st-idle', paused: 'st-paused', test: 'st-test', done: 'st-complete' };
 function robotBadge(id) {
   const s = robotState[id].state;
-  if (s === 'waiting') return ['st-waiting', '許可待ち'];
+  // a question waits for the person too, but it is no permission: its own badge and filter (requester, 10-18)
+  if (s === 'waiting') return robotState[id].asking ? ['st-asking', '質問に回答待ち'] : ['st-waiting', '許可待ち'];
   if (s === 'done') return ['st-done', '完了'];
   if (s === 'idle') return ['st-idle', '待機'];
   if (s === 'thinking') return ['st-busy', '考え中'];
@@ -3146,13 +3350,13 @@ const UI = {
   sessFilter: readPref('sessFilter', 'all'),
   collapsed: new Set(prefJSON('collapsed', [])),
 };
-if (!['all', 'active', 'waiting', 'background', 'idle'].includes(UI.sessFilter)) UI.sessFilter = 'all';
+if (!['all', 'active', 'waiting', 'asking', 'background', 'idle'].includes(UI.sessFilter)) UI.sessFilter = 'all';
 const inScope = (project) => UI.project === 'all' || UI.project === project;
 const scopeLabel = () => (UI.project === 'all' ? 'すべて' : PROJECT[UI.project].name);
 function sessionBadge(s) {
   const b = s.robots.map(robotBadge);
   // A session whose busy robots only think says 考え中, as its robot row does (they disagreed — 10-18 review).
-  return b.some((x) => x[0] === 'st-waiting') ? ['st-waiting', '許可待ち'] : b.some((x) => x[1] === '作業中') ? ['st-busy', '作業中']
+  return b.some((x) => x[0] === 'st-waiting') ? ['st-waiting', '許可待ち'] : b.some((x) => x[0] === 'st-asking') ? ['st-asking', '質問に回答待ち'] : b.some((x) => x[1] === '作業中') ? ['st-busy', '作業中']
     : b.some((x) => x[1] === '考え中') ? ['st-busy', '考え中'] : b.some((x) => x[0] === 'st-bg') ? ['st-bg', '裏で作業中'] : ['st-idle', '待機'];
 }
 const roleVar = (s) => (s.by ? ` style="--c:${ROLES[DEF[s.by].role].color}"` : '');
@@ -3207,7 +3411,7 @@ $('btn-taskboard').addEventListener('click', (e) => openTaskBoard(e.currentTarge
 
 const COL_STATE = { doing: ['st-busy', '作業中'], wait: ['st-waiting', '待ち'], todo: ['st-idle', '未着手'], done: ['st-done', '完了'] };
 const paintState = (node, [cls, label]) => { if (!node) return; const c = `state ${cls}`; if (node.className !== c) node.className = c; setText(node, label); };
-const SESS_FILTERS = [['all', 'すべて'], ['active', '動いている'], ['waiting', '許可待ち'], ['background', '裏で作業中'], ['idle', '待機']];
+const SESS_FILTERS = [['all', 'すべて'], ['active', '動いている'], ['waiting', '許可待ち'], ['asking', '質問待ち'], ['background', '裏で作業中'], ['idle', '待機']];
 const sessFilterEl = $('sess-filter');
 sessFilterEl.innerHTML = SESS_FILTERS.map(([k, label]) => `<button type="button" data-sf="${esc(k)}" aria-pressed="${k === UI.sessFilter}">${esc(label)}<b></b></button>`).join('');
 sessFilterEl.addEventListener('click', (e) => {
@@ -3217,7 +3421,7 @@ sessFilterEl.addEventListener('click', (e) => {
   [...sessFilterEl.children].forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
   renderSessions();
 });
-const sessMatch = (s, f) => { const [c] = sessionBadge(s); return f === 'all' || (f === 'active' && c !== 'st-idle') || (f === 'waiting' && c === 'st-waiting') || (f === 'background' && c === 'st-bg') || (f === 'idle' && c === 'st-idle'); };
+const sessMatch = (s, f) => { const [c] = sessionBadge(s); return f === 'all' || (f === 'active' && c !== 'st-idle') || (f === 'waiting' && c === 'st-waiting') || (f === 'asking' && c === 'st-asking') || (f === 'background' && c === 'st-bg') || (f === 'idle' && c === 'st-idle'); };
 $('sessions').addEventListener('click', (e) => {
   const b = e.target.closest('[data-fold]');
   if (!b) return;
@@ -3225,7 +3429,7 @@ $('sessions').addEventListener('click', (e) => {
   writePref('collapsed', JSON.stringify([...UI.collapsed]));
   renderSessions();
 });
-const SB_ORDER = { 'st-waiting': 0, 'st-busy': 1, 'st-bg': 2, 'st-idle': 3 };
+const SB_ORDER = { 'st-waiting': 0, 'st-asking': 1, 'st-busy': 2, 'st-bg': 3, 'st-idle': 4 };
 function renderSessions() {
   const el = $('sessions'), scoped = SESSIONS.filter((s) => inScope(s.project));
   [...sessFilterEl.children].forEach((b) => setText(b.lastElementChild, String(scoped.filter((s) => sessMatch(s, b.dataset.sf)).length)));
@@ -3241,8 +3445,8 @@ function renderSessions() {
   }).join(''));
   for (const [r] of groups) {
     const all = scoped.filter((x) => x.project === r.id), badges = all.map(sessionBadge);
-    const w = badges.filter((b) => b[0] === 'st-waiting').length, busy = badges.filter((b) => b[0] === 'st-busy').length;
-    setText(el.querySelector(`[data-pgsum="${CSS.escape(r.id)}"]`), `${all.length} セッション${w ? ` · 許可待ち ${w}` : ''}${busy ? ` · 作業中 ${busy}` : ''}`);
+    const w = badges.filter((b) => b[0] === 'st-waiting').length, ask = badges.filter((b) => b[0] === 'st-asking').length, busy = badges.filter((b) => b[0] === 'st-busy').length;
+    setText(el.querySelector(`[data-pgsum="${CSS.escape(r.id)}"]`), `${all.length} セッション${w ? ` · 許可待ち ${w}` : ''}${ask ? ` · 質問待ち ${ask}` : ''}${busy ? ` · 作業中 ${busy}` : ''}`);
   }
   for (const x of scoped) {
     paintState(el.querySelector(`[data-sst="${CSS.escape(x.id)}"]`), sessionBadge(x));
@@ -3290,8 +3494,8 @@ function renderPanel(model) {
   keyed($('tasks'), JSON.stringify([UI.project, loose.map(permSig), tasks.map((x) => `${x.key}:${x.col}:${permSig(x.perm)}:${x.subject}:${x.owner || ''}`)]), () => [
     ...loose.map((p) => `<li class="task has-perm perm-only"><button type="button" class="task-open" data-open="perm:${esc(p.id)}" data-fk="to-${esc(p.id)}"><span class="tid">${esc(SESSION_OF[p.who])} セッション</span><span class="subject">タスクの外で許可を求めている</span></button><span class="state st-waiting">許可待ち</span><span class="meta">${pill(p.who, DEF[p.who].role)} ${esc(DEF[p.who].agent)}${projectTag(SESSION_OF[p.who])}</span>${permBox(p)}</li>`),
     ...tasks.map((x) => {
-      const [c, l] = x.perm ? ['st-waiting', '許可待ち'] : x.col === 'wait' ? ['st-waiting', waitLabel(x)] : COL_STATE[x.col];
-      return `<li class="task t-${esc(x.status)}${x.perm ? ' has-perm' : ''}${x.fresh ? ' t-new' : ''}${isTurn(x) ? ' t-turn' : ''}${x.failed ? ' t-failed' : ''}"><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="to-${esc(x.key)}"><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${esc(x.subject)}</span></button><span class="state ${esc(c)}">${esc(l)}</span><span class="meta">${x.owner ? `${pill(x.owner, DEF[x.owner].role)} ${esc(DEF[x.owner].agent)}` : '担当なし'}${projectTag(x.list)}</span>${x.perm ? permBox(x.perm) : ''}</li>`;
+      const [c, l] = x.perm ? ['st-waiting', '許可待ち'] : x.col === 'wait' ? [x.waitingFor === 'question' ? 'st-asking' : 'st-waiting', waitLabel(x)] : COL_STATE[x.col];
+      return `<li class="task t-${esc(x.status)}${x.perm ? ' has-perm' : ''}${x.fresh ? ' t-new' : ''}${isTurn(x) ? ' t-turn' : ''}${x.failed ? ' t-failed' : ''}"><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="to-${esc(x.key)}"><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${x.harness ? `<span class="h-tag">${esc(x.harness)}</span>` : ''}${esc(x.subject)}</span></button><span class="state ${esc(c)}">${esc(l)}</span><span class="meta">${x.owner ? `${pill(x.owner, DEF[x.owner].role)} ${esc(DEF[x.owner].agent)}` : '担当なし'}${projectTag(x.list)}</span>${x.perm ? permBox(x.perm) : ''}</li>`;
     }),
   ].join('') || `<li class="empty-note">${esc(scopeLabel())} にタスクはない</li>`);
 
@@ -3428,8 +3632,14 @@ const Q_SHOW_MS = 30_000;   // an answered card stays a moment, saying who answe
 const qState = (q) => (q.status === 'sent' ? '送信済み · Claude Code の確定を待っている'
   : q.status === 'answered' ? 'ブラウザの答えが届いた' : q.status === 'answered_in_terminal' ? 'ターミナルで答えた'
     : q.status === 'expired' ? '答えないまま終わった' : '');
+/* Why a pending card cannot be answered here. It goes at the top, above choices drawn as not pickable: at the
+   bottom, under radios that looked live, the requester clicked them and nothing happened (10-18). */
+const qWhy = (q) => (q.tooLongToShow ? '質問の全部をここに表示できないため、ここでは答えられません'
+  : q.released ? 'ターミナルに返しました' : q.waitEnded ? 'ブラウザで答えられる時間が過ぎました（だれも操作しないまま待ちが終わった）'
+    : 'このセッションは答えの中継を待っていません');
 function questionHTML(q) {
   const open = q.status === 'pending' && q.hookWaiting && !q.tooLongToShow;
+  const closed = q.status === 'pending' && !open;
   const got = q.sentAnswers || q.gotAnswers || null;
   const itemsHTML = q.questions.map((x, i) => {
     const type = x.multiSelect ? 'checkbox' : 'radio', name = `qa-${q.id}-${i}`;
@@ -3442,9 +3652,9 @@ function questionHTML(q) {
   }).join('');
   // While the hook waits the terminal shows no question (measured 10-18): the time left, and the way to the terminal.
   const footHTML = open ? `<div class="qfoot"><button type="button" class="pa pa-allow" data-qsend="${esc(q.id)}" data-fk="qs-${esc(q.id)}" disabled>答えを送る</button><button type="button" class="pa pa-deny" data-qrelease="${esc(q.id)}" data-fk="qr-${esc(q.id)}">ターミナルで答える</button></div><p class="qnote">待っている間はターミナルに質問が出ない · <span data-quntil="${esc(q.id)}"></span>（操作すると延びる）</p>`
-    : q.status === 'pending' ? `<p class="qnote">${q.tooLongToShow ? '質問の全部をここに表示できないため、ターミナルで答えてください' : 'このセッションは答えの中継を待っていない。ターミナルで答えてください'}</p>`
-      : `<p class="qnote qdone">${esc(qState(q))}</p>`;
-  return `<article class="qcard${open ? ' q-open' : ''}" data-qcard="${esc(q.id)}"><header class="qwho">${pill(q.who, DEF[q.who].role)}<span>${esc(DEF[q.who].agent)}</span><span class="pc-wait" data-since="${q.at}"></span></header>${itemsHTML}${footHTML}</article>`;
+    : closed ? '' : `<p class="qnote qdone">${esc(qState(q))}</p>`;
+  const whyHTML = closed ? `<p class="qnote qwhy" role="note">${esc(qWhy(q))}。ターミナルで答えてください（ここでは選べません）</p>` : '';
+  return `<article class="qcard${open ? ' q-open' : ''}${closed ? ' q-closed' : ''}" data-qcard="${esc(q.id)}"><header class="qwho">${pill(q.who, DEF[q.who].role)}<span>${esc(DEF[q.who].agent)}</span><span class="pc-wait" data-since="${q.at}"></span></header>${whyHTML}${itemsHTML}${footHTML}</article>`;
 }
 function renderQuestions() {
   const now = Date.now();
@@ -3454,7 +3664,7 @@ function renderQuestions() {
   chip.hidden = waiting === 0;
   setText(chip, `質問 ${waiting}`);
   $('questions-sec').hidden = shown.length === 0;
-  keyed($('questions'), JSON.stringify(shown.map((q) => [q.id, q.status, q.hookWaiting, q.tooLongToShow, q.sentAnswers, q.gotAnswers])), () => shown.map((q) => questionHTML(q)).join(''));
+  keyed($('questions'), JSON.stringify(shown.map((q) => [q.id, q.status, q.hookWaiting, q.tooLongToShow, q.waitEnded, q.released, q.sentAnswers, q.gotAnswers])), () => shown.map((q) => questionHTML(q)).join(''));
   for (const el of $('questions').querySelectorAll('[data-quntil]')) {   // the countdown, in place (inputs keep their state)
     const q = QUESTIONS.find((x) => x.id === el.dataset.quntil);
     setText(el, q && q.waitUntil ? `あと ${Math.max(0, Math.ceil((q.waitUntil - now) / 1000))} 秒でターミナルに戻す` : '');
@@ -4060,7 +4270,7 @@ function renderTaskBoard(model) {
   const noteHTML = (x, col) => {
       const ownerHTML = x.owner ? `${pill(x.owner, DEF[x.owner].role)}<span>${esc(DEF[x.owner].agent)}</span>` : '<span>担当なし</span>';
       const extraHTML = col === 'doing' ? `<span class="n-doing">▶ ${esc(isTurn(x) ? (x.background ? 'バックグラウンドで作業中' : '指示を処理中') : x.activeForm || x.subject)}<span data-since="${x.start}"></span></span>`
-        : col === 'wait' ? (x.dep ? `<span class="n-wait">#${esc(x.dep.id)}「${esc(x.dep.subject)}」の完了待ち</span>` : `<span class="n-wait">${isTurn(x) ? '許可の返事待ち' : '待ち'}</span>`)
+        : col === 'wait' ? (x.dep ? `<span class="n-wait">#${esc(x.dep.id)}「${esc(x.dep.subject)}」の完了待ち</span>` : `<span class="n-wait">${isTurn(x) ? (x.waitingFor === 'question' ? '質問に回答待ち' : '許可の返事待ち') : '待ち'}</span>`)
           : col === 'done' ? `<span class="n-time">${fmtClock(BASE_CLOCK + loopStart + x.end)} に${x.failed ? '失敗で終了' : '完了'}</span>` : '';
       const permHTML = x.perm ? `<div class="n-permbox"><p class="n-permq"><b>許可待ち</b> ${esc(x.perm.tool)} ${permSubject(x.perm)}</p><div class="perm-acts">${permButtons(x.perm, 'k')}</div></div>` : '';
       return `<li class="note${x.perm ? ' n-perm' : ''}${x.fresh ? ' n-new' : ''}${isTurn(x) ? ' n-turn' : ''}"><button type="button" class="note-open" data-open="${esc(x.key)}" data-fk="nb-${esc(x.key)}"><span class="n-top"><span>${esc(taskRef(x))}</span><span>${UI.lanes ? '' : `${esc(x.list)} の一覧${UI.project === 'all' ? ` · ${esc(PROJECT[PROJECT_OF[x.list]].name)}` : ''}`}</span></span><span class="n-subj">${esc(x.subject)}</span>${extraHTML}<span class="n-owner">${ownerHTML}</span></button>${permHTML}</li>`;
@@ -4186,6 +4396,7 @@ function closeRobot(keepZoom) {
   if (!rbState.id) return;
   rbState.id = null;
   hideOverlay(rbEl);
+  histSync();
   if (!keepZoom) zoomBack();
 }
 function renderRobot(model) {
@@ -4200,21 +4411,24 @@ function renderRobot(model) {
   keyed(rbEl, JSON.stringify([id, permSig(pending), specIdx, owned.map((x) => `${x.key}:${x.col}:${x.perm ? 1 : 0}:${x.subject}`)]), () => {
     const room = (SESSIONS.find((s) => s.id === sess) || { room: (PROJECT[projectOfRobot(id)] || {}).name || '' }).room;
     const tasksHTML = owned.length ? `<ul class="rb-tasks">${owned.map((x) => {
-      const [c, l] = x.perm ? ['st-waiting', '許可待ち'] : x.col === 'wait' ? ['st-waiting', waitLabel(x)] : COL_STATE[x.col];
-      return `<li><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="rt-${esc(x.key)}"><span class="state ${esc(c)}">${esc(l)}</span><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${esc(x.subject)}</span>${!isMain || !x.owner ? '' : `<span class="rb-owner">${pill(x.owner, DEF[x.owner].role)}</span>`}</button></li>`;
+      const [c, l] = x.perm ? ['st-waiting', '許可待ち'] : x.col === 'wait' ? [x.waitingFor === 'question' ? 'st-asking' : 'st-waiting', waitLabel(x)] : COL_STATE[x.col];
+      return `<li><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="rt-${esc(x.key)}"><span class="state ${esc(c)}">${esc(l)}</span><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${x.harness ? `<span class="h-tag">${esc(x.harness)}</span>` : ''}${esc(x.subject)}</span>${!isMain || !x.owner ? '' : `<span class="rb-owner">${pill(x.owner, DEF[x.owner].role)}</span>`}</button></li>`;
     }).join('')}</ul>` : `<p class="rb-none">${isMain ? 'このセッションのタスク一覧は空' : '担当しているタスクはない'}</p>`;
     return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? `${id} のメインセッション` : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.agent} · ${room}` : `${ROLE_JA[d.role]} · ${sess} セッションのサブエージェント · ${room}`)}</p></div><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">← 3D に戻る</button></div>
+<div class="rb-tabs" role="tablist" aria-label="表示"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">今の様子</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">応答の履歴</button></div>
+<div class="rb-body rb-hist" data-rb-hist hidden aria-label="応答の履歴"></div>
 <div class="rb-body">
 <section class="rb-sec" aria-labelledby="rb-h-now"><h3 id="rb-h-now">今やっていること</h3><div class="rb-now"><p class="rb-state"><span class="rb-lamp" data-rb-lamp></span><b data-rb-state></b><span class="rb-since">ランプ: <span data-rb-lampname></span></span></p><p class="rb-act" data-rb-act></p><p class="rb-cond" data-rb-cond></p>${spec ? `<p class="rb-spec"><button type="button" class="link-btn" data-spec-open="${specIdx}" data-fk="rb-spec">${esc(spec.name)}（${esc(spec.screen)}）の spec</button> <span data-rb-specnow></span></p><span class="rb-segs" style="--c:${ROLES[d.role].color}">${SEGS}</span>` : ''}${(SOURCE.mode === 'demo' && id === 'a2') ? '<p class="rb-test" data-rb-test></p><div class="prog" data-rb-prog role="img"><span class="p"></span><span class="r"></span></div>' : ''}</div></section>
 ${pending ? `<section class="rb-sec" aria-label="許可">${permDetail(pending, 'rb')}</section>` : ''}
+${SOURCE.mode === 'live' ? '<section class="rb-sec" aria-labelledby="rb-h-tests"><h3 id="rb-h-tests">テスト実行</h3><div data-rb-tests></div></section>' : ''}
 <section class="rb-sec" aria-labelledby="rb-h-tasks"><h3 id="rb-h-tasks">${isMain ? 'このセッションのタスク' : '担当しているタスク'}<small>${owned.length} 件</small></h3>${tasksHTML}</section>
 ${subs.length ? `<section class="rb-sec" aria-labelledby="rb-h-subs"><h3 id="rb-h-subs">サブエージェント</h3><ul class="rb-subs">${subs.map((r) => `<li><button type="button" class="who-btn" data-robot-open="${esc(r)}" data-fk="rs-${esc(r)}">${pill(r, DEF[r].role)}<span>${esc(DEF[r].agent)}</span></button><span class="state" data-rb-sub="${esc(r)}"></span><p class="act" data-rb-subact="${esc(r)}"></p></li>`).join('')}</ul></section>` : ''}
 <section class="rb-sec" aria-labelledby="rb-h-log"><h3 id="rb-h-log">最近の動き</h3><ul class="tbd-list" data-recent="${esc(id)}"></ul><button type="button" class="link-btn" data-log-robot="${esc(id)}" data-fk="rb-log">ログで ${esc(id)} だけを見る</button></section>
 </div>`;
   });
   const S = STATES[st.state] || STATES.idle;
-  setText(rbEl.querySelector('[data-rb-state]'), S.name);
-  setText(rbEl.querySelector('[data-rb-lampname]'), LAMP_TEXT[S.lamp] || '');
+  setText(rbEl.querySelector('[data-rb-state]'), st.asking ? '質問に回答待ち' : S.name);
+  setText(rbEl.querySelector('[data-rb-lampname]'), st.asking ? '黄（質問に回答待ち）' : LAMP_TEXT[S.lamp] || '');
   const lamp = rbEl.querySelector('[data-rb-lamp]'); if (lamp) lamp.style.background = LAMP[S.lamp];
   setText(rbEl.querySelector('[data-rb-act]'), st.act);
   // Tiredness and heavy work in words too (the 3D showed them, the card did not — 10-18 review)
@@ -4245,16 +4459,34 @@ ${subs.length ? `<section class="rb-sec" aria-labelledby="rb-h-subs"><h3 id="rb-
   rbEl.querySelectorAll('[data-rb-subact]').forEach((el) => setText(el, robotState[el.dataset.rbSubact].act));
   paintSince(rbEl, model.t, '待ち');
   rbEl.querySelectorAll('[data-recent]').forEach((el) => setHTML(el, recentHTML(el.dataset.recent)));
+  const testsEl = rbEl.querySelector('[data-rb-tests]');
+  if (testsEl) setHTML(testsEl, robotTestsHTML(robotRuns(id)));   // rewritten on every refresh while a run moves
+  histSync();   // 55-history.js: the tab shown, and the history kept fresh while it is
 }
 
 /* ---------- live: the test run in the side panel (plan 09 §4) ---------- */
 const CASE_ICON = { pending: '○', running: '▶', passed: '✓', flaky: '⚠', failed: '✗', skipped: '–' };
+/* A robot's runs on its card: platform, state, counts, the bar, and the failed cases by name (FAILED_SHOWN at most). */
+const FAILED_SHOWN = 5;
+function robotTestsHTML(runs) {
+  if (!runs.length) return '<p class="rb-none">このロボットが走らせたテストはまだ無い</p>';
+  return `<ul class="rb-runs">${runs.map((T) => robotRunHTML(T)).join('')}</ul>`;
+}
+function robotRunHTML(T) {
+  const n = T.rows.length, pPct = n ? (T.passed / n) * 100 : T.runStatus === 'passed' ? 100 : 0, rPct = n && T.runningIdx >= 0 ? 100 / n : 0;
+  const fPct = n ? (T.failed / n) * 100 : T.runStatus === 'failed' ? 100 : 0;
+  const failedRows = T.rows.filter((c) => c.status === 'failed');
+  const namesHTML = failedRows.slice(0, FAILED_SHOWN).map((c) => `<li>${esc(c.name)}</li>`).join('');
+  const moreHTML = failedRows.length > FAILED_SHOWN ? `<li class="rb-fail-more">ほか ${Math.max(0, failedRows.length - FAILED_SHOWN)} 件</li>` : '';
+  return `<li class="rb-run r-${esc(T.runStatus)}" data-rb-run="${esc(T.id)}"><p class="rb-run-head"><b>${esc(T.device || 'テスト')}</b> <span>${esc(T.statusText)}</span>${T.savedAt ? '<small class="rb-saved">保存された結果</small>' : ''}</p><code class="rb-run-file">${esc(T.file)}</code>
+<div class="prog" role="img" aria-label="通過 ${Number(T.passed)} 件 / 失敗 ${Number(T.failed)} 件 / 全 ${Number(n)} 件"><span class="p" style="width:${Number(pPct)}%"></span><span class="r" style="width:${Number(rPct)}%"></span><span class="x" style="width:${Number(fPct)}%"></span></div>${namesHTML ? `<ul class="rb-fails" aria-label="失敗したケース">${namesHTML}${moreHTML}</ul>` : ''}</li>`;
+}
 function liveTestsHTML(T) {
   const n = T.rows.length, pPct = n ? (T.passed / n) * 100 : T.runStatus === 'passed' ? 100 : 0, rPct = n && T.runningIdx >= 0 ? 100 / n : 0;
   const fPct = n ? (T.failed / n) * 100 : T.runStatus === 'failed' ? 100 : 0;
   const whoPillHTML = T.who && DEF[T.who] ? pill(T.who, DEF[T.who].role) : '';
   return `<div class="test-head"><div>${whoPillHTML} <code>${esc(T.file)}</code></div><code>${esc(T.device)}${T.device ? ' · ' : ''}${esc(T.statusText)}</code>
-<div class="prog" role="img" aria-label="通過 ${T.passed} 件 / 全 ${n} 件"><span class="p" style="width:${pPct}%"></span><span class="r" style="width:${rPct}%"></span><span class="x" style="width:${fPct}%"></span></div></div>
+<div class="prog" role="img" aria-label="通過 ${Number(T.passed)} 件 / 全 ${Number(n)} 件"><span class="p" style="width:${Number(pPct)}%"></span><span class="r" style="width:${Number(rPct)}%"></span><span class="x" style="width:${Number(fPct)}%"></span></div></div>
 <ul class="cases">${T.rows.map((c, i) => `<li class="c-${esc(c.status)}"><span class="ic">${CASE_ICON[c.status] || '○'}</span><span>${i + 1}. ${esc(c.name)}</span>${c.status === 'running' ? `<span class="step">${esc(c.step)}</span>` : ''}</li>`).join('')}</ul>`;
 }
 
@@ -4310,6 +4542,260 @@ function closeAlwaysConfirm(back) {
   alwaysDlg = null; el.remove();
   if (back && opener && document.contains(opener)) opener.focus({ preventScroll: true });
 }
+// ---- web/js/55-history.js ----
+/* ---------- 応答の履歴: the robot card's second tab (requester, 10-18) ----------
+   "ロボットに合わせた時に会話履歴みたいな感じで" / "応答の履歴タブをこのメニューに作って、それ選択したらメニュー全体が
+   会話の履歴見れるようになる感じがいいな". The server reads the last turns of that robot's transcript only when this tab
+   asks (sources/history.py), and again every HIST_POLL_MS while it stays open.
+
+   Everything here is built with DOM nodes: a transcript holds any text at all (files read, pages fetched, HTML), so
+   every character of it goes in through textContent, never through innerHTML, and this part has no HTML template.
+   The answers are Markdown, drawn by a small subset: headings, lists, quotes, rules, tables, fenced and inline code
+   (never converted inside), bold, italics, links — an href only when the URL, its character references decoded,
+   is http: or https: — and images as a mark (nothing is fetched). */
+const HIST_POLL_MS = 3000;
+const HIST = { tab: 'now', id: null, data: null, error: '', timer: 0, busy: false, node: null, sig: '' };
+
+function hNode(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined && text !== null) n.textContent = String(text);
+  return n;
+}
+
+/* A link's target as the browser would read it: character references decoded, then whitespace and controls out. */
+function histDecodeRefs(s) {
+  return String(s).replace(/&(#x[0-9a-f]+|#[0-9]+|[a-z]+);?/gi, (m, ref) => {
+    const r = ref.toLowerCase();
+    if (r[0] === '#') {
+      const code = r[1] === 'x' ? parseInt(r.slice(2), 16) : parseInt(r.slice(1), 10);
+      return Number.isFinite(code) && code >= 0 && code <= 0x10ffff ? String.fromCodePoint(code) : '';
+    }
+    return { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", colon: ':', tab: '\t', newline: '\n' }[r] ?? m;
+  });
+}
+function histSafeHref(raw) {
+  const url = histDecodeRefs(raw).replace(/[\u0000- \u007f-\u009f]/g, '');
+  return /^https?:/i.test(url) ? url : null;
+}
+
+/* Inline Markdown into parent: code spans first (their text is left as it is), then images, links, bold, italics. */
+const HIST_INLINE = /(\x60+)([\s\S]+?)\1|!\[([^\]\n]*)\]\(([^)\s]*)\)|\[([^\]\n]+)\]\(([^)\s]+)\)|\*\*([^*\n](?:[\s\S]*?[^*\n])?)\*\*|\*([^*\s\n](?:[^*\n]*?[^*\s\n])?)\*/g;
+function histInline(parent, text) {
+  let last = 0;
+  const re = new RegExp(HIST_INLINE.source, 'g');   // its own: the calls below for a link's text or bold recurse
+  const src = String(text);
+  for (let m = re.exec(src); m; m = re.exec(src)) {
+    if (m.index > last) parent.appendChild(document.createTextNode(src.slice(last, m.index)));
+    if (m[1]) parent.appendChild(hNode('code', '', m[2]));
+    else if (m[4] !== undefined && m[0][0] === '!') parent.appendChild(hNode('span', 'h-img', `画像: ${m[3] || '（説明なし）'}`));
+    else if (m[5] !== undefined) {
+      const href = histSafeHref(m[6]);
+      if (href) {
+        const a = hNode('a');
+        a.setAttribute('href', href);
+        a.setAttribute('target', '_blank');
+        a.setAttribute('rel', 'noopener noreferrer');
+        histInline(a, m[5]);
+        parent.appendChild(a);
+      } else parent.appendChild(document.createTextNode(m[0]));   // not http(s): the text as written
+    } else if (m[7] !== undefined) { const b = hNode('strong'); histInline(b, m[7]); parent.appendChild(b); }
+    else if (m[8] !== undefined) { const i = hNode('em'); histInline(i, m[8]); parent.appendChild(i); }
+    last = re.lastIndex;
+  }
+  if (last < src.length) parent.appendChild(document.createTextNode(src.slice(last)));
+}
+
+const histCells = (line) => line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim());
+/* Block Markdown into a new element. */
+function histMarkdown(text) {
+  const root = hNode('div', 'h-md');
+  const lines = String(text).replace(/\r\n?/g, '\n').split('\n');
+  let i = 0, para = null, list = null;
+  const flush = () => { para = null; list = null; };
+  while (i < lines.length) {
+    const line = lines[i];
+    const fence = line.match(/^\s*(\x60{3,}|~{3,})\s*([\w+-]*)\s*$/);
+    if (fence) {                                       // a code block: kept as it is, up to its closing fence
+      flush();
+      const body = [];
+      i += 1;
+      while (i < lines.length && !lines[i].trim().startsWith(fence[1])) { body.push(lines[i]); i += 1; }
+      i += 1;
+      const pre = hNode('pre', 'h-code');
+      pre.appendChild(hNode('code', '', body.join('\n')));
+      root.appendChild(pre);
+      continue;
+    }
+    if (!line.trim()) { flush(); i += 1; continue; }
+    const h = line.match(/^\s{0,3}(#{1,6})\s+(.*)$/);
+    if (h) { flush(); const n = hNode(`h${Math.min(6, h[1].length + 3)}`, 'h-h'); histInline(n, h[2].replace(/\s+#+\s*$/, '')); root.appendChild(n); i += 1; continue; }
+    if (/^\s{0,3}([-*_])(\s*\1){2,}\s*$/.test(line)) { flush(); root.appendChild(hNode('hr')); i += 1; continue; }
+    if (line.includes('|') && i + 1 < lines.length && /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/.test(lines[i + 1])) {
+      flush();
+      const table = hNode('table', 'h-table'), head = hNode('tr');
+      for (const c of histCells(line)) { const th = hNode('th'); histInline(th, c); head.appendChild(th); }
+      const thead = hNode('thead'); thead.appendChild(head); table.appendChild(thead);
+      const tbody = hNode('tbody');
+      i += 2;
+      while (i < lines.length && lines[i].includes('|') && lines[i].trim()) {
+        const tr = hNode('tr');
+        for (const c of histCells(lines[i])) { const td = hNode('td'); histInline(td, c); tr.appendChild(td); }
+        tbody.appendChild(tr);
+        i += 1;
+      }
+      table.appendChild(tbody);
+      const wrap = hNode('div', 'h-tablewrap'); wrap.appendChild(table); root.appendChild(wrap);
+      continue;
+    }
+    const q = line.match(/^\s{0,3}>\s?(.*)$/);
+    if (q) {
+      flush();
+      const body = [q[1]];
+      i += 1;
+      while (i < lines.length && /^\s{0,3}>/.test(lines[i])) { body.push(lines[i].replace(/^\s{0,3}>\s?/, '')); i += 1; }
+      const bq = hNode('blockquote', 'h-quote');
+      bq.appendChild(histMarkdown(body.join('\n')));
+      root.appendChild(bq);
+      continue;
+    }
+    const li = line.match(/^(\s*)([-*+]|\d{1,9}[.)])\s+(.*)$/);
+    if (li) {
+      const ordered = /\d/.test(li[2]);
+      if (!list || list.ordered !== ordered) {
+        para = null;
+        list = { ordered, el: hNode(ordered ? 'ol' : 'ul', 'h-list') };
+        root.appendChild(list.el);
+      }
+      const item = hNode('li');
+      if (li[1].length >= 2) item.className = 'h-sub';
+      histInline(item, li[3]);
+      list.el.appendChild(item);
+      i += 1;
+      continue;
+    }
+    list = null;
+    if (!para) { para = hNode('p'); root.appendChild(para); } else para.appendChild(hNode('br'));
+    histInline(para, line);
+    i += 1;
+  }
+  return root;
+}
+
+/* ---------- the items ---------- */
+const HIST_TIME = (at) => (Number.isFinite(at) ? new Date(at).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) : '');
+function histCutNote(item) { return item.cut ? hNode('p', 'h-cut', '（長いので途中まで）') : null; }
+function histFolded(cls, title, body, open) {
+  const d = hNode('details', cls);
+  if (open) d.open = true;
+  const s = hNode('summary');
+  for (const part of title) s.appendChild(part);
+  d.appendChild(s);
+  for (const b of body) if (b) d.appendChild(b);
+  return d;
+}
+function histItem(item) {
+  const at = hNode('time', 'h-at', HIST_TIME(item.at));
+  if (item.kind === 'user') {
+    const n = hNode('div', 'h-item h-user');
+    const head = hNode('p', 'h-who', '依頼者'); head.appendChild(at); n.appendChild(head);
+    n.appendChild(hNode('p', 'h-plain', item.text));
+    const cut = histCutNote(item); if (cut) n.appendChild(cut);
+    return n;
+  }
+  if (item.kind === 'assistant') {
+    const n = hNode('div', 'h-item h-asst');
+    n.appendChild(histMarkdown(item.text));
+    const cut = histCutNote(item); if (cut) n.appendChild(cut);
+    return n;
+  }
+  if (item.kind === 'peer') {
+    return histFolded('h-item h-peer', [hNode('b', '', `${item.from} から`), hNode('span', 'h-head', String(item.text).split('\n').find((l) => l.trim()) || ''), at],
+      [hNode('p', 'h-plain', item.text), histCutNote(item)], false);
+  }
+  if (item.kind === 'harness') {
+    return histFolded('h-item h-harness', [hNode('b', '', item.label), hNode('span', 'h-head', 'ハーネスが入れた文'), at],
+      [hNode('p', 'h-plain', item.text), histCutNote(item)], false);
+  }
+  if (item.kind === 'tool') {
+    const first = String(item.in || '').split('\n')[0];
+    const title = [hNode('b', 'h-tname', item.name), hNode('span', 'h-head', item.description || first)];
+    if (item.error) title.push(hNode('span', 'h-err', 'エラー'));
+    if (item.out === undefined) title.push(hNode('span', 'h-run', '結果待ち'));
+    const io = hNode('div', 'h-io');
+    io.appendChild(hNode('span', 'h-io-k', 'IN'));
+    io.appendChild(hNode('pre', 'h-code', `${item.in || ''}${item.inCut ? '\n…' : ''}`));
+    if (item.out !== undefined) {
+      io.appendChild(hNode('span', 'h-io-k', 'OUT'));
+      io.appendChild(hNode('pre', `h-code${item.error ? ' h-code-err' : ''}`, `${item.out}${item.outCut ? '\n…' : ''}`));
+    }
+    return histFolded('h-item h-tool', title, [io], false);
+  }
+  if (item.kind === 'thought') return hNode('p', 'h-item h-mark', '考えた');
+  if (item.kind === 'image') return hNode('p', 'h-item h-mark', '画像 1 枚');
+  return null;
+}
+function histBuild(data) {
+  const box = hNode('div', 'h-list-box');
+  const items = Array.isArray(data.items) ? data.items : [];
+  if (data.more) box.appendChild(hNode('p', 'h-note', `直近 ${items.filter((x) => x.kind !== 'thought' && x.kind !== 'image').length} 件（それより前は表示しない）`));
+  let prev = null;
+  for (const item of items) {
+    if (item.kind === 'thought' && prev === 'thought') continue;   // one mark for a run of thinking
+    const n = histItem(item);
+    if (n) box.appendChild(n);
+    prev = item.kind;
+  }
+  if (!items.length) box.appendChild(hNode('p', 'h-note', 'まだ応答がない'));
+  return box;
+}
+
+/* ---------- the tab ---------- */
+function histPane() { return rbEl.querySelector('[data-rb-hist]'); }
+function histShow() {
+  const pane = histPane();
+  if (!pane) return;
+  if (HIST.error && !HIST.data) { pane.replaceChildren(hNode('p', 'h-note', HIST.error)); return; }
+  if (!HIST.node) { pane.replaceChildren(hNode('p', 'h-note', '読み込み中…')); return; }
+  if (pane.firstChild !== HIST.node) pane.replaceChildren(HIST.node);
+}
+async function histFetch() {
+  const id = HIST.id;
+  if (!id || HIST.busy || HIST.tab !== 'history') return;
+  HIST.busy = true;
+  const got = await SOURCE.history(id);
+  HIST.busy = false;
+  if (HIST.id !== id || HIST.tab !== 'history') return;
+  if (!got.ok) { HIST.error = got.error === 'demo' ? 'デモでは応答の履歴を表示しない' : '応答の履歴を読めない（このロボットの記録が見つからない）'; histShow(); return; }
+  HIST.error = '';
+  const sig = JSON.stringify(got.data.items);
+  if (sig === HIST.sig && HIST.node) return;           // nothing new: the open folds and the scroll stay
+  const pane = histPane();
+  const atEnd = !pane || pane.scrollHeight - pane.scrollTop - pane.clientHeight < 40;
+  HIST.sig = sig; HIST.data = got.data; HIST.node = histBuild(got.data);
+  histShow();
+  if (pane && atEnd) pane.scrollTop = pane.scrollHeight;
+}
+function histStop() { clearInterval(HIST.timer); HIST.timer = 0; }
+/* After every renderRobot: which tab shows, and the polling that keeps an open history fresh. */
+function histSync() {
+  const id = rbEl.hidden ? null : rbState.id;
+  if (id !== HIST.id) { HIST.id = id; HIST.data = null; HIST.node = null; HIST.sig = ''; HIST.error = ''; histStop(); }
+  const tabs = rbEl.querySelectorAll('[data-rb-tab]');
+  tabs.forEach((b) => b.setAttribute('aria-selected', String(b.dataset.rbTab === HIST.tab)));
+  const body = rbEl.querySelector('.rb-body:not([data-rb-hist])'), pane = histPane();
+  if (body) body.hidden = HIST.tab !== 'now';
+  if (pane) pane.hidden = HIST.tab !== 'history';
+  if (!id || HIST.tab !== 'history') { histStop(); return; }
+  histShow();
+  if (!HIST.timer) { histFetch(); HIST.timer = setInterval(() => { if (document.visibilityState === 'visible') histFetch(); }, HIST_POLL_MS); }
+}
+rbEl.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-rb-tab]');
+  if (!b) return;
+  HIST.tab = b.dataset.rbTab === 'history' ? 'history' : 'now';
+  histSync();
+});
 // ---- web/js/60-log.js ----
 
 /* ---------- full-screen event log ---------- */
