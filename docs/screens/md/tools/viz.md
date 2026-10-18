@@ -2,7 +2,7 @@
 
 ## Overview
 
-Tools > jui viz. The local browser view of Claude Code sessions and subagents (rooms and robots), shipped in jsonui-cli 2.0.0. The page opens with the live demo (VizDemo, the folder `jui viz export-demo` writes), then ten sections: what it shows / what you need / install / start / reading the screen / permission prompts / test progress / remove / troubleshooting / safety. Source: the article the jui viz side handed over, checked against jsonui-cli 2.0.0.
+Tools > jui viz. The local browser view of Claude Code sessions and subagents (rooms and robots), shipped in jsonui-cli 2.0.0. The page opens with the live demo (VizDemo, the folder `jui viz export-demo` writes), then ten sections: what it shows / what you need / install / start / reading the screen / permission prompts / test progress / remove / troubleshooting / safety. Source: the article the jui viz side handed over, checked against jsonui-cli 2.0.0; the reading-the-screen section re-read at 2.1.0 (doors and the one-room view, the background state, the spec board across apps, a task card per instruction).
 
 | | |
 |---|---|
@@ -157,6 +157,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 ## Notes
 
 - The demo is served from jsonui-doc-web/public/tools/viz-demo/<jsonui-cli version>/, written by `jui viz export-demo` from the pinned jsonui-cli. Re-export on a pin bump that changes it; see the VizDemo component spec.
-- The jui viz screen is Japanese only (2.0.0). The English page says so under the demo.
+- The jui viz screen is Japanese only (checked at 2.1.0). The English page says so under the demo.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

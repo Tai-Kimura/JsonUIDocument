@@ -25,10 +25,11 @@ const COL = {
   band: '#fffdf7', bandInk: '#d62839', wood: '#c99f73', woodDark: '#9e7752',
   laptop: '#c9d0db', phone: '#1f2532',
 };
-const LAMP = { idle: '#8fa3bf', busy: '#35d07f', think: '#8fe0b4', waiting: '#ffb020', done: '#35d07f', off: '#2a3a30' };
+const LAMP = { idle: '#8fa3bf', busy: '#35d07f', think: '#8fe0b4', bg: '#4cc3d9', waiting: '#ffb020', done: '#35d07f', off: '#2a3a30' };
 const STATES = {
   idle: { name: '待機', lamp: 'idle', face: 'normal' },
   thinking: { name: '考え中', lamp: 'think', face: 'normal' },
+  background: { name: '裏で作業中', lamp: 'bg', face: 'normal' },   // waiting on background work: lit, watching its screen (10-18)
   typing: { name: '入力', lamp: 'busy', face: 'focus' },
   reading: { name: '読む', lamp: 'busy', face: 'normal' },
   command: { name: 'コマンド', lamp: 'busy', face: 'focus' },
@@ -37,7 +38,7 @@ const STATES = {
   carry: { name: '運ぶ', lamp: 'busy', face: 'normal' },
   done: { name: '完了', lamp: 'done', face: 'happy' },
 };
-const LAMP_TEXT = { idle: '青灰（待機）', busy: '緑（作業中）', think: '淡い緑のゆっくり点滅（考え中）', waiting: '黄（許可待ち）', done: '緑の点滅（完了）' };
+const LAMP_TEXT = { idle: '青灰（待機）', busy: '緑（作業中）', think: '淡い緑のゆっくり点滅（考え中）', waiting: '黄（許可待ち）', done: '緑の点滅（完了）', bg: '水色（裏で作業中）' };
 
 const HIPS_Y = 0.36;
 const HEAD = { w: 1.1, h: 0.9, d: 0.92, r: 0.17 };
@@ -747,6 +748,12 @@ function poseFor(state, s) {
       p.torsoY = sway * 0.04; p.hipsY = reduceMotion ? 0 : Math.sin(s * 1.8) * 0.006;
       break;
     }
+    case 'background': {   // at its desk, watching the screen while the work runs in the background
+      const look = reduceMotion ? 0 : Math.sin(s * 0.35);
+      p.torsoX = 0.04; p.headX = 0.22 + look * 0.02; p.headY = look * 0.06; p.hipsY = reduceMotion ? 0 : Math.sin(s * 1.4) * 0.006;
+      p.aLx = -0.85; p.aLz = -0.28; p.aRx = -0.85; p.aRz = 0.28;   // hands resting on the desk
+      break;
+    }
     case 'typing':
       p.torsoX = 0.06; p.headX = 0.2 + Math.sin(s * 1.2) * 0.03; p.headY = Math.sin(s * 0.45) * 0.08;
       p.aLx = -1.05 + Math.max(0, Math.sin(s * 15)) * 0.13; p.aLz = -0.32;
@@ -885,6 +892,11 @@ function secState(s, k) {
   return { kind: c >= n ? 'done' : 'impl', f: n ? c / n : 1, text: c >= n ? '実装済み' : `実装 ${c}/${n}` };
 }
 const KCOLS = [['todo', '未着手'], ['wait', '待ち'], ['doing', '作業中'], ['done', '完了']];
+/* Where a card came from (requester, 10-18): a turn — a prompt the session received, done at Stop — or the task tools
+   (TodoWrite, the task hooks, ~/.claude/tasks/). A turn reads 指示 n where a task reads #n. */
+const isTurn = (x) => !!x && x.source === 'turn';
+const taskRef = (x) => (isTurn(x) ? `指示 ${x.turn}` : `#${x.id}`);
+const waitLabel = (x) => (isTurn(x) ? '許可待ち' : x.blockedBy ? `#${x.blockedBy} 待ち` : '待ち');
 const permSummary = (p) => p.input.command || p.input.file_path || '';
 const ruleCovers = (p, abs) => alwaysRules.has(p.rule) && alwaysRules.get(p.rule) < abs;
 // ---- web/js/30-source-demo.js ----
@@ -1259,6 +1271,15 @@ const TASKS = [
   { list: 'e1', id: 1, subject: '属性リファレンスの spec を書く', activeForm: '属性リファレンスの spec を書いています', owner: 'e1', spec: 'attrs', created: -1, start: 18, end: 78 },
   { list: 'e1', id: 2, subject: '属性リファレンスを実装', owner: null, spec: 'attrs', created: -1, start: null, end: null, blockedBy: 1 },
 ];
+/* The turns (requester, 10-18): one card per prompt a session received, done at Stop; 4f waits for its pip install
+   (p6) while its second turn works. */
+TASKS.push(
+  { list: 'a0', id: 'turn-1', source: 'turn', turn: 1, subject: 'ホームからカートまでの画面を仕上げて', owner: 'a0', spec: null, created: -1, start: -1, end: null },
+  { list: 'b4', id: 'turn-1', source: 'turn', turn: 1, subject: '会員登録と商品詳細を進めて', owner: 'b4', spec: null, created: -1, start: -1, end: null },
+  { list: '4f', id: 'turn-1', source: 'turn', turn: 1, subject: 'jui build の iOS 出力を直して', owner: '4f', spec: null, created: -1, start: -1, end: 24 },
+  { list: '4f', id: 'turn-2', source: 'turn', turn: 2, subject: 'jui viz の雛形を作って', owner: '4f', spec: null, created: 40, start: 40, end: null, waitFrom: 42, waitTo: 44 },
+  { list: 'c9', id: 'turn-1', source: 'turn', turn: 1, subject: 'spec の構造ページを生成して', owner: 'c9', spec: null, created: -1, start: -1, end: 60 },
+);
 const TASK_BY_KEY = Object.fromEntries(TASKS.map((x) => [`${x.list}#${x.id}`, x]));
 const EVENTS = [
   [0.2, 'a5', 'Read', 'docs/screens/json/home.spec.json'],
@@ -1518,8 +1539,9 @@ function computeTasks(t) {
     const status = statusOf(task);
     const dep = task.blockedBy ? byKey[`${task.list}#${task.blockedBy}`] : null;
     const blocked = status === 'pending' && !!dep && statusOf(dep) !== 'completed';
-    const col = status === 'completed' ? 'done' : status === 'in_progress' ? 'doing' : blocked ? 'wait' : 'todo';
-    return { ...task, key: `${task.list}#${task.id}`, status, blocked, dep, col, fresh: task.created >= 0 && t - task.created < 1.5 };
+    const waiting = status === 'in_progress' && task.waitFrom !== undefined && t >= task.waitFrom && t < task.waitTo;
+    const col = status === 'completed' ? 'done' : status === 'in_progress' ? (waiting ? 'wait' : 'doing') : blocked ? 'wait' : 'todo';
+    return { ...task, key: `${task.list}#${task.id}`, status, blocked, dep, col, waiting, fresh: task.created >= 0 && t - task.created < 1.5 };
   }).filter((task) => task.status);
 }
 
@@ -1793,7 +1815,7 @@ function drawProjectBoard(pb, model, now) {
     open.slice(0, 3).forEach((t, k) => {
       const ly = by + bh + 26 + k * 40;
       ctx.fillStyle = K.head[t.col]; ctx.beginPath(); ctx.arc(40, ly - 7, 7, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = P.title; ctx.font = `700 20px ${FONT_BODY}`; fitText(ctx, `${t.list} #${t.id} ${t.subject}${t.perm ? '（許可待ち）' : ''}`, 58, ly, W - 90);
+      ctx.fillStyle = P.title; ctx.font = `700 20px ${FONT_BODY}`; fitText(ctx, `${t.list} ${taskRef(t)} ${t.subject}${t.perm ? '（許可待ち）' : ''}`, 58, ly, W - 90);
     });
     const note = SOURCE.mode === 'demo' ? '画面の spec はない（CLI ツール）' : proj.jsonui ? 'spec はまだ無い' : 'JsonUI のプロジェクトではない（spec なし）';
     ctx.fillStyle = P.sub; ctx.font = `600 18px ${FONT_BODY}`; ctx.fillText(note, 30, H - 22);
@@ -1833,9 +1855,10 @@ function drawTaskBoard(full, project = 'shop', board = null) {
       ctx.translate(nx + nw / 2, ny + noteH / 2); ctx.rotate((((task.id * 37 + c * 11) % 5) - 2) * 0.007); ctx.translate(-(nx + nw / 2), -(ny + noteH / 2));
       ctx.fillStyle = 'rgba(0, 0, 0, 0.16)'; ctx.fillRect(nx + 2, ny + 3, nw, noteH);
       ctx.fillStyle = P.note[col]; ctx.fillRect(nx, ny, nw, noteH);
+      if (isTurn(task)) { ctx.fillStyle = task.failed ? P.warn : P.head[col]; ctx.fillRect(nx, ny, 7, noteH); }   // a turn: a stripe down its left edge
       if (task.perm) { ctx.lineWidth = 6; ctx.strokeStyle = P.warn; ctx.strokeRect(nx - 2, ny - 2, nw + 4, noteH + 4); }
       ctx.fillStyle = P.pin; ctx.beginPath(); ctx.arc(nx + nw / 2, ny + 7, 5, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = P.soft; ctx.font = `700 15px ${FONT_MONO}`; ctx.fillText(`${task.list} #${task.id}`, nx + 10, ny + 25);
+      ctx.fillStyle = P.soft; ctx.font = `700 15px ${FONT_MONO}`; ctx.fillText(`${task.list} ${taskRef(task)}`, nx + (isTurn(task) ? 14 : 10), ny + 25);
       if (task.perm) {
         rr(ctx, nx + nw - 76, ny + 9, 66, 24, 12); ctx.fillStyle = P.warn; ctx.fill();
         ctx.fillStyle = P.warnInk; ctx.font = `700 14px ${FONT_BODY}`; ctx.textAlign = 'center'; ctx.fillText('許可待ち', nx + nw - 43, ny + 26); ctx.textAlign = 'left';
@@ -2135,6 +2158,7 @@ function build3D() {
     // A board belongs to one project room, so opening it narrows the view to that project (unless it already shows everything).
     const fit = (proj) => { if (proj && UI.project !== 'all' && UI.project !== proj) setProject(proj, { camera: false }); };
     if (h.kind === 'floor') towerLeave(SOURCE.mode === 'live' ? h.k : 0);   // the demo has one office
+    else if (h.kind === 'room') setProject(h.project);
     else if (h.kind === 'robot') openRobot(h.id, canvas);
     else if (h.kind === 'tasks') { fit(h.project); openTaskBoard(canvas, undefined, h.project); }
     else if (h.kind === 'spec') { fit(SPECS[h.i].project); openWhiteboard(h.i, canvas); }
@@ -2144,7 +2168,7 @@ function build3D() {
     if (ev.buttons || (zoom.zoomed && !rbState.id)) return;
     const h = hitAt(ev);
     canvas.style.cursor = h ? 'pointer' : '';
-    canvas.title = h && h.kind === 'floor' ? h.title : '';
+    canvas.title = h && (h.kind === 'floor' || h.kind === 'room') ? h.title : '';
   });
 
   sceneEl.addEventListener('pointerdown', () => { DIRECTOR.userAt = performance.now(); });
@@ -2161,6 +2185,7 @@ function build3D() {
     document.getElementById('floor-up').addEventListener('click', () => step(1));
     document.getElementById('floor-down').addEventListener('click', () => step(-1));
     document.getElementById('floor-building').addEventListener('click', () => (TOWER.on ? towerLeave(LIVE.floor) : towerEnter()));
+    document.getElementById('room-back').addEventListener('click', () => setProject('all'));
   }
   const applyTheme = () => { for (const [mat, token, fallback] of roomMats) mat.color.set(readToken(token, fallback)); };
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
@@ -2199,19 +2224,39 @@ function liveBuildRoom(room) {
   const mats = [[wallMat, '--wall', '#f7f9fc'], [floorMat, room.floor, '#e9eef6']];
   roomMats.push(...mats);
   const floor = new THREE.Mesh(new RoundedBoxGeometry(w, 0.16, d, 2, 0.05), floorMat); floor.position.set(cx, -0.08, cz); g.add(floor);
-  const back = new THREE.Mesh(new THREE.BoxGeometry(w + 0.16, room.back, 0.16), wallMat); back.position.set(cx - 0.08, room.back / 2, room.z0 - 0.08); g.add(back);
-  const left = new THREE.Mesh(new THREE.BoxGeometry(0.16, room.left, d), wallMat); left.position.set(room.x0 - 0.08, room.left / 2, cz); g.add(left);
-  // the doorway: a mat at the front right, where robots come in and go out
-  const mat = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.02, 0.6), toon('#c9d0db')); mat.position.set(room.x1 - 0.7, 0.01, room.z1 - 0.3); g.add(mat);
   const frameMat = toon('#7a5a3c');
-  // project board on the back wall; a room with many specs gets the big spec board instead (plan 09 §7)
-  const pbW = room.big ? w - 1.2 : Math.min(w - 2.2, 4.2);
+  // the back and left walls, with a door where a room is behind or to the left (requester, 10-18)
+  const doors = room.doors || {}, da = doorAt(room), half = DOOR_W / 2;
+  for (const wall of liveWalls().filter((q) => q.room === room.id)) {
+    const ww = wall.x1 - wall.x0, wd = wall.z1 - wall.z0, hgt = wall.side === 'back' ? room.back : room.left;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(ww, hgt, wd), wallMat); m.position.set((wall.x0 + wall.x1) / 2, hgt / 2, (wall.z0 + wall.z1) / 2); g.add(m);
+  }
+  const doorway = (x, z, along) => {   // a lintel over the gap, a frame round it, a sill across the gap between the rooms
+    const hgt = along === 'x' ? room.back : room.left, top = hgt - DOOR_H;
+    const lin = new THREE.Mesh(along === 'x' ? new THREE.BoxGeometry(DOOR_W, top, WALL_T) : new THREE.BoxGeometry(WALL_T, top, DOOR_W), wallMat);
+    lin.position.set(x, DOOR_H + top / 2, z); g.add(lin);
+    for (const [bw, bh, bd, ox, oy, oz] of along === 'x'
+      ? [[0.08, DOOR_H, WALL_T + 0.04, -half, DOOR_H / 2, 0], [0.08, DOOR_H, WALL_T + 0.04, half, DOOR_H / 2, 0], [DOOR_W + 0.08, 0.08, WALL_T + 0.04, 0, DOOR_H, 0]]
+      : [[WALL_T + 0.04, DOOR_H, 0.08, 0, DOOR_H / 2, -half], [WALL_T + 0.04, DOOR_H, 0.08, 0, DOOR_H / 2, half], [WALL_T + 0.04, 0.08, DOOR_W + 0.08, 0, DOOR_H, 0]]) {
+      const bar = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, bd), frameMat); bar.position.set(x + ox, oy, z + oz); g.add(bar);
+    }
+    const gap = ROOM_GAP + WALL_T;
+    const sill = new THREE.Mesh(along === 'x' ? new THREE.BoxGeometry(DOOR_W, 0.16, gap) : new THREE.BoxGeometry(gap, 0.16, DOOR_W), floorMat);
+    sill.position.set(along === 'x' ? x : x - gap / 2 + WALL_T / 2, -0.08, along === 'x' ? z - gap / 2 + WALL_T / 2 : z); g.add(sill);
+  };
+  if (doors.back) doorway(da.backX, room.z0 - WALL_T / 2, 'x');
+  if (doors.left) doorway(room.x0 - WALL_T / 2, da.leftZ, 'z');
+  // the entrance from the corridor: a mat at the front, where robots come in and go out
+  if (doors.front) { const mat = new THREE.Mesh(new THREE.BoxGeometry(DOOR_W, 0.02, 0.6), toon('#c9d0db')); mat.position.set(da.frontX, 0.01, room.z1 - 0.3); g.add(mat); }
+  // project board on the back wall; a room with many specs gets the big spec board instead (plan 09 §7), kept
+  // clear of the back door
+  const pbW = room.big ? w - (doors.back ? 3.2 : 1.2) : Math.min(w - 2.2, 4.2);
   const pb = room.big ? { project: room.id, big: true, W: 2048, H: 1024, w: pbW, h: Math.min(room.back - 0.9, pbW * 1024 / 2048), specs: [], tiles: [], splitY: 1e9, sig: '' }
     : { project: room.id, W: 1024, H: 560, w: pbW, h: pbW * 560 / 1024, specs: [], tiles: [], splitY: 0, sig: '' };
   if (room.big) pb.W = Math.round(pb.H * pb.w / pb.h);
   pb.canvas = makeCanvas(pb.W, pb.H); pb.tex = texFrom(pb.canvas);
   pb.mesh = new THREE.Mesh(new THREE.PlaneGeometry(pb.w, pb.h), new THREE.MeshBasicMaterial({ map: pb.tex, toneMapped: false }));
-  const pbX = room.big ? cx : cx + 0.4, pbY = room.big ? Math.max(2.35, pb.h / 2 + 0.75) : 2.35;
+  const pbX = room.big ? cx - (doors.back ? 1.0 : 0) : cx + 0.4, pbY = room.big ? Math.max(2.35, pb.h / 2 + 0.75) : 2.35;
   pb.mesh.position.set(pbX, pbY, room.z0 + 0.02); g.add(pb.mesh);
   for (const [bw, bh, x, y] of [[pb.w + 0.16, 0.08, 0, pb.h / 2 + 0.04], [pb.w + 0.16, 0.08, 0, -pb.h / 2 - 0.04], [0.08, pb.h, -pb.w / 2 - 0.04, 0], [0.08, pb.h, pb.w / 2 + 0.04, 0]]) {
     const bar = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, 0.05), frameMat); bar.position.set(pbX + x, pbY + y, room.z0 + 0.03); g.add(bar);
@@ -2234,7 +2279,7 @@ function liveBuildRoom(room) {
   const kw = Math.min(d - 1.4, 2.6), kb = { project: room.id, W: 1024, H: 842, w: kw, h: kw * 842 / 1024, sig: '' };
   kb.canvas = makeCanvas(kb.W, kb.H); kb.tex = texFrom(kb.canvas);
   kb.mesh = new THREE.Mesh(new THREE.PlaneGeometry(kb.w, kb.h), new THREE.MeshBasicMaterial({ map: kb.tex, toneMapped: false }));
-  kb.mesh.rotation.y = Math.PI / 2; kb.mesh.position.set(room.x0 + 0.02, 2.1, cz); g.add(kb.mesh);
+  kb.mesh.rotation.y = Math.PI / 2; kb.mesh.position.set(room.x0 + 0.02, 2.1, doors.left ? Math.min(cz, da.leftZ - half - 0.25 - kw / 2) : cz); g.add(kb.mesh);
   scene.add(g);
   const tag = document.createElement('button');
   tag.type = 'button'; tag.className = 'tag room'; tag.dataset.setProject = room.id; tag.title = `${room.name} だけを表示する`; tag.textContent = room.name;
@@ -2242,7 +2287,7 @@ function liveBuildRoom(room) {
   // over its own back wall's left end: at the front corner it sat on the back edge of the room in front (3×2 floors)
   const rt = { el: tag, id: room.id, p: new THREE.Vector3(room.x0 + 0.6, room.back + 0.35, room.z0 - 0.05) };
   roomTags.push(rt);
-  return { geo: room.geo, group: g, pb, kb, tb, rt, mats };
+  return { geo: room.geo, group: g, floor, pb, kb, tb, rt, mats };
 }
 function liveDropRoom(id) {
   const R = LIVE3D.rooms[id];
@@ -2256,13 +2301,15 @@ function liveDropRoom(id) {
 function liveAddRobot(d, i) {
   const robot = createRobot({ label: d.id, role: d.role, state: 'idle', seed: i * 1.7, furnished: true });
   robot.drawPhone = drawLivePhone;
-  const start = d.enter && d.door ? d.door.outside : d.pos || [0, 0];
+  // a robot that comes in walks from the corridor through the doors (requester, 10-18)
+  const route = d.enter ? liveRoute(null, d.room) : [];
+  const start = route.length ? route[0] : d.pos || [0, 0];
   robot.root.position.set(start[0], 0, start[1]); robot.root.rotation.y = d.ry || 0;
   robot.root.userData.robotId = d.id;
   scene.add(robot.root);
   const tag = addTag('', `${pill(d.id, d.role)}<span></span>`);
   const R = { def: d, robot, tag, text: tag.lastElementChild, act: '', path: [], room: d.room, seatKey: '', exitAt: 0 };
-  if (d.enter && d.door) R.path = [d.door.inside];
+  if (route.length) R.path = route.slice(1);
   d.enter = false;
   robots.push(R);
   return R;
@@ -2307,12 +2354,19 @@ function livePlan(R) {
   if (!d.pos) return;
   const key = `${d.room}:${d.pos.join()}`;
   if (key === R.seatKey) return;
-  const fromRoom = PROJECT[R.room];
-  if (R.seatKey && R.room !== d.room && fromRoom && fromRoom.shown && d.door) {
-    const out = doorOf(fromRoom);
-    R.path = [out.inside, out.outside, d.door.outside, d.door.inside, d.pos];
-  } else if (R.seatKey) R.path = [d.pos];   // another seat in the same room
-  else R.path.push(d.pos);                    // first seat: after the doorway when it just came in
+  const root = R.robot.root, here = [root.position.x, root.position.z];
+  const rm = PROJECT[d.room], rect = rm ? `${rm.x0},${rm.z0},${rm.x1},${rm.z1}` : '';
+  const moved = R.seatKey && R.room === d.room && R.rect && R.rect !== rect;   // its room was laid out again (another slot, the one-room view)
+  R.rect = rect;
+  if (moved) { root.position.x = d.pos[0]; root.position.z = d.pos[1]; R.path = []; R.jumps = (R.jumps || 0) + 1; }
+  else if (R.seatKey && R.room !== d.room) {
+    // to another room: finish the step it is on, then through the doors (never a straight line through a wall)
+    const next = R.path.length ? R.path[0] : here;
+    R.path = [...(R.path.length ? [next] : []), ...liveRoute(roomAtPoint(next), d.room), d.pos];
+  } else if (R.seatKey && R.path.length > 1) R.path[R.path.length - 1] = d.pos;   // still on its way: a new seat at the end
+  else if (R.seatKey && roomAtPoint(here) !== d.room) { root.position.x = d.pos[0]; root.position.z = d.pos[1]; R.path = []; R.jumps = (R.jumps || 0) + 1; }   // its room moved under it (counted: the e2e wall check skips a jump)
+  else if (R.seatKey) R.path = [d.pos];   // another seat in the same room
+  else R.path.push(d.pos);                // first seat: after the doors when it just came in
   R.room = d.room; R.seatKey = key;
 }
 function liveWalk(R, dt, nowMs) {
@@ -2321,9 +2375,7 @@ function liveWalk(R, dt, nowMs) {
   if (LIVE.leaving[d.id]) { if (!R.exitAt && !R.out) R.exitAt = nowMs + 2500; }
   else if (R.exitAt && !R.out) R.exitAt = 0;   // it came back before walking out
   if (R.exitAt && nowMs >= R.exitAt && !R.path.length && !R.out) {
-    const room = PROJECT[d.room];
-    const door = room && room.shown ? doorOf(room) : null;
-    R.path = door ? [door.inside, door.outside] : [];
+    R.path = liveRoute(roomAtPoint([root.position.x, root.position.z]), null);   // out to the corridor
     R.out = true;
   }
   if (R.out && !R.path.length) { SOURCE.robotGone(d.id); return 'gone'; }
@@ -2383,6 +2435,22 @@ function liveUpdateRobots(nowSec, dt) {
     updateRobot(R.robot, nowSec, dt);
   }
 }
+/* One room at a time (requester, 10-18): a project picked (its room's tag, its floor in 3D, the menu) lays out only
+   that room, wider (layoutRooms, SOLO_GROW), with the way back at the top left. The other rooms' robots keep their
+   desks for when the floor comes back. */
+const liveSolo = () => (SOURCE.mode === 'live' ? soloRoomId() : null);
+function liveSoloSync() {
+  const solo = liveSolo();
+  for (const [id, R] of Object.entries(LIVE3D.rooms)) { const on = !solo || id === solo; R.group.visible = on; R.rt.el.hidden = !!solo; }   // alone, its name is in the box
+  for (const R of robots) {
+    const p = R.robot.root.position, on = !solo || R.def.room === solo || roomAtPoint([p.x, p.z]) === solo;
+    R.robot.root.visible = on; R.tag.hidden = !on;
+  }
+  const box = document.getElementById('room-solo');
+  if (!box) return;
+  box.hidden = !solo || !has3D || TOWER.on || zoom.zoomed;
+  if (solo) setText(document.getElementById('room-solo-name'), PROJECT[solo].name);
+}
 /* A board press in the live office: the project board opens that project's spec board (overview), its lower
    part and the cork board the task board, a robot its card. */
 function towerHit(ray) {
@@ -2392,9 +2460,15 @@ function towerHit(ray) {
   return h ? { kind: 'floor', k: h.object.userData.floor, title: towerHover(h) } : null;
 }
 function liveHit(ray) {
-  const targets = [...Object.values(LIVE3D.rooms).flatMap((R) => [R.pb.mesh, R.kb.mesh, ...(R.tb ? [R.tb.mesh] : [])]), ...robots.map((R) => R.robot.root)];
+  const solo = liveSolo(), rooms = Object.entries(LIVE3D.rooms).filter(([id]) => !solo || id === solo).map(([, R]) => R);
+  const targets = [...rooms.flatMap((R) => [R.pb.mesh, R.kb.mesh, ...(R.tb ? [R.tb.mesh] : [])]), ...robots.filter((R) => R.robot.root.visible).map((R) => R.robot.root)];
   const hit = ray.intersectObjects(targets, true)[0];
-  if (!hit) return null;
+  if (!hit) {
+    // a room's floor picks the room (the floor view only)
+    const f = solo ? null : ray.intersectObjects(rooms.map((R) => R.floor), false)[0];
+    const id = f && Object.keys(LIVE3D.rooms).find((k) => LIVE3D.rooms[k].floor === f.object);
+    return id ? { kind: 'room', project: id, title: `${PROJECT[id].name} を選ぶ` } : null;
+  }
   let o = hit.object;
   while (o && o.userData.robotId === undefined && o.parent) o = o.parent;
   if (o && o.userData.robotId !== undefined) return { kind: 'robot', id: o.userData.robotId };
@@ -2478,7 +2552,7 @@ function liveLinks(model, nowSec) {
   const used = new Set();
   if (!zoom.zoomed) {
     model.specs.forEach((s, i) => {
-      if (!s.by || !robots.some((R) => R.def.id === s.by)) return;
+      if (!s.by || !robots.some((R) => R.def.id === s.by && R.robot.root.visible)) return;
       const R = LIVE3D.rooms[s.project];
       const t = R && R.pb.tiles.find((q) => q.i === i);
       if (!t) return;
@@ -2495,7 +2569,7 @@ function liveRoomPose(id) {
   const b = liveBounds(id === 'all' ? null : [id]) || { c: new THREE.Vector3(0, 0.4, 0), size: 12 };
   const half = THREE.MathUtils.degToRad(camera.fov) / 2, tanH = Math.tan(half) * Math.min(1, camera.aspect || 1);
   const fit = (size, share) => (size / 2) / (tanH * share);
-  const dist = id === 'all' ? Math.max(22, fit(b.size, 0.92)) : Math.max(9, fit(b.size, 0.8));
+  const dist = id === 'all' ? Math.max(22, fit(b.size, 0.92)) : Math.max(9, fit(b.size, (camera.aspect || 1) < 1 ? 0.7 : 0.86));   // one room: most of the view (less on a tall screen, where its corners reach out)
   return { p: b.c.clone().add(new THREE.Vector3(6.5, 15.5, 22.5).normalize().multiplyScalar(dist)), t: b.c };
 }
 /* The floor buttons (both views). Hidden while a board, the log, a zoom or a robot card covers the 3D (10-18). The
@@ -2968,7 +3042,7 @@ const TAG_UP = new THREE.Vector3(0, 2.62, 0);
 function robotPoint(id, up) { const R = robots.find((x) => x.def.id === id); return R.robot.root.position.clone().add(up); }
 
 function update3D(model, nowSec, dt) {
-  if (SOURCE.mode === 'live') liveUpdateRobots(nowSec, dt);
+  if (SOURCE.mode === 'live') { liveUpdateRobots(nowSec, dt); liveSoloSync(); }
   else {
     demoDirector(model, nowSec);
     for (const R of robots) {
@@ -3047,6 +3121,7 @@ function robotBadge(id) {
   if (s === 'done') return ['st-done', '完了'];
   if (s === 'idle') return ['st-idle', '待機'];
   if (s === 'thinking') return ['st-busy', '考え中'];
+  if (s === 'background') return ['st-bg', '裏で作業中'];
   return ['st-busy', '作業中'];
 }
 /* What the view is narrowed to: one project (or all), which sessions, how the session list is shown. */
@@ -3058,14 +3133,14 @@ const UI = {
   sessFilter: readPref('sessFilter', 'all'),
   collapsed: new Set(prefJSON('collapsed', [])),
 };
-if (!['all', 'active', 'waiting', 'idle'].includes(UI.sessFilter)) UI.sessFilter = 'all';
+if (!['all', 'active', 'waiting', 'background', 'idle'].includes(UI.sessFilter)) UI.sessFilter = 'all';
 const inScope = (project) => UI.project === 'all' || UI.project === project;
 const scopeLabel = () => (UI.project === 'all' ? 'すべて' : PROJECT[UI.project].name);
 function sessionBadge(s) {
   const b = s.robots.map(robotBadge);
   // A session whose busy robots only think says 考え中, as its robot row does (they disagreed — 10-18 review).
   return b.some((x) => x[0] === 'st-waiting') ? ['st-waiting', '許可待ち'] : b.some((x) => x[1] === '作業中') ? ['st-busy', '作業中']
-    : b.some((x) => x[1] === '考え中') ? ['st-busy', '考え中'] : ['st-idle', '待機'];
+    : b.some((x) => x[1] === '考え中') ? ['st-busy', '考え中'] : b.some((x) => x[0] === 'st-bg') ? ['st-bg', '裏で作業中'] : ['st-idle', '待機'];
 }
 const roleVar = (s) => (s.by ? ` style="--c:${ROLES[DEF[s.by].role].color}"` : '');
 /* Lists of buttons are rebuilt only when their membership changes, so keyboard focus survives the
@@ -3119,7 +3194,7 @@ $('btn-taskboard').addEventListener('click', (e) => openTaskBoard(e.currentTarge
 
 const COL_STATE = { doing: ['st-busy', '作業中'], wait: ['st-waiting', '待ち'], todo: ['st-idle', '未着手'], done: ['st-done', '完了'] };
 const paintState = (node, [cls, label]) => { if (!node) return; const c = `state ${cls}`; if (node.className !== c) node.className = c; setText(node, label); };
-const SESS_FILTERS = [['all', 'すべて'], ['active', '動いている'], ['waiting', '許可待ち'], ['idle', '待機']];
+const SESS_FILTERS = [['all', 'すべて'], ['active', '動いている'], ['waiting', '許可待ち'], ['background', '裏で作業中'], ['idle', '待機']];
 const sessFilterEl = $('sess-filter');
 sessFilterEl.innerHTML = SESS_FILTERS.map(([k, label]) => `<button type="button" data-sf="${esc(k)}" aria-pressed="${k === UI.sessFilter}">${esc(label)}<b></b></button>`).join('');
 sessFilterEl.addEventListener('click', (e) => {
@@ -3129,7 +3204,7 @@ sessFilterEl.addEventListener('click', (e) => {
   [...sessFilterEl.children].forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
   renderSessions();
 });
-const sessMatch = (s, f) => { const [c] = sessionBadge(s); return f === 'all' || (f === 'active' && c !== 'st-idle') || (f === 'waiting' && c === 'st-waiting') || (f === 'idle' && c === 'st-idle'); };
+const sessMatch = (s, f) => { const [c] = sessionBadge(s); return f === 'all' || (f === 'active' && c !== 'st-idle') || (f === 'waiting' && c === 'st-waiting') || (f === 'background' && c === 'st-bg') || (f === 'idle' && c === 'st-idle'); };
 $('sessions').addEventListener('click', (e) => {
   const b = e.target.closest('[data-fold]');
   if (!b) return;
@@ -3137,7 +3212,7 @@ $('sessions').addEventListener('click', (e) => {
   writePref('collapsed', JSON.stringify([...UI.collapsed]));
   renderSessions();
 });
-const SB_ORDER = { 'st-waiting': 0, 'st-busy': 1, 'st-idle': 2 };
+const SB_ORDER = { 'st-waiting': 0, 'st-busy': 1, 'st-bg': 2, 'st-idle': 3 };
 function renderSessions() {
   const el = $('sessions'), scoped = SESSIONS.filter((s) => inScope(s.project));
   [...sessFilterEl.children].forEach((b) => setText(b.lastElementChild, String(scoped.filter((s) => sessMatch(s, b.dataset.sf)).length)));
@@ -3202,8 +3277,8 @@ function renderPanel(model) {
   keyed($('tasks'), JSON.stringify([UI.project, loose.map(permSig), tasks.map((x) => `${x.key}:${x.col}:${permSig(x.perm)}:${x.subject}:${x.owner || ''}`)]), () => [
     ...loose.map((p) => `<li class="task has-perm perm-only"><button type="button" class="task-open" data-open="perm:${esc(p.id)}" data-fk="to-${esc(p.id)}"><span class="tid">${esc(SESSION_OF[p.who])} セッション</span><span class="subject">タスクの外で許可を求めている</span></button><span class="state st-waiting">許可待ち</span><span class="meta">${pill(p.who, DEF[p.who].role)} ${esc(DEF[p.who].agent)}${projectTag(SESSION_OF[p.who])}</span>${permBox(p)}</li>`),
     ...tasks.map((x) => {
-      const [c, l] = x.perm ? ['st-waiting', '許可待ち'] : x.col === 'wait' ? ['st-waiting', `#${x.blockedBy} 待ち`] : COL_STATE[x.col];
-      return `<li class="task t-${esc(x.status)}${x.perm ? ' has-perm' : ''}${x.fresh ? ' t-new' : ''}"><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="to-${esc(x.key)}"><span class="tid">${esc(x.list)} #${esc(x.id)}</span><span class="subject">${esc(x.subject)}</span></button><span class="state ${esc(c)}">${esc(l)}</span><span class="meta">${x.owner ? `${pill(x.owner, DEF[x.owner].role)} ${esc(DEF[x.owner].agent)}` : '担当なし'}${projectTag(x.list)}</span>${x.perm ? permBox(x.perm) : ''}</li>`;
+      const [c, l] = x.perm ? ['st-waiting', '許可待ち'] : x.col === 'wait' ? ['st-waiting', waitLabel(x)] : COL_STATE[x.col];
+      return `<li class="task t-${esc(x.status)}${x.perm ? ' has-perm' : ''}${x.fresh ? ' t-new' : ''}${isTurn(x) ? ' t-turn' : ''}${x.failed ? ' t-failed' : ''}"><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="to-${esc(x.key)}"><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${esc(x.subject)}</span></button><span class="state ${esc(c)}">${esc(l)}</span><span class="meta">${x.owner ? `${pill(x.owner, DEF[x.owner].role)} ${esc(DEF[x.owner].agent)}` : '担当なし'}${projectTag(x.list)}</span>${x.perm ? permBox(x.perm) : ''}</li>`;
     }),
   ].join('') || `<li class="empty-note">${esc(scopeLabel())} にタスクはない</li>`);
 
@@ -3321,6 +3396,7 @@ function setProject(id, { camera: moveCamera = true } = {}) {
   if (wb.open && wb.idx >= 0 && !inScope(SPECS[wb.idx].project)) wb.idx = -1;
   if (tb.detail && !tb.detail.startsWith('perm:') && !inScope(PROJECT_OF[tb.detail.split('#')[0]])) tb.detail = null;
   if (SOURCE.mode === 'live' && has3D) liveShowFloorOf(id);   // a room on another floor: go there first
+  if (SOURCE.mode === 'live') liveRelayout();                // one room at a time: the room picked, wider (or the floor again)
   if (moveCamera) focusProject(id);
   paintScopeButtons();
   refreshNow();
@@ -3489,8 +3565,9 @@ function stepTween(ms) {
   viewTarget.lerpVectors(camTween.t0, camTween.t1, e);
   if (k >= 1) { const done = camTween.done; camTween = null; if (done) done(); }
 }
-function showOverlay(el) { el.hidden = false; requestAnimationFrame(() => el.classList.add('show')); }
-function hideOverlay(el) { el.classList.remove('show'); setTimeout(() => { if (!el.classList.contains('show')) el.hidden = true; }, reduceMotion ? 0 : 240); }
+// The show class lands a frame later; a hide in between cancels it (an Escape in that frame used to reopen the card).
+function showOverlay(el) { el.hidden = false; el._showing = true; requestAnimationFrame(() => { if (el._showing) el.classList.add('show'); }); }
+function hideOverlay(el) { el._showing = false; el.classList.remove('show'); setTimeout(() => { if (!el.classList.contains('show')) el.hidden = true; }, reduceMotion ? 0 : 240); }
 function zoomTo(pose, opener, arrive) {
   if (opener) zoom.opener = opener;
   if (!has3D) { arrive(); return; }
@@ -3531,7 +3608,18 @@ function taskPose(pref) {
 
 /* ---------- spec board up close: every spec (overview) or one spec as a readable sheet ---------- */
 const wbEl = $('wb'), wbCode = $('wb-code'), wbNav = $('wb-nav'), wbBody = $('wb-body'), wbSideList = $('wb-side-list');
-const wb = { open: false, idx: -1, lastActive: null, q: '' };
+const wb = { open: false, idx: -1, lastActive: null, q: '', app: 'all' };
+/* The apps of the rooms in scope (a repo with client/, admin/, … each declaring its own specs): [app, count, specDir],
+   in the order the specs come. The board offers them only when there is more than one; 全体 adds them up. */
+function wbApps(model) {
+  const apps = new Map();
+  for (const s of model.specs) if (inScope(s.project)) { const a = apps.get(s.app || '') || [s.app || '', 0, s.specDir || '']; a[1] += 1; apps.set(s.app || '', a); }
+  const list = [...apps.values()];
+  if (wb.app !== 'all' && !apps.has(wb.app)) wb.app = 'all';
+  return list;
+}
+const inApp = (s) => wb.app === 'all' || (s.app || '') === wb.app;
+const appLabel = (app) => app || '直下';
 let wbSideOpen = readPref('wbSide', 'open') === 'open';
 const narrowWb = () => sceneEl.clientWidth < 800;
 function applyWbSide() {
@@ -3548,6 +3636,8 @@ $('wb-side-btn').addEventListener('click', () => {
 });
 $('wb-search').addEventListener('input', (e) => { wb.q = e.target.value.trim().toLowerCase(); renderWbSide(latestModel); });
 wbSideList.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-app]');
+  if (a) { wb.app = a.dataset.app; renderWhiteboard(latestModel, true); return; }
   const b = e.target.closest('[data-idx]');
   if (!b) return;
   openWhiteboard(Number(b.dataset.idx));
@@ -3568,6 +3658,7 @@ function openWhiteboard(i, opener, board) {
   if (tb.open) { tb.open = false; tb.detail = null; hideOverlay(tbEl); }
   if (rbState.id) closeRobot(true);
   if (i >= 0 && !inScope(SPECS[i].project)) setProject(SPECS[i].project, { camera: false });
+  if (i >= 0 && !inApp(SPECS[i])) wb.app = 'all';
   wb.idx = i; wb.lastActive = null; wb.board = board || null;
   if (wb.open) {
     if (opener) zoom.opener = opener;
@@ -3602,12 +3693,14 @@ function renderWhiteboard(model, force) {
   if (wb.idx < 0) renderOverview(model); else renderSheet(model, force);
 }
 function renderWbSide(model) {
-  const q = wb.q;
-  const match = (s) => inScope(s.project) && (!q || `${s.name} ${s.screen} ${s.file} ${PROJECT[s.project].name}`.toLowerCase().includes(q));
+  const q = wb.q, apps = wbApps(model);
+  const match = (s) => inScope(s.project) && inApp(s) && (!q || `${s.name} ${s.screen} ${s.file} ${PROJECT[s.project].name}`.toLowerCase().includes(q));
   const groups = BUCKETS.map(([b, label]) => [label, model.specs.map((s, i) => [s, i]).filter(([s]) => s.bucket === b && match(s))]).filter(([, items]) => items.length);
-  const n = model.specs.filter((s) => inScope(s.project)).length;
-  keyed(wbSideList, JSON.stringify([UI.project, q, wb.idx, groups.map(([label, items]) => [label, items.map(([s, i]) => `${i}:${s.by || ''}:${s.name}`)])]), () => {
-    const allHTML = `<button type="button" class="ws-item ws-all" data-idx="-1" data-fk="ws--1" aria-current="${wb.idx === -1}"><span class="dot" aria-hidden="true"></span><span class="nm">全体を見る</span><span></span><small>${esc(scopeLabel())} · ${n} 画面の進み具合</small></button>`;
+  const n = model.specs.filter((s) => inScope(s.project) && inApp(s)).length;
+  keyed(wbSideList, JSON.stringify([UI.project, q, wb.idx, wb.app, apps, groups.map(([label, items]) => [label, items.map(([s, i]) => `${i}:${s.by || ''}:${s.name}`)])]), () => {
+    const total = apps.reduce((k, [, c]) => k + c, 0);
+    const appsHTML = apps.length > 1 ? `<div class="seg-filter ws-apps" role="group" aria-label="アプリで絞り込む">${[['all', total], ...apps].map(([a, c]) => `<button type="button" data-app="${esc(a)}" aria-pressed="${wb.app === a}">${esc(a === 'all' ? '全体' : appLabel(a))}<b>${esc(String(c))}</b></button>`).join('')}</div>` : '';
+    const allHTML = appsHTML + `<button type="button" class="ws-item ws-all" data-idx="-1" data-fk="ws--1" aria-current="${wb.idx === -1}"><span class="dot" aria-hidden="true"></span><span class="nm">全体を見る</span><span></span><small>${esc(scopeLabel())} · ${n} 画面の進み具合</small></button>`;
     const bodyHTML = groups.map(([label, items]) => `<p class="ws-group"><span>${esc(label)}</span><b>${items.length}</b></p>${items.map(([s, i]) => `<button type="button" class="ws-item b-${esc(s.bucket)}" data-idx="${i}" data-fk="ws-${i}" aria-current="${wb.idx === i}"${roleVar(s)}><span class="dot" aria-hidden="true"></span><span class="nm">${esc(s.name)}</span>${s.by ? pill(s.by, DEF[s.by].role) : '<span></span>'}<small></small></button>`).join('')}`).join('');
     return allHTML + (bodyHTML || '<p class="ws-none">該当する画面がない</p>');
   });
@@ -3632,14 +3725,17 @@ function specSummary(s) {
   return `記述 ${pct(w)}% · 実装 ${s.implPhase ? `${sumImpl(s.implN)}/${sumImpl(s.totals)}` : '—'} · テスト ${s.implPhase ? `${s.implN[6]}/${s.totals[6]}` : '—'}`;
 }
 function renderOverview(model) {
-  const inS = model.specs.filter((s) => inScope(s.project)), c = bucketCounts(inS);
-  setHead(UI.project === 'all' ? 'spec ボード' : `spec ボード · ${PROJECT[UI.project].name}`, `docs/screens/json/（${inS.length} 画面）`, 'st-busy', `作業中 ${c.live} · 途中 ${c.partial} · 未着手 ${c.todo} · 完了 ${c.done}`, '');
+  const apps = wbApps(model), inS = model.specs.filter((s) => inScope(s.project) && inApp(s)), c = bucketCounts(inS);
+  const dirs = [...new Set(inS.map((s) => s.specDir).filter(Boolean))];
+  const where = dirs.length > 1 ? `${dirs.length} か所の spec フォルダ` : `${dirs[0] || 'docs/screens/json'}/`;
+  const title = `spec ボード${UI.project === 'all' ? '' : ` · ${PROJECT[UI.project].name}`}${wb.app !== 'all' && apps.length > 1 ? ` · ${appLabel(wb.app)}` : ''}`;
+  setHead(title, `${where}（${inS.length} 画面）`, 'st-busy', `作業中 ${c.live} · 途中 ${c.partial} · 未着手 ${c.todo} · 完了 ${c.done}`, '');
   wbNav.hidden = true; $('wb-follow-label').hidden = true;
   setHTML($('wb-legend'), OV_LEGEND);
-  const sig = JSON.stringify(['ov', UI.project, model.specs.map((s) => `${s.bucket}:${s.by || ''}`)]);
+  const sig = JSON.stringify(['ov', UI.project, wb.app, model.specs.map((s) => `${s.bucket}:${s.by || ''}`)]);
   if (wbCode._sig !== sig) {
     wbCode.innerHTML = !inS.length ? `<p class="sc-ph ov-none">${esc(scopeLabel())} には画面の spec がない（CLI ツールなど）。上の「プロジェクト」で別のプロジェクトを選べる</p>` : BUCKETS.map(([b, label]) => {
-      const items = model.specs.map((s, i) => [s, i]).filter(([s]) => s.bucket === b && inScope(s.project));
+      const items = model.specs.map((s, i) => [s, i]).filter(([s]) => s.bucket === b && inScope(s.project) && inApp(s));
       if (!items.length) return '';
       return `<section class="ov-group" aria-label="${esc(label)}"><h3>${esc(label)}<small>${items.length}</small></h3><div class="ov-grid">${items.map(([s, i]) => `<button type="button" class="ov-card b-${esc(s.bucket)}" data-idx="${i}"${roleVar(s)}><span class="ov-top"><strong>${esc(s.name)}</strong><span class="state"></span></span><code class="ov-file">${UI.project === 'all' ? `${esc(PROJECT[s.project].name)} · ` : ''}${esc(s.file)}</code><span class="ov-who"></span><span class="ov-secs">${SEGS}<span class="ov-labels" aria-hidden="true">${SECTIONS.map((x) => `<span>${esc(x)}</span>`).join('')}</span></span><span class="ov-sum"></span></button>`).join('')}</div></section>`;
     }).join('');
@@ -3845,7 +3941,7 @@ function renderTaskBoard(model) {
   keyed(stripEl, JSON.stringify([pend.map(permSig), [...alwaysRules.keys()], elsewhere]), () => {
     const cardsHTML = pend.map((p) => {
       const x = p.task && TASK_BY_KEY[p.task];
-      return `<li class="pcard"><div class="pc-who">${pill(p.who, DEF[p.who].role)}<span>${esc(DEF[p.who].agent)}</span><span class="pc-wait" data-since="${p.at}"></span></div><p class="pc-what"><b>${esc(p.tool)}</b> ${permSubject(p)}</p><button type="button" class="pc-task" data-open="${x ? esc(p.task) : `perm:${esc(p.id)}`}" data-fk="pt-${esc(p.id)}">${x ? `${esc(x.list)} #${esc(x.id)} ${esc(x.subject)}` : `${esc(SESSION_OF[p.who])} セッション · タスクなし`} › 詳細</button><div class="perm-acts">${permButtons(p, 'p')}</div></li>`;
+      return `<li class="pcard"><div class="pc-who">${pill(p.who, DEF[p.who].role)}<span>${esc(DEF[p.who].agent)}</span><span class="pc-wait" data-since="${p.at}"></span></div><p class="pc-what"><b>${esc(p.tool)}</b> ${permSubject(p)}</p><button type="button" class="pc-task" data-open="${x ? esc(p.task) : `perm:${esc(p.id)}`}" data-fk="pt-${esc(p.id)}">${x ? `${esc(x.list)} ${esc(taskRef(x))} ${esc(x.subject)}` : `${esc(SESSION_OF[p.who])} セッション · タスクなし`} › 詳細</button><div class="perm-acts">${permButtons(p, 'p')}</div></li>`;
     }).join('');
     const rulesHTML = alwaysRules.size ? `<p class="ps-rules">このデモで足した常時許可: ${[...alwaysRules.keys()].map((r) => `<code>${esc(r)}</code>`).join(' ')} <button type="button" class="link-btn" data-reset-rules data-fk="rules">取り消す</button></p>` : '';
     const otherHTML = elsewhere ? `<p class="ps-rules">ほかのプロジェクトでも ${elsewhere} 件が許可を待っている <button type="button" class="link-btn" data-set-all data-fk="ps-all">すべてのプロジェクトを表示</button></p>` : '';
@@ -3856,11 +3952,11 @@ function renderTaskBoard(model) {
   const lists = SESSIONS.filter((x) => visible(x.id)).map((x) => x.id);
   const noteHTML = (x, col) => {
       const ownerHTML = x.owner ? `${pill(x.owner, DEF[x.owner].role)}<span>${esc(DEF[x.owner].agent)}</span>` : '<span>担当なし</span>';
-      const extraHTML = col === 'doing' ? `<span class="n-doing">▶ ${esc(x.activeForm || x.subject)}<span data-since="${x.start}"></span></span>`
-        : col === 'wait' ? `<span class="n-wait">#${esc(x.dep.id)}「${esc(x.dep.subject)}」の完了待ち</span>`
-          : col === 'done' ? `<span class="n-time">${fmtClock(BASE_CLOCK + loopStart + x.end)} に完了</span>` : '';
+      const extraHTML = col === 'doing' ? `<span class="n-doing">▶ ${esc(isTurn(x) ? (x.background ? 'バックグラウンドで作業中' : '指示を処理中') : x.activeForm || x.subject)}<span data-since="${x.start}"></span></span>`
+        : col === 'wait' ? (x.dep ? `<span class="n-wait">#${esc(x.dep.id)}「${esc(x.dep.subject)}」の完了待ち</span>` : `<span class="n-wait">${isTurn(x) ? '許可の返事待ち' : '待ち'}</span>`)
+          : col === 'done' ? `<span class="n-time">${fmtClock(BASE_CLOCK + loopStart + x.end)} に${x.failed ? '失敗で終了' : '完了'}</span>` : '';
       const permHTML = x.perm ? `<div class="n-permbox"><p class="n-permq"><b>許可待ち</b> ${esc(x.perm.tool)} ${permSubject(x.perm)}</p><div class="perm-acts">${permButtons(x.perm, 'k')}</div></div>` : '';
-      return `<li class="note${x.perm ? ' n-perm' : ''}${x.fresh ? ' n-new' : ''}"><button type="button" class="note-open" data-open="${esc(x.key)}" data-fk="nb-${esc(x.key)}"><span class="n-top"><span>#${esc(x.id)}</span><span>${UI.lanes ? '' : `${esc(x.list)} の一覧${UI.project === 'all' ? ` · ${esc(PROJECT[PROJECT_OF[x.list]].name)}` : ''}`}</span></span><span class="n-subj">${esc(x.subject)}</span>${extraHTML}<span class="n-owner">${ownerHTML}</span></button>${permHTML}</li>`;
+      return `<li class="note${x.perm ? ' n-perm' : ''}${x.fresh ? ' n-new' : ''}${isTurn(x) ? ' n-turn' : ''}"><button type="button" class="note-open" data-open="${esc(x.key)}" data-fk="nb-${esc(x.key)}"><span class="n-top"><span>${esc(taskRef(x))}</span><span>${UI.lanes ? '' : `${esc(x.list)} の一覧${UI.project === 'all' ? ` · ${esc(PROJECT[PROJECT_OF[x.list]].name)}` : ''}`}</span></span><span class="n-subj">${esc(x.subject)}</span>${extraHTML}<span class="n-owner">${ownerHTML}</span></button>${permHTML}</li>`;
   };
   const sortCol = (col) => (a, b) => (b.perm ? 1 : 0) - (a.perm ? 1 : 0) || (col === 'done' ? b.end - a.end : 0) || a.list.localeCompare(b.list) || a.id - b.id;
   kanbanEl.classList.toggle('lanes', UI.lanes);
@@ -3909,7 +4005,7 @@ function renderTaskDetail(model) {
     }).join('');
     const sample = pending || here[here.length - 1] || known;
     const times = base ? [base.created >= 0 ? `作成 ${clock(base.created)}` : '', base.start !== null && base.start <= model.t ? `開始 ${clock(base.start)}` : '', base.end !== null && base.end <= model.t ? `完了 ${clock(base.end)}` : ''].filter(Boolean).join(' · ') : '';
-    return `<div class="tbd-top"><p class="tbd-id">${base ? `${esc(base.list)} #${esc(base.id)} · ${esc(base.list)} の一覧` : `${esc(SESSION_OF[who])} セッション · タスクなし`}</p><button type="button" class="wb-btn" id="tbd-close" data-close-detail data-fk="tbd-close">閉じる</button></div>
+    return `<div class="tbd-top"><p class="tbd-id">${base ? `${esc(base.list)} ${esc(taskRef(base))} · ${esc(base.list)} の一覧` : `${esc(SESSION_OF[who])} セッション · タスクなし`}</p><button type="button" class="wb-btn" id="tbd-close" data-close-detail data-fk="tbd-close">閉じる</button></div>
 <h3 id="tbd-title">${base ? esc(base.subject) : `${esc(known.tool)} の実行許可`}</h3>
 ${base ? `<p class="tbd-state"><span class="state ${esc(cls)}">${esc(label)}</span></p>` : ''}
 ${pending ? permDetail(pending, 'tbd') : ''}
@@ -3968,7 +4064,10 @@ function openRobot(id, opener) {
   const showing = !!rbState.id;
   rbState.id = id;
   if (showing) { renderRobot(latestModel); $('rb-close').focus({ preventScroll: true }); return; }
-  if (!has3D) { showOverlay(rbEl); renderRobot(latestModel); $('rb-close').focus({ preventScroll: true }); return; }
+  // no 3D, or the robot is not in the scene (another floor, another room of the one-room view): the card alone
+  if (!has3D || !robots.some((x) => x.def.id === id)) {
+    if (!zoom.zoomed) zoom.returnPose = null;   // nothing to fly back from when the card closes
+    showOverlay(rbEl); renderRobot(latestModel); $('rb-close').focus({ preventScroll: true }); return; }
   zoomTo(robotPose(id), opener, () => {
     if (rbState.id !== id) return;
     showOverlay(rbEl);
@@ -3994,8 +4093,8 @@ function renderRobot(model) {
   keyed(rbEl, JSON.stringify([id, permSig(pending), specIdx, owned.map((x) => `${x.key}:${x.col}:${x.perm ? 1 : 0}:${x.subject}`)]), () => {
     const room = (SESSIONS.find((s) => s.id === sess) || { room: (PROJECT[projectOfRobot(id)] || {}).name || '' }).room;
     const tasksHTML = owned.length ? `<ul class="rb-tasks">${owned.map((x) => {
-      const [c, l] = x.perm ? ['st-waiting', '許可待ち'] : x.col === 'wait' ? ['st-waiting', '待ち'] : COL_STATE[x.col];
-      return `<li><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="rt-${esc(x.key)}"><span class="state ${esc(c)}">${esc(l)}</span><span class="tid">${esc(x.list)} #${esc(x.id)}</span><span class="subject">${esc(x.subject)}</span>${!isMain || !x.owner ? '' : `<span class="rb-owner">${pill(x.owner, DEF[x.owner].role)}</span>`}</button></li>`;
+      const [c, l] = x.perm ? ['st-waiting', '許可待ち'] : x.col === 'wait' ? ['st-waiting', waitLabel(x)] : COL_STATE[x.col];
+      return `<li><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="rt-${esc(x.key)}"><span class="state ${esc(c)}">${esc(l)}</span><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${esc(x.subject)}</span>${!isMain || !x.owner ? '' : `<span class="rb-owner">${pill(x.owner, DEF[x.owner].role)}</span>`}</button></li>`;
     }).join('')}</ul>` : `<p class="rb-none">${isMain ? 'このセッションのタスク一覧は空' : '担当しているタスクはない'}</p>`;
     return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? `${id} のメインセッション` : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.agent} · ${room}` : `${ROLE_JA[d.role]} · ${sess} セッションのサブエージェント · ${room}`)}</p></div><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">← 3D に戻る</button></div>
 <div class="rb-body">
@@ -4190,6 +4289,7 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     if (narrowWb() && wbSideOpen) { wbSideOpen = false; applyWbSide(); } else closeWhiteboard();
   } else if (tb.open) { e.preventDefault(); if (tb.detail) closeTaskDetail(); else closeTaskBoard(); }
+  else if (has3D && liveSolo() && !TOWER.on && !e.target.closest('input, textarea, select')) { e.preventDefault(); setProject('all'); }   // one room → the floor
 });
 
 // ---- web/js/70-main.js ----
