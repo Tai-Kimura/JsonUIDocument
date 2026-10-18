@@ -14,7 +14,8 @@ module RjuiTools
           'Sidebar' => 'SidebarConverter',
           'TopBar' => 'TopBarConverter',
           'DocSamplePreview' => 'DocSamplePreviewConverter',
-        }.freeze
+          'VizDemo' => 'VizDemoConverter',
+}.freeze
       end
     end
   end

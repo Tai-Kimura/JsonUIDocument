@@ -1,0 +1,159 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "Viz",
+    "displayName": "jui viz: watch your agents work",
+    "description": "Tools > jui viz. The local browser view of Claude Code sessions and subagents (rooms and robots), shipped in jsonui-cli 2.0.0. The page opens with the live demo (VizDemo, the folder `jui viz export-demo` writes), then ten sections: what it shows / what you need / install / start / reading the screen / permission prompts / test progress / remove / troubleshooting / safety. Source: the article the jui viz side handed over, checked against jsonui-cli 2.0.0.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "tools/viz",
+    "createdAt": "2026-10-18",
+    "updatedAt": "2026-10-18"
+  },
+  "structure": {
+    "components": [],
+    "customComponents": [
+      {
+        "name": "VizDemo",
+        "specFile": "viz-demo.component.json",
+        "description": "The jui viz demo in an iframe."
+      }
+    ],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the static catalog (two rows: next_cli -> /tools/cli, next_agents -> /tools/agents). Each row's titleKey / descriptionKey is resolved through StringManager with the tools_viz_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /tools, /tools/cli, /tools/agents."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /tools/cli and /tools/agents. Seeded on appear and re-seeded on a language change."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is spec-mapped",
+      "destination": "Target screen or tab",
+      "description": "v1: /tools, /tools/cli, /tools/agents."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/tools/viz.json",
+      "description": "Layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/tools/VizViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/tools/viz/page.tsx",
+      "description": "Page."
+    },
+    {
+      "type": "Component",
+      "path": "jsonui-doc-web/src/components/extensions/VizDemo.tsx",
+      "description": "The demo iframe."
+    }
+  ],
+  "notes": [
+    "The demo is served from jsonui-doc-web/public/tools/viz-demo/<jsonui-cli version>/, written by `jui viz export-demo` from the pinned jsonui-cli. Re-export on a pin bump that changes it; see the VizDemo component spec.",
+    "The jui viz screen is Japanese only (2.0.0). The English page says so under the demo."
+  ]
+}

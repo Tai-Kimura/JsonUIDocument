@@ -2318,6 +2318,679 @@
       }
     },
     {
+      "binary": "jui",
+      "command": "viz serve",
+      "synopsis": "jui viz serve [--port PORT] [--open] [--record FILE] [--replay FILE] [--speed SPEED] [--no-agents-poll]",
+      "purpose": {
+        "en": "Start the jui viz server in the foreground, on 127.0.0.1 only. It shows the Claude Code sessions and subagents on this machine in the browser. Ctrl+C stops it.",
+        "ja": "jui viz のサーバーを前面で起動する（127.0.0.1 のみ）。このマシンの Claude Code のセッションとサブエージェントをブラウザに出す。Ctrl+C で止まる。"
+      },
+      "options": [
+        {
+          "name": "--port",
+          "type": "number",
+          "default": "7788",
+          "description": {
+            "en": "Port on 127.0.0.1.",
+            "ja": "127.0.0.1 のポート。"
+          }
+        },
+        {
+          "name": "--open",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Open the page in the browser.",
+            "ja": "ブラウザでページを開く。"
+          }
+        },
+        {
+          "name": "--record",
+          "type": "path",
+          "default": "—",
+          "description": {
+            "en": "Append every hook body received to FILE as JSONL. The file holds tool input (file contents, commands).",
+            "ja": "受け取ったフックの本文を FILE に JSONL で追記する。ファイルにはツールの入力（ファイルの中身やコマンド）が残る。"
+          }
+        },
+        {
+          "name": "--replay",
+          "type": "path",
+          "default": "—",
+          "description": {
+            "en": "Feed a --record file instead of live hooks. Cannot be combined with --record.",
+            "ja": "ライブのフックの代わりに --record のファイルを流す。--record とは併用できない。"
+          }
+        },
+        {
+          "name": "--speed",
+          "type": "number",
+          "default": "1.0",
+          "description": {
+            "en": "Replay speed.",
+            "ja": "再生の速さ。"
+          }
+        },
+        {
+          "name": "--no-agents-poll",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Do not run `claude agents --json` to list sessions.",
+            "ja": "セッション一覧のための `claude agents --json` を実行しない。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz serve --open"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz start",
+        "jui viz stop",
+        "jui viz doctor"
+      ],
+      "verifiedAgainst": {
+        "version": "2.0.0",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "809b88bf41ff4b6f933e58271fd518b406f6457d909c21c0807657735b1b77c3",
+        "cardHash": "dfe7ee10a9ddb99986dba4e0e2b8059b1a69e488d166ea898fefd54440f0921a",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "b4f064ac32f0",
+          "synopsis": "d9155215e594",
+          "purpose": "63f4aba87e07",
+          "options": "9ac8ff33e008",
+          "examples": "c13cea177b19",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "b61012e2e7da"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz start",
+      "synopsis": "jui viz start [--port PORT] [--json]",
+      "purpose": {
+        "en": "Start the jui viz server in the background, wait until it answers, and print its URL. A server that is already running is reported, not started again.",
+        "ja": "jui viz のサーバーを裏で起動し、応答するのを待って URL を表示する。すでに起動しているときは、それを報告して二重には起動しない。"
+      },
+      "options": [
+        {
+          "name": "--port",
+          "type": "number",
+          "default": "7788",
+          "description": {
+            "en": "Port on 127.0.0.1.",
+            "ja": "127.0.0.1 のポート。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Machine-readable output.",
+            "ja": "機械可読の出力。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz start"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz serve",
+        "jui viz status",
+        "jui viz stop"
+      ],
+      "verifiedAgainst": {
+        "version": "2.0.0",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "a13f1df39ede8f687d7d624e472f81f0b1a38c2fc6c56a7e350a3fd04af208b2",
+        "cardHash": "bc954ac1a4c1c01aaadd4915b5cd081eecddd5dfbdfc7f0d9dbd681e2da86226",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "59a2898723a7",
+          "synopsis": "567997ebac1f",
+          "purpose": "651428384a9d",
+          "options": "7ed8726195e5",
+          "examples": "0f027333accf",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "ad478a3fa94c"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz status",
+      "synopsis": "jui viz status [--json] [--with-relay]",
+      "purpose": {
+        "en": "Print whether a jui viz server is running, and its URL. With --json the answer also carries the state of the hooks.",
+        "ja": "jui viz のサーバーが起動しているかと、その URL を表示する。--json では、フックの状態も答えに入る。"
+      },
+      "options": [
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Machine-readable output.",
+            "ja": "機械可読の出力。"
+          }
+        },
+        {
+          "name": "--with-relay",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Also ask claude whether the permission relay is registered (runs `claude mcp get`; slower). The answer appears in the --json output.",
+            "ja": "許可の中継が登録されているかも claude に問い合わせる（`claude mcp get` を実行するので遅い）。答えは --json の出力に入る。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz status"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz start",
+        "jui viz doctor"
+      ],
+      "verifiedAgainst": {
+        "version": "2.0.0",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "203a160cac2fe6b74ba0350272daa45d4d6bf5bf37fcdb4c75d31798feffa8a4",
+        "cardHash": "68d1f3c0c5fb99c3b100d6f198d8a726d5a2edae0ab524941514eb1925bf857d",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "e99983f5dc54",
+          "synopsis": "ce239cfdfb96",
+          "purpose": "d4ec193b25c1",
+          "options": "90d7df19106b",
+          "examples": "1b2afcb0e110",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "86c446272808"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz stop",
+      "synopsis": "jui viz stop",
+      "purpose": {
+        "en": "Stop the running jui viz server: the one whose pid this tool wrote, and only after it answers as a jui viz server.",
+        "ja": "起動中の jui viz サーバーを止める。止めるのは、このツールが pid を書いたプロセスで、jui viz のサーバーとして応答したときだけ。"
+      },
+      "options": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz stop"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz serve",
+        "jui viz start"
+      ],
+      "verifiedAgainst": {
+        "version": "2.0.0",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "2a8a31f1911859b54cefafc9d706bf52ade62a7cebc86c4f122caeef9bf6b917",
+        "cardHash": "ea73411641f91e60b379ae72c8faa2cc50d8adf7ed1b276a80e5a9847ecf1f1a",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "6ff4516befd3",
+          "synopsis": "854b448eccc8",
+          "purpose": "72fb3525b67b",
+          "options": "357b9e47f539",
+          "examples": "3e22534b5181",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "e1f0d369aa0d"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz open",
+      "synopsis": "jui viz open",
+      "purpose": {
+        "en": "Open the running server's page in the browser. Exits 1 when no server is running.",
+        "ja": "起動中のサーバーのページをブラウザで開く。起動していなければ終了コード 1。"
+      },
+      "options": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz open"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz start"
+      ],
+      "verifiedAgainst": {
+        "version": "2.0.0",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "d8e67bd9bc02f32a31a9da23b7418f1908b14b642f846dfb38c4aa875355bdae",
+        "cardHash": "85715959723343ab1f1e4b20dc93aed1430000fe16b35023f466b8d6319bbac5",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "91308e889e16",
+          "synopsis": "ca84dfba3e15",
+          "purpose": "90e6b2013e63",
+          "options": "357b9e47f539",
+          "examples": "2fa250f579f3",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "88fa1fcdd8d2"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz doctor",
+      "synopsis": "jui viz doctor [--json]",
+      "purpose": {
+        "en": "Check the environment for jui viz — Python 3.11 or later, aiohttp and watchdog, the claude command, disableAllHooks, the hooks, the permission relay, the server and the port — and say how to fix what fails. Exits 1 when a check fails.",
+        "ja": "jui viz の環境を確かめる（Python 3.11 以上、aiohttp と watchdog、claude コマンド、disableAllHooks、フック、許可の中継、サーバー、ポート）。駄目なものには直し方を出す。1 つでも駄目なら終了コード 1。"
+      },
+      "options": [
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Machine-readable output.",
+            "ja": "機械可読の出力。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz doctor"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz hooks status",
+        "jui viz status"
+      ],
+      "verifiedAgainst": {
+        "version": "2.0.0",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "b7565244c9540a31b622d7b0f755511c837c9d39c735a0195e1cd5a901b793db",
+        "cardHash": "6b7eefaa5f3e4ff18f8c4a7420eedc3476d4ff36b63cfc4ebb14d3f88a245d64",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "c97c2ebb810b",
+          "synopsis": "a8380a6299f3",
+          "purpose": "2c95de14b011",
+          "options": "aa5b149e7cdf",
+          "examples": "a38867cde311",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "e30574509c10"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz hooks install",
+      "synopsis": "jui viz hooks install [--dry-run]",
+      "purpose": {
+        "en": "Add the jui viz hooks to ~/.claude/settings.json, for where the jui-viz plugin cannot be used. Hooks and settings already there are kept, and the file as it was is saved under ~/.jsonui-cli/viz/backups/.",
+        "ja": "jui viz のフックを ~/.claude/settings.json に足す（jui-viz プラグインを使えない環境向け）。すでにあるフックや設定は残し、書き換える前のファイルを ~/.jsonui-cli/viz/backups/ に保存する。"
+      },
+      "options": [
+        {
+          "name": "--dry-run",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Show the change, write nothing.",
+            "ja": "変更を表示するだけで、書き込まない。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz hooks install --dry-run\n$ jui viz hooks install"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz hooks uninstall",
+        "jui viz hooks status"
+      ],
+      "verifiedAgainst": {
+        "version": "2.0.0",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "ac37e90dfd074049b592906c681df87b04c6e143b426986bf3ccb5fb58c351e9",
+        "cardHash": "6b323a38bba8dcc1ce20a25650897fabce45dac03ee4ca775d728d7f0a8508e4",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "2018a340ee66",
+          "synopsis": "55c0b733d84b",
+          "purpose": "ae65fd6e6f37",
+          "options": "6df17d1e1130",
+          "examples": "8cd1b00eac0a",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "2c838683a983"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz hooks uninstall",
+      "synopsis": "jui viz hooks uninstall [--dry-run]",
+      "purpose": {
+        "en": "Remove the jui viz hooks from ~/.claude/settings.json. Your other hooks stay.",
+        "ja": "~/.claude/settings.json から jui viz のフックを外す。ほかのフックは残る。"
+      },
+      "options": [
+        {
+          "name": "--dry-run",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Show the change, write nothing.",
+            "ja": "変更を表示するだけで、書き込まない。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz hooks uninstall"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz hooks install"
+      ],
+      "verifiedAgainst": {
+        "version": "2.0.0",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "76d0b65949e652b957331a0c99375ae7bea086b088e7ecd9a7532d94394ae863",
+        "cardHash": "901811ba4eb2db992a66c1b297eec2a3bf33b87ec909d15db985890fad41cbff",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "ddc2b580425d",
+          "synopsis": "910753293c2a",
+          "purpose": "a9e34f4f00b4",
+          "options": "6df17d1e1130",
+          "examples": "a8b668e52515",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "632056f8fc90"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz hooks status",
+      "synopsis": "jui viz hooks status [--json]",
+      "purpose": {
+        "en": "Report how many of the jui viz hook events are installed, whether the plugin provides them, and any hook whose python or script is missing.",
+        "ja": "jui viz のフックのイベントがいくつ入っているか、プラグインで入っているか、python やスクリプトが見つからないフックがないかを表示する。"
+      },
+      "options": [
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Machine-readable status.",
+            "ja": "機械可読の状態。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz hooks status"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz hooks install",
+        "jui viz doctor"
+      ],
+      "verifiedAgainst": {
+        "version": "2.0.0",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "124bce36e2051a2ce70125c719d5f9b5e4c36b70b15380e52bb641ec9d5f4be2",
+        "cardHash": "9d88714d3ad1592f3285405bb9793e6eca6619f30a33bf18a216ea3ca0e05d9b",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "882f1d5c4a72",
+          "synopsis": "c7d1161ada6e",
+          "purpose": "b2fe2340f68f",
+          "options": "3f1528c576e4",
+          "examples": "76d84044883b",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "3b40fa73406c"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz export-demo",
+      "synopsis": "jui viz export-demo --out OUT",
+      "purpose": {
+        "en": "Write the jui viz demo page as a static folder for a documentation site: the page with its built-in demo data, no server, no token, relative paths. Open it from a static server or a site, not from file://.",
+        "ja": "jui viz のデモのページを、ドキュメントサイト向けの静的なフォルダとして書き出す。組み込みのデモデータで動き、サーバーもトークンも使わず、パスは相対。file:// ではなく、静的なサーバーかサイトの中で開く。"
+      },
+      "options": [
+        {
+          "name": "--out",
+          "type": "path",
+          "default": "—",
+          "description": {
+            "en": "An empty or new folder.",
+            "ja": "空のフォルダ、またはまだ無いパス。"
+          },
+          "required": true
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz export-demo --out viz-demo"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz serve"
+      ],
+      "verifiedAgainst": {
+        "version": "2.0.0",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "138e0b1ef6313ca6c4e6be33eefa7188bffb4be54d0408e0a21d3358bab739d4",
+        "cardHash": "1ec905c09d8ad362ca6226dda706d6636ba0006b0bc71593f40906c4737f8501",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "0afa27e63838",
+          "synopsis": "ab15803e2346",
+          "purpose": "10c198430d7b",
+          "options": "e1e1df250b6a",
+          "examples": "505e087aaf1e",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "396adac8840a"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz relay install",
+      "synopsis": "jui viz relay install [--dry-run] [--yes]",
+      "purpose": {
+        "en": "Register the permission relay (an MCP channel) with Claude Code, for where the jui-viz plugin cannot be used. It runs `claude mcp add --scope user jui-viz`, after asking. Start a session with `claude --dangerously-load-development-channels server:jui-viz` to answer its permission prompts from the page.",
+        "ja": "許可の中継（MCP のチャネル）を Claude Code に登録する（jui-viz プラグインを使えない環境向け）。確認のうえで `claude mcp add --scope user jui-viz` を実行する。ページから許可に答えるセッションは `claude --dangerously-load-development-channels server:jui-viz` で起動する。"
+      },
+      "options": [
+        {
+          "name": "--dry-run",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Show the command, run nothing.",
+            "ja": "コマンドを表示するだけで、実行しない。"
+          }
+        },
+        {
+          "name": "--yes",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Do not ask before running claude mcp.",
+            "ja": "claude mcp を実行する前に確認しない。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz relay install --dry-run"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz relay uninstall",
+        "jui viz relay status"
+      ],
+      "verifiedAgainst": {
+        "version": "2.0.0",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "55a232c0d5803609b5efced1d0f007e20a96d3e656c1da1075913f2383364615",
+        "cardHash": "7b5b1973e5a9a89983bde94fab237d270a5ecc9634c116932bd07934bc9f5b6b",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "d1049c9f4995",
+          "synopsis": "92390de7f2be",
+          "purpose": "b846ee6ab267",
+          "options": "e93333e0833f",
+          "examples": "7b2145a53138",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "3dceb2c72cf8"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz relay uninstall",
+      "synopsis": "jui viz relay uninstall [--dry-run] [--yes]",
+      "purpose": {
+        "en": "Unregister the permission relay (`claude mcp remove --scope user jui-viz`), after asking.",
+        "ja": "許可の中継の登録を外す（確認のうえで `claude mcp remove --scope user jui-viz`）。"
+      },
+      "options": [
+        {
+          "name": "--dry-run",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Show the command, run nothing.",
+            "ja": "コマンドを表示するだけで、実行しない。"
+          }
+        },
+        {
+          "name": "--yes",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Do not ask before running claude mcp.",
+            "ja": "claude mcp を実行する前に確認しない。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz relay uninstall"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz relay install"
+      ],
+      "verifiedAgainst": {
+        "version": "2.0.0",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "f57b262d44c1c41b6affb223461b61603ffe8333fe2cec507594fd413ce5f966",
+        "cardHash": "81c0b403e173858d4b4c8648a396802959c3c8d505aaf04bc518758f4b3fad32",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "53fdad1a49e1",
+          "synopsis": "1077c9bde484",
+          "purpose": "b30f2e9b6f51",
+          "options": "e93333e0833f",
+          "examples": "3acbab7f8942",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "f0d1dfd44c8a"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz relay status",
+      "synopsis": "jui viz relay status",
+      "purpose": {
+        "en": "Print whether the permission relay is registered (asks `claude mcp get jui-viz`).",
+        "ja": "許可の中継が登録されているかを表示する（`claude mcp get jui-viz` に問い合わせる）。"
+      },
+      "options": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz relay status"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz relay install"
+      ],
+      "verifiedAgainst": {
+        "version": "2.0.0",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "3ac51f77931697082285fb7a6d5a748d4b2ae605fddf834f6b8f15b450dae1f5",
+        "cardHash": "7ba044d7141269b821fa2411e2255b88cfbf75827872f10b96cd27448c19b11a",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "786f1d69dbe9",
+          "synopsis": "ef80a0fa7d2f",
+          "purpose": "bca3fd6f031c",
+          "options": "357b9e47f539",
+          "examples": "e3da4c20278a",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "f0d1dfd44c8a"
+        }
+      }
+    },
+    {
       "binary": "sjui",
       "command": "init",
       "synopsis": "sjui init [--mode all|uikit|swiftui]",

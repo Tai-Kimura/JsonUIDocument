@@ -31,6 +31,10 @@
         {
           "name": "onHeroRefusesTap",
           "class": "() -> Void"
+        },
+        {
+          "name": "onHeroVizTap",
+          "class": "() -> Void"
         }
       ]
     },
@@ -47,109 +51,114 @@
           "child": [
             {
               "type": "View",
-              "id": "home_hero_columns",
-              "orientation": "horizontal",
+              "id": "home_hero_copy",
+              "orientation": "vertical",
               "width": "matchParent",
               "height": "wrapContent",
-              "spacing": 40,
               "child": [
                 {
-                  "type": "View",
-                  "id": "home_hero_copy",
-                  "orientation": "vertical",
+                  "type": "Label",
+                  "width": "matchParent",
                   "height": "wrapContent",
-                  "weight": 3,
-                  "child": [
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "fontSize": 13,
-                      "fontWeight": "semibold",
-                      "fontColor": "eyebrow",
-                      "text": "hero_eyebrow"
-                    },
-                    {
-                      "type": "Label",
-                      "id": "home_hero_title",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 16,
-                      "fontSize": 44,
-                      "fontWeight": "bold",
-                      "fontColor": "chrome_ink",
-                      "text": "hero_title"
-                    },
-                    {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 16,
-                      "fontSize": 18,
-                      "fontColor": "chrome_ink_muted",
-                      "text": "hero_subtitle"
-                    },
-                    {
-                      "type": "View",
-                      "id": "home_hero_ctas",
-                      "orientation": "horizontal",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 28,
-                      "spacing": 3,
-                      "child": [
-                        {
-                          "type": "Button",
-                          "id": "home_hero_cta_primary",
-                          "style": "primary_button",
-                          "text": "hero_cta_primary",
-                          "onClick": "@{onHeroInstallTap}"
-                        },
-                        {
-                          "type": "Button",
-                          "id": "home_hero_cta_secondary",
-                          "style": "ghost_button",
-                          "text": "hero_cta_secondary",
-                          "onClick": "@{onHeroRefusesTap}"
-                        },
-                        {
-                          "type": "Button",
-                          "id": "home_hero_cta_tertiary",
-                          "style": "ghost_button",
-                          "text": "hero_cta_tertiary",
-                          "onClick": "@{onHeroAiAgentsTap}"
-                        }
-                      ]
-                    }
-                  ]
+                  "fontSize": 13,
+                  "fontWeight": "semibold",
+                  "fontColor": "eyebrow",
+                  "text": "hero_eyebrow"
+                },
+                {
+                  "type": "Label",
+                  "id": "home_hero_title",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "fontSize": 44,
+                  "fontWeight": "bold",
+                  "fontColor": "chrome_ink",
+                  "text": "hero_title"
+                },
+                {
+                  "type": "Label",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 16,
+                  "fontSize": 18,
+                  "fontColor": "chrome_ink_muted",
+                  "text": "hero_subtitle"
                 },
                 {
                   "type": "View",
-                  "id": "home_hero_proof",
-                  "orientation": "vertical",
+                  "id": "home_hero_ctas",
+                  "orientation": "horizontal",
+                  "width": "matchParent",
                   "height": "wrapContent",
-                  "weight": 2,
+                  "topMargin": 28,
+                  "spacing": 3,
                   "child": [
                     {
-                      "type": "CodeBlock",
-                      "id": "home_hero_transcript",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "code": "$ jui verify --fail-on-diff --detail\n# jui verify report\n| Screen         | Expected | Actual | Match | Missing | Extra | TypeMM | %   |\n|----------------|----------|--------|-------|---------|-------|--------|-----|\n| profile_screen | 2        | 2      | 1     | 1       | 1     | 0      | 33% |\n**Total: match=1, missing=1, extra=1, type_mismatch=0**\n## profile_screen\n**Missing (in spec but not in Layout JSON):**\n- save (Button)\n**Extra (in Layout JSON but not in spec):**\n- nickname (TextField)\n**verified 1 of 1 screen(s)**\n$ echo $?\n1",
-                      "language": "text",
-                      "showLineNumbers": false,
-                      "copyable": false
+                      "type": "Button",
+                      "id": "home_hero_cta_primary",
+                      "style": "primary_button",
+                      "text": "hero_cta_primary",
+                      "onClick": "@{onHeroInstallTap}"
                     },
                     {
-                      "type": "Label",
-                      "width": "matchParent",
-                      "height": "wrapContent",
-                      "topMargin": 12,
-                      "fontSize": 13,
-                      "fontColor": "chrome_ink_subtle",
-                      "text": "hero_transcript_caption"
+                      "type": "Button",
+                      "id": "home_hero_cta_secondary",
+                      "style": "ghost_button",
+                      "text": "hero_cta_secondary",
+                      "onClick": "@{onHeroRefusesTap}"
+                    },
+                    {
+                      "type": "Button",
+                      "id": "home_hero_cta_tertiary",
+                      "style": "ghost_button",
+                      "text": "hero_cta_tertiary",
+                      "onClick": "@{onHeroAiAgentsTap}"
                     }
                   ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "home_hero_demo",
+              "orientation": "vertical",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 40,
+              "child": [
+                {
+                  "type": "Label",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "fontSize": 13,
+                  "fontWeight": "semibold",
+                  "fontColor": "eyebrow",
+                  "text": "hero_viz_eyebrow"
+                },
+                {
+                  "type": "VizDemo",
+                  "id": "home_viz_demo",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 12
+                },
+                {
+                  "type": "Label",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 12,
+                  "fontSize": 13,
+                  "fontColor": "chrome_ink_subtle",
+                  "text": "hero_viz_caption"
+                },
+                {
+                  "type": "Button",
+                  "id": "home_hero_viz_cta",
+                  "style": "ghost_button",
+                  "topMargin": 12,
+                  "text": "hero_viz_cta",
+                  "onClick": "@{onHeroVizTap}"
                 }
               ]
             }
@@ -509,6 +518,35 @@
               "height": "wrapContent",
               "style": "section_subheading",
               "text": "refuses_subheading"
+            },
+            {
+              "type": "View",
+              "id": "home_refuses_verify",
+              "orientation": "vertical",
+              "width": "matchParent",
+              "topMargin": 32,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "CodeBlock",
+                  "id": "home_refuses_verify_transcript",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "code": "$ jui verify --fail-on-diff --detail\n# jui verify report\n| Screen         | Expected | Actual | Match | Missing | Extra | TypeMM | %   |\n|----------------|----------|--------|-------|---------|-------|--------|-----|\n| profile_screen | 2        | 2      | 1     | 1       | 1     | 0      | 33% |\n**Total: match=1, missing=1, extra=1, type_mismatch=0**\n## profile_screen\n**Missing (in spec but not in Layout JSON):**\n- save (Button)\n**Extra (in Layout JSON but not in spec):**\n- nickname (TextField)\n**verified 1 of 1 screen(s)**\n$ echo $?\n1",
+                  "language": "text",
+                  "showLineNumbers": false,
+                  "copyable": false
+                },
+                {
+                  "type": "Label",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "topMargin": 12,
+                  "fontSize": 13,
+                  "fontColor": "chrome_ink_subtle",
+                  "text": "hero_transcript_caption"
+                }
+              ]
             },
             {
               "type": "View",

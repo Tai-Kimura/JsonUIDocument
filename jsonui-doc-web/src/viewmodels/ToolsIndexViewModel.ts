@@ -30,7 +30,8 @@ const CATALOG: ReadonlyArray<{ id: string; url: string; titleKey: string }> = [
   { id: "mcp", url: "/tools/mcp", titleKey: "tools_mcp_title" },
   { id: "test-runner", url: "/tools/test-runner", titleKey: "tools_test_runner_title" },
   { id: "agents", url: "/tools/agents", titleKey: "tools_agents_title" },
-  { id: "helper", url: "/tools/helper", titleKey: "tools_helper_title" }
+  { id: "helper", url: "/tools/helper", titleKey: "tools_helper_title" },
+  { id: "viz", url: "/tools/viz", titleKey: "tools_viz_title" }
 ];
 
 export class ToolsIndexViewModel {

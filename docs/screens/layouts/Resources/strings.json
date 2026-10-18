@@ -237,8 +237,8 @@
       "ja": "検証器が拒否するもの"
     },
     "refuses_subheading": {
-      "en": "Each of these is a non-zero exit, not a lint suggestion. Four of them, with the actual output of the pinned toolchain on a fixture.",
-      "ja": "いずれも lint の提案ではなく、非ゼロの終了です。そのうち 4 つを、pin されたツールチェーンが fixture に対して出した実際の出力とともに。"
+      "en": "Each of these is a non-zero exit, not a lint suggestion. Five of them, with the actual output of the pinned toolchain on a fixture.",
+      "ja": "いずれも lint の提案ではなく、非ゼロの終了です。そのうち 5 つを、pin されたツールチェーンが fixture に対して出した実際の出力とともに。"
     },
     "refuse_build_kind": {
       "en": "Layout",
@@ -415,6 +415,18 @@
     "eco_tests_parts": {
       "en": "jsonui-test-runner (XCUITest · UIAutomator · Playwright) · jsonui-doc generate",
       "ja": "jsonui-test-runner（XCUITest · UIAutomator · Playwright）· jsonui-doc generate"
+    },
+    "hero_viz_eyebrow": {
+      "en": "jui viz — watch your agents work",
+      "ja": "jui viz — エージェントの作業を見る"
+    },
+    "hero_viz_caption": {
+      "en": "A demo with made-up data, running in your browser. Each project is a room, each Claude Code session and subagent a robot at a desk. The jui viz screen is in Japanese.",
+      "ja": "作り物のデータで、ブラウザの中で動いているデモです。プロジェクトごとに部屋が、Claude Code のセッションとサブエージェントごとにロボットがいます。"
+    },
+    "hero_viz_cta": {
+      "en": "Read about jui viz",
+      "ja": "jui viz について読む"
     }
   },
   "learn_hello_world": {
@@ -5055,8 +5067,8 @@
       "ja": "ORCHESTRATOR"
     },
     "cli_jui_body": {
-      "en": "Top-level command. Subcommands: init / generate / build / verify / sync_tool, plus screens / ls / migrate-layouts / lint-strings / lint-generated / hotload / conformance. Reads jui.config.json to fan out to the right platform builder(s). Almost every day's work starts and ends here.",
-      "ja": "トップレベルコマンド。サブコマンド: init / generate / build / verify / sync_tool、ほかに screens / ls / migrate-layouts / lint-strings / lint-generated / hotload / conformance。jui.config.json を読んで適切なプラットフォーム builder に振り分けます。日常作業のほぼ全てがここから始まり、ここで終わります。"
+      "en": "Top-level command. Subcommands: init / generate / build / verify / sync_tool, plus screens / ls / migrate-layouts / lint-strings / lint-generated / hotload / conformance / viz. Reads jui.config.json to fan out to the right platform builder(s). Almost every day's work starts and ends here.",
+      "ja": "トップレベルコマンド。サブコマンド: init / generate / build / verify / sync_tool、ほかに screens / ls / migrate-layouts / lint-strings / lint-generated / hotload / conformance / viz。jui.config.json を読んで適切なプラットフォーム builder に振り分けます。日常作業のほぼ全てがここから始まり、ここで終わります。"
     },
     "cli_sjui_name": {
       "en": "sjui",
@@ -5699,6 +5711,196 @@
     "toc_row_limits": {
       "en": "Known limits",
       "ja": "既知の制限"
+    }
+  },
+  "tools_viz": {
+    "breadcrumb": {
+      "en": "← Tools",
+      "ja": "← ツール"
+    },
+    "title": {
+      "en": "jui viz: watch your agents work",
+      "ja": "jui viz: エージェントの作業を見る"
+    },
+    "lead": {
+      "en": "`jui viz` shows the Claude Code sessions and subagents running on your machine as rooms and robots in the browser. Each project folder gets a room, and each session gets a robot with a headband at a desk. A robot shows what it is doing now — reading a file, writing one, running a command, running a test, waiting for permission — with a motion and one line of text.",
+      "ja": "`jui viz` は、手元で動いている Claude Code のセッションとサブエージェントを、ブラウザの中の部屋とロボットで見せるツールです。プロジェクトのフォルダごとに部屋ができ、セッションごとにハチマキを巻いたロボットが座ります。ロボットは、ファイルを読む、書く、コマンドを打つ、テストを走らせる、許可を待つ、といった今の作業を、動きと 1 行の文で見せます。"
+    },
+    "read_time": {
+      "en": "7 min read",
+      "ja": "7 分で読めます"
+    },
+    "demo_caption": {
+      "en": "This is the demo, running in your browser with made-up data. It talks to no server. The jui viz screen is in Japanese. Drag to rotate, scroll to zoom, and tap a board or a robot for details.",
+      "ja": "これはデモです。ブラウザの中で、作り物のデータで動いています。サーバーとは通信しません。ドラッグで回転、ホイールで拡大、ボードやロボットを押すと詳しく表示します。"
+    },
+    "demo_frame_title": {
+      "en": "jui viz demo",
+      "ja": "jui viz のデモ"
+    },
+    "section_what_heading": {
+      "en": "What it shows",
+      "ja": "何が見えるか"
+    },
+    "section_what_body": {
+      "en": "In a JsonUI project, the same screen also shows how far each spec has got, the tasks, the test runs and the permission requests. You can answer a permission request from the browser.\n\nThe page runs only on your machine. The server listens on `127.0.0.1` only and makes no outside connections.",
+      "ja": "JsonUI のプロジェクトでは、spec の進み具合、タスク、テストの実行、許可の要求も同じ画面に並びます。許可の要求には、ブラウザから答えることもできます。\n\n画面はあなたのマシンの中だけで動きます。サーバーは `127.0.0.1` だけで待ち受け、外部への通信はしません。"
+    },
+    "section_needs_heading": {
+      "en": "What you need",
+      "ja": "必要なもの"
+    },
+    "section_needs_body": {
+      "en": "• jsonui-cli 2.0.0 or later (the `jui` command), on Python 3.11 or later\n• Claude Code, running on this machine — the CLI, the desktop app or an IDE. Cloud sessions are not shown.",
+      "ja": "• jsonui-cli 2.0.0 以降（`jui` コマンド）。Python 3.11 以上\n• Claude Code（手元のセッション。CLI、デスクトップアプリ、IDE のどれでも）。クラウドのセッションは見えません"
+    },
+    "section_install_heading": {
+      "en": "Install",
+      "ja": "入れる"
+    },
+    "section_install_body": {
+      "en": "In Claude Code, install the plugin once. From then on, every Claude Code session tells `jui viz` about each step of its work.",
+      "ja": "Claude Code で、プラグインを 1 回だけ入れます。Claude Code の各セッションが、作業のたびに `jui viz` へ知らせるようになります。"
+    },
+    "section_install_notes": {
+      "en": "• Your `~/.claude/settings.json` is not changed. To remove it, remove the plugin.\n• When the `jui viz` server is not running, the plugin does nothing and returns at once. It does not slow Claude Code down.\n\nWhere plugins are not available, this command adds the same hooks to `~/.claude/settings.json` instead. The hooks and settings you already have stay as they are, and the file as it was before the change is saved in `~/.jsonui-cli/viz/backups/`.",
+      "ja": "• あなたの `~/.claude/settings.json` は書き換えません。外すのも、プラグインを外すだけです。\n• プラグインは、`jui viz` のサーバーが止まっているときは何もせずにすぐ終わります。Claude Code の作業を遅らせることはありません。\n\nプラグインを使えない環境では、代わりに次のコマンドで、同じフックを `~/.claude/settings.json` に足せます。あなたがすでに入れているフックや設定は、そのまま残り、書き換える前のファイルは `~/.jsonui-cli/viz/backups/` に保存されます。"
+    },
+    "section_start_heading": {
+      "en": "Start it",
+      "ja": "起動する"
+    },
+    "section_start_body": {
+      "en": "Your browser opens `http://127.0.0.1:7788/`. To stop the server, press Ctrl+C or run `jui viz stop`. `jui viz start` runs it in the background instead and prints the URL.\n\nSessions that were already running before the hooks went in also appear in the list (read from `claude agents --json`).",
+      "ja": "ブラウザで `http://127.0.0.1:7788/` が開きます。止めるときは Ctrl+C か `jui viz stop` です。`jui viz start` を使うと、裏で起動して URL を表示します。\n\nフックを入れる前から動いていたセッションも、一覧には出ます（`claude agents --json` から読みます）。"
+    },
+    "section_screen_heading": {
+      "en": "Reading the screen",
+      "ja": "画面の見方"
+    },
+    "section_screen_body": {
+      "en": "• Rooms: one per project folder. A folder with `jui.config.json` is treated as a JsonUI project.\n• Robots: one for a session's main agent and one for each subagent. The text on the headband is the start of the session id. A subagent walks in through the door when it is called and walks out when it is done.\n• Robot states: idle, typing (writing a file), reading, command, phone (a test on a device), waiting for permission, carrying (a new deliverable is ready), done.\n• Right panel: sessions, spec progress, test runs and tasks.\n• Spec board: for each spec, how far its seven sections are filled in (overview, structure, state, data flow, actions, transitions, branches), and how far implementation and tests have got. Open one to read the spec as a sheet; the structure is drawn from the Layout file the spec points to. The implementation count is a guide only — `jui verify` is the real check.\n• Task board: the tasks Claude created (TodoWrite and the like), in not started, waiting, in progress and done.\n• Log: the latest events in the strip at the bottom. The full-screen log can be filtered by kind and by text.",
+      "ja": "• 部屋: プロジェクトのフォルダごとに 1 つ。`jui.config.json` があるフォルダは JsonUI のプロジェクトとして扱われます。\n• ロボット: セッションのメインと、サブエージェントが 1 体ずつ。ハチマキの文字は、セッションの id の先頭です。サブエージェントは、呼ばれるとドアから歩いて入ってきて、終わると出ていきます。\n• ロボットの状態: 待機、入力（ファイルを書く）、読む、コマンド、スマホ（端末でテスト）、許可待ち、運ぶ（新しい成果物ができた）、完了。\n• 右のパネル: セッション、spec の進み具合、テストの実行、タスク。\n• spec ボード: spec ごとに 7 つの区分（概要、構造、状態、データの流れ、操作、遷移、分岐）の記入状況と、実装・テストの進み具合。開くと、spec の中身をシートで読めます。構造は、spec が指す Layout ファイルから描きます。実装の数は目安です。正しい判定は `jui verify` で行ってください。\n• タスクボード: Claude が作ったタスク（TodoWrite など）を、未着手・待ち・作業中・完了で並べます。\n• ログ: 下の帯に最新のイベント。全画面のログでは、種類や文字で絞り込めます。"
+    },
+    "section_permissions_heading": {
+      "en": "Answer permission prompts from the browser",
+      "ja": "ブラウザから許可に答える"
+    },
+    "section_permissions_body": {
+      "en": "When Claude Code asks for permission, a card appears on the page. The card shows the command that would run, or the path of the file that would change, exactly as requested.\n\nTo answer from the browser, set up one of the two below.",
+      "ja": "Claude Code が許可を求めると、画面にカードが出ます。カードには、実行されるコマンドや、書き換えるファイルのパスがそのまま出ます。\n\nブラウザから答えるには、次の 2 つのどちらかを用意します。"
+    },
+    "section_permissions_relay": {
+      "en": "Allow or deny only (the relay)\n\nThe plugin includes a relay that passes permission requests to this page. Start a session that should use it like this:",
+      "ja": "許可・拒否だけ（中継）\n\nプラグインには、許可の要求をこのページに中継する仕組みが入っています。中継を使うセッションは、次のように起動します。"
+    },
+    "section_permissions_relay_after": {
+      "en": "In that session, the card has Allow and Deny buttons. At the warning on start-up, choose \"I am using this for local development\". Without the plugin, register the relay with `jui viz relay install` and start with `server:jui-viz` instead.",
+      "ja": "このセッションで、カードに「許可」「拒否」のボタンが出ます。起動のときの警告では「I am using this for local development」を選びます。プラグインを使わない環境では、`jui viz relay install` で中継を登録し、`server:jui-viz` で起動します。"
+    },
+    "section_permissions_hooks": {
+      "en": "Always allow, and deny with a reason\n\nThe hooks the plugin (or `jui viz hooks install`) adds wait for the browser's answer, for up to 30 seconds, but only while the page is showing.\n\n• \"Always allow\" can add only a rule the request itself suggested. Before it is added, the rule and the file it is saved to are shown.\n• A denial can carry a reason, and the reason is passed to Claude.\n• When the page is not open, or its tab is in the background, the hooks do not wait, so the terminal dialog is not delayed.\n• If you answer in the terminal first, that answer is used.",
+      "ja": "今後も許可・理由つきの拒否\n\nプラグイン（または `jui viz hooks install`）で入るフックが、ページが表示されている間だけ、ブラウザの答えを待ちます（最大 30 秒）。\n\n• 「今後も許可」で足せるのは、その要求自身が示したルールの候補だけです。足す前に、ルールと保存先が表示されます。\n• 「拒否」には理由を書けます。理由は Claude に伝わります。\n• ページを開いていないとき、またはタブが裏にあるときは待たないので、ターミナルのダイアログは遅れません。\n• ターミナルで先に答えると、そちらが使われます。"
+    },
+    "section_tests_heading": {
+      "en": "Test progress",
+      "ja": "テストの進捗"
+    },
+    "section_tests_body": {
+      "en": "The JsonUI test runners (iOS, Android and web) report when each case starts and ends. When you run tests, the running case appears on the test board and on the robot's phone.",
+      "ja": "JsonUI のテストランナー（iOS、Android、Web）は、ケースの開始と終了を知らせます。テストを走らせると、テストのボードとロボットのスマホに、実行中のケースが出ます。"
+    },
+    "section_remove_heading": {
+      "en": "Remove it",
+      "ja": "外す"
+    },
+    "section_remove_body": {
+      "en": "In Claude Code, run `/plugin uninstall jui-viz@jsonui`.\n\nIf you installed with `jui viz hooks install`, use these commands:",
+      "ja": "Claude Code で `/plugin uninstall jui-viz@jsonui` を実行します。\n\n`jui viz hooks install` で入れた場合は、次のコマンドです。"
+    },
+    "section_trouble_heading": {
+      "en": "When it does not work",
+      "ja": "うまくいかないとき"
+    },
+    "section_trouble_body": {
+      "en": "`jui viz doctor` checks Python, the libraries it needs, the `claude` command, the hooks, the server and the port, and says how to fix what it finds.\n\n• No robots: check that jui-viz is enabled in `/plugin`, or that `jui viz hooks status` reports the hooks.\n• The port is taken: change it, as in `jui viz serve --port 7789`.",
+      "ja": "`jui viz doctor` は、Python、必要なライブラリ、`claude` コマンド、フックの状態、サーバーの状態、ポートを確かめ、直し方を出します。\n\n• ロボットが出ない: `/plugin` で jui-viz が有効か、または `jui viz hooks status` でフックが入っているかを確かめます。\n• ポートが使われている: `jui viz serve --port 7789` のように変えます。"
+    },
+    "section_safety_heading": {
+      "en": "Safety",
+      "ja": "安全について"
+    },
+    "section_safety_body": {
+      "en": "• The server listens on `127.0.0.1` only. It cannot be seen from your LAN or another device.\n• Each start creates a new token. Writes that do not come from the browser page, and connections from another site's page, are refused.\n• Tool input (file contents and commands) is kept in memory only. It is written to a file only when you pass `--record`.",
+      "ja": "• サーバーは `127.0.0.1` だけで待ち受けます。LAN や別の端末からは見えません。\n• 起動ごとにトークンを作り、ブラウザ以外からの書き込みと、別のサイトのページからの接続を拒否します。\n• ツールの入力（ファイルの中身やコマンド）は、メモリにだけ持ちます。ファイルに残すのは、`--record` を付けたときだけです。"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの内容"
+    },
+    "toc_row_what": {
+      "en": "What it shows",
+      "ja": "何が見えるか"
+    },
+    "toc_row_needs": {
+      "en": "What you need",
+      "ja": "必要なもの"
+    },
+    "toc_row_install": {
+      "en": "Install",
+      "ja": "入れる"
+    },
+    "toc_row_start": {
+      "en": "Start it",
+      "ja": "起動する"
+    },
+    "toc_row_screen": {
+      "en": "Reading the screen",
+      "ja": "画面の見方"
+    },
+    "toc_row_permissions": {
+      "en": "Permission prompts",
+      "ja": "許可に答える"
+    },
+    "toc_row_tests": {
+      "en": "Test progress",
+      "ja": "テストの進捗"
+    },
+    "toc_row_remove": {
+      "en": "Remove it",
+      "ja": "外す"
+    },
+    "toc_row_trouble": {
+      "en": "When it does not work",
+      "ja": "うまくいかないとき"
+    },
+    "toc_row_safety": {
+      "en": "Safety",
+      "ja": "安全について"
+    },
+    "next_heading": {
+      "en": "Keep reading",
+      "ja": "次に読む"
+    },
+    "next_cli_title": {
+      "en": "jsonui-cli",
+      "ja": "jsonui-cli"
+    },
+    "next_cli_description": {
+      "en": "Every jui subcommand, including the jui viz ones.",
+      "ja": "jui viz を含む、jui の全サブコマンド。"
+    },
+    "next_agents_title": {
+      "en": "Agents for Claude / Codex",
+      "ja": "Agents for Claude / Codex"
+    },
+    "next_agents_description": {
+      "en": "The agents whose work the robots show.",
+      "ja": "ロボットが作業を見せている、エージェントたち。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI",
+      "ja": "© 2026 JsonUI"
     }
   },
   "learn_what_is_jsonui": {

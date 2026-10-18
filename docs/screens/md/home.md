@@ -2,13 +2,13 @@
 
 ## Overview
 
-Top page. Three sections: hero (brand statement + three CTAs), featured cards (3 'start here' links), platform cards (Swift/Kotlin/React), and a 'What's new' changelog ribbon. Navigation between site categories now lives in the site-wide chrome (TopBar + Sidebar) — home is no longer a navigation surface. Language toggle also moved to the top bar; home simply re-renders when StringManager flips.
+Top page. Three sections: hero (brand statement + three CTAs, then the jui viz demo running in an iframe with a link to /tools/viz), featured cards (3 'start here' links), platform cards (Swift/Kotlin/React), and a 'What's new' changelog ribbon. Navigation between site categories now lives in the site-wide chrome (TopBar + Sidebar) — home is no longer a navigation surface. Language toggle also moved to the top bar; home simply re-renders when StringManager flips.
 
 | | |
 |---|---|
 | Layout File | `home` |
 | Created | 2026-04-22 |
-| Updated | 2026-05-27 |
+| Updated | 2026-10-18 |
 
 ## Screen Structure
 
@@ -19,18 +19,19 @@ Top page. Three sections: hero (brand statement + three CTAs), featured cards (3
 | View | `home_root` | - | - | - | - |
 | &nbsp;&nbsp;↳ Scroll | `home_scroll` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `home_hero` | - | - | - | - |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `home_hero_columns` | - | - | - | - |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `home_hero_copy` | - | - | - | - |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `home_hero_title` | - | - | - | - |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `home_hero_ctas` | - | - | - | - |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Button | `home_hero_cta_primary` | - | - | - | - |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Button | `home_hero_cta_secondary` | - | - | - | - |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Button | `home_hero_cta_tertiary` | - | - | - | - |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `home_hero_proof` | - | - | - | - |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `home_hero_transcript` | - | - | - | - |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `home_hero_copy` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `home_hero_title` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `home_hero_ctas` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Button | `home_hero_cta_primary` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Button | `home_hero_cta_secondary` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Button | `home_hero_cta_tertiary` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `home_hero_demo` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ VizDemo | `home_viz_demo` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Button | `home_hero_viz_cta` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `home_ecosystem` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
@@ -76,6 +77,9 @@ Top page. Three sections: hero (brand statement + three CTAs), featured cards (3
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `home_refuses` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `home_refuses_verify` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `home_refuses_verify_transcript` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `-` | - | - | - | - |
@@ -136,6 +140,12 @@ home_root
 └── home_scroll
 ```
 
+### Custom Components
+
+| Component | Specification | Description |
+|---|---|---|
+| VizDemo | `viz-demo.component.json` | The jui viz demo in an iframe, in the hero. |
+
 ## Data Flow
 
 ```mermaid
@@ -154,7 +164,7 @@ flowchart TD
 | Signature | Platforms | Description |
 |---|---|---|
 | `onAppear()` | all | Build featuredLinks, platformCards, and recentChanges by mapping the module-scope FEATURED_LINKS / PLATFORM_CARDS / RECENT_CHANGES constants through hydrate* helpers that resolve each titleKey / descriptionKey / blurbKey / ctaLabelKey via StringManager.getString() and bind a pre-wired onNavigate closure per row. Also wraps the results in CollectionDataSources via the asCollection() private helper so the generated Collection JSX finds data at data.xxx.sections[0].cells.data. |
-| `onNavigate(url: String)` | all | Single navigation funnel: calls router.push(url). Hero CTA bindings (onHeroInstallTap / onHeroRefusesTap / onHeroAiAgentsTap) and every card's onNavigate closure flow through this one method so future analytics / middleware can hook a single spot. |
+| `onNavigate(url: String)` | all | Single navigation funnel: calls router.push(url). Hero CTA bindings (onHeroInstallTap / onHeroRefusesTap / onHeroAiAgentsTap / onHeroVizTap) and every card's onNavigate closure flow through this one method so future analytics / middleware can hook a single spot. |
 
 #### Vars
 
@@ -185,6 +195,7 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 | `onHeroInstallTap` |  | - |
 | `onHeroRefusesTap` |  | - |
 | `onHeroAiAgentsTap` |  | - |
+| `onHeroVizTap` |  | - |
 
 ## User Actions
 

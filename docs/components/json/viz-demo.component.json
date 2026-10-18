@@ -1,0 +1,60 @@
+{
+  "type": "component_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "VizDemo",
+    "displayName": "jui viz demo",
+    "description": "The jui viz demo page, running inside an iframe. The page is the static folder that `jui viz export-demo` writes, served by this site from /tools/viz-demo/<jsonui-cli version>/. Its data is built into the page; it talks to no server and loads nothing from another origin.",
+    "category": "display",
+    "createdAt": "2026-10-18",
+    "updatedAt": "2026-10-18"
+  },
+  "props": {
+    "items": [],
+    "notes": [
+      "Propless. There is one demo and one place it is served from, so a `src` prop would only invite a second copy to drift from the first.",
+      "The iframe title is the string key `tools_viz_demo_frame_title`, resolved per language like the other chrome strings."
+    ]
+  },
+  "slots": {
+    "items": [],
+    "notes": [
+      "Leaf component. The iframe owns its own document."
+    ]
+  },
+  "structure": {
+    "components": [
+      {
+        "type": "View",
+        "id": "viz_demo_root",
+        "description": "Wrapper that sizes the iframe: full width, a 16:10 frame with a minimum height so the narrow layout of the demo still fits."
+      }
+    ],
+    "layout": {
+      "root": "viz_demo_root",
+      "children": []
+    }
+  },
+  "stateManagement": {
+    "internalStates": [],
+    "exposedEvents": []
+  },
+  "usage": {
+    "example": {
+      "layoutSnippet": {
+        "type": "VizDemo"
+      },
+      "description": "Zero-attribute usage inside a Layout JSON."
+    },
+    "usedInScreens": [
+      "/",
+      "/tools/viz"
+    ]
+  },
+  "notes": [
+    "Rendering contract: <iframe src=\"/tools/viz-demo/<version>/index.html\" title=... loading=\"lazy\"> inside the wrapper. The demo is a same-origin page, so no sandbox flags are needed for it to run, and it may not be given any that let it reach another origin.",
+    "Colour mode: the demo reads `data-theme` on its own root element and watches it. The component sets that attribute to the site's colour mode (ColorManager) on load and on every change. It sets an attribute only; no script is added to the demo.",
+    "Updating the demo: run `jui viz export-demo --out <an empty folder>` with the pinned jsonui-cli into jsonui-doc-web/public/tools/viz-demo/<version>/, point DEMO_SRC in VizDemo.tsx at it, and delete the previous folder. A new folder, not an overwrite: deploy uploads non-HTML files as immutable for a year, and the export keeps its file names. Do it on every pin bump that changes the export.",
+    "Nothing is injected into the demo: no analytics, no measurement, no extra script. The request from the jui viz side asks for exactly that."
+  ]
+}

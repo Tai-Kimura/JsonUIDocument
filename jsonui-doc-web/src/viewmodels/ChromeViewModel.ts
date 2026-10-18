@@ -170,6 +170,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "test-runner", titleKey: "tools_test_runner_title", titleEn: "jsonui-test-runner",        url: "/tools/test-runner" },
       { id: "agents",      titleKey: "tools_agents_title",      titleEn: "Agents for Claude / Codex", url: "/tools/agents" },
       { id: "helper",      titleKey: "tools_helper_title",      titleEn: "jsonui-helper (VS Code)",   url: "/tools/helper" },
+      { id: "viz",         titleKey: "tools_viz_title",         titleEn: "jui viz",                   url: "/tools/viz" },
     ],
   },
   {
