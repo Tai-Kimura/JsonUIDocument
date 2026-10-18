@@ -5727,8 +5727,8 @@
       "ja": "`jui viz` は、手元で動いている Claude Code のセッションとサブエージェントを、ブラウザの中の部屋とロボットで見せるツールです。プロジェクトのフォルダごとに部屋ができ、セッションごとにハチマキを巻いたロボットが座ります。ロボットは、ファイルを読む、書く、コマンドを打つ、テストを走らせる、許可を待つ、といった今の作業を、動きと 1 行の文で見せます。"
     },
     "read_time": {
-      "en": "7 min read",
-      "ja": "7 分で読めます"
+      "en": "9 min read",
+      "ja": "9 分で読めます"
     },
     "demo_caption": {
       "en": "This is the demo, running in your browser with made-up data. It talks to no server. The jui viz screen is in Japanese. Drag to rotate, scroll to zoom, and tap a board or a robot for details.",
@@ -5751,8 +5751,8 @@
       "ja": "必要なもの"
     },
     "section_needs_body": {
-      "en": "• jsonui-cli 2.0.0 or later (the `jui` command), on Python 3.11 or later\n• Claude Code, running on this machine — the CLI, the desktop app or an IDE. Cloud sessions are not shown.",
-      "ja": "• jsonui-cli 2.0.0 以降（`jui` コマンド）。Python 3.11 以上\n• Claude Code（手元のセッション。CLI、デスクトップアプリ、IDE のどれでも）。クラウドのセッションは見えません"
+      "en": "• jsonui-cli 2.0.0 or later (the `jui` command), on Python 3.11 or later. Answering Claude's questions from the page needs jsonui-cli 2.2.0 and version 1.1.0 of the plugin.\n• Claude Code, running on this machine — the CLI, the desktop app or an IDE. Cloud sessions are not shown.",
+      "ja": "• jsonui-cli 2.0.0 以降（`jui` コマンド）。Python 3.11 以上。Claude の質問にページから答えるには、jsonui-cli 2.2.0 とプラグインの 1.1.0 が要ります。\n• Claude Code（手元のセッション。CLI、デスクトップアプリ、IDE のどれでも）。クラウドのセッションは見えません"
     },
     "section_install_heading": {
       "en": "Install",
@@ -5763,8 +5763,8 @@
       "ja": "Claude Code で、プラグインを 1 回だけ入れます。Claude Code の各セッションが、作業のたびに `jui viz` へ知らせるようになります。"
     },
     "section_install_notes": {
-      "en": "• Your `~/.claude/settings.json` is not changed. To remove it, remove the plugin.\n• When the `jui viz` server is not running, the plugin does nothing and returns at once. It does not slow Claude Code down.\n\nWhere plugins are not available, this command adds the same hooks to `~/.claude/settings.json` instead. The hooks and settings you already have stay as they are, and the file as it was before the change is saved in `~/.jsonui-cli/viz/backups/`.",
-      "ja": "• あなたの `~/.claude/settings.json` は書き換えません。外すのも、プラグインを外すだけです。\n• プラグインは、`jui viz` のサーバーが止まっているときは何もせずにすぐ終わります。Claude Code の作業を遅らせることはありません。\n\nプラグインを使えない環境では、代わりに次のコマンドで、同じフックを `~/.claude/settings.json` に足せます。あなたがすでに入れているフックや設定は、そのまま残り、書き換える前のファイルは `~/.jsonui-cli/viz/backups/` に保存されます。"
+      "en": "• Your `~/.claude/settings.json` is not changed. To remove it, remove the plugin.\n• When the `jui viz` server is not running, the plugin does nothing and returns at once. It does not slow Claude Code down.\n\nWhere plugins are not available, this command adds the same hooks to `~/.claude/settings.json` instead. The hooks and settings you already have stay as they are, and the file as it was before the change is saved in `~/.local/state/jui-viz/backups/` (`$XDG_STATE_HOME/jui-viz` or `$JUI_VIZ_HOME` instead, when you set one). Before jsonui-cli 2.2.0 the backups were kept in `~/.jsonui-cli/viz/backups/`, which every bootstrap deleted; the first viz command of 2.2.0 moves what is left there.",
+      "ja": "• あなたの `~/.claude/settings.json` は書き換えません。外すのも、プラグインを外すだけです。\n• プラグインは、`jui viz` のサーバーが止まっているときは何もせずにすぐ終わります。Claude Code の作業を遅らせることはありません。\n\nプラグインを使えない環境では、代わりに次のコマンドで、同じフックを `~/.claude/settings.json` に足せます。あなたがすでに入れているフックや設定は、そのまま残り、書き換える前のファイルは `~/.local/state/jui-viz/backups/` に保存されます（`$XDG_STATE_HOME/jui-viz` や `$JUI_VIZ_HOME` を設定していればそちら）。jsonui-cli 2.2.0 より前は `~/.jsonui-cli/viz/backups/` に置かれていて、bootstrap のたびに消えていました。2.2.0 の最初の viz コマンドが、そこに残っている物を移します。"
     },
     "section_start_heading": {
       "en": "Start it",
@@ -5779,8 +5779,8 @@
       "ja": "画面の見方"
     },
     "section_screen_body": {
-      "en": "• Rooms: one per project folder. A folder with `jui.config.json` is treated as a JsonUI project. Rooms have doors, and robots walk room to room through them. Pick a room (its tag, its floor or the menu) to show it alone, laid out 1.6 times wider and deeper; ← フロア全体に戻る or Escape brings the whole floor back. Doors and the one-room view are from jsonui-cli 2.1.0.\n• Robots: one for a session's main agent and one for each subagent. The text on the headband is the start of the session id. A subagent walks in through the door when it is called and walks out when it is done. Each robot's desk is placed at random and stays put while the page is open.\n• Robot states: idle, typing (writing a file), reading, command, phone (a test on a device), waiting for permission, carrying (a new deliverable is ready), done. From 2.1.0 there is also background: a session whose turn ended with background work still running (a test run, say) keeps its light on and watches the screen until that work ends.\n• Right panel: sessions, spec progress, test runs and tasks.\n• Spec board: for each spec, how far its seven sections are filled in (overview, structure, state, data flow, actions, transitions, branches), and how far implementation and tests have got. Open one to read the spec as a sheet; the structure is drawn from the Layout file the spec points to. The implementation count is a guide only — `jui verify` is the real check. From 2.1.0 the board reads every JsonUI app in the room — `jui.config.json` files up to three folders below it — and lets you pick one app or all of them.\n• Task board: from 2.1.0, a card for each instruction you give, titled by its first line. It is working until the turn ends, waiting while a permission is asked, and failed if the turn fails; the last three finished turns of each session stay. Tasks Claude creates with its task tools appear as well.\n• Log: the latest events in the strip at the bottom. The full-screen log can be filtered by kind and by text.",
-      "ja": "• 部屋: プロジェクトのフォルダごとに 1 つ。`jui.config.json` があるフォルダは JsonUI のプロジェクトとして扱われます。部屋にはドアがあり、ロボットはドアを通って部屋から部屋へ歩きます。部屋を選ぶ（名札、床、メニューのどれか）と、その部屋だけを縦横 1.6 倍に広げて表示します。「← フロア全体に戻る」か Escape で全体に戻ります。ドアと部屋ごとの表示は jsonui-cli 2.1.0 から。\n• ロボット: セッションのメインと、サブエージェントが 1 体ずつ。ハチマキの文字は、セッションの id の先頭です。サブエージェントは、呼ばれるとドアから歩いて入ってきて、終わると出ていきます。机の位置はロボットごとにランダムで、ページを開いている間は動きません。\n• ロボットの状態: 待機、入力（ファイルを書く）、読む、コマンド、スマホ（端末でテスト）、許可待ち、運ぶ（新しい成果物ができた）、完了。2.1.0 からは「裏で作業中」も加わりました。ターンが終わってもテストの実行などが裏で続いているセッションは、それが終わるまで明かりをつけたまま、画面を見ています。\n• 右のパネル: セッション、spec の進み具合、テストの実行、タスク。\n• spec ボード: spec ごとに 7 つの区分（概要、構造、状態、データの流れ、操作、遷移、分岐）の記入状況と、実装・テストの進み具合。開くと、spec の中身をシートで読めます。構造は、spec が指す Layout ファイルから描きます。実装の数は目安です。正しい判定は `jui verify` で行ってください。2.1.0 からは、部屋の中の JsonUI のアプリ（3 階層下までの `jui.config.json`）をすべて読み、アプリごとにも全体でも選べます。\n• タスクボード: 2.1.0 からは、あなたが出した指示ごとにカードができます。題は指示の 1 行目です。ターンが終わるまで作業中、許可を求めている間は待ち、ターンが失敗したら失敗になり、終わったターンはセッションごとに 3 つまで残ります。Claude がタスクのツールで作ったタスクも並びます。\n• ログ: 下の帯に最新のイベント。全画面のログでは、種類や文字で絞り込めます。"
+      "en": "• Rooms: one per project folder. A folder with `jui.config.json` is treated as a JsonUI project. Rooms have doors, and robots walk room to room through them. Pick a room (its tag, its floor or the menu) to show it alone, laid out 1.6 times wider and deeper; ← フロア全体に戻る or Escape brings the whole floor back. Doors and the one-room view are from jsonui-cli 2.1.0.\n• Robots: one for a session's main agent and one for each subagent. The text on the headband is the start of the session id. A subagent walks in through the door when it is called and walks out when it is done. Each robot's desk is placed at random and stays put while the page is open.\n• Robot states: idle, typing (writing a file), reading, command, phone (a test on a device), waiting for permission, carrying (a new deliverable is ready), done. From 2.1.0 there is also background: a session whose turn ended with background work still running (a test run, say) keeps its light on and watches the screen until that work ends.\n• Right panel: sessions, spec progress, test runs and tasks.\n• Spec board: for each spec, how far its seven sections are filled in (overview, structure, state, data flow, actions, transitions, branches), and how far implementation and tests have got. Open one to read the spec as a sheet; the structure is drawn from the Layout file the spec points to. From 2.2.0 a spec's card reads: how much is written, whether its layout exists, how many of its related files exist, and how many of its tests pass; a mark appears only where it was measured (the structure, from the layout; the branches, from the tests). These are a guide only — `jui verify` is the real check. From 2.1.0 the board reads every JsonUI app in the room — `jui.config.json` files up to three folders below it — and lets you pick one app or all of them.\n• Task board: from 2.1.0, a card for each instruction you give, titled by its first line. It is working until the turn ends, waiting while a permission is asked, and failed if the turn fails; the last three finished turns of each session stay. Tasks Claude creates with its task tools appear as well.\n• Log: the latest events in the strip at the bottom. The full-screen log can be filtered by kind and by text.",
+      "ja": "• 部屋: プロジェクトのフォルダごとに 1 つ。`jui.config.json` があるフォルダは JsonUI のプロジェクトとして扱われます。部屋にはドアがあり、ロボットはドアを通って部屋から部屋へ歩きます。部屋を選ぶ（名札、床、メニューのどれか）と、その部屋だけを縦横 1.6 倍に広げて表示します。「← フロア全体に戻る」か Escape で全体に戻ります。ドアと部屋ごとの表示は jsonui-cli 2.1.0 から。\n• ロボット: セッションのメインと、サブエージェントが 1 体ずつ。ハチマキの文字は、セッションの id の先頭です。サブエージェントは、呼ばれるとドアから歩いて入ってきて、終わると出ていきます。机の位置はロボットごとにランダムで、ページを開いている間は動きません。\n• ロボットの状態: 待機、入力（ファイルを書く）、読む、コマンド、スマホ（端末でテスト）、許可待ち、運ぶ（新しい成果物ができた）、完了。2.1.0 からは「裏で作業中」も加わりました。ターンが終わってもテストの実行などが裏で続いているセッションは、それが終わるまで明かりをつけたまま、画面を見ています。\n• 右のパネル: セッション、spec の進み具合、テストの実行、タスク。\n• spec ボード: spec ごとに 7 つの区分（概要、構造、状態、データの流れ、操作、遷移、分岐）の記入状況と、実装・テストの進み具合。開くと、spec の中身をシートで読めます。構造は、spec が指す Layout ファイルから描きます。2.2.0 からは、spec のカードに、記述の割合、layout があるか、関連ファイルがいくつ在るか、テストがいくつ通ったかを出します。印が付くのは測ったところだけです（構造は layout から、分岐はテストから）。どれも目安です。正しい判定は `jui verify` で行ってください。2.1.0 からは、部屋の中の JsonUI のアプリ（3 階層下までの `jui.config.json`）をすべて読み、アプリごとにも全体でも選べます。\n• タスクボード: 2.1.0 からは、あなたが出した指示ごとにカードができます。題は指示の 1 行目です。ターンが終わるまで作業中、許可を求めている間は待ち、ターンが失敗したら失敗になり、終わったターンはセッションごとに 3 つまで残ります。Claude がタスクのツールで作ったタスクも並びます。\n• ログ: 下の帯に最新のイベント。全画面のログでは、種類や文字で絞り込めます。"
     },
     "section_permissions_heading": {
       "en": "Answer permission prompts from the browser",
@@ -5801,6 +5801,30 @@
     "section_permissions_hooks": {
       "en": "Always allow, and deny with a reason\n\nThe hooks the plugin (or `jui viz hooks install`) adds wait for the browser's answer, for up to 30 seconds, but only while the page is showing.\n\n• \"Always allow\" can add only a rule the request itself suggested. Before it is added, the rule and the file it is saved to are shown.\n• A denial can carry a reason, and the reason is passed to Claude.\n• When the page is not open, or its tab is in the background, the hooks do not wait, so the terminal dialog is not delayed.\n• If you answer in the terminal first, that answer is used.",
       "ja": "今後も許可・理由つきの拒否\n\nプラグイン（または `jui viz hooks install`）で入るフックが、ページが表示されている間だけ、ブラウザの答えを待ちます（最大 30 秒）。\n\n• 「今後も許可」で足せるのは、その要求自身が示したルールの候補だけです。足す前に、ルールと保存先が表示されます。\n• 「拒否」には理由を書けます。理由は Claude に伝わります。\n• ページを開いていないとき、またはタブが裏にあるときは待たないので、ターミナルのダイアログは遅れません。\n• ターミナルで先に答えると、そちらが使われます。"
+    },
+    "section_questions_heading": {
+      "en": "Answer Claude's questions from the browser",
+      "ja": "Claude の質問にブラウザから答える"
+    },
+    "section_questions_body": {
+      "en": "From jsonui-cli 2.2.0 with the 1.1.0 plugin, when Claude asks you a multiple-choice question (AskUserQuestion), the page shows it as a card.\n\n• Single choice, multiple choice, and a free answer under \"その他\" for each question. Descriptions and previews are shown.\n• Answer every question, then press 答えを送る. The answer goes to Claude, and the terminal does not ask.\n• The hook waits only while the page is showing: by default 20 seconds for you to start, longer while you are answering, 300 seconds at most (askWaitSec and askMaxSec in config.json in the state folder). \"ターミナルで答える\" hands the question back to the terminal, and so does nobody answering.\n• If you answer in the terminal instead, the card closes at the session's next step.",
+      "ja": "jsonui-cli 2.2.0 とプラグイン 1.1.0 からは、Claude が選択肢の質問（AskUserQuestion）を出すと、ページにカードが出ます。\n\n• 単一選択、複数選択、それぞれの質問の「その他」に自由記述。説明とプレビューも出ます。\n• すべての質問に答えてから「答えを送る」を押します。答えは Claude に届き、ターミナルには質問が出ません。\n• フックが待つのは、ページが表示されている間だけです。既定では、答え始めるまで 20 秒、答えている間は延び、最長 300 秒（状態フォルダの config.json の askWaitSec と askMaxSec）。「ターミナルで答える」を押すか、誰も答えなければ、質問はターミナルに出ます。\n• ターミナルで答えた場合は、そのセッションが次に動いたときにカードが閉じます。"
+    },
+    "section_update_heading": {
+      "en": "Update to a new version",
+      "ja": "新しい版に上げる"
+    },
+    "section_update_body": {
+      "en": "After updating jsonui-cli, restart the server. The new `jui viz stop` also finds a server an older version left running:",
+      "ja": "jsonui-cli を上げたら、サーバーを起動し直します。新しい `jui viz stop` は、古い版が起動したまま残したサーバーも見つけて止めます。"
+    },
+    "section_update_plugin": {
+      "en": "Then update the plugin, and restart each Claude Code session so it loads the new one. Until you do, the robots and permission prompts keep working, but question cards do not appear. In Claude Code, `/plugin` does the same from its menu.",
+      "ja": "続けてプラグインを更新し、Claude Code の各セッションを起動し直して、新しいプラグインを読ませます。それまでの間も、ロボットと許可の中継は動きますが、質問のカードは出ません。Claude Code の中では、`/plugin` のメニューからも同じことができます。"
+    },
+    "section_update_hooks": {
+      "en": "If you installed with `jui viz hooks install` instead of the plugin, run it again. It adds the question hook and points the test-progress setting at the new state folder.",
+      "ja": "プラグインではなく `jui viz hooks install` で入れた場合は、撃ち直してください。質問のフックが入り、テストの進捗の設定が新しい状態フォルダに向きます。"
     },
     "section_tests_heading": {
       "en": "Test progress",
@@ -5861,6 +5885,14 @@
     "toc_row_permissions": {
       "en": "Permission prompts",
       "ja": "許可に答える"
+    },
+    "toc_row_questions": {
+      "en": "Questions",
+      "ja": "質問に答える"
+    },
+    "toc_row_update": {
+      "en": "Update",
+      "ja": "新しい版に上げる"
     },
     "toc_row_tests": {
       "en": "Test progress",

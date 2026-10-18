@@ -2529,12 +2529,22 @@
     {
       "binary": "jui",
       "command": "viz stop",
-      "synopsis": "jui viz stop",
+      "synopsis": "jui viz stop [--port PORT]",
       "purpose": {
-        "en": "Stop the running jui viz server: the one whose pid this tool wrote, and only after it answers as a jui viz server.",
-        "ja": "起動中の jui viz サーバーを止める。止めるのは、このツールが pid を書いたプロセスで、jui viz のサーバーとして応答したときだけ。"
+        "en": "Stop the running jui viz server: the one whose pid this tool wrote, and only after it answers as a jui viz server. From 2.2.0, when no state file names a server, it also stops a jui viz server it finds on the port, if that server is this user's: it uses the same state folder, or, for a server from 2.1.0 or earlier, runs with the same HOME. A server left running by an older version is the usual case.",
+        "ja": "起動中の jui viz サーバーを止める。止めるのは、このツールが pid を書いたプロセスで、jui viz のサーバーとして応答したときだけ。2.2.0 からは、状態ファイルがサーバーを名指していなくても、ポートで見つけた jui viz のサーバーを、それが自分のもの（同じ状態フォルダを使っている。2.1.0 以前のサーバーなら同じ HOME で動いている）なら止める。古い版が起動したまま残したサーバーがよくある例。"
       },
-      "options": [],
+      "options": [
+        {
+          "name": "--port",
+          "type": "number",
+          "default": "the configured port (7788)",
+          "description": {
+            "en": "Port to look on for a jui viz server that has no state file.",
+            "ja": "状態ファイルの無い jui viz サーバーを探すポート。"
+          }
+        }
+      ],
       "examples": [
         {
           "language": "bash",
@@ -2547,17 +2557,17 @@
         "jui viz start"
       ],
       "verifiedAgainst": {
-        "version": "2.0.0",
+        "version": "2.2.0",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "2a8a31f1911859b54cefafc9d706bf52ade62a7cebc86c4f122caeef9bf6b917",
-        "cardHash": "ea73411641f91e60b379ae72c8faa2cc50d8adf7ed1b276a80e5a9847ecf1f1a",
+        "helpHash": "e36c40e8d53f920fae9b39dba4ee33de7a4a123adb315b4891b6bf313424bc6b",
+        "cardHash": "c890ffd856ff0f95a7e170c68a962eab56052af1a3b7398c9a993a13c7764828",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "6ff4516befd3",
-          "synopsis": "854b448eccc8",
-          "purpose": "72fb3525b67b",
-          "options": "357b9e47f539",
+          "synopsis": "982b80cffd3a",
+          "purpose": "977541c77305",
+          "options": "8c22c061b484",
           "examples": "3e22534b5181",
           "aliases": "98edafdd23a8",
           "seeAlso": "e1f0d369aa0d"
@@ -2654,8 +2664,8 @@
       "command": "viz hooks install",
       "synopsis": "jui viz hooks install [--dry-run]",
       "purpose": {
-        "en": "Add the jui viz hooks to ~/.claude/settings.json, for where the jui-viz plugin cannot be used. Hooks and settings already there are kept, and the file as it was is saved under ~/.jsonui-cli/viz/backups/.",
-        "ja": "jui viz のフックを ~/.claude/settings.json に足す（jui-viz プラグインを使えない環境向け）。すでにあるフックや設定は残し、書き換える前のファイルを ~/.jsonui-cli/viz/backups/ に保存する。"
+        "en": "Add the jui viz hooks to ~/.claude/settings.json, for where the jui-viz plugin cannot be used. Hooks and settings already there are kept, and the file as it was is saved in the backups folder of jui viz's state folder: ~/.local/state/jui-viz/backups/ (or $XDG_STATE_HOME/jui-viz, or $JUI_VIZ_HOME, when set). Before 2.2.0 it was ~/.jsonui-cli/viz/backups/, which every bootstrap deleted; the first viz command of 2.2.0 moves what is left there. Run it again after updating to 2.2.0 to add the AskUserQuestion hook.",
+        "ja": "jui viz のフックを ~/.claude/settings.json に足す（jui-viz プラグインを使えない環境向け）。すでにあるフックや設定は残し、書き換える前のファイルを jui viz の状態フォルダの backups に保存する: ~/.local/state/jui-viz/backups/（$XDG_STATE_HOME/jui-viz や $JUI_VIZ_HOME を設定していればそちら）。2.2.0 より前は ~/.jsonui-cli/viz/backups/ で、bootstrap のたびに消えていた。2.2.0 の最初の viz コマンドが、そこに残っている物を移す。2.2.0 に上げたら撃ち直すと、AskUserQuestion のフックが入る。"
       },
       "options": [
         {
@@ -2680,16 +2690,16 @@
         "jui viz hooks status"
       ],
       "verifiedAgainst": {
-        "version": "2.0.0",
+        "version": "2.2.0",
         "columns": 80,
         "python": "3.12",
         "helpHash": "ac37e90dfd074049b592906c681df87b04c6e143b426986bf3ccb5fb58c351e9",
-        "cardHash": "6b323a38bba8dcc1ce20a25650897fabce45dac03ee4ca775d728d7f0a8508e4",
+        "cardHash": "0afc1fb7b4071dce08bfa01d739125c1ea5a65bc8d0602c7aed25fc55403463b",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "2018a340ee66",
           "synopsis": "55c0b733d84b",
-          "purpose": "ae65fd6e6f37",
+          "purpose": "c6e41433107c",
           "options": "6df17d1e1130",
           "examples": "8cd1b00eac0a",
           "aliases": "98edafdd23a8",
