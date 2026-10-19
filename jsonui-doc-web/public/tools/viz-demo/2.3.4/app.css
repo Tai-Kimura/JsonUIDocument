@@ -232,6 +232,10 @@ body { background: var(--bg); color: var(--ink); font-family: var(--font-body); 
   box-shadow: 0 1px 4px var(--shadow);
 }
 .tag > span:last-child { overflow: hidden; text-overflow: ellipsis; }
+/* A session's name in place of its mark (10-19): bold, cut at its end; the act keeps the rest of the tag's width. */
+.tag > .nm { flex: none; max-width: 13em; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
+.tag > .pill[hidden] { display: none; }
+.tag.named { padding-left: 9px; }
 /* A room's name is a sign, not a robot's name tag (requester 10-18: the two blended in a crowded room): square corners,
    a frame and the info hue always on, an opaque ground, and in front of the tags (a later sibling would paint over it). */
 .tag.room { z-index: 1; padding: 2px 8px; border: 1.5px solid var(--info); border-radius: 3px; background: var(--panel); color: var(--info); font: 700 12px/1.5 var(--font-mono); box-shadow: 0 1px 4px var(--shadow); pointer-events: auto; cursor: pointer; }
@@ -297,6 +301,8 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .session { display: grid; gap: 4px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; }
 .srow { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
 .sname { overflow: hidden; font: 700 12.5px/1.5 var(--font-mono); text-overflow: ellipsis; white-space: nowrap; }
+.srow .who-btn > .sname { overflow-wrap: anywhere; white-space: normal; }   /* a session's name, whole (10-19): it wraps */
+.srow .who-btn { align-items: flex-start; }
 .act { margin: 0; overflow: hidden; color: var(--ink-soft); font: 500 11.5px/1.5 var(--font-mono); text-overflow: ellipsis; white-space: nowrap; }
 .subs { display: grid; gap: 3px; margin-left: 6px; padding-left: 10px; border-left: 2px solid var(--line); }
 .subs li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 6px; font-size: 12px; }
@@ -433,6 +439,21 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 #ticker time { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
 #ticker .kind { overflow: hidden; font-weight: 700; text-overflow: ellipsis; }
 #ticker .what { overflow: hidden; text-overflow: ellipsis; }
+.ticker-btns { display: flex; gap: 6px; align-items: start; }
+/* The log strip closed (requester, 10-19): its row goes (the scene and the panel take the height) and only 「ログを開く」
+   is left at the bottom right: at the foot of the panel (an opaque band of its own, pushed to the bottom when the
+   panel is short and kept there when it scrolls, so it never lies on the panel's text), or, with the panel closed,
+   floating over the scene's corner (whose hint moves up). */
+.app.log-closed .ticker { display: none; }
+/* only while the panel shows: .main.side-closed hides it, and the same weight here, later, would show it again (10-19) */
+.app.log-closed .main:not(.side-closed) > .side { display: flex; flex-direction: column; gap: 22px; padding-bottom: 0; }
+.app.log-closed .side > section { flex: none; }
+.side-foot { position: sticky; bottom: 0; z-index: 2; display: flex; justify-content: flex-end; margin-top: auto; padding: 10px 0 14px; background: var(--panel); }
+.side-foot[hidden] { display: none; }
+.app.log-closed .main.side-closed .scene-hint { bottom: 54px; }   /* clear of the floating 「ログを開く」 */
+.log-open { padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--ink); font: 700 12px/1.5 var(--font-body); box-shadow: 0 4px 14px var(--shadow); cursor: pointer; }
+.log-open-float { position: fixed; right: 16px; bottom: 14px; z-index: 30; }
+.log-open-float[hidden] { display: none; }
 .ticker-btn, .log-close, .wb-btn { padding: 4px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font: 700 12px/1.5 var(--font-body); white-space: nowrap; cursor: pointer; }
 
 .log-overlay {
@@ -627,6 +648,7 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .ov-file { color: var(--wb-soft); font: 500 11px/1.4 var(--font-mono); overflow-wrap: anywhere; }
 .ov-who { display: flex; align-items: center; gap: 6px; min-width: 0; color: var(--wb-soft); font: 500 11.5px/1.5 var(--font-mono); }
 .ov-who > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.who-name { flex: none; margin-left: 6px; font-weight: 700; white-space: nowrap; }   /* a session's name, whole (10-19) */
 .ov-secs { display: grid; gap: 3px; }
 .ov-secs .segs i { height: 9px; }
 .ov-labels { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; color: var(--wb-soft); font: 500 10px/1.3 var(--font-body); text-align: center; }
@@ -705,8 +727,25 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .rb { position: absolute; top: 14px; right: 14px; bottom: 14px; z-index: 5; display: grid; grid-template-rows: auto auto minmax(0, 1fr); width: min(420px, calc(100% - 28px)); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); box-shadow: 0 10px 30px var(--shadow); opacity: 0; transform: translateX(16px); transition: opacity 0.2s ease, transform 0.25s ease;
   --wb-ink: var(--ink); --wb-soft: var(--ink-soft); --wb-card: var(--bg); --wb-line: var(--line); --wb-blue: var(--info); }
 .rb.show { opacity: 1; transform: none; }
-.rb-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; padding: 12px 14px; border-top: 5px solid var(--c); border-bottom: 1px solid var(--line); }
-.rb-nav { display: flex; align-items: center; gap: 4px; }
+/* The mark and the name on top, the controls on a row of their own below (10-19, requester: a session's name gets the
+   card's width instead of sharing it with the buttons): ‹ › at the left, back to 3D at the right. */
+.rb-head { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px 12px; padding: 12px 14px; border-top: 5px solid var(--c); border-bottom: 1px solid var(--line); }
+.rb-nav { display: flex; grid-column: 1 / -1; align-items: center; gap: 4px; }
+.rb-nav #rb-close { margin-left: auto; }
+.rb-side { display: grid; grid-column: 1 / -1; gap: 6px; }   /* the 2nd row: 退勤 right-aligned just above 「← 3D に戻る」 (both on the card's width) */
+.rb-side .rb-clock { justify-self: end; }
+.rb-clock { border-color: var(--bad); color: var(--bad); background: var(--panel); }
+.rb-clock:hover:not(:disabled) { background: var(--bad-bg); }
+.rb-clock:disabled { border-color: var(--line); color: var(--ink-soft); opacity: 0.75; cursor: not-allowed; }
+.rb-clock-why { grid-column: 1 / -1; margin: 0; padding: 4px 10px; border-radius: 8px; background: var(--chip); color: var(--ink-soft); font: 600 11.5px/1.5 var(--font-body); overflow-wrap: anywhere; }
+.rb-clock-why[hidden] { display: none; }
+.rb-clock-why.rb-clock-err { background: var(--bad-bg); color: var(--bad); }
+.clk-facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; margin: 0 0 10px; font-size: 13px; }
+.clk-facts dt { color: var(--ink-soft); font-weight: 700; }
+.clk-facts dd { margin: 0; overflow-wrap: anywhere; }
+.clk-facts code { font: 500 12px/1.5 var(--font-mono); }
+.pa.clk-go { border-color: var(--bad); background: var(--bad); color: var(--panel); }
+.pa.clk-cancel { border-color: var(--line); background: var(--panel); color: var(--ink); }
 .rb-step { width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: 700 18px/1 var(--font-body); cursor: pointer; }
 .rb-step:hover { background: var(--chip); }
 .rb-badge { display: grid; place-items: center; min-width: 54px; height: 54px; padding: 0 6px; border: 3px solid var(--cloth-ink); border-radius: 12px; background: var(--cloth); color: var(--cloth-ink); font: 400 21px/1 var(--font-display); transform: rotate(-3deg); }
@@ -720,8 +759,26 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 /* 応答の履歴 (55-history.js): the conversation as the VS Code extension shows it */
 .rb-hist { gap: 8px; font-size: 13px; }
 .h-list-box { display: grid; gap: 8px; min-width: 0; }
+.h-newer { position: sticky; bottom: 0; justify-self: center; padding: 5px 14px; border: 0; border-radius: 999px; background: var(--info); color: var(--bg); font: 700 12px/1.4 var(--font-body); box-shadow: 0 2px 8px rgba(0, 0, 0, .25); cursor: pointer; }
+.h-newer[hidden] { display: none; }
+.h-compose { display: grid; gap: 6px; padding: 8px 14px 12px; border-top: 1px solid var(--line); background: var(--panel); }
+.h-compose[hidden], .h-confirm[hidden], .h-compose-why[hidden] { display: none; }
+.h-compose-why { margin: 0; padding: 6px 10px; border-radius: 8px; background: var(--warn-bg); color: var(--warn); font: 700 12px/1.5 var(--font-body); overflow-wrap: anywhere; }
+.h-compose-why.h-compose-note { background: var(--info-bg); color: var(--ink); font-weight: 500; }
+.h-compose-text { box-sizing: border-box; width: 100%; min-height: 3.6em; max-height: 30vh; resize: vertical; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: 500 13px/1.5 var(--font-body); }
+.h-compose-text:disabled { opacity: 0.55; cursor: not-allowed; }
+.h-compose-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.h-compose-state { min-width: 0; color: var(--ink-soft); font: 700 12px/1.4 var(--font-body); }
+.h-compose-state.h-compose-err { color: var(--warn); }
+.h-confirm { display: grid; gap: 6px; padding: 8px 10px; border: 2px solid var(--info); border-radius: 10px; background: var(--info-bg); }
+.h-confirm-to { margin: 0; font: 700 12.5px/1.5 var(--font-body); overflow-wrap: anywhere; }
+.h-confirm-text { margin: 0; max-height: 8em; overflow-y: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 500 12.5px/1.5 var(--font-body); }
+.h-confirm-acts { display: flex; gap: 8px; }
+.h-compose .wb-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.h-confirm-go { border-color: var(--info); background: var(--info); color: var(--bg); }
 .h-item { min-width: 0; margin: 0; overflow-wrap: anywhere; }
 .h-user { padding: 8px 10px; border-radius: 10px; background: var(--chip); }
+.h-channel { border-left: 3px solid var(--info); }
 .h-who { display: flex; gap: 8px; margin: 0 0 2px; color: var(--ink-soft); font: 700 11px/1.4 var(--font-body); }
 .h-at { color: var(--ink-soft); font: 500 11px/1.4 var(--font-mono); }
 .h-plain { margin: 0; white-space: pre-wrap; }
@@ -737,12 +794,21 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .h-tablewrap { overflow-x: auto; }
 .h-table { border-collapse: collapse; font-size: 12px; }
 .h-table th, .h-table td { padding: 3px 6px; border: 1px solid var(--line); text-align: left; }
+.h-table th, .h-table td { min-width: 6em; }   /* a many-column table scrolls sideways (.h-tablewrap) instead of folding every cell to one character */
 .h-md a { color: var(--info); }
 .h-img { color: var(--ink-soft); font-style: italic; }
 .h-tool, .h-peer, .h-harness { border-radius: 8px; background: var(--bg); }
 .h-tool summary, .h-peer summary, .h-harness summary { display: flex; gap: 8px; align-items: baseline; min-width: 0; padding: 5px 8px; cursor: pointer; font-size: 12.5px; }
 .h-head { flex: 1 1 auto; min-width: 0; overflow: hidden; color: var(--ink-soft); text-overflow: ellipsis; white-space: nowrap; }
 .h-tname { font-family: var(--font-mono); }
+/* The labels of an item never fold (2.3.4, requester 10-19: "時間の表示が崩れてる"): .h-item's overflow-wrap: anywhere is
+   inherited, which makes a label's min-content one character, and a flex item may shrink to it — beside a long body the
+   time, the tool's name and the sender went down one or two characters a line. The time and the marks keep their width; a
+   name (the tool's, the harness's, the sender's) is cut with … when it must narrow; the body is what narrows first. */
+.h-item .h-at, .h-who > *, .h-tool summary > .h-err, .h-tool summary > .h-run { flex: none; white-space: nowrap; overflow-wrap: normal; }
+.h-who { white-space: nowrap; overflow-wrap: normal; }   /* 依頼者 is a bare text node in the row: the row itself keeps it whole */
+.h-tool summary > b, .h-harness summary > b, .h-peer summary > b { flex: 0 1 auto; min-width: 3em; max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; overflow-wrap: normal; }
+.h-item summary > .h-head { flex: 1 1 0; }   /* the body narrows first: the labels get their own width before it */
 .h-err { color: var(--warn); font-weight: 700; }
 .h-run { color: var(--info); }
 .h-io { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 8px; padding: 0 8px 8px; }
@@ -763,6 +829,8 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .rb-lamp { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 0 3px var(--chip); }
 .rb-since { margin-left: auto; color: var(--ink-soft); font-size: 11.5px; }
 .rb-act { margin: 0; font: 500 12.5px/1.55 var(--font-mono); overflow-wrap: anywhere; }
+.rb-git { margin: 0; color: var(--ink-soft); font: 500 12px/1.5 var(--font-mono); overflow-wrap: anywhere; }
+.rb-git[hidden] { display: none; }
 .rb-spec, .rb-test { margin: 0; color: var(--ink-soft); font-size: 12.5px; }
 .rb-segs .segs i { height: 9px; }
 .rb-tasks, .rb-subs { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
@@ -849,6 +917,8 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
   .side { overflow: visible; border-top: 1px solid var(--line); border-left: 0; }
   .spec-list { max-height: none; }
   .ticker { height: auto; }
+  .side-foot { position: static; }   /* the page scrolls: a row of its own at the panel's end, over nothing */
+  .log-open-float { position: static; display: block; margin: 8px 16px 16px auto; }
   #ticker li { grid-template-columns: auto auto minmax(0, 1fr); }
   #ticker .kind { display: none; }
   .wb { position: fixed; z-index: 40; padding: 6px; }
@@ -940,5 +1010,52 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .usage .uw { padding: 2px 9px; border-radius: 999px; background: var(--chip); color: var(--ink-soft); font: 500 12px/1.6 var(--font-mono); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .usage .uw b { font-weight: 700; }
 .usage .uw .limit { color: var(--ink-soft); opacity: 0.75; font-weight: 700; }
-.usage .uw .note { opacity: 0.8; }
+.usage .uw .stale { opacity: 0.8; }   /* not .note: the board's sticky-note card took it and swelled the header (10-19) */
 .usage .none { opacity: 0.7; }
+
+/* 「spec の進み具合」 explained in a dialog (2.3.4): a 「?」 next to the heading in the panel and on the overview board */
+.head-help { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.help-btn { display: inline-grid; place-items: center; flex: none; width: 22px; height: 22px; padding: 0; border: 1.5px solid currentColor; border-radius: 50%; background: transparent; color: var(--ink-soft); font: 700 13px/1 var(--font-body); cursor: pointer; }
+.help-btn:hover { color: var(--ink); }
+.wb-head .help-btn { color: var(--wb-soft); }
+.wb-head .help-btn[hidden], .wb-legend[hidden] { display: none; }
+.spec-help { position: fixed; inset: 0; z-index: 65; display: grid; place-items: center; padding: 16px; background: rgba(10, 20, 35, 0.45); }
+.sh-box { width: min(520px, 100%); max-height: calc(100vh - 32px); overflow: auto; padding: 14px 18px 16px; border-radius: 12px; background: var(--panel); color: var(--ink); box-shadow: 0 12px 40px var(--shadow); }
+.sh-box:focus { outline: none; }
+.sh-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.sh-head h3 { margin: 0; font: 700 16px/1.5 var(--font-body); }
+.sh-body p { margin: 0 0 10px; font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.sh-body .sh-legend { gap: 4px 14px; font-size: 12.5px; color: var(--ink); }
+/* The wide 応答の履歴 (2.3.4): the card from the left margin (one robot's width, --wide-left) to the right edge, over the
+   side panel; the whole screen at 900 px or narrower. Pictures in the history: thumbnails and a large view. */
+.rb.rb-wide { position: fixed; top: calc(var(--wide-top, 0px) + 14px); left: var(--wide-left, 0px); right: 14px; bottom: 14px; z-index: 30; width: auto; max-height: none; }
+.rb.rb-wide-full { inset: 0; border-radius: 0; }
+.rb-wide-btn[hidden] { display: none; }
+/* the tab row holds the tabs (the tablist) and, on its right, 広げる: the card's head keeps its width for the title.
+   広げる comes first in the DOM (Tab: 広げる, 今の様子, 応答の履歴, then the panel) and is drawn on the right. */
+.rb-tablist { display: flex; gap: 4px; order: 1; }
+.rb-tabs .rb-wide-btn { order: 2; margin: 0 0 4px auto; align-self: center; padding: 3px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font: 700 12px/1.5 var(--font-body); }
+.rb-tabs .rb-wide-btn[aria-pressed="true"] { border-color: var(--info); background: var(--info-bg); color: var(--info); }
+.rb.rb-wide .rb-hist { font-size: 14px; padding-inline: clamp(14px, 3vw, 40px); }
+.rb.rb-wide .h-compose { padding-inline: clamp(14px, 3vw, 40px); }
+.rb.rb-wide .h-code { white-space: pre; }
+.rb.rb-wide .h-table { font-size: 13px; }
+.rb.rb-wide .h-table th, .rb.rb-wide .h-table td { min-width: 6em; }
+.h-imgs { display: flex; flex-wrap: wrap; gap: 8px; }
+.h-thumb { display: grid; place-items: center; width: 160px; min-height: 60px; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--chip); color: var(--ink-soft); cursor: zoom-in; }
+.h-thumb img { display: block; width: 160px; height: auto; max-height: 200px; object-fit: contain; }
+.h-thumb-wait img, .h-thumb-bad img { display: none; }
+.h-thumb-note { padding: 6px 8px; font: 700 11.5px/1.4 var(--font-body); }
+.h-thumb-note:empty { display: none; }
+.h-thumb-wait .h-thumb-note:empty { display: block; }
+.h-thumb-wait .h-thumb-note:empty::after { content: '読み込み中…'; }
+.h-gone { margin: 4px 0 0; color: var(--warn); font: 700 11.5px/1.5 var(--font-body); overflow-wrap: anywhere; }
+.h-light { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 16px; background: rgba(10, 20, 35, 0.7); }
+.h-light-box { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 8px; max-width: 100%; max-height: calc(100vh - 32px); padding: 10px 12px; border-radius: 12px; background: var(--panel); color: var(--ink); box-shadow: 0 12px 40px var(--shadow); }
+.h-light-box:focus { outline: none; }
+.h-light-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.h-light-head h3 { margin: 0 auto 0 0; font: 700 15px/1.5 var(--font-body); }
+.h-light-count { color: var(--ink-soft); font: 700 12px/1.5 var(--font-mono); }
+.h-light-box img { display: block; max-width: calc(100vw - 56px); max-height: calc(100vh - 120px); margin: 0 auto; object-fit: contain; }
+.h-light-note { margin: 0; color: var(--ink-soft); font: 700 12px/1.5 var(--font-body); }
+.h-light-note:empty { display: none; }

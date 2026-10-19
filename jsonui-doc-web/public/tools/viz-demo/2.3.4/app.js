@@ -538,7 +538,7 @@ function handThing(kind) {
   return g;
 }
 function startGesture(r, kind, t) {
-  if (reduceMotion || !GESTURE_OK.has(r.state) || r.play || r.solo || (r.call && CALL_ON_LINE.has(r.call.state))) return false;
+  if (reduceMotion || !GESTURE_OK.has(r.state) || r.play || r.solo || r.brk || (r.call && CALL_ON_LINE.has(r.call.state))) return false;
   endGesture(r);
   if (kind !== 'cheer') { r.hand = handThing(kind); (kind === 'meal' ? r.armL : r.armR).add(r.hand); }
   r.gesture = { kind, t0: t, t1: t + GESTURE_LEN[kind] };
@@ -625,43 +625,130 @@ function callPose(p, t) {   // the right hand at the ear, the head toward it
   if (!reduceMotion) p.headY = Math.sin(t * 1.3) * 0.12;
 }
 /* Play (requester, 10-18: robots idle for long in one room play together; the scene decides who, where and how
-   long). r.play is { kind: 'ball' | 'highfive' | 'rps', t0, side: 0 | 1 } while at the spot; the state stays idle.
-   ball: a throw from the right hand, the two in turn (the ball itself is the scene's); highfive: both hands up,
-   meeting now and then; rps (じゃんけん): three pumps, then a hand over the head. */
+   long). r.play is { kind: 'ball' | 'highfive' | 'rps', t0, side: 0 | 1, seed } while at the spot; the state stays idle.
+   2.3.3 (requester, 10-19: "ずっと二人で向き合ってるだけで何やってるかわからない"): every game moves big enough to read
+   from the usual view. ball: the thrower winds up over its shoulder and swings through, the catcher holds both hands
+   out (the ball itself is the scene's); highfive: the two walk toward each other, turn a little to the front and slap
+   the inner hands (the walk and the パチン mark are the scene's); rps (じゃんけん): three pumps, then the hand drawn in a
+   bubble that stays up until the next pump, the winner raises both arms, the loser hangs its head, あいこ plays again
+   at once. The timing helpers are shared with the scene (40-scene.js), so the arms, the ball and the walk agree. */
 const RPS_HANDS = ['グー', 'チョキ', 'パー'];
+const playEase = (v) => { const k = Math.max(0, Math.min(1, v)); return k * k * (3 - 2 * k); };
+const playMix = (a, b, k) => a + (b - a) * k;
+// ball: one throw per half; the thrower winds up until windup, the ball leaves the hand at release
+const BALL_T = { half: 1.5, windup: 0.3, release: 0.42 };
+function ballPhase(u) { const n = Math.floor(u / BALL_T.half); return { n, thrower: n % 2, w: u / BALL_T.half - n }; }
+// highfive: walk in until inEnd, the hands up and the slap at touch, walk back from outStart until back
+const HIGHFIVE_T = { period: 2.8, inEnd: 0.34, touch: 0.46, outStart: 0.6, back: 0.92, turn: 1.15 };
+function highfivePhase(u) {
+  const T = HIGHFIVE_T, w = (u / T.period) % 1;
+  const near = w < T.inEnd ? playEase(w / T.inEnd) : w < T.outStart ? 1 : w < T.back ? 1 - playEase((w - T.outStart) / (T.back - T.outStart)) : 0;
+  const up = w < T.touch ? playEase((w - (T.inEnd - 0.1)) / (T.touch - T.inEnd + 0.06)) : 1 - playEase((w - T.touch - 0.06) / (T.outStart - T.touch));
+  const walking = (w < T.inEnd) || (w >= T.outStart && w < T.back);
+  return { w, near, up, walking, slap: Math.abs(w - T.touch) < 0.09 };
+}
+// rps: the pumps until shake; a decided round lasts len, a tie (あいこ) only tie: it plays again at once
+const RPS_T = { shake: 1.5, result: 2.1, len: 4.4, tie: 3.2 };
+function rpsHand(seed, k, side) {
+  let h = Math.imul((seed | 0) ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(k + 1, 0xc2b2ae35) ^ Math.imul(side + 7, 0x27d4eb2f);
+  h = Math.imul(h ^ (h >>> 15), 0x2c1b3c6d); h ^= h >>> 13;
+  return (h >>> 0) % 3;
+}
+// a beats b when (b - a + 3) % 3 === 1 (グー > チョキ > パー > グー)
+function rpsRound(seed, u) {
+  let start = 0;
+  for (let k = 0; k < 500; k++) {
+    const hands = [rpsHand(seed, k, 0), rpsHand(seed, k, 1)], tie = hands[0] === hands[1];
+    const len = tie ? RPS_T.tie : RPS_T.len;
+    if (u < start + len) {
+      const res = tie ? ['tie', 'tie'] : (hands[1] - hands[0] + 3) % 3 === 1 ? ['win', 'lose'] : ['lose', 'win'];
+      return { k, w: u - start, len, hands, res };
+    }
+    start += len;
+  }
+  return { k: 0, w: 0, len: RPS_T.len, hands: [0, 0], res: ['tie', 'tie'] };
+}
 function playPose(r, p, t) {
-  const P = r.play, u = t - P.t0;
+  const P = r.play, u = Math.max(0, t - P.t0);
   if (P.kind === 'ball') {
-    const turn = ((u / 1.6) + P.side * 0.5) % 1;           // the two throw half a period apart
-    const throwing = turn < 0.25;
-    p.aRx = throwing ? -2.4 + turn * 6 : -0.9; p.aRz = -0.25; p.aLx = -0.7; p.aLz = 0.3; p.headX = -0.18;
+    const { thrower, w } = ballPhase(u);
+    if (P.side === thrower) {
+      p.aLx = -1.1; p.aLz = 0.25; p.headX = -0.12;
+      if (w < BALL_T.windup) {                               // wind up: the arm up and back over the shoulder, the body turned away
+        const k = playEase(w / BALL_T.windup);
+        p.aRx = playMix(-0.6, 0.75, k); p.aRz = playMix(-0.3, -2.35, k); p.torsoY = -0.4 * k; p.torsoX = -0.12 * k;
+      } else if (w < BALL_T.release) {                       // the throw: a big swing forward and down, the body leaning in
+        const k = playEase((w - BALL_T.windup) / (BALL_T.release - BALL_T.windup));
+        p.aRx = playMix(0.75, -2.0, k); p.aRz = playMix(-2.35, -0.5, k); p.torsoY = playMix(-0.4, 0.3, k); p.torsoX = playMix(-0.12, 0.2, k);
+      } else {                                               // follow through, then rest while the ball flies
+        const k = playEase((w - BALL_T.release) / 0.35);
+        p.aRx = playMix(-2.0, -0.5, k); p.aRz = playMix(-0.5, -0.2, k); p.torsoY = playMix(0.3, 0, k); p.torsoX = playMix(0.2, 0, k);
+      }
+    } else {                                                 // the catcher: both hands out in front, together
+      const k = playEase((w - 0.08) / 0.25);
+      p.aRx = -1.45 * k; p.aLx = -1.45 * k; p.aRz = playMix(-0.12, 0.38, k); p.aLz = playMix(0.12, -0.38, k);
+      p.headX = -0.1; p.torsoX = w > 0.94 ? -0.08 : 0.04 * k;
+    }
   } else if (P.kind === 'highfive') {
-    const meet = Math.max(0, Math.sin(u * 2.6));
-    p.aRz = -2.4 - meet * 0.3; p.aRx = -0.2 - meet * 0.4; p.aLz = 0.4; p.rootY = meet * 0.08; p.headX = -0.12;
+    const H = highfivePhase(u), inner = P.side === 0 ? 'L' : 'R', sgn = P.side === 0 ? 1 : -1;   // the hand toward the partner
+    if (H.walking) { const sw = Math.sin(u * 11) * 0.55; p.lLx = sw; p.lRx = -sw; p.aLx = -sw * 0.5; p.aRx = sw * 0.5; }
+    p[`a${inner}z`] = sgn * playMix(0.12, 2.0, H.up); p[`a${inner}x`] = playMix(p[`a${inner}x`] || 0, 0, H.up);
+    p.rootY = H.slap ? 0.08 * (1 - Math.abs(H.w - HIGHFIVE_T.touch) / 0.09) : 0; p.headX = -0.12 * H.up;
   } else {
-    const round = u % 3, pump = round < 1.8 ? Math.abs(Math.sin(round * Math.PI * 1.67)) : 0;
-    p.aRx = -1.2 - pump * 0.5; p.aRz = -0.3; p.aLx = -0.4; p.headX = 0.05;
+    const R = rpsRound(P.seed | 0, u), w = R.w;
+    if (w < RPS_T.shake) {                                   // じゃん・けん・ぽん: three big pumps
+      const pump = Math.abs(Math.sin((w / RPS_T.shake) * Math.PI * 3));
+      p.aRx = -0.6 - pump * 1.5; p.aRz = -0.3; p.aLx = -0.4; p.aLz = 0.3; p.headX = 0.05; p.torsoX = pump * 0.06;
+    } else if (w < RPS_T.result) {                           // the hand out in front
+      p.aRx = -1.45; p.aRz = -0.15; p.aLx = -0.3; p.headX = 0.08;
+    } else if (R.res[P.side] === 'win') {                    // both arms up, a hop
+      const hop = Math.abs(Math.sin((w - RPS_T.result) * 6));
+      p.aRx = 0; p.aRz = -2.35; p.aLx = 0; p.aLz = 2.35; p.rootY = hop * 0.12; p.headX = -0.2;
+    } else if (R.res[P.side] === 'lose') {                   // head down, arms hanging
+      p.aRx = 0.15; p.aRz = -0.05; p.aLx = 0.15; p.aLz = 0.05; p.headX = 0.4; p.torsoX = 0.14; p.hipsY = -0.02;
+    } else {                                                 // あいこ: the hand still out, the head tilted
+      p.aRx = -1.3; p.aRz = -0.15; p.headZ = 0.22; p.headX = -0.05;
+    }
+  }
+}
+// the hand as a picture (a fist, two fingers, an open hand) and its name; the result under it once it is known
+function rpsDraw(ctx, W, H, hand, res) {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#1f2532'; ctx.lineWidth = 7;
+  rr(ctx, 6, 6, W - 12, H - 12, 34); ctx.fill(); ctx.stroke();
+  const cx = 82, cy = 104, skin = '#ffcf9e';
+  ctx.fillStyle = skin; ctx.strokeStyle = '#5a3a1e'; ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const finger = (ang, len) => {
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(ang);
+    rr(ctx, -10, -len - 18, 20, len + 10, 10); ctx.fill(); ctx.stroke(); ctx.restore();
+  };
+  if (hand === 1) { finger(-0.32, 58); finger(0.18, 62); }
+  if (hand === 2) { finger(-0.95, 34); finger(-0.42, 54); finger(-0.08, 60); finger(0.26, 56); finger(0.6, 46); }
+  rr(ctx, cx - 36, cy - 32, 72, 70, 24); ctx.fill(); ctx.stroke();
+  if (hand === 0) for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(cx - 34, cy - 12 + i * 16); ctx.lineTo(cx + 6, cy - 12 + i * 16); ctx.stroke(); }
+  ctx.fillStyle = '#1f2532'; ctx.font = `700 50px ${FONT_BODY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(RPS_HANDS[hand], 200, res ? 74 : 104);
+  if (res) {
+    const [text, color] = { win: ['かち！', '#d0352b'], lose: ['まけ…', '#5b6577'], tie: ['あいこ', '#d88a00'] }[res];
+    ctx.fillStyle = color; ctx.font = `700 46px ${FONT_DISPLAY}`; ctx.fillText(text, 200, 150);
   }
 }
 function playBubble(r, P, t) {
-  const show = !!P && P.kind === 'rps' && (t - P.t0) % 3 >= 1.8;
+  const R = P && P.kind === 'rps' ? rpsRound(P.seed | 0, Math.max(0, t - P.t0)) : null;
+  const show = !!R && R.w >= RPS_T.shake;                    // from the reveal until the next pump
+  r.rpsState = R ? { k: R.k, hand: show ? RPS_HANDS[R.hands[P.side]] : null, res: show && R.w >= RPS_T.result ? R.res[P.side] : null, shaking: !show } : null;
   if (show && !r.rps) {
-    r.rpsCanvas = makeCanvas(200, 120);
-    r.rps = new THREE.Sprite(new THREE.SpriteMaterial({ map: texFrom(r.rpsCanvas), transparent: true }));
-    r.rps.position.set(0, 2.25, 0.1); r.rps.scale.set(0.6, 0.36, 1); r.root.add(r.rps); r.rpsShown = '';
+    r.rpsCanvas = makeCanvas(300, 210);
+    r.rps = new THREE.Sprite(new THREE.SpriteMaterial({ map: texFrom(r.rpsCanvas), transparent: true, depthTest: false }));
+    r.rps.renderOrder = 5; r.rps.position.set(0, 2.3, 0.1); r.rps.scale.set(0.86, 0.6, 1); r.root.add(r.rps); r.rpsShown = '';
   }
   if (!r.rps) return;
   r.rps.visible = show;
   if (!show) return;
-  const hand = RPS_HANDS[(Math.floor((t - P.t0) / 3) * 7 + P.side * 5 + (r.seed | 0)) % 3];
-  if (hand === r.rpsShown) return;
-  r.rpsShown = hand;
-  const ctx = r.rpsCanvas.getContext('2d');
-  ctx.clearRect(0, 0, 200, 120);
-  ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#1f2532'; ctx.lineWidth = 5;
-  rr(ctx, 6, 6, 188, 108, 26); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = '#1f2532'; ctx.font = `700 46px ${FONT_BODY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(hand, 100, 62);
+  const key = `${R.hands[P.side]}:${r.rpsState.res || ''}`;
+  if (key === r.rpsShown) return;
+  r.rpsShown = key;
+  rpsDraw(r.rpsCanvas.getContext('2d'), 300, 210, R.hands[P.side], r.rpsState.res);
   r.rps.material.map.needsUpdate = true;
 }
 /* Alone in its room (requester, 10-18): r.solo is { kind: 'nap' | 'bento', t0 } while the scene says so. nap: the head
@@ -710,6 +797,46 @@ function soloProps(r, S, t) {
   }
   if (bento && !r.bento) { r.bento = bentoBox(); r.root.add(r.bento); }
   if (r.bento) r.bento.visible = bento;
+}
+/* A break (requester, 10-19: a cigarette in the smoking booth, a drink from the vending machine). r.brk is
+   { kind: 'smoke' | 'vend', t0, buySec } while the robot is at the booth or the machine; the scene walks it there and back.
+   smoke: the hand with the cigarette goes to the mouth every BRK_PUFF_SEC, then down (the scene lets the smoke out);
+   vend: a button pressed, a bend to the slot, then a can sipped now and then. */
+const BRK_PUFF_SEC = 5;
+function brkPuff(u) {   // 0: the hand down, 1: at the mouth (a smooth lift, a hold, a smooth drop)
+  const c = u % BRK_PUFF_SEC, e = (x) => x * x * (3 - 2 * x);
+  return c < 0.5 ? e(c / 0.5) : c < 1.8 ? 1 : c < 2.3 ? 1 - e((c - 1.8) / 0.5) : 0;
+}
+function brkPose(r, p, t) {
+  const B = r.brk, u = t - B.t0;
+  if (B.kind === 'smoke') {
+    const k = reduceMotion ? 0 : brkPuff(u);
+    p.aRx = -0.55 - k * 1.0; p.aRz = 0.15 + k * 0.35; p.aLx = -0.15; p.aLz = 0.12; p.headX = 0.02 - k * 0.08;
+  } else if (u < B.buySec * 0.5) {                          // a finger on a button
+    p.aRx = -1.45; p.aRz = 0.08; p.torsoX = 0.05; p.headX = 0.05;
+  } else if (u < B.buySec) {                                // a bend to the slot below
+    p.aRx = -0.9; p.aRz = 0.1; p.torsoX = 0.35; p.headX = 0.25;
+  } else {                                                  // the can to the mouth, head back, now and then
+    const c = (u - B.buySec) % 4, sip = c < 1.6 ? Math.sin((c / 1.6) * Math.PI) : 0;
+    p.aRx = -1.0 - sip * 0.8; p.aRz = 0.3 + sip * 0.15; p.headX = -sip * 0.3;
+  }
+}
+function cigarette() {
+  const g = new THREE.Group();
+  const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.16, 8), toon('#f4f1ea'));
+  const filter = new THREE.Mesh(new THREE.CylinderGeometry(0.021, 0.021, 0.05, 8), toon('#d9913a')); filter.position.y = -0.08;
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.026, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff6a2a })); tip.position.y = 0.085;
+  g.add(stick, filter, tip); g.userData.tip = tip;
+  g.rotation.x = Math.PI / 2; g.position.set(0, -0.43, 0.1); g.scale.setScalar(1.5);
+  return g;
+}
+function brkProps(r, B, t) {
+  const want = !B ? null : B.kind === 'smoke' ? 'smoke' : t - B.t0 >= B.buySec ? 'vend' : null;   // the can once it is taken out
+  if (want === (r.brkHandKind || null)) return;
+  if (r.brkHand) { r.brkHand.parent.remove(r.brkHand); r.brkHand.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); }
+  r.brkHand = want === 'smoke' ? cigarette() : want === 'vend' ? handThing('drink') : null;
+  r.brkHandKind = want;
+  if (r.brkHand) r.armR.add(r.brkHand);
 }
 function gesturePose(r, p, t) {
   const G = r.gesture, k = Math.min(1, (t - G.t0) / 0.35, (G.t1 - t) / 0.35);   // ease in and out
@@ -829,11 +956,17 @@ const BUILDERS = {
     const bubble = new THREE.Sprite(S.mat.alert); bubble.position.set(0.6, 1.95, 0.1); bubble.scale.set(0.42, 0.462, 1); group.add(bubble);
     return { group, update(s) { bubble.position.y = 1.95 + Math.sin(s * 4) * 0.035; } };
   },
-  carry() {
+  carry(r) {
+    // up to CARRY_MAX sheets; r.carrySheets (the box, 2.3.4: the amount of a push or a pull) shows that many, 4 otherwise
     const g = S.geo, m = S.mat, group = new THREE.Group();
     const stack = new THREE.Group(); stack.position.set(0, 0.64, 0.4); group.add(stack);
-    for (let i = 0; i < 4; i++) { const sheet = new THREE.Mesh(g.sheet, m.sheets[i]); sheet.position.y = i * 0.034; sheet.rotation.y = (i % 2 ? 1 : -1) * 0.05 * i; stack.add(sheet); }
-    return { group, update(s) { stack.position.y = 0.64 + Math.abs(Math.cos(s * 7)) * 0.03; } };
+    const sheets = [];
+    for (let i = 0; i < CARRY_MAX; i++) { const sheet = new THREE.Mesh(g.sheet, m.sheets[i % 4]); sheet.position.y = i * 0.034; sheet.rotation.y = (i % 2 ? 1 : -1) * 0.05 * (i % 5); stack.add(sheet); sheets.push(sheet); }
+    return { group, update(s) {
+      const n = Math.max(1, Math.min(CARRY_MAX, r && Number.isFinite(r.carrySheets) ? r.carrySheets : 4));
+      sheets.forEach((sh, i) => { sh.visible = i < n; });
+      stack.position.y = 0.64 + Math.abs(Math.cos(s * 7)) * 0.03;
+    } };
   },
   done() {
     const group = new THREE.Group();
@@ -855,6 +988,7 @@ const BUILDERS = {
     };
   },
 };
+const CARRY_MAX = 12;
 function ensureProps(r, state) {
   if (r.props[state] || !BUILDERS[state]) return;
   const pr = BUILDERS[state](r);
@@ -951,8 +1085,10 @@ function updateRobot(r, t, dt) {
   if (onCall) callPose(p, t);
   else if (r.play) playPose(r, p, t);
   else if (r.solo) soloPose(r, p, t);
+  else if (r.brk) brkPose(r, p, t);
   else if (r.gesture) gesturePose(r, p, t);
   soloProps(r, onCall ? null : r.solo, t);
+  brkProps(r, onCall ? null : r.brk, t);
   playBubble(r, onCall ? null : r.play, t);
   r.antenna.rotation.x += ((r.tired ? 1.0 : 0) - r.antenna.rotation.x) * Math.min(1, dt * 3);
   r.root.position.y = p.rootY;
@@ -1007,6 +1143,11 @@ const frac = (t, a, b) => clamp01((t - a) / (b - a));
 const pct = (v) => Math.round(v * 100);
 const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 const ROLE_INK = { debug: '#2a2000' };
+/* A session's name (/rename, `claude -n`; 10-19): the server's title, one line, at most NAME_MAX characters. Panels and
+   cards show all of it next to the two-letter mark; the tag over the robot shows it alone, cut at its end with "…". */
+const NAME_MAX = 80;
+const sessionName = (t) => (typeof t === 'string' ? t.replace(/\s+/g, ' ').trim().slice(0, NAME_MAX) : '');
+const NAMES = { rev: 0 };   // bumped when a robot's name changes: the panels' keys carry it
 const pill = (label, role) => `<span class="pill" style="--c:${ROLES[role].color};--t:${ROLE_INK[role] || '#ffffff'}">${esc(label)}</span>`;
 /* The time the view shows (the sky, the 8-hour tiredness): the machine's clock, unless a test or the demo sets one. */
 const VIZ_CLOCK = { at: null };
@@ -1759,6 +1900,7 @@ const SOURCE = {
     showToast(`${p.who} の ${p.tool} を${behavior === 'deny' ? '拒否' : behavior === 'always' ? '許可し、ルールを追加' : '許可'}した（デモ。実際は Claude Code へ答えを返す）`);
   },
   history() { return Promise.resolve({ ok: false, error: 'demo' }); },   // the demo has no transcripts
+  historyImage() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
   setWeather() { return Promise.resolve({ ok: false, error: 'demo' }); },   // the demo asks nobody about the weather
 };
 const robotRuns = () => [];   // the demo's one test run is shown by the card's own a2 row
@@ -2245,7 +2387,7 @@ function buildDemoOffice() {
     if (d.id === 'a2') { robot.drawPhone = drawCartUI; ensureProps(robot, 'phone'); }
     robot.root.userData.robotId = d.id;
     scene.add(robot.root);
-    const tag = addTag('', `${pill(d.id, d.role)}<span></span>`);
+    const tag = addTag('', `${pill(d.id, d.role)}<span class="nm"></span><span></span>`);
     robots.push({ def: d, robot, tag, text: tag.lastElementChild, act: '' });
   }
 }
@@ -2465,7 +2607,7 @@ function liveAddRobot(d, i) {
   robot.root.position.set(start[0], 0, start[1]); robot.root.rotation.y = d.ry || 0;
   robot.root.userData.robotId = d.id;
   scene.add(robot.root);
-  const tag = addTag('', `${pill(d.id, d.role)}<span></span>`);
+  const tag = addTag('', `${pill(d.id, d.role)}<span class="nm"></span><span></span>`);
   const R = { def: d, robot, tag, text: tag.lastElementChild, act: '', path: [], room: d.room, seatKey: '', exitAt: 0 };
   if (route.length) R.path = route.slice(1);
   d.enter = false;
@@ -2516,7 +2658,7 @@ function livePlan(R) {
   const rm = PROJECT[d.room], rect = rm ? `${rm.x0},${rm.z0},${rm.x1},${rm.z1}` : '';
   const moved = R.seatKey && R.room === d.room && R.rect && R.rect !== rect;   // its room was laid out again (another slot, the one-room view)
   R.rect = rect;
-  if (R.play) {
+  if (R.shred || R.play || R.brk) {   // the shredder's errand and a break (10-19) keep their path as play does: shredStop / brkStop walk it to this seat (a git trip need not: gitLaid)
     // At play (2.3.1): the path is the game's. Taking it sent a player to its new desk, and there liveWalk read the
     // empty path as "at the spot" and it played from its desk (e2e, 1 run in 3). The game ends on its own reasons;
     // playStop then walks it to this seat (through the doors when the room changed).
@@ -2548,9 +2690,22 @@ function liveWalk(R, dt, nowMs) {
   if (!next && R.play) {                                          // at the play spot: no desk, facing the partner
     if (R.robot.desk) R.robot.desk.visible = false;
     R.play.phase = 'playing';
-    const q = R.play.partner.robot.root.position, ry = Math.atan2(q.x - root.position.x, q.z - root.position.z);
-    root.rotation.y += (ry - root.rotation.y) * Math.min(1, dt * 6);
+    const q = R.play.partner.robot.root.position, ry = Math.atan2(q.x - root.position.x, q.z - root.position.z) + (R.play.turn || 0);
+    root.rotation.y += (ry - root.rotation.y) * Math.min(1, dt * (R.play.turn !== undefined ? 12 : 6));   // highfive: turns to slap
     return 'playing';
+  }
+  if (!next && R.brk) return brkAt(R, dt);                        // at the smoking booth or the vending machine (10-19)
+  if (!next && R.shred) {                                         // at the shredder: no desk, facing it
+    if (R.robot.desk) R.robot.desk.visible = false;
+    const P = PROPS.shredder, ry = P ? Math.atan2(P.x - root.position.x, P.z - root.position.z) : Math.PI;
+    root.rotation.y += (ry - root.rotation.y) * Math.min(1, dt * 6);
+    return 'shredding';
+  }
+  if (!next && R.git && R.git.phase === 'at') {                  // at the box (2.3.4): no desk of its own, facing the box
+    if (R.robot.desk) R.robot.desk.visible = false;
+    const q = R.git.desk, ry = Math.atan2(q[0] - root.position.x, q[1] - root.position.z);
+    root.rotation.y += (ry - root.rotation.y) * Math.min(1, dt * 6);
+    return 'gitbox';
   }
   if (!next && R.playBack) R.playBack = false;                    // back at its desk
   if (!next) {
@@ -2591,11 +2746,21 @@ const CALL_TAG_TEXT = { dialing: '発信中', ringing: '呼び出し中', answer
 /* Alone at its desk (2.3.1): the name tag says so too — the robot is small in any view, so the zzz and the bento alone
    were hard to see (jsonuidocument-96, 10-18). The call mark wins; a call stops a nap anyway. */
 const SOLO_TAG_TEXT = { nap: 'zzz 居眠り', bento: '弁当' };
+/* The tag's name (10-19): a session with a name (/rename, `claude -n`) shows it in place of the two-letter mark, cut at
+   its end by the CSS; none (and a subagent) keeps the mark. Text only (textContent), and a rename shows at once. */
+function liveTagName(R) {
+  const name = R.def.title || '';
+  if (name === (R.nameShown || '')) return;
+  R.nameShown = name;
+  R.tag.querySelector('.nm').textContent = name;
+  R.tag.firstElementChild.hidden = !!name;
+  R.tag.classList.toggle('named', !!name);
+}
 function liveCallTag(R, call) {
   R.robot.call = call && CALL_ON_LINE.has(call.state) ? call : null;
   const c = R.robot.call;
   const text = c ? `☎ ${c.role === 'callee' && c.state !== 'answered' ? '着信' : CALL_TAG_TEXT[c.state]}${c.peer ? ` ${c.peer}` : ''}`
-    : R.solo ? SOLO_TAG_TEXT[R.solo.kind] || '' : '';
+    : R.solo ? SOLO_TAG_TEXT[R.solo.kind] || '' : playText(R) || brkTagText(R);   // a game and a break never overlap
   if (text === (R.callText || '')) return;
   R.callText = text;
   if (!R.callEl) { R.callEl = document.createElement('span'); R.callEl.className = 'call-mark'; R.tag.insertBefore(R.callEl, R.text); }
@@ -2624,8 +2789,61 @@ const PLAY = { seed: 20261019, kinds: PLAY_KINDS, idleMs: 60_000, p: 1 / 15, gam
   walkSec: 30, next: 0, rng: null, list: [], ends: [] };
 const SOLO_KINDS = ['nap', 'bento'];
 const SOLO = { p: 1 / 20, minSec: 20, maxSec: 60, kinds: SOLO_KINDS };
+/* What a game looks like (2.3.3, requester 10-19: "ずっと二人で向き合ってるだけで何やってるかわからない"): the name tag,
+   the robot's card and the building's window say which game it is (遊びに行く on the way), the ball is big enough to
+   see from the usual view and goes from hand to hands, and at highfive the two walk toward each other and slap with a
+   パチン mark. The poses are 10-robot-core.js's; both read the same phase helpers (ballPhase, highfivePhase). */
+const PLAY_LOOK = { ballR: 0.3, gap: { ball: 1.3, highfive: 1.4 }, hfNear: 0.8 };   // gap: half the distance between the two spots
+const PLAY_TAG_TEXT = { ball: 'キャッチボール中', highfive: 'ハイタッチ中', rps: 'じゃんけん中' };
+function playText(R) {
+  if (!R.play) return '';
+  return R.robot.play ? PLAY_TAG_TEXT[R.robot.play.kind] || '' : '遊びに行く';
+}
+function playTagText(id) { const R = robots.find((x) => x.def.id === id); return R ? playText(R) : ''; }   // the card (50-panel.js)
+function playRoomText(room) { const G = PLAY.list.find((x) => x.room === room); return !G ? '' : G.t0 ? PLAY_TAG_TEXT[G.kind] || '' : '遊びに行く'; }   // the building
+const playV = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+function playHand(r, side, out) { return (side === 'L' ? r.armL : r.armR).localToWorld(out.set(0, -0.38, 0)); }
+function pachinCanvas() {
+  const c = makeCanvas(280, 180), ctx = c.getContext('2d');
+  ctx.beginPath();
+  for (let i = 0; i < 24; i++) { const a = (i / 24) * Math.PI * 2, rad = i % 2 ? 52 : 88; ctx.lineTo(140 + Math.cos(a) * rad * 1.45, 90 + Math.sin(a) * rad); }
+  ctx.closePath(); ctx.fillStyle = '#ffd23f'; ctx.fill(); ctx.lineWidth = 7; ctx.strokeStyle = '#1f2532'; ctx.lineJoin = 'round'; ctx.stroke();
+  ctx.font = `700 52px ${FONT_DISPLAY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.lineWidth = 8; ctx.strokeStyle = '#ffffff'; ctx.strokeText('パチン!', 140, 92);
+  ctx.fillStyle = '#d0352b'; ctx.fillText('パチン!', 140, 92);
+  return c;
+}
+function playMove(G, left, nowSec) {
+  if (left.length < 2) return;
+  const u = Math.max(0, nowSec - G.t0);
+  if (G.kind === 'ball') {
+    if (!G.ball) { G.ball = new THREE.Mesh(new THREE.SphereGeometry(PLAY_LOOK.ballR, 16, 12), toon('#ff7a3d')); scene.add(G.ball); }
+    const { n, thrower, w } = ballPhase(u), from = left[thrower].robot, to = left[1 - thrower].robot;
+    const hand = playHand(from, 'R', playV[0]);
+    if (w < BALL_T.release) { G.ball.position.copy(hand); return; }   // in the thrower's hand through the wind-up
+    if (G.ballN !== n) { G.ballFrom = hand.clone(); G.ballN = n; }
+    const at = playHand(to, 'L', playV[1]).add(playHand(to, 'R', playV[2])).multiplyScalar(0.5);   // between the catcher's hands
+    const k = (w - BALL_T.release) / (1 - BALL_T.release);
+    G.ball.position.lerpVectors(G.ballFrom, at, k); G.ball.position.y += Math.sin(Math.PI * k) * 0.8;
+  } else if (G.kind === 'highfive') {
+    const H = highfivePhase(u), [a, b] = left, sa = a.play.spot, sb = b.play.spot;
+    const dx = sb[0] - sa[0], dz = sb[1] - sa[1], d = Math.hypot(dx, dz) || 1;
+    const walk = Math.max(0, d / 2 - PLAY_LOOK.hfNear) * H.near;   // each walks this far toward the other
+    left.forEach((R, i) => {
+      const s = i ? -1 : 1, root = R.robot.root;
+      root.position.x = R.play.spot[0] + (s * dx / d) * walk; root.position.z = R.play.spot[1] + (s * dz / d) * walk;
+      R.play.turn = (i ? 1 : -1) * HIGHFIVE_T.turn * H.up;   // a little to the front: the inner hands meet between them
+    });
+    if (!G.mark) {
+      G.mark = new THREE.Sprite(new THREE.SpriteMaterial({ map: texFrom(pachinCanvas()), transparent: true, depthTest: false }));
+      G.mark.renderOrder = 6; G.mark.scale.set(1.5, 0.96, 1); G.mark.userData.playMark = true; scene.add(G.mark);
+    }
+    G.mark.visible = H.slap;
+    if (H.slap) { G.mark.position.copy(playHand(a.robot, 'L', playV[0])).add(playHand(b.robot, 'R', playV[1])).multiplyScalar(0.5); G.mark.position.y += 0.6; }
+  }
+}
 const playIdle = (R, st, now) => R.def.kind === 'main' && st.state === 'idle' && Number.isFinite(st.since) && st.since > 0
-  && now - st.since >= PLAY.idleMs && !LIVE.leaving[R.def.id] && !R.robot.call && !R.path.length && !R.playBack && !R.play && !R.solo;
+  && now - st.since >= PLAY.idleMs && !LIVE.leaving[R.def.id] && !R.robot.call && !R.path.length && !R.playBack && !R.play && !R.solo && !R.brk && !R.shred && !R.git;   // nothing starts on the way to the shredder or the git box (2.3.4)
 /* Why a robot stops (null: it does not): the reasons the requester's "walked up and went back" can be told by. Only a
    desk in another room stops it now; a desk that moves within the room (another session came or went and the room
    was laid out again — common with many sessions) no longer does: it walks back to the new desk afterwards. */
@@ -2652,12 +2870,14 @@ function playStop(R) {
 function playEnd(G) {
   for (const R of G.players) playStop(R);
   if (G.ball) { scene.remove(G.ball); G.ball.geometry.dispose(); G.ball.material.dispose(); }
+  if (G.mark) { scene.remove(G.mark); G.mark.material.map.dispose(); G.mark.material.dispose(); }
   PLAY.list.splice(PLAY.list.indexOf(G), 1);
 }
 /* The game's room laid out again (another room came or went, its robot count changed its size): the spot and the
    players move with it, as a jump (the e2e wall check skips jumps, as it does for livePlan's), and the game goes on.
    Without it the spot and the players stayed where the room had been — inside a wall of the new layout. */
-const playSpotOf = (rm, side) => [(rm.x0 + rm.x1) / 2 + (side ? 0.8 : -0.8), rm.z1 - 0.9];
+// ball and highfive (2.3.3): farther apart, so the ball's flight shows and the two can walk toward each other (playMove)
+const playSpotOf = (rm, side, kind) => [(rm.x0 + rm.x1) / 2 + (side ? 1 : -1) * (PLAY_LOOK.gap[kind] || 0.8), rm.z1 - 0.9];
 function playFollowRoom(G) {
   const rm = PROJECT[G.room];
   if (!rm) return;
@@ -2666,7 +2886,7 @@ function playFollowRoom(G) {
   G.rect = rect;
   G.players.forEach((R, i) => {
     if (!R.play) return;
-    const to = playSpotOf(rm, i), dx = to[0] - R.play.spot[0], dz = to[1] - R.play.spot[1];
+    const to = playSpotOf(rm, i, G.kind), dx = to[0] - R.play.spot[0], dz = to[1] - R.play.spot[1];
     const root = R.robot.root;
     root.position.x += dx; root.position.z += dz;
     R.path = R.path.map((p) => [p[0] + dx, p[1] + dz]);
@@ -2688,17 +2908,12 @@ function playTick(nowSec, now) {
     const at = left.filter((R) => R.play.phase === 'playing');
     if (at.length === left.length && left.length >= 2 && !G.t0) {   // all there: the game's clock starts now
       G.t0 = nowSec; G.until = nowSec + G.len;
-      left.forEach((R, i) => { R.robot.play = { kind: G.kind, t0: nowSec, side: i }; });
+      left.forEach((R, i) => { R.robot.play = { kind: G.kind, t0: nowSec, side: i, seed: G.seed }; });
     }
     const end = left.length < 2 ? `alone (${why || 'partner stopped'})` : G.t0 && nowSec >= G.until ? 'done'
       : !G.t0 && nowSec >= G.walkUntil ? 'walk too long' : null;
     if (end) { playLog(G, end, nowSec); G.players = left; playEnd(G); continue; }
-    if (G.t0 && G.kind === 'ball') {
-      if (!G.ball) { G.ball = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 8), toon('#ff7a3d')); scene.add(G.ball); }
-      const [a, b] = left.map((R) => R.robot.root.position), u = ((nowSec - G.t0) / 1.6) % 1;
-      const k = u < 0.5 ? u * 2 : 2 - u * 2;                          // there and back
-      G.ball.position.set(a.x + (b.x - a.x) * k, 1.25 + Math.sin(Math.PI * (u < 0.5 ? u * 2 : u * 2 - 1)) * 0.9, a.z + (b.z - a.z) * k);
-    }
+    if (G.t0) playMove(G, left, nowSec);
   }
   if (reduceMotion || nowSec < PLAY.next) return;
   PLAY.next = nowSec + 1;
@@ -2718,10 +2933,11 @@ function playTick(nowSec, now) {
     const rm = PROJECT[room];
     const kind = PLAY.kinds[Math.floor(PLAY.rng() * PLAY.kinds.length)];
     const len = PLAY.minSec + PLAY.rng() * (PLAY.maxSec - PLAY.minSec);
-    const G = { room, kind, players: [a, b], t0: 0, len, until: 0, walkUntil: nowSec + PLAY.walkSec, ball: null, rect: `${rm.x0},${rm.z0},${rm.x1},${rm.z1}` };
+    PLAY.count = (PLAY.count || 0) + 1;
+    const G = { room, kind, players: [a, b], t0: 0, len, until: 0, walkUntil: nowSec + PLAY.walkSec, ball: null, rect: `${rm.x0},${rm.z0},${rm.x1},${rm.z1}`, seed: PLAY.seed + PLAY.count };
     [a, b].forEach((R, i) => {
-      const spot = playSpotOf(rm, i);
-      R.play = { phase: 'going', spot, partner: i ? a : b, since: robotState[R.def.id].since, len };
+      const spot = playSpotOf(rm, i, kind);
+      R.play = { phase: 'going', spot, partner: i ? a : b, since: robotState[R.def.id].since, len, kind };
       R.path = [spot];
       R.restUntil = nowSec + PLAY.walkSec + len + PLAY.restMinSec + PLAY.rng() * (PLAY.restMaxSec - PLAY.restMinSec);
     });
@@ -2769,22 +2985,39 @@ function liveUpdateRobots(nowSec, dt) {
   snackTick(nowSec);
   const now = vizNow();
   playTick(nowSec, now);
+  brkTick(nowSec, now);
+  gitTick(nowSec);   // the box (2.3.4): trips to the box and back
   const calls = callsByLabel();
   for (const R of [...robots]) {
     const st = robotState[R.def.id] || { state: 'idle', act: '' };
+    liveTagName(R);
     liveCallTag(R, calls[R.def.id] || null);
     setRobotTired(R.robot, R.def.kind === 'main' && isTired(sinceOf(R.def.id), now));
     R.robot.heavy = heavyOf(R.def.id);   // fast typing and sweat while it works (the robot decides when)
+    shredTick(R, st, nowSec);
     const how = liveWalk(R, walkDt, nowMs);
     if (how === 'gone') continue;
-    const playing = !!(R.play || R.playBack);
-    R.robot.lampState = playing ? st.state : null;   // to, at and back from play: the real state's lamp
-    const vis = how === 'walking' ? (playing ? 'stroll' : 'carry') : how === 'playing' ? 'idle' : st.state;
+    if (how === 'shredding') shredAt(R, nowSec);
+    const playing = !!(R.play || R.playBack || R.brk || R.shred);
+    R.robot.lampState = playing || R.git ? st.state : null;   // to, at and back from play, a break, the shredder or the box: the real state's lamp
+    const vis = R.git ? gitLook(R) : how === 'walking' ? (playing ? 'stroll' : 'carry') : how === 'playing' || how === 'shredding' ? 'idle' : st.state;
     if (vis !== R.robot.state) setRobotState(R.robot, vis);
-    if (st.act !== R.act) { R.act = st.act; R.text.textContent = st.act; }
+    // over its head: the errand under way says its own line (one robot never runs both, gitTick / shredTick); else, of
+    // what it deleted (SHRED.labelMs after) and the box's line (GITBOX.showMs after), the newer one; else what it does
+    const shredLine = st.shred && (R.shred || vizNow() - st.shred.at < SHRED.labelMs) ? `${st.shred.ok ? 'シュレッダー' : '削除できず'} ${st.shred.label}` : '';
+    const gitLine = gitSaid(R, st);
+    const act = R.shred ? shredLine : R.git ? gitLine || st.act
+      : shredLine && gitLine ? (st.shred.at >= (st.git.at || 0) ? shredLine : gitLine) : shredLine || gitLine || st.act;
+    if (act !== R.act) { R.act = act; R.text.textContent = act; }
     updateRobot(R.robot, nowSec, dt);
+    if (R.tiltUntil && R.robot.head) {   // a deletion that found nothing: a puzzled tilt of the head
+      const left = R.tiltUntil - nowSec;
+      R.robot.head.rotation.z = left > 0 ? Math.sin(Math.min(1, (1.6 - left) / 0.3) * Math.PI / 2) * 0.32 * Math.min(1, left / 0.3) : 0;
+      if (left <= 0) R.tiltUntil = 0;
+    }
   }
   propsTick(nowSec, dt);
+  shredBits(nowSec, dt);
 }
 /* One room at a time (requester, 10-18): a project picked (its room's tag, its floor in 3D, the menu) lays out only
    that room, wider (layoutRooms, SOLO_GROW), with the way back at the top left. The other rooms' robots keep their
@@ -2805,9 +3038,14 @@ function liveSoloSync() {
 /* ---------- the room up close: a water server, a robot vacuum and a wooden floor (requester, 10-18) ----------
    Only in the one-room view (room-solo) and only while that room has 10 robots or fewer; built when it is wanted and
    disposed as soon as it is not (back to the floor, the building, an 11th robot). The floor's own material is swapped
-   for a toon material with a canvas plank texture (512 px, repeated; no image, no light, no shadow) and put back. */
+   for a toon material with a canvas plank texture (512 px, repeated; no image, no light, no shadow) and put back.
+   2.3.3 (requester, 10-19): a glass smoking booth and a vending machine come with them, on the same rule (the one-room
+   view, PROPS.max robots or fewer); robots on a break walk to them (BRK below). Where the three stand: propsPlace. */
 const PROPS = { max: 10, room: null, geo: null, dark: null, group: null, server: null, vac: null, woodMat: null, woodTex: null, floorMat: null,
-  boxes: [], boxesAt: 0, rng: null, seed: 20261020, speed: 0.45, radius: 0.64, serverScale: 1.9 };   // the robots' scale (they stand about 1 m)
+  boxes: [], boxesAt: 0, rng: null, seed: 20261020, speed: 0.45, radius: 0.64, serverScale: 1.9,   // the robots' scale (they stand about 1 m)
+  place: null, booth: null, vend: null, fan: null, smoke: [], shredder: null, bits: [], gitDesk: null, gitFill: null };
+const PROPS_EMPTY = { room: null, geo: null, dark: null, group: null, server: null, vac: null, woodMat: null, woodTex: null, floorMat: null, boxes: [], boxesAt: 0,
+  place: null, booth: null, vend: null, fan: null, smoke: [], shredder: null, bits: [], gitDesk: null, gitFill: null };
 function woodTexture(dark) {
   const N = 512, cv = makeCanvas(N, N), ctx = cv.getContext('2d'), W = { rng: snackRandom(PROPS.seed) };   // the same planks every time
   const base = dark ? [92, 72, 55] : [214, 184, 146], rows = 8, h = N / rows;
@@ -2836,12 +3074,14 @@ function propsWanted() {
 }
 function propsClear() {
   if (!PROPS.room) return;
+  for (const Q of robots) if (Q.shred) shredStop(Q);   // an errand to a shredder that is going away ends here
   const R = LIVE3D.rooms[PROPS.room];
   if (R && PROPS.floorMat && R.floor.material === PROPS.woodMat) R.floor.material = PROPS.floorMat;
   if (PROPS.group) { scene.remove(PROPS.group); disposeTree(PROPS.group); }
   if (PROPS.woodMat) PROPS.woodMat.dispose();
   if (PROPS.woodTex) PROPS.woodTex.dispose();
-  Object.assign(PROPS, { room: null, geo: null, dark: null, group: null, server: null, vac: null, woodMat: null, woodTex: null, floorMat: null, boxes: [], boxesAt: 0 });
+  if (PROPS.shredder) { PROPS.shredder.bit.geo.dispose(); PROPS.shredder.bit.mat.dispose(); }   // shared by bits that may all be gone
+  Object.assign(PROPS, PROPS_EMPTY, { boxes: [], smoke: [], bits: [] });
 }
 function propsBuild(id) {
   const r = PROJECT[id], R = LIVE3D.rooms[id], g = new THREE.Group();
@@ -2849,8 +3089,8 @@ function propsBuild(id) {
   // the floor: the same mesh, a wooden material while the room is up close
   PROPS.woodTex = woodTexture(PROPS.dark); PROPS.woodTex.repeat.set((r.x1 - r.x0) / 2.4, (r.z1 - r.z0) / 2.4);
   PROPS.woodMat = toon('#ffffff', { map: PROPS.woodTex }); PROPS.floorMat = R.floor.material; R.floor.material = PROPS.woodMat;
-  // the water server: the back-right corner, in sight from the usual view; the back-left one when a back door opens
-  // near the right (doorAt). No desk takes either corner (SEAT.left / SEAT.back / SEAT.aisleR).
+  // the water server: the back-right corner (propsPlace), in sight from the usual view
+  const P = PROPS.place = propsPlace(r);
   const sv = new THREE.Group(), body = toon('#eef1f4'), dark = toon('#5b6573');
   const cab = new THREE.Mesh(new RoundedBoxGeometry(0.42, 0.95, 0.38, 2, 0.04), body); cab.position.y = 0.475; sv.add(cab);
   const panel = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.22, 0.02), dark); panel.position.set(0, 0.72, 0.2); sv.add(panel);
@@ -2859,10 +3099,10 @@ function propsBuild(id) {
   const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.42, 20), toon('#8fd0f2', { transparent: true, opacity: 0.82 }));
   tank.position.y = 0.95 + 0.21; sv.add(tank);
   const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.04, 12), toon('#2f7fd1')); cap.position.y = 1.39; sv.add(cap);
-  const right = !(r.doors && r.doors.back);
-  const k = PROPS.serverScale, off = 0.42 * k;   // built at 1, shown bigger (requester, 10-18: the robots' size)
-  sv.scale.setScalar(k);
-  sv.position.set(right ? r.x1 - off : r.x0 + off, 0, r.z0 + 0.38 * k); sv.rotation.y = right ? -Math.PI / 4 : Math.PI / 4; g.add(sv); PROPS.server = sv;
+  sv.scale.setScalar(PROPS.serverScale);   // built at 1, shown bigger (requester, 10-18: the robots' size)
+  sv.position.set(P.server.x, 0, P.server.z); sv.rotation.y = P.server.ry; g.add(sv); PROPS.server = sv;
+  PROPS.booth = boothBuild(P.booth); g.add(PROPS.booth);
+  PROPS.vend = vendBuild(P.vend); g.add(PROPS.vend);
   // the robot vacuum: a flat disc with a bumper and a light, on the floor clear of desks, robots and the front aisle
   const vac = new THREE.Group();
   const shell = new THREE.Mesh(new THREE.CylinderGeometry(PROPS.radius, PROPS.radius, 0.11, 32), toon('#3a3f47')); shell.position.y = 0.065; vac.add(shell);
@@ -2871,6 +3111,8 @@ function propsBuild(id) {
   const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.04, 12, 8), toon('#52e08a')); lamp.position.set(0, 0.145, PROPS.radius * 0.5); vac.add(lamp);
   vac.userData.heading = PROPS.rng() * Math.PI * 2;
   g.add(vac); PROPS.vac = vac;
+  PROPS.shredder = shredderBuild(r, g);
+  gitDeskBuild(id, g);   // the cardboard box on its desk (2.3.4)
   propsBoxes(0, true);
   const start = propsSpot();
   vac.position.set(start[0], 0, start[1]);
@@ -2888,9 +3130,12 @@ function propsBoxes(nowSec, force) {
   const box = new THREE.Box3();
   PROPS.boxes = robots.filter((R) => R.robot.root.visible && (R.def.room === PROPS.room || roomAtPoint([R.robot.root.position.x, R.robot.root.position.z]) === PROPS.room))
     .map((R) => { box.setFromObject(R.robot.root); return [box.min.x, box.max.x, box.min.z, box.max.z]; });
+  if (PROPS.shredder) PROPS.boxes.push(PROPS.shredder.box);
   const s = PROPS.server.position;
   const half = 0.42 * PROPS.serverScale;
   PROPS.boxes.push([s.x - half, s.x + half, s.z - half, s.z + half]);
+  const P = PROPS.place;   // the booth and the machine with the spot in front of it (10-19), the box's desk (2.3.4)
+  PROPS.boxes.push([P.booth.x0, P.booth.x1, P.booth.z0, P.booth.z1], [P.vend.x0, P.vend.x1, P.vend.z0, P.vend.spot[1] + 0.3], P.git.rect);
 }
 function propsClearAt(x, z) {
   const a = propsArea(), m = PROPS.radius + 0.06;
@@ -2905,6 +3150,172 @@ function propsSpot() {
   }
   return [a.x1, a.z1];
 }
+/* ---------- the cardboard box: git push / pull (2.3.4, requester 10-19) ----------
+   "部屋拡大の時に…机おいてその上にダンボール箱を設置 Gitのプッシュとかの場合はダンボールにコミットしたコード量に応じて書類をロボットが
+   入れに行く(表示でコミットしたブランチ名とか情報を出す) 逆にプルした時は箱から書類を持って机に帰る", "場所は真ん中じゃなくてもいいよ
+   他のアイテムと被らないように気をつけてくれればはしっこでも良い".
+   Where: one desk with a box, only in the one-room view (it is one of PROPS), against the left wall, its middle
+   GITBOX.fromBack from the back wall: past the back-left corner (the smoking booth, BOOTH 2.6 x 2.0, and the point in
+   front of its door, booth.way[0] = z1 + 0.7, kept clear by 0.5 as the breaks arm draws it), short of the cork board,
+   the left door and the easel at the front left. The left strip is kept clear of desks (SEAT.left, SEAT_SOLO.left); no
+   door, aisle or play spot is on it. It is one row of propsPlace (PROPS.place.git: desk, stand, rect), so the breaks
+   arm's 12 room configs and gitDeskOverlaps both see it, and the vacuum keeps off it (propsBoxes).
+   A trip, a break (or play) and the shredder's errand never share a robot: playIdle is false on a trip or an errand.
+   Between a trip and an errand the one that comes second waits for the first to end — a trip while it is fresh
+   (GITBOX.freshMs), a deletion up to SHRED.waitSec (then it is dropped). A deletion ends a break, a game or a nap
+   instead (shredTick: work ends them). gitTick runs before shredTick in a frame, so both cannot start in one frame.
+   What: the server's agent.git (gitbox.py: a push or a pull a session's Bash ran, its branch, commits and lines).
+   A robot in the room up close walks to the box with a stack as thick as the push (1 to CARRY_MAX sheets), puts it in
+   and walks back empty; for a pull it walks there empty and comes back with the stack. Nothing to pull (up to date):
+   back empty. Rejected: it walks back with its stack. Its line over its head shows the trip's label for GITBOX.showMs.
+   It stops at once — walking back — on a call, a question or a permission (waiting), an instruction (the server marks
+   agent.git stopped, and keeps it for the card), leaving, or another trip, or the props going away; no trip starts while it plays, takes a break or feeds the shredder. */
+const GITBOX = { fromBack: 4.0, half: [0.33, 0.66], stand: 0.95, atSec: 1.4, freshMs: 60_000, showMs: 20_000, ends: [] };
+function gitDeskSpot(rm) {
+  const x = rm.x0 + 0.48, z = rm.z0 + GITBOX.fromBack, [hx, hz] = GITBOX.half;
+  return { desk: [x, z], stand: [x + GITBOX.stand, z], rect: [x - hx, x + hx, z - hz, z + hz] };
+}
+function gitDeskBuild(id, g) {
+  const sp = PROPS.place.git, desk = new THREE.Group(), wood = toon('#b98a5e'), card = toon('#c99a62'), cardDark = toon('#a97c48');
+  const [hx, hz] = GITBOX.half;
+  const top = new THREE.Mesh(new RoundedBoxGeometry(hx * 2, 0.06, hz * 2, 1, 0.02), wood); top.position.y = 0.7; desk.add(top);
+  for (const [lx, lz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.68, 0.06), wood); leg.position.set(lx * (hx - 0.06), 0.34, lz * (hz - 0.06)); desk.add(leg);
+  }
+  // the box: open at the top, four flaps out, the papers inside (their height is PROPS.gitFill)
+  const box = new THREE.Group(); box.position.y = 0.73; desk.add(box);
+  const bw = 0.5, bh = 0.32, bd = 0.62, t = 0.02;
+  for (const [w, d, x, z] of [[bw, t, 0, -bd / 2], [bw, t, 0, bd / 2], [t, bd, -bw / 2, 0], [t, bd, bw / 2, 0]]) {
+    const side = new THREE.Mesh(new THREE.BoxGeometry(w, bh, d), card); side.position.set(x, bh / 2, z); box.add(side);
+  }
+  const bottom = new THREE.Mesh(new THREE.BoxGeometry(bw, t, bd), cardDark); bottom.position.y = t / 2; box.add(bottom);
+  for (const [w, d, x, z, rx, rz] of [[bw, 0.16, 0, -bd / 2 - 0.07, -0.7, 0], [bw, 0.16, 0, bd / 2 + 0.07, 0.7, 0], [0.16, bd, -bw / 2 - 0.07, 0, 0, 0.7], [0.16, bd, bw / 2 + 0.07, 0, 0, -0.7]]) {
+    const flap = new THREE.Mesh(new THREE.BoxGeometry(w, t, d), cardDark); flap.position.set(x, bh, z); flap.rotation.set(rx, 0, rz); box.add(flap);
+  }
+  const papers = new THREE.Mesh(new THREE.BoxGeometry(bw - 0.08, 1, bd - 0.1), toon('#f4efe3')); papers.position.y = t; box.add(papers);
+  desk.position.set(sp.desk[0], 0, sp.desk[1]);
+  desk.userData.gitDesk = true;
+  g.add(desk);
+  PROPS.gitDesk = { group: desk, papers };
+  if (PROPS.gitFill === null) PROPS.gitFill = 0.35;
+  gitFillShow();
+}
+function gitFillShow() {
+  if (!PROPS.gitDesk) return;
+  const h = Math.max(0.02, Math.min(1, PROPS.gitFill)) * 0.26, p = PROPS.gitDesk.papers;
+  p.scale.y = h; p.position.y = 0.02 + h / 2;
+}
+/* How many sheets a trip carries: 1 to CARRY_MAX, by the lines it changed (added + removed), 0 for nothing. */
+function gitSheets(trip) {
+  if (!trip || ['uptodate', 'failed', 'deleted', 'unknown'].includes(trip.status)) return 0;
+  if (trip.status === 'tag') return 1;
+  const c = trip.counted || {}, lines = (c.ins || 0) + (c.dels || 0);
+  if (!c.ins && !c.dels) return 3;   // not counted: a modest stack
+  return Math.max(1, Math.min(CARRY_MAX, 1 + Math.round(Math.log2(1 + lines / 10))));
+}
+function gitEnd(entry) {
+  GITBOX.ends.push(entry);
+  if (GITBOX.ends.length > 30) GITBOX.ends.shift();
+}
+function gitStop(R, why, nowSec) {
+  if (!R.git || (R.git.phase === 'back' && why !== 'relaid')) return;
+  gitEnd({ id: R.def.id, kind: R.git.trip.kind, phase: R.git.phase, why, at: +nowSec.toFixed(1) });
+  if (why === 'relaid') {   // its room was laid out again (a bigger room): a jump to its new desk, as a break's and livePlan's
+    const root = R.robot.root;
+    root.position.x = R.def.pos[0]; root.position.z = R.def.pos[1]; R.path = []; R.jumps = (R.jumps || 0) + 1;
+    R.git = null;
+    return;
+  }
+  R.git.phase = 'back'; R.git.stopped = why;
+  const p = R.robot.root.position, from = roomAtPoint([p.x, p.z]);
+  R.path = from && from !== R.def.room ? [...liveRoute(from, R.def.room), R.def.pos] : [R.def.pos];
+}
+// its room's rect and its seat: a change in the same room while on a trip is the room laid out again (a bigger room:
+// the box's desk moves with it, the trip's way would not), and the trip stops with a jump to the new desk
+// (docs/bugs/2026-10-19-jui-viz-git-trip-walks-to-the-old-box-when-the-room-grows.md). Another room is 'props': it walks
+// back through the doors. So livePlan need not keep a trip's path: whatever it does to it, gitTick stops the trip in
+// the same frame (measured 10-19: with or without that, the same jump to the same seat).
+const gitLaid = (R) => { const rm = PROJECT[R.def.room]; return `${rm ? rectOf(rm) : ''}|${R.def.pos ? R.def.pos.join() : ''}`; };
+function gitTick(nowSec) {
+  for (const R of robots) {
+    const st = robotState[R.def.id] || { state: 'idle' }, trip = st.git;
+    if (R.git) {
+      // stop at once: a call, waiting (a question or a permission), an instruction or another trip, leaving
+      const why = R.robot.call ? 'call' : st.state === 'waiting' ? 'waiting' : !trip || trip.stopped ? 'cleared' : trip.id !== R.git.trip.id ? 'replaced'
+        : LIVE.leaving[R.def.id] ? 'leaving' : R.def.room === R.git.room && gitLaid(R) !== R.git.laid ? 'relaid' : PROPS.room !== R.def.room ? 'props' : null;   // props: the box went away (the floor, a bigger room)
+      if (why) gitStop(R, why, nowSec);
+      if (!R.git) continue;   // relaid: at its new desk already
+      if (R.git.phase === 'going' && !R.path.length) { R.git.phase = 'at'; R.git.until = nowSec + GITBOX.atSec; }
+      if (R.git.phase === 'at' && nowSec >= R.git.until) {
+        const k = R.git.trip.kind, rejected = R.git.trip.status === 'rejected';
+        if (k === 'push' && !rejected) { PROPS.gitFill = Math.min(1, (PROPS.gitFill || 0) + R.git.sheets / 30); R.git.sheets = 0; }
+        if (k === 'pull') { R.git.sheets = gitSheets(R.git.trip); PROPS.gitFill = Math.max(0.05, (PROPS.gitFill || 0) - R.git.sheets / 30); }
+        gitFillShow();
+        gitEnd({ id: R.def.id, kind: k, phase: 'at', why: rejected ? 'rejected' : 'done', at: +nowSec.toFixed(1) });
+        R.git.phase = 'back'; R.path = [R.def.pos];
+      }
+      if (R.git.phase === 'back' && !R.path.length) R.git = null;   // home
+      continue;
+    }
+    if (!trip || trip.id === R.gitSeen || trip.pending) continue;
+    if (trip.stopped) { R.gitSeen = trip.id; continue; }               // an instruction came before it could start
+    const deskHere = PROPS.gitDesk && PROPS.room === R.def.room && !R.def.standing;
+    // an old one (a reload) or no box in sight: its line only, never later; busy now (walking to a new desk, playing,
+    // a call, a question, a break, the shredder): it waits — still fresh, the trip starts once the robot is free
+    if (vizNow() - (trip.at || 0) > GITBOX.freshMs || !deskHere) { R.gitSeen = trip.id; continue; }
+    if (R.play || R.playBack || R.brk || R.shred || R.solo || R.path.length || LIVE.leaving[R.def.id] || R.robot.call || st.state === 'waiting') continue;
+    R.gitSeen = trip.id;
+    const sp = PROPS.place.git;
+    R.git = { trip, phase: 'going', desk: sp.desk, sheets: trip.kind === 'push' ? gitSheets(trip) : 0, t0: nowSec, room: R.def.room, laid: gitLaid(R) };
+    R.path = [sp.stand];
+  }
+}
+/* The robot's look on a trip: a stack while it carries (to the box for a push; back for a pull, or a rejected push). */
+function gitLook(R) {
+  const g = R.git, push = g.trip.kind === 'push', rejected = g.trip.status === 'rejected';
+  R.robot.carrySheets = g.phase === 'back' ? (push ? (rejected ? gitSheets(g.trip) : 0) : g.sheets) : push ? gitSheets(g.trip) : 0;
+  if (g.phase === 'at') return push ? 'carry' : 'idle';
+  return R.robot.carrySheets > 0 ? 'carry' : 'stroll';
+}
+/* The line over the robot: the trip's label while it is on its way, and for GITBOX.showMs after the push / pull. */
+function gitSaid(R, st) {
+  const trip = st.git;
+  if (!trip || !trip.label || (trip.stopped && !R.git)) return '';
+  return R.git || vizNow() - (trip.at || 0) < GITBOX.showMs ? trip.label : '';
+}
+/* What the box's desk overlaps in its room (the arm, and dd's check against the smoking room when it lands). */
+function gitDeskOverlaps() {
+  if (!PROPS.gitDesk || !PROPS.room) return null;
+  const rm = PROJECT[PROPS.room], P = PROPS.place, G = P.git, out = [];
+  const box = (q, r) => [q[0] - r, q[0] + r, q[1] - r, q[1] + r], stand = box(G.stand, 0.5);
+  const hit = (name, a) => {
+    for (const [who, b] of [['desk', G.rect], ['stand', stand]]) if (b[0] < a[1] && b[1] > a[0] && b[2] < a[3] && b[3] > a[2]) out.push(`${who} x ${name}`);
+  };
+  hit('server', box([P.server.x, P.server.z], P.server.half));
+  for (const R of robots) if (R.def.room === PROPS.room && R.def.pos && !R.def.standing) {
+    const [px, pz] = R.def.pos, F = SEAT.foot;
+    hit(`desk ${R.def.id}`, [px - F.l, px + F.r, pz - F.b, pz + F.f]);
+  }
+  const da = doorAt(rm), dh = DOOR_W / 2 + 0.3;
+  if (rm.doors && rm.doors.left) hit('left door', [rm.x0 - 0.2, rm.x0 + 1.2, da.leftZ - dh, da.leftZ + dh]);
+  if (rm.doors && rm.doors.back) hit('back door', [da.backX - dh, da.backX + dh, rm.z0 - 0.2, rm.z0 + 1.2]);
+  if (rm.doors && rm.doors.front) hit('entrance', [da.frontX - dh, da.frontX + dh, rm.z1 - 1.2, rm.z1 + 0.2]);
+  for (const side of [0, 1]) { const p = playSpotOf(rm, side); hit(`play ${side}`, [p[0] - 0.6, p[0] + 0.6, p[1] - 0.6, p[1] + 0.6]); }
+  if (rm.tests) hit('easel', [rm.x0 + 0.15, rm.x0 + 2.15, rm.z1 - 1.5, rm.z1 - 0.3]);
+  const kw = Math.min(rm.z1 - rm.z0 - 1.4, 2.6), cz = (rm.z0 + rm.z1) / 2;
+  const kz = rm.doors && rm.doors.left ? Math.min(cz, da.leftZ - DOOR_W / 2 - 0.25 - kw / 2) : cz;
+  hit('cork board', [rm.x0 - 0.1, rm.x0 + 0.9, kz - kw / 2, kz + kw / 2]);
+  // the smoking booth and the vending machine (2.3.3, propsPlace) with the walks to them, drawn as the breaks arm draws them
+  hit('smoking booth', [P.booth.x0, P.booth.x1, P.booth.z0, P.booth.z1]);
+  hit('booth way', box(P.booth.way[0], 0.5));
+  hit('vending machine', [P.vend.x0, P.vend.x1, P.vend.z0, P.vend.z1]);
+  hit('vend customer', box(P.vend.spot, 0.5));
+  hit('vend way', box(P.vend.way[0], 0.5));
+  hit('shredder', P.shredder.box);
+  hit('shredder spot', box(P.shredder.spot, 0.5));
+  const [x0, x1, z0, z1] = G.rect;
+  return { rect: G.rect, stand: G.stand, room: [rm.x0, rm.x1, rm.z0, rm.z1], inRoom: x0 >= rm.x0 && x1 <= rm.x1 && z0 >= rm.z0 && z1 <= rm.z1, overlaps: out };
+}
 function propsTick(nowSec, dt) {
   const want = propsWanted();
   if (PROPS.room && (want !== PROPS.room || LIVE3D.rooms[PROPS.room].geo !== PROPS.geo || isDark() !== PROPS.dark)) propsClear();
@@ -2918,6 +3329,352 @@ function propsTick(nowSec, dt) {
   const nx = p.x + Math.sin(h) * step, nz = p.z + Math.cos(h) * step;
   if (propsClearAt(nx, nz)) { p.x = nx; p.z = nz; v.rotation.y = h; }
   else v.userData.heading = h + Math.PI * (0.5 + PROPS.rng());   // a bump: turn away and try again next frame
+}
+/* ---------- breaks: a cigarette in the smoking booth, a drink from the vending machine (requester, 10-19) ----------
+   「セッションが少ない時には部屋の隅っこに喫煙室作って待機中の時にたまにタバコ吸うようにして。これはbot１対でもやるし複数でもやる」,
+   「部屋のbotが少ない時は自販機も設置して。たまにそこに行って飲み物を飲むパターンも追加で」, placement (10-19):
+   「喫煙所は左上端、自販機はウォーターサーバーの横がいいかな」.
+   Where (propsPlace; built with the room's other props, so only in the one-room view of a room with PROPS.max robots or
+   fewer, and never on the floor or in the building):
+   - the booth: the back-left corner (the top left of the usual view), BOOTH.w by BOOTH.d, its door in the front glass.
+     The one-room view keeps that corner free of desks (SEAT_SOLO.left, 30-source-live.js).
+   - the water server: the back-right corner, as before; the vending machine beside it on its left, facing the front.
+     A room with a back door (near the right, doorAt) keeps the door's apron clear: the two stand BACK_DOOR_APRON in
+     front of the back wall, still on the right. (The server's old place in such a room, the back-left corner, is the
+     booth's now.) SEAT_SOLO.right keeps the machine's customer clear of the desks.
+   Looks only, like play: the server, the panel's state and the lamp still say 待機. Once a second a main robot in that
+   room, idle for PLAY.idleMs or more and not at play, a nap or a bento, may go (BRK.p per kind; a second smoker joins
+   one already in the booth with BRK.joinP). At most BOOTH.seats in the booth and one at the machine; none in a room
+   with standing robots (as play). Anything that stops a game stops a break at once (playStopReason: an instruction,
+   a call, another state, leaving, another room), and so do the props going away or the room laid out again; it walks
+   back with its real lamp (playBack), or jumps to its desk when the room was laid out again. None under reduced motion
+   (as play). The e2e build can shorten the times (80-dbg.js). */
+const BOOTH = { w: 2.6, d: 2.0, h: 2.3, door: 1.0, seats: 2 };
+// taller than a robot, as a real one is than a person (requester, 10-19: 「自販機が小さい 人よりは背が高いのが普通でしょ」);
+// the robots stand about 2.1 with the antenna (the e2e measures both)
+const VEND = { w: 1.2, d: 0.9, h: 2.5 };
+const BACK_DOOR_APRON = 1.3;
+function propsPlace(r) {
+  const backDoor = !!(r.doors && r.doors.back), zb = r.z0 + (backDoor ? BACK_DOOR_APRON : 0);
+  const booth = { x0: r.x0, x1: r.x0 + BOOTH.w, z0: r.z0, z1: r.z0 + BOOTH.d };
+  const bx = (booth.x0 + booth.x1) / 2;
+  booth.ashtray = [bx, r.z0 + 0.6];
+  booth.spots = [[booth.x0 + 0.6, r.z0 + 0.95, Math.PI / 2], [booth.x1 - 0.6, r.z0 + 0.95, -Math.PI / 2]];   // facing each other over the ashtray
+  booth.way = [[bx, booth.z1 + 0.7], [bx, booth.z1 - 0.4]];   // in front of the door, then just inside it
+  const server = { x: r.x1 - 0.42 * PROPS.serverScale, z: zb + 0.38 * PROPS.serverScale, ry: -Math.PI / 4, half: 0.55 };   // its footprint, turned
+  const vx1 = server.x - server.half - 0.1;
+  const vend = { x0: vx1 - VEND.w, x1: vx1, z0: zb + 0.05, z1: zb + 0.05 + VEND.d };
+  vend.cx = (vend.x0 + vend.x1) / 2;
+  vend.spot = [vend.cx, vend.z1 + 0.55, Math.PI];   // in front of it, facing it
+  vend.way = [[vend.cx, vend.z1 + 1.3]];              // from the front: never round its corner
+  return { booth, server, vend, backDoor, git: gitDeskSpot(r), shredder: shredderSpot(r) };   // the git box's desk (2.3.4, GITBOX) and the shredder (10-19)   // the git box's desk (2.3.4, GITBOX)
+}
+function signTexture(text, bg, ink, w = 256, h = 96) {
+  const cv = makeCanvas(w, h), ctx = cv.getContext('2d');
+  ctx.fillStyle = bg; rr(ctx, 0, 0, w, h, 14); ctx.fill();
+  ctx.fillStyle = ink; ctx.font = `${Math.round(h * 0.5)}px ${FONT_DISPLAY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, w / 2, h / 2 + 2);
+  return texFrom(cv);
+}
+function boothBuild(B) {
+  const g = new THREE.Group(), w = B.x1 - B.x0, d = B.z1 - B.z0, h = BOOTH.h, t = 0.06, fz = B.z1, rx = B.x1, dx = (B.x0 + B.x1) / 2, half = BOOTH.door / 2;
+  const metal = toon('#4a515c');
+  const glass = new THREE.MeshBasicMaterial({ color: 0xbfe6f5, transparent: true, opacity: 0.2, depthWrite: false, side: THREE.DoubleSide });
+  const base = new THREE.Mesh(new THREE.BoxGeometry(w, 0.04, d), toon('#9aa1ab')); base.position.set(dx, 0.02, B.z0 + d / 2); g.add(base);
+  const bar = (bw, bh, bd, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, bd), metal); m.position.set(x, y, z); g.add(m); };
+  const pane = (pw, ph, x, y, z, ry) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(pw, ph), glass); m.position.set(x, y, z); m.rotation.y = ry; g.add(m); };
+  for (const [x, z] of [[B.x0 + t / 2, fz - t / 2], [rx - t / 2, fz - t / 2], [rx - t / 2, B.z0 + t / 2], [dx - half, fz - t / 2], [dx + half, fz - t / 2]]) bar(t, h, t, x, h / 2, z);
+  bar(w, t, t, dx, h, fz - t / 2); bar(w, t, t, dx, h, B.z0 + t / 2); bar(t, t, d, rx - t / 2, h, B.z0 + d / 2); bar(t, t, d, B.x0 + t / 2, h, B.z0 + d / 2);
+  bar(BOOTH.door, t, t, dx, 1.95, fz - t / 2);   // over the door
+  const lw = dx - half - B.x0, rw = rx - dx - half;
+  pane(lw, h, B.x0 + lw / 2, h / 2, fz - 0.03, 0); pane(rw, h, dx + half + rw / 2, h / 2, fz - 0.03, 0); pane(BOOTH.door, h - 1.95, dx, (h + 1.95) / 2, fz - 0.03, 0);
+  pane(d, h, rx - 0.03, h / 2, B.z0 + d / 2, Math.PI / 2);
+  const roof = new THREE.Mesh(new THREE.PlaneGeometry(w, d), glass); roof.rotation.x = -Math.PI / 2; roof.position.set(dx, h, B.z0 + d / 2); g.add(roof);   // glass: the view from above sees in
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 0.34), new THREE.MeshBasicMaterial({ map: signTexture('喫煙室', '#2b3340', '#ffffff'), toneMapped: false }));
+  sign.position.set(dx, (h + 1.95) / 2, fz + 0.01); g.add(sign);
+  // the ventilation fan on the back wall inside, turning (BRK's tick turns it)
+  const fan = new THREE.Group(); fan.position.set(dx, 1.85, B.z0 + 0.06); g.add(fan);
+  const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.07, 24, 1, true), toon('#d7dce3', { side: THREE.DoubleSide })); ring.rotation.x = Math.PI / 2; fan.add(ring);
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.08, 12), toon('#3a3f47')); hub.rotation.x = Math.PI / 2; fan.add(hub);
+  const blades = new THREE.Group(); fan.add(blades);
+  for (let k = 0; k < 3; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.08, 0.012), toon('#7d8794')); b.position.set(Math.cos(k * 2.094) * 0.13, Math.sin(k * 2.094) * 0.13, 0); b.rotation.z = k * 2.094; blades.add(b); }
+  PROPS.fan = blades;
+  // the ashtray stand between the two spots
+  const [ax, az] = B.ashtray;
+  const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.03, 20), metal); foot.position.set(ax, 0.055, az); g.add(foot);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.8, 10), metal); pole.position.set(ax, 0.45, az); g.add(pole);
+  const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.13, 0.08, 20), toon('#aab3bd')); bowl.position.set(ax, 0.88, az); g.add(bowl);
+  const sand = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.01, 20), toon('#d8cfb8')); sand.position.set(ax, 0.92, az); g.add(sand);
+  // the smoke: a fixed pool of soft sprites (BRK.puffs), nothing made while it runs; grey on the light wall, pale on the dark one
+  const cv = makeCanvas(64, 64), ctx = cv.getContext('2d'), grd = ctx.createRadialGradient(32, 32, 2, 32, 32, 31);
+  grd.addColorStop(0, 'rgba(255,255,255,1)'); grd.addColorStop(0.55, 'rgba(255,255,255,0.8)'); grd.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = grd; ctx.fillRect(0, 0, 64, 64);
+  const puffTex = texFrom(cv);
+  PROPS.smoke = [];
+  for (let k = 0; k < BRK.puffs; k++) {
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: puffTex, color: PROPS.dark ? 0xd9dee5 : 0x8f98a3, transparent: true, opacity: 0, depthWrite: false }));
+    s.visible = false; s.renderOrder = 4; g.add(s);
+    PROPS.smoke.push({ s, age: 0, life: 1, size: 0.1, alpha: 0, vx: 0, vy: 0, vz: 0 });
+  }
+  return g;
+}
+function vendTexture() {
+  const W = 256, H = 576, cv = makeCanvas(W, H), ctx = cv.getContext('2d');
+  ctx.fillStyle = '#f6f8fb'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#d8343c'; ctx.fillRect(0, 0, W, 64);
+  ctx.fillStyle = '#ffffff'; ctx.font = `34px ${FONT_DISPLAY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('のみもの', W / 2, 34);
+  const colors = [['#1c2440', '#b6f03c'], ['#2f7fd1', '#ffffff'], ['#e8554e', '#fff3bf'], ['#2e9e5b', '#e1f1ef'], ['#7a4a2a', '#f3e6d4'], ['#f2b632', '#3b2410']];
+  for (let row = 0; row < 3; row++) {
+    const y = 84 + row * 128;
+    ctx.fillStyle = '#e3eaf4'; ctx.fillRect(14, y, W - 28, 92);
+    for (let k = 0; k < 4; k++) {
+      const [body, band] = colors[(row * 4 + k) % colors.length], x = 24 + k * 56;
+      rr(ctx, x, y + 10, 40, 74, 8); ctx.fillStyle = body; ctx.fill();
+      ctx.fillStyle = band; ctx.fillRect(x, y + 36, 40, 16);
+      ctx.fillStyle = '#41505f'; ctx.fillRect(x + 4, y + 98, 32, 12);   // the price
+      ctx.fillStyle = '#ff5a4f'; ctx.beginPath(); ctx.arc(x + 20, y + 120, 5, 0, Math.PI * 2); ctx.fill();   // the button
+    }
+  }
+  ctx.fillStyle = '#2b3340'; ctx.fillRect(W - 62, 470, 30, 44);   // the coin slot
+  ctx.fillStyle = '#cfd6df'; ctx.fillRect(W - 54, 478, 14, 28);
+  return texFrom(cv);
+}
+function vendBuild(V) {
+  const g = new THREE.Group(), cz = (V.z0 + V.z1) / 2;
+  const body = new THREE.Mesh(new RoundedBoxGeometry(VEND.w, VEND.h, VEND.d, 2, 0.04), toon('#d8343c')); body.position.set(V.cx, VEND.h / 2, cz); g.add(body);
+  const ph = VEND.h - 0.55, pw = Math.min(VEND.w - 0.12, ph * 256 / 576);   // the texture's shape, a red frame round it
+  const panel = new THREE.Mesh(new THREE.PlaneGeometry(pw, ph), new THREE.MeshBasicMaterial({ map: vendTexture(), toneMapped: false }));
+  panel.position.set(V.cx, 0.42 + ph / 2, V.z1 + 0.006); g.add(panel);   // lit: no light needed
+  const slot = new THREE.Mesh(new THREE.BoxGeometry(VEND.w - 0.3, 0.2, 0.04), toon('#1f242c')); slot.position.set(V.cx, 0.22, V.z1 + 0.01); g.add(slot);
+  return g;
+}
+const BRK_TAG_TEXT = { smoke: 'タバコ休憩', vend: '飲み物を買いに' };
+const BRK = { seed: 20261021, kinds: ['smoke', 'vend'], p: { smoke: 1 / 40, vend: 1 / 40 }, joinP: 1 / 6, smokeMinSec: 20, smokeMaxSec: 40,
+  buySec: 2.4, drinkMinSec: 8, drinkMaxSec: 16, restMinSec: 60, restMaxSec: 180, walkSec: 30, puffs: 10, next: 0, last: 0, rng: null, ends: [] };
+const brkTagText = (R) => (R.brk ? BRK_TAG_TEXT[R.brk.kind] || '' : '');
+function brkPanelText(id) { const R = robots.find((x) => x.def.id === id); return R ? brkTagText(R) : ''; }   // the robot card (50-panel.js)
+const brkCap = (kind) => (kind === 'smoke' ? BOOTH.seats : 1);
+const rectOf = (rm) => `${rm.x0},${rm.z0},${rm.x1},${rm.z1}`;
+function brkStart(R, kind, slot, nowSec) {
+  const P = PROPS.place, st = robotState[R.def.id];
+  const len = kind === 'smoke' ? BRK.smokeMinSec + BRK.rng() * (BRK.smokeMaxSec - BRK.smokeMinSec)
+    : BRK.buySec + BRK.drinkMinSec + BRK.rng() * (BRK.drinkMaxSec - BRK.drinkMinSec);
+  const spot = kind === 'smoke' ? P.booth.spots[slot] : P.vend.spot, way = kind === 'smoke' ? P.booth.way : P.vend.way;
+  R.brk = { kind, slot, room: R.def.room, rect: rectOf(PROJECT[R.def.room]), since: st.since, phase: 'going', spot, way, len, t0: 0, until: 0, walkUntil: nowSec + BRK.walkSec };
+  if (R.robot.gesture) endGesture(R.robot);
+  R.path = [...way.map((q) => [q[0], q[1]]), [spot[0], spot[1]]];
+  R.restUntil = nowSec + BRK.walkSec + len + BRK.restMinSec + BRK.rng() * (BRK.restMaxSec - BRK.restMinSec);
+}
+function brkStop(R, reason, nowSec) {
+  const B = R.brk;
+  BRK.ends.push({ room: B.room, kind: B.kind, who: R.def.id, reason, atSec: B.t0 ? +(nowSec - B.t0).toFixed(1) : 0 });
+  if (BRK.ends.length > 30) BRK.ends.shift();
+  // the way points it has passed, back out the same way (out of the booth's door, round the front of the machine)
+  const reached = Math.min(B.way.length, B.way.length + 1 - R.path.length);
+  R.brk = null; R.robot.brk = null;
+  if (!robots.includes(R) || !R.def.pos) return;
+  const root = R.robot.root;
+  if (reason === 'relaid') {   // its room was laid out again (back to the floor, a bigger room): a jump to its desk, as livePlan's
+    root.position.x = R.def.pos[0]; root.position.z = R.def.pos[1]; R.path = []; R.jumps = (R.jumps || 0) + 1;
+    return;
+  }
+  const out = B.way.slice(0, Math.max(0, reached)).reverse().map((q) => [q[0], q[1]]);
+  const from = roomAtPoint([root.position.x, root.position.z]);
+  R.playBack = true;   // walking back: the real state's lamp, no papers (as from play)
+  if (R.robot.desk) R.robot.desk.visible = false;
+  R.path = from && from !== R.def.room ? [...out, ...liveRoute(from, R.def.room), R.def.pos] : [...out, R.def.pos];   // never through a wall
+}
+function brkAt(R, dt) {
+  const B = R.brk, root = R.robot.root;
+  if (R.robot.desk) R.robot.desk.visible = false;
+  if (B.phase === 'going') B.phase = 'at';
+  // bought: it turns round to the room with the can (its back hid the can and the machine's panel from the usual view)
+  const ry = B.kind === 'vend' && R.robot.brkHandKind === 'vend' ? 0 : B.spot[2];
+  const turn = ((ry - root.rotation.y) % (Math.PI * 2) + Math.PI * 3) % (Math.PI * 2) - Math.PI;   // the short way round
+  root.rotation.y += turn * Math.min(1, dt * 6);
+  return 'playing';
+}
+function brkTick(nowSec, now) {
+  if (!BRK.rng) BRK.rng = snackRandom(BRK.seed);
+  // stop at once: every frame
+  for (const R of robots) {
+    const B = R.brk;
+    if (!B) continue;
+    const st = robotState[R.def.id] || { state: 'idle' }, rm = PROJECT[B.room];
+    const reason = playStopReason(R, st, B.room, B.since) || (!rm || !rm.shown || rectOf(rm) !== B.rect ? 'relaid' : null) || (PROPS.room !== B.room ? 'props' : null)
+      || (B.phase === 'going' && nowSec >= B.walkUntil ? 'walk too long' : null) || (B.t0 && nowSec >= B.until ? 'done' : null);
+    if (reason) { brkStop(R, reason, nowSec); continue; }
+    if (B.phase === 'at' && !B.t0) { B.t0 = nowSec; B.until = nowSec + B.len; R.robot.brk = { kind: B.kind, t0: nowSec, buySec: BRK.buySec }; }
+  }
+  brkSmoke(nowSec);
+  if (reduceMotion || nowSec < BRK.next) return;
+  BRK.next = nowSec + 1;
+  const room = PROPS.room;
+  if (!room || !PROPS.place || robots.some((R) => R.def.room === room && R.def.standing)) return;
+  const here = robots.filter((R) => R.def.room === room);
+  for (const R of here) {
+    const st = robotState[R.def.id];
+    if (!st || !playIdle(R, st, now) || (R.restUntil || 0) > nowSec) continue;
+    for (const kind of BRK.kinds) {
+      const on = here.filter((x) => x.brk && x.brk.kind === kind);
+      if (on.length >= brkCap(kind)) continue;
+      if (BRK.rng() >= (kind === 'smoke' && on.length ? BRK.joinP : BRK.p[kind])) continue;
+      const used = new Set(on.map((x) => x.brk.slot));
+      brkStart(R, kind, kind === 'smoke' ? [0, 1].find((k) => !used.has(k)) : 0, nowSec);
+      break;
+    }
+  }
+}
+/* The smoke: from the cigarette's tip now and then, and out of the mouth after each puff (brkPuff); each sprite rises,
+   grows and fades. Never more than BRK.puffs at once (a free sprite or none). */
+const brkV = new THREE.Vector3();
+function brkSmoke(nowSec) {
+  const dt = Math.max(0, Math.min(0.1, nowSec - (BRK.last || nowSec)));
+  BRK.last = nowSec;
+  if (PROPS.fan && !reduceMotion) PROPS.fan.rotation.z += dt * 7;
+  const pool = PROPS.smoke;
+  if (!pool.length) return;
+  for (const q of pool) {
+    if (!q.s.visible) continue;
+    q.age += dt;
+    if (q.age >= q.life) { q.s.visible = false; continue; }
+    const k = q.age / q.life;
+    q.s.position.x += q.vx * dt; q.s.position.y += q.vy * dt; q.s.position.z += q.vz * dt;
+    q.s.scale.setScalar(q.size * (1 + k * 1.2));
+    q.s.material.opacity = q.alpha * (1 - k);
+  }
+  if (reduceMotion) return;
+  for (const R of robots) {
+    const B = R.robot.brk, hand = R.robot.brkHand;
+    if (!B || B.kind !== 'smoke' || !hand || R.robot.call) continue;
+    const c = (nowSec - B.t0) % BRK_PUFF_SEC, exhale = c >= 2.3 && c < 3.3;
+    if (nowSec - (R.puffAt || 0) < (exhale ? 0.22 : 0.6)) continue;
+    const q = pool.find((x) => !x.s.visible);
+    if (!q) continue;
+    R.puffAt = nowSec;
+    const ry = R.robot.root.rotation.y, fw = exhale ? 0.25 : 0.03;
+    if (exhale) { R.robot.head.getWorldPosition(brkV); brkV.x += Math.sin(ry) * 0.7; brkV.z += Math.cos(ry) * 0.7; brkV.y += 0.3; }   // in front of the face (HEAD.d)
+    else hand.userData.tip.getWorldPosition(brkV);
+    Object.assign(q, { age: 0, life: exhale ? 2.8 : 2.2, size: exhale ? 0.8 : 0.4, alpha: exhale ? 0.95 : 0.8,
+      vx: Math.sin(ry) * fw + (BRK.rng() - 0.5) * 0.08, vy: 0.35, vz: Math.cos(ry) * fw + (BRK.rng() - 0.5) * 0.08 });
+    q.s.position.copy(brkV); q.s.scale.setScalar(q.size); q.s.material.opacity = q.alpha; q.s.visible = true;
+  }
+}
+/* ---------- the shredder: a robot that deleted files feeds them to it (requester, 10-19) ----------
+   Claude Code deletes with Bash (rm, git rm, find -delete …); ingest reads which files from the command (robots.py
+   deletions) and gives the robot a shred. In a room up close with its props (propsWanted) the robot carries the papers
+   (a stack as thick as the count, a box for a folder) to the shredder against the back wall, feeds them, paper bits
+   fall into the bin, and it goes back to its desk; a new instruction, a call or a question ends it at once. A deletion
+   that found nothing: no errand, a puzzled tilt of the head. The name of what went is the robot's act (over its head,
+   in its card and in the log). Not seen: a script that deletes from inside, or the user by hand. */
+const SHRED = { w: 0.8, d: 0.55, h: 1.1, bitsMax: 24, feedSec: 1.2, bitsSec: 2.0, doneSec: 3.6, tiltSec: 1.6, labelMs: 8000, every: 0.07, scale: 1.35, waitSec: 15 };   // built at 1, shown at the robots' size (as the other props)
+// where it stands (pure: propsPlace's row, so the breaks arm's 12 room configs see it next to the booth, the machine
+// and the git box's desk; 2.3.4)
+function shredderSpot(r) {
+  const k = SHRED.scale, W = SHRED.w * k, D = SHRED.d * k;
+  const cx = (r.x0 + r.x1) / 2, x = Math.min(cx + 1.6, r.x1 - SEAT.aisleR - W), z = r.z0 + 0.12 + D / 2;
+  // the feeder's spot 0.1 in front of the machine's middle: as the arms draw it (0.5 round it) it ends at z0 + 1.09, short of
+  // the back row of desks (z0 + SEAT.back); + 0.2 reached 0.09 into it (docs/bugs/2026-10-19-jui-viz-shredder-spot-in-desk-zone.md)
+  return { x, z, k, spot: [x - W / 2 - 0.45, z + 0.1], box: [x - W / 2, x + W / 2, z - D / 2, z + D / 2] };
+}
+function shredderBuild(r, g) {
+  const k = SHRED.scale, W = SHRED.w * k, D = SHRED.d * k;
+  const { x, z, spot } = shredderSpot(r);
+  const sg = new THREE.Group(), body = toon('#4a515c'), lid = toon('#6b7480'), bin = toon('#c7cdd6');
+  const box = new THREE.Mesh(new RoundedBoxGeometry(SHRED.w, SHRED.h - 0.08, SHRED.d, 2, 0.03), body); box.position.y = (SHRED.h - 0.08) / 2; sg.add(box);
+  const top = new THREE.Mesh(new RoundedBoxGeometry(SHRED.w + 0.02, 0.08, SHRED.d + 0.02, 2, 0.02), lid); top.position.y = SHRED.h - 0.04; sg.add(top);
+  const slot = new THREE.Mesh(new THREE.BoxGeometry(SHRED.w * 0.7, 0.012, 0.03), toon('#1d2127')); slot.position.set(0, SHRED.h + 0.001, 0.02); sg.add(slot);
+  const pane = new THREE.Mesh(new THREE.PlaneGeometry(SHRED.w * 0.72, SHRED.h * 0.42), bin); pane.position.set(0, SHRED.h * 0.3, SHRED.d / 2 + 0.002); sg.add(pane);
+  const led = new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), toon('#52e08a')); led.position.set(SHRED.w * 0.36, SHRED.h - 0.04, SHRED.d / 2 + 0.01); sg.add(led);
+  sg.position.set(x, 0, z); sg.scale.setScalar(k); g.add(sg);
+  const bit = { geo: new THREE.PlaneGeometry(0.07, 0.022), mat: toon('#ffffff', { side: THREE.DoubleSide }) };
+  // the robot stands at its left side, so the usual view from the front sees the machine and the bits (in front of
+  // it, the robot hid both, 10-19)
+  return { group: sg, x, z, k, spot, box: [x - W / 2, x + W / 2, z - D / 2, z + D / 2], bit, led };
+}
+function shredHeld(folder, count) {
+  if (folder) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.26, 0.26), toon('#b98a56'));
+    m.position.set(0, 0.58, 0.34); return m;
+  }
+  const t = 0.012 * Math.min(12, Math.max(1, count));   // as thick as the count, up to a dozen sheets' worth
+  const m = new THREE.Mesh(new THREE.BoxGeometry(0.24, t, 0.32), toon('#fbfaf6'));
+  m.position.set(0, 0.6, 0.34); return m;
+}
+function shredTick(R, st, nowSec) {
+  const sh = st.shred;
+  if (sh && sh.at !== R.shredAt) {
+    const first = R.shredAt === undefined;
+    R.shredAt = sh.at;
+    if (first && vizNow() - sh.at > 30_000) return;   // a deletion from before the page opened: not acted out now
+    if (!sh.ok) { R.tiltUntil = nowSec + SHRED.tiltSec; return; }
+    // only with a shredder in its room now: a deletion seen on the floor view is not acted out on coming up close
+    if (PROPS.shredder && PROPS.room === R.def.room) {
+      R.shredPending = { sh, until: nowSec + SHRED.waitSec };
+      // A deletion is work, and work ends a break, a game or a nap. Most are ended already (playTick / brkTick, earlier
+      // in the frame, see the new since), but one begun this very frame took that since and would hold the errand:
+      // it ends here. A git trip is not ended: the errand waits for it (gitTick).
+      if (R.brk) brkStop(R, 'shred', nowSec);
+      if (R.play) playStop(R);
+      if (R.solo) { PLAY.ends.push({ room: R.solo.room, kind: R.solo.kind, players: [R.def.id], reason: 'shred', playedSec: +(nowSec - R.solo.t0).toFixed(1) }); soloStop(R); }
+    }
+  }
+  const want = R.shredPending;
+  if (want && nowSec > want.until) R.shredPending = null;
+  const P = PROPS.shredder;
+  // It goes when nothing else holds it. A break, a game or a nap is never under way here: the deletion ended it above,
+  // and none starts while the errand waits, for what holds it (a git trip, an errand, a call) keeps playIdle false too.
+  // It goes straight from the walk back from one. A git trip (2.3.4) holds it: it waits, up to SHRED.waitSec.
+  if (R.shredPending && P && PROPS.room === R.def.room && R.robot.root.visible && !R.shred && !R.git
+      && !LIVE.leaving[R.def.id] && !R.robot.call && (st.promptAt || 0) <= want.sh.at) {
+    const s0 = R.shredPending.sh;
+    R.shredPending = null; R.playBack = false;
+    R.shred = { phase: 'going', at: s0.at, t0: 0, held: shredHeld(s0.folder, s0.count), count: s0.count };
+    R.robot.root.add(R.shred.held);
+    const p = R.robot.root.position, from = roomAtPoint([p.x, p.z]);
+    R.path = from && from !== R.def.room ? [...liveRoute(from, R.def.room), P.spot] : [P.spot];
+  }
+  // stop at once: a new instruction (promptAt after the deletion), a tool, a wait or a question (any state but idle and
+  // done), a call, leaving. The turn ending (done, and back to idle 3 s later) is not one: a deletion is often the last
+  // thing a turn does, so the errand goes on through it.
+  if (R.shred && ((st.state !== 'idle' && st.state !== 'done') || (st.promptAt || 0) > R.shred.at || R.robot.call || LIVE.leaving[R.def.id])) shredStop(R);
+}
+function shredAt(R, nowSec) {
+  const S0 = R.shred;
+  if (!S0) return;
+  if (!S0.t0) { S0.t0 = nowSec; S0.phase = 'feeding'; }
+  const t = nowSec - S0.t0;
+  if (S0.held) {   // fed into the slot: forward and down, then gone
+    const k = Math.min(1, t / SHRED.feedSec);
+    S0.held.position.z = 0.34 + 0.18 * k; S0.held.position.y = 0.6 + 0.3 * k; S0.held.scale.z = Math.max(0.02, 1 - k);
+    if (k >= 1) { R.robot.root.remove(S0.held); S0.held.geometry.dispose(); S0.held.material.dispose(); S0.held = null; }
+  }
+  const P = PROPS.shredder;
+  if (P && !reduceMotion && t > 0.4 && t < SHRED.feedSec + SHRED.bitsSec && PROPS.bits.length < SHRED.bitsMax && t - (S0.lastBit || 0) >= SHRED.every) {
+    S0.lastBit = t;
+    const m = new THREE.Mesh(P.bit.geo, P.bit.mat);
+    m.position.set(P.x + (Math.random() - 0.5) * SHRED.w * P.k * 0.6, SHRED.h * P.k * 0.5, P.z + SHRED.d * P.k / 2 + 0.01);
+    m.rotation.set(0, 0, Math.random() * Math.PI);
+    m.userData.v = -0.18 - Math.random() * 0.14;
+    PROPS.group.add(m); PROPS.bits.push(m);
+  }
+  if (P) P.led.material.color.set(t < SHRED.feedSec + SHRED.bitsSec ? '#ff9b3d' : '#52e08a');
+  if (t >= SHRED.doneSec) shredStop(R);
+}
+function shredStop(R) {
+  const S0 = R.shred;
+  if (!S0) return;
+  if (S0.held) { R.robot.root.remove(S0.held); S0.held.geometry.dispose(); S0.held.material.dispose(); }
+  if (PROPS.shredder) PROPS.shredder.led.material.color.set('#52e08a');
+  R.shred = null; R.playBack = true;
+  const p = R.robot.root.position, from = roomAtPoint([p.x, p.z]);
+  R.path = from && from !== R.def.room ? [...liveRoute(from, R.def.room), R.def.pos] : [R.def.pos];
+}
+function shredBits(nowSec, dt) {   // the bits fall into the bin behind its window and are gone
+  for (const m of [...(PROPS.bits || [])]) {
+    m.position.y += m.userData.v * Math.min(dt, 0.1); m.rotation.z += 3 * Math.min(dt, 0.1);
+    if (m.position.y < 0.06) { PROPS.group.remove(m); PROPS.bits.splice(PROPS.bits.indexOf(m), 1); }
+  }
 }
 /* A board press in the live office: the project board opens that project's spec board (overview), its lower
    part and the cork board the task board, a robot its card. */
@@ -3307,11 +4064,20 @@ function towerFacade(F, k, P) {
       ctx.setLineDash([14, 10]); ctx.strokeStyle = P.soft; ctx.lineWidth = 4; ctx.strokeRect(x + 10, gy + 10, w - 20, WIN_BOTTOM - gy - 20); ctx.setLineDash([]);
     }
     if (state === 'waiting') { ctx.strokeStyle = P.warn; ctx.lineWidth = 12; ctx.globalAlpha = 0.5 + 0.5 * TOWER.pulse; ctx.strokeRect(x + 6, WIN_TOP + 6, w - 12, WIN_BOTTOM - WIN_TOP - 12); ctx.globalAlpha = 1; }
+    const play = id && SOURCE.mode === 'live' ? playRoomText(id) : '';   // a game in the room (2.3.3): its name at the window's foot
+    if (play) {
+      let size = 32; ctx.font = `700 ${size}px ${FONT_BODY}`;
+      while (ctx.measureText(play).width > w - 40 && size > 14) { size -= 2; ctx.font = `700 ${size}px ${FONT_BODY}`; }
+      const pw = ctx.measureText(play).width + 28;
+      ctx.fillStyle = P.panel; ctx.beginPath(); ctx.roundRect(x + (w - pw) / 2, WIN_BOTTOM - 58, pw, size + 22, 12); ctx.fill();
+      ctx.strokeStyle = P.ink; ctx.lineWidth = 3; ctx.stroke();
+      ctx.fillStyle = P.ink; ctx.textAlign = 'center'; ctx.fillText(play, x + w / 2, WIN_BOTTOM - 58 + size + 8);
+    }
     // the name band
     ctx.fillStyle = id ? P.ink : P.soft; ctx.textAlign = 'center';
     const fit = id ? towerNameFit(ctx, towerName(id), w - 8) : (ctx.font = `700 30px ${FONT_BODY}`, { size: 30, lines: ['—'] });
     fit.lines.forEach((ln, j) => ctx.fillText(ln, x + w / 2, NAME_TOP + 30 + j * (fit.size + 10)));
-    F.bays.push({ x0: x / W, x1: (x + w) / W, gy0: gy / H, gy1: WIN_BOTTOM / H, id, state });
+    F.bays.push({ x0: x / W, x1: (x + w) / W, gy0: gy / H, gy1: WIN_BOTTOM / H, id, state, play });
   });
   const sx = W - STATS + 18;
   ctx.fillStyle = P.chip; ctx.beginPath(); ctx.roundRect(sx - 8, 22, STATS - 36, H - 44, 20); ctx.fill();
@@ -3503,7 +4269,8 @@ function towerSync(now = performance.now()) {
   towerBuild();
   const waits = LIVE.floors.some((f) => f.some((id) => LIVE.rank[id] === 0));
   const pulse = waits && !reduceMotion ? Math.round((0.5 + 0.5 * Math.sin(now / 160)) * 4) / 4 : 1;   // a waiting window's frame
-  const sig = JSON.stringify([LIVE.floors, LIVE.rank, TOWER.floors.map((F, k) => towerFloorText(k)).map((t) => [t.working, t.waiting, t.idle])]);
+  const sig = JSON.stringify([LIVE.floors, LIVE.rank, TOWER.floors.map((F, k) => towerFloorText(k)).map((t) => [t.working, t.waiting, t.idle]),
+    SOURCE.mode === 'live' ? PLAY.list.map((G) => [G.room, G.kind, !!G.t0]) : []]);   // a game's name on its window (2.3.3)
   if (sig === TOWER.sig && pulse === TOWER.pulse) return;
   const P = towerPalette(), all = sig !== TOWER.sig;
   TOWER.sig = sig; TOWER.pulse = pulse;
@@ -3672,6 +4439,47 @@ function placeTag(el, p) {
   const x = ((tmpV.x + 1) / 2) * canvas.clientWidth, y = ((1 - tmpV.y) / 2) * canvas.clientHeight;
   el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -100%)`;
 }
+/* Robots' name tags kept apart on screen (10-19): two robots close by (at play, in the smoking booth, at desks side
+   by side) put their tags on each other and the one behind could not be read. Each frame, nearest first, a tag that
+   would cross one already placed moves up just above it; the move eases (no flicker when the order swaps). Sizes
+   are read again only when the text changes or every TAGS.measureMs, all reads before all writes (one layout). A
+   robot showing じゃんけん lifts its tag clear of the hand. Cost per frame: TAGS.stats (the e2e reads it). */
+const TAGS = { gap: 3, ease: 0.35, measureMs: 500, maxPasses: 12, rpsLift: 0.55, stats: { n: 0, sumMs: 0, maxMs: 0, frames: 0 } };
+const tagNdc = new THREE.Vector3();
+function placeRobotTags() {
+  const t0 = performance.now(), W = canvas.clientWidth, H = canvas.clientHeight, list = [];
+  for (const R of robots) {
+    tagNdc.copy(R.robot.root.position).add(TAG_UP);
+    if (R.robot.rps && R.robot.rps.visible) tagNdc.y += TAGS.rpsLift;
+    tagNdc.project(camera);
+    const hidden = tagNdc.z > 1 || tagNdc.z < -1 || !R.robot.root.visible || R.tag.hidden;
+    const text = R.tag.textContent;
+    if (!hidden && (!R.tagSize || R.tagSize.text !== text || t0 - R.tagSize.at > TAGS.measureMs)) R.tagSize = { text, at: t0, w: R.tag.offsetWidth, h: R.tag.offsetHeight };
+    list.push({ R, hidden, x: ((tagNdc.x + 1) / 2) * W, y: ((1 - tagNdc.y) / 2) * H, z: tagNdc.z });
+  }
+  const placed = [];
+  for (const it of list.filter((q) => !q.hidden).sort((a, b) => a.z - b.z)) {   // nearest first: it keeps its spot
+    const { w, h } = it.R.tagSize, x0 = it.x - w / 2, x1 = it.x + w / 2;
+    let bottom = it.y;
+    for (let pass = 0; pass < TAGS.maxPasses; pass++) {
+      const hit = placed.find((p) => x0 < p.x1 && p.x0 < x1 && bottom - h < p.y1 && p.y0 < bottom);
+      if (!hit) break;
+      bottom = hit.y0 - TAGS.gap;   // just above the one it crossed
+    }
+    placed.push({ x0, x1, y0: bottom - h, y1: bottom });
+    it.target = it.y - bottom;
+  }
+  for (const it of list) {   // the writes
+    const el = it.R.tag;
+    if (it.hidden) { el.style.visibility = 'hidden'; it.R.tagDy = 0; continue; }
+    el.style.visibility = 'visible';
+    const dy = it.R.tagDy === undefined ? it.target : it.R.tagDy + (it.target - it.R.tagDy) * TAGS.ease;
+    it.R.tagDy = Math.abs(dy - it.target) < 0.5 ? it.target : dy;
+    el.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - it.R.tagDy).toFixed(1)}px) translate(-50%, -100%)`;
+  }
+  const ms = performance.now() - t0, S0 = TAGS.stats;
+  S0.n = list.length; S0.frames++; S0.sumMs += ms; S0.maxMs = Math.max(S0.maxMs, ms);
+}
 const HEAD_UP = new THREE.Vector3(0, 2.2, 0);
 const TAG_UP = new THREE.Vector3(0, 2.62, 0);
 function robotPoint(id, up) { const R = robots.find((x) => x.def.id === id); return R.robot.root.position.clone().add(up); }
@@ -3739,7 +4547,7 @@ function update3D(model, nowSec, dt) {
   if (TOWER.on) { towerSync(); towerAnimate(nowSec, dt); }
   skySync();
   tagsEl.hidden = zoom.zoomed || TOWER.on;
-  for (const R of robots) placeTag(R.tag, tmpV.copy(R.robot.root.position).add(TAG_UP).clone());
+  placeRobotTags();
   for (const rt of roomTags) { placeTag(rt.el, rt.p); rt.el.classList.toggle('on', UI.project === rt.id); }
   if (trayTag) placeTag(trayTag.el, trayTag.p);   // the demo's document tray
 }
@@ -3778,6 +4586,8 @@ function sessionBadge(s) {
   return b.some((x) => x[0] === 'st-waiting') ? ['st-waiting', '許可待ち'] : b.some((x) => x[0] === 'st-asking') ? ['st-asking', '質問に回答待ち'] : b.some((x) => x[1] === '作業中') ? ['st-busy', '作業中']
     : b.some((x) => x[1] === '考え中') ? ['st-busy', '考え中'] : b.some((x) => x[0] === 'st-bg') ? ['st-bg', '裏で作業中'] : ['st-idle', '待機'];
 }
+/* A robot on the whiteboards (10-19): its mark, and its session's name when it has one. */
+const robotWho = (id) => `${pill(id, DEF[id].role)}${DEF[id].title ? `<span class="who-name">${esc(DEF[id].title)}</span>` : ''}`;
 const roleVar = (s) => (s.by ? ` style="--c:${ROLES[DEF[s.by].role].color}"` : '');
 /* Lists of buttons are rebuilt only when their membership changes, so keyboard focus survives the
    four-times-a-second refresh; the changing text and bars inside are updated in place. */
@@ -3788,7 +4598,7 @@ function keyed(el, sig, build) {
   if (el._sig === sig) return;
   const a = document.activeElement, fk = el.contains(a) ? a.dataset.fk : undefined;
   el.innerHTML = build(); el._sig = sig; el._html = null;
-  if (fk !== undefined) { const again = el.querySelector(`[data-fk="${CSS.escape(fk)}"]`); if (again) again.focus({ preventScroll: true }); }
+  if (fk !== undefined) { const again = el.querySelector(`[data-fk="${CSS.escape(fk)}"]`); if (again) again.focus({ preventScroll: true }); else el._lostFk = fk; }
 }
 const SEGS = `<span class="segs" aria-hidden="true">${'<i></i>'.repeat(7)}</span>`;
 const SG_CLASS = { empty: 'sg-empty', writing: 'sg-writing', written: 'sg-written', impl: 'sg-impl', done: 'sg-done', test: 'sg-test', tested: 'sg-tested' };
@@ -3854,7 +4664,7 @@ function renderSessions() {
   [...sessFilterEl.children].forEach((b) => setText(b.lastElementChild, String(scoped.filter((s) => sessMatch(s, b.dataset.sf)).length)));
   // Sessions that need you come first: waiting for permission, then working, then idle.
   const groups = ROOMS.filter((r) => inScope(r.id)).map((r) => [r, scoped.filter((s) => s.project === r.id && sessMatch(s, UI.sessFilter)).sort((a, b) => SB_ORDER[sessionBadge(a)[0]] - SB_ORDER[sessionBadge(b)[0]] || a.id.localeCompare(b.id))]);
-  keyed(el, JSON.stringify([UI.project, UI.sessFilter, [...UI.collapsed], groups.map(([r, l]) => [r.id, l.map((x) => x.id)])]), () => groups.map(([r, list]) => {
+  keyed(el, JSON.stringify([UI.project, UI.sessFilter, [...UI.collapsed], groups.map(([r, l]) => [r.id, l.map((x) => x.id)]), NAMES.rev]), () => groups.map(([r, list]) => {
     const folded = UI.collapsed.has(r.id), any = scoped.some((x) => x.project === r.id);
     const itemsHTML = list.map((x) => {
       const subsHTML = x.robots.filter((id) => id !== x.id).map((id) => `<li><button type="button" class="who-btn" data-robot-open="${esc(id)}" data-fk="ss-${esc(id)}">${pill(id, DEF[id].role)}<span>${esc(DEF[id].agent)}</span></button><span class="state" data-st="${esc(id)}"></span><p class="act" data-sact="${esc(id)}"></p></li>`).join('');
@@ -3910,7 +4720,7 @@ function renderPanel(model) {
   const loose = scopedPend.filter((p) => !p.task);
   const projectTag = (list) => (UI.project === 'all' ? `<span class="ptag">${esc(PROJECT[PROJECT_OF[list]].name)}</span>` : '');
   setHTML($('task-sum'), KCOLS.map(([c, label]) => `<span class="state ${COL_STATE[c][0]}">${esc(label)} ${scopedTasks.filter((x) => x.col === c).length}</span>`).join('') + (scopedPend.length ? `<span class="state st-waiting">許可待ち ${scopedPend.length}</span>` : ''));
-  keyed($('tasks'), JSON.stringify([UI.project, loose.map(permSig), tasks.map((x) => `${x.key}:${x.col}:${permSig(x.perm)}:${x.subject}:${x.owner || ''}`)]), () => [
+  keyed($('tasks'), JSON.stringify([UI.project, NAMES.rev, loose.map(permSig), tasks.map((x) => `${x.key}:${x.col}:${permSig(x.perm)}:${x.subject}:${x.owner || ''}`)]), () => [
     ...loose.map((p) => `<li class="task has-perm perm-only"><button type="button" class="task-open" data-open="perm:${esc(p.id)}" data-fk="to-${esc(p.id)}"><span class="tid">${esc(SESSION_OF[p.who])} セッション</span><span class="subject">タスクの外で許可を求めている</span></button><span class="state st-waiting">許可待ち</span><span class="meta">${pill(p.who, DEF[p.who].role)} ${esc(DEF[p.who].agent)}${projectTag(SESSION_OF[p.who])}</span>${permBox(p)}</li>`),
     ...tasks.map((x) => {
       const [c, l] = x.perm ? ['st-waiting', '許可待ち'] : x.col === 'wait' ? [x.waitingFor === 'question' ? 'st-asking' : 'st-waiting', waitLabel(x)] : COL_STATE[x.col];
@@ -4083,7 +4893,7 @@ function renderQuestions() {
   chip.hidden = waiting === 0;
   setText(chip, `質問 ${waiting}`);
   $('questions-sec').hidden = shown.length === 0;
-  keyed($('questions'), JSON.stringify(shown.map((q) => [q.id, q.status, q.hookWaiting, q.tooLongToShow, q.waitEnded, q.released, q.sentAnswers, q.gotAnswers])), () => shown.map((q) => questionHTML(q)).join(''));
+  keyed($('questions'), JSON.stringify([NAMES.rev, ...shown.map((q) => [q.id, q.status, q.hookWaiting, q.tooLongToShow, q.waitEnded, q.released, q.sentAnswers, q.gotAnswers])]), () => shown.map((q) => questionHTML(q)).join(''));
   for (const el of $('questions').querySelectorAll('[data-quntil]')) {   // the countdown, in place (inputs keep their state)
     const q = QUESTIONS.find((x) => x.id === el.dataset.quntil);
     setText(el, q && q.waitUntil ? `あと ${Math.max(0, Math.ceil((q.waitUntil - now) / 1000))} 秒でターミナルに戻す` : '');
@@ -4437,7 +5247,44 @@ function renderWbSide(model) {
 }
 
 const SWATCHES = '<span><i class="sw sw-writing"></i>書き込み中</span><span><i class="sw sw-written"></i>記入済み</span><span><i class="sw sw-impl"></i>実装済み</span><span><i class="sw sw-tested"></i>テスト済み</span><span><i class="sw sw-empty"></i>未記入</span>';
-const OV_LEGEND = `${SWATCHES}<span>バーは左から 概要・構造・状態・データ・操作・遷移・分岐</span><span>カードを押すとその spec を開く</span>`;
+/* The explanation of 「spec の進み具合」 (2.3.4, requester 10-19: "specの進み具合の説明をボードから消してその代わりに？
+   ボタンおいて押したらモーダルで説明出して", for the panel and the overview alike: "同じで"). It used to sit under the
+   panel's heading and over the overview's cards; now both places have a 「?」 next to the heading and both open this
+   one dialog, built from this one source (the two can no longer say different things). */
+const SPEC_HELP_HTML = `<p>spec ファイルの書き込みをファイル監視で追い、今どのセクションが実装・テストされているかを relatedFiles から割り出す。</p>
+<p>バーは左から 概要・構造・状態・データ・操作・遷移・分岐 の 7 区分。色は次のとおり。</p>
+<p class="seg-legend sh-legend">${SWATCHES}</p>
+<p>右のパネルでは行を押すとホワイトボードに寄ってその spec を開く。「ボードで全部見る」の一覧では、カードを押すとその spec を開く。</p>`;
+let specHelp = null;
+function openSpecHelp(opener) {
+  closeSpecHelp(false);
+  const el = document.createElement('div');
+  el.className = 'spec-help'; el.id = 'spec-help';
+  el.innerHTML = `<div class="sh-box" role="dialog" aria-modal="true" aria-labelledby="sh-title" tabindex="-1"><div class="sh-head"><h3 id="sh-title">spec の進み具合の見かた</h3><button type="button" class="mini-btn" data-sh-close>閉じる</button></div><div class="sh-body">${SPEC_HELP_HTML}</div></div>`;
+  document.body.append(el);
+  const onKey = (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeSpecHelp(true); return; }
+    if (e.key !== 'Tab') return;
+    const box = el.querySelector('.sh-box'), list = [...box.querySelectorAll('button, [href], input, [tabindex]:not([tabindex="-1"])')];
+    const first = list[0], last = list[list.length - 1];
+    if (!box.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+    else if (e.shiftKey && (document.activeElement === first || document.activeElement === box)) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  };
+  document.addEventListener('keydown', onKey, true);   // first, so Esc closes this and not the board under it
+  el.addEventListener('click', (e) => { if (e.target === el || e.target.closest('[data-sh-close]')) closeSpecHelp(true); });
+  specHelp = { el, opener, onKey };
+  el.querySelector('[data-sh-close]').focus();
+}
+function closeSpecHelp(back) {
+  if (!specHelp) return;
+  const { el, opener, onKey } = specHelp;
+  specHelp = null; el.remove(); document.removeEventListener('keydown', onKey, true);
+  if (back && opener && document.contains(opener)) opener.focus({ preventScroll: true });
+}
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-spec-help]'); if (b) openSpecHelp(b); });
+// the overview shows the 「?」 instead of its legend; an open spec keeps its own legend (what the marks on the sheet mean)
+function wbHelpMode(overview) { $('spec-help-board').hidden = !overview; $('wb-legend').hidden = overview; }
 const SHEET_LEGEND_LIVE = '<span class="lg-writing">✎ 紫の枠 = 書き込み中</span><span class="lg-empty">点線 = 未記入</span><span><b class="m-done">✓</b> 構造: layout に在る ／ 分岐: テスト通過</span><span><b class="m-todo">○</b> 構造: layout が無い ／ 分岐: 未テスト</span><span><b class="m-test">▶</b> テスト中</span><span>状態・データ・操作・遷移は項目ごとの実装を測れないので印なし（関連ファイルの節に、在るファイルの数）</span>';
 const SHEET_LEGEND = '<span class="lg-writing">✎ 紫の枠 = 書き込み中</span><span class="lg-empty">点線 = 未記入</span><span><b class="m-done">✓</b> 実装済み・テスト済み</span><span><b class="m-doing">●</b> 実装中</span><span><b class="m-todo">○</b> 未実装・未テスト</span><span><b class="m-test">▶</b> テスト中</span><span><b class="m-flaky">⚠</b> 再実行で通過</span><span>中身はデモの例</span>';
 function setHead(title, file, stCls, stText, whoHTML) {
@@ -4464,7 +5311,7 @@ function renderOverview(model) {
   const title = `spec ボード${UI.project === 'all' ? '' : ` · ${PROJECT[UI.project].name}`}${wb.app !== 'all' && apps.length > 1 ? ` · ${appLabel(wb.app)}` : ''}`;
   setHead(title, `${where}（${inS.length} 画面）`, 'st-busy', `作業中 ${c.live} · 途中 ${c.partial} · 未着手 ${c.todo} · 完了 ${c.done}`, '');
   wbNav.hidden = true; $('wb-follow-label').hidden = true;
-  setHTML($('wb-legend'), OV_LEGEND);
+  wbHelpMode(true);
   const sig = JSON.stringify(['ov', UI.project, wb.app, model.specs.map((s) => `${s.bucket}:${s.by || ''}`)]);
   if (wbCode._sig !== sig) {
     wbCode.innerHTML = !inS.length ? `<p class="sc-ph ov-none">${esc(scopeLabel())} には画面の spec がない（CLI ツールなど）。上の「プロジェクト」で別のプロジェクトを選べる</p>` : BUCKETS.map(([b, label]) => {
@@ -4478,7 +5325,7 @@ function renderOverview(model) {
     const s = model.specs[+card.dataset.idx], st = card.querySelector('.state'), cls = `state ${STATUS_CLASS[s.status.kind]}`;
     if (st.className !== cls) st.className = cls;
     setText(st, s.status.text);
-    setHTML(card.querySelector('.ov-who'), s.by ? `${pill(s.by, DEF[s.by].role)}<span>${esc(robotState[s.by].act)}</span>` : `<span>${esc(s.note)}</span>`);
+    setHTML(card.querySelector('.ov-who'), s.by ? `${robotWho(s.by)}<span>${esc(robotState[s.by].act)}</span>` : `<span>${esc(s.note)}</span>`);
     paintSegs(card.querySelector('.segs'), s);
     setText(card.querySelector('.ov-sum'), specSummary(s));
   });
@@ -4528,9 +5375,9 @@ function renderSheet(model, force) {
   if (SOURCE.mode === 'live') {
     liveWantSheet(s);
     if (!d) {
-      setHead(s.name, s.file, STATUS_CLASS[s.status.kind], s.status.text, s.by ? pill(s.by, DEF[s.by].role) : '');
+      setHead(s.name, s.file, STATUS_CLASS[s.status.kind], s.status.text, s.by ? robotWho(s.by) : '');
       wbNav.hidden = false; $('wb-follow-label').hidden = false;
-      setHTML($('wb-legend'), SHEET_LEGEND_LIVE);
+      setHTML($('wb-legend'), SHEET_LEGEND_LIVE); wbHelpMode(false);
       renderNav(s);
       const failed = LIVE.sheetFailed[s.id];
       setHTML(wbCode, `<p class="sc-ph">${failed ? `この spec を読めなかった（${esc(failed)}）` : 'spec を読み込んでいます…'}</p>`);
@@ -4538,10 +5385,10 @@ function renderSheet(model, force) {
       return;
     }
   }
-  if (SOURCE.mode === 'live') setHead(s.name, s.file, STATUS_CLASS[s.status.kind], s.status.text, s.by ? pill(s.by, DEF[s.by].role) : '');
+  if (SOURCE.mode === 'live') setHead(s.name, s.file, STATUS_CLASS[s.status.kind], s.status.text, s.by ? robotWho(s.by) : '');
   else setHead(`${s.name}（${s.screen}）`, `docs/screens/json/${s.file}`, STATUS_CLASS[s.status.kind], s.status.text, s.by ? pill(s.by, DEF[s.by].role) : '');
   wbNav.hidden = false; $('wb-follow-label').hidden = false;
-  setHTML($('wb-legend'), SOURCE.mode === 'live' ? SHEET_LEGEND_LIVE : SHEET_LEGEND);
+  setHTML($('wb-legend'), SOURCE.mode === 'live' ? SHEET_LEGEND_LIVE : SHEET_LEGEND); wbHelpMode(false);
   renderNav(s);
   if (wbCode._sig) { wbCode._sig = null; wbCode._html = null; }
 
@@ -4674,7 +5521,7 @@ function renderTaskBoard(model) {
   setText($('tb-count'), `${tasks.length} 件`);
   setText($('tb-title'), UI.project === 'all' ? 'タスクボード' : `タスクボード · ${PROJECT[UI.project].name}`);
   stripEl.hidden = !pend.length && !alwaysRules.size && !elsewhere;
-  keyed(stripEl, JSON.stringify([pend.map(permSig), [...alwaysRules.keys()], elsewhere]), () => {
+  keyed(stripEl, JSON.stringify([NAMES.rev, pend.map(permSig), [...alwaysRules.keys()], elsewhere]), () => {
     const cardsHTML = pend.map((p) => {
       const x = p.task && TASK_BY_KEY[p.task];
       return `<li class="pcard"><div class="pc-who">${pill(p.who, DEF[p.who].role)}<span>${esc(DEF[p.who].agent)}</span><span class="pc-wait" data-since="${p.at}"></span></div><p class="pc-what"><b>${esc(p.tool)}</b> ${permSubject(p)}</p><button type="button" class="pc-task" data-open="${x ? esc(p.task) : `perm:${esc(p.id)}`}" data-fk="pt-${esc(p.id)}">${x ? `${esc(x.list)} ${esc(taskRef(x))} ${esc(x.subject)}` : `${esc(SESSION_OF[p.who])} セッション · タスクなし`} › 詳細</button><div class="perm-acts">${permButtons(p, 'p')}</div></li>`;
@@ -4696,7 +5543,7 @@ function renderTaskBoard(model) {
   };
   const sortCol = (col) => (a, b) => (b.perm ? 1 : 0) - (a.perm ? 1 : 0) || (col === 'done' ? b.end - a.end : 0) || a.list.localeCompare(b.list) || a.id - b.id;
   kanbanEl.classList.toggle('lanes', UI.lanes);
-  keyed(kanbanEl, JSON.stringify([UI.lanes, lists, KCOLS.map(([col]) => tasks.filter((x) => x.col === col).map((x) => `${x.key}:${permSig(x.perm)}:${x.fresh ? 1 : 0}:${x.subject}:${x.owner || ''}`))]), () => {
+  keyed(kanbanEl, JSON.stringify([UI.lanes, NAMES.rev, lists, KCOLS.map(([col]) => tasks.filter((x) => x.col === col).map((x) => `${x.key}:${permSig(x.perm)}:${x.fresh ? 1 : 0}:${x.subject}:${x.owner || ''}`))]), () => {
     if (!lists.length) return `<p class="k-none">表示するセッションがない。上の「セッション」で選ぶ</p>`;
     if (!UI.lanes) return KCOLS.map(([col, label]) => {
       const items = tasks.filter((x) => x.col === col).sort(sortCol(col));
@@ -4802,7 +5649,10 @@ function focusPose(R, az, el, dist) {
   const t = R.robot.root.position.clone().add(new THREE.Vector3(0, 1.15, 0));
   // Wide: the card covers the right of the scene, so the robot sits left of centre. Narrow: the card is a
   // bottom sheet, so the robot sits high.
-  if (wide) t.add(right.multiplyScalar((Math.min(420, sceneEl.clientWidth - 28) / 2 / sceneEl.clientWidth) * viewW));
+  // The wide 応答の履歴 (2.3.4, 55-history.js): the card leaves only histWideMargin() on the left, and the robot sits in its middle.
+  const margin = typeof histWideMargin === 'function' ? histWideMargin() : 0;
+  if (wide && margin) t.add(right.multiplyScalar(((sceneEl.clientWidth - margin) / 2 / sceneEl.clientWidth) * viewW));
+  else if (wide) t.add(right.multiplyScalar((Math.min(420, sceneEl.clientWidth - 28) / 2 / sceneEl.clientWidth) * viewW));
   else t.y -= viewH * 0.2;
   return { p: t.clone().add(dir.multiplyScalar(dist)), t };
 }
@@ -4955,21 +5805,33 @@ function stepRobot(dir) {
   if (has3D && robots.some((x) => x.def.id === next)) zoomTo(robotPose(next), null, () => {});
 }
 rbEl.addEventListener('click', (e) => { const b = e.target.closest('[data-rb-step]'); if (b) stepRobot(Number(b.dataset.rbStep)); });
+/* 2.3.4 (requester 10-19: "タブ選択してる時左右キーがタブの移動になるのやめてほしい 左右はロボットの移動でタブの移動はtabキーに
+   できる？"): ← → switch robots wherever the focus is on the card, the tabs included (2.3.1 moved between the tabs there),
+   except where text is typed (an input, a textarea, a select, an editable element) and while an IME composes. The tabs
+   move with Tab instead (below). */
 document.addEventListener('keydown', (e) => {
   if ((e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
-  if (!rbState.id || rbEl.hidden || !popEl.hidden || logState.open || alwaysDlg) return;
+  if (e.isComposing || e.keyCode === 229) return;                                                   // an IME is composing
+  if (!rbState.id || rbEl.hidden || !popEl.hidden || logState.open || alwaysDlg || clockDlg) return;
   const t = e.target;
   if (t && (t.isContentEditable || (t.closest && t.closest('input, textarea, select')))) return;   // typing keeps its keys
   e.preventDefault();
-  const tab = t && t.closest && t.closest('[role="tablist"] [role="tab"]');
-  if (tab) {   // a tab has the focus: ← → move between the tabs (the ARIA tabs pattern), the robot stays
-    const tabs = [...tab.closest('[role="tablist"]').querySelectorAll('[role="tab"]')];
-    const next = tabs[(tabs.indexOf(tab) + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
-    next.focus();
-    next.click();
-    return;
-  }
   stepRobot(e.key === 'ArrowRight' ? 1 : -1);
+});
+/* Tab on the card's tabs: 今の様子 → Tab selects 応答の履歴 and focuses it; 応答の履歴 → Tab goes on into the card (the
+   browser's own order); Shift+Tab is the reverse (応答の履歴 → 今の様子 → what is before the tabs). Never a dead end. */
+rbEl.addEventListener('keydown', (e) => {
+  if (e.key !== 'Tab' || e.altKey || e.ctrlKey || e.metaKey) return;
+  const tab = e.target && e.target.closest && e.target.closest('[role="tablist"] [role="tab"]');
+  if (!tab) return;
+  const tabs = [...tab.closest('[role="tablist"]').querySelectorAll('[role="tab"]')], k = tabs.indexOf(tab);
+  const next = tabs[k + (e.shiftKey ? -1 : 1)];
+  if (!next) return;                                  // the last tab forward, the first back: the browser's order
+  e.preventDefault();
+  next.click();
+  const want = next.dataset.rbTab;
+  const again = [...rbEl.querySelectorAll('[role="tab"]')].find((b) => b.dataset.rbTab === want);   // the card may have been rebuilt
+  if (again) again.focus();
 });
 function renderRobot(model) {
   const id = rbState.id;
@@ -4980,17 +5842,17 @@ function renderRobot(model) {
   const order = { doing: 0, wait: 1, todo: 2, done: 3 };
   const owned = model.tasks.filter((x) => (isMain ? x.list === id : x.owner === id)).sort((a, b) => order[a.col] - order[b.col] || a.id - b.id);
   const subs = isMain ? (SESSIONS.find((s) => s.id === id) || { robots: [] }).robots.filter((r) => r !== id) : [];
-  keyed(rbEl, JSON.stringify([id, permSig(pending), specIdx, owned.map((x) => `${x.key}:${x.col}:${x.perm ? 1 : 0}:${x.subject}`)]), () => {
+  keyed(rbEl, JSON.stringify([id, NAMES.rev, permSig(pending), specIdx, owned.map((x) => `${x.key}:${x.col}:${x.perm ? 1 : 0}:${x.subject}`)]), () => {
     const room = (SESSIONS.find((s) => s.id === sess) || { room: (PROJECT[projectOfRobot(id)] || {}).name || '' }).room;
     const tasksHTML = owned.length ? `<ul class="rb-tasks">${owned.map((x) => {
       const [c, l] = x.perm ? ['st-waiting', '許可待ち'] : x.col === 'wait' ? [x.waitingFor === 'question' ? 'st-asking' : 'st-waiting', waitLabel(x)] : COL_STATE[x.col];
       return `<li><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="rt-${esc(x.key)}"><span class="state ${esc(c)}">${esc(l)}</span><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${x.harness ? `<span class="h-tag">${esc(x.harness)}</span>` : ''}${esc(x.subject)}</span>${!isMain || !x.owner ? '' : `<span class="rb-owner">${pill(x.owner, DEF[x.owner].role)}</span>`}</button></li>`;
     }).join('')}</ul>` : `<p class="rb-none">${isMain ? 'このセッションのタスク一覧は空' : '担当しているタスクはない'}</p>`;
-    return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? `${id} のメインセッション` : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.agent} · ${room}` : `${ROLE_JA[d.role]} · ${sess} セッションのサブエージェント · ${room}`)}</p></div><div class="rb-nav"><button type="button" class="rb-step" data-rb-step="-1" data-fk="rb-prev" aria-label="前のロボット（←）" title="前のロボット（←）">‹</button><button type="button" class="rb-step" data-rb-step="1" data-fk="rb-next" aria-label="次のロボット（→）" title="次のロボット（→）">›</button><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">← 3D に戻る</button></div></div>
-<div class="rb-tabs" role="tablist" aria-label="表示"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">今の様子</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">応答の履歴</button></div>
-<div class="rb-body rb-hist" data-rb-hist hidden aria-label="応答の履歴"></div>
-<div class="rb-body">
-<section class="rb-sec" aria-labelledby="rb-h-now"><h3 id="rb-h-now">今やっていること</h3><div class="rb-now"><p class="rb-state"><span class="rb-lamp" data-rb-lamp></span><b data-rb-state></b><span class="rb-since">ランプ: <span data-rb-lampname></span></span></p><p class="rb-act" data-rb-act></p><p class="rb-cond" data-rb-cond></p>${spec ? `<p class="rb-spec"><button type="button" class="link-btn" data-spec-open="${specIdx}" data-fk="rb-spec">${esc(spec.name)}（${esc(spec.screen)}）の spec</button> <span data-rb-specnow></span></p><span class="rb-segs" style="--c:${ROLES[d.role].color}">${SEGS}</span>` : ''}${(SOURCE.mode === 'demo' && id === 'a2') ? '<p class="rb-test" data-rb-test></p><div class="prog" data-rb-prog role="img"><span class="p"></span><span class="r"></span></div>' : ''}</div></section>
+    return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? d.title || `${id} のメインセッション` : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.title ? `${id} のメインセッション · ${d.head}` : d.agent} · ${room}` : `${ROLE_JA[d.role]} · ${sess} セッションのサブエージェント · ${room}`)}</p></div><div class="rb-side"><button type="button" class="wb-btn rb-clock" data-rb-clock data-fk="rb-clock" aria-haspopup="dialog" aria-describedby="rb-clock-why">退勤…</button><div class="rb-nav"><button type="button" class="rb-step" data-rb-step="-1" data-fk="rb-prev" aria-label="前のロボット（←）" title="前のロボット（←）">‹</button><button type="button" class="rb-step" data-rb-step="1" data-fk="rb-next" aria-label="次のロボット（→）" title="次のロボット（→）">›</button><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">← 3D に戻る</button></div></div><p class="rb-clock-why" id="rb-clock-why" data-rb-clock-why hidden></p></div>
+<div class="rb-tabs"><button type="button" class="wb-btn rb-wide-btn" data-rb-wide data-fk="rb-wide" aria-pressed="false" hidden>広げる</button><div class="rb-tablist" role="tablist" aria-label="表示"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">今の様子</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">応答の履歴</button></div></div>
+<div class="rb-body rb-hist" data-rb-hist hidden aria-label="応答の履歴" tabindex="0"></div>
+<div class="rb-body" tabindex="0" aria-label="今の様子">
+<section class="rb-sec" aria-labelledby="rb-h-now"><h3 id="rb-h-now">今やっていること</h3><div class="rb-now"><p class="rb-state"><span class="rb-lamp" data-rb-lamp></span><b data-rb-state></b><span class="rb-since">ランプ: <span data-rb-lampname></span></span></p><p class="rb-act" data-rb-act></p><p class="rb-git" data-rb-git hidden title="Claude のセッションが Bash で撃った git push / pull だけが見える（自分のターミナル、エディタの git、GitHub での merge は見えない）"></p><p class="rb-cond" data-rb-cond></p>${spec ? `<p class="rb-spec"><button type="button" class="link-btn" data-spec-open="${specIdx}" data-fk="rb-spec">${esc(spec.name)}（${esc(spec.screen)}）の spec</button> <span data-rb-specnow></span></p><span class="rb-segs" style="--c:${ROLES[d.role].color}">${SEGS}</span>` : ''}${(SOURCE.mode === 'demo' && id === 'a2') ? '<p class="rb-test" data-rb-test></p><div class="prog" data-rb-prog role="img"><span class="p"></span><span class="r"></span></div>' : ''}</div></section>
 ${pending ? `<section class="rb-sec" aria-label="許可">${permDetail(pending, 'rb')}</section>` : ''}
 ${SOURCE.mode === 'live' ? '<section class="rb-sec" aria-labelledby="rb-h-tests"><h3 id="rb-h-tests">テスト実行</h3><div data-rb-tests></div></section>' : ''}
 <section class="rb-sec" aria-labelledby="rb-h-tasks"><h3 id="rb-h-tasks">${isMain ? 'このセッションのタスク' : '担当しているタスク'}<small>${owned.length} 件</small></h3>${tasksHTML}</section>
@@ -4999,10 +5861,14 @@ ${subs.length ? `<section class="rb-sec" aria-labelledby="rb-h-subs"><h3 id="rb-
 </div>`;
   });
   const S = STATES[st.state] || STATES.idle;
-  setText(rbEl.querySelector('[data-rb-state]'), st.asking ? '質問に回答待ち' : S.name);
+  const play = SOURCE.mode === 'live' && has3D ? playTagText(id) : '';   // a game (2.3.3): the same words as the name tag
+  setText(rbEl.querySelector('[data-rb-state]'), st.asking ? '質問に回答待ち' : play ? `${S.name} · ${play}` : S.name);
   setText(rbEl.querySelector('[data-rb-lampname]'), st.asking ? '黄（質問に回答待ち）' : LAMP_TEXT[S.lamp] || '');
   const lamp = rbEl.querySelector('[data-rb-lamp]'); if (lamp) lamp.style.background = LAMP[S.lamp];
   setText(rbEl.querySelector('[data-rb-act]'), st.act);
+  // the box (2.3.4): its last push / pull, from the server's agent.git
+  const gitEl = rbEl.querySelector('[data-rb-git]');
+  if (gitEl) { const g = st.git; gitEl.hidden = !g; if (g) setText(gitEl, `最近の git: ${g.label || ''}（${new Date(g.at || 0).toTimeString().slice(0, 5)}）`); }
   // Tiredness and heavy work in words too (the 3D showed them, the card did not — 10-18 review)
   const cond = robotCondition(id), parts = [];
   if (cond.tired) parts.push(`稼働 ${Math.floor(cond.hours)} 時間（疲れ気味）`);
@@ -5013,6 +5879,8 @@ ${subs.length ? `<section class="rb-sec" aria-labelledby="rb-h-subs"><h3 id="rb-
     if (H.reasons.includes('subagents')) why.push(`サブエージェント ${H.subagents || 0} 体`);
     parts.push(`重い作業: ${why.join(' · ')}`);
   }
+  const brk = SOURCE.mode === 'live' ? brkPanelText(id) : '';   // on a break (10-19): the name tag's words
+  if (brk) parts.push(brk);
   const condEl = rbEl.querySelector('[data-rb-cond]');
   if (condEl) { setText(condEl, parts.join(' / ')); condEl.hidden = !parts.length; }
   if (spec) {
@@ -5027,6 +5895,7 @@ ${subs.length ? `<section class="rb-sec" aria-labelledby="rb-h-subs"><h3 id="rb-
     bar.setAttribute('aria-label', `通過 ${T.passed} 件 / 全 ${n} 件`);
     bar.children[0].style.width = `${(T.passed / n) * 100}%`; bar.children[1].style.width = `${T.runningIdx >= 0 ? 100 / n : 0}%`;
   }
+  clockPaint(id);
   rbEl.querySelectorAll('[data-rb-sub]').forEach((el) => paintState(el, robotBadge(el.dataset.rbSub)));
   rbEl.querySelectorAll('[data-rb-subact]').forEach((el) => setText(el, robotState[el.dataset.rbSubact].act));
   paintSince(rbEl, model.t, '待ち');
@@ -5036,6 +5905,93 @@ ${subs.length ? `<section class="rb-sec" aria-labelledby="rb-h-subs"><h3 id="rb-
   histSync();   // 55-history.js: the tab shown, and the history kept fresh while it is
   focusFadeSync();   // what stands between the camera and this robot, faint
 }
+
+/* ---------- 退勤: end this robot's session from its card (requester, 10-19) ----------
+   「3Dに戻るの上あたりに退勤ボタン置いて、それ押したら確認ダイアログの後にセッション消す」. Measured with the requester (11:10–11:15):
+   SIGTERM ends claude in about 1.5 s everywhere, but only a terminal is left in a good state (back at its shell); the
+   VS Code tab stays with an error and the desktop app shows no change. So the button works for terminal sessions only and
+   is disabled elsewhere with the reason (the server refuses those too: clockout.py). The dialog names the robot, the
+   session (its title), the folder and the client; its default focus is やめる. After 退勤させる the server sends SIGTERM once,
+   sees the process go and marks the session ended — the robot then walks out of the door like any session that ended. */
+const CLOCK_WHY = {
+  vscode: 'VS Code ではタブがエラーで残るので使えない。タブを閉じて終わらせる',
+  desktop: 'デスクトップアプリでは画面が変わらないので使えない',
+  other: 'ターミナルで起動したセッションだけ退勤させられる',
+  unknown: '起動元が分からないので使えない（ターミナルで起動したセッションだけ）',
+};
+const CLIENT_JA = { terminal: 'ターミナル', vscode: 'VS Code 拡張', desktop: 'デスクトップアプリ', other: 'その他', unknown: '不明' };
+const CLOCK = { busy: null, last: null };
+let clockDlg = null;
+function clockTarget(id) {
+  if (SOURCE.mode !== 'live') return { why: 'デモでは使えない' };
+  if (!id || !DEF[id]) return { why: '' };
+  if (DEF[id].kind === 'sub') return { why: `サブエージェントは退勤させられない（${SESSION_OF[id]} のメインセッションのカードから）` };
+  const sess = SESSIONS.find((x) => x.id === SESSION_OF[id]);
+  if (!sess || sess.status === 'ended' || LIVE.leaving[id]) return { why: 'このセッションは終わっている' };
+  const client = sess.client || 'unknown';
+  if (client !== 'terminal') return { why: CLOCK_WHY[client] || CLOCK_WHY.unknown, client };
+  if (location.hostname !== '127.0.0.1') return { why: `このページは http://127.0.0.1:${location.port}/ で開いたときだけ使える（jui viz open）`, client };
+  return { why: '', sess, client };
+}
+function clockPaint(id) {
+  const btn = rbEl.querySelector('[data-rb-clock]'), why = rbEl.querySelector('[data-rb-clock-why]');
+  if (!btn || !why) return;
+  const t = clockTarget(id), busy = CLOCK.busy === id, last = CLOCK.last && CLOCK.last.id === id ? CLOCK.last : null;
+  btn.disabled = !!t.why || busy;
+  setText(btn, busy ? '退勤中…' : '退勤…');
+  const text = t.why || (last ? `退勤させられなかった（${last.error}）` : '');
+  setText(why, text);
+  why.hidden = !text;
+  why.classList.toggle('rb-clock-err', !t.why && !!last);
+}
+function openClockConfirm(id) {
+  const t = clockTarget(id);
+  if (t.why || clockDlg) return;
+  const opener = rbEl.querySelector('[data-rb-clock]');
+  const el = document.createElement('div');
+  el.className = 'perm-confirm clock-confirm'; el.setAttribute('role', 'alertdialog'); el.setAttribute('aria-modal', 'true');
+  el.setAttribute('aria-labelledby', 'clk-title'); el.setAttribute('aria-describedby', 'clk-note');
+  const title = t.sess.title || '（名前なし）';
+  el.innerHTML = `<div class="pcf-box"><h3 id="clk-title">${esc(id)} を退勤させる</h3>
+<dl class="clk-facts"><dt>ロボット</dt><dd data-clk-robot>${pill(id, DEF[id].role)} ${esc(id)} のメインセッション</dd><dt>セッション</dt><dd data-clk-title>${esc(title)}</dd><dt>フォルダ</dt><dd data-clk-cwd><code>${esc(CWD[id] || '?')}</code></dd><dt>クライアント</dt><dd data-clk-client>${esc(CLIENT_JA[t.client] || t.client)}</dd></dl>
+<p id="clk-note">このセッションの claude に終了の合図（SIGTERM）を 1 回送る。途中の作業はそこで止まる。終わらなければ「終わらなかった」と出すだけで、強制終了はしない。</p>
+<div class="pcf-acts"><button type="button" class="pa clk-go" data-clk-go>退勤させる</button><button type="button" class="pa clk-cancel" data-clk-cancel>やめる</button></div></div>`;
+  document.body.append(el);
+  clockDlg = { el, id, opener, at: Date.now() };
+  el.addEventListener('click', (e) => {
+    if (e.target === el || e.target.closest('[data-clk-cancel]')) { closeClockConfirm(true); return; }
+    if (e.target.closest('[data-clk-go]') && Date.now() - clockDlg.at > 350) clockGo(id);   // not the press that opened it
+  });
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeClockConfirm(true); return; }
+    if (e.key === 'Tab') {   // the focus stays in the dialog
+      const f = [...el.querySelectorAll('button')];
+      const i = f.indexOf(document.activeElement);
+      e.preventDefault();
+      f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+    }
+  });
+  el.querySelector('[data-clk-cancel]').focus();
+}
+function closeClockConfirm(back) {
+  if (!clockDlg) return;
+  const { el, opener } = clockDlg;
+  clockDlg = null; el.remove();
+  const again = back ? rbEl.querySelector('[data-rb-clock]') || opener : null;
+  if (again && document.contains(again) && !again.disabled) again.focus({ preventScroll: true });
+}
+async function clockGo(id) {
+  closeClockConfirm(false);
+  if (clockTarget(id).why || CLOCK.busy) return;
+  CLOCK.busy = id; CLOCK.last = null;
+  if (rbState.id === id) clockPaint(id);
+  const got = await SOURCE.clockOut(id);
+  CLOCK.busy = null;
+  if (got.ok) showToast(`${id} を退勤させた（セッションは終わった）`);
+  else { CLOCK.last = { id, error: got.error || `HTTP ${got.status}` }; showToast(`${id} を退勤させられなかった（${CLOCK.last.error}）`); }
+  if (rbState.id === id) clockPaint(id);
+}
+rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rb-clock]') && rbState.id) openClockConfirm(rbState.id); });
 
 /* ---------- live: the test run in the side panel (plan 09 §4) ---------- */
 const CASE_ICON = { pending: '○', running: '▶', passed: '✓', flaky: '⚠', failed: '✗', skipped: '–' };
@@ -5127,7 +6083,11 @@ function closeAlwaysConfirm(back) {
    (never converted inside), bold, italics, links — an href only when the URL, its character references decoded,
    is http: or https: — and images as a mark (nothing is fetched). */
 const HIST_POLL_MS = 3000;
-const HIST = { tab: 'now', id: null, data: null, error: '', timer: 0, busy: false, node: null, sig: '' };
+/* atEnd / top: where the reader is in the pane, kept here because the pane itself is not kept — renderRobot rebuilds the
+   whole card (keyed) whenever its key changes, and the new pane starts at scrollTop 0 (measured 10-19: every new turn of
+   a working session sent the reader to the top). newer: answers came while the reader was above (the 新しい応答 marker). */
+const HIST = { tab: 'now', id: null, data: null, error: '', timer: 0, busy: false, node: null, sig: '',
+  atEnd: true, top: 0, newer: false, marker: null, compose: null, sent: null, wide: false, imgs: new Map(), box: null };
 
 function hNode(tag, cls, text) {
   const n = document.createElement(tag);
@@ -5274,11 +6234,20 @@ function histItem(item) {
     const head = hNode('p', 'h-who', '依頼者'); head.appendChild(at); n.appendChild(head);
     n.appendChild(hNode('p', 'h-plain', item.text));
     const cut = histCutNote(item); if (cut) n.appendChild(cut);
+    for (const path of Array.isArray(item.gone) ? item.gone : []) n.appendChild(hNode('p', 'h-gone', `元の画像ファイルは消えている: ${path}`));
     return n;
   }
   if (item.kind === 'assistant') {
     const n = hNode('div', 'h-item h-asst');
     n.appendChild(histMarkdown(item.text));
+    const cut = histCutNote(item); if (cut) n.appendChild(cut);
+    return n;
+  }
+  if (item.kind === 'channel') {   // a prompt that came through a channel (from this page, for jui-viz)
+    const n = hNode('div', 'h-item h-user h-channel');
+    const head = hNode('p', 'h-who', /(^|:)jui-viz$/.test(String(item.server || '')) ? 'ページから（jui-viz の channel）' : `channel ${item.server || ''}`);
+    head.appendChild(at); n.appendChild(head);
+    n.appendChild(hNode('p', 'h-plain', item.text));
     const cut = histCutNote(item); if (cut) n.appendChild(cut);
     return n;
   }
@@ -5301,11 +6270,17 @@ function histItem(item) {
     if (item.out !== undefined) {
       io.appendChild(hNode('span', 'h-io-k', 'OUT'));
       io.appendChild(hNode('pre', `h-code${item.error ? ' h-code-err' : ''}`, `${item.out}${item.outCut ? '\n…' : ''}`));
+      if (Array.isArray(item.imgs) && item.imgs.length) { const row = hNode('div', 'h-imgs'); for (const ref of item.imgs) row.appendChild(histThumb(ref)); io.appendChild(row); }
     }
     return histFolded('h-item h-tool', title, [io], false);
   }
   if (item.kind === 'thought') return hNode('p', 'h-item h-mark', '考えた');
-  if (item.kind === 'image') return hNode('p', 'h-item h-mark', '画像 1 枚');
+  if (item.kind === 'image') {
+    if (!item.img) return hNode('p', 'h-item h-mark', '画像 1 枚（表示できない形式）');
+    const row = hNode('div', 'h-item h-imgs');
+    row.appendChild(histThumb(item.img));
+    return row;
+  }
   return null;
 }
 function histBuild(data) {
@@ -5313,10 +6288,21 @@ function histBuild(data) {
   const items = Array.isArray(data.items) ? data.items : [];
   if (data.more) box.appendChild(hNode('p', 'h-note', `直近 ${items.filter((x) => x.kind !== 'thought' && x.kind !== 'image').length} 件（それより前は表示しない）`));
   let prev = null;
+  const seen = new Map();
   for (const item of items) {
     if (item.kind === 'thought' && prev === 'thought') continue;   // one mark for a run of thinking
+    if (item.kind === 'image' && item.img && prev === 'image' && box.lastChild && box.lastChild.classList.contains('h-imgs')) {
+      box.lastChild.appendChild(histThumb(item.img));               // pictures side by side
+      continue;
+    }
     const n = histItem(item);
-    if (n) box.appendChild(n);
+    if (n) {
+      // Which item this is, so the place read above survives a rebuild of the list (the oldest items leave the window).
+      const base = `${item.kind}|${item.at}|${String(item.text ?? item.in ?? item.name ?? '').slice(0, 200)}`;
+      seen.set(base, (seen.get(base) || 0) + 1);
+      n._hk = `${base}|${seen.get(base)}`;
+      box.appendChild(n);
+    }
     prev = item.kind;
   }
   if (!items.length) box.appendChild(hNode('p', 'h-note', 'まだ応答がない'));
@@ -5325,12 +6311,53 @@ function histBuild(data) {
 
 /* ---------- the tab ---------- */
 function histPane() { return rbEl.querySelector('[data-rb-hist]'); }
+const HIST_END_PX = 24;
+function histMarker() {
+  if (!HIST.marker) {
+    const b = hNode('button', 'h-newer', '新しい応答 ↓');
+    b.type = 'button';
+    b.dataset.hNewer = '';
+    b.dataset.fk = 'rb-hist-newer';
+    b.addEventListener('click', () => { const pane = histPane(); if (pane) histToEnd(pane); });
+    HIST.marker = b;
+  }
+  HIST.marker.hidden = !HIST.newer;
+  return HIST.marker;
+}
+function histToEnd(pane) {
+  HIST.atEnd = true; HIST.newer = false;
+  pane.scrollTop = pane.scrollHeight;
+  HIST.top = pane.scrollTop;
+  histMarker();
+}
+/* The reader's place, on every scroll of the pane (a user's or ours). */
+function histRemember(pane) {
+  if (pane.hidden || !pane.contains(HIST.node)) return;
+  HIST.top = pane.scrollTop;
+  HIST.atEnd = pane.scrollHeight - pane.scrollTop - pane.clientHeight < HIST_END_PX;
+  if (HIST.atEnd && HIST.newer) { HIST.newer = false; histMarker(); }
+}
+/* The place kept in HIST, put back on a pane that was just given the list (a rebuilt card, the tab opened). */
+function histRestore(pane) {
+  if (HIST.atEnd) histToEnd(pane);
+  else pane.scrollTop = HIST.top;
+}
 function histShow() {
   const pane = histPane();
   if (!pane) return;
+  if (!pane._histBound) { pane._histBound = true; pane.addEventListener('scroll', () => histRemember(pane), { passive: true }); }
   if (HIST.error && !HIST.data) { pane.replaceChildren(hNode('p', 'h-note', HIST.error)); return; }
   if (!HIST.node) { pane.replaceChildren(hNode('p', 'h-note', '読み込み中…')); return; }
-  if (pane.firstChild !== HIST.node) pane.replaceChildren(HIST.node);
+  if (pane.firstChild !== HIST.node) { pane.replaceChildren(HIST.node, histMarker()); histRestore(pane); }
+}
+/* The first item at the top of the pane and how far below the top it starts. */
+function histAnchor(pane) {
+  if (!HIST.node || !pane.contains(HIST.node)) return null;
+  const top = pane.getBoundingClientRect().top;
+  for (const n of HIST.node.children) {
+    if (n._hk && n.getBoundingClientRect().bottom > top + 1) return { key: n._hk, y: n.getBoundingClientRect().top - top };
+  }
+  return null;
 }
 async function histFetch() {
   const id = HIST.id;
@@ -5344,31 +6371,379 @@ async function histFetch() {
   const sig = JSON.stringify(got.data.items);
   if (sig === HIST.sig && HIST.node) return;           // nothing new: the open folds and the scroll stay
   const pane = histPane();
-  const atEnd = !pane || pane.scrollHeight - pane.scrollTop - pane.clientHeight < 40;
+  const shown = pane && !pane.hidden && HIST.node && pane.contains(HIST.node);
+  const anchor = shown && !HIST.atEnd ? histAnchor(pane) : null;
+  const had = !!HIST.data;
   HIST.sig = sig; HIST.data = got.data; HIST.node = histBuild(got.data);
-  histShow();
-  if (pane && atEnd) pane.scrollTop = pane.scrollHeight;
+  composeArrived(got.data.items);
+  if (had && !HIST.atEnd) HIST.newer = true;          // the reader is above: leave the place, show the marker
+  histShow();                                          // at the end: histRestore sends the pane to the newest
+  if (anchor && pane && pane.contains(HIST.node)) {   // the same item at the same place, though the oldest left
+    const top = pane.getBoundingClientRect().top;
+    const same = [...HIST.node.children].find((n) => n._hk === anchor.key);
+    if (same) pane.scrollTop += same.getBoundingClientRect().top - top - anchor.y;
+    HIST.top = pane.scrollTop;
+  }
 }
 function histStop() { clearInterval(HIST.timer); HIST.timer = 0; }
 /* After every renderRobot: which tab shows, and the polling that keeps an open history fresh. */
 function histSync() {
   const id = rbEl.hidden ? null : rbState.id;
-  if (id !== HIST.id) { HIST.id = id; HIST.data = null; HIST.node = null; HIST.sig = ''; HIST.error = ''; histStop(); }
+  if (id !== HIST.id) { HIST.id = id; HIST.data = null; HIST.node = null; HIST.sig = ''; HIST.error = ''; HIST.atEnd = true; HIST.newer = false; histStop(); histImgsDrop(); }
   const tabs = rbEl.querySelectorAll('[data-rb-tab]');
   tabs.forEach((b) => b.setAttribute('aria-selected', String(b.dataset.rbTab === HIST.tab)));
   const body = rbEl.querySelector('.rb-body:not([data-rb-hist])'), pane = histPane();
   if (body) body.hidden = HIST.tab !== 'now';
   if (pane) pane.hidden = HIST.tab !== 'history';
+  composePlace(pane, id);
+  histWideSync(id);
   if (!id || HIST.tab !== 'history') { histStop(); return; }
   histShow();
-  if (!HIST.timer) { histFetch(); HIST.timer = setInterval(() => { if (document.visibilityState === 'visible') histFetch(); }, HIST_POLL_MS); }
+  if (!HIST.timer) { histFetch(); HIST.timer = setInterval(() => { if (document.visibilityState === 'visible') { histFetch(); composePaint(); } }, HIST_POLL_MS); }
 }
 rbEl.addEventListener('click', (e) => {
   const b = e.target.closest('[data-rb-tab]');
   if (!b) return;
+  const opening = b.dataset.rbTab === 'history' && HIST.tab !== 'history';
   HIST.tab = b.dataset.rbTab === 'history' ? 'history' : 'now';
+  if (opening) {   // the tab opened: the newest shows (the bottom), the old place is not kept
+    HIST.atEnd = true; HIST.newer = false;
+    const pane = histPane();
+    if (pane && HIST.node && pane.contains(HIST.node)) pane.replaceChildren();   // histShow puts it back and restores
+  }
   histSync();
 });
+
+/* ---------- a prompt to the session of this robot (requester, 10-19) ----------
+   "プロンプトをロボットの会話の履歴から打てないと不便だから打てるようにしよう" — and "別端末からは送れなくていいよ": the server takes it
+   only from this page at http://127.0.0.1:<port> (server.prompt_checks). Here: the box under the history; Enter is a new
+   line, the 送信 button or Ctrl/⌘+Enter opens a confirmation naming the robot and the session, and only its 送る sends.
+   After that 「送信済み」 until the prompt shows in the history. The box is built once and moved into each rebuilt card,
+   so what is typed survives a rebuild. A session without the relay, or with a jui-viz plugin older than 1.2.0 (its
+   channel cannot deliver), gets the box disabled and the reason. */
+const PROMPT_MAX_BYTES = 8192;   // server.PROMPT_MAX_BODY: the JSON body, not only the text
+const composeBytes = (label, text) => new TextEncoder().encode(JSON.stringify({ sessionId: SESSION_UUID[label] || '', text })).length;
+const RELAY_HOW_TEXT = RELAY_HOW.replace(/<[^>]+>/g, '');   // the same how-to as on a permission card, as plain text
+const composeNorm = (t) => String(t || '').split(/\s+/).join(' ').trim();
+/* Whether the CLI hands the channel's text to the session (sources/launch.py, 2.3.4): it does only for a session started
+   naming the channel. The server's sessions slice says which case (launch); the words here are the same as the server's. */
+const PROMPT_START = 'claude --dangerously-load-development-channels plugin:jui-viz@jsonui';
+const PROMPT_START_CHANNELS = 'claude --channels plugin:jui-viz@jsonui';
+const LAUNCH_WHY = {
+  dev: [true, ''],
+  channels: [true, '--channels で起動したセッション。managed settings の allowedChannelPlugins に jui-viz が載っていなければ届かない'],
+  'no-flag': [false, '起動に channel の指定が無いので届かない'],
+  other: [false, '起動の channel の指定に jui-viz が無いので届かない'],
+  form: [false, '起動の指定の形が、この channel のつながり方と合わない（プラグインなら plugin:jui-viz@jsonui、jui viz relay install なら server:jui-viz）'],
+  'server-channels': [false, 'server: の指定は --channels では効かない'],
+  vscode: [false, 'VS Code 拡張のセッションは起動の指定を足せないので届かない'],
+  desktop: [false, 'デスクトップアプリのセッションは起動の指定を足せないので届かない'],
+  unreadable: [false, 'このセッションのプロセスの起動の引数を読めないので、届くか確かめられない'],
+};
+/* 送信中 until the receiver's own transcript shows the prompt (届いた); 届いていない when it has not, NOT_ARRIVED_MS after
+   sending and with the session quiet (not busy) for QUIET_MS — a busy session takes it at the end of its turn. */
+const PROMPT_WAIT = { notArrivedMs: 60000, quietMs: 30000 };
+function composeTarget(id) {
+  if (!id || !DEF[id]) return { why: '' };
+  const sess = SESSIONS.find((x) => x.id === SESSION_OF[id]);
+  const name = sess ? `${sess.id} のメインセッション（${DEF[sess.id].agent} · ${sess.room}）` : '';
+  if (SOURCE.mode !== 'live') return { why: 'デモでは送れない' };
+  if (DEF[id].kind === 'sub') return { why: `サブエージェントには送れない。${SESSION_OF[id]} のメインセッションのカードから送る` };
+  if (location.hostname !== '127.0.0.1') return { why: `このページは http://127.0.0.1:${location.port}/ で開いたときだけ送れる（jui viz open）` };
+  if (!sess || sess.status === 'ended') return { why: 'このセッションは終わっている' };
+  if (!sess.relay) return { why: 'このセッションは中継（jui-viz の channel）につながっていないので送れない。' + RELAY_HOW_TEXT };
+  if (!sess.prompt) return { why: 'このセッションの jui-viz プラグインが古いので送れない（1.2.0 から送れる）。/plugin で jui-viz を更新して、セッションを起動し直す' };
+  const L = LAUNCH_WHY[sess.launch] || LAUNCH_WHY.unreadable;
+  if (!L[0]) {
+    return { why: `${L[1]}。届くのは、ターミナルで ${PROMPT_START}（起動のたびに確認が出る）か、managed settings の allowedChannelPlugins に jui-viz を載せて ${PROMPT_START_CHANNELS}（警告なし）と起動したセッションだけ。組織のアカウントは channelsEnabled も要る` };
+  }
+  return { why: '', name, note: L[1] };
+}
+function composeBuild() {
+  const box = hNode('div', 'h-compose');
+  box.dataset.hCompose = '';
+  const why = hNode('p', 'h-compose-why'); why.dataset.hWhy = '';
+  const area = hNode('textarea', 'h-compose-text');
+  area.rows = 3;
+  area.dataset.hText = '';
+  area.dataset.fk = 'rb-prompt';
+  area.setAttribute('aria-label', 'このセッションへのプロンプト');
+  area.placeholder = 'このセッションへのプロンプト（Enter は改行。送信は ボタン か Ctrl/⌘+Enter）';
+  const row = hNode('div', 'h-compose-row');
+  const state = hNode('span', 'h-compose-state'); state.dataset.hState = ''; state.setAttribute('aria-live', 'polite');
+  const send = hNode('button', 'wb-btn h-compose-send', '送信…'); send.type = 'button'; send.dataset.hSend = ''; send.dataset.fk = 'rb-prompt-send';
+  row.append(state, send);
+  const confirm = hNode('div', 'h-confirm'); confirm.dataset.hConfirm = ''; confirm.hidden = true;
+  confirm.setAttribute('role', 'group'); confirm.setAttribute('aria-label', '送信の確認');
+  const to = hNode('p', 'h-confirm-to'); to.dataset.hTo = '';
+  const preview = hNode('p', 'h-confirm-text'); preview.dataset.hPreview = '';
+  const acts = hNode('div', 'h-confirm-acts');
+  const go = hNode('button', 'wb-btn h-confirm-go', 'このセッションへ送る'); go.type = 'button'; go.dataset.hGo = '';
+  const back = hNode('button', 'wb-btn', 'やめる'); back.type = 'button'; back.dataset.hBack = '';
+  acts.append(go, back);
+  confirm.append(to, preview, acts);
+  box.append(why, area, row, confirm);
+  area.addEventListener('input', () => composePaint());
+  area.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !e.isComposing) { e.preventDefault(); composeAsk(); }
+  });
+  send.addEventListener('click', () => composeAsk());
+  back.addEventListener('click', () => composeClose(true));
+  go.addEventListener('click', () => { if (Date.now() - (box._askedAt || 0) > 350) composeSend(); });   // not the same key press that opened it
+  return box;
+}
+function composeEls() {
+  const b = HIST.compose;
+  const q = (k) => b.querySelector(`[data-${k}]`);
+  return { box: b, why: q('h-why'), area: q('h-text'), state: q('h-state'), send: q('h-send'), confirm: q('h-confirm'), to: q('h-to'), preview: q('h-preview'), go: q('h-go') };
+}
+/* After every histSync: the box under the history pane of the card shown, and its state. */
+function composePlace(pane, id) {
+  if (!HIST.compose) HIST.compose = composeBuild();
+  const { box } = composeEls();
+  if (HIST.compose._for !== id) {   // another robot: nothing typed for the last one goes to this one
+    HIST.compose._for = id;
+    composeEls().area.value = '';
+    composeClose(false);
+  }
+  if (pane && box.previousElementSibling !== pane) pane.after(box);
+  box.hidden = !pane || HIST.tab !== 'history';
+  // The card was rebuilt (50-panel.js, keyed) while the box had the focus, and the box is put back only now: refocus.
+  const lost = rbEl._lostFk;
+  rbEl._lostFk = undefined;
+  const again = lost !== undefined && !box.hidden ? box.querySelector('[data-fk="' + CSS.escape(lost) + '"]') : null;
+  if (again) again.focus({ preventScroll: true });
+  composePaint();
+}
+function composePaint() {
+  if (!HIST.compose) return;
+  const E = composeEls(), id = HIST.compose._for, t = composeTarget(id);
+  const asking = !E.confirm.hidden;
+  E.why.textContent = t.why || t.note || '';
+  E.why.hidden = !(t.why || t.note);
+  E.why.classList.toggle('h-compose-note', !t.why && !!t.note);
+  E.area.disabled = !!t.why;
+  E.area.readOnly = asking;
+  const text = E.area.value, bytes = text.trim() ? composeBytes(id, text) : 0;
+  E.send.disabled = !!t.why || !text.trim() || bytes > PROMPT_MAX_BYTES || asking;
+  const sent = HIST.sent && HIST.sent.id === id ? HIST.sent : null;
+  const phase = sent && !sent.error ? composePhase(sent) : '';
+  E.state.textContent = bytes > PROMPT_MAX_BYTES ? `長すぎる（${bytes.toLocaleString('ja-JP')} / ${PROMPT_MAX_BYTES.toLocaleString('ja-JP')} バイト）`
+    : sent && sent.error ? `送れなかった（${sent.error}）`
+    : phase === 'arrived' ? `届いた ${HIST_TIME(sent.arrivedAt)}（受け手の記録に出た）`
+    : phase === 'missing' ? `届いていない（${HIST_TIME(sent.at)} に送ったが、受け手の記録に出ない。候補: 起動の指定が無い・組織の channelsEnabled が無い・セッションが閉じた）`
+    : sent ? `送信中 ${HIST_TIME(sent.at)}（受け手の記録に出るのを待っている。まだ届いたとは言えない）` : '';
+  E.state.dataset.hPhase = bytes > PROMPT_MAX_BYTES ? 'long' : sent && sent.error ? 'error' : phase;
+  E.state.classList.toggle('h-compose-err', bytes > PROMPT_MAX_BYTES || !!(sent && sent.error) || phase === 'missing');
+  if (asking && t.why) composeClose(false);   // the session lost its relay while the confirmation was open
+}
+/* sending / arrived / missing for a prompt sent (and taken by the server). */
+function composePhase(sent) {
+  if (sent.arrivedAt) return 'arrived';
+  const now = Date.now(), sess = SESSIONS.find((x) => x.id === SESSION_OF[sent.id]);
+  if (sess && sess.status === 'busy') sent.quietSince = 0;
+  else if (!sent.quietSince) sent.quietSince = now;
+  return now - sent.at > PROMPT_WAIT.notArrivedMs && sent.quietSince && now - sent.quietSince > PROMPT_WAIT.quietMs ? 'missing' : 'sending';
+}
+function composeAsk() {
+  const E = composeEls(), id = HIST.compose._for, t = composeTarget(id), text = E.area.value;
+  if (t.why || !text.trim() || composeBytes(id, text) > PROMPT_MAX_BYTES || !E.confirm.hidden) return;
+  E.to.textContent = `送り先: ${t.name}`;
+  E.preview.textContent = text.length > 400 ? `${text.slice(0, 400)}…` : text;
+  E.confirm.hidden = false;
+  E.box._askedAt = Date.now();
+  composePaint();
+  E.go.focus({ preventScroll: true });
+}
+function composeClose(focusBack) {
+  const E = composeEls();
+  E.confirm.hidden = true;
+  composePaint();
+  if (focusBack) E.area.focus({ preventScroll: true });
+}
+async function composeSend() {
+  const E = composeEls(), id = HIST.compose._for, text = E.area.value;
+  if (composeTarget(id).why || !text.trim()) return;
+  E.go.disabled = true;
+  const got = await SOURCE.sendPrompt(id, text);
+  E.go.disabled = false;
+  composeClose(!got.ok);
+  if (got.ok) { HIST.sent = { id, text, at: Date.now() }; E.area.value = ''; }
+  else HIST.sent = { id, text, at: Date.now(), error: got.error || `HTTP ${got.status}` };
+  composePaint();
+}
+/* The prompt sent shows in the receiver's transcript as a channel item of jui-viz (sources/history.py: the CLI's own
+   record, origin.kind "channel", measured 10-19 on a real receiver started with --channels plugin:jui-viz@jsonui),
+   its text the text sent: 届いた. Our own POST proves only that it was sent; the same words typed by hand do not count. */
+function composeArrived(items) {
+  const sent = HIST.sent;
+  if (!sent || sent.error || sent.arrivedAt || sent.id !== HIST.id || !Array.isArray(items)) return;
+  const want = composeNorm(sent.text).slice(0, 120);
+  const fresh = (x) => !(Number(x.at) < sent.at - 60000);   // an older item with the same words is not this one
+  const ours = (x) => x.kind === 'channel' && /(^|:)jui-viz$/.test(String(x.server || ''));
+  if (items.some((x) => ours(x) && fresh(x) && composeNorm(x.text).startsWith(want))) { sent.arrivedAt = Date.now(); composePaint(); }
+}
+
+/* ---------- pictures (2.3.4, requester 10-19: "画像ファイルが履歴にある場合はサムネイル表示とクリックで拡大表示") ----------
+   An image item names a picture by its place (sources/history.py); the bytes are asked for one picture at a time
+   (SOURCE.historyImage, POST /api/history-image under the prompt's checks) when its thumbnail comes into view, and
+   kept as a blob URL only while this robot's tab is open. The browser scales the thumbnail. A press opens it large
+   in a dialog: ← → for the others in this history, Esc / the backdrop / 閉じる close it and give the focus back. */
+const histImgKey = (ref) => `${HIST.id}|${ref.off}|${ref.n}`;
+function histImgsDrop() {
+  for (const v of HIST.imgs.values()) v.then((g) => { if (g.url) URL.revokeObjectURL(g.url); });
+  HIST.imgs.clear();
+}
+function histImgGet(ref) {
+  const key = histImgKey(ref);
+  if (!HIST.imgs.has(key)) {
+    const id = HIST.id;
+    HIST.imgs.set(key, SOURCE.historyImage(id, ref).then((got) => (got.ok ? { url: URL.createObjectURL(got.blob) }
+      : { error: got.status === 413 ? '大きすぎて表示しない' : got.status === 415 ? '表示できない形式' : `画像を読めない（${got.status || got.error}）` })));
+  }
+  return HIST.imgs.get(key);
+}
+const histSeen = typeof IntersectionObserver === 'function' ? new IntersectionObserver((entries) => {
+  for (const e of entries) if (e.isIntersecting) { histSeen.unobserve(e.target); histThumbLoad(e.target); }
+}, { rootMargin: '200px' }) : null;
+function histThumbLoad(btn) {
+  if (btn._loading) return;
+  btn._loading = true;
+  histImgGet(btn._ref).then((g) => {
+    const img = btn.querySelector('img');
+    if (g.url) {
+      img.addEventListener('load', () => { const pane = histPane(); if (HIST.atEnd && pane && pane.contains(btn)) histToEnd(pane); }, { once: true });
+      img.src = g.url; btn.classList.remove('h-thumb-wait');
+    }
+    else { btn.classList.add('h-thumb-bad'); btn.querySelector('.h-thumb-note').textContent = g.error; }
+  });
+}
+function histThumb(ref) {
+  const b = hNode('button', 'h-thumb h-thumb-wait');
+  b.type = 'button';
+  b._ref = ref;
+  b.dataset.hImg = `${ref.off}:${ref.n}`;
+  b.setAttribute('aria-label', '画像を大きく表示');
+  const img = hNode('img');
+  img.alt = '履歴の画像';
+  img.decoding = 'async';
+  b.append(img, hNode('span', 'h-thumb-note', ''));
+  b.addEventListener('click', () => histLightOpen(b));
+  if (histSeen) histSeen.observe(b); else histThumbLoad(b);
+  return b;
+}
+const LIGHT = { el: null, list: [], k: 0, opener: null, onKey: null };
+function histLightShow() {
+  const ref = LIGHT.list[LIGHT.k], img = LIGHT.el.querySelector('img'), note = LIGHT.el.querySelector('.h-light-note');
+  LIGHT.el.querySelector('.h-light-count').textContent = `${LIGHT.k + 1} / ${LIGHT.list.length}`;
+  LIGHT.el.querySelectorAll('[data-h-light-step]').forEach((b) => { b.disabled = LIGHT.list.length < 2; });
+  img.removeAttribute('src'); note.textContent = '読み込み中…';
+  const want = LIGHT.k;
+  histImgGet(ref).then((g) => {
+    if (!LIGHT.el || LIGHT.k !== want) return;
+    if (g.url) { img.src = g.url; note.textContent = ''; } else note.textContent = g.error;
+  });
+}
+function histLightOpen(btn) {
+  histLightClose(false);
+  const all = HIST.node ? [...HIST.node.querySelectorAll('.h-thumb')] : [btn];
+  LIGHT.list = all.map((b) => b._ref);
+  LIGHT.k = Math.max(0, all.indexOf(btn));
+  LIGHT.opener = btn.dataset.hImg;
+  const el = hNode('div', 'h-light');
+  const box = hNode('div', 'h-light-box');
+  box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-labelledby', 'h-light-title'); box.tabIndex = -1;
+  const head = hNode('div', 'h-light-head');
+  const title = hNode('h3', '', '履歴の画像'); title.id = 'h-light-title';
+  const prev = hNode('button', 'wb-btn', '‹ 前'); prev.type = 'button'; prev.dataset.hLightStep = '-1'; prev.setAttribute('aria-label', '前の画像（←）');
+  const next = hNode('button', 'wb-btn', '次 ›'); next.type = 'button'; next.dataset.hLightStep = '1'; next.setAttribute('aria-label', '次の画像（→）');
+  const close = hNode('button', 'wb-btn', '閉じる'); close.type = 'button'; close.dataset.hLightClose = '';
+  head.append(title, hNode('span', 'h-light-count', ''), prev, next, close);
+  const img = hNode('img'); img.alt = '履歴の画像（拡大）';
+  box.append(head, img, hNode('p', 'h-light-note', ''));
+  el.appendChild(box);
+  document.body.appendChild(el);
+  LIGHT.el = el;
+  const step = (d) => { LIGHT.k = (LIGHT.k + d + LIGHT.list.length) % LIGHT.list.length; histLightShow(); };
+  el.addEventListener('click', (e) => {
+    if (e.target === el || e.target.closest('[data-h-light-close]')) { histLightClose(true); return; }
+    const s = e.target.closest('[data-h-light-step]');
+    if (s) step(Number(s.dataset.hLightStep));
+  });
+  LIGHT.onKey = (e) => {   // first (capture): these keys belong to the dialog, not to the card or the board under it
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); histLightClose(true); return; }
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !e.altKey && !e.ctrlKey && !e.metaKey) { e.preventDefault(); e.stopPropagation(); if (LIGHT.list.length > 1) step(e.key === 'ArrowRight' ? 1 : -1); return; }
+    if (e.key !== 'Tab') return;
+    const list = [...box.querySelectorAll('button:not(:disabled)')], first = list[0], last = list[list.length - 1];
+    if (!box.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+    else if (e.shiftKey && (document.activeElement === first || document.activeElement === box)) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  };
+  document.addEventListener('keydown', LIGHT.onKey, true);
+  histLightShow();
+  close.focus();
+}
+function histLightClose(back) {
+  if (!LIGHT.el) return;
+  LIGHT.el.remove(); LIGHT.el = null;
+  document.removeEventListener('keydown', LIGHT.onKey, true);
+  if (!back) return;
+  // the thumbnail that opened it (the list may have been rebuilt meanwhile: the same picture's new button)
+  const again = HIST.node && [...HIST.node.querySelectorAll('.h-thumb')].find((b) => b.dataset.hImg === LIGHT.opener);
+  if (again) again.focus({ preventScroll: true });
+}
+
+/* ---------- the wide history (2.3.4, requester 10-19: "チャットが狭いから見づらい 左にロボット一人分くらいの余裕を残して残りを
+   チャットの表示にしてほしい"; "チャット広げた時はカメラの位置移動もしてね 選んでるボットが左の余白の部分に来るように") ----------
+   広げる on the card's head (the 応答の履歴 tab only): the card covers everything right of histWideMargin(), the side
+   panel too, and the camera flies (focusPose, 50-panel.js) so the robot stands in the middle of that margin; ← → keep
+   it there for the next robot. 元の幅に戻す / Esc: the card's width and the view before. 900 px or narrower: the whole
+   screen. The choice is kept in localStorage (readPref / writePref: a blocked storage only forgets it). */
+const HIST_WIDE_PREF = 'hist-wide';
+let histWidePref = readPref(HIST_WIDE_PREF, 'off') === 'on';   // read once: a blocked storage still keeps it for this page
+function histWideMargin() {
+  if (!HIST.wide) return 0;
+  const w = window.innerWidth;
+  return w <= 900 ? 0 : Math.round(Math.min(440, Math.max(320, w * 0.28)));
+}
+function histWideFly() {
+  if (!has3D || !zoom.zoomed || !rbState.id || !robots.some((x) => x.def.id === rbState.id)) return;
+  const pose = robotPose(rbState.id);
+  flyTo(pose.p, pose.t, viewTarget, reduceMotion ? 0 : 0.6, null);
+}
+function histSetWide(on, remember = true) {
+  on = !!on && HIST.tab === 'history' && !!rbState.id;
+  if (remember) { histWidePref = on; writePref(HIST_WIDE_PREF, on ? 'on' : 'off'); }
+  if (HIST.wide === on) { histWidePaint(); return; }
+  HIST.wide = on;
+  histWidePaint();
+  histWideFly();
+  const pane = histPane();
+  if (pane && HIST.atEnd) histToEnd(pane);   // the newest stays in view across the change of width
+}
+function histWidePaint() {
+  const m = histWideMargin();
+  rbEl.classList.toggle('rb-wide', HIST.wide);
+  rbEl.classList.toggle('rb-wide-full', HIST.wide && !m);
+  rbEl.style.setProperty('--wide-left', `${m}px`);
+  rbEl.style.setProperty('--wide-top', `${HIST.wide && m ? Math.round(sceneEl.getBoundingClientRect().top) : 0}px`);
+  const b = rbEl.querySelector('[data-rb-wide]');
+  if (b) {
+    b.hidden = HIST.tab !== 'history';
+    b.setAttribute('aria-pressed', String(HIST.wide));
+    b.textContent = HIST.wide ? '元の幅に戻す' : '広げる';
+    b.title = HIST.wide ? '元の幅に戻す（Esc）' : '応答の履歴を画面いっぱいに広げる';
+  }
+}
+/* After every histSync: the tab and the card decide whether it is wide (the kept choice applies to the history tab). */
+function histWideSync(id) {
+  const want = !!id && HIST.tab === 'history' && histWidePref;
+  if (want !== HIST.wide) histSetWide(want, false);
+  else histWidePaint();
+}
+rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rb-wide]')) histSetWide(!HIST.wide); });
+window.addEventListener('resize', () => { if (HIST.wide) { histWidePaint(); histWideFly(); } });
+
 // ---- web/js/60-log.js ----
 
 /* ---------- full-screen event log ---------- */
@@ -5421,6 +6796,29 @@ function openLogFor(id, opener) {
 }
 function closeLog() { logState.open = false; logOverlay.hidden = true; if (logState.opener) logState.opener.focus(); }
 $('btn-log').addEventListener('click', (e) => openLog(e.currentTarget));
+/* The log strip can be closed (requester, 10-19): the strip goes, the scene and the panel take its height, and
+   「ログを開く」 floats at the bottom right. Remembered in this browser (readPref / writePref: a blocked storage only
+   forgets it). Closed, the strip still gets every event (renderTicker keeps writing it), so it opens on the latest. */
+const LOG_STRIP = { open: true };
+function placeStripOpen() {   // the panel's foot while the panel shows, else floating over the scene's corner
+  const sideShown = !document.querySelector('.main').classList.contains('side-closed');
+  $('side-foot').hidden = LOG_STRIP.open || !sideShown;
+  $('btn-strip-open-float').hidden = LOG_STRIP.open || sideShown;
+}
+function setLogStrip(open, { save = true, focus = false } = {}) {
+  LOG_STRIP.open = open;
+  document.querySelector('.app').classList.toggle('log-closed', !open);
+  placeStripOpen();
+  for (const id of ['btn-strip-close', 'btn-strip-open', 'btn-strip-open-float']) $(id).setAttribute('aria-expanded', String(open));
+  if (save) writePref('logStrip', open ? 'open' : 'closed');
+  if (open) renderTicker();
+  if (focus) (open ? $('btn-strip-close') : $('btn-strip-open').offsetParent ? $('btn-strip-open') : $('btn-strip-open-float')).focus();
+}
+$('btn-strip-close').addEventListener('click', () => setLogStrip(false, { focus: true }));
+$('btn-strip-open').addEventListener('click', () => setLogStrip(true, { focus: true }));
+$('btn-strip-open-float').addEventListener('click', () => setLogStrip(true, { focus: true }));
+new MutationObserver(placeStripOpen).observe(document.querySelector('.main'), { attributes: true, attributeFilter: ['class'] });
+setLogStrip(readPref('logStrip', 'open') !== 'closed', { save: false });
 $('log-close').addEventListener('click', closeLog);
 function renderLog(force) {
   if (!logState.open) return;
@@ -5450,6 +6848,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
   if (!popEl.hidden) { e.preventDefault(); closePop(); return; }
   if (logState.open) { e.preventDefault(); closeLog(); }
+  else if (rbState.id && HIST.wide) { e.preventDefault(); histSetWide(false); }   // the wide history: back to the card's width first
   else if (rbState.id) { e.preventDefault(); closeRobot(); }
   else if (wb.open) {
     e.preventDefault();
