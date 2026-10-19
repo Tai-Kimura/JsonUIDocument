@@ -204,7 +204,9 @@ body { background: var(--bg); color: var(--ink); font-family: var(--font-body); 
 .brand { margin: 0; font: 400 18px/1.3 var(--font-display); letter-spacing: 0.02em; white-space: nowrap; }
 .cloth { display: inline-block; margin-right: 0.25em; padding: 0 0.3em 0.05em; background: var(--cloth); color: var(--cloth-ink); border: 2px solid var(--cloth-ink); transform: rotate(-2deg); }
 .chips { display: flex; flex: 1 1 auto; flex-wrap: wrap; gap: 6px; }
-.chip { padding: 2px 9px; border-radius: 999px; background: var(--chip); color: var(--ink-soft); font: 500 12px/1.6 var(--font-mono); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.chip { padding: 2px 9px; border: 0; border-radius: 999px; background: var(--chip); color: var(--ink-soft); font: 500 12px/1.6 var(--font-mono); white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* border 0 (2.3.5): a chip that is a <button> (質問の窓 chip-askwait) kept the browser's 2 px border, stood 4 px taller,
+   and the row stretched every other chip to its height with the text left at the top (2.6 px off the middle). */
 .chip.demo { background: var(--warn-bg); color: var(--warn); font-family: var(--font-body); font-weight: 700; }
 .controls { display: flex; flex-wrap: wrap; gap: 6px; }
 .controls button { padding: 4px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font: 700 12px/1.5 var(--font-body); cursor: pointer; }
@@ -615,6 +617,12 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .vt td { padding: 5px 6px; border-bottom: 1px dashed var(--wb-line); color: var(--wb-ink); vertical-align: baseline; }
 .vt td.mk { width: 1.8em; }
 .sub-h, .fb-h { margin: 0; color: var(--wb-soft); font: 700 11.5px/1.5 var(--font-body); }
+/* the data flow diagram (2.3.5): Mermaid's SVG on the sheet at its own size, a scroll bar when wider (or fitted) */
+.flow-mmd-wrap { min-width: 0; max-width: 100%; margin: 2px 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.flow-mmd-bar { display: flex; justify-content: flex-end; padding: 6px 8px 0; }
+.flow-mmd { max-width: 100%; overflow-x: auto; padding: 6px 10px 10px; }
+.flow-mmd svg { display: block; margin: 0 auto; }
+.flow-mmd.mmd-failed::before { content: '図を描けませんでした（下の箱を見てください）'; color: var(--ink-soft); font-size: 12px; }
 .flow { display: grid; gap: 4px; }
 .fbox { display: grid; gap: 4px; padding: 8px 10px; border: 1.5px solid var(--wb-line); border-radius: 8px; }
 .fbox p { margin: 0; }
@@ -654,10 +662,47 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .ov-labels { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; color: var(--wb-soft); font: 500 10px/1.3 var(--font-body); text-align: center; }
 .ov-sum { color: var(--wb-soft); font: 500 11px/1.4 var(--font-mono); }
 
+/* the data server's sheet (2.3.5): the whiteboard's frame, its tabs in the head, one scrolling body */
+.ds-frame { grid-template-rows: auto auto minmax(0, 1fr); }
+.ds-tabs { display: flex; gap: 6px; padding: 10px 18px 0; }
+.ds-tab { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border: 1.5px solid var(--wb-line); border-radius: 999px; background: var(--wb-card); color: var(--wb-ink); font: 700 12.5px/1.4 var(--font-body); cursor: pointer; }
+.ds-tab b { font: 700 11px/1 var(--font-mono); opacity: 0.75; }
+.ds-tab[aria-selected="true"] { border-color: var(--wb-ink); background: var(--wb-ink); color: var(--wb-bg); }
+.ds-body { min-height: 0; overflow: auto; padding: 14px 18px 22px; }
+.ds-doc { display: grid; gap: 10px; margin-bottom: 18px; padding: 12px 14px 14px; border: 1.5px solid var(--wb-line); border-radius: 12px; background: var(--wb-card); }
+.ds-doc > header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.ds-doc h3 { margin: 0; font: 700 16px/1.4 var(--font-body); }
+.ds-doc h4 { margin: 8px 0 2px; font: 700 14px/1.4 var(--font-body); }
+.ds-doc h5 { margin: 10px 0 4px; font: 700 12px/1.4 var(--font-body); color: var(--wb-soft); }
+.ds-doc code { font: 500 12px/1.5 var(--font-mono); overflow-wrap: anywhere; }
+.ds-desc { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12.5px; }
+.ds-none { color: var(--wb-soft); font-size: 12.5px; }
+.ds-eps { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.ds-ep { display: flex; align-items: baseline; gap: 8px; width: 100%; padding: 6px 8px; border: 1px solid var(--wb-line); border-radius: 8px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.ds-ep[aria-expanded="true"] { border-color: var(--wb-ink); }
+.ds-ep .desc { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--wb-soft); font-size: 12.5px; }
+.ds-detail { margin: 4px 0 8px 12px; padding-left: 10px; border-left: 3px solid var(--wb-line); }
+.ds-json { max-height: 320px; margin: 2px 0 8px; padding: 8px 10px; overflow: auto; border-radius: 8px; background: var(--wb-bg); font: 500 11.5px/1.5 var(--font-mono); white-space: pre; }
+.ds-ct { margin: 4px 0 0; font: 700 11px/1.4 var(--font-mono); color: var(--wb-soft); }
+.ds-code { font-family: var(--font-mono); }
+.ds-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ds-table th, .ds-table td { padding: 4px 6px; border-bottom: 1px solid var(--wb-line); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.ds-table th { color: var(--wb-soft); font-weight: 700; }
+.ds-key { display: inline-block; padding: 0 5px; border-radius: 4px; background: var(--wb-bg); font: 700 11px/1.6 var(--font-mono); }
+.ds-file { display: block; color: var(--wb-soft); }
+.ds-erd { border: 1px solid var(--wb-line); border-radius: 10px; background: var(--panel); }
+.ds-erd svg { display: block; max-width: 100%; height: auto; margin: 0 auto; }
 .kb-frame { border-color: var(--kb-rim); background: radial-gradient(var(--kb-speck) 1px, transparent 1.6px) 0 0 / 10px 10px, var(--kb-bg); }
 .kb-frame .wb-head { border-bottom-color: transparent; }
 .kb-frame .wb-head h2, .kb-frame .wb-head code { text-shadow: 0 1px 0 var(--kb-col); }
-.kb-body { position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+/* The board's body: the question strip, the permission strip, then the columns — each in its own row, so the columns start
+   below whatever strips show (2.3.5: with the question strip added the columns fell into an auto row after a squeezed
+   1fr one and their headers covered the permission strip's buttons; ticket 2026-10-20-jui-viz-board-kanban-header-covers-perm-strip).
+   A hidden strip leaves an empty row of no height. */
+.kb-body { position: relative; display: grid; grid-template-rows: auto auto minmax(0, 1fr); min-height: 0; }
+.kb-body > #q-strip { grid-row: 1; }
+.kb-body > #perm-strip { grid-row: 2; }
+.kb-body > .kanban { grid-row: 3; }
 .kanban { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 12px; min-height: 0; overflow: auto; padding: 2px 14px 16px; }
 .perm-strip { display: grid; gap: 8px; max-height: 42vh; margin: 0 14px 10px; padding: 10px 12px; overflow-y: auto; border: 2px solid var(--wb-amber); border-radius: 12px; background: var(--wb-card); color: var(--wb-ink); }
 .ps-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0; font: 700 14px/1.4 var(--font-body); }
@@ -809,12 +854,26 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .h-who { white-space: nowrap; overflow-wrap: normal; }   /* 依頼者 is a bare text node in the row: the row itself keeps it whole */
 .h-tool summary > b, .h-harness summary > b, .h-peer summary > b { flex: 0 1 auto; min-width: 3em; max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; overflow-wrap: normal; }
 .h-item summary > .h-head { flex: 1 1 0; }   /* the body narrows first: the labels get their own width before it */
+/* A message from another session reads top to bottom (requester 10-19, issue #34): the sender, then the body, then
+   the time, each on its own line. The sender takes the row's width (cut with … if longer still); the body wraps, up to
+   three lines folded — the whole text is in the opened item. */
+.h-peer summary { flex-direction: column; align-items: stretch; gap: 2px; }
+.h-peer summary > b { max-width: none; }
+/* SendMessage's recipient and a received message's sender (2.3.6): a robot here is a link-like button */
+.h-tool summary > .h-to { flex: none; max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-soft); }
+.h-peerlink { padding: 0; border: 0; background: none; font: inherit; color: var(--info); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.h-peerlink:hover { text-decoration-thickness: 2px; }
+.h-peerlink:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-radius: 3px; }
+.h-peer summary > .h-head { flex: none; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; white-space: normal; overflow-wrap: anywhere; }
+.h-peer summary > .h-at { align-self: flex-end; margin-top: 4px; }   /* the time at the right end, a little apart from the body (issue #37) */
 .h-err { color: var(--warn); font-weight: 700; }
 .h-run { color: var(--info); }
 .h-io { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 8px; padding: 0 8px 8px; }
 .h-io-k { color: var(--ink-soft); font: 700 11px/1.9 var(--font-mono); }
 .h-peer { border-left: 3px solid var(--info); }
 .h-peer > .h-plain, .h-harness > .h-plain { padding: 0 8px 8px; }
+details.h-item[open] > :not(summary) { cursor: pointer; }   /* an open fold's body closes it on a click (text still selects) */
+details.h-item[open] > :not(summary) :is(a[href], button, img, .h-thumb) { cursor: revert; }
 .h-harness { border-left: 3px solid var(--line); background: none; }
 .h-harness summary b { color: var(--ink-soft); }
 .h-mark { color: var(--ink-soft); font-size: 11.5px; font-style: italic; }
@@ -844,6 +903,10 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .rb-run-head { display: flex; gap: 8px; margin: 0; }
 .rb-saved { margin-left: auto; color: var(--ink-soft); font-size: 11px; }
 .rb-run-file { overflow: hidden; color: var(--ink-soft); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
+/* the whole text of a line cut to one (57-fulltext.js): wrapped, selectable, inside the card's or the panel's box */
+.fulltext { position: fixed; z-index: 45; box-sizing: border-box; padding: 6px 9px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); box-shadow: 0 6px 18px var(--shadow); font: 500 12px/1.5 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; cursor: text; }
+.fulltext[hidden] { display: none; }
+[tabindex="0"]:is(.rb-run-file, .act, .h-head):focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 .rb-fails { display: grid; gap: 2px; margin: 0; padding-left: 1.2em; color: var(--warn); font-size: 12px; overflow-wrap: anywhere; }
 .rb-fail-more { list-style: none; margin-left: -1.2em; color: var(--ink-soft); }
 .note::before { content: ""; position: absolute; top: 4px; left: 50%; width: 9px; height: 9px; border-radius: 50%; background: var(--pin); transform: translateX(-50%); }
@@ -969,6 +1032,27 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 /* one room at a time (requester, 10-18): the room picked fills the view, the way back sits at the top left */
 .room-solo { position: absolute; left: 12px; top: 12px; z-index: 6; display: flex; align-items: center; gap: 8px; max-width: calc(100% - 24px); padding: 4px 10px 4px 4px; border-radius: 10px; background: var(--panel); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12); }
 .room-solo[hidden] { display: none; }
+/* the notifications and the question window's settings (2.3.6) */
+.notify-pop { position: fixed; top: 52px; right: 12px; z-index: 55; width: min(380px, calc(100vw - 24px)); display: grid; gap: 8px; padding: 14px 16px; border-radius: 12px; background: var(--panel); color: var(--ink); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); font: 13px/1.5 var(--font-body); }
+.notify-pop[hidden] { display: none; }
+.notify-pop h2 { margin: 0; font: 700 15px/1.3 var(--font-body); }
+.notify-pop p { margin: 0; }
+.notify-kinds { display: grid; gap: 4px; margin: 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; }
+.notify-kinds legend { padding: 0 4px; font-weight: 700; }
+.notify-pop select { padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: 13px/1.4 var(--font-body); }
+.notify-note { color: var(--ink-soft); }
+/* the call bell's dialog (2.3.5) */
+.call-overlay { position: fixed; inset: 0; z-index: 55;   /* over the log (50), under the toast (60) */ display: grid; place-items: center; padding: 16px; background: rgba(10, 14, 20, 0.45); }
+.call-overlay[hidden] { display: none; }
+.call-card { width: min(640px, 100%); max-height: calc(100vh - 32px); overflow: auto; display: grid; gap: 6px; padding: 18px 20px; border-radius: 12px; background: var(--panel); color: var(--ink); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); }
+.call-card h2 { margin: 0 0 2px; font: 700 18px/1.3 var(--font-body); }
+.call-card label { margin-top: 6px; font: 700 13px/1.3 var(--font-body); }
+.call-card input, .call-card textarea { width: 100%; box-sizing: border-box; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: 14px/1.45 var(--font-body); resize: vertical; }
+.call-card #call-cmd { font: 12.5px/1.5 var(--font-mono); word-break: break-all; }
+.call-lead, .call-note { margin: 0; color: var(--ink-soft); font: 13px/1.5 var(--font-body); }
+.call-why { min-height: 1.4em; margin: 2px 0 0; font: 13px/1.4 var(--font-body); }
+.call-actions { display: flex; gap: 8px; margin-top: 4px; }
+.call-copy:not(:disabled) { border-color: var(--info); }
 .rs-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ink); font: 700 13px/1 var(--font-mono); }
 .tags .tag[hidden] { display: none; }
 .tower-legend { position: absolute; right: 12px; top: 56px; z-index: 6; margin: 0; padding: 8px 12px; list-style: none; border-radius: 10px; background: var(--panel); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12); font: 600 12.5px/1.5 var(--font-body); color: var(--ink); }
@@ -997,6 +1081,8 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .tag > span:empty { display: none; }
 .rb-cond { margin: 4px 0 0; font: 700 12.5px/1.5 var(--font-body); color: var(--warn); }
 .rb-cond[hidden] { display: none; }
+.rb-looks { margin: 2px 0 0; font: 12px/1.5 var(--font-body); color: var(--ink-soft); }
+.rb-looks[hidden] { display: none; }
 .demo-clock { position: absolute; left: 12px; bottom: 10px; z-index: 5; margin: 0; padding: 2px 8px; border-radius: 6px; background: var(--tag-bg); color: var(--ink-soft); font: 600 11.5px/1.6 var(--font-body); }
 .demo-clock[hidden] { display: none; }
 
@@ -1027,8 +1113,9 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .sh-body p { margin: 0 0 10px; font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
 .sh-body .sh-legend { gap: 4px 14px; font-size: 12.5px; color: var(--ink); }
 /* The wide 応答の履歴 (2.3.4): the card from the left margin (one robot's width, --wide-left) to the right edge, over the
-   side panel; the whole screen at 900 px or narrower. Pictures in the history: thumbnails and a large view. */
-.rb.rb-wide { position: fixed; top: calc(var(--wide-top, 0px) + 14px); left: var(--wide-left, 0px); right: 14px; bottom: 14px; z-index: 30; width: auto; max-height: none; }
+   side panel and over the site's header too (requester 10-19, issue #35: the header's height goes to the history); the
+   whole screen at 900 px or narrower. Pictures in the history: thumbnails and a large view. */
+.rb.rb-wide { position: fixed; top: 14px; left: var(--wide-left, 0px); right: 14px; bottom: 14px; z-index: 30; width: auto; max-height: none; }
 .rb.rb-wide-full { inset: 0; border-radius: 0; }
 .rb-wide-btn[hidden] { display: none; }
 /* the tab row holds the tabs (the tablist) and, on its right, 広げる: the card's head keeps its width for the title.
@@ -1036,6 +1123,13 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .rb-tablist { display: flex; gap: 4px; order: 1; }
 .rb-tabs .rb-wide-btn { order: 2; margin: 0 0 4px auto; align-self: center; padding: 3px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font: 700 12px/1.5 var(--font-body); }
 .rb-tabs .rb-wide-btn[aria-pressed="true"] { border-color: var(--info); background: var(--info-bg); color: var(--info); }
+/* Wide, the head is one row (requester 10-19, issue #36): the mark and the name on the left, ‹ › 「← 3D に戻る」 and 退勤
+   on the right; the name takes what the buttons leave. At the card's width it stays stacked, and so does the wide card
+   at 900 px or narrower (.rb-wide-full), where one row would leave the name a few characters. */
+.rb.rb-wide:not(.rb-wide-full) .rb-head { grid-template-columns: auto minmax(0, 1fr) auto; }
+.rb.rb-wide:not(.rb-wide-full) .rb-side { display: flex; grid-column: auto; align-items: center; gap: 8px; }
+.rb.rb-wide:not(.rb-wide-full) .rb-nav { grid-column: auto; }
+.rb.rb-wide:not(.rb-wide-full) .rb-side .rb-clock { order: 1; }
 .rb.rb-wide .rb-hist { font-size: 14px; padding-inline: clamp(14px, 3vw, 40px); }
 .rb.rb-wide .h-compose { padding-inline: clamp(14px, 3vw, 40px); }
 .rb.rb-wide .h-code { white-space: pre; }
@@ -1059,3 +1153,107 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .h-light-box img { display: block; max-width: calc(100vw - 56px); max-height: calc(100vh - 120px); margin: 0 auto; object-fit: contain; }
 .h-light-note { margin: 0; color: var(--ink-soft); font: 700 12px/1.5 var(--font-body); }
 .h-light-note:empty { display: none; }
+
+/* The spec sheet's colours (2.3.5): a transition's tag by its kind, a state variable's type by its type (50-panel.js,
+   TRANSITION_KINDS / TYPE_KINDS, the same source as the legend in the 「?」). Each pair is 4.5:1 or more against where it
+   is drawn — the tag's text against its own ground, a type against the card, the highlighted rows and the dialog — in
+   light and in dark (measured by tools/viz_e2e/spec_colors.py from the computed colours). */
+:root {
+  --tk-push-fg: #0a4a85; --tk-push-bg: #e2effc;
+  --tk-modal-fg: #62288a; --tk-modal-bg: #f1e6fa;
+  --tk-back-fg: #5f4300; --tk-back-bg: #fbefcf;
+  --tk-replace-fg: #8a280a; --tk-replace-bg: #fde6dd;
+  --tk-external-fg: #0a5a3b; --tk-external-bg: #ddf4e8;
+  --tk-none-fg: #3f4957; --tk-none-bg: #eaedf2;
+  --tk-screen-fg: #8c1d5a; --tk-screen-bg: #fbe4f0;
+  --tk-other-fg: #1a2433; --tk-other-bg: #ffffff;
+  --ty-string: #a8281f; --ty-bool: #6f35a8; --ty-number: #0b6b4b; --ty-color: #9a4a12; --ty-array: #1d5aa0; --ty-optional: #7d5500; --ty-custom: #454f5e;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --tk-push-fg: #b3d9ff; --tk-push-bg: #183a60;
+    --tk-modal-fg: #e5c9ff; --tk-modal-bg: #3b2655;
+    --tk-back-fg: #f7dc8f; --tk-back-bg: #463711;
+    --tk-replace-fg: #ffbaa6; --tk-replace-bg: #4b2317;
+    --tk-external-fg: #93f2c8; --tk-external-bg: #123f2e;
+    --tk-none-fg: #cdd5e0; --tk-none-bg: #2a3547;
+    --tk-screen-fg: #ffb3d9; --tk-screen-bg: #4a1a36;
+    --tk-other-fg: #e4ecf8; --tk-other-bg: #15243a;
+    --ty-string: #ff9a8f; --ty-bool: #d7b4ff; --ty-number: #7ce8bd; --ty-color: #ffbc85; --ty-array: #9ccbff; --ty-optional: #f2d27e; --ty-custom: #c6d1de;
+  }
+}
+:root[data-theme="dark"] {
+  --tk-push-fg: #b3d9ff; --tk-push-bg: #183a60;
+  --tk-modal-fg: #e5c9ff; --tk-modal-bg: #3b2655;
+  --tk-back-fg: #f7dc8f; --tk-back-bg: #463711;
+  --tk-replace-fg: #ffbaa6; --tk-replace-bg: #4b2317;
+  --tk-external-fg: #93f2c8; --tk-external-bg: #123f2e;
+  --tk-none-fg: #cdd5e0; --tk-none-bg: #2a3547;
+  --tk-screen-fg: #ffb3d9; --tk-screen-bg: #4a1a36;
+    --tk-other-fg: #e4ecf8; --tk-other-bg: #15243a;
+  --ty-string: #ff9a8f; --ty-bool: #d7b4ff; --ty-number: #7ce8bd; --ty-color: #ffbc85; --ty-array: #9ccbff; --ty-optional: #f2d27e; --ty-custom: #c6d1de;
+}
+.scr.tk { border: 1px solid color-mix(in srgb, currentColor 30%, transparent); font-weight: 600; }
+.tk .tk-k { margin-right: 6px; padding-right: 6px; border-right: 1px solid color-mix(in srgb, currentColor 35%, transparent); font: 700 10.5px/1.5 var(--font-body); }
+.scr.tk-push { color: var(--tk-push-fg); background: var(--tk-push-bg); }
+.scr.tk-modal { color: var(--tk-modal-fg); background: var(--tk-modal-bg); }
+.scr.tk-back { color: var(--tk-back-fg); background: var(--tk-back-bg); }
+.scr.tk-replace { color: var(--tk-replace-fg); background: var(--tk-replace-bg); }
+.scr.tk-external { color: var(--tk-external-fg); background: var(--tk-external-bg); }
+.scr.tk-none { color: var(--tk-none-fg); background: var(--tk-none-bg); }
+.scr.tk-screen { color: var(--tk-screen-fg); background: var(--tk-screen-bg); }
+.scr.tk-other { color: var(--tk-other-fg); background: var(--tk-other-bg); }
+.ty.ty-string { color: var(--ty-string); }
+.ty.ty-bool { color: var(--ty-bool); }
+.ty.ty-number { color: var(--ty-number); }
+.ty.ty-color { color: var(--ty-color); }
+.ty.ty-array { color: var(--ty-array); }
+.ty.ty-optional { color: var(--ty-optional); }
+.ty.ty-custom { color: var(--ty-custom); }
+.sh-body .sh-kinds { gap: 6px 8px; }
+.tk.tk-solo .tk-k { margin-right: 0; padding-right: 0; border-right: 0; }
+.sh-body .sh-types code { font: 600 12px/1.5 var(--font-mono); }
+
+/* The questions on the board (2.3.5): the panel's cards in the permission strip's frame, above it */
+.q-strip { border-color: var(--wb-violet, var(--info)); }
+.q-strip .qcard { margin: 0; }
+
+/* The bill over a robot (2.3.6): a banknote and the estimated cost of its responses, above its name tag (placeRobotTags
+   keeps the room for it inside the tag's box, so it never covers a tag); it rises a little and goes. ? = no price. */
+.bill { position: absolute; left: 0; top: 0; pointer-events: none; }
+.bill-in { display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px 1px 5px; border: 1.5px solid var(--ok); border-radius: 999px; background: var(--ok-bg); color: var(--ok); font: 700 11.5px/1.5 var(--font-mono); white-space: nowrap; font-variant-numeric: tabular-nums; box-shadow: 0 1px 4px var(--shadow); }
+.bill.unknown .bill-in { border-color: var(--warn); background: var(--warn-bg); color: var(--warn); }
+.bill-ico { flex: none; width: 18px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.bill-ico rect { fill: currentColor; fill-opacity: 0.16; }
+.bill-in.rise { animation: bill-rise 4.2s ease-out forwards; }
+@keyframes bill-rise {
+  0% { opacity: 0; transform: translateY(0); }
+  8% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-12px); }
+}
+.set-bills { display: grid; justify-items: start; gap: 6px; margin-top: 14px; }
+.price-chip::before { content: "$ "; }
+.pr-body { display: grid; align-content: start; gap: 14px; }
+.pr-about { margin: 0; font-size: 12.5px; line-height: 1.6; }
+.pr-about code, .pr-body li code { font: 500 11.5px/1.5 var(--font-mono); overflow-wrap: anywhere; }
+.pr-msg { margin: 0; padding: 6px 10px; border-radius: 8px; background: var(--wb-card); font: 700 12.5px/1.5 var(--font-body); }
+.pr-unpriced, .pr-errors { padding: 10px 14px; border: 1.5px solid var(--warn); border-radius: 12px; background: var(--wb-card); }
+.pr-body h3 { margin: 0 0 6px; font: 700 13.5px/1.4 var(--font-body); }
+.pr-unpriced ul, .pr-errors ul { display: grid; gap: 4px; margin: 0; padding-left: 18px; font-size: 12.5px; }
+.pr-form { display: grid; gap: 8px; padding: 12px 14px; border: 1.5px solid var(--wb-line); border-radius: 12px; background: var(--wb-card); }
+.pr-form label { display: grid; gap: 3px; font: 700 11.5px/1.4 var(--font-body); color: var(--wb-soft); }
+.pr-form input { min-width: 0; padding: 5px 8px; border: 1px solid var(--wb-line); border-radius: 6px; background: var(--panel); color: var(--ink); font: 500 13px/1.4 var(--font-mono); }
+.pr-nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.pr-btns { display: flex; gap: 8px; }
+.pr-table td, .pr-table th { font-variant-numeric: tabular-nums; }
+.pr-table tr.removed { opacity: 0.55; }
+.pr-extra { display: block; color: var(--wb-soft); font-size: 11px; font-weight: 500; }
+.pr-origin { display: inline-block; padding: 0 6px; border-radius: 4px; background: var(--wb-bg); font: 700 11px/1.6 var(--font-body); white-space: nowrap; }
+.pr-origin[data-origin="changed"], .pr-origin[data-origin="user"] { background: var(--info-bg); color: var(--info); }
+.pr-origin[data-origin="removed"] { background: var(--bad-bg); color: var(--bad); }
+.pr-acts { white-space: nowrap; }
+.pr-acts .mini-btn + .mini-btn { margin-left: 4px; }
+@media (max-width: 640px) { .pr-table thead { display: none; } .pr-table tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 6px 0; border-bottom: 1px solid var(--wb-line); } .pr-table th[scope="row"], .pr-table td.pr-acts { grid-column: 1 / -1; } .pr-table td, .pr-table th { border: 0; } }
+/* priced by the user's own table (not the shipped one): a dashed frame, and the title says so */
+.bill.own-price .bill-in { border-style: dashed; }

@@ -2948,6 +2948,214 @@
     },
     {
       "binary": "jui",
+      "command": "viz prices list",
+      "synopsis": "jui viz prices [list] [--json]",
+      "purpose": {
+        "en": "Show the prices (USD per million tokens) behind the estimated cost over each robot (from 2.3.5): the table shipped with jui viz, with its source and the day it was checked, then your own changes, each row marked as shipped, added, changed or removed, and any row of yours that is left out, with the reason. The amounts over the robots are estimates: on a subscription the bill is not per token.",
+        "ja": "ロボットの頭上の概算の金額に使う単価（100 万トークンあたりの USD）を表示する（2.3.5 から）。jui viz に同梱の表（出典と確認した日）と、利用者の変更を、行ごとに 既定・追加・変更・削除 の印つきで出し、使わない利用者の行があれば理由を出す。ロボットの頭上の金額は概算で、サブスクリプションの請求はトークン単位ではない。"
+      },
+      "options": [
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Machine-readable list.",
+            "ja": "機械可読の一覧。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz prices"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz prices set",
+        "jui viz prices reset"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.5",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "3a493d52650be91ef0f2e1b08523d177ffc1886e6b9f0da2546dd6fc30a1a102",
+        "cardHash": "635c79a55233b750bb24066cb05b921792b0f2c69d0bf913fba8cb1f23f566be",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "240199a00c3f",
+          "synopsis": "f1b9dd135c76",
+          "purpose": "64b4ede4dd6b",
+          "options": "e841652500d2",
+          "examples": "603082ed37e2",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "37be035989cb"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz prices set",
+      "synopsis": "jui viz prices set MODEL --input USD --cache-write-5m USD --cache-write-1h USD --cache-read USD --output USD",
+      "purpose": {
+        "en": "Add a model to the price table, or change a model's prices. MODEL is the model ID as the transcript writes it (message.model), and all five prices are required. Changes go to your own table, prices.json in jui viz's state folder (~/.local/state/jui-viz), the same one the page's 単価 sheet writes; a running server uses it from its next response, with no restart.",
+        "ja": "単価の表にモデルを足す、またはモデルの単価を変える。MODEL は transcript に書かれるモデルの ID（message.model）で、5 つの単価がすべて要る。変更は、jui viz の状態フォルダ（~/.local/state/jui-viz）の prices.json（利用者の表。画面の単価のシートと同じ物）に書き、動いているサーバーは、再起動なしで次の応答から使う。"
+      },
+      "options": [
+        {
+          "name": "--input",
+          "type": "number",
+          "default": "none",
+          "description": {
+            "en": "USD per million tokens. set needs all five.",
+            "ja": "100 万トークンあたりの USD。set には 5 つとも要る。"
+          }
+        },
+        {
+          "name": "--cache-write-5m",
+          "type": "number",
+          "default": "none",
+          "description": {
+            "en": "USD per million tokens. set needs all five.",
+            "ja": "100 万トークンあたりの USD。set には 5 つとも要る。"
+          }
+        },
+        {
+          "name": "--cache-write-1h",
+          "type": "number",
+          "default": "none",
+          "description": {
+            "en": "USD per million tokens. set needs all five.",
+            "ja": "100 万トークンあたりの USD。set には 5 つとも要る。"
+          }
+        },
+        {
+          "name": "--cache-read",
+          "type": "number",
+          "default": "none",
+          "description": {
+            "en": "USD per million tokens. set needs all five.",
+            "ja": "100 万トークンあたりの USD。set には 5 つとも要る。"
+          }
+        },
+        {
+          "name": "--output",
+          "type": "number",
+          "default": "none",
+          "description": {
+            "en": "USD per million tokens. set needs all five.",
+            "ja": "100 万トークンあたりの USD。set には 5 つとも要る。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz prices set my-model --input 3 --cache-write-5m 3.75 --cache-write-1h 6 --cache-read 0.3 --output 15"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz prices list",
+        "jui viz prices reset"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.5",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "6057b79882e45a66428c87194f74061e7c791f3c768ba5c31703a7a19082f6e3",
+        "cardHash": "05d74dd733fc703cfc4f6cfce63cab516d6d752b395e7203b6eb3539e149c8c4",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "0a4d99f377a1",
+          "synopsis": "312912168101",
+          "purpose": "7774470529c3",
+          "options": "2a85403704d9",
+          "examples": "eb8353b25eba",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "e0a177533148"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz prices remove",
+      "synopsis": "jui viz prices remove MODEL",
+      "purpose": {
+        "en": "Stop showing an amount for a model: a model you added is taken out of your table; a shipped one is marked removed there. Changes go to your own table, prices.json in jui viz's state folder (~/.local/state/jui-viz), the same one the page's 単価 sheet writes; a running server uses it from its next response, with no restart.",
+        "ja": "モデルの金額を出さなくする。利用者が足したモデルは利用者の表から消し、同梱のモデルは、その表で削除の印を付ける。変更は、jui viz の状態フォルダ（~/.local/state/jui-viz）の prices.json（利用者の表。画面の単価のシートと同じ物）に書き、動いているサーバーは、再起動なしで次の応答から使う。"
+      },
+      "options": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz prices remove my-model"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz prices reset",
+        "jui viz prices list"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.5",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "a716514e25cddccdef8db72a25fef4d4c0d93c9211d3be67a380421879cf87b0",
+        "cardHash": "e8d0faa85ed33bd6bd56d8e614bfce2f36da325a49f1a2ef8fe3a1e484c0716f",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "01336aabe242",
+          "synopsis": "0a0c53f54ddc",
+          "purpose": "a4dad7faadc0",
+          "options": "357b9e47f539",
+          "examples": "f28ee41f0be4",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "9e04b29c3d67"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz prices reset",
+      "synopsis": "jui viz prices reset MODEL",
+      "purpose": {
+        "en": "Take a model's line out of your table, so the shipped price applies again. Changes go to your own table, prices.json in jui viz's state folder (~/.local/state/jui-viz), the same one the page's 単価 sheet writes; a running server uses it from its next response, with no restart.",
+        "ja": "利用者の表からモデルの行を消し、同梱の単価に戻す。変更は、jui viz の状態フォルダ（~/.local/state/jui-viz）の prices.json（利用者の表。画面の単価のシートと同じ物）に書き、動いているサーバーは、再起動なしで次の応答から使う。"
+      },
+      "options": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz prices reset claude-haiku-5-5"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz prices set",
+        "jui viz prices list"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.5",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "a3488c98131ec9f81b62bf0d971f4ae5f057f3ed354ef4e2569d224f4c98bbd7",
+        "cardHash": "d9e0091498eb526918805b9a05c6221b59d23125907c4a4e9066108f928a2bcf",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "4f6ca1ea5c4d",
+          "synopsis": "1238d1387937",
+          "purpose": "869c1f0679a0",
+          "options": "357b9e47f539",
+          "examples": "4d51e9082451",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "80815c11473d"
+        }
+      }
+    },
+    {
+      "binary": "jui",
       "command": "viz export-demo",
       "synopsis": "jui viz export-demo --out OUT",
       "purpose": {

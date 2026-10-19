@@ -28,10 +28,13 @@
       <span class="usage" id="usage" hidden></span>
       <button type="button" class="chip perm-chip" id="chip-perm" hidden aria-haspopup="dialog">許可待ち 0</button>
       <button type="button" class="chip perm-chip" id="chip-ask" hidden aria-controls="questions-sec">質問 0</button>
+      <button type="button" class="chip" id="chip-askwait" hidden aria-haspopup="dialog" title="質問が viz で待つ間、ターミナルや VS Code には質問が出ない（押すと変えられる）"></button>
+      <button type="button" class="chip perm-chip price-chip" id="chip-price" hidden aria-haspopup="dialog">単価の無いモデル 0</button>
     </div>
     <div class="controls">
       <button type="button" id="btn-play" aria-pressed="false">一時停止</button>
       <button type="button" id="btn-speed">速度 ×1</button>
+      <button type="button" id="btn-notify" hidden aria-haspopup="dialog" aria-expanded="false" aria-controls="notify-pop">通知</button>
       <button type="button" id="btn-side" aria-controls="side" aria-expanded="true">パネルを閉じる</button>
     </div>
   </header>
@@ -48,6 +51,7 @@
       <div class="room-solo" id="room-solo" hidden>
         <button type="button" class="fn-btn" id="room-back">← フロア全体に戻る</button>
         <span class="rs-name" id="room-solo-name" aria-live="polite"></span>
+        <button type="button" class="fn-btn" id="room-call" hidden aria-haspopup="dialog">呼び出し</button>
       </div>
       <ul class="tower-legend" id="tower-legend" aria-label="窓の見方" hidden>
         <li><span class="tl-win tl-work" aria-hidden="true">▶</span>作業中 — 明かりがつき、ロボットが動く</li>
@@ -112,10 +116,31 @@
             <label class="lane-toggle" for="tb-lanes"><input type="checkbox" id="tb-lanes"> セッションごとに分ける</label>
           </div>
           <div class="kb-body">
+            <section class="perm-strip q-strip" id="q-strip" hidden aria-label="答えを待っている質問"></section>
             <section class="perm-strip" id="perm-strip" hidden aria-label="許可を求めているもの"></section>
             <div class="kanban" id="kanban"></div>
             <aside class="tb-detail" id="tb-detail" hidden aria-labelledby="tbd-title"></aside>
           </div>
+        </div>
+      </div>
+      <div class="wb" id="ds" hidden role="dialog" aria-modal="false" aria-labelledby="ds-title">
+        <div class="wb-frame ds-frame">
+          <div class="wb-head">
+            <button type="button" class="wb-btn" id="ds-close">← 3D に戻る</button>
+            <h2 id="ds-title">データサーバー</h2>
+            <span class="chip" id="ds-room"></span>
+          </div>
+          <div class="ds-tabs" id="ds-tabs" role="tablist" aria-label="仕様書"></div>
+          <div class="ds-body" id="ds-body" tabindex="0" aria-label="仕様書の内容"></div>
+        </div>
+      </div>
+      <div class="wb" id="pr" hidden role="dialog" aria-modal="false" aria-labelledby="pr-title">
+        <div class="wb-frame pr-frame">
+          <div class="wb-head">
+            <button type="button" class="wb-btn" id="pr-close">← 3D に戻る</button>
+            <h2 id="pr-title">単価の表（お札の概算）</h2>
+          </div>
+          <div class="ds-body pr-body" id="pr-body" tabindex="0" aria-label="単価の表"></div>
         </div>
       </div>
       <section class="rb" id="rb" hidden role="dialog" aria-modal="false" aria-labelledby="rb-title"></section>
@@ -151,6 +176,11 @@
           <p class="tw-note" id="weather-note-panel">オフ — 外への通信はしません</p>
           <p class="set-hint">オンにすると位置の許可を求め、約 1 km に丸めた位置でサーバーが 30 分に 1 回天気を問い合わせます。見た目に出るのは、ビルの全景（部屋が 7 つ以上）です。</p>
         </div>
+        <div class="set-bills">
+          <button type="button" class="tw-switch" id="bill-switch" role="switch" aria-checked="true">お札（概算の金額）</button>
+          <p class="tw-note" id="bill-note">オン — 応答ごとの概算の金額をロボットの頭上に出します</p>
+          <p class="set-hint">金額は公式の単価 × 応答のトークン数の概算です。サブスクリプションでの利用では、実際の請求とは一致しません。<button type="button" class="mini-btn" id="prices-open" aria-haspopup="dialog">単価の表</button></p>
+        </div>
       </section>
       <div class="side-foot" id="side-foot" hidden><button type="button" class="log-open" id="btn-strip-open" aria-controls="ticker-strip" aria-expanded="false" aria-label="ログの帯を開く">ログを開く</button></div>
     </aside>
@@ -160,6 +190,40 @@
 <button type="button" class="log-open log-open-float" id="btn-strip-open-float" hidden aria-controls="ticker-strip" aria-expanded="false" aria-label="ログの帯を開く">ログを開く</button>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="pop" id="pop" hidden role="dialog" aria-modal="false"></div>
+<div class="notify-pop" id="notify-pop" hidden role="dialog" aria-modal="false" aria-labelledby="notify-title">
+  <h2 id="notify-title">通知と、質問の待ち時間</h2>
+  <p id="notify-perm-state"></p>
+  <button type="button" class="fn-btn" id="notify-ask-perm" hidden>ブラウザの通知を許可する</button>
+  <p class="notify-note" id="notify-os-note">Mac のシステム設定 → 通知 → Google Chrome をオンにしてください（オフだと通知が出ないまま、質問は viz で待ちます）。</p>
+  <fieldset class="notify-kinds">
+    <legend>通知する出来事（このブラウザに覚える）</legend>
+    <label><input type="checkbox" data-notify-kind="done"> 完了（メインのセッションのターンの終わり）</label>
+    <label><input type="checkbox" data-notify-kind="perm"> 許可の待ち</label>
+    <label><input type="checkbox" data-notify-kind="ask"> 質問の待ち</label>
+  </fieldset>
+  <label for="ask-wait">質問を viz で待つ時間（サーバーに保存）</label>
+  <select id="ask-wait"></select>
+  <p class="notify-note" id="ask-wait-note">待っている間、ターミナルや VS Code には質問が出ません。カードの「ターミナルで答える」でいつでも戻せます。viz のページを全部閉じると、12 秒ほどで戻ります。ページが見えていないときは、質問の通知がオンで許可済みの間だけ待ちます。</p>
+  <button type="button" class="fn-btn" id="notify-close">閉じる（Esc）</button>
+</div>
+<div class="call-overlay" id="call" hidden role="dialog" aria-modal="true" aria-labelledby="call-title">
+  <div class="call-card">
+    <h2 id="call-title">ロボットを呼ぶ</h2>
+    <p class="call-lead" id="call-lead"></p>
+    <label for="call-name">担当名（必須、1 行）</label>
+    <input type="text" id="call-name" maxlength="64" autocomplete="off" spellcheck="false">
+    <label for="call-role">役割の文（任意）</label>
+    <textarea id="call-role" rows="3" maxlength="4000" spellcheck="false"></textarea>
+    <label for="call-cmd">ターミナルに貼るコマンド</label>
+    <textarea id="call-cmd" rows="4" readonly spellcheck="false"></textarea>
+    <p class="call-why" id="call-why" role="status" aria-live="polite"></p>
+    <div class="call-actions">
+      <button type="button" class="fn-btn call-copy" id="call-copy" disabled>コピー</button>
+      <button type="button" class="fn-btn" id="call-close">閉じる（Esc）</button>
+    </div>
+    <p class="call-note">viz はこのコマンドを実行しません。ターミナルに貼って、自分で実行してください。担当名と役割の文は、それぞれ 1 つの引数として渡ります。</p>
+  </div>
+</div>
 <div class="log-overlay" id="log-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="log-title">
   <div class="log-head">
     <h2 id="log-title">イベントログ</h2>

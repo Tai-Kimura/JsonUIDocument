@@ -11,10 +11,10 @@ const FONT_BODY = '"BIZ UDPGothic", "Hiragino Sans", "Yu Gothic", sans-serif';
 const FONT_MONO = '"JetBrains Mono", ui-monospace, Menlo, monospace';
 
 const ROLES = {
-  main: { name: 'メイン', color: '#ff7a3d' },
+  main: { name: 'メイン', color: '#0ea5e9' },   // sky blue (2.3.5, requester 10-19: 「スカイブルーにしようか」; it was orange, beside the subagents' orange coveralls)
   define: { name: 'define', color: '#7d5cff' },
   ground: { name: 'ground', color: '#b07a52' },
-  implement: { name: 'implement', color: '#2f80ed' },
+  implement: { name: 'implement', color: '#3b5bdb' },   // indigo (2.3.5): #2f80ed sat ΔE2000 14.6 from the main sky blue, side by side in the panel
   navigation: { name: 'navigation', color: '#10a693' },
   test: { name: 'test', color: '#3fae4a' },
   debug: { name: 'debug', color: '#f0b400' },
@@ -25,6 +25,13 @@ const COL = {
   band: '#fffdf7', bandInk: '#d62839', wood: '#c99f73', woodDark: '#9e7752',
   laptop: '#c9d0db', phone: '#1f2532',
 };
+/* A subagent's work clothes (2.3.5, requester 10-19: "サブエージェントは格好を作業着っぽい感じにできる？", "さいずも0.8くらいに
+   して", "作業着の服装の感じはアメリカの囚人服っぽいオレンジがいいな"): a bright orange coverall (body, sleeves, legs) with a
+   reflective stripe, a patch of its role's colour on the chest (a white rim and a navy edge, readable on the orange),
+   a work cap; the whole robot SUB_SIZE of a main one. The orange is kept apart from ROLES.main (ΔE2000 ≥ 10; the e2e
+   measures it). */
+const WEAR = { overall: '#ff8c1a', stripe: '#e8edf3', brim: '#c25e00', rim: '#ffffff', edge: '#1f2a44' };
+const SUB_SIZE = 0.8;
 const LAMP = { idle: '#8fa3bf', busy: '#35d07f', think: '#8fe0b4', bg: '#4cc3d9', waiting: '#ffb020', done: '#35d07f', off: '#2a3a30' };
 const STATES = {
   idle: { name: '待機', lamp: 'idle', face: 'normal' },
@@ -43,6 +50,7 @@ const LAMP_TEXT = { idle: '青灰（待機）', busy: '緑（作業中）', thin
 
 const HIPS_Y = 0.36;
 const HEAD = { w: 1.1, h: 0.9, d: 0.92, r: 0.17 };
+const CAP = { w: 0.92, h: 0.18, d: 0.82, y: HEAD.h + 0.06 };   // the work cap's crown, sitting on the head (head space)
 const BAND = { y: 0.645, h: 0.17, t: 0.028 };
 const LOOK = new THREE.Vector3(0, 1.25, 0.5);
 const UP = new THREE.Vector3(0, 1, 0);
@@ -206,10 +214,11 @@ function drawCover(c) {
 }
 
 /* ---------- per-robot drawings ---------- */
-function drawFace(ctx, mode) {
+function drawFace(ctx, mode, tint = null) {
   const W = ctx.canvas.width, H = ctx.canvas.height;
   ctx.clearRect(0, 0, W, H);
   rr(ctx, 3, 3, W - 6, H - 6, 34); ctx.fillStyle = COL.screen; ctx.fill();
+  if (tint && tint[3] > 0) { ctx.fillStyle = `rgba(${tint[0]}, ${tint[1]}, ${tint[2]}, ${tint[3]})`; ctx.fill(); }   // heavy work: red or blue
   const sheen = ctx.createLinearGradient(0, 0, 0, H);
   sheen.addColorStop(0, 'rgba(120, 230, 255, 0.14)'); sheen.addColorStop(0.55, 'rgba(120, 230, 255, 0)');
   ctx.fillStyle = sheen; ctx.fill();
@@ -225,9 +234,21 @@ function drawFace(ctx, mode) {
     else if (mode === 'happy') { ctx.lineWidth = 10; ctx.beginPath(); ctx.arc(x, ey + 12, 17, Math.PI * 1.15, Math.PI * 1.85); ctx.stroke(); }
     else if (mode === 'wide') { ctx.beginPath(); ctx.arc(x, ey, 22, 0, Math.PI * 2); ctx.fill(); }
     else if (mode === 'tired') { rr(ctx, x - 16, ey - 2, 32, 22, 9); ctx.fill(); ctx.fillStyle = COL.screen; ctx.fillRect(x - 18, ey - 6, 36, 9); ctx.fillStyle = COL.eye; }
+    else if (mode === 'fired') {                          // fired up: narrowed eyes under brows slanted to the middle
+      rr(ctx, x - 19, ey - 4, 38, 17, 8); ctx.fill();
+      ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(x - side * 22, ey - 24); ctx.lineTo(x + side * 20, ey - 12); ctx.stroke();
+    } else if (mode === 'drained') {                      // drained: small eyes sunk low, looking down
+      ctx.beginPath(); ctx.arc(x, ey + 12, 8, 0, Math.PI * 2); ctx.fill();
+    } else if (mode === 'whistle') {                      // blowing the whistle: eyes squeezed shut with the effort
+      ctx.lineWidth = 9; ctx.beginPath();                 // > <
+      ctx.moveTo(x + side * 17, ey - 12); ctx.lineTo(x - side * 5, ey); ctx.lineTo(x + side * 17, ey + 12); ctx.stroke();
+    }
   }
   ctx.lineWidth = 6; ctx.beginPath();
-  if (mode === 'happy') ctx.arc(cx, 86, 14, Math.PI * 0.1, Math.PI * 0.9);
+  if (mode === 'whistle') { /* the whistle covers the mouth */ }
+  else if (mode === 'fired') { ctx.moveTo(cx - 14, 96); ctx.lineTo(cx + 14, 96); }   // a set jaw
+  else if (mode === 'drained') { ctx.moveTo(cx - 16, 98); ctx.quadraticCurveTo(cx - 8, 90, cx, 98); ctx.quadraticCurveTo(cx + 8, 106, cx + 16, 98); }   // a wobbly mouth
+  else if (mode === 'happy') ctx.arc(cx, 86, 14, Math.PI * 0.1, Math.PI * 0.9);
   else if (mode === 'wide') ctx.arc(cx, 98, 7, 0, Math.PI * 2);
   else if (mode === 'focus') { ctx.moveTo(cx - 9, 97); ctx.lineTo(cx + 9, 97); }
   else ctx.arc(cx, 86, 10, Math.PI * 0.2, Math.PI * 0.8);
@@ -236,6 +257,10 @@ function drawFace(ctx, mode) {
   if (mode === 'tired') {                                  // bags under the eyes
     ctx.strokeStyle = 'rgba(170, 120, 255, 0.85)'; ctx.lineWidth = 4;
     for (const side of [-1, 1]) { ctx.beginPath(); ctx.arc(cx + side * dx, ey + 26, 15, Math.PI * 0.15, Math.PI * 0.85); ctx.stroke(); }
+  }
+  if (mode === 'drained') {                              // gloom lines down the top of the screen (青ざめ), not the bags of 8 hours
+    ctx.strokeStyle = 'rgba(150, 200, 255, 0.85)'; ctx.lineWidth = 4;
+    for (let i = 0; i < 7; i++) { const x = cx - 78 + i * 26; ctx.beginPath(); ctx.moveTo(x, 12); ctx.lineTo(x, 12 + (i % 2 ? 22 : 30)); ctx.stroke(); }
   }
   if (mode === 'wide') { ctx.fillStyle = COL.screen; for (const side of [-1, 1]) { ctx.beginPath(); ctx.arc(cx + side * dx + 7, ey - 8, 6, 0, Math.PI * 2); ctx.fill(); } }
   ctx.fillStyle = 'rgba(255, 120, 160, 0.42)';
@@ -378,6 +403,12 @@ function initShared() {
     beam: new THREE.CylinderGeometry(0.3, 0.05, 0.68, 24, 1, true),
     sheet: new RoundedBoxGeometry(0.34, 0.03, 0.24, 1, 0.006),
     confetti: new THREE.PlaneGeometry(0.035, 0.06),
+    stripe: new THREE.BoxGeometry(0.77, 0.045, 0.57),
+    patch: new THREE.PlaneGeometry(0.13, 0.1),
+    patchRim: new THREE.PlaneGeometry(0.16, 0.13),
+    patchEdge: new THREE.PlaneGeometry(0.185, 0.155),
+    capCrown: new RoundedBoxGeometry(CAP.w, CAP.h, CAP.d, 4, 0.09),
+    capBrim: new RoundedBoxGeometry(0.74, 0.035, 0.32, 2, 0.015),
   };
   S.tex = {
     chest: texFrom(makeCanvas(160, 100)),
@@ -416,6 +447,11 @@ function initShared() {
     projector: toon('#3a4252'),
     beam: new THREE.MeshBasicMaterial({ color: '#7ef9ff', transparent: true, opacity: 0.12, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }),
     sheets: ['#ffffff', '#f4efe3', '#e8f0fb', '#fff6dc'].map((c) => toon(c)),
+    overall: toon(WEAR.overall),
+    stripe: toon(WEAR.stripe),
+    brim: toon(WEAR.brim),
+    rim: new THREE.MeshBasicMaterial({ color: WEAR.rim }),
+    edge: new THREE.MeshBasicMaterial({ color: WEAR.edge }),
     confetti: ['#d62839', '#ffb020', '#35d07f', '#2f80ed', '#7d5cff', '#ff7a3d'].map((c) => new THREE.MeshBasicMaterial({ color: c, side: THREE.DoubleSide })),
   };
 }
@@ -425,11 +461,14 @@ function faceToward(obj, target) {
   const m = new THREE.Matrix4().lookAt(target, obj.position, UP);
   obj.quaternion.setFromRotationMatrix(m);
 }
-function createRobot({ label = 'a0', role = 'main', state = 'idle', seed = 0, furnished = false }) {
+function createRobot({ label = 'a0', role = 'main', state = 'idle', seed = 0, furnished = false, sub = false }) {
   const g = S.geo, m = S.mat;
+  const coat = sub ? m.overall : null;   // a subagent: the coverall over body, sleeves and legs
   const r = { label, role, state, prev: state, blend: 1, seed, props: {}, faceMode: '', nextBlink: 1 + (seed % 2), blinkEnd: 0, termAt: 0, phoneAt: 0,
-    tired: false, needDrink: false, drinks: 0, gesture: null, hand: null, heavy: false, sweat: null };
+    tired: false, needDrink: false, drinks: 0, gesture: null, hand: null, heavy: false, sweat: null,
+    look: null, tint: null, whistle: null, pipi: null };
   r.furnished = furnished;
+  r.sub = sub; r.size = sub ? SUB_SIZE : 1;
   r.accent = toon(ROLES[role].color);
   r.lampMat = new THREE.MeshBasicMaterial({ color: LAMP.idle });
   r.logoCanvas = makeCanvas(96, 64);
@@ -438,17 +477,25 @@ function createRobot({ label = 'a0', role = 'main', state = 'idle', seed = 0, fu
   r.root = new THREE.Group();
 
   r.hips = new THREE.Group(); r.hips.position.y = HIPS_Y; r.root.add(r.hips);
-  const pelvis = new THREE.Mesh(g.pelvis, m.limb); pelvis.position.y = 0.03; r.hips.add(pelvis);
+  const pelvis = new THREE.Mesh(g.pelvis, coat || m.limb); pelvis.position.y = 0.03; r.hips.add(pelvis);
   const leg = (x) => {
     const pivot = new THREE.Group(); pivot.position.set(x, 0, 0); r.hips.add(pivot);
-    const shin = new THREE.Mesh(g.leg, m.limb); shin.position.y = -0.15; pivot.add(shin);
+    const shin = new THREE.Mesh(g.leg, coat || m.limb); shin.position.y = -0.15; pivot.add(shin);
     const foot = new THREE.Mesh(g.foot, r.accent); foot.position.set(0, -0.31, 0.04); pivot.add(foot);
     return pivot;
   };
   r.legL = leg(0.17); r.legR = leg(-0.17);
 
   r.torso = new THREE.Group(); r.hips.add(r.torso);
-  const body = new THREE.Mesh(g.torso, m.shell); body.position.y = 0.32; r.torso.add(body);
+  const body = new THREE.Mesh(g.torso, coat || m.shell); body.position.y = 0.32; r.torso.add(body);
+  if (sub) {
+    const stripe = new THREE.Mesh(g.stripe, m.stripe); stripe.position.y = 0.14; r.torso.add(stripe);
+    const patch = new THREE.Group(); patch.position.set(-0.24, 0.45, 0.2725); patch.userData.wear = 'patch'; r.torso.add(patch);
+    const edge = new THREE.Mesh(g.patchEdge, m.edge); patch.add(edge);
+    const rim = new THREE.Mesh(g.patchRim, m.rim); rim.position.z = 0.001; patch.add(rim);
+    const fill = new THREE.Mesh(g.patch, r.accent); fill.position.z = 0.002; patch.add(fill);
+    r.wear = { body, stripe, patch, fill };
+  }
   const chest = new THREE.Mesh(g.chest, m.chest); chest.position.set(0, 0.3, 0.2715); r.torso.add(chest);
   const lamp = new THREE.Mesh(g.lamp, r.lampMat); lamp.position.set(0.2, 0.5, 0.235); r.torso.add(lamp);
   const neck = new THREE.Mesh(g.neck, m.limb); neck.position.y = 0.63; r.torso.add(neck);
@@ -486,11 +533,18 @@ function createRobot({ label = 'a0', role = 'main', state = 'idle', seed = 0, fu
   const arm = (x) => {
     const pivot = new THREE.Group(); pivot.position.set(x, 0.49, 0.05); r.torso.add(pivot);
     pivot.add(new THREE.Mesh(g.shoulder, r.accent));
-    const upper = new THREE.Mesh(g.arm, m.limb); upper.position.y = -0.18; pivot.add(upper);
+    const upper = new THREE.Mesh(g.arm, coat || m.limb); upper.position.y = -0.18; pivot.add(upper);
     const hand = new THREE.Mesh(g.hand, m.shell); hand.position.y = -0.38; pivot.add(hand);
     return pivot;
   };
   r.armL = arm(0.42); r.armR = arm(-0.42);
+  if (sub) {   // the work cap: its brim to the front, over the band; the antenna stays out through the top
+    const cap = new THREE.Group(); cap.userData.wear = 'cap'; r.head.add(cap);
+    const crown = new THREE.Mesh(g.capCrown, m.overall); crown.position.y = CAP.y; cap.add(crown);
+    const brim = new THREE.Mesh(g.capBrim, m.brim); brim.position.set(0, HEAD.h - 0.01, HEAD.d / 2 + 0.13); brim.rotation.x = 0.1; cap.add(brim);
+    r.wear.cap = cap; r.wear.crown = crown;
+  }
+  r.root.scale.setScalar(r.size);
   if (furnished) {
     const desk = new THREE.Group(); desk.position.set(0, 0.275, 0.6); r.root.add(desk);
     const top = new THREE.Mesh(g.deskTop, m.wood); top.position.y = 0.25; desk.add(top);
@@ -572,6 +626,143 @@ function sweatUpdate(r, s, on) {
     d.position.set(side * (0.62 + ph * 0.45), 0.85 + Math.sin(ph * Math.PI) * 0.35 - ph * 0.2, 0.15);
     d.scale.setScalar(Math.max(0.2, 1 - ph * 0.8)); d.scale.y *= 1.5;
   }
+}
+/* Heavy work in three looks, one per cause (requester, 10-19; 2.3.6). r.heavy is the server's list of causes
+   (ingest.py _heavy: 'tokens', 'tool', 'subagents'); the causes are decided there, only the look is decided here:
+     tokens    -> 'fired':   the screen glows red, brows slanted down to the middle, a set jaw; fast typing
+     tool      -> 'drained': the screen goes blue, small eyes sunk low, a wobbly mouth, gloom lines down its top;
+                             slower typing. Not the 8-hour tiredness: that keeps the dark screen, half-shut eyes with
+                             purple bags, a drooping antenna and the energy drink.
+     subagents -> 'whistle': a whistle at the mouth, eyes squeezed > <, 「ピッ！」 over the head, one arm waving the
+                             team on (main robots only: a subagent has no team)
+   Sweat drops stay with all three (heavy work). Two or more causes take turns every LOOK_PERIOD seconds, the colour
+   easing over LOOK_EASE seconds. Reduced motion: colour and face only, no waving and no turns: the first of
+   LOOK_ORDER that holds (blue > whistle > red), the colour set at once. */
+const HEAVY_LOOK = { tokens: 'fired', tool: 'drained', subagents: 'whistle' };
+const LOOK_ORDER = ['drained', 'whistle', 'fired'];
+const LOOK_PERIOD = 4, LOOK_EASE = 0.6;
+const LOOK_TINT = { fired: [255, 64, 64, 0.42], drained: [64, 140, 255, 0.42], whistle: [0, 0, 0, 0] };
+function heavyCauses(r) {
+  const h = r.heavy === true ? ['tokens'] : Array.isArray(r.heavy) ? r.heavy : [];
+  return LOOK_ORDER.filter((look) => h.some((c) => HEAVY_LOOK[c] === look) && (look !== 'whistle' || r.role === 'main'));
+}
+function heavyLook(r, t) {
+  if (!HEAVY_OK.has(r.state)) return null;
+  const looks = heavyCauses(r);
+  if (!looks.length) return null;
+  if (reduceMotion || looks.length === 1) return looks[0];
+  return looks[Math.floor(t / LOOK_PERIOD) % looks.length];
+}
+function whistleProp() {
+  const g = new THREE.Group(), metal = toon('#ffc928');
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.1, 12), metal); body.rotation.z = Math.PI / 2;
+  const tube = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.03, 0.09), metal); tube.position.set(-0.05, 0.01, 0.04);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.025, 0.009, 6, 10), toon('#1f2532')); ring.position.set(0.06, 0.02, 0);
+  g.add(body, tube, ring);
+  g.rotation.y = Math.PI / 2;
+  g.position.set(0.02, 0.27, HEAD.d / 2 + 0.06);           // at the mouth, in front of the screen
+  g.scale.setScalar(1.6);
+  g.userData.whistle = true;
+  return g;
+}
+function pipiBubble() {                                    // 「ピッ」 over the head while the whistle blows
+  const canvas = makeCanvas(192, 112), ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#1f2532'; ctx.lineWidth = 6;
+  rr(ctx, 6, 6, 180, 78, 30); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(132, 82); ctx.lineTo(148, 106); ctx.lineTo(108, 82); ctx.closePath(); ctx.fill(); ctx.stroke();   // the tail toward the head
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(104, 76, 30, 8);
+  ctx.fillStyle = '#e8590c'; ctx.font = `46px ${FONT_DISPLAY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('ピッ！', 96, 46);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: texFrom(canvas), transparent: true }));
+  s.position.set(-1.0, 2.1, 0.3); s.scale.set(0.72, 0.42, 1); s.userData.pipi = true;   // beside the head, by the waving (right, -x) arm
+  return s;
+}
+function lookUpdate(r, t, dt) {
+  const look = heavyLook(r, t);
+  r.look = look;
+  const want = look ? LOOK_TINT[look] : [0, 0, 0, 0];
+  const cur = r.tint || (r.tint = [0, 0, 0, 0]);
+  if (!cur[3]) { cur[0] = want[0]; cur[1] = want[1]; cur[2] = want[2]; }   // from nothing: the hue at once, the alpha eases
+  const k = reduceMotion ? 1 : Math.min(1, dt / LOOK_EASE * 3);
+  for (let i = 0; i < 4; i++) cur[i] += (want[i] - cur[i]) * k;
+  if (look === 'whistle' && !r.whistle) { r.whistle = whistleProp(); r.head.add(r.whistle); }
+  if (r.whistle) r.whistle.visible = look === 'whistle';
+  if (look === 'whistle' && !r.pipi) { r.pipi = pipiBubble(); r.root.add(r.pipi); }
+  if (r.pipi) {
+    r.pipi.visible = look === 'whistle';
+    if (r.pipi.visible && !reduceMotion) r.pipi.position.y = 2.1 + Math.abs(Math.sin(t * 7)) * 0.08;   // in time with the arm
+  }
+  return look;
+}
+/* The browser tests' hook (80-dbg.js, force) sets a robot's causes or its tiredness; the page never does. */
+const forced = (r, key, value) => (r.force && key in r.force ? r.force[key] : value);
+/* Background work and heavy work never show at once: the heavy looks (lookUpdate, sweat) hold only in HEAVY_OK's
+   states (typing, reading, a command), and a robot working in the background is in its own state, 'background', so the
+   headset, the notes and the loose typing win while it waits on background work; its heavy causes show again when it is
+   back at work in the foreground (2.3.5 integration, 10-20). */
+/* Background work (requester, 10-19: "バックグラウンドで作業の場合はヘッドセットつけて、音符出してる状態で机の上でパソコンを
+   ゆるめにいじってほしい"): a headset on the head (cups in the 裏で作業中 colour, LAMP.bg, as on the tag, the card and the
+   legend), NOTE_MAX notes rising over it (still under reduced motion), and the laptop typed on loosely (poseFor
+   'background'). Built once a robot first works in the background, one set a robot; shown only in that state. */
+const NOTE_MAX = 3;
+function noteCanvas(double) {
+  const c = makeCanvas(96, 112), ctx = c.getContext('2d');
+  const head = (x, y) => { ctx.beginPath(); ctx.ellipse(x, y, 15, 11, -0.45, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); };
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  for (const [pass, w, colour] of [[0, 14, '#1f2a44'], [1, 0, LAMP.bg]]) {
+    ctx.strokeStyle = pass ? colour : '#1f2a44'; ctx.fillStyle = pass ? colour : '#1f2a44'; ctx.lineWidth = pass ? 6 : w;
+    if (double) {
+      ctx.beginPath(); ctx.moveTo(38, 84); ctx.lineTo(38, 24); ctx.lineTo(80, 14); ctx.lineTo(80, 74); ctx.stroke();
+      ctx.lineWidth = pass ? 10 : 18; ctx.beginPath(); ctx.moveTo(38, 26); ctx.lineTo(80, 16); ctx.stroke();
+      ctx.lineWidth = pass ? 2 : w; head(26, 86); head(68, 76);
+    } else {
+      ctx.beginPath(); ctx.moveTo(56, 86); ctx.lineTo(56, 16); ctx.quadraticCurveTo(66, 40, 84, 46); ctx.stroke();
+      ctx.lineWidth = pass ? 2 : w; head(44, 88);
+    }
+  }
+  return c;
+}
+function bgGear(r) {
+  if (!S.tex.notes) S.tex.notes = [texFrom(noteCanvas(false)), texFrom(noteCanvas(true))];
+  const band = toon('#273449'), cup = toon(LAMP.bg), pad = toon('#1b2333');
+  const headset = new THREE.Group(); headset.userData.headset = true;
+  const R = HEAD.w / 2 + 0.15;
+  const arc = new THREE.Mesh(new THREE.TorusGeometry(R, 0.04, 10, 40, Math.PI), band);
+  const top = r.sub ? CAP.y + CAP.h / 2 + 0.07 : HEAD.h + 0.07;   // over the work cap's crown when it has one
+  arc.position.set(0, 0.42, -0.02); arc.scale.y = (top - 0.42) / R; headset.add(arc);
+  for (const side of [1, -1]) {
+    const shell = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.13, 28), cup); shell.rotation.z = Math.PI / 2; shell.position.set(side * R, 0.42, -0.02); headset.add(shell);
+    const cushion = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.05, 24), pad); cushion.rotation.z = Math.PI / 2; cushion.position.set(side * (R - 0.08), 0.42, -0.02); headset.add(cushion);
+  }
+  // the microphone on its boom, from the right cup to in front of the mouth
+  const boom = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.5, 8), band);
+  boom.position.set(R - 0.12, 0.26, 0.24); boom.rotation.set(Math.PI / 2 - 0.35, 0, 0.55); headset.add(boom);
+  const mic = new THREE.Mesh(new THREE.SphereGeometry(0.05, 14, 10), pad); mic.position.set(R - 0.27, 0.15, 0.47); headset.add(mic);
+  r.head.add(headset);
+  const notes = new THREE.Group(); notes.userData.notes = true;
+  for (let k = 0; k < NOTE_MAX; k++) {
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: S.tex.notes[k % 2], transparent: true, depthWrite: false }));
+    sp.scale.set(0.3, 0.35, 1); sp.userData.k = k; notes.add(sp);
+  }
+  r.root.add(notes);
+  r.headset = headset; r.notes = notes;
+}
+function bgUpdate(r, t, on) {
+  if (on && !r.headset) bgGear(r);
+  if (!r.headset) return;
+  r.headset.visible = on; r.notes.visible = on;
+  if (!on) return;
+  for (const sp of r.notes.children) {
+    const n = notePose(r, sp.userData.k, t);
+    sp.position.set(n.x, n.y, 0.1);
+    sp.material.opacity = n.opacity;
+  }
+}
+/* Where note k stands at time t (the e2e reads it at two times: still under reduced motion, rising otherwise). */
+function notePose(r, k, t) {
+  const ph = reduceMotion ? 0.3 + k * 0.22 : (t * 0.42 + k / NOTE_MAX + r.seed * 0.13) % 1;
+  return { x: (k % 2 ? -1 : 1) * (0.42 + ph * 0.18) + Math.sin(ph * 6.3 + k) * 0.06, y: 1.95 + ph * 0.75,
+    opacity: reduceMotion ? 1 : Math.min(1, Math.sin(ph * Math.PI) * 1.6) };
 }
 function setRobotTired(r, on) {
   if (on && !r.tired) r.needDrink = true;
@@ -870,6 +1061,7 @@ const BUILDERS = {
     const screen = new THREE.Mesh(g.lidScreen, m.code); screen.position.set(0, 0.2, -0.0115); screen.rotation.y = Math.PI; lid.add(screen);
     return { group };
   },
+  background(r) { return BUILDERS.typing(r); },   // the same laptop (and desk where the room has none) as typing
   reading(r) {
     const g = S.geo, m = S.mat, group = new THREE.Group();
     const book = new THREE.Group(); book.position.set(0, 0.93, 0.47); book.rotation.x = -0.35; book.scale.setScalar(1.2); group.add(book);
@@ -1016,10 +1208,13 @@ function poseFor(state, s) {
       p.torsoY = sway * 0.04; p.hipsY = reduceMotion ? 0 : Math.sin(s * 1.8) * 0.006;
       break;
     }
-    case 'background': {   // at its desk, watching the screen while the work runs in the background
-      const look = reduceMotion ? 0 : Math.sin(s * 0.35);
-      p.torsoX = 0.04; p.headX = 0.22 + look * 0.02; p.headY = look * 0.06; p.hipsY = reduceMotion ? 0 : Math.sin(s * 1.4) * 0.006;
-      p.aLx = -0.85; p.aLz = -0.28; p.aRx = -0.85; p.aRz = 0.28;   // hands resting on the desk
+    case 'background': {   // at its desk with the headset on, typing now and then while the work runs in the background
+      const nod = reduceMotion ? 0 : Math.sin(s * 2.2);   // nodding along to the music
+      p.torsoX = 0.04; p.headX = 0.2 + nod * 0.035; p.headY = Math.sin(s * 0.35) * 0.06; p.headZ = nod * 0.03;
+      p.hipsY = reduceMotion ? 0 : Math.sin(s * 1.4) * 0.006;
+      // the keys, loosely: slower (6 against 15) and smaller (0.05 against 0.13) than 'typing'
+      p.aLx = -1.0 + Math.max(0, Math.sin(s * 6)) * 0.05; p.aLz = -0.3;
+      p.aRx = -1.0 + Math.max(0, Math.sin(s * 6 + 2.6)) * 0.05; p.aRz = 0.3;
       break;
     }
     case 'typing':
@@ -1073,11 +1268,17 @@ function updateRobot(r, t, dt) {
   const s = t * SPEED * (r.tired ? 0.7 : 1) + r.seed;    // tired: a little slower
   r.blend = Math.min(1, r.blend + dt / 0.4);
   const e = r.blend * r.blend * (3 - 2 * r.blend);
-  const heavy = r.heavy && HEAVY_OK.has(r.state);
-  const a = poseFor(r.prev, s), b = heavy ? poseFor('typing', s * 2.4) : poseFor(r.state, s);   // heavy: fast typing
+  const look = lookUpdate(r, t, dt), heavy = !!look;
+  // heavy: fast typing (drained: slower than fired)
+  const a = poseFor(r.prev, s), b = heavy ? poseFor('typing', s * (look === 'drained' ? 1.5 : 2.4)) : poseFor(r.state, s);
   sweatUpdate(r, s, heavy);
   const p = {};
   for (const k in b) p[k] = a[k] + (b[k] - a[k]) * e;
+  if (look === 'drained') { p.headX += 0.12; }             // head a little down over the long wait
+  if (look === 'whistle' && !reduceMotion) {               // one arm up waving the team on, the other pointing
+    // the right arm up beside the head (as the done cheer, so the head does not hide it), waving; the left pointing
+    p.aRx = Math.sin(t * 7) * 0.25; p.aRz = -2.85 + Math.sin(t * 7) * 0.3; p.aLx = -1.35; p.aLz = 0.15; p.headY = Math.sin(t * 3.5) * 0.15;
+  }
   if (r.tired) { p.headX += 0.2; p.torsoX += 0.08; p.hipsY -= 0.012; p.aLz *= 0.5; p.aRz *= 0.5; }   // head and shoulders down
   if (r.gesture && (!GESTURE_OK.has(r.state) || t >= r.gesture.t1)) endGesture(r);
   const onCall = callUpdate(r, t);
@@ -1090,6 +1291,7 @@ function updateRobot(r, t, dt) {
   soloProps(r, onCall ? null : r.solo, t);
   brkProps(r, onCall ? null : r.brk, t);
   playBubble(r, onCall ? null : r.play, t);
+  bgUpdate(r, t, r.state === 'background' && !onCall && !r.play && !r.solo && !r.brk);
   r.antenna.rotation.x += ((r.tired ? 1.0 : 0) - r.antenna.rotation.x) * Math.min(1, dt * 3);
   r.root.position.y = p.rootY;
   r.hips.position.y = HIPS_Y + p.hipsY;
@@ -1108,11 +1310,14 @@ function updateRobot(r, t, dt) {
 
   let mode = STATES[r.blend < 0.5 ? r.prev : r.state].face;
   if (r.tired && mode === 'normal') mode = 'tired';
-  if (mode === 'normal' || mode === 'focus' || mode === 'tired') {
+  if (look) mode = look;                                     // heavy work's face over the state's and the tired one
+  if (mode === 'normal' || mode === 'focus' || mode === 'tired' || mode === 'fired') {
     if (s > r.nextBlink) { r.blinkEnd = s + 0.12; r.nextBlink = s + 2.4 + Math.random() * 3.2; }
     if (s < r.blinkEnd) mode = 'blink';
   }
-  if (mode !== r.faceMode) { drawFace(r.faceCtx, mode); r.faceTex.needsUpdate = true; r.faceMode = mode; }
+  const tint = r.tint && r.tint[3] > 0.01 ? r.tint.map((v, i) => (i < 3 ? Math.round(v / 8) * 8 : Math.round(v * 40) / 40)) : null;
+  const faceKey = `${mode}|${tint ? tint.join(',') : ''}`;   // the colour in steps: redrawn a few times while it eases
+  if (faceKey !== r.faceMode) { drawFace(r.faceCtx, mode, tint); r.faceTex.needsUpdate = true; r.faceMode = faceKey; }
 
   for (const key in r.props) {
     const pr = r.props[key];
@@ -1142,7 +1347,7 @@ const clamp01 = (v) => Math.max(0, Math.min(1, v));
 const frac = (t, a, b) => clamp01((t - a) / (b - a));
 const pct = (v) => Math.round(v * 100);
 const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
-const ROLE_INK = { debug: '#2a2000' };
+const ROLE_INK = { debug: '#2a2000', main: '#082f49' };   // dark ink where white would not read (sky blue: 2.77:1 white, 5.01:1 this)
 /* A session's name (/rename, `claude -n`; 10-19): the server's title, one line, at most NAME_MAX characters. Panels and
    cards show all of it next to the two-letter mark; the tag over the robot shows it alone, cut at its end with "…". */
 const NAME_MAX = 80;
@@ -1162,6 +1367,78 @@ const isTired = (since, now) => Number.isFinite(since) && since > 0 && now - sin
 const isDark = () => { const th = document.documentElement.dataset.theme; return th === 'dark' || (th !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches); };
 const readPref = (key, fallback) => { try { return localStorage.getItem(`agent-view:${key}`) || fallback; } catch (err) { return fallback; } };
 const writePref = (key, value) => { try { localStorage.setItem(`agent-view:${key}`, value); } catch (err) { /* storage blocked: the choice lasts until reload */ } };
+/* Mermaid (2.3.5): vendored (vendor/VENDOR.md), read only when a diagram is first drawn, never at page load (3.6 MB).
+   export-demo leaves it out: the demo's hand-written sheets draw no diagram. securityLevel 'strict': the
+   text is a spec's, so labels are sanitized and no click / script in a diagram runs. htmlLabels off: a label is SVG
+   text, never HTML (with HTML labels, strict still lets an <img src> through and the page fetched it — measured
+   10-19). The theme follows the page's. */
+const MERMAID = { src: 'vendor/mermaid-11.17.2/mermaid.min.js', loading: null, theme: '', n: 0, drawn: new Map() };
+function loadMermaid() {
+  if (!MERMAID.loading) {
+    MERMAID.loading = new Promise((resolve, reject) => {
+      const el = document.createElement('script');
+      el.src = MERMAID.src;
+      el.onload = () => (window.mermaid ? resolve(window.mermaid) : reject(new Error('mermaid did not load')));
+      el.onerror = () => { MERMAID.loading = null; reject(new Error('mermaid did not load')); };
+      document.head.appendChild(el);
+    });
+  }
+  return MERMAID.loading;
+}
+/* What a diagram may not set for itself (dd's review, 10-19): Mermaid reads an init / config directive (%%{…}%%) and a
+   front-matter config (--- config: … ---) from the text and lets them change everything but its six `secure` keys —
+   htmlLabels back on (an <img> in a label, fetched), themeCSS with url() (fetched). The text is the spec's: both are
+   taken out before it is drawn, with Mermaid's own patterns (11.17.2), and anything left of a directive is broken
+   up; the keys below are made secure as well, in case one gets through. */
+const MERMAID_FRONT = /^([^\S\n\r]*)-{3}\s*[\n\r](.*?)[\n\r]\1-{3}\s*[\n\r]+/s;
+const MERMAID_DIRECTIVE = /%{2}{\s*(?:(\w+)\s*:|(\w+))\s*(?:(\w+)|((?:(?!}%{2}).|\r?\n)*))?\s*(?:}%{2})?/gi;
+const MERMAID_SECURE = ['secure', 'securityLevel', 'startOnLoad', 'maxTextSize', 'suppressErrorRendering', 'maxEdges', 'htmlLabels', 'flowchart', 'er',
+  'theme', 'themeCSS', 'themeVariables', 'darkMode', 'fontFamily', 'altFontFamily', 'look', 'layout', 'markdownAutoWrap', 'dompurifyConfig', 'deterministicIds'];
+function mermaidSafeText(text) {
+  // until nothing more comes off: a directive taken out can leave a front matter at the start, and the other way
+  // round (dd's review 2, 10-19: "%%{x}%%---\nconfig: …" passed one round of each)
+  let t = String(text), prev = null;
+  for (let k = 0; k < 50 && t !== prev; k++) { prev = t; t = t.replace(MERMAID_FRONT, '').replace(MERMAID_DIRECTIVE, ''); }
+  if (t !== prev) return '';                                  // still changing after 50 rounds: no diagram
+  if (/^[^\S\n\r]*-{3}\s*[\n\r]/.test(t)) return '';   // an unclosed front matter: no diagram
+  return mermaidNoUrl(t.split('%%{').join('%% {'));   // never a directive; no url() out of the diagram
+}
+/* A url() that is not a reference inside the diagram (#…) becomes one to nothing, and @import goes: in the text before
+   it is drawn — Mermaid puts the SVG in the page to measure it, and a style or classDef of a class or state diagram
+   (fill:url(/x)) was fetched then (dd's review 2) — and in the SVG it gave back. Every kind of diagram goes through. */
+function mermaidNoUrl(t) {
+  return String(t).replace(/url\(\s*(?!['"]?\s*#)/gi, 'url(#blocked-').replace(/@import/gi, '@blocked');
+}
+function mermaidSafeSvg(svg) { return mermaidNoUrl(svg); }
+async function renderMermaid(el, text) { return mermaidDraw(el, text, true); }
+/* cleanText false only for the arm that checks the `secure` lock on its own (the test hook, never the page). */
+async function mermaidDraw(el, text, cleanText) {
+  const mm = await loadMermaid();
+  const theme = isDark() ? 'dark' : 'default';
+  if (MERMAID.theme !== theme) {
+    // every key of Mermaid's own config is secure (no diagram changes any: class.htmlLabels got through a list of names)
+    const secure = [...new Set([...MERMAID_SECURE, ...Object.keys(mm.mermaidAPI.getConfig())])];
+    mm.initialize({ startOnLoad: false, securityLevel: 'strict', theme, fontFamily: 'var(--font-body)', htmlLabels: false, flowchart: { htmlLabels: false },
+      class: { htmlLabels: false }, er: { useMaxWidth: false }, secure });
+    MERMAID.theme = theme;
+  }
+  MERMAID.n += 1;
+  const svg = mermaidSafeSvg((await mm.render(`mmd-${MERMAID.n}`, cleanText ? mermaidSafeText(text) : String(text))).svg);
+  el.innerHTML = svg;   // Mermaid's own SVG, its labels sanitized (securityLevel 'strict')
+  el.dataset.theme = theme;
+  if (MERMAID.drawn.size >= 40) MERMAID.drawn.clear();
+  MERMAID.drawn.set(`${theme}\n${text}`, svg);
+  return el.querySelector('svg');
+}
+/* A diagram in a box the panels rebuild: the same text in the same theme is drawn once and put back as it was. */
+function drawMermaid(el, text) {
+  const theme = isDark() ? 'dark' : 'default', key = `${theme}\n${text}`;
+  if (el.dataset.drawn === key) return Promise.resolve(el.querySelector('svg'));
+  el.dataset.drawn = key;
+  const svg = MERMAID.drawn.get(key);
+  if (svg) { el.innerHTML = svg; el.dataset.theme = theme; return Promise.resolve(el.querySelector('svg')); }   // drawn before (strict)
+  return renderMermaid(el, text).catch(() => { delete el.dataset.drawn; el.classList.add('mmd-failed'); return null; });
+}
 const ROLE_JA = { main: 'メインセッション', define: 'spec を書く担当', ground: '初期設定の担当', implement: '実装の担当', navigation: '画面遷移の担当', test: 'テストの担当', debug: '調査の担当', other: 'その他' };
 const SECTIONS = ['概要', '構造', '状態', 'データ', '操作', '遷移', '分岐'];
 const sumImpl = (arr) => arr.slice(1, 6).reduce((a, b) => a + b, 0);
@@ -1878,11 +2155,11 @@ function demoBuilding(t) {
   LIVE.rank = rank;
 }
 const demoTired = (id) => id === DEMO_BEATS.tired.session && isTired(demoDayMs() + DEMO_BEATS.tired.since * 3600000, vizNow());
-const demoHeavy = (id, t) => id === DEMO_BEATS.heavy[2] && t >= DEMO_BEATS.heavy[0] && t < DEMO_BEATS.heavy[1];
+const demoHeavy = (id, t) => (id === DEMO_BEATS.heavy[2] && t >= DEMO_BEATS.heavy[0] && t < DEMO_BEATS.heavy[1] ? ['tokens'] : []);
 function robotCondition(id) {
   const t = latestModel ? latestModel.t : 0;
   return { tired: demoTired(id), hours: (vizNow() - demoDayMs()) / 3600000 - DEMO_BEATS.tired.since,
-    heavy: demoHeavy(id, t) ? { reasons: ['tokens'], tokensPerMin: 3200 } : null };
+    heavy: demoHeavy(id, t).length ? { reasons: ['tokens'], tokensPerMin: 3200 } : null };
 }
 
 /* ---------- the source's face to the rest of the view (plan 07 §2) ---------- */
@@ -1901,6 +2178,8 @@ const SOURCE = {
   },
   history() { return Promise.resolve({ ok: false, error: 'demo' }); },   // the demo has no transcripts
   historyImage() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
+  notifyPresence() { return Promise.resolve(); },
+  callCommand() { return Promise.resolve({ ok: false, why: 'デモでは使えません（プロジェクトのフォルダがありません）' }); },
   setWeather() { return Promise.resolve({ ok: false, error: 'demo' }); },   // the demo asks nobody about the weather
 };
 const robotRuns = () => [];   // the demo's one test run is shown by the card's own a2 row
@@ -2458,15 +2737,17 @@ function build3D() {
     if (h.kind === 'floor') { if (SOURCE.mode === 'live') towerLeave(h.k, h.project); else towerLeave(0); }   // the demo has one office
     else if (h.kind === 'room') setProject(h.project);
     else if (h.kind === 'robot') openRobot(h.id, canvas);
+    else if (h.kind === 'call') openCall(h.project, canvas);
     else if (h.kind === 'tasks') { fit(h.project); openTaskBoard(canvas, undefined, h.project); }
     else if (h.kind === 'spec') { fit(SPECS[h.i].project); openWhiteboard(h.i, canvas); }
+    else if (h.kind === 'data') openDataDocs(h.project, canvas);
     else { fit(h.project); openWhiteboard(-1, canvas, h.project); }
   });
   canvas.addEventListener('pointermove', (ev) => {
     if (ev.buttons || (zoom.zoomed && !rbState.id)) return;
     const h = hitAt(ev);
     canvas.style.cursor = h ? 'pointer' : '';
-    canvas.title = h && (h.kind === 'floor' || h.kind === 'room') ? h.title : '';
+    canvas.title = h && (h.kind === 'floor' || h.kind === 'room' || h.kind === 'call' || h.kind === 'data') ? h.title : '';
   });
 
   sceneEl.addEventListener('pointerdown', () => { DIRECTOR.userAt = performance.now(); });
@@ -2599,7 +2880,7 @@ function liveDropRoom(id) {
   delete LIVE3D.rooms[id];
 }
 function liveAddRobot(d, i) {
-  const robot = createRobot({ label: d.id, role: d.role, state: 'idle', seed: i * 1.7, furnished: true });
+  const robot = createRobot({ label: d.id, role: d.role, state: 'idle', seed: i * 1.7, furnished: true, sub: d.kind === 'sub' });   // a subagent: work clothes, 0.8 (2.3.5)
   robot.drawPhone = drawLivePhone;
   // a robot that comes in walks from the corridor through the doors (requester, 10-18)
   const route = d.enter ? liveRoute(null, d.room) : [];
@@ -2618,6 +2899,7 @@ function liveDropRobot(R) {
   scene.remove(R.robot.root); focusRelease(R.robot.root); disposeTree(R.robot.root);   // focusRelease: 50-panel.js (10-18)
   const k = fontRedraws.indexOf(R.robot.fontRedraw); if (k >= 0) fontRedraws.splice(k, 1);
   R.tag.remove();
+  if (R.bill) R.bill.remove();
   if (links[R.def.id]) links[R.def.id].set(null, null, false, 0);
   robots.splice(robots.indexOf(R), 1);
 }
@@ -2676,49 +2958,68 @@ function livePlan(R) {
   else R.path.push(d.pos);                // first seat: after the doors when it just came in
   R.room = d.room; R.seatKey = key;
 }
-function liveWalk(R, dt, nowMs) {
+function liveWalk(R, dt, nowMs, nowSec) {
   const root = R.robot.root, d = R.def;
-  // Leaving is a state, not a layout change: start the "done, then out of the door" here.
-  if (LIVE.leaving[d.id]) { if (!R.exitAt && !R.out) R.exitAt = nowMs + 2500; }
+  // Leaving is a state, not a layout change: start the "done, then out of the door" here. The 2.5 s count from when
+  // the page learned it left (LIVE.leaving's since), not from the first frame after: with frames seconds apart, that
+  // frame was a whole gap later (ticket 2026-10-20-jui-viz-arrivals-and-rolls-wait-for-frames).
+  const lv = LIVE.leaving[d.id];
+  if (lv) { if (!R.exitAt && !R.out) R.exitAt = nowMs + 2500 - Math.min(2500, Math.max(0, Date.now() - (lv.since || Date.now()))); }
   else if (R.exitAt && !R.out) R.exitAt = 0;   // it came back before walking out
   if (R.exitAt && nowMs >= R.exitAt && !R.path.length && !R.out) {
     R.path = liveRoute(roomAtPoint([root.position.x, root.position.z]), null);   // out to the corridor
     R.out = true;
   }
   if (R.out && !R.path.length) { SOURCE.robotGone(d.id); return 'gone'; }
-  const next = R.path[0];
-  if (!next && R.play) {                                          // at the play spot: no desk, facing the partner
+  if (R.path.length) {
+    // The frame's whole step, carried along the path through as many points as it reaches (a slow frame rate must
+    // not slow the walk: one point a frame, and the rest of the step dropped, made a walk out of a room take ~10
+    // frames however far apart they were - 30 s at 3 s a frame; ticket 2026-10-19-jui-viz-walk-stretches-with-frame-gaps).
+    // Always along the path, point by point, so never through a wall; never past its end.
+    let step = WALK_SPEED * (SOURCE.replaySpeed > 1 ? Math.min(4, SOURCE.replaySpeed) : 1) * dt;
+    if (R.robot.desk) R.robot.desk.visible = false;
+    // The points passed in this frame, in order (a new array each walking frame): what a watcher joins between two
+    // frames' positions, since the walk turns at them (ticket 2026-10-20-jui-viz-e2e-wall-watch-joins-frames-not-the-path)
+    const trail = R.walkTrail = [];
+    while (R.path.length) {
+      const q = R.path[0], dx = q[0] - root.position.x, dz = q[1] - root.position.z, dist = Math.hypot(dx, dz);
+      if (dist > 1e-3) root.rotation.y = Math.atan2(dx, dz);
+      if (dist <= step || dist < 1e-3) { root.position.x = q[0]; root.position.z = q[1]; R.path.shift(); trail.push([q[0], q[1]]); step -= dist; continue; }
+      root.position.x += (dx / dist) * step; root.position.z += (dz / dist) * step;
+      break;
+    }
+    // out of the door within this frame's step: gone now, not a frame later (with frames seconds apart, every hand-off
+    // from one frame to the next is seconds)
+    if (R.out && !R.path.length) { SOURCE.robotGone(d.id); return 'gone'; }
+    if (R.path.length) return 'walking';
+    // arrived in this frame: what it came for starts in this frame too, below (it used to wait a frame or two:
+    // ticket 2026-10-20-jui-viz-arrivals-and-rolls-wait-for-frames)
+  }
+  if (R.play) {                                          // at the play spot: no desk, facing the partner
     if (R.robot.desk) R.robot.desk.visible = false;
     R.play.phase = 'playing';
     const q = R.play.partner.robot.root.position, ry = Math.atan2(q.x - root.position.x, q.z - root.position.z) + (R.play.turn || 0);
     root.rotation.y += (ry - root.rotation.y) * Math.min(1, dt * (R.play.turn !== undefined ? 12 : 6));   // highfive: turns to slap
     return 'playing';
   }
-  if (!next && R.brk) return brkAt(R, dt);                        // at the smoking booth or the vending machine (10-19)
-  if (!next && R.shred) {                                         // at the shredder: no desk, facing it
+  if (R.brk) return brkAt(R, dt, nowSec);                        // at the smoking booth or the vending machine (10-19)
+  if (R.shred) {                                         // at the shredder: no desk, facing it
     if (R.robot.desk) R.robot.desk.visible = false;
     const P = PROPS.shredder, ry = P ? Math.atan2(P.x - root.position.x, P.z - root.position.z) : Math.PI;
     root.rotation.y += (ry - root.rotation.y) * Math.min(1, dt * 6);
     return 'shredding';
   }
-  if (!next && R.git && R.git.phase === 'at') {                  // at the box (2.3.4): no desk of its own, facing the box
+  if (R.git) gitArrive(R, nowSec);
+  if (R.git && R.git.phase === 'at') {                  // at the box (2.3.4): no desk of its own, facing the box
     if (R.robot.desk) R.robot.desk.visible = false;
     const q = R.git.desk, ry = Math.atan2(q[0] - root.position.x, q[1] - root.position.z);
     root.rotation.y += (ry - root.rotation.y) * Math.min(1, dt * 6);
     return 'gitbox';
   }
-  if (!next && R.playBack) R.playBack = false;                    // back at its desk
-  if (!next) {
-    if (R.robot.desk) R.robot.desk.visible = !d.standing;
-    if (Math.abs(root.rotation.y - (d.ry || 0)) > 1e-3) root.rotation.y += ((d.ry || 0) - root.rotation.y) * Math.min(1, dt * 6);
-    return 'still';
-  }
-  const dx = next[0] - root.position.x, dz = next[1] - root.position.z, dist = Math.hypot(dx, dz);
-  const step = WALK_SPEED * (SOURCE.replaySpeed > 1 ? Math.min(4, SOURCE.replaySpeed) : 1) * dt;
-  if (R.robot.desk) R.robot.desk.visible = false;
-  if (dist <= step || dist < 1e-3) { root.position.x = next[0]; root.position.z = next[1]; R.path.shift(); }
-  else { root.position.x += (dx / dist) * step; root.position.z += (dz / dist) * step; root.rotation.y = Math.atan2(dx, dz); }
-  return 'walking';
+  if (R.playBack) R.playBack = false;                             // back at its desk
+  if (R.robot.desk) R.robot.desk.visible = !d.standing;
+  if (Math.abs(root.rotation.y - (d.ry || 0)) > 1e-3) root.rotation.y += ((d.ry || 0) - root.rotation.y) * Math.min(1, dt * 6);
+  return 'still';
 }
 /* Coffee and meals, now and then (requester, 10-18): once a second each robot that is idle or at work may start
    one (probability SNACK.p, a seeded generator so a test can repeat it), while at most SNACK.share of the robots
@@ -2728,9 +3029,21 @@ function snackRandom(seed = SNACK.seed) {
   let a = seed >>> 0;
   return () => { a = (a + 0x6d2b79f5) >>> 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
+/* "Once a second" (snacks, games, naps, breaks): the rolls due since the last one - a frame seconds late owes several -
+   as one roll with the chance of all of them (it rolled once a frame: with frames 3 s apart, a third as often; ticket
+   2026-10-20-jui-viz-arrivals-and-rolls-wait-for-frames). At most ROLL_CATCHUP_SEC: a hidden tab's minutes are not
+   time anyone watched, and its return must not start everything at once. n = 1 (frames under a second apart) is the
+   old roll exactly: the same chance, the same seeded sequence. */
+const ROLL_CATCHUP_SEC = 10;
+function rollsDue(T, nowSec) {
+  const n = T.next ? Math.max(1, Math.min(ROLL_CATCHUP_SEC, 1 + Math.floor(nowSec - T.next))) : 1;
+  T.next = nowSec + 1;
+  return n;
+}
+const chanceIn = (p, n) => (n <= 1 ? p : 1 - Math.pow(1 - p, n));
 function snackTick(t) {
   if (reduceMotion || t < SNACK.next) return;
-  SNACK.next = t + 1;
+  const n = rollsDue(SNACK, t);
   if (!SNACK.rng) SNACK.rng = snackRandom();
   const here = robots.filter((R) => !LIVE.leaving[R.def.id]);
   const cap = Math.max(1, Math.floor(here.length * SNACK.share));
@@ -2738,7 +3051,7 @@ function snackTick(t) {
   for (const R of here) {
     if (busy >= cap) break;
     if (R.robot.gesture || !GESTURE_OK.has(R.robot.state)) continue;
-    if (SNACK.rng() < SNACK.p && startGesture(R.robot, SNACK.rng() < 0.5 ? 'coffee' : 'meal', t)) busy += 1;
+    if (SNACK.rng() < chanceIn(SNACK.p, n) && startGesture(R.robot, SNACK.rng() < 0.5 ? 'coffee' : 'meal', t)) busy += 1;
   }
 }
 /* A call on the robot and on its name tag: a phone mark and the other robot's number, never the message. */
@@ -2905,18 +3218,14 @@ function playTick(nowSec, now) {
       if (reason) { playStop(R); why = why || `${R.def.id} ${reason}`; }
     }
     const left = G.players.filter((R) => R.play);
-    const at = left.filter((R) => R.play.phase === 'playing');
-    if (at.length === left.length && left.length >= 2 && !G.t0) {   // all there: the game's clock starts now
-      G.t0 = nowSec; G.until = nowSec + G.len;
-      left.forEach((R, i) => { R.robot.play = { kind: G.kind, t0: nowSec, side: i, seed: G.seed }; });
-    }
+    playClock(G, nowSec);
     const end = left.length < 2 ? `alone (${why || 'partner stopped'})` : G.t0 && nowSec >= G.until ? 'done'
       : !G.t0 && nowSec >= G.walkUntil ? 'walk too long' : null;
     if (end) { playLog(G, end, nowSec); G.players = left; playEnd(G); continue; }
     if (G.t0) playMove(G, left, nowSec);
   }
   if (reduceMotion || nowSec < PLAY.next) return;
-  PLAY.next = nowSec + 1;
+  const n = rollsDue(PLAY, nowSec);
   if (!PLAY.rng) PLAY.rng = snackRandom.call(null, PLAY.seed);
   if (PLAY.list.length >= PLAY.games) return;
   const byRoom = {};
@@ -2928,7 +3237,7 @@ function playTick(nowSec, now) {
   for (const [room, idle] of Object.entries(byRoom)) {
     if (PLAY.list.length >= PLAY.games || idle.length < 2 || PLAY.list.some((G) => G.room === room) || !PROJECT[room]) continue;
     if (robots.some((R) => R.def.room === room && R.def.standing)) continue;   // a full room: no aisle to play in
-    if (PLAY.rng() >= PLAY.p) continue;
+    if (PLAY.rng() >= chanceIn(PLAY.p, n)) continue;
     const a = idle.splice(Math.floor(PLAY.rng() * idle.length), 1)[0], b = idle[Math.floor(PLAY.rng() * idle.length)];
     const rm = PROJECT[room];
     const kind = PLAY.kinds[Math.floor(PLAY.rng() * PLAY.kinds.length)];
@@ -2957,7 +3266,7 @@ function soloTick(nowSec, now) {
     if (reason) { PLAY.ends.push({ room: R.solo.room, kind: R.solo.kind, players: [R.def.id], reason, playedSec: +(nowSec - R.solo.t0).toFixed(1) }); soloStop(R); }
   }
   if (reduceMotion || nowSec < (SOLO.next || 0)) return;
-  SOLO.next = nowSec + 1;
+  const n = rollsDue(SOLO, nowSec);
   const byRoom = {};
   for (const R of robots) {
     const st = robotState[R.def.id];
@@ -2967,20 +3276,30 @@ function soloTick(nowSec, now) {
     // with two or more a game comes first; one left over (or alone) may nap or eat
     if (idle.length !== 1) continue;
     const R = idle[0];
-    if ((R.restUntil || 0) > nowSec || PLAY.rng() >= SOLO.p) continue;
+    if ((R.restUntil || 0) > nowSec || PLAY.rng() >= chanceIn(SOLO.p, n)) continue;
     const kind = SOLO.kinds[Math.floor(PLAY.rng() * SOLO.kinds.length)], len = SOLO.minSec + PLAY.rng() * (SOLO.maxSec - SOLO.minSec);
     R.solo = { kind, room, t0: nowSec, until: nowSec + len, since: robotState[R.def.id].since };
     R.robot.solo = { kind, t0: nowSec };
     R.restUntil = nowSec + len + PLAY.restMinSec + PLAY.rng() * (PLAY.restMaxSec - PLAY.restMinSec);
   }
 }
+// All the players there: the game's clock starts now (playTick; and in the frame the last one arrived, liveUpdateRobots).
+function playClock(G, nowSec) {
+  const left = G.players.filter((R) => R.play);
+  if (left.length >= 2 && !G.t0 && left.every((R) => R.play.phase === 'playing')) {
+    G.t0 = nowSec; G.until = nowSec + G.len;
+    left.forEach((R, i) => { R.robot.play = { kind: G.kind, t0: nowSec, side: i, seed: G.seed }; });
+  }
+}
 function liveUpdateRobots(nowSec, dt) {
   if (SOURCE.layoutRev !== LIVE3D.rev) liveSync();
   liveLinks(latestModel, nowSec);
   const nowMs = performance.now();
-  // Walking uses the real time between frames (up to 1 s), not the animation's capped step: a slow frame rate
+  // Walking uses the real time between frames, not the animation's capped step: a slow frame rate
   // must not slow the walk down.
-  const walkDt = LIVE3D.lastWalk ? Math.min(1, (nowMs - LIVE3D.lastWalk) / 1000) : 0;
+  // No cap: a step only ever moves along the path and stops at its end (liveWalk), so even a gap of minutes (a hidden
+  // tab, rAF stopped) only brings each walk to where it was going - where it would have been anyway.
+  const walkDt = LIVE3D.lastWalk ? Math.max(0, (nowMs - LIVE3D.lastWalk) / 1000) : 0;
   LIVE3D.lastWalk = nowMs;
   snackTick(nowSec);
   const now = vizNow();
@@ -2992,10 +3311,10 @@ function liveUpdateRobots(nowSec, dt) {
     const st = robotState[R.def.id] || { state: 'idle', act: '' };
     liveTagName(R);
     liveCallTag(R, calls[R.def.id] || null);
-    setRobotTired(R.robot, R.def.kind === 'main' && isTired(sinceOf(R.def.id), now));
-    R.robot.heavy = heavyOf(R.def.id);   // fast typing and sweat while it works (the robot decides when)
+    setRobotTired(R.robot, forced(R.robot, 'tired', R.def.kind === 'main' && isTired(sinceOf(R.def.id), now)));
+    R.robot.heavy = forced(R.robot, 'heavy', heavyOf(R.def.id));   // one look per cause while it works (the robot decides when)
     shredTick(R, st, nowSec);
-    const how = liveWalk(R, walkDt, nowMs);
+    const how = liveWalk(R, walkDt, nowMs, nowSec);
     if (how === 'gone') continue;
     if (how === 'shredding') shredAt(R, nowSec);
     const playing = !!(R.play || R.playBack || R.brk || R.shred);
@@ -3016,8 +3335,11 @@ function liveUpdateRobots(nowSec, dt) {
       if (left <= 0) R.tiltUntil = 0;
     }
   }
+  for (const G of PLAY.list) playClock(G, nowSec);   // the last player arrived this frame: the game starts in it
+  if (SOURCE.layoutRev !== LIVE3D.rev) liveSync();   // a robot walked out this frame: the room counts it out now
   propsTick(nowSec, dt);
   shredBits(nowSec, dt);
+  if (LIVE3D.afterFrame) LIVE3D.afterFrame(nowSec);   // a test's recorder of the frame's outcome (80-dbg.js), else none
 }
 /* One room at a time (requester, 10-18): a project picked (its room's tag, its floor in 3D, the menu) lays out only
    that room, wider (layoutRooms, SOLO_GROW), with the way back at the top left. The other rooms' robots keep their
@@ -3032,8 +3354,10 @@ function liveSoloSync() {
   }
   const box = document.getElementById('room-solo');
   if (!box) return;
-  box.hidden = !solo || !has3D || TOWER.on || zoom.zoomed;
+  box.hidden = !solo || !has3D || TOWER.on || zoom.zoomed || ds.open || pr.open;   // the data server's sheet covers it (2.3.5)
   if (solo) setText(document.getElementById('room-solo-name'), PROJECT[solo].name);
+  const call = document.getElementById('room-call');
+  if (call) call.hidden = SOURCE.mode !== 'live';   // the call bell's keyboard way in (2.3.5); the demo has no folder
 }
 /* ---------- the room up close: a water server, a robot vacuum and a wooden floor (requester, 10-18) ----------
    Only in the one-room view (room-solo) and only while that room has 10 robots or fewer; built when it is wanted and
@@ -3043,9 +3367,9 @@ function liveSoloSync() {
    view, PROPS.max robots or fewer); robots on a break walk to them (BRK below). Where the three stand: propsPlace. */
 const PROPS = { max: 10, room: null, geo: null, dark: null, group: null, server: null, vac: null, woodMat: null, woodTex: null, floorMat: null,
   boxes: [], boxesAt: 0, rng: null, seed: 20261020, speed: 0.45, radius: 0.64, serverScale: 1.9,   // the robots' scale (they stand about 1 m)
-  place: null, booth: null, vend: null, fan: null, smoke: [], shredder: null, bits: [], gitDesk: null, gitFill: null };
+  place: null, booth: null, vend: null, fan: null, smoke: [], shredder: null, bits: [], gitDesk: null, gitFill: null, bell: null, dataServer: null };
 const PROPS_EMPTY = { room: null, geo: null, dark: null, group: null, server: null, vac: null, woodMat: null, woodTex: null, floorMat: null, boxes: [], boxesAt: 0,
-  place: null, booth: null, vend: null, fan: null, smoke: [], shredder: null, bits: [], gitDesk: null, gitFill: null };
+  place: null, booth: null, vend: null, fan: null, smoke: [], shredder: null, bits: [], gitDesk: null, gitFill: null, bell: null, dataServer: null };
 function woodTexture(dark) {
   const N = 512, cv = makeCanvas(N, N), ctx = cv.getContext('2d'), W = { rng: snackRandom(PROPS.seed) };   // the same planks every time
   const base = dark ? [92, 72, 55] : [214, 184, 146], rows = 8, h = N / rows;
@@ -3113,6 +3437,8 @@ function propsBuild(id) {
   g.add(vac); PROPS.vac = vac;
   PROPS.shredder = shredderBuild(r, g);
   gitDeskBuild(id, g);   // the cardboard box on its desk (2.3.4)
+  PROPS.bell = bellBuild(P.callButton); g.add(PROPS.bell);   // the call bell (2.3.5)
+  if (dataServerWanted(id)) PROPS.dataServer = dataServerBuild(P.dataServer, g);   // the rack (2.3.5)
   propsBoxes(0, true);
   const start = propsSpot();
   vac.position.set(start[0], 0, start[1]);
@@ -3131,11 +3457,12 @@ function propsBoxes(nowSec, force) {
   PROPS.boxes = robots.filter((R) => R.robot.root.visible && (R.def.room === PROPS.room || roomAtPoint([R.robot.root.position.x, R.robot.root.position.z]) === PROPS.room))
     .map((R) => { box.setFromObject(R.robot.root); return [box.min.x, box.max.x, box.min.z, box.max.z]; });
   if (PROPS.shredder) PROPS.boxes.push(PROPS.shredder.box);
+  if (PROPS.dataServer) PROPS.boxes.push(PROPS.place.dataServer.rect);
   const s = PROPS.server.position;
   const half = 0.42 * PROPS.serverScale;
   PROPS.boxes.push([s.x - half, s.x + half, s.z - half, s.z + half]);
   const P = PROPS.place;   // the booth and the machine with the spot in front of it (10-19), the box's desk (2.3.4)
-  PROPS.boxes.push([P.booth.x0, P.booth.x1, P.booth.z0, P.booth.z1], [P.vend.x0, P.vend.x1, P.vend.z0, P.vend.spot[1] + 0.3], P.git.rect);
+  PROPS.boxes.push([P.booth.x0, P.booth.x1, P.booth.z0, P.booth.z1], [P.vend.x0, P.vend.x1, P.vend.z0, P.vend.spot[1] + 0.3], P.git.rect, P.callButton.rect);
 }
 function propsClearAt(x, z) {
   const a = propsArea(), m = PROPS.radius + 0.06;
@@ -3149,6 +3476,31 @@ function propsSpot() {
     if (propsClearAt(x, z)) return [x, z];
   }
   return [a.x1, a.z1];
+}
+/* ---------- the call bell (2.3.5, requester 10-19: 「ロボット呼び出しボタンを部屋に置いて、そのボタン押したらそのプロジェクトで
+   新規セッション呼び出すためのスクリプトコピーできるダイアログ出してほしい」) ----------
+   A desk bell on a slim stand, one of PROPS (the one-room view only), in the strip along the back wall that no desk
+   takes (z0 to z0 + SEAT.back): BELL.x from the back-left corner, past the smoking booth (BOOTH.w) and short of the
+   shredder near the middle. No robot walks to it: a click (or the header's button, 50-panel.js) opens the dialog with
+   the command to copy; viz runs nothing (callcmd.py). Its footprint is propsPlace's bell row, in the breaks arm's 12
+   room configs with the others (row callButton; b8's data server, row dataServer, stands just to its right), and the vacuum keeps off it (propsBoxes). */
+const BELL = { x: 3.3, z: 0.5, w: 0.36, h: 1.0 };
+function bellSpot(r) {
+  const x = r.x0 + BELL.x, z = r.z0 + BELL.z, h = BELL.w / 2;
+  return { x, z, rect: [x - h, x + h, z - h, z + h] };
+}
+function bellBuild(B) {
+  const g = new THREE.Group(), metal = toon('#5b6370'), brass = toon('#d9a53a'), red = toon('#e5484d');
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.18, 0.04, 20), metal); base.position.y = 0.02; g.add(base);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, BELL.h - 0.1, 12), metal); pole.position.y = (BELL.h - 0.1) / 2; g.add(pole);
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.04, 20), metal); top.position.y = BELL.h - 0.08; g.add(top);
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(0.12, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), brass); dome.position.y = BELL.h - 0.06; g.add(dome);
+  const knob = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.05, 10), red); knob.position.y = BELL.h + 0.08; g.add(knob);
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.18), new THREE.MeshBasicMaterial({ map: signTexture('呼び出し', '#e5484d', '#ffffff'), toneMapped: false }));
+  sign.position.set(0, BELL.h - 0.32, 0.035); g.add(sign);
+  g.position.set(B.x, 0, B.z);
+  g.traverse((o) => { o.userData.callBell = true; });
+  return g;
 }
 /* ---------- the cardboard box: git push / pull (2.3.4, requester 10-19) ----------
    "部屋拡大の時に…机おいてその上にダンボール箱を設置 Gitのプッシュとかの場合はダンボールにコミットしたコード量に応じて書類をロボットが
@@ -3236,6 +3588,10 @@ function gitStop(R, why, nowSec) {
 // back through the doors. So livePlan need not keep a trip's path: whatever it does to it, gitTick stops the trip in
 // the same frame (measured 10-19: with or without that, the same jump to the same seat).
 const gitLaid = (R) => { const rm = PROJECT[R.def.room]; return `${rm ? rectOf(rm) : ''}|${R.def.pos ? R.def.pos.join() : ''}`; };
+// At the box: its time there starts (in the frame it arrived: liveWalk; gitTick for one that was there already).
+function gitArrive(R, nowSec) {
+  if (R.git && R.git.phase === 'going' && !R.path.length && nowSec !== undefined) { R.git.phase = 'at'; R.git.until = nowSec + GITBOX.atSec; }
+}
 function gitTick(nowSec) {
   for (const R of robots) {
     const st = robotState[R.def.id] || { state: 'idle' }, trip = st.git;
@@ -3245,7 +3601,7 @@ function gitTick(nowSec) {
         : LIVE.leaving[R.def.id] ? 'leaving' : R.def.room === R.git.room && gitLaid(R) !== R.git.laid ? 'relaid' : PROPS.room !== R.def.room ? 'props' : null;   // props: the box went away (the floor, a bigger room)
       if (why) gitStop(R, why, nowSec);
       if (!R.git) continue;   // relaid: at its new desk already
-      if (R.git.phase === 'going' && !R.path.length) { R.git.phase = 'at'; R.git.until = nowSec + GITBOX.atSec; }
+      gitArrive(R, nowSec);
       if (R.git.phase === 'at' && nowSec >= R.git.until) {
         const k = R.git.trip.kind, rejected = R.git.trip.status === 'rejected';
         if (k === 'push' && !rejected) { PROPS.gitFill = Math.min(1, (PROPS.gitFill || 0) + R.git.sheets / 30); R.git.sheets = 0; }
@@ -3318,10 +3674,11 @@ function gitDeskOverlaps() {
 }
 function propsTick(nowSec, dt) {
   const want = propsWanted();
-  if (PROPS.room && (want !== PROPS.room || LIVE3D.rooms[PROPS.room].geo !== PROPS.geo || isDark() !== PROPS.dark)) propsClear();
+  if (PROPS.room && (want !== PROPS.room || LIVE3D.rooms[PROPS.room].geo !== PROPS.geo || isDark() !== PROPS.dark || dataServerWanted(PROPS.room) !== !!PROPS.dataServer)) propsClear();
   if (!want) return;
   if (!PROPS.room) propsBuild(want);
   propsBoxes(nowSec, false);
+  dataServerTick(nowSec);
   if (reduceMotion) return;   // placed, not driven
   const v = PROPS.vac, p = v.position;
   if (!propsClearAt(p.x, p.z)) { const s = propsSpot(); p.set(s[0], 0, s[1]); return; }   // a robot sat down on it: start elsewhere
@@ -3367,7 +3724,7 @@ function propsPlace(r) {
   vend.cx = (vend.x0 + vend.x1) / 2;
   vend.spot = [vend.cx, vend.z1 + 0.55, Math.PI];   // in front of it, facing it
   vend.way = [[vend.cx, vend.z1 + 1.3]];              // from the front: never round its corner
-  return { booth, server, vend, backDoor, git: gitDeskSpot(r), shredder: shredderSpot(r) };   // the git box's desk (2.3.4, GITBOX) and the shredder (10-19)   // the git box's desk (2.3.4, GITBOX)
+  return { booth, server, vend, backDoor, git: gitDeskSpot(r), shredder: shredderSpot(r), callButton: bellSpot(r), dataServer: dataServerSpot(r) };   // the call bell (2.3.5, BELL)   // the git box's desk (2.3.4, GITBOX) and the shredder (10-19)   // the git box's desk (2.3.4, GITBOX)
 }
 function signTexture(text, bg, ink, w = 256, h = 96) {
   const cv = makeCanvas(w, h), ctx = cv.getContext('2d');
@@ -3484,15 +3841,21 @@ function brkStop(R, reason, nowSec) {
   if (R.robot.desk) R.robot.desk.visible = false;
   R.path = from && from !== R.def.room ? [...out, ...liveRoute(from, R.def.room), R.def.pos] : [...out, R.def.pos];   // never through a wall
 }
-function brkAt(R, dt) {
+function brkAt(R, dt, nowSec) {
   const B = R.brk, root = R.robot.root;
   if (R.robot.desk) R.robot.desk.visible = false;
   if (B.phase === 'going') B.phase = 'at';
+  brkClock(R, nowSec);   // in the frame it arrived (brkTick did it a frame later)
   // bought: it turns round to the room with the can (its back hid the can and the machine's panel from the usual view)
   const ry = B.kind === 'vend' && R.robot.brkHandKind === 'vend' ? 0 : B.spot[2];
   const turn = ((ry - root.rotation.y) % (Math.PI * 2) + Math.PI * 3) % (Math.PI * 2) - Math.PI;   // the short way round
   root.rotation.y += turn * Math.min(1, dt * 6);
   return 'playing';
+}
+// At the booth or the machine: its clock starts (the cigarette, the can), once.
+function brkClock(R, nowSec) {
+  const B = R.brk;
+  if (B && B.phase === 'at' && !B.t0 && nowSec !== undefined) { B.t0 = nowSec; B.until = nowSec + B.len; R.robot.brk = { kind: B.kind, t0: nowSec, buySec: BRK.buySec }; }
 }
 function brkTick(nowSec, now) {
   if (!BRK.rng) BRK.rng = snackRandom(BRK.seed);
@@ -3504,11 +3867,11 @@ function brkTick(nowSec, now) {
     const reason = playStopReason(R, st, B.room, B.since) || (!rm || !rm.shown || rectOf(rm) !== B.rect ? 'relaid' : null) || (PROPS.room !== B.room ? 'props' : null)
       || (B.phase === 'going' && nowSec >= B.walkUntil ? 'walk too long' : null) || (B.t0 && nowSec >= B.until ? 'done' : null);
     if (reason) { brkStop(R, reason, nowSec); continue; }
-    if (B.phase === 'at' && !B.t0) { B.t0 = nowSec; B.until = nowSec + B.len; R.robot.brk = { kind: B.kind, t0: nowSec, buySec: BRK.buySec }; }
+    brkClock(R, nowSec);
   }
   brkSmoke(nowSec);
   if (reduceMotion || nowSec < BRK.next) return;
-  BRK.next = nowSec + 1;
+  const n = rollsDue(BRK, nowSec);
   const room = PROPS.room;
   if (!room || !PROPS.place || robots.some((R) => R.def.room === room && R.def.standing)) return;
   const here = robots.filter((R) => R.def.room === room);
@@ -3518,7 +3881,7 @@ function brkTick(nowSec, now) {
     for (const kind of BRK.kinds) {
       const on = here.filter((x) => x.brk && x.brk.kind === kind);
       if (on.length >= brkCap(kind)) continue;
-      if (BRK.rng() >= (kind === 'smoke' && on.length ? BRK.joinP : BRK.p[kind])) continue;
+      if (BRK.rng() >= chanceIn(kind === 'smoke' && on.length ? BRK.joinP : BRK.p[kind], n)) continue;
       const used = new Set(on.map((x) => x.brk.slot));
       brkStart(R, kind, kind === 'smoke' ? [0, 1].find((k) => !used.has(k)) : 0, nowSec);
       break;
@@ -3570,6 +3933,43 @@ function brkSmoke(nowSec) {
 const SHRED = { w: 0.8, d: 0.55, h: 1.1, bitsMax: 24, feedSec: 1.2, bitsSec: 2.0, doneSec: 3.6, tiltSec: 1.6, labelMs: 8000, every: 0.07, scale: 1.35, waitSec: 15 };   // built at 1, shown at the robots' size (as the other props)
 // where it stands (pure: propsPlace's row, so the breaks arm's 12 room configs see it next to the booth, the machine
 // and the git box's desk; 2.3.4)
+/* ---------- the data server (requester, 10-19; 2.3.5): a rack for a JsonUI room's API and DB specifications ----------
+   「dbとapiのファイルがある場合は部屋にデータサーバーっぽいもの置いてそれクリックでDB仕様書とAPI仕様書みれるようにしてほしい」.
+   With the room's other props (the one-room view, PROPS.max robots or fewer), only in a room whose docs/api or docs/db
+   hold a specification (PROJECT[id].dataDocs, counted by the server: data_docs.counts); it comes and goes with them.
+   Against the back wall, DATASRV.fromLeft from the room's left edge: right of the call button's stand (c2, 2.3.5),
+   left of the shredder and its feeder in the smallest room. No robot walks to it. Pressed (liveHit: kind 'data'), the
+   big sheet opens (50-panel.js openDataDocs) and the documents are read from the server then (POST /api/data-docs). */
+const DATASRV = { fromLeft: 4.25, w: 0.6, d: 0.5, h: 1.75, blinkSec: 0.6 };
+function dataServerWanted(id) { const d = PROJECT[id] && PROJECT[id].dataDocs; return !!(d && (d.api > 0 || d.db > 0)); }
+function dataServerSpot(r) {
+  const x = r.x0 + DATASRV.fromLeft, z = r.z0 + 0.05 + DATASRV.d / 2;
+  return { x, z, rect: [x - DATASRV.w / 2, x + DATASRV.w / 2, z - DATASRV.d / 2, z + DATASRV.d / 2] };
+}
+function dataServerBuild(S, g) {
+  const rack = new THREE.Group(), W = DATASRV.w, D = DATASRV.d, H = DATASRV.h, leds = [];
+  const cab = new THREE.Mesh(new RoundedBoxGeometry(W, H, D, 2, 0.03), toon('#2f3540')); cab.position.y = H / 2; rack.add(cab);
+  for (let k = 0; k < 6; k++) {   // six units, three lamps each
+    const y = 0.28 + k * 0.22;
+    const u = new THREE.Mesh(new THREE.BoxGeometry(W - 0.1, 0.16, 0.02), toon(k % 2 ? '#5d6675' : '#4c5462')); u.position.set(0, y, D / 2 + 0.005); rack.add(u);
+    for (let j = 0; j < 3; j++) {
+      const led = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, 0.01), new THREE.MeshBasicMaterial({ color: j === 1 ? 0x6aa5ff : 0x52e08a, toneMapped: false }));
+      led.position.set(-W / 2 + 0.12 + j * 0.06, y, D / 2 + 0.02); rack.add(led); leds.push(led);
+    }
+  }
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.18), new THREE.MeshBasicMaterial({ map: signTexture('API · DB', '#1f6feb', '#ffffff'), toneMapped: false }));
+  sign.position.set(0, H - 0.16, D / 2 + 0.012); rack.add(sign);
+  rack.position.set(S.x, 0, S.z);
+  rack.traverse((o) => { o.userData.dataServer = true; });
+  g.add(rack);
+  return { group: rack, leds, next: 0 };
+}
+function dataServerTick(nowSec) {   // the lamps blink now and then (none with reduced motion)
+  const S = PROPS.dataServer;
+  if (!S || reduceMotion || nowSec < S.next) return;
+  S.next = nowSec + DATASRV.blinkSec;
+  for (const led of S.leds) led.visible = PROPS.rng() > 0.25;
+}
 function shredderSpot(r) {
   const k = SHRED.scale, W = SHRED.w * k, D = SHRED.d * k;
   const cx = (r.x0 + r.x1) / 2, x = Math.min(cx + 1.6, r.x1 - SEAT.aisleR - W), z = r.z0 + 0.12 + D / 2;
@@ -3690,7 +4090,9 @@ function towerHit(ray) {
 }
 function liveHit(ray) {
   const solo = liveSolo(), rooms = Object.entries(LIVE3D.rooms).filter(([id]) => !solo || id === solo).map(([, R]) => R);
-  const targets = [...rooms.flatMap((R) => [R.pb.mesh, R.kb.mesh, ...(R.tb ? [R.tb.mesh] : [])]), ...robots.filter((R) => R.robot.root.visible).map((R) => R.robot.root)];
+  const targets = [...rooms.flatMap((R) => [R.pb.mesh, R.kb.mesh, ...(R.tb ? [R.tb.mesh] : [])]), ...robots.filter((R) => R.robot.root.visible).map((R) => R.robot.root),
+    ...(PROPS.bell && PROPS.room === solo ? [PROPS.bell] : []),
+    ...(PROPS.dataServer ? [PROPS.dataServer.group] : [])];   // the data server's rack (2.3.5)
   const hit = ray.intersectObjects(targets, true)[0];
   if (!hit) {
     // a room's floor picks the room (the floor view only)
@@ -3701,6 +4103,8 @@ function liveHit(ray) {
   let o = hit.object;
   while (o && o.userData.robotId === undefined && o.parent) o = o.parent;
   if (o && o.userData.robotId !== undefined) return { kind: 'robot', id: o.userData.robotId };
+  for (let q = hit.object; q; q = q.parent) if (q.userData.callBell) return { kind: 'call', project: PROPS.room, title: 'ロボットを呼ぶ（起動のコマンドをコピー）' };
+  if (hit.object.userData.dataServer && PROPS.room) return { kind: 'data', project: PROPS.room, title: 'API 仕様書・DB 仕様書を見る' };
   for (const [id, R] of Object.entries(LIVE3D.rooms)) {
     if (hit.object === R.kb.mesh) return { kind: 'tasks', project: id };
     if (R.tb && hit.object === R.tb.mesh) return { kind: 'board', project: id };
@@ -4446,20 +4850,28 @@ function placeTag(el, p) {
    robot showing じゃんけん lifts its tag clear of the hand. Cost per frame: TAGS.stats (the e2e reads it). */
 const TAGS = { gap: 3, ease: 0.35, measureMs: 500, maxPasses: 12, rpsLift: 0.55, stats: { n: 0, sumMs: 0, maxMs: 0, frames: 0 } };
 const tagNdc = new THREE.Vector3();
-function placeRobotTags() {
+function placeRobotTags(dt = 1 / 60) {
+  const ease = 1 - Math.pow(1 - TAGS.ease, dt * 60);   // TAGS.ease of the way each 1/60 s, in real time (it was per frame)
   const t0 = performance.now(), W = canvas.clientWidth, H = canvas.clientHeight, list = [];
+  billsExpire();   // 54-bills.js
   for (const R of robots) {
-    tagNdc.copy(R.robot.root.position).add(TAG_UP);
-    if (R.robot.rps && R.robot.rps.visible) tagNdc.y += TAGS.rpsLift;
+    const size = R.robot.size || 1;   // a subagent is smaller (2.3.5): its tag just above its own head
+    tagNdc.copy(R.robot.root.position).addScaledVector(TAG_UP, size);
+    if (R.robot.rps && R.robot.rps.visible) tagNdc.y += TAGS.rpsLift * size;
     tagNdc.project(camera);
     const hidden = tagNdc.z > 1 || tagNdc.z < -1 || !R.robot.root.visible || R.tag.hidden;
     const text = R.tag.textContent;
     if (!hidden && (!R.tagSize || R.tagSize.text !== text || t0 - R.tagSize.at > TAGS.measureMs)) R.tagSize = { text, at: t0, w: R.tag.offsetWidth, h: R.tag.offsetHeight };
-    list.push({ R, hidden, x: ((tagNdc.x + 1) / 2) * W, y: ((1 - tagNdc.y) / 2) * H, z: tagNdc.z });
+    // the bill (54-bills.js) sits on the tag, inside the tag's box: what keeps tags apart keeps it off every tag
+    const bill = !hidden && R.bill && !R.bill.hidden ? R.bill : null, btext = bill ? bill.textContent : '';
+    if (bill && (!R.billSize || R.billSize.text !== btext)) R.billSize = { text: btext, w: bill.offsetWidth, h: bill.offsetHeight };
+    list.push({ R, hidden, bill, x: ((tagNdc.x + 1) / 2) * W, y: ((1 - tagNdc.y) / 2) * H, z: tagNdc.z });
   }
   const placed = [];
   for (const it of list.filter((q) => !q.hidden).sort((a, b) => a.z - b.z)) {   // nearest first: it keeps its spot
-    const { w, h } = it.R.tagSize, x0 = it.x - w / 2, x1 = it.x + w / 2;
+    const b = it.bill ? it.R.billSize : null;
+    const w = Math.max(it.R.tagSize.w, b ? b.w : 0), h = it.R.tagSize.h + (b ? b.h + BILL.gap + BILL.rise : 0);
+    const x0 = it.x - w / 2, x1 = it.x + w / 2;
     let bottom = it.y;
     for (let pass = 0; pass < TAGS.maxPasses; pass++) {
       const hit = placed.find((p) => x0 < p.x1 && p.x0 < x1 && bottom - h < p.y1 && p.y0 < bottom);
@@ -4471,18 +4883,23 @@ function placeRobotTags() {
   }
   for (const it of list) {   // the writes
     const el = it.R.tag;
-    if (it.hidden) { el.style.visibility = 'hidden'; it.R.tagDy = 0; continue; }
+    if (it.hidden) { el.style.visibility = 'hidden'; it.R.tagDy = 0; if (it.R.bill) it.R.bill.style.visibility = 'hidden'; continue; }
     el.style.visibility = 'visible';
-    const dy = it.R.tagDy === undefined ? it.target : it.R.tagDy + (it.target - it.R.tagDy) * TAGS.ease;
+    const dy = it.R.tagDy === undefined ? it.target : it.R.tagDy + (it.target - it.R.tagDy) * ease;
     it.R.tagDy = Math.abs(dy - it.target) < 0.5 ? it.target : dy;
+    it.R.tagTarget = it.target;   // where the tag is going (the e2e reads a tag once tagDy has reached it: the settle hook of 80-dbg.js)
     el.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - it.R.tagDy).toFixed(1)}px) translate(-50%, -100%)`;
+    if (it.bill) {   // its bottom just above the tag; it rises inside the room the box kept for it (BILL.rise)
+      it.bill.style.visibility = 'visible';
+      it.bill.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - it.R.tagDy - it.R.tagSize.h - BILL.gap).toFixed(1)}px) translate(-50%, -100%)`;
+    } else if (it.R.bill) it.R.bill.style.visibility = 'hidden';
   }
   const ms = performance.now() - t0, S0 = TAGS.stats;
   S0.n = list.length; S0.frames++; S0.sumMs += ms; S0.maxMs = Math.max(S0.maxMs, ms);
 }
 const HEAD_UP = new THREE.Vector3(0, 2.2, 0);
 const TAG_UP = new THREE.Vector3(0, 2.62, 0);
-function robotPoint(id, up) { const R = robots.find((x) => x.def.id === id); return R.robot.root.position.clone().add(up); }
+function robotPoint(id, up) { const R = robots.find((x) => x.def.id === id); return R.robot.root.position.clone().addScaledVector(up, R.robot.size || 1); }   // a subagent is smaller (2.3.5)
 
 function update3D(model, nowSec, dt) {
   if (SOURCE.mode === 'live') { liveUpdateRobots(nowSec, dt); liveSoloSync(); }
@@ -4490,8 +4907,8 @@ function update3D(model, nowSec, dt) {
     demoDirector(model, nowSec);
     for (const R of robots) {
       const st = robotState[R.def.id];
-      setRobotTired(R.robot, demoTired(R.def.id));
-      R.robot.heavy = demoHeavy(R.def.id, model.t);
+      setRobotTired(R.robot, forced(R.robot, 'tired', demoTired(R.def.id)));
+      R.robot.heavy = forced(R.robot, 'heavy', demoHeavy(R.def.id, model.t));
       if (st.walk) { R.robot.root.position.x = st.walk.x; R.robot.root.position.z = st.walk.z; R.robot.root.rotation.y = st.walk.ry; }
       if (st.state !== R.robot.state) setRobotState(R.robot, st.state);
       if (st.act !== R.act) { R.act = st.act; R.text.textContent = st.act; }
@@ -4539,7 +4956,8 @@ function update3D(model, nowSec, dt) {
     selRing.material.color.set(ROLES[sel.def.role].color);
     selRing.scale.setScalar(1 + 0.06 * Math.sin(nowSec * 3));
     // keep the robot framed, also while it walks or after switching to another robot
-    if (!camTween && zoom.zoomed) { const pose = robotPose(rbState.id); camera.position.lerp(pose.p, 0.08); viewTarget.lerp(pose.t, 0.08); }
+    // 8% of the way each 1/60 s, in real time (it was 8% a frame: the camera crawled on a busy machine)
+    if (!camTween && zoom.zoomed) { const pose = robotPose(rbState.id), k = 1 - Math.pow(1 - 0.08, dt * 60); camera.position.lerp(pose.p, k); viewTarget.lerp(pose.t, k); }
   }
   stepTween(performance.now());
   if (camTween || zoom.zoomed) camera.lookAt(viewTarget); else controls.update();
@@ -4547,7 +4965,7 @@ function update3D(model, nowSec, dt) {
   if (TOWER.on) { towerSync(); towerAnimate(nowSec, dt); }
   skySync();
   tagsEl.hidden = zoom.zoomed || TOWER.on;
-  placeRobotTags();
+  placeRobotTags(dt);
   for (const rt of roomTags) { placeTag(rt.el, rt.p); rt.el.classList.toggle('on', UI.project === rt.id); }
   if (trayTag) placeTag(trayTag.el, trayTag.p);   // the demo's document tray
 }
@@ -4557,6 +4975,8 @@ function update3D(model, nowSec, dt) {
 const $ = (id) => document.getElementById(id);
 const setHTML = (el, html) => { if (el._html !== html) { el.innerHTML = html; el._html = html; } };
 const setText = (el, text) => { if (el && el.textContent !== text) el.textContent = text; };
+/* The legend of heavy work's three looks (2.3.6), under the card's 重い作業 line. */
+const HEAVY_LEGEND = '見た目: 赤い顔＝出力が多い · 青い顔＝ツールが長く走っている · 笛＝サブエージェント 3 体以上（重なると交互）';
 const STATUS_CLASS = { idle: 'st-idle', write: 'st-write', written: 'st-idle', impl: 'st-impl', verify: 'st-verify', 'impl-done': 'st-idle', paused: 'st-paused', test: 'st-test', done: 'st-complete' };
 function robotBadge(id) {
   const s = robotState[id].state;
@@ -4809,7 +5229,7 @@ document.addEventListener('click', (e) => {
   else if (t.hasAttribute('data-rb-close')) closeRobot();
   else if (t.hasAttribute('data-set-all')) setProject('all');
 });
-$('chip-perm').addEventListener('click', (e) => openTaskBoard(e.currentTarget));
+$('chip-perm').addEventListener('click', (e) => { tb.waitView = true; openTaskBoard(e.currentTarget); });
 
 /* ---------- scope: which project (or all) every panel and board shows, and which sessions ---------- */
 function paintScopeButtons() {
@@ -4864,14 +5284,31 @@ const qState = (q) => (q.status === 'sent' ? '送信済み · Claude Code の確
 /* Why a pending card cannot be answered here. It goes at the top, above choices drawn as not pickable: at the
    bottom, under radios that looked live, the requester clicked them and nothing happened (10-18). */
 const qWhy = (q) => (q.tooLongToShow ? '質問の全部をここに表示できないため、ここでは答えられません'
-  : q.released ? 'ターミナルに返しました' : q.waitEnded ? 'ブラウザで答えられる時間が過ぎました（だれも操作しないまま待ちが終わった）'
+  : q.released ? 'ターミナルに返しました' : q.waitEnded ? qWhyEnded(q)
     : 'このセッションは答えの中継を待っていません');
-function questionHTML(q) {
+/* Why the wait ended (2.3.6, ticket 2026-10-19-jui-viz-question-window-too-short): the server keeps the reason and
+   the time on the card (questions.hook_gave_up), so a reload says the same. */
+const qClock = (ms) => (ms ? new Date(ms).toTimeString().slice(0, 8) : '');
+function qWhyEnded(q) {
+  const at = q.waitEndedAt ? `（${qClock(q.waitEndedAt)}）` : '';
+  if (q.waitEndReason === 'hidden') return `viz のページが見えなくなったので、ターミナルに返しました${at}。ターミナルで答えてください`;
+  if (q.waitEndReason === 'session') return `セッションが止まったので、待ちを終えました${at}`;
+  return `ブラウザで答えられる時間が過ぎました${at}（だれも操作しないまま待ちが終わった）。ターミナルで答えてください`;
+}
+/* The countdown on a waiting card: "until answered" (2.3.6) has none. */
+const Q_NEVER_MS = 2 ** 53 - 1;
+function qLeftText(q, now) {
+  if (!q || !q.waitUntil) return '';
+  if (q.waitUntil >= Q_NEVER_MS) return 'viz で答えるまで待っている（「ターミナルで答える」で戻す）';
+  const left = Math.max(0, Math.ceil((q.waitUntil - now) / 1000));
+  return left >= 90 ? `あと ${Math.floor(left / 60)} 分 ${left % 60} 秒でターミナルに戻す` : `あと ${left} 秒でターミナルに戻す`;
+}
+function questionHTML(q, where = '') {   // where: '' in the panel, 'b' on the board (the same card twice in one page)
   const open = q.status === 'pending' && q.hookWaiting && !q.tooLongToShow;
   const closed = q.status === 'pending' && !open;
   const got = q.sentAnswers || q.gotAnswers || null;
   const itemsHTML = q.questions.map((x, i) => {
-    const type = x.multiSelect ? 'checkbox' : 'radio', name = `qa-${q.id}-${i}`;
+    const type = x.multiSelect ? 'checkbox' : 'radio', name = `qa-${where}${q.id}-${i}`;   // radios: one group per card
     const optsHTML = x.options.map((o, k) => `<label class="qopt"><input type="${esc(type)}" name="${esc(name)}" data-qi="${i}" data-qk="${k}"${open ? '' : ' disabled'}><span class="qlabel">${esc(o.label)}</span>${o.description ? `<span class="qdesc">${esc(o.description)}</span>` : ''}${o.preview ? `<pre class="qprev">${esc(o.preview)}</pre>` : ''}</label>`).join('');
     const otherHTML = `<label class="qopt qother"><input type="${esc(type)}" name="${esc(name)}" data-qi="${i}" data-qk="other"${open ? '' : ' disabled'}><span class="qlabel">その他（自由記述）</span><input type="text" class="qother-text" data-qi="${i}" aria-label="${esc(x.question)} への自由記述" maxlength="2000"${open ? '' : ' disabled'}></label>`;
     const answeredHTML = got && got[x.question] !== undefined ? `<p class="qgot">答え: <b>${esc(got[x.question])}</b></p>` : '';
@@ -4880,23 +5317,33 @@ function questionHTML(q) {
     return `<fieldset class="qq"><legend>${x.header ? `<span class="qhead">${esc(x.header)}</span>` : ''}<span class="qtext">${esc(x.question)}</span>${x.multiSelect ? '<span class="qmulti">複数選べる</span>' : ''}</legend>${choicesHTML}${answeredHTML}</fieldset>`;
   }).join('');
   // While the hook waits the terminal shows no question (measured 10-18): the time left, and the way to the terminal.
-  const footHTML = open ? `<div class="qfoot"><button type="button" class="pa pa-allow" data-qsend="${esc(q.id)}" data-fk="qs-${esc(q.id)}" disabled>答えを送る</button><button type="button" class="pa pa-deny" data-qrelease="${esc(q.id)}" data-fk="qr-${esc(q.id)}">ターミナルで答える</button></div><p class="qnote">待っている間はターミナルに質問が出ない · <span data-quntil="${esc(q.id)}"></span>（操作すると延びる）</p>`
+  const footHTML = open ? `<div class="qfoot"><button type="button" class="pa pa-allow" data-qsend="${esc(q.id)}" data-fk="${esc(where)}qs-${esc(q.id)}" disabled>答えを送る</button><button type="button" class="pa pa-deny" data-qrelease="${esc(q.id)}" data-fk="${esc(where)}qr-${esc(q.id)}">ターミナルで答える</button></div><p class="qnote">待っている間はターミナルに質問が出ない · <span data-quntil="${esc(q.id)}"></span>（操作すると延びる）</p>`
     : closed ? '' : `<p class="qnote qdone">${esc(qState(q))}</p>`;
   const whyHTML = closed ? `<p class="qnote qwhy" role="note">${esc(qWhy(q))}。ターミナルで答えてください（ここでは選べません）</p>` : '';
   return `<article class="qcard${open ? ' q-open' : ''}${closed ? ' q-closed' : ''}" data-qcard="${esc(q.id)}"><header class="qwho">${pill(q.who, DEF[q.who].role)}<span>${esc(DEF[q.who].agent)}</span><span class="pc-wait" data-since="${q.at}"></span></header>${whyHTML}${itemsHTML}${footHTML}</article>`;
 }
+/* The question cards the panel shows and the board shows (2.3.5): one list from QUESTIONS, oldest first. */
+function questionsShown(now = Date.now()) {
+  return QUESTIONS.filter((q) => inScope(projectOfRobot(q.who)) && (q.status === 'pending' || q.status === 'sent' || now - (q.doneAt || 0) < Q_SHOW_MS))
+    .sort((a, b) => (a.at || 0) - (b.at || 0));
+}
+/* The questions waiting for an answer, every project; the chip counts them all. In scope and elsewhere: the board shows
+   the first and says how many of the second (as its permission strip does), so the chip = cards in scope + elsewhere. */
+const questionsWaiting = () => QUESTIONS.filter((q) => q.status === 'pending');
+const questionsElsewhere = () => questionsWaiting().filter((q) => !inScope(projectOfRobot(q.who))).length;
+const questionsSig = (shown) => JSON.stringify([NAMES.rev, ...shown.map((q) => [q.id, q.status, q.hookWaiting, q.tooLongToShow, q.waitEnded, q.waitEndReason, q.waitEndedAt, q.released, q.sentAnswers, q.gotAnswers])]);
 function renderQuestions() {
   const now = Date.now();
-  const shown = QUESTIONS.filter((q) => inScope(projectOfRobot(q.who)) && (q.status === 'pending' || q.status === 'sent' || now - (q.doneAt || 0) < Q_SHOW_MS));
-  const waiting = QUESTIONS.filter((q) => q.status === 'pending').length;
+  const shown = questionsShown(now);
+  const waiting = questionsWaiting().length;
   const chip = $('chip-ask');
   chip.hidden = waiting === 0;
   setText(chip, `質問 ${waiting}`);
   $('questions-sec').hidden = shown.length === 0;
-  keyed($('questions'), JSON.stringify([NAMES.rev, ...shown.map((q) => [q.id, q.status, q.hookWaiting, q.tooLongToShow, q.waitEnded, q.released, q.sentAnswers, q.gotAnswers])]), () => shown.map((q) => questionHTML(q)).join(''));
-  for (const el of $('questions').querySelectorAll('[data-quntil]')) {   // the countdown, in place (inputs keep their state)
+  keyed($('questions'), questionsSig(shown), () => shown.map((q) => questionHTML(q)).join(''));
+  for (const el of document.querySelectorAll('#questions [data-quntil], #q-strip [data-quntil]')) {   // the countdown, in place (inputs keep their state)
     const q = QUESTIONS.find((x) => x.id === el.dataset.quntil);
-    setText(el, q && q.waitUntil ? `あと ${Math.max(0, Math.ceil((q.waitUntil - now) / 1000))} 秒でターミナルに戻す` : '');
+    setText(el, qLeftText(q, now));
   }
 }
 const qHeld = {};   // question id -> when the page last asked the hook to wait longer
@@ -4921,7 +5368,7 @@ function questionPicks(card, q) {
   });
   return { picks, complete };
 }
-$('questions').addEventListener('input', (e) => {
+function onQuestionInput(e) {
   const card = e.target.closest('[data-qcard]');
   const q = card && QUESTIONS.find((x) => x.id === card.dataset.qcard);
   if (!q) return;
@@ -4930,8 +5377,8 @@ $('questions').addEventListener('input', (e) => {
   const send = card.querySelector('[data-qsend]');
   if (send) send.disabled = !questionPicks(card, q).complete;
   if (send) holdQuestion(q.id);   // someone is answering: the hook waits a little longer
-});
-$('questions').addEventListener('click', (e) => {
+}
+function onQuestionClick(e) {
   const r = e.target.closest('[data-qrelease]');
   if (r) { r.disabled = true; SOURCE.releaseQuestion(r.dataset.qrelease); return; }
   const b = e.target.closest('[data-qsend]');
@@ -4942,8 +5389,13 @@ $('questions').addEventListener('click', (e) => {
   if (!complete) return;
   b.disabled = true;
   SOURCE.answerQuestion(q.id, picks);
-});
-$('chip-ask').addEventListener('click', () => { const sec = $('questions-sec'); sec.scrollIntoView({ block: 'start' }); const first = sec.querySelector('input:not([disabled])'); if (first) first.focus({ preventScroll: true }); });
+}
+// The same handlers for the panel's cards and the board's: the same state (QUESTIONS), the same sending (SOURCE).
+for (const id of ['questions', 'q-strip']) { $(id).addEventListener('input', onQuestionInput); $(id).addEventListener('click', onQuestionClick); }
+/* 2.3.5 (requester 10-19: "このヘッダーの許可のチップクリックでボード表示してほしい"): the 質問 chip opens the board that
+   already lists what waits for a permission (the task board, its strip on top) with the questions waiting over it,
+   panel open or not; the 許可待ち chip opens the same board. The chips are hidden while nothing waits (no no-op chip). */
+$('chip-ask').addEventListener('click', (e) => { tb.waitView = true; openTaskBoard(e.currentTarget); });
 
 /* ---------- popovers: project switcher, session picker, robot picker ---------- */
 const popEl = $('pop');
@@ -5147,7 +5599,24 @@ function taskPose(pref) {
 
 /* ---------- spec board up close: every spec (overview) or one spec as a readable sheet ---------- */
 const wbEl = $('wb'), wbCode = $('wb-code'), wbNav = $('wb-nav'), wbBody = $('wb-body'), wbSideList = $('wb-side-list');
-const wb = { open: false, idx: -1, lastActive: null, q: '', app: 'all' };
+const wb = { open: false, idx: -1, lastActive: null, q: '', app: 'all', flowFit: false };
+/* The data flow diagram (2.3.5): at the sheet's text size (Mermaid's 16 px × FLOW_SCALE = 12 px), with a scroll bar
+   when it is wider than the section — fitted, a long flow's text came out at 8 px — or fitted on request. */
+const FLOW_SCALE = 0.75;
+function flowZoomApply(svg) {
+  if (!svg || !svg.viewBox || !svg.viewBox.baseVal) return;
+  const vb = svg.viewBox.baseVal;
+  svg.style.maxWidth = wb.flowFit ? `${Math.round(vb.width)}px` : 'none';
+  svg.style.width = wb.flowFit ? '100%' : `${Math.round(vb.width * FLOW_SCALE)}px`;
+  svg.style.height = 'auto';
+}
+wbCode.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-flow-zoom]');
+  if (!b) return;
+  wb.flowFit = !wb.flowFit;
+  b.setAttribute('aria-pressed', String(wb.flowFit)); b.textContent = wb.flowFit ? '実際の大きさ' : '幅に合わせる';
+  flowZoomApply(b.closest('.flow-mmd-wrap').querySelector('svg'));
+});
 /* The apps of the rooms in scope (a repo with client/, admin/, … each declaring its own specs): [app, count, specDir],
    in the order the specs come. The board offers them only when there is more than one; 全体 adds them up. */
 function wbApps(model) {
@@ -5246,6 +5715,53 @@ function renderWbSide(model) {
   wbSideList.querySelectorAll('.ws-item:not(.ws-all)').forEach((b) => { const x = model.specs[+b.dataset.idx]; setText(b.lastElementChild, UI.project === 'all' ? `${PROJECT[x.project].name} · ${x.status.text}` : x.status.text); });
 }
 
+/* Colours of the spec sheet (2.3.5, requester 10-19: "遷移のところの遷移先が白の太字見にくい 色少しつけてみやすくしてほしい。
+   あと状態変数の型も型ごとに色分けできない？"). One source for three things: a transition's tag (its kind, from the spec's
+   type / method and the destination's words; the kind is written in the tag too, so the colour is never the only cue),
+   a state variable's type text, and their legend in the 「?」 dialog (SPEC_HELP_HTML). The colours themselves are CSS
+   variables (app.css, light and dark), each at least 4.5:1 against where it is drawn. */
+const TRANSITION_KINDS = [   // [key, label, what it is told by] — the first that matches wins
+  ['none', '遷移なし', /遷移なし|画面内|no transition|\bnone\b|alert|confirmationdialog|ダイアログ|toast|トースト/i],
+  ['external', '外部（URL・tel・地図）', /外部|ブラウザ|browser|https?:|\burl\b|tel:|mailto:|地図アプリ|マップアプリ|\bmaps? app|google ?maps|apple ?maps|safari|openurl|linking/i],   // a screen named …MAP… is not an app
+  ['back', 'pop / dismiss（戻る）', /\bpop|dismiss|戻る|\bback\b|閉じる/i],
+  ['replace', 'replace / root（入れ替え）', /replace|\broot|navigatetoscreen|置き換|入れ替/i],
+  ['modal', 'sheet / modal（重ねる）', /sheet|modal|present|fullscreen|cover|シート|モーダル/i],
+  ['push', 'push（進む）', /push|navigat|router|遷移/i],
+];
+// No kind written (requester's ruling 10-19): a destination that names a screen (or a path) is 「画面へ」 in a colour
+// of its own — never shown as push, the page does not guess what the spec does not say. Grey only when the destination
+// names nothing either: empty, blank, or a placeholder (TRANSITION_PLACEHOLDER: 未定・未設定・不明・TBD・TBA・TODO・N/A・
+// null・undefined, or only ? / - / — / ー / … / ・ / . characters).
+const TRANSITION_SCREEN = ['screen', '画面へ（種類の指定なし）'];
+const TRANSITION_OTHER = ['other', '行き先も種類も不明'];
+const TRANSITION_PLACEHOLDER = /^(?:未定|未設定|不明|tbd|tba|todo|n\/a|null|undefined|[?？\-—―ー…・.]+)$/i;
+// The type / method decides when it is written and names a kind; only then the destination's words (a word in the
+// destination — 「sheet 表示」, 「MAP」, 「…Sheet」 — must not beat what the spec says the transition is).
+const kindOf = (text) => (text ? TRANSITION_KINDS.find((k) => k[2].test(text)) : null);
+function transitionKind(type, dest) {
+  const d = String(dest || '').trim();
+  return kindOf(String(type || '').trim()) || kindOf(d) || (d && !TRANSITION_PLACEHOLDER.test(d) ? TRANSITION_SCREEN : TRANSITION_OTHER);
+}
+const transitionTag = (dest, type) => {
+  const [key, label] = transitionKind(type, dest);
+  return `<span class="scr tk tk-${esc(key)}" data-tk="${esc(key)}" title="${esc(dest)}"><span class="tk-k">${esc(label.split('（')[0])}</span>${esc(SCREEN_JA[dest] || dest)}</span>`;
+};
+const TYPE_KINDS = [   // [key, label, sample, test] — Optional first: String? is an Optional
+  ['optional', 'Optional（T?）', 'String?', (t) => /\?\s*$/.test(t)],
+  ['array', '配列・辞書（[T]・{K: V}）', '[Item]', (t) => /^\s*[[{]|^\s*(array|dictionary|set|list|map)\b/i.test(t)],
+  ['string', 'String', 'String', (t) => /^\s*string\s*$/i.test(t)],
+  ['bool', 'Bool', 'Bool', (t) => /^\s*(bool|boolean)\s*$/i.test(t)],
+  ['number', '数（Int・Double・Float）', 'Int', (t) => /^\s*(u?int\d*|double|float|cgfloat|number|decimal|long)\s*$/i.test(t)],
+  ['color', 'Color', 'Color', (t) => /^\s*(color|uicolor|cgcolor)\s*$/i.test(t)],
+];
+const TYPE_OTHER = ['custom', 'そのほか（自作の型など）', 'Visibility'];
+const typeKind = (t) => TYPE_KINDS.find((k) => k[3](String(t || ''))) || TYPE_OTHER;
+const typeCell = (t) => { const k = esc(typeKind(t)[0]); return `<td class="mono ty ty-${k}" data-ty="${k}">${esc(t)}</td>`; };
+const COLOR_LEGEND_HTML = `<p>遷移先の札は、遷移の種類で色を分ける（札の頭に種類も書く）。</p>
+<p class="seg-legend sh-legend sh-kinds">${[...TRANSITION_KINDS, TRANSITION_SCREEN, TRANSITION_OTHER].map(([key, label]) => { const more = label.includes('（') ? label.slice(label.indexOf('（')) : '';
+  return `<span class="scr tk tk-${esc(key)}${more ? '' : ' tk-solo'}" data-tk="${esc(key)}"><span class="tk-k">${esc(label.split('（')[0])}</span>${esc(more)}</span>`; }).join('')}</p>
+<p>状態の型は、型で文字の色を分ける。</p>
+<p class="seg-legend sh-legend sh-types">${[...TYPE_KINDS, TYPE_OTHER].map(([key, label, sample]) => `<span><code class="mono ty ty-${esc(key)}" data-ty="${esc(key)}">${esc(sample)}</code> ${esc(label)}</span>`).join('')}</p>`;
 const SWATCHES = '<span><i class="sw sw-writing"></i>書き込み中</span><span><i class="sw sw-written"></i>記入済み</span><span><i class="sw sw-impl"></i>実装済み</span><span><i class="sw sw-tested"></i>テスト済み</span><span><i class="sw sw-empty"></i>未記入</span>';
 /* The explanation of 「spec の進み具合」 (2.3.4, requester 10-19: "specの進み具合の説明をボードから消してその代わりに？
    ボタンおいて押したらモーダルで説明出して", for the panel and the overview alike: "同じで"). It used to sit under the
@@ -5254,7 +5770,8 @@ const SWATCHES = '<span><i class="sw sw-writing"></i>書き込み中</span><span
 const SPEC_HELP_HTML = `<p>spec ファイルの書き込みをファイル監視で追い、今どのセクションが実装・テストされているかを relatedFiles から割り出す。</p>
 <p>バーは左から 概要・構造・状態・データ・操作・遷移・分岐 の 7 区分。色は次のとおり。</p>
 <p class="seg-legend sh-legend">${SWATCHES}</p>
-<p>右のパネルでは行を押すとホワイトボードに寄ってその spec を開く。「ボードで全部見る」の一覧では、カードを押すとその spec を開く。</p>`;
+<p>右のパネルでは行を押すとホワイトボードに寄ってその spec を開く。「ボードで全部見る」の一覧では、カードを押すとその spec を開く。</p>
+${COLOR_LEGEND_HTML}`;
 let specHelp = null;
 function openSpecHelp(opener) {
   closeSpecHelp(false);
@@ -5418,7 +5935,7 @@ function renderSheet(model, force) {
       return `<div class="st-grid"><div class="wf-phone" role="img" aria-label="${esc((d.components[0] || [])[1] || '')} の中に並ぶ部品の配置図">${wfHTML}</div><ul class="rows">${rowsHTML}</ul></div>${moreHTML}`;
     },
     (w, writing) => {
-      const rowsHTML = pick(2, d.uiVariables, reveal(d.uiVariables.length, w), writing).map(([[name, type, init], i, m]) => tr(m, `v${i}`, `<td class="mono">${esc(name)}</td><td class="mono">${esc(type)}</td><td class="mono">${esc(init)}</td>`)).join('');
+      const rowsHTML = pick(2, d.uiVariables, reveal(d.uiVariables.length, w), writing).map(([[name, type, init], i, m]) => tr(m, `v${i}`, `<td class="mono">${esc(name)}</td>${typeCell(type)}<td class="mono">${esc(init)}</td>`)).join('');
       const evHTML = !writing || w >= 0.6 ? `<p class="sub-h">イベント</p><ul class="rows">${d.eventHandlers.map(([name, desc]) => `<li class="rw"><span class="mk"></span><span><span class="id">${esc(name)}</span> <span class="desc">${esc(desc)}</span></span></li>`).join('')}</ul>` : '';
       return `<table class="vt"><thead><tr><th><span class="sr">状態</span></th><th>変数</th><th>型</th><th>初期値</th></tr></thead><tbody>${rowsHTML}</tbody></table>${evHTML}`;
     },
@@ -5431,10 +5948,14 @@ function renderSheet(model, force) {
       let apisHTML = '';
       if (shown > M + 1 && !d.apis.length) apisHTML = '<div class="farrow" aria-hidden="true">↓</div><div class="fbox"><p class="fb-h">API</p><p class="sc-ph">通信しない</p></div>';
       else if (apiN > 0) apisHTML = `<div class="farrow" aria-hidden="true">↓</div><div class="fbox"><p class="fb-h">API</p><ul class="rows">${d.apis.slice(0, apiN).map(([op, method, path]) => `<li class="api"><span class="http http-${esc(method)}">${esc(method)}</span><code>${esc(path)}</code><span class="desc">${esc(op)}</span></li>`).join('')}</ul></div>`;
-      return `<div class="flow"><div class="fbox"><p class="fb-h">ViewModel</p><ul class="rows">${methodsHTML}</ul>${varsHTML}</div>${reposHTML}${apisHTML}</div>`;
+      const boxesHTML = `<div class="flow"><div class="fbox"><p class="fb-h">ViewModel</p><ul class="rows">${methodsHTML}</ul>${varsHTML}</div>${reposHTML}${apisHTML}</div>`;
+      // 2.3.5: the diagram the spec page draws (Mermaid), the boxes under it with what it does not say; while the
+      // section is being written, the boxes alone (they grow as it is written)
+      if (!d.flowMermaid || writing) return boxesHTML;
+      return `<div class="flow-mmd-wrap"><div class="flow-mmd-bar"><button type="button" class="wb-btn" data-flow-zoom data-fk="flow-zoom" aria-pressed="${wb.flowFit ? 'true' : 'false'}">${wb.flowFit ? '実際の大きさ' : '幅に合わせる'}</button></div><div class="flow-mmd" data-flow-mmd role="img" aria-label="データの流れの図"></div></div><p class="sub-h">詳しく</p>${boxesHTML}`;
     },
     (w, writing) => `<ul class="rows">${pick(4, d.userActions, reveal(d.userActions.length, w), writing).map(([[a, p], i, m]) => li(m, `a${i}`, `${esc(a)}<span class="to">→</span><code>${esc(p)}</code>`)).join('')}</ul>`,
-    (w, writing) => `<ul class="rows">${pick(5, d.transitions, reveal(d.transitions.length, w), writing).map(([[trig, dest], i, m]) => li(m, `t${i}`, `${esc(trig)}<span class="to">→</span><span class="scr" title="${esc(dest)}">${esc(SCREEN_JA[dest] || dest)}</span>`)).join('')}</ul>`,
+    (w, writing) => `<ul class="rows">${pick(5, d.transitions, reveal(d.transitions.length, w), writing).map(([[trig, dest, how], i, m]) => li(m, `t${i}`, `${esc(trig)}<span class="to">→</span>${transitionTag(dest, how)}`)).join('')}</ul>`,
     (w, writing) => {
       const rowsHTML = pick(6, d.branches, reveal(d.branches.length, w), writing).map(([[method, when, then], i, m]) => tr(m, `b${i}`, `<td class="mono">${esc(method)}</td><td>${esc(when)}</td><td>${esc(then)}</td>`)).join('');
       const sheetNoteHTML = s.id === 'cart' && model.t >= 18 ? `<p class="sc-note">tests/screens/cart.test.json の 8 ケースと 1 対 1（${T.passed}/8 通過）</p>` : '';
@@ -5445,7 +5966,8 @@ function renderSheet(model, force) {
       return `<li class="${now ? 'now' : ''}"><span class="bdg">${esc(type)}</span><code>${esc(path)}</code>${exists === false ? '<span class="desc">まだ無い</span>' : ''}${now ? `<span class="editing">${pill(s.by, DEF[s.by].role)} ${s.status.kind === 'test' ? '実行中' : '編集中'}</span>` : ''}</li>`;
     }).join('')}</ul>`,
   ];
-  const sheetHTML = SHEET.map(([k, title, key, wide]) => {
+  const sheetHTML = SHEET.map(([k, title, key, wideAlways]) => {
+    const wide = wideAlways || (k === 3 && !!d.flowMermaid);   // the data flow diagram takes the whole row (2.3.5)
     // 関連ファイル: live, written when the spec lists any (the demo ties it to 分岐, as its script does).
     const w = k === 7 ? (s.measure ? (s.measure.related.total ? 1 : 0) : (s.written[6] >= 1 ? 1 : 0)) : s.written[k];
     const rel = s.measure && s.measure.related;
@@ -5460,6 +5982,8 @@ function renderSheet(model, force) {
     return `<section class="${esc(cls)}" id="wb-sec-${k}"${esc(act)}>${headHTML}${bodies[k](w, writing)}${tailHTML}</section>`;
   }).join('');
   setHTML(wbCode, sheetHTML);
+  const mmd = wbCode.querySelector('[data-flow-mmd]');
+  if (mmd) drawMermaid(mmd, d.flowMermaid).then((svg) => flowZoomApply(svg));
 
   // Follow: keep the card being written, or the row being implemented or tested, in view.
   if ($('wb-follow').checked && activeKey) {
@@ -5474,8 +5998,8 @@ function renderSheet(model, force) {
 }
 
 /* ---------- task board up close: one column per task state, permission prompts on top ---------- */
-const tbEl = $('tb'), kanbanEl = $('kanban'), stripEl = $('perm-strip'), detailEl = $('tb-detail');
-const tb = { open: false, detail: null, board: null };
+const tbEl = $('tb'), kanbanEl = $('kanban'), stripEl = $('perm-strip'), detailEl = $('tb-detail'), qStripEl = $('q-strip');
+const tb = { open: false, detail: null, board: null, waitView: false };   // waitView: opened from a 質問 / 許可待ち chip
 $('tb-lanes').addEventListener('change', (e) => { UI.lanes = e.target.checked; writePref('lanes', UI.lanes ? 'on' : 'off'); renderTaskBoard(latestModel); });
 function openTaskBoard(opener, detail, board) {
   if (detail !== undefined) tb.detail = detail;
@@ -5490,7 +6014,8 @@ function openTaskBoard(opener, detail, board) {
     if (!tb.open) return;
     showOverlay(tbEl);
     renderTaskBoard(latestModel);
-    $(tb.detail ? 'tbd-close' : 'tb-close').focus({ preventScroll: true });
+    const firstQ = tb.waitView && !tb.detail ? qStripEl.querySelector('input:not([disabled])') : null;   // from the 質問 chip: the first choice
+    (firstQ || $(tb.detail ? 'tbd-close' : 'tb-close')).focus({ preventScroll: true });
   });
 }
 function closeTaskDetail() {
@@ -5502,7 +6027,8 @@ function closeTaskDetail() {
 }
 function closeTaskBoard() {
   if (!tb.open) return;
-  tb.open = false; tb.detail = null;
+  tb.open = false; tb.detail = null; tb.waitView = false;
+  qStripEl.replaceChildren(); qStripEl._sig = null; qStripEl.hidden = true;   // no second copy of the cards while closed
   hideOverlay(tbEl);
   zoomBack();
 }
@@ -5510,6 +6036,15 @@ $('tb-close').addEventListener('click', closeTaskBoard);
 const COL_HINT = { todo: '担当が決まれば始められる', wait: '先に終わるタスクがある', doing: 'ロボットが今やっている', done: '' };
 const mmss = (sec) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;
 const paintSince = (root, t, word) => root.querySelectorAll('[data-since]').forEach((el) => setText(el, `${word} ${mmss(Math.max(0, t - Number(el.dataset.since)))}`));
+/* The board's question strip (2.3.5): the panel's cards in scope, and how many wait elsewhere (the chip counts both). */
+function renderQuestionStrip() {
+  const qs = questionsShown(), elsewhere = questionsElsewhere();
+  qStripEl.hidden = !qs.length && !elsewhere && !tb.waitView;
+  keyed(qStripEl, `${tb.waitView}|${elsewhere}|${questionsSig(qs)}`, () => {
+    const otherHTML = elsewhere ? `<p class="ps-rules" data-q-elsewhere="${elsewhere}">ほかのプロジェクトでも ${elsewhere} 件が答えを待っている <button type="button" class="link-btn" data-set-all data-fk="qs-all">すべてのプロジェクトを表示</button></p>` : '';
+    return `<h3 class="ps-title">質問に答える<b>${qs.filter((q) => q.status === 'pending').length}</b><small>古い順</small></h3>${qs.some((q) => q.status === 'pending') ? '' : '<p class="ps-none">答えを待っている質問はない</p>'}${otherHTML}${qs.map((q) => questionHTML(q, 'b')).join('')}`;
+  });
+}
 function renderTaskBoard(model) {
   if (!tb.open) return;
   const visible = (list) => inScope(PROJECT_OF[list]) && !UI.hiddenLists.has(list);
@@ -5520,7 +6055,10 @@ function renderTaskBoard(model) {
   const elsewhere = model.pending.length - pend.length;
   setText($('tb-count'), `${tasks.length} 件`);
   setText($('tb-title'), UI.project === 'all' ? 'タスクボード' : `タスクボード · ${PROJECT[UI.project].name}`);
-  stripEl.hidden = !pend.length && !alwaysRules.size && !elsewhere;
+  // the questions waiting, the same cards as the panel's from the same list (questionsShown), on top
+  renderQuestionStrip();
+  paintSince(qStripEl, model.t, '待ち');
+  stripEl.hidden = !pend.length && !alwaysRules.size && !elsewhere && !tb.waitView;
   keyed(stripEl, JSON.stringify([NAMES.rev, pend.map(permSig), [...alwaysRules.keys()], elsewhere]), () => {
     const cardsHTML = pend.map((p) => {
       const x = p.task && TASK_BY_KEY[p.task];
@@ -5642,19 +6180,51 @@ const FOCUS_BASE = { az: Math.atan2(CAM_DIR.x, CAM_DIR.z), el: Math.asin(CAM_DIR
 const FOCUS_SAMPLES = [0.55, 1.15, 1.65];   // heights on the robot the camera must see
 const focusRay = new THREE.Raycaster();
 const focusDir = (az, el) => new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
-function focusPose(R, az, el, dist) {
+function focusPose(R, az, el, dist, fitted = false) {
   const dir = focusDir(az, el), wide = sceneEl.clientWidth > 900;
   const right = new THREE.Vector3().crossVectors(dir.clone().negate(), new THREE.Vector3(0, 1, 0)).normalize();
   const viewH = 2 * dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), viewW = viewH * camera.aspect;
-  const t = R.robot.root.position.clone().add(new THREE.Vector3(0, 1.15, 0));
+  const t = R.robot.root.position.clone().add(new THREE.Vector3(0, 1.15 * (R.robot.size || 1), 0));   // a subagent is 0.8 (2.3.5)
   // Wide: the card covers the right of the scene, so the robot sits left of centre. Narrow: the card is a
   // bottom sheet, so the robot sits high.
-  // The wide 応答の履歴 (2.3.4, 55-history.js): the card leaves only histWideMargin() on the left, and the robot sits in its middle.
+  // The wide 応答の履歴 (2.3.4, 55-history.js): the card leaves only histWideMargin() on the left, and the robot sits in its middle —
+  // the robot as posed (2.3.5: a tired robot's slumped pose is wider and stuck 1–10 px out of the margin when its root was
+  // put in the middle): the middle of its posed width in the middle of the margin, and the camera backs off if that width
+  // would not fit (ticket 2026-10-20-jui-viz-wide-history-tired-robot-leans-out-of-the-margin).
   const margin = typeof histWideMargin === 'function' ? histWideMargin() : 0;
-  if (wide && margin) t.add(right.multiplyScalar(((sceneEl.clientWidth - margin) / 2 / sceneEl.clientWidth) * viewW));
+  if (wide && margin) {
+    const ext = focusExtent(R, right, dir, dist, az), mid = (ext.l + ext.r) / 2, width = ext.r - ext.l;
+    const fit = (margin / sceneEl.clientWidth) * viewW * FOCUS_FIT;
+    if (width > fit && !fitted) return focusPose(R, az, el, dist * (width / fit), true);   // farther, so the posed robot fits the margin
+    t.add(right.clone().multiplyScalar(((sceneEl.clientWidth - margin) / 2 / sceneEl.clientWidth) * viewW + mid));
+  }
   else if (wide) t.add(right.multiplyScalar((Math.min(420, sceneEl.clientWidth - 28) / 2 / sceneEl.clientWidth) * viewW));
   else t.y -= viewH * 0.2;
   return { p: t.clone().add(dir.multiplyScalar(dist)), t };
+}
+/* The robot's posed width as the camera sees it, measured from its root along the camera's right, in units of the plane
+   the camera looks at (a corner nearer the camera counts wider: perspective): every shown mesh, the desk included, as the
+   wide history must keep it in the margin. Kept per robot as the widest seen for its posture (state, tired, desk), the
+   camera's turn and distance, so a pose that breathes or types does not shake the camera every frame. */
+const FOCUS_FIT = 0.9;
+const focusBox = new THREE.Box3(), focusCorner = new THREE.Vector3(), FOCUS_LOOK = new THREE.Vector3(0, 1.15, 0);
+function focusExtent(R, right, dir, dist, az) {
+  const root = R.robot.root, key = `${R.robot.state}|${!!R.robot.tired}|${!!(R.robot.desk && R.robot.desk.visible)}|${Math.round(az * 20)}|${dist.toFixed(2)}`;
+  const kept = R.focusExt && R.focusExt.key === key ? R.focusExt : (R.focusExt = { key, l: 0, r: 0 });
+  root.updateMatrixWorld(true);
+  root.traverse((o) => {
+    if (!o.isMesh || !shownChain(o)) return;
+    focusBox.setFromObject(o);
+    for (let i = 0; i < 8; i++) {
+      focusCorner.set(i & 1 ? focusBox.max.x : focusBox.min.x, i & 2 ? focusBox.max.y : focusBox.min.y, i & 4 ? focusBox.max.z : focusBox.min.z);
+      focusCorner.sub(root.position);
+      const side = focusCorner.dot(right), depth = dist - focusCorner.sub(FOCUS_LOOK).dot(dir);
+      const d = depth > 0.1 ? side * (dist / depth) : side;
+      if (d < kept.l) kept.l = d;
+      if (d > kept.r) kept.r = d;
+    }
+  });
+  return kept;
 }
 const shownChain = (o) => { for (let x = o; x; x = x.parent) if (!x.visible) return false; return true; };
 const ofRobot = (o) => { for (let x = o; x; x = x.parent) if (x.userData && x.userData.robotId !== undefined) return true; return false; };
@@ -5662,7 +6232,7 @@ const ofRobot = (o) => { for (let x = o; x; x = x.parent) if (x.userData && x.us
 function focusBlockers(R, p) {
   const out = new Set();
   for (const y of FOCUS_SAMPLES) {
-    const from = R.robot.root.position.clone().add(new THREE.Vector3(0, y, 0)), dir = p.clone().sub(from), len = dir.length();
+    const from = R.robot.root.position.clone().add(new THREE.Vector3(0, y * (R.robot.size || 1), 0)), dir = p.clone().sub(from), len = dir.length();
     focusRay.set(from, dir.normalize());
     focusRay.far = len;
     focusRay.camera = camera;   // a sprite (a tag, a label) cannot be raycast without it: three.js throws
@@ -5798,8 +6368,11 @@ function stepRobot(dir) {
   const list = robotCycle();
   if (!rbState.id || list.length < 2) return;
   const i = list.indexOf(rbState.id);
-  const next = list[i < 0 ? 0 : (i + dir + list.length) % list.length];
-  if (next === rbState.id) return;
+  goRobot(list[i < 0 ? 0 : (i + dir + list.length) % list.length]);
+}
+/* The card on another robot, as ← → do it (the camera flies, the tab stays): also a linked name in the history. */
+function goRobot(next) {
+  if (!rbState.id || !next || next === rbState.id) return;
   rbState.id = next;
   renderRobot(latestModel);
   if (has3D && robots.some((x) => x.def.id === next)) zoomTo(robotPose(next), null, () => {});
@@ -5817,6 +6390,44 @@ document.addEventListener('keydown', (e) => {
   if (t && (t.isContentEditable || (t.closest && t.closest('input, textarea, select')))) return;   // typing keeps its keys
   e.preventDefault();
   stepRobot(e.key === 'ArrowRight' ? 1 : -1);
+});
+/* 2.3.5 (requester 10-19: "部屋の状態で左右キー押したら左右の部屋に移動したい それと階全体表示で上下押したら上下の階に移動したい"):
+   with no card open, in the room close-up ← → go to the room before / after on this floor, and on the whole floor ↑ ↓ go
+   one floor up / down (the same as ▲ ▼). The card's own ← → (above) are untouched: this handler does nothing while a
+   card is open. Nothing either where text is typed, while an IME composes, with a modifier, while a dialog, a board,
+   the log or the building covers the floor, and in the demo (one office). Only a key that acts is taken
+   (preventDefault); the room's ↑ ↓ and the floor's ← → stay the page's (they do nothing here). */
+/* The rooms of the floor shown, in the order ← → walk them. The requester's rulings (10-19): the floor's own layout
+   (the scene's row and column of each room, layoutRooms), read like text — the back row left to right, then the front
+   row left to right; empty slots are skipped. Swap this one function to change the order. The walk wraps (ruling 2:
+   after the last room the first, before the first the last) and never leaves the floor (floors are ↑ ↓). */
+function arrowRoomOrder() {
+  const ids = (LIVE.floors[LIVE.floor] || []).filter((id) => PROJECT[id]);
+  return ids.sort((a, b) => (PROJECT[a].row - PROJECT[b].row) || (PROJECT[a].col - PROJECT[b].col));
+}
+function roomStep(dir) {
+  const list = arrowRoomOrder(), i = list.indexOf(UI.project);
+  if (i < 0 || list.length < 2) return false;
+  const next = list[(i + dir + list.length) % list.length];   // wraps, on this floor
+  setProject(next);                  // the room's tag, ← フロア全体に戻る, the project menu and the camera follow
+  return true;
+}
+const arrowsCovered = () => !!(rbState.id || !rbEl.hidden || !popEl.hidden || logState.open || wb.open || tb.open || alwaysDlg || clockDlg
+  || specHelp || LIGHT.el || document.querySelector('[aria-modal="true"]:not([hidden])'));
+document.addEventListener('keydown', (e) => {
+  if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key) || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  if (e.isComposing || e.keyCode === 229 || e.defaultPrevented) return;
+  const t = e.target;
+  if (t && (t.isContentEditable || (t.closest && t.closest('input, textarea, select')))) return;
+  if (SOURCE.mode !== 'live' || !has3D || TOWER.on || zoom.zoomed || arrowsCovered()) return;
+  const room = UI.project !== 'all' && PROJECT[UI.project] && PROJECT[UI.project].shown;
+  if (room && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+    e.preventDefault();
+    roomStep(e.key === 'ArrowRight' ? 1 : -1);
+  } else if (UI.project === 'all' && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+    e.preventDefault();
+    if (LIVE.floors.length > 1) liveFloorStep(e.key === 'ArrowUp' ? 1 : -1);
+  }
 });
 /* Tab on the card's tabs: 今の様子 → Tab selects 応答の履歴 and focuses it; 応答の履歴 → Tab goes on into the card (the
    browser's own order); Shift+Tab is the reverse (応答の履歴 → 今の様子 → what is before the tabs). Never a dead end. */
@@ -5852,7 +6463,7 @@ function renderRobot(model) {
 <div class="rb-tabs"><button type="button" class="wb-btn rb-wide-btn" data-rb-wide data-fk="rb-wide" aria-pressed="false" hidden>広げる</button><div class="rb-tablist" role="tablist" aria-label="表示"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">今の様子</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">応答の履歴</button></div></div>
 <div class="rb-body rb-hist" data-rb-hist hidden aria-label="応答の履歴" tabindex="0"></div>
 <div class="rb-body" tabindex="0" aria-label="今の様子">
-<section class="rb-sec" aria-labelledby="rb-h-now"><h3 id="rb-h-now">今やっていること</h3><div class="rb-now"><p class="rb-state"><span class="rb-lamp" data-rb-lamp></span><b data-rb-state></b><span class="rb-since">ランプ: <span data-rb-lampname></span></span></p><p class="rb-act" data-rb-act></p><p class="rb-git" data-rb-git hidden title="Claude のセッションが Bash で撃った git push / pull だけが見える（自分のターミナル、エディタの git、GitHub での merge は見えない）"></p><p class="rb-cond" data-rb-cond></p>${spec ? `<p class="rb-spec"><button type="button" class="link-btn" data-spec-open="${specIdx}" data-fk="rb-spec">${esc(spec.name)}（${esc(spec.screen)}）の spec</button> <span data-rb-specnow></span></p><span class="rb-segs" style="--c:${ROLES[d.role].color}">${SEGS}</span>` : ''}${(SOURCE.mode === 'demo' && id === 'a2') ? '<p class="rb-test" data-rb-test></p><div class="prog" data-rb-prog role="img"><span class="p"></span><span class="r"></span></div>' : ''}</div></section>
+<section class="rb-sec" aria-labelledby="rb-h-now"><h3 id="rb-h-now">今やっていること</h3><div class="rb-now"><p class="rb-state"><span class="rb-lamp" data-rb-lamp></span><b data-rb-state></b><span class="rb-since">ランプ: <span data-rb-lampname></span></span></p><p class="rb-act" data-rb-act></p><p class="rb-git" data-rb-git hidden title="Claude のセッションが Bash で撃った git push / pull だけが見える（自分のターミナル、エディタの git、GitHub での merge は見えない）"></p><p class="rb-cond" data-rb-cond></p><p class="rb-looks" data-rb-looks hidden></p>${spec ? `<p class="rb-spec"><button type="button" class="link-btn" data-spec-open="${specIdx}" data-fk="rb-spec">${esc(spec.name)}（${esc(spec.screen)}）の spec</button> <span data-rb-specnow></span></p><span class="rb-segs" style="--c:${ROLES[d.role].color}">${SEGS}</span>` : ''}${(SOURCE.mode === 'demo' && id === 'a2') ? '<p class="rb-test" data-rb-test></p><div class="prog" data-rb-prog role="img"><span class="p"></span><span class="r"></span></div>' : ''}</div></section>
 ${pending ? `<section class="rb-sec" aria-label="許可">${permDetail(pending, 'rb')}</section>` : ''}
 ${SOURCE.mode === 'live' ? '<section class="rb-sec" aria-labelledby="rb-h-tests"><h3 id="rb-h-tests">テスト実行</h3><div data-rb-tests></div></section>' : ''}
 <section class="rb-sec" aria-labelledby="rb-h-tasks"><h3 id="rb-h-tasks">${isMain ? 'このセッションのタスク' : '担当しているタスク'}<small>${owned.length} 件</small></h3>${tasksHTML}</section>
@@ -5883,6 +6494,10 @@ ${subs.length ? `<section class="rb-sec" aria-labelledby="rb-h-subs"><h3 id="rb-
   if (brk) parts.push(brk);
   const condEl = rbEl.querySelector('[data-rb-cond]');
   if (condEl) { setText(condEl, parts.join(' / ')); condEl.hidden = !parts.length; }
+  // what the three looks of heavy work mean (2.3.6), only while the robot works hard
+  const looksEl = rbEl.querySelector('[data-rb-looks]');
+  const RB = robots.find((x) => x.def.id === id), causes = RB ? heavyCauses(RB.robot) : [];   // what the robot shows
+  if (looksEl) { looksEl.hidden = !causes.length; if (causes.length) setText(looksEl, HEAVY_LEGEND); }
   if (spec) {
     const k = activeSec(spec);
     setText(rbEl.querySelector('[data-rb-specnow]'), `${spec.status.text}${k >= 0 ? ` · ${SECTIONS[k]}` : ''}`);
@@ -6071,6 +6686,605 @@ function closeAlwaysConfirm(back) {
   alwaysDlg = null; el.remove();
   if (back && opener && document.contains(opener)) opener.focus({ preventScroll: true });
 }
+
+/* ---------- the call bell's dialog (2.3.5, ticket 2026-10-19-jui-viz-call-a-robot-button) ----------
+   The bell in the room up close (40-scene.js) or the header's 呼び出し opens it for that project: a name (required, one
+   line), a role text (optional), the command the server makes from them (SOURCE.callCommand -> /api/call-command,
+   callcmd.py) and a copy button. Each edit asks again; only the latest answer is shown (CALL.seq), and the copy button
+   is off whenever the shown line is not the one for what is typed now. Copy: the clipboard API (127.0.0.1 is a secure
+   context); when that fails, the line is selected for a manual copy. viz runs nothing. */
+const CALL = { project: null, opener: null, seq: 0, command: '', timer: 0 };
+const callEl = $('call');
+function openCall(project, opener) {
+  if (!project || !PROJECT[project]) return;
+  CALL.project = project; CALL.opener = opener || document.activeElement; CALL.command = '';
+  const p = PROJECT[project];
+  setText($('call-lead'), `${p.name}（${p.path || ''}）に、担当名つきの新しいセッションを起動するコマンド`);
+  $('call-cmd').value = ''; setText($('call-why'), '担当名を入れてください'); $('call-copy').disabled = true;
+  callEl.hidden = false;
+  $('call-name').focus();
+  callAsk();
+}
+function closeCall() {
+  if (callEl.hidden) return;
+  callEl.hidden = true; CALL.seq++; clearTimeout(CALL.timer);
+  const back = CALL.opener;
+  CALL.project = null; CALL.opener = null;
+  if (back && document.contains(back) && back.focus) back.focus({ preventScroll: true });
+}
+function callAsk() {
+  clearTimeout(CALL.timer);
+  const seq = ++CALL.seq, project = CALL.project, name = $('call-name').value, role = $('call-role').value;
+  CALL.command = ''; $('call-copy').disabled = true;
+  if (!name.trim()) { $('call-cmd').value = ''; setText($('call-why'), '担当名を入れてください'); return; }
+  CALL.timer = setTimeout(async () => {
+    const got = await SOURCE.callCommand(project, name, role);
+    if (seq !== CALL.seq || callEl.hidden) return;   // typed again (or closed) meanwhile: a newer answer comes
+    if (!got.ok) { $('call-cmd').value = ''; setText($('call-why'), got.why || '作れなかった'); return; }
+    CALL.command = got.command; $('call-cmd').value = got.command; $('call-copy').disabled = false;
+    setText($('call-why'), got.flag === '--channels' ? '貼って実行すると、このプロジェクトで新しいセッションが始まります'
+      : '貼って実行すると、このプロジェクトで新しいセッションが始まります（起動時に development channels の警告が 1 回出ます）');
+  }, 150);
+}
+async function callCopy() {
+  const line = CALL.command;
+  if (!line) return;
+  try {
+    await navigator.clipboard.writeText(line);
+    showToast('コマンドをコピーした（ターミナルに貼って実行）');
+    setText($('call-why'), 'コピーした。ターミナルに貼って実行してください');
+  } catch (err) {
+    const t = $('call-cmd'); t.focus(); t.select();
+    showToast('コピーできなかった。選択したので ⌘C でコピーしてください');
+    setText($('call-why'), 'コピーできなかった。コマンドを選択したので ⌘C でコピーしてください');
+  }
+}
+$('call-name').addEventListener('input', callAsk);
+$('call-role').addEventListener('input', callAsk);
+$('call-copy').addEventListener('click', callCopy);
+$('call-close').addEventListener('click', closeCall);
+$('room-call').addEventListener('click', (e) => openCall(liveSolo(), e.currentTarget));
+callEl.addEventListener('click', (e) => { if (e.target === callEl) closeCall(); });
+callEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeCall(); return; }
+  if (e.key === 'Tab') {   // the focus stays in the dialog
+    const f = [...callEl.querySelectorAll('input, textarea, button')].filter((x) => !x.disabled);
+    const i = f.indexOf(document.activeElement);
+    e.preventDefault();
+    f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+  }
+});
+
+/* ---------- browser notifications and the question window's setting (2.3.6) ----------
+   Requester 10-19: 「完了通知がwebプッシュで届くようにしてほしい。許可や質問も同様」, then 「開いている間でいい」: the
+   Notification API only, while a viz page is open — no service worker, no push service; nothing leaves the machine.
+   - done: a main robot's turn ends (its Stop); subagents never. perm: a new permission waits. ask: a new question waits.
+   - one ring per event in all the tabs: the rung keys (server start + kind + id) are kept in localStorage and read
+     and written under one Web Lock; a tab without storage decides alone. The notification's tag is the key too.
+   - nothing from before the page was loaded or connected: the waiting permissions and questions of the first snapshot
+     are taken as seen; neither the recent events the server sends after each snapshot nor the history asked for are
+     rung; and an event older than 2 minutes is not either.
+   - quiet: the page in front and focused, and that very thing on screen (the robot's card; that permission or that
+     question on the board).
+   - a click: the page comes forward and opens the robot's card, or the board on that permission, or the questions.
+   - the switches per kind are kept in this browser (localStorage, try/catch); the browser's permission is asked only
+     from the button in the settings, never on load.
+   - while question notifications can be shown (permission granted, the kind on) the page says so to the server every
+     4 s and whenever the server asks (notify.ping): then a question waits for an answer though the page is hidden
+     (cd's ruling 10-19; it lapses notifyPresenceSec after the last word, a closed tab included). */
+const NOTIFY_PREFS = 'jui-viz-notify', NOTIFY_RUNG = 'jui-viz-notify-rung', NOTIFY_KINDS = ['done', 'perm', 'ask'];
+const NOTIFY = { on: { done: true, perm: true, ask: true }, seen: new Set(), based: { perm: false, ask: false }, said: false, settings: null, pings: 0 };
+function notifyLoadPrefs() {
+  try {
+    const v = JSON.parse(localStorage.getItem(NOTIFY_PREFS) || 'null');
+    if (v && typeof v === 'object') for (const k of NOTIFY_KINDS) if (typeof v[k] === 'boolean') NOTIFY.on[k] = v[k];
+  } catch (err) { /* no storage: the defaults */ }
+}
+notifyLoadPrefs();
+// a switch turned in another tab holds here too (a kind turned off there must not ring from this one)
+window.addEventListener('storage', (e) => { if (e.key === NOTIFY_PREFS) { notifyLoadPrefs(); notifySettingsShow(); notifyPresenceSay(); } });
+function notifySavePrefs() { try { localStorage.setItem(NOTIFY_PREFS, JSON.stringify(NOTIFY.on)); } catch (err) { /* kept for this page only */ } }
+const notifyCan = () => typeof Notification !== 'undefined';
+const notifyGranted = () => notifyCan() && Notification.permission === 'granted';
+const notifyName = (who) => String((DEF[who] && (DEF[who].title || DEF[who].agent)) || who).slice(0, 40);
+function notifyViewing(kind, ref) {
+  if (document.visibilityState !== 'visible' || !document.hasFocus()) return false;
+  if (kind === 'done') return rbState.id === ref.who;
+  if (kind === 'perm') return tb.open && (tb.detail === `perm:${ref.id}` || (!!ref.task && tb.detail === ref.task) || (tb.waitView && !tb.detail));
+  return tb.open && !!(qStripEl && qStripEl.querySelector(`[data-qcard="${CSS.escape(ref.id)}"]`));
+}
+function notifyOpen(kind, ref) {
+  try { window.focus(); } catch (err) { /* the OS may keep it behind */ }
+  if (kind === 'done') { if (DEF[ref.who]) openRobot(ref.who, document.getElementById('scene-canvas')); }
+  else if (kind === 'perm') openTaskBoard(null, ref.task || `perm:${ref.id}`);
+  else { tb.waitView = true; openTaskBoard(null); }
+}
+/* The one place a notification is made. */
+function notifyOut(key, body, onClick) {
+  const n = new Notification('jui viz', { body, tag: key });
+  n.onclick = () => { n.close(); onClick(); };
+  return n;
+}
+/* true: this tab rings it (the first to take the key); false: another tab (or this one) already did. */
+function notifyRungTake(key) {
+  let rung;
+  try { rung = JSON.parse(localStorage.getItem(NOTIFY_RUNG) || '[]'); if (!Array.isArray(rung)) rung = []; } catch (err) { return true; }
+  if (rung.includes(key)) return false;
+  rung.push(key);
+  try { localStorage.setItem(NOTIFY_RUNG, JSON.stringify(rung.slice(-300))); } catch (err) { /* the next tab may ring it too */ }
+  return true;
+}
+function notifyEvent(kind, key, ref, body) {
+  if (NOTIFY.seen.has(key)) return;
+  NOTIFY.seen.add(key);
+  if (!NOTIFY.on[kind] || !notifyGranted() || notifyViewing(kind, ref)) return;
+  const ring = () => { if (notifyRungTake(key)) notifyOut(key, body, () => notifyOpen(kind, ref)); };
+  if (navigator.locks && navigator.locks.request) navigator.locks.request('jui-viz-notify', ring).catch(() => {});
+  else ring();
+}
+/* From the live source: a turn's end, the permissions and the questions as they are now. */
+const notifyServer = () => (typeof LIVE !== 'undefined' && LIVE.slices.server && LIVE.slices.server.startedAt) || 0;
+function notifyStop(raw, item, replay = false) {
+  if (replay) { NOTIFY.seen.add(`${notifyServer()}:done:${raw.seq}`); return; }   // sent again after a snapshot: seen, not rung
+  if (!item || !DEF[item.who] || DEF[item.who].kind !== 'main' || !(Date.now() - (Number(raw.at) || 0) < 120_000)) return;
+  notifyEvent('done', `${notifyServer()}:done:${raw.seq}`, { who: item.who }, `${notifyName(item.who)} が完了${raw.kind === 'StopFailure' ? '（失敗で止まった）' : ''}`);
+}
+function notifyWaiting(kind, rows) {
+  const waiting = rows.filter((x) => x.status === 'pending');
+  if (!NOTIFY.based[kind]) {   // the first look after loading: what already waits was there before this page
+    NOTIFY.based[kind] = true;
+    for (const x of waiting) NOTIFY.seen.add(`${notifyServer()}:${kind}:${x.id}`);
+    return;
+  }
+  for (const x of waiting) {
+    const name = notifyName(x.who);
+    const body = kind === 'perm' ? `${name} が許可を待っています: ${String(x.tool || '').slice(0, 40)}`
+      : `${name} が質問しています — ${x.hookWaiting ? notifyAskLeft() : 'ターミナルで答えてください'}`;
+    notifyEvent(kind, `${notifyServer()}:${kind}:${x.id}`, { id: x.id, who: x.who, task: x.task || null }, body);
+  }
+}
+function notifyAskLeft() {
+  const s = NOTIFY.settings;
+  if (!s) return 'viz で答えるか、ターミナルで';
+  return s.askWaitSec > 0 ? `viz で答えるか、${s.askWaitText}後にターミナルへ` : 'viz で答えるまで待ちます';
+}
+/* The page tells the server its question notifications are on (or no longer). */
+const notifyPresenceWanted = () => SOURCE.mode === 'live' && notifyGranted() && NOTIFY.on.ask;
+function notifyPresenceSay() {
+  const want = notifyPresenceWanted();
+  if (!want && !NOTIFY.said) return;
+  NOTIFY.said = want;
+  if (SOURCE.notifyPresence) SOURCE.notifyPresence(want);
+}
+setInterval(notifyPresenceSay, 4000);
+document.addEventListener('visibilitychange', notifyPresenceSay);
+
+/* The settings: a button in the header, a chip saying how long a question waits, a small panel. */
+const notifyEl = $('notify-pop');
+function notifySettingsShow(settings) {
+  if (settings && typeof settings === 'object') NOTIFY.settings = settings;
+  const s = NOTIFY.settings, live = SOURCE.mode === 'live';
+  $('btn-notify').hidden = !live;
+  const chip = $('chip-askwait');
+  chip.hidden = !live || !s;
+  if (s) setText(chip, s.askWaitSec > 0 ? `質問は viz で ${s.askWaitText}待つ` : '質問は viz で答えるまで待つ');
+  if (notifyEl.hidden) return;
+  const state = !notifyCan() ? 'このブラウザは通知を出せません'
+    : Notification.permission === 'granted' ? 'ブラウザの通知: 許可済み'
+      : Notification.permission === 'denied' ? 'ブラウザの通知: 拒否されています（ブラウザのサイトの設定で許可してください）'
+        : 'ブラウザの通知: まだ許可していません';
+  setText($('notify-perm-state'), state);
+  $('notify-ask-perm').hidden = !notifyCan() || Notification.permission !== 'default';
+  for (const el of notifyEl.querySelectorAll('[data-notify-kind]')) el.checked = !!NOTIFY.on[el.dataset.notifyKind];
+  const sel = $('ask-wait');
+  if (s) {
+    const label = (sec) => (sec <= 0 ? '答えるまで' : sec < 60 ? `${sec} 秒` : `${sec / 60} 分`);
+    const choices = s.askWaitChoices.includes(s.askWaitSec) ? s.askWaitChoices : [...s.askWaitChoices, s.askWaitSec];
+    const sig = JSON.stringify(choices);
+    if (sel.dataset.sig !== sig) { sel.dataset.sig = sig; sel.innerHTML = choices.map((c) => `<option value="${esc(String(c))}">${esc(label(c))}</option>`).join(''); }
+    sel.value = String(s.askWaitSec);
+  }
+}
+function notifyOpenPanel(opener) {
+  NOTIFY.opener = opener || null;
+  notifyEl.hidden = false;
+  $('btn-notify').setAttribute('aria-expanded', 'true');
+  notifySettingsShow();
+  (notifyEl.querySelector('#notify-ask-perm:not([hidden])') || notifyEl.querySelector('[data-notify-kind]')).focus({ preventScroll: true });
+}
+function notifyClosePanel() {
+  if (notifyEl.hidden) return;
+  notifyEl.hidden = true;
+  $('btn-notify').setAttribute('aria-expanded', 'false');
+  const back = NOTIFY.opener; NOTIFY.opener = null;
+  if (back && document.contains(back)) back.focus({ preventScroll: true });
+}
+$('btn-notify').addEventListener('click', (e) => (notifyEl.hidden ? notifyOpenPanel(e.currentTarget) : notifyClosePanel()));
+$('chip-askwait').addEventListener('click', (e) => notifyOpenPanel(e.currentTarget));
+$('notify-close').addEventListener('click', notifyClosePanel);
+$('notify-ask-perm').addEventListener('click', async () => {
+  if (!notifyCan()) return;
+  try { await Notification.requestPermission(); } catch (err) { /* refused or not asked */ }
+  notifySettingsShow();
+  notifyPresenceSay();
+});
+notifyEl.addEventListener('change', async (e) => {
+  const k = e.target.closest('[data-notify-kind]');
+  if (k) { NOTIFY.on[k.dataset.notifyKind] = k.checked; notifySavePrefs(); notifyPresenceSay(); return; }
+  if (e.target.id === 'ask-wait') {
+    const got = SOURCE.setAskWait ? await SOURCE.setAskWait(Number(e.target.value)) : { ok: false, why: 'デモでは変えられません' };
+    setText($('ask-wait-note'), got.ok ? '保存した。次の質問から使います' : `変えられなかった（${got.why || '?'}）`);
+  }
+});
+notifyEl.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); notifyClosePanel(); } });
+document.addEventListener('pointerdown', (e) => {
+  if (!notifyEl.hidden && !notifyEl.contains(e.target) && !$('btn-notify').contains(e.target) && !$('chip-askwait').contains(e.target)) notifyClosePanel();
+}, true);
+notifySettingsShow();
+// ---- web/js/52-data-docs.js ----
+/* ---------- the data server's sheet (requester, 10-19; 2.3.5): a JsonUI room's API and DB specifications ----------
+   Opened by pressing the rack (40-scene.js, kind 'data'). Read from the server then (SOURCE.dataDocs: POST
+   /api/data-docs, the room's id only), never kept: closing drops it, opening again reads it again (a changed file
+   shows). Two tabs, each only when the room has that kind: API 仕様書 — per document its endpoints (method, path,
+   summary), a row opening its parameters, request body and responses; DB 仕様書 — per database its ER diagram
+   (document_tools' Mermaid text, drawn strict like the data flow) and its tables, column by column as the generated
+   schema page shows them. Every text is the specification's own, escaped here. */
+const dsEl = $('ds'), dsBody = $('ds-body'), dsTabs = $('ds-tabs');
+const ds = { open: false, project: null, tab: 'api', doc: null, error: '', loading: false, ep: null, seq: 0, opener: null };
+async function openDataDocs(project, opener) {
+  if (wb.open) closeWhiteboard();
+  if (tb.open) closeTaskBoard();
+  if (rbState.id) closeRobot(true);
+  if (pr.open) closePrices();   // 54-bills.js
+  Object.assign(ds, { open: true, project, doc: null, error: '', loading: true, ep: null, opener: opener || null });
+  setText($('ds-room'), PROJECT[project] ? PROJECT[project].name : '');
+  showOverlay(dsEl);
+  liveSoloSync();   // the room's 'back to the floor' box hides under the sheet
+  renderDataDocs();
+  $('ds-close').focus({ preventScroll: true });
+  const seq = ++ds.seq;
+  const got = typeof SOURCE.dataDocs === 'function' ? await SOURCE.dataDocs(project) : { ok: false, error: 'ライブ表示だけで見られます' };
+  if (seq !== ds.seq || !ds.open) return;
+  ds.loading = false;
+  if (!got.ok) ds.error = got.error || '読めなかった';
+  else { ds.doc = got.doc; ds.tab = got.doc.api.length ? 'api' : 'db'; }
+  renderDataDocs();
+}
+function closeDataDocs() {
+  if (!ds.open) return;
+  ds.open = false; ds.doc = null; ds.seq += 1;
+  hideOverlay(dsEl);
+  liveSoloSync();
+  if (ds.opener && ds.opener.focus) ds.opener.focus({ preventScroll: true });
+}
+$('ds-close').addEventListener('click', closeDataDocs);
+dsTabs.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-ds-tab]');
+  if (!b || !ds.doc) return;
+  ds.tab = b.dataset.dsTab; ds.ep = null;
+  renderDataDocs();
+});
+dsBody.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-ep]');
+  if (!b) return;
+  ds.ep = ds.ep === b.dataset.ep ? null : b.dataset.ep;
+  renderDataDocs();
+});
+const DS_METHODS = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']);
+// A schema as text, a $ref to the document's own schemas followed one level (the name, then what it holds).
+function dsSchemaText(schema, schemas) {
+  if (!schema || typeof schema !== 'object') return '';
+  const ref = typeof schema.$ref === 'string' ? schema.$ref : schema.items && typeof schema.items.$ref === 'string' ? schema.items.$ref : '';
+  const name = ref.split('/').pop();
+  const target = ref && schemas && typeof schemas === 'object' ? schemas[name] : null;
+  const head = ref ? `${schema.items ? `${name}[]` : name}\n` : '';
+  return head + JSON.stringify(target || schema, null, 2);
+}
+function dsContentHTML(content, schemas) {
+  if (!content || typeof content !== 'object') return '';
+  const partsHTML = Object.entries(content).slice(0, 8).map(([type, c]) => `<p class="ds-ct">${esc(type)}</p><pre class="ds-json">${esc(dsSchemaText(c && c.schema, schemas))}</pre>`);
+  return partsHTML.join('');
+}
+function dsParamType(p) { return p.schema && typeof p.schema === 'object' ? String(p.schema.type || (p.schema.$ref || '').split('/').pop() || '') : ''; }
+function dsEndpointHTML(e, schemas) {
+  const params = (Array.isArray(e.parameters) ? e.parameters : []).filter((p) => p && typeof p === 'object');
+  const paramRowsHTML = params.map((p) => `<tr><td><code>${esc(p.name || '')}</code></td><td>${esc(p.in || '')}</td><td>${p.required ? '必須' : ''}</td><td><code>${esc(dsParamType(p))}</code></td><td>${esc(p.description || '')}</td></tr>`).join('');
+  const paramsHTML = params.length ? `<table class="ds-table"><thead><tr><th>名前</th><th>場所</th><th>必須</th><th>型</th><th>説明</th></tr></thead><tbody>${paramRowsHTML}</tbody></table>` : '<p class="ds-none">パラメータなし</p>';
+  const rb = e.requestBody && typeof e.requestBody === 'object' ? e.requestBody : null;
+  const rbDescHTML = rb && rb.description ? `<p>${esc(rb.description)}</p>` : '';
+  const reqHTML = rb ? rbDescHTML + dsContentHTML(rb.content, schemas) : '<p class="ds-none">リクエストの本文なし</p>';
+  const responses = Object.entries(e.responses && typeof e.responses === 'object' ? e.responses : {}).slice(0, 20);
+  const resRowsHTML = responses.map(([code, r]) => `<div class="ds-res"><p><b class="ds-code">${esc(code)}</b> ${esc((r && r.description) || '')}</p>${dsContentHTML(r && r.content, schemas)}</div>`).join('');
+  const resHTML = resRowsHTML || '<p class="ds-none">レスポンスの記述なし</p>';
+  const descHTML = e.description ? `<p class="ds-desc">${esc(e.description)}</p>` : '';
+  return `<div class="ds-detail">${descHTML}<h5>パラメータ</h5>${paramsHTML}<h5>リクエスト</h5>${reqHTML}<h5>レスポンス</h5>${resHTML}</div>`;
+}
+function dsEpHTML(e, i, k, schemas) {
+  const key = `${i}:${k}`, open = ds.ep === key, m = DS_METHODS.has(e.method) ? e.method : 'GET';
+  const detailHTML = open ? dsEndpointHTML(e, schemas) : '';
+  return `<li><button type="button" class="ds-ep" data-ep="${esc(key)}" data-fk="ds-ep-${esc(key)}" aria-expanded="${open ? 'true' : 'false'}"><span class="http http-${esc(m)}">${esc(e.method)}</span><code>${esc(e.path)}</code><span class="desc">${esc(e.summary || e.operationId || '')}</span></button>${detailHTML}</li>`;
+}
+function dsApiHTML(doc) {
+  const docsHTML = doc.api.map((d, i) => {
+    const epsHTML = d.endpoints.map((e, k) => dsEpHTML(e, i, k, d.schemas)).join('');
+    const verHTML = d.version ? `<span class="chip">v${esc(d.version)}</span>` : '';
+    const descHTML = d.description ? `<p class="ds-desc">${esc(d.description)}</p>` : '';
+    return `<section class="ds-doc"><header><h3>${esc(d.title)}</h3>${verHTML}<code>${esc(d.file)}</code></header>${descHTML}<ul class="ds-eps">${epsHTML}</ul></section>`;
+  });
+  return docsHTML.join('');
+}
+function dsTableHTML(t) {
+  const descHTML = t.description ? `<p class="ds-desc">${esc(t.description)}</p>` : '';
+  if (Array.isArray(t.enum)) {
+    const valsHTML = t.enum.map((v) => `<code>${esc(v)}</code>`).join(' ');
+    return `<div class="ds-tbl"><h4>${esc(t.name)} <span class="chip">enum</span></h4>${descHTML}<p>${valsHTML}</p></div>`;
+  }
+  const rowsHTML = t.columns.map((c) => {
+    const keysHTML = c.keys.map((x) => `<span class="ds-key">${esc(x)}</span>`).join(' ') || '-';
+    const consHTML = c.constraints.map((x) => esc(x)).join('<br>') || '-';
+    const notesHTML = c.notes.map((x) => esc(x)).join('<br>') || '-';
+    return `<tr><td><code>${esc(c.name)}</code></td><td><code>${esc(c.type)}</code></td><td>${esc(c.description)}</td><td><code>${esc(c.default)}</code></td><td>${keysHTML}</td><td>${consHTML}</td><td>${notesHTML}</td></tr>`;
+  }).join('');
+  return `<div class="ds-tbl"><h4>${esc(t.name)}</h4><code class="ds-file">${esc(t.file || '')}</code>${descHTML}<table class="ds-table"><thead><tr><th>列</th><th>型</th><th>説明</th><th>既定</th><th>キー</th><th>制約</th><th>メモ</th></tr></thead><tbody>${rowsHTML}</tbody></table></div>`;
+}
+function dsDbHTML(doc) {
+  const dbsHTML = doc.db.map((d, k) => {
+    const erdHTML = d.erd ? `<div class="flow-mmd ds-erd" data-erd="${k}" role="img" aria-label="${esc(d.name)} の ER 図"></div>` : '';
+    const tablesHTML = d.tables.map((t) => dsTableHTML(t)).join('');
+    return `<section class="ds-doc"><header><h3>${esc(d.name)}</h3><span class="chip">${Number(d.tables.length)} 件</span></header>${erdHTML}${tablesHTML}</section>`;
+  });
+  return dbsHTML.join('');
+}
+function renderDataDocs() {
+  if (!ds.open) return;
+  const doc = ds.doc;
+  const tabs = doc ? [['api', 'API 仕様書', doc.api.length], ['db', 'DB 仕様書', doc.db.length]].filter((t) => t[2] > 0) : [];
+  const tabsHTML = tabs.map(([k, label, n]) => `<button type="button" role="tab" class="ds-tab" data-ds-tab="${esc(k)}" data-fk="ds-tab-${esc(k)}" aria-selected="${ds.tab === k ? 'true' : 'false'}">${esc(label)}<b>${Number(n)}</b></button>`).join('');
+  setHTML(dsTabs, tabsHTML);
+  const bodyHTML = ds.loading ? '<p class="ds-none">読み込み中…</p>'
+    : ds.error ? `<p class="ds-none">${esc(ds.error)}</p>`
+    : !tabs.length ? '<p class="ds-none">この部屋の docs/api・docs/db に仕様書が見つかりません</p>'
+    : ds.tab === 'db' ? dsDbHTML(doc) : dsApiHTML(doc);
+  const skippedHTML = doc && doc.skipped ? `<p class="ds-none">大きさの上限で ${Number(doc.skipped)} 件を読んでいません</p>` : '';
+  const sheetHTML = `${bodyHTML}${skippedHTML}`;
+  setHTML(dsBody, sheetHTML);
+  if (doc && ds.tab === 'db') dsBody.querySelectorAll('[data-erd]').forEach((el) => { const d = doc.db[Number(el.dataset.erd)]; if (d && d.erd) drawMermaid(el, d.erd); });
+}
+// ---- web/js/54-bills.js ----
+/* ---------- the bill over a robot (2.3.6, ticket 2026-10-19-jui-viz-cost-bill-over-robot) ----------
+   Each response's estimated cost (USD), over the robot that made it, with a banknote: the server prices it (prices.py:
+   the four kinds of tokens × the model's row) and puts it in the "bills" slice once per message id; a subagent's go over
+   its own robot. A bill rises a little and goes after BILL.showMs; responses that come while one shows are added to it
+   (one amount per robot, never a pile). A model with no price shows ? and the tokens, never an amount. The bill takes
+   its place above the name tag in placeRobotTags (40-scene.js), as part of the tag's box, so it never covers a tag.
+   設定 › お札 turns it off (kept per browser, readPref); reduced motion: shown and gone, no rise. The 単価 sheet lists
+   the table in use and changes the user's table (POST /api/prices); a model with no price is told in the top bar. */
+const BILL = { showMs: 4200, rise: 12, gap: 3, on: readPref('bills', 'on') !== 'off', seen: new Map(), primed: false,
+  notice: 'お札の金額は概算です（公式の単価 × 応答のトークン数）。サブスクリプションでの利用では、実際の請求とは一致しません。' };
+const BILL_ICON_HTML = '<svg class="bill-ico" viewBox="0 0 22 14" aria-hidden="true"><rect x="0.75" y="0.75" width="20.5" height="12.5" rx="2" /><circle cx="11" cy="7" r="3" /><path d="M3.5 4v6M18.5 4v6" /></svg>';
+function billMoney(usd) {
+  if (usd < 0.01) return '< $0.01';
+  return usd < 100 ? `≈ $${usd.toFixed(2)}` : `≈ $${Math.round(usd).toLocaleString('en-US')}`;
+}
+function billTokens(n) { return n < 1000 ? `${n}` : n < 1e6 ? `${(n / 1000).toFixed(1)}k` : `${(n / 1e6).toFixed(2)}M`; }
+/* The text of a robot's bill from the responses it holds: their priced sum, "+ ?" when some had no price. */
+function billText(items) {
+  let usd = 0, priced = 0, tokens = 0;
+  for (const it of items.values()) {
+    tokens += it.tokens;
+    if (typeof it.usd === 'number') { usd += it.usd; priced += 1; }
+  }
+  if (!priced) return { text: `? ${billTokens(tokens)} tok`, unknown: true };
+  return { text: priced < items.size ? `${billMoney(usd)} + ?` : billMoney(usd), unknown: false };
+}
+function billEl(R) {
+  if (R.bill) return R.bill;
+  const el = document.createElement('div');
+  el.className = 'bill';
+  el.hidden = true;
+  el.innerHTML = `<span class="bill-in">${BILL_ICON_HTML}<b></b></span>`;
+  tagsEl.append(el);
+  R.bill = el;
+  return el;
+}
+/* One response over robot `label` (the page's label): added to the bill showing, or a new one. */
+function billShow(label, item) {
+  if (!BILL.on || !has3D) return;
+  const R = robots.find((x) => x.def.id === label);
+  if (!R) return;
+  const now = performance.now(), el = billEl(R);
+  if (!R.billItems || now >= R.billUntil) R.billItems = new Map();
+  R.billItems.set(item.id, { usd: item.usd, tokens: item.tokens, model: item.model, from: item.from });
+  R.billUntil = now + BILL.showMs;
+  const { text, unknown } = billText(R.billItems);
+  el.querySelector('b').textContent = text;
+  el.classList.toggle('unknown', unknown);
+  const models = [...new Set([...R.billItems.values()].map((x) => x.model))].join(', ');
+  const from = [...new Set([...R.billItems.values()].filter((x) => typeof x.usd === 'number').map((x) => (x.from === 'user' ? 'あなたの表' : '既定')))].join('・');
+  el.title = `${R.billItems.size} 回の応答 · ${models}${from ? ` · 単価: ${from}` : ''}${unknown ? ' · 単価の無いモデル（設定 › 単価の表で足せます）' : ''}\n${BILL.notice}`;
+  el.classList.toggle('own-price', [...R.billItems.values()].some((x) => x.from === 'user' && typeof x.usd === 'number'));
+  if (el.hidden) el.style.visibility = 'hidden';   // placeRobotTags shows it where it belongs, from the next frame
+  el.hidden = false;
+  el.dataset.n = String(R.billItems.size);
+  const inner = el.firstElementChild;
+  inner.classList.remove('rise');
+  if (!reduceMotion) { void inner.offsetWidth; inner.classList.add('rise'); }   // start the rise again from the bottom
+}
+function billHide(R) {
+  if (!R.bill || R.bill.hidden) return;
+  R.bill.hidden = true;
+  R.billItems = null;
+  R.billSize = null;
+}
+/* Every frame (placeRobotTags): bills past their time go. */
+function billsExpire() {
+  const now = performance.now();
+  for (const R of robots) if (R.bill && !R.bill.hidden && now >= R.billUntil) billHide(R);
+}
+/* Live: the slice's new bills. The bills already there when the page opens are old: seen, not shown. A bill whose
+   amount changed (the same message written again with more tokens) replaces its own line in the robot's sum. */
+function billsFromSlice() {
+  const list = Array.isArray(LIVE.slices.bills) ? LIVE.slices.bills : [];
+  if (list === BILL.list) return;   // a slice is replaced whole when it changes
+  BILL.list = list;
+  for (const b of list) {
+    if (!b || typeof b.id !== 'string') continue;
+    const key = `${b.agentId}|${b.id}`, sig = `${b.usd}|${b.tokens}`;
+    if (BILL.seen.get(key) === sig) continue;
+    BILL.seen.set(key, sig);
+    if (!BILL.primed) continue;
+    const label = labelOf(b.agentId);
+    if (label) billShow(label, { id: key, usd: typeof b.usd === 'number' ? b.usd : null, tokens: Number(b.tokens) || 0, model: String(b.model || ''), from: b.priceFrom === 'user' ? 'user' : 'default' });
+  }
+  BILL.primed = true;
+  if (BILL.seen.size > 600) for (const k of [...BILL.seen.keys()].slice(0, 300)) BILL.seen.delete(k);
+}
+/* Demo: now and then a working robot's response costs a little (made up: the demo has no transcripts). */
+const BILL_DEMO = { next: 0, n: 0, seed: 7 };
+function billsDemo(ms) {
+  if (SOURCE.mode !== 'demo' || ms < BILL_DEMO.next) return;
+  BILL_DEMO.seed = (BILL_DEMO.seed * 16807) % 2147483647;
+  const r = (BILL_DEMO.seed % 1000) / 1000;
+  BILL_DEMO.next = ms + 2500 + r * 3500;
+  const busy = robots.filter((R) => R.robot.root.visible && !['idle', 'sleep'].includes(R.robot.state));
+  if (!busy.length) return;
+  const R = busy[Math.floor(r * busy.length) % busy.length];
+  BILL_DEMO.n += 1;
+  billShow(R.def.id, { id: `demo-${BILL_DEMO.n}`, usd: r < 0.12 ? null : 0.004 + r * r * 0.11, tokens: Math.round(20000 + r * 60000), model: r < 0.12 ? 'claude-unknown' : 'claude-opus-5-5' });
+}
+
+/* 設定 › お札: on by default; off hides what shows. */
+function billPaint() {
+  const b = document.getElementById('bill-switch');
+  if (b) b.setAttribute('aria-checked', BILL.on ? 'true' : 'false');
+  const n = document.getElementById('bill-note');
+  if (n) setText(n, BILL.on ? 'オン — 応答ごとの概算の金額をロボットの頭上に出します' : 'オフ — 出しません');
+}
+{ const b = document.getElementById('bill-switch');
+  if (b) b.addEventListener('click', () => {
+    BILL.on = !BILL.on;
+    writePref('bills', BILL.on ? 'on' : 'off');
+    if (!BILL.on) for (const R of robots) billHide(R);
+    billPaint();
+  });
+  billPaint(); }
+
+/* ---------- the 単価 sheet: the table in use, and the user's own (live only) ---------- */
+const prEl = $('pr'), prBody = $('pr-body');
+const pr = { open: false, edit: null, msg: '', busy: false, opener: null, sig: '' };
+const PR_KINDS = [['input', '入力'], ['cache_write_5m', 'キャッシュ書込（5 分）'], ['cache_write_1h', 'キャッシュ書込（1 時間）'], ['cache_read', 'キャッシュ読込'], ['output', '出力']];
+const PR_ORIGIN = { default: '既定', user: '追加', changed: '変更', removed: '削除' };
+function pricesSlice() { const p = LIVE.slices && LIVE.slices.prices; return p && !Array.isArray(p) && typeof p === 'object' ? p : null; }
+function openPrices(opener, model) {
+  if (SOURCE.mode !== 'live') return;
+  if (wb.open) closeWhiteboard();
+  if (tb.open) closeTaskBoard();
+  if (rbState.id) closeRobot(true);
+  if (ds.open) closeDataDocs();
+  const p = pricesSlice(), row = p && (p.rows || []).find((r) => r.model === model);
+  Object.assign(pr, { open: true, msg: '', opener: opener || null, sig: '',
+    edit: model ? { model, values: row && row.origin !== 'removed' ? Object.fromEntries(PR_KINDS.map(([k]) => [k, row[k]])) : {}, isNew: !row } : null });
+  showOverlay(prEl);
+  liveSoloSync();
+  renderPrices(true);
+  const first = model ? prBody.querySelector('[data-pr-in="input"]') : $('pr-close');
+  if (first) first.focus({ preventScroll: true });
+}
+function closePrices() {
+  if (!pr.open) return;
+  pr.open = false; pr.edit = null;
+  hideOverlay(prEl);
+  liveSoloSync();
+  if (pr.opener && pr.opener.focus) pr.opener.focus({ preventScroll: true });
+}
+function renderPrices(force) {
+  if (!pr.open) return;
+  const p = pricesSlice();
+  const sig = JSON.stringify([p, pr.edit, pr.msg, pr.busy]);
+  if (!force && sig === pr.sig) return;
+  // a form being typed into is not drawn again under the cursor: only the list and the notes change
+  if (!force && prBody.contains(document.activeElement) && document.activeElement.matches('input')) return;
+  pr.sig = sig;
+  if (!p) { prBody.innerHTML = '<p class="ds-none">単価の表がまだ届いていません。</p>'; return; }
+  const num = (v) => (typeof v === 'number' ? String(v) : '—');
+  const unpricedHTML = (p.unpriced || []).map((m) => `<li><code>${esc(m)}</code> <button type="button" class="mini-btn" data-pr-add="${esc(m)}">単価を足す</button></li>`).join('');
+  const errorsHTML = (p.errors || []).map((e) => `<li>${esc(e)}</li>`).join('');
+  const rowsHTML = (p.rows || []).map((r) => {
+    const removed = r.origin === 'removed', mine = r.origin !== 'default';
+    const extra = [r.long ? `プロンプト ${Number(r.long.over).toLocaleString('en-US')} 超は別の単価` : '', r.fast ? 'fast あり' : '', r.us ? `us ×${r.us}` : ''].filter(Boolean).join(' · ');
+    return `<tr data-pr-row="${esc(r.model)}"${removed ? ' class="removed"' : ''}><th scope="row"><code>${esc(r.model)}</code>${extra ? `<span class="pr-extra">${esc(extra)}</span>` : ''}</th>`
+      + PR_KINDS.map(([k]) => `<td>${removed ? '' : esc(num(r[k]))}</td>`).join('')
+      + `<td><span class="pr-origin" data-origin="${esc(r.origin)}">${esc(PR_ORIGIN[r.origin] || r.origin)}</span></td><td class="pr-acts">`
+      + (removed ? '' : `<button type="button" class="mini-btn" data-pr-edit="${esc(r.model)}">変更</button><button type="button" class="mini-btn" data-pr-op="remove" data-pr-model="${esc(r.model)}">削除</button>`)
+      + (mine && r.origin !== 'user' ? `<button type="button" class="mini-btn" data-pr-op="reset" data-pr-model="${esc(r.model)}">既定に戻す</button>` : '')
+      + '</td></tr>';
+  }).join('');
+  const e = pr.edit;
+  const formHTML = e ? `<form class="pr-form" id="pr-form"><h3>${e.isNew ? '単価を足す' : '単価を変える'}</h3>
+      <label class="pr-model">モデル（記録の message.model のとおり）<input data-pr-in="model" value="${esc(e.model || '')}" ${e.isNew ? '' : 'readonly'} required maxlength="100" autocomplete="off" spellcheck="false"></label>
+      <div class="pr-nums">${PR_KINDS.map(([k, ja]) => `<label>${esc(ja)}<input data-pr-in="${esc(k)}" type="number" min="0" max="100000" step="any" required value="${esc(e.values[k] === undefined ? '' : String(e.values[k]))}"></label>`).join('')}</div>
+      <p class="set-hint">USD / 100 万トークン。公式の価格のページの値を写してください。</p>
+      <div class="pr-btns"><button type="submit" class="mini-btn pr-save"${pr.busy ? ' disabled' : ''}>保存</button><button type="button" class="mini-btn" data-pr-cancel>やめる</button></div></form>`
+    : '<p><button type="button" class="mini-btn" data-pr-add="">単価を足す</button></p>';
+  const aboutHTML = `<p class="pr-about">${esc(BILL.notice)} 既定の単価の出典: <code>${esc(p.source || '')}</code>（${esc(p.checked || '')} に確認）。変更はあなたの表 <code>${esc(p.userPath || '')}</code> に書き、次の応答から効きます（<code>jui viz prices</code> でも変えられます）。</p>`;
+  const msgHTML = pr.msg ? `<p class="pr-msg" role="status">${esc(pr.msg)}</p>` : '';
+  const headHTML = PR_KINDS.map(([, ja]) => `<th>${esc(ja)}</th>`).join('');
+  prBody.innerHTML = `${aboutHTML}${msgHTML}`
+    + (unpricedHTML ? `<section class="pr-unpriced"><h3>単価の無いモデル（金額は出していません）</h3><ul>${unpricedHTML}</ul></section>` : '')
+    + (errorsHTML ? `<section class="pr-errors"><h3>使っていない行（その行だけ）</h3><ul>${errorsHTML}</ul></section>` : '')
+    + `${formHTML}<table class="ds-table pr-table"><thead><tr><th>モデル</th>${headHTML}<th>出どころ</th><th></th></tr></thead><tbody>${rowsHTML}</tbody></table>`;
+}
+async function pricesSend(op, model, row) {
+  pr.busy = true; renderPrices(true);
+  const got = typeof SOURCE.pricesOp === 'function' ? await SOURCE.pricesOp(op, model, row) : { ok: false, error: 'ライブ表示だけで変えられます' };
+  pr.busy = false;
+  pr.msg = got.ok ? `${model}: ${{ set: '保存しました', remove: '削除しました', reset: '既定に戻しました' }[op]}（次の応答から）` : `できませんでした: ${got.error || '不明'}`;
+  if (got.ok && op === 'set') pr.edit = null;
+  renderPrices(true);
+}
+$('pr-close').addEventListener('click', closePrices);
+prBody.addEventListener('click', (ev) => {
+  const t = ev.target;
+  const add = t.closest('[data-pr-add]'), edit = t.closest('[data-pr-edit]'), op = t.closest('[data-pr-op]');
+  if (add) { pr.edit = { model: add.dataset.prAdd, values: {}, isNew: true }; pr.msg = ''; renderPrices(true); const f = prBody.querySelector(add.dataset.prAdd ? '[data-pr-in="input"]' : '[data-pr-in="model"]'); if (f) f.focus(); return; }
+  if (edit) {
+    const row = ((pricesSlice() || {}).rows || []).find((r) => r.model === edit.dataset.prEdit);
+    pr.edit = { model: edit.dataset.prEdit, values: row ? Object.fromEntries(PR_KINDS.map(([k]) => [k, row[k]])) : {}, isNew: false };
+    pr.msg = ''; renderPrices(true);
+    const f = prBody.querySelector('[data-pr-in="input"]'); if (f) f.focus();
+    return;
+  }
+  if (op) { pricesSend(op.dataset.prOp, op.dataset.prModel, null); return; }
+  if (t.closest('[data-pr-cancel]')) { pr.edit = null; renderPrices(true); }
+});
+prBody.addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  const val = (k) => (prBody.querySelector(`[data-pr-in="${k}"]`) || {}).value;
+  const model = String(val('model') || '').trim();
+  const row = Object.fromEntries(PR_KINDS.map(([k]) => [k, Number(val(k))]));
+  pricesSend('set', model, row);
+});
+/* The top bar: models seen with no price — the amount is not shown for them; the chip opens the sheet to add one. */
+function pricesNotice() {
+  const chip = $('chip-price');
+  if (!chip) return;
+  const p = SOURCE.mode === 'live' ? pricesSlice() : null, list = (p && p.unpriced) || [];
+  chip.hidden = !list.length;
+  setText(chip, `単価の無いモデル ${list.length}`);
+  chip.title = `${list.join(', ')} — 金額を出していません。押すと単価を足せます`;
+}
+$('chip-price').addEventListener('click', (e) => { const p = pricesSlice(); openPrices(e.currentTarget, p && p.unpriced && p.unpriced[0]); });
+{ const b = document.getElementById('prices-open'); if (b) b.addEventListener('click', (e) => openPrices(e.currentTarget)); }
+/* Each frame from the main loop: the live bills (when the slice changed), the demo's. */
+function billsFrame(ms) {
+  if (SOURCE.mode === 'live') billsFromSlice();
+  else billsDemo(ms);
+}
+/* With the panels (4 a second): the chip, and the sheet when the table changed. */
+function pricesPanel() {
+  pricesNotice();
+  renderPrices(false);
+}
 // ---- web/js/55-history.js ----
 /* ---------- 応答の履歴: the robot card's second tab (requester, 10-18) ----------
    "ロボットに合わせた時に会話履歴みたいな感じで" / "応答の履歴タブをこのメニューに作って、それ選択したらメニュー全体が
@@ -6218,6 +7432,27 @@ function histMarkdown(text) {
 /* ---------- the items ---------- */
 const HIST_TIME = (at) => (Number.isFinite(at) ? new Date(at).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) : '');
 function histCutNote(item) { return item.cut ? hNode('p', 'h-cut', '（長いので途中まで）') : null; }
+/* A fold (a message from another session, the harness's text, a tool's IN / OUT): the summary opens and closes it,
+   and once open a click anywhere in its body closes it too (requester, 10-20: 「開くと閉じづらい」), then the row's
+   head is scrolled back into view if it went above. A click does not close it when it selects text (a drag, a
+   double-click: the selection is not empty, the pointer moved, or a second click came within HIST_DBL_MS), or when
+   it lands on something with its own action (HIST_FOLD_KEEP: a link, a button, a field, a picture, the whole-text
+   tag, a table that scrolls sideways, and the scroll bar of a long code line).
+   Keyboard: Enter / Space on the summary, as before — focus stays on the summary after it opens, so the body gets no
+   key and no extra tab stop of its own. */
+const HIST_FOLD_KEEP = 'a[href], button, input, textarea, select, label, img, video, [contenteditable], .h-thumb, .fulltext';
+const HIST_DRAG_PX = 4, HIST_DBL_MS = 280;
+const histScrollsX = (el) => el.scrollWidth > el.clientWidth + 1 && /auto|scroll/.test(getComputedStyle(el).overflowX);
+function histFoldKeeps(target, d, y) {
+  if (!(target instanceof Element) || target.closest('summary') || target.closest(HIST_FOLD_KEEP)) return true;
+  const table = target.closest('.h-tablewrap');
+  if (table && histScrollsX(table)) return true;
+  for (let el = target; el && el !== d; el = el.parentElement) {   // on the scroll bar under a sideways-scrolling box
+    if (histScrollsX(el) && y > el.getBoundingClientRect().top + el.clientTop + el.clientHeight) return true;
+  }
+  const sel = window.getSelection ? window.getSelection() : null;
+  return !!(sel && !sel.isCollapsed && String(sel).trim() && d.contains(sel.anchorNode));
+}
 function histFolded(cls, title, body, open) {
   const d = hNode('details', cls);
   if (open) d.open = true;
@@ -6225,7 +7460,40 @@ function histFolded(cls, title, body, open) {
   for (const part of title) s.appendChild(part);
   d.appendChild(s);
   for (const b of body) if (b) d.appendChild(b);
+  let down = null, pending = 0;
+  d.addEventListener('pointerdown', (e) => { down = { x: e.clientX, y: e.clientY }; });
+  d.addEventListener('click', (e) => {
+    const moved = down && Math.hypot(e.clientX - down.x, e.clientY - down.y) > HIST_DRAG_PX;
+    down = null;
+    clearTimeout(pending);
+    if (!d.open || moved || e.detail > 1 || histFoldKeeps(e.target, d, e.clientY)) return;
+    // a double-click selects a word: wait out its second click before closing (and look at the selection again then)
+    const target = e.target, y = e.clientY;
+    pending = setTimeout(() => {
+      if (!d.open || histFoldKeeps(target, d, y)) return;
+      d.open = false;
+      const pane = d.closest('[data-rb-hist]'), top = s.getBoundingClientRect().top;
+      if (pane && top < pane.getBoundingClientRect().top) s.scrollIntoView({ block: 'nearest' });
+    }, HIST_DBL_MS);
+  });
   return d;
+}
+/* The other end of a SendMessage, or the sender of a received message (2.3.6, requester 10-20: 「閉じた状態でも誰宛か
+   わかるようにして、その宛先クリックでそのロボットの表示に切り替え」). The server links it to a session here
+   (World._history_peers: an agents-list name, `name [ref]`, a uds socket or the pid in it); a session with a robot on
+   this page is a button that switches the card to that robot (the same way as ← →: the camera follows, the tab
+   stays). Anything else is plain text, not focusable, with a title that says it is not here. */
+function histPeerName(text, session) {
+  const label = session && typeof labelOf === 'function' ? labelOf(session) : null;
+  if (label && robots.some((R) => R.def.id === label)) {
+    const b = hNode('button', 'h-peerlink', text);
+    b.type = 'button'; b.dataset.hGo = label;
+    b.title = `${label} のロボットに切り替える`;
+    return b;
+  }
+  const s = hNode('span', 'h-peername', text);
+  s.title = 'この viz にいないセッション';
+  return s;
 }
 function histItem(item) {
   const at = hNode('time', 'h-at', HIST_TIME(item.at));
@@ -6252,7 +7520,8 @@ function histItem(item) {
     return n;
   }
   if (item.kind === 'peer') {
-    return histFolded('h-item h-peer', [hNode('b', '', `${item.from} から`), hNode('span', 'h-head', String(item.text).split('\n').find((l) => l.trim()) || ''), at],
+    const who = hNode('b', 'h-from'); who.append(histPeerName(item.from, item.fromSession), ' から');
+    return histFolded('h-item h-peer', [who, hNode('span', 'h-head', String(item.text).split('\n').find((l) => l.trim()) || ''), at],
       [hNode('p', 'h-plain', item.text), histCutNote(item)], false);
   }
   if (item.kind === 'harness') {
@@ -6262,6 +7531,10 @@ function histItem(item) {
   if (item.kind === 'tool') {
     const first = String(item.in || '').split('\n')[0];
     const title = [hNode('b', 'h-tname', item.name), hNode('span', 'h-head', item.description || first)];
+    if (item.name === 'SendMessage' && typeof item.to === 'string') {   // who it went to and what about, folded too
+      const to = hNode('span', 'h-to'); to.append('→ ', histPeerName(item.to, item.toSession));
+      title.splice(1, 1, to, hNode('span', 'h-head', item.summary || first));
+    }
     if (item.error) title.push(hNode('span', 'h-err', 'エラー'));
     if (item.out === undefined) title.push(hNode('span', 'h-run', '結果待ち'));
     const io = hNode('div', 'h-io');
@@ -6726,7 +7999,6 @@ function histWidePaint() {
   rbEl.classList.toggle('rb-wide', HIST.wide);
   rbEl.classList.toggle('rb-wide-full', HIST.wide && !m);
   rbEl.style.setProperty('--wide-left', `${m}px`);
-  rbEl.style.setProperty('--wide-top', `${HIST.wide && m ? Math.round(sceneEl.getBoundingClientRect().top) : 0}px`);
   const b = rbEl.querySelector('[data-rb-wide]');
   if (b) {
     b.hidden = HIST.tab !== 'history';
@@ -6744,6 +8016,140 @@ function histWideSync(id) {
 rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rb-wide]')) histSetWide(!HIST.wide); });
 window.addEventListener('resize', () => { if (HIST.wide) { histWidePaint(); histWideFly(); } });
 
+
+/* A linked name: switch the card to that robot. Inside a summary: the fold does not toggle. */
+document.addEventListener('click', (e) => {
+  const b = e.target instanceof Element ? e.target.closest('[data-rb-hist] [data-h-go]') : null;
+  if (!b) return;
+  e.preventDefault();
+  e.stopPropagation();
+  goRobot(b.dataset.hGo);
+});
+// ---- web/js/57-fulltext.js ----
+/* ---------- the whole text of a line cut to one (2.3.6, requester 10-19: "これテストのパスが見えないからホバーで全部表示されるようにしてほしい") ----------
+   One component for every one-line ellipsis of the robot card and the side panel (the family: FULLTEXT_LINES; the table is
+   in the ticket 2026-10-19-jui-viz-test-run-path-on-hover). A line that is cut (scrollWidth > clientWidth) shows a floating
+   tag with its whole text, wrapped, when the pointer is over it or the keyboard focus reaches it; the tag's text can be
+   selected and copied; it stays inside the card's (or the panel's) box and goes when the pointer or the focus leaves, or
+   on Esc. A line that is not cut never gets it. Not the native title: slow, and the OS cuts a long one.
+   Focus: a cut line that is plain text becomes focusable (tabindex 0) only while it is cut; a line inside a button or a
+   summary (already focusable) shows through that control's focus. The control or the line points at the tag
+   (aria-describedby) while the tag shows. */
+const FULLTEXT_HOSTS = ['#rb', '#side', '#ticker-strip'];
+/* The log strip (2.3.6) sits at the bottom of the screen and is a few lines high: its tag opens upward and is kept inside
+   the viewport, not inside the strip. Closed (2.3.4's log-strip), its lines are not drawn: never cut, never focusable. */
+const FULLTEXT_UP = '#ticker-strip';
+const FULLTEXT_LINES = [
+  '.rb-run-file',                 // card · テスト実行: the test file / command (the request)
+  '.rb-subs .act',                // card · サブエージェント: what each is doing
+  '.h-head',                      // card · 応答の履歴: a folded item's head (in its summary)
+  '.h-tool summary > b',          // card · 応答の履歴: a tool's name (in its summary)
+  '#sessions .act',               // panel · セッション: a robot's act, the row's second line
+  '#sessions .subs .who-btn > span:last-child',   // panel · セッション: a subagent's name (in its button)
+  '.spec-row .nm',                // panel · spec の進み具合: the spec's name (in its button)
+  '.pg-toggle small',             // panel · セッション: a project group's summary (in its button)
+  '#ticker .what',                // the log strip: an event's text (2.3.6: a cross-session message was cut there)
+  '#ticker .kind',                // the log strip: an event's kind
+].join(', ');
+const FULLTEXT = { el: null, anchor: null, owner: null, host: null, via: null };
+const fulltextCut = (el) => !!el && el.isConnected && el.scrollWidth > el.clientWidth + 1;
+const fulltextControl = (el) => el.closest('button, summary, a[href]');   // already focusable: the line shows through it
+function fulltextHost(el) { return FULLTEXT_HOSTS.map((s) => document.querySelector(s)).find((h) => h && h.contains(el)) || null; }
+function fulltextEl() {
+  if (FULLTEXT.el) return FULLTEXT.el;
+  const el = document.createElement('div');
+  el.id = 'fulltext'; el.className = 'fulltext'; el.setAttribute('role', 'tooltip'); el.hidden = true;
+  el.addEventListener('pointerleave', (e) => { if (!(FULLTEXT.anchor && FULLTEXT.anchor.contains(e.relatedTarget))) fulltextHide(); });
+  document.body.append(el);
+  FULLTEXT.el = el;
+  return el;
+}
+function fulltextShow(line, via) {
+  const host = fulltextHost(line);
+  if (!host || !fulltextCut(line)) return;
+  const el = fulltextEl();
+  if (FULLTEXT.anchor !== line) fulltextHide();
+  el.textContent = line.textContent;
+  el.hidden = false;
+  const owner = fulltextControl(line) || line;
+  owner.setAttribute('aria-describedby', 'fulltext');
+  Object.assign(FULLTEXT, { anchor: line, owner, host, via });
+  fulltextPlace();
+}
+/* Below the line (above when there is no room), inside the host's box; wrapped to the host's width. */
+function fulltextPlace() {
+  const { el, anchor, host } = FULLTEXT;
+  if (!el || el.hidden || !anchor) return;
+  const up = host.matches(FULLTEXT_UP);
+  const hb = up ? { left: 0, right: window.innerWidth, top: 0, bottom: window.innerHeight, width: window.innerWidth } : host.getBoundingClientRect();
+  const lb = anchor.getBoundingClientRect(), pad = 8;
+  const top = Math.max(hb.top, 0), bottom = Math.min(hb.bottom, window.innerHeight);
+  el.style.maxWidth = `${Math.max(120, hb.width - pad * 2)}px`;
+  el.style.maxHeight = `${Math.max(60, (bottom - top) - pad * 2)}px`;
+  el.style.left = '0px'; el.style.top = '0px';
+  const r = el.getBoundingClientRect();
+  const x = Math.min(Math.max(lb.left, hb.left + pad), hb.right - pad - r.width);
+  let y = up ? lb.top - 4 - r.height : lb.bottom + 4;
+  if (up && y < top + pad) y = Math.min(lb.bottom + 4, bottom - pad - r.height);
+  if (!up && y + r.height > bottom - pad) y = Math.max(top + pad, lb.top - 4 - r.height);
+  el.style.left = `${Math.round(x)}px`; el.style.top = `${Math.round(y)}px`;
+}
+function fulltextHide() {
+  if (FULLTEXT.owner) FULLTEXT.owner.removeAttribute('aria-describedby');
+  if (FULLTEXT.el) FULLTEXT.el.hidden = true;
+  Object.assign(FULLTEXT, { anchor: null, owner: null, host: null, via: null });
+}
+/* Plain cut lines take the focus while they are cut, and only then (re-checked when the card or the panel changes). */
+function fulltextSync() {
+  for (const host of FULLTEXT_HOSTS.map((s) => document.querySelector(s)).filter(Boolean)) {
+    for (const line of host.querySelectorAll(FULLTEXT_LINES)) {
+      if (fulltextControl(line)) continue;
+      const cut = fulltextCut(line);
+      if (cut && line.getAttribute('tabindex') !== '0') line.setAttribute('tabindex', '0');
+      else if (!cut && line.hasAttribute('tabindex')) line.removeAttribute('tabindex');
+    }
+  }
+  if (FULLTEXT.anchor && !FULLTEXT.anchor.isConnected) fulltextHide();   // the card was rebuilt under it
+  else fulltextPlace();
+}
+const fulltextLineAt = (t) => (t && t.closest ? t.closest(FULLTEXT_LINES) : null);
+document.addEventListener('pointerover', (e) => {
+  const line = fulltextLineAt(e.target);
+  if (line && fulltextHost(line) && fulltextCut(line)) fulltextShow(line, 'pointer');
+});
+document.addEventListener('pointerout', (e) => {
+  if (FULLTEXT.via !== 'pointer' || !FULLTEXT.anchor) return;
+  const to = e.relatedTarget;
+  if (FULLTEXT.anchor.contains(e.target) && !(to && (FULLTEXT.anchor.contains(to) || FULLTEXT.el.contains(to)))) fulltextHide();
+});
+document.addEventListener('focusin', (e) => {
+  const t = e.target;
+  // a box focused by the mouse (the history pane takes the focus on a click) shows nothing: only a keyboard visit
+  // to a box names its first cut line (10-20: the tag of an unrelated line popped up under the pointer and took the click)
+  const viaKeys = !!(t.matches && t.matches(':focus-visible'));
+  const line = t.matches && t.matches(FULLTEXT_LINES) ? t : viaKeys ? [...(t.querySelectorAll ? t.querySelectorAll(FULLTEXT_LINES) : [])].find(fulltextCut) : null;
+  if (line && fulltextHost(line) && fulltextCut(line)) fulltextShow(line, 'focus');
+  else if (FULLTEXT.via === 'focus') fulltextHide();
+});
+document.addEventListener('focusout', (e) => {
+  if (FULLTEXT.via === 'focus' && FULLTEXT.owner && FULLTEXT.owner.contains(e.target) && !(e.relatedTarget && FULLTEXT.owner.contains(e.relatedTarget))) fulltextHide();
+});
+document.addEventListener('keydown', (e) => {   // first (capture): Esc closes the tag, not the card under it
+  if (e.key !== 'Escape' || !FULLTEXT.el || FULLTEXT.el.hidden) return;
+  e.preventDefault(); e.stopPropagation();
+  fulltextHide();
+}, true);
+{
+  let due = false;
+  const later = () => { if (due) return; due = true; requestAnimationFrame(() => { due = false; fulltextSync(); }); };
+  const mo = new MutationObserver(later), ro = new ResizeObserver(later);
+  for (const host of FULLTEXT_HOSTS.map((s) => document.querySelector(s)).filter(Boolean)) {
+    mo.observe(host, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden', 'class'] });
+    ro.observe(host);
+  }
+  document.addEventListener('scroll', () => { if (FULLTEXT.anchor) fulltextPlace(); }, true);
+  window.addEventListener('resize', later);
+}
 // ---- web/js/60-log.js ----
 
 /* ---------- full-screen event log ---------- */
@@ -6848,6 +8254,8 @@ document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
   if (!popEl.hidden) { e.preventDefault(); closePop(); return; }
   if (logState.open) { e.preventDefault(); closeLog(); }
+  else if (ds.open) { e.preventDefault(); closeDataDocs(); }   // the data server's sheet (2.3.5)
+  else if (pr.open) { e.preventDefault(); closePrices(); }   // the 単価 sheet (2.3.6)
   else if (rbState.id && HIST.wide) { e.preventDefault(); histSetWide(false); }   // the wide history: back to the card's width first
   else if (rbState.id) { e.preventDefault(); closeRobot(); }
   else if (wb.open) {
@@ -6869,8 +8277,16 @@ $('btn-speed').addEventListener('click', (e) => { speed = speed === 1 ? 3 : 1; e
 const fpsMeter = new URLSearchParams(location.search).get('fps') === '1' ? { el: document.createElement('p'), n: 0, from: performance.now() } : null;
 if (fpsMeter) { fpsMeter.el.className = 'fps-meter'; fpsMeter.el.setAttribute('aria-hidden', 'true'); document.body.append(fpsMeter.el); }
 
+/* The real time between two frames drives what animates (a pose blending into the next, eases, the camera following),
+   up to FRAME_DT_MAX: on a busy machine the page draws a frame every second or more, and a step capped at 0.05 s made
+   all of it crawl (a 0.4 s pose blend took 8 frames however far apart; ticket 2026-10-19-jui-viz-walk-stretches-with-
+   frame-gaps). Past 1 s everything that eases has arrived anyway; what steps physics (the vacuum's collisions, falling
+   petals, smoke, the shredder's bits) keeps its own 0.1 s step. The demo's script clock keeps the 0.05 s step: it
+   plays its script frame by frame and must not jump. */
+const FRAME_DT_MAX = 1;
 function frame(ms) {
-  const dt = Math.min(0.05, Math.max(0, (ms - lastMs) / 1000));
+  const rawDt = Math.max(0, (ms - lastMs) / 1000);
+  const dt = Math.min(0.05, rawDt);
   lastMs = ms;
   if (SOURCE.mode === 'demo') {
     if (playing) simT += dt * speed;
@@ -6885,7 +8301,8 @@ function frame(ms) {
   }
   if (has3D) {
     if (ms - lastBoard > 200 && !TOWER.on) { redrawBoards(latestModel, ms / 1000); lastBoard = ms; }   // the building hides the boards
-    update3D(latestModel, ms / 1000, dt);
+    update3D(latestModel, ms / 1000, Math.min(FRAME_DT_MAX, rawDt));
+    billsFrame(ms);   // 54-bills.js
   }
   if (ms - lastPanel > 250) {
     renderPanel(latestModel);
@@ -6894,6 +8311,7 @@ function frame(ms) {
     renderTaskBoard(latestModel);
     renderRobot(latestModel);
     renderLog(false);
+    pricesPanel();
     $('chip-clock').textContent = fmtClock(BASE_CLOCK + simT);
     if (SOURCE.mode === 'live') liveChrome();
     floorNavSync();
