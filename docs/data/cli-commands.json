@@ -5207,8 +5207,8 @@
       "command": "validate infra",
       "synopsis": "jsonui-doc validate infra [<root>] [--json]",
       "purpose": {
-        "en": "Validate a project's declared infrastructure — the model `jui viz` draws as the server room (since 2.3.9). It reads `docs/infra/*.json`, or the folder named by `infra.dir` in jui.config.json, the way jui viz reads it: each file is checked against the infra-model v0 schema and for the shapes of secrets (an access key, an IP address, an ARN, an account id, a connection string, a private key, a token, a password written with its value, a URL with credentials), then the files are merged. A file with an error is left out and the rest is still used. Subfolders such as `seed/` are not read. Exit 0 when there is no error (warnings alone are 0), 1 when there are errors, 2 when nothing could be read (for example, no `*.json` in the folder).",
-        "ja": "プロジェクトが宣言したインフラ — `jui viz` がサーバールームとして描くモデル（2.3.9 から）— を検証する。`docs/infra/*.json`（jui.config.json の `infra.dir` があればそのフォルダ）を jui viz と同じように読み、ファイルごとに infra-model v0 のスキーマと秘密の形（アクセスキー、IP アドレス、ARN、アカウント ID、接続文字列、秘密鍵、トークン、値つきのパスワード、資格情報つきの URL）を検査してから、ファイルを合わせる。エラーのあるファイルは外し、残りは使う。`seed/` などのサブフォルダは読まない。エラーが無ければ exit 0（警告だけなら 0）、エラーがあれば 1、何も読めなければ 2（フォルダに `*.json` が無い、など）。"
+        "en": "Validate a project's declared infrastructure — the model `jui viz` draws as the server room (since 2.3.9). It reads `docs/infra/*.json`, or the folder named by `infra.dir` in jui.config.json, the way jui viz reads it: each file is checked against the infra-model v0 schema and for the shapes of secrets (an access key, an IP address, an ARN, an account id, a connection string, a private key, a token, a password written with its value, a URL with credentials), then the files are merged. A file with an error is left out and the rest is still used. Subfolders such as `seed/`, `load/` and `prices/` are not read. Exit 0 when there is no error (warnings alone are 0), 1 when there are errors, 2 when nothing could be read (for example, no `*.json` in the folder).",
+        "ja": "プロジェクトが宣言したインフラ — `jui viz` がサーバールームとして描くモデル（2.3.9 から）— を検証する。`docs/infra/*.json`（jui.config.json の `infra.dir` があればそのフォルダ）を jui viz と同じように読み、ファイルごとに infra-model v0 のスキーマと秘密の形（アクセスキー、IP アドレス、ARN、アカウント ID、接続文字列、秘密鍵、トークン、値つきのパスワード、資格情報つきの URL）を検査してから、ファイルを合わせる。エラーのあるファイルは外し、残りは使う。`seed/`・`load/`・`prices/` などのサブフォルダは読まない。エラーが無ければ exit 0（警告だけなら 0）、エラーがあれば 1、何も読めなければ 2（フォルダに `*.json` が無い、など）。"
       },
       "options": [
         {
@@ -5237,23 +5237,133 @@
       ],
       "seeAlso": [
         "jsonui-doc seed infra",
+        "jsonui-doc validate infra-load",
         "jsonui-doc check",
         "jui viz start"
       ],
       "verifiedAgainst": {
-        "version": "2.3.9",
+        "version": "2.3.10",
         "columns": 80,
         "python": "3.12",
         "helpHash": "783d22555c69ad3150a8c972f4cc871272692a26ec85eb9652bda06af5001a97",
-        "cardHash": "2b9d04b3cc57ac62db0c770eb4e7ad1c260bf11a1e411f0fbdcc00d3544e0dc5",
+        "cardHash": "71238d9bec9803afeb66aa93c5fb2277f392149288dcf3d8baba20130081d586",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "91dab032cfaa",
           "synopsis": "2bcb5d597744",
-          "purpose": "8e11857e308e",
+          "purpose": "1713bf6f27cd",
           "options": "55f2f7dc7a45",
           "examples": "12eb3565310e",
-          "seeAlso": "2df74f4a5d99"
+          "seeAlso": "b2456210c122"
+        }
+      }
+    },
+    {
+      "binary": "jsonui-doc",
+      "command": "validate infra-load",
+      "synopsis": "jsonui-doc validate infra-load [<root>] [--json]",
+      "purpose": {
+        "en": "Validate the load definitions for the cost simulator (since 2.3.10; the cost itself is not computed yet). They are read from `<infra.dir>/load/*.json`, or the folder named by `infra.load_dir` in jui.config.json, and follow the infra-load v0 schema: one file is one month of one environment (its timezone, profiles of 24 hourly multipliers, the week, special days and holidays, schedules) and its rows give a node, or the nodes a selector matches, quantities from a closed list such as requests, vcpu or storage_gb, with optional autoscale or vertical scaling. A file with an error is left out whole — a schema break, a secret's shape, or a contradiction inside it such as min above max. Rows that do not fit the model are warnings: a row naming a node the model does not have is left out, a later row for a node that already has one is used in place of the earlier, and a quantity the node's kind does not read is reported. The model must be readable. Exit 0 when there is no error (warnings alone are 0), 1 when there are errors, 2 when the model or the folder cannot be read; a project with a model and no load folder is 0 with 0 files.",
+        "ja": "コストのシミュレーターの負荷定義を検証する（2.3.10 から。コストの計算はまだ入っていない）。`<infra.dir>/load/*.json`（jui.config.json の `infra.load_dir` があればそのフォルダ）を読み、形は infra-load v0 のスキーマ。1 ファイルが 1 つの環境の 1 か月で（タイムゾーン、1 時間ごとの倍率 24 個のプロファイル、曜日、特別な日と祝日、スケジュール）、行ごとにノード（またはセレクタに合うノード）と、requests・vcpu・storage_gb などの決まった一覧の量、任意で autoscale や vertical を書く。スキーマ違反、秘密の形、min が max より大きいといったファイルの中の矛盾はエラーで、そのファイルをまるごと外す。モデルに合わない行は警告で、モデルに無いノードを名指しした行は外し、すでに行のあるノードの後の行は前の行の代わりに使い、そのノードの種類が読まない量は知らせる。モデルが読めることが前提。エラーが無ければ exit 0（警告だけなら 0）、エラーがあれば 1、モデルかフォルダが読めなければ 2。モデルがあって load のフォルダが無いときは、0 ファイルで 0。"
+      },
+      "options": [
+        {
+          "name": "<root>",
+          "type": "path",
+          "default": "the current folder",
+          "description": {
+            "en": "The project root, the folder with jui.config.json.",
+            "ja": "プロジェクトのルート（jui.config.json のあるフォルダ）。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "flag",
+          "description": {
+            "en": "Print the result as JSON: the folder, the files used, the problems, and per scenario its id, file, environment, month and the counts of hours, rows and edge rows.",
+            "ja": "結果を JSON で出す。フォルダ、使ったファイル、問題、シナリオごとの id・ファイル・環境・月と、時間・行・エッジの行の数。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-doc validate infra-load\ninfra-load: docs/infra/load: 2 file(s) used, 2 scenario(s); 0 error(s)"
+        }
+      ],
+      "seeAlso": [
+        "jsonui-doc validate infra-prices",
+        "jsonui-doc validate infra",
+        "jsonui-doc check"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.10",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "bfa3ebd0c6ffb38aca25a7c8d13e508bd0b6a278371a88dcf35f7f59da8fb1ab",
+        "cardHash": "3ce64cdfcc4006377788e2a5bafec46329dbdcd5ac7a21f10c9ad1d7af1a121f",
+        "fieldHashes": {
+          "binary": "f9476e5a629c",
+          "command": "3b53581196a4",
+          "synopsis": "29a227c82b94",
+          "purpose": "6aaef3d64b12",
+          "options": "35505f512bb1",
+          "examples": "5834cc6dc4a8",
+          "seeAlso": "37b84b7d4cfc"
+        }
+      }
+    },
+    {
+      "binary": "jsonui-doc",
+      "command": "validate infra-prices",
+      "synopsis": "jsonui-doc validate infra-prices [<root>] [--json]",
+      "purpose": {
+        "en": "Validate the price files for the cost simulator (since 2.3.10; nothing reads them for a cost yet). They are read from `<infra.dir>/prices/*.json`, or the folder named by `infra.prices_dir` in jui.config.json, and follow the infra-prices v0 schema: rows of provider, service, sku, region, unit, effective date and source, with either `price_usd` or `tiers`, and optionally a free amount. A file with an error is left out whole (a schema break or a secret's shape). A row with neither or both of price_usd and tiers, tiers that do not start at 0 or overlap, or a row repeating an earlier one's key is a warning and only that row is left out. It does not need the model. Exit 0 when there is no error, including when there is no folder; 1 when there are errors; 2 when the folder cannot be read.",
+        "ja": "コストのシミュレーターの単価のファイルを検証する（2.3.10 から。まだコストに使う物は無い）。`<infra.dir>/prices/*.json`（jui.config.json の `infra.prices_dir` があればそのフォルダ）を読み、形は infra-prices v0 のスキーマ。行ごとに provider・service・sku・region・unit・effective（効く日）・source（出どころ）と、`price_usd` か `tiers` のどちらかを書き、無料の分は任意。スキーマ違反と秘密の形はエラーで、そのファイルをまるごと外す。price_usd と tiers の両方か、どちらも無い行、0 から始まらない・重なる tiers、前の行と同じ鍵の行は警告で、その行だけを外す。モデルは要らない。エラーが無ければ exit 0（フォルダが無いときも 0）、エラーがあれば 1、フォルダが読めなければ 2。"
+      },
+      "options": [
+        {
+          "name": "<root>",
+          "type": "path",
+          "default": "the current folder",
+          "description": {
+            "en": "The project root, the folder with jui.config.json.",
+            "ja": "プロジェクトのルート（jui.config.json のあるフォルダ）。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "flag",
+          "description": {
+            "en": "Print the result as JSON: the folder, the files used, the problems and the count of prices.",
+            "ja": "結果を JSON で出す。フォルダ、使ったファイル、問題、単価の数。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-doc validate infra-prices\ninfra-prices: docs/infra/prices: 1 file(s) used, 5 price(s); 0 error(s)"
+        }
+      ],
+      "seeAlso": [
+        "jsonui-doc validate infra-load",
+        "jsonui-doc validate infra"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.10",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "35cbf88aa22ba3e1c80279b5d3b8b27d420c5a418ae8e6a3b5b2de494b6ee8e6",
+        "cardHash": "6ae10fa3861bac4d7e13f05699d8a134eb981fcb9f4c4b23649542c62cf5cfbe",
+        "fieldHashes": {
+          "binary": "f9476e5a629c",
+          "command": "7f59eb8f5066",
+          "synopsis": "29329f7f07e2",
+          "purpose": "545da5874dce",
+          "options": "9921ce4f1bc6",
+          "examples": "5e80a45b3c04",
+          "seeAlso": "90625d15102e"
         }
       }
     },
@@ -5262,8 +5372,8 @@
       "command": "seed infra",
       "synopsis": "jsonui-doc seed infra [<root>] [-o <out>] [--stdout] [--force]",
       "purpose": {
-        "en": "Draft the infrastructure model from what the project already says (since 2.3.9): Docker Compose, Terraform / OpenTofu, Kubernetes manifests, CloudFormation / SAM and a synthesized CDK app, Cloudflare wrangler, PaaS files (firebase.json, vercel.json, netlify.toml, serverless.yml, fly.toml, render.yaml, app.yaml), Bicep, and the code's SDK imports and environment variable names. It never reads Terraform state, `*.tfvars`, `.env` files or other files that hold values, and it never writes a value: a string shaped like a secret is withheld. The draft is a starting point, not the display source — it goes to `<infra.dir>/seed/draft.json` with `seed-report.json` (what was unmatched, not drawn, skipped or withheld), a folder that neither jui viz nor `validate infra` reads; you move what you keep into the model's folder. Exit 0 when written or printed, 2 when not (an existing draft without `--force`, a bad config, or a draft that fails its own check).",
-        "ja": "プロジェクトにすでに書かれていることから、インフラのモデルの下書きを作る（2.3.9 から）。読むのは Docker Compose、Terraform / OpenTofu、Kubernetes のマニフェスト、CloudFormation / SAM と合成済みの CDK、Cloudflare wrangler、PaaS のファイル（firebase.json、vercel.json、netlify.toml、serverless.yml、fly.toml、render.yaml、app.yaml）、Bicep、それにコードの SDK の import と環境変数の名前。Terraform の state、`*.tfvars`、`.env` など値を持つファイルは読まず、値も書かない（秘密の形の文字列は伏せる）。下書きは出発点で、表示の元ではない。`<infra.dir>/seed/draft.json` と `seed-report.json`（合わなかった物・描かない物・読まなかった物・伏せた物）に書き、このフォルダは jui viz も `validate infra` も読まない。残したい分を自分でモデルのフォルダへ移す。書けた（出せた）ら exit 0、書かなかったら 2（下書きがすでにあって `--force` が無い、設定が悪い、下書きが自分の検査を通らない）。"
+        "en": "Draft the infrastructure model from what the project already says (since 2.3.9): Docker Compose, Terraform / OpenTofu, Kubernetes manifests, CloudFormation / SAM and a synthesized CDK app, Cloudflare wrangler, PaaS files (firebase.json, vercel.json, netlify.toml, serverless.yml, fly.toml, render.yaml, app.yaml), Bicep, and the code's SDK imports and environment variable names. It never reads Terraform state, `*.tfvars`, `.env` files or other files that hold values, and it never writes a value: a string shaped like a secret is withheld. The draft is a starting point, not the display source — it goes to `<infra.dir>/seed/draft.json` with `seed-report.json` (what was unmatched, not drawn, skipped or withheld), a folder that neither jui viz nor `validate infra` reads; you move what you keep into the model's folder. Since 2.3.10, when the folder already holds a model that can be read, a drafted node at an IaC address a declared node lists takes that node's id, and no other drafted node takes the id of a declared node that lists IaC addresses (a load definition names nodes by id). Exit 0 when written or printed, 2 when not (an existing draft without `--force`, a bad config, or a draft that fails its own check).",
+        "ja": "プロジェクトにすでに書かれていることから、インフラのモデルの下書きを作る（2.3.9 から）。読むのは Docker Compose、Terraform / OpenTofu、Kubernetes のマニフェスト、CloudFormation / SAM と合成済みの CDK、Cloudflare wrangler、PaaS のファイル（firebase.json、vercel.json、netlify.toml、serverless.yml、fly.toml、render.yaml、app.yaml）、Bicep、それにコードの SDK の import と環境変数の名前。Terraform の state、`*.tfvars`、`.env` など値を持つファイルは読まず、値も書かない（秘密の形の文字列は伏せる）。下書きは出発点で、表示の元ではない。`<infra.dir>/seed/draft.json` と `seed-report.json`（合わなかった物・描かない物・読まなかった物・伏せた物）に書き、このフォルダは jui viz も `validate infra` も読まない。残したい分を自分でモデルのフォルダへ移す。2.3.10 からは、フォルダに読めるモデルがあると、宣言済みのノードが iac に書いたアドレスの下書きのノードはそのノードの id になり、ほかの下書きのノードは、iac を書いた宣言済みのノードの id を使わない（負荷定義はノードを id で名指しするため）。書けた（出せた）ら exit 0、書かなかったら 2（下書きがすでにあって `--force` が無い、設定が悪い、下書きが自分の検査を通らない）。"
       },
       "options": [
         {
@@ -5307,16 +5417,16 @@
         "jsonui-doc check"
       ],
       "verifiedAgainst": {
-        "version": "2.3.9",
+        "version": "2.3.10",
         "columns": 80,
         "python": "3.12",
         "helpHash": "2b91d26e31e0840494eb3fb6dc1825f1741391c80272f9354ecc52776cd7c015",
-        "cardHash": "158dd24285cb5b47080331de329fcb9ebe669343e1f80daa94b624467007649a",
+        "cardHash": "14ea05e78e881116e3625063fe6d82bc2ce09b294e59f40597be76793cb9dc13",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "44406da7d954",
           "synopsis": "7b8fc7684284",
-          "purpose": "059a7bb1adbb",
+          "purpose": "d474a2a19a1e",
           "options": "f6c0917fe69a",
           "examples": "2b8fdc789d3b",
           "seeAlso": "222d1a090af5"
@@ -5444,29 +5554,30 @@
       "command": "check",
       "synopsis": "jsonui-doc check [<filter>] [--list] [-p <project>]",
       "purpose": {
-        "en": "Run the declared contract checks — a real database or an implementation's OpenAPI document against the docs. It executes only the commands declared in jui.config.json, and `--list` shows what would run (name, type, exact command) without running it. The filter restricts the run to `db` / `api` / `db:<name>` / a declared check name. Since 2.3.9 two more types compare the infrastructure model (see `validate infra`): `builtin:infra-iac` against the project's IaC, read statically (no credentials, plan or state), and `builtin:infra-code` against each node's evidence, the SDK imports and the environment variable names; the filter `infra` (not listed in `--help`) selects both. Their findings are warnings and exit 0 unless the check declares `\"gate\": true`, and each says what it could not check; the report is written beside the model as `.check-report.<name>.json`.",
-        "ja": "宣言済みの契約チェック — 実データベースや実装側 OpenAPI をドキュメントと突き合わせる — を実行する。実行するのは jui.config.json に宣言されたコマンドだけで、`--list` は走らせずに実行内容（名前・種別・実際のコマンド）を表示する。フィルタで `db` / `api` / `db:<name>` / 宣言済みチェック名に限定できる。2.3.9 からは、インフラのモデル（`validate infra` を参照）と突き合わせる種別が 2 つ増えた。`builtin:infra-iac` はプロジェクトの IaC と（静的に読む。資格情報・plan・state は使わない）、`builtin:infra-code` は各ノードの evidence、SDK の import、環境変数の名前と比べる。フィルタ `infra`（`--help` には出ない）で両方を選ぶ。見つけた差は警告で exit 0、チェックが `\"gate\": true` を宣言したときだけ失敗になる。どちらも確かめられなかった物を言い、レポートはモデルの隣に `.check-report.<name>.json` として書く。"
+        "en": "Run the declared contract checks — a real database or an implementation's OpenAPI document against the docs. It executes only the commands declared in jui.config.json, and `--list` shows what would run (name, type, exact command) without running it. The filter restricts the run to `db` / `api` / `db:<name>` / a declared check name. Since 2.3.9 two more types compare the infrastructure model (see `validate infra`): `builtin:infra-iac` against the project's IaC, read statically (no credentials, plan or state), and `builtin:infra-code` against each node's evidence, the SDK imports and the environment variable names; since 2.3.10 `builtin:infra-load` compares the model with the load definitions (see `validate infra-load`): a node billed by use that a definition gives no load is missing_in_doc (its load is undefined, not 0), a row naming a node the model does not have is missing_in_impl, and a node billed by the hour with no row is ok (it runs the model's count). It stops with an execution error (exit 2) while the definitions have an error, and with no definition it is ok with a warning that nothing was compared. The filter `infra` (not listed in `--help`) selects all three. Their findings are warnings and exit 0 unless the check declares `\"gate\": true`, and each says what it could not check. The report is named by the type, not the check's name: `.check-report.infra-iac.json` and `.check-report.infra-code.json` beside the model, `.check-report.infra-load.json` in the load folder.",
+        "ja": "宣言済みの契約チェック — 実データベースや実装側 OpenAPI をドキュメントと突き合わせる — を実行する。実行するのは jui.config.json に宣言されたコマンドだけで、`--list` は走らせずに実行内容（名前・種別・実際のコマンド）を表示する。フィルタで `db` / `api` / `db:<name>` / 宣言済みチェック名に限定できる。2.3.9 からは、インフラのモデル（`validate infra` を参照）と突き合わせる種別が 2 つ増えた。`builtin:infra-iac` はプロジェクトの IaC と（静的に読む。資格情報・plan・state は使わない）、`builtin:infra-code` は各ノードの evidence、SDK の import、環境変数の名前と比べる。2.3.10 からは `builtin:infra-load` がモデルと負荷定義（`validate infra-load` を参照）を比べる。使った分だけ課金されるノードに負荷定義が負荷を書いていなければ missing_in_doc（負荷は 0 ではなく未定義）、モデルに無いノードを名指しした行は missing_in_impl、時間で課金されるノードに行が無いのは ok（モデルの count で動き続ける）。負荷定義にエラーがある間は実行エラー（exit 2）で止まり、負荷定義が 1 つも無ければ、比べた物が無いという警告つきの ok。フィルタ `infra`（`--help` には出ない）で 3 つとも選ぶ。見つけた差は警告で exit 0、チェックが `\"gate\": true` を宣言したときだけ失敗になる。どれも確かめられなかった物を言う。レポートの名前はチェックの名前ではなく種別で決まり、`.check-report.infra-iac.json` と `.check-report.infra-code.json` はモデルの隣、`.check-report.infra-load.json` は load のフォルダに書く。"
       },
       "options": [],
       "examples": [],
       "seeAlso": [
         "jsonui-doc validate spec",
-        "jsonui-doc validate infra"
+        "jsonui-doc validate infra",
+        "jsonui-doc validate infra-load"
       ],
       "verifiedAgainst": {
-        "version": "2.3.9",
+        "version": "2.3.10",
         "columns": 80,
         "python": "3.12",
         "helpHash": "8841ba076d03c63a740580a5741573883f68e7c81e8103fa6e4c55e12c8738f4",
-        "cardHash": "53f8cac44205a78677f2ed67bbcd98c7492dffeb433dff0c3a18b02390a342a7",
+        "cardHash": "68a25f9a9bd8660fc7aef7b3eaf5a88057e76355f4b68944cd98382e8efde631",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "4d712611e72a",
           "synopsis": "792abb114102",
-          "purpose": "9888348d5c11",
+          "purpose": "88799ebd0563",
           "options": "357b9e47f539",
           "examples": "2b8fdc789d3b",
-          "seeAlso": "cf5e12bfe0c6"
+          "seeAlso": "92c1e07b6fc4"
         }
       }
     }

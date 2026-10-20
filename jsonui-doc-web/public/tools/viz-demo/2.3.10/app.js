@@ -38,7 +38,8 @@ const COL = {
    measures it). */
 const WEAR = { overall: '#ff8c1a', stripe: '#e8edf3', brim: '#c25e00', rim: '#ffffff', edge: '#1f2a44' };
 const SUB_SIZE = 0.8;
-const LAMP = { idle: '#8fa3bf', busy: '#35d07f', think: '#8fe0b4', bg: '#4cc3d9', waiting: '#ffb020', done: '#35d07f', off: '#2a3a30' };
+// asking: a question waits (ticket 2026-10-20-jui-viz-3d-waiting-kinds-question-permission-input): a violet far from the permission's amber
+const LAMP = { idle: '#8fa3bf', busy: '#35d07f', think: '#8fe0b4', bg: '#4cc3d9', waiting: '#ffb020', asking: '#b48cff', done: '#35d07f', off: '#2a3a30' };
 const STATES = {
   idle: { name: '待機', lamp: 'idle', face: 'normal' },
   thinking: { name: '考え中', lamp: 'think', face: 'normal' },
@@ -52,7 +53,7 @@ const STATES = {
   stroll: { name: '歩く', lamp: 'idle', face: 'normal' },   // to and from play (10-18): no papers; the lamp is the real state's
   done: { name: '完了', lamp: 'done', face: 'happy' },
 };
-const LAMP_TEXT = { idle: '青灰（待機）', busy: '緑（作業中）', think: '淡い緑のゆっくり点滅（考え中）', waiting: '黄（許可待ち）', done: '緑の点滅（完了）', bg: '水色（裏で作業中）' };
+const LAMP_TEXT = { idle: '青灰（待機）', busy: '緑（作業中）', think: '淡い緑のゆっくり点滅（考え中）', waiting: '黄（許可待ち）', asking: '紫（質問に回答待ち）', done: '緑の点滅（完了）', bg: '水色（裏で作業中）' };
 
 const HIPS_Y = 0.36;
 const HEAD = { w: 1.1, h: 0.9, d: 0.92, r: 0.17 };
@@ -1338,6 +1339,21 @@ function poseFor(state, s) {
       p.aRz = -2.7 + Math.sin(s * 7) * 0.2; p.aRx = -0.1; p.aLz = 0.2;
       p.headX = -0.12; p.headZ = Math.sin(s * 1.6) * 0.06; p.hipsY = Math.abs(Math.sin(s * 3.5)) * 0.02;
       break;
+    case 'asking': {   // a question waits: the head tilted the other way from thinking's, a hand to the chin, the other arm out
+      const bob = reduceMotion ? 0 : Math.sin(s * 1.4);
+      p.headZ = -0.3 + bob * 0.05; p.headX = -0.1; p.headY = -0.16;
+      p.aLx = -2.05; p.aLz = 0.95;            // the left hand to the chin
+      p.aRx = -0.35; p.aRz = -0.75 - bob * 0.06;   // the right arm out, palm up: "which one?"
+      p.hipsY = reduceMotion ? 0 : Math.abs(Math.sin(s * 1.4)) * 0.008;
+      break;
+    }
+    case 'leanBack': {   // waiting for the person's input: leaning back, looking up at its screen, arms at rest
+      const b = reduceMotion ? 0 : Math.sin(s * 0.9);
+      p.torsoX = -0.24; p.headX = -0.2 + b * 0.02; p.headY = b * 0.08;
+      p.aLx = 0.25; p.aLz = 0.42; p.aRx = 0.25; p.aRz = -0.42;
+      p.hipsY = b * 0.006;
+      break;
+    }
     case 'stroll': {
       const w = s * 7;
       p.lLx = Math.sin(w) * 0.5; p.lRx = -Math.sin(w) * 0.5; p.hipsY = Math.abs(Math.cos(w)) * 0.03;
@@ -1367,7 +1383,10 @@ function updateRobot(r, t, dt) {
   const e = r.blend * r.blend * (3 - 2 * r.blend);
   const look = lookUpdate(r, t, dt), heavy = !!look;
   // heavy: fast typing (drained: slower than fired)
-  const posed = (state) => (state === 'reading' && r.readKind === 'web' ? 'readingWeb' : state);   // the dictionary (10-20)
+  // the dictionary (10-20); a question's and an input's wait (ticket 2026-10-20-jui-viz-3d-waiting-kinds-question-permission-input)
+  const posed = (state) => (state === 'reading' && r.readKind === 'web' ? 'readingWeb'
+    : state === 'waiting' && r.waitKind === 'ask' ? 'asking' : state === 'idle' && r.waitKind === 'input' ? 'leanBack' : state);
+  r.poseName = heavy ? 'typing' : posed(r.state);   // read by the e2e (80-dbg.js waitLook)
   const a = poseFor(posed(r.prev), s), b = heavy ? poseFor('typing', s * (look === 'drained' ? 1.5 : 2.4)) : poseFor(posed(r.state), s);
   sweatUpdate(r, s, heavy);
   const p = {};
@@ -1401,7 +1420,9 @@ function updateRobot(r, t, dt) {
   r.legR.rotation.x = p.lRx;
   r.tails.forEach((tail, i) => tail.rotation.set(0.5 + Math.sin(s * 6.5 + i * 1.3) * 0.12, 0, tail.userData.spread));
 
-  const lampKey = STATES[r.lampState && STATES[r.lampState] ? r.lampState : r.state].lamp;   // play: the real state's lamp
+  let lampKey = STATES[r.lampState && STATES[r.lampState] ? r.lampState : r.state].lamp;   // play: the real state's lamp
+  if (lampKey === 'waiting' && r.waitKind === 'ask') lampKey = 'asking';                 // a question's wait: violet
+  r.lampKey = lampKey;
   const lampOn = lampKey === 'think' ? (reduceMotion || Math.sin(s * 1.6) > -0.4)   // thinking: a slow blink
     : lampKey !== 'done' || Math.floor(s * 3) % 2 === 0;
   r.lampMat.color.set(lampOn ? LAMP[lampKey] : LAMP.off);
@@ -2288,6 +2309,7 @@ const SOURCE = {
   },
   history() { return Promise.resolve({ ok: false, error: 'demo' }); },   // the demo has no transcripts
   historyImage() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
+  historyFile() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
   attachImage() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
   attachFile() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
   attachRemove() {},
@@ -3986,6 +4008,7 @@ function liveDropRobot(R) {
   const k = fontRedraws.indexOf(R.robot.fontRedraw); if (k >= 0) fontRedraws.splice(k, 1);
   R.tag.remove();
   if (R.bill) R.bill.remove();
+  waitDrop(R);
   if (links[R.def.id]) links[R.def.id].set(null, null, false, 0);
   robots.splice(robots.indexOf(R), 1);
 }
@@ -4396,6 +4419,7 @@ function liveUpdateRobots(nowSec, dt) {
   for (const R of [...robots]) {
     const st = robotState[R.def.id] || { state: 'idle', act: '' };
     liveTagName(R);
+    waitSync(R);   // the wait it shows over its head, and the pose and lamp of it (53-waits.js)
     liveCallTag(R, calls[R.def.id] || null);
     setRobotTired(R.robot, forced(R.robot, 'tired', R.def.kind === 'main' && isTired(sinceOf(R.def.id), now)));
     R.robot.heavy = forced(R.robot, 'heavy', heavyOf(R.def.id));   // one look per cause while it works (the robot decides when)
@@ -5593,7 +5617,24 @@ const TOWER_STATE = ['waiting', 'working', 'idle', 'idle'];   // rank 0..3 → w
 // A working room where nobody does more than think shows "thinking" (lit, its own badge and pose).
 const roomThinks = (id) => { const st = ROBOT_DEFS.filter((d) => roomOfDef(d) === id && !LIVE.leaving[d.id]).map((d) => (robotState[d.id] || {}).state);
   return st.includes('thinking') && !st.some((x) => x && !['idle', 'done', 'thinking', 'waiting'].includes(x)); };
-const towerState = (id) => { if (!id) return 'empty'; const t = TOWER_STATE[LIVE.rank[id]] || 'idle'; return t === 'working' && roomThinks(id) ? 'thinking' : t; };
+/* A room's wait as the window shows it (53-waits.js waitKindOf, the same order as the bubbles): perm > ask > input. */
+const roomWaitKind = (id) => {
+  let ask = false, input = false;
+  for (const d of ROBOT_DEFS) {
+    if (roomOfDef(d) !== id || LIVE.leaving[d.id]) continue;
+    const k = waitKindOf(d.id);
+    if (k === 'perm') return 'perm';
+    ask = ask || k === 'ask'; input = input || k === 'input';
+  }
+  return ask ? 'ask' : input ? 'input' : null;
+};
+const towerState = (id) => {
+  if (!id) return 'empty';
+  const t = TOWER_STATE[LIVE.rank[id]] || 'idle';
+  if (t === 'waiting') return roomWaitKind(id) === 'ask' ? 'asking' : 'waiting';   // a question's window apart from a permission's
+  if (t === 'idle' && roomWaitKind(id) === 'input') return 'input';               // the lights stay as they were, its own mark
+  return t === 'working' && roomThinks(id) ? 'thinking' : t;
+};
 const towerName = (id) => String(TOWER_NAMES[id] || (PROJECT[id] && PROJECT[id].name) || id || '').replace(/\/+$/, '');
 const roomOfDef = (d) => d.room || projectOfRobot(d.id);   // the live defs carry a room; the demo's come from their session
 /* A name in up to two lines that fit maxW, broken after '-', '_' or a space when it can be (not "tea-finder-ag / ent");
@@ -5647,7 +5688,9 @@ function towerFacade(F, k, P) {
     const id = ids[i], state = towerState(id), gy = WIN_TOP + BADGE;
     // the badge band: the state in words and a symbol (not only a colour)
     ctx.fillStyle = P.frame; ctx.fillRect(x, WIN_TOP, w, BADGE);
-    const badge = { working: ['▶ 作業中', P.ok, P.okBg], thinking: ['… 考え中', P.ok, P.okBg], waiting: ['! 許可待ち', P.warn, P.warnBg], idle: ['● 待機（消灯）', P.soft, P.chip], empty: ['空き', P.soft, P.panel] }[state];
+    const badge = { working: ['▶ 作業中', P.ok, P.okBg], thinking: ['… 考え中', P.ok, P.okBg], waiting: ['! 許可待ち', P.warn, P.warnBg],
+      asking: ['? 質問待ち', '#14062e', '#b48cff'], input: ['… 入力待ち', '#13233a', '#e8ecf1'],
+      idle: ['● 待機（消灯）', P.soft, P.chip], empty: ['空き', P.soft, P.panel] }[state];
     ctx.font = `700 26px ${FONT_BODY}`;
     const bwid = ctx.measureText(badge[0]).width + 26;
     ctx.fillStyle = badge[2]; ctx.beginPath(); ctx.roundRect(x + 10, WIN_TOP + 8, bwid, 36, 18); ctx.fill();
@@ -5660,7 +5703,11 @@ function towerFacade(F, k, P) {
     if (state === 'empty') {                         // no room: a dashed frame across the dark glass
       ctx.setLineDash([14, 10]); ctx.strokeStyle = P.soft; ctx.lineWidth = 4; ctx.strokeRect(x + 10, gy + 10, w - 20, WIN_BOTTOM - gy - 20); ctx.setLineDash([]);
     }
-    if (state === 'waiting') { ctx.strokeStyle = P.warn; ctx.lineWidth = 12; ctx.globalAlpha = 0.5 + 0.5 * TOWER.pulse; ctx.strokeRect(x + 6, WIN_TOP + 6, w - 12, WIN_BOTTOM - WIN_TOP - 12); ctx.globalAlpha = 1; }
+    if (state === 'waiting' || state === 'asking') {   // a frame that pulses: amber for a permission, violet for a question
+      ctx.strokeStyle = state === 'asking' ? '#b48cff' : P.warn; ctx.lineWidth = 12; ctx.globalAlpha = 0.5 + 0.5 * TOWER.pulse;
+      ctx.strokeRect(x + 6, WIN_TOP + 6, w - 12, WIN_BOTTOM - WIN_TOP - 12); ctx.globalAlpha = 1;
+    }
+    if (state === 'input') { ctx.setLineDash([18, 12]); ctx.strokeStyle = '#6b7a90'; ctx.lineWidth = 8; ctx.strokeRect(x + 6, WIN_TOP + 6, w - 12, WIN_BOTTOM - WIN_TOP - 12); ctx.setLineDash([]); }
     const play = id && SOURCE.mode === 'live' ? playRoomText(id) : '';   // a game in the room (2.3.3): its name at the window's foot
     if (play) {
       let size = 32; ctx.font = `700 ${size}px ${FONT_BODY}`;
@@ -5866,7 +5913,7 @@ function towerSync(now = performance.now()) {
   towerBuild();
   const waits = LIVE.floors.some((f) => f.some((id) => LIVE.rank[id] === 0));
   const pulse = waits && !reduceMotion ? Math.round((0.5 + 0.5 * Math.sin(now / 160)) * 4) / 4 : 1;   // a waiting window's frame
-  const sig = JSON.stringify([LIVE.floors, LIVE.rank, TOWER.floors.map((F, k) => towerFloorText(k)).map((t) => [t.working, t.waiting, t.idle]),
+  const sig = JSON.stringify([LIVE.floors, LIVE.rank, LIVE.floors.map((f) => f.map(towerState)), TOWER.floors.map((F, k) => towerFloorText(k)).map((t) => [t.working, t.waiting, t.idle]),
     SOURCE.mode === 'live' ? PLAY.list.map((G) => [G.room, G.kind, !!G.t0]) : []]);   // a game's name on its window (2.3.3)
   if (sig === TOWER.sig && pulse === TOWER.pulse) return;
   const P = towerPalette(), all = sig !== TOWER.sig;
@@ -5880,7 +5927,7 @@ function towerSync(now = performance.now()) {
 const towerTmp = { m: new THREE.Matrix4(), q: new THREE.Quaternion(), p: new THREE.Vector3(), s: new THREE.Vector3(1, 1, 1), c: new THREE.Color() };
 function towerAnimate(t, dt) {
   if (!TOWER.lights || !TOWER.actors) return;
-  const P = towerPalette(), want = { working: P.on, thinking: P.on, waiting: P.on, idle: P.off, empty: P.none };
+  const P = towerPalette(), want = { working: P.on, thinking: P.on, waiting: P.on, asking: P.on, input: P.off, idle: P.off, empty: P.none };
   const k = reduceMotion ? 1 : Math.min(1, dt * 4);
   const counts = Object.fromEntries(TOWER_POSES.map((p) => [p, 0]));
   const { m, q, p, s, c } = towerTmp;
@@ -5907,6 +5954,10 @@ function towerAnimate(t, dt) {
     } else if (bay.state === 'waiting') {
       place('raise', x(0.55), B.yBot + (still ? 0 : Math.abs(Math.sin(t * 3 + seed)) * 0.05));
       place('type', x(0.2), B.yBot);
+    } else if (bay.state === 'asking') {           // a hand to the chin over the question
+      place('think', x(0.55), B.yBot, -1, still ? 0 : Math.sin(t * 1.4 + seed) * 0.05); place('type', x(0.2), B.yBot);
+    } else if (bay.state === 'input') {            // the lights off, one figure waiting at the glass
+      place('shadow', x(0.5), B.yBot);
     } else if (bay.state === 'idle') {
       place('shadow', x(0.3), B.yBot); place('shadow', x(0.72), B.yBot, -1);
     }
@@ -5923,7 +5974,7 @@ function towerAnimate(t, dt) {
   if (flash !== !!TOWER.flash) { TOWER.flash = flash; sceneEl.style.filter = flash ? 'brightness(1.8)' : ''; }
 }
 /* The room under the pointer in the building: its full name and state, as the canvas's title. */
-const TOWER_STATE_JA = { working: '作業中', thinking: '考え中', waiting: '許可待ち', idle: '待機（消灯）', empty: '空き' };
+const TOWER_STATE_JA = { working: '作業中', thinking: '考え中', waiting: '許可待ち', asking: '質問に回答待ち', input: '入力待ち', idle: '待機（消灯）', empty: '空き' };
 function towerHover(hit) {
   const F = hit && TOWER.floors[hit.object.userData.floor];
   const bay = F && hit.uv ? F.bays.find((b) => hit.uv.x >= b.x0 && hit.uv.x <= b.x1) : null;
@@ -6058,12 +6109,15 @@ function placeRobotTags(dt = 1 / 60) {
     // the bill (54-bills.js) sits on the tag, inside the tag's box: what keeps tags apart keeps it off every tag
     const bill = !hidden && R.bill && !R.bill.hidden ? R.bill : null, btext = bill ? bill.textContent : '';
     if (bill && (!R.billSize || R.billSize.text !== btext)) R.billSize = { text: btext, w: bill.offsetWidth, h: bill.offsetHeight };
-    list.push({ R, hidden, bill, x: ((tagNdc.x + 1) / 2) * W, y: ((1 - tagNdc.y) / 2) * H, z: tagNdc.z });
+    // the wait's bubble (53-waits.js) sits over the bill, or over the tag: kept on the tag's box as the bill is
+    const wait = !hidden && R.waitEl && !R.waitEl.hidden ? R.waitEl : null, wtext = wait ? `${wait.dataset.waitKind}|${wait.textContent}` : '';
+    if (wait && (!R.waitSize || R.waitSize.text !== wtext)) R.waitSize = { text: wtext, w: wait.offsetWidth, h: wait.offsetHeight };
+    list.push({ R, hidden, bill, wait, x: ((tagNdc.x + 1) / 2) * W, y: ((1 - tagNdc.y) / 2) * H, z: tagNdc.z });
   }
   const placed = [];
   for (const it of list.filter((q) => !q.hidden).sort((a, b) => a.z - b.z)) {   // nearest first: it keeps its spot
-    const b = it.bill ? it.R.billSize : null;
-    const w = Math.max(it.R.tagSize.w, b ? b.w : 0), h = it.R.tagSize.h + (b ? b.h + BILL.gap + BILL.rise : 0);
+    const b = it.bill ? it.R.billSize : null, wb = it.wait ? it.R.waitSize : null;
+    const w = Math.max(it.R.tagSize.w, b ? b.w : 0, wb ? wb.w : 0), h = it.R.tagSize.h + (b ? b.h + BILL.gap + BILL.rise : 0) + (wb ? wb.h + BILL.gap : 0);
     const x0 = it.x - w / 2, x1 = it.x + w / 2;
     let bottom = it.y;
     for (let pass = 0; pass < TAGS.maxPasses; pass++) {
@@ -6077,11 +6131,12 @@ function placeRobotTags(dt = 1 / 60) {
   }
   for (const it of list) {   // the writes
     const el = it.R.tag;
-    if (it.hidden) { el.style.visibility = 'hidden'; it.R.tagDy = 0; if (it.R.bill) it.R.bill.style.visibility = 'hidden'; continue; }
+    if (it.hidden) { el.style.visibility = 'hidden'; it.R.tagDy = 0; if (it.R.bill) it.R.bill.style.visibility = 'hidden'; if (it.R.waitEl) it.R.waitEl.style.visibility = 'hidden'; continue; }
     el.style.visibility = 'visible';
     const zi = String(-it.front);   // negative: under the rooms' signs (z-index 1), inside .tags (isolation: isolate)
     if (el.style.zIndex !== zi) el.style.zIndex = zi;
     if (it.R.bill && it.R.bill.style.zIndex !== zi) it.R.bill.style.zIndex = zi;
+    if (it.R.waitEl && it.R.waitEl.style.zIndex !== zi) it.R.waitEl.style.zIndex = zi;
     const dy = it.R.tagDy === undefined ? it.target : it.R.tagDy + (it.target - it.R.tagDy) * ease;
     it.R.tagDy = Math.abs(dy - it.target) < 0.5 ? it.target : dy;
     it.R.tagTarget = it.target;   // where the tag is going (the e2e reads a tag once tagDy has reached it: the settle hook of 80-dbg.js)
@@ -6090,6 +6145,11 @@ function placeRobotTags(dt = 1 / 60) {
       it.bill.style.visibility = 'visible';
       it.bill.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - it.R.tagDy - it.R.tagSize.h - BILL.gap).toFixed(1)}px) translate(-50%, -100%)`;
     } else if (it.R.bill) it.R.bill.style.visibility = 'hidden';
+    if (it.wait) {   // over the bill (with its rise kept), or over the tag
+      const above = it.R.tagSize.h + (it.bill ? it.R.billSize.h + BILL.gap + BILL.rise : 0) + BILL.gap;
+      it.wait.style.visibility = 'visible';
+      it.wait.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - it.R.tagDy - above).toFixed(1)}px) translate(-50%, -100%)`;
+    } else if (it.R.waitEl) it.R.waitEl.style.visibility = 'hidden';
   }
   const ms = performance.now() - t0, S0 = TAGS.stats;
   S0.n = list.length; S0.frames++; S0.sumMs += ms; S0.maxMs = Math.max(S0.maxMs, ms);
@@ -6110,6 +6170,7 @@ function update3D(model, nowSec, dt) {
       R.robot.launch = forced(R.robot, 'launch', demoLaunch(R.def.id, model.t));   // a subagent called (10-20)
       if (st.walk) { R.robot.root.position.x = st.walk.x; R.robot.root.position.z = st.walk.z; R.robot.root.rotation.y = st.walk.ry; }
       if (st.state !== R.robot.state) setRobotState(R.robot, st.state);
+      waitSync(R);
       if (st.act !== R.act) { R.act = st.act; R.text.textContent = st.act; }
       updateRobot(R.robot, nowSec, dt);
     }
@@ -6353,6 +6414,7 @@ function renderPanel(model) {
   renderQuestions();
   renderDenials();
   paintSince($('denied'), model.t, '経過');
+  waitChips();   // 53-waits.js
   const sIn = SESSIONS.filter((x) => inScope(x.project)).length, rIn = ROBOT_DEFS.filter((d) => inScope(projectOfRobot(d.id))).length;
   setText($('chip-robots'), UI.project === 'all' ? `ロボット ${ROBOT_DEFS.length}` : `ロボット ${rIn} / ${ROBOT_DEFS.length}`);
   setText($('chip-sessions'), UI.project === 'all' ? `セッション ${SESSIONS.length}` : `セッション ${sIn} / ${SESSIONS.length}`);
@@ -6384,7 +6446,7 @@ function permSubjectLive(p) {
   return `<span class="perm-exact" tabindex="0">${partsHTML.join('')}</span>`;
 }
 const permSubject = (p) => (SOURCE.mode === 'live' ? permSubjectLive(p) : `<code>${esc(permSummary(p))}</code>`);
-const permBox = (p) => `<div class="perm-box"><p class="perm-q"><b>${esc(p.tool)}</b> ${permSubject(p)}</p><div class="perm-acts">${permButtons(p, 's')}</div></div>`;
+const permBox = (p) => `<div class="perm-box" data-perm-box="${esc(p.id)}"><p class="perm-q"><b>${esc(p.tool)}</b> ${permSubject(p)}</p><div class="perm-acts">${permButtons(p, 's')}</div></div>`;
 function recentHTML(id) {
   const items = logItems.filter((e) => e.who === id).slice(0, 6);
   return items.length ? items.map((e) => `<li><time>${fmtClock(BASE_CLOCK + e.abs)}</time><span><b>${esc(e.kind)}</b> ${esc(e.what)}</span></li>`).join('') : '<li><span>まだ記録がない</span></li>';
@@ -7828,8 +7890,8 @@ ${subs.length ? `<section class="rb-sec" aria-labelledby="rb-h-subs"><h3 id="rb-
   const S = STATES[st.state] || STATES.idle;
   const play = SOURCE.mode === 'live' && has3D ? playTagText(id) : '';   // a game (2.3.3): the same words as the name tag
   setText(rbEl.querySelector('[data-rb-state]'), st.asking ? '質問に回答待ち' : play ? `${S.name} · ${play}` : S.name);
-  setText(rbEl.querySelector('[data-rb-lampname]'), st.asking ? '黄（質問に回答待ち）' : LAMP_TEXT[S.lamp] || '');
-  const lamp = rbEl.querySelector('[data-rb-lamp]'); if (lamp) lamp.style.background = LAMP[S.lamp];
+  setText(rbEl.querySelector('[data-rb-lampname]'), st.asking ? LAMP_TEXT.asking : LAMP_TEXT[S.lamp] || '');
+  const lamp = rbEl.querySelector('[data-rb-lamp]'); if (lamp) lamp.style.background = st.asking ? LAMP.asking : LAMP[S.lamp];   // its swatch as its name
   setText(rbEl.querySelector('[data-rb-act]'), st.act);
   // the box (2.3.4): its last push / pull, from the server's agent.git
   const gitEl = rbEl.querySelector('[data-rb-git]');
@@ -7977,14 +8039,14 @@ function robotRunHTML(T) {
   const failedRows = T.rows.filter((c) => c.status === 'failed');
   const namesHTML = failedRows.slice(0, FAILED_SHOWN).map((c) => `<li>${esc(c.name)}</li>`).join('');
   const moreHTML = failedRows.length > FAILED_SHOWN ? `<li class="rb-fail-more">ほか ${Math.max(0, failedRows.length - FAILED_SHOWN)} 件</li>` : '';
-  return `<li class="rb-run r-${esc(T.runStatus)}" data-rb-run="${esc(T.id)}"><p class="rb-run-head"><b>${esc(T.device || 'テスト')}</b> <span>${esc(T.statusText)}</span>${T.savedAt ? '<small class="rb-saved">保存された結果</small>' : ''}</p><code class="rb-run-file">${esc(T.file)}</code>
+  return `<li class="rb-run r-${esc(T.runStatus)}" data-rb-run="${esc(T.id)}"><p class="rb-run-head"><b>${esc(T.device || 'テスト')}</b> <span${T.verdictWhy ? ` title="${esc(T.verdictWhy)}" data-verdict-why` : ''}>${esc(T.statusText)}</span>${T.savedAt ? '<small class="rb-saved">保存された結果</small>' : ''}</p><code class="rb-run-file">${esc(T.file)}</code>
 <div class="prog" role="img" aria-label="通過 ${Number(T.passed)} 件 / 失敗 ${Number(T.failed)} 件 / 全 ${Number(n)} 件"><span class="p" style="width:${Number(pPct)}%"></span><span class="r" style="width:${Number(rPct)}%"></span><span class="x" style="width:${Number(fPct)}%"></span></div>${namesHTML ? `<ul class="rb-fails" aria-label="失敗したケース">${namesHTML}${moreHTML}</ul>` : ''}</li>`;
 }
 function liveTestsHTML(T) {
   const n = T.rows.length, pPct = n ? (T.passed / n) * 100 : T.runStatus === 'passed' ? 100 : 0, rPct = n && T.runningIdx >= 0 ? 100 / n : 0;
   const fPct = n ? (T.failed / n) * 100 : T.runStatus === 'failed' ? 100 : 0;
   const whoPillHTML = T.who && DEF[T.who] ? pill(T.who, DEF[T.who].role) : '';
-  return `<div class="test-head"><div>${whoPillHTML} <code>${esc(T.file)}</code></div><code>${esc(T.device)}${T.device ? ' · ' : ''}${esc(T.statusText)}</code>
+  return `<div class="test-head"><div>${whoPillHTML} <code>${esc(T.file)}</code></div><code${T.verdictWhy ? ` title="${esc(T.verdictWhy)}" data-verdict-why` : ''}>${esc(T.device)}${T.device ? ' · ' : ''}${esc(T.statusText)}</code>
 <div class="prog" role="img" aria-label="通過 ${Number(T.passed)} 件 / 全 ${Number(n)} 件"><span class="p" style="width:${Number(pPct)}%"></span><span class="r" style="width:${Number(rPct)}%"></span><span class="x" style="width:${Number(fPct)}%"></span></div></div>
 <ul class="cases">${T.rows.map((c, i) => `<li class="c-${esc(c.status)}"><span class="ic">${CASE_ICON[c.status] || '○'}</span><span>${i + 1}. ${esc(c.name)}</span>${c.status === 'running' ? `<span class="step">${esc(c.step)}</span>` : ''}</li>`).join('')}</ul>`;
 }
@@ -8651,6 +8713,107 @@ function renderDataDocs() {
   setHTML(dsBody, sheetHTML);
   if (doc && ds.tab === 'db') dsBody.querySelectorAll('[data-erd]').forEach((el) => { const d = doc.db[Number(el.dataset.erd)]; if (d && d.erd) drawMermaid(el, d.erd); });
 }
+// ---- web/js/53-waits.js ----
+/* ---------- a robot waiting on the person, told apart in 3D (ticket 2026-10-20-jui-viz-3d-waiting-kinds-question-permission-input) ----------
+   Requester: 「今こっちの返答や許可待ちになってるbotが3dの見た目でもわかるようにしてほしい。質問、許可、入力待ちでそれぞれUI用意して」
+   and 「ボットの頭に追加の吹き出し用意して、そこからボード遷移もできるといい」; answers: an input's wait may go to play (the
+   bubble goes with it), an auto mode denial is a permission's bubble, the colour is ours, the bubble opens the panel's card.
+   One robot shows one wait, permission > question > input (the panel's order):
+     * perm  — a permission prompt (state waiting, not a question) or a stopped call's card (51-denials.js): "!", amber
+     * ask   — a question (state waiting on AskUserQuestion): "?" and how many choices, violet; the lamp violet too
+     * input — the session's turn ended and nobody answered (Notification idle_prompt: the server's inputWaitAt, until it
+               moves again), on its main robot, until it is opened on this page since: "…"
+   The pose (10-robot-core.js) follows r.waitKind: perm the raised hand, ask a hand to the chin, input leaning back. The
+   bubble is a button over the tag (placeRobotTags keeps it on the tag's box), in front of everything 3D; a press opens
+   the wait's card in the panel — the question card, the permission (or the stopped call's) card — or the session's
+   talk. A press on the robot or its tag does what it did. Text 4.5:1 on each bubble, light and dark (fixed colours). */
+const WAIT = { picked: null, mark: { perm: '!', ask: '?', input: '…' }, name: { perm: '許可待ち', ask: '質問に回答待ち', input: '入力待ち' } };
+function waitKindOf(id) {
+  const st = robotState[id];
+  if (!st || !DEF[id]) return null;
+  const denied = typeof DENIALS !== 'undefined' && DENIALS.some((d) => d.who === id && d.status === 'pending');
+  if ((st.state === 'waiting' && !st.asking) || denied) return 'perm';
+  if (st.state === 'waiting' && st.asking) return 'ask';
+  if (DEF[id].kind === 'main' && SOURCE.mode === 'live') {
+    const sess = SESSIONS.find((x) => x.id === SESSION_OF[id]);
+    const since = sess ? Number(sess.inputWaitAt) || 0 : 0;
+    if (since && !((NOTIFY.opened.get(id) || 0) >= since)) return 'input';   // seen on this page since: no bubble
+  }
+  return null;
+}
+/* The question waiting for this robot (the one its bubble opens), or null. */
+const waitQuestion = (id) => (typeof QUESTIONS !== 'undefined' ? QUESTIONS.find((q) => q.who === id && q.status === 'pending') : null) || null;
+function waitText(id, kind) {
+  if (kind !== 'ask') return WAIT.mark[kind];
+  const q = waitQuestion(id), n = q && q.questions[0] && Array.isArray(q.questions[0].options) ? q.questions[0].options.length : 0;
+  return n ? `? ${n}` : '?';
+}
+/* Each frame (liveUpdateRobots / the demo's loop): the robot's wait and its bubble. */
+function waitSync(R) {
+  const kind = waitKindOf(R.def.id);
+  R.robot.waitKind = kind;
+  if (!kind) { if (R.waitEl) R.waitEl.hidden = true; return; }
+  if (!R.waitEl) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'wait-bubble'; b.dataset.waitRobot = R.def.id;
+    tagsEl.append(b);
+    R.waitEl = b;
+  }
+  const text = waitText(R.def.id, kind);
+  if (R.waitEl.dataset.waitKind !== kind) { R.waitEl.dataset.waitKind = kind; R.waitEl.title = `${WAIT.name[kind]}（押すと開く）`; }
+  if (R.waitEl.textContent !== text) R.waitEl.textContent = text;
+  R.waitEl.hidden = false;
+}
+function waitDrop(R) { if (R.waitEl) { R.waitEl.remove(); R.waitEl = null; } }
+/* A press on a bubble: the panel's card of that wait, scrolled to and focused (the side panel opened first), or the
+   session's talk. WAIT.picked says what was picked (the e2e reads it). */
+function waitOpen(id, kind) {
+  if (kind === 'input') {
+    openRobot(id, document.getElementById('scene-canvas'));
+    const until = Date.now() + 4000;
+    const talk = () => { if (rbState.id !== id) return; if (rbEl.hidden) { if (Date.now() < until) requestAnimationFrame(talk); return; } talkShow(true); WAIT.picked = { kind, id }; };
+    requestAnimationFrame(talk);
+    return;
+  }
+  if (!sideOpen) { sideOpen = true; applySide(); }
+  let el = null, card = null;
+  if (kind === 'ask') {
+    const q = waitQuestion(id);
+    card = q ? q.id : null;
+    el = q ? $('questions').querySelector(`[data-qcard="${CSS.escape(q.id)}"]`) : null;
+  } else {
+    const d = typeof DENIALS !== 'undefined' ? DENIALS.find((x) => x.who === id && x.status === 'pending') : null;
+    const p = SOURCE.mode === 'live' ? PERMS_LIVE.find((x) => x.who === id && x.status === 'pending') : null;
+    // the panel's task list: the permission's box (50-panel.js permBox), with or without its buttons (no relay: none)
+    if (p) { card = `perm:${p.id}`; const b = $('tasks').querySelector(`[data-perm-box="${CSS.escape(p.id)}"]`); el = b ? b.closest('li') : null; }
+    else if (d) { card = `denied:${d.id}`; el = $('denied').querySelector(`[data-dcard="${CSS.escape(d.id)}"]`); }
+  }
+  WAIT.picked = { kind, id, card, found: !!el };
+  if (!el) return;
+  el.scrollIntoView({ block: 'center' });
+  el.classList.add('wait-picked');
+  setTimeout(() => el.classList.remove('wait-picked'), 2400);
+  // its first control, or the card itself when it has none (answered in the terminal: no relay)
+  const first = el.querySelector('input:not([disabled]), button:not([disabled])');
+  if (first) first.focus({ preventScroll: true });
+  else { el.tabIndex = -1; el.focus({ preventScroll: true }); }
+}
+tagsEl.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-wait-robot]');
+  if (b) waitOpen(b.dataset.waitRobot, b.dataset.waitKind);
+});
+/* The header's chips say how many wait of each kind with the bubbles' marks (the 入力待ち chip is new). */
+function waitChips() {
+  let input = 0;
+  for (const d of ROBOT_DEFS) if (waitKindOf(d.id) === 'input') input += 1;
+  const chip = $('chip-input');
+  chip.hidden = input === 0;
+  setText(chip, `… 入力待ち ${input}`);
+}
+$('chip-input').addEventListener('click', () => {
+  const d = ROBOT_DEFS.find((x) => waitKindOf(x.id) === 'input');
+  if (d) waitOpen(d.id, 'input');
+});
 // ---- web/js/54-bills.js ----
 /* ---------- the bill over a robot (2.3.6, ticket 2026-10-19-jui-viz-cost-bill-over-robot) ----------
    Each response's estimated cost (USD), over the robot that made it, with a banknote: the server prices it (prices.py:
@@ -9156,7 +9319,19 @@ function histItem(item) {
       io.appendChild(hNode('pre', `h-code${item.error ? ' h-code-err' : ''}`, `${item.out}${item.outCut ? '\n…' : ''}`));
       if (Array.isArray(item.imgs) && item.imgs.length) { const row = hNode('div', 'h-imgs'); for (const ref of item.imgs) row.appendChild(histThumb(ref)); io.appendChild(row); }
     }
-    return histFolded('h-item h-tool', title, [io], false);
+    // SendUserFile (ticket 2026-10-20-jui-viz-history-senduserfile-image-no-thumb): the transcript holds only the paths, so
+    // each picture is read from its file by (off, n) — never a path from the page — as a thumbnail that opens the large
+    // view; a file that is no picture is its name only. Shown open: what was sent is the point of the row.
+    const sent = Array.isArray(item.sent) ? item.sent : [];
+    if (sent.length) {
+      const box = hNode('div', 'h-sent');
+      const pics = sent.filter((f) => f.image), others = sent.filter((f) => !f.image);
+      if (pics.length) { const row = hNode('div', 'h-imgs'); for (const f of pics) row.appendChild(histThumb({ sent: { off: f.off, n: f.n } })); box.appendChild(row); }
+      if (typeof item.caption === 'string' && item.caption) box.appendChild(hNode('p', 'h-sent-caption', item.caption));
+      for (const f of others) box.appendChild(hNode('p', 'h-sent-file', `📎 ${f.name}`));
+      io.appendChild(box);
+    }
+    return histFolded('h-item h-tool', title, [io], sent.length > 0);
   }
   if (item.kind === 'thought') return hNode('p', 'h-item h-mark', '考えた');
   if (item.kind === 'image') {
@@ -9611,7 +9786,7 @@ function composeArrived(items) {
    (SOURCE.historyImage, POST /api/history-image under the prompt's checks) when its thumbnail comes into view, and
    kept as a blob URL only while this robot's tab is open. The browser scales the thumbnail. A press opens it large
    in a dialog: ← → for the others in this history, Esc / the backdrop / 閉じる close it and give the focus back. */
-const histRefKey = (ref) => (ref.attach ? `a:${ref.attach.sessionId}:${ref.attach.id}` : `${ref.off}:${ref.n}`);   // a history picture, or an attached image
+const histRefKey = (ref) => (ref.attach ? `a:${ref.attach.sessionId}:${ref.attach.id}` : ref.sent ? `s:${ref.sent.off}:${ref.sent.n}` : `${ref.off}:${ref.n}`);   // a history picture, an attached image, a file the session sent
 const histImgKey = (ref) => `${HIST.id}|${histRefKey(ref)}`;
 function histImgsDrop() {
   for (const v of HIST.imgs.values()) v.then((g) => { if (g.url) URL.revokeObjectURL(g.url); });
@@ -9621,7 +9796,7 @@ function histImgGet(ref) {
   const key = histImgKey(ref);
   if (!HIST.imgs.has(key)) {
     const id = HIST.id;
-    const asked = ref.attach ? SOURCE.attachImage(ref.attach) : SOURCE.historyImage(id, ref);
+    const asked = ref.attach ? SOURCE.attachImage(ref.attach) : ref.sent ? SOURCE.historyFile(id, ref.sent) : SOURCE.historyImage(id, ref);
     HIST.imgs.set(key, asked.then((got) => (got.ok ? { url: URL.createObjectURL(got.blob) }
       : { error: got.gone ? '消えました' : got.status === 413 ? '大きすぎて表示しない' : got.status === 415 ? '表示できない形式' : `画像を読めない（${got.status || got.error}）` })));
   }
