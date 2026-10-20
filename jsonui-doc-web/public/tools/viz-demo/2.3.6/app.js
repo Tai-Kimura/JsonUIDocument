@@ -11,14 +11,17 @@ const FONT_BODY = '"BIZ UDPGothic", "Hiragino Sans", "Yu Gothic", sans-serif';
 const FONT_MONO = '"JetBrains Mono", ui-monospace, Menlo, monospace';
 
 const ROLES = {
-  main: { name: 'メイン', color: '#0ea5e9' },   // sky blue (2.3.5, requester 10-19: 「スカイブルーにしようか」; it was orange, beside the subagents' orange coveralls)
-  define: { name: 'define', color: '#7d5cff' },
-  ground: { name: 'ground', color: '#b07a52' },
+  main: { name: 'メイン', color: '#0ea5e9', pill: '#0369a1' },   // sky blue (2.3.5, requester 10-19: 「スカイブルーにしようか」; it was orange, beside the subagents' orange coveralls)
+  // `pill` (2.3.6, ticket 2026-10-20-jui-viz-main-pill-text-contrast): a role's pills (over the robot, in the panels, on the
+  // boards) take it in place of `color`, white text on it. Main's is one step darker (#0369a1, white 5.93:1); its body stays #0ea5e9.
+  // define / ground / navigation / test / other the same (requester 10-20: 「全部直す」): each the body's hue, darker, white ≥ 4.7:1.
+  define: { name: 'define', color: '#7d5cff', pill: '#7552ff' },
+  ground: { name: 'ground', color: '#b07a52', pill: '#996946' },
   implement: { name: 'implement', color: '#3b5bdb' },   // indigo (2.3.5): #2f80ed sat ΔE2000 14.6 from the main sky blue, side by side in the panel
-  navigation: { name: 'navigation', color: '#10a693' },
-  test: { name: 'test', color: '#3fae4a' },
+  navigation: { name: 'navigation', color: '#10a693', pill: '#0c8172' },
+  test: { name: 'test', color: '#3fae4a', pill: '#2f8338' },
   debug: { name: 'debug', color: '#f0b400' },
-  other: { name: 'その他', color: '#8a9bb0' },
+  other: { name: 'その他', color: '#8a9bb0', pill: '#60748e' },
 };
 const COL = {
   shell: '#e8ecf3', limb: '#394150', screen: '#0f1830', eye: '#a6fbff',
@@ -665,18 +668,27 @@ function whistleProp() {
   g.userData.whistle = true;
   return g;
 }
-function pipiBubble() {                                    // 「ピッ」 over the head while the whistle blows
+function pipiBubble(text = 'ピッ！') {                        // 「ピッ」 over the head while the whistle blows
   const canvas = makeCanvas(192, 112), ctx = canvas.getContext('2d');
   ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#1f2532'; ctx.lineWidth = 6;
   rr(ctx, 6, 6, 180, 78, 30); ctx.fill(); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(132, 82); ctx.lineTo(148, 106); ctx.lineTo(108, 82); ctx.closePath(); ctx.fill(); ctx.stroke();   // the tail toward the head
   ctx.fillStyle = '#ffffff'; ctx.fillRect(104, 76, 30, 8);
   ctx.fillStyle = '#e8590c'; ctx.font = `46px ${FONT_DISPLAY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('ピッ！', 96, 46);
+  ctx.font = `${text.length > 3 ? 40 : 46}px ${FONT_DISPLAY}`;
+  ctx.fillText(text, 96, 46);
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: texFrom(canvas), transparent: true }));
   s.position.set(-1.0, 2.1, 0.3); s.scale.set(0.72, 0.42, 1); s.userData.pipi = true;   // beside the head, by the waving (right, -x) arm
   return s;
 }
+/* Calling a subagent (requester 10-20: "サブエージェント呼ぶのは笛鳴らそうか"; ticket 2026-10-20-jui-viz-agent-launch-whistle):
+   r.launch is true for a fixed length from the moment an Agent call starts (the server's agent.whistle, robots.py
+   LAUNCH_WHISTLE_MS; the page turns it off when vizNow passes its end, and never while the robot is away from its
+   desk). The same whistle and the same waving arm as heavy work's 'whistle', the face squeezed > <, and its own
+   bubble 「ピーッ！」 (a long blow) where heavy work says 「ピッ！」. Told apart: the launch is short (2.5 s), comes with
+   the call (the robot carries its papers, then waits, or works on), with no sweat and with 「ピーッ！」; heavy work's
+   directing of 3 or more subagents lasts as long as they run, with sweat and 「ピッ！」. Both at once: 「ピーッ！」 for
+   the launch's 2.5 s, then 「ピッ！」 and the sweat go on. Reduced motion: the whistle at the mouth only, no waving. */
 function lookUpdate(r, t, dt) {
   const look = heavyLook(r, t);
   r.look = look;
@@ -685,12 +697,15 @@ function lookUpdate(r, t, dt) {
   if (!cur[3]) { cur[0] = want[0]; cur[1] = want[1]; cur[2] = want[2]; }   // from nothing: the hue at once, the alpha eases
   const k = reduceMotion ? 1 : Math.min(1, dt / LOOK_EASE * 3);
   for (let i = 0; i < 4; i++) cur[i] += (want[i] - cur[i]) * k;
-  if (look === 'whistle' && !r.whistle) { r.whistle = whistleProp(); r.head.add(r.whistle); }
-  if (r.whistle) r.whistle.visible = look === 'whistle';
-  if (look === 'whistle' && !r.pipi) { r.pipi = pipiBubble(); r.root.add(r.pipi); }
-  if (r.pipi) {
-    r.pipi.visible = look === 'whistle';
-    if (r.pipi.visible && !reduceMotion) r.pipi.position.y = 2.1 + Math.abs(Math.sin(t * 7)) * 0.08;   // in time with the arm
+  const blow = look === 'whistle' || !!r.launch;
+  if (blow && !r.whistle) { r.whistle = whistleProp(); r.head.add(r.whistle); }
+  if (r.whistle) r.whistle.visible = blow;
+  if (look === 'whistle' && !r.launch && !r.pipi) { r.pipi = pipiBubble(); r.root.add(r.pipi); }
+  if (r.launch && !r.pipiLong) { r.pipiLong = pipiBubble('ピーッ！'); r.pipiLong.userData.launch = true; r.root.add(r.pipiLong); }
+  for (const [bubble, on] of [[r.pipi, look === 'whistle' && !r.launch], [r.pipiLong, !!r.launch]]) {
+    if (!bubble) continue;
+    bubble.visible = on;
+    if (on && !reduceMotion) bubble.position.y = 2.1 + Math.abs(Math.sin(t * 7)) * 0.08;   // in time with the arm
   }
   return look;
 }
@@ -763,6 +778,74 @@ function notePose(r, k, t) {
   const ph = reduceMotion ? 0.3 + k * 0.22 : (t * 0.42 + k / NOTE_MAX + r.seed * 0.13) % 1;
   return { x: (k % 2 ? -1 : 1) * (0.42 + ph * 0.18) + Math.sin(ph * 6.3 + k) * 0.06, y: 1.95 + ph * 0.75,
     opacity: reduceMotion ? 1 : Math.min(1, Math.sin(ph * Math.PI) * 1.6) };
+}
+/* Reading the web (requester 10-20: "WebFetchの時は机で辞書をペラペラめくるアニメーションにして欲しい"; WebSearch too): the
+   state stays 'reading' (lamp, tag and card as they were) and r.readKind is 'web' (ingest.py agent.readKind, from
+   robots.WEB_READING_TOOLS). In place of the book held up, a thick dictionary lies open on the desk and the right hand
+   flips its pages: DICT_PAGES pages one after another (DICT_GAP apart, each over in DICT_FLIP), then a rest, every
+   DICT_PERIOD of pose time. A page is drawn only while it turns; the two blocks of pages stay. Only in 'reading', so
+   never away from the desk (walking, a break, a game, the box: other states). Reduced motion: the dictionary open,
+   no page turning, the hand still. Built once a robot first reads the web, under its root with geometries and
+   materials of its own: taking the robot down (disposeTree) disposes them, as the other props. */
+const DICT_PAGES = 3, DICT_PERIOD = 2.6, DICT_FLIP = 0.55, DICT_GAP = 0.22;
+const DICT = { w: 0.27, d: 0.36, block: 0.1, board: 0.014, x: 0, y: 0.55, z: 0.5 };   // y: the desk's top (0.275 + 0.25 + 0.025)
+/* How far page k has turned at pose time s, 0 (on the right block) to 1 (laid on the left one). */
+function dictFlip(s, k) {
+  if (reduceMotion) return 0;
+  const u = Math.min(1, Math.max(0, ((((s % DICT_PERIOD) + DICT_PERIOD) % DICT_PERIOD) - k * DICT_GAP) / DICT_FLIP));
+  return u * u * (3 - 2 * u);
+}
+/* The right hand over the pages: 0 at rest, 1 in the middle of a turn. */
+function dictHand(s) {
+  let f = 0;
+  for (let k = 0; k < DICT_PAGES; k++) f = Math.max(f, Math.sin(Math.PI * dictFlip(s, k)));
+  return f;
+}
+function dictBuild(r) {
+  const group = new THREE.Group(); group.userData.dictionary = true;
+  group.position.set(DICT.x, DICT.y, DICT.z);
+  const coverMat = toon('#7a2432'), pageMat = toon('#f7f1df'), edgeMat = toon('#d9cba3'), tabMat = toon('#c9a227');
+  const top = DICT.board + DICT.block;
+  for (const side of [-1, 1]) {   // -1: the robot's right (-x), the pages not read yet; 1: its left
+    const board = new THREE.Mesh(new THREE.BoxGeometry(DICT.w + 0.02, DICT.board, DICT.d + 0.025), coverMat);
+    board.position.set(side * (DICT.w / 2 + 0.008), DICT.board / 2, 0); group.add(board);
+    const block = new THREE.Mesh(new THREE.BoxGeometry(DICT.w, DICT.block, DICT.d), [edgeMat, edgeMat, pageMat, edgeMat, edgeMat, edgeMat]);
+    block.position.set(side * (DICT.w / 2 + 0.004), DICT.board + DICT.block / 2, 0); block.rotation.z = side * 0.04; group.add(block);
+  }
+  const spine = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, DICT.d + 0.025, 16, 1, false, -Math.PI / 2, Math.PI), coverMat);
+  spine.rotation.x = Math.PI / 2; spine.position.set(0, 0.03, 0); group.add(spine);   // the round back, under the middle
+  for (let k = 0; k < 3; k++) {   // thumb-index tabs on the outer edge of the pages still to read: a dictionary
+    const tab = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.03, 0.05), tabMat);
+    tab.position.set(-(DICT.w + 0.01), DICT.board + 0.022 + k * 0.028, -0.11 + k * 0.11); group.add(tab);
+  }
+  const leafGeo = new THREE.BoxGeometry(DICT.w - 0.01, 0.003, DICT.d - 0.01).translate(-(DICT.w - 0.01) / 2, 0, 0);
+  const pages = [];
+  for (let k = 0; k < DICT_PAGES; k++) {   // each page turns about the spine, from the right block over to the left
+    const hinge = new THREE.Group(); hinge.position.set(0, top + 0.002 + k * 0.001, 0); group.add(hinge);
+    const leaf = new THREE.Mesh(leafGeo, pageMat); hinge.add(leaf);
+    pages.push(hinge);
+  }
+  const holder = new THREE.Group(); holder.add(group);
+  if (!r.furnished) {   // a robot without a desk of its own (the demo) gets one, as the laptop does
+    const g = S.geo, m = S.mat, desk = new THREE.Group(); desk.position.set(0, 0.275, 0.6); holder.add(desk);
+    const deskTop = new THREE.Mesh(g.deskTop, m.wood); deskTop.position.y = 0.25; desk.add(deskTop);
+    for (const [x, z] of [[-0.44, -0.22], [0.44, -0.22], [-0.44, 0.22], [0.44, 0.22]]) { const leg = new THREE.Mesh(g.deskLeg, m.woodDark); leg.position.set(x, -0.025, z); desk.add(leg); }
+  }
+  r.root.add(holder);
+  return { group: holder, book: group, pages };
+}
+function dictUpdate(r, s, k) {
+  const on = k > 0.02;
+  if (on && !r.dict) r.dict = dictBuild(r);
+  if (!r.dict) return;
+  r.dict.group.visible = on;
+  if (!on) return;
+  r.dict.book.scale.setScalar(Math.max(0.001, k));
+  r.dict.pages.forEach((hinge, i) => {
+    const f = dictFlip(s, i);
+    hinge.rotation.z = -Math.PI * f;   // 0: lying on the right block; π: on the left one
+    hinge.visible = f > 0.001 && f < 0.999;
+  });
 }
 function setRobotTired(r, on) {
   if (on && !r.tired) r.needDrink = true;
@@ -1226,6 +1309,13 @@ function poseFor(state, s) {
       p.headX = 0.3 + Math.sin(s * 0.7) * 0.03; p.headY = Math.sin(s * 0.3) * 0.12;
       p.aLx = -1.25; p.aLz = -0.55; p.aRx = -1.25; p.aRz = 0.55;
       break;
+    case 'readingWeb': {   // over the dictionary on the desk: the left hand holds its pages, the right one turns them
+      const f = dictHand(s);
+      p.torsoX = 0.06; p.headX = 0.42 + Math.sin(s * 0.7) * 0.02; p.headY = -0.1 + f * 0.16;
+      p.aLx = -0.95; p.aLz = -0.3;
+      p.aRx = -0.95 - f * 0.25; p.aRz = 0.2 + f * 0.45;
+      break;
+    }
     case 'command': {
       const tap = Math.max(0, Math.sin(s * 5));
       p.headY = -0.55; p.headX = -0.02; p.torsoY = -0.15;
@@ -1270,12 +1360,13 @@ function updateRobot(r, t, dt) {
   const e = r.blend * r.blend * (3 - 2 * r.blend);
   const look = lookUpdate(r, t, dt), heavy = !!look;
   // heavy: fast typing (drained: slower than fired)
-  const a = poseFor(r.prev, s), b = heavy ? poseFor('typing', s * (look === 'drained' ? 1.5 : 2.4)) : poseFor(r.state, s);
+  const posed = (state) => (state === 'reading' && r.readKind === 'web' ? 'readingWeb' : state);   // the dictionary (10-20)
+  const a = poseFor(posed(r.prev), s), b = heavy ? poseFor('typing', s * (look === 'drained' ? 1.5 : 2.4)) : poseFor(posed(r.state), s);
   sweatUpdate(r, s, heavy);
   const p = {};
   for (const k in b) p[k] = a[k] + (b[k] - a[k]) * e;
   if (look === 'drained') { p.headX += 0.12; }             // head a little down over the long wait
-  if (look === 'whistle' && !reduceMotion) {               // one arm up waving the team on, the other pointing
+  if ((look === 'whistle' || r.launch) && !reduceMotion) { // one arm up waving the team on, the other pointing
     // the right arm up beside the head (as the done cheer, so the head does not hide it), waving; the left pointing
     p.aRx = Math.sin(t * 7) * 0.25; p.aRz = -2.85 + Math.sin(t * 7) * 0.3; p.aLx = -1.35; p.aLz = 0.15; p.headY = Math.sin(t * 3.5) * 0.15;
   }
@@ -1311,6 +1402,7 @@ function updateRobot(r, t, dt) {
   let mode = STATES[r.blend < 0.5 ? r.prev : r.state].face;
   if (r.tired && mode === 'normal') mode = 'tired';
   if (look) mode = look;                                     // heavy work's face over the state's and the tired one
+  if (r.launch) mode = 'whistle';                            // calling a subagent: the whistle's face for its moment
   if (mode === 'normal' || mode === 'focus' || mode === 'tired' || mode === 'fired') {
     if (s > r.nextBlink) { r.blinkEnd = s + 0.12; r.nextBlink = s + 2.4 + Math.random() * 3.2; }
     if (s < r.blinkEnd) mode = 'blink';
@@ -1319,9 +1411,11 @@ function updateRobot(r, t, dt) {
   const faceKey = `${mode}|${tint ? tint.join(',') : ''}`;   // the colour in steps: redrawn a few times while it eases
   if (faceKey !== r.faceMode) { drawFace(r.faceCtx, mode, tint); r.faceTex.needsUpdate = true; r.faceMode = faceKey; }
 
+  let dictK = 0;
   for (const key in r.props) {
     const pr = r.props[key];
-    const k = key === r.state ? e : (key === r.prev && r.prev !== r.state ? 1 - e : 0);
+    let k = key === r.state ? e : (key === r.prev && r.prev !== r.state ? 1 - e : 0);
+    if (key === 'reading' && r.readKind === 'web') { dictK = k; k = 0; }   // the dictionary on the desk, not the book
     pr.group.visible = k > 0.02;
     if (!pr.group.visible) continue;
     for (const child of pr.group.children) {
@@ -1330,6 +1424,7 @@ function updateRobot(r, t, dt) {
     }
     if (pr.update) pr.update(s);
   }
+  dictUpdate(r, s, dictK);
 }
 function setRobotState(r, state) {
   if (state === r.state) return;
@@ -1347,13 +1442,17 @@ const clamp01 = (v) => Math.max(0, Math.min(1, v));
 const frac = (t, a, b) => clamp01((t - a) / (b - a));
 const pct = (v) => Math.round(v * 100);
 const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
-const ROLE_INK = { debug: '#2a2000', main: '#082f49' };   // dark ink where white would not read (sky blue: 2.77:1 white, 5.01:1 this)
+const ROLE_INK = { debug: '#2a2000' };   // dark ink where white would not read on the pill (debug's yellow)
+/* A role's pill: its background (ROLES[role].pill, else its colour) and its text (ROLE_INK, else white). One source for
+   the HTML pills (pill()) and the canvas ones (drawRolePill, the boards). */
+const pillBg = (role) => ROLES[role].pill || ROLES[role].color;
+const pillInk = (role) => ROLE_INK[role] || '#ffffff';
 /* A session's name (/rename, `claude -n`; 10-19): the server's title, one line, at most NAME_MAX characters. Panels and
    cards show all of it next to the two-letter mark; the tag over the robot shows it alone, cut at its end with "…". */
 const NAME_MAX = 80;
 const sessionName = (t) => (typeof t === 'string' ? t.replace(/\s+/g, ' ').trim().slice(0, NAME_MAX) : '');
 const NAMES = { rev: 0 };   // bumped when a robot's name changes: the panels' keys carry it
-const pill = (label, role) => `<span class="pill" style="--c:${ROLES[role].color};--t:${ROLE_INK[role] || '#ffffff'}">${esc(label)}</span>`;
+const pill = (label, role) => `<span class="pill" style="--c:${ROLES[role].pill || ROLES[role].color};--t:${ROLE_INK[role] || '#ffffff'}">${esc(label)}</span>`;   // = pillBg / pillInk (the escape gate reads the tables)
 /* The time the view shows (the sky, the 8-hour tiredness): the machine's clock, unless a test or the demo sets one. */
 const VIZ_CLOCK = { at: null };
 const vizNow = () => (VIZ_CLOCK.at !== null ? VIZ_CLOCK.at : Date.now());
@@ -2133,6 +2232,9 @@ const DEMO_BEATS = {
   nightOut: 70, nightIn: 78,                            // at night: the rooms working late lit, the sign aglow
   thinking: [34, 50, 'd8'],                             // a quiet busy session (d8's plan)
   heavy: [38, 58, '7c'],                                // heavy work: fast typing and sweat
+  // a subagent called (10-20): the whistle for launchSec (robots.py LAUNCH_WHISTLE_MS) from each [t, robot, how]:
+  // a0 calls one in the foreground at 20 (then waits for its report), b4 at 6, a0 one in the background at 76
+  launch: [[6, 'b4', 'fg'], [20, 'a0', 'fg'], [76, 'a0', 'bg']], launchSec: 2.5,
   tired: { session: 'b4', since: 9 },                   // the session began at 9:00 of the demo clock
   snacks: [[34, '4f', 'coffee'], [42, 'e1', 'coffee'], [64, 'c9', 'meal']],
 };
@@ -2155,6 +2257,7 @@ function demoBuilding(t) {
   LIVE.rank = rank;
 }
 const demoTired = (id) => id === DEMO_BEATS.tired.session && isTired(demoDayMs() + DEMO_BEATS.tired.since * 3600000, vizNow());
+const demoLaunch = (id, t) => DEMO_BEATS.launch.some(([at, who]) => who === id && t >= at && t < at + DEMO_BEATS.launchSec);
 const demoHeavy = (id, t) => (id === DEMO_BEATS.heavy[2] && t >= DEMO_BEATS.heavy[0] && t < DEMO_BEATS.heavy[1] ? ['tokens'] : []);
 function robotCondition(id) {
   const t = latestModel ? latestModel.t : 0;
@@ -2203,6 +2306,890 @@ function updateRobotStates(simT, t, perms) {
     robotState[d.id] = st;
   }
 }
+
+/* ---------- トーク (2.3.7): the demo's stand-in for the server's talk frames (TALK_CONTRACT.md) ----------
+   The talks themselves are 31-talk-demo-data.js (TALK_DEMO: generated frames, data only; it comes after this file, so it
+   is read only when the first request comes). talkStandIn answers the page's talk.* requests from them the way the
+   server does: talk.open → the robot's list, talk.get → a page of messages (before / limit), talk.seen → the unread
+   recounted (a conv op, and talk.badges when a total changed). The data's script (a new message at 20 s, a read at 30 s,
+   a removal at 45 s) plays on the page's clock; ?talkhold=1 holds it for the e2e, which plays it with talkDemo.play(t).
+   Times move by (now − base). tests/test_viz_talk_ui_frames.py runs this block under node and validates every frame. */
+/* talk-demo:begin */
+function talkStandIn(data, now) {
+  const shift = now - data.base;
+  const TIMES = ['at', 'deliveredAt', 'readAt', 'lastAt', 'goneAt', 'removeAt'];
+  const moved = (v) => {   // a deep copy with every time moved to the page's clock
+    if (Array.isArray(v)) return v.map(moved);
+    if (!v || typeof v !== 'object') return v;
+    const o = {};
+    for (const [k, x] of Object.entries(v)) o[k] = TIMES.includes(k) && Number.isFinite(x) ? x + shift : moved(x);
+    return o;
+  };
+  const lists = {}, msgs = {}, seen = {};
+  for (const [owner, f] of Object.entries(data.lists)) lists[owner] = moved(f.items);
+  for (const [key, f] of Object.entries(data.messages)) msgs[key] = moved(f.items);
+  const ins = (owner, convId) => (msgs[`${owner} ${convId}`] || []).filter((m) => m.dir === 'in');
+  // "seen" up to where the data's unread count says: the newest `unread` messages in are not seen yet
+  for (const [owner, items] of Object.entries(lists)) for (const c of items) {
+    const list = ins(owner, c.id).sort((a, b) => a.at - b.at);
+    const k = list.length - c.unread - 1;
+    seen[`${owner} ${c.id}`] = k >= 0 ? list[k].at : 0;
+  }
+  const unread = (owner, convId) => ins(owner, convId).filter((m) => m.at > (seen[`${owner} ${convId}`] || 0)).length;
+  const row = (owner, convId) => (lists[owner] || []).find((c) => c.id === convId);
+  const recount = (owner, convId) => { const c = row(owner, convId); if (c) c.unread = unread(owner, convId); return c; };
+  function badges() {
+    const counts = {};
+    for (const [owner, items] of Object.entries(lists)) { const n = items.reduce((a, c) => a + c.unread, 0); if (n) counts[owner] = n; }
+    return { type: 'talk.badges', counts };
+  }
+  const ack = (reqId, error) => ({ type: 'ack', reqId, ok: false, error });
+  function handle(f) {
+    if (f.type === 'talk.open') {
+      const items = (lists[f.agentId] || []).slice().sort((a, b) => b.lastAt - a.lastAt);
+      return [{ type: 'talk.list', reqId: f.reqId, agentId: f.agentId, items: items.slice(0, 200), more: items.length > 200 }];
+    }
+    if (f.type === 'talk.close') return [];
+    const all = msgs[`${f.agentId} ${f.convId}`];
+    if (!all || !row(f.agentId, f.convId)) return [ack(f.reqId, 'no such conversation')];
+    if (f.type === 'talk.get') {
+      let end = all.length;
+      if (f.before !== undefined) { end = all.findIndex((m) => m.id === f.before); if (end < 0) return [ack(f.reqId, 'no such message')]; }
+      const start = Math.max(0, end - (f.limit || 100));
+      return [{ type: 'talk.messages', reqId: f.reqId, agentId: f.agentId, convId: f.convId, items: all.slice(start, end), more: start > 0 }];
+    }
+    if (f.type === 'talk.seen') {
+      const before = JSON.stringify(badges()), k = `${f.agentId} ${f.convId}`;
+      seen[k] = Math.max(seen[k] || 0, f.upTo);
+      const out = [{ type: 'talk.update', agentId: f.agentId, ops: [{ op: 'conv', conv: recount(f.agentId, f.convId) }] }];
+      const after = badges();
+      if (JSON.stringify(after) !== before) out.push(after);
+      return out;
+    }
+    return [ack(f.reqId, 'unknown request')];
+  }
+  /* One frame of the data's script, applied to the state; what goes out is recounted from the state (a seen before it
+     counts), so the badge and the rows never disagree with what the page told the stand-in. */
+  function apply(frame) {
+    const f = moved(frame);
+    if (f.type === 'talk.badges') return [badges()];
+    if (f.type !== 'talk.update') return [];
+    const owner = f.agentId, ops = [];
+    for (const op of f.ops) {
+      if (op.op === 'message') {
+        const key = `${owner} ${op.convId}`, list = msgs[key] || (msgs[key] = []);
+        const k = list.findIndex((m) => m.id === op.message.id);
+        if (k >= 0) list[k] = op.message; else { list.push(op.message); list.sort((a, b) => a.at - b.at); }
+        ops.push(op);
+      } else if (op.op === 'conv') {
+        const items = lists[owner] || (lists[owner] = []), k = items.findIndex((c) => c.id === op.conv.id);
+        if (k >= 0) items[k] = op.conv; else items.push(op.conv);
+        ops.push({ op: 'conv', conv: recount(owner, op.conv.id) });
+      } else if (op.op === 'remove') {
+        lists[owner] = (lists[owner] || []).filter((c) => c.id !== op.convId);
+        delete msgs[`${owner} ${op.convId}`];
+        ops.push(op);
+      }
+    }
+    return ops.length ? [{ type: 'talk.update', agentId: owner, ops }] : [];
+  }
+  return { handle, badges, apply, script: data.script };
+}
+/* talk-demo:end */
+const TALK_SOCK = { open: null, stand: null, played: new Set() };
+const talkStand = () => TALK_SOCK.stand || (TALK_SOCK.stand = talkStandIn(TALK_DEMO, Date.now()));
+/* Frames reach the page a moment later, as from the socket; an update only for the robot this "socket" has open. */
+function talkDemoDeliver(frames) {
+  for (const f of frames) {
+    if (f.type === 'ack') continue;
+    if (f.type === 'talk.update' && f.agentId !== TALK_SOCK.open) continue;
+    setTimeout(() => talkReceive(f), 30);
+  }
+}
+/* The script's frames due by t seconds (each once). */
+function talkDemoPlay(t) {
+  const S = talkStand();
+  S.script.forEach((x, k) => { if (x.t <= t && !TALK_SOCK.played.has(k)) { TALK_SOCK.played.add(k); talkDemoDeliver(S.apply(x.frame)); } });
+}
+Object.assign(SOURCE, {
+  talkAgentId: (label) => (DEF[label] ? label : null),   // the demo's talks name the robots by their labels
+  talkLabel: (agentId) => (agentId && DEF[agentId] ? agentId : null),
+  /* One request, already checked against the contract (58-talk.js talkFrame). Resolves { ok, data } / { ok: false, error }. */
+  talkSend(frame) {
+    if (frame.type === 'talk.open') TALK_SOCK.open = frame.agentId;
+    if (frame.type === 'talk.close') TALK_SOCK.open = null;
+    const out = talkStand().handle(frame);
+    const fail = out.find((f) => f.type === 'ack' && f.reqId === frame.reqId);
+    const answer = out.find((f) => f.type === 'talk.messages' && f.reqId === frame.reqId);
+    talkDemoDeliver(out.filter((f) => f !== answer));
+    return new Promise((resolve) => setTimeout(() => resolve(fail ? { ok: false, error: fail.error } : { ok: true, data: answer || null }), 30));
+  },
+  /* The e2e's hand on the script: play what is due by t seconds. */
+  talkDemo: { play: (t) => talkDemoPlay(t) },
+});
+setTimeout(() => {
+  talkDemoDeliver([talkStand().badges()]);   // as the server sends it right after auth
+  if (new URLSearchParams(location.search).get('talkhold') !== '1') {
+    for (const t of [...new Set(talkStand().script.map((x) => x.t))]) setTimeout(() => talkDemoPlay(t), t * 1000);
+  }
+}, 0);
+// ---- web/js/31-talk-demo-data.js ----
+// The talk view's demo data: frames as jui_cli/viz/talk_contract.json says (data only, no code). Read by the demo
+// source in place of the server's talk.* frames. Checked by tests/test_viz_talk_demo_data.py.
+// eslint-disable-next-line no-unused-vars
+const TALK_DEMO = {
+ "about": "The talk view's demo data (frames as talk_contract.json says), for the demo page only. Times are ms around base; the page moves them by its own clock (now - base). script: frames that arrive t seconds into the demo.",
+ "contractVersion": 2,
+ "base": 1792300000000,
+ "badges": {
+  "type": "talk.badges",
+  "counts": {
+   "a0": 2
+  }
+ },
+ "lists": {
+  "a0": {
+   "type": "talk.list",
+   "agentId": "a0",
+   "items": [
+    {
+     "id": "t-e7be89fd2788347b",
+     "owner": "a0",
+     "peer": {
+      "key": "4f",
+      "agentId": "4f",
+      "sessionId": "4f2b0000-0000-4000-8000-00000000004f",
+      "name": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+      "kind": "session",
+      "alive": true,
+      "goneAt": null,
+      "removeAt": null
+     },
+     "lastAt": 1792299520000,
+     "preview": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
+     "lastDir": "in",
+     "unread": 1,
+     "count": 1
+    },
+    {
+     "id": "t-70adb9b17963bc5a",
+     "owner": "a0",
+     "peer": {
+      "key": "b4",
+      "agentId": "b4",
+      "sessionId": "b47e0000-0000-4000-8000-0000000000b4",
+      "name": "shop-app-signup",
+      "kind": "session",
+      "alive": true,
+      "goneAt": null,
+      "removeAt": null
+     },
+     "lastAt": 1792299400000,
+     "preview": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+     "lastDir": "out",
+     "unread": 1,
+     "count": 4
+    },
+    {
+     "id": "t-56ee3add5d59df3a",
+     "owner": "a0",
+     "peer": {
+      "key": "x:cloud-reviewer",
+      "agentId": null,
+      "sessionId": null,
+      "name": "cloud-reviewer",
+      "kind": "external",
+      "alive": false,
+      "goneAt": 1792298800000,
+      "removeAt": 1792302400000
+     },
+     "lastAt": 1792298800000,
+     "preview": "レビューをお願いします（クラウドの相手へ）",
+     "lastDir": "out",
+     "unread": 0,
+     "count": 1
+    },
+    {
+     "id": "t-68f5487e3df0ef59",
+     "owner": "a0",
+     "peer": {
+      "key": "a3",
+      "agentId": "a3",
+      "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+      "name": "サブエージェント a3（jsonui-define）",
+      "kind": "subagent",
+      "alive": true,
+      "goneAt": null,
+      "removeAt": null
+     },
+     "lastAt": 1792298500000,
+     "preview": "足しました。doc_validate_spec は緑です。",
+     "lastDir": "in",
+     "unread": 0,
+     "count": 2
+    },
+    {
+     "id": "t-d74ea5e94db195e1",
+     "owner": "a0",
+     "peer": {
+      "key": "d8",
+      "agentId": "d8",
+      "sessionId": "d8a50000-0000-4000-8000-0000000000d8",
+      "name": "shop-app-payment",
+      "kind": "session",
+      "alive": false,
+      "goneAt": 1792299700000,
+      "removeAt": 1792303300000
+     },
+     "lastAt": 1792297120000,
+     "preview": "シミュレーターを待っています。空いたら流します。",
+     "lastDir": "in",
+     "unread": 0,
+     "count": 2
+    }
+   ],
+   "more": false
+  },
+  "b4": {
+   "type": "talk.list",
+   "agentId": "b4",
+   "items": [
+    {
+     "id": "t-70adb9b17963bc5a",
+     "owner": "b4",
+     "peer": {
+      "key": "a0",
+      "agentId": "a0",
+      "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+      "name": "shop-app-main",
+      "kind": "session",
+      "alive": true,
+      "goneAt": null,
+      "removeAt": null
+     },
+     "lastAt": 1792299400000,
+     "preview": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+     "lastDir": "in",
+     "unread": 0,
+     "count": 4
+    }
+   ],
+   "more": false
+  },
+  "a3": {
+   "type": "talk.list",
+   "agentId": "a3",
+   "items": [
+    {
+     "id": "t-68f5487e3df0ef59",
+     "owner": "a3",
+     "peer": {
+      "key": "a0",
+      "agentId": "a0",
+      "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+      "name": "shop-app-main",
+      "kind": "session",
+      "alive": true,
+      "goneAt": null,
+      "removeAt": null
+     },
+     "lastAt": 1792298500000,
+     "preview": "足しました。doc_validate_spec は緑です。",
+     "lastDir": "out",
+     "unread": 0,
+     "count": 2
+    }
+   ],
+   "more": false
+  },
+  "4f": {
+   "type": "talk.list",
+   "agentId": "4f",
+   "items": [
+    {
+     "id": "t-e7be89fd2788347b",
+     "owner": "4f",
+     "peer": {
+      "key": "a0",
+      "agentId": "a0",
+      "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+      "name": "shop-app-main",
+      "kind": "session",
+      "alive": true,
+      "goneAt": null,
+      "removeAt": null
+     },
+     "lastAt": 1792299520000,
+     "preview": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
+     "lastDir": "out",
+     "unread": 0,
+     "count": 1
+    }
+   ],
+   "more": false
+  },
+  "d8": {
+   "type": "talk.list",
+   "agentId": "d8",
+   "items": [
+    {
+     "id": "t-d74ea5e94db195e1",
+     "owner": "d8",
+     "peer": {
+      "key": "a0",
+      "agentId": "a0",
+      "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+      "name": "shop-app-main",
+      "kind": "session",
+      "alive": true,
+      "goneAt": null,
+      "removeAt": null
+     },
+     "lastAt": 1792297120000,
+     "preview": "シミュレーターを待っています。空いたら流します。",
+     "lastDir": "out",
+     "unread": 0,
+     "count": 2
+    }
+   ],
+   "more": false
+  }
+ },
+ "messages": {
+  "a0 t-70adb9b17963bc5a": {
+   "type": "talk.messages",
+   "reqId": 0,
+   "agentId": "a0",
+   "convId": "t-70adb9b17963bc5a",
+   "items": [
+    {
+     "id": "m-demo-0001-0000-4000-8000-000000000000",
+     "msgId": "demo-0001-0000-4000-8000-000000000000",
+     "convId": "t-70adb9b17963bc5a",
+     "dir": "out",
+     "fromName": "shop-app-main",
+     "toName": "shop-app-signup",
+     "at": 1792297480000,
+     "deliveredAt": 1792297480800,
+     "readAt": 1792297481600,
+     "state": "read",
+     "text": "会員登録の画面、進み具合はどう？",
+     "cut": false,
+     "summary": "会員登録の進み具合",
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    },
+    {
+     "id": "m-demo-0002-0000-4000-8000-000000000000",
+     "msgId": "demo-0002-0000-4000-8000-000000000000",
+     "convId": "t-70adb9b17963bc5a",
+     "dir": "in",
+     "fromName": "shop-app-signup",
+     "toName": "shop-app-main",
+     "at": 1792297600000,
+     "deliveredAt": 1792297600800,
+     "readAt": 1792297601600,
+     "state": "read",
+     "text": "いま入力の検証を書いています。30 分ほどで出せます。",
+     "cut": false,
+     "summary": null,
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    },
+    {
+     "id": "m-demo-0003-0000-4000-8000-000000000000",
+     "msgId": "demo-0003-0000-4000-8000-000000000000",
+     "convId": "t-70adb9b17963bc5a",
+     "dir": "in",
+     "fromName": "shop-app-signup",
+     "toName": "shop-app-main",
+     "at": 1792299280000,
+     "deliveredAt": 1792299280800,
+     "readAt": 1792299281600,
+     "state": "read",
+     "text": "会員登録の画面を仕上げました。確認してほしい点は次のとおりです。\n\n1. **メールアドレス**の入力欄は、確認用の欄と一致しないとき `送信` を押せないようにしました。\n2. パスワードは 8 文字以上、英字と数字を含むこと。弱いときは赤い文で理由を出します。\n3. 利用規約のリンクは別画面で開きます（戻ると入力は残ります）。\n\nテスト: `jsonui-test run tests/screens/signup` で 14 件すべて通りました。\niOS と Android のスクリーンショットは docs/screens/signup/ に置いてあります。\n<script>alert(1)</script> のような文字列も、そのまま文字として出ること（escape の見本）。\n残り: 住所の自動入力は次の列車で。",
+     "cut": false,
+     "summary": "会員登録の画面を仕上げた",
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    },
+    {
+     "id": "m-demo-0004-0000-4000-8000-000000000000",
+     "msgId": "demo-0004-0000-4000-8000-000000000000",
+     "convId": "t-70adb9b17963bc5a",
+     "dir": "out",
+     "fromName": "shop-app-main",
+     "toName": "shop-app-signup",
+     "at": 1792299400000,
+     "deliveredAt": 1792299400800,
+     "readAt": null,
+     "state": "delivered",
+     "text": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+     "cut": false,
+     "summary": null,
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    }
+   ],
+   "more": false
+  },
+  "a0 t-68f5487e3df0ef59": {
+   "type": "talk.messages",
+   "reqId": 0,
+   "agentId": "a0",
+   "convId": "t-68f5487e3df0ef59",
+   "items": [
+    {
+     "id": "u-toolu_demo_0005",
+     "msgId": null,
+     "convId": "t-68f5487e3df0ef59",
+     "dir": "out",
+     "fromName": "shop-app-main",
+     "toName": "サブエージェント a3（jsonui-define）",
+     "at": 1792298200000,
+     "deliveredAt": 1792298200800,
+     "readAt": 1792298201600,
+     "state": "read",
+     "text": "signup.spec.json の項目を 3 つ足して、検証を通してください。",
+     "cut": false,
+     "summary": null,
+     "seen": "both",
+     "via": "subagent",
+     "merged": false
+    },
+    {
+     "id": "u-toolu_demo_0006",
+     "msgId": null,
+     "convId": "t-68f5487e3df0ef59",
+     "dir": "in",
+     "fromName": "サブエージェント a3（jsonui-define）",
+     "toName": "shop-app-main",
+     "at": 1792298500000,
+     "deliveredAt": 1792298500800,
+     "readAt": 1792298501600,
+     "state": "read",
+     "text": "足しました。doc_validate_spec は緑です。",
+     "cut": false,
+     "summary": null,
+     "seen": "both",
+     "via": "parent",
+     "merged": false
+    }
+   ],
+   "more": false
+  },
+  "a0 t-56ee3add5d59df3a": {
+   "type": "talk.messages",
+   "reqId": 0,
+   "agentId": "a0",
+   "convId": "t-56ee3add5d59df3a",
+   "items": [
+    {
+     "id": "u-toolu_demo_0007",
+     "msgId": null,
+     "convId": "t-56ee3add5d59df3a",
+     "dir": "out",
+     "fromName": "shop-app-main",
+     "toName": "cloud-reviewer",
+     "at": 1792298800000,
+     "deliveredAt": null,
+     "readAt": null,
+     "state": "undelivered",
+     "text": "レビューをお願いします（クラウドの相手へ）",
+     "cut": false,
+     "summary": null,
+     "seen": "sender",
+     "via": "external",
+     "merged": false
+    }
+   ],
+   "more": false
+  },
+  "a0 t-e7be89fd2788347b": {
+   "type": "talk.messages",
+   "reqId": 0,
+   "agentId": "a0",
+   "convId": "t-e7be89fd2788347b",
+   "items": [
+    {
+     "id": "m-demo-0008-0000-4000-8000-000000000000",
+     "msgId": "demo-0008-0000-4000-8000-000000000000",
+     "convId": "t-e7be89fd2788347b",
+     "dir": "in",
+     "fromName": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+     "toName": "shop-app-main",
+     "at": 1792299520000,
+     "deliveredAt": 1792299520800,
+     "readAt": 1792299521600,
+     "state": "read",
+     "text": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
+     "cut": false,
+     "summary": "2.3.7 の範囲",
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    }
+   ],
+   "more": false
+  },
+  "a0 t-d74ea5e94db195e1": {
+   "type": "talk.messages",
+   "reqId": 0,
+   "agentId": "a0",
+   "convId": "t-d74ea5e94db195e1",
+   "items": [
+    {
+     "id": "m-demo-0009-0000-4000-8000-000000000000",
+     "msgId": "demo-0009-0000-4000-8000-000000000000",
+     "convId": "t-d74ea5e94db195e1",
+     "dir": "out",
+     "fromName": "shop-app-main",
+     "toName": "shop-app-payment",
+     "at": 1792297000000,
+     "deliveredAt": 1792297000800,
+     "readAt": 1792297001600,
+     "state": "read",
+     "text": "決済の画面のテスト、止まっていますか？",
+     "cut": false,
+     "summary": null,
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    },
+    {
+     "id": "m-demo-0010-0000-4000-8000-000000000000",
+     "msgId": "demo-0010-0000-4000-8000-000000000000",
+     "convId": "t-d74ea5e94db195e1",
+     "dir": "in",
+     "fromName": "shop-app-payment",
+     "toName": "shop-app-main",
+     "at": 1792297120000,
+     "deliveredAt": 1792297120800,
+     "readAt": 1792297121600,
+     "state": "read",
+     "text": "シミュレーターを待っています。空いたら流します。",
+     "cut": false,
+     "summary": null,
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    }
+   ],
+   "more": false
+  },
+  "b4 t-70adb9b17963bc5a": {
+   "type": "talk.messages",
+   "reqId": 0,
+   "agentId": "b4",
+   "convId": "t-70adb9b17963bc5a",
+   "items": [
+    {
+     "id": "m-demo-0001-0000-4000-8000-000000000000",
+     "msgId": "demo-0001-0000-4000-8000-000000000000",
+     "convId": "t-70adb9b17963bc5a",
+     "dir": "in",
+     "fromName": "shop-app-main",
+     "toName": "shop-app-signup",
+     "at": 1792297480000,
+     "deliveredAt": 1792297480800,
+     "readAt": 1792297481600,
+     "state": "read",
+     "text": "会員登録の画面、進み具合はどう？",
+     "cut": false,
+     "summary": "会員登録の進み具合",
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    },
+    {
+     "id": "m-demo-0002-0000-4000-8000-000000000000",
+     "msgId": "demo-0002-0000-4000-8000-000000000000",
+     "convId": "t-70adb9b17963bc5a",
+     "dir": "out",
+     "fromName": "shop-app-signup",
+     "toName": "shop-app-main",
+     "at": 1792297600000,
+     "deliveredAt": 1792297600800,
+     "readAt": 1792297601600,
+     "state": "read",
+     "text": "いま入力の検証を書いています。30 分ほどで出せます。",
+     "cut": false,
+     "summary": null,
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    },
+    {
+     "id": "m-demo-0003-0000-4000-8000-000000000000",
+     "msgId": "demo-0003-0000-4000-8000-000000000000",
+     "convId": "t-70adb9b17963bc5a",
+     "dir": "out",
+     "fromName": "shop-app-signup",
+     "toName": "shop-app-main",
+     "at": 1792299280000,
+     "deliveredAt": 1792299280800,
+     "readAt": 1792299281600,
+     "state": "read",
+     "text": "会員登録の画面を仕上げました。確認してほしい点は次のとおりです。\n\n1. **メールアドレス**の入力欄は、確認用の欄と一致しないとき `送信` を押せないようにしました。\n2. パスワードは 8 文字以上、英字と数字を含むこと。弱いときは赤い文で理由を出します。\n3. 利用規約のリンクは別画面で開きます（戻ると入力は残ります）。\n\nテスト: `jsonui-test run tests/screens/signup` で 14 件すべて通りました。\niOS と Android のスクリーンショットは docs/screens/signup/ に置いてあります。\n<script>alert(1)</script> のような文字列も、そのまま文字として出ること（escape の見本）。\n残り: 住所の自動入力は次の列車で。",
+     "cut": false,
+     "summary": "会員登録の画面を仕上げた",
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    },
+    {
+     "id": "m-demo-0004-0000-4000-8000-000000000000",
+     "msgId": "demo-0004-0000-4000-8000-000000000000",
+     "convId": "t-70adb9b17963bc5a",
+     "dir": "in",
+     "fromName": "shop-app-main",
+     "toName": "shop-app-signup",
+     "at": 1792299400000,
+     "deliveredAt": 1792299400800,
+     "readAt": null,
+     "state": "delivered",
+     "text": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+     "cut": false,
+     "summary": null,
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    }
+   ],
+   "more": false
+  },
+  "a3 t-68f5487e3df0ef59": {
+   "type": "talk.messages",
+   "reqId": 0,
+   "agentId": "a3",
+   "convId": "t-68f5487e3df0ef59",
+   "items": [
+    {
+     "id": "u-toolu_demo_0005",
+     "msgId": null,
+     "convId": "t-68f5487e3df0ef59",
+     "dir": "in",
+     "fromName": "shop-app-main",
+     "toName": "サブエージェント a3（jsonui-define）",
+     "at": 1792298200000,
+     "deliveredAt": 1792298200800,
+     "readAt": 1792298201600,
+     "state": "read",
+     "text": "signup.spec.json の項目を 3 つ足して、検証を通してください。",
+     "cut": false,
+     "summary": null,
+     "seen": "both",
+     "via": "subagent",
+     "merged": false
+    },
+    {
+     "id": "u-toolu_demo_0006",
+     "msgId": null,
+     "convId": "t-68f5487e3df0ef59",
+     "dir": "out",
+     "fromName": "サブエージェント a3（jsonui-define）",
+     "toName": "shop-app-main",
+     "at": 1792298500000,
+     "deliveredAt": 1792298500800,
+     "readAt": 1792298501600,
+     "state": "read",
+     "text": "足しました。doc_validate_spec は緑です。",
+     "cut": false,
+     "summary": null,
+     "seen": "both",
+     "via": "parent",
+     "merged": false
+    }
+   ],
+   "more": false
+  },
+  "4f t-e7be89fd2788347b": {
+   "type": "talk.messages",
+   "reqId": 0,
+   "agentId": "4f",
+   "convId": "t-e7be89fd2788347b",
+   "items": [
+    {
+     "id": "m-demo-0008-0000-4000-8000-000000000000",
+     "msgId": "demo-0008-0000-4000-8000-000000000000",
+     "convId": "t-e7be89fd2788347b",
+     "dir": "out",
+     "fromName": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+     "toName": "shop-app-main",
+     "at": 1792299520000,
+     "deliveredAt": 1792299520800,
+     "readAt": 1792299521600,
+     "state": "read",
+     "text": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
+     "cut": false,
+     "summary": "2.3.7 の範囲",
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    }
+   ],
+   "more": false
+  },
+  "d8 t-d74ea5e94db195e1": {
+   "type": "talk.messages",
+   "reqId": 0,
+   "agentId": "d8",
+   "convId": "t-d74ea5e94db195e1",
+   "items": [
+    {
+     "id": "m-demo-0009-0000-4000-8000-000000000000",
+     "msgId": "demo-0009-0000-4000-8000-000000000000",
+     "convId": "t-d74ea5e94db195e1",
+     "dir": "in",
+     "fromName": "shop-app-main",
+     "toName": "shop-app-payment",
+     "at": 1792297000000,
+     "deliveredAt": 1792297000800,
+     "readAt": 1792297001600,
+     "state": "read",
+     "text": "決済の画面のテスト、止まっていますか？",
+     "cut": false,
+     "summary": null,
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    },
+    {
+     "id": "m-demo-0010-0000-4000-8000-000000000000",
+     "msgId": "demo-0010-0000-4000-8000-000000000000",
+     "convId": "t-d74ea5e94db195e1",
+     "dir": "out",
+     "fromName": "shop-app-payment",
+     "toName": "shop-app-main",
+     "at": 1792297120000,
+     "deliveredAt": 1792297120800,
+     "readAt": 1792297121600,
+     "state": "read",
+     "text": "シミュレーターを待っています。空いたら流します。",
+     "cut": false,
+     "summary": null,
+     "seen": "both",
+     "via": "session",
+     "merged": false
+    }
+   ],
+   "more": false
+  }
+ },
+ "script": [
+  {
+   "t": 20,
+   "frame": {
+    "type": "talk.update",
+    "agentId": "a0",
+    "ops": [
+     {
+      "op": "message",
+      "convId": "t-70adb9b17963bc5a",
+      "message": {
+       "id": "m-demo-0011-0000-4000-8000-000000000000",
+       "msgId": "demo-0011-0000-4000-8000-000000000000",
+       "convId": "t-70adb9b17963bc5a",
+       "dir": "in",
+       "fromName": "shop-app-signup",
+       "toName": "shop-app-main",
+       "at": 1792300020000,
+       "deliveredAt": 1792300020700,
+       "readAt": null,
+       "state": "delivered",
+       "text": "スクリーンショットを差し替えました。もう一度見てください。",
+       "cut": false,
+       "summary": "差し替え",
+       "seen": "both",
+       "via": "session",
+       "merged": false
+      }
+     },
+     {
+      "op": "conv",
+      "conv": {
+       "id": "t-70adb9b17963bc5a",
+       "owner": "a0",
+       "peer": {
+        "key": "b4",
+        "agentId": "b4",
+        "sessionId": "b47e0000-0000-4000-8000-0000000000b4",
+        "name": "shop-app-signup",
+        "kind": "session",
+        "alive": true,
+        "goneAt": null,
+        "removeAt": null
+       },
+       "lastAt": 1792300020000,
+       "preview": "スクリーンショットを差し替えました。もう一度見てください。",
+       "lastDir": "in",
+       "unread": 2,
+       "count": 5
+      }
+     }
+    ]
+   }
+  },
+  {
+   "t": 20,
+   "frame": {
+    "type": "talk.badges",
+    "counts": {
+     "a0": 3
+    }
+   }
+  },
+  {
+   "t": 30,
+   "frame": {
+    "type": "talk.update",
+    "agentId": "a0",
+    "ops": [
+     {
+      "op": "message",
+      "convId": "t-70adb9b17963bc5a",
+      "message": {
+       "id": "m-demo-0004-0000-4000-8000-000000000000",
+       "msgId": "demo-0004-0000-4000-8000-000000000000",
+       "convId": "t-70adb9b17963bc5a",
+       "dir": "out",
+       "fromName": "shop-app-main",
+       "toName": "shop-app-signup",
+       "at": 1792299400000,
+       "deliveredAt": 1792299400800,
+       "readAt": 1792300030000,
+       "state": "read",
+       "text": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+       "cut": false,
+       "summary": null,
+       "seen": "both",
+       "via": "session",
+       "merged": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "t": 45,
+   "frame": {
+    "type": "talk.update",
+    "agentId": "a0",
+    "ops": [
+     {
+      "op": "remove",
+      "convId": "t-d74ea5e94db195e1",
+      "reason": "peer-ended"
+     }
+    ]
+   }
+  }
+ ]
+};
 // ---- web/js/40-scene.js ----
 
 /* ---------- 3D office ---------- */
@@ -2310,6 +3297,11 @@ function drawSpecBoard(model, now) {
   SHOP_IDX.forEach((i, pos) => { const t = sbTile(pos); drawSpecTile(ctx, P, ST, model.specs[i], t.x, t.y, SB.tw, SB.th, now, SBG); });
   sbTex.needsUpdate = true;
 }
+/* A role's pill on a canvas (the spec board's tiles, the task board's notes): pillBg / pillInk, as the HTML pills. */
+function drawRolePill(ctx, role, label, x, y, w, h, font, baseline) {
+  rr(ctx, x, y, w, h, h / 2); ctx.fillStyle = pillBg(role); ctx.fill();
+  ctx.fillStyle = pillInk(role); ctx.font = `700 ${font}px ${FONT_MONO}`; ctx.textAlign = 'center'; ctx.fillText(label, x + w / 2, y + baseline); ctx.textAlign = 'left';
+}
 function drawSpecTile(ctx, P, ST, s, x, y, w, h, now, g) {
   const todo = s.bucket === 'todo', role = s.by ? DEF[s.by].role : null, sw = segW(w, g);
   rr(ctx, x, y, w, h, 14);
@@ -2321,8 +3313,7 @@ function drawSpecTile(ctx, P, ST, s, x, y, w, h, now, g) {
   fitText(ctx, s.name, x + g.pad, y + g.nameY, w - g.pad * 2 - (role ? g.pillW + 8 : 0));
   if (role) {
     const px = x + w - g.pad - g.pillW, py = y + g.nameY - g.pillH + 6;
-    rr(ctx, px, py, g.pillW, g.pillH, g.pillH / 2); ctx.fillStyle = ROLES[role].color; ctx.fill();
-    ctx.fillStyle = ROLE_INK[role] || '#ffffff'; ctx.font = `700 ${g.pillFont}px ${FONT_MONO}`; ctx.textAlign = 'center'; ctx.fillText(s.by, px + g.pillW / 2, py + g.pillH * 0.72); ctx.textAlign = 'left';
+    drawRolePill(ctx, role, s.by, px, py, g.pillW, g.pillH, g.pillFont, g.pillH * 0.72);
   }
   ctx.font = `700 ${g.status}px ${FONT_BODY}`; ctx.fillStyle = todo ? P.todoInk : ST[s.status.kind][1];
   fitText(ctx, s.status.text, x + g.pad, y + g.statusY, w - g.pad * 2);
@@ -2439,8 +3430,7 @@ function drawTaskBoard(full, project = 'shop', board = null) {
         ctx.fillStyle = P.warnInk; ctx.font = `700 14px ${FONT_BODY}`; ctx.textAlign = 'center'; ctx.fillText('許可待ち', nx + nw - 43, ny + 26); ctx.textAlign = 'left';
       } else if (task.owner) {
         const role = DEF[task.owner].role;
-        rr(ctx, nx + nw - 50, ny + 11, 40, 20, 10); ctx.fillStyle = ROLES[role].color; ctx.fill();
-        ctx.fillStyle = ROLE_INK[role] || '#ffffff'; ctx.font = `700 13px ${FONT_MONO}`; ctx.textAlign = 'center'; ctx.fillText(task.owner, nx + nw - 30, ny + 26); ctx.textAlign = 'left';
+        drawRolePill(ctx, role, task.owner, nx + nw - 50, ny + 11, 40, 20, 13, 15);
       }
       ctx.fillStyle = P.ink; ctx.font = `700 16px ${FONT_BODY}`;
       wrapText(ctx, task.subject, nx + 10, ny + 49, nw - 20, 20, 2);
@@ -3321,6 +4311,9 @@ function liveUpdateRobots(nowSec, dt) {
     R.robot.lampState = playing || R.git ? st.state : null;   // to, at and back from play, a break, the shredder or the box: the real state's lamp
     const vis = R.git ? gitLook(R) : how === 'walking' ? (playing ? 'stroll' : 'carry') : how === 'playing' || how === 'shredding' ? 'idle' : st.state;
     if (vis !== R.robot.state) setRobotState(R.robot, vis);
+    // a subagent called: the whistle from the call's start until its fixed end, only at the desk (10-20)
+    R.robot.launch = forced(R.robot, 'launch', !!(st.whistle && vizNow() < st.whistle.until) && !playing && !R.git && how !== 'walking' && !R.path.length);
+    if (vis === 'reading') R.robot.readKind = st.readKind || null;   // kept after it: the dictionary fades out as it came (10-20)
     // over its head: the errand under way says its own line (one robot never runs both, gitTick / shredTick); else, of
     // what it deleted (SHRED.labelMs after) and the box's line (GITBOX.showMs after), the newer one; else what it does
     const shredLine = st.shred && (R.shred || vizNow() - st.shred.at < SHRED.labelMs) ? `${st.shred.ok ? 'シュレッダー' : '削除できず'} ${st.shred.label}` : '';
@@ -4909,6 +5902,7 @@ function update3D(model, nowSec, dt) {
       const st = robotState[R.def.id];
       setRobotTired(R.robot, forced(R.robot, 'tired', demoTired(R.def.id)));
       R.robot.heavy = forced(R.robot, 'heavy', demoHeavy(R.def.id, model.t));
+      R.robot.launch = forced(R.robot, 'launch', demoLaunch(R.def.id, model.t));   // a subagent called (10-20)
       if (st.walk) { R.robot.root.position.x = st.walk.x; R.robot.root.position.z = st.walk.z; R.robot.root.rotation.y = st.walk.ry; }
       if (st.state !== R.robot.state) setRobotState(R.robot, st.state);
       if (st.act !== R.act) { R.act = st.act; R.text.textContent = st.act; }
@@ -6166,6 +7160,8 @@ const rawDetails = (p) => {
 /* ---------- a robot up close: what it is doing, its tasks and its prompts ---------- */
 const rbEl = $('rb');
 const rbState = { id: null };
+/* The chat icon of トーク (58-talk.js): a speech bubble, drawn with the text's colour. */
+const TALK_ICON = '<svg class="rb-talk-icon" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3 4.5A2.5 2.5 0 0 1 5.5 2h9A2.5 2.5 0 0 1 17 4.5v6a2.5 2.5 0 0 1-2.5 2.5H9l-4 3.5V13h0A2 2 0 0 1 3 11z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="7.6" r="1" fill="currentColor"/><circle cx="10" cy="7.6" r="1" fill="currentColor"/><circle cx="13" cy="7.6" r="1" fill="currentColor"/></svg>';
 const CAM_DIR = new THREE.Vector3(0.25, 0.42, 0.87).normalize();
 /* ---------- the camera on a robot (requester, 10-18: "ズーム中も回転とか拡大縮小とかできるようにしたい",
    "ロボットの場所によってはこんな感じになって見えない") ----------
@@ -6349,6 +7345,7 @@ function closeRobot(keepZoom) {
   rbState.id = null;
   hideOverlay(rbEl);
   histSync();
+  talkSync();
   FOCUS.id = null;      // the next robot opened chooses its view afresh
   focusFadeSync();      // everything faint gets its own material back
   if (!keepZoom) zoomBack();
@@ -6459,7 +7456,7 @@ function renderRobot(model) {
       const [c, l] = x.perm ? ['st-waiting', '許可待ち'] : x.col === 'wait' ? [x.waitingFor === 'question' ? 'st-asking' : 'st-waiting', waitLabel(x)] : COL_STATE[x.col];
       return `<li><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="rt-${esc(x.key)}"><span class="state ${esc(c)}">${esc(l)}</span><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${x.harness ? `<span class="h-tag">${esc(x.harness)}</span>` : ''}${esc(x.subject)}</span>${!isMain || !x.owner ? '' : `<span class="rb-owner">${pill(x.owner, DEF[x.owner].role)}</span>`}</button></li>`;
     }).join('')}</ul>` : `<p class="rb-none">${isMain ? 'このセッションのタスク一覧は空' : '担当しているタスクはない'}</p>`;
-    return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? d.title || `${id} のメインセッション` : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.title ? `${id} のメインセッション · ${d.head}` : d.agent} · ${room}` : `${ROLE_JA[d.role]} · ${sess} セッションのサブエージェント · ${room}`)}</p></div><div class="rb-side"><button type="button" class="wb-btn rb-clock" data-rb-clock data-fk="rb-clock" aria-haspopup="dialog" aria-describedby="rb-clock-why">退勤…</button><div class="rb-nav"><button type="button" class="rb-step" data-rb-step="-1" data-fk="rb-prev" aria-label="前のロボット（←）" title="前のロボット（←）">‹</button><button type="button" class="rb-step" data-rb-step="1" data-fk="rb-next" aria-label="次のロボット（→）" title="次のロボット（→）">›</button><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">← 3D に戻る</button></div></div><p class="rb-clock-why" id="rb-clock-why" data-rb-clock-why hidden></p></div>
+    return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? d.title || `${id} のメインセッション` : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.title ? `${id} のメインセッション · ${d.head}` : d.agent} · ${room}` : `${ROLE_JA[d.role]} · ${sess} セッションのサブエージェント · ${room}`)}</p></div><div class="rb-side"><div class="rb-menu"><button type="button" class="wb-btn rb-talk" data-rb-talk data-fk="rb-talk" aria-pressed="false" aria-label="トーク" title="トーク（SendMessage の会話）">${TALK_ICON}<span>トーク</span><span class="rb-talk-n" data-rb-talk-n hidden></span></button><button type="button" class="wb-btn rb-clock" data-rb-clock data-fk="rb-clock" aria-haspopup="dialog" aria-describedby="rb-clock-why">退勤…</button></div><div class="rb-nav"><button type="button" class="rb-step" data-rb-step="-1" data-fk="rb-prev" aria-label="前のロボット（←）" title="前のロボット（←）">‹</button><button type="button" class="rb-step" data-rb-step="1" data-fk="rb-next" aria-label="次のロボット（→）" title="次のロボット（→）">›</button><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">← 3D に戻る</button></div></div><p class="rb-clock-why" id="rb-clock-why" data-rb-clock-why hidden></p></div>
 <div class="rb-tabs"><button type="button" class="wb-btn rb-wide-btn" data-rb-wide data-fk="rb-wide" aria-pressed="false" hidden>広げる</button><div class="rb-tablist" role="tablist" aria-label="表示"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">今の様子</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">応答の履歴</button></div></div>
 <div class="rb-body rb-hist" data-rb-hist hidden aria-label="応答の履歴" tabindex="0"></div>
 <div class="rb-body" tabindex="0" aria-label="今の様子">
@@ -6518,6 +7515,7 @@ ${subs.length ? `<section class="rb-sec" aria-labelledby="rb-h-subs"><h3 id="rb-
   const testsEl = rbEl.querySelector('[data-rb-tests]');
   if (testsEl) setHTML(testsEl, robotTestsHTML(robotRuns(id)));   // rewritten on every refresh while a run moves
   histSync();   // 55-history.js: the tab shown, and the history kept fresh while it is
+  talkSync();   // 58-talk.js: the talk socket follows this robot, and its pane shows while トーク is on
   focusFadeSync();   // what stands between the camera and this robot, faint
 }
 
@@ -6843,10 +7841,18 @@ function notifyWaiting(kind, rows) {
     notifyEvent(kind, `${notifyServer()}:${kind}:${x.id}`, { id: x.id, who: x.who, task: x.task || null }, body);
   }
 }
+/* The question window as the page shows and offers it (ticket 2026-10-20): never over the server's cap (5 min, or
+   askMaxSec when shorter) — the --ask hook gives up there, so a longer choice cannot work; 2.3.5's 0 ("until
+   answered") and a saved 10 / 30 min are read as the cap. */
+const ASK_WAIT_CAP_SEC = 300;
+function askWaitCap(s) { return Math.min(ASK_WAIT_CAP_SEC, Number(s.askWaitCapSec) > 0 ? Number(s.askWaitCapSec) : ASK_WAIT_CAP_SEC); }
+function askWaitSecShown(s) { const cap = askWaitCap(s), v = Number(s.askWaitSec); return v > 0 && v <= cap ? v : cap; }
+function askWaitTextShown(s) { const v = askWaitSecShown(s); return v === Number(s.askWaitSec) ? s.askWaitText : (v < 60 ? `${v} 秒` : `${v / 60} 分`); }
+function askWaitChoicesShown(s) { const cap = askWaitCap(s); return (s.askWaitChoices || []).filter((c) => c > 0 && c <= cap); }
 function notifyAskLeft() {
   const s = NOTIFY.settings;
   if (!s) return 'viz で答えるか、ターミナルで';
-  return s.askWaitSec > 0 ? `viz で答えるか、${s.askWaitText}後にターミナルへ` : 'viz で答えるまで待ちます';
+  return `viz で答えるか、${askWaitTextShown(s)}後にターミナルへ`;
 }
 /* The page tells the server its question notifications are on (or no longer). */
 const notifyPresenceWanted = () => SOURCE.mode === 'live' && notifyGranted() && NOTIFY.on.ask;
@@ -6867,7 +7873,7 @@ function notifySettingsShow(settings) {
   $('btn-notify').hidden = !live;
   const chip = $('chip-askwait');
   chip.hidden = !live || !s;
-  if (s) setText(chip, s.askWaitSec > 0 ? `質問は viz で ${s.askWaitText}待つ` : '質問は viz で答えるまで待つ');
+  if (s) setText(chip, `質問は viz で ${askWaitTextShown(s)}待つ`);
   if (notifyEl.hidden) return;
   const state = !notifyCan() ? 'このブラウザは通知を出せません'
     : Notification.permission === 'granted' ? 'ブラウザの通知: 許可済み'
@@ -6878,11 +7884,12 @@ function notifySettingsShow(settings) {
   for (const el of notifyEl.querySelectorAll('[data-notify-kind]')) el.checked = !!NOTIFY.on[el.dataset.notifyKind];
   const sel = $('ask-wait');
   if (s) {
-    const label = (sec) => (sec <= 0 ? '答えるまで' : sec < 60 ? `${sec} 秒` : `${sec / 60} 分`);
-    const choices = s.askWaitChoices.includes(s.askWaitSec) ? s.askWaitChoices : [...s.askWaitChoices, s.askWaitSec];
+    const label = (sec) => (sec < 60 ? `${sec} 秒` : `${sec / 60} 分`);
+    const now = askWaitSecShown(s), offered = askWaitChoicesShown(s);
+    const choices = offered.includes(now) ? offered : [...offered, now];
     const sig = JSON.stringify(choices);
     if (sel.dataset.sig !== sig) { sel.dataset.sig = sig; sel.innerHTML = choices.map((c) => `<option value="${esc(String(c))}">${esc(label(c))}</option>`).join(''); }
-    sel.value = String(s.askWaitSec);
+    sel.value = String(now);
   }
 }
 function notifyOpenPanel(opener) {
@@ -7783,9 +8790,8 @@ function composePlace(pane, id) {
   box.hidden = !pane || HIST.tab !== 'history';
   // The card was rebuilt (50-panel.js, keyed) while the box had the focus, and the box is put back only now: refocus.
   const lost = rbEl._lostFk;
-  rbEl._lostFk = undefined;
   const again = lost !== undefined && !box.hidden ? box.querySelector('[data-fk="' + CSS.escape(lost) + '"]') : null;
-  if (again) again.focus({ preventScroll: true });
+  if (again) { rbEl._lostFk = undefined; again.focus({ preventScroll: true }); }   // not found here: the talk pane may hold it (58-talk.js)
   composePaint();
 }
 function composePaint() {
@@ -8050,6 +9056,8 @@ const FULLTEXT_LINES = [
   '.pg-toggle small',             // panel · セッション: a project group's summary (in its button)
   '#ticker .what',                // the log strip: an event's text (2.3.6: a cross-session message was cut there)
   '#ticker .kind',                // the log strip: an event's kind
+  '.talk-peer-name',                // card · トーク (2.3.7): the peer's name in the talk's header (in its button)
+  '.talk-row-name',                  // card · トーク: a peer's name in the list of talks (in its button)
 ].join(', ');
 const FULLTEXT = { el: null, anchor: null, owner: null, host: null, via: null };
 const fulltextCut = (el) => !!el && el.isConnected && el.scrollWidth > el.clientWidth + 1;
@@ -8150,6 +9158,533 @@ document.addEventListener('keydown', (e) => {   // first (capture): Esc closes t
   document.addEventListener('scroll', () => { if (FULLTEXT.anchor) fulltextPlace(); }, true);
   window.addEventListener('resize', later);
 }
+// ---- web/js/58-talk.js ----
+/* ---------- トーク: a robot's SendMessage conversations, as a chat (2.3.7, requester 10-20) ----------
+   「チャットアイコンをロボットのメニューに置いて、それ選んだらラインのトークっぽい画面でトークの一覧が表示される。トーク選ぶと詳細で
+   トークが見れる。新しいメッセージ受信したら一覧では通知が出て詳細ではメッセージが表示される。」 and (00:54) 「トークの詳細でヘッダーに
+   相手のbot名表示しってタップでそのbotに切り替えられるようにして。名前は一行で入らないなら省略で」.
+   The rulings (TALK_CONTRACT.md): read only — no box, no button and no request that sends; no browser notification (the
+   badge and the order of the list are the news); a talk whose peer ended goes when the server removes it.
+
+   The wire is talk_contract.json (version 2): the page asks talk.open / talk.get / talk.seen / talk.close and hears
+   talk.list / talk.messages / talk.update / talk.badges. Every request is built by talkFrame, which checks it against the
+   contract's rules first and refuses (null, nothing sent) what would not conform; tests/test_viz_talk_ui_frames.py runs
+   the block below under node and validates what it builds with talk_contract.validate, and pins these rules to the JSON.
+   Text from a transcript goes in through textContent (histMarkdown: escaped Markdown), never innerHTML. */
+/* talk-frames:begin */
+const TALK_RULES = {
+  agentId: '^[A-Za-z0-9_.:@-]+$', agentIdMax: 128,
+  convId: '^t-[0-9a-f]{16}$',
+  messageId: '^(m|u|r)-[A-Za-z0-9_.:@-]+$', messageIdMin: 3, messageIdMax: 200,
+  pageMax: 100,
+};
+const TALK_FIELDS = {   // the keys each request may carry (required first), as the contract's requests
+  'talk.open': { need: ['type', 'reqId', 'agentId'], may: [] },
+  'talk.close': { need: ['type'], may: ['reqId'] },
+  'talk.get': { need: ['type', 'reqId', 'agentId', 'convId'], may: ['before', 'limit'] },
+  'talk.seen': { need: ['type', 'reqId', 'agentId', 'convId', 'upTo'], may: [] },
+};
+const talkIsInt = (v) => typeof v === 'number' && Number.isInteger(v);
+const talkOkAgent = (v) => typeof v === 'string' && v.length >= 1 && v.length <= TALK_RULES.agentIdMax && new RegExp(TALK_RULES.agentId).test(v);
+const talkOkConv = (v) => typeof v === 'string' && new RegExp(TALK_RULES.convId).test(v);
+const talkOkMessage = (v) => typeof v === 'string' && v.length >= TALK_RULES.messageIdMin && v.length <= TALK_RULES.messageIdMax && new RegExp(TALK_RULES.messageId).test(v);
+/* Every way a request breaks the contract (empty: it conforms). */
+function talkCheck(f) {
+  const spec = f && typeof f === 'object' ? TALK_FIELDS[f.type] : null;
+  if (!spec) return ['not a talk request'];
+  const out = [];
+  for (const k of spec.need) if (!(k in f)) out.push(`missing ${k}`);
+  for (const k of Object.keys(f)) if (!spec.need.includes(k) && !spec.may.includes(k)) out.push(`unexpected ${k}`);
+  if ('reqId' in f && !(talkIsInt(f.reqId) || typeof f.reqId === 'string')) out.push('reqId');
+  if ('agentId' in f && !talkOkAgent(f.agentId)) out.push('agentId');
+  if ('convId' in f && !talkOkConv(f.convId)) out.push('convId');
+  if ('before' in f && !talkOkMessage(f.before)) out.push('before');
+  if ('limit' in f && !(talkIsInt(f.limit) && f.limit >= 1 && f.limit <= TALK_RULES.pageMax)) out.push('limit');
+  if ('upTo' in f && !(talkIsInt(f.upTo) && f.upTo >= 0)) out.push('upTo');
+  return out;
+}
+/* A request of `type` from `fields` (undefined fields left out), or null when it would not conform. */
+function talkFrame(type, fields) {
+  const f = { type };
+  for (const [k, v] of Object.entries(fields || {})) if (v !== undefined) f[k] = v;
+  return talkCheck(f).length ? null : f;
+}
+/* talk-frames:end */
+
+const TALK_END_PX = 24;        // this close to the bottom counts as at the end (as the history's)
+const TALK = {
+  on: false,                   // the talk pane shows on the card (instead of its tabs)
+  owner: null, agent: null,    // the card's robot (label) and its agentId
+  opened: null,                // the agentId this socket has talk.open'd
+  list: null, more: false, listError: '', listAt: 0,
+  conv: null,                  // the talk shown in detail (convId), or null: the list
+  want: null,                  // a talk to show once the card has switched to the peer (the header's press)
+  msgs: new Map(),             // convId -> { items, more, busy, error, loaded }
+  seenSent: new Map(),         // `${agent}|${convId}` -> upTo sent
+  seenWant: new Map(),         // `${agent}|${convId}` -> the newest at seen on screen, not sent yet
+  badges: {},                  // agentId -> unread (talk.badges; robots at 0 are not in it)
+  sent: [], refused: [],       // the requests sent and refused, for the tests (the last 200)
+  page: 30,                    // messages a talk.get asks for (≤ pageMax)
+  seq: 0, node: null, nodes: new Map(), atEnd: true, top: 0, newer: false, note: '',
+};
+const talkNow = () => Date.now();
+function talkTime(at, short) {
+  if (!Number.isFinite(at)) return '';
+  const d = new Date(at), n = new Date(talkNow());
+  const hm = d.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+  if (d.toDateString() === n.toDateString()) return hm;
+  return short ? `${d.getMonth() + 1}/${d.getDate()}` : `${d.getMonth() + 1}/${d.getDate()} ${hm}`;
+}
+
+/* ---------- requests ---------- */
+function talkSend(type, fields) {
+  const reqId = type === 'talk.close' ? undefined : `tk${++TALK.seq}`;
+  const frame = talkFrame(type, { reqId, ...fields });
+  if (!frame) { TALK.refused.push({ type, fields }); TALK.refused.splice(0, TALK.refused.length - 200); return Promise.resolve({ ok: false, error: 'refused' }); }
+  TALK.sent.push(frame); TALK.sent.splice(0, TALK.sent.length - 200);
+  return SOURCE.talkSend(frame);
+}
+/* The socket follows the card: the robot on the card is the one open (its list and its updates), none when it closes. */
+function talkFollow(agent) {
+  if (agent === TALK.opened) return;
+  if (!agent) { if (TALK.opened) talkSend('talk.close', {}); TALK.opened = null; return; }
+  TALK.opened = agent;
+  TALK.list = null; TALK.listError = ''; TALK.more = false; TALK.msgs.clear(); TALK.nodes.clear();
+  talkSend('talk.open', { agentId: agent }).then((got) => {
+    if (TALK.opened !== agent || got.ok) return;
+    TALK.listError = got.error === 'offline' ? 'サーバーにつながっていない（つながると読み直す）' : `トークを読めない（${got.error || '不明'}）`;
+    talkRender();
+  });
+}
+/* The socket closed or came back (live): the server forgot what was open, so it is opened again. */
+function talkConn(state) {
+  if (state === 'connected') { const a = TALK.opened; TALK.opened = null; if (a) { talkFollow(a); if (TALK.conv) talkLoad(TALK.conv, false); } }
+  else if (TALK.opened && !TALK.list) { TALK.listError = 'サーバーにつながっていない（つながると読み直す）'; talkRender(); }
+}
+async function talkLoad(convId, older) {
+  const agent = TALK.agent;
+  if (!agent || !convId) return;
+  const box = TALK.msgs.get(convId) || { items: [], more: false, busy: false, error: '', loaded: false };
+  TALK.msgs.set(convId, box);
+  if (box.busy || (older && (!box.more || !box.items.length))) return;
+  box.busy = true; box.error = '';
+  talkRender();
+  const got = await talkSend('talk.get', { agentId: agent, convId, before: older ? box.items[0].id : undefined, limit: TALK.page });
+  box.busy = false;
+  if (TALK.agent !== agent || TALK.msgs.get(convId) !== box) return;
+  if (!got.ok || !got.data || !Array.isArray(got.data.items)) {
+    box.error = got.error === 'offline' ? 'サーバーにつながっていない（つながると読み直す）' : `メッセージを読めない（${got.error || '不明'}）`;
+  } else {
+    const pane = talkPane(), keep = older && pane ? pane.scrollHeight - pane.scrollTop : null;
+    talkMerge(box, got.data.items);
+    if (older || !box.loaded) box.more = !!got.data.more;
+    box.loaded = true;
+    talkRender();
+    if (keep !== null && pane) { pane.scrollTop = pane.scrollHeight - keep; TALK.top = pane.scrollTop; }
+    return;
+  }
+  talkRender();
+}
+const talkOkMsg = (m) => m && typeof m === 'object' && talkOkMessage(m.id) && Number.isFinite(m.at) && (m.dir === 'in' || m.dir === 'out') && typeof m.text === 'string';
+function talkMerge(box, items) {
+  const byId = new Map(box.items.map((m) => [m.id, m]));
+  for (const m of items) if (talkOkMsg(m)) byId.set(m.id, m);
+  box.items = [...byId.values()].sort((a, b) => a.at - b.at || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+}
+
+/* ---------- what the server sends ---------- */
+const talkOkConvRow = (c) => c && typeof c === 'object' && talkOkConv(c.id) && c.peer && typeof c.peer === 'object' && Number.isFinite(c.lastAt);
+function talkSortList() { if (TALK.list) TALK.list.sort((a, b) => b.lastAt - a.lastAt || (a.id < b.id ? -1 : 1)); }
+function talkReceive(f) {
+  if (!f || typeof f !== 'object') return;
+  if (f.type === 'talk.badges') {
+    const counts = {};
+    for (const [k, v] of Object.entries(f.counts && typeof f.counts === 'object' ? f.counts : {})) if (talkOkAgent(k) && talkIsInt(v) && v > 0) counts[k] = v;
+    TALK.badges = counts;
+    talkPaintButton();
+    return;
+  }
+  if (f.agentId !== TALK.opened) return;   // another robot's (the socket moved on)
+  if (f.type === 'talk.list') {
+    TALK.list = (Array.isArray(f.items) ? f.items : []).filter(talkOkConvRow);
+    TALK.more = !!f.more; TALK.listError = '';
+    talkSortList();
+    talkRender();
+    return;
+  }
+  if (f.type !== 'talk.update' || !Array.isArray(f.ops)) return;
+  let newHere = false;
+  for (const op of f.ops) {
+    if (!op || typeof op !== 'object') continue;
+    if (op.op === 'conv' && talkOkConvRow(op.conv)) {
+      if (!TALK.list) continue;
+      const k = TALK.list.findIndex((c) => c.id === op.conv.id);
+      if (k >= 0) TALK.list[k] = op.conv; else TALK.list.push(op.conv);
+    } else if (op.op === 'message' && talkOkConv(op.convId) && talkOkMsg(op.message)) {
+      const box = TALK.msgs.get(op.convId);
+      if (box && box.loaded) {
+        const had = box.items.some((m) => m.id === op.message.id);
+        talkMerge(box, [op.message]);
+        if (!had && op.convId === TALK.conv) newHere = true;
+      }
+    } else if (op.op === 'remove' && talkOkConv(op.convId)) {
+      if (TALK.list) TALK.list = TALK.list.filter((c) => c.id !== op.convId);
+      TALK.msgs.delete(op.convId);
+      if (TALK.conv === op.convId) {
+        TALK.conv = null;
+        TALK.note = op.reason === 'owner-ended' ? 'このロボットのセッションが終わって 1 時間たったので、トークは消えた' : '相手のセッションが終わって 1 時間たったので、トークは消えた';
+      }
+    }
+  }
+  talkSortList();
+  if (newHere && !TALK.atEnd) TALK.newer = true;
+  talkRender();
+}
+
+/* ---------- the pane ---------- */
+function talkPane() { return TALK.node ? TALK.node.querySelector('[data-tk-body]') : null; }
+function talkBuildNode() {
+  const root = hNode('section', 'tk');
+  root.dataset.talk = '';
+  root.setAttribute('aria-label', 'トーク');
+  const head = hNode('div', 'talk-head'); head.dataset.tkHead = '';
+  const body = hNode('div', 'talk-body'); body.dataset.tkBody = ''; body.tabIndex = 0;
+  const newer = hNode('button', 'h-newer talk-newer', '新しいメッセージ ↓'); newer.type = 'button'; newer.dataset.tkNewer = ''; newer.hidden = true;
+  const foot = hNode('p', 'talk-foot', '見るだけ（トークからは送れない）');
+  root.append(head, body, newer, foot);
+  body.addEventListener('scroll', () => talkRemember(body), { passive: true });
+  root.addEventListener('click', talkClick);
+  return root;
+}
+function talkRemember(pane) {
+  if (!TALK.conv) return;
+  TALK.top = pane.scrollTop;
+  TALK.atEnd = pane.scrollHeight - pane.scrollTop - pane.clientHeight < TALK_END_PX;
+  if (TALK.atEnd && TALK.newer) { TALK.newer = false; talkPaintNewer(); }
+  const box = TALK.msgs.get(TALK.conv);
+  if (box && box.more && !box.busy && pane.scrollTop < 40) talkLoad(TALK.conv, true);   // read up: the page before
+}
+function talkToEnd() {
+  const pane = talkPane();
+  if (!pane) return;
+  TALK.atEnd = true; TALK.newer = false;
+  pane.scrollTop = pane.scrollHeight;
+  TALK.top = pane.scrollTop;
+  talkPaintNewer();
+}
+function talkPaintNewer() { const b = TALK.node && TALK.node.querySelector('[data-tk-newer]'); if (b) b.hidden = !(TALK.newer && TALK.conv); }
+
+function talkPeerMark(peer) {
+  const label = SOURCE.talkLabel(peer.agentId);
+  const span = hNode('span', 'talk-mark');
+  span.setAttribute('aria-hidden', 'true');
+  if (label && DEF[label]) {   // the robot's mark, as pill() draws it (built as nodes here)
+    const role = DEF[label].role, mark = hNode('span', 'pill', label);
+    mark.style.setProperty('--c', ROLES[role].color); mark.style.setProperty('--t', ROLE_INK[role] || '#ffffff');
+    span.appendChild(mark);
+  }
+  else span.appendChild(hNode('span', `talk-kind talk-kind-${peer.kind}`, peer.kind === 'external' ? '外' : peer.kind === 'subagent' ? 'サブ' : '？'));
+  return span;
+}
+const TALK_KIND = { session: 'セッション', subagent: 'サブエージェント', external: 'この機械の外の相手' };
+function talkGoneText(peer) {
+  if (peer.alive) return '';
+  return Number.isFinite(peer.removeAt) ? `終了 · ${talkTime(peer.removeAt)} に消える` : '終了';
+}
+function talkHead() {
+  const head = TALK.node.querySelector('[data-tk-head]');
+  const conv = TALK.conv && TALK.list ? TALK.list.find((c) => c.id === TALK.conv) : null;
+  const sig = JSON.stringify([TALK.owner, TALK.conv, conv && conv.peer, NAMES.rev]);
+  if (head._sig === sig) return;
+  head._sig = sig;
+  const fk = head.contains(document.activeElement) ? document.activeElement.dataset.fk : undefined;
+  const kids = [];
+  if (!TALK.conv) {
+    const back = hNode('button', 'wb-btn talk-back', '← カードに戻る'); back.type = 'button'; back.dataset.tkClose = ''; back.dataset.fk = 'talk-close';
+    const title = hNode('h3', 'talk-title', 'トーク');
+    kids.push(back, title);
+  } else {
+    const back = hNode('button', 'wb-btn talk-back', '← 一覧'); back.type = 'button'; back.dataset.tkBack = ''; back.dataset.fk = 'talk-back';
+    back.setAttribute('aria-label', 'トークの一覧に戻る');
+    kids.push(back);
+    if (conv) {
+      const p = conv.peer;
+      // The peer's name, one line (cut with … : the whole name on hover and focus, 57-fulltext.js). Pressed: that robot.
+      const who = p.agentId ? hNode('button', 'talk-peer') : hNode('span', 'talk-peer talk-peer-off');
+      if (p.agentId) { who.type = 'button'; who.dataset.tkPeer = p.agentId; who.dataset.fk = 'talk-peer'; who.setAttribute('aria-label', `${p.name || '相手'} に切り替える`); }
+      else who.title = 'この機械で見えない相手（切り替えられない）';
+      who.append(talkPeerMark(p), hNode('span', 'talk-peer-name', p.name || '（名前なし）'));
+      const sub = hNode('p', 'talk-peer-sub', [TALK_KIND[p.kind] || '', talkGoneText(p)].filter(Boolean).join(' · '));
+      const box = hNode('div', 'talk-peer-box'); box.append(who, sub);
+      kids.push(box);
+    }
+  }
+  head.replaceChildren(...kids);
+  if (fk !== undefined) { const again = head.querySelector(`[data-fk="${CSS.escape(fk)}"]`); if (again) again.focus({ preventScroll: true }); }
+}
+function talkRow(c) {
+  const b = hNode('button', 'talk-row');
+  b.type = 'button'; b.dataset.tkConv = c.id; b.dataset.fk = `talk-${c.id}`;
+  if (!c.peer.alive) b.classList.add('talk-row-gone');
+  const top = hNode('span', 'talk-row-top');
+  top.append(hNode('span', 'talk-row-name', c.peer.name || '（名前なし）'), hNode('time', 'talk-row-at', talkTime(c.lastAt, true)));
+  const bottom = hNode('span', 'talk-row-bottom');
+  bottom.append(hNode('span', 'talk-row-pre', `${c.lastDir === 'out' ? '自分: ' : ''}${c.preview}`));
+  if (c.unread > 0) { const u = hNode('span', 'talk-unread', c.unread > 99 ? '99+' : String(c.unread)); u.dataset.tkUnread = String(c.unread); bottom.append(u); }
+  const text = hNode('span', 'talk-row-text'); text.append(top, bottom);
+  const gone = talkGoneText(c.peer);
+  if (gone) text.append(hNode('span', 'talk-row-gone-note', gone));
+  b.append(talkPeerMark(c.peer), text);
+  b.setAttribute('aria-label', `${c.peer.name}、${talkTime(c.lastAt)}、${c.unread ? `未読 ${c.unread}、` : ''}${c.preview}`);
+  return b;
+}
+const TALK_STATE = { read: '既読', delivered: '届いた', sent: '送信済み', undelivered: '届かなかった' };
+function talkMsgSig(m) { return JSON.stringify([m.id, m.state, m.readAt, m.deliveredAt, m.text, m.cut, m.merged, m.dir]); }
+function talkMsgNode(m) {
+  const n = hNode('div', `talk-msg talk-${m.dir === 'out' ? 'out' : 'in'}`);
+  n.dataset.tkMsg = m.id;
+  n._at = m.at; n._dir = m.dir;
+  const bubble = hNode('div', 'talk-bubble');
+  if (m.state === 'undelivered') bubble.classList.add('talk-undelivered');
+  const text = hNode('div', 'talk-text talk-folded');
+  text.dataset.tkText = '';
+  text.appendChild(histMarkdown(m.text));
+  const more = hNode('button', 'talk-more', '全文を表示'); more.type = 'button'; more.dataset.tkMore = ''; more.hidden = true;
+  bubble.append(text, more);
+  if (m.cut) bubble.appendChild(hNode('p', 'talk-note', '（長いので途中まで）'));
+  if (m.merged) bubble.appendChild(hNode('p', 'talk-note', '（受け手は 2 通をまとめて受け取った）'));
+  const meta = hNode('p', 'talk-meta');
+  meta.appendChild(hNode('time', 'talk-at', talkTime(m.at)));
+  if (m.dir === 'out') {
+    const st = hNode('span', `talk-state talk-state-${m.state}`, m.state === 'read' && Number.isFinite(m.readAt) ? `既読 ${talkTime(m.readAt)}` : TALK_STATE[m.state] || '');
+    st.dataset.tkState = m.state;
+    if (m.state === 'undelivered') st.title = '相手に届かなかった（この機械にいない、または名前が解けなかった）';
+    meta.appendChild(st);
+  }
+  if (m.via === 'subagent' || m.via === 'parent') meta.appendChild(hNode('span', 'talk-via', m.via === 'subagent' ? 'サブエージェントへ' : '親へ'));
+  n.append(bubble, meta);
+  return n;
+}
+/* A long text is folded to three lines (as the history's messages from other sessions); 全文を表示 or a press on the text
+   opens it, and a press on the opened text folds it again — not while text is selected, not on a link or a control. */
+function talkMeasure() {
+  const pane = talkPane();
+  if (!pane || !pane.offsetParent) return;
+  for (const t of pane.querySelectorAll('[data-tk-text]')) {
+    if (t._measured) continue;
+    if (!t.clientHeight) continue;
+    t._measured = true;
+    const long = t.scrollHeight > t.clientHeight + 1;
+    t._long = long;
+    t.classList.toggle('talk-folded', long);
+    t.classList.toggle('talk-foldable', long);
+    const more = t.parentNode.querySelector('[data-tk-more]');
+    if (more) more.hidden = !long;
+  }
+}
+function talkFold(text, open) {
+  const more = text.parentNode.querySelector('[data-tk-more]');
+  text.classList.toggle('talk-folded', !open);
+  if (more) { more.textContent = open ? 'たたむ' : '全文を表示'; more.setAttribute('aria-expanded', String(open)); }
+  if (!open) {   // folded: its start stays in view
+    const pane = talkPane(), msg = text.closest('.talk-msg');
+    if (pane && msg && msg.getBoundingClientRect().top < pane.getBoundingClientRect().top) msg.scrollIntoView({ block: 'nearest' });
+  }
+}
+function talkClick(e) {
+  const t = e.target;
+  if (t.closest('[data-tk-close]')) { talkShow(false); return; }
+  if (t.closest('[data-tk-back]')) { TALK.conv = null; TALK.note = ''; talkRender(); const r = TALK.node.querySelector('[data-tk-conv]'); (r || TALK.node.querySelector('[data-tk-close]')).focus({ preventScroll: true }); return; }
+  const row = t.closest('[data-tk-conv]');
+  if (row) { talkOpenConv(row.dataset.tkConv); return; }
+  const peer = t.closest('[data-tk-peer]');
+  if (peer) { talkSwitch(peer.dataset.tkPeer); return; }
+  if (t.closest('[data-tk-newer]')) { talkToEnd(); return; }
+  if (t.closest('[data-tk-older]')) { talkLoad(TALK.conv, true); return; }
+  const more = t.closest('[data-tk-more]');
+  if (more) { const text = more.parentNode.querySelector('[data-tk-text]'); talkFold(text, text.classList.contains('talk-folded')); return; }
+  const text = t.closest('[data-tk-text]');
+  if (text && text._long) {
+    if (t.closest('a, button, input, textarea, select, pre, .h-tablewrap')) return;   // its own action, or a box that scrolls
+    const sel = window.getSelection && window.getSelection();
+    if (sel && !sel.isCollapsed && text.contains(sel.anchorNode)) return;           // selecting text, not pressing
+    talkFold(text, text.classList.contains('talk-folded'));
+  }
+}
+function talkOpenConv(convId) {
+  TALK.conv = convId; TALK.note = ''; TALK.atEnd = true; TALK.newer = false; TALK.nodes.clear();
+  const box = TALK.msgs.get(convId);
+  talkRender();
+  if (!box || !box.loaded) talkLoad(convId, false);
+  const back = TALK.node.querySelector('[data-tk-back]'); if (back) back.focus({ preventScroll: true });
+}
+/* The header's name pressed: the card switches to that robot, its talk open on this same conversation (a talk's id is
+   the same seen from either side). A peer not on this page says so and stays. */
+function talkSwitch(agentId) {
+  const label = SOURCE.talkLabel(agentId);
+  if (!label || !DEF[label]) { showToast('このロボットは今この画面にいない（切り替えられない）'); return; }
+  if (label === TALK.owner) return;
+  TALK.want = TALK.conv;
+  openRobot(label);
+}
+function talkBody() {
+  const pane = talkPane();
+  if (!TALK.conv) {
+    const sig = JSON.stringify(['list', TALK.list, TALK.listError, TALK.note, TALK.more]);
+    if (pane._sig === sig) return;
+    pane._sig = sig;
+    const fk = pane.contains(document.activeElement) ? document.activeElement.dataset.fk : undefined;
+    const kids = [];
+    if (TALK.note) kids.push(hNode('p', 'talk-empty talk-gone-note', TALK.note));
+    if (TALK.listError) kids.push(hNode('p', 'talk-empty talk-error', TALK.listError));
+    else if (!TALK.list) kids.push(hNode('p', 'talk-empty', '読み込み中…'));
+    else if (!TALK.list.length) kids.push(hNode('p', 'talk-empty', 'まだトークがない（このロボットが SendMessage で送った・受け取った会話がここに出る）'));
+    else {
+      const ul = hNode('ul', 'talk-list');
+      for (const c of TALK.list) { const li = hNode('li'); li.appendChild(talkRow(c)); ul.appendChild(li); }
+      kids.push(ul);
+      if (TALK.more) kids.push(hNode('p', 'talk-empty', `新しい ${TALK.list.length} 件だけを表示`));
+    }
+    pane.replaceChildren(...kids);
+    pane.scrollTop = 0;
+    if (fk !== undefined) { const again = pane.querySelector(`[data-fk="${CSS.escape(fk)}"]`); if (again) again.focus({ preventScroll: true }); }
+    return;
+  }
+  const box = TALK.msgs.get(TALK.conv) || { items: [], loaded: false, busy: true };
+  const sig = JSON.stringify(['conv', TALK.conv, box.items.map(talkMsgSig), box.more, box.busy, box.error, box.loaded]);
+  if (pane._sig === sig) return;
+  pane._sig = sig;
+  const keepTop = !TALK.atEnd && pane.firstChild ? talkAnchor(pane) : null;
+  const kids = [];
+  if (box.more) {
+    const older = hNode('button', 'talk-older', box.busy ? '読み込み中…' : 'さらに前を読み込む'); older.type = 'button'; older.dataset.tkOlder = '';
+    kids.push(older);
+  }
+  if (box.error) kids.push(hNode('p', 'talk-empty talk-error', box.error));
+  if (!box.loaded && !box.error) kids.push(hNode('p', 'talk-empty', '読み込み中…'));
+  else if (box.loaded && !box.items.length) kids.push(hNode('p', 'talk-empty', 'まだメッセージがない'));
+  let day = '';
+  const keep = new Map();
+  for (const m of box.items) {
+    const d = new Date(m.at).toDateString();
+    if (d !== day) { day = d; const dt = new Date(m.at); kids.push(hNode('p', 'talk-day', `${dt.getMonth() + 1}月${dt.getDate()}日`)); }
+    const ms = talkMsgSig(m), old = TALK.nodes.get(m.id);
+    const node = old && old.sig === ms ? old.node : talkMsgNode(m);
+    keep.set(m.id, { sig: ms, node });
+    kids.push(node);
+  }
+  TALK.nodes = keep;
+  pane.replaceChildren(...kids);
+  talkObserve(pane);
+  requestAnimationFrame(() => {
+    talkMeasure();
+    if (TALK.atEnd) talkToEnd();
+    else if (keepTop) talkRestoreAnchor(pane, keepTop);
+  });
+  talkPaintNewer();
+}
+function talkAnchor(pane) {
+  const top = pane.getBoundingClientRect().top;
+  for (const n of pane.querySelectorAll('[data-tk-msg]')) if (n.getBoundingClientRect().bottom > top + 1) return { id: n.dataset.tkMsg, y: n.getBoundingClientRect().top - top };
+  return null;
+}
+function talkRestoreAnchor(pane, a) {
+  const n = [...pane.querySelectorAll('[data-tk-msg]')].find((x) => x.dataset.tkMsg === a.id);
+  if (n) pane.scrollTop += n.getBoundingClientRect().top - pane.getBoundingClientRect().top - a.y;
+  TALK.top = pane.scrollTop;
+}
+
+/* ---------- seen: what came in and was on screen, told to the server (talk.seen) ----------
+   A message from the peer counts as seen when at least half of it has been in the pane while the talk shows and the
+   tab is visible. The newest such time goes out as upTo, once per new value; the server recounts the unread and answers
+   with a conv op and, when a total changed, talk.badges. */
+const talkSeenIO = typeof IntersectionObserver === 'function' ? new IntersectionObserver((entries) => {
+  for (const e of entries) {
+    if (!e.isIntersecting || !TALK.conv || !TALK.agent) continue;
+    const n = e.target;
+    if (n._dir !== 'in') continue;
+    const k = `${TALK.agent}|${TALK.conv}`;
+    if (!(n._at <= (TALK.seenWant.get(k) || -1))) TALK.seenWant.set(k, n._at);
+  }
+  talkSeenFlush();
+}, { threshold: 0.5 }) : null;
+let talkSeenRoot = null;
+function talkObserve(pane) {
+  if (!talkSeenIO) return;
+  if (talkSeenRoot !== pane) talkSeenRoot = pane;
+  talkSeenIO.disconnect();
+  for (const n of pane.querySelectorAll('.talk-msg.talk-in')) talkSeenIO.observe(n);
+}
+function talkSeenFlush() {
+  if (document.visibilityState !== 'visible' || !TALK.on || !TALK.conv || !TALK.agent) return;
+  const k = `${TALK.agent}|${TALK.conv}`, want = TALK.seenWant.get(k);
+  if (!Number.isFinite(want) || want <= (TALK.seenSent.get(k) || -1)) return;
+  TALK.seenSent.set(k, want);
+  talkSend('talk.seen', { agentId: TALK.agent, convId: TALK.conv, upTo: Math.max(0, Math.round(want)) });
+}
+document.addEventListener('visibilitychange', talkSeenFlush);
+
+/* ---------- the card ---------- */
+function talkRender() {
+  if (!TALK.node) return;
+  talkHead();
+  talkBody();
+  talkPaintButton();
+}
+/* The chat button's unread badge: talk.badges, the server's totals per robot. */
+function talkPaintButton() {
+  const b = rbEl.querySelector('[data-rb-talk]');
+  if (!b) return;
+  const n = (TALK.agent && TALK.badges[TALK.agent]) || 0;
+  const badge = b.querySelector('[data-rb-talk-n]');
+  const text = n > 99 ? '99+' : String(n);
+  if (badge) { badge.hidden = !n; if (badge.textContent !== text) badge.textContent = text; }
+  const label = n ? `トーク（未読 ${n}）` : 'トーク';
+  if (b.getAttribute('aria-label') !== label) b.setAttribute('aria-label', label);
+  if (b.getAttribute('aria-pressed') !== String(TALK.on)) b.setAttribute('aria-pressed', String(TALK.on));
+}
+function talkShow(on) {
+  TALK.on = !!on && !!rbState.id;
+  if (!TALK.on) { TALK.conv = null; TALK.note = ''; }
+  talkSync();
+  const again = rbEl.querySelector(TALK.on ? '[data-tk-close]' : '[data-rb-talk]');
+  if (again) again.focus({ preventScroll: true });
+}
+/* After every renderRobot (and when the card closes): the socket follows the card's robot, and the pane takes the
+   card's place below its head while it is on. */
+function talkSync() {
+  const robot = rbEl.hidden ? null : rbState.id;
+  const agent = robot ? SOURCE.talkAgentId(robot) : null;
+  if (robot !== TALK.owner) {
+    TALK.owner = robot; TALK.agent = agent;
+    TALK.conv = robot && TALK.want ? TALK.want : null;
+    TALK.want = null; TALK.note = ''; TALK.atEnd = true; TALK.newer = false; TALK.nodes.clear();
+    if (!robot) TALK.on = false;
+    if (TALK.node) { const p = talkPane(); if (p) p._sig = ''; TALK.node.querySelector('[data-tk-head]')._sig = ''; }
+  }
+  TALK.agent = agent;
+  talkFollow(agent);
+  if (TALK.on && TALK.conv && TALK.agent && !(TALK.msgs.get(TALK.conv) || {}).loaded && !(TALK.msgs.get(TALK.conv) || {}).busy && !(TALK.msgs.get(TALK.conv) || {}).error) talkLoad(TALK.conv, false);
+  rbEl.classList.toggle('rb-talking', TALK.on);
+  if (TALK.on) {
+    if (!TALK.node) TALK.node = talkBuildNode();
+    if (TALK.node.parentNode !== rbEl) {
+      const head = rbEl.querySelector('.rb-head');
+      if (head) head.after(TALK.node); else rbEl.appendChild(TALK.node);
+      const pane = talkPane();
+      requestAnimationFrame(() => { talkMeasure(); if (TALK.atEnd) talkToEnd(); else pane.scrollTop = TALK.top; });
+    }
+    if (HIST.compose) HIST.compose.hidden = true;
+    talkRender();
+  } else if (TALK.node && TALK.node.parentNode) TALK.node.remove();
+  // The card was rebuilt (50-panel.js keyed) with the focus in the talk pane, put back only now: the focus goes back too.
+  const lost = rbEl._lostFk;
+  rbEl._lostFk = undefined;
+  const again = lost !== undefined && TALK.on && TALK.node ? TALK.node.querySelector(`[data-fk="${CSS.escape(lost)}"]`) : null;
+  if (again) again.focus({ preventScroll: true });
+  talkPaintButton();
+}
+rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rb-talk]') && rbState.id) talkShow(!TALK.on); });
 // ---- web/js/60-log.js ----
 
 /* ---------- full-screen event log ---------- */
