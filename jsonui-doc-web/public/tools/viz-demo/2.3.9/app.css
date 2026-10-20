@@ -414,6 +414,15 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .qfoot .pa:disabled { opacity: 0.45; cursor: default; }
 .qnote { margin: 0; color: var(--ink-soft); font-size: 12px; }
 .qnote.qwhy { padding: 6px 8px; border-radius: 6px; background: var(--chip); color: var(--ink); font-size: 13px; font-weight: 700; }
+/* a call stopped by auto mode (51-denials.js) */
+.dcard .dtag { padding: 1px 6px; border-radius: 6px; background: var(--chip); color: var(--ink); font: 700 11px/1.5 var(--font-body); }
+.dwhat { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; min-width: 0; }
+.dwhat code { min-width: 0; overflow-wrap: anywhere; font: 500 12px/1.5 var(--font-mono); }
+.dwhy { margin: 0; color: var(--ink-soft); font: 600 12px/1.5 var(--font-mono); }
+.dconfirm { display: grid; gap: 6px; }
+.dreply { margin: 0; padding: 6px 10px; border-left: 3px solid var(--line); background: var(--bg); color: var(--ink); font-size: 13px; overflow-wrap: anywhere; }
+.dconfirm-to { margin: 0; font-weight: 700; font-size: 12px; }
+.dprompt { margin: 0; padding: 6px 10px; border-left: 3px solid var(--warn); background: var(--bg); color: var(--ink); font-size: 13px; overflow-wrap: anywhere; }
 .qcard.q-closed .qopt { cursor: not-allowed; opacity: .5; }
 .qcard.q-closed .qopt:hover { background: none; }
 .perm-acts { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -744,11 +753,13 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 /* The board's body: the question strip, the permission strip, then the columns — each in its own row, so the columns start
    below whatever strips show (2.3.5: with the question strip added the columns fell into an auto row after a squeezed
    1fr one and their headers covered the permission strip's buttons; ticket 2026-10-20-jui-viz-board-kanban-header-covers-perm-strip).
-   A hidden strip leaves an empty row of no height. */
-.kb-body { position: relative; display: grid; grid-template-rows: auto auto minmax(0, 1fr); min-height: 0; }
+   A hidden strip leaves an empty row of no height. The strip of calls stopped by auto mode (51-denials.js) has its own
+   row too: without one it fell into an auto row after the columns. */
+.kb-body { position: relative; display: grid; grid-template-rows: auto auto auto minmax(0, 1fr); min-height: 0; }
 .kb-body > #q-strip { grid-row: 1; }
-.kb-body > #perm-strip { grid-row: 2; }
-.kb-body > .kanban { grid-row: 3; }
+.kb-body > #denied-strip { grid-row: 2; }
+.kb-body > #perm-strip { grid-row: 3; }
+.kb-body > .kanban { grid-row: 4; }
 .kanban { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 12px; min-height: 0; overflow: auto; padding: 2px 14px 16px; }
 .perm-strip { display: grid; gap: 8px; max-height: 42vh; margin: 0 14px 10px; padding: 10px 12px; overflow-y: auto; border: 2px solid var(--wb-amber); border-radius: 12px; background: var(--wb-card); color: var(--wb-ink); }
 .ps-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0; font: 700 14px/1.4 var(--font-body); }
@@ -971,7 +982,7 @@ details.h-item[open] > :not(summary) :is(a[href], button, img, .h-thumb) { curso
 .rb-run-head { display: flex; gap: 8px; margin: 0; }
 .rb-saved { margin-left: auto; color: var(--ink-soft); font-size: 11px; }
 .rb-run-file { overflow: hidden; color: var(--ink-soft); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
-/* the whole text of a line cut to one (57-fulltext.js): wrapped, selectable, in the 3D's left column (fulltextPlace) */
+/* the whole text of a line cut to one (57-fulltext.js): wrapped, selectable, just left of the card or the panel (fulltextPlace) */
 .fulltext { position: fixed; z-index: 45; box-sizing: border-box; padding: 6px 9px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); box-shadow: 0 6px 18px var(--shadow); font: 500 12px/1.5 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; cursor: text; }
 .fulltext[hidden] { display: none; }
 [tabindex="0"]:is(.rb-run-file, .act, .h-head):focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
@@ -1208,6 +1219,9 @@ details.h-item[open] > :not(summary) :is(a[href], button, img, .h-thumb) { curso
 .h-thumb img { display: block; width: 160px; height: auto; max-height: 200px; object-fit: contain; }
 .h-thumb-wait img, .h-thumb-bad img { display: none; }
 .h-thumb-note { padding: 6px 8px; font: 700 11.5px/1.4 var(--font-body); }
+/* an attached image's thumbnail in its mark (55-history.js histAttachMarks): smaller, and the keyboard's focus shows */
+.h-attach-sent .h-thumb, .h-attach-sent .h-thumb img { width: 72px; min-height: 40px; max-height: 96px; }
+.h-thumb:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .h-thumb-note:empty { display: none; }
 .h-thumb-wait .h-thumb-note:empty { display: block; }
 .h-thumb-wait .h-thumb-note:empty::after { content: '読み込み中…'; }
@@ -1332,22 +1346,25 @@ details.h-item[open] > :not(summary) :is(a[href], button, img, .h-thumb) { curso
 /* ---------- トーク (58-talk.js, 2.3.6): a robot's SendMessage conversations, as a chat ---------- */
 /* A received talk bubble (2.3.8, ticket 2026-10-20-jui-viz-talk-bubble-colours; requester 10-20: 「トークの吹き出しの色が背景と
    どうかしててわかりづらい」「相手側ね」): its ground, edge, text and what is inside it (links and 全文を表示, `code` and code
-   blocks, notes and quotes, table lines, a code block's error). Light: a white bubble with a grey edge (the edge 3:1+ on
-   the panel); dark: a light grey bubble with dark text, as a chat app's. The text 4.5:1+ on its ground; the ground apart
-   from the sent bubble's (ΔE2000 ≥ 8). The sent bubble keeps --info-bg / --info / --ink. Measured by tools/viz_e2e/talk_ui.py. */
+   blocks, notes and quotes, table lines, a code block's error). Light: a pale grey bubble (#e8ecf1, the requester's
+   sample A: 「ライトはAでいいよ」) with a grey edge (the edge 3:1+ on the panel); dark: a navy a little deeper than the
+   sent bubble (#0f2747 against #15305a) with white text and a violet edge, the requester's sample C (ticket
+   2026-10-20-jui-viz-talk-bubble-dark-v2: 「右側のより少しだけ濃い背景に白文字、縁の色を変えてわかりやすく」, 「トークのデザインはCで」):
+   the fills are close by design (1.14:1), so the edge (violet against the sent blue) and the side tell them apart. The text 4.5:1+ on its ground; apart from the sent bubble by its fill or its edge
+   (ΔE2000 ≥ 8 on either: in light the fills are 5.9 apart, the grey and the blue edges 14.1). The sent bubble keeps --info-bg / --info / --ink. Measured by tools/viz_e2e/talk_ui.py. */
 :root {
-  --talk-in-bg: #ffffff; --talk-in-edge: #6b7a90; --talk-in-ink: #111827; --talk-in-soft: #4b5563; --talk-in-link: #1d4ed8;
-  --talk-in-code-bg: #eef1f5; --talk-in-line: #c9d1dc; --talk-in-warn: #9a3412;
+  --talk-in-bg: #e8ecf1; --talk-in-edge: #6b7a90; --talk-in-ink: #13233a; --talk-in-soft: #4b5563; --talk-in-link: #1d4ed8;
+  --talk-in-code-bg: #d5dbe3; --talk-in-line: #c9d1dc; --talk-in-warn: #9a3412;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --talk-in-bg: #e5e7eb; --talk-in-edge: #e5e7eb; --talk-in-ink: #111827; --talk-in-soft: #4b5563; --talk-in-link: #1d4ed8;
-    --talk-in-code-bg: #d1d5db; --talk-in-line: #9ca3af; --talk-in-warn: #9a3412;
+    --talk-in-bg: #0f2747; --talk-in-edge: #c4b5fd; --talk-in-ink: #ffffff; --talk-in-soft: #cbd5e1; --talk-in-link: #93c5fd;
+    --talk-in-code-bg: #0a1a33; --talk-in-line: #2f4a72; --talk-in-warn: #fdba74;
   }
 }
 :root[data-theme="dark"] {
-  --talk-in-bg: #e5e7eb; --talk-in-edge: #e5e7eb; --talk-in-ink: #111827; --talk-in-soft: #4b5563; --talk-in-link: #1d4ed8;
-  --talk-in-code-bg: #d1d5db; --talk-in-line: #9ca3af; --talk-in-warn: #9a3412;
+  --talk-in-bg: #0f2747; --talk-in-edge: #c4b5fd; --talk-in-ink: #ffffff; --talk-in-soft: #cbd5e1; --talk-in-link: #93c5fd;
+  --talk-in-code-bg: #0a1a33; --talk-in-line: #2f4a72; --talk-in-warn: #fdba74;
 }
 .rb-talk { position: relative; display: inline-flex; align-items: center; gap: 5px; background: var(--panel); color: var(--ink); }
 .rb-talk[aria-pressed="true"] { border-color: var(--info); background: var(--info-bg); color: var(--info); }
@@ -1416,3 +1433,46 @@ button.talk-peer:focus-visible { outline: 2px solid var(--focus); outline-offset
 .talk-via { color: var(--violet); }
 .talk-newer { position: absolute; left: 50%; bottom: 40px; transform: translateX(-50%); }
 .talk-newer[hidden] { display: none; }
+
+/* the server room (ticket 2026-10-20-jui-viz-server-room, part B): the whole page under one view, a board and a log */
+.srm { position: fixed; inset: 0; z-index: 52;   /* over the log (50), under the notices (55) and the toast (60) */ display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--bg); color: var(--ink); }
+.srm[hidden] { display: none; }
+.sr-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line); background: var(--panel); }
+.sr-head h2 { margin: 0; font: 700 16px/1.3 var(--font-body); }
+.sr-room { color: var(--ink-soft); font: 500 13px/1.3 var(--font-mono); }
+.sr-ctl { display: inline-flex; align-items: center; gap: 4px; font: 13px/1.3 var(--font-body); }
+.sr-ctl select { padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); }
+.sr-head .grow { flex: 1; }
+.sr-main { display: flex; min-height: 0; }
+.sr-stage { position: relative; flex: 1; min-width: 0; overflow: hidden; }
+.sr-stage canvas { display: block; width: 100%; height: 100%; }
+.sr-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.sr-label { position: absolute; left: 0; top: 0; padding: 1px 6px; border-radius: 4px; background: var(--tag-bg); color: var(--ink); font: 500 11px/1.5 var(--font-mono); white-space: nowrap; }
+.sr-label[hidden] { display: none; }
+.sr-label[data-kind="group"] { font-weight: 700; background: var(--panel); border: 1px solid var(--line); }
+.sr-label[data-kind="external"] { border: 1px dashed var(--ink-soft); }
+.sr-board { width: min(340px, 40vw); overflow: auto; padding: 10px 14px; border-left: 1px solid var(--line); background: var(--panel); font: 13px/1.5 var(--font-body); }
+.sr-board[hidden] { display: none; }
+.sr-board h3 { margin: 10px 0 4px; font: 700 13px/1.3 var(--font-body); }
+.sr-board dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 0; }
+.sr-board dt { color: var(--ink-soft); }
+.sr-board dd { margin: 0; font-family: var(--font-mono); }
+.sr-legend, .sr-edges, .sr-problems { margin: 0; padding-left: 0; list-style: none; }
+.sr-chip { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 2px; vertical-align: middle; }
+.sr-line { display: inline-block; width: 22px; margin-right: 6px; border-top: 2px solid #5c6b7f; vertical-align: middle; }
+.sr-line-cross { border-top: 2px dashed #d63fb0; }
+.sr-meta, .sr-hint { margin: 0; color: var(--ink-soft); }
+.sr-prov { display: inline-flex; align-items: center; padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--ink); font: 500 12.5px/1.5 var(--font-body); cursor: pointer; }
+.sr-prov[aria-pressed="true"] { border-color: var(--info); background: var(--info-bg); color: var(--info); font-weight: 700; }
+.sr-legend li { margin: 2px 0; }
+.sr-acts { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.sr-problems li { padding: 2px 0; border-bottom: 1px solid var(--line); }
+.sr-log { max-height: 30vh; overflow: auto; padding: 6px 12px; border-top: 1px solid var(--line); background: var(--panel); font: 12px/1.5 var(--font-mono); }
+.sr-log[hidden] { display: none; }
+.sr-log ol { margin: 0; padding: 0; list-style: none; }
+.sr-bubble { position: fixed; z-index: 44; max-width: min(420px, calc(100vw - 32px)); padding: 6px 12px; border-radius: 12px; background: var(--panel); color: var(--ink); border: 2px solid var(--info); box-shadow: 0 4px 16px var(--shadow); font: 700 13px/1.4 var(--font-body); transform: translate(-50%, calc(-100% - 10px)); pointer-events: auto; }
+.sr-bubble[hidden] { display: none; }
+.sr-bubble[data-kind="error"] { border-color: #e5484d; }
+.sr-bubble.sr-bubble-free { left: 50% !important; top: 96px !important; }
+.sr-full { display: none; margin-top: 4px; font: 400 12px/1.45 var(--font-mono); white-space: pre-wrap; }
+.sr-bubble[data-kind="error"]:hover .sr-full:not(:empty) { display: block; }

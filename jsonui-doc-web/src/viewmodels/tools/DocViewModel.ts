@@ -57,6 +57,7 @@ const COMMAND_INIT_ENTRIES: ReadonlyArray<{ id: string; keyPrefix: string }> = [
 const COMMAND_VALIDATE_ENTRIES: ReadonlyArray<{ id: string; keyPrefix: string }> = [
   { id: "validate_spec",      keyPrefix: "cmd_validate_spec" },
   { id: "validate_component", keyPrefix: "cmd_validate_component" },
+  { id: "validate_infra",     keyPrefix: "cmd_validate_infra" },
 ];
 
 const COMMAND_GENERATE_ENTRIES: ReadonlyArray<{ id: string; keyPrefix: string }> = [

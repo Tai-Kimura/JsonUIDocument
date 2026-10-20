@@ -5204,6 +5204,127 @@
     },
     {
       "binary": "jsonui-doc",
+      "command": "validate infra",
+      "synopsis": "jsonui-doc validate infra [<root>] [--json]",
+      "purpose": {
+        "en": "Validate a project's declared infrastructure — the model `jui viz` draws as the server room (since 2.3.9). It reads `docs/infra/*.json`, or the folder named by `infra.dir` in jui.config.json, the way jui viz reads it: each file is checked against the infra-model v0 schema and for the shapes of secrets (an access key, an IP address, an ARN, an account id, a connection string, a private key, a token, a password written with its value, a URL with credentials), then the files are merged. A file with an error is left out and the rest is still used. Subfolders such as `seed/` are not read. Exit 0 when there is no error (warnings alone are 0), 1 when there are errors, 2 when nothing could be read (for example, no `*.json` in the folder).",
+        "ja": "プロジェクトが宣言したインフラ — `jui viz` がサーバールームとして描くモデル（2.3.9 から）— を検証する。`docs/infra/*.json`（jui.config.json の `infra.dir` があればそのフォルダ）を jui viz と同じように読み、ファイルごとに infra-model v0 のスキーマと秘密の形（アクセスキー、IP アドレス、ARN、アカウント ID、接続文字列、秘密鍵、トークン、値つきのパスワード、資格情報つきの URL）を検査してから、ファイルを合わせる。エラーのあるファイルは外し、残りは使う。`seed/` などのサブフォルダは読まない。エラーが無ければ exit 0（警告だけなら 0）、エラーがあれば 1、何も読めなければ 2（フォルダに `*.json` が無い、など）。"
+      },
+      "options": [
+        {
+          "name": "<root>",
+          "type": "path",
+          "default": "the current folder",
+          "description": {
+            "en": "The project root, the folder with jui.config.json.",
+            "ja": "プロジェクトのルート（jui.config.json のあるフォルダ）。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "flag",
+          "description": {
+            "en": "Print the result as JSON: the files used, the environments, the problems, and the counts of groups, nodes and edges.",
+            "ja": "結果を JSON で出す。使ったファイル、環境、問題、グループ・ノード・エッジの数。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-doc validate infra\ninfra: docs/infra: 2 file(s) used, 12 nodes, 10 edges, 2 environment(s); 0 error(s)"
+        }
+      ],
+      "seeAlso": [
+        "jsonui-doc seed infra",
+        "jsonui-doc check",
+        "jui viz start"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.9",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "783d22555c69ad3150a8c972f4cc871272692a26ec85eb9652bda06af5001a97",
+        "cardHash": "2b9d04b3cc57ac62db0c770eb4e7ad1c260bf11a1e411f0fbdcc00d3544e0dc5",
+        "fieldHashes": {
+          "binary": "f9476e5a629c",
+          "command": "91dab032cfaa",
+          "synopsis": "2bcb5d597744",
+          "purpose": "8e11857e308e",
+          "options": "55f2f7dc7a45",
+          "examples": "12eb3565310e",
+          "seeAlso": "2df74f4a5d99"
+        }
+      }
+    },
+    {
+      "binary": "jsonui-doc",
+      "command": "seed infra",
+      "synopsis": "jsonui-doc seed infra [<root>] [-o <out>] [--stdout] [--force]",
+      "purpose": {
+        "en": "Draft the infrastructure model from what the project already says (since 2.3.9): Docker Compose, Terraform / OpenTofu, Kubernetes manifests, CloudFormation / SAM and a synthesized CDK app, Cloudflare wrangler, PaaS files (firebase.json, vercel.json, netlify.toml, serverless.yml, fly.toml, render.yaml, app.yaml), Bicep, and the code's SDK imports and environment variable names. It never reads Terraform state, `*.tfvars`, `.env` files or other files that hold values, and it never writes a value: a string shaped like a secret is withheld. The draft is a starting point, not the display source — it goes to `<infra.dir>/seed/draft.json` with `seed-report.json` (what was unmatched, not drawn, skipped or withheld), a folder that neither jui viz nor `validate infra` reads; you move what you keep into the model's folder. Exit 0 when written or printed, 2 when not (an existing draft without `--force`, a bad config, or a draft that fails its own check).",
+        "ja": "プロジェクトにすでに書かれていることから、インフラのモデルの下書きを作る（2.3.9 から）。読むのは Docker Compose、Terraform / OpenTofu、Kubernetes のマニフェスト、CloudFormation / SAM と合成済みの CDK、Cloudflare wrangler、PaaS のファイル（firebase.json、vercel.json、netlify.toml、serverless.yml、fly.toml、render.yaml、app.yaml）、Bicep、それにコードの SDK の import と環境変数の名前。Terraform の state、`*.tfvars`、`.env` など値を持つファイルは読まず、値も書かない（秘密の形の文字列は伏せる）。下書きは出発点で、表示の元ではない。`<infra.dir>/seed/draft.json` と `seed-report.json`（合わなかった物・描かない物・読まなかった物・伏せた物）に書き、このフォルダは jui viz も `validate infra` も読まない。残したい分を自分でモデルのフォルダへ移す。書けた（出せた）ら exit 0、書かなかったら 2（下書きがすでにあって `--force` が無い、設定が悪い、下書きが自分の検査を通らない）。"
+      },
+      "options": [
+        {
+          "name": "<root>",
+          "type": "path",
+          "default": "the current folder",
+          "description": {
+            "en": "The project root, the folder with jui.config.json.",
+            "ja": "プロジェクトのルート（jui.config.json のあるフォルダ）。"
+          }
+        },
+        {
+          "name": "--out",
+          "type": "path",
+          "default": "<infra.dir>/seed",
+          "description": {
+            "en": "Where to write draft.json and seed-report.json. Short form `-o`.",
+            "ja": "draft.json と seed-report.json を書く場所。短縮形は `-o`。"
+          }
+        },
+        {
+          "name": "--stdout",
+          "type": "flag",
+          "description": {
+            "en": "Print the draft instead of writing it; the summary line goes to stderr.",
+            "ja": "書かずに下書きを出力する。要約の行は stderr へ。"
+          }
+        },
+        {
+          "name": "--force",
+          "type": "flag",
+          "description": {
+            "en": "Replace a draft already in the output folder. A symlinked folder or file is refused even with it.",
+            "ja": "出力先にある下書きを置き換える。フォルダやファイルが symlink なら、これがあっても断る。"
+          }
+        }
+      ],
+      "examples": [],
+      "seeAlso": [
+        "jsonui-doc validate infra",
+        "jsonui-doc check"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.9",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "2b91d26e31e0840494eb3fb6dc1825f1741391c80272f9354ecc52776cd7c015",
+        "cardHash": "158dd24285cb5b47080331de329fcb9ebe669343e1f80daa94b624467007649a",
+        "fieldHashes": {
+          "binary": "f9476e5a629c",
+          "command": "44406da7d954",
+          "synopsis": "7b8fc7684284",
+          "purpose": "059a7bb1adbb",
+          "options": "f6c0917fe69a",
+          "examples": "2b8fdc789d3b",
+          "seeAlso": "222d1a090af5"
+        }
+      }
+    },
+    {
+      "binary": "jsonui-doc",
       "command": "rules",
       "synopsis": "jsonui-doc rules init [-o DIR] [--flutter] | jsonui-doc rules show [-d DIR]",
       "purpose": {
@@ -5323,28 +5444,29 @@
       "command": "check",
       "synopsis": "jsonui-doc check [<filter>] [--list] [-p <project>]",
       "purpose": {
-        "en": "Run the declared contract checks — a real database or an implementation's OpenAPI document against the docs. It executes only the commands declared in jui.config.json, and `--list` shows what would run (name, type, exact command) without running it. The filter restricts the run to `db` / `api` / `db:<name>` / a declared check name.",
-        "ja": "宣言済みの契約チェック — 実データベースや実装側 OpenAPI をドキュメントと突き合わせる — を実行する。実行するのは jui.config.json に宣言されたコマンドだけで、`--list` は走らせずに実行内容（名前・種別・実際のコマンド）を表示する。フィルタで `db` / `api` / `db:<name>` / 宣言済みチェック名に限定できる。"
+        "en": "Run the declared contract checks — a real database or an implementation's OpenAPI document against the docs. It executes only the commands declared in jui.config.json, and `--list` shows what would run (name, type, exact command) without running it. The filter restricts the run to `db` / `api` / `db:<name>` / a declared check name. Since 2.3.9 two more types compare the infrastructure model (see `validate infra`): `builtin:infra-iac` against the project's IaC, read statically (no credentials, plan or state), and `builtin:infra-code` against each node's evidence, the SDK imports and the environment variable names; the filter `infra` (not listed in `--help`) selects both. Their findings are warnings and exit 0 unless the check declares `\"gate\": true`, and each says what it could not check; the report is written beside the model as `.check-report.<name>.json`.",
+        "ja": "宣言済みの契約チェック — 実データベースや実装側 OpenAPI をドキュメントと突き合わせる — を実行する。実行するのは jui.config.json に宣言されたコマンドだけで、`--list` は走らせずに実行内容（名前・種別・実際のコマンド）を表示する。フィルタで `db` / `api` / `db:<name>` / 宣言済みチェック名に限定できる。2.3.9 からは、インフラのモデル（`validate infra` を参照）と突き合わせる種別が 2 つ増えた。`builtin:infra-iac` はプロジェクトの IaC と（静的に読む。資格情報・plan・state は使わない）、`builtin:infra-code` は各ノードの evidence、SDK の import、環境変数の名前と比べる。フィルタ `infra`（`--help` には出ない）で両方を選ぶ。見つけた差は警告で exit 0、チェックが `\"gate\": true` を宣言したときだけ失敗になる。どちらも確かめられなかった物を言い、レポートはモデルの隣に `.check-report.<name>.json` として書く。"
       },
       "options": [],
       "examples": [],
       "seeAlso": [
-        "jsonui-doc validate spec"
+        "jsonui-doc validate spec",
+        "jsonui-doc validate infra"
       ],
       "verifiedAgainst": {
-        "version": "1.8.4",
+        "version": "2.3.9",
         "columns": 80,
         "python": "3.12",
         "helpHash": "8841ba076d03c63a740580a5741573883f68e7c81e8103fa6e4c55e12c8738f4",
-        "cardHash": "bf8f42160e6dec83b61147613028c34685bb399e5dcda58aad127d2964a23291",
+        "cardHash": "53f8cac44205a78677f2ed67bbcd98c7492dffeb433dff0c3a18b02390a342a7",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "4d712611e72a",
           "synopsis": "792abb114102",
-          "purpose": "46a4e4cefaaf",
+          "purpose": "9888348d5c11",
           "options": "357b9e47f539",
           "examples": "2b8fdc789d3b",
-          "seeAlso": "fb0c54cc44ab"
+          "seeAlso": "cf5e12bfe0c6"
         }
       }
     }

@@ -28,6 +28,7 @@
       <span class="usage" id="usage" hidden></span>
       <button type="button" class="chip perm-chip" id="chip-perm" hidden aria-haspopup="dialog">許可待ち 0</button>
       <button type="button" class="chip perm-chip" id="chip-ask" hidden aria-controls="questions-sec">質問 0</button>
+      <button type="button" class="chip perm-chip" id="chip-denied" hidden aria-haspopup="dialog" title="自動モードが止めた操作（押すとボードで見られる）">止められた 0</button>
       <button type="button" class="chip" id="chip-askwait" hidden aria-haspopup="dialog" title="質問が viz で待つ間、ターミナルや VS Code には質問が出ない（押すと変えられる）"></button>
       <button type="button" class="chip perm-chip price-chip" id="chip-price" hidden aria-haspopup="dialog">単価の無いモデル 0</button>
     </div>
@@ -116,6 +117,7 @@
             <label class="lane-toggle" for="tb-lanes"><input type="checkbox" id="tb-lanes"> セッションごとに分ける</label>
           </div>
           <div class="kb-body">
+            <section class="perm-strip q-strip d-strip" id="denied-strip" hidden aria-label="自動モードが止めた操作"></section>
             <section class="perm-strip q-strip" id="q-strip" hidden aria-label="答えを待っている質問"></section>
             <section class="perm-strip" id="perm-strip" hidden aria-label="許可を求めているもの"></section>
             <div class="kanban" id="kanban"></div>
@@ -123,6 +125,27 @@
           </div>
         </div>
       </div>
+      <section class="srm" id="sr" hidden role="dialog" aria-modal="true" aria-labelledby="sr-title">
+        <header class="sr-head">
+          <button type="button" class="wb-btn" id="sr-back">← 部屋に戻る（Esc）</button>
+          <h2 id="sr-title">サーバールーム</h2>
+          <span class="sr-room" id="sr-room"></span>
+          <label class="sr-ctl">環境 <select id="sr-env"></select></label>
+          <label class="sr-ctl"><input type="checkbox" id="sr-fold"> 細かいもの（IAM・アラームなど）</label>
+          <span class="grow"></span>
+          <label class="sr-ctl">線 <select id="sr-lines"><option value="all">すべて（薄く）</option><option value="cross">跨ぐ線だけ</option><option value="focus">選んだものだけ</option></select></label>
+          <button type="button" class="wb-btn" id="sr-zin" aria-label="寄る">＋</button>
+          <button type="button" class="wb-btn" id="sr-zout" aria-label="引く">−</button>
+          <button type="button" class="wb-btn" id="sr-fit">全体を見る</button>
+          <button type="button" class="wb-btn" id="sr-board-btn" aria-pressed="true" aria-controls="sr-board">ボード</button>
+          <button type="button" class="wb-btn" id="sr-log-btn" aria-pressed="false" aria-controls="sr-log">ログ</button>
+        </header>
+        <div class="sr-main">
+          <div class="sr-stage"><canvas id="sr-canvas" aria-label="インフラの構成の 3D（ドラッグで回す、ホイールで寄る・引く、右ドラッグで動かす）"></canvas><div class="sr-labels" id="sr-labels" aria-hidden="true"></div></div>
+          <aside class="sr-board" id="sr-board" aria-label="構成のボード"></aside>
+        </div>
+        <div class="sr-log" id="sr-log" hidden aria-label="サーバールームのログ"></div>
+      </section>
       <div class="wb" id="ds" hidden role="dialog" aria-modal="false" aria-labelledby="ds-title">
         <div class="wb-frame ds-frame">
           <div class="wb-head">
@@ -146,6 +169,10 @@
       <section class="rb" id="rb" hidden role="dialog" aria-modal="false" aria-labelledby="rb-title"></section>
     </div>
     <aside class="side" id="side" aria-label="セッション、spec、テスト、タスク">
+      <section aria-labelledby="h-denied" id="denied-sec" hidden>
+        <h2 id="h-denied">自動モードが止めた操作</h2>
+        <div class="questions" id="denied"></div>
+      </section>
       <section aria-labelledby="h-questions" id="questions-sec" hidden>
         <h2 id="h-questions">質問に答える</h2>
         <div class="questions" id="questions"></div>
@@ -192,6 +219,7 @@
   <footer class="ticker" id="ticker-strip" aria-label="最新のイベント"><ol id="ticker"></ol><div class="ticker-btns"><button type="button" class="ticker-btn" id="btn-log" aria-haspopup="dialog">ログを全画面で見る</button><button type="button" class="ticker-btn" id="btn-strip-close" aria-controls="ticker-strip" aria-expanded="true" aria-label="ログの帯を閉じる">閉じる</button></div></footer>
 </div>
 <button type="button" class="log-open log-open-float" id="btn-strip-open-float" hidden aria-controls="ticker-strip" aria-expanded="false" aria-label="ログの帯を開く">ログを開く</button>
+<div class="sr-bubble" id="sr-bubble" hidden role="status" aria-live="polite"><span class="sr-short"></span><div class="sr-full"></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="pop" id="pop" hidden role="dialog" aria-modal="false"></div>
 <div class="notify-pop" id="notify-pop" hidden role="dialog" aria-modal="false" aria-labelledby="notify-title">
