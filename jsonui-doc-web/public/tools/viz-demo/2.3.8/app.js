@@ -2288,6 +2288,8 @@ const SOURCE = {
   },
   history() { return Promise.resolve({ ok: false, error: 'demo' }); },   // the demo has no transcripts
   historyImage() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
+  attachFile() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
+  attachRemove() {},
   notifyPresence() { return Promise.resolve(); },
   callCommand() { return Promise.resolve({ ok: false, why: 'デモでは使えません（プロジェクトのフォルダがありません）' }); },
   setWeather() { return Promise.resolve({ ok: false, error: 'demo' }); },   // the demo asks nobody about the weather
@@ -6794,7 +6796,7 @@ function transitionKind(type, dest) {
 }
 const transitionTag = (dest, type) => {
   const [key, label] = transitionKind(type, dest);
-  return `<span class="scr tk tk-${esc(key)}" data-tk="${esc(key)}" title="${esc(dest)}"><span class="tk-k">${esc(label.split('（')[0])}</span>${esc(SCREEN_JA[dest] || dest)}</span>`;
+  return `<span class="scr tk tk-${esc(key)}" data-tk="${esc(key)}" title="${esc(dest)}"><span class="tk-k">${esc(label.split('（')[0])}</span><span class="tk-d">${esc(SCREEN_JA[dest] || dest)}</span></span>`;
 };
 const TYPE_KINDS = [   // [key, label, sample, test] — Optional first: String? is an Optional
   ['optional', 'Optional（T?）', 'String?', (t) => /\?\s*$/.test(t)],
@@ -6977,6 +6979,51 @@ function wfTree(nodes) {
   };
   return levelHTML(0);
 }
+/* 分岐's condition and result as formatted JSON (ticket 2026-10-20-jui-viz-spec-branch-json-formatted; requester 10-20:
+   「json formatterでフォーマットした感じに」). The server sends a when / then the spec wrote as an object or an array as
+   it is (sheet._json_or_text); its cell is an empty placeholder in the sheet's HTML, filled after it is set with
+   JSON.stringify(v, null, 2) built from text nodes and spans — keys, strings, numbers and true / false / null each
+   coloured — with createElement and textContent only: no value of the spec ever goes through HTML. The block scrolls
+   sideways inside itself; over BJ_FOLD lines it is folded, 「全部を見る」 opens it (kept open across redraws). Anything
+   else stays the one line of text it was. */
+const BJ_FOLD = 12;
+const bjCell = (v, i, j) => (v !== null && typeof v === 'object' ? `<td class="bj-cell" data-bj="${esc(i)}:${esc(j)}"></td>` : `<td>${esc(v)}</td>`);
+const BJ_OPEN = new Set();
+function jsonBlock(v, key) {
+  const text = JSON.stringify(v, null, 2), lines = text.split('\n').length;
+  const box = document.createElement('div'), pre = document.createElement('pre');
+  box.className = 'bj'; pre.className = 'bj-pre';
+  const put = (t, cls) => {
+    if (!t) return;
+    if (!cls) { pre.append(document.createTextNode(t)); return; }
+    const sp = document.createElement('span'); sp.className = cls; sp.textContent = t; pre.append(sp);
+  };
+  const re = /("(?:[^"\\]|\\.)*")(\s*:)?|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|\b(true|false|null)\b/g;
+  let at = 0, m;
+  while ((m = re.exec(text))) {
+    put(text.slice(at, m.index));
+    if (m[1]) { put(m[1], m[2] ? 'bj-key' : 'bj-str'); put(m[2]); } else if (m[3]) put(m[3], 'bj-num'); else put(m[4], 'bj-lit');
+    at = re.lastIndex;
+  }
+  put(text.slice(at));
+  box.append(pre);
+  if (lines > BJ_FOLD) {
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'bj-more';
+    const show = (open) => { box.classList.toggle('bj-open', open); btn.setAttribute('aria-expanded', String(open)); btn.textContent = open ? '畳む' : `全部を見る（${lines} 行）`; };
+    btn.addEventListener('click', () => { const open = !box.classList.contains('bj-open'); if (open) BJ_OPEN.add(key); else BJ_OPEN.delete(key); show(open); });
+    box.classList.add('bj-fold'); show(BJ_OPEN.has(key));
+    box.append(btn);
+  }
+  return box;
+}
+function fillBranchJSON(root, branches, specId) {
+  for (const td of root.querySelectorAll('td[data-bj]')) {
+    if (td.firstChild) continue;   // filled before, the sheet's HTML unchanged
+    const [i, j] = td.dataset.bj.split(':').map(Number), row = branches[i];
+    if (row && row[j] !== null && typeof row[j] === 'object') td.append(jsonBlock(row[j], `${specId}:${i}:${j}`));
+  }
+}
 function renderNav(s) {
   if (wbNav._idx !== wb.idx) { wbNav.innerHTML = SECTIONS.map((label, k) => `<button type="button" data-sec="${k}"><span>${esc(label)}</span><small></small></button>`).join(''); wbNav._idx = wb.idx; }
   [...wbNav.children].forEach((b, k) => { const g = secState(s, k); const cls = chipCls(g); if (b.className !== cls) b.className = cls; setText(b.lastElementChild, g.text); });
@@ -7006,6 +7053,10 @@ function renderSheet(model, force) {
   let activeKey = null;
   const actAttr = (cls, key) => ((cls === 'is-doing' || cls === 'is-testing') && activeKey === null ? (activeKey = key, ' data-act') : '');
   const li = (m, key, innerHTML, depth) => `<li ${depth === undefined ? '' : `data-depth="${esc(depth)}" `}class="rw ${depth === undefined ? '' : 'rw-tree '}${esc(m[2])}"${actAttr(m[2], key)}><span class="mk ${esc(m[1])}">${esc(m[0])}</span><span>${innerHTML}</span></li>`;
+  // イベント and 操作: one table (tickets 2026-10-20-jui-viz-spec-events-as-table), the look of the variables above it.
+  // Its columns are the spec's own fields, nothing read out of the text; an event's name in one unbroken line.
+  const nameTable = (heads, bodyHTML) => `<table class="vt nt"><thead><tr><th><span class="sr">状態</span></th>${heads.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${bodyHTML}</tbody></table>`;
+  const nameCells = (cells, named) => cells.map((c, j) => `<td class="${j === 0 && named ? 'mono nt-name' : 'nt-desc'}">${esc(c)}</td>`).join('');
   const tr = (m, key, cellsHTML) => `<tr class="${esc(m[2])}"${actAttr(m[2], key)}><td class="mk ${esc(m[1])}">${esc(m[0])}</td>${cellsHTML}</tr>`;
   // The first n items of a section; while it is being written the newest one is highlighted instead of marked.
   const pick = (k, arr, n, fresh) => arr.slice(0, n).map((x, i) => [x, i, fresh ? ['', '', i === n - 1 ? 'is-new' : ''] : markOf(s, model, k, i)]);
@@ -7040,7 +7091,7 @@ function renderSheet(model, force) {
     },
     (w, writing) => {
       const rowsHTML = pick(2, d.uiVariables, reveal(d.uiVariables.length, w), writing).map(([[name, type, init], i, m]) => tr(m, `v${i}`, `<td class="mono">${esc(name)}</td>${typeCell(type)}<td class="mono">${esc(init)}</td>`)).join('');
-      const evHTML = !writing || w >= 0.6 ? `<p class="sub-h">イベント</p><ul class="rows">${d.eventHandlers.map(([name, desc]) => `<li class="rw"><span class="mk"></span><span><span class="id">${esc(name)}</span> <span class="desc">${esc(desc)}</span></span></li>`).join('')}</ul>` : '';
+      const evHTML = !writing || w >= 0.6 ? `<p class="sub-h">イベント</p>${nameTable(['イベント', '説明'], d.eventHandlers.map(([name, desc], i) => tr(['', '', ''], `e${i}`, nameCells([name, desc], true))).join(''))}` : '';
       return `<table class="vt"><thead><tr><th><span class="sr">状態</span></th><th>変数</th><th>型</th><th>初期値</th></tr></thead><tbody>${rowsHTML}</tbody></table>${evHTML}`;
     },
     (w, writing) => {
@@ -7058,12 +7109,17 @@ function renderSheet(model, force) {
       if (!d.flowMermaid || writing) return boxesHTML;
       return `<div class="flow-mmd-wrap"><div class="flow-mmd-bar"><button type="button" class="wb-btn" data-flow-zoom data-fk="flow-zoom" aria-pressed="${wb.flowFit ? 'true' : 'false'}">${wb.flowFit ? '実際の大きさ' : '幅に合わせる'}</button></div><div class="flow-mmd" data-flow-mmd role="img" aria-label="データの流れの図"></div></div><p class="sub-h">詳しく</p>${boxesHTML}`;
     },
-    (w, writing) => `<ul class="rows">${pick(4, d.userActions, reveal(d.userActions.length, w), writing).map(([[a, p], i, m]) => li(m, `a${i}`, `${esc(a)}<span class="to">→</span><code>${esc(p)}</code>`)).join('')}</ul>`,
+    (w, writing) => {
+      // 操作 (userAction: action, processing, destination): the destination column only when the spec writes one
+      const dest = d.userActions.some((x) => x[2]);
+      return nameTable(dest ? ['操作', '結果', '行き先'] : ['操作', '結果'], pick(4, d.userActions, reveal(d.userActions.length, w), writing)
+        .map(([[a, p, to], i, m]) => tr(m, `a${i}`, nameCells(dest ? [a, p, to || ''] : [a, p], false))).join(''));
+    },
     (w, writing) => `<ul class="rows">${pick(5, d.transitions, reveal(d.transitions.length, w), writing).map(([[trig, dest, how], i, m]) => li(m, `t${i}`, `${esc(trig)}<span class="to">→</span>${transitionTag(dest, how)}`)).join('')}</ul>`,
     (w, writing) => {
-      const rowsHTML = pick(6, d.branches, reveal(d.branches.length, w), writing).map(([[method, when, then], i, m]) => tr(m, `b${i}`, `<td class="mono">${esc(method)}</td><td>${esc(when)}</td><td>${esc(then)}</td>`)).join('');
+      const rowsHTML = pick(6, d.branches, reveal(d.branches.length, w), writing).map(([[method, when, then], i, m]) => tr(m, `b${i}`, `<td class="mono">${esc(method)}</td>${bjCell(when, i, 1)}${bjCell(then, i, 2)}`)).join('');
       const sheetNoteHTML = s.id === 'cart' && model.t >= 18 ? `<p class="sc-note">tests/screens/cart.test.json の 8 ケースと 1 対 1（${T.passed}/8 通過）</p>` : '';
-      return `<table class="vt"><thead><tr><th><span class="sr">状態</span></th><th>メソッド</th><th>条件</th><th>結果</th></tr></thead><tbody>${rowsHTML}</tbody></table>${sheetNoteHTML}`;
+      return `<table class="vt bt"><thead><tr><th><span class="sr">状態</span></th><th>メソッド</th><th>条件</th><th>結果</th></tr></thead><tbody>${rowsHTML}</tbody></table>${sheetNoteHTML}`;
     },
     () => `<ul class="files">${s.related.map(([type, path, exists], i) => {
       const now = i === s.relatedNow && s.by;
@@ -7086,6 +7142,7 @@ function renderSheet(model, force) {
     return `<section class="${esc(cls)}" id="wb-sec-${k}"${esc(act)}>${headHTML}${bodies[k](w, writing)}${tailHTML}</section>`;
   }).join('');
   setHTML(wbCode, sheetHTML);
+  fillBranchJSON(wbCode, d.branches, s.id);
   const mmd = wbCode.querySelector('[data-flow-mmd]');
   if (mmd) drawMermaid(mmd, d.flowMermaid).then((svg) => flowZoomApply(svg));
 
@@ -7439,6 +7496,7 @@ const focusing = () => has3D && !!rbState.id && zoom.zoomed && !camTween;
   }, { passive: false });
 }
 function openRobot(id, opener) {
+  NOTIFY.opened.set(id, Date.now());   // the session looked at since its turn's end: no 入力待ち reminder (notifyIdle)
   holdView('rb');
   if (wb.open) closeWhiteboard();
   if (tb.open) closeTaskBoard();
@@ -7886,10 +7944,10 @@ callEl.addEventListener('keydown', (e) => {
    - while question notifications can be shown (permission granted, the kind on) the page says so to the server every
      4 s and whenever the server asks (notify.ping): then a question waits for an answer though the page is hidden
      (cd's ruling 10-19; it lapses notifyPresenceSec after the last word, a closed tab included). */
-const NOTIFY_PREFS = 'jui-viz-notify', NOTIFY_RUNG = 'jui-viz-notify-rung', NOTIFY_KINDS = ['done', 'perm', 'ask', 'chime'];
+const NOTIFY_PREFS = 'jui-viz-notify', NOTIFY_RUNG = 'jui-viz-notify-rung', NOTIFY_KINDS = ['done', 'perm', 'ask', 'idle', 'chime'];
 // the chime's loudness (requester 10-20: 「音が少し小さいね」): the tones' peak gain, 中 by default (0.08 before)
 const NOTIFY_VOLUMES = { low: 0.1, mid: 0.2, high: 0.35 };
-const NOTIFY = { on: { done: true, perm: true, ask: true, chime: true }, volume: 'mid', audio: null, seen: new Set(), based: { perm: false, ask: false }, said: false, settings: null, pings: 0,
+const NOTIFY = { on: { done: true, perm: true, ask: true, idle: true, chime: true }, lastStop: new Map(), opened: new Map(), volume: 'mid', audio: null, seen: new Set(), based: { perm: false, ask: false }, said: false, settings: null, pings: 0,
   tab: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`, peers: new Map(), yieldMs: 1500 };
 function notifyLoadPrefs() {
   try {
@@ -7907,19 +7965,19 @@ const notifyGranted = () => notifyCan() && Notification.permission === 'granted'
 const notifyName = (who) => String((DEF[who] && (DEF[who].title || DEF[who].agent)) || who).slice(0, 40);
 function notifyViewing(kind, ref) {
   if (document.visibilityState !== 'visible' || !document.hasFocus()) return false;
-  if (kind === 'done') return rbState.id === ref.who;
+  if (kind === 'done' || kind === 'idle') return rbState.id === ref.who;
   if (kind === 'perm') return tb.open && (tb.detail === `perm:${ref.id}` || (!!ref.task && tb.detail === ref.task) || (tb.waitView && !tb.detail));
   return tb.open && !!(qStripEl && qStripEl.querySelector(`[data-qcard="${CSS.escape(ref.id)}"]`));
 }
 function notifyOpen(kind, ref) {
   try { window.focus(); } catch (err) { /* the OS may keep it behind */ }
-  if (kind === 'done') { if (DEF[ref.who]) openRobot(ref.who, document.getElementById('scene-canvas')); }
+  if (kind === 'done' || kind === 'idle') { NOTIFY.opened.set(ref.who, Date.now()); if (DEF[ref.who]) openRobot(ref.who, document.getElementById('scene-canvas')); }
   else if (kind === 'perm') openTaskBoard(null, ref.task || `perm:${ref.id}`);
   else { tb.waitView = true; openTaskBoard(null); }
 }
 /* The one place a notification is made. */
-function notifyOut(key, body, onClick) {
-  const n = new Notification('jui viz', { body, tag: key });
+function notifyOut(key, body, onClick, title = 'jui viz') {
+  const n = new Notification(title, { body, tag: key });
   n.onclick = () => { n.close(); onClick(); };
   return n;
 }
@@ -8014,14 +8072,14 @@ function notifyRungTake(key) {
   try { localStorage.setItem(NOTIFY_RUNG, JSON.stringify(rung.slice(-300))); } catch (err) { /* the next tab may ring it too */ }
   return true;
 }
-function notifyEvent(kind, key, ref, body) {
+function notifyEvent(kind, key, ref, body, title) {
   if (NOTIFY.seen.has(key)) return;
   NOTIFY.seen.add(key);
   if (!NOTIFY.on[kind] || !notifyGranted()) return;
   // quiet (this very thing on screen, in front): the key is taken without a ring, so a tab that comes to it later does
   // not ring it either (tabs take an event in no fixed order: one that came first may already have rung it)
   const quiet = notifyViewing(kind, ref);
-  const ring = () => { if (notifyRungTake(key) && !quiet) { notifyOut(key, body, () => notifyOpen(kind, ref)); notifyChime(kind); } };   // the sound: the same one tab
+  const ring = () => { if (notifyRungTake(key) && !quiet) { notifyOut(key, body, () => notifyOpen(kind, ref), title); notifyChime(kind); } };   // the sound: the same one tab
   const locked = (fn) => (navigator.locks && navigator.locks.request ? navigator.locks.request('jui-viz-notify', fn).catch(() => {}) : fn());
   locked(() => {
     // this tab cannot sound and another says it can: that one rings it; this one only if nobody has, a moment later
@@ -8034,10 +8092,26 @@ const notifyServer = () => (typeof LIVE !== 'undefined' && LIVE.slices.server &&
 function notifyStop(raw, item, replay = false) {
   if (replay) { NOTIFY.seen.add(`${notifyServer()}:done:${raw.seq}`); return; }   // sent again after a snapshot: seen, not rung
   if (!item || !DEF[item.who] || DEF[item.who].kind !== 'main' || !(Date.now() - (Number(raw.at) || 0) < 120_000)) return;
+  NOTIFY.lastStop.set(item.who, Date.now());
   notifyEvent('done', `${notifyServer()}:done:${raw.seq}`, { who: item.who }, `${notifyName(item.who)} が完了${raw.kind === 'StopFailure' ? '（失敗で止まった）' : ''}`);
 }
 const NOTIFY_ASK_GRACE_MS = 1500;
 NOTIFY.askFirst = new Map();
+/* 入力待ち (2.3.7, ticket 2026-10-20-jui-viz-notify-waiting-for-input; requester: 「入力待ち…検知出来るなら許可とかと同じ
+   ように通知鳴らして欲しい」). Claude Code sends Notification idle_prompt 60 s after a turn's end that nobody answered
+   (measured by the requester 10-20 10:36: Stop 10:36:45, idle_prompt 10:37:45, "Claude is waiting for your input").
+   cd's ruling: a reminder — not rung when, since that turn's end, its 完了 notification was clicked or the session was
+   opened on the page (NOTIFY.opened, by openRobot and by a click on the notification); otherwise once, with the chime,
+   by the same one-tab, yield and quiet rules; its own switch. A replay after a snapshot is seen, never rung. */
+function notifyIdle(raw, item, replay = false) {
+  const key = `${notifyServer()}:idle:${raw.seq}`;
+  if (replay) { NOTIFY.seen.add(key); return; }
+  if (!item || !DEF[item.who] || DEF[item.who].kind !== 'main' || !(Date.now() - (Number(raw.at) || 0) < 120_000)) return;
+  const stop = NOTIFY.lastStop.get(item.who) || 0, opened = NOTIFY.opened.get(item.who) || 0;
+  if (stop && opened >= stop) { NOTIFY.seen.add(key); return; }   // looked at since the turn's end: no reminder
+  const name = notifyName(item.who);
+  notifyEvent('idle', key, { who: item.who }, `${name} が返事を待っています`, `入力待ち: ${name}`);
+}
 function notifyWaiting(kind, rows) {
   const waiting = rows.filter((x) => x.status === 'pending');
   if (!NOTIFY.based[kind]) {   // the first look after loading: what already waits was there before this page
@@ -8538,7 +8612,8 @@ const HIST_POLL_MS = 3000;
    whole card (keyed) whenever its key changes, and the new pane starts at scrollTop 0 (measured 10-19: every new turn of
    a working session sent the reader to the top). newer: answers came while the reader was above (the 新しい応答 marker). */
 const HIST = { tab: 'now', id: null, data: null, error: '', timer: 0, busy: false, node: null, sig: '',
-  atEnd: true, top: 0, newer: false, marker: null, compose: null, sent: null, wide: false, imgs: new Map(), box: null };
+  atEnd: true, top: 0, newer: false, marker: null, compose: null, sent: null, wide: false, imgs: new Map(), box: null,
+  attach: [], attachThumbs: new Map() };
 
 function hNode(tag, cls, text) {
   const n = document.createElement(tag);
@@ -8752,7 +8827,10 @@ function histItem(item) {
     const n = hNode('div', 'h-item h-user h-channel');
     const head = hNode('p', 'h-who', /(^|:)jui-viz$/.test(String(item.server || '')) ? 'ページから（jui-viz の channel）' : `channel ${item.server || ''}`);
     head.appendChild(at); n.appendChild(head);
-    n.appendChild(hNode('p', 'h-plain', item.text));
+    const lines = String(item.text).split('\n'), files = lines.filter((l) => HIST_ATTACH_LINE.test(l));
+    const rest = lines.filter((l) => !HIST_ATTACH_LINE.test(l)).join('\n');
+    if (rest.trim()) n.appendChild(hNode('p', 'h-plain', rest));
+    if (files.length) n.appendChild(histAttachMarks(files));
     const cut = histCutNote(item); if (cut) n.appendChild(cut);
     return n;
   }
@@ -8935,9 +9013,33 @@ rbEl.addEventListener('click', (e) => {
    so what is typed survives a rebuild. A session without the relay, or with a jui-viz plugin older than 1.2.0 (its
    channel cannot deliver), gets the box disabled and the reason. */
 const PROMPT_MAX_BYTES = 8192;   // server.PROMPT_MAX_BODY: the JSON body, not only the text
-const composeBytes = (label, text) => new TextEncoder().encode(JSON.stringify({ sessionId: SESSION_UUID[label] || '', text })).length;
+const composeBytes = (label, text) => new TextEncoder().encode(JSON.stringify({ sessionId: SESSION_UUID[label] || '', text,
+  attachments: HIST.attach.map((a) => a.id || '0000000000000000') })).length;
+/* Files attached to the prompt (ticket 2026-10-20 prompt-attach): the 添付… button, a drop on the box, or an image pasted
+   into the text (Ctrl/⌘+V). Each goes to the server at once (SOURCE.attachFile, POST /api/attach); the prompt names their
+   ids and the server adds a line with each file's path, which the receiver opens with Read (its own permission check:
+   the permission board shows it). Limits as the server's (attachments.py). */
+const ATTACH_MAX = 10, ATTACH_FILE_MAX = 20 * 1024 * 1024, ATTACH_THUMBS_MAX = 60;
+const attachReady = () => HIST.attach.filter((a) => a.id);
+const attachBusy = () => HIST.attach.some((a) => a.up);
+const attachSize = (n) => (n < 1024 ? `${n} B` : n < 1048576 ? `${Math.round(n / 1024)} KB` : `${(n / 1048576).toFixed(1)} MB`);
 const RELAY_HOW_TEXT = RELAY_HOW.replace(/<[^>]+>/g, '');   // the same how-to as on a permission card, as plain text
 const composeNorm = (t) => String(t || '').split(/\s+/).join(' ').trim();
+/* the server's line for one attached file (ingest.attachment_line): 添付: <path>（<name>、<media>、<size>） */
+const HIST_ATTACH_LINE = /^添付: (\/\S*?([0-9a-f]{16})\.[a-z]+)（(.*)、([^、]*)、([^、]*)）$/;
+function histAttachMarks(lines) {
+  const ul = hNode('ul', 'h-attach h-attach-sent');
+  for (const line of lines) {
+    const m = HIST_ATTACH_LINE.exec(line), li = hNode('li', 'h-attach-item');
+    li.title = m[1];
+    const thumb = HIST.attachThumbs.get(m[2]);
+    if (thumb) { const img = hNode('img', 'h-attach-thumb'); img.src = thumb; img.alt = ''; li.appendChild(img); }
+    li.appendChild(hNode('span', 'h-attach-name', `📎 ${m[3]}`));
+    li.appendChild(hNode('span', 'h-attach-meta', m[5]));
+    ul.appendChild(li);
+  }
+  return ul;
+}
 /* Whether the CLI hands the channel's text to the session (sources/launch.py, 2.3.4): it does only for a session started
    naming the channel. The server's sessions slice says which case (launch); the words here are the same as the server's. */
 const PROMPT_START = 'claude --dangerously-load-development-channels plugin:jui-viz@jsonui';
@@ -9010,7 +9112,11 @@ function composeBuild() {
   const row = hNode('div', 'h-compose-row');
   const state = hNode('span', 'h-compose-state'); state.dataset.hState = ''; state.setAttribute('aria-live', 'polite');
   const send = hNode('button', 'wb-btn h-compose-send', '送信…'); send.type = 'button'; send.dataset.hSend = ''; send.dataset.fk = 'rb-prompt-send';
-  row.append(state, send);
+  const pick = hNode('button', 'wb-btn h-attach-pick', '添付…'); pick.type = 'button'; pick.dataset.hPick = ''; pick.dataset.fk = 'rb-prompt-attach';
+  pick.title = 'ファイルを添付（欄へのドロップ、画像の貼り付けでも添付できる）';
+  const input = hNode('input', ''); input.type = 'file'; input.multiple = true; input.hidden = true; input.dataset.hFile = '';
+  const list = hNode('ul', 'h-attach'); list.dataset.hAttach = ''; list.setAttribute('aria-label', '添付');
+  row.append(state, pick, send, input);
   const confirm = hNode('div', 'h-confirm'); confirm.dataset.hConfirm = ''; confirm.hidden = true;
   confirm.setAttribute('role', 'group'); confirm.setAttribute('aria-label', '送信の確認');
   const to = hNode('p', 'h-confirm-to'); to.dataset.hTo = '';
@@ -9020,8 +9126,26 @@ function composeBuild() {
   const back = hNode('button', 'wb-btn', 'やめる'); back.type = 'button'; back.dataset.hBack = '';
   acts.append(go, back);
   confirm.append(to, preview, acts);
-  box.append(head, area, row, confirm);
+  box.append(head, area, list, row, confirm);
   area.addEventListener('input', () => composePaint());
+  pick.addEventListener('click', () => input.click());
+  input.addEventListener('change', () => { attachAdd([...input.files]); input.value = ''; });
+  box.addEventListener('dragover', (e) => {
+    if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) { e.preventDefault(); box.classList.add('h-drop'); }
+  });
+  box.addEventListener('dragleave', (e) => { if (!box.contains(e.relatedTarget)) box.classList.remove('h-drop'); });
+  box.addEventListener('drop', (e) => {
+    box.classList.remove('h-drop');
+    if (!e.dataTransfer || !e.dataTransfer.files.length) return;
+    e.preventDefault(); attachAdd([...e.dataTransfer.files]);
+  });
+  area.addEventListener('paste', (e) => {   // an image copied to the clipboard; text pastes as usual
+    const cd = e.clipboardData;
+    const files = cd ? [...cd.items].filter((it) => it.kind === 'file').map((it) => it.getAsFile()).filter(Boolean) : [];
+    if (!files.length) return;
+    if (!cd.types.includes('text/plain')) e.preventDefault();
+    attachAdd(files);
+  });
   area.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !e.isComposing) { e.preventDefault(); composeAsk(); }
   });
@@ -9033,13 +9157,73 @@ function composeBuild() {
 function composeEls() {
   const b = HIST.compose;
   const q = (k) => b.querySelector(`[data-${k}]`);
-  return { box: b, head: q('h-head'), why: q('h-why'), noteX: q('h-note-x'), area: q('h-text'), state: q('h-state'), send: q('h-send'), confirm: q('h-confirm'), to: q('h-to'), preview: q('h-preview'), go: q('h-go') };
+  return { box: b, head: q('h-head'), why: q('h-why'), noteX: q('h-note-x'), area: q('h-text'), state: q('h-state'), send: q('h-send'), confirm: q('h-confirm'), to: q('h-to'), preview: q('h-preview'), go: q('h-go'),
+    pick: q('h-pick'), list: q('h-attach') };
+}
+function attachAdd(files) {
+  const id = HIST.compose && HIST.compose._for;
+  if (!id || composeTarget(id).why) return;
+  for (const file of files) {
+    if (HIST.attach.length >= ATTACH_MAX) { showToast(`添付は 1 回に ${ATTACH_MAX} 個まで`); break; }
+    const a = { key: Math.random().toString(36).slice(2), name: file.name || (file.type.startsWith('image/') ? '貼り付けた画像' : '添付'),
+      size: file.size, media: file.type || '', up: true, error: '', id: '',
+      thumb: /^image\/(png|jpeg|gif|webp)$/.test(file.type) ? URL.createObjectURL(file) : '' };
+    HIST.attach.push(a);
+    if (file.size === 0) { a.up = false; a.error = '空のファイル'; continue; }
+    if (file.size > ATTACH_FILE_MAX) { a.up = false; a.error = `大きすぎる（1 個 ${attachSize(ATTACH_FILE_MAX)} まで）`; continue; }
+    SOURCE.attachFile(id, file).then((got) => {
+      a.up = false;
+      if (!HIST.attach.includes(a)) { if (got.ok) SOURCE.attachRemove(id, got.id); return; }   // × pressed while it went up
+      if (got.ok) { a.id = got.id; a.name = got.name; a.size = got.size; a.media = got.media; }
+      else a.error = got.status === 413 ? '大きすぎる' : got.error || `HTTP ${got.status}`;
+      composePaint();
+    });
+  }
+  composePaint();
+}
+function attachRemove(a) {
+  HIST.attach = HIST.attach.filter((x) => x !== a);
+  if (a.id) SOURCE.attachRemove(HIST.compose._for, a.id);
+  if (a.thumb) URL.revokeObjectURL(a.thumb);
+  composePaint();
+}
+function attachDropAll(label) {
+  for (const a of HIST.attach) { if (a.id && label) SOURCE.attachRemove(label, a.id); if (a.thumb) URL.revokeObjectURL(a.thumb); }
+  HIST.attach = [];
+}
+/* A sent image's thumbnail stays (by its server id) for the history's own line of it; the oldest go first. */
+function attachKeepThumb(a) {
+  if (!a.thumb) return;
+  if (!a.id) { URL.revokeObjectURL(a.thumb); return; }
+  HIST.attachThumbs.set(a.id, a.thumb);
+  while (HIST.attachThumbs.size > ATTACH_THUMBS_MAX) {
+    const [old, url] = HIST.attachThumbs.entries().next().value;
+    URL.revokeObjectURL(url); HIST.attachThumbs.delete(old);
+  }
+}
+function attachPaint(E) {
+  const sig = HIST.attach.map((a) => `${a.key}:${a.id}:${a.up}:${a.error}`).join('|');
+  E.list.hidden = !HIST.attach.length;
+  if (E.list._sig === sig) return;
+  E.list._sig = sig;
+  E.list.replaceChildren(...HIST.attach.map((a) => {
+    const li = hNode('li', 'h-attach-item' + (a.error ? ' h-attach-err' : a.up ? ' h-attach-up' : ''));
+    li.dataset.hAttachItem = a.id || '';
+    if (a.thumb) { const img = hNode('img', 'h-attach-thumb'); img.src = a.thumb; img.alt = ''; li.appendChild(img); }
+    li.appendChild(hNode('span', 'h-attach-name', a.name));
+    li.appendChild(hNode('span', 'h-attach-meta', a.error ? a.error : a.up ? '送っている…' : attachSize(a.size)));
+    const x = hNode('button', 'h-attach-x', '×'); x.type = 'button'; x.setAttribute('aria-label', `${a.name} を外す`);
+    x.addEventListener('click', () => attachRemove(a));
+    li.appendChild(x);
+    return li;
+  }));
 }
 /* After every histSync: the box under the history pane of the card shown, and its state. */
 function composePlace(pane, id) {
   if (!HIST.compose) HIST.compose = composeBuild();
   const { box } = composeEls();
   if (HIST.compose._for !== id) {   // another robot: nothing typed for the last one goes to this one
+    attachDropAll(HIST.compose._for);
     HIST.compose._for = id;
     composeEls().area.value = '';
     composeClose(false);
@@ -9064,8 +9248,10 @@ function composePaint() {
   E.head.hidden = E.why.hidden;
   E.area.disabled = !!t.why;
   E.area.readOnly = asking;
-  const text = E.area.value, bytes = text.trim() ? composeBytes(id, text) : 0;
-  E.send.disabled = !!t.why || !text.trim() || bytes > PROMPT_MAX_BYTES || asking;
+  const text = E.area.value, files = attachReady().length, bytes = text.trim() || files ? composeBytes(id, text) : 0;
+  E.send.disabled = !!t.why || (!text.trim() && !files) || attachBusy() || bytes > PROMPT_MAX_BYTES || asking;
+  E.pick.disabled = !!t.why || asking || HIST.attach.length >= ATTACH_MAX;
+  attachPaint(E);
   const sent = HIST.sent && HIST.sent.id === id ? HIST.sent : null;
   const phase = sent && !sent.error ? composePhase(sent) : '';
   E.state.textContent = bytes > PROMPT_MAX_BYTES ? `長すぎる（${bytes.toLocaleString('ja-JP')} / ${PROMPT_MAX_BYTES.toLocaleString('ja-JP')} バイト）`
@@ -9086,10 +9272,12 @@ function composePhase(sent) {
   return now - sent.at > PROMPT_WAIT.notArrivedMs && sent.quietSince && now - sent.quietSince > PROMPT_WAIT.quietMs ? 'missing' : 'sending';
 }
 function composeAsk() {
-  const E = composeEls(), id = HIST.compose._for, t = composeTarget(id), text = E.area.value;
-  if (t.why || !text.trim() || composeBytes(id, text) > PROMPT_MAX_BYTES || !E.confirm.hidden) return;
+  const E = composeEls(), id = HIST.compose._for, t = composeTarget(id), text = E.area.value, files = attachReady();
+  if (t.why || (!text.trim() && !files.length) || attachBusy() || composeBytes(id, text) > PROMPT_MAX_BYTES || !E.confirm.hidden) return;
   E.to.textContent = `送り先: ${t.name}`;
-  E.preview.textContent = text.length > 400 ? `${text.slice(0, 400)}…` : text;
+  const listed = files.map((a) => `添付: ${a.name}（${attachSize(a.size)}）`).join('\n');
+  const shown = text.length > 400 ? `${text.slice(0, 400)}…` : text;
+  E.preview.textContent = [shown, listed].filter(Boolean).join('\n');
   E.confirm.hidden = false;
   E.box._askedAt = Date.now();
   composePaint();
@@ -9102,14 +9290,17 @@ function composeClose(focusBack) {
   if (focusBack) E.area.focus({ preventScroll: true });
 }
 async function composeSend() {
-  const E = composeEls(), id = HIST.compose._for, text = E.area.value;
-  if (composeTarget(id).why || !text.trim()) return;
+  const E = composeEls(), id = HIST.compose._for, text = E.area.value, files = attachReady();
+  if (composeTarget(id).why || (!text.trim() && !files.length)) return;
   E.go.disabled = true;
-  const got = await SOURCE.sendPrompt(id, text);
+  const got = await SOURCE.sendPrompt(id, text, files.map((a) => a.id));
   E.go.disabled = false;
   composeClose(!got.ok);
-  if (got.ok) { HIST.sent = { id, text, at: Date.now() }; E.area.value = ''; }
-  else HIST.sent = { id, text, at: Date.now(), error: got.error || `HTTP ${got.status}` };
+  if (got.ok) {
+    HIST.sent = { id, text, at: Date.now() }; E.area.value = '';
+    for (const a of HIST.attach) attachKeepThumb(a);
+    HIST.attach = [];
+  } else HIST.sent = { id, text, at: Date.now(), error: got.error || `HTTP ${got.status}` };
   composePaint();
 }
 /* The prompt sent shows in the receiver's transcript as a channel item of jui-viz (sources/history.py: the CLI's own
@@ -9118,7 +9309,7 @@ async function composeSend() {
 function composeArrived(items) {
   const sent = HIST.sent;
   if (!sent || sent.error || sent.arrivedAt || sent.id !== HIST.id || !Array.isArray(items)) return;
-  const want = composeNorm(sent.text).slice(0, 120);
+  const want = composeNorm(sent.text).slice(0, 120) || '添付:';   // only files: the server's first line
   const fresh = (x) => !(Number(x.at) < sent.at - 60000);   // an older item with the same words is not this one
   const ours = (x) => x.kind === 'channel' && /(^|:)jui-viz$/.test(String(x.server || ''));
   if (items.some((x) => ours(x) && fresh(x) && composeNorm(x.text).startsWith(want))) { sent.arrivedAt = Date.now(); composePaint(); }
@@ -9298,15 +9489,14 @@ document.addEventListener('click', (e) => {
    One component for every one-line ellipsis of the robot card and the side panel (the family: FULLTEXT_LINES; the table is
    in the ticket 2026-10-19-jui-viz-test-run-path-on-hover). A line that is cut (scrollWidth > clientWidth) shows a floating
    tag with its whole text, wrapped, when the pointer is over it or the keyboard focus reaches it; the tag's text can be
-   selected and copied; it stays inside the card's (or the panel's) box and goes when the pointer or the focus leaves, or
-   on Esc. A line that is not cut never gets it. Not the native title: slow, and the OS cuts a long one.
+   selected and copied; it sits at the left of the 3D (fulltextPlace, 10-20) and goes when the pointer or the focus
+   leaves (the pointer: after the time to cross to the tag), or on Esc. A line that is not cut never gets it. Not the native title: slow, and the OS cuts a long one.
    Focus: a cut line that is plain text becomes focusable (tabindex 0) only while it is cut; a line inside a button or a
    summary (already focusable) shows through that control's focus. The control or the line points at the tag
    (aria-describedby) while the tag shows. */
 const FULLTEXT_HOSTS = ['#rb', '#side', '#ticker-strip'];
-/* The log strip (2.3.6) sits at the bottom of the screen and is a few lines high: its tag opens upward and is kept inside
-   the viewport, not inside the strip. Closed (2.3.4's log-strip), its lines are not drawn: never cut, never focusable. */
-const FULLTEXT_UP = '#ticker-strip';
+/* The log strip (2.3.6) sits at the bottom of the screen, below the scene: its tag sits on the scene's bottom (fulltextPlace).
+   Closed (2.3.4's log-strip), its lines are not drawn: never cut, never focusable. */
 const FULLTEXT_LINES = [
   '.rb-run-file',                 // card · テスト実行: the test file / command (the request)
   '.rb-subs .act',                // card · サブエージェント: what each is doing
@@ -9321,7 +9511,7 @@ const FULLTEXT_LINES = [
   '.talk-peer-name',                // card · トーク (2.3.6): the peer's name in the talk's header (in its button)
   '.talk-row-name',                  // card · トーク: a peer's name in the list of talks (in its button)
 ].join(', ');
-const FULLTEXT = { el: null, anchor: null, owner: null, host: null, via: null };
+const FULLTEXT = { el: null, anchor: null, owner: null, host: null, via: null, soon: 0 };
 const fulltextCut = (el) => !!el && el.isConnected && el.scrollWidth > el.clientWidth + 1;
 const fulltextControl = (el) => el.closest('button, summary, a[href]');   // already focusable: the line shows through it
 function fulltextHost(el) { return FULLTEXT_HOSTS.map((s) => document.querySelector(s)).find((h) => h && h.contains(el)) || null; }
@@ -9346,22 +9536,42 @@ function fulltextShow(line, via) {
   Object.assign(FULLTEXT, { anchor: line, owner, host, via });
   fulltextPlace();
 }
-/* Below the line (above when there is no room), inside the host's box; wrapped to the host's width. */
+/* Where the tag goes (requester 10-20: 「いやホバーで出る位置をもっと左にしてよ」 — next to the card, a 2000-char command
+   covered the 3D from its middle to the right, top to bottom; ticket 2026-10-20-jui-viz-fulltext-float-covers-the-scene).
+   One rule for every member of the family (the card, the side panel, the log strip), never beside the line:
+     * the 3D left free: the scene's box, less the robot card when it is open (a side card: what is left of it; a bottom
+       sheet, narrow: what is above it);
+     * the tag sits at the left of that free box, FULLTEXT_PAD in, as wide as its text needs up to
+       min(FULLTEXT_MAX_W, FULLTEXT_SHARE of the free box's width) (a long text: that width, so it stays readable);
+       its right edge is then left of the free box's middle (the view's centre point stays clear; with the card open the
+       camera puts the selected robot there, so the tag may cover the robot's left side, never its middle) and never on
+       the card (the free box ends at the card);
+     * its top is level with the line, moved up or down to stay inside the free box (the log strip's line is below the
+       scene: the tag sits on the scene's bottom, above the strip); taller than the free box, it scrolls inside. */
+const FULLTEXT_PAD = 16, FULLTEXT_MAX_W = 420, FULLTEXT_SHARE = 0.4;
+function fulltextFree() {
+  const sb = sceneEl.getBoundingClientRect();
+  const f = { left: Math.max(sb.left, 0), top: Math.max(sb.top, 0), right: Math.min(sb.right, window.innerWidth), bottom: Math.min(sb.bottom, window.innerHeight) };
+  const card = document.getElementById('rb');
+  if (card && !card.hidden) {
+    const cb = card.getBoundingClientRect();
+    if (cb.left > f.left + (f.right - f.left) * 0.25) f.right = Math.min(f.right, cb.left);   // a side card
+    else f.bottom = Math.min(f.bottom, cb.top);                                                 // a bottom sheet
+  }
+  return f;
+}
 function fulltextPlace() {
-  const { el, anchor, host } = FULLTEXT;
+  const { el, anchor } = FULLTEXT;
   if (!el || el.hidden || !anchor) return;
-  const up = host.matches(FULLTEXT_UP);
-  const hb = up ? { left: 0, right: window.innerWidth, top: 0, bottom: window.innerHeight, width: window.innerWidth } : host.getBoundingClientRect();
-  const lb = anchor.getBoundingClientRect(), pad = 8;
-  const top = Math.max(hb.top, 0), bottom = Math.min(hb.bottom, window.innerHeight);
-  el.style.maxWidth = `${Math.max(120, hb.width - pad * 2)}px`;
-  el.style.maxHeight = `${Math.max(60, (bottom - top) - pad * 2)}px`;
+  const lb = anchor.getBoundingClientRect(), f = fulltextFree();
+  const w = Math.max(0, Math.min(FULLTEXT_MAX_W, (f.right - f.left) * FULLTEXT_SHARE));
+  const h = Math.max(0, f.bottom - f.top - FULLTEXT_PAD * 2);
+  el.style.maxWidth = `${Math.floor(w)}px`;
+  el.style.maxHeight = `${Math.floor(h)}px`;
   el.style.left = '0px'; el.style.top = '0px';
   const r = el.getBoundingClientRect();
-  const x = Math.min(Math.max(lb.left, hb.left + pad), hb.right - pad - r.width);
-  let y = up ? lb.top - 4 - r.height : lb.bottom + 4;
-  if (up && y < top + pad) y = Math.min(lb.bottom + 4, bottom - pad - r.height);
-  if (!up && y + r.height > bottom - pad) y = Math.max(top + pad, lb.top - 4 - r.height);
+  const x = f.left + FULLTEXT_PAD;
+  const y = Math.max(f.top + FULLTEXT_PAD, Math.min(lb.top, f.bottom - FULLTEXT_PAD - r.height));
   el.style.left = `${Math.round(x)}px`; el.style.top = `${Math.round(y)}px`;
 }
 function fulltextHide() {
@@ -9390,8 +9600,27 @@ document.addEventListener('pointerover', (e) => {
 document.addEventListener('pointerout', (e) => {
   if (FULLTEXT.via !== 'pointer' || !FULLTEXT.anchor) return;
   const to = e.relatedTarget;
-  if (FULLTEXT.anchor.contains(e.target) && !(to && (FULLTEXT.anchor.contains(to) || FULLTEXT.el.contains(to)))) fulltextHide();
+  if (FULLTEXT.anchor.contains(e.target) && !(to && (FULLTEXT.anchor.contains(to) || FULLTEXT.el.contains(to)))) fulltextHideSoon();
 });
+/* The tag is away from its line (at the 3D's left): the pointer crossing to it, to select its text, passes over the card
+   and the 3D first. It goes FULLTEXT_TRAVEL_MS after the pointer left the line, unless by then the pointer is on the tag
+   or back on the line. */
+const FULLTEXT_TRAVEL_MS = 700;
+function fulltextHideSoon() {
+  const anchor = FULLTEXT.anchor;
+  clearTimeout(FULLTEXT.soon);
+  FULLTEXT.soon = setTimeout(() => {
+    if (FULLTEXT.anchor !== anchor || FULLTEXT.via !== 'pointer') return;
+    if (FULLTEXT.el.matches(':hover') || (anchor.isConnected && anchor.matches(':hover'))) return;
+    fulltextHide();
+  }, FULLTEXT_TRAVEL_MS);
+}
+/* A press anywhere but the tag and its line, while it is crossing time: the pointer is not on its way to the tag. */
+document.addEventListener('pointerdown', (e) => {
+  if (FULLTEXT.via !== 'pointer' || !FULLTEXT.anchor || !FULLTEXT.el) return;
+  if (FULLTEXT.el.contains(e.target) || FULLTEXT.anchor.contains(e.target)) return;
+  fulltextHide();
+}, true);
 document.addEventListener('focusin', (e) => {
   const t = e.target;
   // a box focused by the mouse (the history pane takes the focus on a click) shows nothing: only a keyboard visit
