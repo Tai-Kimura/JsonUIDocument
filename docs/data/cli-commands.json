@@ -2229,8 +2229,8 @@
       "command": "lint-generated",
       "synopsis": "jui lint-generated [--fix] [--verbose] [--max-depth <n>] [--max-lines <n>] [--update-size-baseline] [--fail-on any|size-ratchet|health]",
       "purpose": {
-        "en": "CI-side audit of the generated tree: every generated file must carry the `@generated` sentinel, and every generated view function must stay inside the size bounds. Not part of `jui build` — run it in CI or before a release.",
-        "ja": "生成物の CI 向け監査: 生成ファイルは `@generated` sentinel を持つこと、生成ビューの各関数はサイズ上限内に収まることを確認する。`jui build` には含まれないので、CI かリリース前に実行する。"
+        "en": "CI-side audit of the generated tree: every generated file must carry the `@generated` sentinel, and every generated view function must stay inside the size bounds. Not part of `jui build` — run it in CI or before a release. From 2.3.13 jsonui-test's branch tests and runtimes in the same folders pass with their one-line banner and no footer, and its harness skeletons (yours) are not counted; the summary gains a Not checked line.",
+        "ja": "生成物の CI 向け監査: 生成ファイルは `@generated` sentinel を持つこと、生成ビューの各関数はサイズ上限内に収まることを確認する。`jui build` には含まれないので、CI かリリース前に実行する。2.3.13 からは、同じフォルダにある jsonui-test の branch テストとランタイムは 1 行の見出しだけでフッターが無くても通り、ハーネスの雛形（あなたの物）は数えず、まとめに Not checked の行が出る。"
       },
       "options": [
         {
@@ -2300,16 +2300,16 @@
       ],
       "aliases": [],
       "verifiedAgainst": {
-        "version": "1.8.7",
+        "version": "2.3.13",
         "columns": 80,
         "python": "3.12",
         "helpHash": "f8610ced490904f015504fdac4c01e62a89d7e17bc87e926505aa3a52244827f",
-        "cardHash": "5b6da5d1c796ee63e8cd7af1e40327ded747db57dedcc74efa9ae610979fd10a",
+        "cardHash": "bb50ffe8937b0fbbc0b26e47e844200a6b1b30056dc19e8ee9d5081394271404",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "18cd5e03726f",
           "synopsis": "24e80afa4c28",
-          "purpose": "6c29bd510299",
+          "purpose": "881677f86597",
           "options": "6d59a8a31f25",
           "examples": "3065aee645fa",
           "seeAlso": "18ad32b9c443",
@@ -3159,8 +3159,8 @@
       "command": "viz cloud-prices fetch",
       "synopsis": "jui viz cloud-prices fetch [--provider {aws,azure}] [--region REGION] [--large LARGE] [--json]",
       "purpose": {
-        "en": "Fetch the cloud prices for the infra cost simulator now (from 2.3.12), even while the daily fetch is off: AWS's public offer files (Lambda, ECS / Fargate, S3, DynamoDB, API Gateway, SQS, SNS, ELB, EKS, Secrets Manager, CloudWatch Logs, Kinesis, data transfer, ElastiCache, and CloudFront as global) and the Azure Retail Prices API, by default for ap-northeast-1 and us-east-1, japaneast and eastus. Only https to pricing.us-east-1.amazonaws.com and prices.azure.com; nothing about your project is sent. Each file goes to the cache, cloud-prices in jui viz's state folder (~/.local/state/jui-viz); a file that fails keeps its last copy. Then the index is printed. Exits 1 only when every file failed. In 2.3.12 nothing a user sees prices with the cache yet.",
-        "ja": "インフラのコストのシミュレーターに使うクラウドの単価を、今取る（2.3.12 から）。日に 1 回の取得をオフにしていても取る。AWS の公開のオファーのファイル（Lambda、ECS / Fargate、S3、DynamoDB、API Gateway、SQS、SNS、ELB、EKS、Secrets Manager、CloudWatch Logs、Kinesis、データ転送、ElastiCache と、global の CloudFront）と、Azure Retail Prices の API から、既定では ap-northeast-1・us-east-1 と japaneast・eastus の分を取る。通信は pricing.us-east-1.amazonaws.com と prices.azure.com への https だけで、プロジェクトのことは何も送らない。ファイルは jui viz の状態フォルダ（~/.local/state/jui-viz）の cloud-prices に置き、取れなかったファイルは前の物を残す。最後に索引を出す。全部のファイルが失敗したときだけ 1 で終わる。2.3.12 では、このキャッシュで値段を出す画面やコマンドはまだ無い。"
+        "en": "Fetch the cloud prices for the infra cost simulator now (from 2.3.12), even while the daily fetch is off: AWS's public offer files (Lambda, ECS / Fargate, S3, DynamoDB, API Gateway, SQS, SNS, ELB, EKS, Secrets Manager, CloudWatch Logs, Kinesis, data transfer, ElastiCache, and CloudFront as global; from 2.3.13 also EFS, Route 53, SES, VPC, EventBridge and WAF) and the Azure Retail Prices API, by default for ap-northeast-1 and us-east-1, japaneast and eastus. Only https to pricing.us-east-1.amazonaws.com and prices.azure.com; nothing about your project is sent. Each file goes to the cache, cloud-prices in jui viz's state folder (~/.local/state/jui-viz); a file that fails keeps its last copy. Then the index is printed. Exits 1 only when every file failed. In 2.3.13 nothing a user sees prices with the cache yet.",
+        "ja": "インフラのコストのシミュレーターに使うクラウドの単価を、今取る（2.3.12 から）。日に 1 回の取得をオフにしていても取る。AWS の公開のオファーのファイル（Lambda、ECS / Fargate、S3、DynamoDB、API Gateway、SQS、SNS、ELB、EKS、Secrets Manager、CloudWatch Logs、Kinesis、データ転送、ElastiCache と、global の CloudFront。2.3.13 からは EFS、Route 53、SES、VPC、EventBridge、WAF も）と、Azure Retail Prices の API から、既定では ap-northeast-1・us-east-1 と japaneast・eastus の分を取る。通信は pricing.us-east-1.amazonaws.com と prices.azure.com への https だけで、プロジェクトのことは何も送らない。ファイルは jui viz の状態フォルダ（~/.local/state/jui-viz）の cloud-prices に置き、取れなかったファイルは前の物を残す。最後に索引を出す。全部のファイルが失敗したときだけ 1 で終わる。2.3.13 でも、このキャッシュで値段を出す画面やコマンドはまだ無い。"
       },
       "options": [
         {
@@ -3213,16 +3213,16 @@
         "jui viz cloud-prices off"
       ],
       "verifiedAgainst": {
-        "version": "2.3.12",
+        "version": "2.3.13",
         "columns": 80,
         "python": "3.12",
         "helpHash": "2566379db73946ade4659f6f37e4e3255828166b14bc21f941a323bf848f08ad",
-        "cardHash": "7ec462891176b189356c1a6b7e52b500c931406cc3d362d97d76ede0ba34585a",
+        "cardHash": "4b103256fee2c2080a6540ae8ca82b46c1296fcdf08db0e8652f7c9fd8cde26b",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "9fc93c3ed264",
           "synopsis": "6295a6475046",
-          "purpose": "289838b4bdc1",
+          "purpose": "1c9d8302f2d0",
           "options": "e49bbff6dc59",
           "examples": "dfb011f8afca",
           "aliases": "98edafdd23a8",

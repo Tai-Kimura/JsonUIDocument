@@ -12,12 +12,37 @@ const I18N = (() => {
 })();
 const LOCALE = I18N.locale || 'en-US';
 const PLURAL = new Intl.PluralRules(LOCALE);
-function tl(key, params) {
-  let v = I18N.strings[key];
+function tlWords(key, p) {
+  const v = I18N.strings[key];
   if (v === undefined) return key;
+  return typeof v === 'object' ? v[PLURAL.select(Number(p.n))] ?? v.other ?? key : v;
+}
+function tl(key, params) {
   const p = params || {};
-  if (typeof v === 'object') v = v[PLURAL.select(Number(p.n))] ?? v.other ?? key;
-  return v.replace(/\{(\w+)\}/g, (m, name) => (name in p ? String(p[name]) : m));
+  return tlWords(key, p).replace(/\{(\w+)\}/g, (m, name) => (name in p ? String(p[name]) : m));
+}
+/* tl() as HTML, for words that hold markup: the words and every slot escaped, then `…` in the words drawn as
+   <code>…</code> — the only markup a table's words can make (a slot's backtick is escaped first, so it makes none). */
+const TL_ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '\x60': '&#96;' };   // \x60: the backtick
+const TL_CODE = new RegExp('\\x60([^\\x60]*)\\x60', 'g');
+const tlEsc = (s) => String(s).replace(/[&<>"'\x60]/g, (c) => TL_ESC[c]);
+function tlHTML(key, params) {
+  const p = params || {};
+  return tlWords(key, p).split(/(\{\w+\})/).map((part) => {
+    const slot = /^\{(\w+)\}$/.exec(part);
+    if (slot && slot[1] in p) return tlEsc(p[slot[1]]);
+    return tlEsc(part).replace(/&#96;/g, '\x60');
+  }).join('').replace(TL_CODE, '<code>$1</code>');
+}
+/* app.css's words: `content: var(--tl-name, 'the words as written')`. Each key css.name of the table is set on
+   :root as --tl-name, a CSS string (its backslashes and quotes escaped, a line break as \A); a key the table lacks
+   keeps the words as written. The gate holds the words as written to the Japanese table, letter for letter. */
+const TL_CSS_ESC = new RegExp('[\\\\"]', 'g');
+const tlCss = (v) => '"' + String(v).replace(TL_CSS_ESC, (c) => '\\' + c).replace(/\n/g, '\\A ') + '"';
+if (document.documentElement) {
+  for (const [key, v] of Object.entries(I18N.strings)) {
+    if (key.startsWith('css.') && typeof v === 'string') document.documentElement.style.setProperty('--tl-' + key.slice(4).replace(/\./g, '-'), tlCss(v));
+  }
 }
 /* Times and counts in the language's own form */
 const fmtTime = (d, opts) => new Date(d).toLocaleTimeString(LOCALE, opts);
@@ -35,7 +60,7 @@ const FONT_BODY = '"BIZ UDPGothic", "Hiragino Sans", "Yu Gothic", sans-serif';
 const FONT_MONO = '"JetBrains Mono", ui-monospace, Menlo, monospace';
 
 const ROLES = {
-  main: { name: 'メイン', color: '#0ea5e9', pill: '#0369a1' },   // sky blue (2.3.5, requester 10-19: 「スカイブルーにしようか」; it was orange, beside the subagents' orange coveralls)
+  main: { name: tl('role.main'), color: '#0ea5e9', pill: '#0369a1' },   // sky blue (2.3.5, requester 10-19: 「スカイブルーにしようか」; it was orange, beside the subagents' orange coveralls)
   // `pill` (2.3.6, ticket 2026-10-20-jui-viz-main-pill-text-contrast): a role's pills (over the robot, in the panels, on the
   // boards) take it in place of `color`, white text on it. Main's is one step darker (#0369a1, white 5.93:1); its body stays #0ea5e9.
   // define / ground / navigation / test / other the same (requester 10-20: 「全部直す」): each the body's hue, darker, white ≥ 4.7:1.
@@ -45,7 +70,7 @@ const ROLES = {
   navigation: { name: 'navigation', color: '#10a693', pill: '#0c8172' },
   test: { name: 'test', color: '#3fae4a', pill: '#2f8338' },
   debug: { name: 'debug', color: '#f0b400' },
-  other: { name: 'その他', color: '#8a9bb0', pill: '#60748e' },
+  other: { name: tl('role.other'), color: '#8a9bb0', pill: '#60748e' },
 };
 /* Whatever is filled with a role's colour and has text on it (pills, the talk's marks, a phone's header and button) takes
    pillBg, with pillInk (20-core.js) for the text; the robot's own parts keep ROLES[role].color. */
@@ -65,19 +90,19 @@ const SUB_SIZE = 0.8;
 // asking: a question waits (ticket 2026-10-20-jui-viz-3d-waiting-kinds-question-permission-input): a violet far from the permission's amber
 const LAMP = { idle: '#8fa3bf', busy: '#35d07f', think: '#8fe0b4', bg: '#4cc3d9', waiting: '#ffb020', asking: '#b48cff', done: '#35d07f', off: '#2a3a30' };
 const STATES = {
-  idle: { name: '待機', lamp: 'idle', face: 'normal' },
-  thinking: { name: '考え中', lamp: 'think', face: 'normal' },
-  background: { name: '裏で作業中', lamp: 'bg', face: 'normal' },   // waiting on background work: lit, watching its screen (10-18)
-  typing: { name: '入力', lamp: 'busy', face: 'focus' },
-  reading: { name: '読む', lamp: 'busy', face: 'normal' },
-  command: { name: 'コマンド', lamp: 'busy', face: 'focus' },
-  phone: { name: 'スマホ', lamp: 'busy', face: 'focus' },
-  waiting: { name: '許可待ち', lamp: 'waiting', face: 'wide' },
-  carry: { name: '運ぶ', lamp: 'busy', face: 'normal' },
-  stroll: { name: '歩く', lamp: 'idle', face: 'normal' },   // to and from play (10-18): no papers; the lamp is the real state's
-  done: { name: '完了', lamp: 'done', face: 'happy' },
+  idle: { name: tl('status.idle'), lamp: 'idle', face: 'normal' },
+  thinking: { name: tl('status.thinking'), lamp: 'think', face: 'normal' },
+  background: { name: tl('status.background'), lamp: 'bg', face: 'normal' },   // waiting on background work: lit, watching its screen (10-18)
+  typing: { name: tl('robot.state.typing'), lamp: 'busy', face: 'focus' },
+  reading: { name: tl('robot.state.reading'), lamp: 'busy', face: 'normal' },
+  command: { name: tl('robot.state.command'), lamp: 'busy', face: 'focus' },
+  phone: { name: tl('robot.state.phone'), lamp: 'busy', face: 'focus' },
+  waiting: { name: tl('status.waiting'), lamp: 'waiting', face: 'wide' },
+  carry: { name: tl('robot.state.carry'), lamp: 'busy', face: 'normal' },
+  stroll: { name: tl('robot.state.stroll'), lamp: 'idle', face: 'normal' },   // to and from play (10-18): no papers; the lamp is the real state's
+  done: { name: tl('status.done'), lamp: 'done', face: 'happy' },
 };
-const LAMP_TEXT = { idle: '青灰（待機）', busy: '緑（作業中）', think: '淡い緑のゆっくり点滅（考え中）', waiting: '黄（許可待ち）', asking: '紫（質問に回答待ち）', done: '緑の点滅（完了）', bg: '水色（裏で作業中）' };
+const LAMP_TEXT = { idle: tl('lamp.idle'), busy: tl('lamp.busy'), think: tl('lamp.think'), waiting: tl('lamp.waiting'), asking: tl('lamp.asking'), done: tl('lamp.done'), bg: tl('lamp.bg') };
 
 const HIPS_Y = 0.36;
 const HEAD = { w: 1.1, h: 0.9, d: 0.92, r: 0.17 };
@@ -240,7 +265,7 @@ function drawCover(c) {
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)'; ctx.lineWidth = 3; ctx.strokeRect(10, 10, c.width - 20, c.height - 20);
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillStyle = '#ffd166'; ctx.font = `700 34px ${FONT_MONO}`; ctx.fillText('{ }', c.width / 2, 58);
-  ctx.fillStyle = '#ffffff'; ctx.font = `30px ${FONT_DISPLAY}`; ctx.fillText('仕様書', c.width / 2, 112);
+  ctx.fillStyle = '#ffffff'; ctx.font = `30px ${FONT_DISPLAY}`; ctx.fillText(tl('robot.paper.spec'), c.width / 2, 112);
   ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'; ctx.font = `700 18px ${FONT_MONO}`; ctx.fillText('Login', c.width / 2, 150);
 }
 
@@ -342,7 +367,7 @@ function drawPhoneUI(r, t) {
   ctx.fillStyle = accent; ctx.fillRect(sx, sy, sw, 64);
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = ink; ctx.font = `700 11px ${FONT_MONO}`; ctx.fillText('9:41', sx + 12, sy + 17); ctx.fillRect(sx + sw - 32, sy + 8, 18, 9);
-  ctx.fillStyle = ink; ctx.font = `700 19px ${FONT_BODY}`; ctx.fillText('ログイン', sx + 14, sy + 50);
+  ctx.fillStyle = ink; ctx.font = `700 19px ${FONT_BODY}`; ctx.fillText(tl('robot.screen.login'), sx + 14, sy + 50);
   for (let i = 0; i < 2; i++) {
     const y = sy + 84 + i * 52;
     ctx.fillStyle = '#7a879b'; ctx.fillRect(sx + 14, y, 56 + i * 20, 7);
@@ -353,7 +378,7 @@ function drawPhoneUI(r, t) {
   }
   const by = sy + 200;
   rr(ctx, sx + 14, by, sw - 28, 40, 10); ctx.fillStyle = accent; ctx.fill();
-  ctx.fillStyle = ink; ctx.font = `700 15px ${FONT_BODY}`; ctx.textAlign = 'center'; ctx.fillText('ログイン', sx + sw / 2, by + 26);
+  ctx.fillStyle = ink; ctx.font = `700 15px ${FONT_BODY}`; ctx.textAlign = 'center'; ctx.fillText(tl('robot.screen.login'), sx + sw / 2, by + 26);
   const ph = (t * 0.7) % 1;
   ctx.beginPath(); ctx.arc(sx + sw / 2 + 24, by + 20, 6 + ph * 30, 0, Math.PI * 2);
   ctx.strokeStyle = `rgba(255, 255, 255, ${(0.9 * (1 - ph)).toFixed(2)})`; ctx.lineWidth = 4; ctx.stroke();
@@ -698,7 +723,7 @@ function whistleProp() {
   g.userData.whistle = true;
   return g;
 }
-function pipiBubble(text = 'ピッ！') {                        // 「ピッ」 over the head while the whistle blows
+function pipiBubble(text = tl('robot.whistle')) {                        // 「ピッ」 over the head while the whistle blows
   const canvas = makeCanvas(192, 112), ctx = canvas.getContext('2d');
   ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#1f2532'; ctx.lineWidth = 6;
   rr(ctx, 6, 6, 180, 78, 30); ctx.fill(); ctx.stroke();
@@ -731,7 +756,7 @@ function lookUpdate(r, t, dt) {
   if (blow && !r.whistle) { r.whistle = whistleProp(); r.head.add(r.whistle); }
   if (r.whistle) r.whistle.visible = blow;
   if (look === 'whistle' && !r.launch && !r.pipi) { r.pipi = pipiBubble(); r.root.add(r.pipi); }
-  if (r.launch && !r.pipiLong) { r.pipiLong = pipiBubble('ピーッ！'); r.pipiLong.userData.launch = true; r.root.add(r.pipiLong); }
+  if (r.launch && !r.pipiLong) { r.pipiLong = pipiBubble(tl('robot.whistle.long')); r.pipiLong.userData.launch = true; r.root.add(r.pipiLong); }
   for (const [bubble, on] of [[r.pipi, look === 'whistle' && !r.launch], [r.pipiLong, !!r.launch]]) {
     if (!bubble) continue;
     bubble.visible = on;
@@ -938,7 +963,7 @@ function callPose(p, t) {   // the right hand at the ear, the head toward it
    the inner hands (the walk and the パチン mark are the scene's); rps (じゃんけん): three pumps, then the hand drawn in a
    bubble that stays up until the next pump, the winner raises both arms, the loser hangs its head, あいこ plays again
    at once. The timing helpers are shared with the scene (40-scene.js), so the arms, the ball and the walk agree. */
-const RPS_HANDS = ['グー', 'チョキ', 'パー'];
+const RPS_HANDS = [tl('rps.rock'), tl('rps.scissors'), tl('rps.paper')];
 const playEase = (v) => { const k = Math.max(0, Math.min(1, v)); return k * k * (3 - 2 * k); };
 const playMix = (a, b, k) => a + (b - a) * k;
 // ball: one throw per half; the thrower winds up until windup, the ball leaves the hand at release
@@ -1035,7 +1060,7 @@ function rpsDraw(ctx, W, H, hand, res) {
   ctx.fillStyle = '#1f2532'; ctx.font = `700 50px ${FONT_BODY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(RPS_HANDS[hand], 200, res ? 74 : 104);
   if (res) {
-    const [text, color] = { win: ['かち！', '#d0352b'], lose: ['まけ…', '#5b6577'], tie: ['あいこ', '#d88a00'] }[res];
+    const [text, color] = { win: [tl('rps.win'), '#d0352b'], lose: [tl('rps.lose'), '#5b6577'], tie: [tl('rps.tie'), '#d88a00'] }[res];
     ctx.fillStyle = color; ctx.font = `700 46px ${FONT_DISPLAY}`; ctx.fillText(text, 200, 150);
   }
 }
@@ -2539,762 +2564,1520 @@ setTimeout(() => {
   }
 }, 0);
 // ---- web/js/31-talk-demo-data.js ----
-// The talk view's demo data: frames as jui_cli/viz/talk_contract.json says (data only, no code). Read by the demo
-// source in place of the server's talk.* frames. Checked by tests/test_viz_talk_demo_data.py.
+// The talk view's demo data: frames as jui_cli/viz/talk_contract.json says (data only, no code), one set per
+// language. Read by the demo source in place of the server's talk.* frames. Checked by
+// tests/test_viz_talk_demo_data.py.
 // eslint-disable-next-line no-unused-vars
-const TALK_DEMO = {
- "about": "The talk view's demo data (frames as talk_contract.json says), for the demo page only. Times are ms around base; the page moves them by its own clock (now - base). script: frames that arrive t seconds into the demo.",
- "contractVersion": 2,
- "base": 1792300000000,
- "badges": {
-  "type": "talk.badges",
-  "counts": {
-   "a0": 2
-  }
- },
- "lists": {
-  "a0": {
-   "type": "talk.list",
-   "agentId": "a0",
-   "items": [
-    {
-     "id": "t-e7be89fd2788347b",
-     "owner": "a0",
-     "peer": {
-      "key": "4f",
-      "agentId": "4f",
-      "sessionId": "4f2b0000-0000-4000-8000-00000000004f",
-      "name": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
-      "kind": "session",
-      "alive": true,
-      "goneAt": null,
-      "removeAt": null
-     },
-     "lastAt": 1792299520000,
-     "preview": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
-     "lastDir": "in",
-     "unread": 1,
-     "count": 1
-    },
-    {
-     "id": "t-70adb9b17963bc5a",
-     "owner": "a0",
-     "peer": {
-      "key": "b4",
-      "agentId": "b4",
-      "sessionId": "b47e0000-0000-4000-8000-0000000000b4",
-      "name": "shop-app-signup",
-      "kind": "session",
-      "alive": true,
-      "goneAt": null,
-      "removeAt": null
-     },
-     "lastAt": 1792299400000,
-     "preview": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
-     "lastDir": "out",
-     "unread": 1,
-     "count": 4
-    },
-    {
-     "id": "t-56ee3add5d59df3a",
-     "owner": "a0",
-     "peer": {
-      "key": "x:cloud-reviewer",
-      "agentId": null,
-      "sessionId": null,
-      "name": "cloud-reviewer",
-      "kind": "external",
-      "alive": false,
-      "goneAt": 1792298800000,
-      "removeAt": 1792302400000
-     },
-     "lastAt": 1792298800000,
-     "preview": "レビューをお願いします（クラウドの相手へ）",
-     "lastDir": "out",
-     "unread": 0,
-     "count": 1
-    },
-    {
-     "id": "t-68f5487e3df0ef59",
-     "owner": "a0",
-     "peer": {
-      "key": "a3",
-      "agentId": "a3",
-      "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
-      "name": "サブエージェント a3（jsonui-define）",
-      "kind": "subagent",
-      "alive": true,
-      "goneAt": null,
-      "removeAt": null
-     },
-     "lastAt": 1792298500000,
-     "preview": "足しました。doc_validate_spec は緑です。",
-     "lastDir": "in",
-     "unread": 0,
-     "count": 2
-    },
-    {
-     "id": "t-d74ea5e94db195e1",
-     "owner": "a0",
-     "peer": {
-      "key": "d8",
-      "agentId": "d8",
-      "sessionId": "d8a50000-0000-4000-8000-0000000000d8",
-      "name": "shop-app-payment",
-      "kind": "session",
-      "alive": false,
-      "goneAt": 1792299700000,
-      "removeAt": 1792303300000
-     },
-     "lastAt": 1792297120000,
-     "preview": "シミュレーターを待っています。空いたら流します。",
-     "lastDir": "in",
-     "unread": 0,
-     "count": 2
-    }
-   ],
-   "more": false
+const TALK_DEMO_BY_LANGUAGE = {
+ "en": {
+  "about": "The talk view's demo data (frames as talk_contract.json says), for the demo page only. Times are ms around base; the page moves them by its own clock (now - base). script: frames that arrive t seconds into the demo.",
+  "contractVersion": 2,
+  "base": 1792300000000,
+  "badges": {
+   "type": "talk.badges",
+   "counts": {
+    "a0": 2
+   }
   },
-  "b4": {
-   "type": "talk.list",
-   "agentId": "b4",
-   "items": [
-    {
-     "id": "t-70adb9b17963bc5a",
-     "owner": "b4",
-     "peer": {
-      "key": "a0",
-      "agentId": "a0",
-      "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
-      "name": "shop-app-main",
-      "kind": "session",
-      "alive": true,
-      "goneAt": null,
-      "removeAt": null
-     },
-     "lastAt": 1792299400000,
-     "preview": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
-     "lastDir": "in",
-     "unread": 0,
-     "count": 4
-    }
-   ],
-   "more": false
-  },
-  "a3": {
-   "type": "talk.list",
-   "agentId": "a3",
-   "items": [
-    {
-     "id": "t-68f5487e3df0ef59",
-     "owner": "a3",
-     "peer": {
-      "key": "a0",
-      "agentId": "a0",
-      "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
-      "name": "shop-app-main",
-      "kind": "session",
-      "alive": true,
-      "goneAt": null,
-      "removeAt": null
-     },
-     "lastAt": 1792298500000,
-     "preview": "足しました。doc_validate_spec は緑です。",
-     "lastDir": "out",
-     "unread": 0,
-     "count": 2
-    }
-   ],
-   "more": false
-  },
-  "4f": {
-   "type": "talk.list",
-   "agentId": "4f",
-   "items": [
-    {
-     "id": "t-e7be89fd2788347b",
-     "owner": "4f",
-     "peer": {
-      "key": "a0",
-      "agentId": "a0",
-      "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
-      "name": "shop-app-main",
-      "kind": "session",
-      "alive": true,
-      "goneAt": null,
-      "removeAt": null
-     },
-     "lastAt": 1792299520000,
-     "preview": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
-     "lastDir": "out",
-     "unread": 0,
-     "count": 1
-    }
-   ],
-   "more": false
-  },
-  "d8": {
-   "type": "talk.list",
-   "agentId": "d8",
-   "items": [
-    {
-     "id": "t-d74ea5e94db195e1",
-     "owner": "d8",
-     "peer": {
-      "key": "a0",
-      "agentId": "a0",
-      "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
-      "name": "shop-app-main",
-      "kind": "session",
-      "alive": true,
-      "goneAt": null,
-      "removeAt": null
-     },
-     "lastAt": 1792297120000,
-     "preview": "シミュレーターを待っています。空いたら流します。",
-     "lastDir": "out",
-     "unread": 0,
-     "count": 2
-    }
-   ],
-   "more": false
-  }
- },
- "messages": {
-  "a0 t-70adb9b17963bc5a": {
-   "type": "talk.messages",
-   "reqId": 0,
-   "agentId": "a0",
-   "convId": "t-70adb9b17963bc5a",
-   "items": [
-    {
-     "id": "m-demo-0001-0000-4000-8000-000000000000",
-     "msgId": "demo-0001-0000-4000-8000-000000000000",
-     "convId": "t-70adb9b17963bc5a",
-     "dir": "out",
-     "fromName": "shop-app-main",
-     "toName": "shop-app-signup",
-     "at": 1792297480000,
-     "deliveredAt": 1792297480800,
-     "readAt": 1792297481600,
-     "state": "read",
-     "text": "会員登録の画面、進み具合はどう？",
-     "cut": false,
-     "summary": "会員登録の進み具合",
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    },
-    {
-     "id": "m-demo-0002-0000-4000-8000-000000000000",
-     "msgId": "demo-0002-0000-4000-8000-000000000000",
-     "convId": "t-70adb9b17963bc5a",
-     "dir": "in",
-     "fromName": "shop-app-signup",
-     "toName": "shop-app-main",
-     "at": 1792297600000,
-     "deliveredAt": 1792297600800,
-     "readAt": 1792297601600,
-     "state": "read",
-     "text": "いま入力の検証を書いています。30 分ほどで出せます。",
-     "cut": false,
-     "summary": null,
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    },
-    {
-     "id": "m-demo-0003-0000-4000-8000-000000000000",
-     "msgId": "demo-0003-0000-4000-8000-000000000000",
-     "convId": "t-70adb9b17963bc5a",
-     "dir": "in",
-     "fromName": "shop-app-signup",
-     "toName": "shop-app-main",
-     "at": 1792299280000,
-     "deliveredAt": 1792299280800,
-     "readAt": 1792299281600,
-     "state": "read",
-     "text": "会員登録の画面を仕上げました。確認してほしい点は次のとおりです。\n\n1. **メールアドレス**の入力欄は、確認用の欄と一致しないとき `送信` を押せないようにしました。\n2. パスワードは 8 文字以上、英字と数字を含むこと。弱いときは赤い文で理由を出します。\n3. 利用規約のリンクは別画面で開きます（戻ると入力は残ります）。\n\nテスト: `jsonui-test run tests/screens/signup` で 14 件すべて通りました。\niOS と Android のスクリーンショットは docs/screens/signup/ に置いてあります。\n<script>alert(1)</script> のような文字列も、そのまま文字として出ること（escape の見本）。\n残り: 住所の自動入力は次の列車で。",
-     "cut": false,
-     "summary": "会員登録の画面を仕上げた",
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    },
-    {
-     "id": "m-demo-0004-0000-4000-8000-000000000000",
-     "msgId": "demo-0004-0000-4000-8000-000000000000",
-     "convId": "t-70adb9b17963bc5a",
-     "dir": "out",
-     "fromName": "shop-app-main",
-     "toName": "shop-app-signup",
-     "at": 1792299400000,
-     "deliveredAt": 1792299400800,
-     "readAt": null,
-     "state": "delivered",
-     "text": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
-     "cut": false,
-     "summary": null,
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    }
-   ],
-   "more": false
-  },
-  "a0 t-68f5487e3df0ef59": {
-   "type": "talk.messages",
-   "reqId": 0,
-   "agentId": "a0",
-   "convId": "t-68f5487e3df0ef59",
-   "items": [
-    {
-     "id": "u-toolu_demo_0005",
-     "msgId": null,
-     "convId": "t-68f5487e3df0ef59",
-     "dir": "out",
-     "fromName": "shop-app-main",
-     "toName": "サブエージェント a3（jsonui-define）",
-     "at": 1792298200000,
-     "deliveredAt": 1792298200800,
-     "readAt": 1792298201600,
-     "state": "read",
-     "text": "signup.spec.json の項目を 3 つ足して、検証を通してください。",
-     "cut": false,
-     "summary": null,
-     "seen": "both",
-     "via": "subagent",
-     "merged": false
-    },
-    {
-     "id": "u-toolu_demo_0006",
-     "msgId": null,
-     "convId": "t-68f5487e3df0ef59",
-     "dir": "in",
-     "fromName": "サブエージェント a3（jsonui-define）",
-     "toName": "shop-app-main",
-     "at": 1792298500000,
-     "deliveredAt": 1792298500800,
-     "readAt": 1792298501600,
-     "state": "read",
-     "text": "足しました。doc_validate_spec は緑です。",
-     "cut": false,
-     "summary": null,
-     "seen": "both",
-     "via": "parent",
-     "merged": false
-    }
-   ],
-   "more": false
-  },
-  "a0 t-56ee3add5d59df3a": {
-   "type": "talk.messages",
-   "reqId": 0,
-   "agentId": "a0",
-   "convId": "t-56ee3add5d59df3a",
-   "items": [
-    {
-     "id": "u-toolu_demo_0007",
-     "msgId": null,
-     "convId": "t-56ee3add5d59df3a",
-     "dir": "out",
-     "fromName": "shop-app-main",
-     "toName": "cloud-reviewer",
-     "at": 1792298800000,
-     "deliveredAt": null,
-     "readAt": null,
-     "state": "undelivered",
-     "text": "レビューをお願いします（クラウドの相手へ）",
-     "cut": false,
-     "summary": null,
-     "seen": "sender",
-     "via": "external",
-     "merged": false
-    }
-   ],
-   "more": false
-  },
-  "a0 t-e7be89fd2788347b": {
-   "type": "talk.messages",
-   "reqId": 0,
-   "agentId": "a0",
-   "convId": "t-e7be89fd2788347b",
-   "items": [
-    {
-     "id": "m-demo-0008-0000-4000-8000-000000000000",
-     "msgId": "demo-0008-0000-4000-8000-000000000000",
-     "convId": "t-e7be89fd2788347b",
-     "dir": "in",
-     "fromName": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
-     "toName": "shop-app-main",
-     "at": 1792299520000,
-     "deliveredAt": 1792299520800,
-     "readAt": 1792299521600,
-     "state": "read",
-     "text": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
-     "cut": false,
-     "summary": "2.3.7 の範囲",
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    }
-   ],
-   "more": false
-  },
-  "a0 t-d74ea5e94db195e1": {
-   "type": "talk.messages",
-   "reqId": 0,
-   "agentId": "a0",
-   "convId": "t-d74ea5e94db195e1",
-   "items": [
-    {
-     "id": "m-demo-0009-0000-4000-8000-000000000000",
-     "msgId": "demo-0009-0000-4000-8000-000000000000",
-     "convId": "t-d74ea5e94db195e1",
-     "dir": "out",
-     "fromName": "shop-app-main",
-     "toName": "shop-app-payment",
-     "at": 1792297000000,
-     "deliveredAt": 1792297000800,
-     "readAt": 1792297001600,
-     "state": "read",
-     "text": "決済の画面のテスト、止まっていますか？",
-     "cut": false,
-     "summary": null,
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    },
-    {
-     "id": "m-demo-0010-0000-4000-8000-000000000000",
-     "msgId": "demo-0010-0000-4000-8000-000000000000",
-     "convId": "t-d74ea5e94db195e1",
-     "dir": "in",
-     "fromName": "shop-app-payment",
-     "toName": "shop-app-main",
-     "at": 1792297120000,
-     "deliveredAt": 1792297120800,
-     "readAt": 1792297121600,
-     "state": "read",
-     "text": "シミュレーターを待っています。空いたら流します。",
-     "cut": false,
-     "summary": null,
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    }
-   ],
-   "more": false
-  },
-  "b4 t-70adb9b17963bc5a": {
-   "type": "talk.messages",
-   "reqId": 0,
-   "agentId": "b4",
-   "convId": "t-70adb9b17963bc5a",
-   "items": [
-    {
-     "id": "m-demo-0001-0000-4000-8000-000000000000",
-     "msgId": "demo-0001-0000-4000-8000-000000000000",
-     "convId": "t-70adb9b17963bc5a",
-     "dir": "in",
-     "fromName": "shop-app-main",
-     "toName": "shop-app-signup",
-     "at": 1792297480000,
-     "deliveredAt": 1792297480800,
-     "readAt": 1792297481600,
-     "state": "read",
-     "text": "会員登録の画面、進み具合はどう？",
-     "cut": false,
-     "summary": "会員登録の進み具合",
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    },
-    {
-     "id": "m-demo-0002-0000-4000-8000-000000000000",
-     "msgId": "demo-0002-0000-4000-8000-000000000000",
-     "convId": "t-70adb9b17963bc5a",
-     "dir": "out",
-     "fromName": "shop-app-signup",
-     "toName": "shop-app-main",
-     "at": 1792297600000,
-     "deliveredAt": 1792297600800,
-     "readAt": 1792297601600,
-     "state": "read",
-     "text": "いま入力の検証を書いています。30 分ほどで出せます。",
-     "cut": false,
-     "summary": null,
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    },
-    {
-     "id": "m-demo-0003-0000-4000-8000-000000000000",
-     "msgId": "demo-0003-0000-4000-8000-000000000000",
-     "convId": "t-70adb9b17963bc5a",
-     "dir": "out",
-     "fromName": "shop-app-signup",
-     "toName": "shop-app-main",
-     "at": 1792299280000,
-     "deliveredAt": 1792299280800,
-     "readAt": 1792299281600,
-     "state": "read",
-     "text": "会員登録の画面を仕上げました。確認してほしい点は次のとおりです。\n\n1. **メールアドレス**の入力欄は、確認用の欄と一致しないとき `送信` を押せないようにしました。\n2. パスワードは 8 文字以上、英字と数字を含むこと。弱いときは赤い文で理由を出します。\n3. 利用規約のリンクは別画面で開きます（戻ると入力は残ります）。\n\nテスト: `jsonui-test run tests/screens/signup` で 14 件すべて通りました。\niOS と Android のスクリーンショットは docs/screens/signup/ に置いてあります。\n<script>alert(1)</script> のような文字列も、そのまま文字として出ること（escape の見本）。\n残り: 住所の自動入力は次の列車で。",
-     "cut": false,
-     "summary": "会員登録の画面を仕上げた",
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    },
-    {
-     "id": "m-demo-0004-0000-4000-8000-000000000000",
-     "msgId": "demo-0004-0000-4000-8000-000000000000",
-     "convId": "t-70adb9b17963bc5a",
-     "dir": "in",
-     "fromName": "shop-app-main",
-     "toName": "shop-app-signup",
-     "at": 1792299400000,
-     "deliveredAt": 1792299400800,
-     "readAt": null,
-     "state": "delivered",
-     "text": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
-     "cut": false,
-     "summary": null,
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    }
-   ],
-   "more": false
-  },
-  "a3 t-68f5487e3df0ef59": {
-   "type": "talk.messages",
-   "reqId": 0,
-   "agentId": "a3",
-   "convId": "t-68f5487e3df0ef59",
-   "items": [
-    {
-     "id": "u-toolu_demo_0005",
-     "msgId": null,
-     "convId": "t-68f5487e3df0ef59",
-     "dir": "in",
-     "fromName": "shop-app-main",
-     "toName": "サブエージェント a3（jsonui-define）",
-     "at": 1792298200000,
-     "deliveredAt": 1792298200800,
-     "readAt": 1792298201600,
-     "state": "read",
-     "text": "signup.spec.json の項目を 3 つ足して、検証を通してください。",
-     "cut": false,
-     "summary": null,
-     "seen": "both",
-     "via": "subagent",
-     "merged": false
-    },
-    {
-     "id": "u-toolu_demo_0006",
-     "msgId": null,
-     "convId": "t-68f5487e3df0ef59",
-     "dir": "out",
-     "fromName": "サブエージェント a3（jsonui-define）",
-     "toName": "shop-app-main",
-     "at": 1792298500000,
-     "deliveredAt": 1792298500800,
-     "readAt": 1792298501600,
-     "state": "read",
-     "text": "足しました。doc_validate_spec は緑です。",
-     "cut": false,
-     "summary": null,
-     "seen": "both",
-     "via": "parent",
-     "merged": false
-    }
-   ],
-   "more": false
-  },
-  "4f t-e7be89fd2788347b": {
-   "type": "talk.messages",
-   "reqId": 0,
-   "agentId": "4f",
-   "convId": "t-e7be89fd2788347b",
-   "items": [
-    {
-     "id": "m-demo-0008-0000-4000-8000-000000000000",
-     "msgId": "demo-0008-0000-4000-8000-000000000000",
-     "convId": "t-e7be89fd2788347b",
-     "dir": "out",
-     "fromName": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
-     "toName": "shop-app-main",
-     "at": 1792299520000,
-     "deliveredAt": 1792299520800,
-     "readAt": 1792299521600,
-     "state": "read",
-     "text": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
-     "cut": false,
-     "summary": "2.3.7 の範囲",
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    }
-   ],
-   "more": false
-  },
-  "d8 t-d74ea5e94db195e1": {
-   "type": "talk.messages",
-   "reqId": 0,
-   "agentId": "d8",
-   "convId": "t-d74ea5e94db195e1",
-   "items": [
-    {
-     "id": "m-demo-0009-0000-4000-8000-000000000000",
-     "msgId": "demo-0009-0000-4000-8000-000000000000",
-     "convId": "t-d74ea5e94db195e1",
-     "dir": "in",
-     "fromName": "shop-app-main",
-     "toName": "shop-app-payment",
-     "at": 1792297000000,
-     "deliveredAt": 1792297000800,
-     "readAt": 1792297001600,
-     "state": "read",
-     "text": "決済の画面のテスト、止まっていますか？",
-     "cut": false,
-     "summary": null,
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    },
-    {
-     "id": "m-demo-0010-0000-4000-8000-000000000000",
-     "msgId": "demo-0010-0000-4000-8000-000000000000",
-     "convId": "t-d74ea5e94db195e1",
-     "dir": "out",
-     "fromName": "shop-app-payment",
-     "toName": "shop-app-main",
-     "at": 1792297120000,
-     "deliveredAt": 1792297120800,
-     "readAt": 1792297121600,
-     "state": "read",
-     "text": "シミュレーターを待っています。空いたら流します。",
-     "cut": false,
-     "summary": null,
-     "seen": "both",
-     "via": "session",
-     "merged": false
-    }
-   ],
-   "more": false
-  }
- },
- "script": [
-  {
-   "t": 20,
-   "frame": {
-    "type": "talk.update",
+  "lists": {
+   "a0": {
+    "type": "talk.list",
     "agentId": "a0",
-    "ops": [
+    "items": [
      {
-      "op": "message",
-      "convId": "t-70adb9b17963bc5a",
-      "message": {
-       "id": "m-demo-0011-0000-4000-8000-000000000000",
-       "msgId": "demo-0011-0000-4000-8000-000000000000",
-       "convId": "t-70adb9b17963bc5a",
-       "dir": "in",
-       "fromName": "shop-app-signup",
-       "toName": "shop-app-main",
-       "at": 1792300020000,
-       "deliveredAt": 1792300020700,
-       "readAt": null,
-       "state": "delivered",
-       "text": "スクリーンショットを差し替えました。もう一度見てください。",
-       "cut": false,
-       "summary": "差し替え",
-       "seen": "both",
-       "via": "session",
-       "merged": false
-      }
+      "id": "t-e7be89fd2788347b",
+      "owner": "a0",
+      "peer": {
+       "key": "4f",
+       "agentId": "4f",
+       "sessionId": "4f2b0000-0000-4000-8000-00000000004f",
+       "name": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+       "kind": "session",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792299520000,
+      "preview": "The 2.3.7 train's scope is set. The talk view is in.",
+      "lastDir": "in",
+      "unread": 1,
+      "count": 1
      },
      {
-      "op": "conv",
-      "conv": {
-       "id": "t-70adb9b17963bc5a",
-       "owner": "a0",
-       "peer": {
-        "key": "b4",
-        "agentId": "b4",
-        "sessionId": "b47e0000-0000-4000-8000-0000000000b4",
-        "name": "shop-app-signup",
-        "kind": "session",
-        "alive": true,
-        "goneAt": null,
-        "removeAt": null
-       },
-       "lastAt": 1792300020000,
-       "preview": "スクリーンショットを差し替えました。もう一度見てください。",
-       "lastDir": "in",
-       "unread": 2,
-       "count": 5
-      }
+      "id": "t-70adb9b17963bc5a",
+      "owner": "a0",
+      "peer": {
+       "key": "b4",
+       "agentId": "b4",
+       "sessionId": "b47e0000-0000-4000-8000-0000000000b4",
+       "name": "shop-app-signup",
+       "kind": "session",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792299400000,
+      "preview": "Thanks. Address autofill on the next train is fine.",
+      "lastDir": "out",
+      "unread": 1,
+      "count": 4
+     },
+     {
+      "id": "t-56ee3add5d59df3a",
+      "owner": "a0",
+      "peer": {
+       "key": "x:cloud-reviewer",
+       "agentId": null,
+       "sessionId": null,
+       "name": "cloud-reviewer",
+       "kind": "external",
+       "alive": false,
+       "goneAt": 1792298800000,
+       "removeAt": 1792302400000
+      },
+      "lastAt": 1792298800000,
+      "preview": "Please review this (to the cloud peer)",
+      "lastDir": "out",
+      "unread": 0,
+      "count": 1
+     },
+     {
+      "id": "t-68f5487e3df0ef59",
+      "owner": "a0",
+      "peer": {
+       "key": "a3",
+       "agentId": "a3",
+       "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+       "name": "subagent a3 (jsonui-define)",
+       "kind": "subagent",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792298500000,
+      "preview": "Added. doc_validate_spec is green.",
+      "lastDir": "in",
+      "unread": 0,
+      "count": 2
+     },
+     {
+      "id": "t-d74ea5e94db195e1",
+      "owner": "a0",
+      "peer": {
+       "key": "d8",
+       "agentId": "d8",
+       "sessionId": "d8a50000-0000-4000-8000-0000000000d8",
+       "name": "shop-app-payment",
+       "kind": "session",
+       "alive": false,
+       "goneAt": 1792299700000,
+       "removeAt": 1792303300000
+      },
+      "lastAt": 1792297120000,
+      "preview": "Waiting for the simulator. It runs as soon as one is free.",
+      "lastDir": "in",
+      "unread": 0,
+      "count": 2
      }
-    ]
-   }
-  },
-  {
-   "t": 20,
-   "frame": {
-    "type": "talk.badges",
-    "counts": {
-     "a0": 3
-    }
-   }
-  },
-  {
-   "t": 30,
-   "frame": {
-    "type": "talk.update",
-    "agentId": "a0",
-    "ops": [
+    ],
+    "more": false
+   },
+   "b4": {
+    "type": "talk.list",
+    "agentId": "b4",
+    "items": [
      {
-      "op": "message",
-      "convId": "t-70adb9b17963bc5a",
-      "message": {
-       "id": "m-demo-0004-0000-4000-8000-000000000000",
-       "msgId": "demo-0004-0000-4000-8000-000000000000",
-       "convId": "t-70adb9b17963bc5a",
-       "dir": "out",
-       "fromName": "shop-app-main",
-       "toName": "shop-app-signup",
-       "at": 1792299400000,
-       "deliveredAt": 1792299400800,
-       "readAt": 1792300030000,
-       "state": "read",
-       "text": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
-       "cut": false,
-       "summary": null,
-       "seen": "both",
-       "via": "session",
-       "merged": false
-      }
+      "id": "t-70adb9b17963bc5a",
+      "owner": "b4",
+      "peer": {
+       "key": "a0",
+       "agentId": "a0",
+       "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+       "name": "shop-app-main",
+       "kind": "session",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792299400000,
+      "preview": "Thanks. Address autofill on the next train is fine.",
+      "lastDir": "in",
+      "unread": 0,
+      "count": 4
      }
-    ]
+    ],
+    "more": false
+   },
+   "a3": {
+    "type": "talk.list",
+    "agentId": "a3",
+    "items": [
+     {
+      "id": "t-68f5487e3df0ef59",
+      "owner": "a3",
+      "peer": {
+       "key": "a0",
+       "agentId": "a0",
+       "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+       "name": "shop-app-main",
+       "kind": "session",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792298500000,
+      "preview": "Added. doc_validate_spec is green.",
+      "lastDir": "out",
+      "unread": 0,
+      "count": 2
+     }
+    ],
+    "more": false
+   },
+   "4f": {
+    "type": "talk.list",
+    "agentId": "4f",
+    "items": [
+     {
+      "id": "t-e7be89fd2788347b",
+      "owner": "4f",
+      "peer": {
+       "key": "a0",
+       "agentId": "a0",
+       "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+       "name": "shop-app-main",
+       "kind": "session",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792299520000,
+      "preview": "The 2.3.7 train's scope is set. The talk view is in.",
+      "lastDir": "out",
+      "unread": 0,
+      "count": 1
+     }
+    ],
+    "more": false
+   },
+   "d8": {
+    "type": "talk.list",
+    "agentId": "d8",
+    "items": [
+     {
+      "id": "t-d74ea5e94db195e1",
+      "owner": "d8",
+      "peer": {
+       "key": "a0",
+       "agentId": "a0",
+       "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+       "name": "shop-app-main",
+       "kind": "session",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792297120000,
+      "preview": "Waiting for the simulator. It runs as soon as one is free.",
+      "lastDir": "out",
+      "unread": 0,
+      "count": 2
+     }
+    ],
+    "more": false
    }
   },
-  {
-   "t": 45,
-   "frame": {
-    "type": "talk.update",
+  "messages": {
+   "a0 t-70adb9b17963bc5a": {
+    "type": "talk.messages",
+    "reqId": 0,
     "agentId": "a0",
-    "ops": [
+    "convId": "t-70adb9b17963bc5a",
+    "items": [
      {
-      "op": "remove",
+      "id": "m-demo-0001-0000-4000-8000-000000000000",
+      "msgId": "demo-0001-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "out",
+      "fromName": "shop-app-main",
+      "toName": "shop-app-signup",
+      "at": 1792297480000,
+      "deliveredAt": 1792297480800,
+      "readAt": 1792297481600,
+      "state": "read",
+      "text": "How is the sign-up screen going?",
+      "cut": false,
+      "summary": "Sign-up progress",
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0002-0000-4000-8000-000000000000",
+      "msgId": "demo-0002-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "in",
+      "fromName": "shop-app-signup",
+      "toName": "shop-app-main",
+      "at": 1792297600000,
+      "deliveredAt": 1792297600800,
+      "readAt": 1792297601600,
+      "state": "read",
+      "text": "Writing the input checks now. About 30 minutes to go.",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0003-0000-4000-8000-000000000000",
+      "msgId": "demo-0003-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "in",
+      "fromName": "shop-app-signup",
+      "toName": "shop-app-main",
+      "at": 1792299280000,
+      "deliveredAt": 1792299280800,
+      "readAt": 1792299281600,
+      "state": "read",
+      "text": "The sign-up screen is done. Here is what to check:\n\n1. The **email** field cannot be sent (`Send` stays off) until it matches the confirmation field.\n2. Passwords need 8 characters or more, with letters and digits. A weak one says why in red.\n3. The terms link opens on its own screen (coming back keeps what was typed).\n\nTests: all 14 pass with `jsonui-test run tests/screens/signup`.\nThe iOS and Android screenshots are in docs/screens/signup/.\nA string like <script>alert(1)</script> shows as plain text (the escaping example).\nLeft: address autofill goes on the next train.",
+      "cut": false,
+      "summary": "The sign-up screen is done",
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0004-0000-4000-8000-000000000000",
+      "msgId": "demo-0004-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "out",
+      "fromName": "shop-app-main",
+      "toName": "shop-app-signup",
+      "at": 1792299400000,
+      "deliveredAt": 1792299400800,
+      "readAt": null,
+      "state": "delivered",
+      "text": "Thanks. Address autofill on the next train is fine.",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "a0 t-68f5487e3df0ef59": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "a0",
+    "convId": "t-68f5487e3df0ef59",
+    "items": [
+     {
+      "id": "u-toolu_demo_0005",
+      "msgId": null,
+      "convId": "t-68f5487e3df0ef59",
+      "dir": "out",
+      "fromName": "shop-app-main",
+      "toName": "subagent a3 (jsonui-define)",
+      "at": 1792298200000,
+      "deliveredAt": 1792298200800,
+      "readAt": 1792298201600,
+      "state": "read",
+      "text": "Add three fields to signup.spec.json and get it through validation, please.",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "subagent",
+      "merged": false
+     },
+     {
+      "id": "u-toolu_demo_0006",
+      "msgId": null,
+      "convId": "t-68f5487e3df0ef59",
+      "dir": "in",
+      "fromName": "subagent a3 (jsonui-define)",
+      "toName": "shop-app-main",
+      "at": 1792298500000,
+      "deliveredAt": 1792298500800,
+      "readAt": 1792298501600,
+      "state": "read",
+      "text": "Added. doc_validate_spec is green.",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "parent",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "a0 t-56ee3add5d59df3a": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "a0",
+    "convId": "t-56ee3add5d59df3a",
+    "items": [
+     {
+      "id": "u-toolu_demo_0007",
+      "msgId": null,
+      "convId": "t-56ee3add5d59df3a",
+      "dir": "out",
+      "fromName": "shop-app-main",
+      "toName": "cloud-reviewer",
+      "at": 1792298800000,
+      "deliveredAt": null,
+      "readAt": null,
+      "state": "undelivered",
+      "text": "Please review this (to the cloud peer)",
+      "cut": false,
+      "summary": null,
+      "seen": "sender",
+      "via": "external",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "a0 t-e7be89fd2788347b": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "a0",
+    "convId": "t-e7be89fd2788347b",
+    "items": [
+     {
+      "id": "m-demo-0008-0000-4000-8000-000000000000",
+      "msgId": "demo-0008-0000-4000-8000-000000000000",
+      "convId": "t-e7be89fd2788347b",
+      "dir": "in",
+      "fromName": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+      "toName": "shop-app-main",
+      "at": 1792299520000,
+      "deliveredAt": 1792299520800,
+      "readAt": 1792299521600,
+      "state": "read",
+      "text": "The 2.3.7 train's scope is set. The talk view is in.",
+      "cut": false,
+      "summary": "2.3.7 scope",
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "a0 t-d74ea5e94db195e1": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "a0",
+    "convId": "t-d74ea5e94db195e1",
+    "items": [
+     {
+      "id": "m-demo-0009-0000-4000-8000-000000000000",
+      "msgId": "demo-0009-0000-4000-8000-000000000000",
       "convId": "t-d74ea5e94db195e1",
-      "reason": "peer-ended"
+      "dir": "out",
+      "fromName": "shop-app-main",
+      "toName": "shop-app-payment",
+      "at": 1792297000000,
+      "deliveredAt": 1792297000800,
+      "readAt": 1792297001600,
+      "state": "read",
+      "text": "Is the payment screen's test stuck?",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0010-0000-4000-8000-000000000000",
+      "msgId": "demo-0010-0000-4000-8000-000000000000",
+      "convId": "t-d74ea5e94db195e1",
+      "dir": "in",
+      "fromName": "shop-app-payment",
+      "toName": "shop-app-main",
+      "at": 1792297120000,
+      "deliveredAt": 1792297120800,
+      "readAt": 1792297121600,
+      "state": "read",
+      "text": "Waiting for the simulator. It runs as soon as one is free.",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
      }
-    ]
+    ],
+    "more": false
+   },
+   "b4 t-70adb9b17963bc5a": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "b4",
+    "convId": "t-70adb9b17963bc5a",
+    "items": [
+     {
+      "id": "m-demo-0001-0000-4000-8000-000000000000",
+      "msgId": "demo-0001-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "in",
+      "fromName": "shop-app-main",
+      "toName": "shop-app-signup",
+      "at": 1792297480000,
+      "deliveredAt": 1792297480800,
+      "readAt": 1792297481600,
+      "state": "read",
+      "text": "How is the sign-up screen going?",
+      "cut": false,
+      "summary": "Sign-up progress",
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0002-0000-4000-8000-000000000000",
+      "msgId": "demo-0002-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "out",
+      "fromName": "shop-app-signup",
+      "toName": "shop-app-main",
+      "at": 1792297600000,
+      "deliveredAt": 1792297600800,
+      "readAt": 1792297601600,
+      "state": "read",
+      "text": "Writing the input checks now. About 30 minutes to go.",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0003-0000-4000-8000-000000000000",
+      "msgId": "demo-0003-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "out",
+      "fromName": "shop-app-signup",
+      "toName": "shop-app-main",
+      "at": 1792299280000,
+      "deliveredAt": 1792299280800,
+      "readAt": 1792299281600,
+      "state": "read",
+      "text": "The sign-up screen is done. Here is what to check:\n\n1. The **email** field cannot be sent (`Send` stays off) until it matches the confirmation field.\n2. Passwords need 8 characters or more, with letters and digits. A weak one says why in red.\n3. The terms link opens on its own screen (coming back keeps what was typed).\n\nTests: all 14 pass with `jsonui-test run tests/screens/signup`.\nThe iOS and Android screenshots are in docs/screens/signup/.\nA string like <script>alert(1)</script> shows as plain text (the escaping example).\nLeft: address autofill goes on the next train.",
+      "cut": false,
+      "summary": "The sign-up screen is done",
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0004-0000-4000-8000-000000000000",
+      "msgId": "demo-0004-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "in",
+      "fromName": "shop-app-main",
+      "toName": "shop-app-signup",
+      "at": 1792299400000,
+      "deliveredAt": 1792299400800,
+      "readAt": null,
+      "state": "delivered",
+      "text": "Thanks. Address autofill on the next train is fine.",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "a3 t-68f5487e3df0ef59": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "a3",
+    "convId": "t-68f5487e3df0ef59",
+    "items": [
+     {
+      "id": "u-toolu_demo_0005",
+      "msgId": null,
+      "convId": "t-68f5487e3df0ef59",
+      "dir": "in",
+      "fromName": "shop-app-main",
+      "toName": "subagent a3 (jsonui-define)",
+      "at": 1792298200000,
+      "deliveredAt": 1792298200800,
+      "readAt": 1792298201600,
+      "state": "read",
+      "text": "Add three fields to signup.spec.json and get it through validation, please.",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "subagent",
+      "merged": false
+     },
+     {
+      "id": "u-toolu_demo_0006",
+      "msgId": null,
+      "convId": "t-68f5487e3df0ef59",
+      "dir": "out",
+      "fromName": "subagent a3 (jsonui-define)",
+      "toName": "shop-app-main",
+      "at": 1792298500000,
+      "deliveredAt": 1792298500800,
+      "readAt": 1792298501600,
+      "state": "read",
+      "text": "Added. doc_validate_spec is green.",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "parent",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "4f t-e7be89fd2788347b": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "4f",
+    "convId": "t-e7be89fd2788347b",
+    "items": [
+     {
+      "id": "m-demo-0008-0000-4000-8000-000000000000",
+      "msgId": "demo-0008-0000-4000-8000-000000000000",
+      "convId": "t-e7be89fd2788347b",
+      "dir": "out",
+      "fromName": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+      "toName": "shop-app-main",
+      "at": 1792299520000,
+      "deliveredAt": 1792299520800,
+      "readAt": 1792299521600,
+      "state": "read",
+      "text": "The 2.3.7 train's scope is set. The talk view is in.",
+      "cut": false,
+      "summary": "2.3.7 scope",
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "d8 t-d74ea5e94db195e1": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "d8",
+    "convId": "t-d74ea5e94db195e1",
+    "items": [
+     {
+      "id": "m-demo-0009-0000-4000-8000-000000000000",
+      "msgId": "demo-0009-0000-4000-8000-000000000000",
+      "convId": "t-d74ea5e94db195e1",
+      "dir": "in",
+      "fromName": "shop-app-main",
+      "toName": "shop-app-payment",
+      "at": 1792297000000,
+      "deliveredAt": 1792297000800,
+      "readAt": 1792297001600,
+      "state": "read",
+      "text": "Is the payment screen's test stuck?",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0010-0000-4000-8000-000000000000",
+      "msgId": "demo-0010-0000-4000-8000-000000000000",
+      "convId": "t-d74ea5e94db195e1",
+      "dir": "out",
+      "fromName": "shop-app-payment",
+      "toName": "shop-app-main",
+      "at": 1792297120000,
+      "deliveredAt": 1792297120800,
+      "readAt": 1792297121600,
+      "state": "read",
+      "text": "Waiting for the simulator. It runs as soon as one is free.",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     }
+    ],
+    "more": false
    }
-  }
- ]
+  },
+  "script": [
+   {
+    "t": 20,
+    "frame": {
+     "type": "talk.update",
+     "agentId": "a0",
+     "ops": [
+      {
+       "op": "message",
+       "convId": "t-70adb9b17963bc5a",
+       "message": {
+        "id": "m-demo-0011-0000-4000-8000-000000000000",
+        "msgId": "demo-0011-0000-4000-8000-000000000000",
+        "convId": "t-70adb9b17963bc5a",
+        "dir": "in",
+        "fromName": "shop-app-signup",
+        "toName": "shop-app-main",
+        "at": 1792300020000,
+        "deliveredAt": 1792300020700,
+        "readAt": null,
+        "state": "delivered",
+        "text": "The screenshots are replaced. Please take another look.",
+        "cut": false,
+        "summary": "Replaced",
+        "seen": "both",
+        "via": "session",
+        "merged": false
+       }
+      },
+      {
+       "op": "conv",
+       "conv": {
+        "id": "t-70adb9b17963bc5a",
+        "owner": "a0",
+        "peer": {
+         "key": "b4",
+         "agentId": "b4",
+         "sessionId": "b47e0000-0000-4000-8000-0000000000b4",
+         "name": "shop-app-signup",
+         "kind": "session",
+         "alive": true,
+         "goneAt": null,
+         "removeAt": null
+        },
+        "lastAt": 1792300020000,
+        "preview": "The screenshots are replaced. Please take another look.",
+        "lastDir": "in",
+        "unread": 2,
+        "count": 5
+       }
+      }
+     ]
+    }
+   },
+   {
+    "t": 20,
+    "frame": {
+     "type": "talk.badges",
+     "counts": {
+      "a0": 3
+     }
+    }
+   },
+   {
+    "t": 30,
+    "frame": {
+     "type": "talk.update",
+     "agentId": "a0",
+     "ops": [
+      {
+       "op": "message",
+       "convId": "t-70adb9b17963bc5a",
+       "message": {
+        "id": "m-demo-0004-0000-4000-8000-000000000000",
+        "msgId": "demo-0004-0000-4000-8000-000000000000",
+        "convId": "t-70adb9b17963bc5a",
+        "dir": "out",
+        "fromName": "shop-app-main",
+        "toName": "shop-app-signup",
+        "at": 1792299400000,
+        "deliveredAt": 1792299400800,
+        "readAt": 1792300030000,
+        "state": "read",
+        "text": "Thanks. Address autofill on the next train is fine.",
+        "cut": false,
+        "summary": null,
+        "seen": "both",
+        "via": "session",
+        "merged": false
+       }
+      }
+     ]
+    }
+   },
+   {
+    "t": 45,
+    "frame": {
+     "type": "talk.update",
+     "agentId": "a0",
+     "ops": [
+      {
+       "op": "remove",
+       "convId": "t-d74ea5e94db195e1",
+       "reason": "peer-ended"
+      }
+     ]
+    }
+   }
+  ]
+ },
+ "ja": {
+  "about": "The talk view's demo data (frames as talk_contract.json says), for the demo page only. Times are ms around base; the page moves them by its own clock (now - base). script: frames that arrive t seconds into the demo.",
+  "contractVersion": 2,
+  "base": 1792300000000,
+  "badges": {
+   "type": "talk.badges",
+   "counts": {
+    "a0": 2
+   }
+  },
+  "lists": {
+   "a0": {
+    "type": "talk.list",
+    "agentId": "a0",
+    "items": [
+     {
+      "id": "t-e7be89fd2788347b",
+      "owner": "a0",
+      "peer": {
+       "key": "4f",
+       "agentId": "4f",
+       "sessionId": "4f2b0000-0000-4000-8000-00000000004f",
+       "name": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+       "kind": "session",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792299520000,
+      "preview": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
+      "lastDir": "in",
+      "unread": 1,
+      "count": 1
+     },
+     {
+      "id": "t-70adb9b17963bc5a",
+      "owner": "a0",
+      "peer": {
+       "key": "b4",
+       "agentId": "b4",
+       "sessionId": "b47e0000-0000-4000-8000-0000000000b4",
+       "name": "shop-app-signup",
+       "kind": "session",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792299400000,
+      "preview": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+      "lastDir": "out",
+      "unread": 1,
+      "count": 4
+     },
+     {
+      "id": "t-56ee3add5d59df3a",
+      "owner": "a0",
+      "peer": {
+       "key": "x:cloud-reviewer",
+       "agentId": null,
+       "sessionId": null,
+       "name": "cloud-reviewer",
+       "kind": "external",
+       "alive": false,
+       "goneAt": 1792298800000,
+       "removeAt": 1792302400000
+      },
+      "lastAt": 1792298800000,
+      "preview": "レビューをお願いします（クラウドの相手へ）",
+      "lastDir": "out",
+      "unread": 0,
+      "count": 1
+     },
+     {
+      "id": "t-68f5487e3df0ef59",
+      "owner": "a0",
+      "peer": {
+       "key": "a3",
+       "agentId": "a3",
+       "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+       "name": "サブエージェント a3（jsonui-define）",
+       "kind": "subagent",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792298500000,
+      "preview": "足しました。doc_validate_spec は緑です。",
+      "lastDir": "in",
+      "unread": 0,
+      "count": 2
+     },
+     {
+      "id": "t-d74ea5e94db195e1",
+      "owner": "a0",
+      "peer": {
+       "key": "d8",
+       "agentId": "d8",
+       "sessionId": "d8a50000-0000-4000-8000-0000000000d8",
+       "name": "shop-app-payment",
+       "kind": "session",
+       "alive": false,
+       "goneAt": 1792299700000,
+       "removeAt": 1792303300000
+      },
+      "lastAt": 1792297120000,
+      "preview": "シミュレーターを待っています。空いたら流します。",
+      "lastDir": "in",
+      "unread": 0,
+      "count": 2
+     }
+    ],
+    "more": false
+   },
+   "b4": {
+    "type": "talk.list",
+    "agentId": "b4",
+    "items": [
+     {
+      "id": "t-70adb9b17963bc5a",
+      "owner": "b4",
+      "peer": {
+       "key": "a0",
+       "agentId": "a0",
+       "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+       "name": "shop-app-main",
+       "kind": "session",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792299400000,
+      "preview": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+      "lastDir": "in",
+      "unread": 0,
+      "count": 4
+     }
+    ],
+    "more": false
+   },
+   "a3": {
+    "type": "talk.list",
+    "agentId": "a3",
+    "items": [
+     {
+      "id": "t-68f5487e3df0ef59",
+      "owner": "a3",
+      "peer": {
+       "key": "a0",
+       "agentId": "a0",
+       "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+       "name": "shop-app-main",
+       "kind": "session",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792298500000,
+      "preview": "足しました。doc_validate_spec は緑です。",
+      "lastDir": "out",
+      "unread": 0,
+      "count": 2
+     }
+    ],
+    "more": false
+   },
+   "4f": {
+    "type": "talk.list",
+    "agentId": "4f",
+    "items": [
+     {
+      "id": "t-e7be89fd2788347b",
+      "owner": "4f",
+      "peer": {
+       "key": "a0",
+       "agentId": "a0",
+       "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+       "name": "shop-app-main",
+       "kind": "session",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792299520000,
+      "preview": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
+      "lastDir": "out",
+      "unread": 0,
+      "count": 1
+     }
+    ],
+    "more": false
+   },
+   "d8": {
+    "type": "talk.list",
+    "agentId": "d8",
+    "items": [
+     {
+      "id": "t-d74ea5e94db195e1",
+      "owner": "d8",
+      "peer": {
+       "key": "a0",
+       "agentId": "a0",
+       "sessionId": "a07c0000-0000-4000-8000-0000000000a0",
+       "name": "shop-app-main",
+       "kind": "session",
+       "alive": true,
+       "goneAt": null,
+       "removeAt": null
+      },
+      "lastAt": 1792297120000,
+      "preview": "シミュレーターを待っています。空いたら流します。",
+      "lastDir": "out",
+      "unread": 0,
+      "count": 2
+     }
+    ],
+    "more": false
+   }
+  },
+  "messages": {
+   "a0 t-70adb9b17963bc5a": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "a0",
+    "convId": "t-70adb9b17963bc5a",
+    "items": [
+     {
+      "id": "m-demo-0001-0000-4000-8000-000000000000",
+      "msgId": "demo-0001-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "out",
+      "fromName": "shop-app-main",
+      "toName": "shop-app-signup",
+      "at": 1792297480000,
+      "deliveredAt": 1792297480800,
+      "readAt": 1792297481600,
+      "state": "read",
+      "text": "会員登録の画面、進み具合はどう？",
+      "cut": false,
+      "summary": "会員登録の進み具合",
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0002-0000-4000-8000-000000000000",
+      "msgId": "demo-0002-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "in",
+      "fromName": "shop-app-signup",
+      "toName": "shop-app-main",
+      "at": 1792297600000,
+      "deliveredAt": 1792297600800,
+      "readAt": 1792297601600,
+      "state": "read",
+      "text": "いま入力の検証を書いています。30 分ほどで出せます。",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0003-0000-4000-8000-000000000000",
+      "msgId": "demo-0003-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "in",
+      "fromName": "shop-app-signup",
+      "toName": "shop-app-main",
+      "at": 1792299280000,
+      "deliveredAt": 1792299280800,
+      "readAt": 1792299281600,
+      "state": "read",
+      "text": "会員登録の画面を仕上げました。確認してほしい点は次のとおりです。\n\n1. **メールアドレス**の入力欄は、確認用の欄と一致しないとき `送信` を押せないようにしました。\n2. パスワードは 8 文字以上、英字と数字を含むこと。弱いときは赤い文で理由を出します。\n3. 利用規約のリンクは別画面で開きます（戻ると入力は残ります）。\n\nテスト: `jsonui-test run tests/screens/signup` で 14 件すべて通りました。\niOS と Android のスクリーンショットは docs/screens/signup/ に置いてあります。\n<script>alert(1)</script> のような文字列も、そのまま文字として出ること（escape の見本）。\n残り: 住所の自動入力は次の列車で。",
+      "cut": false,
+      "summary": "会員登録の画面を仕上げた",
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0004-0000-4000-8000-000000000000",
+      "msgId": "demo-0004-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "out",
+      "fromName": "shop-app-main",
+      "toName": "shop-app-signup",
+      "at": 1792299400000,
+      "deliveredAt": 1792299400800,
+      "readAt": null,
+      "state": "delivered",
+      "text": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "a0 t-68f5487e3df0ef59": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "a0",
+    "convId": "t-68f5487e3df0ef59",
+    "items": [
+     {
+      "id": "u-toolu_demo_0005",
+      "msgId": null,
+      "convId": "t-68f5487e3df0ef59",
+      "dir": "out",
+      "fromName": "shop-app-main",
+      "toName": "サブエージェント a3（jsonui-define）",
+      "at": 1792298200000,
+      "deliveredAt": 1792298200800,
+      "readAt": 1792298201600,
+      "state": "read",
+      "text": "signup.spec.json の項目を 3 つ足して、検証を通してください。",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "subagent",
+      "merged": false
+     },
+     {
+      "id": "u-toolu_demo_0006",
+      "msgId": null,
+      "convId": "t-68f5487e3df0ef59",
+      "dir": "in",
+      "fromName": "サブエージェント a3（jsonui-define）",
+      "toName": "shop-app-main",
+      "at": 1792298500000,
+      "deliveredAt": 1792298500800,
+      "readAt": 1792298501600,
+      "state": "read",
+      "text": "足しました。doc_validate_spec は緑です。",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "parent",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "a0 t-56ee3add5d59df3a": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "a0",
+    "convId": "t-56ee3add5d59df3a",
+    "items": [
+     {
+      "id": "u-toolu_demo_0007",
+      "msgId": null,
+      "convId": "t-56ee3add5d59df3a",
+      "dir": "out",
+      "fromName": "shop-app-main",
+      "toName": "cloud-reviewer",
+      "at": 1792298800000,
+      "deliveredAt": null,
+      "readAt": null,
+      "state": "undelivered",
+      "text": "レビューをお願いします（クラウドの相手へ）",
+      "cut": false,
+      "summary": null,
+      "seen": "sender",
+      "via": "external",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "a0 t-e7be89fd2788347b": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "a0",
+    "convId": "t-e7be89fd2788347b",
+    "items": [
+     {
+      "id": "m-demo-0008-0000-4000-8000-000000000000",
+      "msgId": "demo-0008-0000-4000-8000-000000000000",
+      "convId": "t-e7be89fd2788347b",
+      "dir": "in",
+      "fromName": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+      "toName": "shop-app-main",
+      "at": 1792299520000,
+      "deliveredAt": 1792299520800,
+      "readAt": 1792299521600,
+      "state": "read",
+      "text": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
+      "cut": false,
+      "summary": "2.3.7 の範囲",
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "a0 t-d74ea5e94db195e1": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "a0",
+    "convId": "t-d74ea5e94db195e1",
+    "items": [
+     {
+      "id": "m-demo-0009-0000-4000-8000-000000000000",
+      "msgId": "demo-0009-0000-4000-8000-000000000000",
+      "convId": "t-d74ea5e94db195e1",
+      "dir": "out",
+      "fromName": "shop-app-main",
+      "toName": "shop-app-payment",
+      "at": 1792297000000,
+      "deliveredAt": 1792297000800,
+      "readAt": 1792297001600,
+      "state": "read",
+      "text": "決済の画面のテスト、止まっていますか？",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0010-0000-4000-8000-000000000000",
+      "msgId": "demo-0010-0000-4000-8000-000000000000",
+      "convId": "t-d74ea5e94db195e1",
+      "dir": "in",
+      "fromName": "shop-app-payment",
+      "toName": "shop-app-main",
+      "at": 1792297120000,
+      "deliveredAt": 1792297120800,
+      "readAt": 1792297121600,
+      "state": "read",
+      "text": "シミュレーターを待っています。空いたら流します。",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "b4 t-70adb9b17963bc5a": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "b4",
+    "convId": "t-70adb9b17963bc5a",
+    "items": [
+     {
+      "id": "m-demo-0001-0000-4000-8000-000000000000",
+      "msgId": "demo-0001-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "in",
+      "fromName": "shop-app-main",
+      "toName": "shop-app-signup",
+      "at": 1792297480000,
+      "deliveredAt": 1792297480800,
+      "readAt": 1792297481600,
+      "state": "read",
+      "text": "会員登録の画面、進み具合はどう？",
+      "cut": false,
+      "summary": "会員登録の進み具合",
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0002-0000-4000-8000-000000000000",
+      "msgId": "demo-0002-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "out",
+      "fromName": "shop-app-signup",
+      "toName": "shop-app-main",
+      "at": 1792297600000,
+      "deliveredAt": 1792297600800,
+      "readAt": 1792297601600,
+      "state": "read",
+      "text": "いま入力の検証を書いています。30 分ほどで出せます。",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0003-0000-4000-8000-000000000000",
+      "msgId": "demo-0003-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "out",
+      "fromName": "shop-app-signup",
+      "toName": "shop-app-main",
+      "at": 1792299280000,
+      "deliveredAt": 1792299280800,
+      "readAt": 1792299281600,
+      "state": "read",
+      "text": "会員登録の画面を仕上げました。確認してほしい点は次のとおりです。\n\n1. **メールアドレス**の入力欄は、確認用の欄と一致しないとき `送信` を押せないようにしました。\n2. パスワードは 8 文字以上、英字と数字を含むこと。弱いときは赤い文で理由を出します。\n3. 利用規約のリンクは別画面で開きます（戻ると入力は残ります）。\n\nテスト: `jsonui-test run tests/screens/signup` で 14 件すべて通りました。\niOS と Android のスクリーンショットは docs/screens/signup/ に置いてあります。\n<script>alert(1)</script> のような文字列も、そのまま文字として出ること（escape の見本）。\n残り: 住所の自動入力は次の列車で。",
+      "cut": false,
+      "summary": "会員登録の画面を仕上げた",
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0004-0000-4000-8000-000000000000",
+      "msgId": "demo-0004-0000-4000-8000-000000000000",
+      "convId": "t-70adb9b17963bc5a",
+      "dir": "in",
+      "fromName": "shop-app-main",
+      "toName": "shop-app-signup",
+      "at": 1792299400000,
+      "deliveredAt": 1792299400800,
+      "readAt": null,
+      "state": "delivered",
+      "text": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "a3 t-68f5487e3df0ef59": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "a3",
+    "convId": "t-68f5487e3df0ef59",
+    "items": [
+     {
+      "id": "u-toolu_demo_0005",
+      "msgId": null,
+      "convId": "t-68f5487e3df0ef59",
+      "dir": "in",
+      "fromName": "shop-app-main",
+      "toName": "サブエージェント a3（jsonui-define）",
+      "at": 1792298200000,
+      "deliveredAt": 1792298200800,
+      "readAt": 1792298201600,
+      "state": "read",
+      "text": "signup.spec.json の項目を 3 つ足して、検証を通してください。",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "subagent",
+      "merged": false
+     },
+     {
+      "id": "u-toolu_demo_0006",
+      "msgId": null,
+      "convId": "t-68f5487e3df0ef59",
+      "dir": "out",
+      "fromName": "サブエージェント a3（jsonui-define）",
+      "toName": "shop-app-main",
+      "at": 1792298500000,
+      "deliveredAt": 1792298500800,
+      "readAt": 1792298501600,
+      "state": "read",
+      "text": "足しました。doc_validate_spec は緑です。",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "parent",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "4f t-e7be89fd2788347b": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "4f",
+    "convId": "t-e7be89fd2788347b",
+    "items": [
+     {
+      "id": "m-demo-0008-0000-4000-8000-000000000000",
+      "msgId": "demo-0008-0000-4000-8000-000000000000",
+      "convId": "t-e7be89fd2788347b",
+      "dir": "out",
+      "fromName": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+      "toName": "shop-app-main",
+      "at": 1792299520000,
+      "deliveredAt": 1792299520800,
+      "readAt": 1792299521600,
+      "state": "read",
+      "text": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
+      "cut": false,
+      "summary": "2.3.7 の範囲",
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     }
+    ],
+    "more": false
+   },
+   "d8 t-d74ea5e94db195e1": {
+    "type": "talk.messages",
+    "reqId": 0,
+    "agentId": "d8",
+    "convId": "t-d74ea5e94db195e1",
+    "items": [
+     {
+      "id": "m-demo-0009-0000-4000-8000-000000000000",
+      "msgId": "demo-0009-0000-4000-8000-000000000000",
+      "convId": "t-d74ea5e94db195e1",
+      "dir": "in",
+      "fromName": "shop-app-main",
+      "toName": "shop-app-payment",
+      "at": 1792297000000,
+      "deliveredAt": 1792297000800,
+      "readAt": 1792297001600,
+      "state": "read",
+      "text": "決済の画面のテスト、止まっていますか？",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     },
+     {
+      "id": "m-demo-0010-0000-4000-8000-000000000000",
+      "msgId": "demo-0010-0000-4000-8000-000000000000",
+      "convId": "t-d74ea5e94db195e1",
+      "dir": "out",
+      "fromName": "shop-app-payment",
+      "toName": "shop-app-main",
+      "at": 1792297120000,
+      "deliveredAt": 1792297120800,
+      "readAt": 1792297121600,
+      "state": "read",
+      "text": "シミュレーターを待っています。空いたら流します。",
+      "cut": false,
+      "summary": null,
+      "seen": "both",
+      "via": "session",
+      "merged": false
+     }
+    ],
+    "more": false
+   }
+  },
+  "script": [
+   {
+    "t": 20,
+    "frame": {
+     "type": "talk.update",
+     "agentId": "a0",
+     "ops": [
+      {
+       "op": "message",
+       "convId": "t-70adb9b17963bc5a",
+       "message": {
+        "id": "m-demo-0011-0000-4000-8000-000000000000",
+        "msgId": "demo-0011-0000-4000-8000-000000000000",
+        "convId": "t-70adb9b17963bc5a",
+        "dir": "in",
+        "fromName": "shop-app-signup",
+        "toName": "shop-app-main",
+        "at": 1792300020000,
+        "deliveredAt": 1792300020700,
+        "readAt": null,
+        "state": "delivered",
+        "text": "スクリーンショットを差し替えました。もう一度見てください。",
+        "cut": false,
+        "summary": "差し替え",
+        "seen": "both",
+        "via": "session",
+        "merged": false
+       }
+      },
+      {
+       "op": "conv",
+       "conv": {
+        "id": "t-70adb9b17963bc5a",
+        "owner": "a0",
+        "peer": {
+         "key": "b4",
+         "agentId": "b4",
+         "sessionId": "b47e0000-0000-4000-8000-0000000000b4",
+         "name": "shop-app-signup",
+         "kind": "session",
+         "alive": true,
+         "goneAt": null,
+         "removeAt": null
+        },
+        "lastAt": 1792300020000,
+        "preview": "スクリーンショットを差し替えました。もう一度見てください。",
+        "lastDir": "in",
+        "unread": 2,
+        "count": 5
+       }
+      }
+     ]
+    }
+   },
+   {
+    "t": 20,
+    "frame": {
+     "type": "talk.badges",
+     "counts": {
+      "a0": 3
+     }
+    }
+   },
+   {
+    "t": 30,
+    "frame": {
+     "type": "talk.update",
+     "agentId": "a0",
+     "ops": [
+      {
+       "op": "message",
+       "convId": "t-70adb9b17963bc5a",
+       "message": {
+        "id": "m-demo-0004-0000-4000-8000-000000000000",
+        "msgId": "demo-0004-0000-4000-8000-000000000000",
+        "convId": "t-70adb9b17963bc5a",
+        "dir": "out",
+        "fromName": "shop-app-main",
+        "toName": "shop-app-signup",
+        "at": 1792299400000,
+        "deliveredAt": 1792299400800,
+        "readAt": 1792300030000,
+        "state": "read",
+        "text": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+        "cut": false,
+        "summary": null,
+        "seen": "both",
+        "via": "session",
+        "merged": false
+       }
+      }
+     ]
+    }
+   },
+   {
+    "t": 45,
+    "frame": {
+     "type": "talk.update",
+     "agentId": "a0",
+     "ops": [
+      {
+       "op": "remove",
+       "convId": "t-d74ea5e94db195e1",
+       "reason": "peer-ended"
+      }
+     ]
+    }
+   }
+  ]
+ }
 };
+// eslint-disable-next-line no-unused-vars
+const TALK_DEMO = TALK_DEMO_BY_LANGUAGE[typeof I18N === 'object' ? I18N.language : 'en'] || TALK_DEMO_BY_LANGUAGE.en;
 // ---- web/js/40-scene.js ----
 
 /* ---------- 3D office ---------- */
@@ -6683,6 +7466,12 @@ function qLeftText(q, now) {
   const left = Math.max(0, Math.ceil((q.waitUntil - now) / 1000));
   return left >= 90 ? `あと ${Math.floor(left / 60)} 分 ${left % 60} 秒でターミナルに戻す` : `あと ${left} 秒でターミナルに戻す`;
 }
+/* × on a card in the history's cards box (where 'h') nobody waits on any more: it takes the card off that box only
+   (histOff, 55-history.js; ticket 2026-10-21-jui-viz-hist-answered-card-dismiss-and-expand). */
+function histOffHTML(where, kind, id, done) {
+  if (where !== 'h' || !done) return '';
+  return `<button type="button" class="h-card-x" data-h-off="${esc(`${kind}:${id}`)}" data-fk="hx-${esc(kind)}-${esc(id)}" aria-label="この札を履歴の下から消す（履歴の行は残る）" title="この札を消す">×</button>`;
+}
 function questionHTML(q, where = '') {   // where: '' in the panel, 'b' on the board (the same card twice in one page)
   const open = q.status === 'pending' && q.hookWaiting && !q.tooLongToShow;
   const closed = q.status === 'pending' && !open;
@@ -6700,7 +7489,7 @@ function questionHTML(q, where = '') {   // where: '' in the panel, 'b' on the b
   const footHTML = open ? `<div class="qfoot"><button type="button" class="pa pa-allow" data-qsend="${esc(q.id)}" data-fk="${esc(where)}qs-${esc(q.id)}" disabled>答えを送る</button><button type="button" class="pa pa-deny" data-qrelease="${esc(q.id)}" data-fk="${esc(where)}qr-${esc(q.id)}">ターミナルで答える</button></div><p class="qnote">待っている間はターミナルに質問が出ない · <span data-quntil="${esc(q.id)}"></span>（操作すると延びる）</p>`
     : closed ? '' : `<p class="qnote qdone">${esc(qState(q))}</p>`;
   const whyHTML = closed ? `<p class="qnote qwhy" role="note">${esc(qWhy(q))}。ターミナルで答えてください（ここでは選べません）</p>` : '';
-  return `<article class="qcard${open ? ' q-open' : ''}${closed ? ' q-closed' : ''}" data-qcard="${esc(q.id)}"><header class="qwho">${pill(q.who, DEF[q.who].role)}<span>${esc(DEF[q.who].agent)}</span><span class="pc-wait" data-since="${q.at}"></span></header>${whyHTML}${itemsHTML}${footHTML}</article>`;
+  return `<article class="qcard${open ? ' q-open' : ''}${closed ? ' q-closed' : ''}" data-qcard="${esc(q.id)}"><header class="qwho">${pill(q.who, DEF[q.who].role)}<span>${esc(DEF[q.who].agent)}</span><span class="pc-wait" data-since="${q.at}"></span>${histOffHTML(where, 'q', q.id, q.status !== 'pending')}</header>${whyHTML}${itemsHTML}${footHTML}</article>`;
 }
 /* The question cards the panel shows and the board shows (2.3.5): one list from QUESTIONS, oldest first. */
 function questionsShown(now = Date.now()) {
@@ -7977,7 +8766,7 @@ function renderRobot(model) {
       return `<li><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="rt-${esc(x.key)}"><span class="state ${esc(c)}">${esc(l)}</span><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${x.harness ? `<span class="h-tag">${esc(x.harness)}</span>` : ''}${esc(x.subject)}</span>${!isMain || !x.owner ? '' : `<span class="rb-owner">${pill(x.owner, DEF[x.owner].role)}</span>`}</button></li>`;
     }).join('')}</ul>` : `<p class="rb-none">${isMain ? 'このセッションのタスク一覧は空' : '担当しているタスクはない'}</p>`;
     return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? d.title || `${id} のメインセッション` : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.title ? `${id} のメインセッション · ${d.head}` : d.agent} · ${room}` : `${ROLE_JA[d.role]} · ${sess} セッションのサブエージェント · ${room}`)}</p></div><div class="rb-side"><div class="rb-menu"><button type="button" class="wb-btn rb-talk" data-rb-talk data-fk="rb-talk" aria-pressed="false" aria-label="トーク" title="トーク（SendMessage の会話）">${TALK_ICON}<span>トーク</span><span class="rb-talk-n" data-rb-talk-n hidden></span></button><button type="button" class="wb-btn rb-clock" data-rb-clock data-fk="rb-clock" aria-haspopup="dialog" aria-describedby="rb-clock-why">退勤…</button></div><div class="rb-nav"><button type="button" class="rb-step" data-rb-step="-1" data-fk="rb-prev" aria-label="前のロボット（←）" title="前のロボット（←）">‹</button><button type="button" class="rb-step" data-rb-step="1" data-fk="rb-next" aria-label="次のロボット（→）" title="次のロボット（→）">›</button><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">← 3D に戻る</button></div></div><p class="rb-clock-why" id="rb-clock-why" data-rb-clock-why hidden></p></div>
-<div class="rb-tabs"><button type="button" class="wb-btn rb-wide-btn" data-rb-wide data-fk="rb-wide" aria-pressed="false" hidden>広げる</button><div class="rb-tablist" role="tablist" aria-label="表示"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">今の様子</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">応答の履歴</button></div></div>
+<div class="rb-tabs"><button type="button" class="wb-btn rb-wide-btn" data-rb-wide data-fk="rb-wide" aria-pressed="false" hidden>広げる</button><button type="button" class="wb-btn rb-low-btn" data-rb-low data-fk="rb-low" aria-pressed="false" hidden>下を広げる</button><div class="rb-tablist" role="tablist" aria-label="表示"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">今の様子</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">応答の履歴</button></div></div>
 <div class="rb-body rb-hist" data-rb-hist hidden aria-label="応答の履歴" tabindex="0"></div>
 <div class="rb-body" tabindex="0" aria-label="今の様子">
 <section class="rb-sec" aria-labelledby="rb-h-now"><h3 id="rb-h-now">今やっていること</h3><div class="rb-now"><p class="rb-state"><span class="rb-lamp" data-rb-lamp></span><b data-rb-state></b><span class="rb-since">ランプ: <span data-rb-lampname></span></span></p><p class="rb-act" data-rb-act></p><p class="rb-git" data-rb-git hidden title="Claude のセッションが Bash で撃った git push / pull だけが見える（自分のターミナル、エディタの git、GitHub での merge は見えない）"></p><p class="rb-cond" data-rb-cond></p><p class="rb-looks" data-rb-looks hidden></p>${spec ? `<p class="rb-spec"><button type="button" class="link-btn" data-spec-open="${specIdx}" data-fk="rb-spec">${esc(spec.name)}（${esc(spec.screen)}）の spec</button> <span data-rb-specnow></span></p><span class="rb-segs" style="--c:${ROLES[d.role].color}">${SEGS}</span>` : ''}${(SOURCE.mode === 'demo' && id === 'a2') ? '<p class="rb-test" data-rb-test></p><div class="prog" data-rb-prog role="img"><span class="p"></span><span class="r"></span></div>' : ''}</div></section>
@@ -8636,7 +9425,7 @@ function denialHTML(d, where = '') {
     footHTML = `<div class="qfoot"><button type="button" class="pa pa-allow" data-dask="${esc(d.id)}" data-fk="${esc(where)}da-${esc(d.id)}">実行してよいと伝える…</button><button type="button" class="pa pa-deny" data-ddismiss="${esc(d.id)}" data-fk="${esc(where)}dd-${esc(d.id)}">そのまま</button></div>`
       + `<p class="qnote">押すと、確認の後に、止められた操作と理由と「実行してよいと判断した」をこのセッションへ伝える。${esc(DEN_MAY)}。許可の規則や設定は変えない</p>`;
   }
-  return `<article class="qcard dcard${d.status === 'pending' ? ' q-open' : ''}" data-dcard="${esc(d.id)}"><header class="qwho">${pill(d.who, DEF[d.who].role)}<span>${esc(DEF[d.who].agent)}</span><span class="dtag">自動モードが止めた</span><span class="pc-wait" data-since="${d.at}"></span></header>${whatHTML}${footHTML}</article>`;
+  return `<article class="qcard dcard${d.status === 'pending' ? ' q-open' : ''}" data-dcard="${esc(d.id)}"><header class="qwho">${pill(d.who, DEF[d.who].role)}<span>${esc(DEF[d.who].agent)}</span><span class="dtag">自動モードが止めた</span><span class="pc-wait" data-since="${d.at}"></span>${histOffHTML(where, 'd', d.id, d.status !== 'pending')}</header>${whatHTML}${footHTML}</article>`;
 }
 const denialsSig = (shown) => JSON.stringify([NAMES.rev, DEN.asking, ...shown.map((d) => [d.id, d.status, d.reason, d.input, d.reply, denialTarget(d).why])]);
 function renderDenials() {
@@ -8706,10 +9495,10 @@ async function openDataDocs(project, opener) {
   renderDataDocs();
   $('ds-close').focus({ preventScroll: true });
   const seq = ++ds.seq;
-  const got = typeof SOURCE.dataDocs === 'function' ? await SOURCE.dataDocs(project) : { ok: false, error: 'ライブ表示だけで見られます' };
+  const got = typeof SOURCE.dataDocs === 'function' ? await SOURCE.dataDocs(project) : { ok: false, error: tl('ds.live.only') };
   if (seq !== ds.seq || !ds.open) return;
   ds.loading = false;
-  if (!got.ok) ds.error = got.error || '読めなかった';
+  if (!got.ok) ds.error = got.error || tl('ds.unreadable');
   else { ds.doc = got.doc; ds.tab = got.doc.api.length ? 'api' : 'db'; }
   renderDataDocs();
 }
@@ -8752,16 +9541,16 @@ function dsContentHTML(content, schemas) {
 function dsParamType(p) { return p.schema && typeof p.schema === 'object' ? String(p.schema.type || (p.schema.$ref || '').split('/').pop() || '') : ''; }
 function dsEndpointHTML(e, schemas) {
   const params = (Array.isArray(e.parameters) ? e.parameters : []).filter((p) => p && typeof p === 'object');
-  const paramRowsHTML = params.map((p) => `<tr><td><code>${esc(p.name || '')}</code></td><td>${esc(p.in || '')}</td><td>${p.required ? '必須' : ''}</td><td><code>${esc(dsParamType(p))}</code></td><td>${esc(p.description || '')}</td></tr>`).join('');
-  const paramsHTML = params.length ? `<table class="ds-table"><thead><tr><th>名前</th><th>場所</th><th>必須</th><th>型</th><th>説明</th></tr></thead><tbody>${paramRowsHTML}</tbody></table>` : '<p class="ds-none">パラメータなし</p>';
+  const paramRowsHTML = params.map((p) => `<tr><td><code>${esc(p.name || '')}</code></td><td>${esc(p.in || '')}</td><td>${p.required ? esc(tl('ds.required')) : ''}</td><td><code>${esc(dsParamType(p))}</code></td><td>${esc(p.description || '')}</td></tr>`).join('');
+  const paramsHTML = params.length ? `<table class="ds-table"><thead><tr><th>${esc(tl('ds.col.name'))}</th><th>${esc(tl('ds.col.in'))}</th><th>${esc(tl('ds.required'))}</th><th>${esc(tl('ds.col.type'))}</th><th>${esc(tl('ds.col.description'))}</th></tr></thead><tbody>${paramRowsHTML}</tbody></table>` : `<p class="ds-none">${esc(tl('ds.params.none'))}</p>`;
   const rb = e.requestBody && typeof e.requestBody === 'object' ? e.requestBody : null;
   const rbDescHTML = rb && rb.description ? `<p>${esc(rb.description)}</p>` : '';
-  const reqHTML = rb ? rbDescHTML + dsContentHTML(rb.content, schemas) : '<p class="ds-none">リクエストの本文なし</p>';
+  const reqHTML = rb ? rbDescHTML + dsContentHTML(rb.content, schemas) : `<p class="ds-none">${esc(tl('ds.request.none'))}</p>`;
   const responses = Object.entries(e.responses && typeof e.responses === 'object' ? e.responses : {}).slice(0, 20);
   const resRowsHTML = responses.map(([code, r]) => `<div class="ds-res"><p><b class="ds-code">${esc(code)}</b> ${esc((r && r.description) || '')}</p>${dsContentHTML(r && r.content, schemas)}</div>`).join('');
-  const resHTML = resRowsHTML || '<p class="ds-none">レスポンスの記述なし</p>';
+  const resHTML = resRowsHTML || `<p class="ds-none">${esc(tl('ds.responses.none'))}</p>`;
   const descHTML = e.description ? `<p class="ds-desc">${esc(e.description)}</p>` : '';
-  return `<div class="ds-detail">${descHTML}<h5>パラメータ</h5>${paramsHTML}<h5>リクエスト</h5>${reqHTML}<h5>レスポンス</h5>${resHTML}</div>`;
+  return `<div class="ds-detail">${descHTML}<h5>${esc(tl('ds.params'))}</h5>${paramsHTML}<h5>${esc(tl('ds.request'))}</h5>${reqHTML}<h5>${esc(tl('ds.responses'))}</h5>${resHTML}</div>`;
 }
 function dsEpHTML(e, i, k, schemas) {
   const key = `${i}:${k}`, open = ds.ep === key, m = DS_METHODS.has(e.method) ? e.method : 'GET';
@@ -8789,27 +9578,27 @@ function dsTableHTML(t) {
     const notesHTML = c.notes.map((x) => esc(x)).join('<br>') || '-';
     return `<tr><td><code>${esc(c.name)}</code></td><td><code>${esc(c.type)}</code></td><td>${esc(c.description)}</td><td><code>${esc(c.default)}</code></td><td>${keysHTML}</td><td>${consHTML}</td><td>${notesHTML}</td></tr>`;
   }).join('');
-  return `<div class="ds-tbl"><h4>${esc(t.name)}</h4><code class="ds-file">${esc(t.file || '')}</code>${descHTML}<table class="ds-table"><thead><tr><th>列</th><th>型</th><th>説明</th><th>既定</th><th>キー</th><th>制約</th><th>メモ</th></tr></thead><tbody>${rowsHTML}</tbody></table></div>`;
+  return `<div class="ds-tbl"><h4>${esc(t.name)}</h4><code class="ds-file">${esc(t.file || '')}</code>${descHTML}<table class="ds-table"><thead><tr><th>${esc(tl('ds.col.column'))}</th><th>${esc(tl('ds.col.type'))}</th><th>${esc(tl('ds.col.description'))}</th><th>${esc(tl('ds.col.default'))}</th><th>${esc(tl('ds.col.key'))}</th><th>${esc(tl('ds.col.constraints'))}</th><th>${esc(tl('ds.col.note'))}</th></tr></thead><tbody>${rowsHTML}</tbody></table></div>`;
 }
 function dsDbHTML(doc) {
   const dbsHTML = doc.db.map((d, k) => {
-    const erdHTML = d.erd ? `<div class="flow-mmd ds-erd" data-erd="${k}" role="img" aria-label="${esc(d.name)} の ER 図"></div>` : '';
+    const erdHTML = d.erd ? `<div class="flow-mmd ds-erd" data-erd="${k}" role="img" aria-label="${esc(tl('ds.erd', { name: d.name }))}"></div>` : '';
     const tablesHTML = d.tables.map((t) => dsTableHTML(t)).join('');
-    return `<section class="ds-doc"><header><h3>${esc(d.name)}</h3><span class="chip">${Number(d.tables.length)} 件</span></header>${erdHTML}${tablesHTML}</section>`;
+    return `<section class="ds-doc"><header><h3>${esc(d.name)}</h3><span class="chip">${esc(tl('ds.tables', { n: Number(d.tables.length) }))}</span></header>${erdHTML}${tablesHTML}</section>`;
   });
   return dbsHTML.join('');
 }
 function renderDataDocs() {
   if (!ds.open) return;
   const doc = ds.doc;
-  const tabs = doc ? [['api', 'API 仕様書', doc.api.length], ['db', 'DB 仕様書', doc.db.length]].filter((t) => t[2] > 0) : [];
+  const tabs = doc ? [['api', tl('ds.tab.api'), doc.api.length], ['db', tl('ds.tab.db'), doc.db.length]].filter((t) => t[2] > 0) : [];
   const tabsHTML = tabs.map(([k, label, n]) => `<button type="button" role="tab" class="ds-tab" data-ds-tab="${esc(k)}" data-fk="ds-tab-${esc(k)}" aria-selected="${ds.tab === k ? 'true' : 'false'}">${esc(label)}<b>${Number(n)}</b></button>`).join('');
   setHTML(dsTabs, tabsHTML);
-  const bodyHTML = ds.loading ? '<p class="ds-none">読み込み中…</p>'
+  const bodyHTML = ds.loading ? `<p class="ds-none">${esc(tl('ds.loading'))}</p>`
     : ds.error ? `<p class="ds-none">${esc(ds.error)}</p>`
-    : !tabs.length ? '<p class="ds-none">この部屋の docs/api・docs/db に仕様書が見つかりません</p>'
+    : !tabs.length ? `<p class="ds-none">${esc(tl('ds.none'))}</p>`
     : ds.tab === 'db' ? dsDbHTML(doc) : dsApiHTML(doc);
-  const skippedHTML = doc && doc.skipped ? `<p class="ds-none">大きさの上限で ${Number(doc.skipped)} 件を読んでいません</p>` : '';
+  const skippedHTML = doc && doc.skipped ? `<p class="ds-none">${esc(tl('ds.skipped', { n: Number(doc.skipped) }))}</p>` : '';
   const sheetHTML = `${bodyHTML}${skippedHTML}`;
   setHTML(dsBody, sheetHTML);
   if (doc && ds.tab === 'db') dsBody.querySelectorAll('[data-erd]').forEach((el) => { const d = doc.db[Number(el.dataset.erd)]; if (d && d.erd) drawMermaid(el, d.erd); });
@@ -8828,7 +9617,7 @@ function renderDataDocs() {
    bubble is a button over the tag (placeRobotTags keeps it on the tag's box), in front of everything 3D; a press opens
    the wait's card in the panel — the question card, the permission (or the stopped call's) card — or the session's
    talk. A press on the robot or its tag does what it did. Text 4.5:1 on each bubble, light and dark (fixed colours). */
-const WAIT = { picked: null, mark: { perm: '!', ask: '?', input: '…' }, name: { perm: '許可待ち', ask: '質問に回答待ち', input: '入力待ち' } };
+const WAIT = { picked: null, mark: { perm: '!', ask: '?', input: '…' }, name: { perm: tl('status.waiting'), ask: tl('status.asking'), input: tl('status.input') } };
 function waitKindOf(id) {
   const st = robotState[id];
   if (!st || !DEF[id]) return null;
@@ -8861,7 +9650,7 @@ function waitSync(R) {
     R.waitEl = b;
   }
   const text = waitText(R.def.id, kind);
-  if (R.waitEl.dataset.waitKind !== kind) { R.waitEl.dataset.waitKind = kind; R.waitEl.title = `${WAIT.name[kind]}（押すと開く）`; }
+  if (R.waitEl.dataset.waitKind !== kind) { R.waitEl.dataset.waitKind = kind; R.waitEl.title = tl('wait.open', { name: WAIT.name[kind] }); }
   if (R.waitEl.textContent !== text) R.waitEl.textContent = text;
   R.waitEl.hidden = false;
 }
@@ -8909,7 +9698,7 @@ function waitChips() {
   for (const d of ROBOT_DEFS) if (waitKindOf(d.id) === 'input') input += 1;
   const chip = $('chip-input');
   chip.hidden = input === 0;
-  setText(chip, `… 入力待ち ${input}`);
+  setText(chip, tl('wait.chip.input', { n: input }));
 }
 $('chip-input').addEventListener('click', () => {
   const d = ROBOT_DEFS.find((x) => waitKindOf(x.id) === 'input');
@@ -9035,7 +9824,7 @@ renderDevices();
    設定 › お札 turns it off (kept per browser, readPref); reduced motion: shown and gone, no rise. The 単価 sheet lists
    the table in use and changes the user's table (POST /api/prices); a model with no price is told in the top bar. */
 const BILL = { showMs: 4200, rise: 12, gap: 3, on: readPref('bills', 'on') !== 'off', seen: new Map(), primed: false,
-  notice: 'お札の金額は概算です（公式の単価 × 応答のトークン数）。サブスクリプションでの利用では、実際の請求とは一致しません。' };
+  notice: tl('bill.notice') };
 const BILL_ICON_HTML = '<svg class="bill-ico" viewBox="0 0 22 14" aria-hidden="true"><rect x="0.75" y="0.75" width="20.5" height="12.5" rx="2" /><circle cx="11" cy="7" r="3" /><path d="M3.5 4v6M18.5 4v6" /></svg>';
 function billMoney(usd) {
   if (usd < 0.01) return '< $0.01';
@@ -9076,8 +9865,8 @@ function billShow(label, item) {
   el.querySelector('b').textContent = text;
   el.classList.toggle('unknown', unknown);
   const models = [...new Set([...R.billItems.values()].map((x) => x.model))].join(', ');
-  const from = [...new Set([...R.billItems.values()].filter((x) => typeof x.usd === 'number').map((x) => (x.from === 'user' ? 'あなたの表' : '既定')))].join('・');
-  el.title = `${R.billItems.size} 回の応答 · ${models}${from ? ` · 単価: ${from}` : ''}${unknown ? ' · 単価の無いモデル（設定 › 単価の表で足せます）' : ''}\n${BILL.notice}`;
+  const from = [...new Set([...R.billItems.values()].filter((x) => typeof x.usd === 'number').map((x) => (x.from === 'user' ? tl('bill.from.user') : tl('bill.from.default'))))].join(tl('bill.from.sep'));
+  el.title = `${tl('bill.title.responses', { n: R.billItems.size })} · ${models}${from ? ` · ${tl('bill.title.prices', { from })}` : ''}${unknown ? ` · ${tl('bill.title.unpriced')}` : ''}\n${BILL.notice}`;
   el.classList.toggle('own-price', [...R.billItems.values()].some((x) => x.from === 'user' && typeof x.usd === 'number'));
   if (el.hidden) el.style.visibility = 'hidden';   // placeRobotTags shows it where it belongs, from the next frame
   el.hidden = false;
@@ -9134,7 +9923,7 @@ function billPaint() {
   const b = document.getElementById('bill-switch');
   if (b) b.setAttribute('aria-checked', BILL.on ? 'true' : 'false');
   const n = document.getElementById('bill-note');
-  if (n) setText(n, BILL.on ? 'オン — 応答ごとの概算の金額をロボットの頭上に出します' : 'オフ — 出しません');
+  if (n) setText(n, BILL.on ? tl('bill.switch.on') : tl('bill.switch.off'));
 }
 { const b = document.getElementById('bill-switch');
   if (b) b.addEventListener('click', () => {
@@ -9148,8 +9937,8 @@ function billPaint() {
 /* ---------- the 単価 sheet: the table in use, and the user's own (live only) ---------- */
 const prEl = $('pr'), prBody = $('pr-body');
 const pr = { open: false, edit: null, msg: '', busy: false, opener: null, sig: '' };
-const PR_KINDS = [['input', '入力'], ['cache_write_5m', 'キャッシュ書込（5 分）'], ['cache_write_1h', 'キャッシュ書込（1 時間）'], ['cache_read', 'キャッシュ読込'], ['output', '出力']];
-const PR_ORIGIN = { default: '既定', user: '追加', changed: '変更', removed: '削除' };
+const PR_KINDS = [['input', tl('pr.kind.input')], ['cache_write_5m', tl('pr.kind.cache_write_5m')], ['cache_write_1h', tl('pr.kind.cache_write_1h')], ['cache_read', tl('pr.kind.cache_read')], ['output', tl('pr.kind.output')]];
+const PR_ORIGIN = { default: tl('pr.origin.default'), user: tl('pr.origin.user'), changed: tl('pr.origin.changed'), removed: tl('pr.origin.removed') };
 function pricesSlice() { const p = LIVE.slices && LIVE.slices.prices; return p && !Array.isArray(p) && typeof p === 'object' ? p : null; }
 function openPrices(opener, model) {
   if (SOURCE.mode !== 'live') return;
@@ -9183,40 +9972,40 @@ function renderPrices(force) {
   // a form being typed into is not drawn again under the cursor: only the list and the notes change
   if (!force && prBody.contains(document.activeElement) && document.activeElement.matches('input')) return;
   pr.sig = sig;
-  if (!p) { prBody.innerHTML = '<p class="ds-none">単価の表がまだ届いていません。</p>'; return; }
+  if (!p) { prBody.innerHTML = `<p class="ds-none">${esc(tl('pr.none'))}</p>`; return; }
   const num = (v) => (typeof v === 'number' ? String(v) : '—');
-  const unpricedHTML = (p.unpriced || []).map((m) => `<li><code>${esc(m)}</code> <button type="button" class="mini-btn" data-pr-add="${esc(m)}">単価を足す</button></li>`).join('');
+  const unpricedHTML = (p.unpriced || []).map((m) => `<li><code>${esc(m)}</code> <button type="button" class="mini-btn" data-pr-add="${esc(m)}">${esc(tl('pr.add'))}</button></li>`).join('');
   const errorsHTML = (p.errors || []).map((e) => `<li>${esc(e)}</li>`).join('');
   const rowsHTML = (p.rows || []).map((r) => {
     const removed = r.origin === 'removed', mine = r.origin !== 'default';
-    const extra = [r.long ? `プロンプト ${Number(r.long.over).toLocaleString('en-US')} 超は別の単価` : '', r.fast ? 'fast あり' : '', r.us ? `us ×${r.us}` : ''].filter(Boolean).join(' · ');
+    const extra = [r.long ? tl('pr.extra.long', { over: fmtNum(r.long.over) }) : '', r.fast ? tl('pr.extra.fast') : '', r.us ? `us ×${r.us}` : ''].filter(Boolean).join(' · ');
     return `<tr data-pr-row="${esc(r.model)}"${removed ? ' class="removed"' : ''}><th scope="row"><code>${esc(r.model)}</code>${extra ? `<span class="pr-extra">${esc(extra)}</span>` : ''}</th>`
       + PR_KINDS.map(([k]) => `<td>${removed ? '' : esc(num(r[k]))}</td>`).join('')
       + `<td><span class="pr-origin" data-origin="${esc(r.origin)}">${esc(PR_ORIGIN[r.origin] || r.origin)}</span></td><td class="pr-acts">`
-      + (removed ? '' : `<button type="button" class="mini-btn" data-pr-edit="${esc(r.model)}">変更</button><button type="button" class="mini-btn" data-pr-op="remove" data-pr-model="${esc(r.model)}">削除</button>`)
-      + (mine && r.origin !== 'user' ? `<button type="button" class="mini-btn" data-pr-op="reset" data-pr-model="${esc(r.model)}">既定に戻す</button>` : '')
+      + (removed ? '' : `<button type="button" class="mini-btn" data-pr-edit="${esc(r.model)}">${esc(tl('pr.edit'))}</button><button type="button" class="mini-btn" data-pr-op="remove" data-pr-model="${esc(r.model)}">${esc(tl('pr.remove'))}</button>`)
+      + (mine && r.origin !== 'user' ? `<button type="button" class="mini-btn" data-pr-op="reset" data-pr-model="${esc(r.model)}">${esc(tl('pr.reset'))}</button>` : '')
       + '</td></tr>';
   }).join('');
   const e = pr.edit;
-  const formHTML = e ? `<form class="pr-form" id="pr-form"><h3>${e.isNew ? '単価を足す' : '単価を変える'}</h3>
-      <label class="pr-model">モデル（記録の message.model のとおり）<input data-pr-in="model" value="${esc(e.model || '')}" ${e.isNew ? '' : 'readonly'} required maxlength="100" autocomplete="off" spellcheck="false"></label>
+  const formHTML = e ? `<form class="pr-form" id="pr-form"><h3>${esc(e.isNew ? tl('pr.add') : tl('pr.change'))}</h3>
+      <label class="pr-model">${esc(tl('pr.model.label'))}<input data-pr-in="model" value="${esc(e.model || '')}" ${e.isNew ? '' : 'readonly'} required maxlength="100" autocomplete="off" spellcheck="false"></label>
       <div class="pr-nums">${PR_KINDS.map(([k, ja]) => `<label>${esc(ja)}<input data-pr-in="${esc(k)}" type="number" min="0" max="100000" step="any" required value="${esc(e.values[k] === undefined ? '' : String(e.values[k]))}"></label>`).join('')}</div>
-      <p class="set-hint">USD / 100 万トークン。公式の価格のページの値を写してください。</p>
-      <div class="pr-btns"><button type="submit" class="mini-btn pr-save"${pr.busy ? ' disabled' : ''}>保存</button><button type="button" class="mini-btn" data-pr-cancel>やめる</button></div></form>`
-    : '<p><button type="button" class="mini-btn" data-pr-add="">単価を足す</button></p>';
-  const aboutHTML = `<p class="pr-about">${esc(BILL.notice)} 既定の単価の出典: <code>${esc(p.source || '')}</code>（${esc(p.checked || '')} に確認）。変更はあなたの表 <code>${esc(p.userPath || '')}</code> に書き、次の応答から効きます（<code>jui viz prices</code> でも変えられます）。</p>`;
+      <p class="set-hint">${esc(tl('pr.hint'))}</p>
+      <div class="pr-btns"><button type="submit" class="mini-btn pr-save"${pr.busy ? ' disabled' : ''}>${esc(tl('pr.save'))}</button><button type="button" class="mini-btn" data-pr-cancel>${esc(tl('pr.cancel'))}</button></div></form>`
+    : `<p><button type="button" class="mini-btn" data-pr-add="">${esc(tl('pr.add'))}</button></p>`;
+  const aboutHTML = `<p class="pr-about">${esc(BILL.notice)} ${tlHTML('pr.about', { source: p.source || '', checked: p.checked || '', path: p.userPath || '' })}</p>`;
   const msgHTML = pr.msg ? `<p class="pr-msg" role="status">${esc(pr.msg)}</p>` : '';
   const headHTML = PR_KINDS.map(([, ja]) => `<th>${esc(ja)}</th>`).join('');
   prBody.innerHTML = `${aboutHTML}${msgHTML}`
-    + (unpricedHTML ? `<section class="pr-unpriced"><h3>単価の無いモデル（金額は出していません）</h3><ul>${unpricedHTML}</ul></section>` : '')
-    + (errorsHTML ? `<section class="pr-errors"><h3>使っていない行（その行だけ）</h3><ul>${errorsHTML}</ul></section>` : '')
-    + `${formHTML}<table class="ds-table pr-table"><thead><tr><th>モデル</th>${headHTML}<th>出どころ</th><th></th></tr></thead><tbody>${rowsHTML}</tbody></table>`;
+    + (unpricedHTML ? `<section class="pr-unpriced"><h3>${esc(tl('pr.unpriced'))}</h3><ul>${unpricedHTML}</ul></section>` : '')
+    + (errorsHTML ? `<section class="pr-errors"><h3>${esc(tl('pr.errors'))}</h3><ul>${errorsHTML}</ul></section>` : '')
+    + `${formHTML}<table class="ds-table pr-table"><thead><tr><th>${esc(tl('pr.col.model'))}</th>${headHTML}<th>${esc(tl('pr.col.origin'))}</th><th></th></tr></thead><tbody>${rowsHTML}</tbody></table>`;
 }
 async function pricesSend(op, model, row) {
   pr.busy = true; renderPrices(true);
-  const got = typeof SOURCE.pricesOp === 'function' ? await SOURCE.pricesOp(op, model, row) : { ok: false, error: 'ライブ表示だけで変えられます' };
+  const got = typeof SOURCE.pricesOp === 'function' ? await SOURCE.pricesOp(op, model, row) : { ok: false, error: tl('pr.live.only') };
   pr.busy = false;
-  pr.msg = got.ok ? `${model}: ${{ set: '保存しました', remove: '削除しました', reset: '既定に戻しました' }[op]}（次の応答から）` : `できませんでした: ${got.error || '不明'}`;
+  pr.msg = got.ok ? tl({ set: 'pr.done.set', remove: 'pr.done.remove', reset: 'pr.done.reset' }[op], { model }) : tl('pr.failed', { error: got.error || tl('pr.unknown') });
   if (got.ok && op === 'set') pr.edit = null;
   renderPrices(true);
 }
@@ -9248,8 +10037,8 @@ function pricesNotice() {
   if (!chip) return;
   const p = SOURCE.mode === 'live' ? pricesSlice() : null, list = (p && p.unpriced) || [];
   chip.hidden = !list.length;
-  setText(chip, `単価の無いモデル ${list.length}`);
-  chip.title = `${list.join(', ')} — 金額を出していません。押すと単価を足せます`;
+  setText(chip, tl('pr.chip', { n: list.length }));
+  chip.title = tl('pr.chip.title', { models: list.join(', ') });
 }
 $('chip-price').addEventListener('click', (e) => { const p = pricesSlice(); openPrices(e.currentTarget, p && p.unpriced && p.unpriced[0]); });
 { const b = document.getElementById('prices-open'); if (b) b.addEventListener('click', (e) => openPrices(e.currentTarget)); }
@@ -9280,7 +10069,11 @@ const HIST_POLL_MS = 3000;
    a working session sent the reader to the top). newer: answers came while the reader was above (the 新しい応答 marker). */
 const HIST = { tab: 'now', id: null, data: null, error: '', timer: 0, busy: false, node: null, sig: '',
   atEnd: true, top: 0, newer: false, marker: null, compose: null, sent: null, wide: false, imgs: new Map(), box: null,
-  attach: [] };
+  attach: [],
+  // further back (2.3.12): the older items read with 「もっと前を読む」 (oldest first), where they start, whether more is
+  // there, the byte the newest part is read down to once the reader went back, and the tool results read whose call
+  // was older than what was shown then (joined to it when it comes)
+  older: [], olderFrom: null, olderMore: false, tailStop: null, orphans: {}, olderBusy: false, latest: null };
 
 function hNode(tag, cls, text) {
   const n = document.createElement(tag);
@@ -9494,8 +10287,8 @@ function histItem(item) {
     const n = hNode('div', 'h-item h-user h-channel');
     const head = hNode('p', 'h-who', /(^|:)jui-viz$/.test(String(item.server || '')) ? 'ページから（jui-viz の channel）' : `channel ${item.server || ''}`);
     head.appendChild(at); n.appendChild(head);
-    const lines = String(item.text).split('\n'), files = lines.filter((l) => HIST_ATTACH_LINE.test(l));
-    const rest = lines.filter((l) => !HIST_ATTACH_LINE.test(l)).join('\n');
+    const lines = String(item.text).split('\n'), files = lines.filter((l) => histAttachMatch(l));
+    const rest = lines.filter((l) => !histAttachMatch(l)).join('\n');
     if (rest.trim()) n.appendChild(hNode('p', 'h-plain', rest));
     if (files.length) n.appendChild(histAttachMarks(files));
     const cut = histCutNote(item); if (cut) n.appendChild(cut);
@@ -9523,7 +10316,10 @@ function histItem(item) {
       const link = histFileLink({ tool: { off: item.file.off, id: item.id } }, item.file.name, 'h-head-file');
       if (item.description) title.splice(1, 0, link); else title.splice(1, 1, link);   // no description: the name takes the input's first line's place
     }
-    if (item.error) title.push(hNode('span', 'h-err', 'エラー'));
+    // stopped by auto mode (2.3.12, the requester's ruling of 10-21): on the row itself, however long ago (the board's card
+    // goes a minute after it is answered); the reason in its title and under the OUT
+    if (item.denied) { const m = hNode('span', 'h-denied', '止められた'); m.title = `自動モードが止めた: ${item.denied}`; title.push(m); }
+    else if (item.error) title.push(hNode('span', 'h-err', 'エラー'));
     if (item.out === undefined) title.push(hNode('span', 'h-run', '結果待ち'));
     // Pictures inside, seen with the row closed (2.3.12, requester 10-21: 「閉じてる時でも画像があるってわかるように」,
     // ticket 2026-10-21-jui-viz-hist-tool-row-shows-no-image-when-closed): as the requester's own attachments show (a
@@ -9551,6 +10347,7 @@ function histItem(item) {
     if (item.out !== undefined) {
       io.appendChild(hNode('span', 'h-io-k', 'OUT'));
       io.appendChild(hNode('pre', `h-code${item.error ? ' h-code-err' : ''}`, `${item.out}${item.outCut ? '\n…' : ''}`));
+      if (item.denied) { io.appendChild(hNode('span', 'h-io-k', '止めた理由')); io.appendChild(hNode('p', 'h-denied-why', item.denied)); }
       if (Array.isArray(item.imgs) && item.imgs.length) { const row = hNode('div', 'h-imgs'); for (const ref of item.imgs) row.appendChild(histThumb(ref)); io.appendChild(row); }
     }
     // SendUserFile (ticket 2026-10-20-jui-viz-history-senduserfile-image-no-thumb): the transcript holds only the paths, so
@@ -9579,7 +10376,15 @@ function histItem(item) {
 function histBuild(data) {
   const box = hNode('div', 'h-list-box');
   const items = Array.isArray(data.items) ? data.items : [];
-  if (data.more) box.appendChild(hNode('p', 'h-note', `直近 ${items.filter((x) => x.kind !== 'thought' && x.kind !== 'image').length} 件（それより前は表示しない）`));
+  // 40 at a time further back (2.3.12, ticket 2026-10-21-jui-viz-hist-tab-cannot-scroll-back; the requester's ruling: keep
+  // the 40, add a way back): the button reads the 40 before the oldest shown, from where they start in the transcript
+  if (data.more) {
+    const b = hNode('button', 'h-older wb-btn', 'もっと前を読む');
+    b.type = 'button'; b.dataset.hOlder = '';
+    b.title = `今は ${items.filter((x) => x.kind !== 'thought' && x.kind !== 'image').length} 件。その前の ${HIST_OLDER_N} 件を読む`;
+    b.addEventListener('click', () => histOlder(b));
+    box.appendChild(b);
+  }
   let prev = null;
   const seen = new Map();
   for (const item of items) {
@@ -9652,37 +10457,74 @@ function histAnchor(pane) {
   }
   return null;
 }
+const HIST_OLDER_N = 40;   // sources/history.ITEMS_MAX: a page further back
+/* What the tab shows: the older items read so far, then the newest part; a tool call older than a part its result was
+   read in gets that result now (the server gives the results whose call it did not give). */
+function histCombine(latest) {
+  Object.assign(HIST.orphans, latest.results || {});
+  const items = [...HIST.older, ...(Array.isArray(latest.items) ? latest.items : [])];
+  for (const it of items) if (it.kind === 'tool' && it.out === undefined && HIST.orphans[it.id]) Object.assign(it, HIST.orphans[it.id]);
+  return { items, more: HIST.older.length ? HIST.olderMore : !!latest.more, from: HIST.older.length ? HIST.olderFrom : latest.from };
+}
+/* The anchor kept across a rebuild: the same item at the same place (the oldest left, or older ones came above). */
+function histKeepPlace(pane, anchor) {
+  if (!anchor || !pane || !pane.contains(HIST.node)) return;
+  const top = pane.getBoundingClientRect().top;
+  const same = [...HIST.node.children].find((n) => n._hk === anchor.key);
+  if (same) pane.scrollTop += same.getBoundingClientRect().top - top - anchor.y;
+  HIST.top = pane.scrollTop;
+}
+async function histOlder(btn) {
+  const id = HIST.id;
+  if (!id || HIST.olderBusy || !HIST.data || typeof HIST.data.from !== 'number') return;
+  HIST.olderBusy = true; btn.disabled = true; btn.textContent = '読み込み中…';
+  const before = HIST.data.from;
+  const got = await SOURCE.history(id, { before });
+  HIST.olderBusy = false;
+  if (HIST.id !== id) return;
+  if (!got.ok) { btn.disabled = false; btn.textContent = '読めなかった（もう一度）'; return; }
+  if (HIST.tailStop === null) HIST.tailStop = HIST.latest && typeof HIST.latest.from === 'number' ? HIST.latest.from : before;   // the newest part keeps reaching down to here
+  HIST.older = [...got.data.items, ...HIST.older];
+  HIST.olderFrom = got.data.from; HIST.olderMore = !!got.data.more;
+  Object.assign(HIST.orphans, got.data.results || {});
+  const pane = histPane(), anchor = pane ? histAnchor(pane) : null;
+  HIST.data = histCombine(HIST.latest || { items: [] });
+  HIST.sig = JSON.stringify([HIST.data.items, HIST.data.more]); HIST.node = histBuild(HIST.data);
+  HIST.atEnd = false;
+  histShow();
+  histKeepPlace(pane, anchor);
+}
 async function histFetch() {
   const id = HIST.id;
   if (!id || HIST.busy || HIST.tab !== 'history') return;
   HIST.busy = true;
-  const got = await SOURCE.history(id);
+  const got = await SOURCE.history(id, HIST.tailStop !== null ? { stop: HIST.tailStop } : null);
   HIST.busy = false;
   if (HIST.id !== id || HIST.tab !== 'history') return;
   if (!got.ok) { HIST.error = got.error === 'demo' ? 'デモでは応答の履歴を表示しない' : '応答の履歴を読めない（このロボットの記録が見つからない）'; histShow(); return; }
   HIST.error = '';
-  const sig = JSON.stringify(got.data.items);
+  HIST.latest = got.data;
+  const data = histCombine(got.data);
+  const sig = JSON.stringify([data.items, data.more]);
   if (sig === HIST.sig && HIST.node) return;           // nothing new: the open folds and the scroll stay
   const pane = histPane();
   const shown = pane && !pane.hidden && HIST.node && pane.contains(HIST.node);
   const anchor = shown && !HIST.atEnd ? histAnchor(pane) : null;
   const had = !!HIST.data;
-  HIST.sig = sig; HIST.data = got.data; HIST.node = histBuild(got.data);
+  HIST.sig = sig; HIST.data = data; HIST.node = histBuild(data);
   composeArrived(got.data.items);
   if (had && !HIST.atEnd) HIST.newer = true;          // the reader is above: leave the place, show the marker
   histShow();                                          // at the end: histRestore sends the pane to the newest
-  if (anchor && pane && pane.contains(HIST.node)) {   // the same item at the same place, though the oldest left
-    const top = pane.getBoundingClientRect().top;
-    const same = [...HIST.node.children].find((n) => n._hk === anchor.key);
-    if (same) pane.scrollTop += same.getBoundingClientRect().top - top - anchor.y;
-    HIST.top = pane.scrollTop;
-  }
+  histKeepPlace(pane, anchor);                         // the same item at the same place, though the oldest left
 }
 function histStop() { clearInterval(HIST.timer); HIST.timer = 0; }
 /* After every renderRobot: which tab shows, and the polling that keeps an open history fresh. */
 function histSync() {
   const id = rbEl.hidden ? null : rbState.id;
-  if (id !== HIST.id) { HIST.id = id; HIST.data = null; HIST.node = null; HIST.sig = ''; HIST.error = ''; HIST.atEnd = true; HIST.newer = false; histStop(); histImgsDrop(); }
+  if (id !== HIST.id) {
+    HIST.id = id; HIST.data = null; HIST.node = null; HIST.sig = ''; HIST.error = ''; HIST.atEnd = true; HIST.newer = false; histStop(); histImgsDrop();
+    Object.assign(HIST, { older: [], olderFrom: null, olderMore: false, tailStop: null, orphans: {}, olderBusy: false, latest: null });
+  }
   const tabs = rbEl.querySelectorAll('[data-rb-tab]');
   tabs.forEach((b) => b.setAttribute('aria-selected', String(b.dataset.rbTab === HIST.tab)));
   const body = rbEl.querySelector('.rb-body:not([data-rb-hist])'), pane = histPane();
@@ -9690,6 +10532,7 @@ function histSync() {
   if (pane) pane.hidden = HIST.tab !== 'history';
   composePlace(pane, id);
   histWideSync(id);
+  histLowPaint();
   if (!id || HIST.tab !== 'history') { histStop(); return; }
   histShow();
   if (!HIST.timer) { histFetch(); HIST.timer = setInterval(() => { if (document.visibilityState === 'visible') { histFetch(); composePaint(); } }, HIST_POLL_MS); }
@@ -9727,8 +10570,13 @@ const attachBusy = () => HIST.attach.some((a) => a.up);
 const attachSize = (n) => (n < 1024 ? `${n} B` : n < 1048576 ? `${Math.round(n / 1024)} KB` : `${(n / 1048576).toFixed(1)} MB`);
 const RELAY_HOW_TEXT = RELAY_HOW.replace(/<[^>]+>/g, '');   // the same how-to as on a permission card, as plain text
 const composeNorm = (t) => String(t || '').split(/\s+/).join(' ').trim();
-/* the server's line for one attached file (ingest.attachment_line): 添付: <path>（<name>、<media>、<size>） */
-const HIST_ATTACH_LINE = /^添付: (\/\S*?\/uploads\/([A-Za-z0-9_-]+)\/([0-9a-f]{16})\.([a-z]+))（(.*)、([^、]*)、([^、]*)）$/;
+/* the server's line for one attached file (ingest.attachment_line): attached: <path> (<name>, <media>, <size>). A
+   transcript written before 2.3.13 has the Japanese form 添付: <path>（<name>、<media>、<size>）, and is read the same. */
+const HIST_ATTACH_LINES = [
+  /^attached: (\/\S*?\/uploads\/([A-Za-z0-9_-]+)\/([0-9a-f]{16})\.([a-z]+)) \((.*), ([^,]*), ([^,]*)\)$/,
+  /^添付: (\/\S*?\/uploads\/([A-Za-z0-9_-]+)\/([0-9a-f]{16})\.([a-z]+))（(.*)、([^、]*)、([^、]*)）$/,
+];
+const histAttachMatch = (line) => HIST_ATTACH_LINES.map((re) => re.exec(line)).find(Boolean) || null;
 /* The files of a prompt sent from this page, as marks. An image's mark is a thumbnail button like a history picture's
    (histThumb): the server reads it from the kept file (SOURCE.attachImage, POST /api/attach-image by session and id),
    and a press — or Enter / Space — opens it in the same large view (ticket 2026-10-20-jui-viz-attachment-thumb-opens-
@@ -9737,7 +10585,7 @@ const HIST_ATTACH_LINE = /^添付: (\/\S*?\/uploads\/([A-Za-z0-9_-]+)\/([0-9a-f]
 function histAttachMarks(lines) {
   const ul = hNode('ul', 'h-attach h-attach-sent');
   for (const line of lines) {
-    const m = HIST_ATTACH_LINE.exec(line), li = hNode('li', 'h-attach-item');
+    const m = histAttachMatch(line), li = hNode('li', 'h-attach-item');
     li.title = m[1];
     if (/^image\/(png|jpeg|gif|webp)$/.test(m[6])) li.appendChild(histThumb({ attach: { sessionId: m[2], id: m[3], ext: m[4] } }));
     if (/^image\//.test(m[6])) li.appendChild(hNode('span', 'h-attach-name', `📎 ${m[5]}`));
@@ -9947,6 +10795,19 @@ function composePlace(pane, id) {
    board's (permDetail, questionHTML, denialHTML) under their own `where` (ids and radio names apart; a permission's per card, the session may have two), answered the
    same way: a permission and a question through the hook's decision, a stopped call through its words (it says so,
    DEN_MAY). Answered in one place, every place shows it answered (one state). */
+/* An answered card off the history's cards (ticket 2026-10-21-jui-viz-hist-answered-card-dismiss-and-expand, requester:
+   「この答えた札邪魔だからxでこっちから消せるようにしたい」): × on a card nobody waits on any more (a question not pending, a
+   stopped call not pending; a permission card is always waiting, so never). It leaves this box only: the panel, the board
+   and the history's rows keep it (the × is histOffHTML, 50-panel.js). Kept per card id in this browser (readPref / writePref), the newest HIST_OFF_MAX. */
+const HIST_OFF_PREF = 'hist-cards-off', HIST_OFF_MAX = 300;
+const HIST_OFF = (() => { try { const v = JSON.parse(readPref(HIST_OFF_PREF, '[]')); return Array.isArray(v) ? v.filter((k) => typeof k === 'string') : []; } catch (err) { return []; } })();
+function histOff(key) {
+  if (HIST_OFF.includes(key)) return;
+  HIST_OFF.push(key);
+  HIST_OFF.splice(0, Math.max(0, HIST_OFF.length - HIST_OFF_MAX));
+  writePref(HIST_OFF_PREF, JSON.stringify(HIST_OFF));
+  histCardsPaint();
+}
 function histCardsBox() {
   if (!HIST.cards) {
     const el = hNode('div', 'h-cards');
@@ -9956,6 +10817,7 @@ function histCardsBox() {
     el.addEventListener('input', onQuestionInput);
     el.addEventListener('click', onQuestionClick);
     el.addEventListener('click', onDenialClick);
+    el.addEventListener('click', (e) => { const b = e.target.closest('[data-h-off]'); if (b) histOff(b.dataset.hOff); });
     HIST.cards = el;
   }
   return HIST.cards;
@@ -9964,8 +10826,9 @@ function histCardsPaint(id = HIST.compose && HIST.compose._for, off = HIST.tab !
   const el = histCardsBox(), sess = id ? SESSION_OF[id] : null, now = Date.now();
   const mine = (who) => !!sess && SESSION_OF[who] === sess;
   const perms = !off && latestModel ? latestModel.pending.filter((p) => mine(p.who)) : [];
-  const qs = !off ? QUESTIONS.filter((q) => mine(q.who) && (q.status === 'pending' || q.status === 'sent' || now - (q.doneAt || 0) < Q_SHOW_MS)) : [];
-  const ds = !off && typeof DENIALS !== 'undefined' ? DENIALS.filter((d) => mine(d.who) && (d.status === 'pending' || now - (d.doneAt || 0) < DEN_SHOW_MS)) : [];
+  const kept = (kind, x) => x.status === 'pending' || !HIST_OFF.includes(`${kind}:${x.id}`);
+  const qs = !off ? QUESTIONS.filter((q) => mine(q.who) && kept('q', q) && (q.status === 'pending' || q.status === 'sent' || now - (q.doneAt || 0) < Q_SHOW_MS)) : [];
+  const ds = !off && typeof DENIALS !== 'undefined' ? DENIALS.filter((d) => mine(d.who) && kept('d', d) && (d.status === 'pending' || now - (d.doneAt || 0) < DEN_SHOW_MS)) : [];
   el.hidden = !(perms.length || qs.length || ds.length);
   keyed(el, JSON.stringify([id, NAMES.rev, DEN.asking, perms.map(permSig), questionsSig(qs), denialsSig(ds)]),
     () => `${perms.map((p) => permDetail(p, `hb-${p.id}`)).join('')}${qs.map((q) => questionHTML(q, 'h')).join('')}${ds.map((d) => denialHTML(d, 'h')).join('')}`);
@@ -10043,7 +10906,7 @@ async function composeSend() {
 function composeArrived(items) {
   const sent = HIST.sent;
   if (!sent || sent.error || sent.arrivedAt || sent.id !== HIST.id || !Array.isArray(items)) return;
-  const want = composeNorm(sent.text).slice(0, 120) || '添付:';   // only files: the server's first line
+  const want = composeNorm(sent.text).slice(0, 120) || 'attached:';   // only files: the server's first line
   const fresh = (x) => !(Number(x.at) < sent.at - 60000);   // an older item with the same words is not this one
   const ours = (x) => x.kind === 'channel' && /(^|:)jui-viz$/.test(String(x.server || ''));
   if (items.some((x) => ours(x) && fresh(x) && composeNorm(x.text).startsWith(want))) { sent.arrivedAt = Date.now(); composePaint(); }
@@ -10226,6 +11089,33 @@ function histWideSync(id) {
   else histWidePaint();
 }
 rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rb-wide]')) histSetWide(!HIST.wide); });
+
+/* 下を広げる (ticket 2026-10-21-jui-viz-hist-answered-card-dismiss-and-expand, requester: 「スクロールしないと質問と送信ボタン
+   全部見えないから見え流用に広げるボタンが欲しい」): on the 応答の履歴 tab, the cards and the prompt box take the height they
+   need and the history keeps what is left (its own scroll); 元の高さに戻す: the history first again. Next to 広げる, kept
+   in this browser as that is. */
+const HIST_LOW_PREF = 'hist-low';
+let histLow = readPref(HIST_LOW_PREF, 'off') === 'on';
+function histLowPaint() {
+  const tab = HIST.tab === 'history' && !!rbState.id, on = histLow && tab;
+  rbEl.classList.toggle('rb-histtab', tab);   // the tab's rows (app.css)
+  rbEl.classList.toggle('rb-low', on);
+  const b = rbEl.querySelector('[data-rb-low]');
+  if (b) {
+    b.hidden = HIST.tab !== 'history';
+    b.setAttribute('aria-pressed', String(on));
+    b.textContent = on ? '元の高さに戻す' : '下を広げる';
+    b.title = on ? '履歴の高さを元に戻す' : '質問の札・プロンプトの欄・送信のボタンが一度に見えるよう、履歴を縮めて下を広げる';
+  }
+}
+rbEl.addEventListener('click', (e) => {
+  if (!e.target.closest('[data-rb-low]')) return;
+  histLow = !histLow;
+  writePref(HIST_LOW_PREF, histLow ? 'on' : 'off');
+  histLowPaint();
+  const pane = histPane();
+  if (pane && HIST.atEnd) histToEnd(pane);   // the newest stays in view across the change of height
+});
 window.addEventListener('resize', () => { if (HIST.wide) { histWidePaint(); histWideFly(); } });
 
 
@@ -11235,7 +12125,7 @@ const talkNow = () => Date.now();
 function talkTime(at, short) {
   if (!Number.isFinite(at)) return '';
   const d = new Date(at), n = new Date(talkNow());
-  const hm = d.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+  const hm = fmtTime(d, { hour: '2-digit', minute: '2-digit' });
   if (d.toDateString() === n.toDateString()) return hm;
   return short ? `${d.getMonth() + 1}/${d.getDate()}` : `${d.getMonth() + 1}/${d.getDate()} ${hm}`;
 }
@@ -11256,14 +12146,14 @@ function talkFollow(agent) {
   TALK.list = null; TALK.listError = ''; TALK.more = false; TALK.msgs.clear(); TALK.nodes.clear();
   talkSend('talk.open', { agentId: agent }).then((got) => {
     if (TALK.opened !== agent || got.ok) return;
-    TALK.listError = got.error === 'offline' ? 'サーバーにつながっていない（つながると読み直す）' : `トークを読めない（${got.error || '不明'}）`;
+    TALK.listError = got.error === 'offline' ? tl('talk.offline') : tl('talk.list.error', { error: got.error || tl('talk.unknown') });
     talkRender();
   });
 }
 /* The socket closed or came back (live): the server forgot what was open, so it is opened again. */
 function talkConn(state) {
   if (state === 'connected') { const a = TALK.opened; TALK.opened = null; if (a) { talkFollow(a); if (TALK.conv) talkLoad(TALK.conv, false); } }
-  else if (TALK.opened && !TALK.list) { TALK.listError = 'サーバーにつながっていない（つながると読み直す）'; talkRender(); }
+  else if (TALK.opened && !TALK.list) { TALK.listError = tl('talk.offline'); talkRender(); }
 }
 async function talkLoad(convId, older) {
   const agent = TALK.agent;
@@ -11277,7 +12167,7 @@ async function talkLoad(convId, older) {
   box.busy = false;
   if (TALK.agent !== agent || TALK.msgs.get(convId) !== box) return;
   if (!got.ok || !got.data || !Array.isArray(got.data.items)) {
-    box.error = got.error === 'offline' ? 'サーバーにつながっていない（つながると読み直す）' : `メッセージを読めない（${got.error || '不明'}）`;
+    box.error = got.error === 'offline' ? tl('talk.offline') : tl('talk.messages.error', { error: got.error || tl('talk.unknown') });
   } else {
     const pane = talkPane(), keep = older && pane ? pane.scrollHeight - pane.scrollTop : null;
     talkMerge(box, got.data.items);
@@ -11336,7 +12226,7 @@ function talkReceive(f) {
       TALK.msgs.delete(op.convId);
       if (TALK.conv === op.convId) {
         TALK.conv = null;
-        TALK.note = op.reason === 'owner-ended' ? 'このロボットのセッションが終わって 1 時間たったので、トークは消えた' : '相手のセッションが終わって 1 時間たったので、トークは消えた';
+        TALK.note = op.reason === 'owner-ended' ? tl('talk.gone.owner') : tl('talk.gone.peer');
       }
     }
   }
@@ -11350,11 +12240,11 @@ function talkPane() { return TALK.node ? TALK.node.querySelector('[data-tk-body]
 function talkBuildNode() {
   const root = hNode('section', 'tk');
   root.dataset.talk = '';
-  root.setAttribute('aria-label', 'トーク');
+  root.setAttribute('aria-label', tl('talk.title'));
   const head = hNode('div', 'talk-head'); head.dataset.tkHead = '';
   const body = hNode('div', 'talk-body'); body.dataset.tkBody = ''; body.tabIndex = 0;
-  const newer = hNode('button', 'h-newer talk-newer', '新しいメッセージ ↓'); newer.type = 'button'; newer.dataset.tkNewer = ''; newer.hidden = true;
-  const foot = hNode('p', 'talk-foot', '見るだけ（トークからは送れない）');
+  const newer = hNode('button', 'h-newer talk-newer', tl('talk.newer')); newer.type = 'button'; newer.dataset.tkNewer = ''; newer.hidden = true;
+  const foot = hNode('p', 'talk-foot', tl('talk.foot'));
   root.append(head, body, newer, foot);
   body.addEventListener('scroll', () => talkRemember(body), { passive: true });
   root.addEventListener('click', talkClick);
@@ -11387,13 +12277,13 @@ function talkPeerMark(peer) {
     mark.style.setProperty('--c', pillBg(role)); mark.style.setProperty('--t', pillInk(role));
     span.appendChild(mark);
   }
-  else span.appendChild(hNode('span', `talk-kind talk-kind-${peer.kind}`, peer.kind === 'external' ? '外' : peer.kind === 'subagent' ? 'サブ' : '？'));
+  else span.appendChild(hNode('span', `talk-kind talk-kind-${peer.kind}`, peer.kind === 'external' ? tl('talk.mark.external') : peer.kind === 'subagent' ? tl('talk.mark.subagent') : tl('talk.mark.other')));
   return span;
 }
-const TALK_KIND = { session: 'セッション', subagent: 'サブエージェント', external: 'この機械の外の相手' };
+const TALK_KIND = { session: tl('talk.kind.session'), subagent: tl('talk.kind.subagent'), external: tl('talk.kind.external') };
 function talkGoneText(peer) {
   if (peer.alive) return '';
-  return Number.isFinite(peer.removeAt) ? `終了 · ${talkTime(peer.removeAt)} に消える` : '終了';
+  return Number.isFinite(peer.removeAt) ? tl('talk.ended.until', { at: talkTime(peer.removeAt) }) : tl('talk.ended');
 }
 function talkHead() {
   const head = TALK.node.querySelector('[data-tk-head]');
@@ -11404,20 +12294,20 @@ function talkHead() {
   const fk = head.contains(document.activeElement) ? document.activeElement.dataset.fk : undefined;
   const kids = [];
   if (!TALK.conv) {
-    const back = hNode('button', 'wb-btn talk-back', '← カードに戻る'); back.type = 'button'; back.dataset.tkClose = ''; back.dataset.fk = 'talk-close';
-    const title = hNode('h3', 'talk-title', 'トーク');
+    const back = hNode('button', 'wb-btn talk-back', tl('talk.back.card')); back.type = 'button'; back.dataset.tkClose = ''; back.dataset.fk = 'talk-close';
+    const title = hNode('h3', 'talk-title', tl('talk.title'));
     kids.push(back, title);
   } else {
-    const back = hNode('button', 'wb-btn talk-back', '← 一覧'); back.type = 'button'; back.dataset.tkBack = ''; back.dataset.fk = 'talk-back';
-    back.setAttribute('aria-label', 'トークの一覧に戻る');
+    const back = hNode('button', 'wb-btn talk-back', tl('talk.back.list')); back.type = 'button'; back.dataset.tkBack = ''; back.dataset.fk = 'talk-back';
+    back.setAttribute('aria-label', tl('talk.back.list.aria'));
     kids.push(back);
     if (conv) {
       const p = conv.peer;
       // The peer's name, one line (cut with … : the whole name on hover and focus, 57-fulltext.js). Pressed: that robot.
       const who = p.agentId ? hNode('button', 'talk-peer') : hNode('span', 'talk-peer talk-peer-off');
-      if (p.agentId) { who.type = 'button'; who.dataset.tkPeer = p.agentId; who.dataset.fk = 'talk-peer'; who.setAttribute('aria-label', `${p.name || '相手'} に切り替える`); }
-      else who.title = 'この機械で見えない相手（切り替えられない）';
-      who.append(talkPeerMark(p), hNode('span', 'talk-peer-name', p.name || '（名前なし）'));
+      if (p.agentId) { who.type = 'button'; who.dataset.tkPeer = p.agentId; who.dataset.fk = 'talk-peer'; who.setAttribute('aria-label', tl('talk.peer.switch', { name: p.name || tl('talk.peer.someone') })); }
+      else who.title = tl('talk.peer.unseen');
+      who.append(talkPeerMark(p), hNode('span', 'talk-peer-name', p.name || tl('talk.noname')));
       const sub = hNode('p', 'talk-peer-sub', [TALK_KIND[p.kind] || '', talkGoneText(p)].filter(Boolean).join(' · '));
       const box = hNode('div', 'talk-peer-box'); box.append(who, sub);
       kids.push(box);
@@ -11431,18 +12321,18 @@ function talkRow(c) {
   b.type = 'button'; b.dataset.tkConv = c.id; b.dataset.fk = `talk-${c.id}`;
   if (!c.peer.alive) b.classList.add('talk-row-gone');
   const top = hNode('span', 'talk-row-top');
-  top.append(hNode('span', 'talk-row-name', c.peer.name || '（名前なし）'), hNode('time', 'talk-row-at', talkTime(c.lastAt, true)));
+  top.append(hNode('span', 'talk-row-name', c.peer.name || tl('talk.noname')), hNode('time', 'talk-row-at', talkTime(c.lastAt, true)));
   const bottom = hNode('span', 'talk-row-bottom');
-  bottom.append(hNode('span', 'talk-row-pre', `${c.lastDir === 'out' ? '自分: ' : ''}${c.preview}`));
+  bottom.append(hNode('span', 'talk-row-pre', `${c.lastDir === 'out' ? tl('talk.row.mine') : ''}${c.preview}`));
   if (c.unread > 0) { const u = hNode('span', 'talk-unread', c.unread > 99 ? '99+' : String(c.unread)); u.dataset.tkUnread = String(c.unread); bottom.append(u); }
   const text = hNode('span', 'talk-row-text'); text.append(top, bottom);
   const gone = talkGoneText(c.peer);
   if (gone) text.append(hNode('span', 'talk-row-gone-note', gone));
   b.append(talkPeerMark(c.peer), text);
-  b.setAttribute('aria-label', `${c.peer.name}、${talkTime(c.lastAt)}、${c.unread ? `未読 ${c.unread}、` : ''}${c.preview}`);
+  b.setAttribute('aria-label', tl('talk.row.aria', { name: c.peer.name, at: talkTime(c.lastAt), unread: c.unread ? tl('talk.row.unread', { n: c.unread }) : '', preview: c.preview }));
   return b;
 }
-const TALK_STATE = { read: '既読', delivered: '届いた', sent: '送信済み', undelivered: '届かなかった' };
+const TALK_STATE = { read: tl('talk.state.read'), delivered: tl('talk.state.delivered'), sent: tl('talk.state.sent'), undelivered: tl('talk.state.undelivered') };
 function talkMsgSig(m) { return JSON.stringify([m.id, m.state, m.readAt, m.deliveredAt, m.text, m.cut, m.merged, m.dir]); }
 function talkMsgNode(m) {
   const n = hNode('div', `talk-msg talk-${m.dir === 'out' ? 'out' : 'in'}`);
@@ -11453,19 +12343,19 @@ function talkMsgNode(m) {
   const text = hNode('div', 'talk-text talk-folded');
   text.dataset.tkText = '';
   text.appendChild(histMarkdown(m.text));
-  const more = hNode('button', 'talk-more', '全文を表示'); more.type = 'button'; more.dataset.tkMore = ''; more.hidden = true;
+  const more = hNode('button', 'talk-more', tl('talk.more')); more.type = 'button'; more.dataset.tkMore = ''; more.hidden = true;
   bubble.append(text, more);
-  if (m.cut) bubble.appendChild(hNode('p', 'talk-note', '（長いので途中まで）'));
-  if (m.merged) bubble.appendChild(hNode('p', 'talk-note', '（受け手は 2 通をまとめて受け取った）'));
+  if (m.cut) bubble.appendChild(hNode('p', 'talk-note', tl('talk.cut')));
+  if (m.merged) bubble.appendChild(hNode('p', 'talk-note', tl('talk.merged')));
   const meta = hNode('p', 'talk-meta');
   meta.appendChild(hNode('time', 'talk-at', talkTime(m.at)));
   if (m.dir === 'out') {
-    const st = hNode('span', `talk-state talk-state-${m.state}`, m.state === 'read' && Number.isFinite(m.readAt) ? `既読 ${talkTime(m.readAt)}` : TALK_STATE[m.state] || '');
+    const st = hNode('span', `talk-state talk-state-${m.state}`, m.state === 'read' && Number.isFinite(m.readAt) ? tl('talk.state.read.at', { at: talkTime(m.readAt) }) : TALK_STATE[m.state] || '');
     st.dataset.tkState = m.state;
-    if (m.state === 'undelivered') st.title = '相手に届かなかった（この機械にいない、または名前が解けなかった）';
+    if (m.state === 'undelivered') st.title = tl('talk.state.undelivered.why');
     meta.appendChild(st);
   }
-  if (m.via === 'subagent' || m.via === 'parent') meta.appendChild(hNode('span', 'talk-via', m.via === 'subagent' ? 'サブエージェントへ' : '親へ'));
+  if (m.via === 'subagent' || m.via === 'parent') meta.appendChild(hNode('span', 'talk-via', m.via === 'subagent' ? tl('talk.via.subagent') : tl('talk.via.parent')));
   n.append(bubble, meta);
   return n;
 }
@@ -11489,7 +12379,7 @@ function talkMeasure() {
 function talkFold(text, open) {
   const more = text.parentNode.querySelector('[data-tk-more]');
   text.classList.toggle('talk-folded', !open);
-  if (more) { more.textContent = open ? 'たたむ' : '全文を表示'; more.setAttribute('aria-expanded', String(open)); }
+  if (more) { more.textContent = open ? tl('talk.fold') : tl('talk.more'); more.setAttribute('aria-expanded', String(open)); }
   if (!open) {   // folded: its start stays in view
     const pane = talkPane(), msg = text.closest('.talk-msg');
     if (pane && msg && msg.getBoundingClientRect().top < pane.getBoundingClientRect().top) msg.scrollIntoView({ block: 'nearest' });
@@ -11526,7 +12416,7 @@ function talkOpenConv(convId) {
    the same seen from either side). A peer not on this page says so and stays. */
 function talkSwitch(agentId) {
   const label = SOURCE.talkLabel(agentId);
-  if (!label || !DEF[label]) { showToast('このロボットは今この画面にいない（切り替えられない）'); return; }
+  if (!label || !DEF[label]) { showToast(tl('talk.robot.absent')); return; }
   if (label === TALK.owner) return;
   TALK.want = TALK.conv;
   openRobot(label);
@@ -11541,13 +12431,13 @@ function talkBody() {
     const kids = [];
     if (TALK.note) kids.push(hNode('p', 'talk-empty talk-gone-note', TALK.note));
     if (TALK.listError) kids.push(hNode('p', 'talk-empty talk-error', TALK.listError));
-    else if (!TALK.list) kids.push(hNode('p', 'talk-empty', '読み込み中…'));
-    else if (!TALK.list.length) kids.push(hNode('p', 'talk-empty', 'まだトークがない（このロボットが SendMessage で送った・受け取った会話がここに出る）'));
+    else if (!TALK.list) kids.push(hNode('p', 'talk-empty', tl('talk.loading')));
+    else if (!TALK.list.length) kids.push(hNode('p', 'talk-empty', tl('talk.list.empty')));
     else {
       const ul = hNode('ul', 'talk-list');
       for (const c of TALK.list) { const li = hNode('li'); li.appendChild(talkRow(c)); ul.appendChild(li); }
       kids.push(ul);
-      if (TALK.more) kids.push(hNode('p', 'talk-empty', `新しい ${TALK.list.length} 件だけを表示`));
+      if (TALK.more) kids.push(hNode('p', 'talk-empty', tl('talk.list.newest', { n: TALK.list.length })));
     }
     pane.replaceChildren(...kids);
     pane.scrollTop = 0;
@@ -11561,17 +12451,17 @@ function talkBody() {
   const keepTop = !TALK.atEnd && pane.firstChild ? talkAnchor(pane) : null;
   const kids = [];
   if (box.more) {
-    const older = hNode('button', 'talk-older', box.busy ? '読み込み中…' : 'さらに前を読み込む'); older.type = 'button'; older.dataset.tkOlder = '';
+    const older = hNode('button', 'talk-older', box.busy ? tl('talk.loading') : tl('talk.older')); older.type = 'button'; older.dataset.tkOlder = '';
     kids.push(older);
   }
   if (box.error) kids.push(hNode('p', 'talk-empty talk-error', box.error));
-  if (!box.loaded && !box.error) kids.push(hNode('p', 'talk-empty', '読み込み中…'));
-  else if (box.loaded && !box.items.length) kids.push(hNode('p', 'talk-empty', 'まだメッセージがない'));
+  if (!box.loaded && !box.error) kids.push(hNode('p', 'talk-empty', tl('talk.loading')));
+  else if (box.loaded && !box.items.length) kids.push(hNode('p', 'talk-empty', tl('talk.messages.empty')));
   let day = '';
   const keep = new Map();
   for (const m of box.items) {
     const d = new Date(m.at).toDateString();
-    if (d !== day) { day = d; const dt = new Date(m.at); kids.push(hNode('p', 'talk-day', `${dt.getMonth() + 1}月${dt.getDate()}日`)); }
+    if (d !== day) { day = d; const dt = new Date(m.at); kids.push(hNode('p', 'talk-day', dt.toLocaleDateString(LOCALE, { month: 'long', day: 'numeric' }))); }
     const ms = talkMsgSig(m), old = TALK.nodes.get(m.id);
     const node = old && old.sig === ms ? old.node : talkMsgNode(m);
     keep.set(m.id, { sig: ms, node });
@@ -11643,7 +12533,7 @@ function talkPaintButton() {
   const badge = b.querySelector('[data-rb-talk-n]');
   const text = n > 99 ? '99+' : String(n);
   if (badge) { badge.hidden = !n; if (badge.textContent !== text) badge.textContent = text; }
-  const label = n ? `トーク（未読 ${n}）` : 'トーク';
+  const label = n ? tl('talk.title.unread', { n }) : tl('talk.title');
   if (b.getAttribute('aria-label') !== label) b.setAttribute('aria-label', label);
   if (b.getAttribute('aria-pressed') !== String(TALK.on)) b.setAttribute('aria-pressed', String(TALK.on));
 }
@@ -11694,7 +12584,7 @@ rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rb-talk]') &
 /* ---------- full-screen event log ---------- */
 let logSeq = 0;
 const logItems = [];
-const CAT_LABEL = { tool: 'ツール', spec: 'spec', test: 'テスト', task: 'タスク', session: '許可・停止' };
+const CAT_LABEL = { tool: tl('log.cat.tool'), spec: 'spec', test: tl('log.cat.test'), task: tl('log.cat.task'), session: tl('log.cat.session') };
 const kindCat = (k) => (/^(Read|Edit|Write|Bash|MCP)$/.test(k) ? 'tool' : k === 'spec 更新' ? 'spec' : /^(case|retry)/.test(k) ? 'test' : /^Task/.test(k) ? 'task' : 'session');
 /* Live events carry their category (plan 04 §2); the demo's are read from the kind. */
 const catOf = (e) => e.cat || kindCat(e.kind);
@@ -11702,9 +12592,9 @@ function payloadFor(e) {
   if (SOURCE.mode === 'live') return e.detail === undefined ? { kind: e.kind, text: e.what } : e.detail;
   const cat = kindCat(e.kind), sess = SESSION_OF[e.who];
   if (e.kind === 'PermissionRequest' && e.perm) return permRequestPayload(PERM_BY_ID[e.perm]);
-  if (e.decision) return { source: 'エージェントビュー → Claude Code（PermissionRequest フックへの応答）', ...permResponse(PERM_BY_ID[e.perm], e.decision, e.reason) };
-  if (cat === 'spec') { const [file, section] = e.what.split(' › '); return { source: 'ファイル監視（可視化サーバー）', event: 'change', path: `docs/screens/json/${file}`, section }; }
-  if (cat === 'test') return { source: 'jsonui-test-runner（追加予定の進捗出力）', file: 'tests/screens/cart.test.json', case: e.what, status: e.kind === 'retry' ? 'retrying' : e.kind.includes('✗') ? 'failed' : 'passed' };
+  if (e.decision) return { source: tl('log.demo.source.decision'), ...permResponse(PERM_BY_ID[e.perm], e.decision, e.reason) };
+  if (cat === 'spec') { const [file, section] = e.what.split(' › '); return { source: tl('log.demo.source.watch'), event: 'change', path: `docs/screens/json/${file}`, section }; }
+  if (cat === 'test') return { source: tl('log.demo.source.tests'), file: 'tests/screens/cart.test.json', case: e.what, status: e.kind === 'retry' ? 'retrying' : e.kind.includes('✗') ? 'failed' : 'passed' };
   const p = { hook_event_name: cat === 'tool' ? 'PreToolUse' : e.kind, session_id: SESSION_UUID[sess], cwd: CWD[sess] };
   if (AGENT_ID[e.who]) { p.agent_id = AGENT_ID[e.who]; p.agent_type = DEF[e.who].agent; }
   if (['Read', 'Edit', 'Write'].includes(e.kind)) { p.tool_name = e.kind; p.tool_input = { file_path: `${CWD[sess]}/${e.what}` }; }
@@ -11769,13 +12659,13 @@ function renderLog(force) {
   if (!logState.open) return;
   const follow = $('log-follow').checked;
   const list = logItems.filter((e) => logState.cats.has(catOf(e)) && inScope(projectOfRobot(e.who)) && !logState.hiddenRobots.has(e.who) && (!logState.q || `${e.who} ${e.kind} ${e.what}`.toLowerCase().includes(logState.q)));
-  $('log-count').textContent = `${list.length} 件（全 ${logItems.length} 件）`;
-  setText($('log-title'), UI.project === 'all' ? 'イベントログ' : `イベントログ · ${PROJECT[UI.project].name}`);
+  $('log-count').textContent = tl('log.count', { n: list.length, all: logItems.length });
+  setText($('log-title'), UI.project === 'all' ? tl('log.title') : tl('log.title.project', { name: PROJECT[UI.project].name }));
   const more = $('log-more');
   if (!follow && !force && logState.shownTop !== null) {
     const newer = list.filter((e) => e.seq > logState.shownTop).length;
     more.hidden = newer === 0;
-    more.textContent = `新着 ${newer} 件を表示`;
+    more.textContent = tl('log.more', { n: newer });
     return;
   }
   more.hidden = true;
@@ -11783,10 +12673,10 @@ function renderLog(force) {
   const rowsHTML = list.slice(0, 400).map((e) => {
     const cat = catOf(e), d = DEF[e.who], open = logState.expanded.has(String(e.seq));
     const rowHTML = `<tr class="ev" tabindex="0" data-key="${e.seq}" aria-expanded="${open ? 'true' : 'false'}"><td class="time">${fmtClock(BASE_CLOCK + e.abs)}</td><td class="who">${pill(e.who, d.role)} ${esc(d.agent)}</td><td><span class="cat cat-${esc(cat)}">${esc(e.kind)}</span></td><td class="what">${esc(e.what)}</td></tr>`;
-    const note = SOURCE.mode === 'live' ? 'サーバーが受けた入力（長いものは切り詰め）' : e.decision ? 'ビューで押した答えを Claude Code へ返す内容の例' : cat === 'spec' || cat === 'test' ? '可視化サーバーが作るイベントの例' : 'フック入力の例（項目名は実際と同じ。値はデモ）';
+    const note = SOURCE.mode === 'live' ? tl('log.note.live') : e.decision ? tl('log.note.decision') : cat === 'spec' || cat === 'test' ? tl('log.note.server') : tl('log.note.hook');
     return open ? `${rowHTML}<tr class="payload"><td colspan="4"><p>${esc(note)}</p><pre>${esc(JSON.stringify(payloadFor(e), null, 2))}</pre></td></tr>` : rowHTML;
   }).join('');
-  setHTML(logRows, rowsHTML || '<tr><td colspan="4" class="log-empty">条件に合うイベントがありません</td></tr>');
+  setHTML(logRows, rowsHTML || `<tr><td colspan="4" class="log-empty">${esc(tl('log.empty'))}</td></tr>`);
   if (follow) logBody.scrollTop = 0;
 }
 document.addEventListener('keydown', (e) => {
@@ -11809,8 +12699,8 @@ document.addEventListener('keydown', (e) => {
 // Demo: the script's clock, with play / speed. Live: the wall clock (the local time of day in seconds), no
 // controls; the state comes from the server (25-net.js).
 let simT = START_AT, prevSim = -0.001, playing = true, speed = 1, lastMs = performance.now(), lastPanel = -1e9, lastBoard = -1e9;
-$('btn-play').addEventListener('click', (e) => { playing = !playing; e.currentTarget.textContent = playing ? '一時停止' : '再生'; e.currentTarget.setAttribute('aria-pressed', String(!playing)); });
-$('btn-speed').addEventListener('click', (e) => { speed = speed === 1 ? 3 : 1; e.currentTarget.textContent = `速度 ×${speed}`; });
+$('btn-play').addEventListener('click', (e) => { playing = !playing; e.currentTarget.textContent = playing ? tl('demo.pause') : tl('demo.play'); e.currentTarget.setAttribute('aria-pressed', String(!playing)); });
+$('btn-speed').addEventListener('click', (e) => { speed = speed === 1 ? 3 : 1; e.currentTarget.textContent = tl('demo.speed', { n: speed }); });
 
 /* ?fps=1: frames per second in the corner, from the requestAnimationFrame intervals (plan 10 §7). */
 const fpsMeter = new URLSearchParams(location.search).get('fps') === '1' ? { el: document.createElement('p'), n: 0, from: performance.now() } : null;
@@ -11854,7 +12744,7 @@ function frame(ms) {
     $('chip-clock').textContent = fmtClock(BASE_CLOCK + simT);
     if (SOURCE.mode === 'live') liveChrome();
     floorNavSync();
-    if (SOURCE.mode === 'demo') { const el = $('demo-clock'); el.hidden = false; setText(el, `デモの時計 ${fmtClock(Math.floor(demoHour(latestModel.t) * 3600)).slice(0, 5)}（早回し）`); }
+    if (SOURCE.mode === 'demo') { const el = $('demo-clock'); el.hidden = false; setText(el, tl('demo.clock', { time: fmtClock(Math.floor(demoHour(latestModel.t) * 3600)).slice(0, 5) })); }
     lastPanel = ms;
   }
   if (fpsMeter) {
@@ -11871,13 +12761,13 @@ function liveChrome() {
   const chip = document.querySelector('.chip.demo');
   if (chip) {
     const ok = NET.state === 'connected';
-    setText(chip, ok ? '接続中' : NET.state === 'connecting' && !LIVE.connectedOnce ? '接続しています…' : '再接続中…');
+    setText(chip, ok ? tl('net.connected') : NET.state === 'connecting' && !LIVE.connectedOnce ? tl('net.connecting') : tl('net.reconnecting'));
     chip.dataset.conn = ok ? 'ok' : 'wait';
   }
   const empty = $('live-empty');
   if (empty) empty.hidden = !SOURCE.connected || SESSIONS.length > 0;
   const err = $('live-error');
-  if (err) { err.hidden = !LIVE.serverError; setText(err, LIVE.serverError ? `取得元の故障: ${LIVE.serverError}` : ''); }
+  if (err) { err.hidden = !LIVE.serverError; setText(err, LIVE.serverError ? tl('net.source.error', { error: LIVE.serverError }) : ''); }
 }
 if (SOURCE.mode === 'live') {
   document.body.dataset.mode = 'live';
@@ -11893,9 +12783,9 @@ renderPanel(latestModel);
 if (UI.project !== 'all' && SOURCE.mode === 'demo') focusProject(UI.project, true);
 const redrawAll = () => { fontRedraws.forEach((fn) => fn()); if (has3D) redrawBoards(latestModel, 0, true); };
 Promise.all([
-  document.fonts.load(`40px ${FONT_DISPLAY}`, 'a0!仕様書ログインテスト実行タスクボード'),
+  document.fonts.load(`40px ${FONT_DISPLAY}`, tl('font.sample.display')),
   document.fonts.load(`700 40px ${FONT_MONO}`, '{ }$✓▶○⚠#'),
-  document.fonts.load(`700 16px ${FONT_BODY}`, 'ログインカート購入する未着手待ち作業中完了'),
+  document.fonts.load(`700 16px ${FONT_BODY}`, tl('font.sample.body')),
 ]).then(redrawAll, redrawAll);
 requestAnimationFrame(frame);
 if (SOURCE.mode === 'live') { LIVE.uiReady = true; netConnect(); }
