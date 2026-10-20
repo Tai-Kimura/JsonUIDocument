@@ -129,7 +129,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 16,
-                      "code": "\"stateManagement\": {\n  \"eventHandlers\": [\n    { \"name\": \"onSubmit\", \"description\": \"Validate + navigate to /thanks.\" }\n  ]\n},\n\"userActions\": [\n  { \"action\": \"Tap submit button\", \"processing\": \"onSubmit() then onNavigate('/thanks').\" }\n],\n\"transitions\": [\n  { \"trigger\": \"onNavigate(url)\", \"condition\": \"url === '/thanks'\", \"destination\": \"ThanksScreen\" }\n],\n\"dataFlow\": {\n  \"viewModel\": {\n    \"methods\": [\n      { \"name\": \"onNavigate\", \"params\": [{\"name\": \"url\", \"type\": \"String\"}],\n        \"description\": \"Router.push(url). URL is opaque to spec.\" }\n    ]\n  }\n}",
+                      "code": "\"stateManagement\": {\n  \"uiVariables\": [\n    { \"name\": \"onSubmit\", \"type\": \"(() -> Void)?\", \"description\": \"Bound by the submit button.\" }\n  ]\n},\n\"userActions\": [\n  { \"action\": \"Tap submit button\", \"processing\": \"onSubmit() then onNavigate('/thanks').\" }\n],\n\"transitions\": [\n  { \"trigger\": \"onNavigate(url)\", \"condition\": \"url === '/thanks'\", \"destination\": \"ThanksScreen\" }\n],\n\"dataFlow\": {\n  \"viewModel\": {\n    \"methods\": [\n      { \"name\": \"onSubmit\", \"description\": \"Validate + navigate to /thanks.\" },\n      { \"name\": \"onNavigate\", \"params\": [{\"name\": \"url\", \"type\": \"String\"}],\n        \"description\": \"Router.push(url). URL is opaque to spec.\" }\n    ]\n  }\n}",
                       "language": "json",
                       "filename": "screen_spec.json (excerpt)",
                       "showLineNumbers": false,

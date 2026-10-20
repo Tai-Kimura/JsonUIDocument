@@ -1205,8 +1205,8 @@
       "ja": "spec を書く"
     },
     "article_spec_first_description": {
-      "en": "Author a screen_spec.json end-to-end: uiVariables, eventHandlers, displayLogic, customTypes.",
-      "ja": "screen_spec.json を一通り書く: uiVariables / eventHandlers / displayLogic / customTypes。"
+      "en": "Author a screen_spec.json end-to-end: uiVariables (handlers included), viewModel methods, displayLogic, customTypes.",
+      "ja": "screen_spec.json を一通り書く: uiVariables（ハンドラーを含む）/ viewModel の methods / displayLogic / customTypes。"
     },
     "article_spec_first_read_time": {
       "en": "~12 min read",
@@ -3953,12 +3953,12 @@
       "ja": "uiVariables は Layout が @{name} で bind できる ViewModel フィールド。各エントリは name / type / description を持ち（description が無いエントリは validator が拒否します）、必要なら `defaultValue` を持ちます。type は組み込み型 (Int / String / Bool / Date など) か dataFlow で宣言した customType (Step 4)。`jui g project` は `defaultValue` を、生成する Layout JSON の data エントリにそのまま写します — 文字列はクォートをエスケープ (\\\"neutral\\\")。キーは `defaultValue`（古い綴りの `default` も効きます）: 2026-09-28 まで、このガイドは `initial` と書いていましたが、どのツールも読みません — jsonui-cli 1.9.0 で実測すると、`\"initial\": \"5\"` からは `\"defaultValue\": 0` が、`\"defaultValue\": \"5\"` からは `\"5\"` が生成され、どちらでも警告は出ません。1.9.0 からは、spec の validator が、宣言した型の値として読めない値 — 配列の値として書いた説明文、Int に書いた `a few` — を 1.9.0 では INFO、1.9.1 からは WARNING で名指し、検証そのものは通ります。String と custom type は判定しません。1.9.1 からは、`jui verify --fail-on-diff` も、生成した layout の defaultValue が spec と違うと落ちます — そうした食い違い 1 件で実測すると、1.9.0 では報告だけで exit 0、1.9.1 では exit 1 です。どちらも `initial` は読みません: 1.9.1 でも、`\"initial\": \"5\"` と書いた spec は、6 と書いた layout に対して verify を通ります。"
     },
     "step3_heading": {
-      "en": "3. Declare eventHandlers",
-      "ja": "3. eventHandlers を宣言する"
+      "en": "3. Declare the handlers",
+      "ja": "3. ハンドラーを宣言する"
     },
     "step3_body": {
-      "en": "eventHandlers are the methods the Layout can invoke via onClick / onChange / onAppear / etc. A handler entry is a name + optional params + a one-line description. The description is the contract between you and the implementer — it tells whoever writes the ViewModel body what each method is supposed to do, in prose the generator will not parse but that reviewers will read. Handler names must match the onX… pattern (onAppear, onSubmit, onCountDidChange) — the validator rejects anything else, making this the most common first-time mistake.",
-      "ja": "eventHandlers は Layout が onClick / onChange / onAppear などで呼び出すメソッド。エントリは name + オプションの params + 1 行の description。description はあなたと実装者との契約 — ViewModel body を書く人にメソッドが何をすべきかを散文で伝えます。ジェネレータは parse しませんが、レビュワーが読みます。ハンドラー名は onX… パターン (onAppear, onSubmit, onCountDidChange) にマッチする必要があり、validator が弾きます — 初心者がよくハマるポイントです。"
+      "en": "A handler the Layout calls through onClick / onChange / onAppear and the like is a uiVariables entry with a callback type — \"(() -> Void)?\", or \"((String) -> Void)?\" for one that takes a value (the aliases callback and callback(String) mean the same). The Layout's bindings resolve against the data section, and `jui g project` writes the data section from uiVariables (and from what displayLogic, a collection and a tab view generate), so a handler declared anywhere else is not in it. The method itself — its name, its params and a one-line description — goes in dataFlow.viewModel.methods: that description is the contract with whoever writes the ViewModel body, prose the generator will not parse but reviewers will read. stateManagement.eventHandlers is for handlers that stay inside the View and never reach the ViewModel, which is rare; it never goes into the data section, and its names must match onX… (onAppear, onSubmit). Since jsonui-cli 2.3.12 `jui verify` reports a name a hand-written layout binds that is declared only in eventHandlers or in viewModel.methods. Until 2026-10-21 this step told you to declare the Layout's handlers in eventHandlers, which `jui g project` does not put in the data section either (measured on jsonui-cli 2.3.12: a handler declared only there was left out of the generated data).",
+      "ja": "Layout が onClick / onChange / onAppear などで呼ぶハンドラーは、callback の型を持つ uiVariables のエントリです — \"(() -> Void)?\"、値を 1 つ受け取るものなら \"((String) -> Void)?\"（別名の callback と callback(String) も同じ意味）。Layout の束縛は data 節に対して解決され、`jui g project` は data 節を uiVariables（と displayLogic・collection・tab view が生むもの）から書くので、ほかの所に宣言したハンドラーはそこに入りません。メソッドそのもの — 名前、params、1 行の description — は dataFlow.viewModel.methods に書きます。description は ViewModel の本体を書く人との契約で、ジェネレータは parse しませんがレビュワーが読みます。stateManagement.eventHandlers は、View の中で完結して ViewModel に届かないハンドラー用で、使うことはまれです。data 節には入らず、名前は onX…（onAppear、onSubmit）に合わなければなりません。jsonui-cli 2.3.12 からは、手書きの layout が束縛する名前が eventHandlers か viewModel.methods にしか無いと、`jui verify` が報告します。2026-10-21 まで、このステップは Layout のハンドラーを eventHandlers に宣言するよう書いていましたが、`jui g project` もそれを data 節に入れません（jsonui-cli 2.3.12 で測定: そこにしか無いハンドラーは、生成された data に入りませんでした）。"
     },
     "step4_heading": {
       "en": "4. Declare customTypes",
@@ -4005,8 +4005,8 @@
       "ja": "• Structural — spec の components / layout ツリーが Layout JSON と一致しない。"
     },
     "step5c_bullet_orphan": {
-      "en": "• Orphan data — Layout JSON has data fields with no matching uiVariables / eventHandlers declaration in the spec.",
-      "ja": "• Orphan data — Layout JSON の data フィールドに対応する uiVariables / eventHandlers 宣言が spec に無い。"
+      "en": "• Orphan data — Layout JSON has data fields the spec's data section does not generate (uiVariables, and what displayLogic, a collection and a tab view generate). A name declared only in eventHandlers is one of them.",
+      "ja": "• Orphan data — Layout JSON の data に、spec の data 節が生まないフィールドがある（data 節を生むのは uiVariables と、displayLogic・collection・tab view）。eventHandlers にしか無い名前もこれに当たる。"
     },
     "step5c_bullet_unregistered": {
       "en": "• Unregistered custom types — a type referenced in the spec is not registered in .jsonui-type-map.json.",
@@ -4061,8 +4061,8 @@
       "ja": "jui verify が 'Orphan data: onSubmit not declared in uiVariables' を報告する。"
     },
     "trouble_5_fix": {
-      "en": "Layout JSON has a data entry the spec does not know about. Pick one: add the field to stateManagement.uiVariables (or eventHandlers, if it is a handler) in the spec, or delete the hand-edited data entry from the Layout JSON and let jui build regenerate it. Do not ignore the warning — verify is the only thing that catches generated/hand-written divergence.",
-      "ja": "Layout JSON に、spec が把握していない data エントリがあります。どちらか選ぶ: spec 側の stateManagement.uiVariables (handler なら eventHandlers) にフィールドを追加するか、Layout JSON の手編集 data エントリを削除して jui build に再生成させる。警告は無視しないこと — verify は生成物と手書きの乖離を検知できる唯一の仕組みです。"
+      "en": "Layout JSON has a data entry the spec does not know about. Pick one: add the field to stateManagement.uiVariables in the spec (a handler too, with a callback type such as \"(() -> Void)?\"; eventHandlers never goes into the data section), or delete the hand-edited data entry from the Layout JSON and let jui build regenerate it. Do not ignore the warning — verify is the only thing that catches generated/hand-written divergence.",
+      "ja": "Layout JSON に、spec が把握していない data エントリがあります。どちらか選ぶ: spec 側の stateManagement.uiVariables にフィールドを追加するか（handler も \"(() -> Void)?\" のような callback の型でここに書く。eventHandlers は data 節に入らない）、Layout JSON の手編集 data エントリを削除して jui build に再生成させる。警告は無視しないこと — verify は生成物と手書きの乖離を検知できる唯一の仕組みです。"
     },
     "trouble_6_symptom": {
       "en": "Metadata fails validate with 'Name must be PascalCase' or 'ID must be snake_case'.",
@@ -4125,8 +4125,8 @@
       "ja": "2. uiVariables を宣言"
     },
     "toc_row_step3": {
-      "en": "3. Declare eventHandlers",
-      "ja": "3. eventHandlers を宣言"
+      "en": "3. Declare the handlers",
+      "ja": "3. ハンドラーを宣言"
     },
     "toc_row_step4": {
       "en": "4. Declare customTypes",
@@ -6223,8 +6223,8 @@
       "ja": "実行時にボタンをタップしても何も起きない。"
     },
     "trouble_3_fix": {
-      "en": "Check three things: (1) the spec declared `onIncrement` in eventHandlers, (2) the layout wired `onClick: \"@{onIncrement}\"` exactly — not `\"onIncrement\"` or `\"@{data.onIncrement}\"`, (3) the ViewModel exposes `onIncrement` (or passes it via `initializeEventHandlers` + `updateData`). Missing any one of the three makes the tap no-op silently on web and crashes at launch on iOS — neither is what you want.",
-      "ja": "3 点を確認: (1) spec の eventHandlers に `onIncrement` が宣言されているか、(2) layout が `onClick: \"@{onIncrement}\"` ちょうどで書かれているか（`\"onIncrement\"` や `\"@{data.onIncrement}\"` は NG）、(3) ViewModel が `onIncrement` を公開しているか（または `initializeEventHandlers` + `updateData` 経由で渡している）。どれか 1 つでも欠けると web では静かに no-op、iOS では起動時クラッシュ — どちらも望まない結果です。"
+      "en": "Check three things: (1) the spec declared `onIncrement` in uiVariables with a callback type (`\"(() -> Void)?\"`; eventHandlers never reaches the data section the binding resolves against), (2) the layout wired `onClick: \"@{onIncrement}\"` exactly — not `\"onIncrement\"` or `\"@{data.onIncrement}\"`, (3) the ViewModel exposes `onIncrement` (or passes it via `initializeEventHandlers` + `updateData`). Missing any one of the three makes the tap no-op silently on web and crashes at launch on iOS — neither is what you want.",
+      "ja": "3 点を確認: (1) spec の uiVariables に `onIncrement` が callback の型（`\"(() -> Void)?\"`）で宣言されているか（eventHandlers は、束縛が解決される data 節に入らない）、(2) layout が `onClick: \"@{onIncrement}\"` ちょうどで書かれているか（`\"onIncrement\"` や `\"@{data.onIncrement}\"` は NG）、(3) ViewModel が `onIncrement` を公開しているか（または `initializeEventHandlers` + `updateData` 経由で渡している）。どれか 1 つでも欠けると web では静かに no-op、iOS では起動時クラッシュ — どちらも望まない結果です。"
     },
     "next_heading": {
       "en": "Keep going",
@@ -10837,8 +10837,8 @@
       "ja": "stateManagement"
     },
     "section_state_body": {
-      "en": "Four slots for four different lifecycles. `states` is for explicit persistent state machines and is rarely used. `uiVariables` is the main event — every field the Layout JSON binds through `@{name}` must be declared here with a type and initial expression. `eventHandlers` lists every VM method the Layout binds an `onClick` to. `displayLogic` encodes conditional visibility / enabled rules without putting logic in the Layout — each entry maps a condition on state to effects on an element id, and the generator emits a derived `*Visibility` string the Layout binds to.",
-      "ja": "4 スロット、それぞれ違うライフサイクル。`states` は明示的な永続ステートマシン用、使われることは少ない。主役は `uiVariables` — Layout JSON が `@{name}` で bind する全フィールドをここに型付きで宣言し、初期式を書く。`eventHandlers` は Layout が `onClick` などで bind する VM メソッドの一覧。`displayLogic` は条件付き visibility / enabled を Layout から切り離して書く場所で、state への条件と element id への effect を対応づけ、ジェネレータが派生 `*Visibility` 文字列を emit して Layout がそれを bind する流れ。"
+      "en": "Four slots for four different lifecycles. `states` is for explicit persistent state machines and is rarely used. `uiVariables` is the main event — every field the Layout JSON binds through `@{name}` must be declared here with a type and initial expression. A handler the Layout binds an `onClick` to is a uiVariables entry too, with a callback type (`\"(() -> Void)?\"`); the method behind it is declared in dataFlow.viewModel.methods. `eventHandlers` is for view-local handlers only and never reaches the data section — since jsonui-cli 2.3.12 `jui verify` reports a bound name declared only there. `displayLogic` encodes conditional visibility / enabled rules without putting logic in the Layout — each entry maps a condition on state to effects on an element id, and the generator emits a derived `*Visibility` string the Layout binds to.",
+      "ja": "4 スロット、それぞれ違うライフサイクル。`states` は明示的な永続ステートマシン用、使われることは少ない。主役は `uiVariables` — Layout JSON が `@{name}` で bind する全フィールドをここに型付きで宣言し、初期式を書く。Layout が `onClick` などで bind するハンドラーも、callback の型（`\"(() -> Void)?\"`）を持つ uiVariables のエントリで、その裏のメソッドは dataFlow.viewModel.methods に宣言する。`eventHandlers` は View の中で完結するハンドラー専用で、data 節には入らない — jsonui-cli 2.3.12 からは、そこにしか無い束縛の名前を `jui verify` が報告する。`displayLogic` は条件付き visibility / enabled を Layout から切り離して書く場所で、state への条件と element id への effect を対応づけ、ジェネレータが派生 `*Visibility` 文字列を emit して Layout がそれを bind する流れ。"
     },
     "section_dataflow_heading": {
       "en": "dataFlow",
