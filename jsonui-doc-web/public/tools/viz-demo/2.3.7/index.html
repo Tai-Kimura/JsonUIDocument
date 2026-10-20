@@ -181,6 +181,10 @@
           <p class="tw-note" id="bill-note">オン — 応答ごとの概算の金額をロボットの頭上に出します</p>
           <p class="set-hint">金額は公式の単価 × 応答のトークン数の概算です。サブスクリプションでの利用では、実際の請求とは一致しません。<button type="button" class="mini-btn" id="prices-open" aria-haspopup="dialog">単価の表</button></p>
         </div>
+        <div class="set-cardnote">
+          <button type="button" class="mini-btn" id="card-note-back">カードの説明をまた出す</button>
+          <p class="set-hint" id="card-note-state">出している</p>
+        </div>
       </section>
       <div class="side-foot" id="side-foot" hidden><button type="button" class="log-open" id="btn-strip-open" aria-controls="ticker-strip" aria-expanded="false" aria-label="ログの帯を開く">ログを開く</button></div>
     </aside>
@@ -200,6 +204,9 @@
     <label><input type="checkbox" data-notify-kind="done"> 完了（メインのセッションのターンの終わり）</label>
     <label><input type="checkbox" data-notify-kind="perm"> 許可の待ち</label>
     <label><input type="checkbox" data-notify-kind="ask"> 質問の待ち</label>
+    <label><input type="checkbox" data-notify-kind="chime"> 音を鳴らす（通知を出したタブで、短いチャイム）</label>
+    <label class="notify-volume">音量 <select id="notify-volume"><option value="low">小</option><option value="mid">中</option><option value="high">大</option></select></label>
+    <span class="notify-note" id="notify-chime-note" role="status"></span>
   </fieldset>
   <label for="ask-wait">質問を viz で待つ時間（サーバーに保存）</label>
   <select id="ask-wait"></select>

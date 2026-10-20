@@ -208,7 +208,9 @@ body { background: var(--bg); color: var(--ink); font-family: var(--font-body); 
 /* border 0 (2.3.5): a chip that is a <button> (質問の窓 chip-askwait) kept the browser's 2 px border, stood 4 px taller,
    and the row stretched every other chip to its height with the text left at the top (2.6 px off the middle). */
 .chip.demo { background: var(--warn-bg); color: var(--warn); font-family: var(--font-body); font-weight: 700; }
-.controls { display: flex; flex-wrap: wrap; gap: 6px; }
+.controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; margin-left: auto; }
+/* margin-left auto + flex-end (2.3.7, requester 10-20): when the chips fill the line, the buttons wrap to the next one and
+   used to fall to its left edge; now they keep to the right, there and when they wrap among themselves on a phone. */
 .controls button { padding: 4px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font: 700 12px/1.5 var(--font-body); cursor: pointer; }
 
 .main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 400px); min-height: 0; }
@@ -216,7 +218,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--font-body); 
 .main.side-closed > .side { display: none; }
 .scene { position: relative; min-height: 0; overflow: hidden; background: var(--scene); }
 #scene-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; touch-action: none; }
-.tags { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.tags { position: absolute; inset: 0; overflow: hidden; pointer-events: none; isolation: isolate; }
 .tag {
   position: absolute;
   left: 0;
@@ -238,6 +240,11 @@ body { background: var(--bg); color: var(--ink); font-family: var(--font-body); 
 .tag > .nm { flex: none; max-width: 13em; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
 .tag > .pill[hidden] { display: none; }
 .tag.named { padding-left: 9px; }
+/* A robot's tag selects the robot (ticket 2026-10-20-jui-viz-robot-name-tag-click-selects): the whole tag takes the
+   click, its hover rings it. The nearest robot's tag is in front (z-index from placeRobotTags, negative, so the rooms'
+   signs stay over every tag). The bill over a robot (.bill, 54-bills.js) does the same. */
+.tag.bot, .bill { pointer-events: auto; cursor: pointer; }
+.tag.bot:hover { box-shadow: 0 0 0 2px var(--info), 0 1px 4px var(--shadow); }
 /* A room's name is a sign, not a robot's name tag (requester 10-18: the two blended in a crowded room): square corners,
    a frame and the info hue always on, an opaque ground, and in front of the tags (a later sibling would paint over it). */
 .tag.room { z-index: 1; padding: 2px 8px; border: 1.5px solid var(--info); border-radius: 3px; background: var(--panel); color: var(--info); font: 700 12px/1.5 var(--font-mono); box-shadow: 0 1px 4px var(--shadow); pointer-events: auto; cursor: pointer; }
@@ -612,6 +619,18 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .wf.s-doing { border-color: var(--wb-blue); box-shadow: 0 0 0 3px var(--wb-blue-bg); }
 .wf.s-todo { border-style: dashed; border-color: var(--wb-faint); opacity: 0.6; }
 .wf.s-writing { border-color: var(--wb-violet); box-shadow: 0 0 0 3px var(--wb-violet-bg); }
+/* the structure as a tree (ticket 2026-10-20-jui-viz-spec-structure-shows-no-nesting): the list's lines, the frame's nested boxes (padding: WF_PAD in 50-panel.js) */
+.rw-tree { position: relative; }
+.rw-tree .tg { position: absolute; top: -1px; bottom: -1px; left: calc(12px + 1.4em); display: flex; pointer-events: none; }
+.rw-tree .tg i { position: relative; flex: none; width: 14px; }
+.tg .g-v::before, .tg .g-t::before, .tg .g-l::before { content: ""; position: absolute; top: 0; bottom: 0; left: 6px; border-left: 1.5px solid var(--wb-faint); }
+.tg .g-l::before { bottom: auto; height: 15px; }
+.tg .g-t::after, .tg .g-l::after { content: ""; position: absolute; top: 15px; left: 6px; right: 2px; border-top: 1.5px solid var(--wb-faint); }
+.rw-tree .tr-in { display: block; }
+.wf-box { gap: 4px; min-width: 0; }
+.wf-deep { border-width: 1px; }
+.wf-box.s-todo { opacity: 1; }   /* the dashed border says it; an opacity would compound down a deep tree */
+.wf-box.s-todo > .wf-id { opacity: 0.6; }
 .vt { width: 100%; border-collapse: collapse; font-size: 13px; }
 .vt th { padding: 4px 6px; border-bottom: 1px solid var(--wb-line); color: var(--wb-soft); font: 700 11px/1.5 var(--font-body); text-align: left; }
 .vt td { padding: 5px 6px; border-bottom: 1px dashed var(--wb-line); color: var(--wb-ink); vertical-align: baseline; }
@@ -812,6 +831,12 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .h-compose[hidden], .h-confirm[hidden], .h-compose-why[hidden] { display: none; }
 .h-compose-why { margin: 0; padding: 6px 10px; border-radius: 8px; background: var(--warn-bg); color: var(--warn); font: 700 12px/1.5 var(--font-body); overflow-wrap: anywhere; }
 .h-compose-why.h-compose-note { background: var(--info-bg); color: var(--ink); font-weight: 500; }
+/* The × of the note (2.3.7): over the band's right end; the reason line has none. */
+.h-compose-head { position: relative; }
+.h-compose-head[hidden], .h-note-x[hidden] { display: none; }
+.h-compose-why.h-compose-note { padding-right: 34px; }
+.h-note-x { position: absolute; top: 2px; right: 4px; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--ink-soft); font: 700 16px/1 var(--font-body); cursor: pointer; }
+.h-note-x:hover, .h-note-x:focus-visible { background: var(--bg); color: var(--ink); }
 .h-compose-text { box-sizing: border-box; width: 100%; min-height: 3.6em; max-height: 30vh; resize: vertical; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: 500 13px/1.5 var(--font-body); }
 .h-compose-text:disabled { opacity: 0.55; cursor: not-allowed; }
 .h-compose-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -1222,7 +1247,8 @@ details.h-item[open] > :not(summary) :is(a[href], button, img, .h-thumb) { curso
 
 /* The bill over a robot (2.3.6): a banknote and the estimated cost of its responses, above its name tag (placeRobotTags
    keeps the room for it inside the tag's box, so it never covers a tag); it rises a little and goes. ? = no price. */
-.bill { position: absolute; left: 0; top: 0; pointer-events: none; }
+.bill { position: absolute; left: 0; top: 0; }
+.bill:hover .bill-in { box-shadow: 0 0 0 2px var(--info), 0 1px 4px var(--shadow); }
 .bill-in { display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px 1px 5px; border: 1.5px solid var(--ok); border-radius: 999px; background: var(--ok-bg); color: var(--ok); font: 700 11.5px/1.5 var(--font-mono); white-space: nowrap; font-variant-numeric: tabular-nums; box-shadow: 0 1px 4px var(--shadow); }
 .bill.unknown .bill-in { border-color: var(--warn); background: var(--warn-bg); color: var(--warn); }
 .bill-ico { flex: none; width: 18px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.5; }
@@ -1235,6 +1261,7 @@ details.h-item[open] > :not(summary) :is(a[href], button, img, .h-thumb) { curso
   100% { opacity: 0; transform: translateY(-12px); }
 }
 .set-bills { display: grid; justify-items: start; gap: 6px; margin-top: 14px; }
+.set-cardnote { display: grid; justify-items: start; gap: 6px; margin-top: 14px; }
 .price-chip::before { content: "$ "; }
 .pr-body { display: grid; align-content: start; gap: 14px; }
 .pr-about { margin: 0; font-size: 12.5px; line-height: 1.6; }
@@ -1259,7 +1286,7 @@ details.h-item[open] > :not(summary) :is(a[href], button, img, .h-thumb) { curso
 @media (max-width: 640px) { .pr-table thead { display: none; } .pr-table tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 6px 0; border-bottom: 1px solid var(--wb-line); } .pr-table th[scope="row"], .pr-table td.pr-acts { grid-column: 1 / -1; } .pr-table td, .pr-table th { border: 0; } }
 /* priced by the user's own table (not the shipped one): a dashed frame, and the title says so */
 .bill.own-price .bill-in { border-style: dashed; }
-/* ---------- トーク (58-talk.js, 2.3.7): a robot's SendMessage conversations, as a chat ---------- */
+/* ---------- トーク (58-talk.js, 2.3.6): a robot's SendMessage conversations, as a chat ---------- */
 .rb-talk { position: relative; display: inline-flex; align-items: center; gap: 5px; background: var(--panel); color: var(--ink); }
 .rb-talk[aria-pressed="true"] { border-color: var(--info); background: var(--info-bg); color: var(--info); }
 .rb-talk-icon { flex: none; }

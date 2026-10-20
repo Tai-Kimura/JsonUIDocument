@@ -2616,8 +2616,8 @@
       "command": "viz doctor",
       "synopsis": "jui viz doctor [--json]",
       "purpose": {
-        "en": "Check the environment for jui viz — Python 3.11 or later, aiohttp and watchdog, the claude command, disableAllHooks, the hooks, the state folder, where test results are read from, the near weather (on or off, when it was last read, why it failed), the usage-limits statusLine (installed or not, the last value), what the git box and the shredder can see (from 2.3.4), the permission relay, the server and the port — and say how to fix what fails. Exits 1 when a check fails.",
-        "ja": "jui viz の環境を確かめる。Python 3.11 以上、aiohttp と watchdog、claude コマンド、disableAllHooks、フック、状態フォルダ、テストの結果を読む場所、近所の天気（オンかオフか、最後に取れた時刻、失敗の理由）、上限の表示の statusLine（入っているか、最後の値）、git の箱とシュレッダーに見えるもの（2.3.4 から）、許可の中継、サーバー、ポートを見て、直し方を出す。どれかが失敗なら 1 で終わる。"
+        "en": "Check the environment for jui viz — Python 3.11 or later, aiohttp and watchdog, the claude command, disableAllHooks, the hooks (and, from 2.3.7, a question hook installed with jui viz hooks install whose timeout is still under 86400 seconds), the state folder, where test results are read from, the near weather (on or off, when it was last read, why it failed), the usage-limits statusLine (installed or not, the last value), what the git box and the shredder can see (from 2.3.4), the permission relay, the server and the port — and say how to fix what fails. Exits 1 when a check fails.",
+        "ja": "jui viz の環境を確かめる。Python 3.11 以上、aiohttp と watchdog、claude コマンド、disableAllHooks、フック（2.3.7 からは、jui viz hooks install で入れた質問のフックの timeout が 86400 秒より短いままでないかも）、状態フォルダ、テストの結果を読む場所、近所の天気（オンかオフか、最後に取れた時刻、失敗の理由）、上限の表示の statusLine（入っているか、最後の値）、git の箱とシュレッダーに見えるもの（2.3.4 から）、許可の中継、サーバー、ポートを見て、直し方を出す。どれかが失敗なら 1 で終わる。"
       },
       "options": [
         {
@@ -2642,16 +2642,16 @@
         "jui viz status"
       ],
       "verifiedAgainst": {
-        "version": "2.3.4",
+        "version": "2.3.7",
         "columns": 80,
         "python": "3.12",
         "helpHash": "b7565244c9540a31b622d7b0f755511c837c9d39c735a0195e1cd5a901b793db",
-        "cardHash": "79912148c7f667ab4127028231c798d5e4d733b36ecab4f1a334326a6a5bfab8",
+        "cardHash": "d748527db2ffb7d5110314c6b8564a3e18169e03f6e527dfd707b2006d57dd65",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "c97c2ebb810b",
           "synopsis": "a8380a6299f3",
-          "purpose": "1f3441a44a86",
+          "purpose": "15921b793877",
           "options": "aa5b149e7cdf",
           "examples": "a38867cde311",
           "aliases": "98edafdd23a8",
@@ -2664,8 +2664,8 @@
       "command": "viz hooks install",
       "synopsis": "jui viz hooks install [--dry-run]",
       "purpose": {
-        "en": "Add the jui viz hooks to ~/.claude/settings.json, for where the jui-viz plugin cannot be used. Hooks and settings already there are kept, and the file as it was is saved in the backups folder of jui viz's state folder: ~/.local/state/jui-viz/backups/ (or $XDG_STATE_HOME/jui-viz, or $JUI_VIZ_HOME, when set). Before 2.2.0 it was ~/.jsonui-cli/viz/backups/, which every bootstrap deleted; the first viz command of 2.2.0 moves what is left there. Run it again after updating to 2.2.0 to add the AskUserQuestion hook.",
-        "ja": "jui viz のフックを ~/.claude/settings.json に足す（jui-viz プラグインを使えない環境向け）。すでにあるフックや設定は残し、書き換える前のファイルを jui viz の状態フォルダの backups に保存する: ~/.local/state/jui-viz/backups/（$XDG_STATE_HOME/jui-viz や $JUI_VIZ_HOME を設定していればそちら）。2.2.0 より前は ~/.jsonui-cli/viz/backups/ で、bootstrap のたびに消えていた。2.2.0 の最初の viz コマンドが、そこに残っている物を移す。2.2.0 に上げたら撃ち直すと、AskUserQuestion のフックが入る。"
+        "en": "Add the jui viz hooks to ~/.claude/settings.json, for where the jui-viz plugin cannot be used. Hooks and settings already there are kept, and the file as it was is saved in the backups folder of jui viz's state folder: ~/.local/state/jui-viz/backups/ (or $XDG_STATE_HOME/jui-viz, or $JUI_VIZ_HOME, when set). Before 2.2.0 it was ~/.jsonui-cli/viz/backups/, which every bootstrap deleted; the first viz command of 2.2.0 moves what is left there. Run it again after updating to 2.2.0 to add the AskUserQuestion hook, and after updating to 2.3.7 to give that hook a timeout of 86400 seconds (it was 600), so a question can wait longer than 5 minutes; then restart your Claude Code sessions.",
+        "ja": "jui viz のフックを ~/.claude/settings.json に足す（jui-viz プラグインを使えない環境向け）。すでにあるフックや設定は残し、書き換える前のファイルを jui viz の状態フォルダの backups に保存する: ~/.local/state/jui-viz/backups/（$XDG_STATE_HOME/jui-viz や $JUI_VIZ_HOME を設定していればそちら）。2.2.0 より前は ~/.jsonui-cli/viz/backups/ で、bootstrap のたびに消えていた。2.2.0 の最初の viz コマンドが、そこに残っている物を移す。2.2.0 に上げたら撃ち直すと、AskUserQuestion のフックが入る。2.3.7 に上げたら撃ち直すと、そのフックの timeout が 86400 秒になり（それまでは 600）、質問を 5 分より長く待てる。その後、Claude Code のセッションを起動し直す。"
       },
       "options": [
         {
@@ -2690,16 +2690,16 @@
         "jui viz hooks status"
       ],
       "verifiedAgainst": {
-        "version": "2.2.0",
+        "version": "2.3.7",
         "columns": 80,
         "python": "3.12",
         "helpHash": "ac37e90dfd074049b592906c681df87b04c6e143b426986bf3ccb5fb58c351e9",
-        "cardHash": "0afc1fb7b4071dce08bfa01d739125c1ea5a65bc8d0602c7aed25fc55403463b",
+        "cardHash": "77baf2bf4d04fd83778d228c76b5724046bc08f591fe2231cf5d29be2bf18ec3",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "2018a340ee66",
           "synopsis": "55c0b733d84b",
-          "purpose": "c6e41433107c",
+          "purpose": "db6035942e54",
           "options": "6df17d1e1130",
           "examples": "8cd1b00eac0a",
           "aliases": "98edafdd23a8",
@@ -2759,8 +2759,8 @@
       "command": "viz hooks status",
       "synopsis": "jui viz hooks status [--json]",
       "purpose": {
-        "en": "Report how many of the jui viz hook events are installed, whether the plugin provides them, and any hook whose python or script is missing.",
-        "ja": "jui viz のフックのイベントがいくつ入っているか、プラグインで入っているか、python やスクリプトが見つからないフックがないかを表示する。"
+        "en": "Report how many of the jui viz hook events are installed, whether the plugin provides them, and any hook whose python or script is missing. From 2.3.7 it reports NG when a question hook installed with jui viz hooks install still has a timeout under 86400 seconds (the old 600), which cuts the long question waits; the plugin's own hooks are not checked.",
+        "ja": "jui viz のフックのイベントがいくつ入っているか、プラグインで入っているか、python やスクリプトが見つからないフックがないかを表示する。2.3.7 からは、jui viz hooks install で入れた質問のフックの timeout が 86400 秒より短い（古い 600 のまま）と NG を出す。長い質問の待ちが途中で切れるため。プラグインのフックは確かめない。"
       },
       "options": [
         {
@@ -2785,16 +2785,16 @@
         "jui viz doctor"
       ],
       "verifiedAgainst": {
-        "version": "2.0.0",
+        "version": "2.3.7",
         "columns": 80,
         "python": "3.12",
         "helpHash": "124bce36e2051a2ce70125c719d5f9b5e4c36b70b15380e52bb641ec9d5f4be2",
-        "cardHash": "9d88714d3ad1592f3285405bb9793e6eca6619f30a33bf18a216ea3ca0e05d9b",
+        "cardHash": "d810ec9ad53e3b13ddcd71e46d36ec413dba98629b2a5b8f7add7b108d8a01ca",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "882f1d5c4a72",
           "synopsis": "c7d1161ada6e",
-          "purpose": "b2fe2340f68f",
+          "purpose": "d961ef61fb88",
           "options": "3f1528c576e4",
           "examples": "76d84044883b",
           "aliases": "98edafdd23a8",

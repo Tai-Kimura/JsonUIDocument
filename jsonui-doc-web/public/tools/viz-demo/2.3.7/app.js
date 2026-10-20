@@ -23,6 +23,9 @@ const ROLES = {
   debug: { name: 'debug', color: '#f0b400' },
   other: { name: 'その他', color: '#8a9bb0', pill: '#60748e' },
 };
+/* Whatever is filled with a role's colour and has text on it (pills, the talk's marks, a phone's header and button) takes
+   pillBg, with pillInk (20-core.js) for the text; the robot's own parts keep ROLES[role].color. */
+const pillBg = (role) => ROLES[role].pill || ROLES[role].color;
 const COL = {
   shell: '#e8ecf3', limb: '#394150', screen: '#0f1830', eye: '#a6fbff',
   band: '#fffdf7', bandInk: '#d62839', wood: '#c99f73', woodDark: '#9e7752',
@@ -301,7 +304,7 @@ function drawLogo(r) {
 }
 function drawPhoneUI(r, t) {
   const c = r.phoneCanvas, ctx = c.getContext('2d'), W = c.width;
-  const accent = ROLES[r.role].color;
+  const accent = pillBg(r.role), ink = pillInk(r.role);   // the header and the button carry text
   ctx.clearRect(0, 0, c.width, c.height);
   ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#1d2330'; ctx.lineWidth = 5; ctx.lineJoin = 'round';
   ctx.beginPath(); ctx.moveTo(44, 360); ctx.lineTo(16, 396); ctx.lineTo(84, 362); ctx.closePath(); ctx.fill(); ctx.stroke();
@@ -313,8 +316,8 @@ function drawPhoneUI(r, t) {
   ctx.fillStyle = '#f1f4f9'; ctx.fillRect(sx, sy, sw, sh);
   ctx.fillStyle = accent; ctx.fillRect(sx, sy, sw, 64);
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.92)'; ctx.font = `700 11px ${FONT_MONO}`; ctx.fillText('9:41', sx + 12, sy + 17); ctx.fillRect(sx + sw - 32, sy + 8, 18, 9);
-  ctx.fillStyle = '#ffffff'; ctx.font = `700 19px ${FONT_BODY}`; ctx.fillText('ログイン', sx + 14, sy + 50);
+  ctx.fillStyle = ink; ctx.font = `700 11px ${FONT_MONO}`; ctx.fillText('9:41', sx + 12, sy + 17); ctx.fillRect(sx + sw - 32, sy + 8, 18, 9);
+  ctx.fillStyle = ink; ctx.font = `700 19px ${FONT_BODY}`; ctx.fillText('ログイン', sx + 14, sy + 50);
   for (let i = 0; i < 2; i++) {
     const y = sy + 84 + i * 52;
     ctx.fillStyle = '#7a879b'; ctx.fillRect(sx + 14, y, 56 + i * 20, 7);
@@ -325,7 +328,7 @@ function drawPhoneUI(r, t) {
   }
   const by = sy + 200;
   rr(ctx, sx + 14, by, sw - 28, 40, 10); ctx.fillStyle = accent; ctx.fill();
-  ctx.fillStyle = '#ffffff'; ctx.font = `700 15px ${FONT_BODY}`; ctx.textAlign = 'center'; ctx.fillText('ログイン', sx + sw / 2, by + 26);
+  ctx.fillStyle = ink; ctx.font = `700 15px ${FONT_BODY}`; ctx.textAlign = 'center'; ctx.fillText('ログイン', sx + sw / 2, by + 26);
   const ph = (t * 0.7) % 1;
   ctx.beginPath(); ctx.arc(sx + sw / 2 + 24, by + 20, 6 + ph * 30, 0, Math.PI * 2);
   ctx.strokeStyle = `rgba(255, 255, 255, ${(0.9 * (1 - ph)).toFixed(2)})`; ctx.lineWidth = 4; ctx.stroke();
@@ -650,6 +653,8 @@ function heavyCauses(r) {
   return LOOK_ORDER.filter((look) => h.some((c) => HEAVY_LOOK[c] === look) && (look !== 'whistle' || r.role === 'main'));
 }
 function heavyLook(r, t) {
+  // background work: only the whistle (3+ subagents) shows, over the headset (requester 10-20: 「笛を優先」); red and blue not
+  if (r.state === 'background') return heavyCauses(r).includes('whistle') ? 'whistle' : null;
   if (!HEAVY_OK.has(r.state)) return null;
   const looks = heavyCauses(r);
   if (!looks.length) return null;
@@ -711,10 +716,12 @@ function lookUpdate(r, t, dt) {
 }
 /* The browser tests' hook (80-dbg.js, force) sets a robot's causes or its tiredness; the page never does. */
 const forced = (r, key, value) => (r.force && key in r.force ? r.force[key] : value);
-/* Background work and heavy work never show at once: the heavy looks (lookUpdate, sweat) hold only in HEAVY_OK's
-   states (typing, reading, a command), and a robot working in the background is in its own state, 'background', so the
-   headset, the notes and the loose typing win while it waits on background work; its heavy causes show again when it is
-   back at work in the foreground (2.3.5 integration, 10-20). */
+/* Background work and heavy work: the heavy looks (lookUpdate, sweat) hold in HEAVY_OK's states (typing, reading, a
+   command); a robot working in the background is in its own state, 'background', where the headset, the notes and the
+   loose typing win over the red and the blue face (2.3.5 integration, 10-20). The whistle wins over the headset
+   (requester 10-20: 「サブエージェント7対いるけど笛のアクションにならないね」, then 「笛を優先」): with 3 or more
+   subagents a main robot in the background whistles, waves and sweats, its headset and notes off; when the cause goes,
+   the headset is back. The launch whistle (2.5 s, 「ピーッ！」) shows over the headset as before, with no change. */
 /* Background work (requester, 10-19: "バックグラウンドで作業の場合はヘッドセットつけて、音符出してる状態で机の上でパソコンを
    ゆるめにいじってほしい"): a headset on the head (cups in the 裏で作業中 colour, LAMP.bg, as on the tag, the card and the
    legend), NOTE_MAX notes rising over it (still under reduced motion), and the laptop typed on loosely (poseFor
@@ -1382,7 +1389,7 @@ function updateRobot(r, t, dt) {
   soloProps(r, onCall ? null : r.solo, t);
   brkProps(r, onCall ? null : r.brk, t);
   playBubble(r, onCall ? null : r.play, t);
-  bgUpdate(r, t, r.state === 'background' && !onCall && !r.play && !r.solo && !r.brk);
+  bgUpdate(r, t, r.state === 'background' && look !== 'whistle' && !onCall && !r.play && !r.solo && !r.brk);   // the whistle takes the headset off
   r.antenna.rotation.x += ((r.tired ? 1.0 : 0) - r.antenna.rotation.x) * Math.min(1, dt * 3);
   r.root.position.y = p.rootY;
   r.hips.position.y = HIPS_Y + p.hipsY;
@@ -1444,8 +1451,8 @@ const pct = (v) => Math.round(v * 100);
 const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 const ROLE_INK = { debug: '#2a2000' };   // dark ink where white would not read on the pill (debug's yellow)
 /* A role's pill: its background (ROLES[role].pill, else its colour) and its text (ROLE_INK, else white). One source for
-   the HTML pills (pill()) and the canvas ones (drawRolePill, the boards). */
-const pillBg = (role) => ROLES[role].pill || ROLES[role].color;
+   the HTML pills (pill()), the canvas ones (drawRolePill, the boards), the talk's marks and the phones' headers.
+   pillBg sits next to ROLES (10-robot-core.js), which the phones' drawers there read. */
 const pillInk = (role) => ROLE_INK[role] || '#ffffff';
 /* A session's name (/rename, `claude -n`; 10-19): the server's title, one line, at most NAME_MAX characters. Panels and
    cards show all of it next to the two-letter mark; the tag over the robot shows it alone, cut at its end with "…". */
@@ -2307,7 +2314,7 @@ function updateRobotStates(simT, t, perms) {
   }
 }
 
-/* ---------- トーク (2.3.7): the demo's stand-in for the server's talk frames (TALK_CONTRACT.md) ----------
+/* ---------- トーク (2.3.6): the demo's stand-in for the server's talk frames (TALK_CONTRACT.md) ----------
    The talks themselves are 31-talk-demo-data.js (TALK_DEMO: generated frames, data only; it comes after this file, so it
    is read only when the first request comes). talkStandIn answers the page's talk.* requests from them the way the
    server does: talk.open → the robot's list, talk.get → a page of messages (before / limit), talk.seen → the unread
@@ -3474,7 +3481,7 @@ function drawTestBoard(model, board = null, run = null) {
 
 function drawCartUI(r, t) {
   const c = r.phoneCanvas, ctx = c.getContext('2d'), W = c.width;
-  const accent = ROLES[r.role].color;
+  const accent = pillBg(r.role), ink = pillInk(r.role);   // the header and the button carry text
   const T = latestModel.tests, idx = T.runningIdx, step = idx >= 0 ? T.rows[idx].step : '';
   ctx.clearRect(0, 0, c.width, c.height);
   ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#1d2330'; ctx.lineWidth = 5; ctx.lineJoin = 'round';
@@ -3487,7 +3494,7 @@ function drawCartUI(r, t) {
   ctx.fillStyle = '#f1f4f9'; ctx.fillRect(sx, sy, sw, sh);
   ctx.fillStyle = accent; ctx.fillRect(sx, sy, sw, 58);
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = '#ffffff'; ctx.font = `700 11px ${FONT_MONO}`; ctx.fillText('9:41', sx + 12, sy + 16);
+  ctx.fillStyle = ink; ctx.font = `700 11px ${FONT_MONO}`; ctx.fillText('9:41', sx + 12, sy + 16);
   ctx.font = `700 18px ${FONT_BODY}`; ctx.fillText(idx === 6 && step.includes('screen') ? 'ログイン' : 'カート', sx + 14, sy + 46);
   const empty = idx === 2;
   const items = empty ? 0 : idx === 1 && step.includes('count') ? 2 : 3;
@@ -3510,7 +3517,7 @@ function drawCartUI(r, t) {
   const disabled = empty || idx === 5;
   const byBtn = sy + 274;
   rr(ctx, sx + 10, byBtn, sw - 20, 34, 10); ctx.fillStyle = disabled ? '#b9c3d1' : accent; ctx.fill();
-  ctx.fillStyle = '#ffffff'; ctx.font = `700 14px ${FONT_BODY}`; ctx.textAlign = 'center'; ctx.fillText('購入する', sx + sw / 2, byBtn + 23);
+  ctx.fillStyle = disabled ? '#ffffff' : ink; ctx.font = `700 14px ${FONT_BODY}`; ctx.textAlign = 'center'; ctx.fillText('購入する', sx + sw / 2, byBtn + 23);
   if (idx >= 0) {
     let tx = sx + sw / 2, ty = byBtn + 17;
     if (step.includes('coupon')) { tx = sx + 60; ty = cy + 13; } else if (step.includes('qty')) { tx = sx + sw - 34; ty = sy + 92; } else if (step.includes('cart_list') || step.includes('count')) { tx = sx + 90; ty = sy + 120; }
@@ -3656,7 +3663,8 @@ function buildDemoOffice() {
     if (d.id === 'a2') { robot.drawPhone = drawCartUI; ensureProps(robot, 'phone'); }
     robot.root.userData.robotId = d.id;
     scene.add(robot.root);
-    const tag = addTag('', `${pill(d.id, d.role)}<span class="nm"></span><span></span>`);
+    const tag = addTag('bot', `${pill(d.id, d.role)}<span class="nm"></span><span></span>`);
+    tag.dataset.robot = d.id;   // a click on the tag selects the robot (tagPress in build3D)
     robots.push({ def: d, robot, tag, text: tag.lastElementChild, act: '' });
   }
 }
@@ -3733,6 +3741,36 @@ function build3D() {
     else if (h.kind === 'data') openDataDocs(h.project, canvas);
     else { fit(h.project); openWhiteboard(-1, canvas, h.project); }
   });
+  /* A robot's tag and its bill select the robot (ticket 2026-10-20-jui-viz-robot-name-tag-click-selects): a press on
+     one is handed to the canvas as it is (the camera's controls take the pointer from there, so a drag that starts on
+     a tag turns the camera as a drag anywhere else does), and a release within 6 px of the press opens that robot's
+     card as a click on its body does. The tag's press, not what lies under it, decides the robot. The wheel over any
+     tag goes to the canvas too (a tag must not stop the zoom). */
+  let tagPress = null;
+  const handOn = (ev) => ({ bubbles: false, cancelable: true, composed: true, pointerId: ev.pointerId, pointerType: ev.pointerType,
+    isPrimary: ev.isPrimary, width: ev.width, height: ev.height, pressure: ev.pressure, button: ev.button, buttons: ev.buttons,
+    clientX: ev.clientX, clientY: ev.clientY, screenX: ev.screenX, screenY: ev.screenY,
+    ctrlKey: ev.ctrlKey, shiftKey: ev.shiftKey, altKey: ev.altKey, metaKey: ev.metaKey });
+  tagsEl.addEventListener('pointerdown', (ev) => {
+    const el = ev.target.closest('[data-robot]');
+    if (!el) return;
+    tagPress = { id: el.dataset.robot, x: ev.clientX, y: ev.clientY, pointerId: ev.pointerId };
+    canvas.dispatchEvent(new PointerEvent('pointerdown', handOn(ev)));
+  });
+  tagsEl.addEventListener('contextmenu', (ev) => { if (ev.target.closest('[data-robot]')) ev.preventDefault(); });   // a right drag pans
+  tagsEl.addEventListener('wheel', (ev) => {
+    ev.preventDefault();
+    canvas.dispatchEvent(new WheelEvent('wheel', { ...handOn(ev), deltaX: ev.deltaX, deltaY: ev.deltaY, deltaZ: ev.deltaZ, deltaMode: ev.deltaMode }));
+  }, { passive: false });
+  // before the canvas's own pointerup (capture, on window): a press that began on a tag is the tag's, not the 3D's
+  window.addEventListener('pointerup', (ev) => {
+    if (!tagPress || ev.pointerId !== tagPress.pointerId) return;
+    const { id, x, y } = tagPress;
+    tagPress = null; downAt = null;
+    if (Math.hypot(ev.clientX - x, ev.clientY - y) > 6 || (zoom.zoomed && !rbState.id)) return;
+    if (robots.some((R) => R.def.id === id)) openRobot(id, canvas);
+  }, true);
+  window.addEventListener('pointercancel', (ev) => { if (tagPress && ev.pointerId === tagPress.pointerId) tagPress = null; }, true);
   canvas.addEventListener('pointermove', (ev) => {
     if (ev.buttons || (zoom.zoomed && !rbState.id)) return;
     const h = hitAt(ev);
@@ -3878,7 +3916,8 @@ function liveAddRobot(d, i) {
   robot.root.position.set(start[0], 0, start[1]); robot.root.rotation.y = d.ry || 0;
   robot.root.userData.robotId = d.id;
   scene.add(robot.root);
-  const tag = addTag('', `${pill(d.id, d.role)}<span class="nm"></span><span></span>`);
+  const tag = addTag('bot', `${pill(d.id, d.role)}<span class="nm"></span><span></span>`);
+  tag.dataset.robot = d.id;   // a click on the tag selects the robot (tagPress in build3D)
   const R = { def: d, robot, tag, text: tag.lastElementChild, act: '', path: [], room: d.room, seatKey: '', exitAt: 0 };
   if (route.length) R.path = route.slice(1);
   d.enter = false;
@@ -5811,9 +5850,9 @@ function drawLivePhone(r, t) {
   rr(ctx, 6, 6, W - 12, 360, 28); ctx.fill(); ctx.stroke();
   ctx.save(); rr(ctx, 24, 24, 192, 320, 18); ctx.clip();
   ctx.fillStyle = '#0d1828'; ctx.fillRect(24, 24, 192, 320);
-  ctx.fillStyle = ROLES[r.role].color; ctx.fillRect(24, 24, 192, 46);
+  ctx.fillStyle = pillBg(r.role); ctx.fillRect(24, 24, 192, 46);   // a header with text: the pill's pair
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = '#ffffff'; ctx.font = `700 15px ${FONT_BODY}`; ctx.fillText('テスト実行', 36, 54);
+  ctx.fillStyle = pillInk(r.role); ctx.font = `700 15px ${FONT_BODY}`; ctx.fillText('テスト実行', 36, 54);
   ctx.fillStyle = '#9fc3ff'; ctx.font = `600 12px ${FONT_MONO}`;
   wrapText(ctx, act || '待機中', 36, 96, 168, 18, cases.length ? 6 : 12);
   if (cases.length) {
@@ -5873,11 +5912,15 @@ function placeRobotTags(dt = 1 / 60) {
     }
     placed.push({ x0, x1, y0: bottom - h, y1: bottom });
     it.target = it.y - bottom;
+    it.front = placed.length;   // 1 = the nearest: its tag (and bill) is drawn over, and takes the click from, any farther one
   }
   for (const it of list) {   // the writes
     const el = it.R.tag;
     if (it.hidden) { el.style.visibility = 'hidden'; it.R.tagDy = 0; if (it.R.bill) it.R.bill.style.visibility = 'hidden'; continue; }
     el.style.visibility = 'visible';
+    const zi = String(-it.front);   // negative: under the rooms' signs (z-index 1), inside .tags (isolation: isolate)
+    if (el.style.zIndex !== zi) el.style.zIndex = zi;
+    if (it.R.bill && it.R.bill.style.zIndex !== zi) it.R.bill.style.zIndex = zi;
     const dy = it.R.tagDy === undefined ? it.target : it.R.tagDy + (it.target - it.R.tagDy) * ease;
     it.R.tagDy = Math.abs(dy - it.target) < 0.5 ? it.target : dy;
     it.R.tagTarget = it.target;   // where the tag is going (the e2e reads a tag once tagDy has reached it: the settle hook of 80-dbg.js)
@@ -5970,7 +6013,7 @@ const $ = (id) => document.getElementById(id);
 const setHTML = (el, html) => { if (el._html !== html) { el.innerHTML = html; el._html = html; } };
 const setText = (el, text) => { if (el && el.textContent !== text) el.textContent = text; };
 /* The legend of heavy work's three looks (2.3.6), under the card's 重い作業 line. */
-const HEAVY_LEGEND = '見た目: 赤い顔＝出力が多い · 青い顔＝ツールが長く走っている · 笛＝サブエージェント 3 体以上（重なると交互）';
+const HEAVY_LEGEND = '見た目: 赤い顔＝出力が多い · 青い顔＝ツールが長く走っている · 笛＝サブエージェント 3 体以上（重なると交互） · 裏で作業中でも、サブエージェント 3 体以上なら笛（ヘッドセットを外す）';
 const STATUS_CLASS = { idle: 'st-idle', write: 'st-write', written: 'st-idle', impl: 'st-impl', verify: 'st-verify', 'impl-done': 'st-idle', paused: 'st-paused', test: 'st-test', done: 'st-complete' };
 function robotBadge(id) {
   const s = robotState[id].state;
@@ -6562,8 +6605,20 @@ function zoomTo(pose, opener, arrive) {
     flyTo(pose.p, pose.t, controls.target, reduceMotion ? 0 : 0.9, arrive);
   } else flyTo(pose.p, pose.t, viewTarget, reduceMotion ? 0 : 0.5, arrive);
 }
+/* What holds the 3D view (ticket 2026-10-20-jui-viz-data-server-from-robot-card-freezes-3d): every screen that takes
+   it — the robot's card, the spec board, the task board, the data server's sheet, the 単価 sheet — holds it while it is
+   open. A screen holds as it opens, before it closes the one it replaces, and lets go as it closes; the camera flies
+   back and the orbit takes input again only when the last one lets go (and only if it was zoomed: a sheet opened from
+   the 3D did not move the camera). The card used to close "keeping the zoom" for whatever came next, and a sheet that
+   does not zoom never gave it back: the 3D froze (zoomed, the orbit off) after card → rack → back. */
+const VIEW_HOLD = new Set();
+function holdView(name) { VIEW_HOLD.add(name); }
+function releaseView(name) {
+  if (!VIEW_HOLD.delete(name) || VIEW_HOLD.size) return;
+  zoomBack();
+}
 function zoomBack() {
-  if (has3D && zoom.returnPose) {
+  if (has3D && zoom.returnPose && zoom.zoomed) {    // not zoomed: nothing to fly back from (a pose kept from before)
     const back = zoom.returnPose;
     flyTo(back.p, back.t, viewTarget, reduceMotion ? 0 : 0.8, () => { controls.target.copy(back.t); zoom.zoomed = false; controls.enabled = true; controls.update(); });
   }
@@ -6657,8 +6712,9 @@ wbNav.addEventListener('click', (e) => {
 ['wheel', 'touchmove'].forEach((type) => wbCode.addEventListener(type, () => { if (wb.idx >= 0) $('wb-follow').checked = false; }, { passive: true }));
 
 function openWhiteboard(i, opener, board) {
-  if (tb.open) { tb.open = false; tb.detail = null; hideOverlay(tbEl); }
-  if (rbState.id) closeRobot(true);
+  holdView('wb');
+  if (tb.open) closeTaskBoard();
+  if (rbState.id) closeRobot();
   if (i >= 0 && !inScope(SPECS[i].project)) setProject(SPECS[i].project, { camera: false });
   if (i >= 0 && !inApp(SPECS[i])) wb.app = 'all';
   wb.idx = i; wb.lastActive = null; wb.board = board || null;
@@ -6682,10 +6738,10 @@ function openWhiteboard(i, opener, board) {
   });
 }
 function closeWhiteboard() {
-  if (!wb.open) return;
+  if (!wb.open) { releaseView('wb'); return; }
   wb.open = false;
   hideOverlay(wbEl);
-  zoomBack();
+  releaseView('wb');
 }
 $('wb-close').addEventListener('click', closeWhiteboard);
 
@@ -6864,7 +6920,7 @@ function markOf(s, model, k, i) {
   if (i === n && s.implIdx === k) return ['●', 'm-doing', 'is-doing'];
   return ['○', 'm-todo', ''];
 }
-function wfElement([type, id, desc], state) {
+function wfElement([type, id, desc], state, idx) {
   let shapeHTML;
   if (type === 'Button') shapeHTML = `<b class="wf-btn">${esc(desc)}</b>`;
   else if (type === 'TextField' || type === 'TextView') shapeHTML = `<span class="wf-input">${esc(desc)}</span>`;
@@ -6875,7 +6931,51 @@ function wfElement([type, id, desc], state) {
   else if (type === 'Image' || type === 'NetworkImage') shapeHTML = '<span class="wf-img"></span>';
   else if (type === 'Switch' || type === 'CheckBox') shapeHTML = `<span class="wf-check"><span class="bar short"></span><i class="${type === 'CheckBox' ? 'cb' : ''}"></i></span>`;
   else shapeHTML = `<span class="bar${type === 'Label' ? ' short' : ''}"></span>`;
-  return `<div class="wf s-${esc(state)}"><span class="wf-id">${esc(id)}</span>${shapeHTML}</div>`;
+  return `<div ${idx === undefined ? '' : `data-wf="${esc(idx)}" `}class="wf s-${esc(state)}"><span class="wf-id">${esc(id)}</span>${shapeHTML}</div>`;
+}
+/* The structure as a tree (ticket 2026-10-20-jui-viz-spec-structure-shows-no-nesting). The server sends each
+   component as [type, id, desc, depth], depth-first (sheet.py); a row's parent is the nearest row above it one level
+   up. TREE_STEP: the list's indent per level. WF_PAD: a box's inner padding in the phone frame by its depth — the cap
+   that keeps a deep tree readable in the 196 px frame: 6 px at depths 0–2, 2 px at 3–5, none from 6 (a 1 px border
+   only), so a box at depth 4 is still about 110 px wide and one at depth 15 about 80 px. */
+const TREE_STEP = 14;
+const WF_PAD = (depth) => (depth < 3 ? 6 : depth < 6 ? 2 : 0);
+const hasDepths = (rows) => rows.some((c) => Array.isArray(c) && Number.isInteger(c[3]));
+// The depths as drawn: the first row at 0, a row never more than one level below the row above it (a bad depth from
+// the wire cannot make a row without a parent).
+function treeDepths(rows) {
+  let prev = -1;
+  return rows.map((c) => { const raw = Number.isInteger(c[3]) && c[3] > 0 ? c[3] : 0; prev = Math.min(raw, prev + 1); return prev; });
+}
+// The list's tree lines for each row: one cell per level above it — 'v' (an ancestor's later sibling below: a line
+// down), 'e' (none) — and its own 't' (a later sibling: ├) or 'l' (the last: └). Depth 0: none.
+function treeGuides(depths) {
+  const later = depths.map((d, i) => { for (let j = i + 1; j < depths.length; j++) { if (depths[j] < d) return false; if (depths[j] === d) return true; } return false; });
+  const open = [];
+  return depths.map((d, i) => {
+    open.length = d;
+    const cells = [];
+    for (let k = 1; k < d; k++) cells.push(open[k] ? 'v' : 'e');
+    if (d > 0) cells.push(later[i] ? 't' : 'l');
+    open[d] = later[i];
+    return cells;
+  });
+}
+// The phone frame: a box per row, a child's box inside its parent's.
+function wfTree(nodes) {
+  let i = 0;
+  const levelHTML = (depth) => {
+    let outHTML = '';
+    while (i < nodes.length && nodes[i].depth === depth) {
+      const n = nodes[i++];
+      const kidsHTML = i < nodes.length && nodes[i].depth > depth ? levelHTML(depth + 1) : '';
+      if (!kidsHTML) { outHTML += wfElement(n.c, n.state, n.idx); continue; }
+      const [type, id] = n.c, pad = WF_PAD(depth);
+      outHTML += `<div data-wf="${esc(n.idx)}" class="wf wf-box${depth >= 6 ? ' wf-deep' : ''} s-${esc(n.state)}" style="padding:${esc(pad + 2)}px ${esc(pad)}px ${esc(pad)}px"><span class="wf-id">${esc(id || type)}</span>${kidsHTML}</div>`;
+    }
+    return outHTML;
+  };
+  return levelHTML(0);
 }
 function renderNav(s) {
   if (wbNav._idx !== wb.idx) { wbNav.innerHTML = SECTIONS.map((label, k) => `<button type="button" data-sec="${k}"><span>${esc(label)}</span><small></small></button>`).join(''); wbNav._idx = wb.idx; }
@@ -6905,7 +7005,7 @@ function renderSheet(model, force) {
 
   let activeKey = null;
   const actAttr = (cls, key) => ((cls === 'is-doing' || cls === 'is-testing') && activeKey === null ? (activeKey = key, ' data-act') : '');
-  const li = (m, key, innerHTML) => `<li class="rw ${esc(m[2])}"${actAttr(m[2], key)}><span class="mk ${esc(m[1])}">${esc(m[0])}</span><span>${innerHTML}</span></li>`;
+  const li = (m, key, innerHTML, depth) => `<li ${depth === undefined ? '' : `data-depth="${esc(depth)}" `}class="rw ${depth === undefined ? '' : 'rw-tree '}${esc(m[2])}"${actAttr(m[2], key)}><span class="mk ${esc(m[1])}">${esc(m[0])}</span><span>${innerHTML}</span></li>`;
   const tr = (m, key, cellsHTML) => `<tr class="${esc(m[2])}"${actAttr(m[2], key)}><td class="mk ${esc(m[1])}">${esc(m[0])}</td>${cellsHTML}</tr>`;
   // The first n items of a section; while it is being written the newest one is highlighted instead of marked.
   const pick = (k, arr, n, fresh) => arr.slice(0, n).map((x, i) => [x, i, fresh ? ['', '', i === n - 1 ? 'is-new' : ''] : markOf(s, model, k, i)]);
@@ -6919,13 +7019,23 @@ function renderSheet(model, force) {
       const COMP_MAX = 60, compAll = reveal(d.components.length, w);
       const items = pick(1, d.components, Math.min(COMP_MAX, compAll), writing);
       const moreHTML = compAll > COMP_MAX ? `<p class="sc-note">ほか ${compAll - COMP_MAX} 個の部品（Layout が大きいので先頭の ${COMP_MAX} 個だけ）</p>` : '';
-      const rowsHTML = items.map(([[type, id, desc], i, m]) => li(m, `c${i}`, `<span class="tp">${esc(TYPE_JA[type] || type)}</span> <span class="id">${esc(id)}</span> <span class="desc">${esc(desc)}</span>`)).join('');
-      const byId = new Map(items.map((x) => [x[0][1], x]));
-      const wfHTML = d.layoutChildren.filter((id) => byId.has(id)).map((id) => {
-        const [c, , m] = byId.get(id);
-        const state = writing ? (m[2] === 'is-new' ? 'writing' : 'defined') : !s.implPhase ? 'defined' : m[1] === 'm-done' ? 'done' : m[1] === 'm-doing' ? 'doing' : 'todo';
-        return wfElement(c, state);
-      }).join('');
+      const wfState = (m) => (writing ? (m[2] === 'is-new' ? 'writing' : 'defined') : !s.implPhase ? 'defined' : m[1] === 'm-done' ? 'done' : m[1] === 'm-doing' ? 'doing' : 'todo');
+      const rowText = (type, id, desc) => `<span class="tp">${esc(TYPE_JA[type] || type)}</span> <span class="id">${esc(id)}</span> <span class="desc">${esc(desc)}</span>`;
+      let rowsHTML, wfHTML;
+      if (hasDepths(d.components)) {
+        // a tree: the list indented by depth with its lines, the phone frame's boxes nested
+        const depths = treeDepths(items.map((x) => x[0])), guides = treeGuides(depths);
+        rowsHTML = items.map(([[type, id, desc], i, m]) => {
+          const gHTML = guides[i].length ? `<span class="tg" aria-hidden="true">${guides[i].map((k) => `<i class="g-${esc(k)}"></i>`).join('')}</span>` : '';
+          return li(m, `c${i}`, `${gHTML}<span class="tr-in" style="padding-left:${esc(depths[i] * TREE_STEP)}px">${rowText(type, id, desc)}</span>`, depths[i]);
+        }).join('');
+        wfHTML = wfTree(items.map(([c, i, m]) => ({ c, idx: i, depth: depths[i], state: wfState(m) })));
+      } else {
+        // no depths (the demo's screens): one level, the wireframe in layoutChildren's order
+        rowsHTML = items.map(([[type, id, desc], i, m]) => li(m, `c${i}`, rowText(type, id, desc))).join('');
+        const byId = new Map(items.map((x) => [x[0][1], x]));
+        wfHTML = d.layoutChildren.filter((id) => byId.has(id)).map((id) => { const [c, , m] = byId.get(id); return wfElement(c, wfState(m)); }).join('');
+      }
       return `<div class="st-grid"><div class="wf-phone" role="img" aria-label="${esc((d.components[0] || [])[1] || '')} の中に並ぶ部品の配置図">${wfHTML}</div><ul class="rows">${rowsHTML}</ul></div>${moreHTML}`;
     },
     (w, writing) => {
@@ -7000,8 +7110,9 @@ function openTaskBoard(opener, detail, board) {
   if (board !== undefined) tb.board = board;
   if (detail && !detail.startsWith('perm:') && !inScope(PROJECT_OF[detail.split('#')[0]])) setProject(PROJECT_OF[detail.split('#')[0]], { camera: false });
   if (detail && detail.startsWith('perm:') && !inScope(projectOfRobot(PERM_BY_ID[detail.slice(5)].who))) setProject(projectOfRobot(PERM_BY_ID[detail.slice(5)].who), { camera: false });
-  if (wb.open) { wb.open = false; hideOverlay(wbEl); }
-  if (rbState.id) closeRobot(true);
+  holdView('tb');
+  if (wb.open) closeWhiteboard();
+  if (rbState.id) closeRobot();
   if (tb.open) { renderTaskBoard(latestModel); if (detail) $('tbd-close').focus({ preventScroll: true }); return; }
   tb.open = true;
   zoomTo(taskPose(tb.board), opener, () => {
@@ -7020,11 +7131,11 @@ function closeTaskDetail() {
   (back || $('tb-close')).focus({ preventScroll: true });
 }
 function closeTaskBoard() {
-  if (!tb.open) return;
+  if (!tb.open) { releaseView('tb'); return; }
   tb.open = false; tb.detail = null; tb.waitView = false;
   qStripEl.replaceChildren(); qStripEl._sig = null; qStripEl.hidden = true;   // no second copy of the cards while closed
   hideOverlay(tbEl);
-  zoomBack();
+  releaseView('tb');
 }
 $('tb-close').addEventListener('click', closeTaskBoard);
 const COL_HINT = { todo: '担当が決まれば始められる', wait: '先に終わるタスクがある', doing: 'ロボットが今やっている', done: '' };
@@ -7180,47 +7291,51 @@ function focusPose(R, az, el, dist, fitted = false) {
   const dir = focusDir(az, el), wide = sceneEl.clientWidth > 900;
   const right = new THREE.Vector3().crossVectors(dir.clone().negate(), new THREE.Vector3(0, 1, 0)).normalize();
   const viewH = 2 * dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), viewW = viewH * camera.aspect;
-  const t = R.robot.root.position.clone().add(new THREE.Vector3(0, 1.15 * (R.robot.size || 1), 0));   // a subagent is 0.8 (2.3.5)
+  // a subagent is 0.8 (2.3.5). The floor under the robot, not its root's height: a hop or a jump (play) moves the root up and
+  // down, and the camera does not go with the robot's motion (ticket 2026-10-20-jui-viz-wide-history-camera-jitters).
+  const rp = R.robot.root.position, t = new THREE.Vector3(rp.x, 1.15 * (R.robot.size || 1), rp.z);
   // Wide: the card covers the right of the scene, so the robot sits left of centre. Narrow: the card is a
   // bottom sheet, so the robot sits high.
-  // The wide 応答の履歴 (2.3.4, 55-history.js): the card leaves only histWideMargin() on the left, and the robot sits in its middle —
-  // the robot as posed (2.3.5: a tired robot's slumped pose is wider and stuck 1–10 px out of the margin when its root was
-  // put in the middle): the middle of its posed width in the middle of the margin, and the camera backs off if that width
-  // would not fit (ticket 2026-10-20-jui-viz-wide-history-tired-robot-leans-out-of-the-margin).
+  // The wide 応答の履歴 (2.3.4, 55-history.js): the card leaves only histWideMargin() on the left, and the robot sits in its middle:
+  // the middle of a fixed box around its seat (FOCUS_BOX: the desk and a little room around it) in the middle of the margin,
+  // and the camera backs off if that box would not fit. Fixed, so the camera stays still whatever the robot does (10-20).
   const margin = typeof histWideMargin === 'function' ? histWideMargin() : 0;
   if (wide && margin) {
-    const ext = focusExtent(R, right, dir, dist, az), mid = (ext.l + ext.r) / 2, width = ext.r - ext.l;
+    const ext = focusExtent(R, right, dir, dist), mid = (ext.l + ext.r) / 2, width = ext.r - ext.l;
     const fit = (margin / sceneEl.clientWidth) * viewW * FOCUS_FIT;
-    if (width > fit && !fitted) return focusPose(R, az, el, dist * (width / fit), true);   // farther, so the posed robot fits the margin
+    if (width > fit && !fitted) return focusPose(R, az, el, dist * (width / fit), true);   // farther, so the fixed box fits the margin
     t.add(right.clone().multiplyScalar(((sceneEl.clientWidth - margin) / 2 / sceneEl.clientWidth) * viewW + mid));
   }
   else if (wide) t.add(right.multiplyScalar((Math.min(420, sceneEl.clientWidth - 28) / 2 / sceneEl.clientWidth) * viewW));
   else t.y -= viewH * 0.2;
   return { p: t.clone().add(dir.multiplyScalar(dist)), t };
 }
-/* The robot's posed width as the camera sees it, measured from its root along the camera's right, in units of the plane
-   the camera looks at (a corner nearer the camera counts wider: perspective): every shown mesh, the desk included, as the
-   wide history must keep it in the margin. Kept per robot as the widest seen for its posture (state, tired, desk), the
-   camera's turn and distance, so a pose that breathes or types does not shake the camera every frame. */
+/* The width the wide history keeps in its margin: a fixed box in the robot's own space (its seat: the root's turn and its
+   size go with it), the desk and a little room around it — not the robot as posed (requester 10-20: 「あんまり難しいことしなく
+   ていいよ 机プラス少しの余裕くらいの固定値にしたら？」). 2.3.5 measured every shown mesh each frame and kept the widest per
+   posture, turn and distance: the sweat drops coming and going, and a key with the distance in it that a backed-off camera
+   changed every other frame, moved the camera with the robot's motion (ticket 2026-10-20-jui-viz-wide-history-camera-jitters).
+   The box holds the widest pose there is: FOCUS_SPARE past each side of the desk (DESK_W wide, 10-robot-core.js) takes the
+   tired slump, the headset's cups, the waving arm and the sweat drops: measured 10-20 in the robot's own space over 5 s each,
+   the widest x ±1.09 (the sweat drops, the whistle's arm), y -0.02..2.19, z -0.77..1.00 (tired with sweat). Along the camera's right, in
+   units of the plane it looks at, a corner nearer the camera counted wider (perspective). */
 const FOCUS_FIT = 0.9;
-const focusBox = new THREE.Box3(), focusCorner = new THREE.Vector3(), FOCUS_LOOK = new THREE.Vector3(0, 1.15, 0);
-function focusExtent(R, right, dir, dist, az) {
-  const root = R.robot.root, key = `${R.robot.state}|${!!R.robot.tired}|${!!(R.robot.desk && R.robot.desk.visible)}|${Math.round(az * 20)}|${dist.toFixed(2)}`;
-  const kept = R.focusExt && R.focusExt.key === key ? R.focusExt : (R.focusExt = { key, l: 0, r: 0 });
-  root.updateMatrixWorld(true);
-  root.traverse((o) => {
-    if (!o.isMesh || !shownChain(o)) return;
-    focusBox.setFromObject(o);
-    for (let i = 0; i < 8; i++) {
-      focusCorner.set(i & 1 ? focusBox.max.x : focusBox.min.x, i & 2 ? focusBox.max.y : focusBox.min.y, i & 4 ? focusBox.max.z : focusBox.min.z);
-      focusCorner.sub(root.position);
-      const side = focusCorner.dot(right), depth = dist - focusCorner.sub(FOCUS_LOOK).dot(dir);
-      const d = depth > 0.1 ? side * (dist / depth) : side;
-      if (d < kept.l) kept.l = d;
-      if (d > kept.r) kept.r = d;
-    }
-  });
-  return kept;
+const DESK_W = 1.0, FOCUS_SPARE = 0.65;
+const FOCUS_BOX = { x: [-(DESK_W / 2 + FOCUS_SPARE), DESK_W / 2 + FOCUS_SPARE], y: [-0.05, 2.45], z: [-0.8, 1.05] };
+const focusCorner = new THREE.Vector3(), focusQuat = new THREE.Quaternion(), focusScale = new THREE.Vector3(), FOCUS_LOOK = new THREE.Vector3(0, 1.15, 0);
+function focusExtent(R, right, dir, dist) {
+  const root = R.robot.root, B = FOCUS_BOX;
+  root.updateWorldMatrix(true, false);
+  root.matrixWorld.decompose(focusCorner, focusQuat, focusScale);
+  let l = 0, r = 0;
+  for (let i = 0; i < 8; i++) {
+    focusCorner.set(B.x[i & 1 ? 1 : 0], B.y[i & 2 ? 1 : 0], B.z[i & 4 ? 1 : 0]).multiply(focusScale).applyQuaternion(focusQuat);
+    const side = focusCorner.dot(right), depth = dist - focusCorner.sub(FOCUS_LOOK).dot(dir);
+    const d = depth > 0.1 ? side * (dist / depth) : side;
+    if (d < l) l = d;
+    if (d > r) r = d;
+  }
+  return { l, r };
 }
 const shownChain = (o) => { for (let x = o; x; x = x.parent) if (!x.visible) return false; return true; };
 const ofRobot = (o) => { for (let x = o; x; x = x.parent) if (x.userData && x.userData.robotId !== undefined) return true; return false; };
@@ -7324,8 +7439,9 @@ const focusing = () => has3D && !!rbState.id && zoom.zoomed && !camTween;
   }, { passive: false });
 }
 function openRobot(id, opener) {
-  if (wb.open) { wb.open = false; hideOverlay(wbEl); }
-  if (tb.open) { tb.open = false; tb.detail = null; hideOverlay(tbEl); }
+  holdView('rb');
+  if (wb.open) closeWhiteboard();
+  if (tb.open) closeTaskBoard();
   const showing = !!rbState.id;
   rbState.id = id;
   if (showing) { renderRobot(latestModel); $('rb-close').focus({ preventScroll: true }); return; }
@@ -7340,15 +7456,15 @@ function openRobot(id, opener) {
     $('rb-close').focus({ preventScroll: true });
   });
 }
-function closeRobot(keepZoom) {
-  if (!rbState.id) return;
+function closeRobot() {
+  if (!rbState.id) { releaseView('rb'); return; }
   rbState.id = null;
   hideOverlay(rbEl);
   histSync();
   talkSync();
   FOCUS.id = null;      // the next robot opened chooses its view afresh
   focusFadeSync();      // everything faint gets its own material back
-  if (!keepZoom) zoomBack();
+  releaseView('rb');    // the camera goes back only when no other screen holds the view (VIEW_HOLD)
 }
 /* ← → on the robot card (requester, 10-18: "この画面の時に左右キーとかでロボットを切り替えれるようにできる？"): the
    robots in view — the project picked, or the rooms of the floor shown — room by room in the rooms' order, then by
@@ -7770,18 +7886,22 @@ callEl.addEventListener('keydown', (e) => {
    - while question notifications can be shown (permission granted, the kind on) the page says so to the server every
      4 s and whenever the server asks (notify.ping): then a question waits for an answer though the page is hidden
      (cd's ruling 10-19; it lapses notifyPresenceSec after the last word, a closed tab included). */
-const NOTIFY_PREFS = 'jui-viz-notify', NOTIFY_RUNG = 'jui-viz-notify-rung', NOTIFY_KINDS = ['done', 'perm', 'ask'];
-const NOTIFY = { on: { done: true, perm: true, ask: true }, seen: new Set(), based: { perm: false, ask: false }, said: false, settings: null, pings: 0 };
+const NOTIFY_PREFS = 'jui-viz-notify', NOTIFY_RUNG = 'jui-viz-notify-rung', NOTIFY_KINDS = ['done', 'perm', 'ask', 'chime'];
+// the chime's loudness (requester 10-20: 「音が少し小さいね」): the tones' peak gain, 中 by default (0.08 before)
+const NOTIFY_VOLUMES = { low: 0.1, mid: 0.2, high: 0.35 };
+const NOTIFY = { on: { done: true, perm: true, ask: true, chime: true }, volume: 'mid', audio: null, seen: new Set(), based: { perm: false, ask: false }, said: false, settings: null, pings: 0,
+  tab: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`, peers: new Map(), yieldMs: 1500 };
 function notifyLoadPrefs() {
   try {
     const v = JSON.parse(localStorage.getItem(NOTIFY_PREFS) || 'null');
     if (v && typeof v === 'object') for (const k of NOTIFY_KINDS) if (typeof v[k] === 'boolean') NOTIFY.on[k] = v[k];
+    if (v && Object.hasOwn(NOTIFY_VOLUMES, v.volume)) NOTIFY.volume = v.volume;
   } catch (err) { /* no storage: the defaults */ }
 }
 notifyLoadPrefs();
 // a switch turned in another tab holds here too (a kind turned off there must not ring from this one)
 window.addEventListener('storage', (e) => { if (e.key === NOTIFY_PREFS) { notifyLoadPrefs(); notifySettingsShow(); notifyPresenceSay(); } });
-function notifySavePrefs() { try { localStorage.setItem(NOTIFY_PREFS, JSON.stringify(NOTIFY.on)); } catch (err) { /* kept for this page only */ } }
+function notifySavePrefs() { try { localStorage.setItem(NOTIFY_PREFS, JSON.stringify({ ...NOTIFY.on, volume: NOTIFY.volume })); } catch (err) { /* kept for this page only */ } }
 const notifyCan = () => typeof Notification !== 'undefined';
 const notifyGranted = () => notifyCan() && Notification.permission === 'granted';
 const notifyName = (who) => String((DEF[who] && (DEF[who].title || DEF[who].agent)) || who).slice(0, 40);
@@ -7803,6 +7923,88 @@ function notifyOut(key, body, onClick) {
   n.onclick = () => { n.close(); onClick(); };
   return n;
 }
+/* The chime (2.3.6, ticket 2026-10-20-jui-viz-notify-chime; requester: 「鳴らす 鳴らすかどうかは設定で変えれる」): the
+   page makes it with Web Audio (no sound file), quietly, when it shows a notification — the tab that showed it only,
+   never when quiet. One switch for all three kinds (on by default, kept with them); done falls, a permission or a
+   question rises. A browser starts an AudioContext only after the person has pressed something on the page: it is
+   woken by the permission button and by the first press anywhere; until then the notification shows without sound
+   and the settings say a press is needed. */
+function notifyAudioMake() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC && !NOTIFY.audio) { NOTIFY.audio = new AC(); NOTIFY.audio.onstatechange = () => { notifySettingsShow(); notifyAudioSay(); }; }
+  } catch (err) { /* no sound: the notification still shows */ }
+  return NOTIFY.audio;
+}
+function notifyAudioWake() {
+  const ac = notifyAudioMake();
+  if (ac && ac.state !== 'running') ac.resume().catch(() => {}).finally(() => notifySettingsShow());
+}
+const notifyAudioReady = () => !!(NOTIFY.audio && NOTIFY.audio.state === 'running');
+const notifyAudioState = () => (NOTIFY.audio ? NOTIFY.audio.state : 'none');
+/* The real check (10-20): the banner showed and no chime was heard, though the same tones from a new AudioContext in
+   the console were. A browser lets a context run only after a press on the page since it was loaded, and a context
+   can go back to suspended; so right before each chime the page asks it to resume (at most RESUME_MS) and sounds only
+   if it then runs. Each try is kept (NOTIFY.lastChime: the state before and after, the clock, played or not) and shown
+   in the settings and the console, to tell the two apart the next time. */
+const NOTIFY_RESUME_MS = 600;
+async function notifyChime(kind) {
+  if (!NOTIFY.on.chime) return;
+  const rec = { at: Date.now(), kind, before: notifyAudioState(), after: null, t: null, played: false };
+  try {
+    const ac = notifyAudioMake();
+    if (ac && ac.state !== 'running') await Promise.race([ac.resume().catch(() => {}), new Promise((done) => setTimeout(done, NOTIFY_RESUME_MS))]);
+    rec.after = notifyAudioState();
+    rec.t = ac ? +Number(ac.currentTime || 0).toFixed(2) : null;
+    if (ac && ac.state === 'running') { rec.peak = notifyTones(ac, kind); rec.played = true; }
+  } catch (err) { rec.error = String((err && err.message) || err); }
+  rec.noTab = !rec.played && !notifyPeerCanSound();   // no tab of this browser could make it (the settings say so)
+  NOTIFY.lastChime = rec;
+  try { console.info('jui viz: chime', JSON.stringify(rec)); } catch (err) { /* the console is for the eye only */ }
+  notifySettingsShow();
+}
+function notifyTones(ac, kind) {
+  const peak = NOTIFY_VOLUMES[NOTIFY.volume] || NOTIFY_VOLUMES.mid;
+  try {
+    const t = ac.currentTime, notes = kind === 'done' ? [880, 660] : [660, 988];
+    notes.forEach((hz, i) => {
+      const o = ac.createOscillator(), g = ac.createGain(), at = t + i * 0.16;
+      o.type = 'sine'; o.frequency.setValueAtTime(hz, at);
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(peak, at + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.3);
+      o.connect(g); g.connect(ac.destination); o.start(at); o.stop(at + 0.32);
+    });
+  } catch (err) { /* no sound: the notification has shown */ }
+  return peak;
+}
+/* Which tab rings (the real check 2, 10-20): two old tabs of an earlier check, their sound never started, took the
+   one-time key first and showed the notification silently, while the tab in front could sound. Each tab says on a
+   BroadcastChannel whether its sound runs (when it changes, every NOTIFY_SAY_MS, when a new tab asks, and good-bye
+   when it goes); a tab that cannot sound leaves an event to a tab whose last word was that it can, and takes it
+   itself only if, NOTIFY.yieldMs later, nobody has (the notification is never lost, and still shows once). A last
+   word does not age: a hidden tab's timers can run once a minute (the browser's throttling), so its every-2-s word
+   comes late though its sound runs; one gone without a good-bye costs NOTIFY.yieldMs and a silent notification.
+   When no tab can sound, the notification shows without it and the settings say so. */
+const NOTIFY_SAY_MS = 2000;
+const notifyBus = typeof BroadcastChannel === 'function' ? new BroadcastChannel('jui-viz-notify-audio') : null;
+function notifyAudioSay(bye = false, hello = false) {
+  if (!notifyBus) return;
+  try { notifyBus.postMessage({ tab: NOTIFY.tab, running: !bye && notifyAudioReady(), bye, hello }); } catch (err) { /* a closed channel */ }
+}
+if (notifyBus) {
+  notifyBus.onmessage = (e) => {
+    const m = e.data || {};
+    if (typeof m.tab !== 'string' || m.tab === NOTIFY.tab) return;
+    if (m.bye) NOTIFY.peers.delete(m.tab); else NOTIFY.peers.set(m.tab, { running: !!m.running, at: Date.now() });
+    if (m.hello) notifyAudioSay();   // a new tab: it hears this one now, not a throttled timer later
+    notifySettingsShow();
+  };
+  NOTIFY.sayTimer = setInterval(() => notifyAudioSay(), NOTIFY_SAY_MS);
+  window.addEventListener('pagehide', () => notifyAudioSay(true));
+  notifyAudioSay(false, true);
+}
+const notifyPeerCanSound = () => [...NOTIFY.peers.values()].some((p) => p.running);
+// every press until the sound runs (not the first only: a context can go back to suspended)
+for (const ev of ['pointerdown', 'keydown']) document.addEventListener(ev, () => { if (!notifyAudioReady()) notifyAudioWake(); }, { capture: true });
 /* true: this tab rings it (the first to take the key); false: another tab (or this one) already did. */
 function notifyRungTake(key) {
   let rung;
@@ -7815,10 +8017,17 @@ function notifyRungTake(key) {
 function notifyEvent(kind, key, ref, body) {
   if (NOTIFY.seen.has(key)) return;
   NOTIFY.seen.add(key);
-  if (!NOTIFY.on[kind] || !notifyGranted() || notifyViewing(kind, ref)) return;
-  const ring = () => { if (notifyRungTake(key)) notifyOut(key, body, () => notifyOpen(kind, ref)); };
-  if (navigator.locks && navigator.locks.request) navigator.locks.request('jui-viz-notify', ring).catch(() => {});
-  else ring();
+  if (!NOTIFY.on[kind] || !notifyGranted()) return;
+  // quiet (this very thing on screen, in front): the key is taken without a ring, so a tab that comes to it later does
+  // not ring it either (tabs take an event in no fixed order: one that came first may already have rung it)
+  const quiet = notifyViewing(kind, ref);
+  const ring = () => { if (notifyRungTake(key) && !quiet) { notifyOut(key, body, () => notifyOpen(kind, ref)); notifyChime(kind); } };   // the sound: the same one tab
+  const locked = (fn) => (navigator.locks && navigator.locks.request ? navigator.locks.request('jui-viz-notify', fn).catch(() => {}) : fn());
+  locked(() => {
+    // this tab cannot sound and another says it can: that one rings it; this one only if nobody has, a moment later
+    if (!quiet && NOTIFY.on.chime && !notifyAudioReady() && notifyPeerCanSound()) { setTimeout(() => locked(ring), NOTIFY.yieldMs); return; }
+    ring();
+  });
 }
 /* From the live source: a turn's end, the permissions and the questions as they are now. */
 const notifyServer = () => (typeof LIVE !== 'undefined' && LIVE.slices.server && LIVE.slices.server.startedAt) || 0;
@@ -7827,6 +8036,8 @@ function notifyStop(raw, item, replay = false) {
   if (!item || !DEF[item.who] || DEF[item.who].kind !== 'main' || !(Date.now() - (Number(raw.at) || 0) < 120_000)) return;
   notifyEvent('done', `${notifyServer()}:done:${raw.seq}`, { who: item.who }, `${notifyName(item.who)} が完了${raw.kind === 'StopFailure' ? '（失敗で止まった）' : ''}`);
 }
+const NOTIFY_ASK_GRACE_MS = 1500;
+NOTIFY.askFirst = new Map();
 function notifyWaiting(kind, rows) {
   const waiting = rows.filter((x) => x.status === 'pending');
   if (!NOTIFY.based[kind]) {   // the first look after loading: what already waits was there before this page
@@ -7835,24 +8046,27 @@ function notifyWaiting(kind, rows) {
     return;
   }
   for (const x of waiting) {
+    const key = `${notifyServer()}:${kind}:${x.id}`;
+    // a question comes with two hooks in no fixed order (the async forward and --ask, ingest.py): before --ask the card
+    // does not wait in viz yet, so the text would send the person to the terminal while viz waits — give --ask
+    // NOTIFY_ASK_GRACE_MS from this tab's first sight (ticket 2026-10-20-jui-viz-notify-ask-says-terminal-while-viz-waits)
+    if (kind === 'ask' && !x.hookWaiting && !NOTIFY.seen.has(key)) {
+      const first = NOTIFY.askFirst.get(key) || Date.now();
+      NOTIFY.askFirst.set(key, first);
+      const left = first + NOTIFY_ASK_GRACE_MS - Date.now();
+      if (left > 0) { setTimeout(() => notifyWaiting('ask', typeof QUESTIONS !== 'undefined' ? QUESTIONS : rows), left + 20); continue; }
+    }
+    NOTIFY.askFirst.delete(key);
     const name = notifyName(x.who);
     const body = kind === 'perm' ? `${name} が許可を待っています: ${String(x.tool || '').slice(0, 40)}`
       : `${name} が質問しています — ${x.hookWaiting ? notifyAskLeft() : 'ターミナルで答えてください'}`;
-    notifyEvent(kind, `${notifyServer()}:${kind}:${x.id}`, { id: x.id, who: x.who, task: x.task || null }, body);
+    notifyEvent(kind, key, { id: x.id, who: x.who, task: x.task || null }, body);
   }
 }
-/* The question window as the page shows and offers it (ticket 2026-10-20): never over the server's cap (5 min, or
-   askMaxSec when shorter) — the --ask hook gives up there, so a longer choice cannot work; 2.3.5's 0 ("until
-   answered") and a saved 10 / 30 min are read as the cap. */
-const ASK_WAIT_CAP_SEC = 300;
-function askWaitCap(s) { return Math.min(ASK_WAIT_CAP_SEC, Number(s.askWaitCapSec) > 0 ? Number(s.askWaitCapSec) : ASK_WAIT_CAP_SEC); }
-function askWaitSecShown(s) { const cap = askWaitCap(s), v = Number(s.askWaitSec); return v > 0 && v <= cap ? v : cap; }
-function askWaitTextShown(s) { const v = askWaitSecShown(s); return v === Number(s.askWaitSec) ? s.askWaitText : (v < 60 ? `${v} 秒` : `${v / 60} 分`); }
-function askWaitChoicesShown(s) { const cap = askWaitCap(s); return (s.askWaitChoices || []).filter((c) => c > 0 && c <= cap); }
 function notifyAskLeft() {
   const s = NOTIFY.settings;
   if (!s) return 'viz で答えるか、ターミナルで';
-  return `viz で答えるか、${askWaitTextShown(s)}後にターミナルへ`;
+  return s.askWaitSec > 0 ? `viz で答えるか、${s.askWaitText}後にターミナルへ` : 'viz で答えるまで待ちます';
 }
 /* The page tells the server its question notifications are on (or no longer). */
 const notifyPresenceWanted = () => SOURCE.mode === 'live' && notifyGranted() && NOTIFY.on.ask;
@@ -7873,7 +8087,7 @@ function notifySettingsShow(settings) {
   $('btn-notify').hidden = !live;
   const chip = $('chip-askwait');
   chip.hidden = !live || !s;
-  if (s) setText(chip, `質問は viz で ${askWaitTextShown(s)}待つ`);
+  if (s) setText(chip, s.askWaitSec > 0 ? `質問は viz で ${s.askWaitText}待つ` : '質問は viz で答えるまで待つ');
   if (notifyEl.hidden) return;
   const state = !notifyCan() ? 'このブラウザは通知を出せません'
     : Notification.permission === 'granted' ? 'ブラウザの通知: 許可済み'
@@ -7882,14 +8096,23 @@ function notifySettingsShow(settings) {
   setText($('notify-perm-state'), state);
   $('notify-ask-perm').hidden = !notifyCan() || Notification.permission !== 'default';
   for (const el of notifyEl.querySelectorAll('[data-notify-kind]')) el.checked = !!NOTIFY.on[el.dataset.notifyKind];
+  const st = notifyAudioState(), lc = NOTIFY.lastChime;
+  $('notify-volume').value = NOTIFY.volume;
+  $('notify-volume').disabled = !NOTIFY.on.chime;
+  setText($('notify-chime-note'), !NOTIFY.on.chime ? '' : `音の状態: ${st === 'running' ? '鳴らせる' : st === 'none' ? 'まだ作られていない（ページを一度クリックすると鳴ります）' : '止まっている（ページを一度クリックすると鳴ります）'}（${st}）`
+    + (st !== 'running' && notifyPeerCanSound() ? ' · ほかのタブが鳴らします' : '')
+    + (lc ? ` · 最後のチャイム ${new Date(lc.at).toTimeString().slice(0, 8)}: ${lc.before} → ${lc.after}、currentTime ${lc.t}、${lc.played ? '鳴らした' : '鳴らせなかった'}` : '')
+    + (lc && lc.noTab ? ' · このブラウザのどのタブも音を鳴らせません（どれかのタブをクリックすると鳴ります）' : ''));
   const sel = $('ask-wait');
   if (s) {
-    const label = (sec) => (sec < 60 ? `${sec} 秒` : `${sec / 60} 分`);
-    const now = askWaitSecShown(s), offered = askWaitChoicesShown(s);
-    const choices = offered.includes(now) ? offered : [...offered, now];
+    // "until answered" is bounded by the hook's timeout (ticket 2026-10-20): the server says how long
+    const most = Number(s.askUntilAnsweredSec) > 0 ? Number(s.askUntilAnsweredSec) : 0;
+    const mostText = most >= 3600 ? `${Math.round(most / 3600)} 時間` : most >= 60 ? `${Math.round(most / 60)} 分` : '';
+    const label = (sec) => (sec <= 0 ? (mostText ? `答えるまで（最長 ${mostText}）` : '答えるまで') : sec < 60 ? `${sec} 秒` : `${sec / 60} 分`);
+    const choices = s.askWaitChoices.includes(s.askWaitSec) ? s.askWaitChoices : [...s.askWaitChoices, s.askWaitSec];
     const sig = JSON.stringify(choices);
     if (sel.dataset.sig !== sig) { sel.dataset.sig = sig; sel.innerHTML = choices.map((c) => `<option value="${esc(String(c))}">${esc(label(c))}</option>`).join(''); }
-    sel.value = String(now);
+    sel.value = String(s.askWaitSec);
   }
 }
 function notifyOpenPanel(opener) {
@@ -7911,13 +8134,15 @@ $('chip-askwait').addEventListener('click', (e) => notifyOpenPanel(e.currentTarg
 $('notify-close').addEventListener('click', notifyClosePanel);
 $('notify-ask-perm').addEventListener('click', async () => {
   if (!notifyCan()) return;
+  notifyAudioWake();   // the press that asks also lets the page make a sound (the chime)
   try { await Notification.requestPermission(); } catch (err) { /* refused or not asked */ }
   notifySettingsShow();
   notifyPresenceSay();
 });
 notifyEl.addEventListener('change', async (e) => {
   const k = e.target.closest('[data-notify-kind]');
-  if (k) { NOTIFY.on[k.dataset.notifyKind] = k.checked; notifySavePrefs(); notifyPresenceSay(); return; }
+  if (k) { NOTIFY.on[k.dataset.notifyKind] = k.checked; notifySavePrefs(); notifyPresenceSay(); notifySettingsShow(); return; }
+  if (e.target.id === 'notify-volume') { if (Object.hasOwn(NOTIFY_VOLUMES, e.target.value)) NOTIFY.volume = e.target.value; notifySavePrefs(); return; }
   if (e.target.id === 'ask-wait') {
     const got = SOURCE.setAskWait ? await SOURCE.setAskWait(Number(e.target.value)) : { ok: false, why: 'デモでは変えられません' };
     setText($('ask-wait-note'), got.ok ? '保存した。次の質問から使います' : `変えられなかった（${got.why || '?'}）`);
@@ -7939,9 +8164,10 @@ notifySettingsShow();
 const dsEl = $('ds'), dsBody = $('ds-body'), dsTabs = $('ds-tabs');
 const ds = { open: false, project: null, tab: 'api', doc: null, error: '', loading: false, ep: null, seq: 0, opener: null };
 async function openDataDocs(project, opener) {
+  holdView('ds');   // 50-panel.js VIEW_HOLD: held before the card it replaces lets go
   if (wb.open) closeWhiteboard();
   if (tb.open) closeTaskBoard();
-  if (rbState.id) closeRobot(true);
+  if (rbState.id) closeRobot();
   if (pr.open) closePrices();   // 54-bills.js
   Object.assign(ds, { open: true, project, doc: null, error: '', loading: true, ep: null, opener: opener || null });
   setText($('ds-room'), PROJECT[project] ? PROJECT[project].name : '');
@@ -7958,9 +8184,10 @@ async function openDataDocs(project, opener) {
   renderDataDocs();
 }
 function closeDataDocs() {
-  if (!ds.open) return;
+  if (!ds.open) { releaseView('ds'); return; }
   ds.open = false; ds.doc = null; ds.seq += 1;
   hideOverlay(dsEl);
+  releaseView('ds');
   liveSoloSync();
   if (ds.opener && ds.opener.focus) ds.opener.focus({ preventScroll: true });
 }
@@ -8088,6 +8315,7 @@ function billEl(R) {
   if (R.bill) return R.bill;
   const el = document.createElement('div');
   el.className = 'bill';
+  el.dataset.robot = R.def.id;   // a click on the bill selects the robot, as on its tag (40-scene.js, tagPress)
   el.hidden = true;
   el.innerHTML = `<span class="bill-in">${BILL_ICON_HTML}<b></b></span>`;
   tagsEl.append(el);
@@ -8184,9 +8412,10 @@ const PR_ORIGIN = { default: '既定', user: '追加', changed: '変更', remove
 function pricesSlice() { const p = LIVE.slices && LIVE.slices.prices; return p && !Array.isArray(p) && typeof p === 'object' ? p : null; }
 function openPrices(opener, model) {
   if (SOURCE.mode !== 'live') return;
+  holdView('pr');   // 50-panel.js VIEW_HOLD: held before the card it replaces lets go
   if (wb.open) closeWhiteboard();
   if (tb.open) closeTaskBoard();
-  if (rbState.id) closeRobot(true);
+  if (rbState.id) closeRobot();
   if (ds.open) closeDataDocs();
   const p = pricesSlice(), row = p && (p.rows || []).find((r) => r.model === model);
   Object.assign(pr, { open: true, msg: '', opener: opener || null, sig: '',
@@ -8198,9 +8427,10 @@ function openPrices(opener, model) {
   if (first) first.focus({ preventScroll: true });
 }
 function closePrices() {
-  if (!pr.open) return;
+  if (!pr.open) { releaseView('pr'); return; }
   pr.open = false; pr.edit = null;
   hideOverlay(prEl);
+  releaseView('pr');
   liveSoloSync();
   if (pr.opener && pr.opener.focus) pr.opener.focus({ preventScroll: true });
 }
@@ -8544,6 +8774,9 @@ function histItem(item) {
     }
     if (item.error) title.push(hNode('span', 'h-err', 'エラー'));
     if (item.out === undefined) title.push(hNode('span', 'h-run', '結果待ち'));
+    // The time the tool was called (its tool_use record's), at the right end after the marks (2.3.7, requester 10-20:
+    // 「このBashとかのタイトルの右端にその時の時刻表示できる？」); the description narrows first (.h-head), never the time.
+    title.push(at);
     const io = hNode('div', 'h-io');
     io.appendChild(hNode('span', 'h-io-k', 'IN'));
     io.appendChild(hNode('pre', 'h-code', `${item.in || ''}${item.inCut ? '\n…' : ''}`));
@@ -8739,10 +8972,35 @@ function composeTarget(id) {
   }
   return { why: '', name, note: L[1] };
 }
+/* The note above the box for a session that can take a prompt (LAUNCH_WHY's note: --channels) has a × (requester 10-20:
+   "この注意書きの部分邪魔だから消せるようにしといて xボタンで消せて、消したら他でも表示されない"). Pressed: gone on every card and,
+   kept in this browser (readPref / writePref, both try/catch), after a reload; 設定 › 「カードの説明をまた出す」 brings it
+   back. A blocked storage still hides it for this page view. Only the note: the reason a box is disabled always shows. */
+const CARD_NOTE_PREF = 'cardNote';
+let cardNoteOff = readPref(CARD_NOTE_PREF, 'on') === 'off';
+function cardNoteSet(off) {
+  cardNoteOff = !!off;
+  writePref(CARD_NOTE_PREF, cardNoteOff ? 'off' : 'on');
+  composePaint();
+  cardNotePaint();
+}
+function cardNotePaint() {
+  const b = document.getElementById('card-note-back'), n = document.getElementById('card-note-state');
+  if (b) b.disabled = !cardNoteOff;
+  if (n) setText(n, cardNoteOff ? '消してある — ロボットのカードのプロンプト欄の上の説明（--channels のセッション）を出していません' : '出している');
+}
+{ const b = document.getElementById('card-note-back');
+  if (b) b.addEventListener('click', () => cardNoteSet(false));
+  cardNotePaint(); }
 function composeBuild() {
   const box = hNode('div', 'h-compose');
   box.dataset.hCompose = '';
+  const head = hNode('div', 'h-compose-head'); head.dataset.hHead = '';
   const why = hNode('p', 'h-compose-why'); why.dataset.hWhy = '';
+  const noteX = hNode('button', 'h-note-x', '×'); noteX.type = 'button'; noteX.dataset.hNoteX = '';
+  noteX.setAttribute('aria-label', 'この説明を消す（ほかのカードでも出さない。設定 › カードの説明をまた出す で戻る）'); noteX.title = 'この説明を消す';
+  noteX.addEventListener('click', () => cardNoteSet(true));
+  head.append(why, noteX);
   const area = hNode('textarea', 'h-compose-text');
   area.rows = 3;
   area.dataset.hText = '';
@@ -8762,7 +9020,7 @@ function composeBuild() {
   const back = hNode('button', 'wb-btn', 'やめる'); back.type = 'button'; back.dataset.hBack = '';
   acts.append(go, back);
   confirm.append(to, preview, acts);
-  box.append(why, area, row, confirm);
+  box.append(head, area, row, confirm);
   area.addEventListener('input', () => composePaint());
   area.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !e.isComposing) { e.preventDefault(); composeAsk(); }
@@ -8775,7 +9033,7 @@ function composeBuild() {
 function composeEls() {
   const b = HIST.compose;
   const q = (k) => b.querySelector(`[data-${k}]`);
-  return { box: b, why: q('h-why'), area: q('h-text'), state: q('h-state'), send: q('h-send'), confirm: q('h-confirm'), to: q('h-to'), preview: q('h-preview'), go: q('h-go') };
+  return { box: b, head: q('h-head'), why: q('h-why'), noteX: q('h-note-x'), area: q('h-text'), state: q('h-state'), send: q('h-send'), confirm: q('h-confirm'), to: q('h-to'), preview: q('h-preview'), go: q('h-go') };
 }
 /* After every histSync: the box under the history pane of the card shown, and its state. */
 function composePlace(pane, id) {
@@ -8798,9 +9056,12 @@ function composePaint() {
   if (!HIST.compose) return;
   const E = composeEls(), id = HIST.compose._for, t = composeTarget(id);
   const asking = !E.confirm.hidden;
-  E.why.textContent = t.why || t.note || '';
-  E.why.hidden = !(t.why || t.note);
-  E.why.classList.toggle('h-compose-note', !t.why && !!t.note);
+  const note = !t.why && t.note && !cardNoteOff ? t.note : '';   // the reason (t.why) is never dismissed
+  E.why.textContent = t.why || note;
+  E.why.hidden = !(t.why || note);
+  E.why.classList.toggle('h-compose-note', !!note);
+  E.noteX.hidden = !note;
+  E.head.hidden = E.why.hidden;
   E.area.disabled = !!t.why;
   E.area.readOnly = asking;
   const text = E.area.value, bytes = text.trim() ? composeBytes(id, text) : 0;
@@ -8974,7 +9235,8 @@ function histLightClose(back) {
 
 /* ---------- the wide history (2.3.4, requester 10-19: "チャットが狭いから見づらい 左にロボット一人分くらいの余裕を残して残りを
    チャットの表示にしてほしい"; "チャット広げた時はカメラの位置移動もしてね 選んでるボットが左の余白の部分に来るように") ----------
-   広げる on the card's head (the 応答の履歴 tab only): the card covers everything right of histWideMargin(), the side
+   広げる on the card's head (both tabs since 2.3.7, requester 10-20: "今の様子タブでも広げられるようにして、応答の履歴と共有で単純に
+   タブ切り替えても広さが保持されればいい" — one state, HIST.wide with its kept histWidePref, for 今の様子 and 応答の履歴): the card covers everything right of histWideMargin(), the side
    panel too, and the camera flies (focusPose, 50-panel.js) so the robot stands in the middle of that margin; ← → keep
    it there for the next robot. 元の幅に戻す / Esc: the card's width and the view before. 900 px or narrower: the whole
    screen. The choice is kept in localStorage (readPref / writePref: a blocked storage only forgets it). */
@@ -8991,14 +9253,14 @@ function histWideFly() {
   flyTo(pose.p, pose.t, viewTarget, reduceMotion ? 0 : 0.6, null);
 }
 function histSetWide(on, remember = true) {
-  on = !!on && HIST.tab === 'history' && !!rbState.id;
+  on = !!on && !!rbState.id;
   if (remember) { histWidePref = on; writePref(HIST_WIDE_PREF, on ? 'on' : 'off'); }
   if (HIST.wide === on) { histWidePaint(); return; }
   HIST.wide = on;
   histWidePaint();
   histWideFly();
   const pane = histPane();
-  if (pane && HIST.atEnd) histToEnd(pane);   // the newest stays in view across the change of width
+  if (pane && HIST.tab === 'history' && HIST.atEnd) histToEnd(pane);   // the newest stays in view across the change of width
 }
 function histWidePaint() {
   const m = histWideMargin();
@@ -9007,15 +9269,15 @@ function histWidePaint() {
   rbEl.style.setProperty('--wide-left', `${m}px`);
   const b = rbEl.querySelector('[data-rb-wide]');
   if (b) {
-    b.hidden = HIST.tab !== 'history';
+    b.hidden = false;
     b.setAttribute('aria-pressed', String(HIST.wide));
     b.textContent = HIST.wide ? '元の幅に戻す' : '広げる';
-    b.title = HIST.wide ? '元の幅に戻す（Esc）' : '応答の履歴を画面いっぱいに広げる';
+    b.title = HIST.wide ? '元の幅に戻す（Esc）' : 'カードを画面いっぱいに広げる（今の様子・応答の履歴で同じ）';
   }
 }
-/* After every histSync: the tab and the card decide whether it is wide (the kept choice applies to the history tab). */
+/* After every histSync: the card decides whether it is wide (the kept choice, the same for both tabs). */
 function histWideSync(id) {
-  const want = !!id && HIST.tab === 'history' && histWidePref;
+  const want = !!id && histWidePref;
   if (want !== HIST.wide) histSetWide(want, false);
   else histWidePaint();
 }
@@ -9056,7 +9318,7 @@ const FULLTEXT_LINES = [
   '.pg-toggle small',             // panel · セッション: a project group's summary (in its button)
   '#ticker .what',                // the log strip: an event's text (2.3.6: a cross-session message was cut there)
   '#ticker .kind',                // the log strip: an event's kind
-  '.talk-peer-name',                // card · トーク (2.3.7): the peer's name in the talk's header (in its button)
+  '.talk-peer-name',                // card · トーク (2.3.6): the peer's name in the talk's header (in its button)
   '.talk-row-name',                  // card · トーク: a peer's name in the list of talks (in its button)
 ].join(', ');
 const FULLTEXT = { el: null, anchor: null, owner: null, host: null, via: null };
@@ -9159,7 +9421,7 @@ document.addEventListener('keydown', (e) => {   // first (capture): Esc closes t
   window.addEventListener('resize', later);
 }
 // ---- web/js/58-talk.js ----
-/* ---------- トーク: a robot's SendMessage conversations, as a chat (2.3.7, requester 10-20) ----------
+/* ---------- トーク: a robot's SendMessage conversations, as a chat (2.3.6, requester 10-20) ----------
    「チャットアイコンをロボットのメニューに置いて、それ選んだらラインのトークっぽい画面でトークの一覧が表示される。トーク選ぶと詳細で
    トークが見れる。新しいメッセージ受信したら一覧では通知が出て詳細ではメッセージが表示される。」 and (00:54) 「トークの詳細でヘッダーに
    相手のbot名表示しってタップでそのbotに切り替えられるようにして。名前は一行で入らないなら省略で」.
@@ -9380,7 +9642,7 @@ function talkPeerMark(peer) {
   span.setAttribute('aria-hidden', 'true');
   if (label && DEF[label]) {   // the robot's mark, as pill() draws it (built as nodes here)
     const role = DEF[label].role, mark = hNode('span', 'pill', label);
-    mark.style.setProperty('--c', ROLES[role].color); mark.style.setProperty('--t', ROLE_INK[role] || '#ffffff');
+    mark.style.setProperty('--c', pillBg(role)); mark.style.setProperty('--t', pillInk(role));
     span.appendChild(mark);
   }
   else span.appendChild(hNode('span', `talk-kind talk-kind-${peer.kind}`, peer.kind === 'external' ? '外' : peer.kind === 'subagent' ? 'サブ' : '？'));
