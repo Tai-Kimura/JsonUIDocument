@@ -254,6 +254,8 @@ body { background: var(--bg); color: var(--ink); font-family: var(--font-body); 
 .wait-bubble[data-wait-kind="input"] { background: #e8ecf1; border-color: #6b7a90; color: #13233a; }
 .wait-bubble:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .wait-picked { outline: 3px solid var(--focus); outline-offset: 2px; }
+/* over the call bell, the rack or the server room's door (40-scene.js tagFixtureRects, 2.3.10): the press goes through to it */
+.tag.bot.over-fixture, .bill.over-fixture, .wait-bubble.over-fixture { pointer-events: none; opacity: 0.5; }
 .tag.bot:hover { box-shadow: 0 0 0 2px var(--info), 0 1px 4px var(--shadow); }
 /* A room's name is a sign, not a robot's name tag (requester 10-18: the two blended in a crowded room): square corners,
    a frame and the info hue always on, an opaque ground, and in front of the tags (a later sibling would paint over it). */
@@ -960,6 +962,17 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .h-peer summary > .h-at { align-self: flex-end; margin-top: 4px; }   /* the time at the right end, a little apart from the body (issue #37) */
 .h-err { color: var(--warn); font-weight: 700; }
 .h-run { color: var(--info); }
+/* pictures in a tool's row, seen closed (55-history.js, 2.3.12): the first one's small thumbnail and 画像 N */
+.h-tool summary > .h-thumb-mini { flex: none; width: 36px; height: 24px; min-height: 0; padding: 0; overflow: hidden; }
+.h-tool summary > .h-thumb-mini img { width: 100%; height: 100%; max-height: none; object-fit: cover; }
+.h-tool summary > .h-thumb-mini .h-thumb-note { display: none; }
+/* a file that is no picture: its name as a link, a press shows it in Finder (55-history.js histFileLink) */
+.h-filelink { padding: 0; border: 0; background: none; color: var(--info); font: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; text-align: left; }
+.h-filelink:hover { color: var(--ink); }
+.h-filelink:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.h-tool summary > .h-head-file { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.h-filelink.h-file-gone { color: var(--ink-soft); text-decoration: line-through; cursor: default; }
+.h-imgmark { flex: none; padding: 0 6px; border: 1px solid var(--info); border-radius: 3px; color: var(--info); font-size: 11px; line-height: 1.5; white-space: nowrap; }
 .h-io { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 8px; padding: 0 8px 8px; }
 .h-io-k { color: var(--ink-soft); font: 700 11px/1.9 var(--font-mono); }
 .h-peer { border-left: 3px solid var(--info); }
@@ -1499,3 +1512,27 @@ button.talk-peer:focus-visible { outline: 2px solid var(--focus); outline-offset
 .sr-bubble.sr-bubble-free { left: 50% !important; top: 96px !important; }
 .sr-full { display: none; margin-top: 4px; font: 400 12px/1.45 var(--font-mono); white-space: pre-wrap; }
 .sr-bubble[data-kind="error"]:hover .sr-full:not(:empty) { display: block; }
+/* the デバイス button and its pane (53-devices.js; ticket 2026-10-20-jui-viz-device-panel-machine-load-and-emulators):
+   the button's colour is the machine's load level, the pane takes the side panel's place */
+.controls .dev-btn[data-load="ok"] { border-color: var(--ok); background: var(--ok-bg); color: var(--ok); }
+.controls .dev-btn[data-load="busy"] { border-color: var(--warn); background: var(--warn-bg); color: var(--warn); }
+.controls .dev-btn[data-load="high"] { border-color: var(--bad); background: var(--bad-bg); color: var(--bad); }
+.dev-pane { position: fixed; top: 52px; right: 0; bottom: 0; z-index: 54; width: min(400px, 100vw); display: grid; align-content: start; gap: 12px; overflow-y: auto; padding: 14px 16px 24px; background: var(--panel); color: var(--ink); border-left: 1px solid var(--line); box-shadow: -8px 0 30px rgba(0, 0, 0, 0.18); font: 13px/1.5 var(--font-body); }
+.dev-pane[hidden] { display: none; }
+.dev-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.dev-head h2, .dev-pane h3 { margin: 0; font: 700 15px/1.3 var(--font-body); }
+.dev-pane h3 { font-size: 13.5px; }
+.dev-pane p { margin: 0; }
+.dev-load { display: grid; gap: 4px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); }
+.dev-load[data-load="ok"] { border-color: var(--ok); background: var(--ok-bg); }
+.dev-load[data-load="busy"] { border-color: var(--warn); background: var(--warn-bg); }
+.dev-load[data-load="high"] { border-color: var(--bad); background: var(--bad-bg); }
+.dev-level { font-weight: 700; }
+.dev-group { display: grid; gap: 6px; }
+.dev-list { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.dev-row { display: grid; gap: 2px; width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: 13px/1.45 var(--font-body); text-align: left; overflow-wrap: anywhere; }
+button.dev-row { cursor: pointer; }
+button.dev-row:hover { border-color: var(--info); }
+.dev-row .dev-name { font-weight: 700; }
+.dev-who, .dev-note { color: var(--ink-soft); font-size: 12px; }
+.dev-who .dev-guess { margin-left: 4px; }

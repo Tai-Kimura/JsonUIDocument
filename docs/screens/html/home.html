@@ -1262,13 +1262,17 @@ flowchart TD
 </section>
 <section id="state">
 <h2>State Management</h2>
-<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">3</span></summary>
+<details class="vm-section" open><summary class="vm-section-header">UI Data Variables <span class="count-badge">7</span></summary>
 <table>
 <thead><tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th><th>Notes</th></tr></thead>
 <tbody>
 <tr><td><code>featuredLinks</code></td><td>[FeaturedLink]</td><td><code>-</code></td><td>Three Featured Section cards rendered below the hero: Get started / AI agents / Cross-platform showcase. Hardcoded by the ViewModel in onAppear from the FEATURED_LINKS constant; each row&#x27;s titleKey and descriptionKey are pre-resolved through StringManager so the cell renders display-ready text.</td><td>-</td></tr>
 <tr><td><code>platformCards</code></td><td>[PlatformCard]</td><td><code>-</code></td><td>Three platform cards (Swift / Kotlin / React) that link into each platform section. Hardcoded by the ViewModel in onAppear from the PLATFORM_CARDS constant.</td><td>-</td></tr>
 <tr><td><code>recentChanges</code></td><td>[ChangelogCard]</td><td><code>-</code></td><td>Up to 3–6 &#x27;What&#x27;s new&#x27; ribbon cards telling a returning reader what landed since their last visit. Seeded by the ViewModel in onAppear from the RECENT_CHANGES constant; no API, no runtime fetch. Each cell carries a formatted date + title + blurb + CTA label, all localized. 2026-05 update (swagger-driven Data Models): three new &#x27;May 2026&#x27; entries are appended in HomeViewModel.RECENT_CHANGES — (1) DTO + Domain codegen body -&gt; /concepts/data-models-from-openapi, (2) path filter -&gt; /guides/api-data-models §3, (3) MCP Group E discovery -&gt; /concepts/data-models-from-openapi §7. Each entry stays a distinct row (no bundling) so the discovery surface keeps its own first-class card. The spec only confirms the ChangelogCard structure supports the three rows; the literal RECENT_CHANGES catalog content lives in HomeViewModel.ts and is jsonui-implement&#x27;s responsibility.</td><td>-</td></tr>
+<tr><td><code>onHeroInstallTap</code></td><td>(() -&gt; Void)?</td><td><code>-</code></td><td>Bound by the hero&#x27;s install button: navigates to the install guide.</td><td>-</td></tr>
+<tr><td><code>onHeroAiAgentsTap</code></td><td>(() -&gt; Void)?</td><td><code>-</code></td><td>Bound by the hero&#x27;s AI agents link: navigates to the AI agents page.</td><td>-</td></tr>
+<tr><td><code>onHeroVizTap</code></td><td>(() -&gt; Void)?</td><td><code>-</code></td><td>Bound by the hero&#x27;s jui viz link: navigates to /tools/viz.</td><td>-</td></tr>
+<tr><td><code>onHeroRefusesTap</code></td><td>(() -&gt; Void)?</td><td><code>-</code></td><td>Bound by the hero&#x27;s refuses link: scrolls to the home_refuses section on this page, or navigates to /guides/branch-contracts when that section is not in the document.</td><td>-</td></tr>
 </tbody></table>
 </details>
 <details class="vm-section" open><summary class="vm-section-header">View-local Event Handlers <span class="count-badge">6</span></summary>

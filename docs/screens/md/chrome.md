@@ -91,6 +91,11 @@ flowchart TD
 | `mobileOpen` | Bool | `-` | Mobile drawer open flag. True on viewports <1024px when the user has tapped the top-bar menu button. Tapping any Sidebar link (onLinkTap) and tapping Escape both flip it back to false. | - |
 | `currentLanguage` | String | `-` | Mirror of StringManager.language. Drives the TopBar's language-toggle display label (shows the OTHER language as an invitation to switch). Re-seeded inside onAppear on every language toggle so the chrome re-localizes in lockstep with generated pages. | - |
 | `currentColorMode` | String | `-` | Mirror of ColorManager.currentMode. Drives the TopBar's theme-toggle icon (sun when the current mode is 'light', moon when 'dark'). Seeded from ColorManager at construction and re-synced via ColorManager.subscribe() whenever the mode changes (manual toggle or prefers-color-scheme media query). | - |
+| `onToggleSection` | (() -> Void)? | `-` | Bound by the Sidebar section headers: folds or unfolds one nav section (the handler behind it is the ViewModel method of the same name). | - |
+| `onToggleMobileMenu` | (() -> Void)? | `-` | Bound by the header hamburger: opens or closes the mobile nav drawer. | - |
+| `onToggleLanguage` | (() -> Void)? | `-` | Bound by the header language toggle: switches between English and Japanese. | - |
+| `onToggleColorMode` | (() -> Void)? | `-` | Bound by the header theme toggle: switches between the light and dark color modes. | - |
+| `onLinkTap` | (() -> Void)? | `-` | Bound by every nav row: closes the mobile nav drawer when it is open (the row's link does the navigation). | - |
 
 ### View-local Event Handlers
 

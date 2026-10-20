@@ -702,8 +702,8 @@
       "command": "verify",
       "synopsis": "jui verify [--fail-on-diff] [--file SPEC] [--platform <p>] [--detail] [--json PATH]",
       "purpose": {
-        "en": "Compare generated Layout JSON against the committed Layouts to detect spec drift. `--fail-on-diff` exits non-zero for CI (JsonUI invariant #2). Since jsonui-cli 1.8.5 the summary names its denominator — `verified N of M screen(s)`, with the skipped ones and why — so a green run no longer hides how much it actually compared: a screen whose layout is authored by hand rather than generated is skipped, and a project where every screen is skipped reports `verified 0 of M` while still exiting 0. Since jsonui-cli 1.9.1 `--fail-on-diff` also fails on initial values a spec declares that its layout does not carry (the report's WARNING block lists them; an include's data is read under the include id's prefix), so a hand edit to a data entry's default is drift too.",
-        "ja": "生成された Layout JSON を commit 済みの Layouts と比較して spec drift を検出する。`--fail-on-diff` は CI 用に非 0 で終了（JsonUI 不変条件 #2）。jsonui-cli 1.8.5 からはサマリが分母を名乗る — `verified N of M screen(s)` と skip されたものとその理由 — ので、緑の実行が「実際に何枚比べたか」を隠さなくなった: 生成ではなく手で書かれた layout を持つ画面は skip され、全画面が skip されたプロジェクトは `verified 0 of M` と報告しながら exit 0 を返す。 jsonui-cli 1.9.1 からは、spec が宣言した初期値を layout が持っていない場合も `--fail-on-diff` で失敗する（レポートの WARNING ブロックに一覧が出る。include の data は include の id の接頭辞付きで読む）ので、data エントリの既定値を手で書き換えるのもドリフトになる。"
+        "en": "Compare generated Layout JSON against the committed Layouts to detect spec drift. `--fail-on-diff` exits non-zero for CI (JsonUI invariant #2). Since jsonui-cli 1.8.5 the summary names its denominator — `verified N of M screen(s)`, with the skipped ones and why — so a green run no longer hides how much it actually compared: a screen whose layout is authored by hand rather than generated is skipped, and a project where every screen is skipped reports `verified 0 of M` while still exiting 0. Since jsonui-cli 1.9.1 `--fail-on-diff` also fails on initial values a spec declares that its layout does not carry (the report's WARNING block lists them; an include's data is read under the include id's prefix), so a hand edit to a data entry's default is drift too. Since jsonui-cli 2.3.12 a screen whose layout is authored outside the spec is no longer only counted as skipped: every name its layout binds and every entry of its data section must be declared in what goes into the data section (uiVariables, displayLogic, collection, tabView), reported under a second line, `checked against the spec's declarations: K of E externally authored layout(s)`; jui.config.json's `\"verify\": {\"external\": \"gate\"}` makes `--fail-on-diff` count them.",
+        "ja": "生成された Layout JSON を commit 済みの Layouts と比較して spec drift を検出する。`--fail-on-diff` は CI 用に非 0 で終了（JsonUI 不変条件 #2）。jsonui-cli 1.8.5 からはサマリが分母を名乗る — `verified N of M screen(s)` と skip されたものとその理由 — ので、緑の実行が「実際に何枚比べたか」を隠さなくなった: 生成ではなく手で書かれた layout を持つ画面は skip され、全画面が skip されたプロジェクトは `verified 0 of M` と報告しながら exit 0 を返す。 jsonui-cli 1.9.1 からは、spec が宣言した初期値を layout が持っていない場合も `--fail-on-diff` で失敗する（レポートの WARNING ブロックに一覧が出る。include の data は include の id の接頭辞付きで読む）ので、data エントリの既定値を手で書き換えるのもドリフトになる。 jsonui-cli 2.3.12 からは、spec の外で layout を書いている画面も skip として数えるだけではなくなった。layout が束縛する名前と data 節のエントリは、すべて data 節に入る所（uiVariables、displayLogic、collection、tabView）に宣言されていなければならず、所見は 2 行目の `checked against the spec's declarations: K of E externally authored layout(s)` の下に出る。jui.config.json の `\"verify\": {\"external\": \"gate\"}` で `--fail-on-diff` が数える。"
       },
       "options": [
         {
@@ -762,16 +762,16 @@
         "jui build"
       ],
       "verifiedAgainst": {
-        "version": "1.9.10",
+        "version": "2.3.12",
         "columns": 80,
         "python": "3.12",
         "helpHash": "cef4857adc6919ab2fed436c32f4ac005e4d0a1944b9e29537ba8a33ddee698a",
-        "cardHash": "ec8d9db1f68521da3d7c3a5fde6e0ed120a64c60877819f598021a585d716f6f",
+        "cardHash": "c1bbe8971dcd76db2e9792eac7f28ba4823e05017761758c87f73dab98976f89",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "b90c5b69cbb6",
           "synopsis": "17d634e84baf",
-          "purpose": "6f5941e5c03d",
+          "purpose": "cb33d1d72cea",
           "options": "3f538f5fafba",
           "examples": "f5662f26ca1c",
           "aliases": "98edafdd23a8",
@@ -2616,8 +2616,8 @@
       "command": "viz doctor",
       "synopsis": "jui viz doctor [--json]",
       "purpose": {
-        "en": "Check the environment for jui viz — Python 3.11 or later, aiohttp and watchdog, the claude command, disableAllHooks, the hooks (and, from 2.3.7, a question hook installed with jui viz hooks install whose timeout is still under 86400 seconds), the state folder, where test results are read from, the near weather (on or off, when it was last read, why it failed), the usage-limits statusLine (installed or not, the last value), what the git box and the shredder can see (from 2.3.4), the permission relay, the server and the port — and say how to fix what fails. Exits 1 when a check fails.",
-        "ja": "jui viz の環境を確かめる。Python 3.11 以上、aiohttp と watchdog、claude コマンド、disableAllHooks、フック（2.3.7 からは、jui viz hooks install で入れた質問のフックの timeout が 86400 秒より短いままでないかも）、状態フォルダ、テストの結果を読む場所、近所の天気（オンかオフか、最後に取れた時刻、失敗の理由）、上限の表示の statusLine（入っているか、最後の値）、git の箱とシュレッダーに見えるもの（2.3.4 から）、許可の中継、サーバー、ポートを見て、直し方を出す。どれかが失敗なら 1 で終わる。"
+        "en": "Check the environment for jui viz — Python 3.11 or later, aiohttp and watchdog, the claude command, disableAllHooks, the hooks (and, from 2.3.7, a question hook installed with jui viz hooks install whose timeout is still under 86400 seconds), the state folder, where test results are read from, the near weather (on or off, when it was last read, why it failed), the usage-limits statusLine (installed or not, the last value), what the git box and the shredder can see (from 2.3.4), the permission relay, the cloud price fetch (on or off, when it last got prices, the files that failed; from 2.3.12), the page's language and any problem in your words file (from 2.3.12), the server and the port — and say how to fix what fails. Exits 1 when a check fails.",
+        "ja": "jui viz の環境を確かめる。Python 3.11 以上、aiohttp と watchdog、claude コマンド、disableAllHooks、フック（2.3.7 からは、jui viz hooks install で入れた質問のフックの timeout が 86400 秒より短いままでないかも）、状態フォルダ、テストの結果を読む場所、近所の天気（オンかオフか、最後に取れた時刻、失敗の理由）、上限の表示の statusLine（入っているか、最後の値）、git の箱とシュレッダーに見えるもの（2.3.4 から）、許可の中継、クラウドの単価の取得（オンかオフか、最後に取れた時刻、取れなかったファイル。2.3.12 から）、ページの言語と言葉のファイルの問題（2.3.12 から）、サーバー、ポートを見て、直し方を出す。どれかが失敗なら 1 で終わる。"
       },
       "options": [
         {
@@ -2642,16 +2642,16 @@
         "jui viz status"
       ],
       "verifiedAgainst": {
-        "version": "2.3.7",
+        "version": "2.3.12",
         "columns": 80,
         "python": "3.12",
         "helpHash": "b7565244c9540a31b622d7b0f755511c837c9d39c735a0195e1cd5a901b793db",
-        "cardHash": "d748527db2ffb7d5110314c6b8564a3e18169e03f6e527dfd707b2006d57dd65",
+        "cardHash": "70ccdf4e403bb85317ef6f832b85676f9ea803e2afc01d80dfd9721fed4b063e",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "c97c2ebb810b",
           "synopsis": "a8380a6299f3",
-          "purpose": "15921b793877",
+          "purpose": "786230427c67",
           "options": "aa5b149e7cdf",
           "examples": "a38867cde311",
           "aliases": "98edafdd23a8",
@@ -3156,8 +3156,211 @@
     },
     {
       "binary": "jui",
+      "command": "viz cloud-prices fetch",
+      "synopsis": "jui viz cloud-prices fetch [--provider {aws,azure}] [--region REGION] [--large LARGE] [--json]",
+      "purpose": {
+        "en": "Fetch the cloud prices for the infra cost simulator now (from 2.3.12), even while the daily fetch is off: AWS's public offer files (Lambda, ECS / Fargate, S3, DynamoDB, API Gateway, SQS, SNS, ELB, EKS, Secrets Manager, CloudWatch Logs, Kinesis, data transfer, ElastiCache, and CloudFront as global) and the Azure Retail Prices API, by default for ap-northeast-1 and us-east-1, japaneast and eastus. Only https to pricing.us-east-1.amazonaws.com and prices.azure.com; nothing about your project is sent. Each file goes to the cache, cloud-prices in jui viz's state folder (~/.local/state/jui-viz); a file that fails keeps its last copy. Then the index is printed. Exits 1 only when every file failed. In 2.3.12 nothing a user sees prices with the cache yet.",
+        "ja": "インフラのコストのシミュレーターに使うクラウドの単価を、今取る（2.3.12 から）。日に 1 回の取得をオフにしていても取る。AWS の公開のオファーのファイル（Lambda、ECS / Fargate、S3、DynamoDB、API Gateway、SQS、SNS、ELB、EKS、Secrets Manager、CloudWatch Logs、Kinesis、データ転送、ElastiCache と、global の CloudFront）と、Azure Retail Prices の API から、既定では ap-northeast-1・us-east-1 と japaneast・eastus の分を取る。通信は pricing.us-east-1.amazonaws.com と prices.azure.com への https だけで、プロジェクトのことは何も送らない。ファイルは jui viz の状態フォルダ（~/.local/state/jui-viz）の cloud-prices に置き、取れなかったファイルは前の物を残す。最後に索引を出す。全部のファイルが失敗したときだけ 1 で終わる。2.3.12 では、このキャッシュで値段を出す画面やコマンドはまだ無い。"
+      },
+      "options": [
+        {
+          "name": "--provider",
+          "type": "choice",
+          "default": "none",
+          "description": {
+            "en": "Only this provider (aws or azure).",
+            "ja": "このプロバイダーだけ（aws か azure）。"
+          }
+        },
+        {
+          "name": "--region",
+          "type": "string",
+          "default": "none",
+          "description": {
+            "en": "Only this region (global: CloudFront).",
+            "ja": "このリージョンだけ（global は CloudFront）。"
+          }
+        },
+        {
+          "name": "--large",
+          "type": "string",
+          "default": "none",
+          "description": {
+            "en": "Also these large offers this time, comma-separated: ec2 (a CSV of about 290 MB) and rds (about 30 MB). Anything else is refused.",
+            "ja": "今回だけ大きなオファーも取る。カンマ区切りで ec2（約 290 MB の CSV）と rds（約 30 MB）。ほかの値は断る。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Machine-readable index of the cache (lastRunAt, lastOkAt, each file and its error, the count that failed).",
+            "ja": "キャッシュの索引を機械可読で出す（lastRunAt、lastOkAt、ファイルごとの状態と失敗、失敗した数）。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz cloud-prices fetch --provider aws --region ap-northeast-1"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz cloud-prices status",
+        "jui viz cloud-prices on",
+        "jui viz cloud-prices off"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.12",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "2566379db73946ade4659f6f37e4e3255828166b14bc21f941a323bf848f08ad",
+        "cardHash": "7ec462891176b189356c1a6b7e52b500c931406cc3d362d97d76ede0ba34585a",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "9fc93c3ed264",
+          "synopsis": "6295a6475046",
+          "purpose": "289838b4bdc1",
+          "options": "e49bbff6dc59",
+          "examples": "dfb011f8afca",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "c576f5ce06e3"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz cloud-prices status",
+      "synopsis": "jui viz cloud-prices [status] [--json]",
+      "purpose": {
+        "en": "Show the cloud price cache (from 2.3.12): its folder, then each file with its rows, when it was fetched (まだ取れていない until it is) and its effective date, and why it failed. status is what jui viz cloud-prices does with no action.",
+        "ja": "クラウドの単価のキャッシュを表示する（2.3.12 から）。フォルダと、ファイルごとの行数、取れた時刻（まだなら「まだ取れていない」）、effective の日付、失敗の理由を出す。jui viz cloud-prices を何も付けずに走らせると status になる。"
+      },
+      "options": [
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Machine-readable index of the cache (lastRunAt, lastOkAt, each file and its error, the count that failed).",
+            "ja": "キャッシュの索引を機械可読で出す（lastRunAt、lastOkAt、ファイルごとの状態と失敗、失敗した数）。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz cloud-prices"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz cloud-prices fetch",
+        "jui viz cloud-prices on",
+        "jui viz cloud-prices off"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.12",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "d991547be9d460b3ed825d0c370cdf62fb0058410d0f94e60a61070500479bb5",
+        "cardHash": "6dbf995a5ea4b53fe1ca4c8d6d070b81a553c3c432ada3431a593a06d9ebe953",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "415b3d872763",
+          "synopsis": "da2f30e3db76",
+          "purpose": "a07aa878df02",
+          "options": "9089fd7af8e5",
+          "examples": "512a2c6f8808",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "180fbe5687a0"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz cloud-prices on",
+      "synopsis": "jui viz cloud-prices on",
+      "purpose": {
+        "en": "Turn the daily cloud price fetch on (from 2.3.12; it is on by default). A running jui viz server fetches 10 minutes after it starts and then once a day, and retries in an hour when a run cannot start. The setting is cloudPrices.on in config.json in jui viz's state folder, not jui.config.json; a running server takes it at its next start.",
+        "ja": "クラウドの単価の日に 1 回の取得をオンにする（2.3.12 から。既定でオン）。動いている jui viz のサーバーは、起動の 10 分後に取り、その後は日に 1 回取る。走らせられなかったときは 1 時間後にもう一度試す。設定は jui viz の状態フォルダの config.json の cloudPrices.on で、jui.config.json ではない。動いているサーバーは次の起動から使う。"
+      },
+      "options": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz cloud-prices on"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz cloud-prices fetch",
+        "jui viz cloud-prices status",
+        "jui viz cloud-prices off"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.12",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "17bfdc677d0ed60629e845f0166a53953b7eb63fdccc993136269565496fabd1",
+        "cardHash": "caf3b23e2a91cdabd805d0ecfc17934d429065b68ea3b8d518532cfac5d28c3c",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "85762e92f4f3",
+          "synopsis": "8b00470bcd43",
+          "purpose": "1985acabfa2f",
+          "options": "357b9e47f539",
+          "examples": "53f93f690d82",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "80e1a4f94268"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz cloud-prices off",
+      "synopsis": "jui viz cloud-prices off",
+      "purpose": {
+        "en": "Turn the daily cloud price fetch off (from 2.3.12): jui viz then makes no request for prices on its own; jui viz cloud-prices fetch still fetches when you run it. Writes cloudPrices.on false in config.json in jui viz's state folder; a running server takes it at its next start, and jui viz doctor says off.",
+        "ja": "クラウドの単価の日に 1 回の取得をオフにする（2.3.12 から）。jui viz は単価のための通信を自分からはしなくなる。jui viz cloud-prices fetch は、走らせれば取る。jui viz の状態フォルダの config.json に cloudPrices.on を false で書き、動いているサーバーは次の起動から使う。jui viz doctor はオフと出す。"
+      },
+      "options": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz cloud-prices off"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz cloud-prices fetch",
+        "jui viz cloud-prices status",
+        "jui viz cloud-prices on"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.12",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "fbbe2cfe2ac701786af61167e1790b459e1b08ea26ca0cdfc1e730f214e07c0e",
+        "cardHash": "8d0fe7c046d8661485cfaa4d93286a40cee8edc02dd9bec7497ff6987fc7474b",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "aaa0dbb49165",
+          "synopsis": "f84d37ea4ffe",
+          "purpose": "59377f574c75",
+          "options": "357b9e47f539",
+          "examples": "66fd09cb5b1a",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "3cf3a2d257c7"
+        }
+      }
+    },
+    {
+      "binary": "jui",
       "command": "viz export-demo",
-      "synopsis": "jui viz export-demo --out OUT",
+      "synopsis": "jui viz export-demo --out OUT [--lang {en,ja}]",
       "purpose": {
         "en": "Write the jui viz demo page as a static folder for a documentation site: the page with its built-in demo data, no server, no token, relative paths. Open it from a static server or a site, not from file://.",
         "ja": "jui viz のデモのページを、ドキュメントサイト向けの静的なフォルダとして書き出す。組み込みのデモデータで動き、サーバーもトークンも使わず、パスは相対。file:// ではなく、静的なサーバーかサイトの中で開く。"
@@ -3172,6 +3375,15 @@
             "ja": "空のフォルダ、またはまだ無いパス。"
           },
           "required": true
+        },
+        {
+          "name": "--lang",
+          "type": "choice",
+          "default": "the view's default (ja in 2.3.12)",
+          "description": {
+            "en": "The language of the page's words (from 2.3.12). Only the words already in the table change; in 2.3.12 that is the robots' status badges and the test board's empty lines, and the rest stays Japanese.",
+            "ja": "ページの言葉の言語（2.3.12 から）。変わるのは表に入った言葉だけで、2.3.12 ではロボットの状態の札とテストのボードの空の行だけ。ほかは日本語のまま。"
+          }
         }
       ],
       "examples": [
@@ -3185,17 +3397,17 @@
         "jui viz serve"
       ],
       "verifiedAgainst": {
-        "version": "2.0.0",
+        "version": "2.3.12",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "138e0b1ef6313ca6c4e6be33eefa7188bffb4be54d0408e0a21d3358bab739d4",
-        "cardHash": "1ec905c09d8ad362ca6226dda706d6636ba0006b0bc71593f40906c4737f8501",
+        "helpHash": "c4919a9f3783348a5b51ce5c0f92555740378af416b94cb34003717dfcee8668",
+        "cardHash": "6f2a0e0d6b6fbc1772dbcd848a037cecd045ce0fab56757a9657721a1ae89c0b",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "0afa27e63838",
-          "synopsis": "ab15803e2346",
+          "synopsis": "a1298af1ec86",
           "purpose": "10c198430d7b",
-          "options": "e1e1df250b6a",
+          "options": "331745dfad25",
           "examples": "505e087aaf1e",
           "aliases": "98edafdd23a8",
           "seeAlso": "396adac8840a"

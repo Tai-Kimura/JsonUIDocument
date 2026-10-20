@@ -59,6 +59,31 @@
         "type": "String",
         "initial": "light",
         "description": "Mirror of ColorManager.currentMode. Drives the TopBar's theme-toggle icon (sun when the current mode is 'light', moon when 'dark'). Seeded from ColorManager at construction and re-synced via ColorManager.subscribe() whenever the mode changes (manual toggle or prefers-color-scheme media query)."
+      },
+      {
+        "name": "onToggleSection",
+        "type": "(() -> Void)?",
+        "description": "Bound by the Sidebar section headers: folds or unfolds one nav section (the handler behind it is the ViewModel method of the same name)."
+      },
+      {
+        "name": "onToggleMobileMenu",
+        "type": "(() -> Void)?",
+        "description": "Bound by the header hamburger: opens or closes the mobile nav drawer."
+      },
+      {
+        "name": "onToggleLanguage",
+        "type": "(() -> Void)?",
+        "description": "Bound by the header language toggle: switches between English and Japanese."
+      },
+      {
+        "name": "onToggleColorMode",
+        "type": "(() -> Void)?",
+        "description": "Bound by the header theme toggle: switches between the light and dark color modes."
+      },
+      {
+        "name": "onLinkTap",
+        "type": "(() -> Void)?",
+        "description": "Bound by every nav row: closes the mobile nav drawer when it is open (the row's link does the navigation)."
       }
     ],
     "eventHandlers": [

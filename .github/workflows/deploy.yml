@@ -37,7 +37,7 @@ env:
   # Bump procedure: pick the new jsonui-cli main SHA, replace this value, and
   # review the regenerated reference pages in that deploy — the SHA bump is
   # the review point for reference updates.
-  JSONUI_CLI_REF: a92b24d6ab0a6a5a5c6c57179d22a13d7ce0cba0 # v2.3.11
+  JSONUI_CLI_REF: 21f07c072c31ee9f597f4aa8bf9b68acffa9eb09 # v2.3.12
   # Two releases were skipped on the way here. v1.8.6's `jui build` crashed on
   # `from ..core.version import toolchain_version` (the module is at
   # jui_cli/version.py, not under core/), and v1.8.8 was withdrawn upstream for
@@ -177,16 +177,19 @@ jobs:
           }
           JUI="python3 $JSONUI_CLI_PATH/jui_tools/bin/jui"
           run_gate lint-strings           $JUI lint-strings
-          # This gate verifies NOTHING in this repository, and said so only once
-          # the CLI learned to name its denominator (jsonui-cli 1.8.5): every
-          # screen here has a hand-authored layout, so verify skips all of them
-          # and exits 0 over an empty comparison. Kept, because it costs one run
-          # and would speak the moment a generated layout appears — but the
-          # scope line is printed next to it so that "exit=0" is never read as
-          # "checked something".
+          # Every screen here has a hand-authored layout, so the generated-layout
+          # comparison skips all of them ("verified 0 of 2"). Until jsonui-cli
+          # 2.3.12 that was the whole gate: an exit 0 over an empty comparison.
+          # From 2.3.12 verify also holds an externally authored layout to its
+          # spec (every binding and data entry declared in what goes into the
+          # data section), and jui.config.json's "verify": {"external": "gate"}
+          # makes --fail-on-diff count those findings. Both scope lines are
+          # printed so that "exit=0" is read against what was checked.
           run_gate verify-fail-on-diff    $JUI verify --fail-on-diff
-          verify_scope=$($JUI verify 2>/dev/null | sed -n 's/.*\*\*\(verified [0-9]* of [0-9]* screen(s)\)\*\*.*/\1/p' | head -1)
-          echo "GATE verify-fail-on-diff: scope=${verify_scope:-could not read the denominator}"
+          verify_out=$($JUI verify 2>/dev/null)
+          verify_scope=$(printf '%s\n' "$verify_out" | sed -n 's/.*\*\*\(verified [0-9]* of [0-9]* screen(s)\)\*\*.*/\1/p' | head -1)
+          verify_external=$(printf '%s\n' "$verify_out" | sed -n 's/.*\*\*checked against the spec.s declarations: \([0-9]* of [0-9]*\) externally authored layout(s)\*\* — \([0-9]*\) finding.*/\1 external, \2 finding(s)/p' | head -1)
+          echo "GATE verify-fail-on-diff: scope=${verify_scope:-could not read the denominator}; ${verify_external:-could not read the external line}"
           run_gate validate-strings       npm --prefix jsonui-doc-web run validate:strings
           run_gate tsc-noEmit             npx --prefix jsonui-doc-web tsc --noEmit \
                                             --project jsonui-doc-web/tsconfig.json

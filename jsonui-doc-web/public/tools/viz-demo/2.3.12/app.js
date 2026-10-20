@@ -1,3 +1,27 @@
+// ---- web/js/05-i18n.js ----
+/* The view's words (viz/i18n.py). The server writes the merged table into index.html — English, the configured
+   language over it, the person's own words over that — and tl() reads it. A value is words with {name} slots, or
+   {one, other, …} for words that change with a count (params.n picks the form, Intl.PluralRules). A key the table
+   does not have comes back as itself: the gate (tests/test_viz_i18n.py) keeps such keys out of the source. */
+const I18N = (() => {
+  try {
+    const data = JSON.parse(document.getElementById('jui-viz-strings').textContent);
+    if (data && typeof data.strings === 'object') return data;
+  } catch (err) { /* a page without the server's words (debug.html): English keys as they are */ }
+  return { language: 'en', locale: 'en-US', strings: {} };
+})();
+const LOCALE = I18N.locale || 'en-US';
+const PLURAL = new Intl.PluralRules(LOCALE);
+function tl(key, params) {
+  let v = I18N.strings[key];
+  if (v === undefined) return key;
+  const p = params || {};
+  if (typeof v === 'object') v = v[PLURAL.select(Number(p.n))] ?? v.other ?? key;
+  return v.replace(/\{(\w+)\}/g, (m, name) => (name in p ? String(p[name]) : m));
+}
+/* Times and counts in the language's own form */
+const fmtTime = (d, opts) => new Date(d).toLocaleTimeString(LOCALE, opts);
+const fmtNum = (n, opts) => Number(n).toLocaleString(LOCALE, opts);
 // ---- web/js/10-robot-core.js ----
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -2311,6 +2335,7 @@ const SOURCE = {
   historyImage() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
   historyFile() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
   attachImage() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
+  revealFile() { return Promise.resolve({ ok: false, status: 0, error: 'デモでは開かない' }); },
   attachFile() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
   attachRemove() {},
   denial() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
@@ -4477,12 +4502,18 @@ function liveSoloSync() {
    disposed as soon as it is not (back to the floor, the building, an 11th robot). The floor's own material is swapped
    for a toon material with a canvas plank texture (512 px, repeated; no image, no light, no shadow) and put back.
    2.3.3 (requester, 10-19): a glass smoking booth and a vending machine come with them, on the same rule (the one-room
-   view, PROPS.max robots or fewer); robots on a break walk to them (BRK below). Where the three stand: propsPlace. */
+   view, PROPS.max robots or fewer); robots on a break walk to them (BRK below). Where the three stand: propsPlace.
+   Two sets since 2.3.10 (requester, 10-20: 「遊び以外の意味があるオブジェクト（シュレッダー、呼び鈴、段ボール箱など）は残す
+   ように」, docs/bugs/2026-10-20-jui-viz-functional-props-gone-in-a-crowded-room.md): the things with a use (the
+   shredder, the git box's desk, the call bell, the data server's rack, the server room's door) in PROPS.group, in the
+   one-room view whatever the number of robots (PROPS.room is their room); the looks (the wooden floor, the water
+   server, the vacuum, the booth and the machine, with the breaks) in PROPS.funGroup, only with PROPS.max robots or
+   fewer (PROPS.fun). Robots coming and going across PROPS.max build and drop the looks only. */
 const PROPS = { max: 10, room: null, geo: null, dark: null, group: null, server: null, vac: null, woodMat: null, woodTex: null, floorMat: null,
   boxes: [], boxesAt: 0, rng: null, seed: 20261020, speed: 0.45, radius: 0.64, serverScale: 1.9,   // the robots' scale (they stand about 1 m)
-  place: null, booth: null, vend: null, fan: null, smoke: [], shredder: null, bits: [], gitDesk: null, gitFill: null, bell: null, dataServer: null, serverDoor: null };
+  place: null, booth: null, vend: null, fan: null, smoke: [], shredder: null, bits: [], gitDesk: null, gitFill: null, bell: null, dataServer: null, serverDoor: null, fun: false, funGroup: null };
 const PROPS_EMPTY = { room: null, geo: null, dark: null, group: null, server: null, vac: null, woodMat: null, woodTex: null, floorMat: null, boxes: [], boxesAt: 0,
-  place: null, booth: null, vend: null, fan: null, smoke: [], shredder: null, bits: [], gitDesk: null, gitFill: null, bell: null, dataServer: null, serverDoor: null };
+  place: null, booth: null, vend: null, fan: null, smoke: [], shredder: null, bits: [], gitDesk: null, gitFill: null, bell: null, dataServer: null, serverDoor: null, fun: false, funGroup: null };
 function woodTexture(dark) {
   const N = 512, cv = makeCanvas(N, N), ctx = cv.getContext('2d'), W = { rng: snackRandom(PROPS.seed) };   // the same planks every time
   const base = dark ? [92, 72, 55] : [214, 184, 146], rows = 8, h = N / rows;
@@ -4504,30 +4535,53 @@ function woodTexture(dark) {
   const t = texFrom(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping;
   return t;
 }
+// the room the things with a use stand in: the one-room view's
 function propsWanted() {
   const solo = liveSolo();
-  if (!solo || !has3D || TOWER.on || !LIVE3D.rooms[solo]) return null;
-  return robots.filter((R) => R.def.room === solo).length <= PROPS.max ? solo : null;
+  return !solo || !has3D || TOWER.on || !LIVE3D.rooms[solo] ? null : solo;
+}
+// the looks as well: PROPS.max robots or fewer in that room
+function funWanted() {
+  const id = propsWanted();
+  return !!id && robots.filter((R) => R.def.room === id).length <= PROPS.max;
 }
 function propsClear() {
   if (!PROPS.room) return;
+  funClear();
   for (const Q of robots) if (Q.shred) shredStop(Q);   // an errand to a shredder that is going away ends here
-  const R = LIVE3D.rooms[PROPS.room];
-  if (R && PROPS.floorMat && R.floor.material === PROPS.woodMat) R.floor.material = PROPS.floorMat;
   if (PROPS.group) { scene.remove(PROPS.group); disposeTree(PROPS.group); }
-  if (PROPS.woodMat) PROPS.woodMat.dispose();
-  if (PROPS.woodTex) PROPS.woodTex.dispose();
   if (PROPS.shredder) { PROPS.shredder.bit.geo.dispose(); PROPS.shredder.bit.mat.dispose(); }   // shared by bits that may all be gone
   Object.assign(PROPS, PROPS_EMPTY, { boxes: [], smoke: [], bits: [] });
+}
+// the looks go (an 11th robot, or with the rest): the floor's own material back; a break ends in brkTick ('props')
+function funClear() {
+  if (!PROPS.fun) return;
+  const R = LIVE3D.rooms[PROPS.room];
+  if (R && PROPS.floorMat && R.floor.material === PROPS.woodMat) R.floor.material = PROPS.floorMat;
+  if (PROPS.funGroup) { scene.remove(PROPS.funGroup); disposeTree(PROPS.funGroup); }
+  if (PROPS.woodMat) PROPS.woodMat.dispose();
+  if (PROPS.woodTex) PROPS.woodTex.dispose();
+  Object.assign(PROPS, { fun: false, funGroup: null, woodMat: null, woodTex: null, floorMat: null, server: null, vac: null, booth: null, vend: null, fan: null, smoke: [] });
 }
 function propsBuild(id) {
   const r = PROJECT[id], R = LIVE3D.rooms[id], g = new THREE.Group();
   PROPS.room = id; PROPS.geo = R.geo; PROPS.dark = isDark(); PROPS.group = g; PROPS.rng = snackRandom(PROPS.seed);
+  const P = PROPS.place = propsPlace(r);
+  PROPS.shredder = shredderBuild(r, g);
+  gitDeskBuild(id, g);   // the cardboard box on its desk (2.3.4)
+  PROPS.bell = bellBuild(P.callButton); g.add(PROPS.bell);   // the call bell (2.3.5)
+  if (dataServerWanted(id)) PROPS.dataServer = dataServerBuild(P.dataServer, g);   // the rack (2.3.5)
+  if (serverDoorWanted(id)) PROPS.serverDoor = serverDoorBuild(P.serverDoor, g);   // the server room's door
+  propsBoxes(0, true);
+  scene.add(g);
+}
+function funBuild() {
+  const id = PROPS.room, r = PROJECT[id], R = LIVE3D.rooms[id], g = new THREE.Group(), P = PROPS.place;
+  PROPS.fun = true; PROPS.funGroup = g;
   // the floor: the same mesh, a wooden material while the room is up close
   PROPS.woodTex = woodTexture(PROPS.dark); PROPS.woodTex.repeat.set((r.x1 - r.x0) / 2.4, (r.z1 - r.z0) / 2.4);
   PROPS.woodMat = toon('#ffffff', { map: PROPS.woodTex }); PROPS.floorMat = R.floor.material; R.floor.material = PROPS.woodMat;
   // the water server: the back-right corner (propsPlace), in sight from the usual view
-  const P = PROPS.place = propsPlace(r);
   const sv = new THREE.Group(), body = toon('#eef1f4'), dark = toon('#5b6573');
   const cab = new THREE.Mesh(new RoundedBoxGeometry(0.42, 0.95, 0.38, 2, 0.04), body); cab.position.y = 0.475; sv.add(cab);
   const panel = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.22, 0.02), dark); panel.position.set(0, 0.72, 0.2); sv.add(panel);
@@ -4548,11 +4602,6 @@ function propsBuild(id) {
   const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.04, 12, 8), toon('#52e08a')); lamp.position.set(0, 0.145, PROPS.radius * 0.5); vac.add(lamp);
   vac.userData.heading = PROPS.rng() * Math.PI * 2;
   g.add(vac); PROPS.vac = vac;
-  PROPS.shredder = shredderBuild(r, g);
-  gitDeskBuild(id, g);   // the cardboard box on its desk (2.3.4)
-  PROPS.bell = bellBuild(P.callButton); g.add(PROPS.bell);   // the call bell (2.3.5)
-  if (dataServerWanted(id)) PROPS.dataServer = dataServerBuild(P.dataServer, g);   // the rack (2.3.5)
-  if (serverDoorWanted(id)) PROPS.serverDoor = serverDoorBuild(P.serverDoor, g);   // the server room's door
   propsBoxes(0, true);
   const start = propsSpot();
   vac.position.set(start[0], 0, start[1]);
@@ -4573,6 +4622,7 @@ function propsBoxes(nowSec, force) {
   if (PROPS.shredder) PROPS.boxes.push(PROPS.shredder.box);
   if (PROPS.dataServer) PROPS.boxes.push(PROPS.place.dataServer.rect);
   if (PROPS.serverDoor) PROPS.boxes.push(PROPS.place.serverDoor.rect);   // the floor in front of the server room's door
+  if (!PROPS.fun) return;   // the boxes are the vacuum's, which comes with the looks
   const s = PROPS.server.position;
   const half = 0.42 * PROPS.serverScale;
   PROPS.boxes.push([s.x - half, s.x + half, s.z - half, s.z + half]);
@@ -4792,10 +4842,13 @@ function propsTick(nowSec, dt) {
   if (PROPS.room && (want !== PROPS.room || LIVE3D.rooms[PROPS.room].geo !== PROPS.geo || isDark() !== PROPS.dark || dataServerWanted(PROPS.room) !== !!PROPS.dataServer || serverDoorWanted(PROPS.room) !== !!PROPS.serverDoor)) propsClear();
   if (!want) return;
   if (!PROPS.room) propsBuild(want);
+  const fun = funWanted();   // across PROPS.max: the looks only; the things with a use stay as they are
+  if (PROPS.fun && !fun) funClear();
+  else if (!PROPS.fun && fun) funBuild();
   propsBoxes(nowSec, false);
   dataServerTick(nowSec);
   serverDoorTick(nowSec);
-  if (reduceMotion) return;   // placed, not driven
+  if (reduceMotion || !PROPS.fun) return;   // placed, not driven
   const v = PROPS.vac, p = v.position;
   if (!propsClearAt(p.x, p.z)) { const s = propsSpot(); p.set(s[0], 0, s[1]); return; }   // a robot sat down on it: start elsewhere
   const step = PROPS.speed * Math.min(dt, 0.1), h = v.userData.heading;
@@ -4980,7 +5033,7 @@ function brkTick(nowSec, now) {
     const B = R.brk;
     if (!B) continue;
     const st = robotState[R.def.id] || { state: 'idle' }, rm = PROJECT[B.room];
-    const reason = playStopReason(R, st, B.room, B.since) || (!rm || !rm.shown || rectOf(rm) !== B.rect ? 'relaid' : null) || (PROPS.room !== B.room ? 'props' : null)
+    const reason = playStopReason(R, st, B.room, B.since) || (!rm || !rm.shown || rectOf(rm) !== B.rect ? 'relaid' : null) || (PROPS.room !== B.room || !PROPS.fun ? 'props' : null)
       || (B.phase === 'going' && nowSec >= B.walkUntil ? 'walk too long' : null) || (B.t0 && nowSec >= B.until ? 'done' : null);
     if (reason) { brkStop(R, reason, nowSec); continue; }
     brkClock(R, nowSec);
@@ -4989,7 +5042,7 @@ function brkTick(nowSec, now) {
   if (reduceMotion || nowSec < BRK.next) return;
   const n = rollsDue(BRK, nowSec);
   const room = PROPS.room;
-  if (!room || !PROPS.place || robots.some((R) => R.def.room === room && R.def.standing)) return;
+  if (!room || !PROPS.fun || robots.some((R) => R.def.room === room && R.def.standing)) return;
   const here = robots.filter((R) => R.def.room === room);
   for (const R of here) {
     const st = robotState[R.def.id];
@@ -5051,7 +5104,7 @@ const SHRED = { w: 0.8, d: 0.55, h: 1.1, bitsMax: 24, feedSec: 1.2, bitsSec: 2.0
 // and the git box's desk; 2.3.4)
 /* ---------- the data server (requester, 10-19; 2.3.5): a rack for a JsonUI room's API and DB specifications ----------
    「dbとapiのファイルがある場合は部屋にデータサーバーっぽいもの置いてそれクリックでDB仕様書とAPI仕様書みれるようにしてほしい」.
-   With the room's other props (the one-room view, PROPS.max robots or fewer), only in a room whose docs/api or docs/db
+   With the room's things with a use (the one-room view, however many robots; 2.3.10), only in a room whose docs/api or docs/db
    hold a specification (PROJECT[id].dataDocs, counted by the server: data_docs.counts); it comes and goes with them.
    Against the back wall, DATASRV.fromLeft from the room's left edge: right of the call button's stand (the author, 2.3.5),
    left of the shredder and its feeder in the smallest room. No robot walks to it. Pressed (liveHit: kind 'data'), the
@@ -6094,6 +6147,35 @@ function placeTag(el, p) {
    robot showing じゃんけん lifts its tag clear of the hand. Cost per frame: TAGS.stats (the e2e reads it). */
 const TAGS = { gap: 3, ease: 0.35, measureMs: 500, maxPasses: 12, rpsLift: 0.55, stats: { n: 0, sumMs: 0, maxMs: 0, frames: 0 } };
 const tagNdc = new THREE.Vector3();
+/* A tag over a thing to press (2.3.10, ticket 2026-10-20-jui-viz-robot-tag-covers-a-fixture-in-a-crowded-room, the
+   ruling of 10-20, after the requester's 2.3.9 choice that the bell and the rack are pressed even behind a robot's
+   desk): while a robot's tag (or its bill) crosses the call bell, the data server's rack or the server room's door on
+   the page, it lets the press through to the canvas (liveFirstHit then takes the thing) and is drawn faint, its name
+   still readable (.over-fixture, app.css). The wait's bubble (53-waits.js) goes by its own box the same way. A tag
+   over nothing to press selects its robot as before (2.3.7). */
+const tagFixBox = new THREE.Box3(), tagFixV = new THREE.Vector3();
+function tagFixtureRects(W, H) {
+  const objs = [];
+  if (SOURCE.mode === 'live' && PROPS.bell && PROPS.room === liveSolo()) objs.push(PROPS.bell);   // as liveTargets
+  if (PROPS.dataServer) objs.push(PROPS.dataServer.group);
+  const at = srDoorNow();
+  if (at) objs.push(at.D.root, at.D.pad);
+  const out = [];
+  for (const o of objs) {
+    if (!o || !o.visible) continue;
+    if (!o.userData.tagBox) { o.updateMatrixWorld(true); o.userData.tagBox = new THREE.Box3().setFromObject(o); }   // they never move
+    const b = o.userData.tagBox;
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, behind = false;
+    for (let k = 0; k < 8; k++) {
+      tagFixV.set(k & 1 ? b.max.x : b.min.x, k & 2 ? b.max.y : b.min.y, k & 4 ? b.max.z : b.min.z).project(camera);
+      if (tagFixV.z > 1 || tagFixV.z < -1) { behind = true; break; }
+      const x = ((tagFixV.x + 1) / 2) * W, y = ((1 - tagFixV.y) / 2) * H;
+      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+    }
+    if (!behind) out.push([x0, x1, y0, y1]);
+  }
+  return out;
+}
 function placeRobotTags(dt = 1 / 60) {
   const ease = 1 - Math.pow(1 - TAGS.ease, dt * 60);   // TAGS.ease of the way each 1/60 s, in real time (it was per frame)
   const t0 = performance.now(), W = canvas.clientWidth, H = canvas.clientHeight, list = [];
@@ -6129,6 +6211,7 @@ function placeRobotTags(dt = 1 / 60) {
     it.target = it.y - bottom;
     it.front = placed.length;   // 1 = the nearest: its tag (and bill) is drawn over, and takes the click from, any farther one
   }
+  const fix = tagFixtureRects(W, H);
   for (const it of list) {   // the writes
     const el = it.R.tag;
     if (it.hidden) { el.style.visibility = 'hidden'; it.R.tagDy = 0; if (it.R.bill) it.R.bill.style.visibility = 'hidden'; if (it.R.waitEl) it.R.waitEl.style.visibility = 'hidden'; continue; }
@@ -6141,6 +6224,13 @@ function placeRobotTags(dt = 1 / 60) {
     it.R.tagDy = Math.abs(dy - it.target) < 0.5 ? it.target : dy;
     it.R.tagTarget = it.target;   // where the tag is going (the e2e reads a tag once tagDy has reached it: the settle hook of 80-dbg.js)
     el.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - it.R.tagDy).toFixed(1)}px) translate(-50%, -100%)`;
+    {   // over a thing to press: the tag and its bill let the press through (tagFixtureRects)
+      const b = it.bill ? it.R.billSize : null, w = Math.max(it.R.tagSize.w, b ? b.w : 0), h = it.R.tagSize.h + (b ? b.h + BILL.gap + BILL.rise : 0);
+      const x0 = it.x - w / 2, x1 = it.x + w / 2, y1 = it.y - it.R.tagDy, y0 = y1 - h;
+      const over = fix.some((f) => x0 < f[1] && f[0] < x1 && y0 < f[3] && f[2] < y1);
+      if (el.classList.contains('over-fixture') !== over) el.classList.toggle('over-fixture', over);
+      if (it.R.bill && it.R.bill.classList.contains('over-fixture') !== over) it.R.bill.classList.toggle('over-fixture', over);
+    }
     if (it.bill) {   // its bottom just above the tag; it rises inside the room the box kept for it (BILL.rise)
       it.bill.style.visibility = 'visible';
       it.bill.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - it.R.tagDy - it.R.tagSize.h - BILL.gap).toFixed(1)}px) translate(-50%, -100%)`;
@@ -6149,6 +6239,12 @@ function placeRobotTags(dt = 1 / 60) {
       const above = it.R.tagSize.h + (it.bill ? it.R.billSize.h + BILL.gap + BILL.rise : 0) + BILL.gap;
       it.wait.style.visibility = 'visible';
       it.wait.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - it.R.tagDy - above).toFixed(1)}px) translate(-50%, -100%)`;
+      // the bubble by its own box (tagFixtureRects): over a thing to press, it lets the press through and is faint as
+      // the tag is; over nothing to press it stays as it is, though the tag under it be faint (a wait is not dimmed
+      // for a thing it does not cover)
+      const ww = it.R.waitSize.w, wy1 = it.y - it.R.tagDy - above, wy0 = wy1 - it.R.waitSize.h;
+      const wover = fix.some((f) => it.x - ww / 2 < f[1] && f[0] < it.x + ww / 2 && wy0 < f[3] && f[2] < wy1);
+      if (it.wait.classList.contains('over-fixture') !== wover) it.wait.classList.toggle('over-fixture', wover);
     } else if (it.R.waitEl) it.R.waitEl.style.visibility = 'hidden';
   }
   const ms = performance.now() - t0, S0 = TAGS.stats;
@@ -6238,16 +6334,21 @@ const setText = (el, text) => { if (el && el.textContent !== text) el.textConten
 /* The legend of heavy work's three looks (2.3.6), under the card's 重い作業 line. */
 const HEAVY_LEGEND = '見た目: 赤い顔＝出力が多い · 青い顔＝ツールが長く走っている · 笛＝サブエージェント 3 体以上（重なると交互） · 裏で作業中でも、サブエージェント 3 体以上なら笛（ヘッドセットを外す）';
 const STATUS_CLASS = { idle: 'st-idle', write: 'st-write', written: 'st-idle', impl: 'st-impl', verify: 'st-verify', 'impl-done': 'st-idle', paused: 'st-paused', test: 'st-test', done: 'st-complete' };
-function robotBadge(id) {
+/* A robot's badge: [its class, its words]. The kind (robotBadgeKind) is what the session's badge compares — never
+   the words, which follow the language. */
+const BADGES = {
+  waiting: ['st-waiting', 'status.waiting'], asking: ['st-asking', 'status.asking'], done: ['st-done', 'status.done'],
+  idle: ['st-idle', 'status.idle'], thinking: ['st-busy', 'status.thinking'], background: ['st-bg', 'status.background'],
+  busy: ['st-busy', 'status.busy'],
+};
+function robotBadgeKind(id) {
   const s = robotState[id].state;
   // a question waits for the person too, but it is no permission: its own badge and filter (requester, 10-18)
-  if (s === 'waiting') return robotState[id].asking ? ['st-asking', '質問に回答待ち'] : ['st-waiting', '許可待ち'];
-  if (s === 'done') return ['st-done', '完了'];
-  if (s === 'idle') return ['st-idle', '待機'];
-  if (s === 'thinking') return ['st-busy', '考え中'];
-  if (s === 'background') return ['st-bg', '裏で作業中'];
-  return ['st-busy', '作業中'];
+  if (s === 'waiting') return robotState[id].asking ? 'asking' : 'waiting';
+  return ['done', 'idle', 'thinking', 'background'].includes(s) ? s : 'busy';
 }
+const badgeOf = (kind) => [BADGES[kind][0], tl(BADGES[kind][1])];
+const robotBadge = (id) => badgeOf(robotBadgeKind(id));
 /* What the view is narrowed to: one project (or all), which sessions, how the session list is shown. */
 const prefJSON = (key, fallback) => { try { return JSON.parse(readPref(key, JSON.stringify(fallback))); } catch (err) { return fallback; } };
 const UI = {
@@ -6261,10 +6362,9 @@ if (!['all', 'active', 'waiting', 'asking', 'background', 'idle'].includes(UI.se
 const inScope = (project) => UI.project === 'all' || UI.project === project;
 const scopeLabel = () => (UI.project === 'all' ? 'すべて' : PROJECT[UI.project].name);
 function sessionBadge(s) {
-  const b = s.robots.map(robotBadge);
+  const kinds = new Set(s.robots.map(robotBadgeKind));
   // A session whose busy robots only think says 考え中, as its robot row does (they disagreed — 10-18 review).
-  return b.some((x) => x[0] === 'st-waiting') ? ['st-waiting', '許可待ち'] : b.some((x) => x[0] === 'st-asking') ? ['st-asking', '質問に回答待ち'] : b.some((x) => x[1] === '作業中') ? ['st-busy', '作業中']
-    : b.some((x) => x[1] === '考え中') ? ['st-busy', '考え中'] : b.some((x) => x[0] === 'st-bg') ? ['st-bg', '裏で作業中'] : ['st-idle', '待機'];
+  return badgeOf(['waiting', 'asking', 'busy', 'thinking', 'background'].find((k) => kinds.has(k)) || 'idle');
 }
 /* A robot on the whiteboards (10-19): its mark, and its session's name when it has one. */
 const robotWho = (id) => `${pill(id, DEF[id].role)}${DEF[id].title ? `<span class="who-name">${esc(DEF[id].title)}</span>` : ''}`;
@@ -6380,7 +6480,7 @@ function renderPanel(model) {
 
   const T = model.tests, n = CASES.length;
   const pPct = (T.passed / n) * 100, rPct = T.runningIdx >= 0 ? 100 / n : 0;
-  if (SOURCE.mode === 'live' && !T.rows.length && !T.command) setHTML($('tests'), `<p class="empty-note">${T.statusText === 'まだ無い' ? 'テストの実行はまだ無い' : esc(T.statusText)}</p>`);
+  if (SOURCE.mode === 'live' && !T.rows.length && !T.command) setHTML($('tests'), `<p class="empty-note">${T.none ? esc(tl('tests.none')) : esc(T.statusText)}</p>`);
   else if (SOURCE.mode === 'live') setHTML($('tests'), liveTestsHTML(T));
   else if (!inScope('shop')) setHTML($('tests'), `<p class="empty-note">${esc(scopeLabel())} で動いているテストはない</p>`);
   else setHTML($('tests'), `<div class="test-head"><div>${pill('a2', 'test')} <code>${esc(T.file)}</code></div><code>${esc(T.device)} · ${esc(T.statusText)}</code>
@@ -8815,6 +8915,116 @@ $('chip-input').addEventListener('click', () => {
   const d = ROBOT_DEFS.find((x) => waitKindOf(x.id) === 'input');
   if (d) waitOpen(d.id, 'input');
 });
+// ---- web/js/53-devices.js ----
+/* ---------- the デバイス button: this machine's load and the devices up (ticket 2026-10-20-jui-viz-device-panel-machine-
+   load-and-emulators). Requester: 「ヘッダのメニューにデバイスボタン用意してそれ押すとサイドのボードの位置くらいに全部出る 負荷に
+   応じてボタンの色合いが変わる」「デバイスの担当セッションわかる時はクリックでそのロボット選択状態にして欲しい 部屋の移動」.
+   Live only (the demo has no machine). The button's colour is the server's level (sources/machine.py: the worse of the
+   load over the cores and the free memory); the pane takes the side panel's place. Who uses a device is the server's
+   estimate (ingest.devices_slice), and the row says how it was told; a row whose robot is known goes to its room and
+   picks it, the robot pressed winning over the room's last picked one (LAST_ROBOT). Nothing here starts or stops a
+   device. ---------- */
+const devPane = $('dev-pane');
+const DEV = { opener: null };
+const DEV_LEVEL = { ok: '余裕あり', busy: '混んでいる', high: '高負荷' };
+const DEV_STATE = { booted: '起動中', device: '接続中', offline: 'オフライン', unauthorized: '未許可', recovery: 'リカバリー', sideload: 'サイドロード', bootloader: 'ブートローダー' };
+const DEV_KINDS = [['ios', 'iOS シミュレーター'], ['emulator', 'Android エミュレーター'], ['phone', 'Android 実機']];
+const devKind = (d) => (d.platform === 'ios' ? 'ios' : /^emulator-\d+$/.test(d.id) ? 'emulator' : 'phone');
+const devClock = (at) => new Date(at).toTimeString().slice(0, 5);
+function devData() {
+  const live = SOURCE.mode === 'live' && typeof LIVE !== 'undefined';
+  const m = live && LIVE.slices.machine && typeof LIVE.slices.machine === 'object' ? LIVE.slices.machine : null;
+  const devices = live && Array.isArray(LIVE.slices.devices) ? LIVE.slices.devices.filter((d) => d && typeof d.id === 'string') : [];
+  return { live, m, devices };
+}
+/* The robot a device's row goes to: still in a room (not gone, not walking out), else none. */
+function devRobot(d) {
+  const label = d.usedBy ? labelOf(d.usedBy.agentId) : null;
+  if (!label || !DEF[label] || !ROBOT_DEFS.some((x) => x.id === label) || LIVE.leaving[label]) return null;
+  return label;
+}
+function devWhoHTML(d, label) {
+  const u = d.usedBy;
+  if (!u) return '<span class="dev-who">使っている人: 不明（記録から分からない）</span>';
+  const how = u.how === 'test' ? 'テスト実行中（コマンドがこの機器を指定）'
+    : u.how === 'process' ? '推定（そのセッションの下のプロセスがこの機器を指定）'
+      : `推定（最後にこの機器を指定したコマンド ${devClock(u.at || 0)}）`;
+  const others = (u.others || []).map(labelOf).filter(Boolean);
+  const whoHTML = label ? `${pill(label, DEF[label].role)} ${esc(DEF[label].agent)}` : 'ロボットはもういない';
+  return `<span class="dev-who">使っている人: ${whoHTML}<span class="dev-guess">${esc(how)}</span>${others.length ? `<span class="dev-guess">ほかに ${esc(others.join('・'))}</span>` : ''}</span>`;
+}
+function devRowHTML(d) {
+  const label = devRobot(d);
+  const innerRowHTML = `<span class="dev-name">${esc(String(d.name || d.id))}</span><span class="dev-note">${esc(DEV_STATE[d.state] || String(d.state || ''))} · ${esc(d.id)}</span>${devWhoHTML(d, label)}`;
+  return label
+    ? `<li><button type="button" class="dev-row" data-dev-robot="${esc(label)}" data-dev-id="${esc(d.id)}" data-fk="dev-${esc(d.id)}" title="${esc(label)} の部屋へ移って選ぶ">${innerRowHTML}</button></li>`
+    : `<li><div class="dev-row" data-dev-id="${esc(d.id)}">${innerRowHTML}</div></li>`;
+}
+function devLoadHTML(m) {
+  if (!m) return '<div class="dev-load"><p>負荷はまだ届いていない</p></div>';
+  const load = Array.isArray(m.load) ? m.load : null, ratio = load && m.cpus ? (load[0] / m.cpus).toFixed(2) : null;
+  const gib = m.memTotal ? `${Math.round(m.memTotal / 2 ** 30)} GiB` : '';
+  return `<div class="dev-load" data-load="${esc(m.level || '')}" data-dev-load><p class="dev-level">${esc(DEV_LEVEL[m.level] || '不明')}</p>`
+    + `<p>load（1 / 5 / 15 分）${load ? esc(load.map((x) => x.toFixed(2)).join(' / ')) : '不明'}${m.cpus ? `（コア ${esc(String(m.cpus))}、混み具合 ${esc(String(ratio))}）` : ''}</p>`
+    + `<p>メモリの空き ${m.memFreePct != null ? `${esc(String(m.memFreePct))} %` : '不明'}${gib ? `（合計 ${esc(gib)}）` : ''}</p>`
+    + `<p class="dev-note">${esc(new Date(m.at || 0).toTimeString().slice(0, 8))} に測った · 色は 混み具合（load ÷ コア）0.7 / 1.0 と メモリの空き 25 % / 10 % の悪い方</p></div>`;
+}
+function renderDevices() {
+  const { live, m, devices } = devData();
+  const btn = $('btn-devices');
+  btn.hidden = !live;
+  if (!live) return;
+  const lvl = m && DEV_LEVEL[m.level] ? m.level : '';
+  if (btn.dataset.load !== lvl) btn.dataset.load = lvl;
+  setText(btn, devices.length ? `デバイス ${devices.length}` : 'デバイス');
+  const aria = `デバイス（負荷: ${DEV_LEVEL[lvl] || '不明'}、起動中の機器 ${devices.length} 台）`;
+  if (btn.getAttribute('aria-label') !== aria) btn.setAttribute('aria-label', aria);
+  if (devPane.hidden) return;
+  const rows = devices.map((d) => [d, devRobot(d)]);
+  keyed($('dev-body'), JSON.stringify([m, NAMES.rev, rows.map(([d, label]) => [d, label])]), () => {
+    const groupsHTML = DEV_KINDS.map(([kind, title]) => {
+      const mine = devices.filter((d) => devKind(d) === kind);
+      return `<section class="dev-group" data-dev-kind="${esc(kind)}"><h3>${esc(title)} ${mine.length} 台</h3>${mine.length ? `<ul class="dev-list">${mine.map((d) => devRowHTML(d)).join('')}</ul>` : ''}</section>`;
+    }).join('');
+    return `${devLoadHTML(m)}${groupsHTML}<p class="dev-note">使っている人は記録からの推定です（テストのコマンド、機器を指定したプロセスとそのセッション、最後に機器を指定したコマンドの順）。名前のある行を押すと、そのロボットの部屋へ移って選びます。ここから機器は止めません</p>`;
+  });
+}
+/* Under the header, however tall it wraps (a fixed top hid the header's own buttons, this one among them). */
+function devPlace() { devPane.style.top = `${Math.round(document.querySelector('.topbar').getBoundingClientRect().bottom)}px`; }
+function devOpen(opener) {
+  DEV.opener = opener || null;
+  devPlace();
+  devPane.hidden = false;
+  $('btn-devices').setAttribute('aria-expanded', 'true');
+  renderDevices();
+  $('dev-close').focus({ preventScroll: true });
+}
+function devClose(back = true) {
+  if (devPane.hidden) return;
+  devPane.hidden = true;
+  $('btn-devices').setAttribute('aria-expanded', 'false');
+  const to = DEV.opener; DEV.opener = null;
+  if (back && to && document.contains(to)) to.focus({ preventScroll: true });
+}
+/* A row with its robot: that robot's room, the robot picked. The room remembers it first, so the switch's own pick
+   (robotToPick) is this robot, not the one last picked there. */
+function devGoRobot(label, opener) {
+  const proj = projectOfRobot(label);
+  devClose(false);
+  if (proj) LAST_ROBOT.set(proj, label);
+  if (proj && PROJECT[proj] && UI.project !== proj) setProject(proj, { camera: false });
+  if (rbState.id !== label) openRobot(label, opener);
+}
+$('btn-devices').addEventListener('click', (e) => (devPane.hidden ? devOpen(e.currentTarget) : devClose()));
+$('dev-close').addEventListener('click', () => devClose());
+window.addEventListener('resize', () => { if (!devPane.hidden) devPlace(); });
+devPane.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); devClose(); } });
+devPane.addEventListener('click', (e) => {
+  const row = e.target.closest('[data-dev-robot]');
+  if (row) devGoRobot(row.dataset.devRobot, $('btn-devices'));
+});
+setInterval(renderDevices, 1000);   // the slices come every 5 s (load) and 10 s (devices); the button follows them
+renderDevices();
 // ---- web/js/54-bills.js ----
 /* ---------- the bill over a robot (2.3.6, ticket 2026-10-19-jui-viz-cost-bill-over-robot) ----------
    Each response's estimated cost (USD), over the robot that made it, with a banknote: the server prices it (prices.py:
@@ -9307,8 +9517,31 @@ function histItem(item) {
       const to = hNode('span', 'h-to'); to.append('→ ', histPeerName(item.to, item.toSession));
       title.splice(1, 1, to, hNode('span', 'h-head', item.summary || first));
     }
+    // the file a Read / Edit / Write / NotebookEdit names (2.3.12, the ruling of 10-21): its name as a link to Finder, in
+    // the head, so it is there with the row closed; a press on it is the link's own (the row does not toggle)
+    if (item.file && typeof item.file.name === 'string') {
+      const link = histFileLink({ tool: { off: item.file.off, id: item.id } }, item.file.name, 'h-head-file');
+      if (item.description) title.splice(1, 0, link); else title.splice(1, 1, link);   // no description: the name takes the input's first line's place
+    }
     if (item.error) title.push(hNode('span', 'h-err', 'エラー'));
     if (item.out === undefined) title.push(hNode('span', 'h-run', '結果待ち'));
+    // Pictures inside, seen with the row closed (2.3.12, requester 10-21: 「閉じてる時でも画像があるってわかるように」,
+    // ticket 2026-10-21-jui-viz-hist-tool-row-shows-no-image-when-closed): as the requester's own attachments show (a
+    // thumbnail that opens large), the first picture's small thumbnail and 画像 N. The thumbnail is a button: a press on
+    // it opens the large view (a button's press is its own, the row does not toggle); a press elsewhere on the row's
+    // head opens the row. It is read only when it comes into view, as every thumbnail. The other rows that hold
+    // pictures (the requester's, a channel's attachments) are never folded; a peer's message and the harness's text
+    // hold none.
+    const refs = [...(Array.isArray(item.imgs) ? item.imgs : []), ...(Array.isArray(item.sent) ? item.sent.filter((f) => f.image).map((f) => ({ sent: { off: f.off, n: f.n } })) : [])];
+    if (refs.length) {
+      const mini = histThumb(refs[0]);
+      mini.classList.add('h-thumb-mini');
+      const m = hNode('span', 'h-imgmark', `画像 ${refs.length}`); m.title = `画像 ${refs.length} 枚（行を開くと全部見える）`;
+      title.push(mini, m);
+    }
+    // and the files that are no picture (SendUserFile's), counted the same way: open the row for their names (2.3.12)
+    const files = Array.isArray(item.sent) ? item.sent.filter((f) => !f.image).length : 0;
+    if (files) { const m = hNode('span', 'h-imgmark h-filemark', `ファイル ${files}`); m.title = `ファイル ${files} 個（行を開くと名前が見えて、押すと Finder で開く）`; title.push(m); }
     // The time the tool was called (its tool_use record's), at the right end after the marks (2.3.7, requester 10-20:
     // 「このBashとかのタイトルの右端にその時の時刻表示できる？」); the description narrows first (.h-head), never the time.
     title.push(at);
@@ -9329,7 +9562,7 @@ function histItem(item) {
       const pics = sent.filter((f) => f.image), others = sent.filter((f) => !f.image);
       if (pics.length) { const row = hNode('div', 'h-imgs'); for (const f of pics) row.appendChild(histThumb({ sent: { off: f.off, n: f.n } })); box.appendChild(row); }
       if (typeof item.caption === 'string' && item.caption) box.appendChild(hNode('p', 'h-sent-caption', item.caption));
-      for (const f of others) box.appendChild(hNode('p', 'h-sent-file', `📎 ${f.name}`));
+      for (const f of others) { const p = hNode('p', 'h-sent-file'); p.appendChild(histFileLink({ sent: { off: f.off, n: f.n } }, f.name)); box.appendChild(p); }
       io.appendChild(box);
     }
     return histFolded('h-item h-tool', title, [io], sent.length > 0);
@@ -9507,7 +9740,8 @@ function histAttachMarks(lines) {
     const m = HIST_ATTACH_LINE.exec(line), li = hNode('li', 'h-attach-item');
     li.title = m[1];
     if (/^image\/(png|jpeg|gif|webp)$/.test(m[6])) li.appendChild(histThumb({ attach: { sessionId: m[2], id: m[3], ext: m[4] } }));
-    li.appendChild(hNode('span', 'h-attach-name', `📎 ${m[5]}`));
+    if (/^image\//.test(m[6])) li.appendChild(hNode('span', 'h-attach-name', `📎 ${m[5]}`));
+    else li.appendChild(histFileLink({ attach: { sessionId: m[2], id: m[3], ext: m[4] } }, m[5], 'h-attach-name'));
     li.appendChild(hNode('span', 'h-attach-meta', m[7]));
     ul.appendChild(li);
   }
@@ -9851,6 +10085,22 @@ function histThumbLoad(btn) {
     else { btn.classList.add('h-thumb-bad'); btn.querySelector('.h-thumb-note').textContent = g.error; }
   });
 }
+/* A file that is no picture, by its name, as a link: a press shows it in Finder, selected in its folder's window (2.3.12,
+   requester 10-21: 「画像以外はファイル名出してリンクっぽくして、押したらfinderでそのファイル選択してウィンドウ開く」). The
+   server finds the path by the same reference as a picture (a SendUserFile call's file, an attachment), never one from
+   the page (SOURCE.revealFile, POST /api/reveal-file). Gone: it says so and stays pressable no more. */
+function histFileLink(ref, name, cls = '') {
+  const b = hNode('button', `h-filelink${cls ? ` ${cls}` : ''}`, `📎 ${name}`);
+  b.type = 'button';
+  b.title = 'Finder で表示';
+  b.addEventListener('click', () => {
+    SOURCE.revealFile(HIST.id, ref).then((got) => {
+      if (got.gone) { b.disabled = true; b.classList.add('h-file-gone'); b.textContent = `📎 ${name}（もう無い）`; b.title = 'このファイルはもう無い'; }
+      else if (!got.ok) b.title = `Finder で開けなかった（${got.error || got.status}）`;
+    });
+  });
+  return b;
+}
 function histThumb(ref) {
   const b = hNode('button', 'h-thumb h-thumb-wait');
   b.type = 'button';
@@ -9879,9 +10129,10 @@ function histLightShow() {
 }
 function histLightOpen(btn) {
   histLightClose(false);
-  const all = HIST.node ? [...HIST.node.querySelectorAll('.h-thumb')] : [btn];
+  // each picture once: a closed tool row's head shows its first picture's thumbnail as well as the body (2.3.12)
+  const seen = new Set(), all = (HIST.node ? [...HIST.node.querySelectorAll('.h-thumb')] : [btn]).filter((b) => !seen.has(b.dataset.hImg) && seen.add(b.dataset.hImg));
   LIGHT.list = all.map((b) => b._ref);
-  LIGHT.k = Math.max(0, all.indexOf(btn));
+  LIGHT.k = Math.max(0, all.findIndex((b) => b.dataset.hImg === btn.dataset.hImg));
   LIGHT.opener = btn.dataset.hImg;
   const el = hNode('div', 'h-light');
   const box = hNode('div', 'h-light-box');
