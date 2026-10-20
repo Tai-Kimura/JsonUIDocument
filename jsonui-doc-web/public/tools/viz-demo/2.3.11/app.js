@@ -1512,7 +1512,7 @@ function loadMermaid() {
   }
   return MERMAID.loading;
 }
-/* What a diagram may not set for itself (dd's review, 10-19): Mermaid reads an init / config directive (%%{…}%%) and a
+/* What a diagram may not set for itself (the independent review, 10-19): Mermaid reads an init / config directive (%%{…}%%) and a
    front-matter config (--- config: … ---) from the text and lets them change everything but its six `secure` keys —
    htmlLabels back on (an <img> in a label, fetched), themeCSS with url() (fetched). The text is the spec's: both are
    taken out before it is drawn, with Mermaid's own patterns (11.17.2), and anything left of a directive is broken
@@ -1523,7 +1523,7 @@ const MERMAID_SECURE = ['secure', 'securityLevel', 'startOnLoad', 'maxTextSize',
   'theme', 'themeCSS', 'themeVariables', 'darkMode', 'fontFamily', 'altFontFamily', 'look', 'layout', 'markdownAutoWrap', 'dompurifyConfig', 'deterministicIds'];
 function mermaidSafeText(text) {
   // until nothing more comes off: a directive taken out can leave a front matter at the start, and the other way
-  // round (dd's review 2, 10-19: "%%{x}%%---\nconfig: …" passed one round of each)
+  // round (the independent review 2, 10-19: "%%{x}%%---\nconfig: …" passed one round of each)
   let t = String(text), prev = null;
   for (let k = 0; k < 50 && t !== prev; k++) { prev = t; t = t.replace(MERMAID_FRONT, '').replace(MERMAID_DIRECTIVE, ''); }
   if (t !== prev) return '';                                  // still changing after 50 rounds: no diagram
@@ -1532,7 +1532,7 @@ function mermaidSafeText(text) {
 }
 /* A url() that is not a reference inside the diagram (#…) becomes one to nothing, and @import goes: in the text before
    it is drawn — Mermaid puts the SVG in the page to measure it, and a style or classDef of a class or state diagram
-   (fill:url(/x)) was fetched then (dd's review 2) — and in the SVG it gave back. Every kind of diagram goes through. */
+   (fill:url(/x)) was fetched then (the independent review 2) — and in the SVG it gave back. Every kind of diagram goes through. */
 function mermaidNoUrl(t) {
   return String(t).replace(/url\(\s*(?!['"]?\s*#)/gi, 'url(#blocked-').replace(/@import/gi, '@blocked');
 }
@@ -2346,12 +2346,12 @@ function demoInfra() {
       n('cdn', 'CDN', 'edge.cdn', 'edge', 'cloudflare'),
       n('dns', 'DNS', 'edge.dns', 'edge', 'cloudflare'),
       n('lb', 'ロードバランサー', 'load_balancer', 'pub', 'aws'),
-      n('web', 'Web アプリ', 'compute.container', 'app', 'aws', { count: 3 }),
+      n('web', 'Web アプリ', 'compute.container', 'app', 'aws', { count: 3, service: 'ecs.fargate', spec: [{ key: 'cpu', value: '512' }, { key: 'memory', value: '1024' }] }),
       n('worker', '注文の処理', 'compute.container', 'app', 'aws'),
-      n('queue', '注文のキュー', 'queue', 'app', 'aws'),
-      n('db', '注文の DB', 'database.relational', 'data', 'aws'),
+      n('queue', '注文のキュー', 'queue', 'app', 'aws', { service: 'sqs' }),
+      n('db', '注文の DB', 'database.relational', 'data', 'aws', { service: 'rds.postgres', engine: 'postgres 16', spec: [{ key: 'instance_class', value: 'db.r6g.large' }, { key: 'storage_gb', value: '200' }, { key: 'multi_az', value: 'true' }] }),
       n('replica', '読み取りの写し', 'database.relational', 'data', 'aws', { environments: prod }),
-      n('cache', 'セッションのキャッシュ', 'cache', 'data', 'aws'),
+      n('cache', 'セッションのキャッシュ', 'cache', 'data', 'aws', { service: 'elasticache', spec: [{ key: 'node_type', value: 'cache.t4g.small' }] }),
       n('images', '商品画像', 'storage.object', 'cloud', 'aws'),
       n('role', 'アプリの IAM ロール', 'security.iam', 'cloud', 'aws', { fold: true }),
       n('alarm', '5xx のアラーム', 'monitoring.alarm', 'cloud', 'aws', { fold: true }),
@@ -3781,7 +3781,7 @@ function build3D() {
     if (SOURCE.mode === 'live') return liveHit(ray);
     const hits = ray.intersectObjects([boardMesh, kbMesh, trayGroup, ...PBOARDS.map((pb) => pb.mesh), ...robots.map((R) => R.robot.root),
       ...(DEMO_SRDOOR ? [DEMO_SRDOOR.D.root, DEMO_SRDOOR.D.pad] : [])], true);
-    // the server room's door behind a robot still takes the press, as in the live office (liveFirstHit; dd's re-verification)
+    // the server room's door behind a robot still takes the press, as in the live office (liveFirstHit; the independent re-verification)
     const hit = hits.length && robotOf(hits[0].object) !== undefined ? hits.find((h) => h.object.userData.serverDoor) || hits[0] : hits[0];
     if (!hit) return null;
     if (hit.object.userData.serverDoor) return { kind: 'serverroom', project: DEMO_SRDOOR.room, title: 'サーバールームに入る（構成を読み込む）' };
@@ -4598,7 +4598,7 @@ function propsSpot() {
    takes (z0 to z0 + SEAT.back): BELL.x from the back-left corner, past the smoking booth (BOOTH.w) and short of the
    shredder near the middle. No robot walks to it: a click (or the header's button, 50-panel.js) opens the dialog with
    the command to copy; viz runs nothing (callcmd.py). Its footprint is propsPlace's bell row, in the breaks arm's 12
-   room configs with the others (row callButton; b8's data server, row dataServer, stands just to its right), and the vacuum keeps off it (propsBoxes). */
+   room configs with the others (row callButton; the author's data server, row dataServer, stands just to its right), and the vacuum keeps off it (propsBoxes). */
 const BELL = { x: 3.3, z: 0.5, w: 0.36, h: 1.0 };
 function bellSpot(r) {
   const x = r.x0 + BELL.x, z = r.z0 + BELL.z, h = BELL.w / 2;
@@ -4754,7 +4754,7 @@ function gitSaid(R, st) {
   if (!trip || !trip.label || (trip.stopped && !R.git)) return '';
   return R.git || vizNow() - (trip.at || 0) < GITBOX.showMs ? trip.label : '';
 }
-/* What the box's desk overlaps in its room (the arm, and dd's check against the smoking room when it lands). */
+/* What the box's desk overlaps in its room (the arm, and the independent check against the smoking room when it lands). */
 function gitDeskOverlaps() {
   if (!PROPS.gitDesk || !PROPS.room) return null;
   const rm = PROJECT[PROPS.room], P = PROPS.place, G = P.git, out = [];
@@ -5053,7 +5053,7 @@ const SHRED = { w: 0.8, d: 0.55, h: 1.1, bitsMax: 24, feedSec: 1.2, bitsSec: 2.0
    「dbとapiのファイルがある場合は部屋にデータサーバーっぽいもの置いてそれクリックでDB仕様書とAPI仕様書みれるようにしてほしい」.
    With the room's other props (the one-room view, PROPS.max robots or fewer), only in a room whose docs/api or docs/db
    hold a specification (PROJECT[id].dataDocs, counted by the server: data_docs.counts); it comes and goes with them.
-   Against the back wall, DATASRV.fromLeft from the room's left edge: right of the call button's stand (c2, 2.3.5),
+   Against the back wall, DATASRV.fromLeft from the room's left edge: right of the call button's stand (the author, 2.3.5),
    left of the shredder and its feeder in the smallest room. No robot walks to it. Pressed (liveHit: kind 'data'), the
    big sheet opens (50-panel.js openDataDocs) and the documents are read from the server then (POST /api/data-docs). */
 const DATASRV = { fromLeft: 4.25, w: 0.6, d: 0.5, h: 1.75, blinkSec: 0.6 };
@@ -5298,7 +5298,7 @@ function liveTargets() {
 }
 const robotOf = (obj) => { let o = obj; while (o && o.userData.robotId === undefined && o.parent) o = o.parent; return o && o.userData.robotId !== undefined ? o.userData.robotId : undefined; };
 const isFixture = (obj) => { for (let q = obj; q; q = q.parent) if (q.userData.callBell || q.userData.serverDoor) return true; return !!obj.userData.dataServer; };
-/* The call bell, the data server's rack and the server room's door and keypad (dd's verification D2, 10-20) are small and stand against the back wall: a robot's desk drawn in front of
+/* The call bell, the data server's rack and the server room's door and keypad (the independent verification D2, 10-20) are small and stand against the back wall: a robot's desk drawn in front of
    one (or a robot walking past) covered all of it, and the press opened the robot's card (ticket
    2026-10-20-jui-viz-callbell-bell-hidden-behind-a-desk). A fixture the ray reaches behind a robot wins over that robot,
    from any camera; the robot is still opened by the rest of its body and by its name tag. Boards are not fixtures here
@@ -6468,8 +6468,9 @@ function decide(id, behavior, btn) {
   const p = latestModel.pending.find((q) => q.id === id);
   if (!p) return;
   const where = btn.closest('#tasks, #perm-strip, #kanban, #tb-detail, #rb');
-  const reasonEl = $('tbd-reason') || $('rb-reason');
-  const reason = behavior === 'deny' && reasonEl && where && where.contains(reasonEl) ? reasonEl.value.trim() : '';
+  // the reason box of the very card pressed (the card is on the board, the robot's card and its 応答の履歴 tab at once)
+  const card = btn.closest('.tbd-perm'), reasonEl = card ? card.querySelector('.tbd-reason input') : null;
+  const reason = behavior === 'deny' && reasonEl ? reasonEl.value.trim() : '';
   if (SOURCE.mode === 'live' && behavior === 'always') { openAlwaysConfirm(p, btn); return; }   // confirm the rules first (plan 08 §5)
   SOURCE.decide(id, behavior, { perm: p, reason });
   refreshNow();
@@ -6620,7 +6621,7 @@ function renderQuestions() {
   setText(chip, `質問 ${waiting}`);
   $('questions-sec').hidden = shown.length === 0;
   keyed($('questions'), questionsSig(shown), () => shown.map((q) => questionHTML(q)).join(''));
-  for (const el of document.querySelectorAll('#questions [data-quntil], #q-strip [data-quntil]')) {   // the countdown, in place (inputs keep their state)
+  for (const el of document.querySelectorAll('#questions [data-quntil], #q-strip [data-quntil], [data-h-cards] [data-quntil]')) {   // the countdown, in place (inputs keep their state)
     const q = QUESTIONS.find((x) => x.id === el.dataset.quntil);
     setText(el, qLeftText(q, now));
   }
@@ -7697,7 +7698,7 @@ function focusFadeSync() {
 /* A room or a robot about to be taken down (40-scene.js liveDropRoom / liveDropRobot): what of it is faint gets its
    own material back first, so disposeTree works as if nothing had been faint — the room's own materials disposed,
    the shared ones left — and the faint copies go with it. Left faint, disposeTree disposed the copies and never the
-   own materials (5b's review, 10-18). */
+   own materials (a library lane's review, 10-18). */
 function focusRelease(root) {
   for (const [o, mat] of FOCUS.faded) {
     let inside = false;
@@ -8188,7 +8189,7 @@ callEl.addEventListener('keydown', (e) => {
      from the button in the settings, never on load.
    - while question notifications can be shown (permission granted, the kind on) the page says so to the server every
      4 s and whenever the server asks (notify.ping): then a question waits for an answer though the page is hidden
-     (cd's ruling 10-19; it lapses notifyPresenceSec after the last word, a closed tab included). */
+     (the orchestrator's ruling 10-19; it lapses notifyPresenceSec after the last word, a closed tab included). */
 const NOTIFY_PREFS = 'jui-viz-notify', NOTIFY_RUNG = 'jui-viz-notify-rung', NOTIFY_KINDS = ['done', 'perm', 'ask', 'idle', 'chime'];
 // the chime's loudness (requester 10-20: 「音が少し小さいね」): the tones' peak gain, 中 by default (0.08 before)
 const NOTIFY_VOLUMES = { low: 0.1, mid: 0.2, high: 0.35 };
@@ -8345,7 +8346,7 @@ NOTIFY.askFirst = new Map();
 /* 入力待ち (2.3.7, ticket 2026-10-20-jui-viz-notify-waiting-for-input; requester: 「入力待ち…検知出来るなら許可とかと同じ
    ように通知鳴らして欲しい」). Claude Code sends Notification idle_prompt 60 s after a turn's end that nobody answered
    (measured by the requester 10-20 10:36: Stop 10:36:45, idle_prompt 10:37:45, "Claude is waiting for your input").
-   cd's ruling: a reminder — not rung when, since that turn's end, its 完了 notification was clicked or the session was
+   The orchestrator's ruling: a reminder — not rung when, since that turn's end, its 完了 notification was clicked or the session was
    opened on the page (NOTIFY.opened, by openRobot and by a click on the notification); otherwise once, with the chime,
    by the same one-tab, yield and quiet rules; its own switch. A replay after a snapshot is seen, never rung. */
 function notifyIdle(raw, item, replay = false) {
@@ -8479,7 +8480,7 @@ notifySettingsShow();
    and counted by the 止められた chip. 「実行してよいと伝える…」 opens a confirmation that shows the exact words the server
    will send (the card's prompt); only its 送る sends, and the page names the card, never the words (POST /api/denial).
    That prompt is all: no rule, no setting, no answer to a hook — whether the next try passes is Claude Code's call.
-   cd's ruling (10-20 15:30): what this claims is that the person's judgement reaches the receiver unmistaken, not
+   The orchestrator's ruling (10-20 15:30): what this claims is that the person's judgement reaches the receiver unmistaken, not
    that the receiver goes on — it may rightly ask for a confirmation in the terminal. Once sent, the card says 伝えた
    and shows the receiver's next response under it.
    A session whose channel cannot take a prompt gets the reason instead of the button. 「そのまま」 closes the card. */
@@ -8498,7 +8499,7 @@ function rebuildDenials() {
   if (DEN.asking && !DENIALS.some((d) => d.id === DEN.asking.split('|')[0] && d.status === 'pending')) DEN.asking = null;
   denialsNotify();
 }
-/* The same rule as a permission (c2's notification rules, kind perm): one ring per card; what waited before the page
+/* The same rule as a permission (the author's notification rules, kind perm): one ring per card; what waited before the page
    loaded is not rung. */
 function denialsNotify() {
   const waiting = DENIALS.filter((d) => d.status === 'pending');
@@ -8555,9 +8556,9 @@ function renderDenialStrip() {
   });
 }
 function onDenialClick(e) {
-  const where = e.currentTarget.id === 'denied-strip' ? 'b' : '';
+  const where = e.currentTarget.dataset.dwhere !== undefined ? e.currentTarget.dataset.dwhere : e.currentTarget.id === 'denied-strip' ? 'b' : '';   // h: the 応答の履歴 tab
   const ask = e.target.closest('[data-dask]'), go = e.target.closest('[data-dgo]'), back = e.target.closest('[data-dback]'), dismiss = e.target.closest('[data-ddismiss]');
-  const repaint = () => { renderDenials(); if (typeof tb !== 'undefined' && tb.open) renderDenialStrip(); };
+  const repaint = () => { renderDenials(); if (typeof tb !== 'undefined' && tb.open) renderDenialStrip(); if (typeof histCardsPaint === 'function') histCardsPaint(); };
   if (ask) {
     DEN.asking = `${ask.dataset.dask}|${where}`; DEN.askedAt = Date.now(); repaint();
     const btn = e.currentTarget.querySelector(`[data-dgo="${CSS.escape(ask.dataset.dask)}"]`);
@@ -9694,13 +9695,46 @@ function composePlace(pane, id) {
     composeEls().area.value = '';
     composeClose(false);
   }
-  if (pane && box.previousElementSibling !== pane) pane.after(box);
+  const cards = histCardsBox();
+  if (pane && cards.previousElementSibling !== pane) pane.after(cards);
+  if (pane && box.previousElementSibling !== cards) cards.after(box);
   box.hidden = !pane || HIST.tab !== 'history';
+  histCardsPaint(id, !pane || HIST.tab !== 'history');
   // The card was rebuilt (50-panel.js, keyed) while the box had the focus, and the box is put back only now: refocus.
   const lost = rbEl._lostFk;
   const again = lost !== undefined && !box.hidden ? box.querySelector('[data-fk="' + CSS.escape(lost) + '"]') : null;
   if (again) { rbEl._lostFk = undefined; again.focus({ preventScroll: true }); }   // not found here: the talk pane may hold it (58-talk.js)
   composePaint();
+}
+/* ---------- the session's cards on the 応答の履歴 tab (ticket 2026-10-20-jui-viz-approve-and-answer-from-history) ----------
+   Requester: 「ここでも許可とか質問の回答とか全部できるようにしたい」, plan A (「カードのけんはあんAで進めて」): between the
+   history and the prompt box, outside the history's frame as the box is, the cards of this robot's session — its
+   permission prompts, its questions and its stopped calls, a subagent's too — the same cards as the panel's and the
+   board's (permDetail, questionHTML, denialHTML) under their own `where` (ids and radio names apart; a permission's per card, the session may have two), answered the
+   same way: a permission and a question through the hook's decision, a stopped call through its words (it says so,
+   DEN_MAY). Answered in one place, every place shows it answered (one state). */
+function histCardsBox() {
+  if (!HIST.cards) {
+    const el = hNode('div', 'h-cards');
+    el.dataset.hCards = '';
+    el.dataset.dwhere = 'h';
+    el.setAttribute('aria-label', 'このセッションの許可・質問・止められた操作');
+    el.addEventListener('input', onQuestionInput);
+    el.addEventListener('click', onQuestionClick);
+    el.addEventListener('click', onDenialClick);
+    HIST.cards = el;
+  }
+  return HIST.cards;
+}
+function histCardsPaint(id = HIST.compose && HIST.compose._for, off = HIST.tab !== 'history') {
+  const el = histCardsBox(), sess = id ? SESSION_OF[id] : null, now = Date.now();
+  const mine = (who) => !!sess && SESSION_OF[who] === sess;
+  const perms = !off && latestModel ? latestModel.pending.filter((p) => mine(p.who)) : [];
+  const qs = !off ? QUESTIONS.filter((q) => mine(q.who) && (q.status === 'pending' || q.status === 'sent' || now - (q.doneAt || 0) < Q_SHOW_MS)) : [];
+  const ds = !off && typeof DENIALS !== 'undefined' ? DENIALS.filter((d) => mine(d.who) && (d.status === 'pending' || now - (d.doneAt || 0) < DEN_SHOW_MS)) : [];
+  el.hidden = !(perms.length || qs.length || ds.length);
+  keyed(el, JSON.stringify([id, NAMES.rev, DEN.asking, perms.map(permSig), questionsSig(qs), denialsSig(ds)]),
+    () => `${perms.map((p) => permDetail(p, `hb-${p.id}`)).join('')}${qs.map((q) => questionHTML(q, 'h')).join('')}${ds.map((d) => denialHTML(d, 'h')).join('')}`);
 }
 function composePaint() {
   if (!HIST.compose) return;
@@ -9981,16 +10015,22 @@ document.addEventListener('click', (e) => {
    - labels: a pool of SR.labels.max on the page, given each tenth of a second to the nearest things in view.
    - icons: where the room's settings give one (service → provider → category), its image on a plane above the node,
      read from the room by the server (SOURCE.infraIcon); otherwise the neutral shape.
+   - up close (ticket 2026-10-20-jui-viz-server-room-lines-dark-filter-spec §5, requester: 「ある程度拡大して表示されてる
+     ノードが少なくなった時はどれが何のインスタンスかわかる程度に違いが欲しい」): near, with SR.detail.enter nodes or fewer
+     in view, a second set of shapes by service (a function a slim pillar, a container a crate, a key-value store a
+     tapered drum, a notification a pyramid...: srDetailShape) and tags of name · service · its main spec; back to
+     the simple ones past SR.detail.leave (between the two it stays as it was).
+   - a node's spec (§4): the board's 選んだもの lists it, the keys the IaC tables know with a name in words.
    Measured for the ticket: the first draw, the frame time far and near, the memory (SR.stats). */
 const SR = {
   phase: 'idle', project: null, seq: 0, t0: 0, until: 0, why: '', full: '', opener: null, model: null, view: null, log: [],
   fastMs: 300, starMs: 140, okMs: 700, failMs: 9000,
-  lod: { far: 9, near: 13 }, labels: { max: 110, nodes: 80 }, stats: null,
+  lod: { far: 9, near: 13 }, labels: { max: 110, nodes: 80 }, stats: null, detail: { enter: 30, leave: 40 },
   closed: new Set(), selected: null, selectedGroup: null, zoomStep: 1.4,
-  // fewer lines (2.3.10, requester 10-20: 「線減らす工夫欲しいね」): all cables faint, the pressed and the pointed node's
+  // fewer lines (2.3.9, requester 10-20: 「線減らす工夫欲しいね」): all cables faint, the pressed and the pointed node's
   // drawn strong on a layer of their own; a switch for all (faint) / crossing ones only / the chosen node's only
   lines: 'all', hover: null, plainOpacity: 0.18, crossOpacity: 0.55,
-  only: new Set(),   // the clouds chosen on the board's legend (2.3.10 item 3; empty: all)
+  only: new Set(),   // the clouds chosen on the board's legend (2.3.9, item 3; empty: all)
 };
 const srEl = $('sr'), srBubbleEl = $('sr-bubble');
 function srNow() { return performance.now(); }
@@ -10027,7 +10067,7 @@ function srFail(got) {
   for (const p of (got.problems || []).slice(0, 30)) lines.push(`${p.file || ''}${p.line ? `:${p.line}` : ''} ${p.short || p.message || ''}`.trim());
   Object.assign(SR, { phase: 'failed', why: short, full: lines.filter(Boolean).join('\n'), until: srNow() + SR.failMs });
   srBubble(short, 'error', SR.full);
-  // gone after SR.failMs by its own timer, wherever the view is (dd's verification D1, 10-20: it was cleared from the
+  // gone after SR.failMs by its own timer, wherever the view is (the independent verification D1, 10-20: it was cleared from the
   // keypad's tick, which runs only for the door in sight, and stayed on the floor view after a failure)
   clearTimeout(SR.failTimer);
   const seq = SR.seq;
@@ -10088,6 +10128,11 @@ const SR_SHAPES = {
   globe: () => new THREE.SphereGeometry(0.55, 12, 8), gate: () => new THREE.ConeGeometry(0.6, 1.0, 4),
   puck: () => new THREE.CylinderGeometry(0.55, 0.55, 0.45, 12), small: () => new THREE.BoxGeometry(0.6, 0.6, 0.6),
   kiosk: () => new THREE.OctahedronGeometry(0.55),
+  // up close only (srDetailShape)
+  pillar: () => new THREE.CylinderGeometry(0.3, 0.3, 1.5, 6), crate: () => new THREE.BoxGeometry(1.3, 0.8, 0.8),
+  ring: () => new THREE.TorusGeometry(0.42, 0.16, 8, 20), taper: () => new THREE.CylinderGeometry(0.35, 0.6, 1.1, 8),
+  pyramid: () => new THREE.TetrahedronGeometry(0.65), longBelt: () => new THREE.BoxGeometry(1.7, 0.22, 0.45),
+  shield: () => new THREE.DodecahedronGeometry(0.5), key: () => new THREE.IcosahedronGeometry(0.5),
 };
 function srShape(category) {
   const c = String(category || '');
@@ -10101,8 +10146,53 @@ function srShape(category) {
   if (c === 'external.saas' || c === 'client') return 'kiosk';
   return 'small';
 }
+/* Up close: a shape by what the node is, so two of one category tell apart (an EC2 and a Lambda, an SQS and an SNS). */
+function srDetailShape(n) {
+  const c = String(n.category || ''), s = String(n.service || '');
+  if (c === 'compute.function') return 'pillar';
+  if (c === 'compute.container') return 'crate';
+  if (c === 'compute.k8s') return 'ring';
+  if (c === 'database.kv' || c === 'database.document') return 'taper';
+  if (c === 'queue' && /^(sns|eventgrid|notification)/.test(s)) return 'pyramid';
+  if (c === 'stream') return 'longBelt';
+  if (c === 'edge.waf') return 'shield';
+  if (c === 'auth' || c === 'secrets') return 'key';
+  return srShape(c);
+}
+const srShapeIn = (set, n) => (set === 'detail' ? srDetailShape(n) : srShape(n.category));
+// the services' names as people say them (the tag up close); an unknown one shows as it is written
+const SR_SERVICE_NAME = { ec2: 'EC2', 'ec2.asg': 'EC2 Auto Scaling', ecs: 'ECS', 'ecs.fargate': 'ECS Fargate', eks: 'EKS', lambda: 'Lambda',
+  stepfunctions: 'Step Functions', apprunner: 'App Runner', beanstalk: 'Elastic Beanstalk', elb: 'ELB', 'elb.alb': 'ALB', 'elb.nlb': 'NLB',
+  cloudfront: 'CloudFront', route53: 'Route 53', waf: 'WAF', apigateway: 'API Gateway', rds: 'RDS', 'rds.mysql': 'RDS MySQL',
+  'rds.postgres': 'RDS PostgreSQL', aurora: 'Aurora', dynamodb: 'DynamoDB', docdb: 'DocumentDB', elasticache: 'ElastiCache',
+  opensearch: 'OpenSearch', s3: 'S3', efs: 'EFS', ebs: 'EBS', sqs: 'SQS', sns: 'SNS', eventbridge: 'EventBridge', kinesis: 'Kinesis',
+  msk: 'MSK', ses: 'SES', cognito: 'Cognito', secretsmanager: 'Secrets Manager', kms: 'KMS', ssm: 'SSM', gce: 'Compute Engine',
+  'gce.mig': 'Compute Engine MIG', run: 'Cloud Run', 'run.job': 'Cloud Run Job', functions: 'Cloud Functions', gke: 'GKE',
+  appengine: 'App Engine', cloudsql: 'Cloud SQL', spanner: 'Spanner', firestore: 'Firestore', bigtable: 'Bigtable',
+  bigquery: 'BigQuery', memorystore: 'Memorystore', gcs: 'Cloud Storage', pubsub: 'Pub/Sub', cloudtasks: 'Cloud Tasks',
+  scheduler: 'Cloud Scheduler', workers: 'Workers', kv: 'Workers KV', d1: 'D1', r2: 'R2', queues: 'Queues', nextjs: 'Next.js',
+  'elasticache.redis': 'ElastiCache Redis', 'cloudsql.postgres': 'Cloud SQL PostgreSQL', 'memorystore.redis': 'Memorystore Redis',
+  containerapps: 'Container Apps', servicebus: 'Service Bus', cosmosdb: 'Cosmos DB', blob: 'Blob Storage', sql: 'Azure SQL',
+  'cache.redis': 'Azure Cache for Redis' };
+// a spec's keys the IaC tables give (document_tools iac_tables.TF_SPEC / CFN_SPEC), in words; any other key as written
+const SR_SPEC_NAME = { instance_type: 'インスタンスの種類', instance_class: 'インスタンスの種類', node_type: 'ノードの種類',
+  machine_type: 'マシンの種類', tier: 'ティア', version: '版', storage_gb: 'ストレージ（GB）', storage_type: 'ストレージの種類',
+  memory_mb: 'メモリ（MB）', memory: 'メモリ', cpu: 'CPU', timeout_s: 'タイムアウト（秒）', runtime: 'ランタイム',
+  multi_az: 'マルチ AZ', nodes: 'ノード数', tasks: 'タスク数' };
+// the one value a tag up close shows: what the instance is, else its size
+const SR_SPEC_MAIN = ['instance_type', 'instance_class', 'node_type', 'machine_type', 'tier', 'memory_mb', 'memory', 'cpu'];
+const SR_SPEC_KIND = SR_SPEC_MAIN.slice(0, 5);
+function srDetailText(n) {
+  const name = SR_SERVICE_NAME[n.service] || n.service || '';
+  const eng = n.engine && !name.toLowerCase().includes(String(n.engine).split(/\s/)[0].toLowerCase()) ? ` ${n.engine}` : '';
+  const spec = Array.isArray(n.spec) ? n.spec : [];
+  const main = SR_SPEC_MAIN.map((k) => spec.find((x) => x.key === k)).find(Boolean);
+  // what the instance is speaks for itself (db.r6g.large); a size says which one it is (memory 2048)
+  const shown = !main ? '' : SR_SPEC_KIND.includes(main.key) ? main.value : `${main.key} ${main.value}`;
+  return [n.label || n.id, `${name}${eng}`.trim(), shown].filter(Boolean).join(' · ') + (n.count > 1 ? ` ×${n.count}` : '');
+}
 const SR_PALETTE = ['#f29a38', '#4f8ef7', '#3fb26b', '#e2574c', '#a26bd6', '#26a5b8', '#d4a72c', '#7d8a99', '#e06fa8', '#5c6bc0'];
-/* The 3D's colours (2.3.10 item 2, requester 10-20: 「ダークでも背景が白なの嫌だね 背景は暗めにして欲しい」): in dark the
+/* The 3D's colours (2.3.9, item 2, requester 10-20: 「ダークでも背景が白なの嫌だね 背景は暗めにして欲しい」): in dark the
    background is near-black and every floor at least 3:1 against it; the light set is as before. */
 const SR_PAL = {
   light: { bg: '#eef2f7', logical: '#c9b8e8', public: '#dfe7f2', private: '#9fb0c4', neutral: '#cfd6df', strip: 0xe9e2f5, plain: 0x5c6b7f, focus: 0x1d4ed8 },
@@ -10124,7 +10214,7 @@ function srLayout(model, env, showFold, closed = new Set(), only = new Set()) {
   const roots = [];
   for (const G of groups.values()) { const p = G.g.parent && groups.get(G.g.parent); (p ? p.kids : roots).push(G); }
   const loose = { g: { id: '', kind: 'logical', label: 'グループなし' }, kids: [], nodes: [], level: 0 }, ext = [];
-  // clouds chosen on the board (2.3.10 item 3): only their nodes; one with no provider is out while any is chosen
+  // clouds chosen on the board (2.3.9, item 3): only their nodes; one with no provider is out while any is chosen
   const nodes = (model.nodes || []).filter((n) => srVisible(n, env) && (showFold || !n.fold) && (!only.size || only.has(n.providerResolved || n.provider)));
   for (const n of nodes) {
     if (n.external || n.category === 'external.saas') { ext.push(n); continue; }
@@ -10231,7 +10321,7 @@ function srBuild() {
   srDispose();
   const model = SR.model, env = $('sr-env').value || '', fold = $('sr-fold').checked;
   const L = srLayout(model, env, fold, SR.closed, SR.only);
-  // a chosen or pointed node not drawn now (another environment, a cloud not chosen, folded) is let go (dd's verification)
+  // a chosen or pointed node not drawn now (another environment, a cloud not chosen, folded) is let go (the independent verification)
   for (const k of ['selected', 'hover']) if (SR[k] && !(L.pos.has(SR[k]) && !L.pos.get(SR[k]).hiddenIn)) SR[k] = null;
   const cv = $('sr-canvas'), box = cv.parentElement;
   const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
@@ -10276,20 +10366,30 @@ function srBuild() {
     cm.userData.groups = L.closed.map((G) => G.g.id);
     V.near.add(cm); V.pick.push(cm);
   }
-  // nodes: one instanced mesh per shape
-  const byShape = {};
-  for (const p of L.pos.values()) if (!p.hiddenIn) (byShape[srShape(p.n.category)] = byShape[srShape(p.n.category)] || []).push(p);
-  for (const [shape, list] of Object.entries(byShape)) {
-    const mesh = new THREE.InstancedMesh(SR_SHAPES[shape](), new THREE.MeshLambertMaterial({ color: 0xffffff }), list.length);
-    list.forEach((p, i) => {
-      const s = p.n.count > 1 ? 1 + Math.min(Math.log2(p.n.count), 4) * 0.12 : 1;
-      m4.compose(at.set(p.x, p.y + 0.75, p.z), q, sc.set(s, s, s));
-      mesh.setMatrixAt(i, m4);
-      mesh.setColorAt(i, col.set(srProviderColor(p.n.providerResolved || p.n.provider)));
-    });
-    mesh.userData.nodes = list.map((p) => p.n.id);
-    V.near.add(mesh); V.pick.push(mesh);
+  // nodes: one instanced mesh per shape, twice — the simple shapes, and up close the shapes by service (srSetDetail
+  // shows one set and gives it to the picking)
+  V.nodeSets = { simple: new THREE.Group(), detail: new THREE.Group() };
+  V.nodeMeshes = { simple: [], detail: [] };
+  V.nodeSets.detail.visible = false;
+  V.detail = false;
+  for (const set of ['simple', 'detail']) {
+    const byShape = {};
+    for (const p of L.pos.values()) if (!p.hiddenIn) (byShape[srShapeIn(set, p.n)] = byShape[srShapeIn(set, p.n)] || []).push(p);
+    for (const [shape, list] of Object.entries(byShape)) {
+      const mesh = new THREE.InstancedMesh(SR_SHAPES[shape](), new THREE.MeshLambertMaterial({ color: 0xffffff }), list.length);
+      list.forEach((p, i) => {
+        const s = p.n.count > 1 ? 1 + Math.min(Math.log2(p.n.count), 4) * 0.12 : 1;
+        m4.compose(at.set(p.x, p.y + 0.75, p.z), q, sc.set(s, s, s));
+        mesh.setMatrixAt(i, m4);
+        mesh.setColorAt(i, col.set(srProviderColor(p.n.providerResolved || p.n.provider)));
+      });
+      mesh.userData.nodes = list.map((p) => p.n.id);
+      mesh.userData.shape = shape;
+      V.nodeSets[set].add(mesh); V.nodeMeshes[set].push(mesh);
+    }
   }
+  V.near.add(V.nodeSets.simple, V.nodeSets.detail);
+  V.pick.push(...V.nodeMeshes.simple);
   // cables: within a provider solid, across providers dashed magenta and higher (requester: 跨いでいることが見て分かる)
   const plain = [], cross = [];
   for (const e of L.edges) {
@@ -10331,7 +10431,7 @@ function srBuild() {
     (B.cross ? bc : bp).push(B.a.x + B.a.w / 2, ya, B.a.z + B.a.d / 2, B.b.x + B.b.w / 2, yb, B.b.z + B.b.d / 2);
   }
   V.bundles = [...bundles.values()];
-  // the far view's bundles: as faint as the near cables, and the lines switch holds there too (dd's verification of item 1)
+  // the far view's bundles: as faint as the near cables, and the lines switch holds there too (the independent verification of item 1)
   V.farPlain = lines(bp, new THREE.LineBasicMaterial({ color: PAL.plain, transparent: true, opacity: SR.plainOpacity }));
   V.farCross = lines(bc, new THREE.LineDashedMaterial({ color: 0xd63fb0, dashSize: 1.2, gapSize: 0.7, transparent: true, opacity: SR.crossOpacity }));
   V.far.add(V.farPlain, V.farCross);
@@ -10406,17 +10506,23 @@ function srLod(V) {
 }
 function srPlaceLabels(V) {
   const cam = V.camera, w = V.renderer.domElement.clientWidth, h = V.renderer.domElement.clientHeight, v = new THREE.Vector3(), out = [];
-  const consider = (x, y, z, text, kind, weight) => {
+  const consider = (x, y, z, text, kind, weight, n = null) => {
     v.set(x, y, z).project(cam);
     if (v.z < -1 || v.z > 1 || v.x < -1.05 || v.x > 1.05 || v.y < -1.05 || v.y > 1.05) return;
-    out.push({ sx: (v.x + 1) / 2 * w, sy: (1 - v.y) / 2 * h, text, kind, d: cam.position.distanceToSquared(new THREE.Vector3(x, y, z)) * weight });
+    out.push({ sx: (v.x + 1) / 2 * w, sy: (1 - v.y) / 2 * h, text, kind, n, d: cam.position.distanceToSquared(new THREE.Vector3(x, y, z)) * weight });
   };
   if (V.lod === 'far') {
     for (const G of V.L.tops) consider(G.x + G.w / 2, G.boxH + 0.8, G.z + G.d / 2, `${G.g.label || G.g.id} · ${G.nodeCount}`, 'group', 1);
   } else {
     for (const G of V.L.floors) if (G.g.id) consider(G.x + 0.6, 0.2 + G.level * 0.06, G.z + 0.5, G.g.label || G.g.id, 'group', 0.6);
-    for (const p of V.L.pos.values()) if (!p.hiddenIn) consider(p.x, p.y + 1.9, p.z, `${p.n.label || p.n.id}${p.n.count > 1 ? ` ×${p.n.count}` : ''}`, p.external ? 'external' : 'node', 1);
+    for (const p of V.L.pos.values()) if (!p.hiddenIn) consider(p.x, p.y + 1.9, p.z, `${p.n.label || p.n.id}${p.n.count > 1 ? ` ×${p.n.count}` : ''}`, p.external ? 'external' : 'node', 1, p.n);
   }
+  // up close (§5): how many nodes are in view decides the look, with room between going in and coming back
+  const inView = out.filter((o) => o.n).length;
+  V.inView = inView;
+  const detail = V.lod === 'near' && inView > 0 && (V.detail ? inView <= SR.detail.leave : inView <= SR.detail.enter);
+  if (detail !== V.detail) srSetDetail(V, detail);
+  if (V.detail) for (const o of out) if (o.n) o.text = srDetailText(o.n);
   out.sort((a, b) => a.d - b.d);
   const groups = out.filter((o) => o.kind === 'group').slice(0, SR.labels.max - SR.labels.nodes);
   const rest = out.filter((o) => o.kind !== 'group').slice(0, SR.labels.nodes);
@@ -10434,6 +10540,13 @@ function srPlaceLabels(V) {
     s.style.transform = `translate(${Math.round(o.sx)}px, ${Math.round(o.sy)}px) translate(-50%, -100%)`;
   });
   V.shownLabels = shown.length;
+}
+/* The simple shapes or the ones by service (§5): shown, and the ones a press picks. */
+function srSetDetail(V, on) {
+  V.detail = on;
+  V.nodeSets.simple.visible = !on; V.nodeSets.detail.visible = on;
+  const drop = new Set(V.nodeMeshes[on ? 'simple' : 'detail']);
+  V.pick = V.pick.filter((m) => !drop.has(m)).concat(V.nodeMeshes[on ? 'detail' : 'simple']);
 }
 /* The room's icons: per node the strongest key the settings give (service → provider → category), an image plane above it. */
 async function srIcons(V) {
@@ -10561,7 +10674,8 @@ function srRenderBoard() {
 <ul class="sr-legend">${provs.map((p) => `<li><button type="button" class="sr-prov" data-sr-prov="${esc(p)}" aria-pressed="${SR.only.has(p) ? 'true' : 'false'}"><span class="sr-chip" style="background:${esc(srProviderColor(p))}"></span>${esc(p)}</button></li>`).join('')}
 <li><button type="button" class="sr-prov" data-sr-prov="" aria-pressed="${SR.only.size ? 'false' : 'true'}">全部</button></li>
 <li><span class="sr-line"></span>同じ provider の中のつながり</li><li><span class="sr-line sr-line-cross"></span>provider を跨ぐつながり（破線・マゼンタ）</li></ul>
-${sel ? `<h3>選んだもの</h3><dl class="sr-sel"><dt>id</dt><dd>${esc(sel.id)}</dd><dt>名前</dt><dd>${esc(sel.label || '')}</dd><dt>種類</dt><dd>${esc(sel.category)}</dd><dt>provider</dt><dd>${esc(sel.providerResolved || sel.provider || '')}${sel.service ? ` · ${esc(sel.service)}` : ''}</dd>${sel.count > 1 ? `<dt>台数</dt><dd>${esc(String(sel.count))}</dd>` : ''}</dl>
+${sel ? `<h3>選んだもの</h3><dl class="sr-sel"><dt>id</dt><dd>${esc(sel.id)}</dd><dt>名前</dt><dd>${esc(sel.label || '')}</dd><dt>種類</dt><dd>${esc(sel.category)}</dd><dt>provider</dt><dd>${esc(sel.providerResolved || sel.provider || '')}${sel.service ? ` · ${esc(sel.service)}` : ''}</dd>${sel.count > 1 ? `<dt>台数</dt><dd>${esc(String(sel.count))}</dd>` : ''}${sel.engine ? `<dt>エンジン</dt><dd>${esc(sel.engine)}</dd>` : ''}</dl>
+${Array.isArray(sel.spec) && sel.spec.length ? `<h3>スペック</h3><table class="sr-spec" data-sr-spec><tbody>${sel.spec.map((x) => `<tr><th scope="row">${SR_SPEC_NAME[x.key] ? `${esc(SR_SPEC_NAME[x.key])} <small>${esc(x.key)}</small>` : esc(x.key)}</th><td>${esc(x.value)}</td></tr>`).join('')}</tbody></table>` : ''}
 <p class="sr-acts"><button type="button" class="wb-btn" data-sr-act="focus">これに寄る</button></p>
 <ul class="sr-edges">${edgesOf.map((e) => `<li>${esc(e.from)} → ${esc(e.to)}${e.protocol ? ` <small>${esc(e.protocol)}</small>` : ''}${e.crossProvider ? ' <b>跨ぐ</b>' : ''}</li>`).join('')}</ul>`
     : grp ? `<h3>選んだ group</h3><dl class="sr-sel"><dt>id</dt><dd>${esc(grp.id)}</dd><dt>名前</dt><dd>${esc(grp.label || '')}</dd><dt>種類</dt><dd>${esc(grp.kind || '')}</dd><dt>provider</dt><dd>${esc(grp.providerResolved || grp.provider || '')}</dd><dt>中の node</dt><dd>${esc(String(inGroup ? srCountNodes(inGroup) : 0))}</dd></dl>
@@ -10572,7 +10686,7 @@ ${probs.length ? `<h3>問題 ${probs.length} 件</h3><ul class="sr-problems">${p
 function srRenderLog() {
   setHTML($('sr-log'), `<ol>${SR.log.map((l) => `<li><time>${esc(new Date(l.at).toTimeString().slice(0, 8))}</time> ${esc(l.text)}</li>`).join('')}</ol>`);
 }
-/* The theme changing while the server room is open (the OS's light and dark, or the page's own switch; dd's verification
+/* The theme changing while the server room is open (the OS's light and dark, or the page's own switch; the independent verification
    D3): the 3D is made again in the new colours, the camera where it was. */
 function srRetheme() {
   const V = SR.view;
