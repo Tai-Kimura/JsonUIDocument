@@ -8,8 +8,12 @@
 //
 // To refresh it (on every pin bump that changes the export):
 //   jui viz export-demo --out <an empty folder>
-// into public/tools/viz-demo/<version>/, point DEMO_SRC at it, and delete the
-// old folder.
+// into public/tools/viz-demo/<version>/, point DEMO_DIR at it, and delete the
+// old folder. From jsonui-cli 2.3.15 the export is English by default and only
+// its index.html differs by language, so the Japanese page sits beside it:
+//   jui viz export-demo --lang ja --out <another empty folder>
+// and copy that folder's index.html in as ja.html. tools_viz.demo_page names
+// the page for the site's language.
 //
 // Colour mode: the demo reads `data-theme` on its own <html> and watches it,
 // so the site's mode is mirrored there. Only an attribute is set; nothing is
@@ -22,7 +26,7 @@ import { useLocalizedString } from "@/hooks/useLocalizedString";
 
 // Versioned path: deploy uploads every non-HTML file as immutable for a year,
 // and the export keeps its file names, so a new export goes in a new folder.
-const DEMO_SRC = "/tools/viz-demo/2.3.14/index.html";
+const DEMO_DIR = "/tools/viz-demo/2.3.15/";
 
 interface VizDemoProps {
   id?: string;
@@ -32,6 +36,7 @@ interface VizDemoProps {
 export const VizDemo: React.FC<VizDemoProps> = ({ id, className }) => {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const title = useLocalizedString("tools_viz_demo_frame_title", "jui viz demo");
+  const page = useLocalizedString("tools_viz_demo_page", "index.html");
 
   const applyTheme = useCallback(() => {
     try {
@@ -52,7 +57,7 @@ export const VizDemo: React.FC<VizDemoProps> = ({ id, className }) => {
       <iframe
         ref={frameRef}
         className="viz-demo__frame"
-        src={DEMO_SRC}
+        src={DEMO_DIR + page}
         title={title}
         loading="lazy"
         onLoad={applyTheme}

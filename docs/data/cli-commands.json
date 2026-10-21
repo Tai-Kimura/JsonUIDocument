@@ -2229,8 +2229,8 @@
       "command": "lint-generated",
       "synopsis": "jui lint-generated [--fix] [--verbose] [--max-depth <n>] [--max-lines <n>] [--update-size-baseline] [--fail-on any|size-ratchet|health]",
       "purpose": {
-        "en": "CI-side audit of the generated tree: every generated file must carry the `@generated` sentinel, and every generated view function must stay inside the size bounds. Not part of `jui build` — run it in CI or before a release. From 2.3.13 jsonui-test's branch tests and runtimes in the same folders pass with their one-line banner and no footer, and its harness skeletons (yours) are not counted; the summary gains a Not checked line.",
-        "ja": "生成物の CI 向け監査: 生成ファイルは `@generated` sentinel を持つこと、生成ビューの各関数はサイズ上限内に収まることを確認する。`jui build` には含まれないので、CI かリリース前に実行する。2.3.13 からは、同じフォルダにある jsonui-test の branch テストとランタイムは 1 行の見出しだけでフッターが無くても通り、ハーネスの雛形（あなたの物）は数えず、まとめに Not checked の行が出る。"
+        "en": "CI-side audit of the generated tree: every generated file must carry the `@generated` sentinel, and every generated view function must stay inside the size bounds. Not part of `jui build` — run it in CI or before a release. From 2.3.13 jsonui-test's branch tests and runtimes in the same folders pass with their one-line banner and no footer, and its harness skeletons (yours) are not counted; the summary gains a Not checked line. From 2.3.15 the size ratchet (exit 2) counts only new oversized .swift functions; new .kt ones are reported with their count and the longest, not gating.",
+        "ja": "生成物の CI 向け監査: 生成ファイルは `@generated` sentinel を持つこと、生成ビューの各関数はサイズ上限内に収まることを確認する。`jui build` には含まれないので、CI かリリース前に実行する。2.3.13 からは、同じフォルダにある jsonui-test の branch テストとランタイムは 1 行の見出しだけでフッターが無くても通り、ハーネスの雛形（あなたの物）は数えず、まとめに Not checked の行が出る。2.3.15 からは、サイズのラチェット（終了コード 2）が数えるのは新しく上限を超えた .swift の関数だけで、.kt の関数は数と最長の行数を出すだけで、ゲートにしない。"
       },
       "options": [
         {
@@ -2300,16 +2300,16 @@
       ],
       "aliases": [],
       "verifiedAgainst": {
-        "version": "2.3.13",
+        "version": "2.3.15",
         "columns": 80,
         "python": "3.12",
         "helpHash": "f8610ced490904f015504fdac4c01e62a89d7e17bc87e926505aa3a52244827f",
-        "cardHash": "bb50ffe8937b0fbbc0b26e47e844200a6b1b30056dc19e8ee9d5081394271404",
+        "cardHash": "9468c19d5ec9d34ae2f08af3c6f6752a3acb39e81d5d4831952f959642109607",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "18cd5e03726f",
           "synopsis": "24e80afa4c28",
-          "purpose": "881677f86597",
+          "purpose": "664fa665195b",
           "options": "6d59a8a31f25",
           "examples": "3065aee645fa",
           "seeAlso": "18ad32b9c443",
@@ -5581,6 +5581,89 @@
     },
     {
       "binary": "jsonui-doc",
+      "command": "cost infra",
+      "synopsis": "jsonui-doc cost infra [<root>] [--scenario <id>] [--date YYYY-MM-DD] [--by provider|node] [--json]",
+      "purpose": {
+        "en": "Price a load scenario's month, or one day of it, from the command line (from 2.3.15): the same simulation and shapes as jui viz's server room コスト view, without jui viz. It reads the load definitions against the model, then prices them from the room's price files, the fetched cache and the bundled table, in that order. The terminal gets the total (USD, on demand; reservations, discounts and tax not included), the total by provider or by node, the top nodes, what has no price or no rule, the hours over capacity, the notes and the load problems; --json prints the whole reply. Exit 0 when it simulated; 1 when it simulated but a load definition has an error (that file is left out); 2 when nothing could be simulated (no model, no load definition, no such scenario, a date outside the month), with the reason.",
+        "ja": "負荷のシナリオの 1 か月、またはその 1 日の値段を、コマンドで出す（2.3.15 から）。jui viz のサーバールームの「コスト」と同じ計算と形を、jui viz なしで出す。モデルに照らして負荷定義を読み、部屋の単価のファイル、取得したキャッシュ、同梱の表の順で値段を付ける。端末には合計（USD、オンデマンド。予約、割引、税は含まない）、クラウドごとかノードごとの合計、上位のノード、単価や規則の無いもの、容量を超えた時間、注記、負荷定義の問題を出し、--json は返事を全部出す。計算できれば終了コード 0、計算したが負荷定義にエラーがあれば 1（そのファイルは外す）、何も計算できなければ理由つきで 2（モデルが無い、負荷定義が無い、そのシナリオが無い、日付が月の外）。"
+      },
+      "options": [
+        {
+          "name": "<root>",
+          "type": "path",
+          "default": "the current folder",
+          "description": {
+            "en": "The project root (the folder with jui.config.json).",
+            "ja": "プロジェクトのルート（jui.config.json のあるフォルダ）。"
+          }
+        },
+        {
+          "name": "--scenario",
+          "type": "string",
+          "default": "the first scenario",
+          "description": {
+            "en": "The load scenario's id; an unknown one exits 2 and names the ones there are.",
+            "ja": "負荷のシナリオの id。無い id なら終了コード 2 で、あるものを挙げる。"
+          }
+        },
+        {
+          "name": "--date",
+          "type": "string",
+          "default": "none (the month)",
+          "description": {
+            "en": "One day of the scenario's month (YYYY-MM-DD), hour by hour; a date outside the month exits 2.",
+            "ja": "シナリオの月の 1 日（YYYY-MM-DD）を 1 時間ずつ。月の外の日付なら終了コード 2。"
+          }
+        },
+        {
+          "name": "--by",
+          "type": "enum",
+          "default": "provider",
+          "description": {
+            "en": "How the month's days are stacked: provider or node.",
+            "ja": "月の日の積み方: provider か node。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Print the whole reply as JSON (the month or the day, the scenarios, the problems, the price warnings, the top nodes).",
+            "ja": "返事を全部 JSON で出す（月か日、シナリオ、問題、単価の警告、上位のノード）。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jsonui-doc cost infra\ncost infra: docs/infra/load: scenario ordinary (2026-11, production); other scenarios: sale\n  2026-11: $1,018.60 a month (USD, on demand; reservations, discounts and tax not included)\n  by provider: aws $1,018.60\n  top nodes: cdn $455.48, db-prod $422.40, api-prod $64.80, assets $44.56, alb-prod $29.02"
+        }
+      ],
+      "seeAlso": [
+        "jsonui-doc validate infra-load",
+        "jsonui-doc validate infra-prices",
+        "jsonui-doc validate infra"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.15",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "831952082fe76a8a38b662201bcf389cc1d46624018ae8ccb97d10ce4afa9a87",
+        "cardHash": "3e7878b35536088e2994c19d07ac5fae273c44c195be31af5648ca675575fee0",
+        "fieldHashes": {
+          "binary": "f9476e5a629c",
+          "command": "6849349274ec",
+          "synopsis": "f35351bcb5c4",
+          "purpose": "25a1baeda99d",
+          "options": "ccd7d1ce161a",
+          "examples": "69578871a661",
+          "seeAlso": "fb441974b08e"
+        }
+      }
+    },
+    {
+      "binary": "jsonui-doc",
       "command": "seed infra",
       "synopsis": "jsonui-doc seed infra [<root>] [-o <out>] [--stdout] [--force]",
       "purpose": {
@@ -5764,10 +5847,10 @@
     {
       "binary": "jsonui-doc",
       "command": "check",
-      "synopsis": "jsonui-doc check [<filter>] [--list] [-p <project>]",
+      "synopsis": "jsonui-doc check [<filter>] [--list] [--json] [-p <project>]",
       "purpose": {
-        "en": "Run the declared contract checks — a real database or an implementation's OpenAPI document against the docs. It executes only the commands declared in jui.config.json, and `--list` shows what would run (name, type, exact command) without running it. The filter restricts the run to `db` / `api` / `db:<name>` / a declared check name. Since 2.3.9 two more types compare the infrastructure model (see `validate infra`): `builtin:infra-iac` against the project's IaC, read statically (no credentials, plan or state), and `builtin:infra-code` against each node's evidence, the SDK imports and the environment variable names; since 2.3.10 `builtin:infra-load` compares the model with the load definitions (see `validate infra-load`): a node billed by use that a definition gives no load is missing_in_doc (its load is undefined, not 0), a row naming a node the model does not have is missing_in_impl, and a node billed by the hour with no row is ok (it runs the model's count). It stops with an execution error (exit 2) while the definitions have an error, and with no definition it is ok with a warning that nothing was compared. The filter `infra` (not listed in `--help`) selects all three. Their findings are warnings and exit 0 unless the check declares `\"gate\": true`, and each says what it could not check. The report is named by the type, not the check's name: `.check-report.infra-iac.json` and `.check-report.infra-code.json` beside the model, `.check-report.infra-load.json` in the load folder.",
-        "ja": "宣言済みの契約チェック — 実データベースや実装側 OpenAPI をドキュメントと突き合わせる — を実行する。実行するのは jui.config.json に宣言されたコマンドだけで、`--list` は走らせずに実行内容（名前・種別・実際のコマンド）を表示する。フィルタで `db` / `api` / `db:<name>` / 宣言済みチェック名に限定できる。2.3.9 からは、インフラのモデル（`validate infra` を参照）と突き合わせる種別が 2 つ増えた。`builtin:infra-iac` はプロジェクトの IaC と（静的に読む。資格情報・plan・state は使わない）、`builtin:infra-code` は各ノードの evidence、SDK の import、環境変数の名前と比べる。2.3.10 からは `builtin:infra-load` がモデルと負荷定義（`validate infra-load` を参照）を比べる。使った分だけ課金されるノードに負荷定義が負荷を書いていなければ missing_in_doc（負荷は 0 ではなく未定義）、モデルに無いノードを名指しした行は missing_in_impl、時間で課金されるノードに行が無いのは ok（モデルの count で動き続ける）。負荷定義にエラーがある間は実行エラー（exit 2）で止まり、負荷定義が 1 つも無ければ、比べた物が無いという警告つきの ok。フィルタ `infra`（`--help` には出ない）で 3 つとも選ぶ。見つけた差は警告で exit 0、チェックが `\"gate\": true` を宣言したときだけ失敗になる。どれも確かめられなかった物を言う。レポートの名前はチェックの名前ではなく種別で決まり、`.check-report.infra-iac.json` と `.check-report.infra-code.json` はモデルの隣、`.check-report.infra-load.json` は load のフォルダに書く。"
+        "en": "Run the declared contract checks — a real database or an implementation's OpenAPI document against the docs. It executes only the commands declared in jui.config.json, and `--list` shows what would run (name, type, exact command) without running it. The filter restricts the run to `db` / `api` / `db:<name>` / a declared check name. Since 2.3.9 two more types compare the infrastructure model (see `validate infra`): `builtin:infra-iac` against the project's IaC, read statically (no credentials, plan or state), and `builtin:infra-code` against each node's evidence, the SDK imports and the environment variable names; since 2.3.10 `builtin:infra-load` compares the model with the load definitions (see `validate infra-load`): a node billed by use that a definition gives no load is missing_in_doc (its load is undefined, not 0), a row naming a node the model does not have is missing_in_impl, and a node billed by the hour with no row is ok (it runs the model's count). It stops with an execution error (exit 2) while the definitions have an error, and with no definition it is ok with a warning that nothing was compared. The filter `infra` (not listed in `--help`) selects all three. Their findings are warnings and exit 0 unless the check declares `\"gate\": true`, and each says what it could not check. The report is named by the type, not the check's name: `.check-report.infra-iac.json` and `.check-report.infra-code.json` beside the model, `.check-report.infra-load.json` in the load folder. From 2.3.15 `--json` prints the run as one JSON object (with no checks declared it is {\"ok\": true, \"exit\": 0, \"checks\": [], \"declared\": []}); 2.3.14 refuses the flag with exit 2.",
+        "ja": "宣言済みの契約チェック — 実データベースや実装側 OpenAPI をドキュメントと突き合わせる — を実行する。実行するのは jui.config.json に宣言されたコマンドだけで、`--list` は走らせずに実行内容（名前・種別・実際のコマンド）を表示する。フィルタで `db` / `api` / `db:<name>` / 宣言済みチェック名に限定できる。2.3.9 からは、インフラのモデル（`validate infra` を参照）と突き合わせる種別が 2 つ増えた。`builtin:infra-iac` はプロジェクトの IaC と（静的に読む。資格情報・plan・state は使わない）、`builtin:infra-code` は各ノードの evidence、SDK の import、環境変数の名前と比べる。2.3.10 からは `builtin:infra-load` がモデルと負荷定義（`validate infra-load` を参照）を比べる。使った分だけ課金されるノードに負荷定義が負荷を書いていなければ missing_in_doc（負荷は 0 ではなく未定義）、モデルに無いノードを名指しした行は missing_in_impl、時間で課金されるノードに行が無いのは ok（モデルの count で動き続ける）。負荷定義にエラーがある間は実行エラー（exit 2）で止まり、負荷定義が 1 つも無ければ、比べた物が無いという警告つきの ok。フィルタ `infra`（`--help` には出ない）で 3 つとも選ぶ。見つけた差は警告で exit 0、チェックが `\"gate\": true` を宣言したときだけ失敗になる。どれも確かめられなかった物を言う。レポートの名前はチェックの名前ではなく種別で決まり、`.check-report.infra-iac.json` と `.check-report.infra-code.json` はモデルの隣、`.check-report.infra-load.json` は load のフォルダに書く。2.3.15 からは `--json` で、実行の結果を JSON 1 つで出す（チェックの宣言が無ければ {\"ok\": true, \"exit\": 0, \"checks\": [], \"declared\": []}）。2.3.14 はこのフラグを終了コード 2 で拒む。"
       },
       "options": [],
       "examples": [],
@@ -5777,16 +5860,16 @@
         "jsonui-doc validate infra-load"
       ],
       "verifiedAgainst": {
-        "version": "2.3.10",
+        "version": "2.3.15",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "8841ba076d03c63a740580a5741573883f68e7c81e8103fa6e4c55e12c8738f4",
-        "cardHash": "68a25f9a9bd8660fc7aef7b3eaf5a88057e76355f4b68944cd98382e8efde631",
+        "helpHash": "ef912537535e86f6edb90f33f3a5fc55fe42641fed4a059a04bb898c9fb06703",
+        "cardHash": "a673c293d01c5ec5bb18688d86a7b3d81ddd42e55bb601806fe6766b5eb85fef",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "4d712611e72a",
-          "synopsis": "792abb114102",
-          "purpose": "88799ebd0563",
+          "synopsis": "b665cc9d3582",
+          "purpose": "98429a712877",
           "options": "357b9e47f539",
           "examples": "2b8fdc789d3b",
           "seeAlso": "92c1e07b6fc4"
