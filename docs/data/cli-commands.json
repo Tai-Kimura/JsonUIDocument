@@ -3159,8 +3159,8 @@
       "command": "viz cloud-prices fetch",
       "synopsis": "jui viz cloud-prices fetch [--provider {aws,azure}] [--region REGION] [--large LARGE] [--json]",
       "purpose": {
-        "en": "Fetch the cloud prices for the infra cost simulator now (from 2.3.12), even while the daily fetch is off: AWS's public offer files (Lambda, ECS / Fargate, S3, DynamoDB, API Gateway, SQS, SNS, ELB, EKS, Secrets Manager, CloudWatch Logs, Kinesis, data transfer, ElastiCache, and CloudFront as global; from 2.3.13 also EFS, Route 53, SES, VPC, EventBridge and WAF) and the Azure Retail Prices API, by default for ap-northeast-1 and us-east-1, japaneast and eastus. Only https to pricing.us-east-1.amazonaws.com and prices.azure.com; nothing about your project is sent. Each file goes to the cache, cloud-prices in jui viz's state folder (~/.local/state/jui-viz); a file that fails keeps its last copy. Then the index is printed. Exits 1 only when every file failed. In 2.3.13 nothing a user sees prices with the cache yet.",
-        "ja": "インフラのコストのシミュレーターに使うクラウドの単価を、今取る（2.3.12 から）。日に 1 回の取得をオフにしていても取る。AWS の公開のオファーのファイル（Lambda、ECS / Fargate、S3、DynamoDB、API Gateway、SQS、SNS、ELB、EKS、Secrets Manager、CloudWatch Logs、Kinesis、データ転送、ElastiCache と、global の CloudFront。2.3.13 からは EFS、Route 53、SES、VPC、EventBridge、WAF も）と、Azure Retail Prices の API から、既定では ap-northeast-1・us-east-1 と japaneast・eastus の分を取る。通信は pricing.us-east-1.amazonaws.com と prices.azure.com への https だけで、プロジェクトのことは何も送らない。ファイルは jui viz の状態フォルダ（~/.local/state/jui-viz）の cloud-prices に置き、取れなかったファイルは前の物を残す。最後に索引を出す。全部のファイルが失敗したときだけ 1 で終わる。2.3.13 でも、このキャッシュで値段を出す画面やコマンドはまだ無い。"
+        "en": "Fetch the cloud prices for the infra cost simulator now (from 2.3.12), even while the daily fetch is off: AWS's public offer files (Lambda, ECS / Fargate, S3, DynamoDB, API Gateway, SQS, SNS, ELB, EKS, Secrets Manager, CloudWatch Logs, Kinesis, data transfer, ElastiCache, and CloudFront as global; from 2.3.13 also EFS, Route 53, SES, VPC, EventBridge and WAF; from 2.3.14 also Cognito, DocumentDB, ECR, OpenSearch, Lightsail, MSK, Step Functions, App Runner, KMS and Systems Manager) and the Azure Retail Prices API, by default for ap-northeast-1 and us-east-1, japaneast and eastus. Only https to pricing.us-east-1.amazonaws.com and prices.azure.com; nothing about your project is sent. Each file goes to the cache, cloud-prices in jui viz's state folder (~/.local/state/jui-viz); a file that fails keeps its last copy. Then the index is printed. Exits 1 only when every file failed. From 2.3.14 the server room's コスト view in jui viz prices with the cache.",
+        "ja": "インフラのコストのシミュレーターに使うクラウドの単価を、今取る（2.3.12 から）。日に 1 回の取得をオフにしていても取る。AWS の公開のオファーのファイル（Lambda、ECS / Fargate、S3、DynamoDB、API Gateway、SQS、SNS、ELB、EKS、Secrets Manager、CloudWatch Logs、Kinesis、データ転送、ElastiCache と、global の CloudFront。2.3.13 からは EFS、Route 53、SES、VPC、EventBridge、WAF も。2.3.14 からは Cognito、DocumentDB、ECR、OpenSearch、Lightsail、MSK、Step Functions、App Runner、KMS、Systems Manager も）と、Azure Retail Prices の API から、既定では ap-northeast-1・us-east-1 と japaneast・eastus の分を取る。通信は pricing.us-east-1.amazonaws.com と prices.azure.com への https だけで、プロジェクトのことは何も送らない。ファイルは jui viz の状態フォルダ（~/.local/state/jui-viz）の cloud-prices に置き、取れなかったファイルは前の物を残す。最後に索引を出す。全部のファイルが失敗したときだけ 1 で終わる。2.3.14 からは、jui viz のサーバールームの「コスト」がこのキャッシュで値段を出す。"
       },
       "options": [
         {
@@ -3213,16 +3213,16 @@
         "jui viz cloud-prices off"
       ],
       "verifiedAgainst": {
-        "version": "2.3.13",
+        "version": "2.3.14",
         "columns": 80,
         "python": "3.12",
         "helpHash": "2566379db73946ade4659f6f37e4e3255828166b14bc21f941a323bf848f08ad",
-        "cardHash": "4b103256fee2c2080a6540ae8ca82b46c1296fcdf08db0e8652f7c9fd8cde26b",
+        "cardHash": "07094e6f657b6c241ff8b331048c75b1c7ef82dc2fdca839edbafbeef86565aa",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "9fc93c3ed264",
           "synopsis": "6295a6475046",
-          "purpose": "1c9d8302f2d0",
+          "purpose": "2d3ff3711a85",
           "options": "e49bbff6dc59",
           "examples": "dfb011f8afca",
           "aliases": "98edafdd23a8",
@@ -5475,8 +5475,8 @@
       "command": "validate infra-load",
       "synopsis": "jsonui-doc validate infra-load [<root>] [--json]",
       "purpose": {
-        "en": "Validate the load definitions for the cost simulator (since 2.3.10; the cost itself is not computed yet). They are read from `<infra.dir>/load/*.json`, or the folder named by `infra.load_dir` in jui.config.json, and follow the infra-load v0 schema: one file is one month of one environment (its timezone, profiles of 24 hourly multipliers, the week, special days and holidays, schedules) and its rows give a node, or the nodes a selector matches, quantities from a closed list such as requests, vcpu or storage_gb, with optional autoscale or vertical scaling. A file with an error is left out whole — a schema break, a secret's shape, or a contradiction inside it such as min above max. Rows that do not fit the model are warnings: a row naming a node the model does not have is left out, a later row for a node that already has one is used in place of the earlier, and a quantity the node's kind does not read is reported. The model must be readable. Exit 0 when there is no error (warnings alone are 0), 1 when there are errors, 2 when the model or the folder cannot be read; a project with a model and no load folder is 0 with 0 files.",
-        "ja": "コストのシミュレーターの負荷定義を検証する（2.3.10 から。コストの計算はまだ入っていない）。`<infra.dir>/load/*.json`（jui.config.json の `infra.load_dir` があればそのフォルダ）を読み、形は infra-load v0 のスキーマ。1 ファイルが 1 つの環境の 1 か月で（タイムゾーン、1 時間ごとの倍率 24 個のプロファイル、曜日、特別な日と祝日、スケジュール）、行ごとにノード（またはセレクタに合うノード）と、requests・vcpu・storage_gb などの決まった一覧の量、任意で autoscale や vertical を書く。スキーマ違反、秘密の形、min が max より大きいといったファイルの中の矛盾はエラーで、そのファイルをまるごと外す。モデルに合わない行は警告で、モデルに無いノードを名指しした行は外し、すでに行のあるノードの後の行は前の行の代わりに使い、そのノードの種類が読まない量は知らせる。モデルが読めることが前提。エラーが無ければ exit 0（警告だけなら 0）、エラーがあれば 1、モデルかフォルダが読めなければ 2。モデルがあって load のフォルダが無いときは、0 ファイルで 0。"
+        "en": "Validate the load definitions for the cost simulator (since 2.3.10; from 2.3.14 jui viz's server room prices them in its コスト view). They are read from `<infra.dir>/load/*.json`, or the folder named by `infra.load_dir` in jui.config.json, and follow the infra-load v0 schema: one file is one month of one environment (its timezone, profiles of 24 hourly multipliers, the week, special days and holidays, schedules) and its rows give a node, or the nodes a selector matches, quantities from a closed list such as requests, vcpu or storage_gb, with optional autoscale or vertical scaling. A file with an error is left out whole — a schema break, a secret's shape, or a contradiction inside it such as min above max. Rows that do not fit the model are warnings: a row naming a node the model does not have is left out, a later row for a node that already has one is used in place of the earlier, and a quantity the node's kind does not read is reported. The model must be readable. Exit 0 when there is no error (warnings alone are 0), 1 when there are errors, 2 when the model or the folder cannot be read; a project with a model and no load folder is 0 with 0 files.",
+        "ja": "コストのシミュレーターの負荷定義を検証する（2.3.10 から。2.3.14 からは jui viz のサーバールームの「コスト」がこれで値段を出す）。`<infra.dir>/load/*.json`（jui.config.json の `infra.load_dir` があればそのフォルダ）を読み、形は infra-load v0 のスキーマ。1 ファイルが 1 つの環境の 1 か月で（タイムゾーン、1 時間ごとの倍率 24 個のプロファイル、曜日、特別な日と祝日、スケジュール）、行ごとにノード（またはセレクタに合うノード）と、requests・vcpu・storage_gb などの決まった一覧の量、任意で autoscale や vertical を書く。スキーマ違反、秘密の形、min が max より大きいといったファイルの中の矛盾はエラーで、そのファイルをまるごと外す。モデルに合わない行は警告で、モデルに無いノードを名指しした行は外し、すでに行のあるノードの後の行は前の行の代わりに使い、そのノードの種類が読まない量は知らせる。モデルが読めることが前提。エラーが無ければ exit 0（警告だけなら 0）、エラーがあれば 1、モデルかフォルダが読めなければ 2。モデルがあって load のフォルダが無いときは、0 ファイルで 0。"
       },
       "options": [
         {
@@ -5509,16 +5509,16 @@
         "jsonui-doc check"
       ],
       "verifiedAgainst": {
-        "version": "2.3.10",
+        "version": "2.3.14",
         "columns": 80,
         "python": "3.12",
         "helpHash": "bfa3ebd0c6ffb38aca25a7c8d13e508bd0b6a278371a88dcf35f7f59da8fb1ab",
-        "cardHash": "3ce64cdfcc4006377788e2a5bafec46329dbdcd5ac7a21f10c9ad1d7af1a121f",
+        "cardHash": "b442ba69dcb678c3f2e48823c4c2fcb55a7fdc90078eaec4a046dee3e5a4f3aa",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "3b53581196a4",
           "synopsis": "29a227c82b94",
-          "purpose": "6aaef3d64b12",
+          "purpose": "102b159e7f4c",
           "options": "35505f512bb1",
           "examples": "5834cc6dc4a8",
           "seeAlso": "37b84b7d4cfc"
@@ -5530,8 +5530,8 @@
       "command": "validate infra-prices",
       "synopsis": "jsonui-doc validate infra-prices [<root>] [--json]",
       "purpose": {
-        "en": "Validate the price files for the cost simulator (since 2.3.10; nothing reads them for a cost yet). They are read from `<infra.dir>/prices/*.json`, or the folder named by `infra.prices_dir` in jui.config.json, and follow the infra-prices v0 schema: rows of provider, service, sku, region, unit, effective date and source, with either `price_usd` or `tiers`, and optionally a free amount. A file with an error is left out whole (a schema break or a secret's shape). A row with neither or both of price_usd and tiers, tiers that do not start at 0 or overlap, or a row repeating an earlier one's key is a warning and only that row is left out. It does not need the model. Exit 0 when there is no error, including when there is no folder; 1 when there are errors; 2 when the folder cannot be read.",
-        "ja": "コストのシミュレーターの単価のファイルを検証する（2.3.10 から。まだコストに使う物は無い）。`<infra.dir>/prices/*.json`（jui.config.json の `infra.prices_dir` があればそのフォルダ）を読み、形は infra-prices v0 のスキーマ。行ごとに provider・service・sku・region・unit・effective（効く日）・source（出どころ）と、`price_usd` か `tiers` のどちらかを書き、無料の分は任意。スキーマ違反と秘密の形はエラーで、そのファイルをまるごと外す。price_usd と tiers の両方か、どちらも無い行、0 から始まらない・重なる tiers、前の行と同じ鍵の行は警告で、その行だけを外す。モデルは要らない。エラーが無ければ exit 0（フォルダが無いときも 0）、エラーがあれば 1、フォルダが読めなければ 2。"
+        "en": "Validate the price files for the cost simulator (since 2.3.10; from 2.3.14 jui viz's server room prices with them in its コスト view). They are read from `<infra.dir>/prices/*.json`, or the folder named by `infra.prices_dir` in jui.config.json, and follow the infra-prices v0 schema: rows of provider, service, sku, region, unit, effective date and source, with either `price_usd` or `tiers`, and optionally a free amount (from 2.3.14 it can name a pool, aws:data-transfer-out; any other pool is an error, and 2.3.13 rejects a file that writes pool at all). A file with an error is left out whole (a schema break or a secret's shape). A row with neither or both of price_usd and tiers, tiers that do not start at 0 or overlap, or a row repeating an earlier one's key is a warning and only that row is left out. It does not need the model. Exit 0 when there is no error, including when there is no folder; 1 when there are errors; 2 when the folder cannot be read.",
+        "ja": "コストのシミュレーターの単価のファイルを検証する（2.3.10 から。2.3.14 からは jui viz のサーバールームの「コスト」がこれを使う）。`<infra.dir>/prices/*.json`（jui.config.json の `infra.prices_dir` があればそのフォルダ）を読み、形は infra-prices v0 のスキーマ。行ごとに provider・service・sku・region・unit・effective（効く日）・source（出どころ）と、`price_usd` か `tiers` のどちらかを書き、無料の分は任意（2.3.14 からは pool に aws:data-transfer-out を書けて、ほかの pool はエラー。2.3.13 は pool を書いたファイルを読まない）。スキーマ違反と秘密の形はエラーで、そのファイルをまるごと外す。price_usd と tiers の両方か、どちらも無い行、0 から始まらない・重なる tiers、前の行と同じ鍵の行は警告で、その行だけを外す。モデルは要らない。エラーが無ければ exit 0（フォルダが無いときも 0）、エラーがあれば 1、フォルダが読めなければ 2。"
       },
       "options": [
         {
@@ -5563,16 +5563,16 @@
         "jsonui-doc validate infra"
       ],
       "verifiedAgainst": {
-        "version": "2.3.10",
+        "version": "2.3.14",
         "columns": 80,
         "python": "3.12",
         "helpHash": "35cbf88aa22ba3e1c80279b5d3b8b27d420c5a418ae8e6a3b5b2de494b6ee8e6",
-        "cardHash": "6ae10fa3861bac4d7e13f05699d8a134eb981fcb9f4c4b23649542c62cf5cfbe",
+        "cardHash": "ee03225d505b36e3f57c78c3ba94b28bb81eaa432900e3b589b26a0d9d8b2ab5",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "7f59eb8f5066",
           "synopsis": "29329f7f07e2",
-          "purpose": "545da5874dce",
+          "purpose": "2f7c18a8c8cf",
           "options": "9921ce4f1bc6",
           "examples": "5e80a45b3c04",
           "seeAlso": "90625d15102e"

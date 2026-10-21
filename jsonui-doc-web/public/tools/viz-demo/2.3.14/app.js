@@ -2371,6 +2371,7 @@ const SOURCE = {
   // service's values, requester 10-20), after a moment so the keypad's * are seen
   infraDocs(project, seq) { return new Promise((r) => setTimeout(() => r(project === 'shop' ? { ...demoInfra(), seq } : { ok: false, seq, reason: 'no_infra', message: 'デモのこの部屋には構成が無い', short: 'docs/infra がありません' }), 1200)); },
   infraIcon() { return Promise.resolve(null); },
+  infraCost() { return Promise.resolve({ ok: false, reason: 'demo', message: 'デモではコストを計算しない（jui viz の部屋で開いてください）' }); },
 };
 /* The demo's server room: a made-up web shop on one cloud, a CDN in front, a card payment service outside, two
    environments; the IAM role and the alarm are folded until asked for. */
@@ -2412,6 +2413,24 @@ function demoInfra() {
       e('lb', 'web', 'http'), e('web', 'cache', 'redis'), e('web', 'db', 'postgres'), e('web', 'queue', 'sqs'),
       e('worker', 'queue', 'sqs'), e('worker', 'db', 'postgres'), e('db', 'replica', 'postgres', false, prod),
       e('worker', 'pay', 'https'), e('worker', 'cache', 'redis', false, ['staging']), e('alarm', 'lb', 'metrics'), e('role', 'web', 'iam'),
+    ],
+    // what the shop does, step by step (59-sr-flows.js): a person's order with a branch, and the worker's schedule
+    flows: [
+      { id: 'order', label: '注文する', start: 'browser', trigger: 'user', environments: both, steps: [
+        { from: 'browser', to: 'cdn', action: 'request', label: 'POST /orders' }, { from: 'cdn', to: 'lb', action: 'request' },
+        { from: 'lb', to: 'web', action: 'request' },
+        { branch: { label: 'セッションはキャッシュに有る？', default: 'hit', choices: [
+          { id: 'hit', label: '有る', steps: [{ from: 'web', to: 'cache', action: 'read' }, { from: 'cache', to: 'web', action: 'response' }] },
+          { id: 'miss', label: '無い', steps: [{ from: 'web', to: 'db', action: 'read' }, { from: 'db', to: 'web', action: 'response' }] }] } },
+        { from: 'web', to: 'db', action: 'write', label: '注文を保存' },
+        { from: 'db', to: 'web', action: 'response' },
+        { from: 'web', to: 'queue', action: 'enqueue', async: true, label: '支払いを頼む' },
+        { from: 'web', to: 'lb', action: 'response' }, { from: 'lb', to: 'cdn', action: 'response' },
+        { from: 'cdn', to: 'browser', action: 'response', label: '注文を受け付けた' }] },
+      { id: 'pay', label: '支払いを処理する', start: 'worker', trigger: 'schedule', schedule: 'rate(1 minute)', environments: both, steps: [
+        { from: 'worker', to: 'queue', action: 'dequeue' }, { from: 'queue', to: 'worker', action: 'response' },
+        { from: 'worker', to: 'pay', action: 'request', label: 'カードで払う' }, { from: 'pay', to: 'worker', action: 'response' },
+        { from: 'worker', to: 'db', action: 'write', label: '支払い済みにする' }] },
     ],
   };
 }
@@ -4620,7 +4639,7 @@ function build3D() {
     const fit = (proj) => { if (proj && UI.project !== 'all' && UI.project !== proj) setProject(proj, { camera: false }); };
     if (h.kind === 'floor') { if (SOURCE.mode === 'live') towerLeave(h.k, h.project); else towerLeave(0); }   // the demo has one office
     else if (h.kind === 'room') setProject(h.project);
-    else if (h.kind === 'robot') openRobot(h.id, canvas);
+    else if (h.kind === 'robot') selectRobot(h.id, canvas);
     else if (h.kind === 'call') openCall(h.project, canvas);
     else if (h.kind === 'tasks') { fit(h.project); openTaskBoard(canvas, undefined, h.project); }
     else if (h.kind === 'spec') { fit(SPECS[h.i].project); openWhiteboard(h.i, canvas); }
@@ -4655,7 +4674,7 @@ function build3D() {
     const { id, x, y } = tagPress;
     tagPress = null; downAt = null;
     if (Math.hypot(ev.clientX - x, ev.clientY - y) > 6 || (zoom.zoomed && !rbState.id)) return;
-    if (robots.some((R) => R.def.id === id)) openRobot(id, canvas);
+    if (robots.some((R) => R.def.id === id)) selectRobot(id, canvas);
   }, true);
   window.addEventListener('pointercancel', (ev) => { if (tagPress && ev.pointerId === tagPress.pointerId) tagPress = null; }, true);
   canvas.addEventListener('pointermove', (ev) => {
@@ -4843,6 +4862,8 @@ function liveSync() {
     else if (!zoom.zoomed) focusProject(UI.project, false);
   }
   redrawBoards(latestModel, performance.now() / 1000, true);
+  rbZoomWhenBuilt();   // 50-panel.js: a card opened before its robot was put here gets the camera now
+  queueMicrotask(rbFollow);   // 50-panel.js: the open card's robot in another room — after this layout, not inside it
   const empty = $('live-empty');
   if (empty) empty.hidden = !!SESSIONS.length || !SOURCE.connected;
 }
@@ -7143,6 +7164,9 @@ const UI = {
 };
 if (!['all', 'active', 'waiting', 'asking', 'background', 'idle'].includes(UI.sessFilter)) UI.sessFilter = 'all';
 const inScope = (project) => UI.project === 'all' || UI.project === project;
+// rbFollow (below): busy while it switches the view itself; handAt: the last switch by hand (setProject)
+const FOLLOW = { busy: false, handAt: 0 };
+const FOLLOW_HAND_MS = 3000;
 const scopeLabel = () => (UI.project === 'all' ? 'すべて' : PROJECT[UI.project].name);
 function sessionBadge(s) {
   const kinds = new Set(s.robots.map(robotBadgeKind));
@@ -7368,7 +7392,7 @@ document.addEventListener('click', (e) => {
   if (!t) return;
   if (t.dataset.do) decide(t.dataset.perm, t.dataset.do, t);
   else if (t.dataset.open) openTaskBoard(t, t.dataset.open);
-  else if (t.dataset.robotOpen) openRobot(t.dataset.robotOpen, t);
+  else if (t.dataset.robotOpen) selectRobot(t.dataset.robotOpen, t);
   else if (t.dataset.specOpen !== undefined) openWhiteboard(Number(t.dataset.specOpen), t);
   else if (t.dataset.logRobot) openLogFor(t.dataset.logRobot, t);
   else if (t.hasAttribute('data-close-detail')) closeTaskDetail();
@@ -7418,16 +7442,23 @@ function robotToPick(id) {
 }
 function setProject(id, { camera: moveCamera = true } = {}) {
   if (!(id === 'all' || PROJECT[id]) || UI.project === id) return;
+  if (!FOLLOW.busy) FOLLOW.handAt = Date.now();   // a switch by hand (rbFollow does not follow right after one)
   // only a picked robot carries over: with none picked, the room is shown and nothing opens
   const pick = rbState.id ? robotToPick(id) : undefined;
+  // The card closes and the next opens with the 3D held (ticket 2026-10-21-jui-viz-3d-zoom-lost-after-project-switch):
+  // closing alone used to start the flight back, which then ran to its end under the card opened next.
+  const held = !!rbState.id;
+  if (held) holdView('switch');
   if (rbState.id) closeRobot();
   UI.project = id; writePref('project', id);
   if (wb.open && wb.idx >= 0 && !inScope(SPECS[wb.idx].project)) wb.idx = -1;
   if (tb.detail && !tb.detail.startsWith('perm:') && !inScope(PROJECT_OF[tb.detail.split('#')[0]])) tb.detail = null;
   if (SOURCE.mode === 'live' && has3D) liveShowFloorOf(id);   // a room on another floor: go there first
   if (SOURCE.mode === 'live') liveRelayout();                // one room at a time: the room picked, wider (or the floor again)
+  if (has3D && zoom.zoomed) zoom.returnPose = roomPose(id);   // what closes later goes back to this room, not the last one's
   if (pick) openRobot(pick, document.getElementById('scene-canvas'));   // the camera goes to it, not to the room
   else if (moveCamera) focusProject(id);
+  if (held) releaseView('switch');   // no card now: back to this room; a card open: it holds the view
   paintScopeButtons();
   refreshNow();
   if (wb.open) { wbCode.scrollTop = 0; renderWhiteboard(latestModel, true); }
@@ -7711,7 +7742,7 @@ function renderTicker() {
 }
 
 /* ---------- zooming into a board: camera flight, then the board as a page ---------- */
-const zoom = { zoomed: false, returnPose: null, opener: null };
+const zoom = { zoomed: false, returnPose: null, opener: null, waitFor: null };   // waitFor: a robot whose card is open, not yet in the scene
 let camTween = null;
 const viewTarget = new THREE.Vector3();
 function flyTo(pos, target, fromTarget, dur, done) {
@@ -8460,7 +8491,8 @@ const rawDetails = (p) => {
 
 /* ---------- a robot up close: what it is doing, its tasks and its prompts ---------- */
 const rbEl = $('rb');
-const rbState = { id: null };
+// seen: the robot whose room rbFollow last saw, and that room; moved: the card's mark when it does not follow (rbFollow)
+const rbState = { id: null, seen: null, moved: null };
 /* The chat icon of トーク (58-talk.js): a speech bubble, drawn with the text's colour. */
 const TALK_ICON = '<svg class="rb-talk-icon" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3 4.5A2.5 2.5 0 0 1 5.5 2h9A2.5 2.5 0 0 1 17 4.5v6a2.5 2.5 0 0 1-2.5 2.5H9l-4 3.5V13h0A2 2 0 0 1 3 11z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="7.6" r="1" fill="currentColor"/><circle cx="10" cy="7.6" r="1" fill="currentColor"/><circle cx="13" cy="7.6" r="1" fill="currentColor"/></svg>';
 const CAM_DIR = new THREE.Vector3(0.25, 0.42, 0.87).normalize();
@@ -8630,16 +8662,24 @@ const focusing = () => has3D && !!rbState.id && zoom.zoomed && !camTween;
 }
 function openRobot(id, opener) {
   if (projectOfRobot(id)) LAST_ROBOT.set(projectOfRobot(id), id);   // whichever way it was opened (list, tag, card, notification)
+  rbState.seen = { id, room: projectOfRobot(id) || null, name: (PROJECT[projectOfRobot(id)] || {}).name || '' }; rbState.moved = null;
   NOTIFY.opened.set(id, Date.now());   // the session looked at since its turn's end: no 入力待ち reminder (notifyIdle)
   holdView('rb');
   if (wb.open) closeWhiteboard();
   if (tb.open) closeTaskBoard();
   const showing = !!rbState.id;
   rbState.id = id;
-  if (showing) { renderRobot(latestModel); $('rb-close').focus({ preventScroll: true }); return; }
-  // no 3D, or the robot is not in the scene (another floor, another room of the one-room view): the card alone
+  zoom.waitFor = null;
+  if (showing) {   // another robot on the open card: the camera goes to it too (as ← → do)
+    renderRobot(latestModel); $('rb-close').focus({ preventScroll: true });
+    zoomToRobot(id);
+    return;
+  }
+  // no 3D, or the robot is not in the scene yet (another floor, another room of the one-room view): the card alone, and
+  // the camera goes to the robot when the scene puts it there (rbZoomWhenBuilt)
   if (!has3D || !robots.some((x) => x.def.id === id)) {
     if (!zoom.zoomed) zoom.returnPose = null;   // nothing to fly back from when the card closes
+    if (has3D) zoom.waitFor = id;
     showOverlay(rbEl); renderRobot(latestModel); $('rb-close').focus({ preventScroll: true }); return; }
   zoomTo(robotPose(id), opener, () => {
     if (rbState.id !== id) return;
@@ -8648,10 +8688,96 @@ function openRobot(id, opener) {
     $('rb-close').focus({ preventScroll: true });
   });
 }
+/* The camera to the robot whose card is open: now when it is in the scene, else when the scene puts it there. */
+function zoomToRobot(id) {
+  if (!has3D) return;
+  if (robots.some((x) => x.def.id === id)) { zoom.waitFor = null; zoomTo(robotPose(id), null, () => {}); }
+  else zoom.waitFor = id;
+}
+/* Called by the scene after it has put its robots (40-scene.js liveSync): a card opened before its robot was there gets
+   the camera now — the switch back to a project in the one-room view puts that room's robots a frame later. */
+function rbZoomWhenBuilt() {
+  const id = zoom.waitFor;
+  if (!id) return;
+  if (rbState.id !== id) { zoom.waitFor = null; return; }
+  if (!robots.some((x) => x.def.id === id)) return;
+  const from = !zoom.zoomed;
+  zoomToRobot(id);
+  // Not zoomed, the camera was still on (or flying from) the room before: closing goes back to the room shown now.
+  if (from) zoom.returnPose = roomPose(viewRoom());
+}
+/* The room the camera shows with no card open: the project picked, or the floor (as liveSync chooses). */
+function viewRoom() {
+  return UI.project === 'all' || !PROJECT[UI.project] || (SOURCE.mode === 'live' && !PROJECT[UI.project].shown) ? 'all' : UI.project;
+}
+/* The rooms in view: the project picked, or the rooms of the floor shown. */
+function roomsInView() {
+  const live = SOURCE.mode === 'live';
+  return ROOMS.filter((r) => inScope(r.id) && (!live || UI.project !== 'all' || !LIVE.shown.length || LIVE.shown.includes(r.id))).map((r) => r.id);
+}
+/* Picking a robot, from anywhere outside its card (ticket 2026-10-21-jui-viz-3d-zoom-lost-after-project-switch; with
+   2026-10-21-jui-viz-talk-panel-tabs-and-robot-list): the lists, the 3D, the notifications, a talk. Every way ends as a
+   press on the robot in the 3D does — its room shown, its card open, the camera on it. A robot outside the view (another
+   project's room, another floor) is remembered in its room and its project switched to: with a card open, the switch
+   opens it with the view held (setProject); with none, it opens after the switch and the camera goes to it when the
+   scene has put it there (rbZoomWhenBuilt). openRobot is the part inside: only this and setProject call it. */
+function selectRobot(id, opener) {
+  if (!DEF[id]) return;
+  const p = projectOfRobot(id);
+  const away = !!p && !!PROJECT[p] && !roomsInView().includes(p);
+  if (away) {
+    LAST_ROBOT.set(p, id);
+    if (rbState.id) setProject(p);
+    else setProject(p, { camera: false });
+    if (rbState.id === id) return;
+  }
+  const from = !zoom.zoomed;
+  openRobot(id, opener);
+  // From no card, the camera was still on the room before (or wherever it was turned): closing goes back to the room
+  // switched to. A robot not in the scene yet sets it when it gets the camera (rbZoomWhenBuilt).
+  if (away && from && has3D && zoom.zoomed) zoom.returnPose = roomPose(viewRoom());
+}
+/* The open card's robot moved to another room (ticket 2026-10-21-jui-viz-camera-does-not-follow-robot-walking-rooms;
+   the ruling of 10-21): a room in view, it walks there and the camera follows it each frame (40-scene.js). A room out of
+   the view (the one-room view, another floor) put it out of the 3D and the camera stayed where it was: now the view
+   follows it as selectRobot does, and a toast says so. Not right after a switch by hand (FOLLOW_HAND_MS): the card
+   says where it went, with a button to go there. Its room closed: the card stays open and says so. Only while its card
+   is open; called after each liveSync, never inside it (setProject lays the rooms out again). */
+function rbFollow() {
+  const id = rbState.id;
+  if (SOURCE.mode !== 'live' || !id) return;
+  const room = projectOfRobot(id) || null, seen = rbState.seen;
+  if (!seen || seen.id !== id) { rbState.seen = { id, room, name: room && PROJECT[room] ? PROJECT[room].name : '' }; rbState.moved = null; return; }   // ← →: another robot
+  if (!room || !PROJECT[room]) {   // its room closed: its project gone (the same id, or none)
+    if (rbState.moved && rbState.moved.closed !== undefined) return;
+    const was = seen.name || '';
+    seen.room = room;
+    rbState.moved = { closed: was };
+    renderRobot(latestModel);
+    showToast(`${id} の部屋${was ? `（${was}）` : ''}が閉じました`);
+    return;
+  }
+  if (seen.room === room) return;
+  seen.room = room; seen.name = PROJECT[room].name;
+  rbState.moved = null;
+  if (roomsInView().includes(room)) { renderRobot(latestModel); return; }
+  if (Date.now() - FOLLOW.handAt < FOLLOW_HAND_MS) { rbState.moved = { room }; renderRobot(latestModel); return; }
+  rbFollowTo(id, room);
+}
+function rbFollowTo(id, room) {
+  FOLLOW.busy = true;
+  try { selectRobot(id); } finally { FOLLOW.busy = false; }
+  showToast(`${id} を追って ${PROJECT[room].name} へ移りました`);
+}
+rbEl.addEventListener('click', (e) => {
+  if (!e.target.closest('[data-rb-moved-go]') || !rbState.id || !rbState.moved || !rbState.moved.room) return;
+  selectRobot(rbState.id);   // pressed by hand: a switch by hand, as the project menu
+});
 function closeRobot({ byHand = false } = {}) {
+  zoom.waitFor = null;
   if (!rbState.id) { releaseView('rb'); return; }
   if (byHand && projectOfRobot(rbState.id)) LAST_ROBOT.set(projectOfRobot(rbState.id), null);   // closed by hand: none is remembered
-  rbState.id = null;
+  rbState.id = null; rbState.seen = null; rbState.moved = null;
   hideOverlay(rbEl);
   histSync();
   talkSync();
@@ -8665,7 +8791,7 @@ function closeRobot({ byHand = false } = {}) {
    flies with the existing zoomTo (the camera itself is 40-scene.js's). */
 function robotCycle() {
   const live = SOURCE.mode === 'live';
-  const rooms = ROOMS.filter((r) => inScope(r.id) && (!live || UI.project !== 'all' || !LIVE.shown.length || LIVE.shown.includes(r.id))).map((r) => r.id);
+  const rooms = roomsInView();
   return ROBOT_DEFS.filter((d) => rooms.includes(projectOfRobot(d.id)) && !(live && LIVE.leaving[d.id]))
     .sort((a, b) => rooms.indexOf(projectOfRobot(a.id)) - rooms.indexOf(projectOfRobot(b.id)) || a.id.localeCompare(b.id, 'ja', { numeric: true }))
     .map((d) => d.id);
@@ -8681,7 +8807,7 @@ function goRobot(next) {
   if (!rbState.id || !next || next === rbState.id) return;
   rbState.id = next;
   renderRobot(latestModel);
-  if (has3D && robots.some((x) => x.def.id === next)) zoomTo(robotPose(next), null, () => {});
+  zoomToRobot(next);
 }
 rbEl.addEventListener('click', (e) => { const b = e.target.closest('[data-rb-step]'); if (b) stepRobot(Number(b.dataset.rbStep)); });
 /* 2.3.4 (requester 10-19: "タブ選択してる時左右キーがタブの移動になるのやめてほしい 左右はロボットの移動でタブの移動はtabキーに
@@ -8746,10 +8872,18 @@ rbEl.addEventListener('keydown', (e) => {
   if (!next) return;                                  // the last tab forward, the first back: the browser's order
   e.preventDefault();
   next.click();
-  const want = next.dataset.rbTab;
-  const again = [...rbEl.querySelectorAll('[role="tab"]')].find((b) => b.dataset.rbTab === want);   // the card may have been rebuilt
+  const want = next.dataset.fk;   // the card's tabs, or the talk list's (58-talk.js)
+  const again = [...rbEl.querySelectorAll('[role="tab"]')].find((b) => b.dataset.fk === want);   // the card may have been rebuilt
   if (again) again.focus();
 });
+/* The card's mark when its robot moved and the view did not follow (rbFollow). */
+function rbMovedHTML() {
+  const m = rbState.moved;
+  if (!m) return '';
+  if (m.room === undefined) return `<p class="rb-moved" data-rb-moved>部屋${m.closed ? `（${esc(m.closed)}）` : ''}が閉じた</p>`;
+  const name = PROJECT[m.room] ? PROJECT[m.room].name : m.room;
+  return `<p class="rb-moved" data-rb-moved>${esc(name)} へ移った <button type="button" class="link-btn" data-rb-moved-go data-fk="rb-moved-go">そこへ移る</button></p>`;
+}
 function renderRobot(model) {
   const id = rbState.id;
   if (!id || rbEl.hidden) return;
@@ -8759,13 +8893,13 @@ function renderRobot(model) {
   const order = { doing: 0, wait: 1, todo: 2, done: 3 };
   const owned = model.tasks.filter((x) => (isMain ? x.list === id : x.owner === id)).sort((a, b) => order[a.col] - order[b.col] || a.id - b.id);
   const subs = isMain ? (SESSIONS.find((s) => s.id === id) || { robots: [] }).robots.filter((r) => r !== id) : [];
-  keyed(rbEl, JSON.stringify([id, NAMES.rev, permSig(pending), specIdx, owned.map((x) => `${x.key}:${x.col}:${x.perm ? 1 : 0}:${x.subject}`)]), () => {
+  keyed(rbEl, JSON.stringify([id, NAMES.rev, projectOfRobot(id) || '', rbState.moved, permSig(pending), specIdx, owned.map((x) => `${x.key}:${x.col}:${x.perm ? 1 : 0}:${x.subject}`)]), () => {
     const room = (SESSIONS.find((s) => s.id === sess) || { room: (PROJECT[projectOfRobot(id)] || {}).name || '' }).room;
     const tasksHTML = owned.length ? `<ul class="rb-tasks">${owned.map((x) => {
       const [c, l] = x.perm ? ['st-waiting', '許可待ち'] : x.col === 'wait' ? [x.waitingFor === 'question' ? 'st-asking' : 'st-waiting', waitLabel(x)] : COL_STATE[x.col];
       return `<li><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="rt-${esc(x.key)}"><span class="state ${esc(c)}">${esc(l)}</span><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${x.harness ? `<span class="h-tag">${esc(x.harness)}</span>` : ''}${esc(x.subject)}</span>${!isMain || !x.owner ? '' : `<span class="rb-owner">${pill(x.owner, DEF[x.owner].role)}</span>`}</button></li>`;
     }).join('')}</ul>` : `<p class="rb-none">${isMain ? 'このセッションのタスク一覧は空' : '担当しているタスクはない'}</p>`;
-    return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? d.title || `${id} のメインセッション` : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.title ? `${id} のメインセッション · ${d.head}` : d.agent} · ${room}` : `${ROLE_JA[d.role]} · ${sess} セッションのサブエージェント · ${room}`)}</p></div><div class="rb-side"><div class="rb-menu"><button type="button" class="wb-btn rb-talk" data-rb-talk data-fk="rb-talk" aria-pressed="false" aria-label="トーク" title="トーク（SendMessage の会話）">${TALK_ICON}<span>トーク</span><span class="rb-talk-n" data-rb-talk-n hidden></span></button><button type="button" class="wb-btn rb-clock" data-rb-clock data-fk="rb-clock" aria-haspopup="dialog" aria-describedby="rb-clock-why">退勤…</button></div><div class="rb-nav"><button type="button" class="rb-step" data-rb-step="-1" data-fk="rb-prev" aria-label="前のロボット（←）" title="前のロボット（←）">‹</button><button type="button" class="rb-step" data-rb-step="1" data-fk="rb-next" aria-label="次のロボット（→）" title="次のロボット（→）">›</button><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">← 3D に戻る</button></div></div><p class="rb-clock-why" id="rb-clock-why" data-rb-clock-why hidden></p></div>
+    return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? d.title || `${id} のメインセッション` : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.title ? `${id} のメインセッション · ${d.head}` : d.agent} · ${room}` : `${ROLE_JA[d.role]} · ${sess} セッションのサブエージェント · ${room}`)}</p></div><div class="rb-side"><div class="rb-menu"><button type="button" class="wb-btn rb-talk" data-rb-talk data-fk="rb-talk" aria-pressed="false" aria-label="トーク" title="トーク（SendMessage の会話）">${TALK_ICON}<span>トーク</span><span class="rb-talk-n" data-rb-talk-n hidden></span></button><button type="button" class="wb-btn rb-clock" data-rb-clock data-fk="rb-clock" aria-haspopup="dialog" aria-describedby="rb-clock-why">退勤…</button></div><div class="rb-nav"><button type="button" class="rb-step" data-rb-step="-1" data-fk="rb-prev" aria-label="前のロボット（←）" title="前のロボット（←）">‹</button><button type="button" class="rb-step" data-rb-step="1" data-fk="rb-next" aria-label="次のロボット（→）" title="次のロボット（→）">›</button><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">← 3D に戻る</button></div></div><p class="rb-clock-why" id="rb-clock-why" data-rb-clock-why hidden></p>${rbMovedHTML()}</div>
 <div class="rb-tabs"><button type="button" class="wb-btn rb-wide-btn" data-rb-wide data-fk="rb-wide" aria-pressed="false" hidden>広げる</button><button type="button" class="wb-btn rb-low-btn" data-rb-low data-fk="rb-low" aria-pressed="false" hidden>下を広げる</button><div class="rb-tablist" role="tablist" aria-label="表示"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">今の様子</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">応答の履歴</button></div></div>
 <div class="rb-body rb-hist" data-rb-hist hidden aria-label="応答の履歴" tabindex="0"></div>
 <div class="rb-body" tabindex="0" aria-label="今の様子">
@@ -9106,7 +9240,7 @@ function notifyViewing(kind, ref) {
 }
 function notifyOpen(kind, ref) {
   try { window.focus(); } catch (err) { /* the OS may keep it behind */ }
-  if (kind === 'done' || kind === 'idle') { NOTIFY.opened.set(ref.who, Date.now()); if (DEF[ref.who]) openRobot(ref.who, document.getElementById('scene-canvas')); }
+  if (kind === 'done' || kind === 'idle') { NOTIFY.opened.set(ref.who, Date.now()); if (DEF[ref.who]) selectRobot(ref.who, document.getElementById('scene-canvas')); }
   else if (kind === 'perm') openTaskBoard(null, ref.task || `perm:${ref.id}`);
   else { tb.waitView = true; openTaskBoard(null); }
 }
@@ -9659,7 +9793,7 @@ function waitDrop(R) { if (R.waitEl) { R.waitEl.remove(); R.waitEl = null; } }
    session's talk. WAIT.picked says what was picked (the e2e reads it). */
 function waitOpen(id, kind) {
   if (kind === 'input') {
-    openRobot(id, document.getElementById('scene-canvas'));
+    selectRobot(id, document.getElementById('scene-canvas'));
     const until = Date.now() + 4000;
     const talk = () => { if (rbState.id !== id) return; if (rbEl.hidden) { if (Date.now() < until) requestAnimationFrame(talk); return; } talkShow(true); WAIT.picked = { kind, id }; };
     requestAnimationFrame(talk);
@@ -9795,14 +9929,11 @@ function devClose(back = true) {
   const to = DEV.opener; DEV.opener = null;
   if (back && to && document.contains(to)) to.focus({ preventScroll: true });
 }
-/* A row with its robot: that robot's room, the robot picked. The room remembers it first, so the switch's own pick
-   (robotToPick) is this robot, not the one last picked there. */
+/* A row with its robot: the robot picked as any pick is (selectRobot, 50-panel.js) — outside the view, its room is
+   remembered first and switched to, so the switch's own pick is this robot, not the one last picked there. */
 function devGoRobot(label, opener) {
-  const proj = projectOfRobot(label);
   devClose(false);
-  if (proj) LAST_ROBOT.set(proj, label);
-  if (proj && PROJECT[proj] && UI.project !== proj) setProject(proj, { camera: false });
-  if (rbState.id !== label) openRobot(label, opener);
+  selectRobot(label, opener);
 }
 $('btn-devices').addEventListener('click', (e) => (devPane.hidden ? devOpen(e.currentTarget) : devClose()));
 $('dev-close').addEventListener('click', () => devClose());
@@ -11125,7 +11256,9 @@ document.addEventListener('click', (e) => {
   if (!b) return;
   e.preventDefault();
   e.stopPropagation();
-  goRobot(b.dataset.hGo);
+  const id = b.dataset.hGo, p = projectOfRobot(id);
+  if (p && !roomsInView().includes(p)) selectRobot(id, b);   // another project's robot: its room, as any pick
+  else goRobot(id);
 });
 // ---- web/js/56-server-room.js ----
 /* ---------- the server room (ticket 2026-10-20-jui-viz-server-room, part B) ----------
@@ -11172,6 +11305,8 @@ const SR = {
   // drawn strong on a layer of their own; a switch for all (faint) / crossing ones only / the chosen node's only
   lines: 'all', hover: null, plainOpacity: 0.18, crossOpacity: 0.55,
   only: new Set(),   // the clouds chosen on the board's legend (2.3.9, item 3; empty: all)
+  // a box drawn to move in on (2.3.11 item 6): Option + drag, or 範囲で寄る then one drag; fit is how much of the page it fills
+  box: { armed: false, drag: null }, boxFit: 0.92,
 };
 const srEl = $('sr'), srBubbleEl = $('sr-bubble');
 function srNow() { return performance.now(); }
@@ -11439,6 +11574,9 @@ function srShow(model) {
 function srClose() {
   if (SR.phase !== 'open') return;
   SR.phase = 'idle';
+  srBoxEnd();
+  srBoxArm(false);
+  if (typeof srCostReset === 'function') srCostReset();
   srDispose();
   hideOverlay(srEl);
   SR.seq += 1;
@@ -11448,6 +11586,7 @@ function srClose() {
 function srDispose() {
   const V = SR.view;
   if (!V) return;
+  srFlowStop();          // 59-sr-flows.js: a flow playing belongs to this 3D
   cancelAnimationFrame(V.raf);
   V.ro.disconnect();
   V.controls.dispose();
@@ -11603,16 +11742,21 @@ function srBuild() {
   };
   cv.onpointerleave = () => { if (SR.hover) { SR.hover = null; srFocusLines(V); } };
   cv.onpointerup = (e) => { if (V.downAt && Math.hypot(e.clientX - V.downAt[0], e.clientY - V.downAt[1]) < 5) srPick(e); V.downAt = null; };
-  const loop = () => {
+  srFlowBuild(V);          // 59-sr-flows.js: the cones over the nodes that start a flow
+  const loop = () => {   // the cost view over the stage pauses it (SR.paused, 56-server-cost.js): no frame drawn meanwhile
+    if (SR.paused) { V.raf = 0; return; }
     V.raf = requestAnimationFrame(loop);
     const t = srNow();
+    const dt = V.last ? Math.min(t - V.last, 100) : 16;
     if (V.last) { V.frames.push(t - V.last); if (V.frames.length > 240) V.frames.shift(); }
     V.last = t;
     controls.update();
     srLod(V);
+    srFlowTick(V, dt);
     if (t - V.labelAt > 100) { V.labelAt = t; srPlaceLabels(V); }
     renderer.render(scene, camera);
   };
+  V.loop = loop;
   loop();
   SR.stats = { firstMs: Math.round(srNow() - t0), nodes: L.nodes.length, edges: L.edges.length, floors: L.floors.length };
   srLog(`描いた: node ${L.nodes.length}・edge ${L.edges.length}・床 ${L.floors.length}（${SR.stats.firstMs} ms）${env ? `、環境 ${env}` : ''}`);
@@ -11792,6 +11936,71 @@ function srZoomBy(factor) {
   V.camera.position.copy(V.controls.target).add(d);
   V.controls.update();
 }
+/* The box (2.3.11 item 6). Requester 10-20: 「ドラッグで範囲指定できてそこが画面全体になるようにズームするとかできる？」.
+   Option (Alt) + a left drag draws it, or 範囲で寄る then one drag (a finger too). Not Shift: OrbitControls pans on
+   Shift / Ctrl / ⌘ + a left drag. The stage takes the press in the capture phase, so the controls never start turning;
+   a second finger, Esc or a drag under 5 px draws nothing. Let go, the camera keeps its direction and moves in until
+   what the box held fills SR.boxFit of the page; 全体を見る goes back. */
+function srBoxArm(on) {
+  SR.box.armed = on;
+  $('sr-boxzoom').setAttribute('aria-pressed', String(on));
+  $('sr-canvas').parentElement.dataset.box = on ? 'armed' : '';
+}
+function srBoxEnd() {
+  SR.box.drag = null;
+  $('sr-box').hidden = true;
+}
+function srBoxDraw() {
+  const D = SR.box.drag, el = $('sr-box');
+  el.hidden = false;
+  el.style.transform = `translate(${Math.min(D.x0, D.x1)}px, ${Math.min(D.y0, D.y1)}px)`;
+  el.style.width = `${Math.abs(D.x1 - D.x0)}px`; el.style.height = `${Math.abs(D.y1 - D.y0)}px`;
+}
+/* What the box can hold: near the nodes drawn, far the top groups' boxes ([id, point]). */
+function srBoxPoints(V) {
+  if (V.lod === 'far') return V.L.tops.map((G) => [G.g.id, new THREE.Vector3(G.x + G.w / 2, G.boxH / 2, G.z + G.d / 2)]);
+  return [...V.L.pos.values()].filter((p) => !p.hiddenIn).map((p) => [p.n.id, new THREE.Vector3(p.x, p.y + 0.75, p.z)]);
+}
+/* A point on the page now (px within the canvas), or null behind the camera. */
+function srScreenAt(V, v, w, h) {
+  const q = v.clone().project(V.camera);
+  return q.z < -1 || q.z > 1 ? null : [(q.x + 1) / 2 * w, (1 - q.y) / 2 * h];
+}
+function srZoomToBox(x0, y0, x1, y1) {
+  const V = SR.view;
+  if (!V) return;
+  const cv = V.renderer.domElement, w = cv.clientWidth || 1, h = cv.clientHeight || 1;
+  const l = Math.min(x0, x1), r = Math.max(x0, x1), t = Math.min(y0, y1), b = Math.max(y0, y1);
+  V.camera.updateMatrixWorld();
+  const held = srBoxPoints(V).filter(([, v]) => { const s = srScreenAt(V, v, w, h); return s && s[0] >= l && s[0] <= r && s[1] >= t && s[1] <= b; });
+  const dir = V.camera.position.clone().sub(V.controls.target).normalize(), now = V.camera.position.distanceTo(V.controls.target);
+  const { minDistance: lo0, maxDistance: hi0 } = V.controls;
+  const place = (d) => { V.camera.position.copy(V.controls.target).addScaledVector(dir, d); V.camera.updateMatrixWorld(); };
+  if (held.length) {
+    const c = held.reduce((a, [, v]) => a.add(v), new THREE.Vector3()).divideScalar(held.length);
+    V.controls.target.set(c.x, 0, c.z);
+    const k = SR.boxFit;
+    const fits = (d) => {
+      place(d);
+      return held.every(([, v]) => { const q = v.clone().project(V.camera); return q.z > -1 && q.z < 1 && Math.abs(q.x) <= k && Math.abs(q.y) <= k; });
+    };
+    let lo = lo0, hi = Math.max(now, lo0);
+    while (!fits(hi) && hi < hi0) hi = Math.min(hi0, hi * 2);
+    if (fits(lo)) hi = lo;
+    else for (let i = 0; i < 32 && hi - lo > 0.01; i++) { const m = (lo + hi) / 2; if (fits(m)) hi = m; else lo = m; }
+    place(hi);
+  } else {   // nothing in it: its middle on the floor, as much nearer as the box is smaller than the page
+    const ray = new THREE.Raycaster(), at = new THREE.Vector3();
+    ray.setFromCamera(new THREE.Vector2(((l + r) / 2 / w) * 2 - 1, -((t + b) / 2 / h) * 2 + 1), V.camera);
+    if (ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), at)) V.controls.target.copy(at);
+    place(Math.min(hi0, Math.max(lo0, now * Math.max((r - l) / w, (b - t) / h))));
+  }
+  V.camera.near = Math.max(0.1, Math.min(V.camera.near, V.camera.position.distanceTo(V.controls.target) / 500));
+  V.camera.updateProjectionMatrix();
+  V.controls.update();
+  V.lastBox = { held: held.map(([id]) => id), lod: V.lod };
+  srLog(`範囲に寄った: ${V.lastBox.lod === 'far' ? 'group' : 'node'} ${held.length}`);
+}
 
 /* ---- the board and the log ---- */
 function srCounts(L) {
@@ -11818,7 +12027,7 @@ function srRenderBoard() {
 ${sel ? `<h3>選んだもの</h3><dl class="sr-sel"><dt>id</dt><dd>${esc(sel.id)}</dd><dt>名前</dt><dd>${esc(sel.label || '')}</dd><dt>種類</dt><dd>${esc(sel.category)}</dd><dt>provider</dt><dd>${esc(sel.providerResolved || sel.provider || '')}${sel.service ? ` · ${esc(sel.service)}` : ''}</dd>${sel.count > 1 ? `<dt>台数</dt><dd>${esc(String(sel.count))}</dd>` : ''}${sel.engine ? `<dt>エンジン</dt><dd>${esc(sel.engine)}</dd>` : ''}</dl>
 ${Array.isArray(sel.spec) && sel.spec.length ? `<h3>スペック</h3><table class="sr-spec" data-sr-spec><tbody>${sel.spec.map((x) => `<tr><th scope="row">${SR_SPEC_NAME[x.key] ? `${esc(SR_SPEC_NAME[x.key])} <small>${esc(x.key)}</small>` : esc(x.key)}</th><td>${esc(x.value)}</td></tr>`).join('')}</tbody></table>` : ''}
 <p class="sr-acts"><button type="button" class="wb-btn" data-sr-act="focus">これに寄る</button></p>
-<ul class="sr-edges">${edgesOf.map((e) => `<li>${esc(e.from)} → ${esc(e.to)}${e.protocol ? ` <small>${esc(e.protocol)}</small>` : ''}${e.crossProvider ? ' <b>跨ぐ</b>' : ''}</li>`).join('')}</ul>`
+<ul class="sr-edges">${edgesOf.map((e) => `<li>${esc(e.from)} → ${esc(e.to)}${e.protocol ? ` <small>${esc(e.protocol)}</small>` : ''}${e.crossProvider ? ' <b>跨ぐ</b>' : ''}</li>`).join('')}</ul>${srFlowBoardHTML(sel.id)}`
     : grp ? `<h3>選んだ group</h3><dl class="sr-sel"><dt>id</dt><dd>${esc(grp.id)}</dd><dt>名前</dt><dd>${esc(grp.label || '')}</dd><dt>種類</dt><dd>${esc(grp.kind || '')}</dd><dt>provider</dt><dd>${esc(grp.providerResolved || grp.provider || '')}</dd><dt>中の node</dt><dd>${esc(String(inGroup ? srCountNodes(inGroup) : 0))}</dd></dl>
 <p class="sr-acts"><button type="button" class="wb-btn" data-sr-act="focus">これに寄る</button> <button type="button" class="wb-btn" data-sr-act="toggle" data-sr-group="${esc(grp.id)}">${SR.closed.has(grp.id) ? '開く' : '閉じる（箱 1 つに）'}</button></p>`
     : '<p class="sr-hint">形や床を押すと、ここに詳しく出ます（床なら、その group を閉じる・開く）</p>'}
@@ -11842,6 +12051,37 @@ if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEven
 new MutationObserver(srRetheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 $('sr-back').addEventListener('click', srClose);
 $('sr-fit').addEventListener('click', () => srFit(false));
+$('sr-boxzoom').addEventListener('click', () => { srBoxEnd(); srBoxArm(!SR.box.armed); });
+{
+  const stage = $('sr-canvas').parentElement;
+  const local = (e) => { const r = stage.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  stage.addEventListener('pointerdown', (e) => {   // capture: before OrbitControls on the canvas
+    if (SR.phase !== 'open' || !SR.view || SR.paused) return;   // コスト is drawn on the stage: its presses are its own
+    if (SR.box.drag) { e.stopPropagation(); e.preventDefault(); srBoxEnd(); return; }   // a second finger: no box
+    if (e.button !== 0 || !(e.altKey || SR.box.armed)) return;
+    e.stopPropagation(); e.preventDefault();
+    const [x, y] = local(e);
+    SR.box.drag = { id: e.pointerId, x0: x, y0: y, x1: x, y1: y };
+    try { stage.setPointerCapture(e.pointerId); } catch { /* a pointer already gone */ }
+  }, true);
+  stage.addEventListener('pointermove', (e) => {
+    const D = SR.box.drag;
+    if (!D || e.pointerId !== D.id) return;
+    e.stopPropagation();
+    [D.x1, D.y1] = local(e);
+    srBoxDraw();
+  }, true);
+  const up = (e) => {
+    const D = SR.box.drag;
+    if (!D || e.pointerId !== D.id) return;
+    e.stopPropagation();
+    srBoxEnd();
+    srBoxArm(false);
+    if (e.type === 'pointerup' && Math.abs(D.x1 - D.x0) >= 5 && Math.abs(D.y1 - D.y0) >= 5) srZoomToBox(D.x0, D.y0, D.x1, D.y1);
+  };
+  stage.addEventListener('pointerup', up, true);
+  stage.addEventListener('pointercancel', up, true);
+}
 $('sr-zin').addEventListener('click', () => srZoomBy(1 / SR.zoomStep));
 $('sr-lines').addEventListener('change', () => {
   SR.lines = $('sr-lines').value;
@@ -11858,6 +12098,8 @@ $('sr-board').addEventListener('click', (e) => {
     srBuild();
     return;
   }
+  const fl = e.target.closest('[data-sr-flow]');
+  if (fl) { srFlowPlay(fl.dataset.srFlow); return; }   // 59-sr-flows.js
   const b = e.target.closest('[data-sr-act]');
   if (!b) return;
   if (b.dataset.srAct === 'focus') srFocusSelected();
@@ -11875,9 +12117,239 @@ for (const [btn, el] of [['sr-board-btn', 'sr-board'], ['sr-log-btn', 'sr-log']]
 }
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
+  if (SR.phase === 'open' && (SR.box.drag || SR.box.armed)) { e.preventDefault(); e.stopPropagation(); srBoxEnd(); srBoxArm(false); return; }   // the box only, the room stays
   if (SR.phase === 'loading') { e.preventDefault(); e.stopPropagation(); srCancel(); return; }
   if (SR.phase === 'open') { e.preventDefault(); e.stopPropagation(); srClose(); }
 }, true);
+// ---- web/js/56-server-cost.js ----
+/* ---------- the cost simulator (plan 2026-10-20-jui-viz-backend-load-and-cost-simulator, L-C) ----------
+   Requester 10-20: 「バックエンドの負荷とコストシミュレータをサーバーの3dと切り替えで表示出来るようにしたい … 1ヶ月のコストグラフ …
+   1日のうちで横棒グラフでどのノードのコストがどう変わっていくかをシミュレーション」; 「棒の中とかに何がどのくらいコストを生んでるか
+   表示して欲しい 例えばリクエスト100/sec」; 「捌ききれなくなった時に赤字になって捌けた数/リクエスト数みたいな表示」.
+
+   The page computes nothing: SOURCE.infraCost asks the server (POST /api/infra-cost), which runs document_tools' load,
+   engine and view and gives the shapes drawn here. 3D / コスト on the server room's header switches the stage: the 3D
+   pauses (no frame drawn) while the cost is shown. The month: the days stacked by provider or by node, a red mark on a
+   day with an hour over capacity, a flag on one at the autoscale's top, the sum, and the counts of what is not priced
+   (never hidden). A day: the top nodes' bars hour by hour (play, stop, the hour's slider), each bar its meters with the
+   quantity's rate and the charge; over capacity in red as 捌けた / 来た. A meter pressed shows the price it used. */
+const SRC = { mode: '3d', seq: 0, scenario: null, by: 'provider', month: null, day: null, date: null, hour: 0, timer: 0,
+  playMs: 700, picked: null, error: '' };
+const srcEl = $('sr-cost');
+const SRC_PER = { second: 'sec', minute: 'min', hour: 'h', day: 'day', month: 'mo' };
+const SRC_COLORS = ['#4e79a7', '#f28e2b', '#59a14f', '#e15759', '#76b7b2', '#edc948', '#b07aa1', '#ff9da7', '#9c755f', '#bab0ac'];
+
+function srcUsd(v) {
+  if (v === null || v === undefined) return '単価なし';
+  const digits = Math.abs(v) < 1 && v !== 0 ? 4 : 2;
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: digits }).format(v);
+}
+function srcNum(v) {
+  return new Intl.NumberFormat('en-US', { maximumFractionDigits: v !== 0 && Math.abs(v) < 10 ? 2 : 0 }).format(v);
+}
+function srcRate(rate) { return rate ? `${srcNum(rate.value)}/${SRC_PER[rate.per] || rate.per}` : ''; }
+function srcKeyColor(key, i) {
+  if (SRC.month && SRC.month.by === 'provider' && key !== '__others__') return srProviderColor(key);
+  return key === '__others__' ? '#9aa0a6' : SRC_COLORS[i % SRC_COLORS.length];
+}
+
+/* ---- switching ---- */
+function srcSetMode(mode) {
+  SRC.mode = mode;
+  $('sr-mode-3d').setAttribute('aria-pressed', String(mode === '3d'));
+  $('sr-mode-cost').setAttribute('aria-pressed', String(mode === 'cost'));
+  $('sr-scn-ctl').hidden = mode !== 'cost';
+  srcEl.hidden = mode !== 'cost';
+  SR.paused = mode === 'cost';
+  $('sr-boxzoom').disabled = mode === 'cost';   // the box is the 3D's (56-server-room.js); the cost page takes its own presses
+  if (mode === 'cost') { srBoxEnd(); srBoxArm(false); srFlowStop(); }   // a flow playing (59-sr-flows.js) is the 3D's too
+  if (mode === '3d') {
+    srcStop();
+    if (SR.view && !SR.view.raf && SR.view.loop) SR.view.loop();
+    return;
+  }
+  if (!SRC.month) srcLoad();
+}
+function srCostReset() {   // the server room closed (56-server-room.js srClose): back to 3D, nothing kept
+  srcStop();
+  Object.assign(SRC, { mode: '3d', scenario: null, month: null, day: null, date: null, hour: 0, picked: null, error: '' });
+  SR.paused = false;
+  $('sr-boxzoom').disabled = false;
+  $('sr-mode-3d').setAttribute('aria-pressed', 'true');
+  $('sr-mode-cost').setAttribute('aria-pressed', 'false');
+  $('sr-scn-ctl').hidden = true;
+  srcEl.hidden = true;
+  setHTML(srcEl, '');
+}
+
+/* ---- asking the server ---- */
+async function srcAsk(extra) {
+  const seq = ++SRC.seq;
+  const got = typeof SOURCE.infraCost === 'function' ? await SOURCE.infraCost(SR.project, { seq, scenario: SRC.scenario, ...extra })
+    : { ok: false, reason: 'unreadable', message: 'このページでは計算できない' };
+  return seq === SRC.seq && SRC.mode === 'cost' ? got : null;   // an older answer, or the view left: dropped
+}
+async function srcLoad() {
+  SRC.error = '';
+  srcRender('読み込んでいます…');
+  const got = await srcAsk({ by: SRC.by });
+  if (!got) return;
+  if (!got.ok) { SRC.error = got.message || got.reason || '読めなかった'; SRC.month = null; srcRender(); return; }
+  SRC.scenario = got.scenario;
+  SRC.month = { ...got.month, scenarios: got.scenarios, problems: got.problems, prices: got.prices };
+  setHTML($('sr-scn'), got.scenarios.map((s) => `<option value="${esc(s.id)}"${s.id === got.scenario ? ' selected' : ''}>${esc(s.label)}（${esc(s.month)}）</option>`).join(''));
+  srLog(`コスト: ${got.scenarios.find((s) => s.id === got.scenario).label} を計算した（${srcUsd(got.month.usd)}）`);
+  if (SRC.date) await srcOpenDay(SRC.date); else srcRender();
+}
+async function srcOpenDay(date) {
+  const got = await srcAsk({ date });
+  if (!got) return;
+  if (!got.ok) { SRC.error = got.message || '読めなかった'; srcRender(); return; }
+  Object.assign(SRC, { date, day: got.day, hour: Math.min(SRC.hour, got.day.hours.length - 1), picked: null });
+  srcRender();
+}
+function srcBackToMonth() { srcStop(); Object.assign(SRC, { date: null, day: null, picked: null }); srcRender(); }
+
+/* ---- playing the day ---- */
+function srcPlay() {
+  if (reduceMotion || !SRC.day) return;   // reduced motion: the slider only
+  srcStop();
+  if (SRC.hour >= SRC.day.hours.length - 1) SRC.hour = 0;
+  SRC.timer = setInterval(() => {
+    if (!SRC.day || SRC.hour >= SRC.day.hours.length - 1) { srcStop(); srcRender(); return; }
+    SRC.hour += 1;
+    srcRender();
+  }, SRC.playMs);
+  srcRender();
+}
+function srcStop() { if (SRC.timer) { clearInterval(SRC.timer); SRC.timer = 0; } }
+
+/* ---- the month ---- */
+function srcSummary(M) {
+  const chips = [
+    ['noPrice', '単価なし', M.noPrice.length, M.noPrice.map((x) => `${x.node} · ${x.meter}（${x.sku}・${x.unit}）`)],
+    ['noRule', '規則なし', M.noRule.length, M.noRule],
+    ['loadUndefined', '負荷未定義', M.loadUndefined.length, M.loadUndefined],
+    ['overflow', '容量を超えた node', Object.keys(M.overflowHours).length, Object.entries(M.overflowHours).map(([n, h]) => `${n}: ${h} 時間`)],
+    ['problems', '負荷定義の警告', M.problems.count, M.problems.first.map((p) => `${p.file} ${p.path}: ${p.message}`)],
+    ['warnings', '計算の注意', M.warningCount, M.warnings.map(srcWarnText)],
+  ];
+  // the free amount is taken once per scenario (one environment): environments on one account each counted take it twice
+  const free = M.warnings.find((w) => w.code === 'cost.free_per_scenario');
+  const freeHTML = free ? `<p class="src-free" data-src-free role="note">無料枠はシナリオ（環境）ごとに引いている。同じアカウントの環境を別々に数えると、無料枠を二重に引くので、合計は少なめに出る${free.rows && free.rows.length ? `（無料枠のある行 ${Number(free.rows.length)} 件）` : ''}</p>` : '';
+  return `<div class="src-sum"><strong class="src-total" data-src-total>${esc(srcUsd(M.usd))}</strong><span class="src-note">1 か月の概算（USD・オンデマンド。予約・割引・税は入っていない）</span>
+<label class="sr-ctl">積み上げ <select id="src-by"><option value="provider"${M.by === 'provider' ? ' selected' : ''}>provider ごと</option><option value="node"${M.by === 'node' ? ' selected' : ''}>node ごと</option></select></label></div>
+<div class="src-chips">${chips.map(([k, label, n, items]) => `<details class="src-chip" data-src-chip="${k}"${n ? ' data-some="1"' : ''}><summary>${esc(label)} <b>${n}</b></summary>${items.length ? `<ul>${items.slice(0, 50).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p>なし</p>'}</details>`).join('')}</div>${freeHTML}`;
+}
+/* An engine warning in one line: its message, and the rows it names (a row is an id or a {id}). */
+function srcWarnText(w) {
+  const rows = Array.isArray(w.rows) ? w.rows.map((r) => (r && typeof r === 'object' ? String(r.id || r.sku || JSON.stringify(r)) : String(r))) : [];
+  return `${w.node ? `${w.node} · ` : ''}${w.message}${rows.length ? `（${rows.slice(0, 8).join('・')}${rows.length > 8 ? ` ほか ${rows.length - 8}` : ''}）` : ''}`;
+}
+function srcMonthSvg(M) {
+  const w = Math.max(320, srcEl.clientWidth - 32), h = 260, padL = 56, padB = 28, padT = 18;
+  const max = Math.max(...M.days.map((d) => d.usd), 0.0001), bw = (w - padL - 8) / M.days.length;
+  const y = (v) => padT + (h - padT - padB) * (1 - v / max);
+  const ticksHTML = [0, 0.5, 1].map((f) => `<g class="src-tick"><line x1="${Number(padL)}" x2="${Number(w - 4)}" y1="${Number(y(max * f))}" y2="${Number(y(max * f))}"/><text x="${Number(padL - 6)}" y="${Number(y(max * f) + 4)}" text-anchor="end">${esc(srcUsd(max * f))}</text></g>`).join('');
+  const barsHTML = M.days.map((d, i) => {
+    let acc = 0;
+    const x = padL + i * bw + 1;
+    const segsHTML = M.keys.map((k, ki) => {
+      const v = d.stack[k.key] || 0;
+      if (!v) return '';
+      const y0 = y(acc + v), hh = y(acc) - y0;
+      acc += v;
+      return `<rect x="${Number(x)}" y="${Number(y0)}" width="${Math.max(1, bw - 2)}" height="${Math.max(0, hh)}" fill="${esc(srcKeyColor(k.key, ki))}"><title>${esc(k.label)} ${esc(srcUsd(v))}</title></rect>`;
+    }).join('');
+    const marksHTML = (d.overflowHours ? `<circle class="src-over" cx="${Number(x + bw / 2 - 1)}" cy="${Number(y(d.usd) - 8)}" r="4"><title>${Number(d.overflowHours)} 時間、容量を超えた</title></circle>` : '')
+      + (d.atMaxHours ? `<text class="src-flag" x="${Number(x + bw / 2 - 1)}" y="${Number(y(d.usd) - (d.overflowHours ? 14 : 4))}" text-anchor="middle">⚑<title>${Number(d.atMaxHours)} 時間、自動スケールの上限</title></text>` : '');
+    return `<g class="src-day" data-src-date="${esc(d.date)}" tabindex="0" role="button" aria-label="${esc(d.date)} ${esc(srcUsd(d.usd))}">${segsHTML}<rect class="src-hit" x="${Number(x)}" y="${Number(padT)}" width="${Math.max(1, bw - 2)}" height="${Number(h - padT - padB)}"/>${marksHTML}<text class="src-dlabel" x="${Number(x + bw / 2 - 1)}" y="${Number(h - 10)}" text-anchor="middle">${esc(String(Number(d.date.slice(8))))}</text></g>`;
+  }).join('');
+  const legendHTML = M.keys.map((k, ki) => `<span class="src-key"><i style="background:${esc(srcKeyColor(k.key, ki))}"></i>${esc(k.label)}</span>`).join('');
+  return `<svg class="src-month" width="${Number(w)}" height="${Number(h)}" viewBox="0 0 ${Number(w)} ${Number(h)}" role="img" aria-label="${esc(M.month)} の日ごとのコスト">${ticksHTML}${barsHTML}</svg><div class="src-legend">${legendHTML}</div><p class="src-hint">棒を押すと、その日の 1 日を再生します。</p>`;
+}
+
+/* ---- a day ---- */
+function srcRunning(hr) {
+  if (hr.range) return `稼働 ${srcNum(hr.running)} 台（自動、${hr.range[0]}〜${hr.range[1]}）`;
+  if (hr.sku && hr.running) return `${hr.sku} × ${srcNum(hr.running)}`;
+  return hr.running ? `稼働 ${srcNum(hr.running)} 台` : '';
+}
+function srcSegText(sg) { return `${sg.label}${sg.rate ? ` ${srcRate(sg.rate)}` : ''} · ${srcUsd(sg.usd)}`; }
+function srcRow(n, k, max, barPx) {
+  const hr = n.hours[k];
+  if (n.note) return `<div class="src-row src-noted" data-src-node="${esc(n.node)}"><div class="src-name">${esc(n.label)}</div><div class="src-bar"><span class="src-notetext">${esc(n.note === 'no rule' ? '規則なし' : '負荷未定義')}</span></div></div>`;
+  const over = hr.load && hr.load.overflow > 0;
+  const marksHTML = (hr.atMax ? '<span class="src-flag" title="自動スケールの上限">⚑</span>' : '') + (hr.stepChanged ? '<span class="src-step" title="型が変わった">◆</span>' : '');
+  const outside = [];
+  const segsHTML = hr.segments.map((sg, i) => {
+    const pct = max > 0 && sg.usd ? (sg.usd / max) * 100 : 0, text = srcSegText(sg);
+    const fits = pct / 100 * barPx >= text.length * 7 + 12;
+    if (!fits) outside.push(text);
+    return `<span class="src-seg" tabindex="0" role="button" data-src-seg="${i}" style="width:${Number(pct.toFixed(3))}%;background:${esc(SRC_COLORS[i % SRC_COLORS.length])}" title="${esc(text)}" aria-label="${esc(text)}">${fits ? esc(text) : ''}</span>`;
+  }).join('');
+  const noPrice = hr.segments.filter((sg) => sg.usd === null).map((sg) => `${sg.label}${sg.rate ? ` ${srcRate(sg.rate)}` : ''} · 単価なし`);
+  const loadHTML = over ? `<span class="src-red" data-src-over>${esc(hr.load.label)} ${esc(srcNum(hr.load.served))} / ${esc(srcNum(hr.load.demand))} /${esc(SRC_PER[hr.load.per] || hr.load.per)}（捌けた / 来た）</span>` : '';
+  return `<div class="src-row${over ? ' src-overrow' : ''}" data-src-node="${esc(n.node)}"><div class="src-name">${esc(n.label)}<small>${esc(srcRunning(hr))}</small>${marksHTML}</div><div class="src-bar">${segsHTML}<span class="src-out">${esc([...outside, ...noPrice].join('　'))}</span></div><div class="src-usd">${esc(srcUsd(hr.usd))}${loadHTML ? `<br>${loadHTML}` : ''}</div></div>`;
+}
+function srcDayHtml(D) {
+  const k = SRC.hour, hourUsd = D.nodes.reduce((a, n) => a + (n.note ? 0 : n.hours[k].usd), 0) + (D.others.usd[k] || 0);
+  const max = Math.max(...D.nodes.flatMap((n) => (n.note ? [] : n.hours.map((h) => h.usd))), 0.0001);
+  const barPx = Math.max(160, srcEl.clientWidth - 420);
+  const rowsHTML = D.nodes.map((n) => srcRow(n, k, max, barPx)).join('')
+    + (D.others.count ? `<div class="src-row src-noted"><div class="src-name">その他（${Number(D.others.count)}）</div><div class="src-bar"></div><div class="src-usd">${esc(srcUsd(D.others.usd[k]))}</div></div>` : '');
+  const pickHTML = SRC.picked ? srcPicked(D) : '';
+  return `<div class="src-dayhead"><button type="button" class="wb-btn" data-src-act="month">← 1 か月</button><strong>${esc(D.date)}</strong>
+<button type="button" class="wb-btn" data-src-act="${SRC.timer ? 'stop' : 'play'}"${reduceMotion ? ' disabled title="動きを減らす設定のため、再生しません"' : ''}>${SRC.timer ? '止める' : '再生'}</button>
+<label class="sr-ctl">時刻 <input type="range" id="src-hour" min="0" max="${Number(D.hours.length - 1)}" value="${k}" step="1"></label><span class="src-clock" data-src-clock>${esc(String(D.hours[k]).padStart(2, '0'))}:00</span>
+<span class="src-hoursum">この時間 ${esc(srcUsd(hourUsd))}・この日 ${esc(srcUsd(D.usd))}</span></div>
+<div class="src-rows">${rowsHTML}</div>${pickHTML ? `<div class="src-price" data-src-price>${pickHTML}</div>` : '<p class="src-hint">区間を押すと、使った単価の出どころが出ます。</p>'}`;
+}
+function srcPicked(D) {
+  const n = D.nodes.find((x) => x.node === SRC.picked.node);
+  const sg = n && !n.note ? n.hours[SRC.hour].segments[SRC.picked.seg] : null;
+  if (!sg) return '';
+  const p = sg.price;
+  return `<h4>${esc(n.label)} · ${esc(sg.label)}</h4><dl><dt>量</dt><dd>${esc(srcNum(sg.amount))} ${esc(sg.unit)}${sg.rate ? `（${esc(srcRate(sg.rate))} ${esc(sg.rate.unit)}）` : ''}</dd><dt>金額</dt><dd>${esc(srcUsd(sg.usd))}</dd>`
+    + (p ? `<dt>単価</dt><dd>${esc(p.sku)} · ${esc(p.unit)}${p.per_units > 1 ? ` · ${esc(srcNum(p.per_units))} あたり` : ''} · ${esc(p.region)}</dd><dt>出どころ</dt><dd>${esc({ user: '利用者のファイル', cache: '取得した単価', bundled: '同梱の表' }[p.layer] || p.layer)} · ${esc(p.file)} の ${esc(String(p.index))} 行目</dd><dt>source</dt><dd>${esc(p.source)}</dd><dt>effective</dt><dd>${esc(p.effective)}</dd>`
+      : '<dt>単価</dt><dd>単価なし（この sku の単価が、どの層にもない）</dd>') + '</dl>';
+}
+
+function srcRender(status) {
+  if (SRC.mode !== 'cost') return;
+  if (status) { setHTML(srcEl, `<p class="src-status">${esc(status)}</p>`); return; }
+  if (SRC.error) { setHTML(srcEl, `<p class="src-status src-red">コストを出せません: ${esc(SRC.error)}</p>`); return; }
+  if (!SRC.month) return;
+  if (SRC.day) setHTML(srcEl, srcDayHtml(SRC.day));
+  else setHTML(srcEl, `${srcSummary(SRC.month)}${srcMonthSvg(SRC.month)}`);
+}
+
+/* ---- wiring ---- */
+$('sr-mode-3d').addEventListener('click', () => srcSetMode('3d'));
+$('sr-mode-cost').addEventListener('click', () => srcSetMode('cost'));
+$('sr-scn').addEventListener('change', () => { SRC.scenario = $('sr-scn').value; Object.assign(SRC, { month: null, day: null }); srcLoad(); });
+srcEl.addEventListener('click', (e) => {
+  const act = e.target.closest('[data-src-act]');
+  if (act) {
+    if (act.dataset.srcAct === 'month') srcBackToMonth();
+    else if (act.dataset.srcAct === 'play') srcPlay();
+    else { srcStop(); srcRender(); }
+    return;
+  }
+  const day = e.target.closest('[data-src-date]');
+  if (day) { SRC.hour = 0; srcOpenDay(day.dataset.srcDate); return; }
+  const seg = e.target.closest('[data-src-seg]');
+  if (seg) { SRC.picked = { node: seg.closest('[data-src-node]').dataset.srcNode, seg: Number(seg.dataset.srcSeg) }; srcRender(); }
+});
+srcEl.addEventListener('keydown', (e) => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('[data-src-date], [data-src-seg]')) { e.preventDefault(); e.target.click(); }
+});
+srcEl.addEventListener('input', (e) => {
+  if (e.target.id === 'src-hour') { srcStop(); SRC.hour = Number(e.target.value); srcRender(); }
+});
+srcEl.addEventListener('change', (e) => {
+  if (e.target.id === 'src-by') { SRC.by = e.target.value; Object.assign(SRC, { month: null }); srcLoad(); }
+});
 // ---- web/js/57-fulltext.js ----
 /* ---------- the whole text of a line cut to one (2.3.6, requester 10-19: "これテストのパスが見えないからホバーで全部表示されるようにしてほしい") ----------
    One component for every one-line ellipsis of the robot card and the side panel (the family: FULLTEXT_LINES; the table is
@@ -12113,6 +12585,7 @@ const TALK = {
   list: null, more: false, listError: '', listAt: 0,
   conv: null,                  // the talk shown in detail (convId), or null: the list
   want: null,                  // a talk to show once the card has switched to the peer (the header's press)
+  tab: 'talks',                // the list's tab: 'talks' (トーク履歴) or 'robots' (ロボット一覧); kept across robots
   msgs: new Map(),             // convId -> { items, more, busy, error, loaded }
   seenSent: new Map(),         // `${agent}|${convId}` -> upTo sent
   seenWant: new Map(),         // `${agent}|${convId}` -> the newest at seen on screen, not sent yet
@@ -12268,8 +12741,7 @@ function talkToEnd() {
 }
 function talkPaintNewer() { const b = TALK.node && TALK.node.querySelector('[data-tk-newer]'); if (b) b.hidden = !(TALK.newer && TALK.conv); }
 
-function talkPeerMark(peer) {
-  const label = SOURCE.talkLabel(peer.agentId);
+function talkPeerMark(peer, label = SOURCE.talkLabel(peer.agentId)) {
   const span = hNode('span', 'talk-mark');
   span.setAttribute('aria-hidden', 'true');
   if (label && DEF[label]) {   // the robot's mark, as pill() draws it (built as nodes here)
@@ -12288,7 +12760,7 @@ function talkGoneText(peer) {
 function talkHead() {
   const head = TALK.node.querySelector('[data-tk-head]');
   const conv = TALK.conv && TALK.list ? TALK.list.find((c) => c.id === TALK.conv) : null;
-  const sig = JSON.stringify([TALK.owner, TALK.conv, conv && conv.peer, NAMES.rev]);
+  const sig = JSON.stringify([TALK.owner, TALK.conv, conv && conv.peer, NAMES.rev, TALK.tab]);
   if (head._sig === sig) return;
   head._sig = sig;
   const fk = head.contains(document.activeElement) ? document.activeElement.dataset.fk : undefined;
@@ -12296,7 +12768,13 @@ function talkHead() {
   if (!TALK.conv) {
     const back = hNode('button', 'wb-btn talk-back', tl('talk.back.card')); back.type = 'button'; back.dataset.tkClose = ''; back.dataset.fk = 'talk-close';
     const title = hNode('h3', 'talk-title', tl('talk.title'));
-    kids.push(back, title);
+    const tabs = hNode('div', 'talk-tabs'); tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', tl('talk.tabs.aria'));
+    for (const [k, text] of TALK_TABS) {
+      const b = hNode('button', 'talk-tab', text); b.type = 'button'; b.dataset.tkTab = k; b.dataset.fk = `talk-tab-${k}`;
+      b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(TALK.tab === k));
+      tabs.appendChild(b);
+    }
+    kids.push(back, title, tabs);
   } else {
     const back = hNode('button', 'wb-btn talk-back', tl('talk.back.list')); back.type = 'button'; back.dataset.tkBack = ''; back.dataset.fk = 'talk-back';
     back.setAttribute('aria-label', tl('talk.back.list.aria'));
@@ -12331,6 +12809,52 @@ function talkRow(c) {
   b.append(talkPeerMark(c.peer), text);
   b.setAttribute('aria-label', tl('talk.row.aria', { name: c.peer.name, at: talkTime(c.lastAt), unread: c.unread ? tl('talk.row.unread', { n: c.unread }) : '', preview: c.preview }));
   return b;
+}
+/* ---------- the list's two tabs (2026-10-21-jui-viz-talk-panel-tabs-and-robot-list; requester: 「ここ上にタブでトーク履歴が
+   あるのと履歴がない今動いてるロボットの一覧を切り替えて他のロボットに移動しやすくしたい。一覧からロボットに移動できるリンクもつけて、
+   それクリックで3dも移動」) ----------
+   トーク履歴 is the talks as before; ロボット一覧 is the robots on the page now (not leaving, not this card's robot) that
+   have no talk with this robot. A row on either names its robot with ロボットへ移る: pressed, that robot is picked as a
+   press on it in the 3D picks it (selectRobot: its room shown, the card on it, the camera on it), the talk closed. */
+const TALK_TABS = [['talks', tl('talk.tab.talks')], ['robots', tl('talk.tab.robots')]];
+function talkRobotName(id) {
+  const d = DEF[id];
+  return SESSION_OF[id] === id ? d.title || tl('talk.robot.main', { id }) : d.agent;
+}
+/* The robot a row goes to: on the page, not leaving, not the card's own. */
+function talkGoable(label) {
+  return !!label && !!DEF[label] && label !== TALK.owner && ROBOT_DEFS.some((d) => d.id === label)
+    && !(SOURCE.mode === 'live' && LIVE.leaving[label]);
+}
+function talkGoButton(label, name) {
+  const b = hNode('button', 'link-btn talk-go', tl('talk.go')); b.type = 'button';
+  b.dataset.tkGo = label; b.dataset.fk = `talk-go-${label}`;
+  b.setAttribute('aria-label', tl('talk.go.aria', { name }));
+  return b;
+}
+/* ロボット一覧: the robots with no talk here, room by room in the rooms' order, then by label. */
+function talkRobots() {
+  const talked = new Set((TALK.list || []).map((c) => SOURCE.talkLabel(c.peer.agentId)).filter(Boolean));
+  const rooms = ROOMS.map((r) => r.id);
+  return ROBOT_DEFS.filter((d) => talkGoable(d.id) && !talked.has(d.id))
+    .sort((a, b) => rooms.indexOf(projectOfRobot(a.id)) - rooms.indexOf(projectOfRobot(b.id)) || a.id.localeCompare(b.id, 'ja', { numeric: true }))
+    .map((d) => d.id);
+}
+function talkRobotRow(id) {
+  const li = hNode('li', 'talk-item');
+  const who = hNode('div', 'talk-robot');
+  who.dataset.tkRobot = id;
+  const text = hNode('span', 'talk-row-text');
+  const name = talkRobotName(id), room = (PROJECT[projectOfRobot(id)] || {}).name || '';
+  text.append(hNode('span', 'talk-row-name', name), hNode('span', 'talk-row-pre', [ROLE_JA[DEF[id].role], room].filter(Boolean).join(' · ')));
+  who.append(talkPeerMark({ kind: 'session' }, id), text);
+  li.append(who, talkGoButton(id, name));
+  return li;
+}
+function talkGo(label, opener) {
+  if (!talkGoable(label)) { showToast(tl('talk.go.absent')); return; }
+  TALK.on = false; TALK.conv = null; TALK.note = '';
+  selectRobot(label, opener);
 }
 const TALK_STATE = { read: tl('talk.state.read'), delivered: tl('talk.state.delivered'), sent: tl('talk.state.sent'), undelivered: tl('talk.state.undelivered') };
 function talkMsgSig(m) { return JSON.stringify([m.id, m.state, m.readAt, m.deliveredAt, m.text, m.cut, m.merged, m.dir]); }
@@ -12393,6 +12917,10 @@ function talkClick(e) {
   if (row) { talkOpenConv(row.dataset.tkConv); return; }
   const peer = t.closest('[data-tk-peer]');
   if (peer) { talkSwitch(peer.dataset.tkPeer); return; }
+  const tab = t.closest('[data-tk-tab]');
+  if (tab) { TALK.tab = tab.dataset.tkTab; talkRender(); return; }
+  const go = t.closest('[data-tk-go]');
+  if (go) { talkGo(go.dataset.tkGo, go); return; }
   if (t.closest('[data-tk-newer]')) { talkToEnd(); return; }
   if (t.closest('[data-tk-older]')) { talkLoad(TALK.conv, true); return; }
   const more = t.closest('[data-tk-more]');
@@ -12418,24 +12946,44 @@ function talkSwitch(agentId) {
   const label = SOURCE.talkLabel(agentId);
   if (!label || !DEF[label]) { showToast(tl('talk.robot.absent')); return; }
   if (label === TALK.owner) return;
-  TALK.want = TALK.conv;
-  openRobot(label);
+  const conv = TALK.conv;
+  TALK.want = conv;
+  selectRobot(label);
+  // A robot in another room: the project switch closed the card and opened it again (the talk with it). Open the talk again.
+  if (rbState.id === label && TALK.owner === label && !(TALK.on && TALK.conv === conv)) {
+    TALK.on = true; TALK.conv = conv; TALK.want = null; TALK.atEnd = true;
+    talkSync();
+  }
 }
 function talkBody() {
   const pane = talkPane();
   if (!TALK.conv) {
-    const sig = JSON.stringify(['list', TALK.list, TALK.listError, TALK.note, TALK.more]);
+    const robots = TALK.tab === 'robots' && TALK.list ? talkRobots() : null;
+    const goable = (TALK.list || []).map((c) => talkGoable(SOURCE.talkLabel(c.peer.agentId)));
+    const sig = JSON.stringify(['list', TALK.tab, TALK.list, TALK.listError, TALK.note, TALK.more, goable, robots && robots.map((id) => [id, talkRobotName(id), projectOfRobot(id)]), NAMES.rev]);
     if (pane._sig === sig) return;
     pane._sig = sig;
     const fk = pane.contains(document.activeElement) ? document.activeElement.dataset.fk : undefined;
     const kids = [];
     if (TALK.note) kids.push(hNode('p', 'talk-empty talk-gone-note', TALK.note));
-    if (TALK.listError) kids.push(hNode('p', 'talk-empty talk-error', TALK.listError));
+    if (TALK.tab === 'robots' && !TALK.listError && TALK.list) {
+      if (!robots.length) kids.push(hNode('p', 'talk-empty', tl('talk.robots.empty')));
+      else {
+        const ul = hNode('ul', 'talk-list');
+        for (const id of robots) ul.appendChild(talkRobotRow(id));
+        kids.push(ul);
+      }
+    } else if (TALK.listError) kids.push(hNode('p', 'talk-empty talk-error', TALK.listError));
     else if (!TALK.list) kids.push(hNode('p', 'talk-empty', tl('talk.loading')));
     else if (!TALK.list.length) kids.push(hNode('p', 'talk-empty', tl('talk.list.empty')));
     else {
       const ul = hNode('ul', 'talk-list');
-      for (const c of TALK.list) { const li = hNode('li'); li.appendChild(talkRow(c)); ul.appendChild(li); }
+      for (const c of TALK.list) {
+        const li = hNode('li', 'talk-item'), label = SOURCE.talkLabel(c.peer.agentId);
+        li.appendChild(talkRow(c));
+        if (talkGoable(label)) li.appendChild(talkGoButton(label, c.peer.name || label));
+        ul.appendChild(li);
+      }
       kids.push(ul);
       if (TALK.more) kids.push(hNode('p', 'talk-empty', tl('talk.list.newest', { n: TALK.list.length })));
     }
@@ -12579,6 +13127,311 @@ function talkSync() {
   talkPaintButton();
 }
 rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rb-talk]') && rbState.id) talkShow(!TALK.on); });
+// ---- web/js/59-sr-flows.js ----
+/* ---------- the server room's flows played (ticket 2026-10-20-jui-viz-server-room-lines-dark-filter-spec, item 7) ----------
+   Requester 10-20: 「エンドユーザーのノード押したら選択肢が出る。その選択肢押したら通る経路がアニメーションしてどういう処理の流れになるかが
+   視覚的にわかるようにしたい」; 「DBに保存とか読み取りとかS3にアップロードとかもパッとわかるようにしたいね … 吹き出しでもトーストで出る感じで
+   いける？ 速度も0.5,1.0,1.5,2.0,3.0,5.0,10.0 みたいに選べるようにして」; 「任意のオブジェクトに設定できてほしい」; 「途中で分岐作って
+   そこで止まって選択できるのもあると便利じゃない？」.
+
+   The model's flows (infra/flows.py checked them: every move leaves the node the flow is at). A node that starts a
+   flow drawn now carries a small green cone; choosing the node lists its flows on the board, and a flow chosen plays:
+   - a light runs along each move's edge and the node it reaches glows; a toast over that node says what happened
+     (the action's mark and verb after the node's name: 「💾 d1 に保存」, the step's label on a second line), and the
+     first one says what started it (the trigger's mark: 👤 ⏰ 📡 ⚡, with a schedule as written);
+   - a branch stops the light: its choices are buttons over the node, the first edge of each glows faintly ahead, and
+     with 自動 on a default is taken by itself (none: it waits). goto plays the other flow (jumping when it starts
+     elsewhere), join goes on at that step; the choices taken are listed (「KV に結果が有る？ → 無い」);
+   - lanes side by side run at once, and the flow goes on when all of them are done;
+   - play / pause, one step on, one step back (to a branch: choose again), stop; the speed one of SR_FLOW_SPEEDS,
+     changed while it plays (the light and the toasts go by the same clock).
+   A rebuild of the 3D (the environment, the clouds chosen, the theme) stops the flow playing: its light and toasts
+   belonged to the 3D that went.
+   SR_ACTIONS and SR_TRIGGERS are the schema's x-label / x-icon (test_viz_bundle holds them to the schema). */
+const SR_FLOW_SPEEDS = [0.5, 1.0, 1.5, 2.0, 3.0, 5.0, 10.0];
+const SR_ACTIONS = {"request": ["→", "を呼ぶ"], "response": ["←", "に返す"], "read": ["📖", "から読む"], "write": ["💾", "に保存"], "upload": ["⬆", "にアップロード"], "download": ["⬇", "からダウンロード"], "invoke": ["⚡", "を実行"], "enqueue": ["📥", "に積む"], "dequeue": ["📤", "から取り出す"], "publish": ["📣", "に通知"], "subscribe": ["📡", "で受け取る"], "auth": ["🔑", "で認証"], "schedule": ["⏰", "を予定どおり起こす"]};
+const SR_TRIGGERS = {"user": ["👤", "利用者の操作"], "device": ["📡", "機器"], "schedule": ["⏰", "定期実行"], "event": ["⚡", "出来事"]};
+const SR_FLOW_STATE = { play: '再生中', pause: '止めている', branch: '分かれ道で待っている', done: '終わり' };
+const SR_FLOW = { speed: 1.0, auto: false, moveMs: 900, nodeMs: 450, toastMs: 2600, player: null };
+
+function srFlowsOf(V) {
+  const flows = (SR.model && SR.model.flows) || [];
+  return flows.filter((f) => srVisible(f, V.env) && V.L.pos.has(f.start));
+}
+function srFlowNodeName(id) {
+  const n = SR.model && (SR.model.nodes || []).find((x) => x.id === id);
+  return n ? n.label || n.id : id;
+}
+function srFlowPos(V, id) {
+  const p = V.L.pos.get(id);
+  return p ? new THREE.Vector3(p.x, p.y + 0.9, p.z) : null;
+}
+
+/* After each build: the cones over the nodes that start a flow drawn now, and the layers the player draws on. */
+function srFlowBuild(V) {
+  V.flowStarts = [...new Set(srFlowsOf(V).map((f) => f.start))];
+  V.flowLayer = new THREE.Group();
+  V.near.add(V.flowLayer);
+  if (V.flowStarts.length) {
+    const mesh = new THREE.InstancedMesh(new THREE.ConeGeometry(0.22, 0.4, 10), new THREE.MeshBasicMaterial({ color: 0x2fb36d }), V.flowStarts.length);
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.PI, 0, 0));
+    V.flowStarts.forEach((id, i) => { const p = V.L.pos.get(id); m4.compose(new THREE.Vector3(p.x + 0.55, p.y + 2.0, p.z), q, new THREE.Vector3(1, 1, 1)); mesh.setMatrixAt(i, m4); });
+    mesh.userData.flowStarts = V.flowStarts.slice();
+    V.flowLayer.add(mesh);
+  }
+}
+
+/* The board's list for the chosen node: the flows it starts (none: nothing is added). */
+function srFlowBoardHTML(nodeId) {
+  const V = SR.view;
+  if (!V || !nodeId) return '';
+  const mine = srFlowsOf(V).filter((f) => f.start === nodeId);
+  if (!mine.length) return '';
+  return `<h3>このノードから始まる流れ</h3><ul class="sr-flows">${mine.map((f) => { const t = SR_TRIGGERS[f.trigger] || SR_TRIGGERS.user;
+    return `<li><button type="button" class="wb-btn" data-sr-flow="${esc(f.id)}">${esc(t[0])} ${esc(f.label || f.id)}</button>${f.schedule ? ` <small>${esc(f.schedule)}</small>` : ''}</li>`; }).join('')}</ul>`;
+}
+
+/* ---- the player */
+function srFlowPlay(id) {
+  const V = SR.view, flow = V && srFlowsOf(V).find((f) => f.id === id);
+  if (!flow) return false;
+  srFlowStop();
+  const P = SR_FLOW.player = { flow, frames: [{ steps: flow.steps, i: 0 }], pos: flow.start, state: 'play', anim: null, history: [],
+    chosen: [], toasts: [], lights: [], branch: null, arrivals: [], reached: [], log: [], dirty: true };
+  const t = SR_TRIGGERS[flow.trigger] || SR_TRIGGERS.user;
+  srFlowToast(P, flow.start, `${t[0]} ${flow.label || flow.id}`, flow.schedule || t[1]);
+  srFlowGlow(P, flow.start);
+  srFlowRenderBar();
+  return true;
+}
+function srFlowStop() {
+  const P = SR_FLOW.player;
+  if (!P) return;
+  for (const x of P.toasts) x.el.remove();
+  const layer = SR.view && SR.view.flowLayer;
+  if (layer) for (const o of [...layer.children]) if (!o.userData.flowStarts) { layer.remove(o); if (o.geometry) o.geometry.dispose(); }
+  SR_FLOW.player = null;
+  $('sr-choices').hidden = true;
+  srFlowRenderBar();
+}
+function srFlowSnapshot(P) {
+  return { flow: P.flow, frames: P.frames.map((f) => ({ steps: f.steps, i: f.i })), pos: P.pos, chosen: P.chosen.slice() };
+}
+/* Take the next step (or wait at a branch). One step at a time: the frame loop calls it when the last one is done. */
+function srFlowNext(P) {
+  if (P.branch) return;
+  for (;;) {
+    const top = P.frames[P.frames.length - 1];
+    if (!top) { P.state = 'done'; srFlowToast(P, P.pos, '✓ 流れの終わり', ''); srFlowRenderBar(); return; }
+    if (top.i >= top.steps.length) { P.frames.pop(); continue; }
+    P.history.push(srFlowSnapshot(P));
+    const step = top.steps[top.i];
+    top.i += 1;
+    if (step.branch) { srFlowAtBranch(P, step.branch); return; }
+    if (step.parallel) {
+      const lanes = step.parallel.map((lane) => ({ steps: srFlowLane(lane), k: 0, anim: null }));
+      P.anim = { kind: 'lanes', lanes };
+      for (const L of lanes) srFlowLaneNext(P, L);
+      return;
+    }
+    if (step.from && step.to) { P.anim = srFlowMove(P, step); return; }
+    if (step.at || step.node) { srFlowSay(P, step, step.at || step.node); P.anim = { kind: 'wait', left: SR_FLOW.nodeMs }; return; }
+  }
+}
+/* A lane plays its moves and node steps (a branch inside a lane takes its default, else its first choice). */
+function srFlowLane(steps) {
+  const out = [];
+  for (const s of steps) {
+    if (s.branch) { const c = s.branch.choices.find((x) => x.id === s.branch.default) || s.branch.choices[0]; out.push(...srFlowLane(c.steps || [])); }
+    else if (s.parallel) for (const l of s.parallel) out.push(...srFlowLane(l));
+    else out.push(s);
+  }
+  return out;
+}
+function srFlowLaneNext(P, L) {
+  const s = L.steps[L.k];
+  L.k += 1;
+  if (!s) { L.anim = null; L.done = true; return; }
+  if (s.from && s.to) L.anim = srFlowMove(P, s);
+  else { srFlowSay(P, s, s.at || s.node); L.anim = { kind: 'wait', left: SR_FLOW.nodeMs }; }
+}
+function srFlowMove(P, step) {
+  const V = SR.view, a = srFlowPos(V, step.from), b = srFlowPos(V, step.to);
+  const dot = new THREE.Mesh(new THREE.SphereGeometry(0.28, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffcf33 }));
+  dot.position.copy(a);
+  V.flowLayer.add(dot);
+  P.lights.push(dot);
+  return { kind: 'move', step, a, b, dot, done: 0 };
+}
+function srFlowSay(P, step, at) {
+  const act = SR_ACTIONS[step.action];
+  const head = act ? `${act[0]} ${srFlowNodeName(at)} ${act[1]}` : `• ${srFlowNodeName(at)}`;
+  srFlowToast(P, at, head, step.label || '');
+  srFlowGlow(P, at);
+}
+function srFlowAtBranch(P, b) {
+  P.branch = { b, at: P.pos, shownAt: srNow() };
+  P.state = 'branch';
+  P.stepOnce = false;        // a step taken to here ends here: the choice made plays on
+  srFlowHints(P, b);
+  const box = $('sr-choices');
+  setHTML(box, `<p class="sr-choice-q">${esc(b.label)}</p>${b.choices.map((c) => `<button type="button" class="wb-btn" data-sr-choice="${esc(c.id)}"${c.id === b.default ? ' data-default' : ''}>${esc(c.label)}${c.id === b.default ? ' <small>（既定）</small>' : ''}</button>`).join('')}`);
+  box.hidden = false;
+  srFlowRenderBar();
+}
+/* Each choice's first edge, faint, while the branch waits. */
+function srFlowHints(P, b) {
+  const V = SR.view, arr = [];
+  for (const c of b.choices) {
+    const first = (c.steps || []).find((s) => s.from && s.to);
+    if (!first) continue;
+    const a = srFlowPos(V, first.from), z = srFlowPos(V, first.to);
+    if (a && z) arr.push(a.x, a.y, a.z, z.x, z.y, z.z);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3));
+  const lines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xffcf33, transparent: true, opacity: 0.45 }));
+  lines.userData.hints = arr.length / 6;
+  V.flowLayer.add(lines);
+  P.hints = lines;
+}
+function srFlowChoose(id) {
+  const P = SR_FLOW.player;
+  if (!P || !P.branch) return false;
+  const b = P.branch.b, c = b.choices.find((x) => x.id === id);
+  if (!c) return false;
+  P.chosen.push(`${b.label} → ${c.label}`);
+  P.branch = null;
+  $('sr-choices').hidden = true;
+  if (P.hints) { SR.view.flowLayer.remove(P.hints); P.hints.geometry.dispose(); P.hints = null; }
+  if (c.goto) {
+    const next = srFlowsOf(SR.view).find((f) => f.id === c.goto);
+    if (next) {
+      P.flow = next; P.frames = [{ steps: next.steps, i: 0 }];
+      const t = SR_TRIGGERS[next.trigger] || SR_TRIGGERS.user;
+      P.pos = next.start;
+      srFlowToast(P, next.start, `${t[0]} ${next.label || next.id}`, next.schedule || t[1]);
+    }
+  } else if (c.join) {
+    const j = P.flow.steps.findIndex((s) => s.id === c.join);
+    P.frames = [{ steps: P.flow.steps, i: j }];
+  } else if (c.steps) P.frames.push({ steps: c.steps, i: 0 });
+  if (P.state !== 'pause') P.state = 'play';
+  srFlowRenderBar();
+  return true;
+}
+function srFlowBack() {
+  const P = SR_FLOW.player;
+  if (!P || !P.history.length) return false;
+  const s = P.history.pop();
+  P.flow = s.flow; P.frames = s.frames; P.pos = s.pos; P.chosen = s.chosen;
+  P.branch = null; $('sr-choices').hidden = true;
+  if (P.hints) { SR.view.flowLayer.remove(P.hints); P.hints = null; }
+  for (const d of P.lights) SR.view.flowLayer.remove(d);
+  P.lights = []; P.anim = null; P.state = 'pause';
+  srFlowRenderBar();
+  return true;
+}
+function srFlowToast(P, at, head, sub) {
+  const el = document.createElement('div');
+  el.className = 'sr-toast';
+  el.innerHTML = `<b>${esc(head)}</b>${sub ? `<span>${esc(sub)}</span>` : ''}`;
+  $('sr-toasts').append(el);
+  P.toasts.push({ el, at, left: SR_FLOW.toastMs });
+  P.log.push(head);
+}
+function srFlowGlow(P, at) {
+  const p = srFlowPos(SR.view, at);
+  if (!p) return;
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.08, 6, 24), new THREE.MeshBasicMaterial({ color: 0xffcf33, transparent: true, opacity: 0.9 }));
+  ring.position.set(p.x, p.y - 0.6, p.z); ring.rotation.x = Math.PI / 2;
+  ring.userData.left = SR_FLOW.nodeMs * 2;
+  SR.view.flowLayer.add(ring);
+  P.lights.push(ring);
+}
+
+/* ---- each frame: the light along its edge, the toasts' places and lives, the next step when one is done */
+function srFlowTick(V, dt) {
+  const P = SR_FLOW.player;
+  if (!P) return;
+  const step = dt * SR_FLOW.speed;      // the speed is read every frame: changed while it plays, it applies at once
+  const run = P.state === 'play';
+  const advance = (A) => {
+    if (!A) return true;
+    if (A.kind === 'wait') { A.left -= step; return A.left <= 0; }
+    A.done = Math.min(1, A.done + step / SR_FLOW.moveMs);
+    const k = A.done, y = Math.sin(Math.PI * k) * 0.8;
+    A.dot.position.lerpVectors(A.a, A.b, k); A.dot.position.y += y;
+    if (k < 1) return false;
+    V.flowLayer.remove(A.dot); A.dot.geometry.dispose();
+    P.lights = P.lights.filter((x) => x !== A.dot);
+    P.pos = A.step.to;
+    P.arrivals.push(srNow());
+    P.reached.push([A.step.to, srNow()]);       // where and when (the e2e reads that lanes arrive together)
+    srFlowSay(P, A.step, A.step.to);
+    return true;
+  };
+  if (run || P.stepOnce) {
+    if (P.anim && P.anim.kind === 'lanes') {
+      for (const L of P.anim.lanes) while (!L.done && advance(L.anim)) srFlowLaneNext(P, L);
+      if (P.anim.lanes.every((L) => L.done)) { P.anim = null; if (P.stepOnce) { P.stepOnce = false; } else srFlowNext(P); }
+    } else if (P.anim) {
+      if (advance(P.anim)) { P.anim = null; if (P.stepOnce) P.stepOnce = false; else srFlowNext(P); }
+    } else if (P.state === 'play') srFlowNext(P);
+  }
+  if (P.state === 'branch' && SR_FLOW.auto && P.branch && P.branch.b.default && srNow() - P.branch.shownAt > 600 / SR_FLOW.speed) srFlowChoose(P.branch.b.default);
+  for (const o of [...V.flowLayer.children]) if (o.userData.left !== undefined && (o.userData.left -= step) <= 0) { V.flowLayer.remove(o); P.lights = P.lights.filter((x) => x !== o); }
+  // the toasts over their nodes, stacked when several are on one
+  const w = V.renderer.domElement.clientWidth, h = V.renderer.domElement.clientHeight, per = {};
+  P.toasts = P.toasts.filter((x) => { x.left -= step; if (x.left > 0) return true; x.el.remove(); return false; });
+  for (const x of P.toasts.slice().reverse()) {
+    const p = srFlowPos(V, x.at);
+    if (!p) continue;
+    const v = p.clone(); v.y += 1.6; v.project(V.camera);
+    const n = per[x.at] = (per[x.at] || 0) + 1;
+    x.el.style.transform = `translate(${Math.round((v.x + 1) / 2 * w)}px, ${Math.round((1 - v.y) / 2 * h - (n - 1) * 44)}px) translate(-50%, -100%)`;
+  }
+  if (P.branch) {
+    const p = srFlowPos(V, P.branch.at);
+    if (p) { const v = p.clone(); v.y -= 1.0; v.project(V.camera); $('sr-choices').style.transform = `translate(${Math.round((v.x + 1) / 2 * w)}px, ${Math.round((1 - v.y) / 2 * h)}px) translate(-50%, 0)`; }
+  }
+}
+
+/* The player's bar over the 3D: the flow, play / pause, one step, back, stop, the speed, 自動, the choices taken. */
+function srFlowRenderBar() {
+  const bar = $('sr-player'), P = SR_FLOW.player;
+  if (!P) { bar.hidden = true; return; }
+  bar.hidden = false;
+  const playing = P.state === 'play';
+  setHTML(bar, `<b class="sr-fp-title">${esc((SR_TRIGGERS[P.flow.trigger] || SR_TRIGGERS.user)[0])} ${esc(P.flow.label || P.flow.id)}</b>
+<button type="button" class="wb-btn" data-sr-fp="toggle" aria-label="${playing ? '一時停止' : '再生'}">${playing ? '⏸' : '▶'}</button>
+<button type="button" class="wb-btn" data-sr-fp="step" aria-label="1 歩進む">⏭</button>
+<button type="button" class="wb-btn" data-sr-fp="back" aria-label="1 歩戻る"${P.history.length ? '' : ' disabled'}>⏮</button>
+<button type="button" class="wb-btn" data-sr-fp="stop" aria-label="やめる">■</button>
+<label>速さ <select data-sr-fp="speed">${SR_FLOW_SPEEDS.map((s) => `<option value="${esc(String(s))}"${s === SR_FLOW.speed ? ' selected' : ''}>${esc(s.toFixed(1))}×</option>`).join('')}</select></label>
+<label><input type="checkbox" data-sr-fp="auto"${SR_FLOW.auto ? ' checked' : ''}> 自動（既定の道へ）</label>
+<span class="sr-fp-state">${esc(SR_FLOW_STATE[P.state] || '')}</span>
+${P.chosen.length ? `<ol class="sr-fp-chosen">${P.chosen.map((c) => `<li>${esc(c)}</li>`).join('')}</ol>` : ''}`);
+}
+$('sr-player').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-sr-fp]'), P = SR_FLOW.player;
+  if (!b || !P || b.tagName === 'SELECT' || b.type === 'checkbox') return;
+  const what = b.dataset.srFp;
+  if (what === 'toggle') { P.state = P.state === 'play' ? 'pause' : (P.branch ? 'branch' : P.state === 'done' ? 'done' : 'play'); if (P.state === 'done') srFlowPlay(P.flow.id); }
+  else if (what === 'step') { if (!P.anim && !P.branch) { P.stepOnce = true; srFlowNext(P); } }
+  else if (what === 'back') srFlowBack();
+  else if (what === 'stop') srFlowStop();
+  srFlowRenderBar();
+});
+$('sr-player').addEventListener('change', (e) => {
+  const t = e.target;
+  if (t.dataset.srFp === 'speed') SR_FLOW.speed = Number(t.value);
+  else if (t.dataset.srFp === 'auto') SR_FLOW.auto = t.checked;
+});
+$('sr-choices').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-sr-choice]');
+  if (b) srFlowChoose(b.dataset.srChoice);
+});
 // ---- web/js/60-log.js ----
 
 /* ---------- full-screen event log ---------- */
