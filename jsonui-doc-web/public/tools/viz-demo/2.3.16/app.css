@@ -264,7 +264,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--font-body); 
 .tag.room.on { border-color: var(--ink); background: var(--ink); color: var(--panel); }
 .tag.tray { padding: 2px 8px; border-radius: 4px; font: 700 11px/1.5 var(--font-body); }
 .pill { display: inline-block; min-width: 2.5em; padding: 0 7px; border-radius: 999px; background: var(--c, #8a9bb0); color: var(--t, #ffffff); font: 700 11px/1.75 var(--font-mono); text-align: center; }
-.scene-hint { position: absolute; right: 12px; bottom: 10px; margin: 0; padding: 1px 8px; border-radius: 4px; background: var(--tag-bg); color: var(--ink-soft); font: 500 11px/1.6 var(--font-mono); }
+.scene-hint { position: absolute; right: 12px; bottom: 10px; max-width: calc(50% - 18px); margin: 0; padding: 1px 8px; border-radius: 4px; background: var(--tag-bg); color: var(--ink-soft); font: 500 11px/1.6 var(--font-mono); }
 .nogl { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 16px; color: var(--ink-soft); text-align: center; }
 
 .side { display: grid; align-content: start; gap: 22px; min-height: 0; overflow-y: auto; padding: 14px 16px 24px; background: var(--panel); border-left: 1px solid var(--line); }
@@ -277,8 +277,9 @@ body { background: var(--bg); color: var(--ink); font-family: var(--font-body); 
 .sessions { display: grid; gap: 8px; }
 .sess-groups { display: grid; gap: 10px; }
 .pgroup { display: grid; gap: 6px; }
-.pg-toggle { display: flex; align-items: baseline; gap: 8px; width: 100%; padding: 2px 0; border: 0; background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.pg-toggle { display: flex; align-items: baseline; gap: 8px; width: 100%; min-width: 0; padding: 2px 0; border: 0; background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
 .pg-toggle b { font: 700 13px/1.5 var(--font-mono); }
+/* min-width: 0 above: a grid item, the button is otherwise as wide as its summary unshortened (English on a phone: 441 on 390) */
 .pg-toggle small { overflow: hidden; color: var(--ink-soft); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
 .pg-caret { width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 7px solid var(--ink-soft); transform: rotate(90deg); transition: transform 0.15s ease; }
 .pg-toggle[aria-expanded="false"] .pg-caret { transform: none; }
@@ -1206,8 +1207,10 @@ details.h-item[open] > :not(summary) :is(a[href], button, img, .h-thumb) { curso
 .rb-cond[hidden] { display: none; }
 .rb-looks { margin: 2px 0 0; font: 12px/1.5 var(--font-body); color: var(--ink-soft); }
 .rb-looks[hidden] { display: none; }
-.demo-clock { position: absolute; left: 12px; bottom: 10px; z-index: 5; margin: 0; padding: 2px 8px; border-radius: 6px; background: var(--tag-bg); color: var(--ink-soft); font: 600 11.5px/1.6 var(--font-body); }
+.demo-clock { position: absolute; left: 12px; bottom: 10px; z-index: 5; max-width: calc(50% - 18px); margin: 0; padding: 2px 8px; border-radius: 6px; background: var(--tag-bg); color: var(--ink-soft); font: 600 11.5px/1.6 var(--font-body); }
 .demo-clock[hidden] { display: none; }
+/* The hint (right) and the demo clock (left) share the scene's foot: each keeps to its half, so words a language
+   says longer wrap within it instead of running into the other (English on a phone did). */
 
 /* a phone call on a robot's name tag (SendMessage, 10-18): a mark and the other robot's number */
 .tag .call-mark { flex: none; padding: 0 6px; border-radius: 999px; background: var(--ok-bg); color: var(--ok); font: 700 10px/1.6 var(--font-body); }
@@ -1520,7 +1523,7 @@ button.talk-peer:focus-visible { outline: 2px solid var(--focus); outline-offset
 .sr-player { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 3; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font: 13px/1.4 var(--font-body); }
 .sr-player[hidden] { display: none; }
 .sr-fp-state { color: var(--ink-soft); }
-.sr-fp-chosen { display: flex; flex-wrap: wrap; gap: 4px 12px; width: 100%; margin: 0; padding-left: 18px; font-size: 12px; }
+.sr-fp-chosen { display: grid; gap: 2px; width: 100%; margin: 0; padding-left: 22px; font-size: 12px; }   /* one choice a line, its number before it */
 .sr-flows { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 4px; }
 /* the cost simulator over the stage (56-server-cost.js): the month's stacked days, a day's bars */
 .sr-mode { gap: 0; }
@@ -1536,6 +1539,8 @@ button.talk-peer:focus-visible { outline: 2px solid var(--focus); outline-offset
 .src-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
 .src-chip { border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; background: var(--panel); }
 .src-chip[data-some] summary b { color: #c0392b; }
+.src-acct { margin: 4px 0 8px; }
+.src-acct ul { margin: 2px 0; padding-left: 18px; font-size: 13px; }
 .src-free { margin: 4px 0 8px; padding: 6px 10px; border-left: 3px solid var(--warn); background: var(--warn-bg); color: var(--ink); font-size: 13px; }
 .src-chip ul { margin: 4px 0; padding-left: 18px; max-height: 160px; overflow: auto; font: 12px/1.5 var(--font-mono); }
 .src-month { display: block; max-width: 100%; }

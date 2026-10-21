@@ -6,20 +6,37 @@
 const I18N = (() => {
   try {
     const data = JSON.parse(document.getElementById('jui-viz-strings').textContent);
-    if (data && typeof data.strings === 'object') return data;
+    if (data && typeof data.strings === 'object') return { ...data, served: true };
   } catch (err) { /* a page without the server's words (debug.html): English keys as they are */ }
   return { language: 'en', locale: 'en-US', strings: {} };
 })();
 const LOCALE = I18N.locale || 'en-US';
 const PLURAL = new Intl.PluralRules(LOCALE);
+/* A key the table lacks, or a slot a call leaves unfilled, would read on the page as the key or as {name}, silently:
+   each is said once on the console as a warning (ticket 2026-10-21-viz-english-screen-checks). The browser tests fail
+   on any console warning, in Japanese and in English. Only with the server's table: debug.html has none. */
+const TL_SAID = new Set();
+function tlSay(what, key) {
+  if (!I18N.served || TL_SAID.has(`${what} ${key}`)) return;
+  TL_SAID.add(`${what} ${key}`);
+  console.warn(`[viz i18n] ${what}: ${key}`);
+}
 function tlWords(key, p) {
   const v = I18N.strings[key];
-  if (v === undefined) return key;
-  return typeof v === 'object' ? v[PLURAL.select(Number(p.n))] ?? v.other ?? key : v;
+  if (v === undefined) { tlSay('no words for the key', key); return key; }
+  if (typeof v !== 'object') return v;
+  const form = v[PLURAL.select(Number(p.n))] ?? v.other;
+  if (form === undefined) { tlSay('no plural form for the key', key); return key; }
+  return form;
+}
+function tlSlot(key, p, name) {
+  if (name in p) return true;
+  tlSay(`slot {${name}} not filled`, key);
+  return false;
 }
 function tl(key, params) {
   const p = params || {};
-  return tlWords(key, p).replace(/\{(\w+)\}/g, (m, name) => (name in p ? String(p[name]) : m));
+  return tlWords(key, p).replace(/\{(\w+)\}/g, (m, name) => (tlSlot(key, p, name) ? String(p[name]) : m));
 }
 /* tl() as HTML, for words that hold markup: the words and every slot escaped, then `…` in the words drawn as
    <code>…</code> — the only markup a table's words can make (a slot's backtick is escaped first, so it makes none). */
@@ -30,7 +47,7 @@ function tlHTML(key, params) {
   const p = params || {};
   return tlWords(key, p).split(/(\{\w+\})/).map((part) => {
     const slot = /^\{(\w+)\}$/.exec(part);
-    if (slot && slot[1] in p) return tlEsc(p[slot[1]]);
+    if (slot && tlSlot(key, p, slot[1])) return tlEsc(p[slot[1]]);
     return tlEsc(part).replace(/&#96;/g, '\x60');
   }).join('').replace(TL_CODE, '<code>$1</code>');
 }
@@ -4166,11 +4183,27 @@ const KB_PAL = {
   dark: { cork: '#47331f', speck: 'rgba(0, 0, 0, 0.22)', title: '#f3e6d4', sub: '#d8c3a6', col: 'rgba(0, 0, 0, 0.2)', ink: '#eef2f8', soft: '#b9c6d8', pin: '#ff6b78', warn: '#ffb020', warnInk: '#2a1a00', note: { todo: '#4a4222', wait: '#4e3322', doing: '#1f375c', done: '#1b3f2e' }, head: { todo: '#e6c766', wait: '#ffab73', doing: '#86b8ff', done: '#5ad893' } },
 };
 
-function fitText(ctx, text, x, y, maxW) {
+/* The ctx's font, smaller a pixel at a time down to floor of its size, until the words fit maxW: what a language
+   says longer (English beside Japanese) is drawn smaller before it is cut (ticket
+   2026-10-21-viz-english-screen-checks: the spec board's statuses and names came out cut in English). Returns
+   whether they fit; the font is left at the size reached. */
+function shrinkToFit(ctx, words, maxW, floor) {
+  const m = /(\d+(?:\.\d+)?)px/.exec(ctx.font);
+  if (!m) return ctx.measureText(words).width <= maxW;
+  const font = ctx.font, px = Number(m[1]), least = Math.ceil(px * floor);
+  for (let p = px; p >= least; p--) {
+    ctx.font = font.replace(m[0], `${p}px`);
+    if (ctx.measureText(words).width <= maxW) return true;
+  }
+  return false;
+}
+function fitText(ctx, text, x, y, maxW, floor = 0.72) {
+  const font = ctx.font;
   let s = String(text);
-  if (ctx.measureText(s).width <= maxW) { ctx.fillText(s, x, y); return; }
+  if (shrinkToFit(ctx, s, maxW, floor)) { ctx.fillText(s, x, y); ctx.font = font; return; }
   while (s.length > 1 && ctx.measureText(`${s}…`).width > maxW) s = s.slice(0, -1);
   ctx.fillText(`${s}…`, x, y);
+  ctx.font = font;
 }
 function wrapText(ctx, text, x, y, maxW, lineH, maxLines) {
   const chars = [...String(text)];
@@ -5707,6 +5740,7 @@ function signTexture(text, bg, ink, w = 256, h = 96) {
   const cv = makeCanvas(w, h), ctx = cv.getContext('2d');
   ctx.fillStyle = bg; rr(ctx, 0, 0, w, h, 14); ctx.fill();
   ctx.fillStyle = ink; ctx.font = `${Math.round(h * 0.5)}px ${FONT_DISPLAY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  shrinkToFit(ctx, text, w - h * 0.25, 0.5);   // inside the sign's round corners, whatever its language
   ctx.fillText(text, w / 2, h / 2 + 2);
   return texFrom(cv);
 }
@@ -11304,7 +11338,7 @@ const SR = {
   phase: 'idle', project: null, seq: 0, t0: 0, until: 0, why: '', full: '', opener: null, model: null, view: null, log: [],
   fastMs: 300, starMs: 140, okMs: 700, failMs: 9000,
   lod: { far: 9, near: 13 }, labels: { max: 110, nodes: 80 }, stats: null, detail: { enter: 30, leave: 40 },
-  closed: new Set(), selected: null, selectedGroup: null, zoomStep: 1.4,
+  closed: new Set(), selected: null, selectedGroup: null, boardSel: null, zoomStep: 1.4,
   // fewer lines (2.3.9, requester 10-20: 「線減らす工夫欲しいね」): all cables faint, the pressed and the pointed node's
   // drawn strong on a layer of their own; a switch for all (faint) / crossing ones only / the chosen node's only
   lines: 'all', hover: null, plainOpacity: 0.18, crossOpacity: 0.55,
@@ -12030,14 +12064,18 @@ function srRenderBoard() {
 <ul class="sr-legend">${provs.map((p) => `<li><button type="button" class="sr-prov" data-sr-prov="${esc(p)}" aria-pressed="${SR.only.has(p) ? 'true' : 'false'}"><span class="sr-chip" style="background:${esc(srProviderColor(p))}"></span>${esc(p)}</button></li>`).join('')}
 <li><button type="button" class="sr-prov" data-sr-prov="" aria-pressed="${SR.only.size ? 'false' : 'true'}">${esc(tl('sr.board.all'))}</button></li>
 <li><span class="sr-line"></span>${esc(tl('sr.board.line.same'))}</li><li><span class="sr-line sr-line-cross"></span>${esc(tl('sr.board.line.cross'))}</li></ul>
-${sel ? `<h3>${esc(tl('sr.sel.title'))}</h3><dl class="sr-sel"><dt>id</dt><dd>${esc(sel.id)}</dd><dt>${esc(tl('sr.sel.name'))}</dt><dd>${esc(sel.label || '')}</dd><dt>${esc(tl('sr.sel.kind'))}</dt><dd>${esc(sel.category)}</dd><dt>provider</dt><dd>${esc(sel.providerResolved || sel.provider || '')}${sel.service ? ` · ${esc(sel.service)}` : ''}</dd>${sel.count > 1 ? `<dt>${esc(tl('sr.sel.count'))}</dt><dd>${esc(String(sel.count))}</dd>` : ''}${sel.engine ? `<dt>${esc(tl('sr.sel.engine'))}</dt><dd>${esc(sel.engine)}</dd>` : ''}</dl>
+${sel ? `<h3 data-sr-sel-head>${esc(tl('sr.sel.title'))}</h3><dl class="sr-sel"><dt>id</dt><dd>${esc(sel.id)}</dd><dt>${esc(tl('sr.sel.name'))}</dt><dd>${esc(sel.label || '')}</dd><dt>${esc(tl('sr.sel.kind'))}</dt><dd>${esc(sel.category)}</dd><dt>provider</dt><dd>${esc(sel.providerResolved || sel.provider || '')}${sel.service ? ` · ${esc(sel.service)}` : ''}</dd>${sel.count > 1 ? `<dt>${esc(tl('sr.sel.count'))}</dt><dd>${esc(String(sel.count))}</dd>` : ''}${sel.engine ? `<dt>${esc(tl('sr.sel.engine'))}</dt><dd>${esc(sel.engine)}</dd>` : ''}</dl>${srFlowBoardHTML(sel.id)}
 ${Array.isArray(sel.spec) && sel.spec.length ? `<h3>${esc(tl('sr.sel.spec'))}</h3><table class="sr-spec" data-sr-spec><tbody>${sel.spec.map((x) => `<tr><th scope="row">${SR_SPEC_NAME[x.key] ? `${esc(SR_SPEC_NAME[x.key])} <small>${esc(x.key)}</small>` : esc(x.key)}</th><td>${esc(x.value)}</td></tr>`).join('')}</tbody></table>` : ''}
 <p class="sr-acts"><button type="button" class="wb-btn" data-sr-act="focus">${esc(tl('sr.act.focus'))}</button></p>
-<ul class="sr-edges">${edgesOf.map((e) => `<li>${esc(e.from)} → ${esc(e.to)}${e.protocol ? ` <small>${esc(e.protocol)}</small>` : ''}${e.crossProvider ? ` <b>${esc(tl('sr.edge.cross'))}</b>` : ''}</li>`).join('')}</ul>${srFlowBoardHTML(sel.id)}`
+<ul class="sr-edges">${edgesOf.map((e) => `<li>${esc(e.from)} → ${esc(e.to)}${e.protocol ? ` <small>${esc(e.protocol)}</small>` : ''}${e.crossProvider ? ` <b>${esc(tl('sr.edge.cross'))}</b>` : ''}</li>`).join('')}</ul>`
     : grp ? `<h3>${esc(tl('sr.grp.title'))}</h3><dl class="sr-sel"><dt>id</dt><dd>${esc(grp.id)}</dd><dt>${esc(tl('sr.sel.name'))}</dt><dd>${esc(grp.label || '')}</dd><dt>${esc(tl('sr.sel.kind'))}</dt><dd>${esc(grp.kind || '')}</dd><dt>provider</dt><dd>${esc(grp.providerResolved || grp.provider || '')}</dd><dt>${esc(tl('sr.grp.nodes'))}</dt><dd>${esc(String(inGroup ? srCountNodes(inGroup) : 0))}</dd></dl>
 <p class="sr-acts"><button type="button" class="wb-btn" data-sr-act="focus">${esc(tl('sr.act.focus'))}</button> <button type="button" class="wb-btn" data-sr-act="toggle" data-sr-group="${esc(grp.id)}">${esc(SR.closed.has(grp.id) ? tl('sr.grp.open') : tl('sr.grp.close'))}</button></p>`
     : `<p class="sr-hint">${esc(tl('sr.board.hint'))}</p>`}
 ${probs.length ? `<h3>${esc(tl('sr.board.problems', { n: probs.length }))}</h3><ul class="sr-problems">${probs.map((p) => `<li title="${esc(p.message || '')}">${esc(p.short || p.message || '')}</li>`).join('')}</ul>` : ''}`);
+  // a node newly chosen: the board turns to its rows (and the flows it starts, under them), not left where it was scrolled
+  const head = $('sr-board').querySelector('[data-sr-sel-head]');
+  if (head && SR.boardSel !== SR.selected) { const B = $('sr-board'); B.scrollTop += head.getBoundingClientRect().top - B.getBoundingClientRect().top - 6; }
+  SR.boardSel = SR.selected;
 }
 function srRenderLog() {
   setHTML($('sr-log'), `<ol>${SR.log.map((l) => `<li><time>${esc(new Date(l.at).toTimeString().slice(0, 8))}</time> ${esc(l.text)}</li>`).join('')}</ol>`);
@@ -12138,8 +12176,12 @@ document.addEventListener('keydown', (e) => {
    pauses (no frame drawn) while the cost is shown. The month: the days stacked by provider or by node, a red mark on a
    day with an hour over capacity, a flag on one at the autoscale's top, the sum, and the counts of what is not priced
    (never hidden). A day: the top nodes' bars hour by hour (play, stop, the hour's slider), each bar its meters with the
-   quantity's rate and the charge; over capacity in red as 捌けた / 来た. A meter pressed shows the price it used. */
-const SRC = { mode: '3d', seq: 0, scenario: null, by: 'provider', month: null, day: null, date: null, hour: 0, timer: 0,
+   quantity's rate and the charge; over capacity in red as 捌けた / 来た. A meter pressed shows the price it used.
+   The account (the server's account.available: two environments or more, each with a load definition): この環境だけ /
+   アカウントの合計 — the environments priced with one total (a free amount taken once), the month stacked by
+   environment; a day is the chosen scenario's within that pricing. アカウントの合計 is the default (the requester 10-21:
+   「合計で」): SRC.account stays null (the server's default) until one is pressed. */
+const SRC = { mode: '3d', seq: 0, scenario: null, by: 'provider', account: null, month: null, day: null, date: null, hour: 0, timer: 0,
   playMs: 700, picked: null, error: '' };
 const srcEl = $('sr-cost');
 const SRC_PER = { second: 'sec', minute: 'min', hour: 'h', day: 'day', month: 'mo' };
@@ -12178,7 +12220,7 @@ function srcSetMode(mode) {
 }
 function srCostReset() {   // the server room closed (56-server-room.js srClose): back to 3D, nothing kept
   srcStop();
-  Object.assign(SRC, { mode: '3d', scenario: null, month: null, day: null, date: null, hour: 0, picked: null, error: '' });
+  Object.assign(SRC, { mode: '3d', scenario: null, account: null, month: null, day: null, date: null, hour: 0, picked: null, error: '' });
   SR.paused = false;
   $('sr-boxzoom').disabled = false;
   $('sr-mode-3d').setAttribute('aria-pressed', 'true');
@@ -12191,7 +12233,7 @@ function srCostReset() {   // the server room closed (56-server-room.js srClose)
 /* ---- asking the server ---- */
 async function srcAsk(extra) {
   const seq = ++SRC.seq;
-  const got = typeof SOURCE.infraCost === 'function' ? await SOURCE.infraCost(SR.project, { seq, scenario: SRC.scenario, ...extra })
+  const got = typeof SOURCE.infraCost === 'function' ? await SOURCE.infraCost(SR.project, { seq, scenario: SRC.scenario, account: SRC.account, ...extra })
     : { ok: false, reason: 'unreadable', message: tl('cost.unavailable') };
   return seq === SRC.seq && SRC.mode === 'cost' ? got : null;   // an older answer, or the view left: dropped
 }
@@ -12202,9 +12244,10 @@ async function srcLoad() {
   if (!got) return;
   if (!got.ok) { SRC.error = got.message || got.reason || tl('cost.failed'); SRC.month = null; srcRender(); return; }
   SRC.scenario = got.scenario;
-  SRC.month = { ...got.month, scenarios: got.scenarios, problems: got.problems, prices: got.prices };
+  SRC.month = { ...got.month, scenarios: got.scenarios, problems: got.problems, prices: got.prices, account: got.account };
   setHTML($('sr-scn'), got.scenarios.map((s) => `<option value="${esc(s.id)}"${s.id === got.scenario ? ' selected' : ''}>${esc(tl('cost.scn.option', { label: s.label, month: s.month }))}</option>`).join(''));
-  srLog(tl('cost.log.done', { label: got.scenarios.find((s) => s.id === got.scenario).label, usd: srcUsd(got.month.usd) }));
+  const label = got.scenarios.find((s) => s.id === got.scenario).label;
+  srLog(tl(got.account.on ? 'cost.account.log' : 'cost.log.done', { label, usd: srcUsd(got.month.usd) }));
   if (SRC.date) await srcOpenDay(SRC.date); else srcRender();
 }
 async function srcOpenDay(date) {
@@ -12243,14 +12286,22 @@ function srcSummary(M) {
   // the free amount is taken once per scenario (one environment): environments on one account each counted take it twice
   const free = M.warnings.find((w) => w.code === 'cost.free_per_scenario');
   const freeHTML = free ? `<p class="src-free" data-src-free role="note">${esc(tl('cost.free'))}${free.rows && free.rows.length ? esc(tl('cost.free.rows', { n: Number(free.rows.length) })) : ''}</p>` : '';
+  const acctHTML = M.account && M.account.available ? `<span class="sr-ctl sr-mode" role="group" aria-label="${esc(tl('cost.account.group'))}"><button type="button" class="wb-btn" data-src-act="acct-on" aria-pressed="${esc(String(!!M.account.on))}">${esc(tl('cost.account.all'))}</button><button type="button" class="wb-btn" data-src-act="acct-off" aria-pressed="${esc(String(!M.account.on))}">${esc(tl('cost.account.one'))}</button></span>` : '';
+  const byHTML = M.by === 'environment' ? '' : `<label class="sr-ctl">${esc(tl('cost.by'))} <select id="src-by"><option value="provider"${M.by === 'provider' ? ' selected' : ''}>${esc(tl('cost.by.provider'))}</option><option value="node"${M.by === 'node' ? ' selected' : ''}>${esc(tl('cost.by.node'))}</option></select></label>`;
   return `<div class="src-sum"><strong class="src-total" data-src-total>${esc(srcUsd(M.usd))}</strong><span class="src-note">${esc(tl('cost.month.note'))}</span>
-<label class="sr-ctl">${esc(tl('cost.by'))} <select id="src-by"><option value="provider"${M.by === 'provider' ? ' selected' : ''}>${esc(tl('cost.by.provider'))}</option><option value="node"${M.by === 'node' ? ' selected' : ''}>${esc(tl('cost.by.node'))}</option></select></label></div>
+${acctHTML}${byHTML}</div>${M.account && M.account.on ? srcAccountHTML(M) : ''}
 <div class="src-chips">${chips.map(([k, label, n, items]) => `<details class="src-chip" data-src-chip="${k}"${n ? ' data-some="1"' : ''}><summary>${esc(label)} <b>${n}</b></summary>${items.length ? `<ul>${items.slice(0, 50).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : `<p>${esc(tl('cost.chip.none'))}</p>`}</details>`).join('')}</div>${freeHTML}`;
+}
+/* The account's environments: each one's scenario and month, the ones left out, and how the free amounts were taken. */
+function srcAccountHTML(M) {
+  const partsHTML = M.scenarios.map((s) => `<li>${esc(M.keys.find((k) => k.key === s.environment)?.label || s.environment)}: ${esc(s.label)} ${esc(srcUsd(s.usd))}</li>`).join('');
+  const missing = M.account.missing || [];
+  return `<div class="src-acct" data-src-acct><p class="src-note">${esc(tl('cost.account.note'))}</p><ul>${partsHTML}</ul>${missing.length ? `<p class="src-note">${esc(tl('cost.account.missing', { month: M.month, envs: new Intl.ListFormat(LOCALE).format(missing) }))}</p>` : ''}</div>`;
 }
 /* An engine warning in one line: its message, and the rows it names (a row is an id or a {id}). */
 function srcWarnText(w) {
   const rows = Array.isArray(w.rows) ? w.rows.map((r) => (r && typeof r === 'object' ? String(r.id || r.sku || JSON.stringify(r)) : String(r))) : [];
-  return `${w.node ? `${w.node} · ` : ''}${w.message}${rows.length ? tl('cost.warn.rows', { rows: rows.slice(0, 8).join(tl('cost.warn.sep')), more: rows.length > 8 ? tl('cost.warn.more', { n: rows.length - 8 }) : '' }) : ''}`;
+  return `${w.environment ? `${w.environment} · ` : ''}${w.node ? `${w.node} · ` : ''}${w.message}${rows.length ? tl('cost.warn.rows', { rows: rows.slice(0, 8).join(tl('cost.warn.sep')), more: rows.length > 8 ? tl('cost.warn.more', { n: rows.length - 8 }) : '' }) : ''}`;
 }
 function srcMonthSvg(M) {
   const w = Math.max(320, srcEl.clientWidth - 32), h = 260, padL = 56, padB = 28, padT = 18;
@@ -12305,7 +12356,8 @@ function srcDayHtml(D) {
   const rowsHTML = D.nodes.map((n) => srcRow(n, k, max, barPx)).join('')
     + (D.others.count ? `<div class="src-row src-noted"><div class="src-name">${esc(tl('cost.others', { n: Number(D.others.count) }))}</div><div class="src-bar"></div><div class="src-usd">${esc(srcUsd(D.others.usd[k]))}</div></div>` : '');
   const pickHTML = SRC.picked ? srcPicked(D) : '';
-  return `<div class="src-dayhead"><button type="button" class="wb-btn" data-src-act="month">${esc(tl('cost.back.month'))}</button><strong>${esc(D.date)}</strong>
+  const acctHTML = SRC.month && SRC.month.account && SRC.month.account.on ? `<span class="src-note" data-src-dayacct>${esc(tl('cost.account.day', { scenario: (SRC.month.scenarios.find((s) => s.scenario === SRC.scenario) || {}).label || SRC.scenario }))}</span>` : '';
+  return `<div class="src-dayhead"><button type="button" class="wb-btn" data-src-act="month">${esc(tl('cost.back.month'))}</button><strong>${esc(D.date)}</strong>${acctHTML}
 <button type="button" class="wb-btn" data-src-act="${SRC.timer ? 'stop' : 'play'}"${reduceMotion ? ` disabled title="${esc(tl('cost.play.reduced'))}"` : ''}>${esc(SRC.timer ? tl('cost.stop') : tl('cost.play'))}</button>
 <label class="sr-ctl">${esc(tl('cost.hour'))} <input type="range" id="src-hour" min="0" max="${Number(D.hours.length - 1)}" value="${k}" step="1"></label><span class="src-clock" data-src-clock>${esc(String(D.hours[k]).padStart(2, '0'))}:00</span>
 <span class="src-hoursum">${esc(tl('cost.hoursum', { hour: srcUsd(hourUsd), day: srcUsd(D.usd) }))}</span></div>
@@ -12338,6 +12390,10 @@ srcEl.addEventListener('click', (e) => {
   const act = e.target.closest('[data-src-act]');
   if (act) {
     if (act.dataset.srcAct === 'month') srcBackToMonth();
+    else if (act.dataset.srcAct === 'acct-on' || act.dataset.srcAct === 'acct-off') {
+      const on = act.dataset.srcAct === 'acct-on';
+      if (on !== !!(SRC.month && SRC.month.account.on)) { SRC.account = on; Object.assign(SRC, { month: null, day: null, date: null }); srcLoad(); }
+    }
     else if (act.dataset.srcAct === 'play') srcPlay();
     else { srcStop(); srcRender(); }
     return;
@@ -13187,7 +13243,7 @@ function srFlowBuild(V) {
   }
 }
 
-/* The board's list for the chosen node: the flows it starts (none: nothing is added). */
+/* The board's list for the chosen node: the flows it starts (none: nothing is added), right under the node's own rows. */
 function srFlowBoardHTML(nodeId) {
   const V = SR.view;
   if (!V || !nodeId) return '';
@@ -13265,6 +13321,7 @@ function srFlowMove(P, step) {
   const V = SR.view, a = srFlowPos(V, step.from), b = srFlowPos(V, step.to);
   const dot = new THREE.Mesh(new THREE.SphereGeometry(0.28, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffcf33 }));
   dot.position.copy(a);
+  dot.userData.r = 0.28; dot.userData.minPx = SR_FLOW_MIN_PX;
   V.flowLayer.add(dot);
   P.lights.push(dot);
   return { kind: 'move', step, a, b, dot, done: 0 };
@@ -13352,8 +13409,21 @@ function srFlowGlow(P, at) {
   const ring = new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.08, 6, 24), new THREE.MeshBasicMaterial({ color: 0xffcf33, transparent: true, opacity: 0.9 }));
   ring.position.set(p.x, p.y - 0.6, p.z); ring.rotation.x = Math.PI / 2;
   ring.userData.left = SR_FLOW.nodeMs * 2;
+  ring.userData.r = 0.75; ring.userData.minPx = SR_FLOW_MIN_PX * 2;
   SR.view.flowLayer.add(ring);
   P.lights.push(ring);
+}
+
+/* Pulled back over a large room a light 0.28 across is a few pixels: it is drawn at least SR_FLOW_MIN_PX in radius
+   (the ring under a node twice that), and at its own size once the camera is near enough for that. */
+const SR_FLOW_MIN_PX = 7;
+function srFlowPxPerUnit(V, at) {
+  const d = V.camera.position.distanceTo(at);
+  return V.renderer.domElement.clientHeight / (2 * Math.max(d, 1e-3) * Math.tan(V.camera.fov * Math.PI / 360));
+}
+function srFlowKeepSize(V, o) {
+  if (!o.userData.r) return;
+  o.scale.setScalar(Math.max(1, o.userData.minPx / (o.userData.r * srFlowPxPerUnit(V, o.position))));
 }
 
 /* ---- each frame: the light along its edge, the toasts' places and lives, the next step when one is done */
@@ -13385,6 +13455,7 @@ function srFlowTick(V, dt) {
       if (advance(P.anim)) { P.anim = null; if (P.stepOnce) P.stepOnce = false; else srFlowNext(P); }
     } else if (P.state === 'play') srFlowNext(P);
   }
+  for (const o of P.lights) srFlowKeepSize(V, o);
   if (P.state === 'branch' && SR_FLOW.auto && P.branch && P.branch.b.default && srNow() - P.branch.shownAt > 600 / SR_FLOW.speed) srFlowChoose(P.branch.b.default);
   for (const o of [...V.flowLayer.children]) if (o.userData.left !== undefined && (o.userData.left -= step) <= 0) { V.flowLayer.remove(o); P.lights = P.lights.filter((x) => x !== o); }
   // the toasts over their nodes, stacked when several are on one
@@ -13623,8 +13694,10 @@ function liveChrome() {
   const chip = document.querySelector('.chip.demo');
   if (chip) {
     const ok = NET.state === 'connected';
-    setText(chip, ok ? tl('net.connected') : NET.state === 'connecting' && !LIVE.connectedOnce ? tl('net.connecting') : tl('net.reconnecting'));
+    const net = ok ? 'connected' : NET.state === 'connecting' && !LIVE.connectedOnce ? 'connecting' : 'reconnecting';
+    setText(chip, tl({ connected: 'net.connected', connecting: 'net.connecting', reconnecting: 'net.reconnecting' }[net]));
     chip.dataset.conn = ok ? 'ok' : 'wait';
+    chip.dataset.net = net;   // what the words say, in any language (the browser tests wait on it)
   }
   const empty = $('live-empty');
   if (empty) empty.hidden = !SOURCE.connected || SESSIONS.length > 0;
