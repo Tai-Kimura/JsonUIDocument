@@ -6,7 +6,7 @@ Built with Next.js. The site itself is authored spec-first under `docs/screens/`
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 22+ on a line that still gets security releases (CI builds on 24, at or above v24.22.1, the October 2026 security release; Node 20 is end-of-life)
 - Ruby 3.x (for the rjui_tools build pipeline)
 - [`jsonui-cli`](https://github.com/Tai-Kimura/jsonui-cli) installed — it is **not on PyPI**; install with the bootstrap below
 

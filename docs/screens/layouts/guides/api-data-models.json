@@ -349,7 +349,7 @@
                     { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_ci_body" },
                     {
                       "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
-                      "code": "# .github/workflows/verify.yml — drift detection in CI\nname: jui-verify\non: [push, pull_request]\njobs:\n  verify:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with: { node-version: 20 }\n      - run: npm install -g @jsonui/cli\n      - run: jui build\n      - run: jui verify --fail-on-diff",
+                      "code": "# .github/workflows/verify.yml — drift detection in CI\nname: jui-verify\non: [push, pull_request]\njobs:\n  verify:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with: { node-version: 24 }\n      - run: npm install -g @jsonui/cli\n      - run: jui build\n      - run: jui verify --fail-on-diff",
                       "language": "yaml", "filename": ".github/workflows/verify.yml", "showLineNumbers": false, "copyable": true
                     }
                   ]

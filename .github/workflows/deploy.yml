@@ -75,11 +75,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Node 20 reached end of life and gets no fix for the October 2026
+      # security release (ten CVEs, CVE-2026-111497 among them). check-latest
+      # makes setup-node take the newest 24.x instead of the runner image's
+      # cached one, and the next step refuses a 24.x older than the fix.
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
+          check-latest: true
           cache: npm
           cache-dependency-path: jsonui-doc-web/package-lock.json
+
+      # It guards the 24 pin above, so a later line passes by design.
+      - name: Node is at or above the October 2026 security release (v24.22.1)
+        run: node -e 'const [a,b,c]=process.versions.node.split(".").map(Number); const ok=a>24||(a===24&&(b>22||(b===22&&c>=1))); console.log("node "+process.version+(ok?" >= v24.22.1":" < v24.22.1, the October 2026 security release")); process.exit(ok?0:1)'
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -484,11 +493,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Node 20 reached end of life and gets no fix for the October 2026
+      # security release (ten CVEs, CVE-2026-111497 among them). check-latest
+      # makes setup-node take the newest 24.x instead of the runner image's
+      # cached one, and the next step refuses a 24.x older than the fix.
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
+          check-latest: true
           cache: npm
           cache-dependency-path: jsonui-doc-web/package-lock.json
+
+      # It guards the 24 pin above, so a later line passes by design.
+      - name: Node is at or above the October 2026 security release (v24.22.1)
+        run: node -e 'const [a,b,c]=process.versions.node.split(".").map(Number); const ok=a>24||(a===24&&(b>22||(b===22&&c>=1))); console.log("node "+process.version+(ok?" >= v24.22.1":" < v24.22.1, the October 2026 security release")); process.exit(ok?0:1)'
 
       # rjui_tools pins Ruby 3.2.2 (jsonui-doc-web/rjui_tools/.ruby-version).
       - uses: ruby/setup-ruby@v1
