@@ -1546,6 +1546,14 @@ const clamp01 = (v) => Math.max(0, Math.min(1, v));
 const frac = (t, a, b) => clamp01((t - a) / (b - a));
 const pct = (v) => Math.round(v * 100);
 const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+/* An amount in dollars, one rule wherever the page shows one (10-23): to the cent, under $1 too ($0.79, not $0.7852);
+   under a cent "< $0.01" (never a $0.00 that is not 0); 0 is $0.00. signed: + on a rise (a difference); a fall always
+   has its −, the under-a-cent one too (−(< $0.01)). */
+function usdText(v, signed) {
+  const a = Math.abs(v), sign = v < 0 ? '−' : signed && v > 0 ? '+' : '';
+  if (a > 0 && a < 0.01) return sign ? sign + '(< $0.01)' : '< $0.01';
+  return sign + new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(a);
+}
 const ROLE_INK = { debug: '#2a2000' };   // dark ink where white would not read on the pill (debug's yellow)
 /* A role's pill: its background (ROLES[role].pill, else its colour) and its text (ROLE_INK, else white). One source for
    the HTML pills (pill()), the canvas ones (drawRolePill, the boards), the talk's marks and the phones' headers.
@@ -1645,6 +1653,31 @@ function drawMermaid(el, text) {
 const ROLE_JA = { main: tl('core.role.main'), define: tl('core.role.define'), ground: tl('core.role.ground'), implement: tl('core.role.implement'), navigation: tl('core.role.navigation'), test: tl('core.role.test'), debug: tl('core.role.debug'), other: tl('core.role.other') };
 const SECTIONS = [tl('core.sec.metadata'), tl('core.sec.structure'), tl('core.sec.state'), tl('core.sec.data'), tl('core.sec.actions'), tl('core.sec.transitions'), tl('core.sec.branches')];
 const sumImpl = (arr) => arr.slice(1, 6).reduce((a, b) => a + b, 0);
+/* The spec lists' order (ticket 2026-10-23-viz-spec-list-not-recent-first): the spec that moved on last first
+   (advancedAt, the server's: its write, its Layout's write, its newest test result), then the order SPECS has (room,
+   then file). On [spec, index] pairs: the panel, the board and its side list sort with this one, inside their groups. */
+function specNewer(a, b) { return (b[0].advancedAt || 0) - (a[0].advancedAt || 0) || a[1] - b[1]; }
+/* When a spec last moved on, beside its share wherever the share is shown (ticket 2026-10-23-viz-spec-no-last-updated-time):
+   the same advancedAt specNewer sorts by, so the order and the times agree, in the reader's clock — 12:34 today,
+   昨日 12:34, else 10/21 12:34. The title has the whole time and what moved it (the spec, its Layout, a test result).
+   null when the server sent none (the demo). */
+function specWhen(s, now = new Date()) {
+  if (!(s.advancedAt > 0)) return null;
+  const p2 = (n) => String(n).padStart(2, '0');
+  const d = new Date(s.advancedAt), time = `${p2(d.getHours())}:${p2(d.getMinutes())}`;
+  const day = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime(), days = Math.round((day(now) - day(d)) / 86400000);
+  const text = days === 0 ? tl('spec.when.today', { time }) : days === 1 ? tl('spec.when.yesterday', { time })
+    : tl('spec.when.older', { date: `${d.getMonth() + 1}/${d.getDate()}`, time });
+  const full = `${d.getFullYear()}/${p2(d.getMonth() + 1)}/${p2(d.getDate())} ${time}:${p2(d.getSeconds())}`;
+  const what = s.advancedBy === 'layout' ? tl('spec.when.by.layout') : s.advancedBy === 'test' ? tl('spec.when.by.test') : tl('spec.when.by.spec');
+  return { text, title: tl('spec.when.title', { full, what }) };
+}
+/* A spec's share (s.status.text) with that time beside it: { text, title } for every place the share is shown. */
+function specStatus(s, prefix = '') {
+  const w = specWhen(s), text = `${prefix}${s.status.text}`;
+  return w ? { text: tl('spec.when.beside', { status: text, when: w.text }), title: w.title } : { text, title: '' };
+}
+function paintStatus(el, st) { setText(el, st.text); if (el.title !== st.title) el.title = st.title; }
 const BUCKETS = [['live', tl('core.bucket.live')], ['partial', tl('core.bucket.partial')], ['todo', tl('core.bucket.todo')], ['done', tl('core.bucket.done')]];
 const bucketCounts = (specs) => Object.fromEntries(BUCKETS.map(([b]) => [b, specs.filter((s) => s.bucket === b).length]));
 const activeSec = (s) => (s.writingIdx >= 0 ? s.writingIdx : s.implIdx >= 0 ? s.implIdx : s.testIdx);
@@ -4268,7 +4301,7 @@ function drawSpecTile(ctx, P, ST, s, x, y, w, h, now, g) {
     drawRolePill(ctx, role, s.by, px, py, g.pillW, g.pillH, g.pillFont, g.pillH * 0.72);
   }
   ctx.font = `700 ${g.status}px ${FONT_BODY}`; ctx.fillStyle = todo ? P.todoInk : ST[s.status.kind][1];
-  fitText(ctx, s.status.text, x + g.pad, y + g.statusY, w - g.pad * 2);
+  fitText(ctx, specStatus(s).text, x + g.pad, y + g.statusY, w - g.pad * 2);   // with its time (specWhen)
   const act = role ? activeSec(s) : -1, sy = y + h - g.segBottom - g.segH;
   for (let k = 0; k < 7; k++) {
     const st = secState(s, k), sx = x + g.pad + k * (sw + g.segGap);
@@ -4481,14 +4514,14 @@ function redrawBoards(model, now, force) {
   if (SOURCE.mode === 'live') { liveRedrawBoards(model, now, force); return; }
   const theme = isDark() ? 'd' : 'l';
   const blink = model.specs.some((s) => s.writingIdx >= 0 && s.by) ? Math.floor(now * 2.5) % 2 : 0;
-  const spec = theme + blink + model.specs.map((s) => [s.bucket, s.status.text, s.by, s.written.map((w) => Math.round(w * 50)).join(), s.implN.join(), activeSec(s)].join('|')).join(';');
+  const spec = theme + blink + model.specs.map((s) => [s.bucket, specStatus(s).text, s.by, s.written.map((w) => Math.round(w * 50)).join(), s.implN.join(), activeSec(s)].join('|')).join(';');
   const test = model.tests.statusText + model.tests.rows.map((r) => r.status + (r.step || '')).join();
   const task = theme + model.pending.map((p) => p.id).join() + model.tasks.map((x) => x.key + x.col + (x.perm ? '!' : '')).join();
   if (force || spec !== boardSig.spec) { drawSpecBoard(model, now); boardSig.spec = spec; }
   if (force || test !== boardSig.test) { drawTestBoard(model); boardSig.test = test; }
   if (force || task !== boardSig.task) { drawTaskBoard(model); boardSig.task = task; }
   for (const pb of PBOARDS) {
-    const sig = theme + blink + pb.specs.map((i) => { const s = model.specs[i]; return [s.status.text, s.by, s.written.map((w) => Math.round(w * 50)).join(), s.implN.join(), activeSec(s)].join('|'); }).join(';')
+    const sig = theme + blink + pb.specs.map((i) => { const s = model.specs[i]; return [specStatus(s).text, s.by, s.written.map((w) => Math.round(w * 50)).join(), s.implN.join(), activeSec(s)].join('|'); }).join(';')
       + model.tasks.filter((x) => PROJECT_OF[x.list] === pb.project).map((x) => x.key + x.col + (x.perm ? '!' : '')).join() + model.pending.map((p) => p.id).join();
     if (force || sig !== pb.sig) { drawProjectBoard(pb, model, now); pb.sig = sig; }
   }
@@ -5140,13 +5173,15 @@ function playMove(G, left, nowSec) {
   }
 }
 const playIdle = (R, st, now) => R.def.kind === 'main' && st.state === 'idle' && Number.isFinite(st.since) && st.since > 0
-  && now - st.since >= PLAY.idleMs && !LIVE.leaving[R.def.id] && !R.robot.call && !R.path.length && !R.playBack && !R.play && !R.solo && !R.brk && !R.shred && !R.git;   // nothing starts on the way to the shredder or the git box (2.3.4)
+  && now - st.since >= PLAY.idleMs && !LIVE.leaving[R.def.id] && !R.robot.call && !R.path.length && !R.playBack && !R.play && !R.solo && !R.brk && !R.shred && !R.git
+  && !rosterHides(R);   // hidden by the room's list: no game, nap or break played out where it cannot be seen (53-roster.js)   // nothing starts on the way to the shredder or the git box (2.3.4)
 /* Why a robot stops (null: it does not): the reasons the requester's "walked up and went back" can be told by. Only a
    desk in another room stops it now; a desk that moves within the room (another session came or went and the room
    was laid out again — common with many sessions) no longer does: it walks back to the new desk afterwards. */
 function playStopReason(R, st, room, since) {
   if (!robots.includes(R)) return 'gone';
   if (LIVE.leaving[R.def.id]) return 'leaving';
+  if (rosterHides(R)) return 'hidden';   // unchecked in the room's list: its partner is not left playing with no one
   if (R.robot.call) return 'call';
   if (st.state !== 'idle') return `state:${st.state}`;
   if (st.since !== since) return 'updated';
@@ -5338,9 +5373,10 @@ function liveSoloSync() {
   const solo = liveSolo();
   for (const [id, R] of Object.entries(LIVE3D.rooms)) { const on = !solo || id === solo; R.group.visible = on; R.rt.el.hidden = !!solo; }   // alone, its name is in the box
   for (const R of robots) {
-    const p = R.robot.root.position, on = !solo || R.def.room === solo || roomAtPoint([p.x, p.z]) === solo;
+    const p = R.robot.root.position, on = (!solo || R.def.room === solo || roomAtPoint([p.x, p.z]) === solo) && !rosterHides(R);   // unchecked in the room's list (53-roster.js)
     R.robot.root.visible = on; R.tag.hidden = !on;
   }
+  rosterSync(solo);
   const box = document.getElementById('room-solo');
   if (!box) return;
   box.hidden = !solo || !has3D || TOWER.on || zoom.zoomed || ds.open || pr.open;   // the data server's sheet covers it (2.3.5)
@@ -6254,7 +6290,7 @@ function liveRedrawBoards(model, now, force) {
     const robotsIn = ROBOT_DEFS.filter((d) => d.room === id).length;
     R.pb.specs = model.specs.map((s, i) => [s, i]).filter(([s]) => s.project === id).map(([, i]) => i);
     const blink = R.pb.specs.some((i) => model.specs[i].writingIdx >= 0 && model.specs[i].by) ? Math.floor(now * 2.5) % 2 : 0;
-    const specSig = R.pb.specs.map((i) => { const x = model.specs[i]; return [x.bucket, x.status.text, x.by, x.written.map((v) => Math.round(v * 50)).join(), x.implN.join(), activeSec(x)].join('|'); }).join(';');
+    const specSig = R.pb.specs.map((i) => { const x = model.specs[i]; return [x.bucket, specStatus(x).text, x.by, x.written.map((v) => Math.round(v * 50)).join(), x.implN.join(), activeSec(x)].join('|'); }).join(';');
     const sig = theme + blink + robotsIn + SESSIONS.filter((s) => s.project === id).length + pend + tasks.map((x) => x.key + x.col).join() + specSig;
     if (force || sig !== R.pb.sig) { if (R.pb.big) drawBigSpecBoard(R.pb, model, now); else drawProjectBoard(R.pb, model, now); R.pb.sig = sig; }
     const taskSig = theme + pend + tasks.map((x) => x.key + x.col + (x.perm ? '!' : '')).join();
@@ -7115,6 +7151,7 @@ function placeRobotTags(dt = 1 / 60) {
     for (const e of it.extras) {   // the badge, then a bubble aimed at the robot: each just above the one under it
       above += BILL.gap;
       e.style.visibility = 'visible';
+      if (it.R.spirit && e === it.R.spirit.bubbleEl) spiritBubbleSeen(it.R.spirit);   // its time runs from now (45-spirits.js)
       e.style.zIndex = zi;
       e.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - it.R.tagDy - above).toFixed(1)}px) translate(-50%, -100%)`;
       above += e._size.h;
@@ -7179,7 +7216,7 @@ function update3D(model, nowSec, dt) {
     camera.updateProjectionMatrix();
   }
   const sel = rbState.id && robots.find((x) => x.def.id === rbState.id);
-  selRing.visible = !!sel;
+  selRing.visible = !!sel && sel.robot.root.visible;   // a robot hidden by the room's list leaves no ring
   if (sel) {
     selRing.position.set(sel.robot.root.position.x, 0.03, sel.robot.root.position.z);
     selRing.material.color.set(ROLES[sel.def.role].color);
@@ -7434,9 +7471,14 @@ function spiritBadge(R, skill) {
 /* The model's bubble, for bubble.showSec after the spirit appears: its words and their ruby (<ruby>/<rt>, the words
    as text only), its tail at who says them — the spirit's head (its "bubbleAnchor" node, else the top of the figure)
    or the robot's (then it rides in the tag's column, over the badge). */
+/* A bubble's time (b.showSec, else SPIRIT.bubbleSec) runs from the first frame it is drawn (spiritBubbleSeen), not from the
+   spirit standing (the gate, 10-23): a spirit that stood while its bubble could not be drawn — the spirit too small or
+   far (spiritNear), off the page, its robot hidden by the room's list, the building — used its time up unseen, and the
+   bubble was gone before anyone could read it. */
+function spiritBubbleSeen(S) { if (S && S.bubbleSeenAt == null) S.bubbleSeenAt = vizNow(); }
 function spiritBubble(R, S) {
   const b = S.bubble;
-  const showing = b && S.phase === 'shown' && vizNow() - (S.shownAt || (S.shownAt = vizNow())) < (b.showSec || SPIRIT.bubbleSec) * 1000;
+  const showing = b && S.phase === 'shown' && (S.bubbleSeenAt == null || vizNow() - S.bubbleSeenAt < (b.showSec || SPIRIT.bubbleSec) * 1000);
   if (!showing) { if (S.bubbleEl) S.bubbleEl.hidden = true; return; }
   if (!S.bubbleEl) {
     const el = document.createElement('div');
@@ -7519,6 +7561,27 @@ function spiritGhostShader(object, spec) {
   object.traverse((o) => { if (o.isMesh) { o.material = mat; o.renderOrder = 2; } });
   return mat;
 }
+/* The meshes an outline or a glow goes round: each mesh but the shells, and none under a node named fx_… (a flat card,
+   a flame: a shell drawn from behind shows there as dark or tinted slivers, not as a rim). */
+function spiritShellable(object) {
+  const out = [];
+  const walk = (o, skip) => {
+    skip = skip || /^fx_/.test(o.name || '');
+    if (o.isMesh && !skip && !o.userData.spiritOutline && !o.userData.spiritGlow) out.push(o);
+    for (const c of o.children) walk(c, skip);
+  };
+  walk(object, false);
+  return out;
+}
+/* A shell of the mesh: its geometry again (and, skinned, its skeleton) as its child at no offset, so whatever moves the
+   mesh (its own node in a clip, the bones) moves the shell with it. */
+function spiritShell(mesh, material, flag, renderOrder) {
+  const shell = mesh.clone(false);
+  shell.position.set(0, 0, 0); shell.quaternion.identity(); shell.scale.set(1, 1, 1);
+  shell.material = material; shell.renderOrder = renderOrder; shell.userData = { [flag]: true };
+  mesh.add(shell);
+  return shell;
+}
 /* The outline: each mesh again, pushed out along its normals by width and drawn from behind, in the outline's colour. */
 function spiritOutline(object, spec) {
   const o = spec.outline;
@@ -7529,11 +7592,33 @@ function spiritOutline(object, spec) {
     sh.vertexShader = 'uniform float uWidth;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed += normal * uWidth;');
   };
   mat.userData.base = 1; mat.userData.outline = true;
-  const meshes = []; object.traverse((x) => { if (x.isMesh) meshes.push(x); });
-  for (const mesh of meshes) {
-    const shell = mesh.clone(false); shell.material = mat; shell.renderOrder = 1; shell.userData.spiritOutline = true;
-    mesh.parent.add(shell);
+  for (const mesh of spiritShellable(object)) spiritShell(mesh, mat, 'spiritOutline', 1);
+}
+
+/* effects.glow: a shell on each of the figure's meshes the outline goes round (spiritShell: the mixer that moves the
+   figure moves it too). It grows along the normals before skinning, as the outline does: scale 1.03 is a rim of 3% of
+   half the figure's longest side, whatever the mesh's own scale. */
+const spiritGlowBox = new THREE.Box3(), spiritGlowV = new THREE.Vector3(), spiritGlowW = new THREE.Vector3();
+function spiritGlow(figure, g) {
+  figure.updateMatrixWorld(true);
+  const figureScale = figure.getWorldScale(spiritGlowW).x || 1;
+  const size = spiritGlowBox.setFromObject(figure).getSize(spiritGlowV);
+  const half = Math.max(size.x, size.y, size.z) / 2 / figureScale;
+  const shells = [];
+  for (const mesh of spiritShellable(figure)) {
+    const own = (mesh.getWorldScale(spiritGlowW).x || figureScale) / figureScale;   // the mesh's scale in the figure's
+    const m = new THREE.MeshBasicMaterial({ color: g.color || '#ffffff', transparent: true, opacity: 0, depthWrite: false, side: THREE.BackSide });
+    m.userData.base = g.opacity ?? 0.25;
+    m.userData.reach = ((g.scale || 1.06) - 1) * half;   // the rim, in the figure's units: the same on every mesh
+    m.userData.width = m.userData.reach / own;   // the same rim in the mesh's own units
+    m.onBeforeCompile = (sh) => {   // the shader kept on the material (not its userData: a clone copies that), for dbg
+      m.spiritShader = sh;
+      sh.uniforms.uWidth = { value: m.userData.width };
+      sh.vertexShader = 'uniform float uWidth;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed += normal * uWidth;');
+    };
+    shells.push(spiritShell(mesh, m, 'spiritGlow', 0));
   }
+  return shells;
 }
 
 /* ---------- what spirit.json's robot says: its eyes and its pose ---------- */
@@ -7549,10 +7634,10 @@ function spiritPose(r, p, t) {
 }
 
 /* ---------- the effects the page draws (spirit.json effects, shouts) ----------
-   Each in a group of its own on the robot's root (it moves and scales with the robot), at most SPIRIT_FX.pool sprites
-   for the sparks and shouts (made once, never more). With reduced motion: the aura and the glow stand still, and no
-   sparks, lightning, afterimages or shouts. */
-const SPIRIT_FX = { pool: 24, sparkLife: 1.6, shoutLife: 1.1 };
+   Each in a group of its own on the robot's root (it moves and scales with the robot), every sprite and mesh made once
+   at the start (the sparks' pool as many as rate × sparkLife shows, at most sparkMax). With reduced motion: the aura
+   and the glow stand still, and no sparks, lightning, afterimages or shouts. */
+const SPIRIT_FX = { sparkLife: 1.6, sparkMax: 64, shoutLife: 1.1, tongues: 24, cores: 8, boltSegs: 7, boltSec: 0.15 };
 let spiritDot = null;
 function spiritDotTex() {
   if (spiritDot) return spiritDot;
@@ -7563,6 +7648,34 @@ function spiritDotTex() {
   spiritDot = new THREE.CanvasTexture(c);
   return spiritDot;
 }
+/* The aura's flame (white, coloured by its material): a tongue, bright at its foot and gone at its tip, and the
+   envelope round the robot with flame points along its top (both in the page's canvas, made once). */
+let spiritFlame = null;
+function spiritFlameTex() {
+  if (spiritFlame) return spiritFlame;
+  const tongue = makeCanvas(128, 256), x = tongue.getContext('2d');
+  const g = x.createLinearGradient(0, 256, 0, 0);
+  g.addColorStop(0, 'rgba(255,255,255,0.95)'); g.addColorStop(0.45, 'rgba(255,255,255,0.75)'); g.addColorStop(0.85, 'rgba(255,255,255,0.3)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.beginPath(); x.moveTo(64, 0);
+  x.bezierCurveTo(96, 70, 124, 150, 112, 200); x.bezierCurveTo(100, 250, 28, 250, 16, 200); x.bezierCurveTo(4, 150, 32, 70, 64, 0); x.fill();
+  const env = makeCanvas(256, 320), y = env.getContext('2d');
+  const r = y.createRadialGradient(128, 210, 20, 128, 190, 150);
+  r.addColorStop(0, 'rgba(255,255,255,0.5)'); r.addColorStop(0.55, 'rgba(255,255,255,0.45)'); r.addColorStop(1, 'rgba(255,255,255,0)');
+  y.fillStyle = r; y.beginPath(); y.moveTo(30, 310);
+  const tips = [[24, 150], [52, 70], [78, 110], [100, 30], [128, 80], [156, 26], [178, 108], [204, 66], [232, 148]];
+  y.quadraticCurveTo(0, 220, tips[0][0], tips[0][1]);
+  for (let i = 1; i < tips.length; i++) { const [px, py] = tips[i - 1], [qx, qy] = tips[i]; y.quadraticCurveTo((px + qx) / 2, Math.max(py, qy) + 40, qx, qy); }
+  y.quadraticCurveTo(256, 220, 226, 310); y.closePath(); y.fill();
+  spiritFlame = { tongue: texFrom(tongue), envelope: texFrom(env) };
+  return spiritFlame;
+}
+const spiritUnitCyl = new THREE.CylinderGeometry(1, 1, 1, 6, 1).translate(0, 0.5, 0).rotateX(Math.PI / 2);   // from 0 to +z, one long
+const spiritBoltA = new THREE.Vector3(), spiritBoltB = new THREE.Vector3(), spiritBoltD = new THREE.Vector3(), spiritZ = new THREE.Vector3(0, 0, 1);
+function spiritLimb(mesh, a, b, r) {   // a cylinder from a to b (its parent's own space, not the world's), r thick
+  const d = spiritBoltD.subVectors(b, a), len = d.length();
+  mesh.position.copy(a); mesh.quaternion.setFromUnitVectors(spiritZ, len > 1e-6 ? d.divideScalar(len) : spiritZ);
+  mesh.scale.set(r, r, Math.max(1e-4, len));
+}
 function spiritShoutTex(text, style = {}) {
   const c = document.createElement('canvas'); c.width = 256; c.height = 96;
   const g = c.getContext('2d');
@@ -7572,41 +7685,81 @@ function spiritShoutTex(text, style = {}) {
   g.fillStyle = style.fill || '#ffffff'; g.fillText(text, 128, 50);
   return new THREE.CanvasTexture(c);
 }
+/* effects.aura. style "flame" (the default): an envelope behind the robot with flame points along its top, tongues that
+   rise round it, stretch and die at three rates, and a few brighter ones at its foot. "column": the open cylinder of
+   before. size widens it, height lifts it, flicker speeds it (0: still), opacity is the whole. */
+function spiritAura(group, a) {
+  const h = a.height || 1.6, size = a.size || 1, color = new THREE.Color(a.color || '#ffd23a'), base = a.opacity ?? 0.35;
+  if (a.style === 'column') {
+    const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
+    mat.userData.base = base;
+    const cone = new THREE.Mesh(new THREE.CylinderGeometry(0.55 * size, 0.85 * size, h, 20, 1, true), mat);
+    cone.position.y = h / 2; group.add(cone);
+    return { style: 'column', mesh: cone, base, flicker: a.flicker ?? 1, width: 1.7 * size, h };
+  }
+  const T = spiritFlameTex();
+  const sprite = (map, tint, z, cx, cy) => {
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map, color: tint, transparent: true, opacity: 0, depthWrite: false }));
+    sp.center.set(cx, cy); sp.position.z = z; group.add(sp); return sp;
+  };
+  const envelope = sprite(T.envelope, color, -0.45, 0.5, 0);
+  envelope.position.y = 0.1;
+  const tongues = [], white = color.clone().lerp(new THREE.Color('#ffffff'), 0.55);
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (let i = 0; i < SPIRIT_FX.tongues + SPIRIT_FX.cores; i++) {
+    const core = i >= SPIRIT_FX.tongues, ang = Math.PI * (0.03 + 0.94 * rnd());
+    const sp = sprite(T.tongue, core ? white : color, 0, 0.5, 0.15);
+    tongues.push({ sp, core, x: Math.cos(ang) * (core ? 0.35 : 0.66 + 0.2 * rnd()) * size, z: -0.2 - Math.sin(ang) * 0.35,
+      rate: (core ? 2 : [4, 5, 6][i % 3]) / 3, off: rnd(), w: (core ? 0.3 : 0.42 + 0.28 * rnd()) * size, hh: (core ? 0.6 : 0.9 + 0.5 * rnd()) * h / 1.6, k: i });
+  }
+  return { style: 'flame', envelope, tongues, base, flicker: a.flicker ?? 1, width: 1.8 * size, size, h };
+}
+function spiritAuraTick(A, t, k) {
+  const still = reduceMotion || !A.flicker, s = still ? 0 : t * A.flicker, TAU = Math.PI * 2;
+  if (A.style === 'column') {
+    A.mesh.material.opacity = A.base * k * (still ? 1 : 0.85 + Math.sin(s * 7) * 0.15);
+    if (!still) A.mesh.scale.set(1 + Math.sin(s * 5) * 0.04, 1 + Math.sin(s * 3.3) * 0.06, 1 + Math.sin(s * 4.1) * 0.04);
+    return;
+  }
+  A.envelope.material.opacity = Math.min(1, A.base * 1.6 * k * (still ? 0.9 : 0.85 + 0.1 * Math.sin(TAU * 1.5 * s)));
+  A.envelope.scale.set(2.6 * A.size * (1 + (still ? 0 : 0.03 * Math.sin(TAU * s))), A.h * 1.6 * (1 + (still ? 0 : 0.05 * Math.sin(TAU * 1.5 * s))), 1);
+  for (const F of A.tongues) {
+    const p = still ? (F.off * 0.8 + 0.1) : (s * F.rate + F.off) % 1, flick = still ? 1 : 1 + 0.15 * Math.sin(TAU * 2 * s + F.k);
+    F.sp.position.set(F.x * (1 - 0.3 * p) + (still ? 0 : 0.05 * Math.sin(TAU * 0.75 * s + F.k)), 0.25 + p * A.h * (F.core ? 0.35 : 0.65), F.z);
+    F.sp.scale.set(F.w * (1 - 0.4 * p) * flick, F.hh * (0.7 + 0.5 * Math.sin(Math.PI * p)) * flick, 1);
+    F.sp.material.opacity = Math.min(1, A.base * k * Math.sin(Math.PI * Math.min(1, p * 1.2)) * (F.core ? 2.2 : 2.6));
+  }
+}
 function spiritFxStart(R, S, gltfs) {
   const spec = S.model.spec || {}, fx = spec.effects || {}, r = R.robot;
   const group = new THREE.Group(); r.root.add(group); S.holders.push(group);
   const F = S.fx = { group, sparks: [], shouts: [], clones: [], next: 0, nextShout: 0, nextBolt: 0, t: 0 };
-  if (fx.aura) {
-    const a = fx.aura, h = a.height || 1.6;
-    const mat = new THREE.MeshBasicMaterial({ color: a.color || '#ffd23a', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
-    mat.userData.base = a.opacity ?? 0.35;
-    const cone = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.85, h, 20, 1, true), mat);
-    cone.position.y = h / 2; group.add(cone); F.aura = { mesh: cone, flicker: a.flicker ?? 1 };
-  }
-  if (fx.glow && S.figure) {
-    const g = fx.glow;
-    const shell = SkeletonUtils.clone(S.figure);
-    const mat = new THREE.MeshBasicMaterial({ color: g.color || '#ffffff', transparent: true, opacity: 0, depthWrite: false, side: THREE.BackSide });
-    mat.userData.base = g.opacity ?? 0.25;
-    shell.traverse((o) => { if (o.isMesh) o.material = mat; });
-    shell.scale.multiplyScalar(g.scale || 1.06);
-    S.figure.parent.add(shell); F.glow = shell;
-  }
+  if (fx.aura) F.aura = spiritAura(group, fx.aura);
+  if (fx.glow && S.figure) F.glow = spiritGlow(S.figure, fx.glow);
   if (fx.sparks) {
     const mat = new THREE.SpriteMaterial({ map: spiritDotTex(), color: fx.sparks.color || '#ffffff', transparent: true, depthWrite: false });
-    for (let i = 0; i < SPIRIT_FX.pool; i++) { const sp = new THREE.Sprite(mat.clone()); sp.visible = false; sp.scale.setScalar(0.12); group.add(sp); F.sparks.push({ sp, age: 99 }); }
+    const pool = Math.min(SPIRIT_FX.sparkMax, Math.ceil((fx.sparks.rate || 0) * SPIRIT_FX.sparkLife));   // all rate shows, no more
+    F.sparkSize = fx.sparks.size || 0.12; F.sparkSpread = F.aura ? F.aura.width : 1.2;
+    for (let i = 0; i < pool; i++) { const sp = new THREE.Sprite(mat.clone()); sp.visible = false; sp.scale.setScalar(F.sparkSize); group.add(sp); F.sparks.push({ sp, age: 99 }); }
   }
-  if (fx.lightning) {
-    const mat = new THREE.LineBasicMaterial({ color: fx.lightning.color || '#bfefff', transparent: true, opacity: 0 });
-    F.bolt = new THREE.Line(new THREE.BufferGeometry().setFromPoints(Array.from({ length: 7 }, () => new THREE.Vector3())), mat);
-    group.add(F.bolt);
+  if (fx.lightning) {   // each bolt a ribbon: a thin bright core in a wider glow, segment by segment
+    const L = fx.lightning;
+    const core = new THREE.MeshBasicMaterial({ color: '#f4fbff', transparent: true, opacity: 0, depthWrite: false });
+    const glow = new THREE.MeshBasicMaterial({ color: L.color || '#bfefff', transparent: true, opacity: 0, depthWrite: false });
+    core.userData.base = glow.userData.base = 1;   // spiritDrop disposes them
+    F.bolts = Array.from({ length: L.count || 1 }, () => Array.from({ length: SPIRIT_FX.boltSegs }, () => {
+      const c = new THREE.Mesh(spiritUnitCyl, core), g = new THREE.Mesh(spiritUnitCyl, glow);
+      c.renderOrder = 5; g.renderOrder = 4; group.add(c, g); return [c, g];
+    }));
+    F.bolt = { core, glow, length: L.length || 2.2 };
   }
   if (fx.afterimage && S.figure && S.clips && S.clips.length && !reduceMotion) {
     const n = fx.afterimage.count || 2, spread = fx.afterimage.spreadDeg ?? 12;
     for (let i = 1; i <= n; i++) {
       const c = SkeletonUtils.clone(S.figure);
-      const shells = []; c.traverse((o) => { if (o.isMesh && o.material.userData && o.material.userData.outline) shells.push(o); });
-      for (const o of shells) o.parent.remove(o);   // a faint copy draws no outline
+      const shells = []; c.traverse((o) => { if (o.isMesh && (o.userData.spiritGlow || (o.material.userData && o.material.userData.outline))) shells.push(o); });
+      for (const o of shells) o.parent.remove(o);   // a faint copy draws no outline and no glow
       c.traverse((o) => { if (o.isMesh) o.material = [].concat(o.material).map((m) => { const x = m.clone(); if (x.uniforms) x.uniforms = THREE.UniformsUtils.clone(m.uniforms); return x; })[0]; });
       c.rotation.y = THREE.MathUtils.degToRad(spread * (i % 2 ? i : -i) / 2);
       S.figure.parent.add(c);
@@ -7629,11 +7782,8 @@ function spiritFxTick(R, S, dt, k) {
   if (!F) return;
   F.t += dt;
   const fx = (S.model.spec || {}).effects || {};
-  if (F.aura) {
-    const m = F.aura.mesh.material; m.opacity = m.userData.base * k * (reduceMotion ? 1 : 0.85 + Math.sin(F.t * 7 * F.aura.flicker) * 0.15);
-    if (!reduceMotion) F.aura.mesh.scale.set(1 + Math.sin(F.t * 5) * 0.04, 1 + Math.sin(F.t * 3.3) * 0.06, 1 + Math.sin(F.t * 4.1) * 0.04);
-  }
-  if (F.glow) F.glow.traverse((o) => { if (o.isMesh) o.material.opacity = o.material.userData.base * k; });
+  if (F.aura) spiritAuraTick(F.aura, F.t, k);
+  for (const o of F.glow || []) o.material.opacity = o.material.userData.base * k;
   if (reduceMotion) return;
   if (F.sparks.length && fx.sparks.rate) {
     F.next -= dt;
@@ -7641,24 +7791,33 @@ function spiritFxTick(R, S, dt, k) {
       F.next += 1 / fx.sparks.rate;
       const s = F.sparks.find((x) => x.age >= SPIRIT_FX.sparkLife);
       if (!s) break;
-      s.age = 0; s.sp.position.set((Math.random() - 0.5) * 1.2, 0.2 + Math.random() * 0.6, -0.4 + (Math.random() - 0.5) * 0.8);
+      s.age = 0; s.sp.position.set((Math.random() - 0.5) * F.sparkSpread, 0.2 + Math.random() * 0.6, -0.4 + (Math.random() - 0.5) * 0.8);
     }
     for (const s of F.sparks) {
       s.age += dt;
       const live = s.age < SPIRIT_FX.sparkLife;
       s.sp.visible = live && k > 0.05;
-      if (live) { s.sp.position.y += dt * (fx.sparks.rise || 0.8); s.sp.material.opacity = k * (1 - s.age / SPIRIT_FX.sparkLife); }
+      if (live) { s.sp.position.y += dt * (fx.sparks.rise || 0.8); s.sp.material.opacity = k * (1 - s.age / SPIRIT_FX.sparkLife);
+        s.sp.scale.setScalar(F.sparkSize * (0.7 + 0.3 * Math.sin(s.age * 9 + s.sp.id))); }
     }
   }
   if (F.bolt) {
     F.nextBolt -= dt;
-    const m = F.bolt.material;
-    if (F.nextBolt <= 0) {
+    if (F.nextBolt <= 0) {   // new bolts: each from high on a side of the robot, zigzagging down its length
       F.nextBolt = fx.lightning.everySec || 2.5;
-      const pts = []; for (let i = 0; i < 7; i++) pts.push(new THREE.Vector3((Math.random() - 0.5) * 0.7 + (i % 2 ? 0.25 : -0.25), 2.6 - i * 0.36, -0.5));
-      F.bolt.geometry.setFromPoints(pts); F.boltAt = F.t;
+      const step = F.bolt.length / SPIRIT_FX.boltSegs, a = spiritBoltA, b = spiritBoltB;
+      F.bolts.forEach((segs, i) => {
+        const side = i % 2 ? -1 : 1;
+        a.set(side * (0.35 + 0.35 * Math.random()), 0.6 + F.bolt.length, -0.3 + (Math.random() - 0.5) * 0.4);
+        for (const [c, g] of segs) {
+          b.set(a.x + (Math.random() - 0.5) * 0.5 * step * 2, a.y - step, a.z + (Math.random() - 0.5) * 0.1);
+          spiritLimb(c, a, b, 0.014); spiritLimb(g, a, b, 0.045); a.copy(b);
+        }
+      });
+      F.boltAt = F.t;
     }
-    m.opacity = F.boltAt !== undefined && F.t - F.boltAt < 0.15 ? k : 0;
+    const on = F.boltAt !== undefined && F.t - F.boltAt < SPIRIT_FX.boltSec ? k : 0;
+    F.bolt.core.opacity = on; F.bolt.glow.opacity = on * 0.45;
   }
   for (const cl of F.clones) {   // the afterimages: the loop a little behind, fainter
     if (!cl.action && S.mixer) {
@@ -7700,10 +7859,11 @@ function spiritPlaceBubbles() {
   for (const R of robots) {
     const el = R.spirit && R.spirit.bubbleEl;
     if (!el || el.hidden || el.dataset.target !== 'spirit') continue;
+    if (!R.robot.root.visible) { el.style.visibility = 'hidden'; continue; }   // its robot hidden (the room's list, another room)
     const p = spiritHead(R, R.spirit).project(camera);
     if (p.z > 1 || p.z < -1) { el.style.visibility = 'hidden'; continue; }
     if (!el._size || el._size.text !== el.textContent) el._size = { text: el.textContent, w: el.offsetWidth, h: el.offsetHeight };
-    list.push({ el, x: ((p.x + 1) / 2) * W, y: ((1 - p.y) / 2) * H, z: p.z });
+    list.push({ el, S: R.spirit, x: ((p.x + 1) / 2) * W, y: ((1 - p.y) / 2) * H, z: p.z });
   }
   const placed = [...(TAGS.placed || [])];
   for (const it of list.sort((a, b) => a.z - b.z)) {
@@ -7716,6 +7876,7 @@ function spiritPlaceBubbles() {
     }
     placed.push({ x0, x1, y0: bottom - h, y1: bottom });
     it.el.style.visibility = 'visible';
+    spiritBubbleSeen(it.S);
     it.el.style.transform = `translate(${it.x.toFixed(1)}px, ${bottom.toFixed(1)}px) translate(-50%, -100%)`;
   }
 }
@@ -7730,7 +7891,7 @@ function spiritLod() {
   standing.forEach((R, i) => {
     const full = i < SPIRIT.fullFx, F = R.spirit.fx;
     for (const cl of F.clones) cl.c.visible = full;
-    if (F.glow) F.glow.visible = full;
+    for (const o of F.glow || []) o.visible = full;
     if (R.spirit.full !== full) R.spirit.figure.traverse((o) => { if (o.userData.spiritOutline) o.visible = full; });   // the outline too
     R.spirit.full = full;
   });
@@ -7884,12 +8045,12 @@ function renderPanel(model) {
   const scopedSpecs = model.specs.filter((x) => inScope(x.project)), counts = bucketCounts(scopedSpecs);
   [...specFilterEl.children].forEach((b) => setText(b.lastElementChild, String(b.dataset.f === 'all' ? scopedSpecs.length : counts[b.dataset.f])));
   const roomOrder = Object.fromEntries(ROOMS.map((r, k) => [r.id, k]));
-  const shown = model.specs.map((s, i) => [s, i]).filter(([s]) => inScope(s.project) && (specFilter === 'all' || s.bucket === specFilter)).sort((a, b) => roomOrder[a[0].project] - roomOrder[b[0].project] || a[1] - b[1]);
+  const shown = model.specs.map((s, i) => [s, i]).filter(([s]) => inScope(s.project) && (specFilter === 'all' || s.bucket === specFilter)).sort((a, b) => roomOrder[a[0].project] - roomOrder[b[0].project] || specNewer(a, b));
   const multi = new Set(shown.map(([x]) => x.project)).size > 1;
   keyed(specListEl, JSON.stringify([UI.project, specFilter, scopedSpecs.length, shown.map(([x, i]) => `${i}:${x.bucket}:${x.by || ''}:${x.name}`)]), () => (shown.length
     ? shown.map(([x, i], k) => `${multi && (k === 0 || shown[k - 1][0].project !== x.project) ? `<li class="sl-group">${esc(PROJECT[x.project].name)}<b>${shown.filter(([y]) => y.project === x.project).length}</b></li>` : ''}<li><button type="button" class="spec-row b-${esc(x.bucket)}" data-idx="${i}" data-fk="sp-${i}"${roleVar(x)}><span class="nm">${esc(x.name)}</span><span class="stx"></span>${x.by ? pill(x.by, DEF[x.by].role) : ''}${SEGS}</button></li>`).join('')
     : `<li class="empty-note">${!scopedSpecs.length ? esc(tl('panel.spec.none.scope', { scope: scopeLabel() })) : specFilter === 'live' ? esc(tl('panel.spec.none.live')) : esc(tl('panel.spec.none.state'))}</li>`));
-  specListEl.querySelectorAll('.spec-row').forEach((b) => { const s = model.specs[+b.dataset.idx]; setText(b.querySelector('.stx'), s.status.text); paintSegs(b.querySelector('.segs'), s); });
+  specListEl.querySelectorAll('.spec-row').forEach((b) => { const s = model.specs[+b.dataset.idx]; paintStatus(b.querySelector('.stx'), specStatus(s)); paintSegs(b.querySelector('.segs'), s); });
 
   const T = model.tests, n = CASES.length;
   const pPct = (T.passed / n) * 100, rPct = T.runningIdx >= 0 ? 100 / n : 0;
@@ -8487,6 +8648,7 @@ function openWhiteboard(i, opener, board) {
   if (i >= 0 && !inScope(SPECS[i].project)) setProject(SPECS[i].project, { camera: false });
   if (i >= 0 && !inApp(SPECS[i])) wb.app = 'all';
   wb.idx = i; wb.lastActive = null; wb.board = board || null;
+  wbSideList._shownFor = undefined;   // opened (again): its row is brought into view (wbSideShowOpen)
   if (wb.open) {
     if (opener) zoom.opener = opener;
     $('wb-follow').checked = true;
@@ -8522,7 +8684,7 @@ function renderWhiteboard(model, force) {
 function renderWbSide(model) {
   const q = wb.q, apps = wbApps(model);
   const match = (s) => inScope(s.project) && inApp(s) && (!q || `${s.name} ${s.screen} ${s.file} ${PROJECT[s.project].name}`.toLowerCase().includes(q));
-  const groups = BUCKETS.map(([b, label]) => [label, model.specs.map((s, i) => [s, i]).filter(([s]) => s.bucket === b && match(s))]).filter(([, items]) => items.length);
+  const groups = BUCKETS.map(([b, label]) => [label, model.specs.map((s, i) => [s, i]).filter(([s]) => s.bucket === b && match(s)).sort(specNewer)]).filter(([, items]) => items.length);
   const n = model.specs.filter((s) => inScope(s.project) && inApp(s)).length;
   keyed(wbSideList, JSON.stringify([UI.project, q, wb.idx, wb.app, apps, groups.map(([label, items]) => [label, items.map(([s, i]) => `${i}:${s.by || ''}:${s.name}`)])]), () => {
     const total = apps.reduce((k, [, c]) => k + c, 0);
@@ -8531,7 +8693,20 @@ function renderWbSide(model) {
     const bodyHTML = groups.map(([label, items]) => `<p class="ws-group"><span>${esc(label)}</span><b>${items.length}</b></p>${items.map(([s, i]) => `<button type="button" class="ws-item b-${esc(s.bucket)}" data-idx="${i}" data-fk="ws-${i}" aria-current="${wb.idx === i}"${roleVar(s)}><span class="dot" aria-hidden="true"></span><span class="nm">${esc(s.name)}</span>${s.by ? pill(s.by, DEF[s.by].role) : '<span></span>'}<small></small></button>`).join('')}`).join('');
     return allHTML + (bodyHTML || `<p class="ws-none">${esc(tl('panel.ws.none'))}</p>`);
   });
-  wbSideList.querySelectorAll('.ws-item:not(.ws-all)').forEach((b) => { const x = model.specs[+b.dataset.idx]; setText(b.lastElementChild, UI.project === 'all' ? `${PROJECT[x.project].name} · ${x.status.text}` : x.status.text); });
+  wbSideList.querySelectorAll('.ws-item:not(.ws-all)').forEach((b) => { const x = model.specs[+b.dataset.idx]; paintStatus(b.lastElementChild, specStatus(x, UI.project === 'all' ? `${PROJECT[x.project].name} · ` : '')); });
+  wbSideShowOpen();
+}
+/* The open spec's row in view (ticket 2026-10-23-viz-whiteboard-list-not-scrolled-to-opened-spec): every way of opening
+   one — the panel, a board card, this list, a robot, the URL, the follow — ends in wb.idx and this list's redraw, so it
+   is done here, once per spec opened. Only the list scrolls (never the page); a list not shown waits until it is. */
+function wbSideShowOpen() {
+  if (wbSideList._shownFor === wb.idx) return;
+  const row = wbSideList.querySelector('.ws-item[aria-current="true"]');
+  if (!row || !row.offsetParent) return;
+  const box = wbSideList.getBoundingClientRect(), r = row.getBoundingClientRect();
+  if (r.top < box.top) wbSideList.scrollTop -= box.top - r.top + 8;
+  else if (r.bottom > box.bottom) wbSideList.scrollTop += r.bottom - box.bottom + 8;
+  wbSideList._shownFor = wb.idx;
 }
 
 /* Colours of the spec sheet (2.3.5, requester 10-19: "遷移のところの遷移先が白の太字見にくい 色少しつけてみやすくしてほしい。
@@ -8628,7 +8803,7 @@ function setHead(title, file, stCls, stText, whoHTML) {
   setText($('wb-file'), file);
   const st = $('wb-status'), cls = `state ${stCls}`;
   if (st.className !== cls) st.className = cls;
-  setText(st, stText);
+  paintStatus(st, typeof stText === 'object' ? stText : { text: stText, title: '' });   // a spec's: with its time (specStatus)
   setHTML($('wb-who'), whoHTML);
 }
 function specSummary(s) {
@@ -8648,10 +8823,10 @@ function renderOverview(model) {
   setHead(title, tl('panel.ov.file', { where, n: inS.length }), 'st-busy', tl('panel.ov.counts', { live: c.live, partial: c.partial, todo: c.todo, done: c.done }), '');
   wbNav.hidden = true; $('wb-follow-label').hidden = true;
   wbHelpMode(true);
-  const sig = JSON.stringify(['ov', UI.project, wb.app, model.specs.map((s) => `${s.bucket}:${s.by || ''}`)]);
+  const sig = JSON.stringify(['ov', UI.project, wb.app, model.specs.map((s) => `${s.bucket}:${s.by || ''}:${s.advancedAt || 0}`)]);
   if (wbCode._sig !== sig) {
     wbCode.innerHTML = !inS.length ? `<p class="sc-ph ov-none">${esc(tl('panel.ov.none', { scope: scopeLabel() }))}</p>` : BUCKETS.map(([b, label]) => {
-      const items = model.specs.map((s, i) => [s, i]).filter(([s]) => s.bucket === b && inScope(s.project) && inApp(s));
+      const items = model.specs.map((s, i) => [s, i]).filter(([s]) => s.bucket === b && inScope(s.project) && inApp(s)).sort(specNewer);
       if (!items.length) return '';
       return `<section class="ov-group" aria-label="${esc(label)}"><h3>${esc(label)}<small>${items.length}</small></h3><div class="ov-grid">${items.map(([s, i]) => `<button type="button" class="ov-card b-${esc(s.bucket)}" data-idx="${i}"${roleVar(s)}><span class="ov-top"><strong>${esc(s.name)}</strong><span class="state"></span></span><code class="ov-file">${UI.project === 'all' ? `${esc(PROJECT[s.project].name)} · ` : ''}${esc(s.file)}</code><span class="ov-who"></span><span class="ov-secs">${SEGS}<span class="ov-labels" aria-hidden="true">${SECTIONS.map((x) => `<span>${esc(x)}</span>`).join('')}</span></span><span class="ov-sum"></span></button>`).join('')}</div></section>`;
     }).join('');
@@ -8660,7 +8835,7 @@ function renderOverview(model) {
   wbCode.querySelectorAll('.ov-card').forEach((card) => {
     const s = model.specs[+card.dataset.idx], st = card.querySelector('.state'), cls = `state ${STATUS_CLASS[s.status.kind]}`;
     if (st.className !== cls) st.className = cls;
-    setText(st, s.status.text);
+    paintStatus(st, specStatus(s));
     setHTML(card.querySelector('.ov-who'), s.by ? `${robotWho(s.by)}<span>${esc(robotState[s.by].act)}</span>` : `<span>${esc(s.note)}</span>`);
     paintSegs(card.querySelector('.segs'), s);
     setText(card.querySelector('.ov-sum'), specSummary(s));
@@ -8754,7 +8929,21 @@ function wfTree(nodes) {
    sideways inside itself; over BJ_FOLD lines it is folded, 「全部を見る」 opens it (kept open across redraws). Anything
    else stays the one line of text it was. */
 const BJ_FOLD = 12;
-const bjCell = (v, i, j) => (v !== null && typeof v === 'object' ? `<td class="bj-cell" data-bj="${esc(i)}:${esc(j)}"></td>` : `<td>${esc(v)}</td>`);
+const bjCell = (v, i, j, prose = esc) => (isProse(v) ? `<td>${prose(v)}</td>` : v !== null && typeof v === 'object' ? `<td class="bj-cell" data-bj="${esc(i)}:${esc(j)}"></td>` : `<td>${esc(v)}</td>`);
+/* Prose from a texts file ({markdown}, ticket 2026-10-23-viz-spec-sheet-shows-md-reference-raw): every prose field of
+   the sheet — the description, a part's, an event's, a step's, a transition's condition, a branch's note, an API's
+   notes — is drawn the one way, by the history's histMarkdown (text nodes only, so a < stays a character; only
+   http(s) links, opened in a new tab). The sheet's HTML holds a placeholder per field (its text's hash in it, so a
+   changed text is a changed sheet), filled after it is set. */
+const isProse = (v) => !!v && typeof v === 'object' && typeof v.markdown === 'string';
+function proseHash(t) { let h = 5381; for (let k = 0; k < t.length; k += 1) h = ((h * 33) ^ t.charCodeAt(k)) >>> 0; return h.toString(36); }
+function fillProse(root, texts) {
+  for (const el of root.querySelectorAll('[data-md]')) {
+    if (el.firstChild) continue;   // filled before, the sheet's HTML unchanged
+    const t = texts[+el.dataset.md];
+    if (typeof t === 'string') el.append(histMarkdown(t));
+  }
+}
 const BJ_OPEN = new Set();
 function jsonBlock(v, key) {
   const text = JSON.stringify(v, null, 2), lines = text.split('\n').length;
@@ -8800,7 +8989,7 @@ function renderSheet(model, force) {
   if (SOURCE.mode === 'live') {
     liveWantSheet(s);
     if (!d) {
-      setHead(s.name, s.file, STATUS_CLASS[s.status.kind], s.status.text, s.by ? robotWho(s.by) : '');
+      setHead(s.name, s.file, STATUS_CLASS[s.status.kind], specStatus(s), s.by ? robotWho(s.by) : '');
       wbNav.hidden = false; $('wb-follow-label').hidden = false;
       setHTML($('wb-legend'), SHEET_LEGEND_LIVE); wbHelpMode(false);
       renderNav(s);
@@ -8810,8 +8999,8 @@ function renderSheet(model, force) {
       return;
     }
   }
-  if (SOURCE.mode === 'live') setHead(s.name, s.file, STATUS_CLASS[s.status.kind], s.status.text, s.by ? robotWho(s.by) : '');
-  else setHead(tl('panel.sheet.head', { name: s.name, screen: s.screen }), `docs/screens/json/${s.file}`, STATUS_CLASS[s.status.kind], s.status.text, s.by ? pill(s.by, DEF[s.by].role) : '');
+  if (SOURCE.mode === 'live') setHead(s.name, s.file, STATUS_CLASS[s.status.kind], specStatus(s), s.by ? robotWho(s.by) : '');
+  else setHead(tl('panel.sheet.head', { name: s.name, screen: s.screen }), `docs/screens/json/${s.file}`, STATUS_CLASS[s.status.kind], specStatus(s), s.by ? pill(s.by, DEF[s.by].role) : '');
   wbNav.hidden = false; $('wb-follow-label').hidden = false;
   setHTML($('wb-legend'), SOURCE.mode === 'live' ? SHEET_LEGEND_LIVE : SHEET_LEGEND); wbHelpMode(false);
   renderNav(s);
@@ -8823,14 +9012,20 @@ function renderSheet(model, force) {
   // イベント and 操作: one table (tickets 2026-10-20-jui-viz-spec-events-as-table), the look of the variables above it.
   // Its columns are the spec's own fields, nothing read out of the text; an event's name in one unbroken line.
   const nameTable = (heads, bodyHTML) => `<table class="vt nt"><thead><tr><th><span class="sr">${esc(tl('panel.th.state'))}</span></th>${heads.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${bodyHTML}</tbody></table>`;
-  const nameCells = (cells, named) => cells.map((c, j) => `<td class="${j === 0 && named ? 'mono nt-name' : 'nt-desc'}">${esc(c)}</td>`).join('');
+  const nameCells = (cells, named) => cells.map((c, j) => `<td class="${j === 0 && named ? 'mono nt-name' : 'nt-desc'}">${j === 0 && named ? esc(c) : prose(c)}</td>`).join('');
   const tr = (m, key, cellsHTML) => `<tr class="${esc(m[2])}"${actAttr(m[2], key)}><td class="mk ${esc(m[1])}">${esc(m[0])}</td>${cellsHTML}</tr>`;
   // The first n items of a section; while it is being written the newest one is highlighted instead of marked.
   const pick = (k, arr, n, fresh) => arr.slice(0, n).map((x, i) => [x, i, fresh ? ['', '', i === n - 1 ? 'is-new' : ''] : markOf(s, model, k, i)]);
+  const mdTexts = [];
+  const prose = (v) => {
+    if (!isProse(v)) return esc(v);
+    const k = mdTexts.push(v.markdown) - 1;
+    return `<span class="sc-md" data-md="${k}" data-mdh="${esc(proseHash(v.markdown))}"></span>`;
+  };
   const bodies = [
     (w) => {
       const m = d.metadata;
-      const rows = [[tl('panel.meta.name'), `${esc(m.displayName)}${esc(tl('panel.meta.open'))}<span class="mono">${esc(m.name)}</span>${esc(tl('panel.meta.close'))}`], [tl('panel.meta.description'), esc(m.description)], [tl('panel.meta.platforms'), m.platforms.map((p) => `<span class="bdg">${PLATFORM_JA[p] || esc(p)}</span>`).join(' ')], [tl('panel.meta.layout'), m.layoutFile ? `<code>docs/screens/layouts/${esc(m.layoutFile)}.json</code>` : ''], [tl('panel.meta.created'), esc(m.createdAt)]].filter(([, v]) => v !== '');
+      const rows = [[tl('panel.meta.name'), `${esc(m.displayName)}${esc(tl('panel.meta.open'))}<span class="mono">${esc(m.name)}</span>${esc(tl('panel.meta.close'))}`], [tl('panel.meta.description'), prose(m.description)], [tl('panel.meta.platforms'), m.platforms.map((p) => `<span class="bdg">${PLATFORM_JA[p] || esc(p)}</span>`).join(' ')], [tl('panel.meta.layout'), m.layoutFile ? `<code>docs/screens/layouts/${esc(m.layoutFile)}.json</code>` : ''], [tl('panel.meta.created'), esc(m.createdAt)]].filter(([, v]) => v !== '');
       return `<dl class="kv">${rows.slice(0, reveal(rows.length, w)).map(([a, bHTML]) => `<dt>${esc(a)}</dt><dd>${bHTML}</dd>`).join('')}</dl>`;
     },
     (w, writing) => {
@@ -8838,7 +9033,7 @@ function renderSheet(model, force) {
       const items = pick(1, d.components, Math.min(COMP_MAX, compAll), writing);
       const moreHTML = compAll > COMP_MAX ? `<p class="sc-note">${esc(tl('panel.comp.more', { n: compAll - COMP_MAX, max: COMP_MAX }))}</p>` : '';
       const wfState = (m) => (writing ? (m[2] === 'is-new' ? 'writing' : 'defined') : !s.implPhase ? 'defined' : m[1] === 'm-done' ? 'done' : m[1] === 'm-doing' ? 'doing' : 'todo');
-      const rowText = (type, id, desc) => `<span class="tp">${esc(TYPE_JA[type] || type)}</span> <span class="id">${esc(id)}</span> <span class="desc">${esc(desc)}</span>`;
+      const rowText = (type, id, desc) => `<span class="tp">${esc(TYPE_JA[type] || type)}</span> <span class="id">${esc(id)}</span> <span class="desc">${prose(desc)}</span>`;
       let rowsHTML, wfHTML;
       if (hasDepths(d.components)) {
         // a tree: the list indented by depth with its lines, the phone frame's boxes nested
@@ -8869,7 +9064,7 @@ function renderSheet(model, force) {
       const apiN = Math.max(0, shown - M - 2);
       let apisHTML = '';
       if (shown > M + 1 && !d.apis.length) apisHTML = `<div class="farrow" aria-hidden="true">↓</div><div class="fbox"><p class="fb-h">API</p><p class="sc-ph">${esc(tl('panel.fb.noapi'))}</p></div>`;
-      else if (apiN > 0) apisHTML = `<div class="farrow" aria-hidden="true">↓</div><div class="fbox"><p class="fb-h">API</p><ul class="rows">${d.apis.slice(0, apiN).map(([op, method, path]) => `<li class="api"><span class="http http-${esc(method)}">${esc(method)}</span><code>${esc(path)}</code><span class="desc">${esc(op)}</span></li>`).join('')}</ul></div>`;
+      else if (apiN > 0) apisHTML = `<div class="farrow" aria-hidden="true">↓</div><div class="fbox"><p class="fb-h">API</p><ul class="rows">${d.apis.slice(0, apiN).map(([op, method, path]) => `<li class="api"><span class="http http-${esc(method)}">${esc(method)}</span><code>${esc(path)}</code><span class="desc">${prose(op)}</span></li>`).join('')}</ul></div>`;
       const boxesHTML = `<div class="flow"><div class="fbox"><p class="fb-h">ViewModel</p><ul class="rows">${methodsHTML}</ul>${varsHTML}</div>${reposHTML}${apisHTML}</div>`;
       // 2.3.5: the diagram the spec page draws (Mermaid), the boxes under it with what it does not say; while the
       // section is being written, the boxes alone (they grow as it is written)
@@ -8882,9 +9077,9 @@ function renderSheet(model, force) {
       return nameTable(dest ? [tl('panel.th.action'), tl('panel.th.result'), tl('panel.th.dest')] : [tl('panel.th.action'), tl('panel.th.result')], pick(4, d.userActions, reveal(d.userActions.length, w), writing)
         .map(([[a, p, to], i, m]) => tr(m, `a${i}`, nameCells(dest ? [a, p, to || ''] : [a, p], false))).join(''));
     },
-    (w, writing) => `<ul class="rows">${pick(5, d.transitions, reveal(d.transitions.length, w), writing).map(([[trig, dest, how], i, m]) => li(m, `t${i}`, `${esc(trig)}<span class="to">→</span>${transitionTag(dest, how)}`)).join('')}</ul>`,
+    (w, writing) => `<ul class="rows">${pick(5, d.transitions, reveal(d.transitions.length, w), writing).map(([[trig, dest, how], i, m]) => li(m, `t${i}`, `${prose(trig)}<span class="to">→</span>${transitionTag(dest, how)}`)).join('')}</ul>`,
     (w, writing) => {
-      const rowsHTML = pick(6, d.branches, reveal(d.branches.length, w), writing).map(([[method, when, then], i, m]) => tr(m, `b${i}`, `<td class="mono">${esc(method)}</td>${bjCell(when, i, 1)}${bjCell(then, i, 2)}`)).join('');
+      const rowsHTML = pick(6, d.branches, reveal(d.branches.length, w), writing).map(([[method, when, then], i, m]) => tr(m, `b${i}`, `<td class="mono">${esc(method)}</td>${bjCell(when, i, 1, prose)}${bjCell(then, i, 2, prose)}`)).join('');
       const sheetNoteHTML = s.id === 'cart' && model.t >= 18 ? `<p class="sc-note">${esc(tl('panel.bt.note', { passed: T.passed }))}</p>` : '';
       return `<table class="vt bt"><thead><tr><th><span class="sr">${esc(tl('panel.th.state'))}</span></th><th>${esc(tl('panel.th.method'))}</th><th>${esc(tl('panel.th.condition'))}</th><th>${esc(tl('panel.th.result'))}</th></tr></thead><tbody>${rowsHTML}</tbody></table>${sheetNoteHTML}`;
     },
@@ -8910,6 +9105,7 @@ function renderSheet(model, force) {
   }).join('');
   setHTML(wbCode, sheetHTML);
   fillBranchJSON(wbCode, d.branches, s.id);
+  fillProse(wbCode, mdTexts);
   const mmd = wbCode.querySelector('[data-flow-mmd]');
   if (mmd) drawMermaid(mmd, d.flowMermaid).then((svg) => flowZoomApply(svg));
 
@@ -8927,7 +9123,8 @@ function renderSheet(model, force) {
 
 /* ---------- task board up close: one column per task state, permission prompts on top ---------- */
 const tbEl = $('tb'), kanbanEl = $('kanban'), stripEl = $('perm-strip'), detailEl = $('tb-detail'), qStripEl = $('q-strip');
-const tb = { open: false, detail: null, board: null, waitView: false };   // waitView: opened from a 質問 / 許可待ち chip
+const tb = { open: false, detail: null, board: null, waitView: false, wide: false, waiting: { q: 0, d: 0, p: 0 } };   // waitView: opened from a 質問 / 許可待ち chip
+const kbBodyEl = tbEl.querySelector('.kb-body'), wideBtn = $('tb-wide');
 $('tb-lanes').addEventListener('change', (e) => { UI.lanes = e.target.checked; writePref('lanes', UI.lanes ? 'on' : 'off'); renderTaskBoard(latestModel); });
 function openTaskBoard(opener, detail, board) {
   if (detail !== undefined) tb.detail = detail;
@@ -8943,7 +9140,7 @@ function openTaskBoard(opener, detail, board) {
     if (!tb.open) return;
     showOverlay(tbEl);
     renderTaskBoard(latestModel);
-    const firstQ = tb.waitView && !tb.detail ? qStripEl.querySelector('input:not([disabled])') : null;   // from the 質問 chip: the first choice
+    const firstQ = tb.waitView && !tb.detail ? kbBodyEl.querySelector('#q-strip .ps-line, #denied-strip .ps-line, #perm-strip .ps-line') : null;   // from a chip: the first card's line
     (firstQ || $(tb.detail ? 'tbd-close' : 'tb-close')).focus({ preventScroll: true });
   });
 }
@@ -8956,13 +9153,43 @@ function closeTaskDetail() {
 }
 function closeTaskBoard() {
   if (!tb.open) { releaseView('tb'); return; }
-  tb.open = false; tb.detail = null; tb.waitView = false;
+  tb.open = false; tb.detail = null; tb.waitView = false; tb.wide = false;   // the strips are folded again next time
   qStripEl.replaceChildren(); qStripEl._sig = null; qStripEl.hidden = true;   // no second copy of the cards while closed
   const dStrip = $('denied-strip'); dStrip.replaceChildren(); dStrip._sig = null; dStrip.hidden = true;
   hideOverlay(tbEl);
   releaseView('tb');
 }
 $('tb-close').addEventListener('click', closeTaskBoard);
+/* The strips on top, folded or wide (ticket 2026-10-22-viz-taskboard-top-strips-hide-the-columns). Requester: 「上の許可の
+   表示を小さくして、広げるを押すと許可の部分だけ表示で下が消える仕様にして欲しい」. Folded (the default each time the board
+   opens): each strip is its count and one line per card (who, what, how long); the four columns below stay in sight.
+   Wide: the strips' whole cards and no columns. A card's line opens the strips wide at that card. The handle that opens
+   and folds them hangs under the strips (the requester on the first look: 「上の幅を広げる、たたむはわかりづらい上の方の添付
+   画像の部分を広げるってわかるUIにしてほしい」): ▼ / ▲ and what is waiting in them, in words. */
+const foldLine = (go, x, tool, text, note = '') => `<li><button type="button" class="ps-line" data-ps-go="${esc(go)}" data-fk="fl-${esc(go)}">${pill(x.who, DEF[x.who].role)}<span class="ps-who">${esc(DEF[x.who].agent)}</span><span class="ps-what">${tool ? `<b>${esc(tool)}</b> <code>${esc(text)}</code>` : esc(text)}</span>${note ? `<span class="ps-note">${esc(note)}</span>` : ''}<span class="pc-wait" data-since="${x.at}"></span></button></li>`;
+const countB = (n) => `<b${n ? '' : ' class="ps-zero"'}>${n}</b>`;
+function paintTbWide() {
+  const any = !qStripEl.hidden || !$('denied-strip').hidden || !stripEl.hidden;
+  if (!any) tb.wide = false;
+  wideBtn.hidden = !any;
+  kbBodyEl.classList.toggle('tb-wide', tb.wide);
+  kbBodyEl.classList.toggle('tb-fold', !tb.wide);
+  wideBtn.setAttribute('aria-expanded', String(tb.wide));
+  const W = tb.waiting, what = [W.q && tl('panel.tb.wide.q', { n: W.q }), W.d && tl('panel.tb.wide.d', { n: W.d }), W.p && tl('panel.tb.wide.p', { n: W.p })].filter(Boolean).join(tl('panel.tb.wide.sep'));
+  setText(wideBtn, tb.wide ? tl('panel.tb.fold') : tl('panel.tb.wide', { what: what || tl('panel.tb.wide.none') }));
+}
+const FOLD_CARD = { q: (id) => `#q-strip [data-qcard="${CSS.escape(id)}"]`, d: (id) => `#denied-strip [data-dcard="${CSS.escape(id)}"]`, p: (id) => `#perm-strip [data-fk="pt-${CSS.escape(id)}"]` };
+function setTbWide(on, go) {
+  tb.wide = on;
+  renderTaskBoard(latestModel);
+  const [kind, ...rest] = go ? go.split(':') : [];
+  const at = kind && FOLD_CARD[kind] ? kbBodyEl.querySelector(FOLD_CARD[kind](rest.join(':'))) : null;
+  const card = at && (at.closest('.qcard, .pcard') || at);
+  if (card) { card.scrollIntoView({ block: 'nearest' }); (card.querySelector('input:not([disabled]), button:not([disabled])') || wideBtn).focus({ preventScroll: true }); }
+  else wideBtn.focus({ preventScroll: true });
+}
+wideBtn.addEventListener('click', () => setTbWide(!tb.wide));
+kbBodyEl.addEventListener('click', (e) => { const go = e.target.closest('[data-ps-go]'); if (go) setTbWide(true, go.dataset.psGo); });
 const COL_HINT = { todo: tl('panel.hint.todo'), wait: tl('panel.hint.wait'), doing: tl('panel.hint.doing'), done: '' };
 const mmss = (sec) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;
 const paintSince = (root, t, word) => root.querySelectorAll('[data-since]').forEach((el) => setText(el, `${word} ${mmss(Math.max(0, t - Number(el.dataset.since)))}`));
@@ -8972,8 +9199,11 @@ function renderQuestionStrip() {
   qStripEl.hidden = !qs.length && !elsewhere && !tb.waitView;
   keyed(qStripEl, `${tb.waitView}|${elsewhere}|${questionsSig(qs)}`, () => {
     const otherHTML = elsewhere ? `<p class="ps-rules" data-q-elsewhere="${elsewhere}">${esc(tl('panel.q.elsewhere', { n: elsewhere }))} <button type="button" class="link-btn" data-set-all data-fk="qs-all">${esc(tl('panel.scope.all.shown'))}</button></p>` : '';
-    return `<h3 class="ps-title">${esc(tl('panel.q.title'))}<b>${qs.filter((q) => q.status === 'pending').length}</b><small>${esc(tl('panel.q.oldest'))}</small></h3>${qs.some((q) => q.status === 'pending') ? '' : `<p class="ps-none">${esc(tl('panel.q.none'))}</p>`}${otherHTML}${qs.map((q) => questionHTML(q, 'b')).join('')}`;
+    const foldHTML = qs.map((q) => foldLine(`q:${q.id}`, q, '', q.questions.map((x) => x.header || x.question).join(' / '), q.status === 'pending' ? '' : qState(q))).join('');
+    return `<h3 class="ps-title">${esc(tl('panel.q.title'))}${countB(qs.filter((q) => q.status === 'pending').length)}<small>${esc(tl('panel.q.oldest'))}</small></h3>${foldHTML ? `<ul class="ps-fold">${foldHTML}</ul>` : ''}${qs.some((q) => q.status === 'pending') ? '' : `<p class="ps-none">${esc(tl('panel.q.none'))}</p>`}${otherHTML}${qs.map((q) => questionHTML(q, 'b')).join('')}`;
   });
+  tb.waiting.q = qs.filter((q) => q.status === 'pending').length;
+  qStripEl.classList.toggle('ps-hot', tb.waiting.q > 0);
 }
 function renderTaskBoard(model) {
   if (!tb.open) return;
@@ -8998,9 +9228,13 @@ function renderTaskBoard(model) {
     }).join('');
     const rulesHTML = alwaysRules.size ? `<p class="ps-rules">${esc(tl('panel.rules.added'))}${[...alwaysRules.keys()].map((r) => `<code>${esc(r)}</code>`).join(' ')} <button type="button" class="link-btn" data-reset-rules data-fk="rules">${esc(tl('panel.rules.reset'))}</button></p>` : '';
     const otherHTML = elsewhere ? `<p class="ps-rules">${esc(tl('panel.perm.elsewhere', { n: elsewhere }))} <button type="button" class="link-btn" data-set-all data-fk="ps-all">${esc(tl('panel.scope.all.shown'))}</button></p>` : '';
-    return `<h3 class="ps-title">${esc(tl('panel.perm.asking'))}<b>${pend.length}</b><small>${PERM_NOTE}</small></h3>${cardsHTML ? `<ul class="ps-list">${cardsHTML}</ul>` : `<p class="ps-none">${esc(tl('panel.perm.none'))}</p>`}${otherHTML}${rulesHTML}`;
+    const foldHTML = pend.map((p) => foldLine(`p:${p.id}`, p, p.tool, p.input ? permSummary(p) : '')).join('');
+    return `<h3 class="ps-title">${esc(tl('panel.perm.asking'))}${countB(pend.length)}<small>${PERM_NOTE}</small></h3>${foldHTML ? `<ul class="ps-fold">${foldHTML}</ul>` : ''}${cardsHTML ? `<ul class="ps-list">${cardsHTML}</ul>` : `<p class="ps-none">${esc(tl('panel.perm.none'))}</p>`}${otherHTML}${rulesHTML}`;
   });
+  tb.waiting.p = pend.length;
+  stripEl.classList.toggle('ps-hot', pend.length > 0);
   paintSince(stripEl, model.t, tl('panel.since.wait'));
+  paintTbWide();
   const loopStart = simT - model.t;
   const lists = SESSIONS.filter((x) => visible(x.id)).map((x) => x.id);
   const noteHTML = (x, col) => {
@@ -9068,7 +9302,7 @@ ${who ? `<dt>${esc(tl('panel.td.now'))}</dt><dd data-live-act="${esc(who)}"></dd
 ${base ? `<dt>${esc(tl('panel.td.dep'))}</dt><dd>${base.blockedBy ? `<button type="button" class="link-btn" data-open="${esc(base.list)}#${esc(base.blockedBy)}" data-fk="tbd-dep">${esc(tl('panel.td.ref', { id: base.blockedBy, subject: TASK_BY_KEY[`${base.list}#${base.blockedBy}`].subject }))}</button>${x && x.blocked ? esc(tl('panel.td.dep.wait')) : ''}` : esc(tl('panel.none'))}</dd>` : ''}
 ${base ? `<dt>${esc(tl('panel.td.next'))}</dt><dd>${blocks.length ? blocks.map((q) => `<button type="button" class="link-btn" data-open="${esc(q.list)}#${esc(q.id)}" data-fk="tbd-b${esc(q.id)}">${esc(tl('panel.td.ref', { id: q.id, subject: q.subject }))}</button>`).join(' ') : esc(tl('panel.none'))}</dd>` : ''}
 ${times ? `<dt>${esc(tl('panel.td.times'))}</dt><dd>${esc(times)}</dd>` : ''}
-${spec ? `<dt>spec</dt><dd><button type="button" class="link-btn" data-spec-open="${specIdx}" data-fk="tbd-spec">${esc(tl('panel.td.spec.open', { name: spec.name, screen: spec.screen }))}</button><span class="state ${STATUS_CLASS[spec.status.kind]}">${esc(spec.status.text)}</span></dd>` : ''}
+${spec ? `<dt>spec</dt><dd><button type="button" class="link-btn" data-spec-open="${specIdx}" data-fk="tbd-spec">${esc(tl('panel.td.spec.open', { name: spec.name, screen: spec.screen }))}</button><span class="state ${STATUS_CLASS[spec.status.kind]}" title="${esc(specStatus(spec).title)}">${esc(specStatus(spec).text)}</span></dd>` : ''}
 </dl>
 ${histHTML ? `<h4>${esc(tl('panel.td.perm.hist'))}</h4><ul class="tbd-list">${histHTML}</ul>` : ''}
 ${who ? `<h4>${esc(tl('panel.td.recent', { who }))}</h4><ul class="tbd-list" data-recent="${esc(who)}"></ul>` : ''}
@@ -9506,7 +9740,7 @@ function renderRobot(model) {
       return `<li><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="rt-${esc(x.key)}"><span class="state ${esc(c)}">${esc(l)}</span><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${x.harness ? `<span class="h-tag">${esc(x.harness)}</span>` : ''}${esc(x.subject)}</span>${!isMain || !x.owner ? '' : `<span class="rb-owner">${pill(x.owner, DEF[x.owner].role)}</span>`}</button></li>`;
     }).join('')}</ul>` : `<p class="rb-none">${esc(tl(isMain ? 'panel.rb.tasks.empty' : 'panel.rb.owned.none'))}</p>`;
     return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? d.title || tl('panel.rb.main', { id }) : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.title ? tl('panel.rb.main.head', { id, head: d.head }) : d.agent} · ${room}` : tl('panel.rb.sub', { role: ROLE_JA[d.role], sess, room }))}</p></div><div class="rb-side"><div class="rb-menu"><button type="button" class="wb-btn rb-talk" data-rb-talk data-fk="rb-talk" aria-pressed="false" aria-label="${esc(tl('talk.title'))}" title="${esc(tl('panel.rb.talk.title'))}">${TALK_ICON}<span>${esc(tl('talk.title'))}</span><span class="rb-talk-n" data-rb-talk-n hidden></span></button><button type="button" class="wb-btn rb-clock" data-rb-clock data-fk="rb-clock" aria-haspopup="dialog" aria-describedby="rb-clock-why">${esc(tl('panel.clk.button'))}</button></div><div class="rb-nav"><button type="button" class="rb-step" data-rb-step="-1" data-fk="rb-prev" aria-label="${esc(tl('panel.rb.prev'))}" title="${esc(tl('panel.rb.prev'))}">‹</button><button type="button" class="rb-step" data-rb-step="1" data-fk="rb-next" aria-label="${esc(tl('panel.rb.next'))}" title="${esc(tl('panel.rb.next'))}">›</button><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">${esc(tl('panel.rb.back'))}</button></div></div><p class="rb-clock-why" id="rb-clock-why" data-rb-clock-why hidden></p>${rbMovedHTML()}</div>
-<div class="rb-tabs"><button type="button" class="wb-btn rb-wide-btn" data-rb-wide data-fk="rb-wide" aria-pressed="false" hidden>${esc(tl('panel.rb.wide'))}</button><button type="button" class="wb-btn rb-low-btn" data-rb-low data-fk="rb-low" aria-pressed="false" hidden>${esc(tl('panel.rb.low'))}</button><div class="rb-tablist" role="tablist" aria-label="${esc(tl('panel.rb.tabs'))}"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">${esc(tl('panel.rb.tab.now'))}</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">${esc(tl('panel.rb.tab.history'))}</button></div></div>
+<div class="rb-tabs"><button type="button" class="wb-btn rb-wide-btn" data-rb-wide data-fk="rb-wide" aria-pressed="false" aria-controls="rb" hidden>${esc(tl('hist.wide.on'))}</button><div class="rb-tablist" role="tablist" aria-label="${esc(tl('panel.rb.tabs'))}"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">${esc(tl('panel.rb.tab.now'))}</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">${esc(tl('panel.rb.tab.history'))}</button></div></div>
 <div class="rb-body rb-hist" data-rb-hist hidden aria-label="${esc(tl('panel.rb.tab.history'))}" tabindex="0"></div>
 <div class="rb-body" tabindex="0" aria-label="${esc(tl('panel.rb.tab.now'))}">
 <section class="rb-sec" aria-labelledby="rb-h-now"><h3 id="rb-h-now">${esc(tl('panel.rb.now'))}</h3><div class="rb-now"><p class="rb-state"><span class="rb-lamp" data-rb-lamp></span><b data-rb-state></b><span class="rb-since">${esc(tl('panel.rb.lamp'))}<span data-rb-lampname></span></span></p><p class="rb-act" data-rb-act></p><p class="rb-git" data-rb-git hidden title="${esc(tl('panel.rb.git.title'))}"></p><p class="rb-cond" data-rb-cond></p><p class="rb-looks" data-rb-looks hidden></p>${spec ? `<p class="rb-spec"><button type="button" class="link-btn" data-spec-open="${specIdx}" data-fk="rb-spec">${esc(tl('panel.rb.spec', { name: spec.name, screen: spec.screen }))}</button> <span data-rb-specnow></span></p><span class="rb-segs" style="--c:${ROLES[d.role].color}">${SEGS}</span>` : ''}${(SOURCE.mode === 'demo' && id === 'a2') ? '<p class="rb-test" data-rb-test></p><div class="prog" data-rb-prog role="img"><span class="p"></span><span class="r"></span></div>' : ''}</div></section>
@@ -9546,7 +9780,8 @@ ${subs.length ? `<section class="rb-sec" aria-labelledby="rb-h-subs"><h3 id="rb-
   if (looksEl) { looksEl.hidden = !causes.length; if (causes.length) setText(looksEl, HEAVY_LEGEND); }
   if (spec) {
     const k = activeSec(spec);
-    setText(rbEl.querySelector('[data-rb-specnow]'), `${spec.status.text}${k >= 0 ? ` · ${SECTIONS[k]}` : ''}`);
+    const st = specStatus(spec);
+    paintStatus(rbEl.querySelector('[data-rb-specnow]'), { text: `${st.text}${k >= 0 ? ` · ${SECTIONS[k]}` : ''}`, title: st.title });
     paintSegs(rbEl.querySelector('.rb-segs .segs'), spec);
   }
   if ((SOURCE.mode === 'demo' && id === 'a2')) {
@@ -10181,8 +10416,11 @@ function renderDenialStrip() {
   el.hidden = !shown.length && !elsewhere;
   keyed(el, `${elsewhere}|${denialsSig(shown)}`, () => {
     const otherHTML = elsewhere ? `<p class="ps-rules">${esc(tl('deny.elsewhere', { n: elsewhere }))} <button type="button" class="link-btn" data-set-all data-fk="ds-all">${esc(tl('deny.show.all'))}</button></p>` : '';
-    return `<h3 class="ps-title">${esc(tl('deny.strip.title'))}<b>${shown.filter((d) => d.status === 'pending').length}</b><small>${esc(tl('deny.strip.order'))}</small></h3>${otherHTML}${shown.map((d) => denialHTML(d, 'b')).join('')}`;
+    const foldHTML = shown.map((d) => foldLine(`d:${d.id}`, d, d.tool, d.input || '', d.status === 'pending' ? '' : DEN_DONE[d.status] || d.status)).join('');
+    return `<h3 class="ps-title">${esc(tl('deny.strip.title'))}${countB(shown.filter((d) => d.status === 'pending').length)}<small>${esc(tl('deny.strip.order'))}</small></h3>${foldHTML ? `<ul class="ps-fold">${foldHTML}</ul>` : ''}${otherHTML}${shown.map((d) => denialHTML(d, 'b')).join('')}`;
   });
+  tb.waiting.d = shown.filter((d) => d.status === 'pending').length;
+  el.classList.toggle('ps-hot', tb.waiting.d > 0);
 }
 function onDenialClick(e) {
   const where = e.currentTarget.dataset.dwhere !== undefined ? e.currentTarget.dataset.dwhere : e.currentTarget.id === 'denied-strip' ? 'b' : '';   // h: the 応答の履歴 tab
@@ -10444,6 +10682,155 @@ $('chip-input').addEventListener('click', () => {
   const d = ROBOT_DEFS.find((x) => waitKindOf(x.id) === 'input');
   if (d) waitOpen(d.id, 'input');
 });
+// ---- web/js/53-roster.js ----
+/* ---------- the room's robot list (ticket 2026-10-23-viz-room-robot-list-show-hide) ----------
+   Requester 10-23: 「botが多くなると全体が見づらいので部屋の中の時は3dの右側にbotの名前とチェックを表示してチェックしてないbotは消して
+   欲しい。」 Inside one room (liveSolo), a list at the 3D's right: per session a check, its number and name and a lamp of
+   its state. A robot unchecked leaves the 3D with all it carries (liveSoloSync hides its root, its desk with it, and
+   its tag; the tag's bill, wait and skill badges and the spirit's bubbles follow; a game, a nap or a break it is in
+   ends and none starts: rosterHides in playIdle / playStopReason). Its desk stays empty rather than the room being
+   packed again: the others' desks are remembered (rememberDesk) and would all move.
+   - per session: the subagents follow their main session's check, and a main's row lights when one of them waits;
+   - remembered per room in this browser (pref roster:<room>, the sessions hidden; a new one is shown);
+   - 全部 / 作業中だけ (any state but idle and done: waiting is work the person is owed) / なし;
+   - a hidden robot waiting on the person (waitKindOf: a permission, a question, input) is not lost: its row is marked
+     with what it waits for, and the list's head counts them;
+   - not over a board (requester 10-23 01:23: 「ボード出してる時はbotの切り替えの表示も消していいよ」): while one of
+     ROSTER_BOARDS is drawn over the 3D the list goes, and comes back with the 3D. The robot's card is not a board: it is
+     opened from the list. The header's waiting chips and the notifications are not the list's: they stay. */
+const ROSTER = { off: new Map(), sig: '', max: 200, placedAt: 0, placeMs: 250 };
+// the boards drawn over the 3D (each shown by showOverlay): the whiteboard (a spec, and ボードで全部見る), the task board,
+// the server room, the data server, the bills
+const ROSTER_BOARDS = ['wb', 'tb', 'sr', 'ds', 'pr'];
+// and every dialog that takes the whole page (aria-modal: the full-screen log, the call, the server room) — the gate,
+// 10-23: the list stayed up over the log (the floor buttons go under it)
+const rosterUnderBoard = () => ROSTER_BOARDS.some((id) => { const el = document.getElementById(id); return !!el && el._showing === true; })
+  || !!document.querySelector('[role="dialog"][aria-modal="true"]:not([hidden])');
+const rosterMainDef = (def) => (def.kind === 'sub' && DEF[def.mainLabel] ? DEF[def.mainLabel] : def);
+const rosterKeyOf = (def) => def.sessionId || def.realId || def.id;
+function rosterOff(room) {
+  if (!ROSTER.off.has(room)) {
+    let got = [];
+    try { got = JSON.parse(readPref(`roster:${room}`, '[]')); } catch (err) { got = []; }
+    ROSTER.off.set(room, new Set(Array.isArray(got) ? got.filter((k) => typeof k === 'string') : []));
+  }
+  return ROSTER.off.get(room);
+}
+function rosterSave(room) {
+  const off = [...rosterOff(room)].slice(-ROSTER.max);   // the newest kept: a long-lived room does not grow it for ever
+  writePref(`roster:${room}`, JSON.stringify(off));
+}
+/* Hidden by the list now: in a room's own view, its session unchecked there. */
+function rosterHides(R) {
+  const solo = liveSolo();
+  return !!solo && R.def.room === solo && rosterOff(solo).has(rosterKeyOf(rosterMainDef(R.def)));
+}
+const ROSTER_QUIET = new Set(['idle', 'done']);
+/* The rows: the room's main sessions (a subagent rides on its main's row), each with its lamp and what it waits on. */
+function rosterRows(room) {
+  const off = rosterOff(room), rows = new Map();
+  for (const R of robots) {
+    if (R.def.room !== room) continue;
+    const main = rosterMainDef(R.def), key = rosterKeyOf(main);
+    const row = rows.get(key) || { key, id: main.id, role: main.role, name: main.title || main.agent || main.id, state: 'idle', lamp: 'idle', wait: null, on: !off.has(key) };
+    if (R.def === main) {
+      const st = robotState[main.id] || { state: 'idle' };
+      row.state = st.state;
+      row.lamp = (STATES[st.state] || STATES.idle).lamp;
+      if (row.lamp === 'waiting' && st.asking) row.lamp = 'asking';
+    }
+    row.wait = row.wait || (typeof waitKindOf === 'function' ? waitKindOf(R.def.id) : null);
+    rows.set(key, row);
+  }
+  return [...rows.values()].sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+}
+function rosterRowHTML(r) {
+  const label = r.on ? tl('roster.hide', { name: r.name }) : tl('roster.show', { name: r.name });
+  return `<li class="roster-row${r.on ? '' : ' roster-off'}${!r.on && r.wait ? ' roster-alert' : ''}" data-roster-key="${esc(r.key)}" data-robot="${esc(r.id)}" data-wait="${esc(r.wait || '')}">`
+    + `<input type="checkbox" class="roster-check" data-roster-check="${esc(r.key)}"${r.on ? ' checked' : ''} aria-label="${esc(label)}">`
+    + `<button type="button" class="roster-name" data-roster-open="${esc(r.id)}"${r.on ? '' : ' disabled'}>${pill(r.id, r.role)}<span class="roster-nm">${esc(r.name)}</span></button>`
+    + `<span class="roster-lamp" style="--lamp:${esc(LAMP[r.lamp] || LAMP.idle)}" title="${esc(LAMP_TEXT[r.lamp] || '')}" aria-label="${esc(LAMP_TEXT[r.lamp] || '')}"></span>`
+    + (r.wait ? `<span class="roster-wait">${esc(WAIT.name[r.wait] || '')}</span>` : '')
+    + '</li>';
+}
+/* Called each frame from liveSoloSync: the list shown in a room's view, written again only when a row changed. */
+function rosterSync(solo) {
+  const box = document.getElementById('roster');
+  if (!box) return;
+  // kept while a robot is zoomed on: a card is opened from the list, and the next row is pressed from there
+  const show = !!solo && has3D && !TOWER.on && !ds.open && !pr.open && !rosterUnderBoard();
+  box.hidden = !show;
+  if (!show) { ROSTER.sig = ''; return; }
+  const now = performance.now();
+  if (now - ROSTER.placedAt > ROSTER.placeMs) { ROSTER.placedAt = now; rosterPlace(box); }
+  const rows = rosterRows(solo), waiting = rows.filter((r) => !r.on && r.wait).length;
+  const sig = `${solo}|${rows.map((r) => [r.key, r.id, r.name, r.lamp, r.wait, r.on].join(',')).join(';')}`;
+  if (sig === ROSTER.sig) return;
+  ROSTER.sig = sig;
+  const list = document.getElementById('roster-list'), had = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.rosterCheck : null;
+  setHTML(list, rows.map(rosterRowHTML).join(''));
+  if (had) { const again = [...list.querySelectorAll('[data-roster-check]')].find((x) => x.dataset.rosterCheck === had); if (again) again.focus({ preventScroll: true }); }
+  setText(document.getElementById('roster-count'), tl('roster.count', { shown: rows.filter((r) => r.on).length, n: rows.length }));
+  const alert = document.getElementById('roster-alert');
+  alert.hidden = !waiting;
+  setText(alert, waiting ? tl('roster.waiting', { n: waiting }) : '');
+}
+/* The fixed parts over the 3D that share its column (the gate, 10-23: the list's fold button lay on the floor buttons,
+   a room's view on a building of three floors): the room's name box, the floor buttons, the source's error line, the
+   building's legend and weather, the empty room's note. Any of them shown in the list's column and in the 3D's upper
+   half keeps the list below it; the list is as tall as what is left. On a narrow page the list sits at the foot, so
+   only its height gives way. */
+const ROSTER_AROUND = ['room-solo', 'floor-nav', 'live-error', 'tower-legend', 'tower-weather', 'live-empty'];
+function rosterPlace(box) {
+  const scene = document.getElementById('scene');
+  if (!scene) return;
+  const S = scene.getBoundingClientRect(), r = box.getBoundingClientRect();
+  let clear = S.top + 12;   // the page y the list's top stays under
+  for (const id of ROSTER_AROUND) {
+    const el = document.getElementById(id);
+    if (!el || el.hidden) continue;
+    const o = el.getBoundingClientRect();
+    if (o.width && o.height && o.left < r.right && r.left < o.right && o.top < S.top + S.height / 2) clear = Math.max(clear, o.bottom + 6);
+  }
+  if (!rosterNarrow()) box.style.setProperty('--roster-top', `${Math.round(clear - S.top)}px`);
+  box.style.setProperty('--roster-max', `${Math.max(48, Math.round(S.bottom - 12 - clear))}px`);
+}
+const rosterNarrow = () => !!(window.matchMedia && window.matchMedia('(max-width: 900px)').matches);   // app.css: the list at the foot
+function rosterSet(room, key, on) {
+  const off = rosterOff(room);
+  if (on) off.delete(key); else off.add(key);
+  rosterSave(room);
+  ROSTER.sig = '';
+}
+/* 全部 / 作業中だけ / なし: every row of the room at once. */
+function rosterBulk(room, how) {
+  for (const r of rosterRows(room)) rosterSet(room, r.key, how === 'all' || (how === 'busy' && !ROSTER_QUIET.has(r.state)));
+}
+function rosterFold(folded) {
+  const box = document.getElementById('roster');
+  box.classList.toggle('roster-folded', folded);
+  document.getElementById('roster-fold').setAttribute('aria-expanded', String(!folded));
+  writePref('rosterFold', folded ? '1' : '0');
+}
+{
+  const box = document.getElementById('roster');
+  if (box) {
+    // a narrow page opens it folded (the list would cover the room) until the person opens it
+    rosterFold(readPref('rosterFold', window.matchMedia && window.matchMedia('(max-width: 600px)').matches ? '1' : '0') === '1');
+    box.addEventListener('change', (e) => {
+      const c = e.target.closest('[data-roster-check]'), solo = liveSolo();
+      if (c && solo) rosterSet(solo, c.dataset.rosterCheck, c.checked);
+    });
+    box.addEventListener('click', (e) => {
+      const solo = liveSolo();
+      const b = e.target.closest('[data-roster-bulk]');
+      if (b && solo) { rosterBulk(solo, b.dataset.rosterBulk); return; }
+      const o = e.target.closest('[data-roster-open]');
+      if (o && !o.disabled) { selectRobot(o.dataset.rosterOpen, o); return; }
+      if (e.target.closest('#roster-fold')) rosterFold(!box.classList.contains('roster-folded'));
+    });
+  }
+}
 // ---- web/js/53-devices.js ----
 /* ---------- the デバイス button: this machine's load and the devices up (ticket 2026-10-20-jui-viz-device-panel-machine-
    load-and-emulators). Requester: 「ヘッダのメニューにデバイスボタン用意してそれ押すとサイドのボードの位置くらいに全部出る 負荷に
@@ -10565,7 +10952,7 @@ const BILL = { showMs: 4200, rise: 12, gap: 3, on: readPref('bills', 'on') !== '
 const BILL_ICON_HTML = '<svg class="bill-ico" viewBox="0 0 22 14" aria-hidden="true"><rect x="0.75" y="0.75" width="20.5" height="12.5" rx="2" /><circle cx="11" cy="7" r="3" /><path d="M3.5 4v6M18.5 4v6" /></svg>';
 function billMoney(usd) {
   if (usd < 0.01) return '< $0.01';
-  return usd < 100 ? `≈ $${usd.toFixed(2)}` : `≈ $${Math.round(usd).toLocaleString('en-US')}`;
+  return usd < 100 ? `≈ ${usdText(usd)}` : `≈ $${Math.round(usd).toLocaleString('en-US')}`;   // the page's rule (20-core.js), whole dollars from $100 (the bill is small)
 }
 function billTokens(n) { return n < 1000 ? `${n}` : n < 1e6 ? `${(n / 1000).toFixed(1)}k` : `${(n / 1e6).toFixed(2)}M`; }
 /* The text of a robot's bill from the responses it holds: their priced sum, "+ ?" when some had no price. */
@@ -11404,11 +11791,14 @@ function composeBuild() {
   const row = hNode('div', 'h-compose-row');
   const state = hNode('span', 'h-compose-state'); state.dataset.hState = ''; state.setAttribute('aria-live', 'polite');
   const send = hNode('button', 'wb-btn h-compose-send', tl('hist.send')); send.type = 'button'; send.dataset.hSend = ''; send.dataset.fk = 'rb-prompt-send';
+  const stop = hNode('button', 'wb-btn h-stop', tl('hist.stop')); stop.type = 'button'; stop.dataset.hStop = ''; stop.dataset.fk = 'rb-stop';
+  stop.title = tl('hist.stop.title');
+  const stopState = hNode('p', 'h-stop-state'); stopState.dataset.hStopState = ''; stopState.setAttribute('aria-live', 'polite'); stopState.hidden = true;
   const pick = hNode('button', 'wb-btn h-attach-pick', tl('hist.attach.pick')); pick.type = 'button'; pick.dataset.hPick = ''; pick.dataset.fk = 'rb-prompt-attach';
   pick.title = tl('hist.attach.pick.title');
   const input = hNode('input', ''); input.type = 'file'; input.multiple = true; input.hidden = true; input.dataset.hFile = '';
   const list = hNode('ul', 'h-attach'); list.dataset.hAttach = ''; list.setAttribute('aria-label', tl('hist.attach.list'));
-  row.append(state, pick, send, input);
+  row.append(state, pick, stop, send, input);
   const confirm = hNode('div', 'h-confirm'); confirm.dataset.hConfirm = ''; confirm.hidden = true;
   confirm.setAttribute('role', 'group'); confirm.setAttribute('aria-label', tl('hist.confirm.aria'));
   const to = hNode('p', 'h-confirm-to'); to.dataset.hTo = '';
@@ -11418,7 +11808,7 @@ function composeBuild() {
   const back = hNode('button', 'wb-btn', tl('hist.confirm.back')); back.type = 'button'; back.dataset.hBack = '';
   acts.append(go, back);
   confirm.append(to, preview, acts);
-  box.append(head, area, list, row, confirm);
+  box.append(head, area, list, row, stopState, confirm);
   area.addEventListener('input', () => composePaint());
   pick.addEventListener('click', () => input.click());
   input.addEventListener('change', () => { attachAdd([...input.files]); input.value = ''; });
@@ -11442,6 +11832,7 @@ function composeBuild() {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !e.isComposing) { e.preventDefault(); composeAsk(); }
   });
   send.addEventListener('click', () => composeAsk());
+  stop.addEventListener('click', () => stopPress());
   back.addEventListener('click', () => composeClose(true));
   go.addEventListener('click', () => { if (Date.now() - (box._askedAt || 0) > 350) composeSend(); });   // not the same key press that opened it
   return box;
@@ -11450,7 +11841,7 @@ function composeEls() {
   const b = HIST.compose;
   const q = (k) => b.querySelector(`[data-${k}]`);
   return { box: b, head: q('h-head'), why: q('h-why'), noteX: q('h-note-x'), area: q('h-text'), state: q('h-state'), send: q('h-send'), confirm: q('h-confirm'), to: q('h-to'), preview: q('h-preview'), go: q('h-go'),
-    pick: q('h-pick'), list: q('h-attach') };
+    pick: q('h-pick'), list: q('h-attach'), stop: q('h-stop'), stopState: q('h-stop-state') };
 }
 function attachAdd(files) {
   const id = HIST.compose && HIST.compose._for;
@@ -11514,8 +11905,9 @@ function composePlace(pane, id) {
     composeEls().area.value = '';
     composeClose(false);
   }
-  const cards = histCardsBox();
-  if (pane && cards.previousElementSibling !== pane) pane.after(cards);
+  const cards = histCardsBox(), low = histLowBtn();   // the box's handle on its top edge, a row of its own (not in the box's scroll)
+  if (pane && low.previousElementSibling !== pane) pane.after(low);
+  if (pane && cards.previousElementSibling !== low) low.after(cards);
   if (pane && box.previousElementSibling !== cards) cards.after(box);
   box.hidden = !pane || HIST.tab !== 'history';
   histCardsPaint(id, !pane || HIST.tab !== 'history');
@@ -11569,6 +11961,7 @@ function histCardsPaint(id = HIST.compose && HIST.compose._for, off = HIST.tab !
   el.hidden = !(perms.length || qs.length || ds.length);
   keyed(el, JSON.stringify([id, NAMES.rev, DEN.asking, perms.map(permSig), questionsSig(qs), denialsSig(ds)]),
     () => `${perms.map((p) => permDetail(p, `hb-${p.id}`)).join('')}${qs.map((q) => questionHTML(q, 'h')).join('')}${ds.map((d) => denialHTML(d, 'h')).join('')}`);
+  histLowBtn().hidden = el.hidden;   // the handle that grows this box (下を広げる until 2.3.20) is shown with it, on its top edge
 }
 function composePaint() {
   if (!HIST.compose) return;
@@ -11596,6 +11989,48 @@ function composePaint() {
   E.state.dataset.hPhase = bytes > PROMPT_MAX_BYTES ? 'long' : sent && sent.error ? 'error' : phase;
   E.state.classList.toggle('h-compose-err', bytes > PROMPT_MAX_BYTES || !!(sent && sent.error) || phase === 'missing');
   if (asking && t.why) composeClose(false);   // the session lost its relay while the confirmation was open
+  stopPaint(E, id);
+}
+/* ---------- 停止 (2.3.20, requester 10-22: 「今やってる作業を中断させる停止ボタンがロボットの会話のところにつけたい」) ----------
+   Beside 送信: the server keeps a stop request for the session (POST /api/stop) and the session's synchronous --stop hook
+   (jui-viz 1.3.0, PreToolUse / PostToolUse) takes it at its next tool boundary and ends the turn. It does not need the
+   relay or the channel, only that hook. The limit, in the button's title and the state line: it stops once the tool now
+   running has finished, not in the middle of writing text or of a long Bash. While the request waits the button takes it
+   back. A session whose --stop hook was never heard (a plugin older than 1.3.0, or no tool call since viz started) is
+   asked all the same, and the line says it may not stop. */
+const STOP_DONE_SHOW_MS = 60000;
+function stopTarget(id) {
+  if (!id || !DEF[id] || SOURCE.mode !== 'live' || DEF[id].kind === 'sub' || location.hostname !== '127.0.0.1') return null;
+  const sess = SESSIONS.find((x) => x.id === SESSION_OF[id]);
+  return sess && sess.status !== 'ended' ? sess : null;
+}
+function stopPaint(E, id) {
+  const sess = stopTarget(id), now = Date.now();
+  const working = !!sess && (sess.status === 'busy' || sess.status === 'waiting');
+  const asked = !!sess && sess.stopAt > 0;
+  E.stop.hidden = !(working || asked);
+  E.stop.disabled = !!HIST.stopBusy;
+  setText(E.stop, asked ? tl('hist.stop.cancel') : tl('hist.stop'));
+  E.stop.classList.toggle('h-stop-asked', asked);
+  const failed = HIST.stopError && HIST.stopError.id === id ? HIST.stopError.error : '';
+  const done = !!sess && !asked && sess.stoppedAt > 0 && now - sess.stoppedAt < STOP_DONE_SHOW_MS;
+  const text = failed ? tl('hist.stop.failed', { error: failed })
+    : asked ? (sess.stopHook ? tl('hist.stop.waiting') : tl('hist.stop.old'))
+    : done ? tl('hist.stop.done', { time: HIST_TIME(sess.stoppedAt) }) : '';
+  setText(E.stopState, text);
+  E.stopState.hidden = !text;
+  E.stopState.dataset.hStopPhase = failed ? 'error' : asked ? (sess.stopHook ? 'waiting' : 'old') : done ? 'done' : '';
+  E.stopState.classList.toggle('h-compose-err', !!failed || (asked && !sess.stopHook));
+}
+async function stopPress() {
+  const id = HIST.compose && HIST.compose._for, sess = stopTarget(id);
+  if (!sess || HIST.stopBusy || typeof SOURCE.stopSession !== 'function') return;
+  HIST.stopBusy = true;
+  composePaint();
+  const got = await SOURCE.stopSession(id, sess.stopAt > 0);
+  HIST.stopBusy = false;
+  HIST.stopError = got.ok ? null : { id, error: got.error || `HTTP ${got.status}` };
+  composePaint();
 }
 /* sending / arrived / missing for a prompt sent (and taken by the server). */
 function composePhase(sent) {
@@ -11660,13 +12095,15 @@ function histImgsDrop() {
   for (const v of HIST.imgs.values()) v.then((g) => { if (g.url) URL.revokeObjectURL(g.url); });
   HIST.imgs.clear();
 }
+/* A sent picture gone with no copy: why the copy was not taken when it was sent (viz/sent_copies.py). */
+const HIST_GONE_WHY = { 'too-large': tl('hist.img.err.gone.big'), 'not-picture': tl('hist.img.err.gone.format'), gone: tl('hist.img.err.gone.before'), unreadable: tl('hist.img.err.gone.read') };
 function histImgGet(ref) {
   const key = histImgKey(ref);
   if (!HIST.imgs.has(key)) {
     const id = HIST.id;
     const asked = ref.attach ? SOURCE.attachImage(ref.attach) : ref.sent ? SOURCE.historyFile(id, ref.sent) : SOURCE.historyImage(id, ref);
     HIST.imgs.set(key, asked.then((got) => (got.ok ? { url: URL.createObjectURL(got.blob) }
-      : { error: got.gone ? tl('hist.img.err.gone') : got.status === 413 ? tl('hist.img.err.big') : got.status === 415 ? tl('hist.img.err.format') : tl('hist.img.err.read', { error: got.status || got.error }) })));
+      : { error: got.gone ? (HIST_GONE_WHY[got.why] || tl('hist.img.err.gone')) : got.status === 413 ? tl('hist.img.err.big') : got.status === 415 ? tl('hist.img.err.format') : tl('hist.img.err.read', { error: got.status || got.error }) })));
   }
   return HIST.imgs.get(key);
 }
@@ -11829,21 +12266,30 @@ rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rb-wide]')) 
 
 /* 下を広げる (ticket 2026-10-21-jui-viz-hist-answered-card-dismiss-and-expand, requester: 「スクロールしないと質問と送信ボタン
    全部見えないから見え流用に広げるボタンが欲しい」): on the 応答の履歴 tab, the cards and the prompt box take the height they
-   need and the history keeps what is left (its own scroll); 元の高さに戻す: the history first again. Next to 広げる, kept
-   in this browser as that is. */
+   need and the history keeps what is left (its own scroll); 元の高さに戻す: the history first again. Kept in this browser as
+   広げる is. Since 2.3.20 a handle on the cards box's top edge, saying what grows (the requester: 「下を広げるは広げる領域
+   ないにボタンを設置で」; ticket 2026-10-22-viz-taskboard-top-strips-hide-the-columns, the family of 広げる). */
 const HIST_LOW_PREF = 'hist-low';
 let histLow = readPref(HIST_LOW_PREF, 'off') === 'on';
+let histLowEl = null;
+function histLowBtn() {
+  if (!histLowEl) {
+    histLowEl = hNode('button', 'h-low');
+    histLowEl.type = 'button'; histLowEl.dataset.rbLow = ''; histLowEl.dataset.fk = 'rb-low';
+    histLowEl.setAttribute('aria-controls', 'rb');
+    histLowEl.setAttribute('aria-expanded', 'false');
+    histLowEl.textContent = tl('hist.low.on');
+  }
+  return histLowEl;
+}
 function histLowPaint() {
   const tab = HIST.tab === 'history' && !!rbState.id, on = histLow && tab;
   rbEl.classList.toggle('rb-histtab', tab);   // the tab's rows (app.css)
   rbEl.classList.toggle('rb-low', on);
-  const b = rbEl.querySelector('[data-rb-low]');
-  if (b) {
-    b.hidden = HIST.tab !== 'history';
-    b.setAttribute('aria-pressed', String(on));
-    b.textContent = on ? tl('hist.low.off') : tl('hist.low.on');
-    b.title = on ? tl('hist.low.off.title') : tl('hist.low.on.title');
-  }
+  const b = histLowBtn();   // it opens a box wider, as a disclosure does: expanded, not one of the selected look's states
+  b.setAttribute('aria-expanded', String(on));
+  b.textContent = on ? tl('hist.low.off') : tl('hist.low.on');
+  b.title = on ? tl('hist.low.off.title') : tl('hist.low.on.title');
 }
 rbEl.addEventListener('click', (e) => {
   if (!e.target.closest('[data-rb-low]')) return;
@@ -11889,7 +12335,8 @@ document.addEventListener('click', (e) => {
    - layout: every group a floor holding its child groups and its nodes, packed in rows (sizes bottom-up, places top-
      down), so 2,000 nodes still fit one view; a node is a cell.
    - shapes: one InstancedMesh per shape (category → shape, srShape), the colour the provider's; one InstancedMesh for
-     all the floors; the cables two LineSegments (within a provider: solid; across providers: dashed magenta, higher).
+     all the floors; the cables two sets of strips (within a provider: solid; across providers: dashed magenta, higher),
+     each at least SR_CABLE px wide on the page however far the camera is (srCables).
    - far (a node smaller than SR.lod.far px on the page): the top groups are boxes, the cables bundled between them
      (one line per pair, its count in the board), the labels the boxes' only; near again past SR.lod.near px.
    - labels: a pool of SR.labels.max on the page, given each tenth of a second to the nearest things in view.
@@ -11901,7 +12348,11 @@ document.addEventListener('click', (e) => {
      tapered drum, a notification a pyramid...: srDetailShape) and tags of name · service · its main spec; back to
      the simple ones past SR.detail.leave (between the two it stays as it was). There, each node in view stands as a model of what
      it does (56-sr-models.js); the shapes by service under it still take the press.
+   - migration plans (ticket 2026-10-22-viz-infra-migration-plan): the board lists them; 移管 plays one (59-sr-migration.js).
    - a node's spec (§4): the board's 選んだもの lists it, the keys the IaC tables know with a name in words.
+   - つながっている物を全部見せる (ticket 2026-10-22-viz-sr-cables-too-thin-and-no-show-neighbours): beside これに寄る; the
+     chosen node and every node an edge joins it to (in and out; one step, or every step on) drawn as they are, the rest
+     faint, their cables strong, the camera moved until all of them are in view; pressed again or Esc, as it was (srReach).
    Measured for the ticket: the first draw, the frame time far and near, the memory (SR.stats). */
 const SR = {
   phase: 'idle', project: null, seq: 0, t0: 0, until: 0, why: '', full: '', opener: null, model: null, view: null, log: [],
@@ -11914,6 +12365,8 @@ const SR = {
   only: new Set(),   // the clouds chosen on the board's legend (2.3.9, item 3; empty: all)
   // a box drawn to move in on (2.3.11 item 6): Option + drag, or 範囲で寄る then one drag; fit is how much of the page it fills
   box: { armed: false, drag: null }, boxFit: 0.92,
+  // つながっている物を全部見せる: {id, hops, ids, edges, cam} while shown; how many steps it follows (1, or 'all'); how faint the rest
+  reach: null, reachHops: 1, reachFade: 0.82, reachLineOpacity: 0.05, reachFit: 0.7,   // reachFit: what it holds fills this much of the page, its tags inside
 };
 const srEl = $('sr'), srBubbleEl = $('sr-bubble');
 function srNow() { return performance.now(); }
@@ -12123,6 +12576,88 @@ function srProviderColor(p, role = 'node', level = 0, dark = isDark()) {
 const srVisible = (x, env) => !env || !Array.isArray(x.environments) || !x.environments.length || x.environments.includes(env);
 function srEnvs(model) { return (model.environments || []).map((e) => (typeof e === 'string' ? { id: e, label: e } : { id: e.id, label: e.label || e.id })); }
 
+/* The cables (ticket 2026-10-22-viz-sr-cables-too-thin-and-no-show-neighbours; requester: 「ノード同士を繋ぐ線が細すぎて
+   みづらい」). A WebGL line is one pixel whatever is asked, so a cable is a strip: four corners per segment,
+   pushed apart on the page by SR_CABLE_SHADER — at least `px` wide (pulled back) and, up close, as wide as
+   `world` units up to `max` px, like the flows' light (59-sr-flows.js srFlowLightKeepSize) whose core is a little wider, so a light
+   still reads as running inside its cable. A segment with an end behind the camera is cut at the near plane; one of
+   length 0 (a migration step's edge before it grows) draws nothing. srCableSet / srCableGet / srCableDone move one
+   segment's ends (59-sr-migration.js): the order is the one srBuild laid them in. */
+// px: the least width on the page by layer; world: the width up close (units); max: the most on the page — a cable running
+// past the camera would otherwise fill the page, and draw every pixel of it
+const SR_CABLE = { plain: 2.2, cross: 2.8, focus: 4, bundle: 2.6, world: 0.08, max: 7 };
+const SR_CABLE_SHADER = {
+  vertex: `attribute vec3 cableStart; attribute vec3 cableEnd; uniform vec2 uRes; uniform float uPx, uWorld, uMax; varying float vDist;
+    void main() {
+      vec4 a = modelViewMatrix * vec4(cableStart, 1.0), b = modelViewMatrix * vec4(cableEnd, 1.0);
+      float len = distance(cableStart, cableEnd);
+      float near = -projectionMatrix[3][2] / (projectionMatrix[2][2] - 1.0);   // the near plane's z (the camera looks down -z)
+      if (a.z > near && b.z > near) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); vDist = 0.0; return; }
+      if (a.z > near) a = mix(b, a, (b.z - near) / (b.z - a.z) * 0.999);
+      if (b.z > near) b = mix(a, b, (a.z - near) / (a.z - b.z) * 0.999);
+      vec4 ca = projectionMatrix * a, cb = projectionMatrix * b;
+      vec2 sa = ca.xy / ca.w * uRes, sb = cb.xy / cb.w * uRes, d = sb - sa;
+      float dl = length(d);
+      vec2 dir = dl > 1e-5 ? d / dl : vec2(1.0, 0.0), nrm = vec2(-dir.y, dir.x);
+      vec4 c = position.y < 0.5 ? ca : cb;
+      float w = len > 1e-6 ? clamp(uWorld * projectionMatrix[1][1] * uRes.y / c.w, uPx, max(uPx, uMax)) : 0.0;
+      c.xy += nrm * position.x * w / uRes * c.w;
+      vDist = position.y * len;
+      gl_Position = c;
+    }`,
+  fragment: `uniform vec3 uColor; uniform float uOpacity, uDash, uGap; varying float vDist;
+    void main() {
+      if (uDash > 0.0 && mod(vDist, uDash + uGap) > uDash) discard;
+      gl_FragColor = vec4(uColor, uOpacity);
+      #include <colorspace_fragment>
+    }`,   // the colour as the old lines drew it: uColor is linear (THREE.Color), the page sRGB
+};
+/* A set of cables from [ax, ay, az, bx, by, bz, ...]: `px` the least width on the page, `dash`/`gap` world units (0: solid). */
+function srCables(arr, { color, opacity = 1, px = SR_CABLE.plain, dash = 0, gap = 0 }) {
+  const g = new THREE.BufferGeometry();
+  srCableFill(g, arr);
+  const m = new THREE.ShaderMaterial({ vertexShader: SR_CABLE_SHADER.vertex, fragmentShader: SR_CABLE_SHADER.fragment, transparent: opacity < 1, depthWrite: opacity >= 1, side: THREE.DoubleSide,   // the corners' winding is the page's, whichever way the cable runs
+    uniforms: { uColor: { value: new THREE.Color(color) }, uOpacity: { value: opacity }, uRes: { value: new THREE.Vector2(1, 1) }, uPx: { value: px },
+      uWorld: { value: SR_CABLE.world }, uMax: { value: SR_CABLE.max }, uDash: { value: dash }, uGap: { value: gap } } });
+  m.opacity = opacity;   // read as a LineBasicMaterial's was (the board, the e2e); the shader reads uOpacity
+  const mesh = new THREE.Mesh(g, m);
+  mesh.frustumCulled = false;   // the strips are placed by the shader: the box three would cull by is the corners'
+  mesh.userData.cables = true; mesh.userData.dashed = dash > 0;
+  mesh.onBeforeRender = (renderer) => renderer.getSize(m.uniforms.uRes.value).multiplyScalar(0.5);   // half the page: NDC 1 is this many px
+  return mesh;
+}
+/* Four corners a cable, each carrying both its ends. Not instanced: measured in the e2e's software GL, up close in the
+   2,000-node room, 5,000 instanced strips made a frame's p90 56 ms (17 with the old lines); written out, 20. */
+function srCableFill(g, arr) {
+  const n = arr.length / 6, corner = new Float32Array(n * 12), st = new Float32Array(n * 12), en = new Float32Array(n * 12), idx = new Uint32Array(n * 6);
+  for (let i = 0; i < n; i++) {
+    corner.set([-0.5, 0, 0, 0.5, 0, 0, -0.5, 1, 0, 0.5, 1, 0], i * 12);
+    for (let k = 0; k < 4; k++) for (let c = 0; c < 3; c++) { st[i * 12 + k * 3 + c] = arr[i * 6 + c]; en[i * 12 + k * 3 + c] = arr[i * 6 + 3 + c]; }
+    idx.set([0, 1, 2, 2, 1, 3].map((x) => i * 4 + x), i * 6);
+  }
+  g.setAttribute('position', new THREE.BufferAttribute(corner, 3));
+  g.setAttribute('cableStart', new THREE.BufferAttribute(st, 3));
+  g.setAttribute('cableEnd', new THREE.BufferAttribute(en, 3));
+  g.setIndex(new THREE.BufferAttribute(idx, 1));
+  g.userData.cables = n;
+}
+/* A set's cables all made again (the strong layer: the pressed, the pointed, the reach). */
+function srCablesRefill(mesh, arr) {
+  mesh.geometry.dispose();
+  mesh.geometry = new THREE.BufferGeometry();
+  srCableFill(mesh.geometry, arr);
+}
+const srCableCount = (mesh) => mesh.geometry.userData.cables;
+function srCableSet(mesh, j, a, b) {
+  const st = mesh.geometry.getAttribute('cableStart').array, en = mesh.geometry.getAttribute('cableEnd').array;
+  for (let k = 0; k < 4; k++) for (let c = 0; c < 3; c++) { st[j * 12 + k * 3 + c] = a[c]; en[j * 12 + k * 3 + c] = b[c]; }
+}
+function srCableGet(mesh, j) {
+  const st = mesh.geometry.getAttribute('cableStart').array, en = mesh.geometry.getAttribute('cableEnd').array;
+  return [[st[j * 12], st[j * 12 + 1], st[j * 12 + 2]], [en[j * 12], en[j * 12 + 1], en[j * 12 + 2]]];
+}
+function srCableDone(mesh) { for (const k of ['cableStart', 'cableEnd']) mesh.geometry.getAttribute(k).needsUpdate = true; }
+
 /* Places every group and node (sizes bottom-up, places top-down); the external nodes on a strip in front. */
 function srLayout(model, env, showFold, closed = new Set(), only = new Set()) {
   const groups = new Map();
@@ -12199,7 +12734,7 @@ function srLayout(model, env, showFold, closed = new Set(), only = new Set()) {
 
 function srShow(model) {
   SR.phase = 'open';
-  SR.model = model;
+  SR.model = model; SR.migBase = null;
   showOverlay(srEl);
   setText($('sr-room'), (PROJECT[SR.project] && PROJECT[SR.project].name) || '');
   const envs = srEnvs(model);
@@ -12214,6 +12749,8 @@ function srShow(model) {
 function srClose() {
   if (SR.phase !== 'open') return;
   SR.phase = 'idle';
+  SR.reach = null;
+  srMigStop(true);   // a plan open: the room's own model again (59-sr-migration.js)
   srBoxEnd();
   srBoxArm(false);
   if (typeof srCostReset === 'function') srCostReset();
@@ -12231,20 +12768,26 @@ function srDispose() {
   V.ro.disconnect();
   V.controls.dispose();
   V.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) { for (const m of [].concat(o.material)) { if (m.map) m.map.dispose(); m.dispose(); } } });
-  V.renderer.dispose();
+  V.renderer.renderLists.dispose();   // the renderer stays: a new one on the same canvas drew its first frame washed out
   for (const url of V.iconUrls) URL.revokeObjectURL(url);
+  if (V.reachMats) for (const m of V.reachMats.values()) m.dispose();   // a faint copy not on a model now is in no scene
   $('sr-labels').innerHTML = '';
   SR.view = null;
 }
-function srBuild() {
+/* keep: {pos, target} — the camera the view had (the theme, a migration step): set before the first frame is drawn,
+   so the fit view is never seen in between. */
+function srBuild(keep) {
   const t0 = srNow();
+  SR.builds = (SR.builds || 0) + 1;   // the e2e: a migration step builds nothing
   srDispose();
   const model = SR.model, env = $('sr-env').value || '', fold = $('sr-fold').checked;
   const L = srLayout(model, env, fold, SR.closed, SR.only);
   // a chosen or pointed node not drawn now (another environment, a cloud not chosen, folded) is let go (the independent verification)
   for (const k of ['selected', 'hover']) if (SR[k] && !(L.pos.has(SR[k]) && !L.pos.get(SR[k]).hiddenIn)) SR[k] = null;
   const cv = $('sr-canvas'), box = cv.parentElement;
-  const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+  // one renderer for the page's server room, kept across builds (the video, 10-22: each build made a new one on the same
+  // canvas, and its first frame showed the floors white and the models pale — once a migration step, once a theme)
+  const renderer = SR.renderer || (SR.renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true }));
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   const scene = new THREE.Scene();
   const dark = isDark(), PAL = dark ? SR_PAL.dark : SR_PAL.light;
@@ -12273,7 +12816,7 @@ function srBuild() {
   });
   floorMesh.count = L.floors.length;
   floorMesh.userData.groups = L.floors.map((G) => G.g.id);
-  V.near.add(floorMesh); V.pick.push(floorMesh);
+  V.near.add(floorMesh); V.pick.push(floorMesh); V.floorMesh = floorMesh;
   if (L.closed.length) {   // the closed groups: a box each, as tall as what it holds
     const cm = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({ color: 0xffffff }), L.closed.length);
     L.closed.forEach((G, i) => {
@@ -12315,12 +12858,11 @@ function srBuild() {
     const a = L.pos.get(e.from), b = L.pos.get(e.to), crossing = !!e.crossProvider, y = crossing ? 2.6 : 1.7;
     (crossing ? cross : plain).push(a.x, y, a.z, b.x, y, b.z);
   }
-  const lines = (arr, mat) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3)); const l = new THREE.LineSegments(g, mat); if (mat.isLineDashedMaterial) l.computeLineDistances(); return l; };
-  V.plainLines = lines(plain, new THREE.LineBasicMaterial({ color: PAL.plain, transparent: true, opacity: SR.plainOpacity }));
-  V.crossLines = lines(cross, new THREE.LineDashedMaterial({ color: PAL.cross, dashSize: 0.5, gapSize: 0.3, transparent: true, opacity: SR.crossOpacity }));
-  // the strong layer: the pressed and the pointed node's cables (srFocusLines fills it)
-  V.focusLines = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: PAL.focus }));
-  V.focusCross = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: PAL.cross }));
+  V.plainLines = srCables(plain, { color: PAL.plain, opacity: SR.plainOpacity, px: SR_CABLE.plain });
+  V.crossLines = srCables(cross, { color: PAL.cross, opacity: SR.crossOpacity, px: SR_CABLE.cross, dash: 0.5, gap: 0.3 });
+  // the strong layer: the pressed, the pointed node's and the reach's cables (srFocusLines fills it)
+  V.focusLines = srCables([], { color: PAL.focus, px: SR_CABLE.focus });
+  V.focusCross = srCables([], { color: PAL.cross, px: SR_CABLE.focus });
   V.focusLines.renderOrder = V.focusCross.renderOrder = 2;
   V.near.add(V.plainLines, V.crossLines, V.focusLines, V.focusCross);
   // far: the top groups as boxes, the cables bundled between them
@@ -12351,8 +12893,8 @@ function srBuild() {
   }
   V.bundles = [...bundles.values()];
   // the far view's bundles: as faint as the near cables, and the lines switch holds there too (the independent verification of item 1)
-  V.farPlain = lines(bp, new THREE.LineBasicMaterial({ color: PAL.plain, transparent: true, opacity: SR.plainOpacity }));
-  V.farCross = lines(bc, new THREE.LineDashedMaterial({ color: PAL.cross, dashSize: 1.2, gapSize: 0.7, transparent: true, opacity: SR.crossOpacity }));
+  V.farPlain = srCables(bp, { color: PAL.plain, opacity: SR.plainOpacity, px: SR_CABLE.bundle });
+  V.farCross = srCables(bc, { color: PAL.cross, opacity: SR.crossOpacity, px: SR_CABLE.bundle, dash: 1.2, gap: 0.7 });
   V.far.add(V.farPlain, V.farCross);
   // the external strip's sign
   if (L.ext.length) {
@@ -12371,6 +12913,7 @@ function srBuild() {
   srLinesMode(V);
   srFocusLines(V);
   srFit(true);
+  if (keep) { camera.position.copy(keep.pos); controls.target.copy(keep.target); controls.update(); }
   srCounts(L);
   cv.onpointerdown = (e) => { V.downAt = [e.clientX, e.clientY]; };
   cv.onpointermove = (e) => {   // the pointed node's cables, strong (at most every 60 ms)
@@ -12381,7 +12924,9 @@ function srBuild() {
   };
   cv.onpointerleave = () => { if (SR.hover) { SR.hover = null; srFocusLines(V); } };
   cv.onpointerup = (e) => { if (V.downAt && Math.hypot(e.clientX - V.downAt[0], e.clientY - V.downAt[1]) < 5) srPick(e); V.downAt = null; };
+  srReachAfterBuild(V);
   srFlowBuild(V);          // 59-sr-flows.js: the cones over the nodes that start a flow
+  srMigAfterBuild(V);      // 59-sr-migration.js: a plan open, its state drawn
   const loop = () => {   // the cost view over the stage pauses it (SR.paused, 56-server-cost.js): no frame drawn meanwhile
     if (SR.paused) { V.raf = 0; return; }
     V.raf = requestAnimationFrame(loop);
@@ -12390,16 +12935,29 @@ function srBuild() {
     if (V.last) { V.frames.push(t - V.last); if (V.frames.length > 240) V.frames.shift(); }
     V.last = t;
     controls.update();
+    if (SR.camTrail) SR.camTrail.push(camera.position.toArray().concat(controls.target.toArray()));   // the e2e: each frame's camera
     srLod(V);
     srFlowTick(V, dt);
+    srMigTick(V, dt);
     if (t - V.labelAt > 100) { V.labelAt = t; srPlaceLabels(V); }
     renderer.render(scene, camera);
+    if (SR.pixTrail) SR.pixTrail.push(srPixMean(renderer));   // the e2e: each frame's colour, read as it was drawn
   };
   V.loop = loop;
   loop();
   SR.stats = { firstMs: Math.round(srNow() - t0), nodes: L.nodes.length, edges: L.edges.length, floors: L.floors.length };
   srLog(tl('sr.log.drawn', { nodes: L.nodes.length, edges: L.edges.length, floors: L.floors.length, ms: SR.stats.firstMs })
     + (env ? tl('sr.log.drawn.env', { env }) : ''));
+}
+/* The mean colour of a 12 x 8 grid of the frame just drawn (read before the browser clears it): the e2e holds that a
+   redraw never shows a frame in other colours. */
+function srPixMean(renderer) {
+  const gl = renderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(4), sum = [0, 0, 0];
+  for (let i = 0; i < 12; i++) for (let j = 0; j < 8; j++) {
+    gl.readPixels(Math.floor((i + 0.5) * w / 12), Math.floor((j + 0.5) * h / 8), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    sum[0] += px[0]; sum[1] += px[1]; sum[2] += px[2];
+  }
+  return sum.map((s) => Math.round(s / 96 * 10) / 10);
 }
 function srCountNodes(G) { return G.nodes.length + G.kids.reduce((a, k) => a + srCountNodes(k), 0); }
 function srResize(V) {
@@ -12439,8 +12997,8 @@ function srPlaceLabels(V) {
   if (V.lod === 'far') {
     for (const G of V.L.tops) consider(G.x + G.w / 2, G.boxH + 0.8, G.z + G.d / 2, `${G.g.label || G.g.id} · ${G.nodeCount}`, 'group', 1);
   } else {
-    for (const G of V.L.floors) if (G.g.id) consider(G.x + 0.6, 0.2 + G.level * 0.06, G.z + 0.5, G.g.label || G.g.id, 'group', 0.6);
-    for (const p of V.L.pos.values()) if (!p.hiddenIn) consider(p.x, p.y + 1.9, p.z, `${p.n.label || p.n.id}${p.n.count > 1 ? ` ×${p.n.count}` : ''}`, p.external ? 'external' : 'node', 1, p.n);
+    for (const G of V.L.floors) if (G.g.id && !(V.migFloorShown && !V.migFloorShown.includes(G.g.id))) consider(G.x + 0.6, 0.2 + G.level * 0.06, G.z + 0.5, G.g.label || G.g.id, 'group', 0.6);
+    for (const p of V.L.pos.values()) if (!p.hiddenIn && !srMigHides(p.n.id) && !(SR.reach && !SR.reach.ids.has(p.n.id))) consider(p.x, p.y + 1.9, p.z, `${p.n.label || p.n.id}${p.n.count > 1 ? ` ×${p.n.count}` : ''}`, p.external ? 'external' : 'node', 1, p.n);
   }
   // up close (§5): how many nodes are in view decides the look, with room between going in and coming back
   const inView = out.filter((o) => o.n).length;
@@ -12497,7 +13055,7 @@ async function srIcons(V) {
     const mesh = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.9, 0.9), new THREE.MeshBasicMaterial({ map: tex, transparent: true, toneMapped: false }), list.length);
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.5, 0, 0));
     list.forEach((p, i) => { m4.compose(new THREE.Vector3(p.x, p.y + 2.1, p.z), q, new THREE.Vector3(1, 1, 1)); mesh.setMatrixAt(i, m4); });
-    mesh.userData.icon = key;
+    mesh.userData.icon = key; mesh.userData.nodes = list.map((p) => p.n.id);
     V.near.add(mesh);
     V.iconCount = (V.iconCount || 0) + list.length;
   }
@@ -12520,25 +13078,23 @@ function srPick(e) {
   srSelect(h && h.ud.nodes ? h.ud.nodes[h.i] : null, h && h.ud.groups ? h.ud.groups[h.i] || null : null);
 }
 function srSelect(node, group = null) {
+  if (SR.reach && node !== SR.reach.id) srReachEnd(false);   // another node chosen: the faint rest goes, the camera stays
   SR.selected = node; SR.selectedGroup = node ? null : group;
   if (SR.view) srFocusLines(SR.view);
   srRenderBoard();
 }
 /* The strong layer: every cable of the pressed node and of the pointed one (both ends drawn). */
 function srFocusLines(V) {
-  const ids = new Set([SR.selected, SR.hover].filter(Boolean)), plain = [], cross = [];
-  if (ids.size) {
+  const ids = new Set([SR.selected, SR.hover].filter(Boolean)), plain = [], cross = [], reach = SR.reach ? SR.reach.edges : null;
+  if (ids.size || reach) {
     for (const e of V.L.edges) {
-      if (!ids.has(e.from) && !ids.has(e.to)) continue;
+      if ((!ids.has(e.from) && !ids.has(e.to) && !(reach && reach.has(e))) || srMigEdgeHidden(e)) continue;
       const a = V.L.pos.get(e.from), b = V.L.pos.get(e.to), y = e.crossProvider ? 2.62 : 1.72;
       (e.crossProvider ? cross : plain).push(a.x, y, a.z, b.x, y, b.z);
     }
   }
-  for (const [layer, arr] of [[V.focusLines, plain], [V.focusCross, cross]]) {
-    layer.geometry.dispose();
-    layer.geometry = new THREE.BufferGeometry();
-    layer.geometry.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3));
-  }
+  srCablesRefill(V.focusLines, plain);
+  srCablesRefill(V.focusCross, cross);
   V.focusCount = (plain.length + cross.length) / 6;
 }
 /* The lines switch: all (faint) / crossing ones only / the chosen node's only. */
@@ -12598,6 +13154,23 @@ function srBoxDraw() {
   el.style.transform = `translate(${Math.min(D.x0, D.x1)}px, ${Math.min(D.y0, D.y1)}px)`;
   el.style.width = `${Math.abs(D.x1 - D.x0)}px`; el.style.height = `${Math.abs(D.y1 - D.y0)}px`;
 }
+/* The camera, its direction kept, on the middle of these points and as near as lets all of them fill k of the page. */
+function srFrameOn(V, pts, k = SR.boxFit) {
+  const dir = V.camera.position.clone().sub(V.controls.target).normalize(), now = V.camera.position.distanceTo(V.controls.target);
+  const { minDistance: lo0, maxDistance: hi0 } = V.controls;
+  const place = (d) => { V.camera.position.copy(V.controls.target).addScaledVector(dir, d); V.camera.updateMatrixWorld(); };
+  const c = pts.reduce((a, v) => a.add(v), new THREE.Vector3()).divideScalar(pts.length);
+  V.controls.target.set(c.x, 0, c.z);
+  const fits = (d) => {
+    place(d);
+    return pts.every((v) => { const q = v.clone().project(V.camera); return q.z > -1 && q.z < 1 && Math.abs(q.x) <= k && Math.abs(q.y) <= k; });
+  };
+  let lo = lo0, hi = Math.max(now, lo0);
+  while (!fits(hi) && hi < hi0) hi = Math.min(hi0, hi * 2);
+  if (fits(lo)) hi = lo;
+  else for (let i = 0; i < 32 && hi - lo > 0.01; i++) { const m = (lo + hi) / 2; if (fits(m)) hi = m; else lo = m; }
+  place(hi);
+}
 /* What the box can hold: near the nodes drawn, far the top groups' boxes ([id, point]). */
 function srBoxPoints(V) {
   if (V.lod === 'far') return V.L.tops.map((G) => [G.g.id, new THREE.Vector3(G.x + G.w / 2, G.boxH / 2, G.z + G.d / 2)]);
@@ -12618,20 +13191,8 @@ function srZoomToBox(x0, y0, x1, y1) {
   const dir = V.camera.position.clone().sub(V.controls.target).normalize(), now = V.camera.position.distanceTo(V.controls.target);
   const { minDistance: lo0, maxDistance: hi0 } = V.controls;
   const place = (d) => { V.camera.position.copy(V.controls.target).addScaledVector(dir, d); V.camera.updateMatrixWorld(); };
-  if (held.length) {
-    const c = held.reduce((a, [, v]) => a.add(v), new THREE.Vector3()).divideScalar(held.length);
-    V.controls.target.set(c.x, 0, c.z);
-    const k = SR.boxFit;
-    const fits = (d) => {
-      place(d);
-      return held.every(([, v]) => { const q = v.clone().project(V.camera); return q.z > -1 && q.z < 1 && Math.abs(q.x) <= k && Math.abs(q.y) <= k; });
-    };
-    let lo = lo0, hi = Math.max(now, lo0);
-    while (!fits(hi) && hi < hi0) hi = Math.min(hi0, hi * 2);
-    if (fits(lo)) hi = lo;
-    else for (let i = 0; i < 32 && hi - lo > 0.01; i++) { const m = (lo + hi) / 2; if (fits(m)) hi = m; else lo = m; }
-    place(hi);
-  } else {   // nothing in it: its middle on the floor, as much nearer as the box is smaller than the page
+  if (held.length) srFrameOn(V, held.map(([, v]) => v));
+  else {   // nothing in it: its middle on the floor, as much nearer as the box is smaller than the page
     const ray = new THREE.Raycaster(), at = new THREE.Vector3();
     ray.setFromCamera(new THREE.Vector2(((l + r) / 2 / w) * 2 - 1, -((t + b) / 2 / h) * 2 + 1), V.camera);
     if (ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), at)) V.controls.target.copy(at);
@@ -12644,6 +13205,111 @@ function srZoomToBox(x0, y0, x1, y1) {
   srLog(tl('sr.box.log', { kind: V.lastBox.lod === 'far' ? 'group' : 'node', n: held.length }));
 }
 
+/* ---- つながっている物を全部見せる (requester 10-22: 「繋がってるものを全て表示のメニューが欲しい。選択したノードによるのと
+   同じ感じで。」) ---- */
+/* The nodes an edge joins to `id` (either way), `hops` steps on (1, or 'all': until nothing new), and the edges walked. */
+function srReachOf(L, id, hops) {
+  const adj = new Map();
+  for (const e of L.edges) for (const [x, y] of [[e.from, e.to], [e.to, e.from]]) (adj.get(x) || adj.set(x, []).get(x)).push([y, e]);
+  const ids = new Set([id]), edges = new Set();
+  let front = [id];
+  for (let d = 0; front.length && (hops === 'all' || d < hops); d++) {
+    const next = [];
+    for (const x of front) for (const [y, e] of adj.get(x) || []) { edges.add(e); if (!ids.has(y)) { ids.add(y); next.push(y); } }
+    front = next;
+  }
+  return { ids, edges };
+}
+function srReachPoints(V) {
+  return [...SR.reach.ids].map((id) => V.L.pos.get(id)).filter(Boolean).map((p) => new THREE.Vector3(p.x, p.y + 0.75, p.z));
+}
+/* Shown: what it holds, the camera on all of it. Pressed again: as it was, the camera too. */
+function srReachToggle() {
+  const V = SR.view;
+  if (SR.reach) { srReachEnd(true); return; }
+  if (!V || !SR.selected || !V.L.pos.has(SR.selected)) return;
+  SR.reach = { id: SR.selected, hops: SR.reachHops, ...srReachOf(V.L, SR.selected, SR.reachHops),
+    cam: { pos: V.camera.position.clone(), target: V.controls.target.clone() } };
+  srReachDraw(V);
+  srFrameOn(V, srReachPoints(V), SR.reachFit);
+  V.controls.update();
+  srLog(tl('sr.log.reach', { node: SR.selected, n: SR.reach.ids.size - 1, hops: tl(SR.reach.hops === 'all' ? 'sr.reach.hops.all' : 'sr.reach.hops.one') }));
+  srRenderBoard();
+}
+function srReachEnd(back) {
+  const R = SR.reach, V = SR.view;
+  if (!R) return;
+  SR.reach = null;
+  if (V) {
+    srReachDraw(V);
+    if (back) { V.camera.position.copy(R.cam.pos); V.controls.target.copy(R.cam.target); V.controls.update(); }
+  }
+  srLog(tl('sr.log.reach.end'));
+  srRenderBoard();
+}
+/* The steps changed while shown: walked again, the camera on what it holds now (going back, still to where it was). */
+function srReachHops(hops) {
+  SR.reachHops = hops;
+  const V = SR.view, R = SR.reach;
+  if (!R || !V) return;
+  Object.assign(R, { hops }, srReachOf(V.L, R.id, hops));
+  srReachDraw(V);
+  srFrameOn(V, srReachPoints(V), SR.reachFit);
+  V.controls.update();
+  srLog(tl('sr.log.reach', { node: R.id, n: R.ids.size - 1, hops: tl(hops === 'all' ? 'sr.reach.hops.all' : 'sr.reach.hops.one') }));
+  srRenderBoard();
+}
+/* A new build (the theme, an environment, a cloud chosen): still shown when its node is still drawn, walked in the new
+   layout; the camera stays where the build put it. */
+function srReachAfterBuild(V) {
+  const R = SR.reach;
+  if (!R) return;
+  if (!V.L.pos.has(R.id) || V.L.pos.get(R.id).hiddenIn) { SR.reach = null; return; }
+  Object.assign(R, srReachOf(V.L, R.id, R.hops));
+  srReachDraw(V);
+}
+/* The rest faint (the shapes, the models up close, the cables), or all as drawn again. A shape's own colour is kept the
+   first time and put back from there, so what any other part of the room set (a migration's new versions) is not lost. */
+function srReachDraw(V) {
+  const R = SR.reach, bg = new THREE.Color(V.scene.background), c = new THREE.Color();
+  for (const mesh of [...V.nodeMeshes.simple, ...V.nodeMeshes.detail]) {
+    if (!mesh.instanceColor) continue;
+    if (!mesh.userData.baseColors) mesh.userData.baseColors = mesh.instanceColor.array.slice();
+    const base = mesh.userData.baseColors;
+    mesh.userData.nodes.forEach((id, i) => {
+      c.fromArray(base, i * 3);
+      if (R && !R.ids.has(id)) c.lerp(bg, SR.reachFade);
+      mesh.setColorAt(i, c);
+    });
+    mesh.instanceColor.needsUpdate = true;
+    if (!R) mesh.userData.baseColors = null;
+  }
+  if (V.models) for (const g of V.models.values()) srReachTint(g);
+  const faint = !!R;
+  for (const [m, o] of [[V.plainLines, SR.plainOpacity], [V.crossLines, SR.crossOpacity], [V.farPlain, SR.plainOpacity], [V.farCross, SR.crossOpacity]]) {
+    m.material.opacity = m.material.uniforms.uOpacity.value = faint ? Math.min(o, SR.reachLineOpacity) : o;
+  }
+  srFocusLines(V);
+  srPlaceLabels(V);   // the faint ones' tags go now, not at the next tenth of a second
+}
+/* A model up close: faint while out of what is shown. The models share a material per colour (56-sr-models.js
+   srModelMaterial), so a faint one gets a faint copy of it, made once a view, never a change to the shared one. */
+function srReachTint(g) {
+  const V = SR.view, out = !!SR.reach && !SR.reach.ids.has(g.userData.node);
+  if (!V) return;
+  V.reachMats = V.reachMats || new Map();
+  g.traverse((o) => {
+    if (!o.isMesh) return;
+    const base = o.userData.reachBase || (o.userData.reachBase = o.material);
+    if (out && !V.reachMats.has(base)) {
+      const f = base.clone();
+      f.transparent = true; f.opacity = base.opacity * (1 - SR.reachFade); f.depthWrite = false;
+      V.reachMats.set(base, f);
+    }
+    o.material = out ? V.reachMats.get(base) : base;
+  });
+}
+
 /* ---- the board and the log ---- */
 function srCounts(L) {
   SR.shown = { nodes: L.nodes.length, edges: L.edges.length, cross: L.edges.filter((e) => e.crossProvider).length, groups: L.floors.length,
@@ -12654,7 +13320,8 @@ function srRenderBoard() {
   const M = SR.model, S = SR.shown || {};
   if (!M) return;
   const provs = [...new Set((M.nodes || []).map((n) => n.providerResolved || n.provider).filter(Boolean))];
-  const sel = SR.selected ? (M.nodes || []).find((n) => n.id === SR.selected) : null;
+  const laid = SR.selected && SR.view && SR.view.L.pos.get(SR.selected);   // a migration step may have put a new version there
+  const sel = SR.selected ? (laid && laid.n) || (M.nodes || []).find((n) => n.id === SR.selected) : null;
   const grp = !sel && SR.selectedGroup ? (M.groups || []).find((g) => g.id === SR.selectedGroup) : null;
   const inGroup = grp && SR.view ? SR.view.L.floors.find((F) => F.g.id === grp.id) : null;
   const edgesOf = sel ? (M.edges || []).filter((e) => e.from === sel.id || e.to === sel.id).slice(0, 20) : [];
@@ -12668,11 +13335,13 @@ function srRenderBoard() {
 <li><span class="sr-line"></span>${esc(tl('sr.board.line.same'))}</li><li><span class="sr-line sr-line-cross"></span>${esc(tl('sr.board.line.cross'))}</li></ul>
 ${sel ? `<h3 data-sr-sel-head>${esc(tl('sr.sel.title'))}</h3><dl class="sr-sel"><dt>id</dt><dd>${esc(sel.id)}</dd><dt>${esc(tl('sr.sel.name'))}</dt><dd>${esc(sel.label || '')}</dd><dt>${esc(tl('sr.sel.kind'))}</dt><dd>${esc(sel.category)}</dd><dt>provider</dt><dd>${esc(sel.providerResolved || sel.provider || '')}${sel.service ? ` · ${esc(sel.service)}` : ''}</dd>${sel.count > 1 ? `<dt>${esc(tl('sr.sel.count'))}</dt><dd>${esc(String(sel.count))}</dd>` : ''}${sel.engine ? `<dt>${esc(tl('sr.sel.engine'))}</dt><dd>${esc(sel.engine)}</dd>` : ''}</dl>${srFlowBoardHTML(sel.id)}
 ${Array.isArray(sel.spec) && sel.spec.length ? `<h3>${esc(tl('sr.sel.spec'))}</h3><table class="sr-spec" data-sr-spec><tbody>${sel.spec.map((x) => `<tr><th scope="row">${SR_SPEC_NAME[x.key] ? `${esc(SR_SPEC_NAME[x.key])} <small>${esc(x.key)}</small>` : esc(x.key)}</th><td>${esc(x.value)}</td></tr>`).join('')}</tbody></table>` : ''}
-<p class="sr-acts"><button type="button" class="wb-btn" data-sr-act="focus">${esc(tl('sr.act.focus'))}</button></p>
+<p class="sr-acts"><button type="button" class="wb-btn" data-sr-act="focus">${esc(tl('sr.act.focus'))}</button> <button type="button" class="wb-btn sr-reach" data-sr-act="reach" aria-pressed="${SR.reach ? 'true' : 'false'}">${esc(tl('sr.act.reach'))}</button> <select class="sr-reach-hops" data-sr-reach-hops aria-label="${esc(tl('sr.reach.hops'))}"><option value="1"${SR.reachHops === 1 ? ' selected' : ''}>${esc(tl('sr.reach.hops.one'))}</option><option value="all"${SR.reachHops === 'all' ? ' selected' : ''}>${esc(tl('sr.reach.hops.all'))}</option></select></p>
+${SR.reach ? `<p class="sr-hint" data-sr-reach-said>${esc(tl('sr.reach.shown', { n: SR.reach.ids.size - 1 }))}</p>` : ''}
 <ul class="sr-edges">${edgesOf.map((e) => `<li>${esc(e.from)} → ${esc(e.to)}${e.protocol ? ` <small>${esc(e.protocol)}</small>` : ''}${e.crossProvider ? ` <b>${esc(tl('sr.edge.cross'))}</b>` : ''}</li>`).join('')}</ul>`
     : grp ? `<h3>${esc(tl('sr.grp.title'))}</h3><dl class="sr-sel"><dt>id</dt><dd>${esc(grp.id)}</dd><dt>${esc(tl('sr.sel.name'))}</dt><dd>${esc(grp.label || '')}</dd><dt>${esc(tl('sr.sel.kind'))}</dt><dd>${esc(grp.kind || '')}</dd><dt>provider</dt><dd>${esc(grp.providerResolved || grp.provider || '')}</dd><dt>${esc(tl('sr.grp.nodes'))}</dt><dd>${esc(String(inGroup ? srCountNodes(inGroup) : 0))}</dd></dl>
 <p class="sr-acts"><button type="button" class="wb-btn" data-sr-act="focus">${esc(tl('sr.act.focus'))}</button> <button type="button" class="wb-btn" data-sr-act="toggle" data-sr-group="${esc(grp.id)}">${esc(SR.closed.has(grp.id) ? tl('sr.grp.open') : tl('sr.grp.close'))}</button></p>`
     : `<p class="sr-hint">${esc(tl('sr.board.hint'))}</p>`}
+${srMigBoardHTML()}
 ${probs.length ? `<h3>${esc(tl('sr.board.problems', { n: probs.length }))}</h3><ul class="sr-problems">${probs.map((p) => `<li title="${esc(p.message || '')}">${esc(p.short || p.message || '')}</li>`).join('')}</ul>` : ''}`);
   // a node newly chosen: the board turns to its rows (and the flows it starts, under them), not left where it was scrolled
   const head = $('sr-board').querySelector('[data-sr-sel-head]');
@@ -12687,10 +13356,8 @@ function srRenderLog() {
 function srRetheme() {
   const V = SR.view;
   if (SR.phase !== 'open' || !V || V.dark === isDark()) return;
-  const pos = V.camera.position.clone(), target = V.controls.target.clone();
-  srBuild();
+  srBuild({ pos: V.camera.position.clone(), target: V.controls.target.clone() });
   const W = SR.view;
-  W.camera.position.copy(pos); W.controls.target.copy(target); W.controls.update();
   srLog(tl('sr.log.theme', { theme: W.dark ? tl('sr.theme.dark') : tl('sr.theme.light') }));
 }
 if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', srRetheme);
@@ -12744,12 +13411,19 @@ $('sr-board').addEventListener('click', (e) => {
     srBuild();
     return;
   }
+  const mg = e.target.closest('[data-sr-mig]');
+  if (mg) { srMigStart(mg.dataset.srMig); return; }   // 59-sr-migration.js
   const fl = e.target.closest('[data-sr-flow]');
   if (fl) { srFlowPlay(fl.dataset.srFlow); return; }   // 59-sr-flows.js
   const b = e.target.closest('[data-sr-act]');
   if (!b) return;
   if (b.dataset.srAct === 'focus') srFocusSelected();
+  else if (b.dataset.srAct === 'reach') srReachToggle();
   else if (b.dataset.srAct === 'toggle') srToggleGroup(b.dataset.srGroup);
+});
+$('sr-board').addEventListener('change', (e) => {
+  const h = e.target.closest('[data-sr-reach-hops]');
+  if (h) srReachHops(h.value === 'all' ? 'all' : 1);
 });
 $('sr-env').addEventListener('change', () => { srLog(tl('sr.log.env', { env: $('sr-env').value || tl('sr.env.unset') })); srBuild(); });
 $('sr-fold').addEventListener('change', () => { srLog($('sr-fold').checked ? tl('sr.log.fold.shown') : tl('sr.log.fold.folded')); srBuild(); });
@@ -12764,6 +13438,7 @@ for (const [btn, el] of [['sr-board-btn', 'sr-board'], ['sr-log-btn', 'sr-log']]
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
   if (SR.phase === 'open' && (SR.box.drag || SR.box.armed)) { e.preventDefault(); e.stopPropagation(); srBoxEnd(); srBoxArm(false); return; }   // the box only, the room stays
+  if (SR.phase === 'open' && SR.reach) { e.preventDefault(); e.stopPropagation(); srReachEnd(true); return; }   // what was shown only, the room stays
   if (SR.phase === 'loading') { e.preventDefault(); e.stopPropagation(); srCancel(); return; }
   if (SR.phase === 'open') { e.preventDefault(); e.stopPropagation(); srClose(); }
 }, true);
@@ -12892,7 +13567,7 @@ function srModelBuild(V, p) {
   }
   const s = p.n.count > 1 ? 1 + Math.min(Math.log2(p.n.count), 4) * 0.12 : 1;
   g.position.set(p.x, p.y + 0.75, p.z); g.scale.setScalar(s);
-  g.userData = { node: p.n.id, kind };
+  g.userData = { node: p.n.id, kind, base: s };   // base: its size, which a migration step scales
   return g;
 }
 
@@ -12918,6 +13593,7 @@ function srModelsSync(V, ids) {
     const p = V.L.pos.get(id);
     if (!p || p.hiddenIn) continue;
     const g = srModelBuild(V, p);
+    if (SR.reach) srReachTint(g);   // つながっている物を全部見せる: one out of it comes in faint (56-server-room.js)
     V.modelLayer.add(g); V.models.set(id, g);
   }
 }
@@ -12938,15 +13614,13 @@ function srModelsSync(V, ids) {
    environment; a day is the chosen scenario's within that pricing. アカウントの合計 is the default (the requester 10-21:
    「合計で」): SRC.account stays null (the server's default) until one is pressed. */
 const SRC = { mode: '3d', seq: 0, scenario: null, by: 'provider', account: null, month: null, day: null, date: null, hour: 0, timer: 0,
-  playMs: 700, picked: null, error: '' };
+  playMs: 700, picked: null, error: '', open: new Set(), fill: {} };   // fill: each row's bar length last drawn (%), to ease from   // open: the rows whose meters are shown whole (広げる)
 const srcEl = $('sr-cost');
 const SRC_PER = { second: 'sec', minute: 'min', hour: 'h', day: 'day', month: 'mo' };
 const SRC_COLORS = ['#4e79a7', '#f28e2b', '#59a14f', '#e15759', '#76b7b2', '#edc948', '#b07aa1', '#ff9da7', '#9c755f', '#bab0ac'];
 
 function srcUsd(v) {
-  if (v === null || v === undefined) return tl('cost.noprice');
-  const digits = Math.abs(v) < 1 && v !== 0 ? 4 : 2;
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: digits }).format(v);
+  return v === null || v === undefined ? tl('cost.noprice') : usdText(v);
 }
 function srcNum(v) {
   return new Intl.NumberFormat('en-US', { maximumFractionDigits: v !== 0 && Math.abs(v) < 10 ? 2 : 0 }).format(v);
@@ -12976,7 +13650,7 @@ function srcSetMode(mode) {
 }
 function srCostReset() {   // the server room closed (56-server-room.js srClose): back to 3D, nothing kept
   srcStop();
-  Object.assign(SRC, { mode: '3d', scenario: null, account: null, month: null, day: null, date: null, hour: 0, picked: null, error: '' });
+  Object.assign(SRC, { mode: '3d', scenario: null, account: null, month: null, day: null, date: null, hour: 0, picked: null, error: '', open: new Set(), fill: {} });
   SR.paused = false;
   $('sr-boxzoom').disabled = false;
   $('sr-mode-3d').setAttribute('aria-pressed', 'true');
@@ -12998,7 +13672,7 @@ async function srcLoad() {
   srcRender(tl('cost.loading'));
   const got = await srcAsk({ by: SRC.by });
   if (!got) return;
-  if (!got.ok) { SRC.error = got.message || got.reason || tl('cost.failed'); SRC.month = null; srcRender(); return; }
+  if (!got.ok) { SRC.error = got.short || got.message || got.reason || tl('cost.failed'); SRC.month = null; srcRender(); return; }
   SRC.scenario = got.scenario;
   SRC.month = { ...got.month, scenarios: got.scenarios, problems: got.problems, prices: got.prices, account: got.account };
   setHTML($('sr-scn'), got.scenarios.map((s) => `<option value="${esc(s.id)}"${s.id === got.scenario ? ' selected' : ''}>${esc(tl('cost.scn.option', { label: s.label, month: s.month }))}</option>`).join(''));
@@ -13009,11 +13683,11 @@ async function srcLoad() {
 async function srcOpenDay(date) {
   const got = await srcAsk({ date });
   if (!got) return;
-  if (!got.ok) { SRC.error = got.message || tl('cost.failed'); srcRender(); return; }
+  if (!got.ok) { SRC.error = got.short || got.message || tl('cost.failed'); srcRender(); return; }
   Object.assign(SRC, { date, day: got.day, hour: Math.min(SRC.hour, got.day.hours.length - 1), picked: null });
   srcRender();
 }
-function srcBackToMonth() { srcStop(); Object.assign(SRC, { date: null, day: null, picked: null }); srcRender(); }
+function srcBackToMonth() { srcStop(); Object.assign(SRC, { date: null, day: null, picked: null, fill: {} }); srcRender(); }
 
 /* ---- playing the day ---- */
 function srcPlay() {
@@ -13036,7 +13710,7 @@ function srcSummary(M) {
     ['noRule', tl('cost.norule'), M.noRule.length, M.noRule],
     ['loadUndefined', tl('cost.noload'), M.loadUndefined.length, M.loadUndefined],
     ['overflow', tl('cost.overflow'), Object.keys(M.overflowHours).length, Object.entries(M.overflowHours).map(([n, h]) => tl('cost.overflow.item', { node: n, n: h }))],
-    ['problems', tl('cost.problems'), M.problems.count, M.problems.first.map((p) => `${p.file} ${p.path}: ${p.message}`)],
+    ['problems', tl('cost.problems'), M.problems.count, M.problems.first.map((p) => p.short || `${p.file} ${p.path}: ${p.message}`)],
     ['warnings', tl('cost.warnings'), M.warningCount, M.warnings.map(srcWarnText)],
   ];
   // the free amount is taken once per scenario (one environment): environments on one account each counted take it twice
@@ -13044,7 +13718,7 @@ function srcSummary(M) {
   const freeHTML = free ? `<p class="src-free" data-src-free role="note">${esc(tl('cost.free'))}${free.rows && free.rows.length ? esc(tl('cost.free.rows', { n: Number(free.rows.length) })) : ''}</p>` : '';
   const acctHTML = M.account && M.account.available ? `<span class="sr-ctl sr-mode" role="group" aria-label="${esc(tl('cost.account.group'))}"><button type="button" class="wb-btn" data-src-act="acct-on" aria-pressed="${esc(String(!!M.account.on))}">${esc(tl('cost.account.all'))}</button><button type="button" class="wb-btn" data-src-act="acct-off" aria-pressed="${esc(String(!M.account.on))}">${esc(tl('cost.account.one'))}</button></span>` : '';
   const byHTML = M.by === 'environment' ? '' : `<label class="sr-ctl">${esc(tl('cost.by'))} <select id="src-by"><option value="provider"${M.by === 'provider' ? ' selected' : ''}>${esc(tl('cost.by.provider'))}</option><option value="node"${M.by === 'node' ? ' selected' : ''}>${esc(tl('cost.by.node'))}</option></select></label>`;
-  return `<div class="src-sum"><strong class="src-total" data-src-total>${esc(srcUsd(M.usd))}</strong><span class="src-note">${esc(tl('cost.month.note'))}</span>
+  return `<div class="src-sum"><strong class="src-total" data-src-total>${esc(srcUsd(M.usd))}</strong>${srMigTotalHTML()}<span class="src-note">${esc(tl('cost.month.note'))}</span>
 ${acctHTML}${byHTML}</div>${M.account && M.account.on ? srcAccountHTML(M) : ''}
 <div class="src-chips">${chips.map(([k, label, n, items]) => `<details class="src-chip" data-src-chip="${k}"${n ? ' data-some="1"' : ''}><summary>${esc(label)} <b>${n}</b></summary>${items.length ? `<ul>${items.slice(0, 50).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : `<p>${esc(tl('cost.chip.none'))}</p>`}</details>`).join('')}</div>${freeHTML}`;
 }
@@ -13057,7 +13731,7 @@ function srcAccountHTML(M) {
 /* An engine warning in one line: its message, and the rows it names (a row is an id or a {id}). */
 function srcWarnText(w) {
   const rows = Array.isArray(w.rows) ? w.rows.map((r) => (r && typeof r === 'object' ? String(r.id || r.sku || JSON.stringify(r)) : String(r))) : [];
-  return `${w.environment ? `${w.environment} · ` : ''}${w.node ? `${w.node} · ` : ''}${w.message}${rows.length ? tl('cost.warn.rows', { rows: rows.slice(0, 8).join(tl('cost.warn.sep')), more: rows.length > 8 ? tl('cost.warn.more', { n: rows.length - 8 }) : '' }) : ''}`;
+  return `${w.environment ? `${w.environment} · ` : ''}${w.node ? `${w.node} · ` : ''}${w.short || w.message}${rows.length ? tl('cost.warn.rows', { rows: rows.slice(0, 8).join(tl('cost.warn.sep')), more: rows.length > 8 ? tl('cost.warn.more', { n: rows.length - 8 }) : '' }) : ''}`;
 }
 function srcMonthSvg(M) {
   const w = Math.max(320, srcEl.clientWidth - 32), h = 260, padL = 56, padB = 28, padT = 18;
@@ -13089,34 +13763,58 @@ function srcRunning(hr) {
   return hr.running ? tl('cost.running', { n: srcNum(hr.running) }) : '';
 }
 function srcSegText(sg) { return `${sg.label}${sg.rate ? ` ${srcRate(sg.rate)}` : ''} · ${srcUsd(sg.usd)}`; }
-function srcRow(n, k, max, barPx) {
+/* A row: the bar across the whole column (each meter's length its share), the meters' words under it, two lines folded
+   with 広げる for the rest (the requester 10-23: 「長い文章だと棒グラフの中に入り切らずに...になってる / 全文見るために広げるのボタンが
+   欲しい」「文字とグラフは縦並びにして」). */
+function srcRow(n, k, max, i) {
   const hr = n.hours[k];
-  if (n.note) return `<div class="src-row src-noted" data-src-node="${esc(n.node)}"><div class="src-name">${esc(n.label)}</div><div class="src-bar"><span class="src-notetext">${esc(n.note === 'no rule' ? tl('cost.norule') : tl('cost.noload'))}</span></div></div>`;
+  if (n.note) return `<div class="src-row src-noted" data-src-node="${esc(n.node)}"><div class="src-name">${esc(n.label)}</div><div class="src-mid"><span class="src-notetext">${esc(n.note === 'no rule' ? tl('cost.norule') : tl('cost.noload'))}</span></div></div>`;
   const over = hr.load && hr.load.overflow > 0;
   const marksHTML = (hr.atMax ? `<span class="src-flag" title="${esc(tl('cost.atmax'))}">⚑</span>` : '') + (hr.stepChanged ? `<span class="src-step" title="${esc(tl('cost.step'))}">◆</span>` : '');
-  const outside = [];
-  const segsHTML = hr.segments.map((sg, i) => {
-    const pct = max > 0 && sg.usd ? (sg.usd / max) * 100 : 0, text = srcSegText(sg);
-    const fits = pct / 100 * barPx >= text.length * 7 + 12;
-    if (!fits) outside.push(text);
-    return `<span class="src-seg" tabindex="0" role="button" data-src-seg="${i}" style="width:${Number(pct.toFixed(3))}%;background:${esc(SRC_COLORS[i % SRC_COLORS.length])}" title="${esc(text)}" aria-label="${esc(text)}">${fits ? esc(text) : ''}</span>`;
+  const color = (j) => SRC_COLORS[j % SRC_COLORS.length];
+  // the row's bar: its amount against the hour's dearest row (that one reaches the right end), its meters sharing it
+  const fill = max > 0 && hr.usd > 0 ? (hr.usd / max) * 100 : 0, from = SRC.fill[n.node] ?? fill;
+  const segsHTML = hr.segments.map((sg, j) => {
+    const pct = hr.usd > 0 && sg.usd ? (sg.usd / hr.usd) * 100 : 0, text = srcSegText(sg);
+    return `<span class="src-seg" tabindex="0" role="button" data-src-seg="${Number(j)}" style="width:${Number(pct.toFixed(3))}%;background:${esc(color(j))}" title="${esc(text)}" aria-label="${esc(text)}"></span>`;
   }).join('');
-  const noPrice = hr.segments.filter((sg) => sg.usd === null).map((sg) => `${sg.label}${sg.rate ? ` ${srcRate(sg.rate)}` : ''} · ${tl('cost.noprice')}`);
+  const partsHTML = hr.segments.map((sg, j) => `<span class="src-part"><i style="background:${esc(color(j))}"></i>${esc(srcSegText(sg))}</span>`).join(' ');
+  const open = SRC.open.has(n.node);
   const loadHTML = over ? `<span class="src-red" data-src-over>${esc(hr.load.label)} ${esc(srcNum(hr.load.served))} / ${esc(srcNum(hr.load.demand))} /${esc(SRC_PER[hr.load.per] || hr.load.per)}${esc(tl('cost.load.served'))}</span>` : '';
-  return `<div class="src-row${over ? ' src-overrow' : ''}" data-src-node="${esc(n.node)}"><div class="src-name">${esc(n.label)}<small>${esc(srcRunning(hr))}</small>${marksHTML}</div><div class="src-bar">${segsHTML}<span class="src-out">${esc([...outside, ...noPrice].join('　'))}</span></div><div class="src-usd">${esc(srcUsd(hr.usd))}${loadHTML ? `<br>${loadHTML}` : ''}</div></div>`;
+  return `<div class="src-row${over ? ' src-overrow' : ''}" data-src-node="${esc(n.node)}"><div class="src-name">${esc(n.label)}<small>${esc(srcRunning(hr))}</small>${marksHTML}</div><div class="src-mid"><div class="src-bar"><span class="src-fill${hr.usd > 0 ? ' src-some' : ''}" data-src-fill="${Number(fill.toFixed(4))}" style="width:${Number(from.toFixed(4))}%">${segsHTML}</span></div>`
+    + `<div class="src-words" data-src-more="${esc(n.node)}"><div class="src-parts${open ? ' open' : ''}" id="src-parts-${Number(i)}" data-src-parts>${partsHTML}</div>`
+    + `<button type="button" class="src-more" data-src-more="${esc(n.node)}" aria-controls="src-parts-${Number(i)}" aria-expanded="${esc(String(open))}"${open ? '' : ' hidden'}>${esc(tl(open ? 'cost.less' : 'cost.more'))}</button></div></div>`
+    + `<div class="src-usd">${esc(srcUsd(hr.usd))}${loadHTML ? `<br>${loadHTML}` : ''}</div></div>`;
+}
+/* 広げる only where the folded words are cut (measured after they are drawn); an open row keeps its たたむ. */
+/* Each bar eases from the length last drawn to this hour's (a new dearest row moves them all). */
+function srcFillGo() {
+  const fills = [...srcEl.querySelectorAll('[data-src-fill]')];
+  for (const f of fills) SRC.fill[f.closest('[data-src-node]').dataset.srcNode] = Number(f.dataset.srcFill);
+  requestAnimationFrame(() => { for (const f of fills) f.style.width = `${Number(f.dataset.srcFill)}%`; });
+}
+function srcMoreFit() {
+  for (const b of srcEl.querySelectorAll('button[data-src-more]')) {
+    const parts = b.parentElement.querySelector('[data-src-parts]');
+    b.hidden = !(SRC.open.has(b.dataset.srcMore) || parts.scrollHeight > parts.clientHeight + 1);
+    b.parentElement.classList.toggle('src-cut', !b.hidden);   // the words themselves press too (the button is their edge)
+  }
+  const all = srcEl.querySelector("[data-src-act='more-all']");
+  if (all) all.hidden = !srcEl.querySelector('button[data-src-more]:not([hidden])');
 }
 function srcDayHtml(D) {
   const k = SRC.hour, hourUsd = D.nodes.reduce((a, n) => a + (n.note ? 0 : n.hours[k].usd), 0) + (D.others.usd[k] || 0);
-  const max = Math.max(...D.nodes.flatMap((n) => (n.note ? [] : n.hours.map((h) => h.usd))), 0.0001);
-  const barPx = Math.max(160, srcEl.clientWidth - 420);
-  const rowsHTML = D.nodes.map((n) => srcRow(n, k, max, barPx)).join('')
-    + (D.others.count ? `<div class="src-row src-noted"><div class="src-name">${esc(tl('cost.others', { n: Number(D.others.count) }))}</div><div class="src-bar"></div><div class="src-usd">${esc(srcUsd(D.others.usd[k]))}</div></div>` : '');
+  const max = Math.max(...D.nodes.map((n) => (n.note ? 0 : n.hours[k].usd)), 0);   // the hour's dearest row: the bars' right end
+  const rowsHTML = D.nodes.map((n, i) => srcRow(n, k, max, i)).join('')
+    + (D.others.count ? `<div class="src-row src-noted"><div class="src-name">${esc(tl('cost.others', { n: Number(D.others.count) }))}</div><div class="src-mid"></div><div class="src-usd">${esc(srcUsd(D.others.usd[k]))}</div></div>` : '');
+  const priced = D.nodes.filter((n) => !n.note), allOpen = priced.length > 0 && priced.every((n) => SRC.open.has(n.node));
   const pickHTML = SRC.picked ? srcPicked(D) : '';
   const acctHTML = SRC.month && SRC.month.account && SRC.month.account.on ? `<span class="src-note" data-src-dayacct>${esc(tl('cost.account.day', { scenario: (SRC.month.scenarios.find((s) => s.scenario === SRC.scenario) || {}).label || SRC.scenario }))}</span>` : '';
   return `<div class="src-dayhead"><button type="button" class="wb-btn" data-src-act="month">${esc(tl('cost.back.month'))}</button><strong>${esc(D.date)}</strong>${acctHTML}
 <button type="button" class="wb-btn" data-src-act="${SRC.timer ? 'stop' : 'play'}"${reduceMotion ? ` disabled title="${esc(tl('cost.play.reduced'))}"` : ''}>${esc(SRC.timer ? tl('cost.stop') : tl('cost.play'))}</button>
 <label class="sr-ctl">${esc(tl('cost.hour'))} <input type="range" id="src-hour" min="0" max="${Number(D.hours.length - 1)}" value="${k}" step="1"></label><span class="src-clock" data-src-clock>${esc(String(D.hours[k]).padStart(2, '0'))}:00</span>
-<span class="src-hoursum">${esc(tl('cost.hoursum', { hour: srcUsd(hourUsd), day: srcUsd(D.usd) }))}</span></div>
+<span class="src-hoursum">${esc(tl('cost.hoursum', { hour: srcUsd(hourUsd), day: srcUsd(D.usd) }))}</span>
+<button type="button" class="wb-btn" data-src-act="more-all" aria-expanded="${esc(String(allOpen))}" hidden>${esc(tl(allOpen ? 'cost.less.all' : 'cost.more.all'))}</button></div>
 <div class="src-rows">${rowsHTML}</div>${pickHTML ? `<div class="src-price" data-src-price>${pickHTML}</div>` : `<p class="src-hint">${esc(tl('cost.day.hint'))}</p>`}`;
 }
 function srcPicked(D) {
@@ -13134,13 +13832,14 @@ function srcRender(status) {
   if (status) { setHTML(srcEl, `<p class="src-status">${esc(status)}</p>`); return; }
   if (SRC.error) { setHTML(srcEl, `<p class="src-status src-red">${esc(tl('cost.error', { why: SRC.error }))}</p>`); return; }
   if (!SRC.month) return;
-  if (SRC.day) setHTML(srcEl, srcDayHtml(SRC.day));
-  else setHTML(srcEl, `${srcSummary(SRC.month)}${srcMonthSvg(SRC.month)}`);
+  if (SRC.day) { setHTML(srcEl, srcDayHtml(SRC.day)); srcFillGo(); srcMoreFit(); }
+  else setHTML(srcEl, `${srcSummary(SRC.month)}${srcMonthSvg(SRC.month)}${srMigCostHTML()}`);   // a plan open: 旧 · 新 · 差 (59-sr-migration.js)
 }
 
 /* ---- wiring ---- */
 $('sr-mode-3d').addEventListener('click', () => srcSetMode('3d'));
 $('sr-mode-cost').addEventListener('click', () => srcSetMode('cost'));
+new ResizeObserver(() => { if (SRC.mode === 'cost' && SRC.day) srcMoreFit(); }).observe(srcEl);   // a narrower page cuts more words
 $('sr-scn').addEventListener('change', () => { SRC.scenario = $('sr-scn').value; Object.assign(SRC, { month: null, day: null }); srcLoad(); });
 srcEl.addEventListener('click', (e) => {
   const act = e.target.closest('[data-src-act]');
@@ -13151,11 +13850,24 @@ srcEl.addEventListener('click', (e) => {
       if (on !== !!(SRC.month && SRC.month.account.on)) { SRC.account = on; Object.assign(SRC, { month: null, day: null, date: null }); srcLoad(); }
     }
     else if (act.dataset.srcAct === 'play') srcPlay();
+    else if (act.dataset.srcAct === 'more-all') {
+      const ids = SRC.day.nodes.filter((n) => !n.note).map((n) => n.node);
+      SRC.open = ids.every((id) => SRC.open.has(id)) ? new Set() : new Set(ids);
+      srcRender();
+    }
     else { srcStop(); srcRender(); }
     return;
   }
   const day = e.target.closest('[data-src-date]');
   if (day) { SRC.hour = 0; srcOpenDay(day.dataset.srcDate); return; }
+  const more = e.target.closest('[data-src-more]');
+  if (more && !more.querySelector(':scope > button[data-src-more][hidden]')) {   // words that are not cut have nothing to show
+    const id = more.dataset.srcMore;
+    if (!SRC.open.delete(id)) SRC.open.add(id);
+    srcRender();
+    srcEl.querySelector(`button[data-src-more="${CSS.escape(id)}"]`)?.focus();   // the key that pressed it stays on it
+    return;
+  }
   const seg = e.target.closest('[data-src-seg]');
   if (seg) { SRC.picked = { node: seg.closest('[data-src-node]').dataset.srcNode, seg: Number(seg.dataset.srcSeg) }; srcRender(); }
 });
@@ -14161,9 +14873,8 @@ function srFlowHints(P, b) {
     const a = srFlowPos(V, first.from), z = srFlowPos(V, first.to);
     if (a && z) arr.push(a.x, a.y, a.z, z.x, z.y, z.z);
   }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3));
-  const lines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: SR_PAL[V.dark ? 'dark' : 'light'].light, transparent: true, opacity: 0.45 }));
+  // a strip as wide as the cables (56-server-room.js srCables), in the light's colour: a 1 px line was lost beside them
+  const lines = srCables(arr, { color: SR_PAL[V.dark ? 'dark' : 'light'].light, opacity: 0.45, px: SR_CABLE.focus });
   lines.userData.hints = arr.length / 6;
   V.flowLayer.add(lines);
   P.hints = lines;
@@ -14176,7 +14887,7 @@ function srFlowChoose(id) {
   P.chosen.push(`${b.label} → ${c.label}`);
   P.branch = null;
   $('sr-choices').hidden = true;
-  if (P.hints) { SR.view.flowLayer.remove(P.hints); P.hints.geometry.dispose(); P.hints = null; }
+  if (P.hints) { SR.view.flowLayer.remove(P.hints); P.hints.geometry.dispose(); P.hints.material.dispose(); P.hints = null; }
   if (c.goto) {
     const next = srFlowsOf(SR.view).find((f) => f.id === c.goto);
     if (next) {
@@ -14199,7 +14910,7 @@ function srFlowBack() {
   const s = P.history.pop();
   P.flow = s.flow; P.frames = s.frames; P.pos = s.pos; P.chosen = s.chosen;
   P.branch = null; $('sr-choices').hidden = true;
-  if (P.hints) { SR.view.flowLayer.remove(P.hints); P.hints = null; }
+  if (P.hints) { SR.view.flowLayer.remove(P.hints); P.hints.geometry.dispose(); P.hints.material.dispose(); P.hints = null; }
   for (const d of P.lights) { SR.view.flowLayer.remove(d); if (d.userData.flowLight) srFlowLightDispose(d); }
   P.lights = []; P.anim = null; P.state = 'pause';
   srFlowRenderBar();
@@ -14325,6 +15036,493 @@ $('sr-choices').addEventListener('click', (e) => {
   const b = e.target.closest('[data-sr-choice]');
   if (b) srFlowChoose(b.dataset.srChoice);
 });
+// ---- web/js/59-sr-migration.js ----
+/* ---------- the server room's migration plans played (ticket 2026-10-22-viz-infra-migration-plan) ----------
+   Requester 10-22: 「インフラの機能でサーバー移管計画をビジュアライズする機能がほしい / 今のjsonと変更箇所のjsonを組み合わせることで
+   それをマージした新インフラになる / 移管ボタンを押すと一個ずつノードが切り替わっていく / 削除のjsonも用意する必要がある / 新旧でid同じ
+   ノードは差し替え / 違うidは追加のアニメーション / 新に変わる時にルートが切れる線はアニメーションで消える / 逆にルート追加は光の線で
+   繋がっていくアニメーション」; 「コストの差の表示は欲しいね」.
+
+   The room's read gives its plans (document_tools' infra.migration: "migrations", each with its steps, its problems
+   in words and the new model). The board lists them; a plan with an error says why and cannot be played. 移管 lays
+   out the old model and the new together (every node of either has its cell, so nothing moves while it plays), shows
+   the old, and the player takes it one step at a time:
+   - add: the node grows in its cell; remove: it shrinks away; replace: the old shape shrinks and the new one (its
+     shape, its cloud's colour, up close its model) grows in its place — both versions are drawn from the start (the
+     new one at size 0), so a step never builds the room again (a rebuild per replace stalled a long plan and, with a
+     new renderer each time, flashed a washed-out frame: the video, 10-22);
+   - an edge that goes shrinks to its middle and is gone; an edge that comes is drawn from its start to its end with
+     the flows' light at its head (59-sr-flows.js srFlowLight), after the node it needs is there;
+   - a floor of a group the new model has alone comes with its first node; one the new model has not goes at the end.
+   play / pause, one step on, back to the start, stop (the old room again), the speed — the flows' player's buttons.
+   The month's cost, when the room has load definitions (infra.cost.diff: the engine's months of the old model, of the
+   model after each step and of the new, each priced on its own): 旧 → 今のステップ → 新 on the player, with the step's
+   difference; the コスト view lists 旧 · 新 · 差 by node and by cloud. A step that moves the month says so where the eye
+   is (the requester 10-22: 「コストが変わるところが少し変化が薄くてわかりづらい」): the amount on the player counts to the
+   new one, the step's difference pops beside it (warm when it rises, cool when it falls), and a tag with it floats up
+   over the node that changed.
+   Played through (the requester: 「もっとたくさんの移管をスムーズに」), a step is shorter than one stepped alone
+   (SR_MIG.playMs) and the next begins as soon as one ends: nothing is rebuilt between them.
+   While a plan is open the room's flows are not offered (they are the old model's). */
+const SR_MIG = { stepMs: 1600, playMs: 1050, speed: 1.0, P: null };
+const SR_MIG_KIND = { add: (node) => tl('sr.mig.kind.add', { node }), remove: (node) => tl('sr.mig.kind.remove', { node }),
+  replace: (node) => tl('sr.mig.kind.replace', { node }), edges: () => tl('sr.mig.kind.edges') };
+const SR_MIG_DONE = { add: (s) => tl('sr.mig.log.add', { node: s.node }), remove: (s) => tl('sr.mig.log.remove', { node: s.node }),
+  replace: (s) => tl('sr.mig.log.replace', { node: s.node }), edges: (s) => tl('sr.mig.log.edges', { n: s.edgesAdded.length + s.edgesRemoved.length }) };
+const SR_MIG_CHANGE = { added: tl('sr.mig.change.added'), replaced: tl('sr.mig.change.replaced'), removed: tl('sr.mig.change.removed') };
+
+function srMigPlans() { return ((SR.migBase || SR.model || {}).migrations) || []; }
+const srMigClamp = (x) => Math.max(0, Math.min(1, x));
+
+/* The old model and the new laid out together: a replaced node as its old version (srMigVersions puts the new one in
+   the layout as its step passes half way); the new model's own nodes, groups and edges after the old ones. */
+function srMigUnion(base, entry) {
+  const oldIds = new Set((base.nodes || []).map((n) => n.id));
+  const nodes = (base.nodes || []).slice();
+  for (const n of entry.model.nodes) if (!oldIds.has(n.id)) nodes.push(n);
+  const oldGroups = new Set((base.groups || []).map((g) => g.id));
+  const groups = (base.groups || []).concat(entry.model.groups.filter((g) => !oldGroups.has(g.id)));
+  const oldKeys = new Set((base.edges || []).map(srMigKey));
+  const edges = (base.edges || []).concat(entry.model.edges.filter((e) => !oldKeys.has(srMigKey(e))));
+  const envIds = new Set((base.environments || []).map((e) => e.id));
+  const environments = (base.environments || []).concat((entry.model.environments || []).filter((e) => !envIds.has(e.id)));
+  return { ...base, nodes, groups, edges, environments, flows: [] };
+}
+function srMigKey(e) { return e.id ? e.id : `${e.from}->${e.to}`; }
+function srMigAt(entry) {
+  if (!entry._at) { entry._at = {}; for (const s of entry.steps) if (s.node) entry._at[s.node] = s.index; }
+  return entry._at;
+}
+function srMigEdgeSteps(entry) {
+  if (!entry._edges) {
+    entry._edges = { out: {}, in: {} };
+    for (const s of entry.steps) { for (const k of s.edgesRemoved) entry._edges.out[k] = s.index; for (const k of s.edgesAdded) entry._edges.in[k] = s.index; }
+  }
+  return entry._edges;
+}
+
+/* ---- what is drawn now: a node's size (0 gone, 1 there), an edge's length (0..1, and how it goes) */
+function srMigNodeScale(id) {
+  const P = SR_MIG.P;
+  if (!P) return 1;
+  const i = srMigAt(P.entry)[id];
+  if (!i) return 1;
+  const kind = P.entry.steps[i - 1].kind, A = P.anim && P.anim.i === i ? P.anim : null;
+  if (A) {
+    const t = A.t;
+    if (kind === 'add') return srMigClamp(t / 0.4);
+    if (kind === 'remove') return 1 - srMigClamp((t - 0.4) / 0.6);
+    return t < 0.5 ? 1 - srMigClamp(t / 0.5) : srMigClamp((t - 0.5) / 0.5);
+  }
+  if (kind === 'add') return P.k >= i ? 1 : 0;
+  if (kind === 'remove') return P.k >= i ? 0 : 1;
+  return 1;
+}
+/* A replaced node is drawn twice (srMigAfterBuild): the old version shrinks over the first half of its step, the new
+   one grows over the second. */
+function srMigVerScale(id, ver) {
+  const P = SR_MIG.P, i = P && srMigAt(P.entry)[id];
+  if (!i || P.entry.steps[i - 1].kind !== 'replace') return srMigNodeScale(id);
+  const A = P.anim && P.anim.i === i ? P.anim : null;
+  if (A) return ver === 'new' ? srMigClamp((A.t - 0.5) / 0.5) : 1 - srMigClamp(A.t / 0.5);
+  return (P.k >= i) === (ver === 'new') ? 1 : 0;
+}
+function srMigVersion(id) {
+  const P = SR_MIG.P, i = srMigAt(P.entry)[id];
+  return P.k >= i || (P.anim && P.anim.i === i && P.anim.t >= 0.5) ? 'new' : 'old';
+}
+function srMigHides(id) { return !!SR_MIG.P && srMigNodeScale(id) <= 0.001; }
+function srMigEdge(e) {
+  const P = SR_MIG.P;
+  if (!P) return { v: 1, mode: 'grow' };
+  const key = srMigKey(e), E = srMigEdgeSteps(P.entry), out = E.out[key], inn = E.in[key];
+  if (out && inn) return { v: 1, mode: 'grow', lit: P.anim && P.anim.i === inn ? srMigClamp((P.anim.t - 0.45) / 0.55) : null };   // replaced: it stays
+  if (out) {
+    if (P.anim && P.anim.i === out) return { v: 1 - srMigClamp(P.anim.t / 0.5), mode: 'shrink' };
+    return { v: P.k >= out ? 0 : 1, mode: 'shrink' };
+  }
+  if (inn) {
+    if (P.anim && P.anim.i === inn) { const g = srMigClamp((P.anim.t - 0.45) / 0.55); return { v: g, mode: 'grow', lit: g > 0 && g < 1 ? g : null }; }
+    return { v: P.k >= inn ? 1 : 0, mode: 'grow' };
+  }
+  return { v: 1, mode: 'grow' };
+}
+function srMigEdgeHidden(e) { return !!SR_MIG.P && srMigEdge(e).v <= 0.001; }
+
+/* ---- the board's plans */
+function srMigBoardHTML() {
+  const plans = srMigPlans();
+  if (!plans.length) return '';
+  const P = SR_MIG.P;
+  return `<h3>${esc(tl('sr.mig.board.title'))}</h3><ul class="sr-migs">${plans.map((m) => {
+    const c = m.counts || {}, errs = (m.problems || []).filter((p) => p.severity === 'error');
+    return `<li><button type="button" class="wb-btn" data-sr-mig="${esc(m.name)}"${m.ok ? '' : ' disabled'} aria-pressed="${P && P.entry.name === m.name ? 'true' : 'false'}">${esc(tl('sr.mig.play', { name: m.name }))}</button>
+${m.ok ? `<small>${esc(tl('sr.mig.counts', { steps: m.steps.length, add: c.added || 0, replace: c.replaced || 0, remove: c.removed || 0 }))}</small>` : ''}
+${(m.problems || []).length ? `<ul class="sr-problems" data-sr-mig-problems="${esc(m.name)}">${m.problems.slice(0, 20).map((p) => `<li title="${esc(p.message || '')}">${esc(p.short || p.message || '')}</li>`).join('')}</ul>` : ''}
+${errs.length ? `<p class="sr-hint">${esc(tl('sr.mig.cannot'))}</p>` : ''}</li>`; }).join('')}</ul>`;
+}
+
+/* ---- opening, the steps, closing */
+function srMigStart(name) {
+  const base = SR.migBase || SR.model, entry = srMigPlans().find((m) => m.name === name);
+  if (!entry || !entry.ok || SR.phase !== 'open') return false;
+  if (SR_MIG.P) srMigStop(true);
+  srFlowStop();
+  SR.migBase = base;
+  SR_MIG.P = { entry, k: 0, anim: null, state: 'pause', cost: null, costSeq: 0, lights: new Map(), log: [], fx: null, tags: [] };
+  srMigRebuild(true);
+  srLog(tl('sr.mig.log.start', { name, n: entry.steps.length }));
+  srMigCost();
+  return true;
+}
+function srMigStop(quiet) {
+  const P = SR_MIG.P;
+  if (!P) return false;
+  srMigTagsClear(P);
+  SR_MIG.P = null;
+  SR.model = SR.migBase; SR.migBase = null;
+  if (!quiet) { srMigRebuild(); srLog(tl('sr.mig.log.stop', { name: P.entry.name })); }
+  srMigRenderBar();
+  return true;
+}
+/* The room drawn again for the plan's state, the camera kept (srFit only when it opens). */
+function srMigRebuild(first) {
+  const V = SR.view, P = SR_MIG.P;
+  if (P) SR.model = srMigUnion(SR.migBase, P.entry);
+  if (!V) return;
+  srBuild(first ? undefined : { pos: V.camera.position.clone(), target: V.controls.target.clone() });   // no frame from the fit camera
+}
+function srMigReset() {   // nothing is rebuilt: the sizes, the versions and the lines are put back to the old model's
+  const P = SR_MIG.P;
+  if (!P) return;
+  srMigLightsClear(SR.view);
+  srMigTagsClear(P);
+  Object.assign(P, { k: 0, anim: null, state: 'pause', fx: null });
+  if (SR.view) srMigApply(SR.view, true);
+}
+function srMigStepOn() {
+  const P = SR_MIG.P;
+  if (!P || P.anim || P.k >= P.entry.steps.length) return false;
+  const s = P.entry.steps[P.k];
+  P.anim = { i: s.index, t: 0 };
+  P.log.push(s.node || 'edges');
+  if (SR.view) srMigFxStart(SR.view, P, s);
+  return true;
+}
+function srMigCost() {
+  const P = SR_MIG.P;
+  if (!P || typeof SOURCE.infraCost !== 'function') return;
+  const seq = ++P.costSeq;
+  SOURCE.infraCost(SR.project, { seq, migration: P.entry.name }).then((got) => {
+    if (SR_MIG.P !== P || seq !== P.costSeq) return;
+    P.cost = got && got.ok ? got : { ok: false, message: (got && (got.short || got.message || got.reason)) || '' };
+    srMigRenderBar();
+    if (typeof srcRender === 'function' && typeof SRC !== 'undefined' && SRC.mode === 'cost') srcRender();
+  });
+}
+
+/* ---- after each build: the index of what the plan changes, and its state drawn */
+function srMigAfterBuild(V) {
+  const P = SR_MIG.P;
+  srMigRenderBar();
+  if (!P) return;
+  V.migLayer = new THREE.Group();
+  V.near.add(V.migLayer);
+  P.lights = new Map();
+  const at = srMigAt(P.entry), E = srMigEdgeSteps(P.entry);
+  srMigNewShapes(V, at);
+  V.migNodes = new Map();
+  srMigIndexNodes(V, at);
+  V.migEdges = [];
+  const segs = { plain: 0, cross: 0 };
+  for (const e of V.L.edges) {   // the same order srBuild laid them in: a segment each
+    const set = e.crossProvider ? 'cross' : 'plain', j = segs[set]++;
+    const key = srMigKey(e);
+    if (E.out[key] || E.in[key]) {
+      const a = V.L.pos.get(e.from), b = V.L.pos.get(e.to), y = e.crossProvider ? 2.6 : 1.7;
+      V.migEdges.push({ e, key, line: set === 'cross' ? V.crossLines : V.plainLines, j, a: [a.x, y, a.z], b: [b.x, y, b.z], v: -1 });
+    }
+  }
+  V.migFloors = V.L.floors.map((G, i) => ({ G, i }));
+  srMigApply(V, true);
+}
+/* The new version of each replaced node, at its cell, at size 0 until its step: a shape of its own in each set (the simple
+   one and the one by service), in its cloud's colour; they take the press as the others do (srSetDetail). */
+function srMigNewShapes(V, at) {
+  const P = SR_MIG.P, m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), col = new THREE.Color();
+  for (const s of P.entry.steps) {
+    if (s.kind !== 'replace') continue;
+    const n = P.entry.model.nodes.find((x) => x.id === s.node), p = n && V.L.pos.get(s.node);
+    if (!p || p.hiddenIn) continue;
+    for (const set of ['simple', 'detail']) {
+      const shape = srShapeIn(set, n), mesh = new THREE.InstancedMesh(SR_SHAPES[shape](), new THREE.MeshLambertMaterial({ color: 0xffffff }), 1);
+      const sc = n.count > 1 ? 1 + Math.min(Math.log2(n.count), 4) * 0.12 : 1;
+      mesh.setMatrixAt(0, m4.compose(new THREE.Vector3(p.x, p.y + 0.75, p.z), q, new THREE.Vector3(sc, sc, sc)));
+      mesh.setColorAt(0, col.set(srProviderColor(n.providerResolved || n.provider, 'node', 0, V.dark)));
+      Object.assign(mesh.userData, { nodes: [s.node], shape, migNew: true });
+      V.nodeSets[set].add(mesh); V.nodeMeshes[set].push(mesh);
+      if (set === (V.detail ? 'detail' : 'simple')) V.pick.push(mesh);
+    }
+  }
+}
+function srMigIndexNodes(V, at) {
+  V.migNodes.clear();
+  const meshes = [...V.nodeMeshes.simple, ...V.nodeMeshes.detail];
+  V.near.traverse((o) => { if (o.isInstancedMesh && o.userData.icon && o.userData.nodes) meshes.push(o); });
+  const m4 = new THREE.Matrix4();
+  for (const mesh of meshes) mesh.userData.nodes.forEach((id, i) => {
+    if (!at[id]) return;
+    mesh.getMatrixAt(i, m4);
+    const pos = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
+    m4.decompose(pos, q, sc);
+    (V.migNodes.get(id) || V.migNodes.set(id, []).get(id)).push({ mesh, i, pos, q, sc, s: -1, ver: mesh.userData.migNew ? 'new' : 'old' });
+  });
+  V.migIcons = V.iconCount || 0;
+}
+/* The plan's state on the 3D: sizes of the nodes it changes (their shapes, icons, models up close), the edges'
+   lengths, the floors, the lights on the edges coming in. Only what changed is written. */
+function srMigApply(V, all) {
+  const P = SR_MIG.P;
+  if (!P || !V.migNodes) return;
+  if ((V.iconCount || 0) !== V.migIcons) srMigIndexNodes(V, srMigAt(P.entry));   // the icons come after the build
+  srMigVersions(V);
+  const m4 = new THREE.Matrix4(), sc = new THREE.Vector3(), touched = new Set();
+  for (const [id, list] of V.migNodes) {
+    for (const it of list) {
+      const s = srMigVerScale(id, it.ver);
+      if (!all && Math.abs(it.s - s) < 1e-4) continue;
+      it.s = s;
+      it.mesh.setMatrixAt(it.i, m4.compose(it.pos, it.q, sc.copy(it.sc).multiplyScalar(Math.max(s, 1e-4))));
+      touched.add(it.mesh);
+    }
+  }
+  for (const mesh of touched) { mesh.instanceMatrix.needsUpdate = true; mesh.boundingSphere = null; }
+  if (V.models) for (const g of V.models.values()) {
+    if (!srMigAt(P.entry)[g.userData.node]) continue;
+    const s = srMigNodeScale(g.userData.node);
+    g.scale.setScalar((g.userData.base || 1) * Math.max(s, 1e-4)); g.visible = s > 0.001;
+  }
+  const lines = new Set();
+  for (const M of V.migEdges) {
+    const st = srMigEdge(M.e);
+    if (!all && Math.abs(M.v - st.v) < 1e-4 && M.mode === st.mode) { srMigLight(V, M, st); continue; }
+    M.v = st.v; M.mode = st.mode;
+    const a = M.a, b = M.b, mid = a.map((x, c) => (x + b[c]) / 2);   // going: to its middle; coming: out of its start
+    if (st.mode === 'shrink') srCableSet(M.line, M.j, a.map((x, c) => mid[c] + (x - mid[c]) * st.v), b.map((x, c) => mid[c] + (x - mid[c]) * st.v));
+    else srCableSet(M.line, M.j, a, a.map((x, c) => x + (b[c] - x) * st.v));
+    lines.add(M.line);
+    srMigLight(V, M, st);
+  }
+  for (const l of lines) srCableDone(l);
+  srMigFloors(V);
+}
+/* An edge coming in: the flows' light at its head while it is drawn. */
+function srMigLight(V, M, st) {
+  const P = SR_MIG.P;
+  let light = P.lights.get(M.key);
+  if (st.lit === null || st.lit === undefined) {
+    if (light) { V.migLayer.remove(light); srFlowLightDispose(light); P.lights.delete(M.key); }
+    return;
+  }
+  if (!light) { light = srFlowLight(V, M.e.from, M.e.to); V.migLayer.add(light); P.lights.set(M.key, light); }
+  srFlowLightAt(light, st.lit);
+  srFlowLightKeepSize(V, light);
+}
+function srMigLightsClear(V) {
+  const P = SR_MIG.P;
+  if (!P || !V || !V.migLayer) return;
+  for (const l of P.lights.values()) { V.migLayer.remove(l); srFlowLightDispose(l); }
+  P.lights.clear();
+}
+/* A floor is drawn while something on it is (a group of the new model alone comes with its first node), and one the
+   new model has not goes with the last step. */
+function srMigFloors(V) {
+  const P = SR_MIG.P, mesh = V.floorMesh;
+  if (!mesh) return;
+  const oldG = new Set((SR.migBase.groups || []).map((g) => g.id)), newG = new Set(P.entry.model.groups.map((g) => g.id));
+  const end = P.k >= P.entry.steps.length && !P.anim;
+  const shown = (G) => G.nodes.some((n) => !srMigHides(n.id)) || G.kids.some(shown);
+  const m4 = new THREE.Matrix4(), pos = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
+  V.migFloorBase = V.migFloorBase || V.L.floors.map((G, i) => { mesh.getMatrixAt(i, m4); const p = new THREE.Vector3(), r = new THREE.Quaternion(), s = new THREE.Vector3(); m4.decompose(p, r, s); return [p, r, s]; });
+  let changed = false;
+  V.migFloorShown = [];
+  V.L.floors.forEach((G, i) => {
+    const id = G.g.id, inOld = !id || oldG.has(id), inNew = !id || newG.has(id);
+    const on = inOld && !inNew ? !end || shown(G) : !inOld ? shown(G) || end : true;
+    if (on) V.migFloorShown.push(id);
+    const [p, r, s] = V.migFloorBase[i];
+    mesh.getMatrixAt(i, m4); m4.decompose(pos, q, sc);
+    const want = on ? 1 : 0;
+    if (Math.abs(sc.x - s.x * Math.max(want, 1e-4)) > 1e-6) { mesh.setMatrixAt(i, m4.compose(p, r, s.clone().multiplyScalar(Math.max(want, 1e-4)))); changed = true; }
+  });
+  if (changed) { mesh.instanceMatrix.needsUpdate = true; mesh.boundingSphere = null; }
+}
+
+/* ---- each frame: the step playing, the next one when it is done */
+function srMigTick(V, dt) {
+  const P = SR_MIG.P;
+  if (!P || !V.migNodes) return;
+  srMigFxTick(V, P, dt);
+  if (!P.anim && P.state === 'play') {   // a frame of play with no step on (the e2e counts them: back to back is none)
+    P.idle = (P.idle || 0) + 1;
+    if (!srMigStepOn()) P.state = 'done';
+    srMigRenderBar();
+  }
+  if (P.anim && (P.state === 'play' || P.state === 'step')) {   // paused: the step, the count and the tags all stand still
+    const ms = P.state === 'play' ? SR_MIG.playMs : SR_MIG.stepMs;   // played through: shorter steps, back to back
+    P.anim.t = reduceMotion ? 1 : Math.min(1, P.anim.t + dt * SR_MIG.speed / ms);
+    if (P.anim.t >= 1) {
+      P.k = P.anim.i; P.anim = null;
+      const s = P.entry.steps[P.k - 1];
+      srLog(SR_MIG_DONE[s.kind](s));
+      if (P.k >= P.entry.steps.length) P.state = 'done';
+      else if (P.state === 'step') P.state = 'pause';
+      srMigApply(V, false);
+      srMigLightsClear(V);
+      if (P.fx) P.fx.left = 0;   // the count ends with its step
+      srMigRenderBar();
+      if (P.state === 'play' && srMigStepOn()) { srMigApply(V, false); srMigRenderBar(); }   // the next step from this same frame: no gap
+      return;
+    }
+  }
+  srMigApply(V, false);
+}
+
+/* The new version of each replaced node put in the layout once its step is half way (labels, the board, the models up
+   close read it there), the old one put back before that; a model up close is made again for it. */
+function srMigVersions(V) {
+  const P = SR_MIG.P, newNodes = P.entry._new || (P.entry._new = new Map(P.entry.model.nodes.map((n) => [n.id, n])));
+  const oldNodes = P.entry._old || (P.entry._old = new Map((SR.migBase.nodes || []).map((n) => [n.id, n])));
+  for (const s of P.entry.steps) {
+    if (s.kind !== 'replace') continue;
+    const want = (srMigVersion(s.node) === 'new' ? newNodes : oldNodes).get(s.node), p = V.L.pos.get(s.node);
+    if (!want || !p || p.n === want) continue;
+    p.n = want;   // the layout's only: SR.model keeps the old version, so a build (the theme, an environment) lays out the same
+    if (V.models && V.models.has(s.node)) { V.modelLayer.remove(V.models.get(s.node)); V.models.delete(s.node); V.labelAt = 0; }
+    if (SR.selected === s.node) srRenderBoard();
+  }
+}
+
+/* ---- a step that moves the month, from its start (the tags and the player point at the same step: a tag stood at a
+   step's end lagged one behind the player when played through): the player's amount counts over the step to the new
+   one, the step's difference pops beside it, and over each node whose month moved in the step (a step's difference is
+   all of it: a free amount shared moves a neighbour too) a tag with that node's own difference floats up. */
+function srMigFxStart(V, P, s) {
+  srMigTagsClear(P);
+  const C = P.cost;
+  P.fx = null;
+  if (!C || !C.ok) return;
+  const cs = C.steps[s.index - 1], to = cs.usd, from = s.index > 1 ? C.steps[s.index - 2].usd : C.old.usd;
+  if (to === null || from === null || Math.abs(to - from) < 0.005) return;
+  const ms = P.state === 'play' ? SR_MIG.playMs : SR_MIG.stepMs;
+  P.fx = { i: s.index, from, to, delta: to - from, left: reduceMotion ? 0 : ms, life: ms };
+  if (reduceMotion) return;
+  for (const mv of (cs.moved || []).slice(0, 4)) {
+    if (!V.L.pos.has(mv.node)) continue;     // an edge's own row (its transfer), not a node
+    const el = document.createElement('div');
+    el.className = `sr-mig-tag ${mv.diff > 0 ? 'sr-up' : 'sr-down'}`;
+    el.dataset.srMigTag = mv.node;
+    el.dataset.srMigStep = String(s.index);
+    el.textContent = srMigSigned(mv.diff);
+    $('sr-toasts').append(el);
+    P.tags.push({ el, at: mv.node, left: ms, life: ms });
+  }
+}
+/* On the player's clock: nothing moves while it is paused. Played through, a tag fades as its step ends (the next
+   step's tags take its place); stepped one at a time, it stays until the next step starts, to be read. */
+function srMigFxTick(V, P, dt) {
+  const running = !!P.anim && (P.state === 'play' || P.state === 'step'), step = running ? dt * SR_MIG.speed : 0;
+  if (P.fx && P.fx.left > 0) {
+    P.fx.left = Math.max(0, P.fx.left - step);
+    const k = 1 - P.fx.left / P.fx.life, e = 1 - (1 - k) ** 3, el = $('sr-mplayer').querySelector('[data-sr-mp-now]');
+    if (el) el.textContent = srMigUsd(P.fx.from + (P.fx.to - P.fx.from) * e);
+  }
+  const w = V.renderer.domElement.clientWidth, h = V.renderer.domElement.clientHeight;
+  P.tags = P.tags.filter((x) => {
+    x.age = Math.min(x.life, (x.age || 0) + step);
+    if (P.state === 'play') x.left -= step;
+    if (x.left > 0) return true;
+    x.el.remove(); return false;
+  });
+  for (const x of P.tags) {
+    const p = srFlowPos(V, x.at);
+    if (!p) continue;
+    const v = p.clone(); v.y += 1.8; v.project(V.camera);
+    const rise = (x.age / x.life) * 28;
+    x.el.style.transform = `translate(${Math.round((v.x + 1) / 2 * w)}px, ${Math.round((1 - v.y) / 2 * h - rise)}px) translate(-50%, -100%)`;
+    x.el.style.opacity = String(Math.min(1, x.left / 400));
+  }
+}
+function srMigTagsClear(P) { for (const x of P.tags) x.el.remove(); P.tags = []; }
+/* ---- the player's bar: the plan, play / pause, one step, back to the start, stop, the speed, the cost */
+function srMigRenderBar() {
+  const bar = $('sr-mplayer'), P = SR_MIG.P;
+  if (!bar) return;
+  if (!P) { bar.hidden = true; setHTML(bar, ''); return; }
+  bar.hidden = false;
+  const n = P.entry.steps.length, playing = P.state === 'play', cur = P.anim ? P.entry.steps[P.anim.i - 1] : P.k ? P.entry.steps[P.k - 1] : null;
+  const what = cur ? SR_MIG_KIND[cur.kind](cur.node || '') : tl('sr.mig.old');
+  const C = P.cost;
+  let costHTML = '';
+  if (C && C.ok) {
+    const nowUsd = P.k ? C.steps[P.k - 1].usd : C.old.usd, stepDiff = cur ? C.steps[cur.index - 1].diff : null;   // the step shown
+    const fx = P.fx, counting = fx && fx.left > 0, shown = counting ? fx.from : nowUsd;
+    const dir = stepDiff > 0 ? 'sr-up' : stepDiff < 0 ? 'sr-down' : '';
+    const nowCls = fx ? (fx.delta > 0 ? 'sr-up' : 'sr-down') : '';
+    costHTML = `<span class="sr-mp-cost" data-sr-mp-cost>${esc(tl('sr.mig.cost.old', { old: srMigUsd(C.old.usd) }))} → <b class="sr-mp-now ${esc(nowCls)}" data-sr-mp-now>${esc(srMigUsd(shown))}</b> → ${esc(tl('sr.mig.cost.new', { new: srMigUsd(C.new.usd) }))}${stepDiff !== null ? ` <b class="sr-mp-delta ${esc(dir)}" data-sr-mp-diff>${esc(tl('sr.mig.cost.step', { diff: srMigSigned(stepDiff) }))}</b>` : ''}</span>`;
+    const moved = cur && C.steps[cur.index - 1].moved;
+    if (moved && moved.length > 1) costHTML += ` <small class="sr-mp-moved" data-sr-mp-moved>${esc(tl('sr.mig.moved', { list: moved.slice(0, 4).map((m) => `${m.node} ${srMigSigned(m.diff)}`).join(' · ') }))}</small>`;
+    if (C.unpricedChanged && C.unpricedChanged.length) costHTML += ` <small class="sr-mp-unpriced" data-sr-mp-unpriced title="${esc(C.unpricedChanged.join(', '))}">${esc(tl('sr.mig.unpriced.bar', { n: C.unpricedChanged.length }))}</small>`;
+  } else if (C && !C.ok) costHTML = `<span class="sr-fp-state">${esc(tl('sr.mig.cost.none'))}</span>`;
+  setHTML(bar, `<b class="sr-fp-title">${esc(tl('sr.mig.title', { name: P.entry.name }))}</b>
+<button type="button" class="wb-btn" data-sr-mp="toggle" aria-label="${esc(playing ? tl('sr.flow.pause') : tl('sr.mig.go'))}">${playing ? '⏸' : '▶'}</button>
+<button type="button" class="wb-btn" data-sr-mp="step" aria-label="${esc(tl('sr.mig.step'))}"${P.k >= n ? ' disabled' : ''}>⏭</button>
+<button type="button" class="wb-btn" data-sr-mp="reset" aria-label="${esc(tl('sr.mig.reset'))}"${P.k || P.anim ? '' : ' disabled'}>⏮</button>
+<button type="button" class="wb-btn" data-sr-mp="stop" aria-label="${esc(tl('sr.mig.stop'))}">■</button>
+<label>${esc(tl('sr.flow.speed'))} <select data-sr-mp="speed">${SR_FLOW_SPEEDS.map((s) => `<option value="${esc(String(s))}"${s === SR_MIG.speed ? ' selected' : ''}>${esc(s.toFixed(1))}×</option>`).join('')}</select></label>
+<span class="sr-fp-state" data-sr-mp-step>${esc(tl('sr.mig.at', { k: P.anim ? P.anim.i : P.k, n }))} · ${esc(what)}</span>
+${costHTML}`);
+}
+/* Dollars and cents, under $1 too (the cost view's own srcUsd gives four places there, for a meter's rate). */
+/* The page's one rule for an amount (usdText, 20-core.js): to the cent; no price said in words. */
+function srMigUsd(v) { return v === null || v === undefined ? tl('cost.noprice') : usdText(v); }
+function srMigSigned(v) { return v === null || v === undefined ? tl('cost.noprice') : usdText(v, true); }
+$('sr-mplayer').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-sr-mp]'), P = SR_MIG.P;
+  if (!b || !P || b.tagName === 'SELECT') return;
+  const what = b.dataset.srMp;
+  if (what === 'toggle') {
+    if (P.state === 'play') P.state = 'pause';
+    else { if (P.k >= P.entry.steps.length && !P.anim) srMigReset(); SR_MIG.P.state = 'play'; if (!P.anim) srMigStepOn(); }   // at once
+  } else if (what === 'step') { if (P.anim || srMigStepOn()) P.state = 'step'; }   // paused mid-step: it goes on to its end
+  else if (what === 'reset') srMigReset();
+  else if (what === 'stop') { srMigStop(); return; }
+  srMigRenderBar();
+});
+$('sr-mplayer').addEventListener('change', (e) => { if (e.target.dataset.srMp === 'speed') SR_MIG.speed = Number(e.target.value); });
+
+/* ---- the cost view's columns: old, new and the difference, by node and by cloud (56-server-cost.js srcRender puts
+   them under the month) */
+function srMigCostHTML() {
+  const P = SR_MIG.P, C = P && P.cost;
+  if (!C || !C.ok) return '';
+  const rowsHTML = (list, key) => list.filter((r) => r.old || r.new || (r.change && r.change !== 'same')).slice(0, 15).map((r) => `<tr data-sr-mig-row="${esc(r[key])}"><th scope="row">${esc(r[key] || '—')}${SR_MIG_CHANGE[r.change] ? ` <small>${esc(SR_MIG_CHANGE[r.change])}</small>` : ''}${r.unpriced ? ` <small class="src-red" data-src-mig-unpriced>${esc(tl('sr.mig.unpriced.row'))}</small>` : ''}</th><td>${esc(srMigUsd(r.old))}</td><td>${esc(srMigUsd(r.new))}</td><td class="${r.diff > 0 ? 'src-up' : r.diff < 0 ? 'src-down' : ''}">${esc(srMigSigned(r.diff))}</td></tr>`).join('');
+  const headHTML = `<thead><tr><th></th><th scope="col">${esc(tl('sr.mig.col.old'))}</th><th scope="col">${esc(tl('sr.mig.col.new'))}</th><th scope="col">${esc(tl('sr.mig.col.diff'))}</th></tr></thead>`;
+  return `<section class="src-mig" data-src-mig><h3>${esc(tl('sr.mig.cost.title', { name: P.entry.name }))}</h3>
+<p>${esc(tl('sr.mig.cost', { old: srMigUsd(C.old.usd), now: srMigUsd(P.k ? C.steps[P.k - 1].usd : C.old.usd), new: srMigUsd(C.new.usd) }))} <b>${esc(srMigSigned(C.diff.usd))}</b></p>
+${C.unpricedChanged && C.unpricedChanged.length ? `<p class="src-red" data-src-mig-unpriced-note>${esc(tl('sr.mig.unpriced.bar', { n: C.unpricedChanged.length }))}: ${esc(C.unpricedChanged.join(', '))}</p>` : ''}
+<table class="src-mig-t" data-src-mig-nodes>${headHTML}<tbody>${rowsHTML(C.byNode, 'node')}</tbody></table>
+<table class="src-mig-t" data-src-mig-clouds>${headHTML}<tbody>${rowsHTML(C.byProvider, 'provider')}</tbody></table></section>`;
+}
+
+/* The cost view's big number is the room's own model (the old one while a plan is open): said so, with the month of
+   the step the player is at. */
+function srMigTotalHTML() {
+  const P = SR_MIG.P, C = P && P.cost;
+  if (!P) return '';
+  const now = C && C.ok ? (P.k ? C.steps[P.k - 1].usd : C.old.usd) : null;
+  return `<span class="src-mig-now" data-src-mig-now>${esc(tl('sr.mig.total.old'))}${now !== null ? ` · ${esc(tl('sr.mig.total.now', { k: P.k, n: P.entry.steps.length, usd: srMigUsd(now) }))}` : ''}</span>`;
+}
 // ---- web/js/60-log.js ----
 
 /* ---------- full-screen event log ---------- */

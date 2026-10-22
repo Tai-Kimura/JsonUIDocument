@@ -5417,10 +5417,10 @@
     {
       "binary": "jsonui-doc",
       "command": "validate infra",
-      "synopsis": "jsonui-doc validate infra [<root>] [--json]",
+      "synopsis": "jsonui-doc validate infra [<root>] [--json] [--migration <plan>]",
       "purpose": {
-        "en": "Validate a project's declared infrastructure — the model `jui viz` draws as the server room (since 2.3.9). It reads `docs/infra/*.json`, or the folder named by `infra.dir` in jui.config.json, the way jui viz reads it: each file is checked against the infra-model v0 schema and for the shapes of secrets (an access key, an IP address, an ARN, an account id, a connection string, a private key, a token, a password written with its value, a URL with credentials), then the files are merged. A file with an error is left out and the rest is still used. Subfolders such as `seed/`, `load/` and `prices/` are not read. Exit 0 when there is no error (warnings alone are 0), 1 when there are errors, 2 when nothing could be read (for example, no `*.json` in the folder).",
-        "ja": "プロジェクトが宣言したインフラ — `jui viz` がサーバールームとして描くモデル（2.3.9 から）— を検証する。`docs/infra/*.json`（jui.config.json の `infra.dir` があればそのフォルダ）を jui viz と同じように読み、ファイルごとに infra-model v0 のスキーマと秘密の形（アクセスキー、IP アドレス、ARN、アカウント ID、接続文字列、秘密鍵、トークン、値つきのパスワード、資格情報つきの URL）を検査してから、ファイルを合わせる。エラーのあるファイルは外し、残りは使う。`seed/`・`load/`・`prices/` などのサブフォルダは読まない。エラーが無ければ exit 0（警告だけなら 0）、エラーがあれば 1、何も読めなければ 2（フォルダに `*.json` が無い、など）。"
+        "en": "Validate a project's declared infrastructure — the model `jui viz` draws as the server room (since 2.3.9). It reads `docs/infra/*.json`, or the folder named by `infra.dir` in jui.config.json, the way jui viz reads it: each file is checked against the infra-model v0 schema and for the shapes of secrets (an access key, an IP address, an ARN, an account id, a connection string, a private key, a token, a password written with its value, a URL with credentials), then the files are merged. A file with an error is left out and the rest is still used. Subfolders such as `seed/`, `load/` and `prices/` are not read. Exit 0 when there is no error (warnings alone are 0), 1 when there are errors, 2 when nothing could be read (for example, no `*.json` in the folder). From 2.3.20 it also checks the migration plans under `docs/infra/migrations` (or `infra.migrations_dir`): each plan's removals.json against the infra-migration v0 schema, what it names against the model, and the new model it makes the way the model is checked; a plan with an error is not used and makes the exit 1. 2.3.19 does not read that folder.",
+        "ja": "プロジェクトが宣言したインフラ — `jui viz` がサーバールームとして描くモデル（2.3.9 から）— を検証する。`docs/infra/*.json`（jui.config.json の `infra.dir` があればそのフォルダ）を jui viz と同じように読み、ファイルごとに infra-model v0 のスキーマと秘密の形（アクセスキー、IP アドレス、ARN、アカウント ID、接続文字列、秘密鍵、トークン、値つきのパスワード、資格情報つきの URL）を検査してから、ファイルを合わせる。エラーのあるファイルは外し、残りは使う。`seed/`・`load/`・`prices/` などのサブフォルダは読まない。エラーが無ければ exit 0（警告だけなら 0）、エラーがあれば 1、何も読めなければ 2（フォルダに `*.json` が無い、など）。 2.3.20 からは、`docs/infra/migrations`（または `infra.migrations_dir`）の移管計画も確かめる。計画ごとに removals.json を infra-migration v0 のスキーマで、挙げたものをモデルに照らして、できる新の構成をモデルと同じように検査する。誤りのある計画は使わず、終了コードは 1。2.3.19 はそのフォルダを読まない。"
       },
       "options": [
         {
@@ -5439,6 +5439,15 @@
             "en": "Print the result as JSON: the files used, the environments, the problems, and the counts of groups, nodes and edges.",
             "ja": "結果を JSON で出す。使ったファイル、環境、問題、グループ・ノード・エッジの数。"
           }
+        },
+        {
+          "name": "--migration",
+          "type": "string",
+          "default": "every plan in the migrations folder",
+          "description": {
+            "en": "Check this migration plan only (its folder's name). A plan that is not there is an error (migration.no_plan).",
+            "ja": "この移管計画だけを確かめる（フォルダの名前）。無い計画はエラー（migration.no_plan）。"
+          }
         }
       ],
       "examples": [
@@ -5454,17 +5463,17 @@
         "jui viz start"
       ],
       "verifiedAgainst": {
-        "version": "2.3.10",
+        "version": "2.3.20",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "783d22555c69ad3150a8c972f4cc871272692a26ec85eb9652bda06af5001a97",
-        "cardHash": "71238d9bec9803afeb66aa93c5fb2277f392149288dcf3d8baba20130081d586",
+        "helpHash": "4ebe6b772875789974900cf3aa5ec67121fad12e5f4a693d94b20506b2fe3e37",
+        "cardHash": "bb381f1e4da6db7b0eede9114db0a25529d8f48f6629bfd283cbd4ea19465b55",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "91dab032cfaa",
-          "synopsis": "2bcb5d597744",
-          "purpose": "1713bf6f27cd",
-          "options": "55f2f7dc7a45",
+          "synopsis": "d588a6716587",
+          "purpose": "0254e52b9100",
+          "options": "608490d2b64e",
           "examples": "12eb3565310e",
           "seeAlso": "b2456210c122"
         }
@@ -5582,10 +5591,10 @@
     {
       "binary": "jsonui-doc",
       "command": "cost infra",
-      "synopsis": "jsonui-doc cost infra [<root>] [--scenario <id>] [--date YYYY-MM-DD] [--by provider|node] [--json]",
+      "synopsis": "jsonui-doc cost infra [<root>] [--scenario <id>] [--date YYYY-MM-DD] [--by provider|node] [--json] [--migration <plan>] [--account]",
       "purpose": {
-        "en": "Price a load scenario's month, or one day of it, from the command line (from 2.3.15): the same simulation and shapes as jui viz's server room コスト view, without jui viz. It reads the load definitions against the model, then prices them from the room's price files, the fetched cache and the bundled table, in that order. The terminal gets the total (USD, on demand; reservations, discounts and tax not included), the total by provider or by node, the top nodes, what has no price or no rule, the hours over capacity, the notes and the load problems; --json prints the whole reply. Exit 0 when it simulated; 1 when it simulated but a load definition has an error (that file is left out); 2 when nothing could be simulated (no model, no load definition, no such scenario, a date outside the month), with the reason.",
-        "ja": "負荷のシナリオの 1 か月、またはその 1 日の値段を、コマンドで出す（2.3.15 から）。jui viz のサーバールームの「コスト」と同じ計算と形を、jui viz なしで出す。モデルに照らして負荷定義を読み、部屋の単価のファイル、取得したキャッシュ、同梱の表の順で値段を付ける。端末には合計（USD、オンデマンド。予約、割引、税は含まない）、クラウドごとかノードごとの合計、上位のノード、単価や規則の無いもの、容量を超えた時間、注記、負荷定義の問題を出し、--json は返事を全部出す。計算できれば終了コード 0、計算したが負荷定義にエラーがあれば 1（そのファイルは外す）、何も計算できなければ理由つきで 2（モデルが無い、負荷定義が無い、そのシナリオが無い、日付が月の外）。"
+        "en": "Price a load scenario's month, or one day of it, from the command line (from 2.3.15): the same simulation and shapes as jui viz's server room コスト view, without jui viz. It reads the load definitions against the model, then prices them from the room's price files, the fetched cache and the bundled table, in that order. The terminal gets the total (USD, on demand; reservations, discounts and tax not included), the total by provider or by node, the top nodes, what has no price or no rule, the hours over capacity, the notes and the load problems; --json prints the whole reply. Exit 0 when it simulated; 1 when it simulated but a load definition has an error (that file is left out); 2 when nothing could be simulated (no model, no load definition, no such scenario, a date outside the month), with the reason. From 2.3.20, with --migration, it prices a migration plan instead: the old model, the model after each step and the new one, on the same scenario and prices, giving old, new and the difference, each step's total with its own difference, and the difference by node and by provider (a node the plan changes that is not fully priced is named, and its part is left out of the difference).",
+        "ja": "負荷のシナリオの 1 か月、またはその 1 日の値段を、コマンドで出す（2.3.15 から）。jui viz のサーバールームの「コスト」と同じ計算と形を、jui viz なしで出す。モデルに照らして負荷定義を読み、部屋の単価のファイル、取得したキャッシュ、同梱の表の順で値段を付ける。端末には合計（USD、オンデマンド。予約、割引、税は含まない）、クラウドごとかノードごとの合計、上位のノード、単価や規則の無いもの、容量を超えた時間、注記、負荷定義の問題を出し、--json は返事を全部出す。計算できれば終了コード 0、計算したが負荷定義にエラーがあれば 1（そのファイルは外す）、何も計算できなければ理由つきで 2（モデルが無い、負荷定義が無い、そのシナリオが無い、日付が月の外）。 2.3.20 からは、--migration で移管計画の値段を出す。旧の構成、各ステップの後の構成、新の構成を、同じシナリオと単価で計算し、旧、新、その差、ステップごとの合計とその差、ノードごと・クラウドごとの差を出す（計画が変えるノードで値段の付かない部分があれば名前を挙げ、その分は差に入れない）。"
       },
       "options": [
         {
@@ -5632,6 +5641,24 @@
             "en": "Print the whole reply as JSON (the month or the day, the scenarios, the problems, the price warnings, the top nodes).",
             "ja": "返事を全部 JSON で出す（月か日、シナリオ、問題、単価の警告、上位のノード）。"
           }
+        },
+        {
+          "name": "--migration",
+          "type": "string",
+          "default": "none (the model as it is)",
+          "description": {
+            "en": "A migration plan's name (its folder under docs/infra/migrations): the old month, the new and the difference. No such plan, or a plan with an error, exits 2.",
+            "ja": "移管計画の名前（docs/infra/migrations の下のフォルダ）。旧の月額、新の月額、その差を出す。計画が無い、または誤りがあれば終了コード 2。"
+          }
+        },
+        {
+          "name": "--account",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "With --migration: the account's month too, its environments priced together, old and new. It needs two environments or more, each with a load definition, in the old model and in the new; otherwise it exits 2.",
+            "ja": "--migration と一緒に、アカウントの月額も出す（環境をまとめて計算した旧と新）。旧と新のどちらでも、負荷定義のある環境が 2 つ以上要り、無ければ終了コード 2。"
+          }
         }
       ],
       "examples": [
@@ -5646,17 +5673,17 @@
         "jsonui-doc validate infra"
       ],
       "verifiedAgainst": {
-        "version": "2.3.15",
+        "version": "2.3.20",
         "columns": 80,
         "python": "3.12",
-        "helpHash": "831952082fe76a8a38b662201bcf389cc1d46624018ae8ccb97d10ce4afa9a87",
-        "cardHash": "3e7878b35536088e2994c19d07ac5fae273c44c195be31af5648ca675575fee0",
+        "helpHash": "006ab62c392e0f4687c272443a90eedacf8274d3a3c43e94c43b1a1a94ec171f",
+        "cardHash": "253380f1bae53739e692d21c73ebaaa7838107d3cc5545a9534f97be77a2be95",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "6849349274ec",
-          "synopsis": "f35351bcb5c4",
-          "purpose": "25a1baeda99d",
-          "options": "ccd7d1ce161a",
+          "synopsis": "79468131b26a",
+          "purpose": "64272b9b7954",
+          "options": "389933ca3b45",
           "examples": "69578871a661",
           "seeAlso": "fb441974b08e"
         }
