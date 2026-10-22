@@ -83,7 +83,7 @@
                     { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_add_schema_body" },
                     {
                       "type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 16,
-                      "code": "# 1. Drop docs/api/example.json with a User schema in components.schemas.\n# 2. Regenerate DTO + Domain scaffold.\njui g api\n\n# 3. Open Domain/User.swift (or domain/User.kt / src/domain/User.ts)\n#    and add a proxy:\n#       var displayName: String { dto.displayName.uppercased() }",
+                      "code": "# 1. Drop docs/api/example.json with a User schema in components.schemas.\n# 2. Regenerate DTO + Domain scaffold (jui g api only previews, with --dry-run).\njui build\n\n# 3. Open Domain/User.swift (or domain/User.kt / src/domain/User.ts)\n#    and add a proxy:\n#       var displayName: String { dto.displayName.uppercased() }",
                       "language": "bash", "filename": "shell", "showLineNumbers": false, "copyable": true
                     }
                   ]

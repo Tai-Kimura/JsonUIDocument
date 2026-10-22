@@ -467,8 +467,8 @@
       "command": "g api",
       "synopsis": "jui g api [--dry-run] [--platform ios|android|web]",
       "purpose": {
-        "en": "Generate DTO + Domain models from the swagger files (api.schemas filter applies). --dry-run previews without writing.",
-        "ja": "swagger から DTO + Domain モデルを生成（api.schemas フィルタ適用）。--dry-run で書き込まずにプレビュー。"
+        "en": "Preview the DTO + Domain models the swagger files would produce (the api.schemas filter applies); `jui build` writes them. Only --dry-run works: without it the command writes nothing, prints `jui g api` currently supports --dry-run only. Use `jui build` to actually write DTO + Domain files. and exits 1 (measured on 2.3.19 and 2.3.20).",
+        "ja": "swagger から作られる DTO + Domain モデルをプレビューする（api.schemas フィルタ適用）。書くのは `jui build`。動くのは --dry-run だけで、無しでは何も書かず、`jui g api` currently supports --dry-run only. Use `jui build` to actually write DTO + Domain files. と出して exit 1（2.3.19 と 2.3.20 で測定）。"
       },
       "options": [
         {
@@ -476,8 +476,8 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Show what would be generated without writing files.",
-            "ja": "書き込まずに生成内容を表示。"
+            "en": "Show what would be generated without writing files. Required: the command does nothing else.",
+            "ja": "書き込まずに生成内容を表示。必須で、コマンドはこれ以外のことをしない。"
           }
         },
         {
@@ -511,17 +511,17 @@
         "jui ls api-models"
       ],
       "verifiedAgainst": {
-        "version": "1.9.10",
+        "version": "2.3.20",
         "columns": 80,
         "python": "3.12",
         "helpHash": "dc12248a2151c3c827face19421bb9607dd31d4ac11a8359c0acc3d591e9a75c",
-        "cardHash": "12802fdca7e0acbabc81906c7916c94a3ea7c8013698c42cf0c9d873eef91fe2",
+        "cardHash": "a2581ee7ee2ec8694a21ea6b98c1e297517891f31c431ebe03999fa5c0d32294",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "36f434751de9",
           "synopsis": "6ca704b632b4",
-          "purpose": "37de1f434140",
-          "options": "140f13e27781",
+          "purpose": "e64f1d5b4c75",
+          "options": "80877add1a24",
           "examples": "ef53d237716d",
           "aliases": "98edafdd23a8",
           "seeAlso": "449ca44b3bbc"
