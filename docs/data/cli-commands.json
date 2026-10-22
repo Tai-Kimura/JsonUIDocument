@@ -3159,8 +3159,8 @@
       "command": "viz cloud-prices fetch",
       "synopsis": "jui viz cloud-prices fetch [--provider {aws,azure}] [--region REGION] [--large LARGE] [--json]",
       "purpose": {
-        "en": "Fetch the cloud prices for the infra cost simulator now (from 2.3.12), even while the daily fetch is off: AWS's public offer files (Lambda, ECS / Fargate, S3, DynamoDB, API Gateway, SQS, SNS, ELB, EKS, Secrets Manager, CloudWatch Logs, Kinesis, data transfer, ElastiCache, and CloudFront as global; from 2.3.13 also EFS, Route 53, SES, VPC, EventBridge and WAF; from 2.3.14 also Cognito, DocumentDB, ECR, OpenSearch, Lightsail, MSK, Step Functions, App Runner, KMS and Systems Manager) and the Azure Retail Prices API, by default for ap-northeast-1 and us-east-1, japaneast and eastus. Only https to pricing.us-east-1.amazonaws.com and prices.azure.com; nothing about your project is sent. Each file goes to the cache, cloud-prices in jui viz's state folder (~/.local/state/jui-viz); a file that fails keeps its last copy. Then the index is printed. Exits 1 only when every file failed. From 2.3.14 the server room's コスト view in jui viz prices with the cache.",
-        "ja": "インフラのコストのシミュレーターに使うクラウドの単価を、今取る（2.3.12 から）。日に 1 回の取得をオフにしていても取る。AWS の公開のオファーのファイル（Lambda、ECS / Fargate、S3、DynamoDB、API Gateway、SQS、SNS、ELB、EKS、Secrets Manager、CloudWatch Logs、Kinesis、データ転送、ElastiCache と、global の CloudFront。2.3.13 からは EFS、Route 53、SES、VPC、EventBridge、WAF も。2.3.14 からは Cognito、DocumentDB、ECR、OpenSearch、Lightsail、MSK、Step Functions、App Runner、KMS、Systems Manager も）と、Azure Retail Prices の API から、既定では ap-northeast-1・us-east-1 と japaneast・eastus の分を取る。通信は pricing.us-east-1.amazonaws.com と prices.azure.com への https だけで、プロジェクトのことは何も送らない。ファイルは jui viz の状態フォルダ（~/.local/state/jui-viz）の cloud-prices に置き、取れなかったファイルは前の物を残す。最後に索引を出す。全部のファイルが失敗したときだけ 1 で終わる。2.3.14 からは、jui viz のサーバールームの「コスト」がこのキャッシュで値段を出す。"
+        "en": "Fetch the cloud prices for the infra cost simulator now (from 2.3.12), even while the daily fetch is off: AWS's public offer files (Lambda, ECS / Fargate, S3, DynamoDB, API Gateway, SQS, SNS, ELB, EKS, Secrets Manager, CloudWatch Logs, Kinesis, data transfer, ElastiCache, and CloudFront as global; from 2.3.13 also EFS, Route 53, SES, VPC, EventBridge and WAF; from 2.3.14 also Cognito, DocumentDB, ECR, OpenSearch, Lightsail, MSK, Step Functions, App Runner, KMS and Systems Manager) and the Azure Retail Prices API, by default for ap-northeast-1 and us-east-1, japaneast and eastus. Only https to pricing.us-east-1.amazonaws.com and prices.azure.com; nothing about your project is sent. Each file goes to the cache, cloud-prices in jui viz's state folder (~/.local/state/jui-viz); a file that fails keeps its last copy. Then the index is printed. Exits 1 only when every file failed. From 2.3.14 the server room's コスト view in jui viz prices with the cache. From 2.3.17 each file's index entry names the jsonui-cli version that wrote it, and only that version reads it: after an upgrade the bundled prices stand in until this command (or the server's next run) fetches again.",
+        "ja": "インフラのコストのシミュレーターに使うクラウドの単価を、今取る（2.3.12 から）。日に 1 回の取得をオフにしていても取る。AWS の公開のオファーのファイル（Lambda、ECS / Fargate、S3、DynamoDB、API Gateway、SQS、SNS、ELB、EKS、Secrets Manager、CloudWatch Logs、Kinesis、データ転送、ElastiCache と、global の CloudFront。2.3.13 からは EFS、Route 53、SES、VPC、EventBridge、WAF も。2.3.14 からは Cognito、DocumentDB、ECR、OpenSearch、Lightsail、MSK、Step Functions、App Runner、KMS、Systems Manager も）と、Azure Retail Prices の API から、既定では ap-northeast-1・us-east-1 と japaneast・eastus の分を取る。通信は pricing.us-east-1.amazonaws.com と prices.azure.com への https だけで、プロジェクトのことは何も送らない。ファイルは jui viz の状態フォルダ（~/.local/state/jui-viz）の cloud-prices に置き、取れなかったファイルは前の物を残す。最後に索引を出す。全部のファイルが失敗したときだけ 1 で終わる。2.3.14 からは、jui viz のサーバールームの「コスト」がこのキャッシュで値段を出す。2.3.17 からは、索引の各ファイルにそれを書いた jsonui-cli の版が入り、読むのはその版だけ。上げた後は、このコマンド（かサーバーの次の取得）で取り直すまで、同梱の単価が代わりに使われる。"
       },
       "options": [
         {
@@ -3213,16 +3213,16 @@
         "jui viz cloud-prices off"
       ],
       "verifiedAgainst": {
-        "version": "2.3.14",
+        "version": "2.3.17",
         "columns": 80,
         "python": "3.12",
         "helpHash": "2566379db73946ade4659f6f37e4e3255828166b14bc21f941a323bf848f08ad",
-        "cardHash": "07094e6f657b6c241ff8b331048c75b1c7ef82dc2fdca839edbafbeef86565aa",
+        "cardHash": "5707184dc2496ef2fd462665f087e8b3343651c3659e79451011b91145504387",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "9fc93c3ed264",
           "synopsis": "6295a6475046",
-          "purpose": "2d3ff3711a85",
+          "purpose": "dcff0a2f986c",
           "options": "e49bbff6dc59",
           "examples": "dfb011f8afca",
           "aliases": "98edafdd23a8",
@@ -5667,8 +5667,8 @@
       "command": "seed infra",
       "synopsis": "jsonui-doc seed infra [<root>] [-o <out>] [--stdout] [--force]",
       "purpose": {
-        "en": "Draft the infrastructure model from what the project already says (since 2.3.9): Docker Compose, Terraform / OpenTofu, Kubernetes manifests, CloudFormation / SAM and a synthesized CDK app, Cloudflare wrangler, PaaS files (firebase.json, vercel.json, netlify.toml, serverless.yml, fly.toml, render.yaml, app.yaml), Bicep, and the code's SDK imports and environment variable names. It never reads Terraform state, `*.tfvars`, `.env` files or other files that hold values, and it never writes a value: a string shaped like a secret is withheld. The draft is a starting point, not the display source — it goes to `<infra.dir>/seed/draft.json` with `seed-report.json` (what was unmatched, not drawn, skipped or withheld), a folder that neither jui viz nor `validate infra` reads; you move what you keep into the model's folder. Since 2.3.10, when the folder already holds a model that can be read, a drafted node at an IaC address a declared node lists takes that node's id, and no other drafted node takes the id of a declared node that lists IaC addresses (a load definition names nodes by id). Exit 0 when written or printed, 2 when not (an existing draft without `--force`, a bad config, or a draft that fails its own check).",
-        "ja": "プロジェクトにすでに書かれていることから、インフラのモデルの下書きを作る（2.3.9 から）。読むのは Docker Compose、Terraform / OpenTofu、Kubernetes のマニフェスト、CloudFormation / SAM と合成済みの CDK、Cloudflare wrangler、PaaS のファイル（firebase.json、vercel.json、netlify.toml、serverless.yml、fly.toml、render.yaml、app.yaml）、Bicep、それにコードの SDK の import と環境変数の名前。Terraform の state、`*.tfvars`、`.env` など値を持つファイルは読まず、値も書かない（秘密の形の文字列は伏せる）。下書きは出発点で、表示の元ではない。`<infra.dir>/seed/draft.json` と `seed-report.json`（合わなかった物・描かない物・読まなかった物・伏せた物）に書き、このフォルダは jui viz も `validate infra` も読まない。残したい分を自分でモデルのフォルダへ移す。2.3.10 からは、フォルダに読めるモデルがあると、宣言済みのノードが iac に書いたアドレスの下書きのノードはそのノードの id になり、ほかの下書きのノードは、iac を書いた宣言済みのノードの id を使わない（負荷定義はノードを id で名指しするため）。書けた（出せた）ら exit 0、書かなかったら 2（下書きがすでにあって `--force` が無い、設定が悪い、下書きが自分の検査を通らない）。"
+        "en": "Draft the infrastructure model from what the project already says (since 2.3.9): Docker Compose, Terraform / OpenTofu, Kubernetes manifests, CloudFormation / SAM and a synthesized CDK app, Cloudflare wrangler, PaaS files (firebase.json, vercel.json, netlify.toml, serverless.yml, fly.toml, render.yaml, app.yaml), Bicep, and the code's SDK imports and environment variable names. It never reads Terraform state, `*.tfvars`, `.env` files or other files that hold values, and it never writes a value: a string shaped like a secret is withheld. The draft is a starting point, not the display source — it goes to `<infra.dir>/seed/draft.json` with `seed-report.json` (what was unmatched, not drawn, skipped or withheld), a folder that neither jui viz nor `validate infra` reads; you move what you keep into the model's folder. Since 2.3.10, when the folder already holds a model that can be read, a drafted node at an IaC address a declared node lists takes that node's id, and no other drafted node takes the id of a declared node that lists IaC addresses (a load definition names nodes by id). Exit 0 when written or printed, 2 when not (an existing draft without `--force`, a bad config, or a draft that fails its own check). From 2.3.17 the folders jui.config.json's infra.exclude lists are not walked, and an ECS task definition no service names is drafted as a compute.container node.",
+        "ja": "プロジェクトにすでに書かれていることから、インフラのモデルの下書きを作る（2.3.9 から）。読むのは Docker Compose、Terraform / OpenTofu、Kubernetes のマニフェスト、CloudFormation / SAM と合成済みの CDK、Cloudflare wrangler、PaaS のファイル（firebase.json、vercel.json、netlify.toml、serverless.yml、fly.toml、render.yaml、app.yaml）、Bicep、それにコードの SDK の import と環境変数の名前。Terraform の state、`*.tfvars`、`.env` など値を持つファイルは読まず、値も書かない（秘密の形の文字列は伏せる）。下書きは出発点で、表示の元ではない。`<infra.dir>/seed/draft.json` と `seed-report.json`（合わなかった物・描かない物・読まなかった物・伏せた物）に書き、このフォルダは jui viz も `validate infra` も読まない。残したい分を自分でモデルのフォルダへ移す。2.3.10 からは、フォルダに読めるモデルがあると、宣言済みのノードが iac に書いたアドレスの下書きのノードはそのノードの id になり、ほかの下書きのノードは、iac を書いた宣言済みのノードの id を使わない（負荷定義はノードを id で名指しするため）。書けた（出せた）ら exit 0、書かなかったら 2（下書きがすでにあって `--force` が無い、設定が悪い、下書きが自分の検査を通らない）。2.3.17 からは、jui.config.json の infra.exclude に書いたフォルダを歩かず、どのサービスも名指さない ECS のタスク定義を compute.container のノードとして下書きする。"
       },
       "options": [
         {
@@ -5712,16 +5712,16 @@
         "jsonui-doc check"
       ],
       "verifiedAgainst": {
-        "version": "2.3.10",
+        "version": "2.3.17",
         "columns": 80,
         "python": "3.12",
         "helpHash": "2b91d26e31e0840494eb3fb6dc1825f1741391c80272f9354ecc52776cd7c015",
-        "cardHash": "14ea05e78e881116e3625063fe6d82bc2ce09b294e59f40597be76793cb9dc13",
+        "cardHash": "f536742b071cac37d12dc51b75163103e7d23928ee7bed483b961a82be42cf9f",
         "fieldHashes": {
           "binary": "f9476e5a629c",
           "command": "44406da7d954",
           "synopsis": "7b8fc7684284",
-          "purpose": "d474a2a19a1e",
+          "purpose": "7c0bf8ffe97f",
           "options": "f6c0917fe69a",
           "examples": "2b8fdc789d3b",
           "seeAlso": "222d1a090af5"
