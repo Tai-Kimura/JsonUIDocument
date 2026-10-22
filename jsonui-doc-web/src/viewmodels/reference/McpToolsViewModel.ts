@@ -24,9 +24,11 @@ interface McpToolDetailCell {
 
 // Catalog order matches /tools/mcp McpViewModel.TOOL_IDS — A (Lookup) →
 // B (Validation) → C (Generation) → D (Build + Runtime) → E (API Model
-// Discovery) → F (Test Tooling, added 2026-07). 46 tools total (search_specs +
-// get_platform_rules added in MCP 2.8.0; test_generate_branch_tests in 2.9.0,
-// 2026-08; test_contracts_coverage in 2.13.0, 2026-09). Keep them in sync.
+// Discovery) → F (Test Tooling, added 2026-07) → G (jui viz) → H (Server
+// room / infra). 57 tools total (search_specs + get_platform_rules added in MCP
+// 2.8.0; test_generate_branch_tests in 2.9.0, 2026-08; test_contracts_coverage
+// in 2.13.0, 2026-09; G and H listed here 2026-10-23, registered since before
+// 2.17.0). Keep them in sync.
 const TOOL_IDS = [
   "get_project_config", "list_screen_specs", "search_specs", "list_layouts",
   "list_component_specs", "lookup_component", "lookup_attribute",
@@ -47,6 +49,11 @@ const TOOL_IDS = [
   "test_generate_description", "test_report", "test_mock_generate",
   "test_generate_branch_tests", "test_contracts_coverage", "test_artifacts_pull",
   "test_artifacts_status",
+
+  "viz_status", "viz_doctor", "viz_start", "viz_stop", "viz_open",
+
+  "infra_validate", "infra_load_validate", "infra_prices_validate", "infra_seed",
+  "infra_check", "infra_cost",
 ] as const;
 
 export class McpToolsViewModel {
