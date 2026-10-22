@@ -11899,7 +11899,8 @@ document.addEventListener('click', (e) => {
      ノードが少なくなった時はどれが何のインスタンスかわかる程度に違いが欲しい」): near, with SR.detail.enter nodes or fewer
      in view, a second set of shapes by service (a function a slim pillar, a container a crate, a key-value store a
      tapered drum, a notification a pyramid...: srDetailShape) and tags of name · service · its main spec; back to
-     the simple ones past SR.detail.leave (between the two it stays as it was).
+     the simple ones past SR.detail.leave (between the two it stays as it was). There, each node in view stands as a model of what
+     it does (56-sr-models.js); the shapes by service under it still take the press.
    - a node's spec (§4): the board's 選んだもの lists it, the keys the IaC tables know with a name in words.
    Measured for the ticket: the first draw, the frame time far and near, the memory (SR.stats). */
 const SR = {
@@ -12074,18 +12075,50 @@ function srDetailText(n) {
   const shown = !main ? '' : SR_SPEC_KIND.includes(main.key) ? main.value : `${main.key} ${main.value}`;
   return [n.label || n.id, `${name}${eng}`.trim(), shown].filter(Boolean).join(' · ') + (n.count > 1 ? ` ×${n.count}` : '');
 }
-const SR_PALETTE = ['#f29a38', '#4f8ef7', '#3fb26b', '#e2574c', '#a26bd6', '#26a5b8', '#d4a72c', '#7d8a99', '#e06fa8', '#5c6bc0'];
-/* The 3D's colours (2.3.9, item 2, requester 10-20: 「ダークでも背景が白なの嫌だね 背景は暗めにして欲しい」): in dark the
-   background is near-black and every floor at least 3:1 against it; the light set is as before. */
-const SR_PAL = {
-  light: { bg: '#eef2f7', logical: '#c9b8e8', public: '#dfe7f2', private: '#9fb0c4', neutral: '#cfd6df', strip: 0xe9e2f5, plain: 0x5c6b7f, focus: 0x1d4ed8 },
-  dark: { bg: '#10161f', logical: '#6b5b99', public: '#5d7088', private: '#566a83', neutral: '#5f6b7a', strip: 0x66588a, plain: 0x8193a8, focus: 0x7cb4ff },
+/* The 3D's colours (requester 10-22: 「サーバーのノードたち色合いがセンスないからもっとオシャレに」; ticket
+   2026-10-22-viz-server-room-palette-and-light-flow). One designed set: a cloud is a hue, and the role sets how much of it
+   shows — a floor holds a whisper of its cloud's hue, a node the hue itself, the focus and the flow's light the strongest.
+   The hues sit at one lightness and chroma (OKLCH), so they read as a family; the ground and the frames are a cool slate,
+   and the warm gold is kept for light (the flow, its glow) — the accent. Dark (2.3.9, item 2: 「ダークでも背景が白なの嫌だね」):
+   the ground near-black, every floor at least 3:1 against it.
+   SR_HUES: the clouds most rooms name, each its own hue; any other takes one of SR_HUE_RING by its name. */
+const SR_HUES = { aws: 68, gcp: 255, azure: 222, cloudflare: 30, vercel: [270, 0.25], auth0: 300, supabase: 155, firebase: 48, fastly: 350,
+  netlify: 190, heroku: 290, digitalocean: 235, oracle: 25, alibaba: 40, render: 165, fly: 300, github: [265, 0.3] };
+const SR_HUE_RING = [255, 190, 300, 155, 32, 340, 222, 120];
+const SR_ROLE = {   // [lightness, chroma] of a cloud's hue by role, light and dark
+  light: { floor: [0.925, 0.06], floorStep: -0.02, node: [0.74, 0.175], box: [0.82, 0.12] },
+  dark: { floor: [0.55, 0.095], floorStep: 0.018, node: [0.8, 0.165], box: [0.66, 0.125] },
 };
-function srProviderColor(p) {
-  if (!p) return '#9aa4b2';
+const srOk = (L, C, h) => srOklch(L, C, h);
+const SR_PAL = {
+  light: { bg: srOk(0.972, 0.006, 250), logical: srOk(0.935, 0.03, 285), public: srOk(0.955, 0.02, 245), private: srOk(0.885, 0.035, 245),
+    neutral: srOk(0.92, 0.01, 250), logicalBox: srOk(0.8, 0.045, 280), strip: srOk(0.93, 0.02, 280), plain: srOk(0.56, 0.035, 255),
+    focus: srOk(0.52, 0.2, 262), cross: srOk(0.6, 0.19, 350), light: srOk(0.66, 0.2, 48), lightCore: srOk(0.86, 0.12, 80), nodeless: srOk(0.72, 0.02, 250) },
+  dark: { bg: srOk(0.17, 0.016, 258), logical: srOk(0.53, 0.045, 285), public: srOk(0.55, 0.025, 245), private: srOk(0.52, 0.035, 245),
+    neutral: srOk(0.53, 0.015, 250), logicalBox: srOk(0.6, 0.05, 280), strip: srOk(0.36, 0.03, 280), plain: srOk(0.66, 0.035, 255),
+    focus: srOk(0.8, 0.13, 255), cross: srOk(0.7, 0.17, 350), light: srOk(0.83, 0.15, 78), lightCore: srOk(0.97, 0.05, 90), nodeless: srOk(0.72, 0.02, 250) },
+};
+/* OKLCH (L 0..1, C, h in degrees) to '#rrggbb' (out of gamut: clipped). */
+function srOklch(L, C, h) {
+  const a = C * Math.cos(h * Math.PI / 180), b = C * Math.sin(h * Math.PI / 180);
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3, m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3, s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  const lin = [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s];
+  return '#' + lin.map((v) => { v = Math.min(1, Math.max(0, v)); const g = v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055; return Math.round(g * 255).toString(16).padStart(2, '0'); }).join('');
+}
+function srHue(p) {
+  const k = String(p).toLowerCase(), known = SR_HUES[k];
+  if (known !== undefined) return Array.isArray(known) ? known : [known, 1];
   let h = 0;
-  for (const ch of String(p)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  return SR_PALETTE[h % SR_PALETTE.length];
+  for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return [SR_HUE_RING[h % SR_HUE_RING.length], 1];
+}
+/* A cloud's colour for a role (node: the shapes, the legend's chip and the cost's bars; box: a closed group and the far
+   view; floor: its floor, `level` deep) in the theme shown. */
+function srProviderColor(p, role = 'node', level = 0, dark = isDark()) {
+  const R = SR_ROLE[dark ? 'dark' : 'light'];
+  if (!p) return dark ? SR_PAL.dark.nodeless : SR_PAL.light.nodeless;
+  const [h, k] = srHue(p), [L, C] = R[role];
+  return srOklch(L + (role === 'floor' ? R.floorStep * Math.min(level, 4) : 0), C * k, h);
 }
 const srVisible = (x, env) => !env || !Array.isArray(x.environments) || !x.environments.length || x.environments.includes(env);
 function srEnvs(model) { return (model.environments || []).map((e) => (typeof e === 'string' ? { id: e, label: e } : { id: e.id, label: e.label || e.id })); }
@@ -12232,10 +12265,9 @@ function srBuild() {
     const h = 0.05, y = 0.06 * G.level + h / 2;
     m4.compose(at.set(G.x + G.w / 2, y, G.z + G.d / 2), q, sc.set(G.w, h, G.d));
     floorMesh.setMatrixAt(i, m4);
-    const g = G.g, base = g.kind === 'logical' ? PAL.logical : g.visibility === 'public' ? PAL.public : g.visibility === 'private' ? PAL.private : g.provider ? srProviderColor(g.provider) : PAL.neutral;
+    const g = G.g, base = g.kind === 'logical' ? PAL.logical : g.visibility === 'public' ? PAL.public : g.visibility === 'private' ? PAL.private
+      : g.provider ? srProviderColor(g.provider, 'floor', G.level, dark) : PAL.neutral;
     col.set(base);
-    if (!dark && g.provider && g.kind !== 'logical') col.lerp(new THREE.Color('#ffffff'), 0.55 - Math.min(G.level, 4) * 0.08);
-    else if (dark && g.provider && g.kind !== 'logical' && !g.visibility) col.lerp(new THREE.Color(PAL.bg), 0.25);   // a provider's own floor, a little toward the ground
     floorMesh.setColorAt(i, col);
     V.floorColors.push(`#${col.getHexString()}`);
   });
@@ -12248,7 +12280,7 @@ function srBuild() {
       const h = 0.6 + Math.log2(1 + srCountNodes(G)) * 0.35;
       m4.compose(at.set(G.x + G.w / 2, 0.06 * G.level + h / 2, G.z + SR_HEAD + (G.d - SR_HEAD) / 2), q, sc.set(G.w - SR_PAD, h, G.d - SR_HEAD - SR_PAD * 0.5));
       cm.setMatrixAt(i, m4);
-      cm.setColorAt(i, col.set(G.g.kind === 'logical' ? '#b49be0' : srProviderColor(G.g.providerResolved || G.g.provider)));
+      cm.setColorAt(i, col.set(G.g.kind === 'logical' ? PAL.logicalBox : srProviderColor(G.g.providerResolved || G.g.provider, 'box', 0, dark)));
     });
     cm.userData.groups = L.closed.map((G) => G.g.id);
     V.near.add(cm); V.pick.push(cm);
@@ -12268,7 +12300,7 @@ function srBuild() {
         const s = p.n.count > 1 ? 1 + Math.min(Math.log2(p.n.count), 4) * 0.12 : 1;
         m4.compose(at.set(p.x, p.y + 0.75, p.z), q, sc.set(s, s, s));
         mesh.setMatrixAt(i, m4);
-        mesh.setColorAt(i, col.set(srProviderColor(p.n.providerResolved || p.n.provider)));
+        mesh.setColorAt(i, col.set(srProviderColor(p.n.providerResolved || p.n.provider, 'node', 0, dark)));
       });
       mesh.userData.nodes = list.map((p) => p.n.id);
       mesh.userData.shape = shape;
@@ -12285,10 +12317,10 @@ function srBuild() {
   }
   const lines = (arr, mat) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3)); const l = new THREE.LineSegments(g, mat); if (mat.isLineDashedMaterial) l.computeLineDistances(); return l; };
   V.plainLines = lines(plain, new THREE.LineBasicMaterial({ color: PAL.plain, transparent: true, opacity: SR.plainOpacity }));
-  V.crossLines = lines(cross, new THREE.LineDashedMaterial({ color: 0xd63fb0, dashSize: 0.5, gapSize: 0.3, transparent: true, opacity: SR.crossOpacity }));
+  V.crossLines = lines(cross, new THREE.LineDashedMaterial({ color: PAL.cross, dashSize: 0.5, gapSize: 0.3, transparent: true, opacity: SR.crossOpacity }));
   // the strong layer: the pressed and the pointed node's cables (srFocusLines fills it)
   V.focusLines = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: PAL.focus }));
-  V.focusCross = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xd63fb0 }));
+  V.focusCross = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: PAL.cross }));
   V.focusLines.renderOrder = V.focusCross.renderOrder = 2;
   V.near.add(V.plainLines, V.crossLines, V.focusLines, V.focusCross);
   // far: the top groups as boxes, the cables bundled between them
@@ -12299,7 +12331,7 @@ function srBuild() {
     G.boxH = h; G.nodeCount = n;
     m4.compose(at.set(G.x + G.w / 2, h / 2, G.z + G.d / 2), q, sc.set(G.w * 0.92, h, G.d * 0.92));
     boxMesh.setMatrixAt(i, m4);
-    boxMesh.setColorAt(i, col.set(G.g.kind === 'logical' ? '#b49be0' : srProviderColor(G.g.provider)));
+    boxMesh.setColorAt(i, col.set(G.g.kind === 'logical' ? PAL.logicalBox : srProviderColor(G.g.provider, 'box', 0, dark)));
   });
   boxMesh.count = tops.length;
   V.far.add(boxMesh);
@@ -12320,7 +12352,7 @@ function srBuild() {
   V.bundles = [...bundles.values()];
   // the far view's bundles: as faint as the near cables, and the lines switch holds there too (the independent verification of item 1)
   V.farPlain = lines(bp, new THREE.LineBasicMaterial({ color: PAL.plain, transparent: true, opacity: SR.plainOpacity }));
-  V.farCross = lines(bc, new THREE.LineDashedMaterial({ color: 0xd63fb0, dashSize: 1.2, gapSize: 0.7, transparent: true, opacity: SR.crossOpacity }));
+  V.farCross = lines(bc, new THREE.LineDashedMaterial({ color: PAL.cross, dashSize: 1.2, gapSize: 0.7, transparent: true, opacity: SR.crossOpacity }));
   V.far.add(V.farPlain, V.farCross);
   // the external strip's sign
   if (L.ext.length) {
@@ -12415,6 +12447,8 @@ function srPlaceLabels(V) {
   V.inView = inView;
   const detail = V.lod === 'near' && inView > 0 && (V.detail ? inView <= SR.detail.leave : inView <= SR.detail.enter);
   if (detail !== V.detail) srSetDetail(V, detail);
+  V.inViewIds = out.filter((o) => o.n).map((o) => o.n.id);
+  srModelsSync(V, V.inViewIds);   // up close, the models of the nodes in view (56-sr-models.js)
   if (V.detail) for (const o of out) if (o.n) o.text = srDetailText(o.n);
   out.sort((a, b) => a.d - b.d);
   const groups = out.filter((o) => o.kind === 'group').slice(0, SR.labels.max - SR.labels.nodes);
@@ -12733,6 +12767,160 @@ document.addEventListener('keydown', (e) => {
   if (SR.phase === 'loading') { e.preventDefault(); e.stopPropagation(); srCancel(); return; }
   if (SR.phase === 'open') { e.preventDefault(); e.stopPropagation(); srClose(); }
 }, true);
+// ---- web/js/56-sr-models.js ----
+/* ---------- the server room's nodes up close, as models that say what they do ----------
+   Requester 10-22: 「これ拡大した時だけもっと複雑なオブジェクトにできない？どんな機能のノードかわかりやすいように / 引きになったら
+   負荷が大きいので今の表示で」 (ticket 2026-10-22-viz-server-room-palette-and-light-flow §3).
+   Only up close: when the room shows its shapes by service (srPlaceLabels' detail, SR.detail.enter nodes in view or
+   fewer, back past SR.detail.leave), each node in view gets a model of its kind (SR_MODEL_KIND), built then and only
+   for those, at most SR_MODEL.max at a time (the ones out of view go first). Far away, and whenever the room shows its
+   simple shapes, there is none: the instanced shapes alone are drawn, as before. The shapes by service stay what a
+   press picks (their drawing is switched off while the models stand on them); the colour is the node's cloud's, the
+   tags, the ring on arrival and the flow's light are where they were. */
+const SR_MODEL = { max: 64 };
+/* category (and a service where one category holds two looks) → the model */
+function srModelKind(n) {
+  const c = String(n.category || ''), s = String(n.service || '');
+  if (c.startsWith('database.')) return 'db';
+  if (c === 'cache') return 'cache';
+  if (c === 'storage.object') return 'bucket';
+  if (c === 'storage.block' || c === 'storage.file') return 'drive';
+  if (c === 'queue' && /^(sns|eventgrid|notification|pubsub)/.test(s)) return 'broadcast';
+  if (c === 'queue') return 'queue';
+  if (c === 'stream') return 'stream';
+  if (c === 'load_balancer') return 'splitter';
+  if (c === 'edge.cdn') return 'globe';
+  if (c === 'edge.dns') return 'signpost';
+  if (c === 'edge.waf') return 'shield';
+  if (c.startsWith('gateway.')) return 'arch';
+  if (c === 'compute.function') return 'bolt';
+  if (c === 'compute.vm') return 'server';
+  if (c === 'compute.container' || c === 'compute.paas') return 'container';
+  if (c === 'compute.k8s') return 'wheel';
+  if (c === 'client') return 'browser';
+  if (c === 'auth') return 'padlock';
+  if (c === 'secrets') return 'key';
+  if (c === 'scheduler') return 'clock';
+  if (c === 'mail') return 'envelope';
+  if (c.startsWith('monitoring')) return 'gauge';
+  if (c === 'external.saas') return 'cloud';
+  return 'plinth';
+}
+
+/* Each model is parts (made once, when first wanted): [geometry, x, y, z, tone, rotation] — tone 0 the cloud's colour, 1 a deeper one, 2 a lighter one;
+   y from the node's middle (the instanced shape's), the whole about as big as the simple shape. */
+let srModelPartsMade = null;
+function srModelParts() {
+  if (srModelPartsMade) return srModelPartsMade;
+  const T = THREE;
+  const cyl = (r, h, n = 20, r2 = r) => new T.CylinderGeometry(r, r2, h, n);
+  const box = (w, h, d) => new T.BoxGeometry(w, h, d);
+  const bolt = () => {
+    const s = new T.Shape([[0.1, 0.75], [-0.32, 0.02], [-0.02, 0.02], [-0.14, -0.75], [0.32, 0.08], [0.02, 0.08]].map(([x, y]) => new T.Vector2(x, y)));
+    const g = new T.ExtrudeGeometry(s, { depth: 0.3, bevelEnabled: true, bevelSize: 0.03, bevelThickness: 0.03, bevelSegments: 1 });
+    g.translate(0, 0, -0.15); g.rotateY(-0.7); return g;   // turned toward the room's usual view, so it is not seen edge on
+  };
+  const parts = {
+    db: [[cyl(0.55, 0.28), 0, -0.45, 0, 0], [cyl(0.56, 0.05), 0, -0.29, 0, 1], [cyl(0.55, 0.28), 0, -0.12, 0, 0], [cyl(0.56, 0.05), 0, 0.04, 0, 1],
+      [cyl(0.55, 0.28), 0, 0.21, 0, 0], [cyl(0.5, 0.04), 0, 0.37, 0, 2]],
+    cache: [[box(1.0, 0.18, 0.8), 0, -0.2, 0, 1], [box(0.62, 0.14, 0.5), 0, -0.04, 0, 0],
+      ...[-0.36, -0.12, 0.12, 0.36].flatMap((x) => [[box(0.08, 0.06, 0.16), x, -0.2, 0.48, 2], [box(0.08, 0.06, 0.16), x, -0.2, -0.48, 2]]),
+      [bolt(), 0, 0.42, 0, 2, [0, 0, 0, 0.42]]],
+    bucket: [[new T.CylinderGeometry(0.58, 0.4, 0.95, 24, 1, true), 0, -0.05, 0, 0], [cyl(0.4, 0.04, 24), 0, -0.5, 0, 1],
+      [new T.TorusGeometry(0.58, 0.05, 8, 28), 0, 0.42, 0, 1, [Math.PI / 2, 0, 0]], [new T.TorusGeometry(0.42, 0.03, 6, 20, Math.PI), 0, 0.42, 0, 2]],
+    drive: [[box(1.0, 0.36, 0.75), 0, -0.25, 0, 0], [box(0.6, 0.05, 0.02), 0, -0.25, 0.38, 1], [cyl(0.05, 0.02, 10), 0.36, -0.25, 0.38, 2, [Math.PI / 2, 0, 0]],
+      [box(1.0, 0.36, 0.75), 0, 0.16, 0, 0], [box(0.6, 0.05, 0.02), 0, 0.16, 0.38, 1]],
+    queue: [[box(1.5, 0.08, 0.5), 0, -0.45, 0, 1], ...[-0.5, -0.17, 0.16, 0.49].map((x, i) => [box(0.26, 0.42 - i * 0.04, 0.4), x, -0.2 - i * 0.02, 0, i ? 0 : 2]),
+      [new T.ConeGeometry(0.14, 0.26, 4), 0.82, -0.2, 0, 2, [0, 0, -Math.PI / 2]]],
+    broadcast: [[cyl(0.18, 0.7, 12), 0, -0.2, 0, 1], [new T.ConeGeometry(0.42, 0.5, 20, 1, true), 0, 0.3, 0, 0],
+      [new T.TorusGeometry(0.6, 0.04, 6, 24, Math.PI * 0.6), 0, 0.3, 0, 2, [0, 0, Math.PI * 0.2]], [new T.TorusGeometry(0.8, 0.04, 6, 24, Math.PI * 0.6), 0, 0.3, 0, 2, [0, 0, Math.PI * 0.2]]],
+    stream: [[box(1.7, 0.06, 0.45), 0, -0.45, 0, 1], ...[-0.7, -0.42, -0.14, 0.14, 0.42, 0.7].map((x, i) => [box(0.1, 0.5, 0.36), x, -0.17, 0, i % 2 ? 2 : 0])],
+    splitter: [[cyl(0.32, 0.5, 16), 0, -0.4, 0, 1], [new T.SphereGeometry(0.3, 16, 12), 0, 0, 0, 0],
+      ...[-0.6, 0, 0.6].flatMap((x) => [[cyl(0.06, 0.62, 8), x / 2, 0.3, 0, 0, [0, 0, -x * 0.9]], [new T.SphereGeometry(0.15, 12, 8), x, 0.55, 0, 2]])],
+    globe: [[new T.SphereGeometry(0.5, 24, 16), 0, 0, 0, 0], [new T.TorusGeometry(0.53, 0.025, 6, 32), 0, 0, 0, 2, [Math.PI / 2, 0, 0]],
+      [new T.TorusGeometry(0.53, 0.025, 6, 32), 0, 0, 0, 2], [new T.TorusGeometry(0.53, 0.025, 6, 32), 0, 0, 0, 2, [0, Math.PI / 2, 0]],
+      [new T.TorusGeometry(0.72, 0.04, 6, 32), 0, -0.15, 0, 1, [Math.PI / 2 + 0.25, 0, 0]]],
+    signpost: [[cyl(0.06, 1.3, 10), 0, -0.1, 0, 1], [box(0.7, 0.22, 0.06), 0.28, 0.35, 0, 0], [new T.ConeGeometry(0.15, 0.16, 3), 0.7, 0.35, 0, 0, [0, 0, -Math.PI / 2]],
+      [box(0.6, 0.2, 0.06), -0.24, 0.05, 0, 2], [new T.ConeGeometry(0.14, 0.15, 3), -0.6, 0.05, 0, 2, [0, 0, Math.PI / 2]], [cyl(0.25, 0.06, 16), 0, -0.73, 0, 1]],
+    shield: [[new T.CylinderGeometry(0.55, 0.55, 0.16, 24, 1, false, -Math.PI / 2, Math.PI), 0, 0.15, 0, 0, [Math.PI / 2, 0, 0]],
+      [new T.ConeGeometry(0.55, 0.7, 4, 1, false, Math.PI / 4), 0, -0.3, 0, 0, [Math.PI, 0, 0]], [box(0.1, 0.6, 0.2), 0, 0, 0, 2], [box(0.4, 0.1, 0.2), 0, 0.1, 0, 2]],
+    arch: [[box(0.26, 1.0, 0.4), -0.45, -0.25, 0, 0], [box(0.26, 1.0, 0.4), 0.45, -0.25, 0, 0], [box(1.25, 0.24, 0.5), 0, 0.37, 0, 1],
+      [new T.TorusGeometry(0.32, 0.05, 6, 20, Math.PI), 0, 0.0, 0, 2]],
+    bolt: [[bolt(), 0, 0, 0, 0], [cyl(0.4, 0.06, 20), 0, -0.75, 0, 1]],
+    server: [[box(0.95, 1.4, 0.75), 0, 0, 0, 1], ...[-0.45, -0.15, 0.15, 0.45].flatMap((y) => [[box(0.82, 0.2, 0.04), 0, y, 0.38, 0], [box(0.06, 0.06, 0.03), 0.3, y, 0.41, 2]])],
+    container: [[box(1.3, 0.72, 0.72), 0, -0.1, 0, 0], ...[-0.48, -0.24, 0, 0.24, 0.48].map((x) => [box(0.05, 0.74, 0.76), x, -0.1, 0, 1]),
+      [box(1.34, 0.06, 0.76), 0, 0.28, 0, 1]],
+    wheel: [[new T.TorusGeometry(0.45, 0.07, 8, 28), 0, 0, 0, 0], [cyl(0.14, 0.12, 14), 0, 0, 0, 1, [Math.PI / 2, 0, 0]],
+      ...[0, 1, 2, 3, 4, 5, 6].map((k) => [box(0.05, 0.62, 0.05), 0, 0, 0, 2, [0, 0, k * Math.PI / 7 * 2]])],
+    browser: [[box(1.2, 0.85, 0.06), 0, 0.15, 0, 2], [box(1.2, 0.14, 0.08), 0, 0.52, 0, 1], ...[-0.5, -0.4, -0.3].map((x) => [cyl(0.03, 0.02, 8), x, 0.52, 0.05, 0, [Math.PI / 2, 0, 0]]),
+      [box(0.9, 0.08, 0.07), -0.05, 0.25, 0.01, 0], [box(0.6, 0.08, 0.07), -0.2, 0.1, 0.01, 0], [cyl(0.05, 0.4, 8), 0, -0.45, 0, 1], [box(0.5, 0.05, 0.3), 0, -0.65, 0, 1]],
+    padlock: [[box(0.8, 0.65, 0.4), 0, -0.25, 0, 0], [new T.TorusGeometry(0.27, 0.07, 8, 20, Math.PI), 0, 0.08, 0, 1], [cyl(0.07, 0.2, 10), 0, -0.2, 0.21, 2, [Math.PI / 2, 0, 0]]],
+    key: [[new T.TorusGeometry(0.24, 0.08, 8, 20), -0.45, 0, 0, 0], [box(0.75, 0.12, 0.12), 0.1, 0, 0, 0], [box(0.08, 0.2, 0.1), 0.3, -0.13, 0, 1], [box(0.08, 0.14, 0.1), 0.42, -0.1, 0, 1]],
+    clock: [[cyl(0.52, 0.16, 28), 0, 0.05, 0, 0, [Math.PI / 2, 0, 0]], [cyl(0.44, 0.02, 28), 0, 0.05, 0.09, 2, [Math.PI / 2, 0, 0]],
+      [box(0.05, 0.32, 0.03), 0, 0.18, 0.11, 1], [box(0.24, 0.05, 0.03), 0.1, 0.05, 0.11, 1], [box(0.5, 0.1, 0.3), 0, -0.55, 0, 1]],
+    envelope: [[box(1.1, 0.7, 0.12), 0, 0, 0, 0], [box(0.78, 0.06, 0.14), -0.2, 0.12, 0, 2, [0, 0, -0.56]], [box(0.78, 0.06, 0.14), 0.2, 0.12, 0, 2, [0, 0, 0.56]]],
+    gauge: [[new T.TorusGeometry(0.45, 0.09, 8, 28, Math.PI), 0, -0.05, 0, 0], [box(0.06, 0.45, 0.06), 0.1, 0.12, 0.05, 2, [0, 0, -0.5]], [cyl(0.08, 0.1, 12), 0, -0.05, 0.05, 1, [Math.PI / 2, 0, 0]],
+      [box(1.05, 0.08, 0.3), 0, -0.1, 0, 1]],
+    cloud: [[new T.SphereGeometry(0.34, 16, 12), -0.3, -0.05, 0, 0], [new T.SphereGeometry(0.44, 16, 12), 0.05, 0.1, 0, 0], [new T.SphereGeometry(0.3, 16, 12), 0.38, -0.08, 0, 0],
+      [box(1.1, 0.12, 0.5), 0, -0.3, 0, 1]],
+    plinth: [[box(0.8, 0.8, 0.8), 0, 0.05, 0, 0], [box(1.0, 0.16, 1.0), 0, -0.45, 0, 1]],
+  };
+  srModelPartsMade = parts;
+  return parts;
+}
+
+/* A material per colour (deeper / lighter tones of the node's), kept for the view. */
+function srModelMaterial(V, hex, tone) {
+  const key = `${hex}:${tone}`;
+  V.modelMats = V.modelMats || {};
+  if (!V.modelMats[key]) {
+    const c = new THREE.Color(hex);
+    if (tone === 1) c.lerp(new THREE.Color(V.dark ? '#0b1018' : '#1d2433'), 0.32);
+    if (tone === 2) c.lerp(new THREE.Color('#ffffff'), V.dark ? 0.45 : 0.5);
+    V.modelMats[key] = new THREE.MeshLambertMaterial({ color: c, side: THREE.DoubleSide });
+  }
+  return V.modelMats[key];
+}
+function srModelBuild(V, p) {
+  const kind = srModelKind(p.n), hex = srProviderColor(p.n.providerResolved || p.n.provider, 'node', 0, V.dark), g = new THREE.Group();
+  for (const [geo, x, y, z, tone, rot] of srModelParts()[kind]) {
+    const m = new THREE.Mesh(geo, srModelMaterial(V, hex, tone));
+    m.userData.tone = tone;
+    m.position.set(x, y, z);
+    if (rot) m.rotation.set(rot[0], rot[1], rot[2]);
+    g.add(m);
+  }
+  const s = p.n.count > 1 ? 1 + Math.min(Math.log2(p.n.count), 4) * 0.12 : 1;
+  g.position.set(p.x, p.y + 0.75, p.z); g.scale.setScalar(s);
+  g.userData = { node: p.n.id, kind };
+  return g;
+}
+
+/* Called with the room's look decided (srSetDetail) and each tenth of a second up close with the nodes in view: the models
+   for those, built as they come into view; none when the simple shapes are shown. */
+function srModelsSync(V, ids) {
+  if (!V.models) { V.models = new Map(); V.modelLayer = new THREE.Group(); V.near.add(V.modelLayer); }
+  const on = V.detail && V.lod === 'near';
+  for (const m of V.nodeMeshes.detail) m.material.visible = !on;    // the shapes by service still take the press
+  if (!on) {
+    for (const g of V.models.values()) V.modelLayer.remove(g);
+    V.models.clear();
+    return;
+  }
+  const want = new Set(ids);
+  for (const id of want) {
+    if (V.models.has(id)) continue;
+    if (V.models.size >= SR_MODEL.max) {
+      const out = [...V.models.keys()].find((k) => !want.has(k));
+      if (!out) break;
+      V.modelLayer.remove(V.models.get(out)); V.models.delete(out);
+    }
+    const p = V.L.pos.get(id);
+    if (!p || p.hiddenIn) continue;
+    const g = srModelBuild(V, p);
+    V.modelLayer.add(g); V.models.set(id, g);
+  }
+}
 // ---- web/js/56-server-cost.js ----
 /* ---------- the cost simulator (plan 2026-10-20-jui-viz-backend-load-and-cost-simulator, L-C) ----------
    Requester 10-20: 「バックエンドの負荷とコストシミュレータをサーバーの3dと切り替えで表示出来るようにしたい … 1ヶ月のコストグラフ …
@@ -13766,7 +13954,8 @@ rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rb-talk]') &
 
    The model's flows (infra/flows.py checked them: every move leaves the node the flow is at). A node that starts a
    flow drawn now carries a small green cone; choosing the node lists its flows on the board, and a flow chosen plays:
-   - a light runs along each move's edge and the node it reaches glows; a toast over that node says what happened
+   - light runs through each move's edge, a bright head and a fading tail inside the cable (requester 10-22: 「ボールが跳ねる
+     んじゃなくて同線に光が流れていくイメージで」), and the node it reaches glows; a toast over that node says what happened
      (the action's mark and verb after the node's name: 「💾 d1 に保存」, the step's label on a second line), and the
      first one says what started it (the trigger's mark: 👤 ⏰ 📡 ⚡, with a schedule as written);
    - a branch stops the light: its choices are buttons over the node, the first edge of each glows faintly ahead, and
@@ -13839,7 +14028,7 @@ function srFlowStop() {
   if (!P) return;
   for (const x of P.toasts) x.el.remove();
   const layer = SR.view && SR.view.flowLayer;
-  if (layer) for (const o of [...layer.children]) if (!o.userData.flowStarts) { layer.remove(o); if (o.geometry) o.geometry.dispose(); }
+  if (layer) for (const o of [...layer.children]) if (!o.userData.flowStarts) { layer.remove(o); if (o.userData.flowLight) srFlowLightDispose(o); else if (o.geometry) o.geometry.dispose(); }
   SR_FLOW.player = null;
   $('sr-choices').hidden = true;
   srFlowRenderBar();
@@ -13886,13 +14075,66 @@ function srFlowLaneNext(P, L) {
   else { srFlowSay(P, s, s.at || s.node); L.anim = { kind: 'wait', left: SR_FLOW.nodeMs }; }
 }
 function srFlowMove(P, step) {
-  const V = SR.view, a = srFlowPos(V, step.from), b = srFlowPos(V, step.to);
-  const dot = new THREE.Mesh(new THREE.SphereGeometry(0.28, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffcf33 }));
-  dot.position.copy(a);
-  dot.userData.r = 0.28; dot.userData.minPx = SR_FLOW_MIN_PX;
-  V.flowLayer.add(dot);
-  P.lights.push(dot);
-  return { kind: 'move', step, a, b, dot, done: 0 };
+  const V = SR.view, light = srFlowLight(V, step.from, step.to);
+  V.flowLayer.add(light);
+  P.lights.push(light);
+  return { kind: 'move', step, light, done: 0 };
+}
+
+/* ---- the light in the cable: no object travels. The move's edge gets a tube as long as its cable, at the cable's
+   height (srBuild: 1.7, across clouds 2.6), in two layers — a thin core and a wide soft glow — and SR_FLOW_LIGHT_SHADER
+   lights the part of it behind the head: full at the head (toward white), fading over the tail. The head goes from the
+   cable's start to its end on the move's clock; once there the tail drains into the node (SR_FLOW_LIGHT.drainMs), the
+   light no longer counted as moving. In dark the glow adds to what is behind it; on the light ground it is laid over. */
+const SR_FLOW_LIGHT = { core: 0.07, glow: 0.24, tail: 3.2, drainMs: 380 };
+const SR_FLOW_LIGHT_SHADER = {
+  vertex: `varying float vAlong; varying float vFacing;
+    void main() { vAlong = position.y + 0.5; vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      vFacing = abs(dot(normalize(normalMatrix * normal), normalize(-mv.xyz))); gl_Position = projectionMatrix * mv; }`,
+  fragment: `uniform vec3 uColor; uniform float uHead, uTail, uOpacity, uSoft, uWhite; varying float vAlong; varying float vFacing;
+    void main() { float d = uHead - vAlong;
+      float a = d >= 0.0 ? pow(max(0.0, 1.0 - d / uTail), 1.7) : max(0.0, 1.0 + d / 0.015);
+      a *= mix(1.0, pow(vFacing, 2.0), uSoft);
+      if (a <= 0.004) discard;
+      gl_FragColor = vec4(mix(uColor, vec3(1.0), uWhite * pow(a, 3.0)), a * uOpacity); }`,
+};
+function srFlowCableY(V, from, to) {
+  const e = V.L.edges.find((x) => (x.from === from && x.to === to) || (x.from === to && x.to === from));
+  return e && e.crossProvider ? 2.6 : 1.7;
+}
+function srFlowLight(V, from, to) {
+  const pa = V.L.pos.get(from), pb = V.L.pos.get(to), y = srFlowCableY(V, from, to);
+  const a = new THREE.Vector3(pa.x, y, pa.z), b = new THREE.Vector3(pb.x, y, pb.z), len = Math.max(a.distanceTo(b), 1e-3);
+  const PAL = SR_PAL[V.dark ? 'dark' : 'light'], tail = Math.min(0.85, SR_FLOW_LIGHT.tail / len);
+  const layer = (color, opacity, soft, white) => new THREE.ShaderMaterial({ vertexShader: SR_FLOW_LIGHT_SHADER.vertex, fragmentShader: SR_FLOW_LIGHT_SHADER.fragment,
+    uniforms: { uColor: { value: new THREE.Color(color) }, uHead: { value: 0 }, uTail: { value: tail }, uOpacity: { value: opacity }, uSoft: { value: soft }, uWhite: { value: white } },
+    transparent: true, depthWrite: false, blending: V.dark ? THREE.AdditiveBlending : THREE.NormalBlending });
+  const tube = new THREE.CylinderGeometry(1, 1, 1, 12, 1, true);
+  const glow = new THREE.Mesh(tube, layer(PAL.light, V.dark ? 0.75 : 0.85, 1, 0));
+  const core = new THREE.Mesh(tube, layer(PAL.lightCore, 1, 0, V.dark ? 0.85 : 0.35));
+  const light = new THREE.Group();
+  light.add(glow, core);
+  light.position.copy(a).add(b).multiplyScalar(0.5);
+  light.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
+  glow.scale.set(SR_FLOW_LIGHT.glow, len, SR_FLOW_LIGHT.glow); core.scale.set(SR_FLOW_LIGHT.core, len, SR_FLOW_LIGHT.core);
+  light.renderOrder = glow.renderOrder = core.renderOrder = 3;
+  light.userData = { flowLight: true, moving: true, a, b, head: a.clone(), glow, core, tail };
+  return light;
+}
+/* The head at k (0: the cable's start, 1: its end, past 1: the tail draining). */
+function srFlowLightAt(o, k) {
+  for (const m of [o.userData.glow, o.userData.core]) m.material.uniforms.uHead.value = k;
+  o.userData.head.lerpVectors(o.userData.a, o.userData.b, Math.min(k, 1));
+}
+/* Pulled back, the glow is drawn at least SR_FLOW_MIN_PX in radius at its head (the core a third of that). */
+function srFlowLightKeepSize(V, o) {
+  const px = srFlowPxPerUnit(V, o.userData.head), g = Math.max(SR_FLOW_LIGHT.glow, SR_FLOW_MIN_PX / px), c = Math.max(SR_FLOW_LIGHT.core, SR_FLOW_MIN_PX / 3 / px);
+  o.userData.glow.scale.x = o.userData.glow.scale.z = g;
+  o.userData.core.scale.x = o.userData.core.scale.z = c;
+}
+function srFlowLightDispose(o) {
+  o.userData.glow.geometry.dispose();
+  for (const m of [o.userData.glow, o.userData.core]) m.material.dispose();
 }
 function srFlowSay(P, step, at) {
   const act = SR_ACTIONS[step.action];
@@ -13921,7 +14163,7 @@ function srFlowHints(P, b) {
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3));
-  const lines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xffcf33, transparent: true, opacity: 0.45 }));
+  const lines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: SR_PAL[V.dark ? 'dark' : 'light'].light, transparent: true, opacity: 0.45 }));
   lines.userData.hints = arr.length / 6;
   V.flowLayer.add(lines);
   P.hints = lines;
@@ -13958,7 +14200,7 @@ function srFlowBack() {
   P.flow = s.flow; P.frames = s.frames; P.pos = s.pos; P.chosen = s.chosen;
   P.branch = null; $('sr-choices').hidden = true;
   if (P.hints) { SR.view.flowLayer.remove(P.hints); P.hints = null; }
-  for (const d of P.lights) SR.view.flowLayer.remove(d);
+  for (const d of P.lights) { SR.view.flowLayer.remove(d); if (d.userData.flowLight) srFlowLightDispose(d); }
   P.lights = []; P.anim = null; P.state = 'pause';
   srFlowRenderBar();
   return true;
@@ -13974,7 +14216,7 @@ function srFlowToast(P, at, head, sub) {
 function srFlowGlow(P, at) {
   const p = srFlowPos(SR.view, at);
   if (!p) return;
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.08, 6, 24), new THREE.MeshBasicMaterial({ color: 0xffcf33, transparent: true, opacity: 0.9 }));
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.08, 6, 24), new THREE.MeshBasicMaterial({ color: SR_PAL[SR.view.dark ? 'dark' : 'light'].light, transparent: true, opacity: 0.9 }));
   ring.position.set(p.x, p.y - 0.6, p.z); ring.rotation.x = Math.PI / 2;
   ring.userData.left = SR_FLOW.nodeMs * 2;
   ring.userData.r = 0.75; ring.userData.minPx = SR_FLOW_MIN_PX * 2;
@@ -13982,8 +14224,8 @@ function srFlowGlow(P, at) {
   P.lights.push(ring);
 }
 
-/* Pulled back over a large room a light 0.28 across is a few pixels: it is drawn at least SR_FLOW_MIN_PX in radius
-   (the ring under a node twice that), and at its own size once the camera is near enough for that. */
+/* Pulled back over a large room a light is a few pixels: it is drawn at least SR_FLOW_MIN_PX in radius (the ring under a
+   node twice that), and at its own size once the camera is near enough for that. */
 const SR_FLOW_MIN_PX = 7;
 function srFlowPxPerUnit(V, at) {
   const d = V.camera.position.distanceTo(at);
@@ -14004,11 +14246,10 @@ function srFlowTick(V, dt) {
     if (!A) return true;
     if (A.kind === 'wait') { A.left -= step; return A.left <= 0; }
     A.done = Math.min(1, A.done + step / SR_FLOW.moveMs);
-    const k = A.done, y = Math.sin(Math.PI * k) * 0.8;
-    A.dot.position.lerpVectors(A.a, A.b, k); A.dot.position.y += y;
-    if (k < 1) return false;
-    V.flowLayer.remove(A.dot); A.dot.geometry.dispose();
-    P.lights = P.lights.filter((x) => x !== A.dot);
+    srFlowLightAt(A.light, A.done);
+    if (A.done < 1) return false;
+    A.light.userData.moving = false;               // its tail drains into the node, on the same clock
+    A.light.userData.left = SR_FLOW_LIGHT.drainMs;
     P.pos = A.step.to;
     P.arrivals.push(srNow());
     P.reached.push([A.step.to, srNow()]);       // where and when (the e2e reads that lanes arrive together)
@@ -14023,9 +14264,16 @@ function srFlowTick(V, dt) {
       if (advance(P.anim)) { P.anim = null; if (P.stepOnce) P.stepOnce = false; else srFlowNext(P); }
     } else if (P.state === 'play') srFlowNext(P);
   }
-  for (const o of P.lights) srFlowKeepSize(V, o);
+  for (const o of P.lights) {
+    if (!o.userData.flowLight) { srFlowKeepSize(V, o); continue; }
+    if (!o.userData.moving) srFlowLightAt(o, 1 + (1 - Math.max(0, o.userData.left) / SR_FLOW_LIGHT.drainMs) * o.userData.tail);
+    srFlowLightKeepSize(V, o);
+  }
   if (P.state === 'branch' && SR_FLOW.auto && P.branch && P.branch.b.default && srNow() - P.branch.shownAt > 600 / SR_FLOW.speed) srFlowChoose(P.branch.b.default);
-  for (const o of [...V.flowLayer.children]) if (o.userData.left !== undefined && (o.userData.left -= step) <= 0) { V.flowLayer.remove(o); P.lights = P.lights.filter((x) => x !== o); }
+  for (const o of [...V.flowLayer.children]) if (o.userData.left !== undefined && (o.userData.left -= step) <= 0) {
+    V.flowLayer.remove(o); P.lights = P.lights.filter((x) => x !== o);
+    if (o.userData.flowLight) srFlowLightDispose(o);
+  }
   // the toasts over their nodes, stacked when several are on one
   const w = V.renderer.domElement.clientWidth, h = V.renderer.domElement.clientHeight, per = {};
   P.toasts = P.toasts.filter((x) => { x.left -= step; if (x.left > 0) return true; x.el.remove(); return false; });
