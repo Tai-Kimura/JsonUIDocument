@@ -60,7 +60,7 @@ module RjuiTools
           # `disabled` is not a valid attribute on <div>; reflect the state via
           # aria-disabled (each inner <button> carries the real disabled attr).
           jsx = <<~JSX.chomp
-            #{indent_str(indent)}<div#{id_attr} className="#{class_name}"#{style_attr}#{testid_attr}#{tag_attr}#{build_aria_disabled_attr}>
+            #{indent_str(indent)}<div#{id_attr}#{class_name_attr(class_name)}#{style_attr}#{testid_attr}#{tag_attr}#{build_aria_disabled_attr}>
             #{items_jsx}
             #{indent_str(indent)}</div>
           JSX
@@ -94,13 +94,9 @@ module RjuiTools
           classes << 'flex'
           classes << 'rounded-lg'
 
-          # Background color
-          bg_color = attributes['backgroundColor']
-          if bg_color
-            classes << TailwindMapper.map_color(bg_color, 'bg')
-          else
-            classes << 'bg-gray-100'
-          end
+          # Background color: a declared `background` is drawn by the base
+          # converter; without one the control's grey
+          classes << 'bg-gray-100' unless attributes['background']
 
           classes << 'p-1'
 

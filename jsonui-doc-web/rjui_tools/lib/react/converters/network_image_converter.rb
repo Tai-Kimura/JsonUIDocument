@@ -33,7 +33,7 @@ module RjuiTools
           corner_radius_style = build_corner_radius_style
 
           jsx = <<~JSX.chomp
-            #{indent_str(indent)}<NetworkImage#{id_attr} className="#{class_name}"#{src}#{content_mode}#{placeholder_attr}#{error_image}#{build_alt_attr}#{loading_attr}#{on_load}#{on_error}#{onclick_attr}#{corner_radius_style}#{style_attr}#{testid_attr}#{tag_attr} />
+            #{indent_str(indent)}<NetworkImage#{id_attr}#{class_name_attr(class_name)}#{src}#{content_mode}#{placeholder_attr}#{error_image}#{build_alt_attr}#{loading_attr}#{on_load}#{on_error}#{onclick_attr}#{corner_radius_style}#{style_attr}#{testid_attr}#{tag_attr} />
           JSX
 
           wrap_with_visibility(jsx, indent)
@@ -56,7 +56,7 @@ module RjuiTools
           # plus the iOS/Android long forms. Canonical semantics:
           # shared/core/attribute_semantics.json — fill = stretch
           # (scaleToFill synonym), AspectFill is the crop.
-          content_mode = attributes['contentMode'] || attributes['scaleType']
+          content_mode = attributes['contentMode']
           if has_binding?(content_mode)
             # A bound value matched no key and fell to the `||` fallback,
             # which built the dead class `object-@{v}`.
@@ -71,13 +71,13 @@ module RjuiTools
           end
 
           # Circle image
-          classes << 'rounded-full' if attributes['circle'] || attributes['circleImage']
+          classes << 'rounded-full' if attributes['circle']
 
           # Corner radius class (if using Tailwind standard values). A bound
           # radius is already an inline `borderRadius` from the base pass;
           # this arbitrary-value class would only restate it as dead text.
           corner_radius = attributes['cornerRadius']
-          if corner_radius && !has_binding?(corner_radius) && !attributes['circle'] && !attributes['circleImage']
+          if corner_radius && !has_binding?(corner_radius) && !attributes['circle']
             classes << "rounded-[#{corner_radius}px]"
           end
 
@@ -88,7 +88,7 @@ module RjuiTools
         end
 
         def build_src_attr
-          src = attributes['src'] || attributes['url'] || attributes['imageUrl']
+          src = attributes['src'] || attributes['url']
           return '' unless src
 
           if has_binding?(src)
@@ -99,7 +99,7 @@ module RjuiTools
         end
 
         def build_content_mode_attr
-          content_mode = attributes['contentMode'] || attributes['scaleType']
+          content_mode = attributes['contentMode']
           return '' unless content_mode
 
           # The NetworkImageProps union ('cover' | 'contain' | 'fill' | 'none'
@@ -169,7 +169,7 @@ module RjuiTools
 
         def build_corner_radius_style
           corner_radius = attributes['cornerRadius']
-          return '' unless corner_radius && !attributes['circle'] && !attributes['circleImage']
+          return '' unless corner_radius && !attributes['circle']
 
           # Already handled in className
           ''

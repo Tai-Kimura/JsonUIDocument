@@ -1686,7 +1686,7 @@ function secState(s, k) {
   const w = s.written[k], n = s.totals[k];
   if (w <= 0) return { kind: 'empty', f: 0, text: tl('core.sec.empty') };
   if (w < 1) return { kind: 'writing', f: w, text: `${s.by ? tl('core.sec.writing') : tl('core.sec.filling')} ${pct(w)}%` };
-  if (k === 6 && s.implPhase) { const c = s.implN[6]; return { kind: c >= n ? 'tested' : 'test', f: n ? c / n : 1, text: tl('core.sec.tests', { c, n }) }; }
+  if (k === 6 && s.implPhase) { const c = s.implN[6], n = s.testsNeeded || s.totals[6]; return { kind: c >= n ? 'tested' : 'test', f: n ? c / n : 1, text: tl('core.sec.tests', { c, n }) }; }
   if (k === 0 || k === 6 || !s.implPhase || (s.unmeasured && s.unmeasured[k])) return { kind: 'written', f: 1, text: tl('core.sec.written') };
   if (k === 1 && s.measure && !s.measure.components) {
     return s.measure.layout ? { kind: 'done', f: 1, text: tl('core.sec.layout.done') } : { kind: 'impl', f: 0, text: s.measure.layout === false ? tl('core.sec.layout.missing') : tl('core.sec.layout.unnamed') };
@@ -5369,6 +5369,17 @@ function liveUpdateRobots(nowSec, dt) {
    that room, wider (layoutRooms, SOLO_GROW), with the way back at the top left. The other rooms' robots keep their
    desks for when the floor comes back. */
 const liveSolo = () => (SOURCE.mode === 'live' ? soloRoomId() : null);
+/* The room's bar (left) and the floor buttons (right) share the top of the stage: the bar keeps the floor buttons' width free
+   (--floor-nav-w on their parent, app.css .room-solo), measured whenever they change size or show / hide. */
+{
+  const nav = document.getElementById('floor-nav');
+  if (nav && typeof ResizeObserver === 'function') {
+    new ResizeObserver(() => {
+      const w = nav.hidden ? 0 : Math.ceil(nav.getBoundingClientRect().width);
+      nav.parentElement.style.setProperty('--floor-nav-w', `${w}px`);
+    }).observe(nav);
+  }
+}
 function liveSoloSync() {
   const solo = liveSolo();
   for (const [id, R] of Object.entries(LIVE3D.rooms)) { const on = !solo || id === solo; R.group.visible = on; R.rt.el.hidden = !!solo; }   // alone, its name is in the box
@@ -5383,6 +5394,18 @@ function liveSoloSync() {
   if (solo) setText(document.getElementById('room-solo-name'), PROJECT[solo].name);
   const call = document.getElementById('room-call');
   if (call) call.hidden = SOURCE.mode !== 'live';   // the call bell's keyboard way in (2.3.5); the demo has no folder
+  // the server room's way in beside it (2.3.21, requester: 「サーバールームに入るのボタンを呼び出しのメニューの横につけて欲しい
+  // / 今3Dクリックでしか入れないよね？」): the door's own srEnter. Shown in every room, as 呼び出し is; a room with no
+  // docs/infra (no door) has it not pressable, saying why — a button that is gone tells nobody where the room went.
+  const sr = document.getElementById('room-sr'), why = document.getElementById('room-sr-why');
+  if (sr) {
+    const has = !!solo && serverDoorWanted(solo);
+    sr.hidden = SOURCE.mode !== 'live';
+    if (sr.getAttribute('aria-disabled') !== String(!has)) sr.setAttribute('aria-disabled', String(!has));
+    const note = has ? tl('page.room.sr.title') : tl('page.room.sr.none');
+    if (sr.title !== note) sr.title = note;
+    if (why) setText(why, has ? '' : note);
+  }
 }
 /* ---------- the room up close: a water server, a robot vacuum and a wooden floor (requester, 10-18) ----------
    Only in the one-room view (room-solo) and only while that room has 10 robots or fewer; built when it is wanted and
@@ -7900,7 +7923,45 @@ function spiritLod() {
 
 /* ---------- side panel ---------- */
 const $ = (id) => document.getElementById(id);
-const setHTML = (el, html) => { if (el._html !== html) { el.innerHTML = html; el._html = html; } };
+/* What the person types is kept through a redraw (requester 10-23: 「質問の回答書いてる途中でこの履歴が更新されると書いてる内容が
+   消える気がする」). A field that can be drawn again under the cursor carries data-keep, a key of its own (the card's id
+   and the field: the same question in the panel, on the board and in the history shares it). Each input or change is
+   remembered by that key (DRAFTS), until it is sent or cancelled (dropDrafts); after a redraw (keepFields: setHTML,
+   keyed, and the price editor's) every field with a draft gets it back — its text, what was checked — and the one
+   that had the focus gets the focus and the cursor back. A card that goes and comes back has its draft too. */
+const DRAFTS = new Map();
+const keepOf = (el) => (el && el.dataset ? el.dataset.keep : undefined);
+function rememberDraft(e) {
+  const el = e.target, k = keepOf(el);
+  if (!k) return;
+  if (el.type === 'radio') {   // the group's other radios unchecked with it: each one's state
+    const scope = el.form || el.closest('[data-qcard]') || document;
+    for (const r of scope.querySelectorAll(`input[type="radio"][name="${CSS.escape(el.name)}"][data-keep]`)) DRAFTS.set(r.dataset.keep, { c: r.checked });
+  } else DRAFTS.set(k, el.type === 'checkbox' ? { c: el.checked } : { v: el.value });
+}
+document.addEventListener('input', rememberDraft, true);
+document.addEventListener('change', rememberDraft, true);
+const dropDrafts = (prefix) => { for (const k of [...DRAFTS.keys()]) if (k.startsWith(prefix)) DRAFTS.delete(k); };
+function restoreDrafts(root) {
+  for (const el of root.querySelectorAll('[data-keep]')) {
+    const d = DRAFTS.get(el.dataset.keep);
+    if (!d) continue;
+    if ('c' in d) { if (el.checked !== d.c) el.checked = d.c; } else if (el.value !== d.v) el.value = d.v;
+  }
+  if (typeof questionSendState === 'function') for (const card of root.querySelectorAll('[data-qcard]')) questionSendState(card);
+}
+function keepFields(root, replace) {
+  const a = document.activeElement, k = root.contains(a) ? keepOf(a) : undefined;
+  const sel = k !== undefined && typeof a.selectionStart === 'number' ? [a.selectionStart, a.selectionEnd, a.selectionDirection] : null;
+  replace();
+  restoreDrafts(root);
+  if (k === undefined) return;
+  const again = root.querySelector(`[data-keep="${CSS.escape(k)}"]`);
+  if (!again) return;
+  if (document.activeElement !== again) again.focus({ preventScroll: true });
+  if (sel) { try { again.setSelectionRange(sel[0], sel[1], sel[2]); } catch (err) { /* a field with no text cursor */ } }
+}
+const setHTML = (el, html) => { if (el._html !== html) keepFields(el, () => { el.innerHTML = html; el._html = html; }); };
 const setText = (el, text) => { if (el && el.textContent !== text) el.textContent = text; };
 /* The legend of heavy work's three looks (2.3.6), under the card's 重い作業 line. */
 const HEAVY_LEGEND = tl('panel.heavy.legend');
@@ -7951,8 +8012,11 @@ const permSig = (p) => (p ? JSON.stringify([p.id, p.status, p.can, p.tooLongToSh
 function keyed(el, sig, build) {
   if (el._sig === sig) return;
   const a = document.activeElement, fk = el.contains(a) ? a.dataset.fk : undefined;
-  el.innerHTML = build(); el._sig = sig; el._html = null;
-  if (fk !== undefined) { const again = el.querySelector(`[data-fk="${CSS.escape(fk)}"]`); if (again) again.focus({ preventScroll: true }); else el._lostFk = fk; }
+  keepFields(el, () => { el.innerHTML = build(); el._sig = sig; el._html = null; });   // a typed field: its text, focus, cursor
+  // The focus by its data-fk, a typed field's too: one drawn again here has it already (keepFields, with its
+  // cursor; focus() on it again moves nothing), and one that is not here any more — the prompt box, which the
+  // history puts back after the card is drawn (55-history.js) — is remembered for whoever puts it back.
+  if (fk !== undefined) { const again = el.querySelector(`[data-fk="${CSS.escape(fk)}"]`); if (again) { if (document.activeElement !== again) again.focus({ preventScroll: true }); } else el._lostFk = fk; }
 }
 const SEGS = `<span class="segs" aria-hidden="true">${'<i></i>'.repeat(7)}</span>`;
 const SG_CLASS = { empty: 'sg-empty', writing: 'sg-writing', written: 'sg-written', impl: 'sg-impl', done: 'sg-done', test: 'sg-test', tested: 'sg-tested' };
@@ -8048,7 +8112,7 @@ function renderPanel(model) {
   const shown = model.specs.map((s, i) => [s, i]).filter(([s]) => inScope(s.project) && (specFilter === 'all' || s.bucket === specFilter)).sort((a, b) => roomOrder[a[0].project] - roomOrder[b[0].project] || specNewer(a, b));
   const multi = new Set(shown.map(([x]) => x.project)).size > 1;
   keyed(specListEl, JSON.stringify([UI.project, specFilter, scopedSpecs.length, shown.map(([x, i]) => `${i}:${x.bucket}:${x.by || ''}:${x.name}`)]), () => (shown.length
-    ? shown.map(([x, i], k) => `${multi && (k === 0 || shown[k - 1][0].project !== x.project) ? `<li class="sl-group">${esc(PROJECT[x.project].name)}<b>${shown.filter(([y]) => y.project === x.project).length}</b></li>` : ''}<li><button type="button" class="spec-row b-${esc(x.bucket)}" data-idx="${i}" data-fk="sp-${i}"${roleVar(x)}><span class="nm">${esc(x.name)}</span><span class="stx"></span>${x.by ? pill(x.by, DEF[x.by].role) : ''}${SEGS}</button></li>`).join('')
+    ? shown.map(([x, i], k) => `${multi && (k === 0 || shown[k - 1][0].project !== x.project) ? `<li class="sl-group">${esc(PROJECT[x.project].name)}<b>${shown.filter(([y]) => y.project === x.project).length}</b></li>` : ''}<li><button type="button" class="spec-row b-${esc(x.bucket)}" data-idx="${i}" data-fk="sp-${i}"${roleVar(x)}><span class="nm">${coTag(x)}${esc(x.name)}</span><span class="stx"></span>${x.by ? pill(x.by, DEF[x.by].role) : ''}${SEGS}</button></li>`).join('')
     : `<li class="empty-note">${!scopedSpecs.length ? esc(tl('panel.spec.none.scope', { scope: scopeLabel() })) : specFilter === 'live' ? esc(tl('panel.spec.none.live')) : esc(tl('panel.spec.none.state'))}</li>`));
   specListEl.querySelectorAll('.spec-row').forEach((b) => { const s = model.specs[+b.dataset.idx]; paintStatus(b.querySelector('.stx'), specStatus(s)); paintSegs(b.querySelector('.segs'), s); });
 
@@ -8089,6 +8153,7 @@ function renderPanel(model) {
   renderDenials();
   paintSince($('denied'), model.t, tl('panel.since.elapsed'));
   waitChips();   // 53-waits.js
+  cardWaits();   // 53-waits.js: the other sessions' waits beside an open card
   const sIn = SESSIONS.filter((x) => inScope(x.project)).length, rIn = ROBOT_DEFS.filter((d) => inScope(projectOfRobot(d.id))).length;
   setText($('chip-robots'), UI.project === 'all' ? tl('panel.chip.robots', { n: ROBOT_DEFS.length }) : tl('panel.chip.robots.of', { n: rIn, all: ROBOT_DEFS.length }));
   setText($('chip-sessions'), UI.project === 'all' ? tl('panel.chip.sessions', { n: SESSIONS.length }) : tl('panel.chip.sessions.of', { n: sIn, all: SESSIONS.length }));
@@ -8147,6 +8212,7 @@ function decide(id, behavior, btn) {
   const reason = behavior === 'deny' && reasonEl ? reasonEl.value.trim() : '';
   if (SOURCE.mode === 'live' && behavior === 'always') { openAlwaysConfirm(p, btn); return; }   // confirm the rules first (plan 08 §5)
   SOURCE.decide(id, behavior, { perm: p, reason });
+  dropDrafts(`perm:${id}:`);   // sent: its reason is no draft any more
   refreshNow();
   // The answered buttons are gone; keep the keyboard where the person was.
   if (!document.activeElement || document.activeElement === document.body) {
@@ -8200,6 +8266,14 @@ function focusProject(id, instant) {
    覚えといて、それがいたらそれを選択、いなかったら未選択で部屋表示」): project id -> robot, or null when its card was closed
    by hand. Kept in the page only (a label may name another robot after the server restarts). */
 const LAST_ROBOT = new Map();
+/* The robot now on the card, its project's last picked: every way the card goes to a robot (openRobot: a press, the
+   lists, a notification, a talk, a switch back; goRobot: ← →, ‹ ›, a name in the history). Requester 10-23: 「クリックで
+   3D開く左右キーで移動、別プロジェクト行って帰ってくるの時に最後に選択してたやつを表示して欲しい」 (ticket
+   2026-10-23-viz-last-robot-per-project-only-on-click: ← → had kept the one clicked). */
+function rbRemember(id) {
+  const p = projectOfRobot(id);
+  if (p) LAST_ROBOT.set(p, id);
+}
 /* The robot to pick on switching to a project with a robot picked: the one last picked there if it is still in the
    room (not gone, not walking out), else none. すべて: none. */
 function robotToPick(id) {
@@ -8276,8 +8350,8 @@ function questionHTML(q, where = '') {   // where: '' in the panel, 'b' on the b
   const got = q.sentAnswers || q.gotAnswers || null;
   const itemsHTML = q.questions.map((x, i) => {
     const type = x.multiSelect ? 'checkbox' : 'radio', name = `qa-${where}${q.id}-${i}`;   // radios: one group per card
-    const optsHTML = x.options.map((o, k) => `<label class="qopt"><input type="${esc(type)}" name="${esc(name)}" data-qi="${i}" data-qk="${k}"${open ? '' : ' disabled'}><span class="qlabel">${esc(o.label)}</span>${o.description ? `<span class="qdesc">${esc(o.description)}</span>` : ''}${o.preview ? `<pre class="qprev">${esc(o.preview)}</pre>` : ''}</label>`).join('');
-    const otherHTML = `<label class="qopt qother"><input type="${esc(type)}" name="${esc(name)}" data-qi="${i}" data-qk="other"${open ? '' : ' disabled'}><span class="qlabel">${esc(tl('panel.q.other'))}</span><input type="text" class="qother-text" data-qi="${i}" aria-label="${esc(tl('panel.q.other.aria', { question: x.question }))}" maxlength="2000"${open ? '' : ' disabled'}></label>`;
+    const optsHTML = x.options.map((o, k) => `<label class="qopt"><input type="${esc(type)}" name="${esc(name)}" data-qi="${i}" data-qk="${k}" data-keep="${esc(`q:${q.id}:${i}:${k}`)}"${open ? '' : ' disabled'}><span class="qlabel">${esc(o.label)}</span>${o.description ? `<span class="qdesc">${esc(o.description)}</span>` : ''}${o.preview ? `<pre class="qprev">${esc(o.preview)}</pre>` : ''}</label>`).join('');
+    const otherHTML = `<label class="qopt qother"><input type="${esc(type)}" name="${esc(name)}" data-qi="${i}" data-qk="other" data-keep="${esc(`q:${q.id}:${i}:other`)}"${open ? '' : ' disabled'}><span class="qlabel">${esc(tl('panel.q.other'))}</span><input type="text" class="qother-text" data-qi="${i}" data-keep="${esc(`q:${q.id}:${i}:text`)}" aria-label="${esc(tl('panel.q.other.aria', { question: x.question }))}" maxlength="2000"${open ? '' : ' disabled'}></label>`;
     const answeredHTML = got && got[x.question] !== undefined ? `<p class="qgot">${esc(tl('panel.q.got'))}<b>${esc(got[x.question])}</b></p>` : '';
     // answered or over: the question and its answer only
     const choicesHTML = q.status === 'pending' ? `${optsHTML}${otherHTML}` : '';
@@ -8340,14 +8414,19 @@ function onQuestionInput(e) {
   const q = card && QUESTIONS.find((x) => x.id === card.dataset.qcard);
   if (!q) return;
   // typing a free answer picks その他
-  if (e.target.classList.contains('qother-text') && e.target.value) { const box = e.target.parentElement.querySelector('input[data-qk="other"]'); if (box) box.checked = true; }
-  const send = card.querySelector('[data-qsend]');
-  if (send) send.disabled = !questionPicks(card, q).complete;
-  if (send) holdQuestion(q.id);   // someone is answering: the hook waits a little longer
+  if (e.target.classList.contains('qother-text') && e.target.value) { const box = e.target.parentElement.querySelector('input[data-qk="other"]'); if (box && !box.checked) { box.checked = true; rememberDraft({ target: box }); } }   // checked by the page: no change event, the draft noted here
+  if (questionSendState(card)) holdQuestion(q.id);   // someone is answering: the hook waits a little longer
+}
+/* Its send button pressable when every question has an answer (as typed, or as kept through a redraw); whether it has one. */
+function questionSendState(card) {
+  const q = QUESTIONS.find((x) => x.id === card.dataset.qcard), send = card.querySelector('[data-qsend]');
+  if (!q || !send) return false;
+  send.disabled = !questionPicks(card, q).complete;
+  return true;
 }
 function onQuestionClick(e) {
   const r = e.target.closest('[data-qrelease]');
-  if (r) { r.disabled = true; SOURCE.releaseQuestion(r.dataset.qrelease); return; }
+  if (r) { r.disabled = true; dropDrafts(`q:${r.dataset.qrelease}:`); SOURCE.releaseQuestion(r.dataset.qrelease); return; }
   const b = e.target.closest('[data-qsend]');
   if (!b) return;
   const card = b.closest('[data-qcard]'), q = QUESTIONS.find((x) => x.id === b.dataset.qsend);
@@ -8355,6 +8434,7 @@ function onQuestionClick(e) {
   const { picks, complete } = questionPicks(card, q);
   if (!complete) return;
   b.disabled = true;
+  dropDrafts(`q:${q.id}:`);   // sent
   SOURCE.answerQuestion(q.id, picks);
 }
 // The same handlers for the panel's cards and the board's: the same state (QUESTIONS), the same sending (SOURCE).
@@ -8606,7 +8686,14 @@ function wbApps(model) {
   return list;
 }
 const inApp = (s) => wb.app === 'all' || (s.app || '') === wb.app;
-const appLabel = (app) => app || tl('panel.app.root');
+// a worktree's app is "<app>@<branch>" (the server's key): its app's name and its branch
+const appLabel = (app) => {
+  const at = app.indexOf('@');
+  return at < 0 ? (app || tl('panel.app.root')) : `${app.slice(0, at) || tl('panel.app.root')} ⎇ ${app.slice(at + 1)}`;
+};
+/* The checkout a spec is read from, when the room shows a worktree of its app beside it: the branch, and on a
+   worktree's row its folder in the title. Both rows of a spec in the two checkouts are shown, each with its own tag. */
+const coTag = (s) => (s.checkout ? `<span class="co-tag${s.checkout.worktree ? ' co-wt' : ''}" title="${esc(s.checkout.worktree ? tl('panel.co.worktree', { path: s.checkout.worktree }) : tl('panel.co.room'))}">⎇ ${esc(s.checkout.branch)}</span>` : '');
 let wbSideOpen = readPref('wbSide', 'open') === 'open';
 const narrowWb = () => sceneEl.clientWidth < 800;
 function applyWbSide() {
@@ -8690,7 +8777,7 @@ function renderWbSide(model) {
     const total = apps.reduce((k, [, c]) => k + c, 0);
     const appsHTML = apps.length > 1 ? `<div class="seg-filter ws-apps" role="group" aria-label="${esc(tl('panel.app.filter'))}">${[['all', total], ...apps].map(([a, c]) => `<button type="button" data-app="${esc(a)}" aria-pressed="${wb.app === a}">${esc(a === 'all' ? tl('panel.app.all') : appLabel(a))}<b>${esc(String(c))}</b></button>`).join('')}</div>` : '';
     const allHTML = appsHTML + `<button type="button" class="ws-item ws-all" data-idx="-1" data-fk="ws--1" aria-current="${wb.idx === -1}"><span class="dot" aria-hidden="true"></span><span class="nm">${esc(tl('panel.ws.all'))}</span><span></span><small>${esc(scopeLabel())} · ${esc(tl('panel.ws.progress', { n }))}</small></button>`;
-    const bodyHTML = groups.map(([label, items]) => `<p class="ws-group"><span>${esc(label)}</span><b>${items.length}</b></p>${items.map(([s, i]) => `<button type="button" class="ws-item b-${esc(s.bucket)}" data-idx="${i}" data-fk="ws-${i}" aria-current="${wb.idx === i}"${roleVar(s)}><span class="dot" aria-hidden="true"></span><span class="nm">${esc(s.name)}</span>${s.by ? pill(s.by, DEF[s.by].role) : '<span></span>'}<small></small></button>`).join('')}`).join('');
+    const bodyHTML = groups.map(([label, items]) => `<p class="ws-group"><span>${esc(label)}</span><b>${items.length}</b></p>${items.map(([s, i]) => `<button type="button" class="ws-item b-${esc(s.bucket)}" data-idx="${i}" data-fk="ws-${i}" aria-current="${wb.idx === i}"${roleVar(s)}><span class="dot" aria-hidden="true"></span><span class="nm">${coTag(s)}${esc(s.name)}</span>${s.by ? pill(s.by, DEF[s.by].role) : '<span></span>'}<small></small></button>`).join('')}`).join('');
     return allHTML + (bodyHTML || `<p class="ws-none">${esc(tl('panel.ws.none'))}</p>`);
   });
   wbSideList.querySelectorAll('.ws-item:not(.ws-all)').forEach((b) => { const x = model.specs[+b.dataset.idx]; paintStatus(b.lastElementChild, specStatus(x, UI.project === 'all' ? `${PROJECT[x.project].name} · ` : '')); });
@@ -8828,7 +8915,7 @@ function renderOverview(model) {
     wbCode.innerHTML = !inS.length ? `<p class="sc-ph ov-none">${esc(tl('panel.ov.none', { scope: scopeLabel() }))}</p>` : BUCKETS.map(([b, label]) => {
       const items = model.specs.map((s, i) => [s, i]).filter(([s]) => s.bucket === b && inScope(s.project) && inApp(s)).sort(specNewer);
       if (!items.length) return '';
-      return `<section class="ov-group" aria-label="${esc(label)}"><h3>${esc(label)}<small>${items.length}</small></h3><div class="ov-grid">${items.map(([s, i]) => `<button type="button" class="ov-card b-${esc(s.bucket)}" data-idx="${i}"${roleVar(s)}><span class="ov-top"><strong>${esc(s.name)}</strong><span class="state"></span></span><code class="ov-file">${UI.project === 'all' ? `${esc(PROJECT[s.project].name)} · ` : ''}${esc(s.file)}</code><span class="ov-who"></span><span class="ov-secs">${SEGS}<span class="ov-labels" aria-hidden="true">${SECTIONS.map((x) => `<span>${esc(x)}</span>`).join('')}</span></span><span class="ov-sum"></span></button>`).join('')}</div></section>`;
+      return `<section class="ov-group" aria-label="${esc(label)}"><h3>${esc(label)}<small>${items.length}</small></h3><div class="ov-grid">${items.map(([s, i]) => `<button type="button" class="ov-card b-${esc(s.bucket)}" data-idx="${i}"${roleVar(s)}><span class="ov-top"><strong>${coTag(s)}${esc(s.name)}</strong><span class="state"></span></span><code class="ov-file">${UI.project === 'all' ? `${esc(PROJECT[s.project].name)} · ` : ''}${esc(s.file)}</code><span class="ov-who"></span><span class="ov-secs">${SEGS}<span class="ov-labels" aria-hidden="true">${SECTIONS.map((x) => `<span>${esc(x)}</span>`).join('')}</span></span><span class="ov-sum"></span></button>`).join('')}</div></section>`;
     }).join('');
     wbCode._sig = sig; wbCode._html = null;
   }
@@ -8999,7 +9086,7 @@ function renderSheet(model, force) {
       return;
     }
   }
-  if (SOURCE.mode === 'live') setHead(s.name, s.file, STATUS_CLASS[s.status.kind], specStatus(s), s.by ? robotWho(s.by) : '');
+  if (SOURCE.mode === 'live') setHead(s.name, s.checkout ? `⎇ ${s.checkout.branch} · ${s.file}` : s.file, STATUS_CLASS[s.status.kind], specStatus(s), s.by ? robotWho(s.by) : '');
   else setHead(tl('panel.sheet.head', { name: s.name, screen: s.screen }), `docs/screens/json/${s.file}`, STATUS_CLASS[s.status.kind], specStatus(s), s.by ? pill(s.by, DEF[s.by].role) : '');
   wbNav.hidden = false; $('wb-follow-label').hidden = false;
   setHTML($('wb-legend'), SOURCE.mode === 'live' ? SHEET_LEGEND_LIVE : SHEET_LEGEND); wbHelpMode(false);
@@ -9033,7 +9120,9 @@ function renderSheet(model, force) {
       const items = pick(1, d.components, Math.min(COMP_MAX, compAll), writing);
       const moreHTML = compAll > COMP_MAX ? `<p class="sc-note">${esc(tl('panel.comp.more', { n: compAll - COMP_MAX, max: COMP_MAX }))}</p>` : '';
       const wfState = (m) => (writing ? (m[2] === 'is-new' ? 'writing' : 'defined') : !s.implPhase ? 'defined' : m[1] === 'm-done' ? 'done' : m[1] === 'm-doing' ? 'doing' : 'todo');
-      const rowText = (type, id, desc) => `<span class="tp">${esc(TYPE_JA[type] || type)}</span> <span class="id">${esc(id)}</span> <span class="desc">${prose(desc)}</span>`;
+      // a Layout's row: its description is the component's own type name (Image and NetworkImage are both 画像), an
+      // identifier, drawn as code beside the Japanese name
+      const rowText = (type, id, desc) => `<span class="tp">${esc(TYPE_JA[type] || type)}</span> <span class="id">${esc(id)}</span> ${desc === type && TYPE_JA[type] ? `<code class="desc ty-raw">${esc(desc)}</code>` : `<span class="desc">${prose(desc)}</span>`}`;
       let rowsHTML, wfHTML;
       if (hasDepths(d.components)) {
         // a tree: the list indented by depth with its lines, the phone frame's boxes nested
@@ -9313,8 +9402,8 @@ ${sample ? rawDetails(sample) : ''}`;
   detailEl.querySelectorAll('[data-recent]').forEach((el) => setHTML(el, recentHTML(el.dataset.recent)));
 }
 const permDetail = (p, where) => (SOURCE.mode === 'live' ? permDetailLive(p, where) : permDetailDemo(p, where));
-const permDetailLive = (p, where) => `<div class="tbd-perm"><h4>${esc(tl('panel.perm.asking'))}</h4><p>${pill(p.who, DEF[p.who].role)} ${esc(DEF[p.who].agent)} ${esc(tl('panel.perm.wants.pre'))}<b>${esc(p.tool)}</b>${esc(tl('panel.perm.wants.post'))}<span class="tbd-wait" data-since="${p.at}"></span></p><div class="tbd-cmd">${permSubjectLive(p)}</div>${p.can.reason ? `<label class="tbd-reason">${esc(tl('panel.perm.reason'))}<input type="text" id="${esc(where)}-reason" autocomplete="off"></label>` : ''}<div class="perm-acts">${permButtons(p, where)}</div><p class="tbd-note">${PERM_NOTE}${p.relayOnly ? esc(tl('panel.perm.relayonly')) : ''}</p></div>`;
-const permDetailDemo = (p, where) => `<div class="tbd-perm"><h4>${esc(tl('panel.perm.asking'))}</h4><p>${pill(p.who, DEF[p.who].role)} ${esc(DEF[p.who].agent)} ${esc(tl('panel.perm.wants.pre'))}<b>${esc(p.tool)}</b>${esc(tl('panel.perm.wants.post'))}<span class="tbd-wait" data-since="${p.at}"></span></p><pre class="tbd-cmd">${esc(permSummary(p))}</pre><label class="tbd-reason">${esc(tl('panel.perm.reason'))}<input type="text" id="${esc(where)}-reason" placeholder="${esc(tl('panel.perm.reason.example'))}" autocomplete="off"></label><div class="perm-acts">${permButtons(p, where)}</div><p class="tbd-note">${PERM_NOTE}${tlHTML('panel.perm.demo.note', { rule: p.rule })}</p></div>`;
+const permDetailLive = (p, where) => `<div class="tbd-perm"><h4>${esc(tl('panel.perm.asking'))}</h4><p>${pill(p.who, DEF[p.who].role)} ${esc(DEF[p.who].agent)} ${esc(tl('panel.perm.wants.pre'))}<b>${esc(p.tool)}</b>${esc(tl('panel.perm.wants.post'))}<span class="tbd-wait" data-since="${p.at}"></span></p><div class="tbd-cmd">${permSubjectLive(p)}</div>${p.can.reason ? `<label class="tbd-reason">${esc(tl('panel.perm.reason'))}<input type="text" id="${esc(where)}-reason" autocomplete="off" data-keep="${esc(`perm:${p.id}:reason`)}"></label>` : ''}<div class="perm-acts">${permButtons(p, where)}</div><p class="tbd-note">${PERM_NOTE}${p.relayOnly ? esc(tl('panel.perm.relayonly')) : ''}</p></div>`;
+const permDetailDemo = (p, where) => `<div class="tbd-perm"><h4>${esc(tl('panel.perm.asking'))}</h4><p>${pill(p.who, DEF[p.who].role)} ${esc(DEF[p.who].agent)} ${esc(tl('panel.perm.wants.pre'))}<b>${esc(p.tool)}</b>${esc(tl('panel.perm.wants.post'))}<span class="tbd-wait" data-since="${p.at}"></span></p><pre class="tbd-cmd">${esc(permSummary(p))}</pre><label class="tbd-reason">${esc(tl('panel.perm.reason'))}<input type="text" id="${esc(where)}-reason" placeholder="${esc(tl('panel.perm.reason.example'))}" autocomplete="off" data-keep="${esc(`perm:${p.id}:reason`)}"></label><div class="perm-acts">${permButtons(p, where)}</div><p class="tbd-note">${PERM_NOTE}${tlHTML('panel.perm.demo.note', { rule: p.rule })}</p></div>`;
 /* The relay's request id: five lowercase letters without "l". */
 const relayId = (p) => [...`${p.id}${p.who}xyz`].slice(0, 5).map((ch, k) => 'abcdefghijkmnopqrstuvwxyz'[(ch.charCodeAt(0) * 7 + k * 11) % 25]).join('');
 const livePermHow = (q) => (q.status === 'terminal' ? (q.terminalBehavior === 'deny' ? esc(tl('panel.how.term.deny')) : esc(tl('panel.how.term.allow')))
@@ -9501,7 +9590,7 @@ const focusing = () => has3D && !!rbState.id && zoom.zoomed && !camTween;
   }, { passive: false });
 }
 function openRobot(id, opener) {
-  if (projectOfRobot(id)) LAST_ROBOT.set(projectOfRobot(id), id);   // whichever way it was opened (list, tag, card, notification)
+  rbRemember(id);
   rbState.seen = { id, room: projectOfRobot(id) || null, name: (PROJECT[projectOfRobot(id)] || {}).name || '' }; rbState.moved = null;
   NOTIFY.opened.set(id, Date.now());   // the session looked at since its turn's end: no 入力待ち reminder (notifyIdle)
   holdView('rb');
@@ -9619,6 +9708,7 @@ function closeRobot({ byHand = false } = {}) {
   if (byHand && projectOfRobot(rbState.id)) LAST_ROBOT.set(projectOfRobot(rbState.id), null);   // closed by hand: none is remembered
   rbState.id = null; rbState.seen = null; rbState.moved = null;
   hideOverlay(rbEl);
+  cardWaits();   // 53-waits.js: nothing beside a closed card
   histSync();
   talkSync();
   FOCUS.id = null;      // the next robot opened chooses its view afresh
@@ -9631,21 +9721,26 @@ function closeRobot({ byHand = false } = {}) {
    flies with the existing zoomTo (the camera itself is 40-scene.js's). */
 function robotCycle() {
   const live = SOURCE.mode === 'live';
-  const rooms = roomsInView();
+  // live with the 3D, a room's own view or the building's: room by room, each in its robot list's order, the robots it
+  // hides skipped (53-roster.js; requester 10-23: the building's too, the rooms in their order). The demo and a page
+  // with no 3D have no list: rooms, then numbers.
+  const solo = liveSolo(), rooms = solo ? [solo] : roomsInView();
+  if (live && has3D) return rooms.flatMap((room) => rosterCycle(room)).filter((id) => !LIVE.leaving[id]);
   return ROBOT_DEFS.filter((d) => rooms.includes(projectOfRobot(d.id)) && !(live && LIVE.leaving[d.id]))
     .sort((a, b) => rooms.indexOf(projectOfRobot(a.id)) - rooms.indexOf(projectOfRobot(b.id)) || a.id.localeCompare(b.id, 'ja', { numeric: true }))
     .map((d) => d.id);
 }
 function stepRobot(dir) {
   const list = robotCycle();
-  if (!rbState.id || list.length < 2) return;
-  const i = list.indexOf(rbState.id);
-  goRobot(list[i < 0 ? 0 : (i + dir + list.length) % list.length]);
+  if (!rbState.id || !list.length) return;
+  const i = list.indexOf(rbState.id);   // -1: its card open on a robot the list hides now, ‹ › go to the last or first
+  goRobot(list[i < 0 ? (dir > 0 ? 0 : list.length - 1) : (i + dir + list.length) % list.length]);
 }
 /* The card on another robot, as ← → do it (the camera flies, the tab stays): also a linked name in the history. */
 function goRobot(next) {
   if (!rbState.id || !next || next === rbState.id) return;
   rbState.id = next;
+  rbRemember(next);
   renderRobot(latestModel);
   zoomToRobot(next);
 }
@@ -9739,7 +9834,7 @@ function renderRobot(model) {
       const [c, l] = x.perm ? ['st-waiting', tl('status.waiting')] : x.col === 'wait' ? [x.waitingFor === 'question' ? 'st-asking' : 'st-waiting', waitLabel(x)] : COL_STATE[x.col];
       return `<li><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="rt-${esc(x.key)}"><span class="state ${esc(c)}">${esc(l)}</span><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${x.harness ? `<span class="h-tag">${esc(x.harness)}</span>` : ''}${esc(x.subject)}</span>${!isMain || !x.owner ? '' : `<span class="rb-owner">${pill(x.owner, DEF[x.owner].role)}</span>`}</button></li>`;
     }).join('')}</ul>` : `<p class="rb-none">${esc(tl(isMain ? 'panel.rb.tasks.empty' : 'panel.rb.owned.none'))}</p>`;
-    return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? d.title || tl('panel.rb.main', { id }) : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.title ? tl('panel.rb.main.head', { id, head: d.head }) : d.agent} · ${room}` : tl('panel.rb.sub', { role: ROLE_JA[d.role], sess, room }))}</p></div><div class="rb-side"><div class="rb-menu"><button type="button" class="wb-btn rb-talk" data-rb-talk data-fk="rb-talk" aria-pressed="false" aria-label="${esc(tl('talk.title'))}" title="${esc(tl('panel.rb.talk.title'))}">${TALK_ICON}<span>${esc(tl('talk.title'))}</span><span class="rb-talk-n" data-rb-talk-n hidden></span></button><button type="button" class="wb-btn rb-clock" data-rb-clock data-fk="rb-clock" aria-haspopup="dialog" aria-describedby="rb-clock-why">${esc(tl('panel.clk.button'))}</button></div><div class="rb-nav"><button type="button" class="rb-step" data-rb-step="-1" data-fk="rb-prev" aria-label="${esc(tl('panel.rb.prev'))}" title="${esc(tl('panel.rb.prev'))}">‹</button><button type="button" class="rb-step" data-rb-step="1" data-fk="rb-next" aria-label="${esc(tl('panel.rb.next'))}" title="${esc(tl('panel.rb.next'))}">›</button><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">${esc(tl('panel.rb.back'))}</button></div></div><p class="rb-clock-why" id="rb-clock-why" data-rb-clock-why hidden></p>${rbMovedHTML()}</div>
+    return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? d.title || tl('panel.rb.main', { id }) : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.title ? tl('panel.rb.main.head', { id, head: d.head }) : d.agent} · ${room}` : tl('panel.rb.sub', { role: ROLE_JA[d.role], sess, room }))}</p></div><div class="rb-side"><div class="rb-menu"><button type="button" class="wb-btn rb-talk" data-rb-talk data-fk="rb-talk" aria-pressed="false" aria-label="${esc(tl('talk.title'))}" title="${esc(tl('panel.rb.talk.title'))}">${TALK_ICON}<span>${esc(tl('talk.title'))}</span><span class="rb-talk-n" data-rb-talk-n hidden></span></button><button type="button" class="wb-btn rb-clock" data-rb-clock data-fk="rb-clock" aria-haspopup="dialog" aria-describedby="rb-clock-why">${esc(tl('panel.clk.button'))}</button></div><div class="rb-nav"><button type="button" class="rb-step" data-rb-step="-1" data-fk="rb-prev" aria-label="${esc(tl('panel.rb.prev'))}" title="${esc(tl('panel.rb.prev'))}">‹</button><button type="button" class="rb-step" data-rb-step="1" data-fk="rb-next" aria-label="${esc(tl('panel.rb.next'))}" title="${esc(tl('panel.rb.next'))}">›</button><span class="rbw-slot" data-rbw-slot></span><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">${esc(tl('panel.rb.back'))}</button></div></div><p class="rb-clock-why" id="rb-clock-why" data-rb-clock-why hidden></p>${rbMovedHTML()}</div>
 <div class="rb-tabs"><button type="button" class="wb-btn rb-wide-btn" data-rb-wide data-fk="rb-wide" aria-pressed="false" aria-controls="rb" hidden>${esc(tl('hist.wide.on'))}</button><div class="rb-tablist" role="tablist" aria-label="${esc(tl('panel.rb.tabs'))}"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">${esc(tl('panel.rb.tab.now'))}</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">${esc(tl('panel.rb.tab.history'))}</button></div></div>
 <div class="rb-body rb-hist" data-rb-hist hidden aria-label="${esc(tl('panel.rb.tab.history'))}" tabindex="0"></div>
 <div class="rb-body" tabindex="0" aria-label="${esc(tl('panel.rb.tab.now'))}">
@@ -10026,6 +10121,10 @@ $('call-role').addEventListener('input', callAsk);
 $('call-copy').addEventListener('click', callCopy);
 $('call-close').addEventListener('click', closeCall);
 $('room-call').addEventListener('click', (e) => openCall(liveSolo(), e.currentTarget));
+$('room-sr').addEventListener('click', (e) => {   // as a press on the room's server room door (40-scene.js); not with no docs/infra
+  if (e.currentTarget.getAttribute('aria-disabled') === 'true') return;
+  srEnter(liveSolo(), e.currentTarget);
+});
 callEl.addEventListener('click', (e) => { if (e.target === callEl) closeCall(); });
 callEl.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeCall(); return; }
@@ -10682,6 +10781,79 @@ $('chip-input').addEventListener('click', () => {
   const d = ROBOT_DEFS.find((x) => waitKindOf(x.id) === 'input');
   if (d) waitOpen(d.id, 'input');
 });
+
+/* ---------- the waits beside an open card (requester 10-23: 「質問や許可まちがカード開いてると見えないので、開いてるときは
+   カードの左側の上の方に許可が来たのがわかるようにしてほしい」) ----------
+   While a robot's card is open, the header's chips and the other robots' bubbles are behind it. Beside the card, out of
+   it at its top-left corner, a small block says what the other sessions wait on — permissions, questions, stopped calls
+   — how many, and whose (each robot's mark). The open card's own session is left out: its wait is in the card. A
+   robot's button opens its wait's card (waitOpen, as its bubble does); the sum opens the task board's waiting strip (as
+   the chips do). Where the card is the page's width (a phone's sheet, or the card widened to the whole stage) the block
+   has no room beside it: the count goes in the card's head row as a badge that opens the same board. Something new moves
+   once (not under reduced motion). */
+const CARD_WAITS = { seen: new Set(), sig: '' };
+const RBW_SUM = { perm: 'rbw.sum.perm', ask: 'rbw.sum.ask', denied: 'rbw.sum.denied' };
+const RBW_KIND = { perm: 'rbw.kind.perm', ask: 'rbw.kind.ask', denied: 'rbw.kind.denied' };
+const rbwSum = (counts) => ['perm', 'ask', 'denied'].filter((k) => counts[k]).map((k) => tl(RBW_SUM[k], { n: counts[k] })).join(' · ');
+const rbwKinds = (ks) => ks.map((x) => tl(RBW_KIND[x])).join(tl('rbw.sep'));
+const CARD_WAIT_MAX = 6;   // robots listed; the rest said as ほか N
+function cardWaitItems() {
+  const own = rbState.id, out = [];
+  for (const p of (latestModel && latestModel.pending) || []) if (p.who !== own && p.status === 'pending') out.push({ kind: 'perm', who: p.who, key: `p:${p.id}` });
+  for (const d of denialsWaiting()) if (d.who !== own) out.push({ kind: 'denied', who: d.who, key: `d:${d.id}` });
+  for (const q of questionsWaiting()) if (q.who !== own) out.push({ kind: 'ask', who: q.who, key: `q:${q.id}` });
+  return out.filter((x) => DEF[x.who]);
+}
+/* Beside the card (its left edge, its top), or in its head (no room). */
+const cardWaitInHead = () => window.matchMedia('(max-width: 900px)').matches || rbEl.classList.contains('rb-wide-full');
+function cardWaits() {
+  const box = $('rb-waits'), open = !!rbState.id && !rbEl.hidden && rbEl.classList.contains('show');   // the card on screen
+  const items = open ? cardWaitItems() : [];
+  const head = open && cardWaitInHead();
+  const counts = { perm: 0, ask: 0, denied: 0 };
+  for (const x of items) counts[x.kind] += 1;
+  const fresh = items.filter((x) => !CARD_WAITS.seen.has(x.key));
+  for (const x of items) CARD_WAITS.seen.add(x.key);
+  // the block beside the card
+  box.hidden = !items.length || head;
+  if (!box.hidden) {
+    const robots = [...new Set(items.map((x) => x.who))];
+    const kindsOf = (id) => ['perm', 'denied', 'ask'].filter((k) => items.some((x) => x.who === id && x.kind === k));
+    const sig = JSON.stringify([NAMES.rev, items.map((x) => x.key)]);
+    if (sig !== CARD_WAITS.sig) {
+      CARD_WAITS.sig = sig;
+      const sum = rbwSum(counts);
+      const newWho = new Set(fresh.map((x) => x.who));
+      setHTML(box, `<p class="rbw-title">${esc(tl('rbw.title'))}</p><button type="button" class="rbw-sum" data-rbw-board data-fk="rbw-board">${esc(sum)}</button>`
+        + `<ul class="rbw-list">${robots.slice(0, CARD_WAIT_MAX).map((id) => {
+          const ks = kindsOf(id), k = ks[0] === 'ask' ? 'ask' : 'perm';
+          return `<li><button type="button" class="rbw-robot${newWho.has(id) ? ' rbw-new' : ''}" data-rbw-robot="${esc(id)}" data-rbw-kind="${esc(k)}" data-fk="rbw-${esc(id)}" title="${esc(tl('rbw.open', { name: DEF[id].title || DEF[id].agent || id, what: rbwKinds(ks) }))}">${pill(id, DEF[id].role)}${DEF[id].title ? `<span class="rbw-name">${esc(DEF[id].title)}</span>` : ''}<span>${esc(rbwKinds(ks))}</span></button></li>`;
+        }).join('')}${robots.length > CARD_WAIT_MAX ? `<li class="rbw-more">${esc(tl('rbw.more', { n: robots.length - CARD_WAIT_MAX }))}</li>` : ''}</ul>`);
+      if (fresh.length) { box.classList.remove('rbw-arrive'); void box.offsetWidth; box.classList.add('rbw-arrive'); }
+    }
+    const parent = rbEl.offsetParent || rbEl.parentElement;
+    box.style.top = `${rbEl.offsetTop}px`;
+    box.style.right = `${parent.clientWidth - rbEl.offsetLeft + 10}px`;
+  } else CARD_WAITS.sig = '';
+  // the badge in the card's head row
+  const slot = rbEl.querySelector('[data-rbw-slot]');
+  if (slot) {
+    const n = items.length, want = head && n ? tl('rbw.badge', { n }) : '';
+    if (slot.dataset.n !== String(head ? n : 0)) {
+      slot.dataset.n = String(head ? n : 0);
+      setHTML(slot, want ? `<button type="button" class="rbw-badge${fresh.length ? ' rbw-new' : ''}" data-rbw-board data-fk="rbw-badge" title="${esc(rbwSum(counts))}">${esc(want)}</button>` : '');
+    }
+  }
+}
+function cardWaitClick(e) {
+  const r = e.target.closest('[data-rbw-robot]');
+  if (r) { waitOpen(r.dataset.rbwRobot, r.dataset.rbwKind); return; }
+  const b = e.target.closest('[data-rbw-board]');
+  if (b) { tb.waitView = true; openTaskBoard(b); }
+}
+$('rb-waits').addEventListener('click', cardWaitClick);
+rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rbw-board]')) cardWaitClick(e); });
+window.addEventListener('resize', () => { if (rbState.id) cardWaits(); });
 // ---- web/js/53-roster.js ----
 /* ---------- the room's robot list (ticket 2026-10-23-viz-room-robot-list-show-hide) ----------
    Requester 10-23: 「botが多くなると全体が見づらいので部屋の中の時は3dの右側にbotの名前とチェックを表示してチェックしてないbotは消して
@@ -10697,8 +10869,14 @@ $('chip-input').addEventListener('click', () => {
      with what it waits for, and the list's head counts them;
    - not over a board (requester 10-23 01:23: 「ボード出してる時はbotの切り替えの表示も消していいよ」): while one of
      ROSTER_BOARDS is drawn over the 3D the list goes, and comes back with the 3D. The robot's card is not a board: it is
-     opened from the list. The header's waiting chips and the notifications are not the list's: they stay. */
-const ROSTER = { off: new Map(), sig: '', max: 200, placedAt: 0, placeMs: 250 };
+     opened from the list. The header's waiting chips and the notifications are not the list's: they stay;
+   - put in order (requester 10-23: 「ロボットの一覧に並べ替え機能追加できる？左右キーで移動するのもその順番に」): the person's
+     own order (dragged, or Alt+↑↓ on a row; remembered per room as the checks are, pref roster-order:<room>, a new
+     session at the end), by name, by state (waiting first) or most recently active (pref roster-sort:<room>). A row
+     moved while another order shows starts the person's own from the one shown. The card's ‹ › and ← → go in the
+     list's order and skip the robots it hides (rosterCycle, robotCycle in a room's view). */
+const ROSTER = { off: new Map(), order: new Map(), sig: '', max: 200, placedAt: 0, placeMs: 250, shownFor: null, drag: null };
+const ROSTER_SORTS = ['own', 'name', 'state', 'recent'];
 // the boards drawn over the 3D (each shown by showOverlay): the whiteboard (a spec, and ボードで全部見る), the task board,
 // the server room, the data server, the bills
 const ROSTER_BOARDS = ['wb', 'tb', 'sr', 'ds', 'pr'];
@@ -10720,6 +10898,51 @@ function rosterSave(room) {
   const off = [...rosterOff(room)].slice(-ROSTER.max);   // the newest kept: a long-lived room does not grow it for ever
   writePref(`roster:${room}`, JSON.stringify(off));
 }
+const rosterSort = (room) => { const s = readPref(`roster-sort:${room}`, 'own'); return ROSTER_SORTS.includes(s) ? s : 'own'; };
+/* The person's own order of the room's sessions (keys), first to last; the sessions not in it come after, by number. */
+function rosterOrder(room) {
+  if (!ROSTER.order.has(room)) {
+    let got = [];
+    try { got = JSON.parse(readPref(`roster-order:${room}`, '[]')); } catch (err) { got = []; }
+    ROSTER.order.set(room, Array.isArray(got) ? got.filter((k) => typeof k === 'string') : []);
+  }
+  return ROSTER.order.get(room);
+}
+const rosterById = (a, b) => a.id.localeCompare(b.id, undefined, { numeric: true });
+// waiting on the person (its own wait or a subagent's), then at work, then free, then done
+const rosterRank = (r) => (r.wait || r.lamp === 'waiting' || r.lamp === 'asking' ? 0 : r.lamp === 'idle' ? 2 : r.lamp === 'done' ? 3 : 1);
+function rosterArrange(rows, how, own) {
+  const at = new Map(own.map((k, i) => [k, i])), pos = (r) => (at.has(r.key) ? at.get(r.key) : Infinity);
+  const by = {
+    own: (a, b) => pos(a) - pos(b),
+    name: (a, b) => String(a.name).localeCompare(String(b.name), 'ja', { numeric: true }),
+    state: (a, b) => rosterRank(a) - rosterRank(b),
+    recent: (a, b) => (b.since || 0) - (a.since || 0),
+  }[how] || (() => 0);
+  return [...rows].sort((a, b) => by(a, b) || rosterById(a, b));
+}
+/* A row moved to place `to` among the others (a drop, Alt+↑↓): the order shown becomes the person's own. The sessions
+   not in the room now keep their places after it, to come back to. */
+function rosterMove(room, key, to) {
+  const keys = rosterRows(room).map((r) => r.key).filter((k) => k !== key);
+  keys.splice(Math.max(0, Math.min(to, keys.length)), 0, key);
+  const order = [...keys, ...rosterOrder(room).filter((k) => !keys.includes(k))].slice(0, ROSTER.max);
+  ROSTER.order.set(room, order);
+  writePref(`roster-order:${room}`, JSON.stringify(order));
+  writePref(`roster-sort:${room}`, 'own');
+  ROSTER.sig = '';
+}
+/* The robots ‹ › and ← → go through in a room's view: the list's rows in its order, the ones it hides skipped, a
+   main session's subagents after it. */
+function rosterCycle(room) {
+  const subs = new Map();
+  for (const R of robots) {
+    if (R.def.room !== room) continue;
+    const main = rosterMainDef(R.def);
+    if (main !== R.def) { if (!subs.has(main.id)) subs.set(main.id, []); subs.get(main.id).push(R.def); }
+  }
+  return rosterRows(room).filter((r) => r.on).flatMap((r) => [r.id, ...(subs.get(r.id) || []).sort(rosterById).map((d) => d.id)]);
+}
 /* Hidden by the list now: in a room's own view, its session unchecked there. */
 function rosterHides(R) {
   const solo = liveSolo();
@@ -10732,7 +10955,8 @@ function rosterRows(room) {
   for (const R of robots) {
     if (R.def.room !== room) continue;
     const main = rosterMainDef(R.def), key = rosterKeyOf(main);
-    const row = rows.get(key) || { key, id: main.id, role: main.role, name: main.title || main.agent || main.id, state: 'idle', lamp: 'idle', wait: null, on: !off.has(key) };
+    const row = rows.get(key) || { key, id: main.id, role: main.role, name: main.title || main.agent || main.id, state: 'idle', lamp: 'idle', wait: null, on: !off.has(key), since: 0 };
+    row.since = Math.max(row.since, (robotState[R.def.id] && robotState[R.def.id].since) || 0);
     if (R.def === main) {
       const st = robotState[main.id] || { state: 'idle' };
       row.state = st.state;
@@ -10742,11 +10966,17 @@ function rosterRows(room) {
     row.wait = row.wait || (typeof waitKindOf === 'function' ? waitKindOf(R.def.id) : null);
     rows.set(key, row);
   }
-  return [...rows.values()].sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+  return rosterArrange([...rows.values()], rosterSort(room), rosterOrder(room));
 }
-function rosterRowHTML(r) {
+/* The row of the robot selected now (its card open, the ring under it in the 3D; requester 10-23: 「今選択されてるロボットが
+   チェックの方でもハイライトされるようにしてほしい」): a subagent's is its main session's row, as the list has it. */
+function rosterCurrentKey() {
+  const def = rbState.id && DEF[rbState.id];
+  return def ? rosterKeyOf(rosterMainDef(def)) : null;
+}
+function rosterRowHTML(r, current) {
   const label = r.on ? tl('roster.hide', { name: r.name }) : tl('roster.show', { name: r.name });
-  return `<li class="roster-row${r.on ? '' : ' roster-off'}${!r.on && r.wait ? ' roster-alert' : ''}" data-roster-key="${esc(r.key)}" data-robot="${esc(r.id)}" data-wait="${esc(r.wait || '')}">`
+  return `<li class="roster-row${r.on ? '' : ' roster-off'}${!r.on && r.wait ? ' roster-alert' : ''}" draggable="true" data-roster-key="${esc(r.key)}" data-robot="${esc(r.id)}" data-wait="${esc(r.wait || '')}"${r.key === current ? ' aria-current="true"' : ''}>`
     + `<input type="checkbox" class="roster-check" data-roster-check="${esc(r.key)}"${r.on ? ' checked' : ''} aria-label="${esc(label)}">`
     + `<button type="button" class="roster-name" data-roster-open="${esc(r.id)}"${r.on ? '' : ' disabled'}>${pill(r.id, r.role)}<span class="roster-nm">${esc(r.name)}</span></button>`
     + `<span class="roster-lamp" style="--lamp:${esc(LAMP[r.lamp] || LAMP.idle)}" title="${esc(LAMP_TEXT[r.lamp] || '')}" aria-label="${esc(LAMP_TEXT[r.lamp] || '')}"></span>`
@@ -10763,37 +10993,86 @@ function rosterSync(solo) {
   if (!show) { ROSTER.sig = ''; return; }
   const now = performance.now();
   if (now - ROSTER.placedAt > ROSTER.placeMs) { ROSTER.placedAt = now; rosterPlace(box); }
-  const rows = rosterRows(solo), waiting = rows.filter((r) => !r.on && r.wait).length;
-  const sig = `${solo}|${rows.map((r) => [r.key, r.id, r.name, r.lamp, r.wait, r.on].join(',')).join(';')}`;
-  if (sig === ROSTER.sig) return;
+  if (ROSTER.drag) return;   // a row being dragged: written again when it is dropped
+  const sort = document.getElementById('roster-sort'), how = rosterSort(solo);
+  if (sort && sort.value !== how) sort.value = how;
+  const rows = rosterRows(solo), waiting = rows.filter((r) => !r.on && r.wait).length, current = rosterCurrentKey();
+  const sig = `${solo}|${current}|${rows.map((r) => [r.key, r.id, r.name, r.lamp, r.wait, r.on].join(',')).join(';')}`;
+  if (sig === ROSTER.sig) { rosterShowCurrent(current); return; }
   ROSTER.sig = sig;
-  const list = document.getElementById('roster-list'), had = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.rosterCheck : null;
-  setHTML(list, rows.map(rosterRowHTML).join(''));
-  if (had) { const again = [...list.querySelectorAll('[data-roster-check]')].find((x) => x.dataset.rosterCheck === had); if (again) again.focus({ preventScroll: true }); }
+  // the focus kept on its row's check or name: a row moved with Alt+↑↓ is moved again with the next press
+  const list = document.getElementById('roster-list'), fo = document.activeElement, fRow = fo && list.contains(fo) ? fo.closest('.roster-row') : null;
+  const had = fRow && { key: fRow.dataset.rosterKey, part: fo.classList.contains('roster-check') ? '.roster-check' : '.roster-name' };
+  setHTML(list, rows.map((r) => rosterRowHTML(r, current)).join(''));
+  if (had) {
+    const again = [...list.querySelectorAll('.roster-row')].find((x) => x.dataset.rosterKey === had.key);
+    const el = again && again.querySelector(had.part);
+    if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }); }
+  }
   setText(document.getElementById('roster-count'), tl('roster.count', { shown: rows.filter((r) => r.on).length, n: rows.length }));
   const alert = document.getElementById('roster-alert');
   alert.hidden = !waiting;
   setText(alert, waiting ? tl('roster.waiting', { n: waiting }) : '');
+  rosterShowCurrent(current);
+}
+/* The selected robot's row in view, once per robot selected (as the spec board's list, wbSideShowOpen): only the list
+   scrolls, and a row scrolled away by hand afterwards stays where the person put it. A folded list waits. */
+function rosterShowCurrent(current) {
+  if (ROSTER.shownFor === current) return;
+  const list = document.getElementById('roster-list');
+  const row = current && list ? list.querySelector('.roster-row[aria-current="true"]') : null;
+  if (current && (!row || !row.offsetParent)) return;
+  if (row) {
+    const box = list.getBoundingClientRect(), r = row.getBoundingClientRect();
+    if (r.top < box.top) list.scrollTop -= box.top - r.top + 4;
+    else if (r.bottom > box.bottom) list.scrollTop += r.bottom - box.bottom + 4;
+  }
+  ROSTER.shownFor = current;
 }
 /* The fixed parts over the 3D that share its column (the gate, 10-23: the list's fold button lay on the floor buttons,
    a room's view on a building of three floors): the room's name box, the floor buttons, the source's error line, the
    building's legend and weather, the empty room's note. Any of them shown in the list's column and in the 3D's upper
    half keeps the list below it; the list is as tall as what is left. On a narrow page the list sits at the foot, so
-   only its height gives way. */
+   only its height gives way.
+   An open card, and the other robots' waits beside it (#rb-waits, 53-waits.js, held at the card's top-left corner),
+   stand where they are, so it is the list that moves (the gate, 2.3.21: the list beside the card lay on their sum and
+   robots at 1920; under 1300 px, where app.css leaves the list at the right, on the card itself): to their left
+   (--roster-shift), the list keeping its height; where the 3D has no room left of the waits, below them as the parts
+   above (under them on a short page the list had no height left: its selected row could not be shown). */
 const ROSTER_AROUND = ['room-solo', 'floor-nav', 'live-error', 'tower-legend', 'tower-weather', 'live-empty'];
+const ROSTER_GAP = 8;
 function rosterPlace(box) {
   const scene = document.getElementById('scene');
   if (!scene) return;
-  const S = scene.getBoundingClientRect(), r = box.getBoundingClientRect();
+  const S = scene.getBoundingClientRect(), now = box.getBoundingClientRect();
+  const had = parseFloat(box.style.getPropertyValue('--roster-shift')) || 0;
+  // the list where it stands with no shift: what is measured against
+  const r = { left: now.left + had, right: now.right + had, top: now.top, bottom: now.bottom };
+  const shown = (el) => { if (!el || el.hidden || rosterNarrow()) return null; const o = el.getBoundingClientRect(); return o.width && o.height ? o : null; };
+  let shift = 0, around = ROSTER_AROUND;
+  const card = shown(document.querySelector('#rb.show'));
+  if (card && card.left < r.right && r.left < card.right) shift = Math.max(0, r.right - (card.left - ROSTER_GAP));
+  const w = shown(document.getElementById('rb-waits'));
+  if (w && w.left < r.right - shift && r.left - shift < w.right) {
+    const want = r.right - (w.left - ROSTER_GAP);   // the list's right edge left of the waits
+    if (r.left - want >= S.left + 12) shift = want;
+    else around = [...ROSTER_AROUND, 'rb-waits'];
+  }
+  shift = Math.round(shift);
+  if (shift !== had) box.style.setProperty('--roster-shift', `${shift}px`);
+  if (shift) { r.left -= shift; r.right -= shift; }
   let clear = S.top + 12;   // the page y the list's top stays under
-  for (const id of ROSTER_AROUND) {
+  for (const id of around) {
     const el = document.getElementById(id);
     if (!el || el.hidden) continue;
     const o = el.getBoundingClientRect();
     if (o.width && o.height && o.left < r.right && r.left < o.right && o.top < S.top + S.height / 2) clear = Math.max(clear, o.bottom + 6);
   }
   if (!rosterNarrow()) box.style.setProperty('--roster-top', `${Math.round(clear - S.top)}px`);
-  box.style.setProperty('--roster-max', `${Math.max(48, Math.round(S.bottom - 12 - clear))}px`);
+  const max = `${Math.max(48, Math.round(S.bottom - 12 - clear))}px`;
+  if (box.style.getPropertyValue('--roster-max') === max) return;
+  box.style.setProperty('--roster-max', max);
+  ROSTER.shownFor = null;   // the list taller or shorter (the page resized, a floor's buttons up): the selected row shown again
 }
 const rosterNarrow = () => !!(window.matchMedia && window.matchMedia('(max-width: 900px)').matches);   // app.css: the list at the foot
 function rosterSet(room, key, on) {
@@ -10829,6 +11108,54 @@ function rosterFold(folded) {
       if (o && !o.disabled) { selectRobot(o.dataset.rosterOpen, o); return; }
       if (e.target.closest('#roster-fold')) rosterFold(!box.classList.contains('roster-folded'));
     });
+    box.addEventListener('change', (e) => {
+      const solo = liveSolo();
+      if (e.target.id !== 'roster-sort' || !solo || !ROSTER_SORTS.includes(e.target.value)) return;
+      writePref(`roster-sort:${solo}`, e.target.value);
+      ROSTER.sig = '';
+    });
+    box.addEventListener('keydown', (e) => {
+      if ((e.key !== 'ArrowUp' && e.key !== 'ArrowDown') || !e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const row = e.target.closest('.roster-row'), solo = liveSolo();
+      if (!row || !solo) return;
+      e.preventDefault();
+      const i = rosterRows(solo).findIndex((r) => r.key === row.dataset.rosterKey);
+      if (i >= 0) rosterMove(solo, row.dataset.rosterKey, i + (e.key === 'ArrowDown' ? 1 : -1));
+    });
+    // dragged: a line above or below the row it would go to
+    const dropAt = (e) => {
+      const row = e.target.closest && e.target.closest('.roster-row');
+      if (!row) return null;
+      const r = row.getBoundingClientRect();
+      return { row, after: e.clientY > r.top + r.height / 2 };
+    };
+    const unmark = () => box.querySelectorAll('.roster-drop-before, .roster-drop-after, .roster-dragging').forEach((x) => x.classList.remove('roster-drop-before', 'roster-drop-after', 'roster-dragging'));
+    box.addEventListener('dragstart', (e) => {
+      const row = e.target.closest && e.target.closest('.roster-row');
+      if (!row) return;
+      ROSTER.drag = row.dataset.rosterKey;
+      row.classList.add('roster-dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', ROSTER.drag);
+    });
+    box.addEventListener('dragover', (e) => {
+      const at = ROSTER.drag && dropAt(e);
+      if (!at) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      box.querySelectorAll('.roster-drop-before, .roster-drop-after').forEach((x) => x.classList.remove('roster-drop-before', 'roster-drop-after'));
+      if (at.row.dataset.rosterKey !== ROSTER.drag) at.row.classList.add(at.after ? 'roster-drop-after' : 'roster-drop-before');
+    });
+    box.addEventListener('drop', (e) => {
+      const at = ROSTER.drag && dropAt(e), solo = liveSolo(), key = ROSTER.drag;
+      if (!at || !solo) return;
+      e.preventDefault();
+      const others = rosterRows(solo).map((r) => r.key).filter((k) => k !== key), j = others.indexOf(at.row.dataset.rosterKey);
+      ROSTER.drag = null;
+      unmark();
+      if (j >= 0) rosterMove(solo, key, j + (at.after ? 1 : 0));
+    });
+    box.addEventListener('dragend', () => { ROSTER.drag = null; unmark(); ROSTER.sig = ''; });
   }
 }
 // ---- web/js/53-devices.js ----
@@ -11112,25 +11439,25 @@ function renderPrices(force) {
   }).join('');
   const e = pr.edit;
   const formHTML = e ? `<form class="pr-form" id="pr-form"><h3>${esc(e.isNew ? tl('pr.add') : tl('pr.change'))}</h3>
-      <label class="pr-model">${esc(tl('pr.model.label'))}<input data-pr-in="model" value="${esc(e.model || '')}" ${e.isNew ? '' : 'readonly'} required maxlength="100" autocomplete="off" spellcheck="false"></label>
-      <div class="pr-nums">${PR_KINDS.map(([k, ja]) => `<label>${esc(ja)}<input data-pr-in="${esc(k)}" type="number" min="0" max="100000" step="any" required value="${esc(e.values[k] === undefined ? '' : String(e.values[k]))}"></label>`).join('')}</div>
+      <label class="pr-model">${esc(tl('pr.model.label'))}<input data-pr-in="model" data-keep="pr:new:model" value="${esc(e.model || '')}" ${e.isNew ? '' : 'readonly'} required maxlength="100" autocomplete="off" spellcheck="false"></label>
+      <div class="pr-nums">${PR_KINDS.map(([k, ja]) => `<label>${esc(ja)}<input data-pr-in="${esc(k)}" data-keep="${esc(`pr:${e.isNew ? 'new' : e.model}:${k}`)}" type="number" min="0" max="100000" step="any" required value="${esc(e.values[k] === undefined ? '' : String(e.values[k]))}"></label>`).join('')}</div>
       <p class="set-hint">${esc(tl('pr.hint'))}</p>
       <div class="pr-btns"><button type="submit" class="mini-btn pr-save"${pr.busy ? ' disabled' : ''}>${esc(tl('pr.save'))}</button><button type="button" class="mini-btn" data-pr-cancel>${esc(tl('pr.cancel'))}</button></div></form>`
     : `<p><button type="button" class="mini-btn" data-pr-add="">${esc(tl('pr.add'))}</button></p>`;
   const aboutHTML = `<p class="pr-about">${esc(BILL.notice)} ${tlHTML('pr.about', { source: p.source || '', checked: p.checked || '', path: p.userPath || '' })}</p>`;
   const msgHTML = pr.msg ? `<p class="pr-msg" role="status">${esc(pr.msg)}</p>` : '';
   const headHTML = PR_KINDS.map(([, ja]) => `<th>${esc(ja)}</th>`).join('');
-  prBody.innerHTML = `${aboutHTML}${msgHTML}`
+  keepFields(prBody, () => { prBody.innerHTML = `${aboutHTML}${msgHTML}`
     + (unpricedHTML ? `<section class="pr-unpriced"><h3>${esc(tl('pr.unpriced'))}</h3><ul>${unpricedHTML}</ul></section>` : '')
     + (errorsHTML ? `<section class="pr-errors"><h3>${esc(tl('pr.errors'))}</h3><ul>${errorsHTML}</ul></section>` : '')
-    + `${formHTML}<table class="ds-table pr-table"><thead><tr><th>${esc(tl('pr.col.model'))}</th>${headHTML}<th>${esc(tl('pr.col.origin'))}</th><th></th></tr></thead><tbody>${rowsHTML}</tbody></table>`;
+    + `${formHTML}<table class="ds-table pr-table"><thead><tr><th>${esc(tl('pr.col.model'))}</th>${headHTML}<th>${esc(tl('pr.col.origin'))}</th><th></th></tr></thead><tbody>${rowsHTML}</tbody></table>`; });   // a number typed and not saved yet: kept (DRAFTS, 50-panel.js)
 }
 async function pricesSend(op, model, row) {
   pr.busy = true; renderPrices(true);
   const got = typeof SOURCE.pricesOp === 'function' ? await SOURCE.pricesOp(op, model, row) : { ok: false, error: tl('pr.live.only') };
   pr.busy = false;
   pr.msg = got.ok ? tl({ set: 'pr.done.set', remove: 'pr.done.remove', reset: 'pr.done.reset' }[op], { model }) : tl('pr.failed', { error: got.error || tl('pr.unknown') });
-  if (got.ok && op === 'set') pr.edit = null;
+  if (got.ok && op === 'set') { pr.edit = null; dropDrafts('pr:'); }   // saved: no draft left
   renderPrices(true);
 }
 $('pr-close').addEventListener('click', closePrices);
@@ -11146,7 +11473,7 @@ prBody.addEventListener('click', (ev) => {
     return;
   }
   if (op) { pricesSend(op.dataset.prOp, op.dataset.prModel, null); return; }
-  if (t.closest('[data-pr-cancel]')) { pr.edit = null; renderPrices(true); }
+  if (t.closest('[data-pr-cancel]')) { pr.edit = null; dropDrafts('pr:'); renderPrices(true); }
 });
 prBody.addEventListener('submit', (ev) => {
   ev.preventDefault();
@@ -11902,7 +12229,9 @@ function composePlace(pane, id) {
   if (HIST.compose._for !== id) {   // another robot: nothing typed for the last one goes to this one
     attachDropAll(HIST.compose._for);
     HIST.compose._for = id;
-    composeEls().area.value = '';
+    const area = composeEls().area;   // what was typed for this robot before (DRAFTS, 50-panel.js) comes back
+    area.dataset.keep = `prompt:${id}`;
+    area.value = (DRAFTS.get(area.dataset.keep) || {}).v || '';
     composeClose(false);
   }
   const cards = histCardsBox(), low = histLowBtn();   // the box's handle on its top edge, a row of its own (not in the box's scroll)
@@ -11947,9 +12276,47 @@ function histCardsBox() {
     el.addEventListener('click', onQuestionClick);
     el.addEventListener('click', onDenialClick);
     el.addEventListener('click', (e) => { const b = e.target.closest('[data-h-off]'); if (b) histOff(b.dataset.hOff); });
+    el.addEventListener('click', (e) => { const b = e.target.closest('[data-h-fold]'); if (b) histFoldToggle(b.dataset.hFold); });
     HIST.cards = el;
   }
   return HIST.cards;
+}
+/* The box of cards folded to one line (requester 10-23: a question on the card hides the conversation above it, and
+   they want to read it before answering): a card that waits takes the box's height from the history above.
+   ▼ folds it to its bar — what waits and how many, the first question's words — and the history gets the height; ▲
+   opens it again. Folded, nothing is taken away: the cards stay (hidden), with what was typed and picked in them.
+   Remembered per robot (HIST_FOLD: its id -> the waits it had when folded). A new wait while folded: the box stays
+   folded (the person is reading), the bar says the new count, moves once and stays marked until opened (h-fold-new). When nothing waits any more
+   the robot's fold is forgotten: the next question comes open. */
+const HIST_FOLD = new Map();
+const histFoldKeys = (perms, qs, ds) => [...perms.filter((p) => p.status === 'pending').map((p) => `p:${p.id}`),
+  ...qs.filter((q) => q.status === 'pending').map((q) => `q:${q.id}`), ...ds.filter((d) => d.status === 'pending').map((d) => `d:${d.id}`)];
+function histFoldState(id, perms, qs, ds) {
+  const keys = histFoldKeys(perms, qs, ds), fold = HIST_FOLD.get(id);
+  if (!keys.length) { HIST_FOLD.delete(id); return { folded: false, n: 0, fresh: false }; }
+  if (!fold) return { folded: false, n: keys.length, fresh: false };
+  if (fold.init) fold.init = false;   // folded now: what waits now is what was seen
+  else if (keys.some((k) => !fold.seen.has(k))) fold.fresh = true;   // a new wait: marked until the box is opened
+  for (const k of keys) fold.seen.add(k);
+  return { folded: true, n: keys.length, fresh: fold.fresh };
+}
+function histFoldBar(fold, perms, qs, ds) {
+  const pend = (xs) => xs.filter((x) => x.status === 'pending').length;
+  const n = { q: pend(qs), p: pend(perms), d: pend(ds) };
+  if (!n.q && !n.p && !n.d) return '';
+  if (!fold.folded) return `<button type="button" class="h-fold" data-h-fold="close" data-fk="h-fold" aria-expanded="true">${esc(tl('hist.fold.close'))}</button>`;
+  const what = [['q', 'hist.fold.q'], ['p', 'hist.fold.p'], ['d', 'hist.fold.d']].filter(([k]) => n[k]).map(([k, key]) => tl(key, { n: n[k] })).join(tl('hist.fold.sep'));
+  const first = qs.find((q) => q.status === 'pending'), text = first && first.questions[0] ? first.questions[0].question : '';
+  const textHTML = text ? `<span class="h-fold-text">${esc(text)}</span>` : '';
+  return `<button type="button" class="h-fold${fold.fresh ? ' h-fold-new' : ''}" data-h-fold="open" data-fk="h-fold" aria-expanded="false">${esc(tl('hist.fold.open', { what }))}${textHTML}</button>`;
+}
+function histFoldToggle(how) {
+  const id = HIST.compose && HIST.compose._for;
+  if (!id) return;
+  if (how === 'close') HIST_FOLD.set(id, { seen: new Set(), fresh: false, init: true });
+  else HIST_FOLD.delete(id);
+  histCardsPaint();
+  if (how === 'close') { const pane = histPane(); if (pane && HIST.atEnd) histToEnd(pane); }   // the newest stays in view as the history grows
 }
 function histCardsPaint(id = HIST.compose && HIST.compose._for, off = HIST.tab !== 'history') {
   const el = histCardsBox(), sess = id ? SESSION_OF[id] : null, now = Date.now();
@@ -11959,9 +12326,11 @@ function histCardsPaint(id = HIST.compose && HIST.compose._for, off = HIST.tab !
   const qs = !off ? QUESTIONS.filter((q) => mine(q.who) && kept('q', q) && (q.status === 'pending' || q.status === 'sent' || now - (q.doneAt || 0) < Q_SHOW_MS)) : [];
   const ds = !off && typeof DENIALS !== 'undefined' ? DENIALS.filter((d) => mine(d.who) && kept('d', d) && (d.status === 'pending' || now - (d.doneAt || 0) < DEN_SHOW_MS)) : [];
   el.hidden = !(perms.length || qs.length || ds.length);
-  keyed(el, JSON.stringify([id, NAMES.rev, DEN.asking, perms.map(permSig), questionsSig(qs), denialsSig(ds)]),
-    () => `${perms.map((p) => permDetail(p, `hb-${p.id}`)).join('')}${qs.map((q) => questionHTML(q, 'h')).join('')}${ds.map((d) => denialHTML(d, 'h')).join('')}`);
-  histLowBtn().hidden = el.hidden;   // the handle that grows this box (下を広げる until 2.3.20) is shown with it, on its top edge
+  const fold = histFoldState(id, perms, qs, ds);
+  el.classList.toggle('h-folded', fold.folded);
+  keyed(el, JSON.stringify([id, NAMES.rev, DEN.asking, perms.map(permSig), questionsSig(qs), denialsSig(ds), fold.folded, fold.n, fold.fresh]),
+    () => `${histFoldBar(fold, perms, qs, ds)}${perms.map((p) => permDetail(p, `hb-${p.id}`)).join('')}${qs.map((q) => questionHTML(q, 'h')).join('')}${ds.map((d) => denialHTML(d, 'h')).join('')}`);
+  histLowBtn().hidden = el.hidden || fold.folded;   // the handle that grows this box: shown with it, on its top edge (not while folded)
 }
 function composePaint() {
   if (!HIST.compose) return;
@@ -12066,7 +12435,7 @@ async function composeSend() {
   E.go.disabled = false;
   composeClose(!got.ok);
   if (got.ok) {
-    HIST.sent = { id, text, at: Date.now() }; E.area.value = '';
+    HIST.sent = { id, text, at: Date.now() }; E.area.value = ''; dropDrafts(`prompt:${id}`);
     for (const a of HIST.attach) attachKeepThumb(a);
     HIST.attach = [];
   } else HIST.sent = { id, text, at: Date.now(), error: got.error || `HTTP ${got.status}` };
@@ -12335,8 +12704,9 @@ document.addEventListener('click', (e) => {
    - layout: every group a floor holding its child groups and its nodes, packed in rows (sizes bottom-up, places top-
      down), so 2,000 nodes still fit one view; a node is a cell.
    - shapes: one InstancedMesh per shape (category → shape, srShape), the colour the provider's; one InstancedMesh for
-     all the floors; the cables two sets of strips (within a provider: solid; across providers: dashed magenta, higher),
-     each at least SR_CABLE px wide on the page however far the camera is (srCables).
+     all the floors; the cables two sets of strips (within a provider: solid; across providers: dashed magenta, a little
+     higher), from one node's side to the other's, low, rising only over what stands between (srCablePathOf), each at least SR_CABLE px
+     wide on the page however far the camera is (srCables).
    - far (a node smaller than SR.lod.far px on the page): the top groups are boxes, the cables bundled between them
      (one line per pair, its count in the board), the labels the boxes' only; near again past SR.lod.near px.
    - labels: a pool of SR.labels.max on the page, given each tenth of a second to the nearest things in view.
@@ -12357,7 +12727,10 @@ document.addEventListener('click', (e) => {
 const SR = {
   phase: 'idle', project: null, seq: 0, t0: 0, until: 0, why: '', full: '', opener: null, model: null, view: null, log: [],
   fastMs: 300, starMs: 140, okMs: 700, failMs: 9000,
-  lod: { far: 9, near: 13 }, labels: { max: 110, nodes: 80 }, stats: null, detail: { enter: 30, leave: 40 },
+  lod: { far: 9, near: 13 },
+  // 2D pulled back (the requester 10-23, 「引きでは跨ぐ線だけ」): below `hide` px a cell, the cables within one provider are
+  // hidden and only the crossing ones drawn; above `show` all again (a gap between, so it never flickers)
+  flatPlain: { hide: 18, show: 22 }, labels: { max: 110, nodes: 80 }, stats: null, detail: { enter: 30, leave: 40 },
   closed: new Set(), selected: null, selectedGroup: null, boardSel: null, zoomStep: 1.4,
   // fewer lines (2.3.9, requester 10-20: 「線減らす工夫欲しいね」): all cables faint, the pressed and the pointed node's
   // drawn strong on a layer of their own; a switch for all (faint) / crossing ones only / the chosen node's only
@@ -12367,7 +12740,23 @@ const SR = {
   box: { armed: false, drag: null }, boxFit: 0.92,
   // つながっている物を全部見せる: {id, hops, ids, edges, cam} while shown; how many steps it follows (1, or 'all'); how faint the rest
   reach: null, reachHops: 1, reachFade: 0.82, reachLineOpacity: 0.05, reachFit: 0.7,   // reachFit: what it holds fills this much of the page, its tags inside
+  // 2D (requester 10-23: 「3D見にくいので2Dモードも実装してほしい / 機能は3Dと一緒」): the same room from straight above, an
+  // orthographic camera and flat shapes; flat is the room open now's, remembered per project (srViewPref)
+  flat: false,
 };
+/* The 2D camera's frame: half its height in world units at zoom 1 (srResize gives it the page's aspect), and how high it
+   sits (well above anything drawn, so the cables' near plane never cuts them). */
+const SR_FLAT = { half: 50, height: 400, fov: 45 };
+/* 2D or 3D, per project: {project: '2d' | '3d'} in the page's own storage. */
+function srViewPref(project) {
+  try { const all = JSON.parse(readPref('srView', '{}')) || {}; return (all[project] || all['*']) === '2d'; } catch (err) { return false; }   // '*': every project not chosen yet (the e2e's 2D runs)
+}
+function srViewPrefSet(project, flat) {
+  let all = {};
+  try { all = JSON.parse(readPref('srView', '{}')) || {}; } catch (err) { all = {}; }
+  all[project] = flat ? '2d' : '3d';
+  writePref('srView', JSON.stringify(all));
+}
 const srEl = $('sr'), srBubbleEl = $('sr-bubble');
 function srNow() { return performance.now(); }
 function srCovers() { return SR.phase === 'open'; }   // 40-scene.js: the room's 3D is not drawn under the server room
@@ -12496,7 +12885,85 @@ function srDetailShape(n) {
   if (c === 'auth' || c === 'secrets') return 'key';
   return srShape(c);
 }
-const srShapeIn = (set, n) => (set === 'detail' ? srDetailShape(n) : srShape(n.category));
+const srShapeIn = (set, n) => (SR.flat ? `flat:${srModelKind(n)}` : set === 'detail' ? srDetailShape(n) : srShape(n.category));
+/* 2D's shapes (the 3D models' kinds, 56-sr-models.js srModelKind; the orchestrator 10-23: each kind told apart, the
+   requester's 「どんな機能のノードかわかりやすいように」): a flat tile each — an outline of its own and its short name on it,
+   drawn once on a canvas, white where the cloud's colour shows and dark for the name. [outline, name, half width, half
+   depth, round]. */
+const SR_FLAT_KIND = {
+  db: ['circle', 'DB', 0.62, 0.62, true], cache: ['circle', 'MEM', 0.55, 0.55, true], bucket: ['bucket', 'OBJ', 0.6, 0.6, false],
+  drive: ['square', 'DISK', 0.6, 0.6, false], broadcast: ['triangle', 'PUB', 0.66, 0.6, false], queue: ['pill', 'QUEUE', 0.8, 0.42, false],
+  stream: ['pill', 'STREAM', 0.8, 0.42, false], splitter: ['diamond', 'LB', 0.66, 0.66, false], globe: ['ring', 'CDN', 0.66, 0.66, true],
+  signpost: ['sign', 'DNS', 0.7, 0.5, false], shield: ['shield', 'WAF', 0.6, 0.66, false], arch: ['arch', 'API', 0.66, 0.6, false],
+  bolt: ['square', 'λ', 0.58, 0.58, false], server: ['square', 'VM', 0.62, 0.62, false], container: ['hex', 'CTR', 0.66, 0.6, false],
+  wheel: ['oct', 'K8s', 0.64, 0.64, true], browser: ['window', 'UI', 0.7, 0.55, false], padlock: ['lock', 'AUTH', 0.58, 0.64, false],
+  key: ['round', 'KEY', 0.58, 0.58, false], clock: ['clock', 'CRON', 0.6, 0.6, true], envelope: ['envelope', 'MAIL', 0.7, 0.5, false],
+  gauge: ['gauge', 'MON', 0.64, 0.56, false], cloud: ['cloud', 'SaaS', 0.74, 0.54, false], plinth: ['round', '', 0.45, 0.45, false],
+};
+const SR_FLAT_TEX = new Map();
+// the tiles drawn this much of their size in SR_FLAT_KIND, so a lane stays clear between two rows or columns of a full
+// room (a cell is SR_CELL; the widest tile then leaves 0.5 between) for the cables to run in (srCablePathFlat)
+const SR_FLAT_TILE = 0.82;
+function srFlatTexture(kind) {
+  if (SR_FLAT_TEX.has(kind)) return SR_FLAT_TEX.get(kind);
+  const [outline, name, hx, hz] = SR_FLAT_KIND[kind] || SR_FLAT_KIND.plinth, S = 128, cv = document.createElement('canvas');
+  cv.width = cv.height = S;
+  const g = cv.getContext('2d'), w = hx / 0.8 * (S / 2 - 4), h = hz / 0.8 * (S / 2 - 4), c = S / 2;
+  g.beginPath();
+  const poly = (pts) => { pts.forEach(([x, y], i) => (i ? g.lineTo(c + x * w, c + y * h) : g.moveTo(c + x * w, c + y * h))); g.closePath(); };
+  const rect = (r) => g.roundRect(c - w, c - h, 2 * w, 2 * h, r);
+  ({ circle: () => g.ellipse(c, c, w, h, 0, 0, Math.PI * 2), ring: () => g.ellipse(c, c, w, h, 0, 0, Math.PI * 2), clock: () => g.ellipse(c, c, w, h, 0, 0, Math.PI * 2),
+    square: () => rect(6), round: () => rect(Math.min(w, h) * 0.45), window: () => rect(5), envelope: () => rect(4), lock: () => rect(10),
+    pill: () => rect(h), hex: () => poly([[-1, 0], [-0.5, -1], [0.5, -1], [1, 0], [0.5, 1], [-0.5, 1]]),
+    oct: () => poly([[-0.42, -1], [0.42, -1], [1, -0.42], [1, 0.42], [0.42, 1], [-0.42, 1], [-1, 0.42], [-1, -0.42]]),
+    diamond: () => poly([[0, -1], [1, 0], [0, 1], [-1, 0]]), triangle: () => poly([[0, -1], [1, 1], [-1, 1]]),
+    bucket: () => poly([[-1, -1], [1, -1], [0.72, 1], [-0.72, 1]]), sign: () => poly([[-1, -1], [0.6, -1], [1, 0], [0.6, 1], [-1, 1]]),
+    shield: () => { g.moveTo(c - w, c - h); g.lineTo(c + w, c - h); g.lineTo(c + w, c); g.quadraticCurveTo(c + w, c + h * 0.7, c, c + h); g.quadraticCurveTo(c - w, c + h * 0.7, c - w, c); g.closePath(); },
+    arch: () => { g.moveTo(c - w, c + h); g.lineTo(c - w, c - h * 0.1); g.arc(c, c - h * 0.1, w, Math.PI, 0); g.lineTo(c + w, c + h); g.closePath(); },
+    gauge: () => { g.moveTo(c - w, c + h * 0.6); g.arc(c, c + h * 0.6, w, Math.PI, 0); g.lineTo(c + w, c + h); g.lineTo(c - w, c + h); g.closePath(); },
+    cloud: () => {} }[outline] || (() => rect(6)))();
+  if (outline === 'cloud') {   // puffs: the edge's grey a little larger under the white
+    const puffs = (k) => { g.beginPath(); for (const [x, y, r] of [[-0.5, 0.25, 0.48], [0.05, -0.2, 0.62], [0.55, 0.2, 0.45]]) { g.moveTo(c + x * w + r * h * k, c + y * h); g.arc(c + x * w, c + y * h, r * h * k, 0, Math.PI * 2); }
+      g.roundRect(c - w * 0.95 * k, c + h * 0.1, w * 1.9 * k, h * 0.75 * k, h * 0.3); };
+    g.fillStyle = '#7a7a7a'; puffs(1.07); g.fill();
+    g.fillStyle = '#ffffff'; puffs(1); g.fill();
+  } else {
+    g.fillStyle = '#ffffff'; g.fill();
+    g.lineWidth = 5; g.strokeStyle = '#7a7a7a'; g.stroke();
+  }
+  g.strokeStyle = '#3a3a3a'; g.lineWidth = 4;   // a mark of the outline's own where it helps tell apart
+  if (outline === 'ring') { g.beginPath(); g.ellipse(c, c, w * 0.78, h * 0.78, 0, 0, Math.PI * 2); g.stroke(); }
+  if (outline === 'window') { g.beginPath(); g.moveTo(c - w, c - h * 0.55); g.lineTo(c + w, c - h * 0.55); g.stroke(); }
+  if (outline === 'envelope') { g.beginPath(); g.moveTo(c - w, c - h); g.lineTo(c, c - h * 0.15); g.lineTo(c + w, c - h); g.stroke(); }
+  if (outline === 'clock') { g.beginPath(); g.moveTo(c, c - h * 0.8); g.lineTo(c, c - h * 0.45); g.stroke(); }
+  if (name) {
+    g.fillStyle = '#2a2a2a';
+    let px = 44;
+    const room = 2 * w * (outline === 'diamond' || outline === 'triangle' ? 0.62 : 0.84);
+    do { g.font = `700 ${px}px system-ui, -apple-system, 'Segoe UI', sans-serif`; px -= 2; } while (g.measureText(name).width > room && px > 14);
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(name, c, c + (outline === 'triangle' ? h * 0.3 : outline === 'window' ? h * 0.2 : outline === 'gauge' ? h * 0.35 : outline === 'envelope' ? h * 0.3 : 0));
+  }
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+  SR_FLAT_TEX.set(kind, tex);
+  return tex;
+}
+/* A flat tile, lying on the floor's plane (the page's up the layout's -z). */
+let srFlatGeoMade = null;
+function srFlatGeo() {
+  if (!srFlatGeoMade) { srFlatGeoMade = new THREE.PlaneGeometry(1.6 * SR_FLAT_TILE, 1.6 * SR_FLAT_TILE); srFlatGeoMade.rotateX(-Math.PI / 2); }
+  return srFlatGeoMade;
+}
+/* The instanced mesh of a shape: the 3D's lit solids, or 2D's flat tiles (their colour the cloud's, unlit). */
+function srShapeMesh(shape, count) {
+  if (shape.startsWith('flat:')) {
+    const mesh = new THREE.InstancedMesh(srFlatGeo(), new THREE.MeshBasicMaterial({ map: srFlatTexture(shape.slice(5)), alphaTest: 0.5, toneMapped: false }), count);
+    mesh.userData.flatGeo = true;   // shared: never disposed with the mesh
+    return mesh;
+  }
+  return new THREE.InstancedMesh(SR_SHAPES[shape](), new THREE.MeshLambertMaterial({ color: 0xffffff }), count);
+}
 // the services' names as people say them (the tag up close); an unknown one shows as it is written
 const SR_SERVICE_NAME = { ec2: 'EC2', 'ec2.asg': 'EC2 Auto Scaling', ecs: 'ECS', 'ecs.fargate': 'ECS Fargate', eks: 'EKS', lambda: 'Lambda',
   stepfunctions: 'Step Functions', apprunner: 'App Runner', beanstalk: 'Elastic Beanstalk', elb: 'ELB', 'elb.alb': 'ALB', 'elb.nlb': 'NLB',
@@ -12581,11 +13048,251 @@ function srEnvs(model) { return (model.environments || []).map((e) => (typeof e 
    pushed apart on the page by SR_CABLE_SHADER — at least `px` wide (pulled back) and, up close, as wide as
    `world` units up to `max` px, like the flows' light (59-sr-flows.js srFlowLightKeepSize) whose core is a little wider, so a light
    still reads as running inside its cable. A segment with an end behind the camera is cut at the near plane; one of
-   length 0 (a migration step's edge before it grows) draws nothing. srCableSet / srCableGet / srCableDone move one
-   segment's ends (59-sr-migration.js): the order is the one srBuild laid them in. */
-// px: the least width on the page by layer; world: the width up close (units); max: the most on the page — a cable running
-// past the camera would otherwise fill the page, and draw every pixel of it
-const SR_CABLE = { plain: 2.2, cross: 2.8, focus: 4, bundle: 2.6, world: 0.08, max: 7 };
+   length 0 (a migration step's edge before it grows) draws nothing. A cable is a path of segments (srCablePathOf);
+   srCableShow / srCableShown / srCableGet / srCableDone draw part of one and read it (59-sr-migration.js): the order is
+   the one srBuild laid them in. A cable running past the camera is held to `max` px, else it would fill the page. */
+// The widths (requester 10-23, 2.3.20 in use: 「未選択の時の線はもっと全然細くていい」「選択時も少しだけ細くして」): the
+// cables not chosen thin — px on the page at least, `faintWorld` units up close up to `faintMax` px; the strong layer (the
+// chosen, the pointed, the reach) `focus` px, `world` units up close up to `max` px, inside the flows' light (its core
+// at least 7/3 px in radius: 59-sr-flows.js).
+const SR_CABLE = { plain: 0.9, cross: 1.1, bundle: 1, faintWorld: 0.025, faintMax: 1.8, focus: 3, world: 0.06, max: 5 };
+/* Where a cable runs (requester 10-23: 「線がノードのオブジェクトの上にあるからわかりづらい、ちゃんとノード同士を繋ぐように
+   してほしい」; then 「ノードの外にあることというよりノードの際外側と接地してることだね、今上に浮いてるから高さが合ってない
+   他のオブジェクト避ける時だけ上に角度変えて」): from the side of one node to the side of the other, low — each end on the
+   outer edge of the node as it is drawn now (its simple shape, or up close its model: srNodeFoot), at a height within the
+   node, SR_ROUTE.side above its foot. Straight and flat between the two, unless something stands on the way (another node,
+   a closed group's box): then the cable rises just before it (SR_ROUTE.ramp), passes SR_ROUTE.clear over its top, and
+   comes down after it; obstacles near each other share one rise. A cable is a polyline: every set of cables, the strong
+   layer, the flows' light and their branch hints, the migration's edges read the same path (srCablePathOf). The far
+   view's bundles run the same way between the top groups' boxes (srBundlePath). */
+// join: two rises nearer than this (units, ramp to ramp) are one — a cable through a crowded room rises once at the
+// height of the tallest thing under it, rather than up and down over each (and a segment for each: 133,000 segments
+// in the 2,000-node room, a frame up close 87 ms, against 5,000 and 18 before the paths)
+const SR_ROUTE = { side: 0.3, ramp: 0.55, clear: 0.25, margin: 0.06, cross: 0.06, join: Infinity };
+// a shape's or a model's extent around its middle (x, z half widths; y from its middle) and whether it is round
+const SR_FOOT = new Map();
+function srFootOfObject(key, make) {
+  if (!SR_FOOT.has(key)) {
+    const o = make(), box = new THREE.Box3().setFromObject(o);
+    const round = o.isMesh && !(o.geometry && o.geometry.type === 'BoxGeometry');
+    SR_FOOT.set(key, { hx: Math.max(Math.abs(box.min.x), box.max.x), hz: Math.max(Math.abs(box.min.z), box.max.z), y0: box.min.y, y1: box.max.y, round });
+    o.traverse((x) => { if (x.geometry) x.geometry.dispose(); });
+  }
+  return SR_FOOT.get(key);
+}
+function srShapeFoot(shape) {
+  if (shape.startsWith('flat:')) { const k = SR_FLAT_KIND[shape.slice(5)] || SR_FLAT_KIND.plinth; return { hx: k[2] * SR_FLAT_TILE, hz: k[3] * SR_FLAT_TILE, y0: -0.01, y1: 0.01, round: k[4] }; }
+  return srFootOfObject(`shape:${shape}`, () => new THREE.Mesh(SR_SHAPES[shape]()));
+}
+function srModelFoot(kind) {
+  return srFootOfObject(`model:${kind}`, () => {
+    const g = new THREE.Group();
+    for (const [geo, x, y, z, , rot] of srModelParts()[kind]) { const m = new THREE.Mesh(geo.clone()); m.position.set(x, y, z); if (rot) m.rotation.set(rot[0], rot[1], rot[2]); g.add(m); }
+    g.updateMatrixWorld(true);
+    return g;
+  });
+}
+/* A node as drawn now, on the floor's plane: its middle, its half widths, its foot and top (world y), whether round. A node
+   in a closed group is that group's box. */
+function srNodeFoot(V, p) {
+  if (p.hiddenIn) {
+    const G = p.hiddenIn, h = 0.6 + Math.log2(1 + srCountNodes(G)) * 0.35, y = 0.06 * G.level;
+    return { x: G.x + G.w / 2, z: G.z + SR_HEAD + (G.d - SR_HEAD) / 2, hx: (G.w - SR_PAD) / 2, hz: (G.d - SR_HEAD - SR_PAD * 0.5) / 2, y0: y, y1: y + h, round: false };
+  }
+  const sc = p.n.count > 1 ? 1 + Math.min(Math.log2(p.n.count), 4) * 0.12 : 1;
+  const f = V.flat ? srShapeFoot(srShapeIn('simple', p.n))
+    : V.detail && typeof srModelKind === 'function' ? srModelFoot(srModelKind(p.n)) : srShapeFoot(srShape(p.n.category));
+  const mid = p.y + 0.75;
+  return { x: p.x, z: p.z, hx: f.hx * sc, hz: f.hz * sc, y0: mid + f.y0 * sc, y1: mid + f.y1 * sc, round: f.round };
+}
+/* Where a ray from a foot's middle, along the unit (dx, dz), leaves its outline. */
+function srFootExit(f, dx, dz) {
+  if (f.round) return 1 / Math.hypot(dx / Math.max(f.hx, 1e-6), dz / Math.max(f.hz, 1e-6));
+  return Math.min(Math.abs(dx) > 1e-9 ? f.hx / Math.abs(dx) : Infinity, Math.abs(dz) > 1e-9 ? f.hz / Math.abs(dz) : Infinity);
+}
+/* Where the segment s(t) = A + t (B - A), t in 0..1, crosses a foot grown by m (null: it does not), as [t in, t out]. */
+function srFootSpan(f, A, B, m) {
+  const dx = B[0] - A[0], dz = B[1] - A[1];
+  if (f.round) {   // an ellipse: scaled to the unit circle
+    const ax = (A[0] - f.x) / (f.hx + m), az = (A[1] - f.z) / (f.hz + m), bx = dx / (f.hx + m), bz = dz / (f.hz + m);
+    const qa = bx * bx + bz * bz, qb = 2 * (ax * bx + az * bz), qc = ax * ax + az * az - 1, disc = qb * qb - 4 * qa * qc;
+    if (qa < 1e-12 || disc <= 0) return null;
+    const r = Math.sqrt(disc), t0 = (-qb - r) / (2 * qa), t1 = (-qb + r) / (2 * qa);
+    return t1 < 0 || t0 > 1 ? null : [Math.max(0, t0), Math.min(1, t1)];
+  }
+  let t0 = 0, t1 = 1;   // a box: the slabs
+  for (const [o, d, c, h] of [[A[0], dx, f.x, f.hx + m], [A[1], dz, f.z, f.hz + m]]) {
+    if (Math.abs(d) < 1e-12) { if (Math.abs(o - c) > h) return null; continue; }
+    let u0 = (c - h - o) / d, u1 = (c + h - o) / d;
+    if (u0 > u1) [u0, u1] = [u1, u0];
+    t0 = Math.max(t0, u0); t1 = Math.min(t1, u1);
+    if (t0 > t1) return null;
+  }
+  return [t0, t1];
+}
+/* The feet of the nodes drawn, on a grid of SR_CELL, for the spans a cable may cross. */
+function srFootGrid(V) {
+  if (V.footGrid && V.footGrid.detail === V.detail) return V.footGrid;
+  const cells = new Map(), feet = new Map(), boxes = new Set();
+  for (const [id, p] of V.L.pos) {
+    const f = srNodeFoot(V, p);
+    feet.set(id, f);
+    if (p.hiddenIn) { if (boxes.has(p.hiddenIn)) continue; boxes.add(p.hiddenIn); }
+    f.id = id;
+    for (let gx = Math.floor((f.x - f.hx) / SR_CELL); gx <= Math.floor((f.x + f.hx) / SR_CELL); gx++)
+      for (let gz = Math.floor((f.z - f.hz) / SR_CELL); gz <= Math.floor((f.z + f.hz) / SR_CELL); gz++) {
+        const k = `${gx},${gz}`; (cells.get(k) || cells.set(k, []).get(k)).push(f);
+      }
+  }
+  V.footGrid = { cells, feet, detail: V.detail };
+  return V.footGrid;
+}
+/* The path of a cable, from one node's side to the other's (see SR_ROUTE): points [x, y, z], at least two. */
+function srCablePathOf(V, from, to, crossing) {
+  if (V.flat) return srCablePathFlat(V, from, to, crossing);
+  const grid = srFootGrid(V), fa = grid.feet.get(from), fb = grid.feet.get(to);
+  if (!fa || !fb) return null;
+  const lift = crossing ? SR_ROUTE.cross : 0;
+  let dx = fb.x - fa.x, dz = fb.z - fa.z;
+  const d = Math.hypot(dx, dz);
+  const ya = Math.min(fa.y0 + SR_ROUTE.side, (fa.y0 + fa.y1) / 2) + lift, yb = Math.min(fb.y0 + SR_ROUTE.side, (fb.y0 + fb.y1) / 2) + lift;
+  if (d < 1e-6 || (fa === fb)) return [[fa.x, ya, fa.z], [fa.x, ya, fa.z]];   // one place (a closed group to itself): nothing drawn
+  dx /= d; dz /= d;
+  const ea = srFootExit(fa, dx, dz), eb = srFootExit(fb, -dx, -dz);
+  if (ea + eb >= d) return [[fa.x, ya, fa.z], [fa.x, ya, fa.z]];   // touching: no cable between them
+  const A = [fa.x + dx * ea, fa.z + dz * ea], B = [fb.x - dx * eb, fb.z - dz * eb], len = d - ea - eb;
+  // what stands on the way: the feet in the grid cells along it (its own two out)
+  const seen = new Set([fa, fb]), spans = [];
+  for (let k = 0, n = Math.ceil(len / (SR_CELL / 2)) + 1; k <= n; k++) {
+    const x = A[0] + (B[0] - A[0]) * k / n, z = A[1] + (B[1] - A[1]) * k / n;
+    for (let gx = Math.floor(x / SR_CELL) - 1; gx <= Math.floor(x / SR_CELL) + 1; gx++)
+      for (let gz = Math.floor(z / SR_CELL) - 1; gz <= Math.floor(z / SR_CELL) + 1; gz++)
+        for (const f of grid.cells.get(`${gx},${gz}`) || []) {
+          if (seen.has(f)) continue;
+          seen.add(f);
+          const sp = srFootSpan(f, A, B, SR_ROUTE.margin);
+          if (sp) spans.push([sp[0], sp[1], f.y1 + SR_ROUTE.clear]);
+        }
+  }
+  const base = (t) => ya + (yb - ya) * t, at = (t, y) => [A[0] + (B[0] - A[0]) * t, y, A[1] + (B[1] - A[1]) * t];
+  const pts = [at(0, ya)];
+  if (spans.length) {   // rises, each over the obstacles it covers; two whose ramps would meet are one
+    const r = SR_ROUTE.ramp / len, join = SR_ROUTE.join / len;
+    spans.sort((p, q) => p[0] - q[0]);
+    const humps = [];
+    for (const sp of spans) {
+      const h = humps[humps.length - 1];
+      if (h && sp[0] - r <= h[1] + r + join) { h[1] = Math.max(h[1], sp[1]); h[2] = Math.max(h[2], sp[2]); } else humps.push([...sp]);
+    }
+    for (const [t0, t1, top] of humps) {
+      const up = Math.max(0, t0 - r), down = Math.min(1, t1 + r), y = Math.max(top, base(t0), base(t1));
+      if (up > 0) pts.push(at(up, base(up)));
+      pts.push(at(t0, y), at(t1, y));
+      if (down < 1) pts.push(at(down, base(down)));
+    }
+  }
+  pts.push(at(1, yb));
+  return pts;
+}
+const srCablePath = (V, e) => srCablePathOf(V, e.from, e.to, !!e.crossProvider);
+/* 2D's cables (the plan's: 「重なる時は角を曲げて避ける」): from one tile's edge to the other's as the 3D's (srNodeFoot,
+   srFootExit), flat under the tiles; straight when nothing is on the way, else around it with square corners: the
+   shortest of an L either way, a run along the lane between two rows or columns next to either end (the cells' edges,
+   SR_CELL / 2 from a node's middle), or a Z, that crosses no other tile. None clear (a full room, far apart): straight,
+   under the tiles — drawn beneath them, never over one. */
+const SR_FLAT_ROUTE = { y: 0.45, cross: 0.03, margin: 0.12, lanes: 6 };
+function srFlatClear(V, grid, P, Q, skip) {
+  const len = Math.hypot(Q[0] - P[0], Q[1] - P[1]);
+  if (len < 1e-6) return true;
+  const seen = new Set(skip);
+  for (let k = 0, n = Math.ceil(len / (SR_CELL / 2)) + 1; k <= n; k++) {
+    const x = P[0] + (Q[0] - P[0]) * k / n, z = P[1] + (Q[1] - P[1]) * k / n;
+    for (let gx = Math.floor(x / SR_CELL) - 1; gx <= Math.floor(x / SR_CELL) + 1; gx++)
+      for (let gz = Math.floor(z / SR_CELL) - 1; gz <= Math.floor(z / SR_CELL) + 1; gz++)
+        for (const f of grid.cells.get(`${gx},${gz}`) || []) {
+          if (seen.has(f)) continue;
+          seen.add(f);
+          if (srFootSpan(f, P, Q, SR_FLAT_ROUTE.margin)) return false;
+        }
+  }
+  return true;
+}
+function srCablePathFlat(V, from, to, crossing) {
+  const grid = srFootGrid(V), fa = grid.feet.get(from), fb = grid.feet.get(to);
+  if (!fa || !fb) return null;
+  const y = SR_FLAT_ROUTE.y + (crossing ? SR_FLAT_ROUTE.cross : 0), skip = [fa, fb];
+  const none = [[fa.x, y, fa.z], [fa.x, y, fa.z]];
+  let dx = fb.x - fa.x, dz = fb.z - fa.z;
+  const d = Math.hypot(dx, dz);
+  if (d < 1e-6 || fa === fb) return none;
+  dx /= d; dz /= d;
+  const ea = srFootExit(fa, dx, dz), eb = srFootExit(fb, -dx, -dz);
+  if (ea + eb >= d) return none;
+  const A = [fa.x + dx * ea, fa.z + dz * ea], B = [fb.x - dx * eb, fb.z - dz * eb];
+  if (srFlatClear(V, grid, A, B, skip)) return [[A[0], y, A[1]], [B[0], y, B[1]]];
+  // the corners' routes: each leg along x or z, leaving and entering the tiles at their edges
+  const out = (f, ux, uz) => { const e = srFootExit(f, ux, uz); return [f.x + ux * e, f.z + uz * e]; };
+  const sx = Math.sign(fb.x - fa.x), sz = Math.sign(fb.z - fa.z), tries = [];
+  if (sx && sz) {
+    tries.push([out(fa, sx, 0), [fb.x, fa.z], out(fb, 0, -sz)]);     // along x, then z
+    tries.push([out(fa, 0, sz), [fa.x, fb.z], out(fb, -sx, 0)]);     // along z, then x
+  }
+  const h = SR_CELL / 2;
+  for (const s1 of [1, -1]) {
+    // along the lane next to one end, then straight into the other (3 legs)
+    tries.push([out(fa, 0, s1), [fa.x, fa.z + s1 * h], [fb.x, fa.z + s1 * h], out(fb, 0, Math.sign(fa.z + s1 * h - fb.z) || -s1)]);
+    tries.push([out(fa, 0, Math.sign(fb.z + s1 * h - fa.z) || s1), [fa.x, fb.z + s1 * h], [fb.x, fb.z + s1 * h], out(fb, 0, s1)]);
+    tries.push([out(fa, s1, 0), [fa.x + s1 * h, fa.z], [fa.x + s1 * h, fb.z], out(fb, Math.sign(fa.x + s1 * h - fb.x) || -s1, 0)]);
+    tries.push([out(fa, Math.sign(fb.x + s1 * h - fa.x) || s1, 0), [fb.x + s1 * h, fa.z], [fb.x + s1 * h, fb.z], out(fb, s1, 0)]);
+    for (const s2 of [1, -1]) {   // the lane by one end, the cross lane by the other (4 legs)
+      tries.push([out(fa, 0, s1), [fa.x, fa.z + s1 * h], [fb.x + s2 * h, fa.z + s1 * h], [fb.x + s2 * h, fb.z], out(fb, s2, 0)]);
+      tries.push([out(fa, s1, 0), [fa.x + s1 * h, fa.z], [fa.x + s1 * h, fb.z + s2 * h], [fb.x, fb.z + s2 * h], out(fb, 0, s2)]);
+    }
+  }
+  for (let k = 0; k <= SR_FLAT_ROUTE.lanes; k++) for (const sgn of k ? [1, -1] : [1]) {
+    const off = sgn * k * SR_CELL / 2;
+    if (sx) { const xm = (fa.x + fb.x) / 2 + off; tries.push([out(fa, Math.sign(xm - fa.x) || sx, 0), [xm, fa.z], [xm, fb.z], out(fb, Math.sign(xm - fb.x) || -sx, 0)]); }
+    if (sz) { const zm = (fa.z + fb.z) / 2 + off; tries.push([out(fa, 0, Math.sign(zm - fa.z) || sz), [fa.x, zm], [fb.x, zm], out(fb, 0, Math.sign(zm - fb.z) || -sz)]); }
+  }
+  const length = (pts) => pts.slice(1).reduce((a, q, i) => a + Math.hypot(q[0] - pts[i][0], q[1] - pts[i][1]), 0);
+  // the shortest first: the first clear one is the one (fewer checks on a full room)
+  const best = tries.map((pts) => [length(pts), pts]).sort((a, b) => a[0] - b[0])
+    .find(([, pts]) => pts.slice(1).every((q, i) => srFlatClear(V, grid, pts[i], q, skip)));
+  return (best ? best[1] : [A, B]).map((q) => [q[0], y, q[1]]);
+}
+/* A bundle between two top groups' boxes, from the side of one to the side of the other, rising over the boxes between. */
+function srBundlePath(V, A, B, crossing) {
+  const foot = (G) => ({ x: G.x + G.w / 2, z: G.z + G.d / 2, hx: G.w * 0.46, hz: G.d * 0.46, y0: 0, y1: G.boxH, round: false });
+  if (V.flat) {   // 2D, pulled back: side to side, straight (the boxes are flat, nothing to go round at this size)
+    const fa = foot(A), fb = foot(B), y = SR_FLAT_ROUTE.y + (crossing ? SR_FLAT_ROUTE.cross : 0) + 0.6;
+    let dx = fb.x - fa.x, dz = fb.z - fa.z;
+    const d = Math.hypot(dx, dz);
+    if (d < 1e-6) return [[fa.x, y, fa.z], [fa.x, y, fa.z]];
+    dx /= d; dz /= d;
+    const ea = srFootExit(fa, dx, dz), eb = srFootExit(fb, -dx, -dz);
+    if (ea + eb >= d) return [[fa.x, y, fa.z], [fa.x, y, fa.z]];
+    return [[fa.x + dx * ea, y, fa.z + dz * ea], [fb.x - dx * eb, y, fb.z - dz * eb]];
+  }
+  const fa = foot(A), fb = foot(B), lift = crossing ? SR_ROUTE.cross : 0;
+  let dx = fb.x - fa.x, dz = fb.z - fa.z;
+  const d = Math.hypot(dx, dz);
+  const ya = Math.min(SR_ROUTE.side * 2, A.boxH / 2) + lift, yb = Math.min(SR_ROUTE.side * 2, B.boxH / 2) + lift;
+  if (d < 1e-6) return [[fa.x, ya, fa.z], [fa.x, ya, fa.z]];
+  dx /= d; dz /= d;
+  const ea = srFootExit(fa, dx, dz), eb = srFootExit(fb, -dx, -dz);
+  if (ea + eb >= d) return [[fa.x, ya, fa.z], [fa.x, ya, fa.z]];
+  const P = [fa.x + dx * ea, fa.z + dz * ea], Q = [fb.x - dx * eb, fb.z - dz * eb], len = d - ea - eb, r = SR_ROUTE.ramp * 2 / len;
+  const spans = V.L.tops.filter((G) => G !== A && G !== B).map((G) => { const sp = srFootSpan(foot(G), P, Q, SR_ROUTE.margin); return sp ? [sp[0], sp[1], G.boxH + SR_ROUTE.clear] : null; }).filter(Boolean).sort((p, q) => p[0] - q[0]);
+  const base = (t) => ya + (yb - ya) * t, at = (t, y) => [P[0] + (Q[0] - P[0]) * t, y, P[1] + (Q[1] - P[1]) * t], pts = [at(0, ya)];
+  for (const [t0, t1, top] of spans) {
+    const up = Math.max(0, t0 - r), down = Math.min(1, t1 + r), y = Math.max(top, base(t0), base(t1));
+    if (up > 0) pts.push(at(up, base(up)));
+    pts.push(at(t0, y), at(t1, y));
+    if (down < 1) pts.push(at(down, base(down)));
+  }
+  pts.push(at(1, yb));
+  return pts;
+}
 const SR_CABLE_SHADER = {
   vertex: `attribute vec3 cableStart; attribute vec3 cableEnd; uniform vec2 uRes; uniform float uPx, uWorld, uMax; varying float vDist;
     void main() {
@@ -12613,12 +13320,12 @@ const SR_CABLE_SHADER = {
     }`,   // the colour as the old lines drew it: uColor is linear (THREE.Color), the page sRGB
 };
 /* A set of cables from [ax, ay, az, bx, by, bz, ...]: `px` the least width on the page, `dash`/`gap` world units (0: solid). */
-function srCables(arr, { color, opacity = 1, px = SR_CABLE.plain, dash = 0, gap = 0 }) {
+function srCables(paths, { color, opacity = 1, px = SR_CABLE.plain, dash = 0, gap = 0, world = SR_CABLE.faintWorld, max = SR_CABLE.faintMax }) {
   const g = new THREE.BufferGeometry();
-  srCableFill(g, arr);
+  srCableFill(g, paths);
   const m = new THREE.ShaderMaterial({ vertexShader: SR_CABLE_SHADER.vertex, fragmentShader: SR_CABLE_SHADER.fragment, transparent: opacity < 1, depthWrite: opacity >= 1, side: THREE.DoubleSide,   // the corners' winding is the page's, whichever way the cable runs
     uniforms: { uColor: { value: new THREE.Color(color) }, uOpacity: { value: opacity }, uRes: { value: new THREE.Vector2(1, 1) }, uPx: { value: px },
-      uWorld: { value: SR_CABLE.world }, uMax: { value: SR_CABLE.max }, uDash: { value: dash }, uGap: { value: gap } } });
+      uWorld: { value: world }, uMax: { value: max }, uDash: { value: dash }, uGap: { value: gap } } });
   m.opacity = opacity;   // read as a LineBasicMaterial's was (the board, the e2e); the shader reads uOpacity
   const mesh = new THREE.Mesh(g, m);
   mesh.frustumCulled = false;   // the strips are placed by the shader: the box three would cull by is the corners'
@@ -12626,36 +13333,61 @@ function srCables(arr, { color, opacity = 1, px = SR_CABLE.plain, dash = 0, gap 
   mesh.onBeforeRender = (renderer) => renderer.getSize(m.uniforms.uRes.value).multiplyScalar(0.5);   // half the page: NDC 1 is this many px
   return mesh;
 }
-/* Four corners a cable, each carrying both its ends. Not instanced: measured in the e2e's software GL, up close in the
-   2,000-node room, 5,000 instanced strips made a frame's p90 56 ms (17 with the old lines); written out, 20. */
-function srCableFill(g, arr) {
-  const n = arr.length / 6, corner = new Float32Array(n * 12), st = new Float32Array(n * 12), en = new Float32Array(n * 12), idx = new Uint32Array(n * 6);
+/* Four corners a segment, each carrying both its ends; a cable (one path, srCablePathOf) is its segments one after
+   the other, kept as geometry.userData.paths[j] = {i0, pts, lens, len}. Not instanced: measured in the e2e's software GL,
+   up close in the 2,000-node room, 5,000 instanced strips made a frame's p90 56 ms (17 with the old lines); written
+   out, 20. */
+function srCableFill(g, paths) {
+  const list = [], segs = [];
+  for (const pts of paths) {
+    const i0 = segs.length, lens = [];
+    for (let k = 0; k + 1 < pts.length; k++) { segs.push([pts[k], pts[k + 1]]); lens.push(Math.hypot(pts[k + 1][0] - pts[k][0], pts[k + 1][1] - pts[k][1], pts[k + 1][2] - pts[k][2])); }
+    list.push({ i0, pts, lens, len: lens.reduce((x, y) => x + y, 0) });
+  }
+  const n = segs.length, corner = new Float32Array(n * 12), st = new Float32Array(n * 12), en = new Float32Array(n * 12), idx = new Uint32Array(n * 6);
   for (let i = 0; i < n; i++) {
     corner.set([-0.5, 0, 0, 0.5, 0, 0, -0.5, 1, 0, 0.5, 1, 0], i * 12);
-    for (let k = 0; k < 4; k++) for (let c = 0; c < 3; c++) { st[i * 12 + k * 3 + c] = arr[i * 6 + c]; en[i * 12 + k * 3 + c] = arr[i * 6 + 3 + c]; }
+    for (let k = 0; k < 4; k++) for (let c = 0; c < 3; c++) { st[i * 12 + k * 3 + c] = segs[i][0][c]; en[i * 12 + k * 3 + c] = segs[i][1][c]; }
     idx.set([0, 1, 2, 2, 1, 3].map((x) => i * 4 + x), i * 6);
   }
   g.setAttribute('position', new THREE.BufferAttribute(corner, 3));
   g.setAttribute('cableStart', new THREE.BufferAttribute(st, 3));
   g.setAttribute('cableEnd', new THREE.BufferAttribute(en, 3));
   g.setIndex(new THREE.BufferAttribute(idx, 1));
-  g.userData.cables = n;
+  g.userData.paths = list;
+  g.userData.cables = paths.length;
 }
-/* A set's cables all made again (the strong layer: the pressed, the pointed, the reach). */
-function srCablesRefill(mesh, arr) {
+/* A set's cables all made again (the strong layer: the pressed, the pointed, the reach; every set when the look changes). */
+function srCablesRefill(mesh, paths) {
   mesh.geometry.dispose();
   mesh.geometry = new THREE.BufferGeometry();
-  srCableFill(mesh.geometry, arr);
+  srCableFill(mesh.geometry, paths);
 }
 const srCableCount = (mesh) => mesh.geometry.userData.cables;
-function srCableSet(mesh, j, a, b) {
-  const st = mesh.geometry.getAttribute('cableStart').array, en = mesh.geometry.getAttribute('cableEnd').array;
-  for (let k = 0; k < 4; k++) for (let c = 0; c < 3; c++) { st[j * 12 + k * 3 + c] = a[c]; en[j * 12 + k * 3 + c] = b[c]; }
+const srCablePts = (mesh, j) => mesh.geometry.userData.paths[j].pts;
+/* Cable j drawn from f0 to f1 of its length (0..1), the rest of it not (a migration's edge going to its middle, or
+   coming out of its start); its segments written, srCableDone hands them over. */
+function srCableShow(mesh, j, f0, f1) {
+  const P = mesh.geometry.userData.paths[j], st = mesh.geometry.getAttribute('cableStart').array, en = mesh.geometry.getAttribute('cableEnd').array;
+  const lo = f0 * P.len, hi = f1 * P.len;
+  let at = 0;
+  for (let k = 0; k < P.lens.length; k++) {
+    const a = P.pts[k], b = P.pts[k + 1], l = P.lens[k], u0 = Math.min(1, Math.max(0, (lo - at) / (l || 1))), u1 = Math.min(1, Math.max(0, (hi - at) / (l || 1)));
+    const s0 = a.map((x, c) => x + (b[c] - x) * u0), s1 = u1 > u0 ? a.map((x, c) => x + (b[c] - x) * u1) : s0;
+    const i = P.i0 + k;
+    for (let q = 0; q < 4; q++) for (let c = 0; c < 3; c++) { st[i * 12 + q * 3 + c] = s0[c]; en[i * 12 + q * 3 + c] = s1[c]; }
+    at += l;
+  }
 }
-function srCableGet(mesh, j) {
-  const st = mesh.geometry.getAttribute('cableStart').array, en = mesh.geometry.getAttribute('cableEnd').array;
-  return [[st[j * 12], st[j * 12 + 1], st[j * 12 + 2]], [en[j * 12], en[j * 12 + 1], en[j * 12 + 2]]];
+/* How much of cable j is drawn now (0..1), and its two ends as drawn. */
+function srCableShown(mesh, j) {
+  const P = mesh.geometry.userData.paths[j], st = mesh.geometry.getAttribute('cableStart').array, en = mesh.geometry.getAttribute('cableEnd').array;
+  let drawn = 0;
+  for (let k = 0; k < P.lens.length; k++) { const i = P.i0 + k; drawn += Math.hypot(en[i * 12] - st[i * 12], en[i * 12 + 1] - st[i * 12 + 1], en[i * 12 + 2] - st[i * 12 + 2]); }
+  return P.len ? drawn / P.len : 0;
 }
+/* Cable j's two ends (its path's first and last points). */
+function srCableGet(mesh, j) { const pts = srCablePts(mesh, j); return [pts[0], pts[pts.length - 1]]; }
 function srCableDone(mesh) { for (const k of ['cableStart', 'cableEnd']) mesh.geometry.getAttribute(k).needsUpdate = true; }
 
 /* Places every group and node (sizes bottom-up, places top-down); the external nodes on a strip in front. */
@@ -12743,6 +13475,8 @@ function srShow(model) {
   $('sr-fold').checked = false;
   SR.closed = new Set(); SR.selected = null; SR.selectedGroup = null; SR.hover = null; SR.only = new Set();
   $('sr-lines').value = SR.lines;
+  SR.flat = srViewPref(SR.project);   // the look this project was last seen in (56-server-cost.js srSetFlat)
+  srModeButtons();
   srBuild();
   $('sr-back').focus({ preventScroll: true });
 }
@@ -12767,7 +13501,10 @@ function srDispose() {
   cancelAnimationFrame(V.raf);
   V.ro.disconnect();
   V.controls.dispose();
-  V.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) { for (const m of [].concat(o.material)) { if (m.map) m.map.dispose(); m.dispose(); } } });
+  V.scene.traverse((o) => {
+    if (o.userData.flatGeo) { o.material.dispose(); return; }   // 2D's tile and its canvases are the page's, kept for the next build
+    if (o.geometry) o.geometry.dispose(); if (o.material) { for (const m of [].concat(o.material)) { if (m.map) m.map.dispose(); m.dispose(); } }
+  });
   V.renderer.renderLists.dispose();   // the renderer stays: a new one on the same canvas drew its first frame washed out
   for (const url of V.iconUrls) URL.revokeObjectURL(url);
   if (V.reachMats) for (const m of V.reachMats.values()) m.dispose();   // a faint copy not on a model now is in no scene
@@ -12794,10 +13531,19 @@ function srBuild(keep) {
   scene.background = new THREE.Color(PAL.bg);
   scene.add(new THREE.HemisphereLight(0xffffff, 0x445566, 1.6));
   const sun = new THREE.DirectionalLight(0xffffff, 1.2); sun.position.set(30, 60, 40); scene.add(sun);
-  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 5000);
+  const flat = SR.flat;
+  // 2D: straight down (OrbitControls' polar angle 0 against the usual up), so the page's top is the layout's -z as the 3D
+  // looks from the south; no turning: a drag moves, the wheel zooms
+  const camera = flat ? new THREE.OrthographicCamera(-SR_FLAT.half, SR_FLAT.half, SR_FLAT.half, -SR_FLAT.half, 1, SR_FLAT.height * 2)
+    : new THREE.PerspectiveCamera(45, 1, 0.1, 5000);
   const controls = new OrbitControls(camera, cv);
   Object.assign(controls, { enableDamping: !reduceMotion, dampingFactor: 0.12, screenSpacePanning: true, minDistance: 3, maxDistance: 4000, maxPolarAngle: Math.PI * 0.48 });
-  const V = { renderer, scene, camera, controls, L, near: new THREE.Group(), far: new THREE.Group(), lod: 'near', pick: [], iconUrls: [], raf: 0,
+  if (flat) {
+    Object.assign(controls, { enableRotate: false, minZoom: SR_FLAT.half * 2 / 4000, maxZoom: SR_FLAT.half * 2 / 3, minPolarAngle: 0, maxPolarAngle: 0 });
+    controls.mouseButtons = { LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
+    controls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_PAN };
+  }
+  const V = { flat, renderer, scene, camera, controls, L, near: new THREE.Group(), far: new THREE.Group(), lod: 'near', pick: [], iconUrls: [], raf: 0,
     frames: [], labelAt: 0, labels: [], ro: null, env, fold, dark, floorColors: [] };
   V.far.visible = false;   // srLod only switches on a change: a view that opens near never showed the far boxes' level
   scene.add(V.near, V.far);
@@ -12834,11 +13580,11 @@ function srBuild(keep) {
   V.nodeMeshes = { simple: [], detail: [] };
   V.nodeSets.detail.visible = false;
   V.detail = false;
-  for (const set of ['simple', 'detail']) {
+  for (const set of flat ? ['simple'] : ['simple', 'detail']) {   // 2D: one set, the flat tiles
     const byShape = {};
     for (const p of L.pos.values()) if (!p.hiddenIn) (byShape[srShapeIn(set, p.n)] = byShape[srShapeIn(set, p.n)] || []).push(p);
     for (const [shape, list] of Object.entries(byShape)) {
-      const mesh = new THREE.InstancedMesh(SR_SHAPES[shape](), new THREE.MeshLambertMaterial({ color: 0xffffff }), list.length);
+      const mesh = srShapeMesh(shape, list.length);
       list.forEach((p, i) => {
         const s = p.n.count > 1 ? 1 + Math.min(Math.log2(p.n.count), 4) * 0.12 : 1;
         m4.compose(at.set(p.x, p.y + 0.75, p.z), q, sc.set(s, s, s));
@@ -12855,14 +13601,13 @@ function srBuild(keep) {
   // cables: within a provider solid, across providers dashed magenta and higher (requester: 跨いでいることが見て分かる)
   const plain = [], cross = [];
   for (const e of L.edges) {
-    const a = L.pos.get(e.from), b = L.pos.get(e.to), crossing = !!e.crossProvider, y = crossing ? 2.6 : 1.7;
-    (crossing ? cross : plain).push(a.x, y, a.z, b.x, y, b.z);
+    (e.crossProvider ? cross : plain).push(srCablePath(V, e));
   }
   V.plainLines = srCables(plain, { color: PAL.plain, opacity: SR.plainOpacity, px: SR_CABLE.plain });
   V.crossLines = srCables(cross, { color: PAL.cross, opacity: SR.crossOpacity, px: SR_CABLE.cross, dash: 0.5, gap: 0.3 });
   // the strong layer: the pressed, the pointed node's and the reach's cables (srFocusLines fills it)
-  V.focusLines = srCables([], { color: PAL.focus, px: SR_CABLE.focus });
-  V.focusCross = srCables([], { color: PAL.cross, px: SR_CABLE.focus });
+  V.focusLines = srCables([], { color: PAL.focus, px: SR_CABLE.focus, world: SR_CABLE.world, max: SR_CABLE.max });
+  V.focusCross = srCables([], { color: PAL.cross, px: SR_CABLE.focus, world: SR_CABLE.world, max: SR_CABLE.max });
   V.focusLines.renderOrder = V.focusCross.renderOrder = 2;
   V.near.add(V.plainLines, V.crossLines, V.focusLines, V.focusCross);
   // far: the top groups as boxes, the cables bundled between them
@@ -12888,8 +13633,7 @@ function srBuild(keep) {
   }
   const bp = [], bc = [];
   for (const B of bundles.values()) {
-    const ya = B.a.boxH + 0.3, yb = B.b.boxH + 0.3;
-    (B.cross ? bc : bp).push(B.a.x + B.a.w / 2, ya, B.a.z + B.a.d / 2, B.b.x + B.b.w / 2, yb, B.b.z + B.b.d / 2);
+    (B.cross ? bc : bp).push(srBundlePath(V, B.a, B.b, !!B.cross));
   }
   V.bundles = [...bundles.values()];
   // the far view's bundles: as faint as the near cables, and the lines switch holds there too (the independent verification of item 1)
@@ -12913,7 +13657,7 @@ function srBuild(keep) {
   srLinesMode(V);
   srFocusLines(V);
   srFit(true);
-  if (keep) { camera.position.copy(keep.pos); controls.target.copy(keep.target); controls.update(); }
+  if (keep && !!keep.flat === flat) { camera.position.copy(keep.pos); controls.target.copy(keep.target); if (flat) { camera.zoom = keep.zoom; camera.updateProjectionMatrix(); } controls.update(); }
   srCounts(L);
   cv.onpointerdown = (e) => { V.downAt = [e.clientX, e.clientY]; };
   cv.onpointermove = (e) => {   // the pointed node's cables, strong (at most every 60 ms)
@@ -12962,26 +13706,61 @@ function srPixMean(renderer) {
 function srCountNodes(G) { return G.nodes.length + G.kids.reduce((a, k) => a + srCountNodes(k), 0); }
 function srResize(V) {
   const box = $('sr-canvas').parentElement, w = Math.max(1, box.clientWidth), h = Math.max(1, box.clientHeight);
-  V.renderer.setSize(w, h, false); V.camera.aspect = w / h; V.camera.updateProjectionMatrix();
+  V.renderer.setSize(w, h, false);
+  if (V.flat) { const a = w / h; Object.assign(V.camera, { left: -SR_FLAT.half * a, right: SR_FLAT.half * a, top: SR_FLAT.half, bottom: -SR_FLAT.half }); }
+  else V.camera.aspect = w / h;
+  V.camera.updateProjectionMatrix();
 }
+/* How much of the floor the page's height shows now (world units): the 3D's at its target's distance, the 2D's its frame
+   over its zoom. Both cameras are moved by it (srSetSpan), so fit, zoom, focus, the box and the reach are one code. */
+function srSpan(V) {
+  if (V.flat) return (V.camera.top - V.camera.bottom) / V.camera.zoom;
+  return 2 * V.camera.position.distanceTo(V.controls.target) * Math.tan((V.camera.fov * Math.PI / 180) / 2);
+}
+/* The span as the 3D's distance to its target (the 2D says the distance a 45° camera would need for its span). */
+function srViewDist(V) { return V.flat ? srSpan(V) / (2 * Math.tan(SR_FLAT.fov * Math.PI / 360)) : V.camera.position.distanceTo(V.controls.target); }
+/* Looks at (x, z) with `span` world units in the page's height: the 3D along its direction now, the 2D from straight above. */
+function srSetSpan(V, x, z, span) {
+  V.controls.target.set(x, 0, z);
+  if (V.flat) {
+    V.camera.position.set(x, SR_FLAT.height, z);
+    V.camera.zoom = Math.min(V.controls.maxZoom, Math.max(V.controls.minZoom, (V.camera.top - V.camera.bottom) / span));
+    V.camera.updateProjectionMatrix();
+  } else {
+    const dir = V.camera.position.clone().sub(V.controls.target).normalize();
+    if (!(dir.lengthSq() > 0)) dir.set(0, 0.78, 0.62).normalize();
+    V.camera.position.copy(V.controls.target).addScaledVector(dir, span / (2 * Math.tan((V.camera.fov * Math.PI / 180) / 2)));
+  }
+  V.camera.updateMatrixWorld();
+}
+/* Where the camera is, to put it back after a build (the same view only: a switch between 2D and 3D fits again). */
+function srCamKeep(V) { return { pos: V.camera.position.clone(), target: V.controls.target.clone(), zoom: V.camera.zoom, flat: V.flat }; }
 function srFit(instant) {
   const V = SR.view;
   if (!V) return;
   const L = V.L, cx = L.width / 2, cz = L.depth / 2, r = Math.max(6, Math.hypot(L.width, L.depth) / 2);
-  const dist = r / Math.sin((V.camera.fov * Math.PI / 180) / 2) * 0.95;
-  V.controls.target.set(cx, 0, cz);
-  V.camera.position.set(cx, dist * 0.78, cz + dist * 0.62);
-  V.camera.near = Math.max(0.1, dist / 500); V.camera.far = dist * 6; V.camera.updateProjectionMatrix();
+  if (V.flat) {   // the whole layout in the page, whichever way it is longer
+    const a = (V.camera.right - V.camera.left) / (V.camera.top - V.camera.bottom);
+    srSetSpan(V, cx, cz, Math.max(12, L.depth, L.width / a) * 1.08);
+  } else {
+    const dist = r / Math.sin((V.camera.fov * Math.PI / 180) / 2) * 0.95;
+    V.controls.target.set(cx, 0, cz);
+    V.camera.position.set(cx, dist * 0.78, cz + dist * 0.62);
+    V.camera.near = Math.max(0.1, dist / 500); V.camera.far = dist * 6; V.camera.updateProjectionMatrix();
+  }
   V.controls.update();
   void instant;
 }
 /* How big a node cell is on the page now (px): far below SR.lod.far, near again above SR.lod.near. */
 function srCellPx(V) {
-  const dist = V.camera.position.distanceTo(V.controls.target), h = V.renderer.domElement.clientHeight || 1;
-  return SR_CELL / (2 * dist * Math.tan((V.camera.fov * Math.PI / 180) / 2)) * h;
+  return SR_CELL / srSpan(V) * (V.renderer.domElement.clientHeight || 1);
 }
 function srLod(V) {
   const px = srCellPx(V);
+  if (V.flat) {
+    const sparse = V.sparse ? px < SR.flatPlain.show : px < SR.flatPlain.hide;
+    if (sparse !== !!V.sparse) { V.sparse = sparse; srLinesMode(V); }
+  }
   const want = V.lod === 'near' ? (px < SR.lod.far ? 'far' : 'near') : (px > SR.lod.near ? 'near' : 'far');
   if (want === V.lod) return;
   V.lod = want; V.near.visible = want === 'near'; V.far.visible = want === 'far';
@@ -12998,7 +13777,7 @@ function srPlaceLabels(V) {
     for (const G of V.L.tops) consider(G.x + G.w / 2, G.boxH + 0.8, G.z + G.d / 2, `${G.g.label || G.g.id} · ${G.nodeCount}`, 'group', 1);
   } else {
     for (const G of V.L.floors) if (G.g.id && !(V.migFloorShown && !V.migFloorShown.includes(G.g.id))) consider(G.x + 0.6, 0.2 + G.level * 0.06, G.z + 0.5, G.g.label || G.g.id, 'group', 0.6);
-    for (const p of V.L.pos.values()) if (!p.hiddenIn && !srMigHides(p.n.id) && !(SR.reach && !SR.reach.ids.has(p.n.id))) consider(p.x, p.y + 1.9, p.z, `${p.n.label || p.n.id}${p.n.count > 1 ? ` ×${p.n.count}` : ''}`, p.external ? 'external' : 'node', 1, p.n);
+    for (const p of V.L.pos.values()) if (!p.hiddenIn && !srMigHides(p.n.id) && !(SR.reach && !SR.reach.ids.has(p.n.id))) consider(p.x, p.y + 1.9, V.flat ? p.z - 0.85 : p.z, `${p.n.label || p.n.id}${p.n.count > 1 ? ` ×${p.n.count}` : ''}`, p.external ? 'external' : 'node', 1, p.n);
   }
   // up close (§5): how many nodes are in view decides the look, with room between going in and coming back
   const inView = out.filter((o) => o.n).length;
@@ -13020,7 +13799,7 @@ function srPlaceLabels(V) {
   V.labels.forEach((s, i) => {
     const o = shown[i];
     if (!o) { s.hidden = true; return; }
-    s.hidden = false; s.dataset.kind = o.kind;
+    s.hidden = false; s.dataset.kind = o.kind; s.dataset.node = o.n ? o.n.id : '';
     if (s.textContent !== o.text) s.textContent = o.text;
     s.style.transform = `translate(${Math.round(o.sx)}px, ${Math.round(o.sy)}px) translate(-50%, -100%)`;
   });
@@ -13029,9 +13808,23 @@ function srPlaceLabels(V) {
 /* The simple shapes or the ones by service (§5): shown, and the ones a press picks. */
 function srSetDetail(V, on) {
   V.detail = on;
+  if (V.flat) return;   // 2D: one set of flat tiles, its feet the same up close; only the tags say more (srPlaceLabels)
   V.nodeSets.simple.visible = !on; V.nodeSets.detail.visible = on;
   const drop = new Set(V.nodeMeshes[on ? 'simple' : 'detail']);
   V.pick = V.pick.filter((m) => !drop.has(m)).concat(V.nodeMeshes[on ? 'detail' : 'simple']);
+  srCablesReroute(V);   // the cables end on the nodes as drawn now: the models' sides up close, the shapes' otherwise
+}
+/* Every cable laid again on the nodes as drawn now (srNodeFoot), the same edges in the same order: a migration's state
+   is written on them again (59-sr-migration.js). */
+function srCablesReroute(V) {
+  const t0 = srNow();
+  const plain = [], cross = [];
+  for (const e of V.L.edges) (e.crossProvider ? cross : plain).push(srCablePath(V, e));
+  srCablesRefill(V.plainLines, plain);
+  srCablesRefill(V.crossLines, cross);
+  srFocusLines(V);
+  if (V.migEdges && typeof srMigApply === 'function') srMigApply(V, true);
+  V.reroutes = (V.reroutes || 0) + 1; V.rerouteMs = Math.round(srNow() - t0);   // how often and how long (the e2e reads it)
 }
 /* The room's icons: per node the strongest key the settings give (service → provider → category), an image plane above it. */
 async function srIcons(V) {
@@ -13053,8 +13846,9 @@ async function srIcons(V) {
     const tex = await new THREE.TextureLoader().loadAsync(url).catch(() => null);
     if (!tex || SR.view !== V) continue;
     const mesh = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.9, 0.9), new THREE.MeshBasicMaterial({ map: tex, transparent: true, toneMapped: false }), list.length);
-    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.5, 0, 0));
-    list.forEach((p, i) => { m4.compose(new THREE.Vector3(p.x, p.y + 2.1, p.z), q, new THREE.Vector3(1, 1, 1)); mesh.setMatrixAt(i, m4); });
+    // 2D: lying flat on the tile's corner (its name stays readable); 3D: tilted to the usual slant, over the shape
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion().setFromEuler(new THREE.Euler(V.flat ? -Math.PI / 2 : -0.5, 0, 0));
+    list.forEach((p, i) => { m4.compose(V.flat ? new THREE.Vector3(p.x + 0.5, p.y + 0.8, p.z - 0.5) : new THREE.Vector3(p.x, p.y + 2.1, p.z), q, new THREE.Vector3(V.flat ? 0.55 : 1, 1, V.flat ? 0.55 : 1)); mesh.setMatrixAt(i, m4); });
     mesh.userData.icon = key; mesh.userData.nodes = list.map((p) => p.n.id);
     V.near.add(mesh);
     V.iconCount = (V.iconCount || 0) + list.length;
@@ -13089,26 +13883,23 @@ function srFocusLines(V) {
   if (ids.size || reach) {
     for (const e of V.L.edges) {
       if ((!ids.has(e.from) && !ids.has(e.to) && !(reach && reach.has(e))) || srMigEdgeHidden(e)) continue;
-      const a = V.L.pos.get(e.from), b = V.L.pos.get(e.to), y = e.crossProvider ? 2.62 : 1.72;
-      (e.crossProvider ? cross : plain).push(a.x, y, a.z, b.x, y, b.z);
+      (e.crossProvider ? cross : plain).push(srCablePath(V, e).map((q) => [q[0], q[1] + 0.02, q[2]]));   // a hair over its faint twin
     }
   }
   srCablesRefill(V.focusLines, plain);
   srCablesRefill(V.focusCross, cross);
-  V.focusCount = (plain.length + cross.length) / 6;
+  V.focusCount = plain.length + cross.length;   // a path a cable
 }
 /* The lines switch: all (faint) / crossing ones only / the chosen node's only. */
 function srLinesMode(V) {
-  V.plainLines.visible = V.farPlain.visible = SR.lines === 'all';
+  V.plainLines.visible = V.farPlain.visible = SR.lines === 'all' && !V.sparse;   // 2D pulled back: the crossing ones only (srLod)
   V.crossLines.visible = V.farCross.visible = SR.lines !== 'focus';
 }
 /* Moves in on a node or a group (its floor's middle, near enough to see what it holds). */
 function srFocus(x, z, r) {
   const V = SR.view;
   if (!V) return;
-  const dir = V.camera.position.clone().sub(V.controls.target).normalize(), dist = Math.max(6, r * 2.2);
-  V.controls.target.set(x, 0, z);
-  V.camera.position.copy(V.controls.target).addScaledVector(dir, dist);
+  srSetSpan(V, x, z, 2 * Math.max(6, r * 2.2) * Math.tan(SR_FLAT.fov * Math.PI / 360));
   V.controls.update();
 }
 function srFocusSelected() {
@@ -13129,6 +13920,13 @@ function srToggleGroup(id) {
 function srZoomBy(factor) {
   const V = SR.view;
   if (!V) return;
+  if (V.flat) {
+    const z = V.camera.zoom / factor;
+    if (z < V.controls.minZoom || z > V.controls.maxZoom) return;
+    V.camera.zoom = z; V.camera.updateProjectionMatrix();
+    V.controls.update();
+    return;
+  }
   const d = V.camera.position.clone().sub(V.controls.target).multiplyScalar(factor);
   if (d.length() < V.controls.minDistance || d.length() > V.controls.maxDistance) return;
   V.camera.position.copy(V.controls.target).add(d);
@@ -13156,10 +13954,21 @@ function srBoxDraw() {
 }
 /* The camera, its direction kept, on the middle of these points and as near as lets all of them fill k of the page. */
 function srFrameOn(V, pts, k = SR.boxFit) {
+  const c = pts.reduce((a, v) => a.add(v), new THREE.Vector3()).divideScalar(pts.length);
+  if (V.flat) {   // a distance as the 3D's (srViewDist), the same search
+    const tan = 2 * Math.tan(SR_FLAT.fov * Math.PI / 360), now = srViewDist(V);
+    const place = (d) => srSetSpan(V, c.x, c.z, d * tan);
+    const fits = (d) => { place(d); return pts.every((v) => { const q = v.clone().project(V.camera); return Math.abs(q.x) <= k && Math.abs(q.y) <= k; }); };
+    let lo = V.controls.minDistance, hi = Math.max(now, lo);
+    while (!fits(hi) && hi < V.controls.maxDistance) hi = Math.min(V.controls.maxDistance, hi * 2);
+    if (fits(lo)) hi = lo;
+    else for (let i = 0; i < 32 && hi - lo > 0.01; i++) { const m = (lo + hi) / 2; if (fits(m)) hi = m; else lo = m; }
+    place(hi);
+    return;
+  }
   const dir = V.camera.position.clone().sub(V.controls.target).normalize(), now = V.camera.position.distanceTo(V.controls.target);
   const { minDistance: lo0, maxDistance: hi0 } = V.controls;
   const place = (d) => { V.camera.position.copy(V.controls.target).addScaledVector(dir, d); V.camera.updateMatrixWorld(); };
-  const c = pts.reduce((a, v) => a.add(v), new THREE.Vector3()).divideScalar(pts.length);
   V.controls.target.set(c.x, 0, c.z);
   const fits = (d) => {
     place(d);
@@ -13188,9 +13997,9 @@ function srZoomToBox(x0, y0, x1, y1) {
   const l = Math.min(x0, x1), r = Math.max(x0, x1), t = Math.min(y0, y1), b = Math.max(y0, y1);
   V.camera.updateMatrixWorld();
   const held = srBoxPoints(V).filter(([, v]) => { const s = srScreenAt(V, v, w, h); return s && s[0] >= l && s[0] <= r && s[1] >= t && s[1] <= b; });
-  const dir = V.camera.position.clone().sub(V.controls.target).normalize(), now = V.camera.position.distanceTo(V.controls.target);
+  const dir = V.camera.position.clone().sub(V.controls.target).normalize(), now = srViewDist(V);
   const { minDistance: lo0, maxDistance: hi0 } = V.controls;
-  const place = (d) => { V.camera.position.copy(V.controls.target).addScaledVector(dir, d); V.camera.updateMatrixWorld(); };
+  const place = (d) => { if (V.flat) { srSetSpan(V, V.controls.target.x, V.controls.target.z, d * 2 * Math.tan(SR_FLAT.fov * Math.PI / 360)); return; } V.camera.position.copy(V.controls.target).addScaledVector(dir, d); V.camera.updateMatrixWorld(); };
   if (held.length) srFrameOn(V, held.map(([, v]) => v));
   else {   // nothing in it: its middle on the floor, as much nearer as the box is smaller than the page
     const ray = new THREE.Raycaster(), at = new THREE.Vector3();
@@ -13198,7 +14007,7 @@ function srZoomToBox(x0, y0, x1, y1) {
     if (ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), at)) V.controls.target.copy(at);
     place(Math.min(hi0, Math.max(lo0, now * Math.max((r - l) / w, (b - t) / h))));
   }
-  V.camera.near = Math.max(0.1, Math.min(V.camera.near, V.camera.position.distanceTo(V.controls.target) / 500));
+  if (!V.flat) V.camera.near = Math.max(0.1, Math.min(V.camera.near, V.camera.position.distanceTo(V.controls.target) / 500));
   V.camera.updateProjectionMatrix();
   V.controls.update();
   V.lastBox = { held: held.map(([id]) => id), lod: V.lod };
@@ -13229,7 +14038,7 @@ function srReachToggle() {
   if (SR.reach) { srReachEnd(true); return; }
   if (!V || !SR.selected || !V.L.pos.has(SR.selected)) return;
   SR.reach = { id: SR.selected, hops: SR.reachHops, ...srReachOf(V.L, SR.selected, SR.reachHops),
-    cam: { pos: V.camera.position.clone(), target: V.controls.target.clone() } };
+    cam: { pos: V.camera.position.clone(), target: V.controls.target.clone(), zoom: V.camera.zoom } };
   srReachDraw(V);
   srFrameOn(V, srReachPoints(V), SR.reachFit);
   V.controls.update();
@@ -13242,7 +14051,7 @@ function srReachEnd(back) {
   SR.reach = null;
   if (V) {
     srReachDraw(V);
-    if (back) { V.camera.position.copy(R.cam.pos); V.controls.target.copy(R.cam.target); V.controls.update(); }
+    if (back) { V.camera.position.copy(R.cam.pos); V.controls.target.copy(R.cam.target); if (V.flat) { V.camera.zoom = R.cam.zoom; V.camera.updateProjectionMatrix(); } V.controls.update(); }
   }
   srLog(tl('sr.log.reach.end'));
   srRenderBoard();
@@ -13356,7 +14165,7 @@ function srRenderLog() {
 function srRetheme() {
   const V = SR.view;
   if (SR.phase !== 'open' || !V || V.dark === isDark()) return;
-  srBuild({ pos: V.camera.position.clone(), target: V.controls.target.clone() });
+  srBuild(srCamKeep(V));
   const W = SR.view;
   srLog(tl('sr.log.theme', { theme: W.dark ? tl('sr.theme.dark') : tl('sr.theme.light') }));
 }
@@ -13575,7 +14384,7 @@ function srModelBuild(V, p) {
    for those, built as they come into view; none when the simple shapes are shown. */
 function srModelsSync(V, ids) {
   if (!V.models) { V.models = new Map(); V.modelLayer = new THREE.Group(); V.near.add(V.modelLayer); }
-  const on = V.detail && V.lod === 'near';
+  const on = V.detail && V.lod === 'near' && !V.flat;   // 2D: the flat shapes say the kind, no models
   for (const m of V.nodeMeshes.detail) m.material.visible = !on;    // the shapes by service still take the press
   if (!on) {
     for (const g of V.models.values()) V.modelLayer.remove(g);
@@ -13632,10 +14441,24 @@ function srcKeyColor(key, i) {
 }
 
 /* ---- switching ---- */
+/* 3D / 2D / コスト: one pressed — the room's look (SR.flat) unless the cost is shown. */
+function srModeButtons() {
+  const cost = SRC.mode === 'cost';
+  $('sr-mode-3d').setAttribute('aria-pressed', String(!cost && !SR.flat));
+  $('sr-mode-2d').setAttribute('aria-pressed', String(!cost && SR.flat));
+  $('sr-mode-cost').setAttribute('aria-pressed', String(cost));
+}
+/* 2D or 3D (remembered for the project): the room built again in that look, fitted; the cost closed. */
+function srSetFlat(flat) {
+  const change = SR.flat !== flat;
+  SR.flat = flat;
+  if (SR.project) srViewPrefSet(SR.project, flat);
+  srcSetMode('3d');
+  if (change && SR.view) srBuild();
+}
 function srcSetMode(mode) {
   SRC.mode = mode;
-  $('sr-mode-3d').setAttribute('aria-pressed', String(mode === '3d'));
-  $('sr-mode-cost').setAttribute('aria-pressed', String(mode === 'cost'));
+  srModeButtons();
   $('sr-scn-ctl').hidden = mode !== 'cost';
   srcEl.hidden = mode !== 'cost';
   SR.paused = mode === 'cost';
@@ -13653,8 +14476,7 @@ function srCostReset() {   // the server room closed (56-server-room.js srClose)
   Object.assign(SRC, { mode: '3d', scenario: null, account: null, month: null, day: null, date: null, hour: 0, picked: null, error: '', open: new Set(), fill: {} });
   SR.paused = false;
   $('sr-boxzoom').disabled = false;
-  $('sr-mode-3d').setAttribute('aria-pressed', 'true');
-  $('sr-mode-cost').setAttribute('aria-pressed', 'false');
+  srModeButtons();
   $('sr-scn-ctl').hidden = true;
   srcEl.hidden = true;
   setHTML(srcEl, '');
@@ -13837,7 +14659,8 @@ function srcRender(status) {
 }
 
 /* ---- wiring ---- */
-$('sr-mode-3d').addEventListener('click', () => srcSetMode('3d'));
+$('sr-mode-3d').addEventListener('click', () => srSetFlat(false));
+$('sr-mode-2d').addEventListener('click', () => srSetFlat(true));
 $('sr-mode-cost').addEventListener('click', () => srcSetMode('cost'));
 new ResizeObserver(() => { if (SRC.mode === 'cost' && SRC.day) srcMoreFit(); }).observe(srcEl);   // a narrower page cuts more words
 $('sr-scn').addEventListener('change', () => { SRC.scenario = $('sr-scn').value; Object.assign(SRC, { month: null, day: null }); srcLoad(); });
@@ -14810,43 +15633,63 @@ const SR_FLOW_LIGHT_SHADER = {
       if (a <= 0.004) discard;
       gl_FragColor = vec4(mix(uColor, vec3(1.0), uWhite * pow(a, 3.0)), a * uOpacity); }`,
 };
-function srFlowCableY(V, from, to) {
+function srFlowCrossing(V, from, to) {
   const e = V.L.edges.find((x) => (x.from === from && x.to === to) || (x.from === to && x.to === from));
-  return e && e.crossProvider ? 2.6 : 1.7;
+  return !!(e && e.crossProvider);
 }
+/* The light runs in its cable, along the same path (56-server-room.js srCablePathOf), in the move's direction: a tube a
+   segment, each lit for the part of the head and tail that falls on it. */
 function srFlowLight(V, from, to) {
-  const pa = V.L.pos.get(from), pb = V.L.pos.get(to), y = srFlowCableY(V, from, to);
-  const a = new THREE.Vector3(pa.x, y, pa.z), b = new THREE.Vector3(pb.x, y, pb.z), len = Math.max(a.distanceTo(b), 1e-3);
-  const PAL = SR_PAL[V.dark ? 'dark' : 'light'], tail = Math.min(0.85, SR_FLOW_LIGHT.tail / len);
+  const pts = srCablePathOf(V, from, to, srFlowCrossing(V, from, to)).map((q) => new THREE.Vector3(...q));
+  const lens = pts.slice(1).map((q, i) => q.distanceTo(pts[i])), total = Math.max(lens.reduce((x, y) => x + y, 0), 1e-3);
+  const PAL = SR_PAL[V.dark ? 'dark' : 'light'], tail = Math.min(0.85, SR_FLOW_LIGHT.tail / total);
   const layer = (color, opacity, soft, white) => new THREE.ShaderMaterial({ vertexShader: SR_FLOW_LIGHT_SHADER.vertex, fragmentShader: SR_FLOW_LIGHT_SHADER.fragment,
     uniforms: { uColor: { value: new THREE.Color(color) }, uHead: { value: 0 }, uTail: { value: tail }, uOpacity: { value: opacity }, uSoft: { value: soft }, uWhite: { value: white } },
     transparent: true, depthWrite: false, blending: V.dark ? THREE.AdditiveBlending : THREE.NormalBlending });
-  const tube = new THREE.CylinderGeometry(1, 1, 1, 12, 1, true);
-  const glow = new THREE.Mesh(tube, layer(PAL.light, V.dark ? 0.75 : 0.85, 1, 0));
-  const core = new THREE.Mesh(tube, layer(PAL.lightCore, 1, 0, V.dark ? 0.85 : 0.35));
-  const light = new THREE.Group();
-  light.add(glow, core);
-  light.position.copy(a).add(b).multiplyScalar(0.5);
-  light.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
-  glow.scale.set(SR_FLOW_LIGHT.glow, len, SR_FLOW_LIGHT.glow); core.scale.set(SR_FLOW_LIGHT.core, len, SR_FLOW_LIGHT.core);
-  light.renderOrder = glow.renderOrder = core.renderOrder = 3;
-  light.userData = { flowLight: true, moving: true, a, b, head: a.clone(), glow, core, tail };
+  const tube = new THREE.CylinderGeometry(1, 1, 1, 12, 1, true), light = new THREE.Group(), parts = [];
+  let at = 0;
+  for (let i = 0; i < lens.length; i++) {
+    const a = pts[i], b = pts[i + 1], len = Math.max(lens[i], 1e-4);
+    const glow = new THREE.Mesh(tube, layer(PAL.light, V.dark ? 0.75 : 0.85, 1, 0)), core = new THREE.Mesh(tube, layer(PAL.lightCore, 1, 0, V.dark ? 0.85 : 0.35));
+    const seg = new THREE.Group();
+    seg.add(glow, core);
+    seg.position.copy(a).add(b).multiplyScalar(0.5);
+    seg.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
+    glow.scale.set(SR_FLOW_LIGHT.glow, len, SR_FLOW_LIGHT.glow); core.scale.set(SR_FLOW_LIGHT.core, len, SR_FLOW_LIGHT.core);
+    seg.renderOrder = glow.renderOrder = core.renderOrder = 3;
+    light.add(seg);
+    parts.push({ glow, core, from: at / total, span: len / total });
+    at += len;
+  }
+  light.renderOrder = 3;
+  // glow / core: the first part's (read by the e2e hooks as before); parts: every part, its place on the path
+  light.userData = { flowLight: true, moving: true, from, to, a: pts[0], b: pts[pts.length - 1], pts, total, head: pts[0].clone(), glow: parts[0].glow, core: parts[0].core, parts, tail };
   return light;
 }
-/* The head at k (0: the cable's start, 1: its end, past 1: the tail draining). */
+/* The head at k (0: the cable's start, 1: its end, past 1: the tail draining): each part sees it in its own length. */
 function srFlowLightAt(o, k) {
-  for (const m of [o.userData.glow, o.userData.core]) m.material.uniforms.uHead.value = k;
-  o.userData.head.lerpVectors(o.userData.a, o.userData.b, Math.min(k, 1));
+  const U = o.userData;
+  U.k = k;   // where the head is on the whole path (the e2e reads it)
+  for (const P of U.parts) for (const m of [P.glow, P.core]) {
+    m.material.uniforms.uHead.value = (k - P.from) / P.span;
+    m.material.uniforms.uTail.value = U.tail / P.span;
+  }
+  const want = Math.min(k, 1) * U.total;
+  let at = 0;
+  for (let i = 0; i + 1 < U.pts.length; i++) {
+    const l = U.pts[i + 1].distanceTo(U.pts[i]);
+    if (at + l >= want || i + 2 === U.pts.length) { U.head.lerpVectors(U.pts[i], U.pts[i + 1], l ? Math.min(1, (want - at) / l) : 1); break; }
+    at += l;
+  }
 }
 /* Pulled back, the glow is drawn at least SR_FLOW_MIN_PX in radius at its head (the core a third of that). */
 function srFlowLightKeepSize(V, o) {
   const px = srFlowPxPerUnit(V, o.userData.head), g = Math.max(SR_FLOW_LIGHT.glow, SR_FLOW_MIN_PX / px), c = Math.max(SR_FLOW_LIGHT.core, SR_FLOW_MIN_PX / 3 / px);
-  o.userData.glow.scale.x = o.userData.glow.scale.z = g;
-  o.userData.core.scale.x = o.userData.core.scale.z = c;
+  for (const P of o.userData.parts) { P.glow.scale.x = P.glow.scale.z = g; P.core.scale.x = P.core.scale.z = c; }
 }
 function srFlowLightDispose(o) {
   o.userData.glow.geometry.dispose();
-  for (const m of [o.userData.glow, o.userData.core]) m.material.dispose();
+  for (const P of o.userData.parts) for (const m of [P.glow, P.core]) m.material.dispose();
 }
 function srFlowSay(P, step, at) {
   const act = SR_ACTIONS[step.action];
@@ -14870,12 +15713,12 @@ function srFlowHints(P, b) {
   for (const c of b.choices) {
     const first = (c.steps || []).find((s) => s.from && s.to);
     if (!first) continue;
-    const a = srFlowPos(V, first.from), z = srFlowPos(V, first.to);
-    if (a && z) arr.push(a.x, a.y, a.z, z.x, z.y, z.z);
+    const path = srCablePathOf(V, first.from, first.to, srFlowCrossing(V, first.from, first.to));   // as its cable runs
+    if (path) arr.push(path);
   }
   // a strip as wide as the cables (56-server-room.js srCables), in the light's colour: a 1 px line was lost beside them
-  const lines = srCables(arr, { color: SR_PAL[V.dark ? 'dark' : 'light'].light, opacity: 0.45, px: SR_CABLE.focus });
-  lines.userData.hints = arr.length / 6;
+  const lines = srCables(arr, { color: SR_PAL[V.dark ? 'dark' : 'light'].light, opacity: 0.45, px: SR_CABLE.focus, world: SR_CABLE.world, max: SR_CABLE.max });
+  lines.userData.hints = arr.length;
   V.flowLayer.add(lines);
   P.hints = lines;
 }
@@ -14939,6 +15782,7 @@ function srFlowGlow(P, at) {
    node twice that), and at its own size once the camera is near enough for that. */
 const SR_FLOW_MIN_PX = 7;
 function srFlowPxPerUnit(V, at) {
+  if (V.flat) return V.renderer.domElement.clientHeight / srSpan(V);   // 2D: one scale over the whole page
   const d = V.camera.position.distanceTo(at);
   return V.renderer.domElement.clientHeight / (2 * Math.max(d, 1e-3) * Math.tan(V.camera.fov * Math.PI / 360));
 }
@@ -15190,7 +16034,7 @@ function srMigRebuild(first) {
   const V = SR.view, P = SR_MIG.P;
   if (P) SR.model = srMigUnion(SR.migBase, P.entry);
   if (!V) return;
-  srBuild(first ? undefined : { pos: V.camera.position.clone(), target: V.controls.target.clone() });   // no frame from the fit camera
+  srBuild(first ? undefined : srCamKeep(V));   // no frame from the fit camera
 }
 function srMigReset() {   // nothing is rebuilt: the sizes, the versions and the lines are put back to the old model's
   const P = SR_MIG.P;
@@ -15239,8 +16083,7 @@ function srMigAfterBuild(V) {
     const set = e.crossProvider ? 'cross' : 'plain', j = segs[set]++;
     const key = srMigKey(e);
     if (E.out[key] || E.in[key]) {
-      const a = V.L.pos.get(e.from), b = V.L.pos.get(e.to), y = e.crossProvider ? 2.6 : 1.7;
-      V.migEdges.push({ e, key, line: set === 'cross' ? V.crossLines : V.plainLines, j, a: [a.x, y, a.z], b: [b.x, y, b.z], v: -1 });
+      V.migEdges.push({ e, key, line: set === 'cross' ? V.crossLines : V.plainLines, j, v: -1 });   // its path: srCablePathOf (56-server-room.js)
     }
   }
   V.migFloors = V.L.floors.map((G, i) => ({ G, i }));
@@ -15254,8 +16097,8 @@ function srMigNewShapes(V, at) {
     if (s.kind !== 'replace') continue;
     const n = P.entry.model.nodes.find((x) => x.id === s.node), p = n && V.L.pos.get(s.node);
     if (!p || p.hiddenIn) continue;
-    for (const set of ['simple', 'detail']) {
-      const shape = srShapeIn(set, n), mesh = new THREE.InstancedMesh(SR_SHAPES[shape](), new THREE.MeshLambertMaterial({ color: 0xffffff }), 1);
+    for (const set of V.flat ? ['simple'] : ['simple', 'detail']) {   // 2D: one set (56-server-room.js srBuild)
+      const shape = srShapeIn(set, n), mesh = srShapeMesh(shape, 1);
       const sc = n.count > 1 ? 1 + Math.min(Math.log2(n.count), 4) * 0.12 : 1;
       mesh.setMatrixAt(0, m4.compose(new THREE.Vector3(p.x, p.y + 0.75, p.z), q, new THREE.Vector3(sc, sc, sc)));
       mesh.setColorAt(0, col.set(srProviderColor(n.providerResolved || n.provider, 'node', 0, V.dark)));
@@ -15307,9 +16150,9 @@ function srMigApply(V, all) {
     const st = srMigEdge(M.e);
     if (!all && Math.abs(M.v - st.v) < 1e-4 && M.mode === st.mode) { srMigLight(V, M, st); continue; }
     M.v = st.v; M.mode = st.mode;
-    const a = M.a, b = M.b, mid = a.map((x, c) => (x + b[c]) / 2);   // going: to its middle; coming: out of its start
-    if (st.mode === 'shrink') srCableSet(M.line, M.j, a.map((x, c) => mid[c] + (x - mid[c]) * st.v), b.map((x, c) => mid[c] + (x - mid[c]) * st.v));
-    else srCableSet(M.line, M.j, a, a.map((x, c) => x + (b[c] - x) * st.v));
+    // going: to its middle; coming: out of its start — along its path, over what it rises over
+    if (st.mode === 'shrink') srCableShow(M.line, M.j, 0.5 - st.v / 2, 0.5 + st.v / 2);
+    else srCableShow(M.line, M.j, 0, st.v);
     lines.add(M.line);
     srMigLight(V, M, st);
   }

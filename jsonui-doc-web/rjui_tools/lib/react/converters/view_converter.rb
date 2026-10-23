@@ -13,6 +13,7 @@ module RjuiTools
           style_attr = build_style_attr_with_visibility
           children = convert_children(indent)
           id_attr = build_id_attr
+          testid_attr = build_testid_attr
           event_attrs = build_event_attrs
           rel_ref_attr = build_relative_position_ref_attr
           # A dimmed, click-through node is still `enabled` in the a11y tree, and
@@ -21,10 +22,10 @@ module RjuiTools
           aria_disabled_attr = build_aria_disabled_attr
 
           jsx = if children.empty?
-            "#{indent_str(indent)}<div#{id_attr}#{rel_ref_attr}#{class_attr}#{style_attr}#{aria_disabled_attr}#{event_attrs} />"
+            "#{indent_str(indent)}<div#{id_attr}#{rel_ref_attr}#{class_attr}#{style_attr}#{testid_attr}#{aria_disabled_attr}#{event_attrs} />"
           else
             <<~JSX.chomp
-              #{indent_str(indent)}<div#{id_attr}#{rel_ref_attr}#{class_attr}#{style_attr}#{aria_disabled_attr}#{event_attrs}>
+              #{indent_str(indent)}<div#{id_attr}#{rel_ref_attr}#{class_attr}#{style_attr}#{testid_attr}#{aria_disabled_attr}#{event_attrs}>
               #{children}
               #{indent_str(indent)}</div>
             JSX
@@ -256,6 +257,16 @@ module RjuiTools
           # it on a View with no click too, and fell back to highlightBackground
           # — on a View that is the colour while `highlighted` holds (below),
           # not while pressed.
+
+          # disabledBackground while `enabled` is false, fixed or bound (ticket
+          # 2026-10-23-bound-enabled-disabled-colors-three-faces): the node carries
+          # aria-disabled (build_aria_disabled_attr), and the `aria-disabled:` class
+          # beats the base background, fixed or bound, as iOS and Android draw it.
+          disabled_bg = attributes['disabledBackground']
+          if disabled_bg && !attributes['enabled'].nil? && attributes['enabled'] != true
+            classes << (bound_state_color_class(disabled_bg, custom_property: '--jui-disabled-bg', prefix: 'aria-disabled:bg') ||
+                        TailwindMapper.map_color(disabled_bg, 'aria-disabled:bg'))
+          end
 
           # Highlighted state (initial highlight).
           #

@@ -252,10 +252,19 @@ module RjuiTools
             static_spacing('marginInlineEnd', attributes['endMargin'])
           )
 
-          # Background - check for dynamic binding or gradient
+          # Background - check for dynamic binding or gradient.
+          #
+          # A bound colour rides a custom property and a class, never an inline
+          # `backgroundColor` (ticket rjui-bound-background-overrides-tap-background):
+          # an inline style beats every class, so the state colours — tapBackground's
+          # `hover:` / `active:`, disabledBackground's `disabled:` — never showed on a
+          # bound background, while iOS and Android draw the state colour over a bound
+          # base exactly as over a fixed one. A class with a state variant beats this
+          # one (a pseudo-class is more specific), as it beats a fixed `bg-*`.
           if attributes['background']
             if has_binding?(attributes['background'])
-              @dynamic_styles['backgroundColor'] = color_style_expr(attributes['background'])
+              @dynamic_styles['--jui-bg'] = color_style_expr(attributes['background'])
+              classes << 'bg-[var(--jui-bg)]'
             elsif attributes['background'].to_s.include?('gradient')
               # CSS gradients must be inline styles
               @dynamic_styles['background'] = "'#{attributes['background']}'"
@@ -268,10 +277,13 @@ module RjuiTools
           corner_radius = bound_length_style('borderRadius', attributes['cornerRadius'])
           classes << TailwindMapper.map_corner_radius(corner_radius) if corner_radius
 
-          # Text color - check for dynamic binding
+          # Text color - check for dynamic binding. Bound: a custom property and a
+          # class, as the background above, so highlightColor's `hover:text-*` and
+          # disabledFontColor's `disabled:text-*` still win over it.
           if attributes['fontColor']
             if has_binding?(attributes['fontColor'])
-              @dynamic_styles['color'] = color_style_expr(attributes['fontColor'])
+              @dynamic_styles['--jui-color'] = color_style_expr(attributes['fontColor'])
+              classes << 'text-[var(--jui-color)]'
             else
               classes << TailwindMapper.map_color(attributes['fontColor'], 'text')
             end
@@ -1247,9 +1259,14 @@ module RjuiTools
             else
               @dynamic_styles['borderWidth'] = "'#{attributes['borderWidth']}px'"
             end
-            @dynamic_styles['borderColor'] = color_style_expr(attributes['borderColor'])
+            # The colour rides a custom property read by a class, not an
+            # inline borderColor: an inline style beats every class, and a
+            # control's own state border (SelectBox's focus:border-*) has to
+            # show over a bound colour as over a fixed one.
+            @dynamic_styles['--jui-border-color'] = color_style_expr(attributes['borderColor'])
             @dynamic_styles['borderStyle'] = convert_binding(attributes['borderStyle']) if has_binding?(attributes['borderStyle'])
-            attributes['borderStyle'] ? '' : 'border-solid'
+            colour_class = attributes['borderColor'] ? 'border-[color:var(--jui-border-color)]' : ''
+            [attributes['borderStyle'] ? '' : 'border-solid', colour_class].reject(&:empty?).join(' ')
           else
             TailwindMapper.map_border(attributes['borderWidth'], attributes['borderColor'], attributes['borderStyle'])
           end
@@ -1490,6 +1507,19 @@ module RjuiTools
           rendered = pairs.map { |key, value| format_dynamic_style_pair(key, value) }
           cast = typescript? && pairs.keys.any? { |key| key.to_s.start_with?('--') } ? ' as React.CSSProperties' : ''
           " style={{ #{rendered.join(', ')} }#{cast}}"
+        end
+
+        # The className attribute for a class string: a template literal when the
+        # string holds a `${...}` expression (a bound `enabled` adds
+        # `${!data.enabled ? 'opacity-50 cursor-not-allowed' : ''}` to it), a
+        # plain string otherwise. Written as "..." the expression reached the
+        # page as its own text and the disabled look never came (ticket
+        # rjui-checkbox-enabled-class-not-template-literal: CheckBox, Switch,
+        # Radio and Slider all wrote their class string that way).
+        def class_name_attr(classes)
+          return " className={`#{classes}`}" if classes.include?('${')
+
+          " className=\"#{classes}\""
         end
 
         # Build className attribute, handling landscape responsive with template literal.

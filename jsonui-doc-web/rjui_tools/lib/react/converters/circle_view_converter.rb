@@ -19,7 +19,7 @@ module RjuiTools
             "#{indent_str(indent)}<div#{id_attr} className=\"#{class_name}\"#{style_attr}#{onclick_attr}#{testid_attr}#{tag_attr} />"
           else
             <<~JSX.chomp
-              #{indent_str(indent)}<div#{id_attr} className="#{class_name}"#{style_attr}#{onclick_attr}#{testid_attr}#{tag_attr}>
+              #{indent_str(indent)}<div#{id_attr}#{class_name_attr(class_name)}#{style_attr}#{onclick_attr}#{testid_attr}#{tag_attr}>
               #{children}
               #{indent_str(indent)}</div>
             JSX
@@ -52,22 +52,19 @@ module RjuiTools
           style_parts = []
 
           # Fill color (takes precedence over background for circle)
-          fill_color = attributes['fillColor'] || attributes['background'] || attributes['backgroundColor']
-          if fill_color
-            if has_binding?(fill_color)
-              binding_expr = convert_binding(fill_color).gsub(/^\{|\}$/, '')
-              style_parts << "backgroundColor: #{binding_expr}"
-            else
-              style_parts << "backgroundColor: '#{fill_color}'"
-            end
-          end
+          # A bound fill is the base's (`--jui-bg` and its class); an inline
+          # backgroundColor here beat it, unresolved by ColorManager.
+          fill_color = attributes['background']
+          style_parts << "backgroundColor: '#{fill_color}'" if fill_color && !has_binding?(fill_color)
 
           # Border/Stroke
-          stroke_color = attributes['strokeColor'] || attributes['borderColor']
-          stroke_width = attributes['strokeWidth'] || attributes['borderWidth']
+          stroke_color = attributes['borderColor']
+          stroke_width = attributes['borderWidth']
           stroke_style = attributes['borderStyle'] || 'solid'
 
-          if stroke_color || stroke_width
+          # A bound border is the base's (`--jui-border-*` on the ::after);
+          # written here as well it went inline with the `@{…}` text in it.
+          if (stroke_color || stroke_width) && !border_bound?
             stroke_width ||= 1
             stroke_color ||= '#000000'
             style_parts << "border: '#{stroke_width}px #{stroke_style} #{stroke_color}'"

@@ -45,15 +45,15 @@
   "canonicalCode": "{\n  \"type\": \"Indicator\",\n  \"indicatorStyle\": \"medium\"\n}",
   "canonicalLanguage": "json",
   "statRequired": "0",
-  "statOptional": "4",
+  "statOptional": "7",
   "statEvents": "0",
   "statRequiredText": {
     "en": "0 required",
     "ja": "必須 0"
   },
   "statOptionalText": {
-    "en": "4 optional",
-    "ja": "任意 4"
+    "en": "7 optional",
+    "ja": "任意 7"
   },
   "statEventsText": {
     "en": "0 events",
@@ -231,6 +231,67 @@
               "required": ""
             },
             {
+              "id": "attr_halfSpinner",
+              "name": "halfSpinner",
+              "anchorId": "attr-halfSpinner",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Draws the spinner's ring half coloured (rjui indicator_converter).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
               "id": "attr_hidesWhenStopped",
               "name": "hidesWhenStopped",
               "anchorId": "attr-hidesWhenStopped",
@@ -388,6 +449,128 @@
               "note": {
                 "en": "`small` / `medium` / `large` are the spinner's size — each one the platform's own, `small` and `large` as well as `medium`, so the platforms need not draw the same small or large spinner (declared since jsonui-cli 1.9.16; before, only `medium` was) — and `linear` draws a bar instead of a spinner. A declared width / height wins over the style's size. The older spellings `style` (naming one of these values) and `size` (a length) are folded by the layout normalizer with a warning — `style` into this attribute, `size` into width and height. iOS (SwiftUI) and, since jsonui-cli 1.9.0, Android Compose; before 1.9.0 the declaration listed `medium` / `large` for iOS only. Upstream records one open defect in 1.9.0: on Android, an Indicator that declares wrapContent does not take `small` / `large`. From the declaration; this site draws no Indicator.",
                 "ja": "`small` / `medium` / `large` はスピナーの大きさで、`medium` だけでなく `small` と `large` もそれぞれのプラットフォーム自身の値 — なのでプラットフォーム間で同じ大きさの small / large を描くとは限らない（jsonui-cli 1.9.16 からの宣言。それまでは `medium` だけがそうだった）。`linear` はスピナーの代わりにバーを描く。width / height を宣言すれば、スタイルの大きさより優先される。古い綴りの `style`（これらの値を名指すもの）と `size`（長さ）は、layout の normalizer が警告付きで畳む — `style` はこの属性へ、`size` は width と height へ。iOS（SwiftUI）と、jsonui-cli 1.9.0 からは Android Compose。1.9.0 より前の宣言は iOS のみで `medium` / `large` だけだった。1.9.0 には上流が記録した未修正の不具合が 1 つある: Android で wrapContent を宣言した Indicator は `small` / `large` が効かない。宣言の記述で、このサイトは Indicator を描かない。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_strokeWidth",
+              "name": "strokeWidth",
+              "anchorId": "attr-strokeWidth",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Width of the spinner's stroke (kjui indicator_component: circular only; rjui indicator_converter: border width, 2 by default).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number",
+              "required": ""
+            },
+            {
+              "id": "attr_trackColor",
+              "name": "trackColor",
+              "anchorId": "attr-trackColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Track colour of a linear indicator (kjui indicator_component).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
               },
               "type": "string",
               "required": ""
@@ -818,6 +1001,67 @@
               "required": ""
             },
             {
+              "id": "attr_halfSpinner",
+              "name": "halfSpinner",
+              "anchorId": "attr-halfSpinner",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Draws the spinner's ring half coloured (rjui indicator_converter).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
               "id": "attr_hidesWhenStopped",
               "name": "hidesWhenStopped",
               "anchorId": "attr-hidesWhenStopped",
@@ -975,6 +1219,128 @@
               "note": {
                 "en": "`small` / `medium` / `large` are the spinner's size — each one the platform's own, `small` and `large` as well as `medium`, so the platforms need not draw the same small or large spinner (declared since jsonui-cli 1.9.16; before, only `medium` was) — and `linear` draws a bar instead of a spinner. A declared width / height wins over the style's size. The older spellings `style` (naming one of these values) and `size` (a length) are folded by the layout normalizer with a warning — `style` into this attribute, `size` into width and height. iOS (SwiftUI) and, since jsonui-cli 1.9.0, Android Compose; before 1.9.0 the declaration listed `medium` / `large` for iOS only. Upstream records one open defect in 1.9.0: on Android, an Indicator that declares wrapContent does not take `small` / `large`. From the declaration; this site draws no Indicator.",
                 "ja": "`small` / `medium` / `large` はスピナーの大きさで、`medium` だけでなく `small` と `large` もそれぞれのプラットフォーム自身の値 — なのでプラットフォーム間で同じ大きさの small / large を描くとは限らない（jsonui-cli 1.9.16 からの宣言。それまでは `medium` だけがそうだった）。`linear` はスピナーの代わりにバーを描く。width / height を宣言すれば、スタイルの大きさより優先される。古い綴りの `style`（これらの値を名指すもの）と `size`（長さ）は、layout の normalizer が警告付きで畳む — `style` はこの属性へ、`size` は width と height へ。iOS（SwiftUI）と、jsonui-cli 1.9.0 からは Android Compose。1.9.0 より前の宣言は iOS のみで `medium` / `large` だけだった。1.9.0 には上流が記録した未修正の不具合が 1 つある: Android で wrapContent を宣言した Indicator は `small` / `large` が効かない。宣言の記述で、このサイトは Indicator を描かない。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_strokeWidth",
+              "name": "strokeWidth",
+              "anchorId": "attr-strokeWidth",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Width of the spinner's stroke (kjui indicator_component: circular only; rjui indicator_converter: border width, 2 by default).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number",
+              "required": ""
+            },
+            {
+              "id": "attr_trackColor",
+              "name": "trackColor",
+              "anchorId": "attr-trackColor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Track colour of a linear indicator (kjui indicator_component).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
               },
               "type": "string",
               "required": ""

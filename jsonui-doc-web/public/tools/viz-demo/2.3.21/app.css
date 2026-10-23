@@ -483,7 +483,7 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 #ticker { display: grid; gap: 1px; font: 500 12px/1.55 var(--font-mono); }
 #ticker li { display: grid; grid-template-columns: auto auto 9.5em minmax(0, 1fr); align-items: center; gap: 8px; white-space: nowrap; }
 #ticker time { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-#ticker .kind { overflow: hidden; font-weight: 700; text-overflow: ellipsis; }
+#ticker .kind { overflow: hidden; font: 600 12px/1.4 var(--font-mono); text-overflow: ellipsis; }   /* a hook's name (SessionStart): an identifier */
 #ticker .what { overflow: hidden; text-overflow: ellipsis; }
 .ticker-btns { display: flex; gap: 6px; align-items: start; }
 /* The log strip closed (requester, 10-19): its row goes (the scene and the panel take the height) and only 「ログを開く」
@@ -578,6 +578,9 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .ws-item[aria-current="true"] { background: var(--wb-card); box-shadow: inset 4px 0 0 var(--wb-ink), inset 0 0 0 2px var(--wb-ink); }
 .ws-item .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--wb-faint); }
 .ws-item .nm { overflow: hidden; font: 700 12.5px/1.5 var(--font-body); text-overflow: ellipsis; white-space: nowrap; }
+/* the checkout a spec is read from (a worktree's branch beside the room's): before the name, so a long name never hides it */
+.co-tag { display: inline-block; margin-right: 6px; padding: 0 5px; border-radius: 4px; background: var(--wb-card); box-shadow: inset 0 0 0 1px var(--wb-faint); color: var(--wb-soft); font: 600 10.5px/1.5 var(--font-mono); vertical-align: 1px; }
+.co-tag.co-wt { color: var(--wb-ink); box-shadow: inset 0 0 0 1.5px var(--wb-amber); }
 .ws-item small { grid-column: 2 / -1; overflow: hidden; color: var(--wb-soft); font: 500 11px/1.4 var(--font-body); text-overflow: ellipsis; white-space: nowrap; }
 .ws-item.b-live .dot { background: var(--c); }
 .ws-item.b-partial .dot { background: var(--wb-amber); }
@@ -889,6 +892,23 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .rb { position: absolute; top: 14px; right: 14px; bottom: 14px; z-index: 5; display: grid; grid-template-rows: auto auto minmax(0, 1fr); width: min(420px, calc(100% - 28px)); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); box-shadow: 0 10px 30px var(--shadow); opacity: 0; transform: translateX(16px); transition: opacity 0.2s ease, transform 0.25s ease;
   --wb-ink: var(--ink); --wb-soft: var(--ink-soft); --wb-card: var(--bg); --wb-line: var(--line); --wb-blue: var(--info); }
 .rb.show { opacity: 1; transform: none; }
+/* The other sessions' waits beside an open card (53-waits.js cardWaits; requester 10-23): out of the card, at its
+   top-left corner, the waits' amber (the bubbles' "!"); in the head row as a badge where the card has the width. */
+.rb-waits { position: absolute; z-index: 6; display: grid; gap: 6px; width: max-content; max-width: 260px; padding: 8px 10px; border: 1px solid var(--line); border-left: 4px solid #ffb020; border-radius: 10px; background: var(--panel); color: var(--ink); box-shadow: 0 6px 18px var(--shadow); }
+.rb-waits[hidden] { display: none; }
+.rbw-title { margin: 0; color: var(--ink-soft); font: 700 11px/1.4 var(--font-body); }
+.rbw-sum { justify-self: stretch; padding: 4px 10px; border: 1px solid #7a4b00; border-radius: 8px; text-align: left; background: #ffb020; color: #1f1400; font: 800 12px/1.5 var(--font-body); cursor: pointer; }
+.rbw-list { display: grid; gap: 3px; margin: 0; padding: 0; list-style: none; }
+.rbw-robot { display: inline-flex; align-items: center; gap: 6px; padding: 2px 6px 2px 2px; border: 0; border-radius: 8px; background: none; color: var(--ink); font: 600 12px/1.5 var(--font-body); text-align: left; cursor: pointer; }
+.rbw-robot:hover { background: var(--chip); }
+.rbw-name { max-width: 9em; overflow: hidden; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.rbw-more { color: var(--ink-soft); font: 500 11.5px/1.5 var(--font-body); }
+.rbw-slot { display: contents; }
+.rbw-badge { padding: 2px 9px; border: 1px solid #7a4b00; border-radius: 999px; background: #ffb020; color: #1f1400; font: 800 12px/1.5 var(--font-body); white-space: nowrap; cursor: pointer; }
+.rbw-sum:focus-visible, .rbw-robot:focus-visible, .rbw-badge:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+@keyframes rbw-arrive { 0% { transform: translateX(-10px) scale(0.96); box-shadow: 0 0 0 0 rgba(255, 176, 32, 0.9); } 60% { transform: none; box-shadow: 0 0 0 8px rgba(255, 176, 32, 0); } 100% { transform: none; } }
+.rb-waits.rbw-arrive, .rbw-badge.rbw-new { animation: rbw-arrive 0.7s ease-out 1; }
+@media (prefers-reduced-motion: reduce) { .rb-waits.rbw-arrive, .rbw-badge.rbw-new { animation: none; } }
 /* The mark and the name on top, the controls on a row of their own below (10-19, requester: a session's name gets the
    card's width instead of sharing it with the buttons): ‹ › at the left, back to 3D at the right. */
 .rb-head { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px 12px; padding: 12px 14px; border-top: 5px solid var(--c); border-bottom: 1px solid var(--line); }
@@ -929,6 +949,15 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 /* the session's cards on the 応答の履歴 tab (55-history.js histCardsPaint): over the prompt box, a scroll of their own */
 .h-cards { display: grid; gap: 8px; max-height: min(30vh, 260px); overflow-y: auto; padding: 8px 14px; border-top: 1px solid var(--line); background: var(--panel); }
 .h-cards[hidden] { display: none; }
+.h-fold { position: sticky; top: -8px; z-index: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; width: 100%; margin: 0; padding: 4px 10px; border: 1px dashed #7a4b00; border-radius: 8px; background: var(--warn-bg); color: var(--ink); font: 700 12px/1.5 var(--font-body); text-align: left; cursor: pointer; }
+.h-fold:hover, .h-fold:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.h-fold-text { overflow: hidden; color: var(--ink-soft); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.h-cards.h-folded { overflow: hidden; padding-bottom: 8px; }
+.h-cards:has(> .h-fold) { scroll-padding-top: 44px; }   /* a field scrolled to or clicked lands under the bar, never behind it */
+.h-cards.h-folded > :not(.h-fold) { display: none; }   /* folded: the cards stay in the page, what was typed in them too */
+@keyframes h-fold-new { 0% { box-shadow: inset 0 0 0 0 rgba(255, 176, 32, 0.9); } 50% { box-shadow: inset 0 0 0 3px rgba(255, 176, 32, 0.9); } 100% { box-shadow: none; } }
+.h-fold.h-fold-new { animation: h-fold-new 0.8s ease-out 1; }
+@media (prefers-reduced-motion: reduce) { .h-fold.h-fold-new { animation: none; } }
 /* × on an answered card there (55-history.js histOffHTML): off this box only */
 .h-card-x { flex: none; width: 24px; height: 24px; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink-soft); font: 700 14px/1 var(--font-body); cursor: pointer; }
 .h-card-x:hover, .h-card-x:focus-visible { border-color: var(--info); color: var(--ink); }
@@ -1213,18 +1242,18 @@ details.h-item[open] > :not(summary) :is(a[href], button, img, .h-thumb) { curso
 .floor-nav { position: absolute; right: 12px; top: 12px; z-index: 6; display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 10px; background: var(--panel); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12); }
 .floor-nav[hidden] { display: none; }
 .fn-btn { position: relative; min-width: 34px; height: 30px; padding: 0 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: 700 13px/1 var(--font-body); cursor: pointer; }
-.fn-btn:disabled { opacity: 0.4; cursor: default; }
+.fn-btn:disabled, .fn-btn[aria-disabled="true"] { opacity: 0.4; cursor: default; }   /* aria-disabled: still focusable, its reason on hover and read out */
 .fn-btn[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 .fn-btn[data-alert]::after { content: ''; position: absolute; top: -4px; right: -4px; width: 10px; height: 10px; border-radius: 50%; background: #f2c230; box-shadow: 0 0 0 2px var(--panel); }
 .fn-label { min-width: 52px; text-align: center; font: 700 14px/1 var(--font-mono); }
 /* one room at a time (requester, 10-18): the room picked fills the view, the way back sits at the top left */
-.room-solo { position: absolute; left: 12px; top: 12px; z-index: 6; display: flex; align-items: center; gap: 8px; max-width: calc(100% - 24px); padding: 4px 10px 4px 4px; border-radius: 10px; background: var(--panel); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12); }
+.room-solo { position: absolute; left: 12px; top: 12px; z-index: 6; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; max-width: calc(100% - 36px - var(--floor-nav-w, 0px)); padding: 4px 10px 4px 4px; border-radius: 10px; background: var(--panel); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12); }   /* the floor buttons' width left free on the right (40-scene.js), its buttons on a second row when that is short (2.3.21's gate: サーバールームに入る under ▲ 1F at 1024 px with the panel open) */
 .room-solo[hidden] { display: none; }
 /* the room's robot list (53-roster.js): at the 3D's right; left of the robot card when the page is wide enough for both,
    under it when not (the card is what was asked for last); at the foot of the 3D on a narrow page, folded by a press */
-.roster { position: absolute; top: var(--roster-top, 12px); right: 12px; z-index: 4; display: grid; grid-template-rows: auto auto minmax(0, 1fr); width: 248px; max-height: var(--roster-max, calc(100% - 24px)); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--ink); box-shadow: 0 4px 16px var(--shadow); font-size: 13px; }
+.roster { position: absolute; top: var(--roster-top, 12px); right: calc(12px + var(--roster-shift, 0px)); z-index: 4; display: grid; grid-template-rows: auto auto minmax(0, 1fr); width: 248px; max-height: var(--roster-max, calc(100% - 24px)); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--ink); box-shadow: 0 4px 16px var(--shadow); font-size: 13px; }
 .roster[hidden] { display: none; }
-@media (min-width: 1300px) { .scene:has(.rb.show) .roster { right: calc(min(420px, 100% - 28px) + 26px); } }
+@media (min-width: 1300px) { .scene:has(.rb.show) .roster { right: calc(min(420px, 100% - 28px) + 26px + var(--roster-shift, 0px)); } }
 .roster-head { display: flex; align-items: center; gap: 6px; padding: 8px 8px 6px 12px; border-bottom: 1px solid var(--line); }
 .roster-head h2 { margin: 0; font-size: 13px; font-weight: 700; }
 .roster-count { margin-left: auto; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
@@ -1233,7 +1262,16 @@ details.h-item[open] > :not(summary) :is(a[href], button, img, .h-thumb) { curso
 .roster-folded .roster-fold::before { content: "▸"; }
 .roster-folded .roster-body { display: none; }
 .roster-alert-line { margin: 0; padding: 6px 12px; background: var(--warn-bg); color: var(--ink); font-weight: 700; }
-.roster-body { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+.roster-body { display: grid; grid-template-rows: auto auto minmax(0, 1fr); min-height: 0; }
+.roster-sort { display: flex; align-items: center; gap: 6px; padding: 0 8px 6px; color: var(--ink-soft); font-size: 12px; }
+.roster-sort select { min-width: 0; flex: 1; font: inherit; color: var(--ink); }
+/* a row dragged (53-roster.js): faded, and a line where it would go — its own element, so a waiting or selected row's
+   inset mark does not hide it */
+.roster-dragging { opacity: 0.45; }
+.roster-drop-before, .roster-drop-after { position: relative; }
+.roster-drop-before::after, .roster-drop-after::after { content: ""; position: absolute; left: 4px; right: 4px; height: 3px; border-radius: 2px; background: var(--info); pointer-events: none; }
+.roster-drop-before::after { top: -1px; }
+.roster-drop-after::after { bottom: -1px; }
 .roster-bulk { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 8px; }
 .roster-bulk .fn-btn { padding: 2px 8px; font-size: 12px; }
 .roster-list { margin: 0; padding: 0 0 6px; overflow-y: auto; list-style: none; }
@@ -1241,6 +1279,8 @@ details.h-item[open] > :not(summary) :is(a[href], button, img, .h-thumb) { curso
 .roster-row .roster-wait { grid-column: 2 / 4; justify-self: start; padding: 0 6px; border-radius: 6px; background: var(--warn-bg); color: var(--warn); font-size: 11px; font-weight: 700; }
 .roster-off .roster-name { opacity: 0.55; }
 .roster-alert { background: var(--warn-bg); box-shadow: inset 3px 0 0 var(--warn); }
+/* the robot selected now (its card, its ring): the project list's selected look, over a waiting row's too */
+.roster-row[aria-current="true"] { background: var(--info-bg); box-shadow: inset 3px 0 0 var(--info); }
 .roster-alert .roster-name { opacity: 1; }
 .roster-check { width: 16px; height: 16px; margin: 0; }
 .roster-name { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 2px 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
@@ -1777,3 +1817,6 @@ button.dev-row:hover { border-color: var(--info); }
 .dev-row .dev-name { font-weight: 700; }
 .dev-who, .dev-note { color: var(--ink-soft); font-size: 12px; }
 .dev-who .dev-guess { margin-left: 4px; }
+
+/* a Layout row's component type beside its Japanese name (View beside コンテナ): an identifier */
+.ty-raw { color: var(--wb-soft); font: 500 11px/1.4 var(--font-mono); }

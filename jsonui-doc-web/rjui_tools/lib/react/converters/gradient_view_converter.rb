@@ -19,7 +19,7 @@ module RjuiTools
             "#{indent_str(indent)}<div#{id_attr} className=\"#{class_name}\"#{style_attr}#{event_attrs}#{testid_attr}#{tag_attr} />"
           else
             <<~JSX.chomp
-              #{indent_str(indent)}<div#{id_attr} className="#{class_name}"#{style_attr}#{event_attrs}#{testid_attr}#{tag_attr}>
+              #{indent_str(indent)}<div#{id_attr}#{class_name_attr(class_name)}#{style_attr}#{event_attrs}#{testid_attr}#{tag_attr}>
               #{children}
               #{indent_str(indent)}</div>
             JSX
@@ -87,7 +87,7 @@ module RjuiTools
           # (RightToLeft, BottomToTop, LeftToRight, TopToBottom, Diagonal)
           # belong to View.gradientDirection (platform swift), which no
           # GradientView converter reads — sjui and kjui draw the same three.
-          direction = JsonUIShared::EnumSpelling.lowered(attributes['gradientDirection'] || attributes['direction'] || 'Vertical', 'GradientView', 'gradientDirection').to_s
+          direction = JsonUIShared::EnumSpelling.lowered(attributes['gradientDirection'] || 'Vertical', 'GradientView', 'gradientDirection').to_s
           case direction
           when 'horizontal'
             'to right'

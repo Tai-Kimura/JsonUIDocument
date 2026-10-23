@@ -103,7 +103,7 @@ module RjuiTools
           # This reader had it backwards for fontColor and did not read the
           # bag's other keys at all.
           hint_bag = attributes['hintAttributes'].is_a?(Hash) ? attributes['hintAttributes'] : {}
-          hint_color = hint_bag['fontColor'] || attributes['hintColor'] || attributes['placeholderColor']
+          hint_color = hint_bag['fontColor'] || attributes['hintColor']
           if hint_color
             classes << (bound_state_color_class(hint_color, custom_property: '--jui-hint-color', prefix: 'placeholder') ||
                         TailwindMapper.map_color(hint_color, 'placeholder'))
@@ -216,10 +216,13 @@ module RjuiTools
             @dynamic_styles['maxHeight'] = "'#{attributes['maxHeight']}px'"
           end
 
-          # Border
+          # Border. A bound width or colour is the base's
+          # (css_border_classes: the width inline, the colour a custom property
+          # and its class); written here as well, the colour went inline over
+          # that class and a bound width became `'@{…}px'`.
           if attributes['borderWidth'] && attributes['borderColor']
-            @dynamic_styles['borderWidth'] = "'#{attributes['borderWidth']}px'"
-            @dynamic_styles['borderColor'] = color_style_expr(attributes['borderColor'])
+            @dynamic_styles['borderWidth'] = "'#{attributes['borderWidth']}px'" unless has_binding?(attributes['borderWidth'])
+            @dynamic_styles['borderColor'] = color_style_expr(attributes['borderColor']) unless has_binding?(attributes['borderColor'])
             @dynamic_styles['borderStyle'] = "'solid'"
           end
 
@@ -273,8 +276,8 @@ module RjuiTools
           end
 
           # Rows
-          if attributes['lines'] || attributes['rows']
-            rows = attributes['lines'] || attributes['rows']
+          if attributes['rows']
+            rows = attributes['rows']
             attrs << " rows={#{rows}}"
           end
 
@@ -282,10 +285,10 @@ module RjuiTools
           attrs << " maxLength={#{attributes['maxLength']}}" if attributes['maxLength']
 
           # Read only
-          attrs << ' readOnly' if attributes['readOnly'] || attributes['editable'] == false
+          attrs << ' readOnly' if attributes['editable'] == false
 
           # Auto focus
-          attrs << ' autoFocus' if attributes['autoFocus'] || attributes['becomeFirstResponder']
+          attrs << ' autoFocus' if attributes['autoFocus']
 
           # Soft-keyboard hints — same UIKit-spelling vocabulary as TextField,
           # mapped by the shared base helpers. A textarea has no `type`, so
@@ -345,7 +348,7 @@ module RjuiTools
 
         def build_on_change
           # If custom handler is defined, use it (passing the event object)
-          handler = attributes['onTextChange'] || attributes['onChange']
+          handler = attributes['onTextChange']
           if handler
             if has_binding?(handler)
               prop = extract_binding_property(handler)

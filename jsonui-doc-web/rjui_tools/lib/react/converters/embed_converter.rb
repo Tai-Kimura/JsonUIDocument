@@ -31,7 +31,7 @@ module RjuiTools
           params_attr = build_params_attr(attributes['params'])
           event_bridge_attr = build_event_bridge_attr(attributes['events'])
 
-          class_attr = class_name.empty? ? '' : %( className="#{class_name}")
+          class_attr = class_name.empty? ? '' : %(#{class_name_attr(class_name)})
           # Version-skew guard: the isolated call site passes screenResolver
           # via buildEmbedScreenResolver (new export in EmbedContainer.tsx
           # template v2), so type-checking against an older template fails
@@ -43,7 +43,7 @@ module RjuiTools
             #{skew_comment}#{indent_str(indent)}<EmbedContainer
             #{indent_str(indent + 2)}embedId="#{embed_id}"
             #{indent_str(indent + 2)}screen="#{screen}"
-            #{indent_str(indent + 2)}navigationMode="#{navigation_mode}"#{isolated_attrs}#{params_attr}#{event_bridge_attr}#{class_attr}
+            #{indent_str(indent + 2)}navigationMode="#{navigation_mode}"#{isolated_attrs}#{params_attr}#{event_bridge_attr}#{class_attr}#{build_testid_attr}
             #{indent_str(indent)}>
             #{indent_str(indent + 2)}<#{embedded_component} />
             #{indent_str(indent)}</EmbedContainer>

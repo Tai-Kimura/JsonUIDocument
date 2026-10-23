@@ -3027,8 +3027,8 @@
       "ja": "2026-07 対応済み — `.yaml` / `.yml` の swagger はメモリ上でパースされます(PyYAML 必須。未導入時は導入手順つきで halt)。正準フォーマットは引き続き JSON で、ディスク上の変換ファイルは作りません。"
     },
     "halt_yaml_workaround": {
-      "en": "Watch YAML 1.1 implicit typing: unquoted `NO` / date literals in enum members or mapping keys halt with `yaml-type-coercion` (quote the value, e.g. `enum: ['NO']`). Keeping a stale converted `foo.json` next to `foo.yaml` halts with `duplicate-swagger-basename` — keep exactly one.",
-      "ja": "YAML 1.1 の型強制に注意 — enum メンバーやキーの引用符なし `NO` / 日付リテラルは `yaml-type-coercion` で halt します(`enum: ['NO']` のように引用符で囲む)。変換済みの古い `foo.json` を `foo.yaml` と併置すると `duplicate-swagger-basename` で halt するため、どちらか 1 つだけ残します。"
+      "en": "Watch YAML 1.1 implicit typing: an unquoted `NO` (or `yes`, `on`, `off`) in an enum member, and a mapping key that YAML reads as a bool, a null (`~`) or a number JSON would write differently (`010`, `1.50`), halt with `yaml-type-coercion`, and the line names the key and its line (quote it, e.g. `enum: ['NO']`, `'NO':`). From jsonui-cli 2.3.21 unquoted dates and keys such as `200:` are read as the strings JSON would hold; up to 2.3.20 they halted too. Keeping a stale converted `foo.json` next to `foo.yaml` halts with `duplicate-swagger-basename` — keep exactly one.",
+      "ja": "YAML 1.1 の型強制に注意 — enum メンバーの引用符なし `NO`（`yes`・`on`・`off` も）と、YAML が bool・null（`~`）・JSON と違う書き方の数（`010`・`1.50`）として読むキーは、`yaml-type-coercion` で halt し、そのキーと行番号を言います（`enum: ['NO']`、`'NO':` のように引用符で囲む）。jsonui-cli 2.3.21 から、引用符なしの日付と `200:` のようなキーは、JSON と同じ文字列として読みます（2.3.20 まではこれも halt しました）。変換済みの古い `foo.json` を `foo.yaml` と併置すると `duplicate-swagger-basename` で halt するため、どちらか 1 つだけ残します。"
     },
     "halt_self_ref_trigger": {
       "en": "direct self-ref",
@@ -7037,8 +7037,8 @@
       "ja": "2026-07 対応済み — YAML swagger はメモリ上でパース(PyYAML 必須。未導入時は導入手順つき halt)。"
     },
     "halt_yaml_workaround": {
-      "en": "Recipe: quote YAML 1.1-coerced values (`enum: ['NO']`) — unquoted forms halt with `yaml-type-coercion`; don't keep a stale converted `.json` next to its `.yaml` (`duplicate-swagger-basename`).",
-      "ja": "Recipe: YAML 1.1 に型強制される値は引用符で囲む(`enum: ['NO']`)— 引用符なしは `yaml-type-coercion` で halt。変換済み `.json` を `.yaml` と併置しない(`duplicate-swagger-basename`)。"
+      "en": "Recipe: quote what YAML 1.1 types differently from JSON — a bool in an enum (`enum: ['NO']`) and a key read as a bool, a null or a renamed number (`'NO':`, `'~':`, `'010':`); unquoted, they halt with `yaml-type-coercion` naming the line. Dates and keys like `200:` read as strings from 2.3.21. Don't keep a stale converted `.json` next to its `.yaml` (`duplicate-swagger-basename`).",
+      "ja": "Recipe: YAML 1.1 が JSON と違う型にする物は引用符で囲む — enum の中の bool（`enum: ['NO']`）と、bool・null・別の数として読まれるキー（`'NO':`・`'~':`・`'010':`）。引用符なしは、行番号つきの `yaml-type-coercion` で halt。日付と `200:` のようなキーは、2.3.21 から文字列として読みます。変換済み `.json` を `.yaml` と併置しない（`duplicate-swagger-basename`）。"
     },
     "halt_self_ref_trigger": {
       "en": "direct self-ref",

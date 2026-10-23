@@ -56,8 +56,10 @@ module RjuiTools
           classes << 'focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
 
           # Border color
+          # A bound one is the base's (css_border_classes: a custom property
+          # and its class); handed to map_color it was read as a colour name.
           border_color = attributes['borderColor']
-          classes << TailwindMapper.map_color(border_color, 'border') if border_color
+          classes << TailwindMapper.map_color(border_color, 'border') if border_color && !has_binding?(border_color)
 
           # fontColor and fontSize are emitted by base_converter already; this
           # converter used to emit them a second time, which put two `text-*`
@@ -100,7 +102,7 @@ module RjuiTools
           # matches nothing — so it rides a custom property. It has to be
           # recorded here, in build_class_name, which owns @dynamic_styles and
           # runs before the style attribute is rendered.
-          hint_color = attributes['hintColor'] || attributes['placeholderColor']
+          hint_color = attributes['hintColor']
           @select_hint_color = hint_color || 'gray-400'
           @declared_hint_color = hint_color
           @select_hint_class =
@@ -361,7 +363,7 @@ module RjuiTools
         # read, so a bound selectedItem reached the page as nothing — no value,
         # no onChange (ticket selectbox-selected-item-binding-is-read-once).
         def selection_attr
-          attributes['selectedItem'] || attributes['selectedValue'] || attributes['value']
+          attributes['selectedItem'] || attributes['selectedValue']
         end
 
         def selected_value_bound?
@@ -561,7 +563,7 @@ module RjuiTools
         end
 
         def build_on_change
-          handler = attributes['onValueChange'] || attributes['onValueChanged'] || attributes['onChange']
+          handler = attributes['onValueChange'] || attributes['onValueChanged']
           if handler
             if has_binding?(handler)
               return operation_attr('onChange', '(e)', declared_handler_call(handler, changed_value_expr, handler_index_expr))
@@ -796,7 +798,7 @@ module RjuiTools
                        end
 
           # Custom handler takes priority
-          handler = attributes['onValueChange'] || attributes['onChange']
+          handler = attributes['onValueChange']
           if handler && has_binding?(handler)
             return operation_attr('onChange', '(e)', declared_handler_call(handler, value_expr, nil))
           end
