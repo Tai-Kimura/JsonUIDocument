@@ -1,0 +1,1772 @@
+{
+  "type": "View",
+  "id": "viz_setup_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_base",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateBack",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "viz_setup_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "viz_setup_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            24,
+            32
+          ],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "ink_subtle",
+              "tapBackground": "surface_sunken",
+              "onClick": "@{onNavigateBack}",
+              "text": "breadcrumb"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "ink",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "ink_muted",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "ink_subtle",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "viz_setup_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "viz_setup_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_install",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_install_heading"
+                    },
+                    {
+                      "type": "View",
+                      "width": 32,
+                      "height": 3,
+                      "topMargin": 32,
+                      "background": "accent",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 10,
+                      "fontSize": 20,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_install_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_install_b1_text"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_install_b2_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_install_b2_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "width": 32,
+                      "height": 3,
+                      "topMargin": 32,
+                      "background": "accent",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 10,
+                      "fontSize": 20,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_install_b3_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_install_b4_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "/plugin marketplace add Tai-Kimura/jsonui-cli\n/plugin install jui-viz@jsonui",
+                      "language": "text",
+                      "filename": "Claude Code",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_install_b6_text"
+                    },
+                    {
+                      "type": "View",
+                      "width": 32,
+                      "height": 3,
+                      "topMargin": 32,
+                      "background": "accent",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 10,
+                      "fontSize": 20,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_install_b7_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_install_b8_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "jui viz hooks install --dry-run   # show the change, write nothing\njui viz hooks install",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_install_b10_text"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "wrapContent",
+                          "height": "wrapContent",
+                          "paddings": [
+                            3,
+                            10,
+                            3,
+                            10
+                          ],
+                          "background": "accent_tint",
+                          "cornerRadius": 999,
+                          "child": [
+                            {
+                              "type": "Label",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "fontSize": 12,
+                              "fontWeight": "semibold",
+                              "fontColor": "accent",
+                              "text": "section_install_b11_since"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_install_b11_title",
+                          "topMargin": 8
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_install_b11_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_start",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_start_heading"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "jui viz serve --open",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_start_b1_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_start_b2_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_start_b3_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_language",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_language_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_language_b0_text"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "accent_tint",
+                      "cornerRadius": 12,
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_language_b1_s1"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_2"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_language_b1_s2"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_3"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_language_b1_s3"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_4"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_language_b1_s4"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_5"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_language_b1_s5"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "{\n  \"language\": \"ja\"\n}",
+                      "language": "json",
+                      "filename": "~/.local/state/jui-viz/config.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "accent_tint",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "accent",
+                          "text": "section_language_b3_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink",
+                          "text": "section_language_b3_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_language_b4_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_language_b4_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_language_b5_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_language_b5_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "{\n  \"language\": \"en\",\n  \"strings\": \"my-words.json\"\n}",
+                      "language": "json",
+                      "filename": "~/.local/state/jui-viz/config.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "{\n  \"status.waiting\": \"Needs your OK\"\n}",
+                      "language": "json",
+                      "filename": "~/.local/state/jui-viz/my-words.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "wrapContent",
+                          "height": "wrapContent",
+                          "paddings": [
+                            3,
+                            10,
+                            3,
+                            10
+                          ],
+                          "background": "accent_tint",
+                          "cornerRadius": 999,
+                          "child": [
+                            {
+                              "type": "Label",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "fontSize": 12,
+                              "fontWeight": "semibold",
+                              "fontColor": "accent",
+                              "text": "section_language_b8_since"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_language_b8_title",
+                          "topMargin": 8
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_language_b8_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_language_b9_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_language_b9_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_language_b10_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_update",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_update_heading"
+                    },
+                    {
+                      "type": "View",
+                      "width": 32,
+                      "height": 3,
+                      "topMargin": 32,
+                      "background": "accent",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 10,
+                      "fontSize": 20,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_update_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_update_b1_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "jui viz stop\njui viz start",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "View",
+                      "width": 32,
+                      "height": 3,
+                      "topMargin": 32,
+                      "background": "accent",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 10,
+                      "fontSize": 20,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_update_b3_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_update_b4_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "claude plugin marketplace update jsonui\nclaude plugin update jui-viz@jsonui",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_update_b6_text"
+                    },
+                    {
+                      "type": "View",
+                      "width": 32,
+                      "height": 3,
+                      "topMargin": 32,
+                      "background": "accent",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 10,
+                      "fontSize": 20,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_update_b7_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_update_b8_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "jui viz hooks install",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "wrapContent",
+                          "height": "wrapContent",
+                          "paddings": [
+                            3,
+                            10,
+                            3,
+                            10
+                          ],
+                          "background": "accent_tint",
+                          "cornerRadius": 999,
+                          "child": [
+                            {
+                              "type": "Label",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "fontSize": 12,
+                              "fontWeight": "semibold",
+                              "fontColor": "accent",
+                              "text": "section_update_b10_since"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_update_b10_title",
+                          "topMargin": 8
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_update_b10_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "wrapContent",
+                          "height": "wrapContent",
+                          "paddings": [
+                            3,
+                            10,
+                            3,
+                            10
+                          ],
+                          "background": "accent_tint",
+                          "cornerRadius": 999,
+                          "child": [
+                            {
+                              "type": "Label",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "fontSize": 12,
+                              "fontWeight": "semibold",
+                              "fontColor": "accent",
+                              "text": "section_update_b11_since"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_update_b11_title",
+                          "topMargin": 8
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_update_b11_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_update_b12_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_update_b12_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_remove",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_remove_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_remove_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_remove_b1_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "jui viz hooks uninstall   # remove the hooks (your other hooks stay)\njui viz relay uninstall   # unregister the relay",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_trouble",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_trouble_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_trouble_b0_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "jui viz doctor",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_trouble_b2_text"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_trouble_b3_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_trouble_b3_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_trouble_b4_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_trouble_b4_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_safety",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_safety_heading"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_safety_b0_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_safety_b0_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_safety_b1_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_safety_b1_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_safety_b2_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_safety_b2_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "wrapContent",
+                          "height": "wrapContent",
+                          "paddings": [
+                            3,
+                            10,
+                            3,
+                            10
+                          ],
+                          "background": "accent_tint",
+                          "cornerRadius": 999,
+                          "child": [
+                            {
+                              "type": "Label",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "fontSize": 12,
+                              "fontWeight": "semibold",
+                              "fontColor": "accent",
+                              "text": "section_safety_b3_since"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_safety_b3_title",
+                          "topMargin": 8
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_safety_b3_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "viz_setup_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    32,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "chrome_ink",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "viz_setup_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 3,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/next_step_card"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "viz_setup_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "ink_faint",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "viz_setup_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [
+                24,
+                16,
+                24,
+                16
+              ],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "viz_setup_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    0,
+                    32
+                  ],
+                  "background": "surface_base",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        {
+                          "id": "toc_install",
+                          "label": "toc_row_install",
+                          "anchor": "section_install",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_start",
+                          "label": "toc_row_start",
+                          "anchor": "section_start",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_language",
+                          "label": "toc_row_language",
+                          "anchor": "section_language",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_update",
+                          "label": "toc_row_update",
+                          "anchor": "section_update",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_remove",
+                          "label": "toc_row_remove",
+                          "anchor": "section_remove",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_trouble",
+                          "label": "toc_row_trouble",
+                          "anchor": "section_trouble",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_safety",
+                          "label": "toc_row_safety",
+                          "anchor": "section_safety",
+                          "level": 1
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

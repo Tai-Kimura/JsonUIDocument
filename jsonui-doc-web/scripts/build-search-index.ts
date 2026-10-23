@@ -126,6 +126,7 @@ const SECTION_INDEXES: Array<{ url: string; namespace: string }> = [
   { url: "/reference", namespace: "reference_index" },
   { url: "/platforms", namespace: "platforms_index" },
   { url: "/tools", namespace: "tools_index" },
+  { url: "/viz", namespace: "viz_index" },
   { url: "/spec", namespace: "spec_index" },
 ];
 

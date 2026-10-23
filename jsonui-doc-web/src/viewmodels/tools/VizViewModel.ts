@@ -1,4 +1,4 @@
-// ViewModel for Tools > jui viz.
+// ViewModel for Tools > jui viz — since 2026-10-24 a pointer to the /viz section.
 
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { VizData } from "@/generated/data/VizData";
@@ -51,29 +51,93 @@ export class VizViewModel {
   };
 
   onAppear = () => {
-    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.sDefault)) });
+    this.updateData({ articleLinks: this.asCollection(this.buildArticles(this.sDefault)) });
   };
 
   mountLanguage = (): void => {
-    this.updateData({ nextReadLinks: this.asCollection(this.buildNextReads(this.s)) });
+    this.updateData({ articleLinks: this.asCollection(this.buildArticles(this.s)) });
   };
 
-  private buildNextReads = (lookup: (key: string) => string): NextReadCell[] => [
-      {
-        id: "next_cli",
-        titleKey: lookup("next_cli_title"),
-        descriptionKey: lookup("next_cli_description"),
-        url: "/tools/cli",
-        onNavigate: () => this.navigate("/tools/cli"),
-      },
-      {
-        id: "next_agents",
-        titleKey: lookup("next_agents_title"),
-        descriptionKey: lookup("next_agents_description"),
-        url: "/tools/agents",
-        onNavigate: () => this.navigate("/tools/agents"),
-      },
-    ];
+  // The page now only points at the /viz section: one card per article.
+  private buildArticles = (lookup: (key: string) => string): NextReadCell[] => [
+    {
+      id: "next_index",
+      titleKey: lookup("next_index_title"),
+      descriptionKey: lookup("next_index_description"),
+      url: "/viz",
+      onNavigate: () => this.navigate("/viz"),
+    },
+    {
+      id: "next_setup",
+      titleKey: lookup("next_setup_title"),
+      descriptionKey: lookup("next_setup_description"),
+      url: "/viz/setup",
+      onNavigate: () => this.navigate("/viz/setup"),
+    },
+    {
+      id: "next_room",
+      titleKey: lookup("next_room_title"),
+      descriptionKey: lookup("next_room_description"),
+      url: "/viz/room",
+      onNavigate: () => this.navigate("/viz/room"),
+    },
+    {
+      id: "next_spirits",
+      titleKey: lookup("next_spirits_title"),
+      descriptionKey: lookup("next_spirits_description"),
+      url: "/viz/spirits",
+      onNavigate: () => this.navigate("/viz/spirits"),
+    },
+    {
+      id: "next_panels",
+      titleKey: lookup("next_panels_title"),
+      descriptionKey: lookup("next_panels_description"),
+      url: "/viz/panels",
+      onNavigate: () => this.navigate("/viz/panels"),
+    },
+    {
+      id: "next_sessions",
+      titleKey: lookup("next_sessions_title"),
+      descriptionKey: lookup("next_sessions_description"),
+      url: "/viz/sessions",
+      onNavigate: () => this.navigate("/viz/sessions"),
+    },
+    {
+      id: "next_approvals",
+      titleKey: lookup("next_approvals_title"),
+      descriptionKey: lookup("next_approvals_description"),
+      url: "/viz/approvals",
+      onNavigate: () => this.navigate("/viz/approvals"),
+    },
+    {
+      id: "next_tests",
+      titleKey: lookup("next_tests_title"),
+      descriptionKey: lookup("next_tests_description"),
+      url: "/viz/tests",
+      onNavigate: () => this.navigate("/viz/tests"),
+    },
+    {
+      id: "next_server_room",
+      titleKey: lookup("next_server_room_title"),
+      descriptionKey: lookup("next_server_room_description"),
+      url: "/viz/server-room",
+      onNavigate: () => this.navigate("/viz/server-room"),
+    },
+    {
+      id: "next_infra_model",
+      titleKey: lookup("next_infra_model_title"),
+      descriptionKey: lookup("next_infra_model_description"),
+      url: "/viz/infra-model",
+      onNavigate: () => this.navigate("/viz/infra-model"),
+    },
+    {
+      id: "next_cost",
+      titleKey: lookup("next_cost_title"),
+      descriptionKey: lookup("next_cost_description"),
+      url: "/viz/cost",
+      onNavigate: () => this.navigate("/viz/cost"),
+    },
+  ];
 
   navigate = (url: string): void => {
     this.router.push(url);

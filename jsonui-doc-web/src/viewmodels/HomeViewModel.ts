@@ -163,7 +163,7 @@ export class HomeViewModel extends HomeViewModelBase {
         else this.navigate("/guides/branch-contracts");
       },
       onHeroAiAgentsTap: () => this.navigate("/tools/agents"),
-      onHeroVizTap: () => this.navigate("/tools/viz"),
+      onHeroVizTap: () => this.navigate("/viz"),
     });
   };
 

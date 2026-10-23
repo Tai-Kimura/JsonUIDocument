@@ -2,7 +2,7 @@
 
 ## Overview
 
-Top page. Three sections: hero (brand statement + three CTAs, then the jui viz demo running in an iframe with a link to /tools/viz), featured cards (3 'start here' links), platform cards (Swift/Kotlin/React), and a 'What's new' changelog ribbon. Navigation between site categories now lives in the site-wide chrome (TopBar + Sidebar) — home is no longer a navigation surface. Language toggle also moved to the top bar; home simply re-renders when StringManager flips.
+Top page. Three sections: hero (brand statement + three CTAs, then the jui viz demo running in an iframe with a link to /viz), featured cards (3 'start here' links), platform cards (Swift/Kotlin/React), and a 'What's new' changelog ribbon. Navigation between site categories now lives in the site-wide chrome (TopBar + Sidebar) — home is no longer a navigation surface. Language toggle also moved to the top bar; home simply re-renders when StringManager flips.
 
 | | |
 |---|---|
@@ -186,7 +186,7 @@ flowchart TD
 | `recentChanges` | [ChangelogCard] | `-` | Up to 3–6 'What's new' ribbon cards telling a returning reader what landed since their last visit. Seeded by the ViewModel in onAppear from the RECENT_CHANGES constant; no API, no runtime fetch. Each cell carries a formatted date + title + blurb + CTA label, all localized. 2026-05 update (swagger-driven Data Models): three new 'May 2026' entries are appended in HomeViewModel.RECENT_CHANGES — (1) DTO + Domain codegen body -> /concepts/data-models-from-openapi, (2) path filter -> /guides/api-data-models §3, (3) MCP Group E discovery -> /concepts/data-models-from-openapi §7. Each entry stays a distinct row (no bundling) so the discovery surface keeps its own first-class card. The spec only confirms the ChangelogCard structure supports the three rows; the literal RECENT_CHANGES catalog content lives in HomeViewModel.ts and is jsonui-implement's responsibility. | - |
 | `onHeroInstallTap` | (() -> Void)? | `-` | Bound by the hero's install button: navigates to the install guide. | - |
 | `onHeroAiAgentsTap` | (() -> Void)? | `-` | Bound by the hero's AI agents link: navigates to the AI agents page. | - |
-| `onHeroVizTap` | (() -> Void)? | `-` | Bound by the hero's jui viz link: navigates to /tools/viz. | - |
+| `onHeroVizTap` | (() -> Void)? | `-` | Bound by the hero's jui viz link: navigates to /viz. | - |
 | `onHeroRefusesTap` | (() -> Void)? | `-` | Bound by the hero's refuses link: scrolls to the home_refuses section on this page, or navigates to /guides/branch-contracts when that section is not in the document. | - |
 
 ### View-local Event Handlers

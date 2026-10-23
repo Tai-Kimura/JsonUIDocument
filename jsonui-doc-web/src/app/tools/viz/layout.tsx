@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 // title template ("... — JsonUI") stays consistent.
 export const metadata: Metadata = {
   title: `jui viz: watch your agents work — JsonUI`,
-  description: `\`jui viz\` shows the Claude Code sessions and subagents running on your machine as rooms and robots in the browser. Each project folder gets a room, and each…`,
+  description: `jui viz now has a section of its own, with one article per feature. Start with the overview, or jump to the feature you need.`,
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -1,0 +1,147 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "Sessions",
+    "displayName": "Talk, prompts and notifications",
+    "description": "jui viz > Talk, prompts and notifications. One article of the /viz section, split out of /tools/viz on 2026-10-24. Sections: Send a prompt to a session / Attach files, and see pictures in the history / Stop a session's turn / Clock a session out / Read the robots' talk / Notifications and the question window. Written from the former /tools/viz text and checked against jsonui-cli 2.3.20.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "viz/sessions",
+    "createdAt": "2026-10-24",
+    "updatedAt": "2026-10-24"
+  },
+  "structure": {
+    "components": [],
+    "customComponents": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Closing 'keep reading' cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed the card collections."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed the card collections from a static catalog; each title / description is resolved through StringManager with the viz_sessions_ prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "router.push(url). Destinations: /viz, /viz/panels, /viz/approvals."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Closing 'keep reading' cards."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is spec-mapped",
+      "destination": "Target screen",
+      "description": "v1: /viz, /viz/panels, /viz/approvals."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/viz/sessions.json",
+      "description": "Layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/viz/SessionsViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/viz/sessions/page.tsx",
+      "description": "Page."
+    }
+  ],
+  "notes": [
+    "Screenshots live in docs/screens/images/viz/ and are taken with sample data only."
+  ]
+}

@@ -54,7 +54,7 @@ interface SidebarSection {
  * post-mount useEffect instead.
  */
 const NAV_CATALOG: ReadonlyArray<{
-  id: "learn" | "concepts" | "spec" | "guides" | "reference" | "platforms" | "tools" | "diagram";
+  id: "learn" | "concepts" | "spec" | "guides" | "reference" | "platforms" | "tools" | "viz" | "diagram";
   iconName: string;
   labelEn: string;
   entries: ReadonlyArray<{ id: string; titleKey: string; titleEn: string; url: string; platforms?: PlatformCode[] }>;
@@ -170,7 +170,26 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "test-runner", titleKey: "tools_test_runner_title", titleEn: "jsonui-test-runner",        url: "/tools/test-runner" },
       { id: "agents",      titleKey: "tools_agents_title",      titleEn: "Agents for Claude / Codex", url: "/tools/agents" },
       { id: "helper",      titleKey: "tools_helper_title",      titleEn: "jsonui-helper (VS Code)",   url: "/tools/helper" },
-      { id: "viz",         titleKey: "tools_viz_title",         titleEn: "jui viz",                   url: "/tools/viz" },
+      { id: "viz",         titleKey: "tools_viz_title",         titleEn: "jui viz",                   url: "/viz" },
+    ],
+  },
+  {
+    // jui viz section — split out of the single /tools/viz page on 2026-10-24, one article per feature.
+    id: "viz",
+    iconName: "viz",
+    labelEn: "jui viz",
+    entries: [
+      { id: "index", titleKey: "viz_index_nav_title", titleEn: "Overview", url: "/viz" },
+      { id: "setup", titleKey: "viz_setup_nav_title", titleEn: "Set up", url: "/viz/setup" },
+      { id: "room", titleKey: "viz_room_nav_title", titleEn: "The room and its robots", url: "/viz/room" },
+      { id: "spirits", titleKey: "viz_spirits_nav_title", titleEn: "Skill spirits", url: "/viz/spirits" },
+      { id: "panels", titleKey: "viz_panels_nav_title", titleEn: "Panels, cards and boards", url: "/viz/panels" },
+      { id: "sessions", titleKey: "viz_sessions_nav_title", titleEn: "Talk, prompts and notifications", url: "/viz/sessions" },
+      { id: "approvals", titleKey: "viz_approvals_nav_title", titleEn: "Permissions and questions", url: "/viz/approvals" },
+      { id: "tests", titleKey: "viz_tests_nav_title", titleEn: "Watching tests", url: "/viz/tests" },
+      { id: "server-room", titleKey: "viz_server_room_nav_title", titleEn: "Server room", url: "/viz/server-room" },
+      { id: "infra-model", titleKey: "viz_infra_model_nav_title", titleEn: "Infra model", url: "/viz/infra-model" },
+      { id: "cost", titleKey: "viz_cost_nav_title", titleEn: "Cost and migration", url: "/viz/cost" },
     ],
   },
   {
