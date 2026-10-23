@@ -13443,8 +13443,8 @@
       "ja": "サーバールーム"
     },
     "next_server_room_description": {
-      "en": "The room's server room, which shows the infrastructure your project declares in 3D.",
-      "ja": "プロジェクトが宣言したインフラを 3D で見せる、部屋の中のサーバールームです。"
+      "en": "The room's server room, which shows the infrastructure your project declares in 3D, or from 2.3.21 flat in 2D.",
+      "ja": "プロジェクトが宣言したインフラを 3D で（2.3.21 からは平らな 2D でも）見せる、部屋の中のサーバールームです。"
     },
     "next_infra_model_title": {
       "en": "Infra model",
@@ -13560,6 +13560,18 @@
       "en": "Sessions that were already running before the hooks went in also appear in the list (read from `claude agents --json`).",
       "ja": "フックを入れる前から動いていたセッションも、一覧には出ます（`claude agents --json` から読みます）。"
     },
+    "section_start_b4_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
+    },
+    "section_start_b4_title": {
+      "en": "A stop ends within 5 seconds",
+      "ja": "止めると 5 秒以内に終わる"
+    },
+    "section_start_b4_body": {
+      "en": "Once the server takes a stop (Ctrl+C, `jui viz stop`, or a TERM signal), it ends within 5 seconds whatever is holding it up, and clears its files. If a step held it that long, the server prints the line stop held in <step> for 5 s; ending without it, naming the step (starting, the readers, the tasks, the file watchers, the web server, the pools, the files, the exit). A server started with `jui viz start` writes that line to serve.log in its state folder.\n\nA TERM that comes while the server is still starting is a stop like any other: it ends with code 0 and its files cleared. Before 2.3.21 such a TERM ended the process outright and left its files behind.",
+      "ja": "サーバーは止める指示（Ctrl+C、`jui viz stop`、TERM のシグナル）を受けると、何に手間取っていても 5 秒以内に終わり、自分のファイルを片付けます。どこかの段で 5 秒かかったときは、stop held in <段> for 5 s; ending without it の行で、その段（starting、the readers、the tasks、the file watchers、the web server、the pools、the files、the exit）を名指しします。`jui viz start` で起動したサーバーは、この行を状態フォルダの serve.log に書きます。\n\nまだ起動している途中に届いた TERM も、ふつうの停止として扱い、終了コード 0 でファイルを片付けて終わります。2.3.21 より前は、こうした TERM でプロセスがそのまま終わり、ファイルが残りました。"
+    },
     "toc_row_start": {
       "en": "Start it",
       "ja": "起動する"
@@ -13653,8 +13665,8 @@
       "ja": "画面の言葉の経緯"
     },
     "section_language_b9_body": {
-      "en": "From 2.3.15 the page is in English by default, and every word it shows comes from one table, with the same keys in English and Japanese (1,892 entries in 2.3.15; 2,207 in 2.3.20). `jui viz doctor` prints language: en on a fresh install of 2.3.15, ja on 2.3.14.\n\nBefore 2.3.15 the page was Japanese by default and the table held only part of it: 9 entries in 2.3.12, 177 in 2.3.13, 185 in 2.3.14.\n\nAlso from 2.3.16, 18 groups that the Japanese table says one way and the English table said two ways are one in English too. 21 others stay apart on purpose, where the English names two things (a status and a sign's short word, say).",
-      "ja": "2.3.15 から、画面は既定で英語になり、出る言葉はすべて 1 つの表から読みます。英語と日本語で同じ key です（2.3.15 で 1,892 項目、2.3.20 で 2,207 項目）。`jui viz doctor` は、入れたばかりの 2.3.15 では language: en、2.3.14 では ja と出ます。\n\n2.3.15 より前は既定が日本語で、表に入っていたのは画面の一部でした（2.3.12 で 9 項目、2.3.13 で 177、2.3.14 で 185）。\n\n同じく 2.3.16 からは、日本語では 1 つの言い方なのに英語では 2 つの言い方だった 18 組を、英語でも 1 つにしました。英語では別の 2 つのものを指す 21 組（状態と看板の短い言葉など）は、わざと分けたままです。"
+      "en": "From 2.3.15 the page is in English by default, and every word it shows comes from one table, with the same keys in English and Japanese (1,892 entries in 2.3.15; 2,207 in 2.3.20; 2,236 in 2.3.21). `jui viz doctor` prints language: en on a fresh install of 2.3.15, ja on 2.3.14.\n\nBefore 2.3.15 the page was Japanese by default and the table held only part of it: 9 entries in 2.3.12, 177 in 2.3.13, 185 in 2.3.14.\n\nAlso from 2.3.16, 18 groups that the Japanese table says one way and the English table said two ways are one in English too. 21 others stay apart on purpose, where the English names two things (a status and a sign's short word, say).",
+      "ja": "2.3.15 から、画面は既定で英語になり、出る言葉はすべて 1 つの表から読みます。英語と日本語で同じ key です（2.3.15 で 1,892 項目、2.3.20 で 2,207 項目、2.3.21 で 2,236 項目）。`jui viz doctor` は、入れたばかりの 2.3.15 では language: en、2.3.14 では ja と出ます。\n\n2.3.15 より前は既定が日本語で、表に入っていたのは画面の一部でした（2.3.12 で 9 項目、2.3.13 で 177、2.3.14 で 185）。\n\n同じく 2.3.16 からは、日本語では 1 つの言い方なのに英語では 2 つの言い方だった 18 組を、英語でも 1 つにしました。英語では別の 2 つのものを指す 21 組（状態と看板の短い言葉など）は、わざと分けたままです。"
     },
     "section_language_b10_text": {
       "en": "These articles give the English words first and the Japanese words after them, as the page shows them with Japanese on.",
@@ -13693,8 +13705,8 @@
       "ja": "3. フックで入れた場合"
     },
     "section_update_b8_text": {
-      "en": "If you installed with `jui viz hooks install` instead of the plugin, run it again. It adds the question hook and points the test-progress setting at the new state folder. In 2.3.20 it also adds the --stop hooks the card's Stop (停止) needs.",
-      "ja": "プラグインではなく `jui viz hooks install` で入れた場合は、撃ち直してください。質問のフックが入り、テストの進捗の設定が新しい状態フォルダに向きます。2.3.20 では、カードの「停止」に要る --stop のフックも入ります。"
+      "en": "If you installed with `jui viz hooks install` instead of the plugin, run it again. It adds the question hook and points the test-progress setting at the new state folder. From 2.3.20 it also adds the --stop hooks the card's Stop (停止) needs.",
+      "ja": "プラグインではなく `jui viz hooks install` で入れた場合は、撃ち直してください。質問のフックが入り、テストの進捗の設定が新しい状態フォルダに向きます。2.3.20 からは、カードの「停止」に要る --stop のフックも入ります。"
     },
     "section_update_b10_since": {
       "en": "from 2.3.1",
@@ -13725,8 +13737,8 @@
       "ja": "効いてくるプラグインの版"
     },
     "section_update_b12_body": {
-      "en": "• In 2.3.7, version 1.2.2 of the plugin is what makes a question wait longer than 5 minutes.\n• In 2.3.20, version 1.3.0 of the plugin is what lets the card's Stop (停止) stop a session (see Talk, prompts and notifications).",
-      "ja": "• 2.3.7 では、プラグインの 1.2.2 にすると、質問の待ちが 5 分より長く効きます。\n• 2.3.20 では、プラグインの 1.3.0 にすると、カードの「停止」でセッションが止まります（「会話、プロンプト、通知」を参照）。"
+      "en": "• In 2.3.7, version 1.2.2 of the plugin is what makes a question wait longer than 5 minutes.\n• From 2.3.20, version 1.3.0 of the plugin is what lets the card's Stop (停止) stop a session (see Talk, prompts and notifications).",
+      "ja": "• 2.3.7 では、プラグインの 1.2.2 にすると、質問の待ちが 5 分より長く効きます。\n• 2.3.20 からは、プラグインの 1.3.0 にすると、カードの「停止」でセッションが止まります（「会話、プロンプト、通知」を参照）。"
     },
     "toc_row_update": {
       "en": "Update to a new version",
@@ -13951,8 +13963,8 @@
       "ja": "押せる物（ロボットが何体でも残る）"
     },
     "section_rooms_b6_body": {
-      "en": "A room shown alone keeps the things with a use whatever the number of robots: the shredder, the git box, the bell, the data-server rack and the server room's door.\n\n• Data-server rack: in a room with OpenAPI files under docs/api or docs/db. Press it for the API and DB documents (endpoints, and per database an ER diagram and its tables).\n• Server room door: in a room with docs/infra (see the Server room article).\n• Bell: see Call below.\n• Git box and shredder: see Reading a robot at a glance.",
-      "ja": "部屋を 1 つだけ表示すると、ロボットが何体でも、使う物（シュレッダー、git の箱、呼び鈴、データサーバーのラック、サーバールームの扉）は残ります。\n\n• データサーバーのラック: docs/api か docs/db に OpenAPI のファイルがある部屋に立ちます。押すと API と DB の仕様書（エンドポイント、データベースごとの ER 図とテーブル）が開きます。\n• サーバールームの扉: docs/infra がある部屋に出ます（「サーバールーム」の記事を参照）。\n• 呼び鈴: 下の「呼び出し」を参照。\n• git の箱とシュレッダー: 「ロボットをひと目で読む」を参照。"
+      "en": "A room shown alone keeps the things with a use whatever the number of robots: the shredder, the git box, the bell, the data-server rack and the server room's door.\n\n• Data-server rack: in a room with OpenAPI files under docs/api or docs/db (JSON, and from 2.3.21 YAML too: .yaml or .yml). Press it for the API and DB documents (endpoints, and per database an ER diagram and its tables).\n• Server room door: in a room with docs/infra (see the Server room article).\n• Bell: see Call below.\n• Git box and shredder: see Reading a robot at a glance.",
+      "ja": "部屋を 1 つだけ表示すると、ロボットが何体でも、使う物（シュレッダー、git の箱、呼び鈴、データサーバーのラック、サーバールームの扉）は残ります。\n\n• データサーバーのラック: docs/api か docs/db に OpenAPI のファイル（JSON。2.3.21 からは YAML の .yaml・.yml も）がある部屋に立ちます。押すと API と DB の仕様書（エンドポイント、データベースごとの ER 図とテーブル）が開きます。\n• サーバールームの扉: docs/infra がある部屋に出ます（「サーバールーム」の記事を参照）。\n• 呼び鈴: 下の「呼び出し」を参照。\n• git の箱とシュレッダー: 「ロボットをひと目で読む」を参照。"
     },
     "section_rooms_b7_since": {
       "en": "from 2.3.5",
@@ -13967,14 +13979,26 @@
       "ja": "部屋の呼び鈴か、部屋の名前の横のボタンを押します。担当名と役割の文を入力すると、その部屋に新しいセッションを起動するコマンドができます。コピーして、ターミナルで自分で実行します。jui viz は何も実行しません。"
     },
     "section_rooms_b8_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
+    },
+    "section_rooms_b8_title": {
+      "en": "Enter the server room (サーバールームに入る)",
+      "ja": "サーバールームに入る"
+    },
+    "section_rooms_b8_body": {
+      "en": "Beside Call (呼び出し), by the room's name, a button Enter the server room (サーバールームに入る) opens the room's server room, as a press on its door in the 3D does. It can be reached from the keyboard too.\n\nIt shows in every room shown alone on the live page. In a room with no docs/infra it is greyed out and does nothing; its tooltip says No docs/infra here, so this room has no server room (docs/infra が無いので、この部屋にサーバールームはありません). See the Server room article.",
+      "ja": "部屋の名前の横、「呼び出し」の隣の「サーバールームに入る」で、3D の扉を押したときと同じように、その部屋のサーバールームが開きます。キーボードからも押せます。\n\nライブのページで部屋を 1 つ出しているときは、どの部屋にも出ます。docs/infra の無い部屋では薄く出て、押しても何も起きません。ツールチップに「docs/infra が無いので、この部屋にサーバールームはありません」と出ます。「サーバールーム」の記事を参照してください。"
+    },
+    "section_rooms_b9_since": {
       "en": "from 2.3.9",
       "ja": "2.3.9 から"
     },
-    "section_rooms_b8_title": {
+    "section_rooms_b9_title": {
       "en": "When a robot stands in the way",
       "ja": "ロボットが手前にいるとき"
     },
-    "section_rooms_b8_body": {
+    "section_rooms_b9_body": {
       "en": "The bell, the data-server rack and the server room's door and keypad can be pressed even with a robot in front of them. The robot still opens from the rest of its body and its name tag.\n\nFrom 2.3.12, a robot's name tag or bill over the bell, the rack or the door is drawn faint and lets the press through, and a wait bubble does the same by its own box.",
       "ja": "呼び鈴、データサーバーのラック、サーバールームの扉とテンキーは、手前のロボットに重なっていても押せます。ロボットは、体のほかの所と名札で開きます。\n\n2.3.12 からは、呼び鈴、ラック、扉に重なったロボットの名札やお札は薄く出て、押すと下の物が押せます。待ちの吹き出しも、自分の箱で同じように判断します。"
     },
@@ -14037,6 +14061,30 @@
     "section_robots_b5_body": {
       "en": "An unchecked robot leaves the 3D with its desk, tag, bill, wait bubble and spirit, and a game, nap or break it is in ends; its desk stays empty.\n\nA hidden robot waiting on you (a permission, a question, input) marks its row, and the list's head counts them.\n\nIt changes only what is drawn: the panel, the header's chips and the notifications still count every robot. The list goes while a board (the whiteboard, the task board, the server room, the data server, the bills) or a page-wide dialog is open.",
       "ja": "チェックを外したロボットは、机、札、お札、待ちの吹き出し、守護霊ごと 3D から消え、していた遊び・居眠り・休憩は終わります。机は空いたまま残ります。\n\n消したロボットがあなたを待っている（許可、質問、入力）と、その行に印が付き、一覧の頭にその数が出ます。\n\n変わるのは描くものだけで、パネル、ヘッダーのチップ、通知は、すべてのロボットを数えます。ボード（ホワイトボード、タスクボード、サーバールーム、データサーバー、お札）やページ全体のダイアログを開いている間、一覧は隠れます。"
+    },
+    "section_robots_b6_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
+    },
+    "section_robots_b6_title": {
+      "en": "The selected robot's row",
+      "ja": "選んでいるロボットの行"
+    },
+    "section_robots_b6_body": {
+      "en": "The row of the robot whose card is open is highlighted; for a subagent it is its main session's row. Each time you select a robot, the list scrolls just enough to show its row. A row you scroll away by hand afterwards stays where you put it.\n\nWith a card open, the list moves left out of the way of the card and of the other robots' waits shown beside it. Where the 3D has no room left of them, it goes below the waits.",
+      "ja": "カードを開いているロボットの行が強調されます。サブエージェントなら、そのメインのセッションの行です。ロボットを選ぶたびに、一覧はその行が見えるところまでだけスクロールします。そのあと手でスクロールして外した行は、そのままです。\n\nカードを開いていると、一覧は、カードと、その横に出るほかのロボットの待ちを避けて左へずれます。その左に 3D の余地が無いときは、待ちの下に移ります。"
+    },
+    "section_robots_b7_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
+    },
+    "section_robots_b7_title": {
+      "en": "Put the list in order",
+      "ja": "一覧を並べ替える"
+    },
+    "section_robots_b7_body": {
+      "en": "Pick an order in Order (並べ方) at the list's head:\n• My own order (自分で並べた順), the default\n• By name (名前順)\n• By state (waiting first) (状態順（待っているものが上）): waiting on you, then at work, then idle, then done\n• Most recently active (最近動いた順)\n\nTo make your own order, drag a row, or press Alt+↑ or Alt+↓ on it. Moving a row while another order shows starts your own order from the one shown. The order and your own order are kept per room in this browser, and a new session goes at the end of your own order.\n\nWith a robot's card open, the card's ‹ › and the ← → keys go through the robots in the list's order, skipping the ones you hid, a main session's subagents right after it. On the whole floor they go room by room, each room in its own list's order.",
+      "ja": "一覧の頭の「並べ方」で選びます。\n• 自分で並べた順（既定）\n• 名前順\n• 状態順（待っているものが上）: あなたを待っているもの、作業中、待機、完了の順\n• 最近動いた順\n\n自分の順にするには、行をドラッグするか、行で Alt+↑ / Alt+↓ を押します。ほかの並べ方のときに行を動かすと、そのとき見えている順から自分の順が始まります。並べ方と自分の順は部屋ごとにこのブラウザが覚え、新しいセッションは自分の順の最後に入ります。\n\nロボットのカードを開いているとき、カードの ‹ › と ← → キーは、一覧の順にロボットを回ります。消したロボットは飛ばし、メインのセッションのすぐ後にそのサブエージェントが来ます。フロア全体では、部屋ごとに、それぞれの部屋の一覧の順で回ります。"
     },
     "toc_row_robots": {
       "en": "What a robot is",
@@ -14402,6 +14450,14 @@
       "en": "The Robots in this room list.",
       "ja": "「この部屋のロボット」の一覧。"
     },
+    "section_history_b13_title": {
+      "en": "2.3.21",
+      "ja": "2.3.21"
+    },
+    "section_history_b13_body": {
+      "en": "The robot list marks the selected robot's row and can be put in order; the card's ‹ › and ← → follow that order. The Enter the server room button beside Call. The data-server rack reads YAML OpenAPI documents too.",
+      "ja": "ロボットの一覧が、選んでいるロボットの行に印を付け、並べ替えられるようになる。カードの ‹ › と ← → もその順に従う。「呼び出し」の隣の「サーバールームに入る」。データサーバーのラックが YAML の OpenAPI の文書も読む。"
+    },
     "toc_row_history": {
       "en": "What changed when",
       "ja": "版ごとの変化"
@@ -14633,8 +14689,8 @@
       "ja": "共通の値"
     },
     "section_fields_b2_body": {
-      "en": "• Colours are #rrggbb.\n• Positions and rotations are three numbers from -10 to 10; rotations are in degrees, so in 2.3.20 a turn is at most 10 degrees each way (90 is refused by the check).\n• Text is a string, or a table by language such as {\"en\": \"...\", \"ja\": \"...\"}, 200 characters at most. The page uses its own language, then ja, then the first one written.\n• Anchors (where something goes on the robot): head, forehead, band, headset, face, handL, handR, back, root.",
-      "ja": "• 色は #rrggbb です。\n• 位置と回転は -10〜10 の 3 つの数で、回転は度です。そのため 2.3.20 では、回せるのは左右に 10 度までです（90 は検査で拒まれます）。\n• 文字は、文字列か、{\"en\": \"...\", \"ja\": \"...\"} のような言語ごとの表で、200 文字までです。ページは自分の言語、次に ja、次に最初に書かれたものを使います。\n• 取り付け位置（ロボットのどこに付けるか）: head、forehead、band、headset、face、handL、handR、back、root。"
+      "en": "• Colours are #rrggbb.\n• Positions and rotations are three numbers from -10 to 10; rotations are in degrees, so in 2.3.21 a turn is at most 10 degrees each way (90 is refused by the check).\n• Text is a string, or a table by language such as {\"en\": \"...\", \"ja\": \"...\"}, 200 characters at most. The page uses its own language, then ja, then the first one written.\n• Anchors (where something goes on the robot): head, forehead, band, headset, face, handL, handR, back, root.",
+      "ja": "• 色は #rrggbb です。\n• 位置と回転は -10〜10 の 3 つの数で、回転は度です。そのため 2.3.21 では、回せるのは左右に 10 度までです（90 は検査で拒まれます）。\n• 文字は、文字列か、{\"en\": \"...\", \"ja\": \"...\"} のような言語ごとの表で、200 文字までです。ページは自分の言語、次に ja、次に最初に書かれたものを使います。\n• 取り付け位置（ロボットのどこに付けるか）: head、forehead、band、headset、face、handL、handR、back、root。"
     },
     "section_fields_b3_title": {
       "en": "Top level",
@@ -14649,8 +14705,8 @@
       "ja": "spirit: ロボットの後ろの姿"
     },
     "section_fields_b4_body": {
-      "en": "• file (required here): a .glb in the folder.\n• at: an anchor, back when left out. scale: 0.1 to 5. opacity: 0 to 1 (0.55 when left out). tint: a colour.\n• clips: {appear, loop, leave}, the names of animation clips in that file. Left out, clips named appear, loop and leave are played if the file has them. loop repeats; appear and leave play once. A clip named here that the file lacks is an error.\n• material: kind ghost or plain. ghost is the page's see-through look, a rim of light over a shade fading downward: rim, shade and base colours, rimK 0 to 4, pow 0.5 to 8, yFade -4 to 4, yFadeLen 0.05 to 8. plain, or no material, keeps the model's own colours, transparent and tinted.\n• outline: color and width (0 to 0.2).\n\noffset and rotate are checked here too (three numbers from -10 to 10), but the 2.3.20 page places the figure by at and scale only: they have no effect on the figure.",
-      "ja": "• file（ここでは必須）: フォルダの中の .glb。\n• at: 取り付け位置。書かなければ back。scale: 0.1〜5。opacity: 0〜1（書かなければ 0.55）。tint: 色。\n• clips: {appear, loop, leave}。そのファイルのアニメーションの名前です。書かなければ、ファイルに appear、loop、leave という名前のものがあれば再生します。loop は繰り返し、appear と leave は 1 回です。ここに書いた名前がファイルに無ければエラーです。\n• material: kind は ghost か plain。ghost はページが描く透けた見た目で、陰の上に光の縁が乗り、下へ行くほど薄くなります。rim、shade、base の色、rimK 0〜4、pow 0.5〜8、yFade -4〜4、yFadeLen 0.05〜8。plain か material なしなら、モデル自身の色を透かして tint で染めます。\n• outline: color と width（0〜0.2）。\n\noffset と rotate もここで検査されます（-10〜10 の 3 つの数）。ただし 2.3.20 のページは、姿を at と scale だけで置くので、姿には効きません。"
+      "en": "• file (required here): a .glb in the folder.\n• at: an anchor, back when left out. scale: 0.1 to 5. opacity: 0 to 1 (0.55 when left out). tint: a colour.\n• clips: {appear, loop, leave}, the names of animation clips in that file. Left out, clips named appear, loop and leave are played if the file has them. loop repeats; appear and leave play once. A clip named here that the file lacks is an error.\n• material: kind ghost or plain. ghost is the page's see-through look, a rim of light over a shade fading downward: rim, shade and base colours, rimK 0 to 4, pow 0.5 to 8, yFade -4 to 4, yFadeLen 0.05 to 8. plain, or no material, keeps the model's own colours, transparent and tinted.\n• outline: color and width (0 to 0.2).\n\noffset and rotate are checked here too (three numbers from -10 to 10), but the 2.3.21 page places the figure by at and scale only: they have no effect on the figure.",
+      "ja": "• file（ここでは必須）: フォルダの中の .glb。\n• at: 取り付け位置。書かなければ back。scale: 0.1〜5。opacity: 0〜1（書かなければ 0.55）。tint: 色。\n• clips: {appear, loop, leave}。そのファイルのアニメーションの名前です。書かなければ、ファイルに appear、loop、leave という名前のものがあれば再生します。loop は繰り返し、appear と leave は 1 回です。ここに書いた名前がファイルに無ければエラーです。\n• material: kind は ghost か plain。ghost はページが描く透けた見た目で、陰の上に光の縁が乗り、下へ行くほど薄くなります。rim、shade、base の色、rimK 0〜4、pow 0.5〜8、yFade -4〜4、yFadeLen 0.05〜8。plain か material なしなら、モデル自身の色を透かして tint で染めます。\n• outline: color と width（0〜0.2）。\n\noffset と rotate もここで検査されます（-10〜10 の 3 つの数）。ただし 2.3.21 のページは、姿を at と scale だけで置くので、姿には効きません。"
     },
     "section_fields_b5_title": {
       "en": "parts: what the robot wears and holds",
@@ -14971,8 +15027,8 @@
       "ja": "前後のロボット"
     },
     "section_robot_card_b9_body": {
-      "en": "With a card open, ← and → (or the ‹ › buttons) go to the previous or next robot in view, in room order and then by number, keeping the tab you were on.\n\nFrom 2.3.4 this works even with focus on a tab (except in a text field or while composing), and Tab moves between the tabs.",
-      "ja": "カードを開いている間、← と →（または ‹ › のボタン）で、見えている範囲の前後のロボットに移ります。順番は部屋の順、その中は番号の順で、開いていたタブはそのままです。\n\n2.3.4 からは、タブにいても切り替えられます（入力欄と、変換の途中は除きます）。タブの移動は Tab です。"
+      "en": "With a card open, ← and → (or the ‹ › buttons) go to the previous or next robot in view, in room order and then by number, keeping the tab you were on.\n\nFrom 2.3.4 this works even with focus on a tab (except in a text field or while composing), and Tab moves between the tabs.\n\nFrom 2.3.21, in the live 3D view, the steps follow each room's robot list (Robots in this room (この部屋のロボット)): room by room, each in the order the list shows, skipping the robots the list hides, a main session's subagents right after it. The demo and a page without the 3D keep room order, then numbers.",
+      "ja": "カードを開いている間、← と →（または ‹ › のボタン）で、見えている範囲の前後のロボットに移ります。順番は部屋の順、その中は番号の順で、開いていたタブはそのままです。\n\n2.3.4 からは、タブにいても切り替えられます（入力欄と、変換の途中は除きます）。タブの移動は Tab です。\n\n2.3.21 から、ライブの 3D 表示では、移る順番が各部屋のロボット一覧（この部屋のロボット）に従います。部屋ごとに一覧に並んだ順で進み、一覧で隠したロボットは飛ばし、メインのセッションのサブエージェントはそのすぐ後に来ます。デモと 3D の無いページでは、これまでどおり部屋の順、次に番号の順です。"
     },
     "section_robot_card_b10_since": {
       "en": "from 2.3.9",
@@ -14983,8 +15039,8 @@
       "ja": "プロジェクトを切り替えたとき"
     },
     "section_robot_card_b10_body": {
-      "en": "Switching projects with a robot picked opens the robot you last picked in that project, if it is still in the room. Otherwise the room is shown; All (すべて) picks none.\n\nThis is kept in the page only: a reload forgets it, and closing the card with × or Escape forgets that project's pick.",
-      "ja": "ロボットを選んだままプロジェクトを切り替えると、そのプロジェクトで最後に選んでいたロボットが、まだ部屋にいれば開きます。いなければ部屋を表示し、「すべて」では選びません。\n\n覚えるのはページの中だけです。再読み込みで忘れ、カードを × か Esc で閉じると、そのプロジェクトの分は忘れます。"
+      "en": "Switching projects with a robot picked opens the robot you last picked in that project, if it is still in the room. Otherwise the room is shown; All (すべて) picks none.\n\nThis is kept in the page only: a reload forgets it, and closing the card with × or Escape forgets that project's pick.\n\nFrom 2.3.21 the robot remembered is the one last on the card, however it got there: a click, ← → or ‹ ›, or a name in the history. Before, moving with ← → still left the robot you had clicked.",
+      "ja": "ロボットを選んだままプロジェクトを切り替えると、そのプロジェクトで最後に選んでいたロボットが、まだ部屋にいれば開きます。いなければ部屋を表示し、「すべて」では選びません。\n\n覚えるのはページの中だけです。再読み込みで忘れ、カードを × か Esc で閉じると、そのプロジェクトの分は忘れます。\n\n2.3.21 から、覚えておくのはカードに最後に出ていたロボットです。クリックでも、← →・‹ › でも、履歴の中の名前から移っても同じです。それまでは ← → で移っても、覚えているのはクリックしたロボットのままでした。"
     },
     "section_robot_card_b11_since": {
       "en": "from 2.3.14",
@@ -14999,66 +15055,82 @@
       "ja": "カードを開いているロボットが、見えていない部屋（1 部屋だけの表示で別の部屋、または別の階の部屋）へ歩くと、表示がそれを追います。その部屋を出し、カードは開いたまま、カメラがロボットに向かい、そのことを知らせが言います。\n\n手で表示を切り替えてから 3 秒の間は動かず、代わりにカードに行き先と、そこへ行くボタンが出ます。部屋が閉じたときは、カードは開いたままで、そのことを 1 度だけ言います。"
     },
     "section_robot_card_b12_text": {
+      "en": "Other robots' waits",
+      "ja": "ほかのロボットの待ち"
+    },
+    "section_robot_card_b13_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
+    },
+    "section_robot_card_b13_title": {
+      "en": "Waits beside the open card",
+      "ja": "開いたカードの横に出る待ち"
+    },
+    "section_robot_card_b13_body": {
+      "en": "An open card covers the header's chips and the other robots' bubbles. So while it is open, a small block, Other sessions are waiting (ほかのセッションが待っています), sits just outside the card at its top-left corner. It sums up what the other robots wait on, such as Permission 2 · Question 1 · Stopped call 1, and lists each robot with its mark, its name if it has one, and what it waits on: six robots, then N more. The open card's own robot is left out; its wait is in the card.\n\nPress a robot's row to open its wait's card, as its bubble does. Press the sum to open the task board's waiting strips, as the header's chips do. A new wait makes the block move once (not with reduced motion).\n\nWhere the card has the page's width (900 px wide or narrower, or the card at full screen) there is no room beside it: the card's head row shows a Waiting N (待ち N) badge instead, which opens the same board. The room's robot list keeps clear: it moves left off the open card and off the block, and goes below the block where the 3D has no room to its left.",
+      "ja": "カードを開くと、ヘッダーの数字のチップやほかのロボットの吹き出しがその下に隠れます。そこでカードが開いている間は、カードの左上の角のすぐ外に「ほかのセッションが待っています」という小さな欄が出ます。ほかのロボットが何を待っているかを「許可 2 · 質問 1 · 止められた操作 1」のようにまとめ、ロボットごとに印・名前（付いていれば）・待っているものを並べます。6 台までで、それ以上は「ほか N 台」です。開いているカードのロボット自身は数えません。その待ちはカードの中に出ています。\n\nロボットの行を押すと、吹き出しを押したときと同じく、その待ちの札が開きます。まとめの行を押すと、ヘッダーのチップと同じく、タスクボードの待ちの欄が開きます。新しい待ちが来ると欄が一度だけ動きます（動きを減らす設定では動きません）。\n\nカードがページの幅いっぱいのとき（幅 900 px 以下、またはカードを全画面にしたとき）は横に場所がないので、代わりにカードの見出しの行に「待ち N」のバッジが出て、押すと同じボードが開きます。部屋のロボット一覧はじゃまにならないよう、開いたカードとこの欄から左へよけ、3D の左に場所がなければ欄の下に回ります。"
+    },
+    "section_robot_card_b15_text": {
       "en": "Reading comfortably",
       "ja": "読みやすくする"
     },
-    "section_robot_card_b13_since": {
+    "section_robot_card_b16_since": {
       "en": "from 2.3.4",
       "ja": "2.3.4 から"
     },
-    "section_robot_card_b13_title": {
+    "section_robot_card_b16_title": {
       "en": "Your place is kept",
       "ja": "読んでいる位置を保つ"
     },
-    "section_robot_card_b13_body": {
+    "section_robot_card_b16_body": {
       "en": "History (応答の履歴) keeps your place when it refreshes. It follows new answers only when you are at the bottom, and shows New responses ↓ (新しい応答 ↓) otherwise.",
       "ja": "「応答の履歴」は、更新されても読んでいる位置を保ちます。下端にいるときだけ新しい応答へ進み、上を読んでいるときは「新しい応答 ↓」を出します。"
     },
-    "section_robot_card_b14_since": {
+    "section_robot_card_b17_since": {
       "en": "from 2.3.4",
       "ja": "2.3.4 から"
     },
-    "section_robot_card_b14_title": {
+    "section_robot_card_b17_title": {
       "en": "Widening the card, images and tables",
       "ja": "カードを広げる・画像・表"
     },
-    "section_robot_card_b14_body": {
+    "section_robot_card_b17_body": {
       "en": "The card can be widened; one robot stays visible at the left, and Escape goes back. History (応答の履歴) shows images as thumbnails you can enlarge, and scrolls wide tables sideways.\n\nFrom 2.3.7 Now (今の様子) widens too, with one width for both tabs, and the camera no longer shakes with the robot while widened.",
       "ja": "カードは広げて読めます。左にロボット 1 体分が残り、Esc で戻ります。「応答の履歴」では、画像はサムネイルで出て拡大でき、幅の広い表は横にスクロールします。\n\n2.3.7 からは「今の様子」でも広げられ、幅は両方のタブで同じです。広げている間、ロボットの動きでカメラが揺れません。"
     },
-    "section_robot_card_b15_since": {
+    "section_robot_card_b18_since": {
       "en": "from 2.3.5",
       "ja": "2.3.5 から"
     },
-    "section_robot_card_b15_title": {
+    "section_robot_card_b18_title": {
       "en": "Messages between sessions",
       "ja": "セッション間のメッセージ"
     },
-    "section_robot_card_b15_body": {
+    "section_robot_card_b18_body": {
       "en": "A message from another session reads sender, text, time, folded to three lines; press the text to fold it again. A SendMessage row names its recipient; press the name to switch to that robot.",
       "ja": "ほかのセッションのメッセージは、送り手・本文・時刻の順で、3 行に畳まれます（本文を押すとまた畳みます）。SendMessage の行には宛先が出て、名前を押すとそのロボットに切り替わります。"
     },
-    "section_robot_card_b16_since": {
+    "section_robot_card_b19_since": {
       "en": "from 2.3.5",
       "ja": "2.3.5 から"
     },
-    "section_robot_card_b16_title": {
+    "section_robot_card_b19_title": {
       "en": "Full text of a cut-off line",
       "ja": "切れた行の全文"
     },
-    "section_robot_card_b16_body": {
+    "section_robot_card_b19_body": {
       "en": "A line cut short shows its full text on hover or focus, on the card, in the panel and in the log strip (from 2.3.5).\n\nFrom 2.3.8 that full text appears over the 3D view and stays 0.7 seconds after the pointer leaves, so you can move onto it and select the text.\n\nFrom 2.3.9, for a line on the card or in the panel, it appears just left of that card (or panel), level with the line. For the log strip and the bottom sheet of a narrow screen it stays at the left of the 3D view, as in 2.3.8.",
       "ja": "1 行で切れた文は、ホバーかフォーカスで全文が出ます。カード、パネル、ログの帯で使えます（2.3.5 から）。\n\n2.3.8 からは、その全文の札は 3D の側に出て、ポインタを離しても 0.7 秒残るので、札に移って文字を選べます。\n\n2.3.9 からは、カードかパネルの行の札は、そのカード（パネル）のすぐ左に、行の高さに合わせて出ます。ログの帯と、狭い画面の下のシートの行は、2.3.8 と同じく 3D の左側です。"
     },
-    "section_robot_card_b17_since": {
+    "section_robot_card_b20_since": {
       "en": "from 2.3.6",
       "ja": "2.3.6 から"
     },
-    "section_robot_card_b17_title": {
+    "section_robot_card_b20_title": {
       "en": "Talk",
       "ja": "トーク"
     },
-    "section_robot_card_b17_body": {
+    "section_robot_card_b20_body": {
       "en": "Talk (トーク) at the top of the card shows that robot's SendMessage conversations. See Talk in the article on talk, prompts and notifications.",
       "ja": "カードの上の「トーク」で、そのロボットの SendMessage の会話を読めます。「トーク・プロンプト・通知」の記事のトークを参照してください。"
     },
@@ -15147,8 +15219,8 @@
       "ja": "spec のカードの読み方"
     },
     "section_boards_b2_body": {
-      "en": "A spec's card reads how much is written, whether its layout exists, how many of its related files exist, and how many of its tests pass. A mark appears only where it was measured (the structure, from the layout; the branches, from the tests).\n\nThese are a guide only: `jui verify` is the real check.",
-      "ja": "spec のカードには、記述の割合、layout があるか、関連ファイルがいくつ在るか、テストがいくつ通ったかが出ます。印が付くのは測ったところだけです（構造は layout から、分岐はテストから）。\n\nどれも目安です。正しい判定は `jui verify` で行ってください。"
+      "en": "A spec's card reads how much is written, whether its layout exists, how many of its related files exist, and how many of its tests pass. A mark appears only where it was measured (the structure, from the layout; the branches, from the tests).\n\nThese are a guide only: `jui verify` is the real check.\n\nFrom 2.3.21 a spec is Done (完了) only when its implementation is done and, with a test file of its own and no failed case, the number of passed cases reaches the larger of its test cases and its branches. Before, passing its test cases was enough. So after updating, a spec with fewer test cases than branches can move from Done back to Partly done (途中): with 3 test cases and 8 branches, its tests read 3/8, not 3/3. The Branches section, the spec's status line and the lists count against that same number. Where results are counted is in Watching tests.",
+      "ja": "spec のカードには、記述の割合、layout があるか、関連ファイルがいくつ在るか、テストがいくつ通ったかが出ます。印が付くのは測ったところだけです（構造は layout から、分岐はテストから）。\n\nどれも目安です。正しい判定は `jui verify` で行ってください。\n\n2.3.21 から、spec が「完了」になるのは、実装が済み、専用のテストファイルがあって失敗したケースが無く、通ったケースの数が「テストのケース数」と「分岐の数」の大きいほうに届いたときだけです。それまではテストのケースが全部通れば完了でした。そのため更新すると、ケースが分岐より少ない spec は「完了」から「途中」に戻ることがあります。たとえばケース 3 件・分岐 8 件なら、テストは 3/3 ではなく 3/8 と出ます。分岐の欄も spec の状態の行も一覧も、同じ数を分母に数えます。結果をどこに数えるかは「テストを見る」の記事にあります。"
     },
     "section_boards_b3_since": {
       "en": "from 2.1.0",
@@ -15163,84 +15235,96 @@
       "ja": "部屋の中の JsonUI のアプリ（3 階層下までの `jui.config.json`）をすべて読み、アプリごとにも全体でも選べます。"
     },
     "section_boards_b4_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
+    },
+    "section_boards_b4_title": {
+      "en": "Specs a session is writing in a worktree",
+      "ja": "worktree で書いている途中の spec"
+    },
+    "section_boards_b4_body": {
+      "en": "When a session works in a git worktree of the room's repository that lies outside the room, the board shows that worktree's specs beside the room's own, before anything is merged and pulled. Each such worktree is an app of its own, named app@branch (the app filter reads app ⎇ branch).\n\nEvery row then carries a ⎇ branch tag before its name, in the panel's list, the whiteboard's list and the overview's cards. A worktree's tag has an amber edge and its tooltip names the worktree's folder (A spec in progress in a worktree (…)); the room's own rows show the room's branch (A spec in the room's checkout). A spec in both checkouts is two rows, and an open sheet's head shows ⎇ branch before the file. A robot writing a spec in the worktree marks that row, as in the room.\n\nOnly a worktree that a session not yet ended is working in is shown, and only when it has jui.config.json at the same place as the room's app. A worktree inside the room, or one no session works in, is not shown, and one that is left or removed takes its rows with it. The board looks again when the sessions' folders change and every 5 seconds. A worktree with no branch checked out is named by its commit's first 8 characters. jui viz only reads git's files; it never runs or writes git.",
+      "ja": "セッションが、部屋のリポジトリの git worktree（部屋の外にあるもの）で作業していると、マージや pull を待たずに、その worktree の spec が部屋の spec と並んでボードに出ます。worktree はそれぞれ「アプリ@ブランチ」という名前の 1 つのアプリとして扱われます（アプリの絞り込みには「アプリ ⎇ ブランチ」と出ます）。\n\nこのとき、パネルの一覧・ホワイトボードの一覧・全体表示のカードのどの行にも、名前の前に「⎇ ブランチ」の札が付きます。worktree の札は琥珀色の枠で、ツールチップに worktree のフォルダが出ます（「worktree で作っている途中の spec（…）」）。部屋自身の行には部屋のブランチが出ます（「部屋のチェックアウトの spec」）。両方のチェックアウトにある spec は 2 行になり、開いたシートの見出しではファイルの前に「⎇ ブランチ」が付きます。worktree で spec を書いているロボットは、部屋のときと同じくその行に印が付きます。\n\n出るのは、終わっていないセッションが作業している worktree で、部屋のアプリと同じ場所に jui.config.json があるものだけです。部屋の中にある worktree や、どのセッションも作業していない worktree は出ず、セッションが離れたり worktree が消えたりすると、その行も消えます。見直すのは、セッションのフォルダが変わったときと 5 秒ごとです。ブランチを指していない worktree は、コミットの先頭 8 文字で名前が付きます。jui viz は git のファイルを読むだけで、git を実行したり書き込んだりはしません。"
+    },
+    "section_boards_b6_since": {
       "en": "from 2.3.20",
       "ja": "2.3.20 から"
     },
-    "section_boards_b4_title": {
+    "section_boards_b6_title": {
       "en": "Latest first",
       "ja": "新しく進んだものから"
     },
-    "section_boards_b4_body": {
+    "section_boards_b6_body": {
       "en": "The spec lists put the spec that moved on last first: its own write, its Layout's, or its newest test result. Each spec shows when that was (12:34, Yesterday 12:34 (昨日 12:34), or the date and time); hover for the full time and what moved it on.",
       "ja": "spec の一覧は、最後に進んだ spec（spec の書き込み、その Layout の書き込み、最新のテストの結果）を先に並べ、それがいつかを出します（12:34、昨日 12:34、または日付と時刻）。重ねると、正確な時刻と何で進んだかが出ます。"
     },
-    "section_boards_b5_since": {
+    "section_boards_b7_since": {
       "en": "from 2.3.4",
       "ja": "2.3.4 から"
     },
-    "section_boards_b5_title": {
+    "section_boards_b7_title": {
       "en": "The ? button",
       "ja": "「?」のボタン"
     },
-    "section_boards_b5_body": {
+    "section_boards_b7_body": {
       "en": "The explanation and the legend open from the ? beside the heading, in the panel and on the board.",
       "ja": "説明と凡例は、パネルとボードの見出しの横の「?」から開きます。"
     },
-    "section_boards_b6_since": {
+    "section_boards_b8_since": {
       "en": "from 2.3.5",
       "ja": "2.3.5 から"
     },
-    "section_boards_b6_title": {
+    "section_boards_b8_title": {
       "en": "The spec sheet",
       "ja": "spec のシート"
     },
-    "section_boards_b6_body": {
-      "en": "The data flow is drawn as a Mermaid diagram, the same graph as the generated spec page. Transitions are coloured by kind (push, sheet / modal, replace, back, external, none; To a screen (画面へ) when no kind is written but a screen is named), and state types by type (from 2.3.5).\n\nFrom 2.3.7 the structure is shown nested: indented with tree lines per level, and each child's box inside its parent's in the phone-frame drawing.\n\nFrom 2.3.8 the sheet is one column that never runs off the side. Events and actions are each a table (actions get a destination column only when the spec writes one), and a branch's when / then shows as formatted JSON when the spec writes it as an object or an array (folded past 12 lines).\n\nFrom 2.3.20 the whiteboard's side list brings the open spec into view however it was opened, and prose a spec takes from a texts file is drawn as Markdown (text only; http(s) links open in a new tab).",
-      "ja": "データの流れは Mermaid の図で描きます（生成される spec のページと同じ図）。遷移は種類ごと（push、sheet / modal、replace、戻る、外部、遷移なし。種類の指定が無く画面だけ書かれたものは「画面へ」）、状態は型ごとに色が付きます（2.3.5 から）。\n\n2.3.7 からは、構造が入れ子で出ます。段ごとに字下げと木の線が入り、スマホの枠の図では子の箱が親の箱の中に入ります。\n\n2.3.8 からは、シートが縦 1 列になって横にはみ出しません。イベントと操作はそれぞれ表になり（操作の行き先は、spec に書いてあるときだけ列が出ます）、分岐の when / then は、spec がオブジェクトか配列で書いていれば、整えた JSON で出ます（12 行を超えると畳みます）。\n\n2.3.20 からは、ホワイトボードの横の一覧が、どこから開いても、開いている spec が見える所まで動きます。spec が文のファイルから取る文章は Markdown として描きます（文字だけで、http(s) のリンクは新しいタブで開きます）。"
+    "section_boards_b8_body": {
+      "en": "The data flow is drawn as a Mermaid diagram, the same graph as the generated spec page. Transitions are coloured by kind (push, sheet / modal, replace, back, external, none; To a screen (画面へ) when no kind is written but a screen is named), and state types by type (from 2.3.5).\n\nFrom 2.3.7 the structure is shown nested: indented with tree lines per level, and each child's box inside its parent's in the phone-frame drawing.\n\nFrom 2.3.8 the sheet is one column that never runs off the side. Events and actions are each a table (actions get a destination column only when the spec writes one), and a branch's when / then shows as formatted JSON when the spec writes it as an object or an array (folded past 12 lines).\n\nFrom 2.3.20 the whiteboard's side list brings the open spec into view however it was opened, and prose a spec takes from a texts file is drawn as Markdown (text only; http(s) links open in a new tab).\n\nFrom 2.3.21 a structure row read from the Layout shows the component's type (View, Image …) in a code typeface beside its translated name (Container …), and the Japanese page says レイアウト everywhere it still said Layout.",
+      "ja": "データの流れは Mermaid の図で描きます（生成される spec のページと同じ図）。遷移は種類ごと（push、sheet / modal、replace、戻る、外部、遷移なし。種類の指定が無く画面だけ書かれたものは「画面へ」）、状態は型ごとに色が付きます（2.3.5 から）。\n\n2.3.7 からは、構造が入れ子で出ます。段ごとに字下げと木の線が入り、スマホの枠の図では子の箱が親の箱の中に入ります。\n\n2.3.8 からは、シートが縦 1 列になって横にはみ出しません。イベントと操作はそれぞれ表になり（操作の行き先は、spec に書いてあるときだけ列が出ます）、分岐の when / then は、spec がオブジェクトか配列で書いていれば、整えた JSON で出ます（12 行を超えると畳みます）。\n\n2.3.20 からは、ホワイトボードの横の一覧が、どこから開いても、開いている spec が見える所まで動きます。spec が文のファイルから取る文章は Markdown として描きます（文字だけで、http(s) のリンクは新しいタブで開きます）。\n\n2.3.21 から、レイアウトから読んだ構造の行では、部品の型名（View・Image など）が日本語の名前（コンテナなど）の横にコードの字体で出ます。日本語の画面で Layout と書いていた残りの箇所も「レイアウト」に揃いました。"
     },
-    "section_boards_b7_text": {
+    "section_boards_b9_text": {
       "en": "Task board",
       "ja": "タスクボード"
     },
-    "section_boards_b8_text": {
+    "section_boards_b10_text": {
       "en": "Since 2.1.0 there is a card for each instruction you give, titled by its first line. Tasks Claude creates with its task tools appear as well.",
       "ja": "2.1.0 からは、あなたが出した指示ごとにカードができ、題は指示の 1 行目です。Claude がタスクのツールで作ったタスクも並びます。"
     },
-    "section_boards_b9_since": {
+    "section_boards_b11_since": {
       "en": "from 2.1.0",
       "ja": "2.1.0 から"
     },
-    "section_boards_b9_title": {
+    "section_boards_b11_title": {
       "en": "A card's state",
       "ja": "カードの状態"
     },
-    "section_boards_b9_body": {
+    "section_boards_b11_body": {
       "en": "A card is working until the turn ends, waiting while a permission is asked, and failed if the turn fails. The last three finished turns of each session stay.",
       "ja": "カードは、ターンが終わるまで作業中、許可を求めている間は待ち、ターンが失敗したら失敗になります。終わったターンは、セッションごとに 3 つまで残ります。"
     },
-    "section_boards_b11_since": {
+    "section_boards_b13_since": {
       "en": "from 2.3.20",
       "ja": "2.3.20 から"
     },
-    "section_boards_b11_title": {
+    "section_boards_b13_title": {
       "en": "The strips at the top",
       "ja": "上の欄"
     },
-    "section_boards_b11_body": {
+    "section_boards_b13_body": {
       "en": "The questions, stopped calls and permissions strips at the board's top are folded each time it opens: a count, and one line per card (who, the tool and its input, how long). A strip with nothing waiting is one line; a count with something waiting is drawn larger and pulses when a card comes.\n\n• ▼ Open the cards above in full (…) · the four columns below hide (▼ この上の欄を広げて、札を全部見る（…）· 下の 4 列は隠れる) shows the whole cards and hides the columns.\n• ▲ Fold the cards above · back to the four columns (▲ この上の欄をたたんで、下の 4 列に戻る) brings the columns back.\n• Pressing a card's line opens the strips wide at that card.",
       "ja": "ボードの上の質問・止められた操作・許可の欄は、ボードを開くたびにたたまれています。数と、札ごとに 1 行（誰が、道具と入力、どれだけ待っているか）です。待っている札の無い欄は 1 行で、待っている札があると数が大きく出て、札が来ると脈打ちます。\n\n• 「▼ この上の欄を広げて、札を全部見る（…）· 下の 4 列は隠れる」で、札を全部出して列を隠します。\n• 「▲ この上の欄をたたんで、下の 4 列に戻る」で、列に戻ります。\n• 札の行を押すと、その札の所で欄が広がります。"
     },
-    "section_boards_b12_text": {
+    "section_boards_b14_text": {
       "en": "Log",
       "ja": "ログ"
     },
-    "section_boards_b13_title": {
+    "section_boards_b15_title": {
       "en": "The log strip and the full-screen log",
       "ja": "ログの帯と全画面のログ"
     },
-    "section_boards_b13_body": {
-      "en": "The strip at the bottom shows the latest events. The full-screen log can be filtered by kind and by text.\n\nFrom 2.3.4 the strip can be closed: the view above takes the space, and Open the log (ログを開く) brings it back. The choice is remembered, and events keep coming in meanwhile.",
-      "ja": "下の帯に最新のイベントが出ます。全画面のログでは、種類や文字で絞り込めます。\n\n2.3.4 からは帯を閉じられます。上の表示が下まで広がり、「ログを開く」で戻ります。開閉は覚えていて、閉じている間もログは受け取ります。"
+    "section_boards_b15_body": {
+      "en": "The strip at the bottom shows the latest events. The full-screen log can be filtered by kind and by text.\n\nFrom 2.3.4 the strip can be closed: the view above takes the space, and Open the log (ログを開く) brings it back. The choice is remembered, and events keep coming in meanwhile.\n\nFrom 2.3.21 the strip shows a hook's name (SessionStart …) in a code typeface.",
+      "ja": "下の帯に最新のイベントが出ます。全画面のログでは、種類や文字で絞り込めます。\n\n2.3.4 からは帯を閉じられます。上の表示が下まで広がり、「ログを開く」で戻ります。開閉は覚えていて、閉じている間もログは受け取ります。\n\n2.3.21 から、ログの帯ではフックの名前（SessionStart など）がコードの字体で出ます。"
     },
     "toc_row_boards": {
       "en": "Boards and the log",
@@ -15489,14 +15573,26 @@
       "ja": "カードには「送信中」、続いて「届いた」か「届いていない」が出ます。受け手のセッションの記録を読んで確かめます。\n\n「届いていない」は、送ったのに受け手の記録に出ないということです。カードには考えられる理由が出ます。起動の指定が無い、組織の channelsEnabled が無い、セッションが閉じた、のどれかです。"
     },
     "section_send_b12_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
+    },
+    "section_send_b12_title": {
+      "en": "What you type is kept",
+      "ja": "書きかけは消えません"
+    },
+    "section_send_b12_body": {
+      "en": "Text you have typed in the prompt box stays when the card redraws, and each robot has its own: open another robot's card and come back, and your unsent text is there again. It is cleared when you send it, and kept only while the page is open.",
+      "ja": "プロンプトの入力欄に書いた文は、カードが描き直されても消えません。書きかけはロボットごとに別々で、ほかのロボットのカードを開いて戻ってくると、送っていない文がまた出ます。送ると消え、覚えているのはページを開いている間だけです。"
+    },
+    "section_send_b13_since": {
       "en": "from 2.3.7",
       "ja": "2.3.7 から"
     },
-    "section_send_b12_title": {
+    "section_send_b13_title": {
       "en": "Hiding the note above the field",
       "ja": "入力欄の上の説明を消す"
     },
-    "section_send_b12_body": {
+    "section_send_b13_body": {
       "en": "The --channels note above the field can be closed with ×. It then stays hidden on every card; Settings (設定) › Show the card notes again (カードの説明をまた出す) brings it back. The reason a field is disabled cannot be closed.",
       "ja": "入力欄の上の --channels の説明は × で消せます。ほかのカードでも出なくなり、設定の「カードの説明をまた出す」で戻ります。無効の理由は消せません。"
     },
@@ -16086,6 +16182,18 @@
       "en": "When the page's answer is no longer waited for (the time ran out, the question went back to the terminal, or the session is not waiting on the relay), the card says why at the top and its choices are greyed out.",
       "ja": "ページの答えをもう待っていないとき（時間が過ぎた、ターミナルに返した、そのセッションが答えの中継を待っていない）は、カードの上にその理由が出て、選択肢は押せない見た目になります。"
     },
+    "section_questions_b7_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
+    },
+    "section_questions_b7_title": {
+      "en": "Your answer stays while you write it",
+      "ja": "書きかけの答えは消えません"
+    },
+    "section_questions_b7_body": {
+      "en": "The choices you pick and the text you type in a question card, and a deny reason on a permission card, stay when the card is drawn again, for example when another question or permission arrives. The same question in the panel, on the board's strip and in a robot card's box shares one draft. It is dropped when you send the answer or hand the question back to the terminal.",
+      "ja": "質問の札で選んだ答えや書いた文、許可の札の拒否の理由は、ほかの質問や許可が届いて札が描き直されても消えません。パネル・ボードの欄・ロボットのカードの欄に出る同じ質問は、書きかけを 1 つ共有します。答えを送るか、質問をターミナルに返すと消えます。"
+    },
     "toc_row_questions": {
       "en": "Answer Claude's questions from the browser",
       "ja": "Claude の質問にブラウザから答える"
@@ -16201,6 +16309,30 @@
     "section_history_tab_b4_body": {
       "en": "When a session has two permission prompts, each card's deny reason goes to its own prompt.",
       "ja": "1 つのセッションに許可の要求が 2 つあるときも、拒否の理由はそれぞれの札から、その要求に届きます。"
+    },
+    "section_history_tab_b5_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
+    },
+    "section_history_tab_b5_title": {
+      "en": "Folding the cards to read the history",
+      "ja": "札をたたんで履歴を読む"
+    },
+    "section_history_tab_b5_body": {
+      "en": "When cards wait in the box, a bar on top reads ▼ Fold these cards and read the history above. Press it and the box folds to one line, ▲ Open and answer (1 question(s), 1 permission(s)), followed by the first question's words, and the history gets the height. Folded cards are only hidden: what you typed or picked in them stays. The bar stays in view while the box scrolls.\n\nThe fold is per robot. A new wait while folded keeps it folded: the bar counts it and stays marked until you open it (it moves once, not with reduced motion). When nothing waits any more the fold is forgotten, so the next question comes open. While folded, the button that grows the box is hidden.",
+      "ja": "箱に札が待っていると、上に「▼ この質問の欄をたたんで、上の履歴を読む」の帯が出ます。押すと箱が 1 行の「▲ 開いて答える（質問 1 件・許可 1 件）」にたたまれ、その後ろに最初の質問の文が続きます。空いた高さは履歴に回ります。たたんだ札は隠れるだけで、書いたことや選んだものは残ります。箱をスクロールしても帯は見えたままです。\n\nたたむのはロボットごとです。たたんでいる間に新しい待ちが来ても開かず、帯の数が増えて、開くまで印が付いたままになります（一度だけ動きます。動きを減らす設定では動きません）。待っているものが無くなるとたたんだことは忘れられ、次の質問は開いた状態で出ます。たたんでいる間は、箱を広げるボタンは出ません。"
+    },
+    "section_history_tab_b7_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
+    },
+    "section_history_tab_b7_title": {
+      "en": "Waits of other robots",
+      "ja": "ほかのロボットの待ち"
+    },
+    "section_history_tab_b7_body": {
+      "en": "While one robot's card is open, the other robots' permissions, questions and stopped calls are summed in a block beside the card (on a narrow page, a Waiting N (待ち N) badge in the card's head). Press a robot there to open its card. See The robot card in Panels, cards and boards.",
+      "ja": "あるロボットのカードを開いている間、ほかのロボットの許可・質問・止められた操作は、カードの横の欄にまとめて出ます（幅の狭いページではカードの見出しの「待ち N」のバッジ）。そこでロボットを押すと、その札が開きます。詳しくは「パネル・カード・ボード」のロボットのカードを見てください。"
     },
     "toc_row_history_tab": {
       "en": "Answer from the History tab",
@@ -16436,6 +16568,30 @@
       "en": "From 2.3.2 a large test run no longer stalls the server (a spec's counts follow within half a second), and an app's tests folder inside another tests folder of the same room (tests/<app>/ under the root's tests/) still reaches the app's specs.",
       "ja": "2.3.2 からは、大きなテストの走行でもサーバーが止まらず（spec の数は 0.5 秒以内に追いつきます）、app のテストフォルダが同じ部屋の別のテストフォルダの中にある形（根の tests/ の下の tests/<app>/）でも、結果が app の spec に届きます。"
     },
+    "section_specs_b6_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
+    },
+    "section_specs_b6_title": {
+      "en": "When a spec counts as done",
+      "ja": "spec が完了になるとき"
+    },
+    "section_specs_b6_body": {
+      "en": "From 2.3.21 a spec's tests are done only when, with a test file of its own and no failed case, the number of passed cases reaches the larger of two counts: its test cases, and the branches its spec lists. The spec board's Done (完了) also needs the implementation done.\n\nBefore 2.3.21 passing every test case was enough, even when the spec listed more branches than there were cases. So after updating, your Done number may drop: a spec with 3 test cases and 8 branches that was done now reads tests 3/8 and stays Partly done (途中) until 8 cases pass. Nothing was lost; the bar is higher. The Branches section, the spec's status line (Testing 3/8, Implemented · tests 3/8) and the lists all count against the same number.",
+      "ja": "2.3.21 から、spec のテストが済んだとみなされるのは、専用のテストファイルがあって失敗したケースが無く、通ったケースの数が 2 つの数の大きいほう、つまり「テストのケース数」と「spec に書いた分岐の数」の大きいほうに届いたときだけです。spec ボードの「完了」には、これに加えて実装が済んでいることも要ります。\n\n2.3.20 までは、分岐がケースより多くても、テストのケースが全部通れば済みでした。そのため更新すると「完了」の数が減ることがあります。たとえばケース 3 件・分岐 8 件で完了だった spec は、テストが 3/8 と出て、8 件通るまで「途中」のままです。結果が消えたのではなく、完了の基準が上がったということです。分岐の欄も spec の状態の行（「テスト中 3/8」「実装完了・テスト 3/8」）も一覧も、同じ数を分母に数えます。"
+    },
+    "section_specs_b7_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
+    },
+    "section_specs_b7_title": {
+      "en": "Which checkout a result counts for",
+      "ja": "結果をどのチェックアウトに数えるか"
+    },
+    "section_specs_b7_body": {
+      "en": "From 2.3.21 a run jui viz watched is counted for the checkout its session works in: the room's own specs, or, when the session works in a git worktree the room shows, that worktree's app@branch rows (see the spec board in Panels, cards and boards).\n\nA result from a run the server did not watch, such as one read back from the drivers' saved results after a restart, counts for the room's own checkout, never for a worktree's. A case is counted once, although the worktree holds the same test files.",
+      "ja": "2.3.21 から、jui viz が見ていた実行は、そのセッションが作業しているチェックアウトに数えます。部屋自身の spec か、セッションが部屋に出ている git worktree で作業していれば、その worktree の「アプリ@ブランチ」の行です（「パネル・カード・ボード」の spec ボードを参照）。\n\nサーバーが見ていなかった実行の結果、たとえば再起動のあとにドライバーの保存した結果から読み戻したものは、部屋自身のチェックアウトに数え、worktree には数えません。worktree に同じテストファイルがあっても、1 つのケースを 2 回数えることはありません。"
+    },
     "toc_row_specs": {
       "en": "Which tests are a spec's",
       "ja": "どのテストがどの spec のものか"
@@ -16489,8 +16645,8 @@
       "ja": "サーバールーム"
     },
     "next_server_room_description": {
-      "en": "The room's server room, which shows the infrastructure your project declares in 3D.",
-      "ja": "プロジェクトが宣言したインフラを 3D で見せる、部屋の中のサーバールームです。"
+      "en": "The room's server room, which shows the infrastructure your project declares in 3D, or from 2.3.21 flat in 2D.",
+      "ja": "プロジェクトが宣言したインフラを 3D で（2.3.21 からは平らな 2D でも）見せる、部屋の中のサーバールームです。"
     },
     "nav_title": {
       "en": "Watching tests",
@@ -16511,8 +16667,8 @@
       "ja": "インフラの構成を 3D で見る「サーバールーム」の案内です。開き方、床と形と線の意味、カメラの動かし方、表示の絞り方、1 つのノードをボードで読む方法を順に見ます。"
     },
     "read_time": {
-      "en": "9 min read",
-      "ja": "9 分で読めます"
+      "en": "11 min read",
+      "ja": "11 分で読めます"
     },
     "section_open_heading": {
       "en": "Open the server room",
@@ -16543,8 +16699,8 @@
       "ja": "3"
     },
     "section_open_b1_s3": {
-      "en": "Press the door or the keypad. The keypad has no code: the * that appear are the progress of the read, and a bubble says Loading the server configuration (サーバー構成を読み込んでいます).",
-      "ja": "扉かテンキーを押します。テンキーに暗証番号はありません。出てくる * は読み込みの進み具合で、吹き出しに「サーバー構成を読み込んでいます」と出ます。"
+      "en": "Press the door or the keypad (on the live page, from 2.3.21, also Enter the server room (サーバールームに入る) in the bar by the room's name). The keypad has no code: the * that appear are the progress of the read, and a bubble says Loading the server configuration (サーバー構成を読み込んでいます).",
+      "ja": "扉かテンキーを押します（ライブのページでは、2.3.21 から、部屋の名前の横の「サーバールームに入る」でも開けます）。テンキーに暗証番号はありません。出てくる * は読み込みの進み具合で、吹き出しに「サーバー構成を読み込んでいます」と出ます。"
     },
     "step_4": {
       "en": "4",
@@ -16554,29 +16710,41 @@
       "en": "On success the keypad shows Unlocked (解錠), the door opens and the server room takes the whole page. ← Back to the room (Esc) (← 部屋に戻る（Esc）) takes you back.",
       "ja": "読めると、テンキーに「解錠」が出て扉が開き、サーバールームがページ全体に開きます。「← 部屋に戻る（Esc）」で部屋に戻ります。"
     },
+    "section_open_b2_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
+    },
     "section_open_b2_title": {
+      "en": "Enter the server room (サーバールームに入る)",
+      "ja": "「サーバールームに入る」のボタン"
+    },
+    "section_open_b2_body": {
+      "en": "With a room shown alone on the live page, the bar at the top left (← Back to the whole floor, the room's name, Call (呼び出し)) has a button Enter the server room (サーバールームに入る). It opens what the door opens, so you no longer have to find the door in the 3D, and it can be reached from the keyboard.\n\nThe button shows in every room. In a room with no docs/infra it is greyed out and a press reads nothing; its tooltip says No docs/infra here, so this room has no server room (docs/infra が無いので、この部屋にサーバールームはありません). The demo page has no such button; use its door.",
+      "ja": "ライブのページで部屋を 1 つ出しているとき、左上のバー（「← フロア全体に戻る」、部屋の名前、「呼び出し」）に「サーバールームに入る」のボタンがあります。扉を押したときと同じものが開くので、3D の中で扉を探さなくて済みます。キーボードからも押せます。\n\nボタンはどの部屋にも出ます。docs/infra の無い部屋では薄く出て、押しても何も読みません。ツールチップに「docs/infra が無いので、この部屋にサーバールームはありません」と出ます。デモのページにはこのボタンが無いので、扉を使ってください。"
+    },
+    "section_open_b3_title": {
       "en": "If the keypad turns red",
       "ja": "テンキーが赤くなったら"
     },
-    "section_open_b2_body": {
+    "section_open_b3_body": {
       "en": "When the files cannot be used, the keypad turns red and a bubble says which file is wrong and how. It never shows the value. The bubble goes after 9 seconds; hover over it to read the whole text. Fix the file (`jsonui-doc validate infra` gives the same verdict) and press the door again.\n\nEscape cancels a read that is still running.",
       "ja": "ファイルが使えないときは、テンキーが赤くなり、吹き出しにどのファイルの何が悪いかが出ます。値は出しません。吹き出しは 9 秒で消え、ホバーすると全文が読めます。ファイルを直して（`jsonui-doc validate infra` も同じ判定をします）、もう一度扉を押します。\n\n読んでいる途中なら、Esc でやめられます。"
     },
-    "section_open_b3_title": {
+    "section_open_b4_title": {
       "en": "What jui viz reads, and when",
       "ja": "jui viz がいつ何を読むか"
     },
-    "section_open_b3_body": {
+    "section_open_b4_body": {
       "en": "jui viz only counts the files, every 5 seconds, to know whether to show the door. It reads them only when you press the door or the keypad.\n\nThe demo page has a door too, in the shop-app room, with a made-up shop behind it.",
       "ja": "jui viz は扉を出すかどうかを決めるために、5 秒ごとにファイルの数を数えるだけです。中身を読むのは、扉かテンキーを押したときだけです。\n\nデモのページにも、shop-app の部屋に扉があり、中に架空のお店の構成があります。"
     },
-    "section_open_b4_title": {
+    "section_open_b5_title": {
       "en": "The bar along the top",
       "ja": "上のバー"
     },
-    "section_open_b4_body": {
-      "en": "• ← Back to the room (Esc) (← 部屋に戻る（Esc）)\n• 3D / Cost (コスト): the 3D or the cost simulator, from 2.3.14 (see Cost and migration plans)\n• Environment (環境), Small things (IAM, alarms, …) (細かいもの（IAM・アラームなど）) and Lines (線): what is drawn (see Show less)\n• + and −: zoom in and out\n• Zoom to an area (範囲で寄る), from 2.3.14\n• Fit all (全体を見る)\n• Board (ボード) and Log (ログ): show or hide those panels. The board is shown when the room opens; the log is hidden.",
-      "ja": "• 「← 部屋に戻る（Esc）」\n• 「3D / コスト」: 3D とコストのシミュレーターの切り替え（2.3.14 から。「コストと移管計画」を参照）\n• 「環境」「細かいもの（IAM・アラームなど）」「線」: 何を描くか（「表示を絞る」を参照）\n• ＋ と −: 寄る・引く\n• 「範囲で寄る」（2.3.14 から）\n• 「全体を見る」\n• 「ボード」と「ログ」: それぞれのパネルを出す・隠す。開いたときはボードが出ていて、ログは隠れています。"
+    "section_open_b5_body": {
+      "en": "• ← Back to the room (Esc) (← 部屋に戻る（Esc）)\n• 3D / 2D / Cost (コスト): the 3D, the flat view from straight above (from 2.3.21, see Look from above: 2D) or the cost simulator (from 2.3.14, see Cost and migration plans)\n• Environment (環境), Small things (IAM, alarms, …) (細かいもの（IAM・アラームなど）) and Lines (線): what is drawn (see Show less)\n• + and −: zoom in and out\n• Zoom to an area (範囲で寄る), from 2.3.14\n• Fit all (全体を見る)\n• Board (ボード) and Log (ログ): show or hide those panels. The board is shown when the room opens; the log is hidden.",
+      "ja": "• 「← 部屋に戻る（Esc）」\n• 「3D / 2D / コスト」: 3D、真上から見た平らな表示（2.3.21 から。「真上から見る: 2D」を参照）、コストのシミュレーター（2.3.14 から。「コストと移管計画」を参照）の切り替え\n• 「環境」「細かいもの（IAM・アラームなど）」「線」: 何を描くか（「表示を絞る」を参照）\n• ＋ と −: 寄る・引く\n• 「範囲で寄る」（2.3.14 から）\n• 「全体を見る」\n• 「ボード」と「ログ」: それぞれのパネルを出す・隠す。開いたときはボードが出ていて、ログは隠れています。"
     },
     "toc_row_open": {
       "en": "Open the server room",
@@ -16631,14 +16799,26 @@
       "ja": "線"
     },
     "section_read_b6_body": {
-      "en": "Lines within one cloud are faint and solid. Lines between clouds are dashed and strong; the board's legend calls them Links across providers (dashed, magenta) (provider を跨ぐつながり（破線・マゼンタ）). The lines of the picked node and of the node under the pointer are always drawn strong.\n\nFrom 2.3.20 a cable is drawn as a strip that keeps a readable width on the page: at least about 2 to 4 px pulled back, up to 7 px up close. Before, every line was one pixel.",
-      "ja": "同じクラウドの中の線は薄い実線、クラウドを跨ぐ線は濃い破線です。ボードの凡例では「provider を跨ぐつながり（破線・マゼンタ）」と書かれています。選んだノードとポインタの下のノードの線は、いつも濃く出ます。\n\n2.3.20 からは、線を、ページの上で読める幅を保つ帯として描きます（引いて見ても 2〜4 px ほど以上、寄って見て 7 px まで）。それまでは、どの線も 1 ピクセルでした。"
+      "en": "Lines within one cloud are faint and solid. Lines between clouds are dashed and strong; the board's legend calls them Links across providers (dashed, magenta) (provider を跨ぐつながり（破線・マゼンタ）). The lines of the picked node and of the node under the pointer are always drawn strong.\n\nFrom 2.3.20 a cable is drawn as a strip that keeps its width on the page however far the camera is; before, every line was one pixel. In 2.3.20 that was at least about 2 to 4 px pulled back and up to 7 px up close; 2.3.21 draws them thinner (next card).",
+      "ja": "同じクラウドの中の線は薄い実線、クラウドを跨ぐ線は濃い破線です。ボードの凡例では「provider を跨ぐつながり（破線・マゼンタ）」と書かれています。選んだノードとポインタの下のノードの線は、いつも濃く出ます。\n\n2.3.20 からは、線を、カメラがどれだけ離れてもページの上で幅を保つ帯として描きます。それまでは、どの線も 1 ピクセルでした。2.3.20 では、引いて見ても 2〜4 px ほど以上、寄って見て 7 px までで、2.3.21 からはもっと細くなります（次のカード）。"
+    },
+    "section_read_b7_since": {
+      "en": "from 2.3.21",
+      "ja": "2.3.21 から"
     },
     "section_read_b7_title": {
+      "en": "Thinner lines, from side to side",
+      "ja": "細くなった線と、ノードの縁から縁へ"
+    },
+    "section_read_b7_body": {
+      "en": "Lines not chosen are thin: at least 0.9 px on the page (1.1 px across clouds, 1 px for the bundles when zoomed out), and up to 1.8 px up close. The strong lines (the picked node's, the node under the pointer's, and those Show everything connected draws) are 3 px, up to 5 px up close, and a flow's light still runs around its line.\n\nA line runs low from the side of one node to the side of the other: each end stops at the node's outer edge as it is drawn (its shape, or up close its model), 0.3 above its foot and never above half its height. It stays straight and flat unless something stands in the way (another node, a closed group's box); then it rises once before it, passes 0.25 over the tallest thing in the way, and comes down after. Lines across clouds run a little higher. Zoomed out, the bundles run the same way, from the side of one box to the side of the other.\n\nIn 2.3.20 every line ran straight from the middle of one node to the middle of the other at one fixed height (higher for lines across clouds).",
+      "ja": "選んでいない線は細く、ページの上で 0.9 px 以上（クラウドを跨ぐ線は 1.1 px、引いたときの束は 1 px）、寄って見て 1.8 px までです。濃い線（選んだノードの線、ポインタの下のノードの線、「つながっている物を全部見せる」で描く線）は 3 px、寄って見て 5 px までで、flow の光は今までどおり線を包んで走ります。\n\n線は、ノードの縁から縁へ、低く走ります。両端は、いま描いているノード（その形、寄ったときはそのモデル）の外側の縁で止まり、高さはノードの足元から 0.3（ノードの高さの半分まで）です。途中に何も無ければまっすぐ平らに、何か（別のノードや、閉じたグループの箱）があれば、その手前で 1 回上がり、途中でいちばん高いものの 0.25 上を越えて、その先で下ります。クラウドを跨ぐ線は少し高く走ります。引いたときの束も同じように、箱の縁から縁へ走ります。\n\n2.3.20 では、どの線も、ノードの真ん中から真ん中へ、決まった 1 つの高さ（クラウドを跨ぐ線はもっと高く）でまっすぐ走っていました。"
+    },
+    "section_read_b8_title": {
       "en": "Colours",
       "ja": "色"
     },
-    "section_read_b7_body": {
+    "section_read_b8_body": {
       "en": "From 2.3.19 the colours are one designed palette. Each cloud is one hue: a node takes the hue itself, a closed group a tone between, and the floor of a group the cloud owns (an account, say) a tint of it, the same in light and dark. A logical group's floor stays a soft lavender and a public or private network's a slate blue, whatever the cloud. The legend's chip, the nodes and the cost view's bars are that one colour (before, several clouds could come out the same blue), and the ground and the frames are a cool slate.\n\nThe background is #f3f6fa in the light theme and #0b1016 in the dark one, and the 3D is redrawn, the camera where it was, when the theme changes.",
       "ja": "2.3.19 からは、色が 1 つの整えた配色になります。クラウドごとに 1 つの色相で、ノードはその色そのもの、閉じたグループはその間の色、そのクラウドのグループ（アカウントなど）の床はその淡い色で、明るい表示でも暗い表示でも同じです。論理のグループの床は淡い藤色、公開と非公開のネットワークの床は青みの灰色のままで、クラウドによりません。凡例の色、ノード、コストの画面の棒は同じ 1 色です（前は、いくつかのクラウドが同じ青になることがありました）。地面と枠は落ち着いた青みの灰色です。\n\n背景はライトでは #f3f6fa、ダークでは #0b1016 で、テーマを変えると、カメラの位置はそのままで 3D を描き直します。"
     },
@@ -16655,8 +16835,8 @@
       "ja": "マウス・トラックパッド・タッチ"
     },
     "section_move_b0_body": {
-      "en": "• Drag: turn the view.\n• Right-drag, or Shift (or Ctrl, or ⌘) + drag: pan.\n• Wheel: zoom in and out. The + and − buttons on the bar do the same in steps.\n• Option (Alt) + drag: zoom to an area (below).\n• On a touch screen: one finger turns the view, two fingers pinch to zoom and move to pan.\nFit all (全体を見る) always brings the whole model back into view.",
-      "ja": "• ドラッグ: 向きを回す\n• 右ドラッグ、または Shift（Ctrl、⌘ でも）+ ドラッグ: 平行に動かす\n• ホイール: 寄る・引く。バーの ＋ と − でも、一定の幅で寄る・引くができます\n• Option（Alt）+ ドラッグ: 範囲で寄る（下を参照）\n• タッチの画面: 1 本指で回し、2 本指でつまんで寄る・引く、動かして平行移動\n「全体を見る」で、いつでもモデル全体が画面に戻ります。"
+      "en": "• Drag: turn the view.\n• Right-drag, or Shift (or Ctrl, or ⌘) + drag: pan.\n• Wheel: zoom in and out. The + and − buttons on the bar do the same in steps.\n• Option (Alt) + drag: zoom to an area (below).\n• On a touch screen: one finger turns the view, two fingers pinch to zoom and move to pan.\nFit all (全体を見る) always brings the whole model back into view.\n\nIn 2D (from 2.3.21) the view does not turn: see Look from above: 2D.",
+      "ja": "• ドラッグ: 向きを回す\n• 右ドラッグ、または Shift（Ctrl、⌘ でも）+ ドラッグ: 平行に動かす\n• ホイール: 寄る・引く。バーの ＋ と − でも、一定の幅で寄る・引くができます\n• Option（Alt）+ ドラッグ: 範囲で寄る（下を参照）\n• タッチの画面: 1 本指で回し、2 本指でつまんで寄る・引く、動かして平行移動\n「全体を見る」で、いつでもモデル全体が画面に戻ります。\n\n2D（2.3.21 から）では向きは回りません。「真上から見る: 2D」を参照してください。"
     },
     "section_move_b1_title": {
       "en": "Zoomed out",
@@ -16697,6 +16877,54 @@
     "toc_row_move": {
       "en": "Move around",
       "ja": "動き回る"
+    },
+    "section_2d_heading": {
+      "en": "Look from above: 2D",
+      "ja": "真上から見る: 2D"
+    },
+    "section_2d_b0_text": {
+      "en": "From 2.3.21 the server room can also be drawn flat, from straight above. It is the same room from the same model: the floors, the board, the filters, the zooms, Show everything connected, flows and migration plans work as they do in 3D.",
+      "ja": "2.3.21 からは、サーバールームを真上から平らに描くこともできます。同じモデルの同じ部屋で、床、ボード、表示の絞り込み、寄る操作、「つながっている物を全部見せる」、flow、移管計画は 3D と同じように使えます。"
+    },
+    "section_2d_b1_s1": {
+      "en": "In the server room, press 2D on the bar, between 3D and Cost (コスト). The room is built again from straight above and fitted to the page.",
+      "ja": "サーバールームで、バーの「3D」と「コスト」の間の「2D」を押します。部屋が真上から描き直され、ページに収まります。"
+    },
+    "section_2d_b1_s2": {
+      "en": "Press 3D to go back. Pressing 3D or 2D while the cost view is shown closes the cost view and shows the room in that look.",
+      "ja": "「3D」で戻ります。コストの画面を出しているときに「3D」か「2D」を押すと、コストの画面を閉じて、その見た目で部屋を出します。"
+    },
+    "section_2d_b1_s3": {
+      "en": "Nothing else to set: the look is remembered per project in this browser, so that room's server room opens in 2D next time until you press 3D.",
+      "ja": "ほかに設定はありません。見た目はプロジェクトごとにこのブラウザが覚えるので、次からその部屋のサーバールームは、「3D」を押すまで 2D で開きます。"
+    },
+    "section_2d_b3_title": {
+      "en": "Tiles instead of shapes",
+      "ja": "形の代わりにタイル"
+    },
+    "section_2d_b3_body": {
+      "en": "Each node is a flat tile in its cloud's colour, with an outline of its own and a short name for its kind: DB a database, MEM a cache, OBJ object storage, DISK block or file storage, PUB a notification topic, QUEUE a queue, STREAM a stream, LB a load balancer, CDN, DNS, WAF, API a gateway, λ a function, VM, CTR a container, K8s Kubernetes, UI a client, AUTH auth, KEY secrets, CRON a scheduler, MAIL mail, MON monitoring, SaaS an outside service. Anything else is a plain tile with no name. The kinds are those of the 3D's models up close.\n\nThe tiles are the same near and far: up close there are no models and no second set of shapes, and only the tags say more. A node's tag sits just above its tile, and an icon set in jui.config.json lies flat on the tile's corner.",
+      "ja": "ノードはそれぞれ、クラウドの色の平らなタイルです。種類ごとの輪郭と短い名前が付きます。DB はデータベース、MEM はキャッシュ、OBJ はオブジェクトのストレージ、DISK はブロックやファイルのストレージ、PUB は通知のトピック、QUEUE はキュー、STREAM はストリーム、LB はロードバランサー、CDN、DNS、WAF、API はゲートウェイ、λ は関数、VM、CTR はコンテナ、K8s は Kubernetes、UI はクライアント、AUTH は認証、KEY は秘密、CRON は定期実行、MAIL はメール、MON は監視、SaaS は外のサービスです。そのほかは名前の無い無地のタイルです。種類は、3D で寄ったときのモデルと同じ分け方です。\n\nタイルは近くでも遠くでも同じです。寄ってもモデルや 2 つ目の形にはならず、詳しくなるのは名札だけです。名札はタイルのすぐ上に出て、jui.config.json で決めたアイコンは、タイルの角に平らに置かれます。"
+    },
+    "section_2d_b4_title": {
+      "en": "Lines in 2D",
+      "ja": "2D の線"
+    },
+    "section_2d_b4_body": {
+      "en": "Lines lie flat under the tiles, from the edge of one tile to the edge of the other. A line is straight when nothing is in the way; otherwise it bends at right angles around the tiles, taking the shortest route that crosses no other tile (an L, a run along the lane between two rows or columns, or a Z). When no such route is clear, it runs straight, beneath the tiles.\n\nPulled back, with Lines (線) on All (faint), the lines within one cloud are hidden once a node's cell is smaller than 18 px on the page, and only the lines across clouds stay; they come back past 22 px. Further out the groups close into boxes as in 3D, and the bundles run straight from box side to box side.",
+      "ja": "線はタイルの下に平らに置かれ、タイルの縁から縁へ走ります。途中に何も無ければまっすぐで、あれば、ほかのタイルを横切らない中でいちばん短い道を、直角に曲がって避けます（L 字、2 つの列や行の間の通路に沿う道、Z 字）。そうした道が無いときは、タイルの下をまっすぐ走ります。\n\n引いて見ると、「線」が「すべて（薄く）」のとき、ノード 1 つ分の升目がページの上で 18 px より小さくなると同じクラウドの中の線は隠れ、クラウドを跨ぐ線だけが残ります。22 px を超えると戻ります。もっと引くと、3D と同じようにグループが箱にまとまり、束は箱の縁から縁へまっすぐ走ります。"
+    },
+    "section_2d_b5_title": {
+      "en": "Moving in 2D",
+      "ja": "2D での動かし方"
+    },
+    "section_2d_b5_body": {
+      "en": "The view does not turn. Drag with the left or right button to move it, and use the wheel (or a middle-button drag) to zoom; the + and − buttons zoom in steps. On a touch screen one finger moves the view and two fingers pinch to zoom and move. Zoom to an area, Zoom to this and Fit all work as in 3D. Switching between 3D and 2D fits the whole room again.",
+      "ja": "向きは回りません。左か右のボタンでドラッグすると動き、ホイール（または中ボタンのドラッグ）で寄る・引くができます。＋ と − でも一定の幅で寄る・引くができます。タッチの画面では、1 本指で動かし、2 本指でつまんで寄る・引く、動かして平行移動です。「範囲で寄る」「これに寄る」「全体を見る」は 3D と同じです。3D と 2D を切り替えると、部屋全体が収まるところに戻ります。"
+    },
+    "toc_row_2d": {
+      "en": "Look from above: 2D",
+      "ja": "真上から見る: 2D"
     },
     "section_filter_heading": {
       "en": "Show less",
@@ -16889,8 +17117,8 @@
       "ja": "ファイルの形は infra-model v0 のスキーマで、version（0）、environments、groups、nodes、edges（と、下の flows）を書きます。ファイルに必須なのは version だけです。environment には id、group には id と kind（account、project、subscription、region、zone、network、subnet、cluster、namespace、host、logical のどれか）、node には id と category、edge には from と to が要ります。\n\nノードの category は compute.function、database.relational、storage.object、queue、edge.cdn、external.saas など 33 種類です。provider は aws や gcp のような小文字の名前です。\n\n2.3.13 から、NAT ゲートウェイの gateway.nat と、公開のアドレスの network.ip が増えました。2.3.13 より前の jui は、それを使ったファイルをまるごと読みません。測ると「no model file could be used」でした。"
     },
     "section_model_b4_text": {
-      "en": "A minimal fictional model: one environment, an account with a region and a private subnet, four nodes, three edges and one flow. It passes `jsonui-doc validate infra` on jsonui-cli 2.3.20 with 0 errors.",
-      "ja": "最小限の架空のモデルです。環境 1 つ、リージョンと非公開のサブネットを持つアカウント、ノード 4 つ、辺 3 本、flow 1 つ。jsonui-cli 2.3.20 の `jsonui-doc validate infra` で、エラー 0 で通ります。"
+      "en": "A minimal fictional model: one environment, an account with a region and a private subnet, four nodes, three edges and one flow. It passes `jsonui-doc validate infra` on jsonui-cli 2.3.21 with 0 errors.",
+      "ja": "最小限の架空のモデルです。環境 1 つ、リージョンと非公開のサブネットを持つアカウント、ノード 4 つ、辺 3 本、flow 1 つ。jsonui-cli 2.3.21 の `jsonui-doc validate infra` で、エラー 0 で通ります。"
     },
     "section_model_b5_title": {
       "en": "Where it came from: iac and evidence",
@@ -17229,8 +17457,8 @@
       "ja": "サーバールーム"
     },
     "next_server_room_description": {
-      "en": "The room's server room, which shows the infrastructure your project declares in 3D.",
-      "ja": "プロジェクトが宣言したインフラを 3D で見せる、部屋の中のサーバールームです。"
+      "en": "The room's server room, which shows the infrastructure your project declares in 3D, or from 2.3.21 flat in 2D.",
+      "ja": "プロジェクトが宣言したインフラを 3D で（2.3.21 からは平らな 2D でも）見せる、部屋の中のサーバールームです。"
     },
     "next_cost_title": {
       "en": "Cost and migration",
@@ -17411,8 +17639,8 @@
       "ja": "1"
     },
     "section_cost_view_b1_s1": {
-      "en": "In the server room, press 3D / Cost (コスト) on the header. The 3D stops drawing while the cost is shown, and Zoom to an area is not available there.",
-      "ja": "サーバールームの上のバーの「3D / コスト」で「コスト」を押します。コストを出している間は 3D の描画が止まり、「範囲で寄る」は使えません。"
+      "en": "In the server room, press Cost (コスト) on the header (in the 3D / 2D / Cost group since 2.3.21; 3D / Cost before). The 3D stops drawing while the cost is shown, and Zoom to an area is not available there. 3D or 2D goes back to the room.",
+      "ja": "サーバールームの上のバーで「コスト」を押します（2.3.21 からは「3D / 2D / コスト」、それまでは「3D / コスト」の並び）。コストを出している間は 3D の描画が止まり、「範囲で寄る」は使えません。「3D」か「2D」で部屋に戻ります。"
     },
     "step_2": {
       "en": "2",
@@ -17515,8 +17743,8 @@
       "ja": "jui viz なしで同じ数字を出す"
     },
     "section_cost_view_b8_body": {
-      "en": "The same month, or one day with --date, comes out of `jsonui-doc cost infra` without jui viz (--json for the whole reply). It exits 0 when it simulated, 1 when it simulated but a load file had an error (that file is left out), and 2 when nothing could be simulated (no model, no load file, no such scenario, a date outside the month), each measured.\n\nMeasured on upstream's aws-three-tier example: a month of $1,018.60 in the cost view and on the CLI, and $2,679.35 for the sale scenario. In 2.3.20 the CLI lists two meters with no price, one node with no rule and one with load undefined (the stripe node, see More quantities); before 2.3.16 that was two meters with no price and two nodes with no rule.",
-      "ja": "同じ月の計算（--date なら 1 日）を、jui viz なしで `jsonui-doc cost infra` が出します（--json で全部）。計算できれば終了コード 0、計算したが負荷のファイルにエラーがあれば 1（そのファイルは外します）、何も計算できなければ 2（モデルが無い、負荷のファイルが無い、そのシナリオが無い、日付が月の外）で、どれも測りました。\n\n上流の aws-three-tier の例で測ると、コストの画面でも CLI でも月 $1,018.60、セールのシナリオでは $2,679.35 でした。2.3.20 の CLI では、単価の無いメーターが 2 つ、規則の無いノードが 1 つ、負荷未定義のノードが 1 つです（stripe のノード。「増えた量」を参照）。2.3.16 より前は、単価の無いメーターが 2 つ、規則の無いノードが 2 つでした。"
+      "en": "The same month, or one day with --date, comes out of `jsonui-doc cost infra` without jui viz (--json for the whole reply). It exits 0 when it simulated, 1 when it simulated but a load file had an error (that file is left out), and 2 when nothing could be simulated (no model, no load file, no such scenario, a date outside the month), each measured.\n\nMeasured on upstream's aws-three-tier example: a month of $1,018.60 in the cost view and on the CLI, and $2,679.35 for the sale scenario. In 2.3.21, as in 2.3.20, the CLI lists two meters with no price, one node with no rule and one with load undefined (the stripe node, see More quantities); before 2.3.16 that was two meters with no price and two nodes with no rule.",
+      "ja": "同じ月の計算（--date なら 1 日）を、jui viz なしで `jsonui-doc cost infra` が出します（--json で全部）。計算できれば終了コード 0、計算したが負荷のファイルにエラーがあれば 1（そのファイルは外します）、何も計算できなければ 2（モデルが無い、負荷のファイルが無い、そのシナリオが無い、日付が月の外）で、どれも測りました。\n\n上流の aws-three-tier の例で測ると、コストの画面でも CLI でも月 $1,018.60、セールのシナリオでは $2,679.35 でした。2.3.21 の CLI でも 2.3.20 と同じく、単価の無いメーターが 2 つ、規則の無いノードが 1 つ、負荷未定義のノードが 1 つです（stripe のノード。「増えた量」を参照）。2.3.16 より前は、単価の無いメーターが 2 つ、規則の無いノードが 2 つでした。"
     },
     "toc_row_cost_view": {
       "en": "The cost view, step by step",
@@ -17543,8 +17771,8 @@
       "ja": "計画は docs/infra/migrations の下のフォルダです（jui.config.json の infra.migrations_dir で変えられます。モデルとしては読みません）。中身は次の 2 つで、どちらも省けます。\n• changes.json: infra-model v0 のファイルで、足すノード・グループ・辺・flow と、同じ id のものと差し替えるものを書きます。ノードの id の order も書けます\n• removals.json: 消すものの id（辺は id か、両端で書きます）"
     },
     "section_migration_b5_text": {
-      "en": "A fictional plan for upstream's aws-three-tier example: add a serverless cache beside the API, with its load row, and remove the assets bucket. These files pass `jsonui-doc validate infra` on 2.3.20 and give the measured numbers below.",
-      "ja": "上流の aws-three-tier の例に足す架空の計画です。API の横にサーバーレスのキャッシュを負荷の行と一緒に足し、アセットのバケツを消します。2.3.20 の `jsonui-doc validate infra` で通り、下の測った数字になります。"
+      "en": "A fictional plan for upstream's aws-three-tier example: add a serverless cache beside the API, with its load row, and remove the assets bucket. These files pass `jsonui-doc validate infra` on 2.3.21 (as on 2.3.20) and give the measured numbers below.",
+      "ja": "上流の aws-three-tier の例に足す架空の計画です。API の横にサーバーレスのキャッシュを負荷の行と一緒に足し、アセットのバケツを消します。2.3.21 の `jsonui-doc validate infra` で（2.3.20 と同じく）通り、下の測った数字になります。"
     },
     "section_migration_b6_title": {
       "en": "How the new model is made",
@@ -17607,12 +17835,12 @@
       "ja": "まだ無いもの"
     },
     "section_not_yet_b0_title": {
-      "en": "What the 2.3.20 server room has, and does not",
-      "ja": "2.3.20 のサーバールームにあるもの・無いもの"
+      "en": "What the 2.3.21 server room has, and does not",
+      "ja": "2.3.21 のサーバールームにあるもの・無いもの"
     },
     "section_not_yet_b0_body": {
-      "en": "In 2.3.20 the server room has the diagram, each node's spec, the closer look, the box zoom, flows played, the cost view (the account's total by default) and migration plans played a step at a time. Agents, skills and MCP are not in it.",
-      "ja": "2.3.20 のサーバールームにあるのは、構成図、ノードごとのスペック、寄ったときの見た目、範囲で寄る、flow の再生、コストの画面（既定はアカウントの合計）、移管計画の 1 ステップずつの再生です。エージェント・スキル・MCP の表示は入っていません。"
+      "en": "In 2.3.21 the server room has the diagram (in 3D, and flat in 2D, the 2D new in 2.3.21), each node's spec, the closer look, the box zoom, flows played, the cost view (the account's total by default) and migration plans played a step at a time. Agents, skills and MCP are not in it.",
+      "ja": "2.3.21 のサーバールームにあるのは、構成図（3D と、2.3.21 で入った平らな 2D）、ノードごとのスペック、寄ったときの見た目、範囲で寄る、flow の再生、コストの画面（既定はアカウントの合計）、移管計画の 1 ステップずつの再生です。エージェント・スキル・MCP の表示は入っていません。"
     },
     "toc_row_not_yet": {
       "en": "Not there yet",
