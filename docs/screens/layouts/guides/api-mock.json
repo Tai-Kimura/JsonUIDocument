@@ -117,12 +117,16 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "// tests/mocks/listProducts.mock.json  (one file per operationId)\n{\n  \"operationId\": \"listProducts\",\n  \"method\": \"GET\",\n  \"activeScenario\": \"default\",\n  \"scenarios\": {\n    \"default\": { \"status\": 200, \"body\": { \"items\": [{ \"id\": 1, \"name\": \"Sample\" }] } },\n    \"empty\":   { \"status\": 200, \"body\": { \"items\": [] } },\n    \"error\":   { \"status\": 500, \"body\": { \"message\": \"boom\" }, \"delayMs\": 200 }\n  }\n}",
+                      "code": "// tests/mocks/listProducts.mock.json  (one file per operationId)\n{\n  \"source\": { \"operationId\": \"listProducts\", \"method\": \"GET\", \"path\": \"/products\" },\n  \"activeScenario\": \"default\",\n  \"scenarios\": {\n    \"default\": { \"status\": 200, \"body\": { \"items\": [{ \"id\": 1, \"name\": \"Sample\" }] } },\n    \"empty\":   { \"status\": 200, \"body\": { \"items\": [] } },\n    \"error\":   { \"status\": 500, \"body\": { \"message\": \"boom\" }, \"delayMs\": 200 }\n  }\n}",
                       "language": "json",
                       "filename": "listProducts.mock.json",
                       "showLineNumbers": false,
                       "copyable": true
-                    }
+                    },
+                    {"type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_files_headers"},
+                    {"type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_files_bodyfile"},
+                    {"type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_files_headers_caption"},
+                    {"type": "CodeBlock", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "code": "// tests/mocks/items/exportItems.mock.json  (hand-written; files/export.csv sits beside it)\n{\n  \"source\": { \"operationId\": \"exportItems\", \"method\": \"GET\", \"path\": \"/items/export\" },\n  \"activeScenario\": \"csv\",\n  \"scenarios\": {\n    \"csv\":       { \"status\": 200, \"contentType\": \"text/csv\", \"bodyFile\": \"files/export.csv\" },\n    \"slow_down\": { \"status\": 429, \"headers\": { \"Retry-After\": \"30\" }, \"body\": { \"retryAfter\": 30 } }\n  }\n}", "language": "json", "filename": "exportItems.mock.json", "showLineNumbers": false, "copyable": true}
                   ]
                 },
                 {
