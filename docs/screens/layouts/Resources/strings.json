@@ -15299,8 +15299,8 @@
       "ja": "worktree で書いている途中の spec"
     },
     "section_boards_b4_body": {
-      "en": "When a session works in a git worktree of the room's repository that lies outside the room, the board shows that worktree's specs beside the room's own, before anything is merged and pulled. Each such worktree is an app of its own, named app@branch (the app filter reads app ⎇ branch).\n\nEvery row then carries a ⎇ branch tag before its name, in the panel's list, the whiteboard's list and the overview's cards. A worktree's tag has an amber edge and its tooltip names the worktree's folder (A spec in progress in a worktree (…)); the room's own rows show the room's branch (A spec in the room's checkout). A spec in both checkouts is two rows, and an open sheet's head shows ⎇ branch before the file. A robot writing a spec in the worktree marks that row, as in the room.\n\nOnly a worktree that a session not yet ended is working in is shown, and only when it has jui.config.json at the same place as the room's app. A worktree inside the room, or one no session works in, is not shown, and one that is left or removed takes its rows with it. The board looks again when the sessions' folders change and every 5 seconds. A worktree with no branch checked out is named by its commit's first 8 characters. jui viz only reads git's files; it never runs or writes git.\n\nFrom 2.3.22 a session whose folder is the room itself also shows a worktree's rows when its tools name the worktree by an absolute path (Read, Edit, Write, Grep, Glob, or a jui-tools project_dir). That worktree counts for 30 minutes after the last call that named it, while the session lives. A relative path or a Bash command names none.",
-      "ja": "セッションが、部屋のリポジトリの git worktree（部屋の外にあるもの）で作業していると、マージや pull を待たずに、その worktree の spec が部屋の spec と並んでボードに出ます。worktree はそれぞれ「アプリ@ブランチ」という名前の 1 つのアプリとして扱われます（アプリの絞り込みには「アプリ ⎇ ブランチ」と出ます）。\n\nこのとき、パネルの一覧・ホワイトボードの一覧・全体表示のカードのどの行にも、名前の前に「⎇ ブランチ」の札が付きます。worktree の札は琥珀色の枠で、ツールチップに worktree のフォルダが出ます（「worktree で作っている途中の spec（…）」）。部屋自身の行には部屋のブランチが出ます（「部屋のチェックアウトの spec」）。両方のチェックアウトにある spec は 2 行になり、開いたシートの見出しではファイルの前に「⎇ ブランチ」が付きます。worktree で spec を書いているロボットは、部屋のときと同じくその行に印が付きます。\n\n出るのは、終わっていないセッションが作業している worktree で、部屋のアプリと同じ場所に jui.config.json があるものだけです。部屋の中にある worktree や、どのセッションも作業していない worktree は出ず、セッションが離れたり worktree が消えたりすると、その行も消えます。見直すのは、セッションのフォルダが変わったときと 5 秒ごとです。ブランチを指していない worktree は、コミットの先頭 8 文字で名前が付きます。jui viz は git のファイルを読むだけで、git を実行したり書き込んだりはしません。\n\n2.3.22 からは、部屋そのもののフォルダで動いているセッションでも、ツールが worktree を絶対パスで名指しすれば（Read、Edit、Write、Grep、Glob、jui-tools の project_dir）、その worktree の行が出ます。その worktree は、名指しした最後の呼び出しから 30 分、セッションが生きている間、数えます。相対パスや Bash のコマンドは名指しになりません。"
+      "en": "When a session works in a git worktree of the room's repository that lies outside the room, the board shows that worktree's specs beside the room's own, before anything is merged and pulled. Each such worktree is an app of its own, named app@branch (the app filter reads app ⎇ branch).\n\nEvery row then carries a ⎇ branch tag before its name, in the panel's list, the whiteboard's list and the overview's cards. A worktree's tag has an amber edge and its tooltip names the worktree's folder (A spec in progress in a worktree (…)); the room's own rows show the room's branch (A spec in the room's checkout). A spec in both checkouts is two rows, and an open sheet's head shows ⎇ branch before the file. A robot writing a spec in the worktree marks that row, as in the room.\n\nOnly a worktree that a session not yet ended is working in is shown, and only when it has jui.config.json at the same place as the room's app. A worktree inside the room, or one no session works in, is not shown, and one that is left or removed takes its rows with it. The board looks again when the sessions' folders change and every 5 seconds. A worktree with no branch checked out is named by its commit's first 8 characters. jui viz finds these worktrees by reading git's files. It never writes git, and runs it for a worktree only when you press Diff against base (ベースとの差分), below.\n\nFrom 2.3.22 a session whose folder is the room itself also shows a worktree's rows when its tools name the worktree by an absolute path (Read, Edit, Write, Grep, Glob, or a jui-tools project_dir). That worktree counts for 30 minutes after the last call that named it, while the session lives. A relative path or a Bash command names none.",
+      "ja": "セッションが、部屋のリポジトリの git worktree（部屋の外にあるもの）で作業していると、マージや pull を待たずに、その worktree の spec が部屋の spec と並んでボードに出ます。worktree はそれぞれ「アプリ@ブランチ」という名前の 1 つのアプリとして扱われます（アプリの絞り込みには「アプリ ⎇ ブランチ」と出ます）。\n\nこのとき、パネルの一覧・ホワイトボードの一覧・全体表示のカードのどの行にも、名前の前に「⎇ ブランチ」の札が付きます。worktree の札は琥珀色の枠で、ツールチップに worktree のフォルダが出ます（「worktree で作っている途中の spec（…）」）。部屋自身の行には部屋のブランチが出ます（「部屋のチェックアウトの spec」）。両方のチェックアウトにある spec は 2 行になり、開いたシートの見出しではファイルの前に「⎇ ブランチ」が付きます。worktree で spec を書いているロボットは、部屋のときと同じくその行に印が付きます。\n\n出るのは、終わっていないセッションが作業している worktree で、部屋のアプリと同じ場所に jui.config.json があるものだけです。部屋の中にある worktree や、どのセッションも作業していない worktree は出ず、セッションが離れたり worktree が消えたりすると、その行も消えます。見直すのは、セッションのフォルダが変わったときと 5 秒ごとです。ブランチを指していない worktree は、コミットの先頭 8 文字で名前が付きます。jui viz は、こうした worktree を git のファイルを読んで見つけます。git に書き込むことはなく、worktree について git を実行するのは、下の「ベースとの差分」を押したときだけです。\n\n2.3.22 からは、部屋そのもののフォルダで動いているセッションでも、ツールが worktree を絶対パスで名指しすれば（Read、Edit、Write、Grep、Glob、jui-tools の project_dir）、その worktree の行が出ます。その worktree は、名指しした最後の呼び出しから 30 分、セッションが生きている間、数えます。相対パスや Bash のコマンドは名指しになりません。"
     },
     "section_boards_b5_alt": {
       "en": "The spec board's list with two rows for ProfileScreen, one tagged ⎇ main and one tagged ⎇ feature/profile with an amber edge.",
@@ -15311,90 +15311,102 @@
       "ja": "部屋と worktree の両方にある spec は 1 行ずつ出ます。"
     },
     "section_boards_b6_since": {
+      "en": "from 2.3.23",
+      "ja": "2.3.23 から"
+    },
+    "section_boards_b6_title": {
+      "en": "Diff against base (ベースとの差分): a worktree's spec beside where it started",
+      "ja": "ベースとの差分: worktree の spec を元と並べる"
+    },
+    "section_boards_b6_body": {
+      "en": "Open a worktree's spec and the whiteboard's head has a Diff against base (ベースとの差分) button. It opens a full-screen view with the base on the left and the worktree's spec on the right. The base is the commit where the worktree's branch left the room's checkout (the merge-base of the two HEADs). The right side is the file the board reads now, uncommitted edits included.\n\nBoth sides are read the way the spec sheet reads them; the left takes its texts file and its Layout from the same commit. Rows are paired section by section by their key: a component's id, a variable's, an event's or a method's name, an API's method and path, an action, a transition, a branch. Each row is Same (同じ), Added (足した), Removed (消した) or Changed (書き換えた). On a changed row only the part that changed is marked, on both sides. The head counts them as +added −removed ~changed, and Show differences only (差だけ見せる) hides the rows that are the same. Close (閉じる) or Esc goes back.\n\nThe same button works on a worktree's whole list: choose the worktree's app in the overview and press it. Every card gets a mark against the base: +n −n ~n, New (新規) or No change (差なし). The specs the worktree deleted appear as faint cards under Specs deleted in this worktree (このワークツリーで消したスペック); each opens the same view, with every row on the left removed. Press the button again (Hide the diff marks / 差分の印を消す) to take the marks off. A list compares up to 300 specs and lists the rest without a mark.\n\nThe button is there only for a worktree's spec or list, and only with a running server; the exported demo has no worktrees. git runs only when you press it, read-only (merge-base, show and ls-tree), and gives up after 3 seconds. When the base cannot be read, the view says why, for example when the histories do not meet or git does not answer in time.",
+      "ja": "worktree の spec を開くと、ホワイトボードの見出しに「ベースとの差分」のボタンが出ます。押すと全画面になり、左に元、右に worktree の spec が並びます。元は、worktree のブランチが部屋のチェックアウトから分かれたコミット（2 つの HEAD の merge-base）です。右は、ボードが今読んでいるファイルで、まだコミットしていない変更も入ります。\n\nどちらも spec のシートと同じ読み方で読み、左は文のファイルとレイアウトも同じコミットから取ります。行は区分ごとに、キー（部品の id、変数・イベント・メソッドの名前、API のメソッドとパス、操作、遷移、分岐）で組にします。行は「同じ」「足した」「消した」「書き換えた」のどれかで、書き換えた行は、変わった所だけに両側で印が付きます。見出しには数が「+足した −消した ~書き換えた」で出て、「差だけ見せる」で同じ行を隠せます。「閉じる」か Esc で戻ります。\n\n同じボタンは worktree の一覧全体にも効きます。全体表示で worktree のアプリを選んで押すと、どのカードにも元と比べた印が付きます（+n −n ~n、「新規」、「差なし」）。worktree で消した spec は「このワークツリーで消したスペック」の下に薄いカードで出て、開くと同じ画面になり、左の行がすべて「消した」になります。もう一度押す（「差分の印を消す」）と印が消えます。一覧で比べるのは 300 件までで、残りは印なしで並びます。\n\nボタンが出るのは worktree の spec か一覧のときで、サーバーが動いているときだけです（書き出したデモには worktree がありません）。git を実行するのは押したときだけで、読むだけ（merge-base・show・ls-tree）、3 秒で諦めます。元が読めないときは、その理由を画面に出します（たとえば、履歴がつながらないときや、git が時間内に答えなかったとき）。"
+    },
+    "section_boards_b7_since": {
       "en": "from 2.3.20",
       "ja": "2.3.20 から"
     },
-    "section_boards_b6_title": {
+    "section_boards_b7_title": {
       "en": "Latest first",
       "ja": "新しく進んだものから"
     },
-    "section_boards_b6_body": {
+    "section_boards_b7_body": {
       "en": "The spec lists put the spec that moved on last first: its own write, its Layout's, or its newest test result. Each spec shows when that was (12:34, Yesterday 12:34 (昨日 12:34), or the date and time); hover for the full time and what moved it on.",
       "ja": "spec の一覧は、最後に進んだ spec（spec の書き込み、その Layout の書き込み、最新のテストの結果）を先に並べ、それがいつかを出します（12:34、昨日 12:34、または日付と時刻）。重ねると、正確な時刻と何で進んだかが出ます。"
     },
-    "section_boards_b7_since": {
+    "section_boards_b8_since": {
       "en": "from 2.3.4",
       "ja": "2.3.4 から"
     },
-    "section_boards_b7_title": {
+    "section_boards_b8_title": {
       "en": "The ? button",
       "ja": "「?」のボタン"
     },
-    "section_boards_b7_body": {
+    "section_boards_b8_body": {
       "en": "The explanation and the legend open from the ? beside the heading, in the panel and on the board.",
       "ja": "説明と凡例は、パネルとボードの見出しの横の「?」から開きます。"
     },
-    "section_boards_b8_since": {
+    "section_boards_b9_since": {
       "en": "from 2.3.5",
       "ja": "2.3.5 から"
     },
-    "section_boards_b8_title": {
+    "section_boards_b9_title": {
       "en": "The spec sheet",
       "ja": "spec のシート"
     },
-    "section_boards_b8_body": {
+    "section_boards_b9_body": {
       "en": "The data flow is drawn as a Mermaid diagram, the same graph as the generated spec page. Transitions are coloured by kind (push, sheet / modal, replace, back, external, none; To a screen (画面へ) when no kind is written but a screen is named), and state types by type (from 2.3.5).\n\nFrom 2.3.7 the structure is shown nested: indented with tree lines per level, and each child's box inside its parent's in the phone-frame drawing.\n\nFrom 2.3.8 the sheet is one column that never runs off the side. Events and actions are each a table (actions get a destination column only when the spec writes one), and a branch's when / then shows as formatted JSON when the spec writes it as an object or an array (folded past 12 lines).\n\nFrom 2.3.20 the whiteboard's side list brings the open spec into view however it was opened, and prose a spec takes from a texts file is drawn as Markdown (text only; http(s) links open in a new tab).\n\nFrom 2.3.21 a structure row read from the Layout shows the component's type (View, Image …) in a code typeface beside its translated name (Container …), and the Japanese page says レイアウト everywhere it still said Layout.",
       "ja": "データの流れは Mermaid の図で描きます（生成される spec のページと同じ図）。遷移は種類ごと（push、sheet / modal、replace、戻る、外部、遷移なし。種類の指定が無く画面だけ書かれたものは「画面へ」）、状態は型ごとに色が付きます（2.3.5 から）。\n\n2.3.7 からは、構造が入れ子で出ます。段ごとに字下げと木の線が入り、スマホの枠の図では子の箱が親の箱の中に入ります。\n\n2.3.8 からは、シートが縦 1 列になって横にはみ出しません。イベントと操作はそれぞれ表になり（操作の行き先は、spec に書いてあるときだけ列が出ます）、分岐の when / then は、spec がオブジェクトか配列で書いていれば、整えた JSON で出ます（12 行を超えると畳みます）。\n\n2.3.20 からは、ホワイトボードの横の一覧が、どこから開いても、開いている spec が見える所まで動きます。spec が文のファイルから取る文章は Markdown として描きます（文字だけで、http(s) のリンクは新しいタブで開きます）。\n\n2.3.21 から、レイアウトから読んだ構造の行では、部品の型名（View・Image など）が日本語の名前（コンテナなど）の横にコードの字体で出ます。日本語の画面で Layout と書いていた残りの箇所も「レイアウト」に揃いました。"
     },
-    "section_boards_b9_text": {
+    "section_boards_b10_text": {
       "en": "Task board",
       "ja": "タスクボード"
     },
-    "section_boards_b10_text": {
+    "section_boards_b11_text": {
       "en": "Since 2.1.0 there is a card for each instruction you give, titled by its first line. Tasks Claude creates with its task tools appear as well.",
       "ja": "2.1.0 からは、あなたが出した指示ごとにカードができ、題は指示の 1 行目です。Claude がタスクのツールで作ったタスクも並びます。"
     },
-    "section_boards_b11_since": {
+    "section_boards_b12_since": {
       "en": "from 2.1.0",
       "ja": "2.1.0 から"
     },
-    "section_boards_b11_title": {
+    "section_boards_b12_title": {
       "en": "A card's state",
       "ja": "カードの状態"
     },
-    "section_boards_b11_body": {
+    "section_boards_b12_body": {
       "en": "A card is working until the turn ends, waiting while a permission is asked, and failed if the turn fails. The last three finished turns of each session stay.",
       "ja": "カードは、ターンが終わるまで作業中、許可を求めている間は待ち、ターンが失敗したら失敗になります。終わったターンは、セッションごとに 3 つまで残ります。"
     },
-    "section_boards_b12_alt": {
+    "section_boards_b13_alt": {
       "en": "The task board with its folded strips at the top (questions, stopped calls, permissions), one waiting question shown as a one-line entry with a larger count, and the four columns below.",
       "ja": "上にたたまれた欄（質問・止められた操作・許可）があるタスクボード。待っている質問が 1 行で出て数が大きく表示され、下に 4 列が並ぶ。"
     },
-    "section_boards_b12_caption": {
+    "section_boards_b13_caption": {
       "en": "The task board with a question waiting in the folded strips.",
       "ja": "たたまれた欄に質問が 1 件待っているタスクボード。"
     },
-    "section_boards_b13_since": {
+    "section_boards_b14_since": {
       "en": "from 2.3.20",
       "ja": "2.3.20 から"
     },
-    "section_boards_b13_title": {
+    "section_boards_b14_title": {
       "en": "The strips at the top",
       "ja": "上の欄"
     },
-    "section_boards_b13_body": {
+    "section_boards_b14_body": {
       "en": "The questions, stopped calls and permissions strips at the board's top are folded each time it opens: a count, and one line per card (who, the tool and its input, how long). A strip with nothing waiting is one line; a count with something waiting is drawn larger and pulses when a card comes.\n\n• ▼ Open the cards above in full (…) · the four columns below hide (▼ この上の欄を広げて、札を全部見る（…）· 下の 4 列は隠れる) shows the whole cards and hides the columns.\n• ▲ Fold the cards above · back to the four columns (▲ この上の欄をたたんで、下の 4 列に戻る) brings the columns back.\n• Pressing a card's line opens the strips wide at that card.",
       "ja": "ボードの上の質問・止められた操作・許可の欄は、ボードを開くたびにたたまれています。数と、札ごとに 1 行（誰が、道具と入力、どれだけ待っているか）です。待っている札の無い欄は 1 行で、待っている札があると数が大きく出て、札が来ると脈打ちます。\n\n• 「▼ この上の欄を広げて、札を全部見る（…）· 下の 4 列は隠れる」で、札を全部出して列を隠します。\n• 「▲ この上の欄をたたんで、下の 4 列に戻る」で、列に戻ります。\n• 札の行を押すと、その札の所で欄が広がります。"
     },
-    "section_boards_b14_text": {
+    "section_boards_b15_text": {
       "en": "Log",
       "ja": "ログ"
     },
-    "section_boards_b15_title": {
+    "section_boards_b16_title": {
       "en": "The log strip and the full-screen log",
       "ja": "ログの帯と全画面のログ"
     },
-    "section_boards_b15_body": {
+    "section_boards_b16_body": {
       "en": "The strip at the bottom shows the latest events. The full-screen log can be filtered by kind and by text.\n\nFrom 2.3.4 the strip can be closed: the view above takes the space, and Open the log (ログを開く) brings it back. The choice is remembered, and events keep coming in meanwhile.\n\nFrom 2.3.21 the strip shows a hook's name (SessionStart …) in a code typeface.",
       "ja": "下の帯に最新のイベントが出ます。全画面のログでは、種類や文字で絞り込めます。\n\n2.3.4 からは帯を閉じられます。上の表示が下まで広がり、「ログを開く」で戻ります。開閉は覚えていて、閉じている間もログは受け取ります。\n\n2.3.21 から、ログの帯ではフックの名前（SessionStart など）がコードの字体で出ます。"
     },
