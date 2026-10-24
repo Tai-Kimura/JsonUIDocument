@@ -3416,6 +3416,63 @@
     },
     {
       "binary": "jui",
+      "command": "viz strings template",
+      "synopsis": "jui viz strings [template] [--lang LANG]",
+      "purpose": {
+        "en": "Print a template of the viz page's words to translate, as JSON on stdout (from 2.3.22): every key with its English words, and each plural key with the plural forms of the language. It writes no file; redirect it, translate the words keeping the {name} slots, and name the file in the viz folder's config.json as \"strings\" beside \"language\". The server reads both when it starts. English and Japanese are bundled; any other language code starts from English. The count of keys goes to stderr (2,257 in 2.3.22).",
+        "ja": "viz のページの言葉を訳すためのひな形を、JSON で標準出力に出す（2.3.22 から）。すべてのキーに英語の言葉が付き、複数形のキーにはその言語の複数形の形が並ぶ。ファイルは書かない。リダイレクトして、{name} の差し込み口を残したまま訳し、viz のフォルダの config.json に \"language\" と並べて \"strings\" としてそのファイルを書く。サーバーは起動のときに両方を読む。英語と日本語は同梱で、それ以外の言語コードは英語から始まる。キーの数は標準エラーに出る（2.3.22 では 2,257）。"
+      },
+      "options": [
+        {
+          "name": "template",
+          "type": "choice",
+          "default": "template",
+          "description": {
+            "en": "The only action, and the default.",
+            "ja": "ただ 1 つの動作で、既定でもある。"
+          }
+        },
+        {
+          "name": "--lang",
+          "type": "string",
+          "default": "config.json's language",
+          "description": {
+            "en": "A BCP 47 language code (fr, de, zh-TW, pt-BR …); it decides the plural forms. A value that is not a language code exits 1.",
+            "ja": "BCP 47 の言語コード（fr、de、zh-TW、pt-BR など）。複数形の形を決める。言語コードでない値は exit 1 で終わる。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz strings template --lang fr > fr.json\njui viz: 2257 keys, in English; plural forms for fr: one, many, other. Translate the words, keep the {name} slots, and name the file in config.json: \"language\": \"fr\", \"strings\": \"<the file>\""
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz serve",
+        "jui viz export-demo"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.22",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "53e00d3d352da7c59d9d5a90e756ea3efa5cee6ee83f4bec9ac9eb904f54d79f",
+        "cardHash": "1a937ef3768281345cbf6691630841efdc161adfb6be2754132e556836f098a6",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "afafa9dcdfa6",
+          "synopsis": "c5f7c17eba64",
+          "purpose": "a43557606332",
+          "options": "7bd28cd152c5",
+          "examples": "fb5a3217eb70",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "fe1054c64d59"
+        }
+      }
+    },
+    {
+      "binary": "jui",
       "command": "viz relay install",
       "synopsis": "jui viz relay install [--dry-run] [--yes]",
       "purpose": {

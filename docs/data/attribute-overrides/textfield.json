@@ -86,8 +86,8 @@
     },
     "returnKeyType": {
       "note": {
-        "en": "`default` / `go` / `done` / `next` / `send` / `search`. Affects the keyboard's return-key label. Maps to `enterkeyhint` on Web.",
-        "ja": "`default` / `go` / `done` / `next` / `send` / `search`。キーボードのリターンキー表記を変える。Web では `enterkeyhint` にマップ。"
+        "en": "`default` / `go` / `done` / `next` / `send` / `search`. Affects the keyboard's return-key label. Maps to `enterkeyhint` on Web. Not written, iOS shows the system's own return key: the generated code puts no label on, and iOS Dynamic mode does the same since SwiftJsonUI 10.30.7 (through 10.30.6 a TextField with an `id` showed Done; one without an `id` already showed the system's key). Also since 10.30.7, Dynamic applies a declared returnKeyType to a secure field with an `id`, which dropped it before.",
+        "ja": "`default` / `go` / `done` / `next` / `send` / `search`。キーボードのリターンキー表記を変える。Web では `enterkeyhint` にマップ。書かないときの iOS は、システムの既定のリターンキーになる。生成コードは表記を付けず、iOS の Dynamic モードも SwiftJsonUI 10.30.7 から同じになった（10.30.6 までは `id` のある TextField が「完了」になっていた。`id` の無い TextField は前からシステムの既定）。また 10.30.7 から、Dynamic は `id` のある secure の欄でも、書いた returnKeyType を付ける（前は落としていた）。"
       }
     },
     "onShouldReturn": {

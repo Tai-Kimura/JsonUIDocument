@@ -8,7 +8,7 @@ const I18N = (() => {
     const data = JSON.parse(document.getElementById('jui-viz-strings').textContent);
     if (data && typeof data.strings === 'object') return { ...data, served: true };
   } catch (err) { /* a page without the server's words (debug.html): English keys as they are */ }
-  return { language: 'en', locale: 'en-US', strings: {} };
+  return { language: 'en', words: 'en', locale: 'en-US', strings: {} };
 })();
 const LOCALE = I18N.locale || 'en-US';
 const PLURAL = new Intl.PluralRules(LOCALE);
@@ -1715,8 +1715,8 @@ const BASE_CLOCK = 14 * 3600 + 20 * 60;
 
 const ROOMS = [
   { id: 'shop', name: 'shop-app/', path: '~/work/shop-app', x0: -9.6, x1: 2.6, z0: -5.0, z1: 4.2, floor: '--floor-a', back: 3.9, left: 3.9, infraDocs: { files: 2, dir: 'docs/infra' } },
-  { id: 'cli', name: 'jsonui-cli/', path: '~/resource/jsonui-cli', x0: 3.1, x1: 10.2, z0: -5.0, z1: -0.25, floor: '--floor-b', back: 3.9, left: 0.55 },
-  { id: 'doc', name: 'JsonUIDocument/', path: '~/resource/JsonUIDocument', x0: 3.1, x1: 10.2, z0: 0.25, z1: 4.2, floor: '--floor-c', back: 0.55, left: 0.55 },
+  { id: 'cli', name: 'shop-tools/', path: '~/work/shop-tools', x0: 3.1, x1: 10.2, z0: -5.0, z1: -0.25, floor: '--floor-b', back: 3.9, left: 0.55 },
+  { id: 'doc', name: 'docs-site/', path: '~/work/docs-site', x0: 3.1, x1: 10.2, z0: 0.25, z1: 4.2, floor: '--floor-c', back: 0.55, left: 0.55 },
 ];
 /* One room per project folder; a project can hold any number of sessions. */
 const PROJECT = Object.fromEntries(ROOMS.map((r) => [r.id, r]));
@@ -1974,7 +1974,7 @@ Object.assign(SPEC_DOCS, {
       transitions: [[tl('demo.spec.tap.help.button'), 'Help']],
       branches: [['togglePush', tl('demo.spec.notifications.denied.os'), tl('demo.spec.show.how.open.settings.app')], ['deleteAccount', 'success', tl('demo.spec.go.login')]] }),
 });
-/* The documentation site (JsonUIDocument) is a JsonUI project of its own. */
+/* The documentation site (docs-site/) is a JsonUI project of its own. */
 Object.assign(SPEC_DOCS, {
   top: doc('top', tl('demo.spec.introduces.jsonui.links.getting.started'), '2026-09-10',
     `SafeAreaView top_root ${tl('demo.spec.whole.screen')}|Label hero_title ${tl('demo.spec.heading')}|Label hero_lead ${tl('demo.spec.intro.text')}|Button start_button ${tl('demo.spec.get.started')}|Collection platform_cards ${tl('demo.spec.ios.android.web.guides')}|Collection news_list ${tl('demo.spec.news')}`,
@@ -2672,14 +2672,14 @@ const TALK_DEMO_BY_LANGUAGE = {
        "key": "4f",
        "agentId": "4f",
        "sessionId": "4f2b0000-0000-4000-8000-00000000004f",
-       "name": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+       "name": "shop-app-release-coordinator-for-the-spring-catalog-and-checkout-update",
        "kind": "session",
        "alive": true,
        "goneAt": null,
        "removeAt": null
       },
       "lastAt": 1792299520000,
-      "preview": "The 2.3.7 train's scope is set. The talk view is in.",
+      "preview": "The spring sale's scope is set. The order history screen is in.",
       "lastDir": "in",
       "unread": 1,
       "count": 1
@@ -2698,7 +2698,7 @@ const TALK_DEMO_BY_LANGUAGE = {
        "removeAt": null
       },
       "lastAt": 1792299400000,
-      "preview": "Thanks. Address autofill on the next train is fine.",
+      "preview": "Thanks. Address autofill in the next release is fine.",
       "lastDir": "out",
       "unread": 1,
       "count": 4
@@ -2781,7 +2781,7 @@ const TALK_DEMO_BY_LANGUAGE = {
        "removeAt": null
       },
       "lastAt": 1792299400000,
-      "preview": "Thanks. Address autofill on the next train is fine.",
+      "preview": "Thanks. Address autofill in the next release is fine.",
       "lastDir": "in",
       "unread": 0,
       "count": 4
@@ -2833,7 +2833,7 @@ const TALK_DEMO_BY_LANGUAGE = {
        "removeAt": null
       },
       "lastAt": 1792299520000,
-      "preview": "The 2.3.7 train's scope is set. The talk view is in.",
+      "preview": "The spring sale's scope is set. The order history screen is in.",
       "lastDir": "out",
       "unread": 0,
       "count": 1
@@ -2922,7 +2922,7 @@ const TALK_DEMO_BY_LANGUAGE = {
       "deliveredAt": 1792299280800,
       "readAt": 1792299281600,
       "state": "read",
-      "text": "The sign-up screen is done. Here is what to check:\n\n1. The **email** field cannot be sent (`Send` stays off) until it matches the confirmation field.\n2. Passwords need 8 characters or more, with letters and digits. A weak one says why in red.\n3. The terms link opens on its own screen (coming back keeps what was typed).\n\nTests: all 14 pass with `jsonui-test run tests/screens/signup`.\nThe iOS and Android screenshots are in docs/screens/signup/.\nA string like <script>alert(1)</script> shows as plain text (the escaping example).\nLeft: address autofill goes on the next train.",
+      "text": "The sign-up screen is done. Here is what to check:\n\n1. The **email** field cannot be sent (`Send` stays off) until it matches the confirmation field.\n2. Passwords need 8 characters or more, with letters and digits. A weak one says why in red.\n3. The terms link opens on its own screen (coming back keeps what was typed).\n\nTests: all 14 pass with `jsonui-test run tests/screens/signup`.\nThe iOS and Android screenshots are in docs/screens/signup/.\nA string like <script>alert(1)</script> shows as plain text (the escaping example).\nLeft: address autofill goes in the next release.",
       "cut": false,
       "summary": "The sign-up screen is done",
       "seen": "both",
@@ -2940,7 +2940,7 @@ const TALK_DEMO_BY_LANGUAGE = {
       "deliveredAt": 1792299400800,
       "readAt": null,
       "state": "delivered",
-      "text": "Thanks. Address autofill on the next train is fine.",
+      "text": "Thanks. Address autofill in the next release is fine.",
       "cut": false,
       "summary": null,
       "seen": "both",
@@ -3033,15 +3033,15 @@ const TALK_DEMO_BY_LANGUAGE = {
       "msgId": "demo-0008-0000-4000-8000-000000000000",
       "convId": "t-e7be89fd2788347b",
       "dir": "in",
-      "fromName": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+      "fromName": "shop-app-release-coordinator-for-the-spring-catalog-and-checkout-update",
       "toName": "shop-app-main",
       "at": 1792299520000,
       "deliveredAt": 1792299520800,
       "readAt": 1792299521600,
       "state": "read",
-      "text": "The 2.3.7 train's scope is set. The talk view is in.",
+      "text": "The spring sale's scope is set. The order history screen is in.",
       "cut": false,
-      "summary": "2.3.7 scope",
+      "summary": "Spring sale scope",
       "seen": "both",
       "via": "session",
       "merged": false
@@ -3147,7 +3147,7 @@ const TALK_DEMO_BY_LANGUAGE = {
       "deliveredAt": 1792299280800,
       "readAt": 1792299281600,
       "state": "read",
-      "text": "The sign-up screen is done. Here is what to check:\n\n1. The **email** field cannot be sent (`Send` stays off) until it matches the confirmation field.\n2. Passwords need 8 characters or more, with letters and digits. A weak one says why in red.\n3. The terms link opens on its own screen (coming back keeps what was typed).\n\nTests: all 14 pass with `jsonui-test run tests/screens/signup`.\nThe iOS and Android screenshots are in docs/screens/signup/.\nA string like <script>alert(1)</script> shows as plain text (the escaping example).\nLeft: address autofill goes on the next train.",
+      "text": "The sign-up screen is done. Here is what to check:\n\n1. The **email** field cannot be sent (`Send` stays off) until it matches the confirmation field.\n2. Passwords need 8 characters or more, with letters and digits. A weak one says why in red.\n3. The terms link opens on its own screen (coming back keeps what was typed).\n\nTests: all 14 pass with `jsonui-test run tests/screens/signup`.\nThe iOS and Android screenshots are in docs/screens/signup/.\nA string like <script>alert(1)</script> shows as plain text (the escaping example).\nLeft: address autofill goes in the next release.",
       "cut": false,
       "summary": "The sign-up screen is done",
       "seen": "both",
@@ -3165,7 +3165,7 @@ const TALK_DEMO_BY_LANGUAGE = {
       "deliveredAt": 1792299400800,
       "readAt": null,
       "state": "delivered",
-      "text": "Thanks. Address autofill on the next train is fine.",
+      "text": "Thanks. Address autofill in the next release is fine.",
       "cut": false,
       "summary": null,
       "seen": "both",
@@ -3231,15 +3231,15 @@ const TALK_DEMO_BY_LANGUAGE = {
       "msgId": "demo-0008-0000-4000-8000-000000000000",
       "convId": "t-e7be89fd2788347b",
       "dir": "out",
-      "fromName": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+      "fromName": "shop-app-release-coordinator-for-the-spring-catalog-and-checkout-update",
       "toName": "shop-app-main",
       "at": 1792299520000,
       "deliveredAt": 1792299520800,
       "readAt": 1792299521600,
       "state": "read",
-      "text": "The 2.3.7 train's scope is set. The talk view is in.",
+      "text": "The spring sale's scope is set. The order history screen is in.",
       "cut": false,
-      "summary": "2.3.7 scope",
+      "summary": "Spring sale scope",
       "seen": "both",
       "via": "session",
       "merged": false
@@ -3376,7 +3376,7 @@ const TALK_DEMO_BY_LANGUAGE = {
         "deliveredAt": 1792299400800,
         "readAt": 1792300030000,
         "state": "read",
-        "text": "Thanks. Address autofill on the next train is fine.",
+        "text": "Thanks. Address autofill in the next release is fine.",
         "cut": false,
         "summary": null,
         "seen": "both",
@@ -3425,14 +3425,14 @@ const TALK_DEMO_BY_LANGUAGE = {
        "key": "4f",
        "agentId": "4f",
        "sessionId": "4f2b0000-0000-4000-8000-00000000004f",
-       "name": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+       "name": "shop-app-release-coordinator-for-the-spring-catalog-and-checkout-update",
        "kind": "session",
        "alive": true,
        "goneAt": null,
        "removeAt": null
       },
       "lastAt": 1792299520000,
-      "preview": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
+      "preview": "春のセールの範囲を決めました。注文履歴の画面が入ります。",
       "lastDir": "in",
       "unread": 1,
       "count": 1
@@ -3451,7 +3451,7 @@ const TALK_DEMO_BY_LANGUAGE = {
        "removeAt": null
       },
       "lastAt": 1792299400000,
-      "preview": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+      "preview": "ありがとう。住所の自動入力は次のリリースで大丈夫です。",
       "lastDir": "out",
       "unread": 1,
       "count": 4
@@ -3534,7 +3534,7 @@ const TALK_DEMO_BY_LANGUAGE = {
        "removeAt": null
       },
       "lastAt": 1792299400000,
-      "preview": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+      "preview": "ありがとう。住所の自動入力は次のリリースで大丈夫です。",
       "lastDir": "in",
       "unread": 0,
       "count": 4
@@ -3586,7 +3586,7 @@ const TALK_DEMO_BY_LANGUAGE = {
        "removeAt": null
       },
       "lastAt": 1792299520000,
-      "preview": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
+      "preview": "春のセールの範囲を決めました。注文履歴の画面が入ります。",
       "lastDir": "out",
       "unread": 0,
       "count": 1
@@ -3675,7 +3675,7 @@ const TALK_DEMO_BY_LANGUAGE = {
       "deliveredAt": 1792299280800,
       "readAt": 1792299281600,
       "state": "read",
-      "text": "会員登録の画面を仕上げました。確認してほしい点は次のとおりです。\n\n1. **メールアドレス**の入力欄は、確認用の欄と一致しないとき `送信` を押せないようにしました。\n2. パスワードは 8 文字以上、英字と数字を含むこと。弱いときは赤い文で理由を出します。\n3. 利用規約のリンクは別画面で開きます（戻ると入力は残ります）。\n\nテスト: `jsonui-test run tests/screens/signup` で 14 件すべて通りました。\niOS と Android のスクリーンショットは docs/screens/signup/ に置いてあります。\n<script>alert(1)</script> のような文字列も、そのまま文字として出ること（escape の見本）。\n残り: 住所の自動入力は次の列車で。",
+      "text": "会員登録の画面を仕上げました。確認してほしい点は次のとおりです。\n\n1. **メールアドレス**の入力欄は、確認用の欄と一致しないとき `送信` を押せないようにしました。\n2. パスワードは 8 文字以上、英字と数字を含むこと。弱いときは赤い文で理由を出します。\n3. 利用規約のリンクは別画面で開きます（戻ると入力は残ります）。\n\nテスト: `jsonui-test run tests/screens/signup` で 14 件すべて通りました。\niOS と Android のスクリーンショットは docs/screens/signup/ に置いてあります。\n<script>alert(1)</script> のような文字列も、そのまま文字として出ること（escape の見本）。\n残り: 住所の自動入力は次のリリースで。",
       "cut": false,
       "summary": "会員登録の画面を仕上げた",
       "seen": "both",
@@ -3693,7 +3693,7 @@ const TALK_DEMO_BY_LANGUAGE = {
       "deliveredAt": 1792299400800,
       "readAt": null,
       "state": "delivered",
-      "text": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+      "text": "ありがとう。住所の自動入力は次のリリースで大丈夫です。",
       "cut": false,
       "summary": null,
       "seen": "both",
@@ -3786,15 +3786,15 @@ const TALK_DEMO_BY_LANGUAGE = {
       "msgId": "demo-0008-0000-4000-8000-000000000000",
       "convId": "t-e7be89fd2788347b",
       "dir": "in",
-      "fromName": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+      "fromName": "shop-app-release-coordinator-for-the-spring-catalog-and-checkout-update",
       "toName": "shop-app-main",
       "at": 1792299520000,
       "deliveredAt": 1792299520800,
       "readAt": 1792299521600,
       "state": "read",
-      "text": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
+      "text": "春のセールの範囲を決めました。注文履歴の画面が入ります。",
       "cut": false,
-      "summary": "2.3.7 の範囲",
+      "summary": "春のセールの範囲",
       "seen": "both",
       "via": "session",
       "merged": false
@@ -3900,7 +3900,7 @@ const TALK_DEMO_BY_LANGUAGE = {
       "deliveredAt": 1792299280800,
       "readAt": 1792299281600,
       "state": "read",
-      "text": "会員登録の画面を仕上げました。確認してほしい点は次のとおりです。\n\n1. **メールアドレス**の入力欄は、確認用の欄と一致しないとき `送信` を押せないようにしました。\n2. パスワードは 8 文字以上、英字と数字を含むこと。弱いときは赤い文で理由を出します。\n3. 利用規約のリンクは別画面で開きます（戻ると入力は残ります）。\n\nテスト: `jsonui-test run tests/screens/signup` で 14 件すべて通りました。\niOS と Android のスクリーンショットは docs/screens/signup/ に置いてあります。\n<script>alert(1)</script> のような文字列も、そのまま文字として出ること（escape の見本）。\n残り: 住所の自動入力は次の列車で。",
+      "text": "会員登録の画面を仕上げました。確認してほしい点は次のとおりです。\n\n1. **メールアドレス**の入力欄は、確認用の欄と一致しないとき `送信` を押せないようにしました。\n2. パスワードは 8 文字以上、英字と数字を含むこと。弱いときは赤い文で理由を出します。\n3. 利用規約のリンクは別画面で開きます（戻ると入力は残ります）。\n\nテスト: `jsonui-test run tests/screens/signup` で 14 件すべて通りました。\niOS と Android のスクリーンショットは docs/screens/signup/ に置いてあります。\n<script>alert(1)</script> のような文字列も、そのまま文字として出ること（escape の見本）。\n残り: 住所の自動入力は次のリリースで。",
       "cut": false,
       "summary": "会員登録の画面を仕上げた",
       "seen": "both",
@@ -3918,7 +3918,7 @@ const TALK_DEMO_BY_LANGUAGE = {
       "deliveredAt": 1792299400800,
       "readAt": null,
       "state": "delivered",
-      "text": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+      "text": "ありがとう。住所の自動入力は次のリリースで大丈夫です。",
       "cut": false,
       "summary": null,
       "seen": "both",
@@ -3984,15 +3984,15 @@ const TALK_DEMO_BY_LANGUAGE = {
       "msgId": "demo-0008-0000-4000-8000-000000000000",
       "convId": "t-e7be89fd2788347b",
       "dir": "out",
-      "fromName": "jsonui-agents-for-claude-4f-library-orchestrator-for-the-2.3.7-train",
+      "fromName": "shop-app-release-coordinator-for-the-spring-catalog-and-checkout-update",
       "toName": "shop-app-main",
       "at": 1792299520000,
       "deliveredAt": 1792299520800,
       "readAt": 1792299521600,
       "state": "read",
-      "text": "2.3.7 の列車の範囲を決めました。トークの画面が入ります。",
+      "text": "春のセールの範囲を決めました。注文履歴の画面が入ります。",
       "cut": false,
-      "summary": "2.3.7 の範囲",
+      "summary": "春のセールの範囲",
       "seen": "both",
       "via": "session",
       "merged": false
@@ -4129,7 +4129,7 @@ const TALK_DEMO_BY_LANGUAGE = {
         "deliveredAt": 1792299400800,
         "readAt": 1792300030000,
         "state": "read",
-        "text": "ありがとう。住所の自動入力は次の列車で大丈夫です。",
+        "text": "ありがとう。住所の自動入力は次のリリースで大丈夫です。",
         "cut": false,
         "summary": null,
         "seen": "both",
@@ -4158,7 +4158,7 @@ const TALK_DEMO_BY_LANGUAGE = {
  }
 };
 // eslint-disable-next-line no-unused-vars
-const TALK_DEMO = TALK_DEMO_BY_LANGUAGE[typeof I18N === 'object' ? I18N.language : 'en'] || TALK_DEMO_BY_LANGUAGE.en;
+const TALK_DEMO = TALK_DEMO_BY_LANGUAGE[typeof I18N === 'object' ? (I18N.words || I18N.language) : 'en'] || TALK_DEMO_BY_LANGUAGE.en;
 // ---- web/js/40-scene.js ----
 
 /* ---------- 3D office ---------- */
@@ -4196,7 +4196,7 @@ function tileFocus(x, y, w, h, g, k) {
   return k >= 0 ? [x + g.pad + k * (sw + g.segGap) + sw / 2, y + h - g.segBottom - g.segH / 2] : [x + w / 2, y + g.nameY - 10];
 }
 function sbFocus(pos, k) { const p = sbTile(pos); return tileFocus(p.x, p.y, SB.tw, SB.th, SBG, k); }
-/* The other project rooms: a wall board in jsonui-cli/, an easel in JsonUIDocument/. */
+/* The other project rooms: a wall board in shop-tools/, an easel in docs-site/. */
 const PBOARDS = [
   { project: 'cli', W: 1024, H: 560, w: 3.4, h: 1.86, wall: { cx: 6.6, cy: 2.35, z: -4.98 } },
   { project: 'doc', W: 1024, H: 720, w: 2.15, h: 1.51, easel: { x: 4.35, z: 1.2, ry: 0.42, bottom: 0.95 } },
@@ -7291,12 +7291,14 @@ const SPIRIT_ANCHORS = {
 };
 /* Where a part goes when spirit.json does not say: robot-*.glb on the head, prop-*.glb in the right hand. */
 const spiritDefaultAt = (file) => (file.startsWith('prop-') ? 'handR' : 'head');
-/* A model's words in the page's language (05-i18n.js), else ja, else the first written; a string is itself. */
+/* A model's words in the page's language (05-i18n.js; a code: pt-BR, then pt), else ja, else the first written; a
+   string is itself. */
 function spiritWords(v) {
   if (typeof v === 'string' || Array.isArray(v)) return v;
   if (!v || typeof v !== 'object') return '';
   const lang = (typeof I18N !== 'undefined' && I18N.language) || 'en';
-  return v[lang] !== undefined ? v[lang] : v.ja !== undefined ? v.ja : Object.values(v)[0] || '';
+  const base = lang.split('-')[0];
+  return v[lang] !== undefined ? v[lang] : v[base] !== undefined ? v[base] : v.ja !== undefined ? v.ja : Object.values(v)[0] || '';
 }
 /* The list, asked at most every SPIRIT.listMs (a model put in the folder shows from the next skill after). */
 function spiritList() {
@@ -7437,7 +7439,8 @@ async function spiritWear(R, S) {
     if (sp.material && sp.material.kind === 'ghost') S.ghost = spiritGhostShader(figure, sp);
     else spiritGhost(figure, sp);
     spiritOutline(figure, sp);
-    S.holders.push(spiritPut(r, figure, sp.at || 'back'));
+    // its offset and rotate as a part's; its scale is the one above, not given again
+    S.holders.push(spiritPut(r, figure, sp.at || 'back', { offset: sp.offset, rotate: sp.rotate }));
     S.figure = figure;
     S.clips = gltfs[figureFile].animations || [];
     S.names = sp.clips || {};
@@ -8088,7 +8091,7 @@ function renderSessions() {
       const subsHTML = x.robots.filter((id) => id !== x.id).map((id) => `<li><button type="button" class="who-btn" data-robot-open="${esc(id)}" data-fk="ss-${esc(id)}">${pill(id, DEF[id].role)}<span>${esc(DEF[id].agent)}</span></button><span class="state" data-st="${esc(id)}"></span><p class="act" data-sact="${esc(id)}"></p></li>`).join('');
       return `<li class="session"><div class="srow"><button type="button" class="who-btn" data-robot-open="${esc(x.id)}" data-fk="ss-${esc(x.id)}">${pill(x.id, 'main')}<span class="sname">${esc(DEF[x.id].agent)}</span></button><span class="state" data-sst="${esc(x.id)}"></span></div><p class="act" data-sact="${esc(x.id)}"></p>${subsHTML ? `<ul class="subs">${subsHTML}</ul>` : ''}</li>`;
     }).join('');
-    return `<section class="pgroup"><button type="button" class="pg-toggle" data-fold="${esc(r.id)}" data-fk="pg-${esc(r.id)}" aria-expanded="${!folded}"><span class="pg-caret" aria-hidden="true"></span><b>${esc(r.name)}</b><small data-pgsum="${esc(r.id)}"></small></button>${folded ? '' : itemsHTML ? `<ul class="sessions">${itemsHTML}</ul>` : `<p class="empty-note">${any ? esc(tl('panel.sess.nomatch')) : esc(tl('panel.sess.none'))}</p>`}</section>`;
+    return `<section class="pgroup"><button type="button" class="pg-toggle" data-fold="${esc(r.id)}" data-fk="pg-${esc(r.id)}" aria-expanded="${!folded}"><span class="pg-caret" aria-hidden="true"></span><b title="${esc(r.name)}">${esc(r.name)}</b><small data-pgsum="${esc(r.id)}"></small></button>${folded ? '' : itemsHTML ? `<ul class="sessions">${itemsHTML}</ul>` : `<p class="empty-note">${any ? esc(tl('panel.sess.nomatch')) : esc(tl('panel.sess.none'))}</p>`}</section>`;
   }).join(''));
   for (const [r] of groups) {
     const all = scoped.filter((x) => x.project === r.id), badges = all.map(sessionBadge);
@@ -8185,7 +8188,7 @@ function permSubjectLive(p) {
   return `<span class="perm-exact" tabindex="0">${partsHTML.join('')}</span>`;
 }
 const permSubject = (p) => (SOURCE.mode === 'live' ? permSubjectLive(p) : `<code>${esc(permSummary(p))}</code>`);
-const permBox = (p) => `<div class="perm-box" data-perm-box="${esc(p.id)}"><p class="perm-q"><b>${esc(p.tool)}</b> ${permSubject(p)}</p><div class="perm-acts">${permButtons(p, 's')}</div></div>`;
+const permBox = (p, where = 's') => `<div class="perm-box" data-perm-box="${esc(p.id)}"><p class="perm-q"><b>${esc(p.tool)}</b> ${permSubject(p)}</p><div class="perm-acts">${permButtons(p, where)}</div></div>`;
 function recentHTML(id) {
   const items = logItems.filter((e) => e.who === id).slice(0, 6);
   return items.length ? items.map((e) => `<li><time>${fmtClock(BASE_CLOCK + e.abs)}</time><span><b>${esc(e.kind)}</b> ${esc(e.what)}</span></li>`).join('') : `<li><span>${esc(tl('panel.recent.none'))}</span></li>`;
@@ -8206,7 +8209,7 @@ function refreshNow() {
 function decide(id, behavior, btn) {
   const p = latestModel.pending.find((q) => q.id === id);
   if (!p) return;
-  const where = btn.closest('#tasks, #perm-strip, #kanban, #tb-detail, #rb');
+  const where = btn.closest('#tasks, #perm-strip, #kanban, #tb-detail, #rb');   // the waits' pane keeps its own focus (53-waits.js cardWaitPanePaint)
   // the reason box of the very card pressed (the card is on the board, the robot's card and its 応答の履歴 tab at once)
   const card = btn.closest('.tbd-perm'), reasonEl = card ? card.querySelector('.tbd-reason input') : null;
   const reason = behavior === 'deny' && reasonEl ? reasonEl.value.trim() : '';
@@ -8233,7 +8236,7 @@ document.addEventListener('click', (e) => {
   else if (t.hasAttribute('data-rb-close')) closeRobot({ byHand: true });
   else if (t.hasAttribute('data-set-all')) setProject('all');
 });
-$('chip-perm').addEventListener('click', (e) => { tb.waitView = true; openTaskBoard(e.currentTarget); });
+$('chip-perm').addEventListener('click', (e) => openWaitBoard(e.currentTarget, WAITS_OF.perm()));   // 53-waits.js
 
 /* ---------- scope: which project (or all) every panel and board shows, and which sessions ---------- */
 function paintScopeButtons() {
@@ -8442,7 +8445,7 @@ for (const id of ['questions', 'q-strip']) { $(id).addEventListener('input', onQ
 /* 2.3.5 (requester 10-19: "このヘッダーの許可のチップクリックでボード表示してほしい"): the 質問 chip opens the board that
    already lists what waits for a permission (the task board, its strip on top) with the questions waiting over it,
    panel open or not; the 許可待ち chip opens the same board. The chips are hidden while nothing waits (no no-op chip). */
-$('chip-ask').addEventListener('click', (e) => { tb.waitView = true; openTaskBoard(e.currentTarget); });
+$('chip-ask').addEventListener('click', (e) => openWaitBoard(e.currentTarget, WAITS_OF.ask()));   // 53-waits.js
 
 /* ---------- popovers: project switcher, session picker, robot picker ---------- */
 const popEl = $('pop');
@@ -8497,7 +8500,7 @@ function renderPopBody() {
     const ids = ['all', ...ROOMS.map((r) => r.id)].filter((id) => id === 'all' || matchQ(`${PROJECT[id].name} ${PROJECT[id].path}`));
     body.innerHTML = `<ul class="pop-list" role="listbox" aria-label="${esc(tl('panel.sb.project'))}">${ids.map((id) => {
       const st = projectStats(latestModel, id), sel = UI.project === id;
-      return `<li role="option" tabindex="${sel ? 0 : -1}" aria-selected="${sel ? 'true' : 'false'}" data-pick-project="${esc(id)}" data-fk="pp-${esc(id)}"><span class="po-main"><b>${id === 'all' ? esc(tl('panel.pop.all.projects')) : esc(PROJECT[id].name)}</b><small>${id === 'all' ? esc(tl('panel.pop.n.projects', { n: ROOMS.length })) : esc(PROJECT[id].path)} · ${esc(tl('panel.pg.sessions', { n: st.sessions }))}</small></span><span class="po-badges">${st.pend ? `<span class="state st-waiting">${esc(tl('panel.count.waiting', { n: st.pend }))}</span>` : ''}${st.busy ? `<span class="state st-busy">${esc(tl('panel.pop.busy', { n: st.busy }))}</span>` : ''}${st.live ? `<span class="state st-write">${esc(tl('panel.pop.live', { n: st.live }))}</span>` : ''}</span></li>`;
+      return `<li role="option" tabindex="${sel ? 0 : -1}" aria-selected="${sel ? 'true' : 'false'}" data-pick-project="${esc(id)}" data-fk="pp-${esc(id)}"><span class="po-main"><b${id === 'all' ? '' : ` title="${esc(PROJECT[id].name)}"`}>${id === 'all' ? esc(tl('panel.pop.all.projects')) : esc(PROJECT[id].name)}</b><small>${id === 'all' ? esc(tl('panel.pop.n.projects', { n: ROOMS.length })) : esc(PROJECT[id].path)} · ${esc(tl('panel.pg.sessions', { n: st.sessions }))}</small></span><span class="po-badges">${st.pend ? `<span class="state st-waiting">${esc(tl('panel.count.waiting', { n: st.pend }))}</span>` : ''}${st.busy ? `<span class="state st-busy">${esc(tl('panel.pop.busy', { n: st.busy }))}</span>` : ''}${st.live ? `<span class="state st-write">${esc(tl('panel.pop.live', { n: st.live }))}</span>` : ''}</span></li>`;
     }).join('')}</ul>`;
   } else {
     const isLog = pop.kind === 'robots';
@@ -8506,12 +8509,12 @@ function renderPopBody() {
     const groups = ROOMS.filter((r) => inScope(r.id)).map((r) => [r, sess.filter((s) => s.project === r.id && matchQ(`${s.id} ${s.room} ${s.robots.map((id) => `${id} ${DEF[id].agent}`).join(' ')} ${sessionBadge(s)[1]}`))]).filter(([, l]) => l.length);
     const rowHTML = (s) => {
       const [c, l] = sessionBadge(s), n = latestModel.tasks.filter((x) => x.list === s.id).length;
-      if (!isLog) return `<label class="pg-item"><input type="checkbox" data-pick-list="${esc(s.id)}" data-fk="pl-${esc(s.id)}"${hidden.has(s.id) ? '' : ' checked'}>${pill(s.id, 'main')}<span class="pg-name">${esc(DEF[s.id].agent)}<small>${esc(tl('panel.pop.tasks', { n }))}</small></span><span class="state ${esc(c)}">${esc(l)}</span></label>`;
+      if (!isLog) return `<label class="pg-item"><input type="checkbox" data-pick-list="${esc(s.id)}" data-fk="pl-${esc(s.id)}"${hidden.has(s.id) ? '' : ' checked'}>${pill(s.id, 'main')}<span class="pg-name"><span class="pg-nm" title="${esc(DEF[s.id].agent)}">${esc(DEF[s.id].agent)}</span><small>${esc(tl('panel.pop.tasks', { n }))}</small></span><span class="state ${esc(c)}">${esc(l)}</span></label>`;
       const on = s.robots.filter((id) => !hidden.has(id)).length;
-      const subsHTML = s.robots.filter((id) => id !== s.id).map((id) => `<label class="pg-item pg-sub"><input type="checkbox" data-pick-robot="${esc(id)}" data-fk="pr-${esc(id)}"${hidden.has(id) ? '' : ' checked'}>${pill(id, DEF[id].role)}<span class="pg-name">${esc(DEF[id].agent)}</span><span class="state ${esc(robotBadge(id)[0])}">${esc(robotBadge(id)[1])}</span></label>`).join('');
-      return `<label class="pg-item"><input type="checkbox" data-pick-session="${esc(s.id)}" data-fk="ps-${esc(s.id)}"${on === s.robots.length ? ' checked' : ''}${on > 0 && on < s.robots.length ? ' data-mixed' : ''}>${pill(s.id, 'main')}<span class="pg-name">${esc(DEF[s.id].agent)}<small>${esc(tl('panel.chip.robots', { n: s.robots.length }))}</small></span><span class="state ${esc(c)}">${esc(l)}</span></label>${subsHTML}`;
+      const subsHTML = s.robots.filter((id) => id !== s.id).map((id) => `<label class="pg-item pg-sub"><input type="checkbox" data-pick-robot="${esc(id)}" data-fk="pr-${esc(id)}"${hidden.has(id) ? '' : ' checked'}>${pill(id, DEF[id].role)}<span class="pg-name"><span class="pg-nm" title="${esc(DEF[id].agent)}">${esc(DEF[id].agent)}</span></span><span class="state ${esc(robotBadge(id)[0])}">${esc(robotBadge(id)[1])}</span></label>`).join('');
+      return `<label class="pg-item"><input type="checkbox" data-pick-session="${esc(s.id)}" data-fk="ps-${esc(s.id)}"${on === s.robots.length ? ' checked' : ''}${on > 0 && on < s.robots.length ? ' data-mixed' : ''}>${pill(s.id, 'main')}<span class="pg-name"><span class="pg-nm" title="${esc(DEF[s.id].agent)}">${esc(DEF[s.id].agent)}</span><small>${esc(tl('panel.chip.robots', { n: s.robots.length }))}</small></span><span class="state ${esc(c)}">${esc(l)}</span></label>${subsHTML}`;
     };
-    body.innerHTML = `<div class="pop-groups">${groups.map(([r, list]) => `<p class="pg-label">${esc(r.name)}</p>${list.map(rowHTML).join('')}`).join('') || `<p class="pop-none">${esc(tl('panel.pop.none'))}</p>`}</div>`;
+    body.innerHTML = `<div class="pop-groups">${groups.map(([r, list]) => `<p class="pg-label" title="${esc(r.name)}">${esc(r.name)}</p>${list.map(rowHTML).join('')}`).join('') || `<p class="pop-none">${esc(tl('panel.pop.none'))}</p>`}</div>`;
     body.querySelectorAll('[data-mixed]').forEach((x) => { x.indeterminate = true; });
     const total = isLog ? ROBOT_DEFS.filter((d) => inScope(projectOfRobot(d.id))).length : sess.length;
     const shown = isLog ? ROBOT_DEFS.filter((d) => inScope(projectOfRobot(d.id)) && !hidden.has(d.id)).length : sess.filter((s) => !hidden.has(s.id)).length;
@@ -10181,8 +10184,8 @@ function notifyViewing(kind, ref) {
 function notifyOpen(kind, ref) {
   try { window.focus(); } catch (err) { /* the OS may keep it behind */ }
   if (kind === 'done' || kind === 'idle') { NOTIFY.opened.set(ref.who, Date.now()); if (DEF[ref.who]) selectRobot(ref.who, document.getElementById('scene-canvas')); }
-  else if (kind === 'perm') openTaskBoard(null, ref.task || `perm:${ref.id}`);
-  else { tb.waitView = true; openTaskBoard(null); }
+  else if (kind === 'perm') { scopeToWaits([ref.who]); openTaskBoard(null, ref.task || `perm:${ref.id}`); }
+  else openWaitBoard(null, [ref]);   // 53-waits.js: its project chosen
 }
 /* The one place a notification is made. */
 function notifyOut(key, body, onClick, title = 'jui viz') {
@@ -10524,7 +10527,7 @@ function renderDenialStrip() {
 function onDenialClick(e) {
   const where = e.currentTarget.dataset.dwhere !== undefined ? e.currentTarget.dataset.dwhere : e.currentTarget.id === 'denied-strip' ? 'b' : '';   // h: the 応答の履歴 tab
   const ask = e.target.closest('[data-dask]'), go = e.target.closest('[data-dgo]'), back = e.target.closest('[data-dback]'), dismiss = e.target.closest('[data-ddismiss]');
-  const repaint = () => { renderDenials(); if (typeof tb !== 'undefined' && tb.open) renderDenialStrip(); if (typeof histCardsPaint === 'function') histCardsPaint(); };
+  const repaint = () => { renderDenials(); if (typeof tb !== 'undefined' && tb.open) renderDenialStrip(); if (typeof histCardsPaint === 'function') histCardsPaint(); if (typeof cardWaitPanePaint === 'function') cardWaitPanePaint(); };
   if (ask) {
     DEN.asking = `${ask.dataset.dask}|${where}`; DEN.askedAt = Date.now(); repaint();
     const btn = e.currentTarget.querySelector(`[data-dgo="${CSS.escape(ask.dataset.dask)}"]`);
@@ -10548,7 +10551,7 @@ function onDenialClick(e) {
   }
 }
 for (const id of ['denied', 'denied-strip']) $(id).addEventListener('click', onDenialClick);
-$('chip-denied').addEventListener('click', (e) => { tb.waitView = true; openTaskBoard(e.currentTarget); });
+$('chip-denied').addEventListener('click', (e) => openWaitBoard(e.currentTarget, WAITS_OF.denied()));   // 53-waits.js
 // ---- web/js/52-data-docs.js ----
 /* ---------- the data server's sheet (requester, 10-19; 2.3.5): a JsonUI room's API and DB specifications ----------
    Opened by pressing the rack (40-scene.js, kind 'data'). Read from the server then (SOURCE.dataDocs: POST
@@ -10732,6 +10735,30 @@ function waitSync(R) {
   R.waitEl.hidden = false;
 }
 function waitDrop(R) { if (R.waitEl) { R.waitEl.remove(); R.waitEl = null; } }
+/* Before a wait is shown on the board or the panel (requester 10-24: 「質問系でボードに移動する時はその質問をしてる
+   プロジェクト選択状態にして」 and 「複数プロジェクト待ちの時は全てのプロジェクト選択状態にして」, ticket
+   2026-10-24-viz-wait-to-board-keeps-the-wrong-project): the project the waits are in — one project: it; two or more:
+   すべて — so what was pressed for is on screen, not a board of another project saying it is elsewhere. Every way from a
+   wait to the board or the panel goes through here: the header's chips, the block's sum and its pane's ボードで見る,
+   a notification, a robot's bubble. */
+const WAITS_OF = {
+  perm: () => ((latestModel && latestModel.pending) || []).filter((p) => p.status === 'pending'),
+  ask: () => questionsWaiting(),
+  denied: () => denialsWaiting(),
+};
+const waitsAll = () => [...WAITS_OF.perm(), ...WAITS_OF.ask(), ...WAITS_OF.denied()];
+function scopeToWaits(whos) {
+  const ps = [...new Set(whos.map((w) => projectOfRobot(w)).filter(Boolean))];
+  if (!ps.length) return;
+  const want = ps.length === 1 ? ps[0] : 'all';
+  if (UI.project !== want) setProject(want, { camera: false });
+}
+/* The board's waiting strip, for these waits (their project chosen first). */
+function openWaitBoard(opener, waits) {
+  scopeToWaits(waits.map((x) => x.who));
+  tb.waitView = true;
+  openTaskBoard(opener);
+}
 /* A press on a bubble: the panel's card of that wait, scrolled to and focused (the side panel opened first), or the
    session's talk. WAIT.picked says what was picked (the e2e reads it). */
 function waitOpen(id, kind) {
@@ -10742,6 +10769,7 @@ function waitOpen(id, kind) {
     requestAnimationFrame(talk);
     return;
   }
+  if (kind !== 'input') scopeToWaits([id]);   // its project: the panel shows the project chosen
   if (!sideOpen) { sideOpen = true; applySide(); }
   let el = null, card = null;
   if (kind === 'ask') {
@@ -10791,7 +10819,7 @@ $('chip-input').addEventListener('click', () => {
    the chips do). Where the card is the page's width (a phone's sheet, or the card widened to the whole stage) the block
    has no room beside it: the count goes in the card's head row as a badge that opens the same board. Something new moves
    once (not under reduced motion). */
-const CARD_WAITS = { seen: new Set(), sig: '' };
+const CARD_WAITS = { seen: new Set(), sig: '', open: null };   // open: the robot whose waits the pane shows
 const RBW_SUM = { perm: 'rbw.sum.perm', ask: 'rbw.sum.ask', denied: 'rbw.sum.denied' };
 const RBW_KIND = { perm: 'rbw.kind.perm', ask: 'rbw.kind.ask', denied: 'rbw.kind.denied' };
 const rbwSum = (counts) => ['perm', 'ask', 'denied'].filter((k) => counts[k]).map((k) => tl(RBW_SUM[k], { n: counts[k] })).join(' · ');
@@ -10799,9 +10827,9 @@ const rbwKinds = (ks) => ks.map((x) => tl(RBW_KIND[x])).join(tl('rbw.sep'));
 const CARD_WAIT_MAX = 6;   // robots listed; the rest said as ほか N
 function cardWaitItems() {
   const own = rbState.id, out = [];
-  for (const p of (latestModel && latestModel.pending) || []) if (p.who !== own && p.status === 'pending') out.push({ kind: 'perm', who: p.who, key: `p:${p.id}` });
-  for (const d of denialsWaiting()) if (d.who !== own) out.push({ kind: 'denied', who: d.who, key: `d:${d.id}` });
-  for (const q of questionsWaiting()) if (q.who !== own) out.push({ kind: 'ask', who: q.who, key: `q:${q.id}` });
+  for (const p of (latestModel && latestModel.pending) || []) if (p.who !== own && p.status === 'pending') out.push({ kind: 'perm', who: p.who, key: `p:${p.id}`, it: p });
+  for (const d of denialsWaiting()) if (d.who !== own) out.push({ kind: 'denied', who: d.who, key: `d:${d.id}`, it: d });
+  for (const q of questionsWaiting()) if (q.who !== own) out.push({ kind: 'ask', who: q.who, key: `q:${q.id}`, it: q });
   return out.filter((x) => DEF[x.who]);
 }
 /* Beside the card (its left edge, its top), or in its head (no room). */
@@ -10827,7 +10855,7 @@ function cardWaits() {
       setHTML(box, `<p class="rbw-title">${esc(tl('rbw.title'))}</p><button type="button" class="rbw-sum" data-rbw-board data-fk="rbw-board">${esc(sum)}</button>`
         + `<ul class="rbw-list">${robots.slice(0, CARD_WAIT_MAX).map((id) => {
           const ks = kindsOf(id), k = ks[0] === 'ask' ? 'ask' : 'perm';
-          return `<li><button type="button" class="rbw-robot${newWho.has(id) ? ' rbw-new' : ''}" data-rbw-robot="${esc(id)}" data-rbw-kind="${esc(k)}" data-fk="rbw-${esc(id)}" title="${esc(tl('rbw.open', { name: DEF[id].title || DEF[id].agent || id, what: rbwKinds(ks) }))}">${pill(id, DEF[id].role)}${DEF[id].title ? `<span class="rbw-name">${esc(DEF[id].title)}</span>` : ''}<span>${esc(rbwKinds(ks))}</span></button></li>`;
+          return `<li><button type="button" class="rbw-robot${newWho.has(id) ? ' rbw-new' : ''}" data-rbw-robot="${esc(id)}" data-rbw-kind="${esc(k)}" data-fk="rbw-${esc(id)}" aria-controls="rb-wait-pane" aria-expanded="false" title="${esc(tl('rbw.open', { name: DEF[id].title || DEF[id].agent || id, what: rbwKinds(ks) }))}">${pill(id, DEF[id].role)}${DEF[id].title ? `<span class="rbw-name">${esc(DEF[id].title)}</span>` : ''}<span>${esc(rbwKinds(ks))}</span></button></li>`;
         }).join('')}${robots.length > CARD_WAIT_MAX ? `<li class="rbw-more">${esc(tl('rbw.more', { n: robots.length - CARD_WAIT_MAX }))}</li>` : ''}</ul>`);
       if (fresh.length) { box.classList.remove('rbw-arrive'); void box.offsetWidth; box.classList.add('rbw-arrive'); }
     }
@@ -10841,18 +10869,150 @@ function cardWaits() {
     const n = items.length, want = head && n ? tl('rbw.badge', { n }) : '';
     if (slot.dataset.n !== String(head ? n : 0)) {
       slot.dataset.n = String(head ? n : 0);
-      setHTML(slot, want ? `<button type="button" class="rbw-badge${fresh.length ? ' rbw-new' : ''}" data-rbw-board data-fk="rbw-badge" title="${esc(rbwSum(counts))}">${esc(want)}</button>` : '');
+      setHTML(slot, want ? `<button type="button" class="rbw-badge${fresh.length ? ' rbw-new' : ''}" data-rbw-pane data-fk="rbw-badge" aria-controls="rb-wait-pane" aria-expanded="false" title="${esc(rbwSum(counts))}">${esc(want)}</button>` : '');
     }
   }
+  cardWaitPanePaint();
+}
+/* ---------- answering a wait where it is listed (requester 10-24: 「ここでも該当の質問クリックで質問が開いてそこで回答
+   できるようにして」, ticket 2026-10-24-viz-card-waits-answer-in-place) ----------
+   A robot's row opens its waits in a pane under the block — the panel's own cards: a question's choices, free answer and
+   send (questionHTML), a permission's tool, what it asks and allow / deny (permBox), a stopped call's (denialHTML) —
+   answered through the same calls (SOURCE.answerQuestion, decide, SOURCE.denial). The open card stays and the camera
+   does not move. Everything is drawn from the one state, so a wait answered anywhere (here, the panel, the board) goes
+   from every place at once; the pane follows, and closes when its robot waits on nothing more. The row again, its ×
+   or Esc closes it. Where the card is the page's width the head's badge opens it, listing the robots first. */
+const paneEl = $('rb-wait-pane');
+const paneItemSig = (x) => (x.kind === 'ask' ? [x.key, x.it.status, x.it.hookWaiting, x.it.tooLongToShow, x.it.released, x.it.waitEnded]
+  : x.kind === 'perm' ? [x.key, x.it.status, x.it.tooLongToShow, x.it.can]
+    : [x.key, x.it.status, x.it.reason, x.it.input, x.it.reply, denialTarget(x.it).why]);
+const paneItemHTML = (x) => (x.kind === 'ask' ? questionHTML(x.it, 'w')
+  : x.kind === 'perm' ? `<article class="qcard pcard rbwp-perm" data-rbwp-perm="${esc(x.it.id)}"><header class="qwho">${pill(x.who, DEF[x.who].role)}<span>${esc(DEF[x.who].agent)}</span><span class="dtag">${esc(tl('rbw.kind.perm'))}</span></header>${permBox(x.it, 'w')}</article>`
+    : denialHTML(x.it, 'w'));
+function paneRobotsHTML(robots, who, items) {
+  return `<ul class="rbw-list rbwp-robots">${robots.map((id) => `<li><button type="button" class="rbw-robot" data-rbwp-robot="${esc(id)}" data-fk="rbwp-${esc(id)}" aria-controls="rb-wait-pane" aria-expanded="${id === who}">${pill(id, DEF[id].role)}${DEF[id].title ? `<span class="rbw-name">${esc(DEF[id].title)}</span>` : ''}<span>${esc(rbwKinds(['perm', 'denied', 'ask'].filter((k) => items.some((x) => x.who === id && x.kind === k))))}</span></button></li>`).join('')}</ul>`;
+}
+function paneHTML(name, head, robots, who, items, mine) {
+  return `<div class="rbwp-head"><p class="rbwp-title">${esc(tl('rbw.pane.title', { name }))}</p>${head ? `<button type="button" class="link-btn" data-rbw-board data-fk="rbwp-board">${esc(tl('rbw.pane.board'))}</button>` : ''}<button type="button" class="rbwp-x" data-rbwp-close data-fk="rbwp-x" aria-label="${esc(tl('rbw.pane.close'))}" title="${esc(tl('rbw.pane.close'))}">×</button></div>`
+    + `${head ? paneRobotsHTML(robots, who, items) : ''}<div class="rbwp-items">${mine.map(paneItemHTML).join('')}</div>`;
+}
+/* Where the keyboard goes when an answer in the pane took its control away: the pane's next control while it stays
+   open, else the block's first row (or the card's ← 3D に戻る when the block has gone too). */
+function cardWaitPaneFocusNext() {
+  if (!paneEl.hidden) return paneEl.querySelector('.rbwp-items input:not([disabled]), .rbwp-items button:not([disabled]), [data-rbwp-close]');
+  const box = $('rb-waits');
+  return (!box.hidden && box.querySelector('[data-rbw-robot], [data-rbw-board]')) || rbEl.querySelector('#rb-close');
+}
+function cardWaitPanePaint() {
+  // the keyboard in the pane before it is drawn again — or dropped from it to the page (a send button disables itself
+  // when pressed, before the answer comes back and the pane is drawn)
+  const a0 = document.activeElement;
+  const had = paneEl.contains(a0) || (CARD_WAITS.keyIn && (!a0 || a0 === document.body));
+  cardWaitPanePaintNow();
+  const a = document.activeElement;
+  if (had && (paneEl.hidden || !paneEl.contains(a) || !a.isConnected)) {
+    const next = cardWaitPaneFocusNext();
+    if (next) next.focus({ preventScroll: true });
+  }
+}
+function cardWaitPanePaintNow() {
+  const head = !!rbState.id && cardWaitInHead();
+  const items = (head || !$('rb-waits').hidden) && rbState.id ? cardWaitItems() : [];
+  const robots = [...new Set(items.map((x) => x.who))];
+  // its robot answered everything: closed (in the head's list, the next robot's waits instead)
+  if (CARD_WAITS.open !== null && !robots.includes(CARD_WAITS.open)) CARD_WAITS.open = head && robots.length ? robots[0] : null;
+  const open = CARD_WAITS.open !== null && items.length > 0;
+  for (const b of document.querySelectorAll('[data-rbw-robot], [data-rbw-pane]')) {
+    const on = open && (b.dataset.rbwPane !== undefined || b.dataset.rbwRobot === CARD_WAITS.open);
+    if (b.getAttribute('aria-expanded') !== String(on)) b.setAttribute('aria-expanded', String(on));
+  }
+  if (!open) { if (!paneEl.hidden) { paneEl.hidden = true; paneEl._sig = null; } CARD_WAITS.open = null; return; }
+  const who = CARD_WAITS.open, mine = items.filter((x) => x.who === who);
+  const name = DEF[who].title || DEF[who].agent || who;
+  paneEl.setAttribute('aria-label', tl('rbw.pane.aria', { name }));
+  // where the block has no room (the card as wide as the page): the robots first, as the block lists them
+  keyed(paneEl, JSON.stringify([NAMES.rev, DEN.asking, head, head ? robots : 0, who, mine.map(paneItemSig)]), () => paneHTML(name, head, head ? robots : [], who, items, mine));
+  for (const card of paneEl.querySelectorAll('[data-qcard]')) questionSendState(card);
+  paneEl.hidden = false;
+  // under the block, its right edge on the block's (left of the card); in the head's case under the card's head row
+  const parent = rbEl.offsetParent || rbEl.parentElement;
+  if (head) {
+    // the card is fixed here (a phone's sheet, or widened over the stage): the pane too, right under the badge, over
+    // the card's body (there is no room beside it), the badge and the head row left in sight
+    const at = (rbEl.querySelector('[data-rbw-pane]') || rbEl.querySelector('.rb-head') || rbEl).getBoundingClientRect(), card = rbEl.getBoundingClientRect();
+    paneEl.classList.add('rbwp-in-head');
+    paneEl.style.top = `${Math.round(at.bottom + 6)}px`;
+    paneEl.style.right = `${Math.round(innerWidth - card.right + 6)}px`;
+    paneEl.style.width = `${Math.max(200, Math.round(card.width - 12))}px`;
+    paneEl.style.maxHeight = `${Math.max(160, Math.round(innerHeight - at.bottom - 18))}px`;
+    return;
+  } else {
+    const box = $('rb-waits');
+    paneEl.classList.remove('rbwp-in-head');
+    const right = parent.clientWidth - rbEl.offsetLeft + 10;
+    paneEl.style.top = `${box.offsetTop + box.offsetHeight + 8}px`;
+    paneEl.style.right = `${right}px`;
+    // the room's list keeps left of the pane at its own height (53-roster.js rosterPlace): the pane leaves it its
+    // width when that still leaves the pane 280; narrower than that, the list goes below the pane instead
+    const roster = document.getElementById('roster');
+    const listW = roster && !roster.hidden && !rosterNarrow() ? roster.getBoundingClientRect().width + 12 + ROSTER_GAP + 4 : 0;
+    const room = parent.clientWidth - right - 12;
+    paneEl.style.width = `${Math.max(220, Math.min(360, room - listW >= 280 ? room - listW : room))}px`;
+  }
+  paneEl.style.maxHeight = `${Math.max(160, parent.clientHeight - paneEl.offsetTop - 12)}px`;
+}
+/* Open (or switch to, or close) the pane for a robot; the focus to its first control, or back to what opened it. */
+function cardWaitPaneToggle(who, from) {
+  CARD_WAITS.open = CARD_WAITS.open === who ? null : who;
+  CARD_WAITS.from = from || null;
+  cardWaitPanePaint();
+  if (CARD_WAITS.open) {
+    const first = paneEl.querySelector('.rbwp-items input:not([disabled]), .rbwp-items button:not([disabled])');
+    (first || paneEl.querySelector('[data-rbwp-close]')).focus({ preventScroll: true });
+  } else if (from && from.isConnected) from.focus({ preventScroll: true });
+}
+function cardWaitPaneClose() {
+  if (CARD_WAITS.open === null) return false;
+  const from = CARD_WAITS.from;
+  CARD_WAITS.open = null;
+  cardWaitPanePaint();
+  if (from && from.isConnected) from.focus({ preventScroll: true });
+  return true;
 }
 function cardWaitClick(e) {
   const r = e.target.closest('[data-rbw-robot]');
-  if (r) { waitOpen(r.dataset.rbwRobot, r.dataset.rbwKind); return; }
+  if (r) { cardWaitPaneToggle(r.dataset.rbwRobot, r); return; }
+  const p = e.target.closest('[data-rbw-pane]');
+  if (p) {
+    const first = cardWaitItems()[0];
+    if (CARD_WAITS.open !== null) cardWaitPaneClose(); else if (first) cardWaitPaneToggle(first.who, p);
+    return;
+  }
   const b = e.target.closest('[data-rbw-board]');
-  if (b) { tb.waitView = true; openTaskBoard(b); }
+  if (b) openWaitBoard(b, cardWaitItems());
 }
 $('rb-waits').addEventListener('click', cardWaitClick);
-rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rbw-board]')) cardWaitClick(e); });
+rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rbw-board], [data-rbw-pane]')) cardWaitClick(e); });
+// whether the keyboard was last in the pane (focus going to the page's body is not leaving it: see cardWaitPanePaint)
+document.addEventListener('focusin', (e) => { CARD_WAITS.keyIn = paneEl.contains(e.target); });
+paneEl.addEventListener('click', (e) => {
+  if (e.target.closest('[data-rbwp-close]')) { cardWaitPaneClose(); return; }
+  const r = e.target.closest('[data-rbwp-robot]');
+  if (r) { CARD_WAITS.open = r.dataset.rbwpRobot; cardWaitPanePaint(); return; }
+  if (e.target.closest('[data-rbw-board]')) { cardWaitPaneClose(); cardWaitClick(e); }
+});
+// the panel's question and stopped-call handlers, on the pane's cards too (the same state, the same sending)
+paneEl.addEventListener('input', onQuestionInput);
+paneEl.addEventListener('click', onQuestionClick);
+paneEl.addEventListener('click', onDenialClick);
+// Esc closes the pane first (the card stays), from inside it or from the row that opened it
+window.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape' || paneEl.hidden) return;
+  const a = document.activeElement;
+  if (!(paneEl.contains(a) || $('rb-waits').contains(a) || (a && a.closest && a.closest('[data-rbw-slot]')) || a === document.body)) return;
+  e.preventDefault(); e.stopPropagation();
+  cardWaitPaneClose();
+}, true);
 window.addEventListener('resize', () => { if (rbState.id) cardWaits(); });
 // ---- web/js/53-roster.js ----
 /* ---------- the room's robot list (ticket 2026-10-23-viz-room-robot-list-show-hide) ----------
@@ -11038,7 +11198,8 @@ function rosterShowCurrent(current) {
    stand where they are, so it is the list that moves (the gate, 2.3.21: the list beside the card lay on their sum and
    robots at 1920; under 1300 px, where app.css leaves the list at the right, on the card itself): to their left
    (--roster-shift), the list keeping its height; where the 3D has no room left of the waits, below them as the parts
-   above (under them on a short page the list had no height left: its selected row could not be shown). */
+   above (under them on a short page the list had no height left: its selected row could not be shown). The pane a
+   robot's row opens under the waits (#rb-wait-pane) is kept clear the same way. */
 const ROSTER_AROUND = ['room-solo', 'floor-nav', 'live-error', 'tower-legend', 'tower-weather', 'live-empty'];
 const ROSTER_GAP = 8;
 function rosterPlace(box) {
@@ -11052,11 +11213,13 @@ function rosterPlace(box) {
   let shift = 0, around = ROSTER_AROUND;
   const card = shown(document.querySelector('#rb.show'));
   if (card && card.left < r.right && r.left < card.right) shift = Math.max(0, r.right - (card.left - ROSTER_GAP));
-  const w = shown(document.getElementById('rb-waits'));
-  if (w && w.left < r.right - shift && r.left - shift < w.right) {
-    const want = r.right - (w.left - ROSTER_GAP);   // the list's right edge left of the waits
-    if (r.left - want >= S.left + 12) shift = want;
-    else around = [...ROSTER_AROUND, 'rb-waits'];
+  // the waits, and a robot's waits opened under them (#rb-wait-pane, wider than the block): left of both, or below
+  for (const id of ['rb-waits', 'rb-wait-pane']) {
+    const w = shown(document.getElementById(id));
+    if (!(w && w.left < r.right - shift && r.left - shift < w.right)) continue;
+    const want = r.right - (w.left - ROSTER_GAP);   // the list's right edge left of it
+    if (r.left - want >= S.left + 12) shift = Math.max(shift, want);
+    else around = [...around, id];
   }
   shift = Math.round(shift);
   if (shift !== had) box.style.setProperty('--roster-shift', `${shift}px`);
@@ -11203,14 +11366,38 @@ function devRowHTML(d) {
     ? `<li><button type="button" class="dev-row" data-dev-robot="${esc(label)}" data-dev-id="${esc(d.id)}" data-fk="dev-${esc(d.id)}" title="${esc(tl('dev.row.go', { name: label }))}">${innerRowHTML}</button></li>`
     : `<li><div class="dev-row" data-dev-id="${esc(d.id)}">${innerRowHTML}</div></li>`;
 }
+/* The machine's load as a person reads it (the requester, 10-23: what the "load" at the top stood for was hard to
+   tell): the CPU's busyness as a per cent of its cores (the 1-minute load / the cores) with a bar marked at 100 %, what
+   100 % means, the three load averages in small type with the way they go, the free memory the same way, and the
+   colour rule in words. The bars' colours are the box's own thresholds (sources/machine.py: LOAD_BUSY / LOAD_HIGH,
+   MEM_BUSY / MEM_HIGH). */
+const DEV_CPU = { busy: 70, high: 100, max: 200 }, DEV_MEM = { busy: 25, high: 10 };
+const DEV_TREND = { up: tl('dev.load.trend.up'), down: tl('dev.load.trend.down'), flat: tl('dev.load.trend.flat') };
+const devCpuTone = (pct) => (pct >= DEV_CPU.high ? 'high' : pct >= DEV_CPU.busy ? 'busy' : 'ok');
+const devMemTone = (free) => (free < DEV_MEM.high ? 'high' : free < DEV_MEM.busy ? 'busy' : 'ok');
+// the 1-minute load against the 15-minute one: a tenth either way is a change
+const devTrend = (load) => (load[0] > load[2] * 1.1 ? 'up' : load[0] < load[2] * 0.9 ? 'down' : 'flat');
+function devBarHTML(kind, fill, tone, mark) {
+  const width = `${Math.max(0, Math.min(100, fill))}%`;
+  return `<span class="dev-bar" data-bar="${esc(kind)}" data-tone="${esc(tone)}" aria-hidden="true"><span class="dev-bar-fill" style="width:${esc(width)}"></span>`
+    + (mark != null ? `<span class="dev-bar-mark" style="left:${esc(String(mark) + '%')}"></span>` : '') + '</span>';
+}
 function devLoadHTML(m) {
   if (!m) return `<div class="dev-load"><p>${esc(tl('dev.load.none'))}</p></div>`;
-  const load = Array.isArray(m.load) ? m.load : null, ratio = load && m.cpus ? (load[0] / m.cpus).toFixed(2) : null;
+  const load = Array.isArray(m.load) && m.load.length >= 3 ? m.load : null;
+  const pct = load && m.cpus ? Math.round((load[0] / m.cpus) * 100) : null;
   const gib = m.memTotal ? `${Math.round(m.memTotal / 2 ** 30)} GiB` : '';
-  return `<div class="dev-load" data-load="${esc(m.level || '')}" data-dev-load><p class="dev-level">${esc(DEV_LEVEL[m.level] || tl('dev.level.unknown'))}</p>`
-    + `<p>${esc(tl('dev.load.avg', { values: load ? load.map((x) => x.toFixed(2)).join(' / ') : tl('dev.unknown') }))}${m.cpus ? esc(tl('dev.load.cores', { cpus: String(m.cpus), ratio: String(ratio) })) : ''}</p>`
-    + `<p>${esc(tl('dev.mem.free'))} ${m.memFreePct != null ? `${esc(String(m.memFreePct))} %` : esc(tl('dev.unknown'))}${gib ? esc(tl('dev.mem.total', { total: gib })) : ''}</p>`
-    + `<p class="dev-note">${esc(tl('dev.load.note', { at: new Date(m.at || 0).toTimeString().slice(0, 8) }))}</p></div>`;
+  const free = m.memFreePct != null ? Math.round(m.memFreePct) : null;
+  return `<div class="dev-load" data-load="${esc(m.level || '')}" data-dev-load>`
+    + `<p class="dev-stat" data-dev-cpu="${esc(pct != null ? String(pct) : '')}"><span>${esc(tl('dev.cpu.head', { pct: pct != null ? String(pct) : tl('dev.unknown') }))}</span>`
+    + `<span class="dev-level">${esc(DEV_LEVEL[m.level] || tl('dev.level.unknown'))}</span></p>`
+    + (pct != null ? devBarHTML('cpu', (pct / DEV_CPU.max) * 100, devCpuTone(pct), (DEV_CPU.high / DEV_CPU.max) * 100) : '')
+    + (m.cpus ? `<p class="dev-what" data-dev-what>${esc(tl('dev.cpu.what', { cpus: String(m.cpus) }))}</p>` : '')
+    + (load ? `<p class="dev-note" data-dev-recent>${esc(tl('dev.load.recent', { a: load[0].toFixed(1), b: load[1].toFixed(1), c: load[2].toFixed(1), trend: DEV_TREND[devTrend(load)] }))}</p>` : '')
+    + `<p class="dev-stat" data-dev-mem="${esc(free != null ? String(free) : '')}"><span>${esc(tl('dev.mem.head', { pct: free != null ? String(free) : tl('dev.unknown') }))}${gib ? esc(tl('dev.mem.of', { total: gib })) : ''}</span></p>`
+    + (free != null ? devBarHTML('mem', free, devMemTone(free)) : '')
+    + `<p class="dev-note" data-dev-rule>${esc(tl('dev.load.rule', { cb: String(DEV_CPU.busy), ch: String(DEV_CPU.high), mb: String(DEV_MEM.busy), mh: String(DEV_MEM.high) }))}</p>`
+    + `<p class="dev-note">${esc(tl('dev.load.at', { at: new Date(m.at || 0).toTimeString().slice(0, 8) }))}</p></div>`;
 }
 function renderDevices() {
   const { live, m, devices } = devData();
@@ -13766,6 +13953,56 @@ function srLod(V) {
   V.lod = want; V.near.visible = want === 'near'; V.far.visible = want === 'far';
   V.labelAt = 0;
 }
+/* A tag's width on the page (px) from its text, as the tags are given out (and as 59-sr-flows.js frames the room). */
+function srTagWidth(text) { return 12 + [...text].reduce((a, ch) => a + (ch.charCodeAt(0) > 0x2e7f ? 12 : 7), 0); }
+/* A node's tag as srPlaceLabels writes it, and the point it stands on. */
+function srTagOf(V, p) { return { text: `${p.n.label || p.n.id}${p.n.count > 1 ? ` ×${p.n.count}` : ''}`, at: [p.x, p.y + 1.9, V.flat ? p.z - 0.85 : p.z] }; }
+/* A group's tag's width on the page (px): measured as drawn, in a hidden tag of its own kind beside the others (its font, padding and
+   border; beside the tags' pool, so nothing reading the tags shown counts it), once a text while the fonts are in. Not srTagWidth's estimate: that is wider than the tag, and where the inner floors'
+   tags sit a few px apart it left one out; nor a canvas's measureText, which reads the CJK in another font than the page. */
+const SR_GROUP_TAG_W = new Map();
+function srGroupTagWidth(V, text) {
+  const got = SR_GROUP_TAG_W.get(text);
+  if (got) return got;
+  const stage = V.labels && V.labels[0] && V.labels[0].parentNode && V.labels[0].parentNode.parentNode;   // beside #sr-labels, not in it
+  if (!stage) return srTagWidth(text);
+  let m = V.tagRuler;
+  if (!m || !m.isConnected) {
+    m = V.tagRuler = document.createElement('span');
+    m.className = 'sr-label'; m.dataset.kind = 'group'; m.style.visibility = 'hidden'; m.setAttribute('aria-hidden', 'true');
+    stage.append(m);
+  }
+  m.textContent = text;
+  const wd = Math.ceil(m.getBoundingClientRect().width);
+  if (!wd) return srTagWidth(text);   // not laid out (the room hidden): the estimate, not kept
+  if (document.fonts.status === 'loaded') SR_GROUP_TAG_W.set(text, wd);
+  return wd;
+}
+/* The groups' tags up close, as given out (srPlaceLabels) and as the flow frames the room (59-sr-flows.js): each from its floor's
+   corner rightward, inside the floor. A nested floor's head is shorter on the page than a tag, so a floor's tag and its inner
+   floors' would cover each other: given out nearest first (an inner floor's corner is the nearer where the two meet), a tag that
+   would cover one already given out stands a row higher (up to two rows) over its corner, else it is left out. In view only,
+   the ones out of it listed apart. */
+function srGroupTagBoxes(V) {
+  const cam = V.camera, w = V.renderer.domElement.clientWidth, h = V.renderer.domElement.clientHeight, v = new THREE.Vector3(), boxes = [], outside = [];
+  const floors = V.L.floors.filter((G) => G.g.id && !(V.migFloorShown && !V.migFloorShown.includes(G.g.id))).map((G) => {
+    const at = [G.x + 0.15, 0.2 + G.level * 0.06, G.z + 0.5];
+    v.set(...at).project(cam);
+    return { G, text: G.g.label || G.g.id, sx: (v.x + 1) / 2 * w, sy: (1 - v.y) / 2 * h, z: v.z, d: cam.position.distanceToSquared(new THREE.Vector3(...at)) };
+  });
+  floors.sort((a, b) => a.d - b.d);
+  for (const f of floors) {
+    const wd = srGroupTagWidth(V, f.text);
+    if (f.z < -1 || f.z > 1 || f.sx < -0.05 * w || f.sx > 1.05 * w || f.sy < -0.05 * h || f.sy > 1.05 * h) { outside.push({ ...f, box: [f.sx, f.sy - 20, f.sx + wd, f.sy] }); continue; }
+    for (let row = 0; row < 3; row++) {
+      const b = [f.sx, f.sy - 20 * (row + 1), f.sx + wd, f.sy - 20 * row];
+      if (boxes.some((q) => b[0] < q.box[2] && b[2] > q.box[0] && b[1] < q.box[3] && b[3] > q.box[1])) continue;
+      boxes.push({ ...f, row, box: b });
+      break;
+    }
+  }
+  return { boxes, outside };
+}
 function srPlaceLabels(V) {
   const cam = V.camera, w = V.renderer.domElement.clientWidth, h = V.renderer.domElement.clientHeight, v = new THREE.Vector3(), out = [];
   const consider = (x, y, z, text, kind, weight, n = null) => {
@@ -13776,8 +14013,8 @@ function srPlaceLabels(V) {
   if (V.lod === 'far') {
     for (const G of V.L.tops) consider(G.x + G.w / 2, G.boxH + 0.8, G.z + G.d / 2, `${G.g.label || G.g.id} · ${G.nodeCount}`, 'group', 1);
   } else {
-    for (const G of V.L.floors) if (G.g.id && !(V.migFloorShown && !V.migFloorShown.includes(G.g.id))) consider(G.x + 0.6, 0.2 + G.level * 0.06, G.z + 0.5, G.g.label || G.g.id, 'group', 0.6);
-    for (const p of V.L.pos.values()) if (!p.hiddenIn && !srMigHides(p.n.id) && !(SR.reach && !SR.reach.ids.has(p.n.id))) consider(p.x, p.y + 1.9, V.flat ? p.z - 0.85 : p.z, `${p.n.label || p.n.id}${p.n.count > 1 ? ` ×${p.n.count}` : ''}`, p.external ? 'external' : 'node', 1, p.n);
+    for (const t of srGroupTagBoxes(V).boxes) out.push({ sx: t.box[0], sy: t.box[3], text: t.text, kind: 'group', n: null, d: t.d, box: t.box });
+    for (const p of V.L.pos.values()) if (!p.hiddenIn && !srMigHides(p.n.id) && !srFlowHides(p.n.id) && !(SR.reach && !SR.reach.ids.has(p.n.id))) { const t = srTagOf(V, p); consider(...t.at, t.text, p.external ? 'external' : 'node', 1, p.n); }
   }
   // up close (§5): how many nodes are in view decides the look, with room between going in and coming back
   const inView = out.filter((o) => o.n).length;
@@ -13791,7 +14028,8 @@ function srPlaceLabels(V) {
   const groups = out.filter((o) => o.kind === 'group').slice(0, SR.labels.max - SR.labels.nodes);
   const rest = out.filter((o) => o.kind !== 'group').slice(0, SR.labels.nodes);
   const placed = [], clear = (o) => {   // a label that would cover one already given out is left out (its width from its text)
-    const wd = 12 + [...o.text].reduce((a, ch) => a + (ch.charCodeAt(0) > 0x2e7f ? 12 : 7), 0), b = [o.sx - wd / 2, o.sy - 20, o.sx + wd / 2, o.sy];
+    // a group's tag up close: where srGroupTagBoxes gave it out (from its floor's corner rightward); far, over its box's middle
+    const wd = srTagWidth(o.text), b = o.box || [o.sx - wd / 2, o.sy - 20, o.sx + wd / 2, o.sy];
     if (placed.some((q) => b[0] < q[2] && b[2] > q[0] && b[1] < q[3] && b[3] > q[1])) return false;
     placed.push(b); return true;
   };
@@ -13801,7 +14039,7 @@ function srPlaceLabels(V) {
     if (!o) { s.hidden = true; return; }
     s.hidden = false; s.dataset.kind = o.kind; s.dataset.node = o.n ? o.n.id : '';
     if (s.textContent !== o.text) s.textContent = o.text;
-    s.style.transform = `translate(${Math.round(o.sx)}px, ${Math.round(o.sy)}px) translate(-50%, -100%)`;
+    s.style.transform = `translate(${Math.round(o.sx)}px, ${Math.round(o.sy)}px) translate(${o.box ? '0' : '-50%'}, -100%)`;   // a group's tag from its floor's corner, inside it
   });
   V.shownLabels = shown.length;
 }
@@ -13824,6 +14062,7 @@ function srCablesReroute(V) {
   srCablesRefill(V.crossLines, cross);
   srFocusLines(V);
   if (V.migEdges && typeof srMigApply === 'function') srMigApply(V, true);
+  if (V.flowHidden && V.flowHidden.size) srFlowShowApply(V, true);   // a flow playing: its hidden nodes' cables again (59-sr-flows.js)
   V.reroutes = (V.reroutes || 0) + 1; V.rerouteMs = Math.round(srNow() - t0);   // how often and how long (the e2e reads it)
 }
 /* The room's icons: per node the strongest key the settings give (service → provider → category), an image plane above it. */
@@ -13882,7 +14121,7 @@ function srFocusLines(V) {
   const ids = new Set([SR.selected, SR.hover].filter(Boolean)), plain = [], cross = [], reach = SR.reach ? SR.reach.edges : null;
   if (ids.size || reach) {
     for (const e of V.L.edges) {
-      if ((!ids.has(e.from) && !ids.has(e.to) && !(reach && reach.has(e))) || srMigEdgeHidden(e)) continue;
+      if ((!ids.has(e.from) && !ids.has(e.to) && !(reach && reach.has(e))) || srMigEdgeHidden(e) || srFlowEdgeHidden(e)) continue;
       (e.crossProvider ? cross : plain).push(srCablePath(V, e).map((q) => [q[0], q[1] + 0.02, q[2]]));   // a hair over its faint twin
     }
   }
@@ -15490,7 +15729,7 @@ rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rb-talk]') &
    The model's flows (infra/flows.py checked them: every move leaves the node the flow is at). A node that starts a
    flow drawn now carries a small green cone; choosing the node lists its flows on the board, and a flow chosen plays:
    - light runs through each move's edge, a bright head and a fading tail inside the cable (requester 10-22: 「ボールが跳ねる
-     んじゃなくて同線に光が流れていくイメージで」), and the node it reaches glows; a toast over that node says what happened
+     んじゃなくて同線に光が流れていくイメージで」), and the node it reaches glows; a row in the side bar says what happened
      (the action's mark and verb after the node's name: 「💾 d1 に保存」, the step's label on a second line), and the
      first one says what started it (the trigger's mark: 👤 ⏰ 📡 ⚡, with a schedule as written);
    - a branch stops the light: its choices are buttons over the node, the first edge of each glows faintly ahead, and
@@ -15498,15 +15737,48 @@ rbEl.addEventListener('click', (e) => { if (e.target.closest('[data-rb-talk]') &
      elsewhere), join goes on at that step; the choices taken are listed (「KV に結果が有る？ → 無い」);
    - lanes side by side run at once, and the flow goes on when all of them are done;
    - play / pause, one step on, one step back (to a branch: choose again), stop; the speed one of SR_FLOW_SPEEDS,
-     changed while it plays (the light and the toasts go by the same clock).
-   A rebuild of the 3D (the environment, the clouds chosen, the theme) stops the flow playing: its light and toasts
+     changed while it plays (the light and the rests go by the same clock).
+   A rebuild of the 3D (the environment, the clouds chosen, the theme) stops the flow playing: its light and side bar
    belonged to the 3D that went.
+   The pace (ticket 2026-10-23-viz-sr-flow-replay-pace-and-focus; requester 10-23: 「遠いところの移動が目が追いつかない。
+   距離/sで設定して / スピード調整が欲しい。0.5-3.0くらいで / 各喉についた時にそれぞれ少し留まって欲しい。 / 再生中は関係ない
+   ノードは消して欲しい」):
+   - the light goes SR_FLOW.unitsPerSec world units a second along its cable, so a long cable takes longer; the speed
+     0.5–3.0 by 0.25, kept per room (srFlowPref) with which nodes are shown;
+   - at each node it reaches it rests SR_FLOW.restMs (÷ the speed); a branch, once chosen, rests twice that with the
+     chosen way's first cable lit;
+   - the nodes shown (SR_FLOW_SHOWS): all, now (the moves' two ends, where the light is, a branch's first cables),
+     seen (passed so far, and now) or flow (every node the flow names, its gotos' too). A node not shown loses its
+     shape, icon, model, tag, cone and cables; the floors stay, faint, as a map (srFlowShowApply);
+   - the camera follows a light about to leave the page (SR_FLOW.follow), at the same distance, never while the whole
+     room is in view.
+   The words (requester 10-24: 「3d/2dのオブジェクト上に文字が出るのみづらいからサイドに光に合わせて順番に履歴として出て
+   それが下矢印で繋がっていく感じにしようか / 選択肢を選ぶのもそのサイドバーで選ぶ」): nothing is written over the room;
+   each step is a row of the side bar left of it (#sr-route), joined to the one before by a down arrow, the newest the
+   current one (its .sr-rt-step marked current), pressed to choose its node; a branch's ways are chosen under the last row.
    SR_ACTIONS and SR_TRIGGERS are the schema's x-label / x-icon (test_viz_bundle holds them to the schema). */
-const SR_FLOW_SPEEDS = [0.5, 1.0, 1.5, 2.0, 3.0, 5.0, 10.0];
+const SR_FLOW_SPEEDS = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0];
+const SR_FLOW_SHOWS = { all: [tl('sr.flow.show.all'), tl('sr.flow.show.all.title')], now: [tl('sr.flow.show.now'), tl('sr.flow.show.now.title')],
+  seen: [tl('sr.flow.show.seen'), tl('sr.flow.show.seen.title')], flow: [tl('sr.flow.show.flow'), tl('sr.flow.show.flow.title')] };
 const SR_ACTIONS = { request: ['→', tl('sr.flow.action.request')], response: ['←', tl('sr.flow.action.response')], read: ['📖', tl('sr.flow.action.read')], write: ['💾', tl('sr.flow.action.write')], upload: ['⬆', tl('sr.flow.action.upload')], download: ['⬇', tl('sr.flow.action.download')], invoke: ['⚡', tl('sr.flow.action.invoke')], enqueue: ['📥', tl('sr.flow.action.enqueue')], dequeue: ['📤', tl('sr.flow.action.dequeue')], publish: ['📣', tl('sr.flow.action.publish')], subscribe: ['📡', tl('sr.flow.action.subscribe')], auth: ['🔑', tl('sr.flow.action.auth')], schedule: ['⏰', tl('sr.flow.action.schedule')] };
 const SR_TRIGGERS = { user: ['👤', tl('sr.flow.trigger.user')], device: ['📡', tl('sr.flow.trigger.device')], schedule: ['⏰', tl('sr.flow.trigger.schedule')], event: ['⚡', tl('sr.flow.trigger.event')] };
 const SR_FLOW_STATE = { play: tl('sr.flow.state.play'), pause: tl('sr.flow.state.pause'), branch: tl('sr.flow.state.branch'), done: tl('sr.flow.state.done') };
-const SR_FLOW = { speed: 1.0, auto: false, moveMs: 900, nodeMs: 450, toastMs: 2600, player: null };
+// follow: the light past `out` of the page's half (NDC) starts the camera after it, back inside `in` it stops; `ms` how
+// quickly it catches up. frame: how much of the seen part of the room its shapes and tags fill when it is framed again
+// beside the side bar (srFlowFrameRoom)
+const SR_FLOW = { speed: 1.0, auto: false, unitsPerSec: 10, restMs: 400, branchRest: 2, nodeMs: 450, show: 'flow', floorFade: 0.6,
+  follow: { out: 0.8, in: 0.45, ms: 280 }, frame: 0.8, player: null };
+
+/* Speed and the nodes shown, per room: {project: {speed, show}} in the page's own storage. */
+function srFlowPref() {
+  try { const all = JSON.parse(readPref('srFlow', '{}')) || {}; return all[SR.project] || {}; } catch (err) { return {}; }
+}
+function srFlowPrefSet(key, value) {
+  let all = {};
+  try { all = JSON.parse(readPref('srFlow', '{}')) || {}; } catch (err) { all = {}; }
+  all[SR.project] = { ...(all[SR.project] || {}), [key]: value };
+  writePref('srFlow', JSON.stringify(all));
+}
 
 function srFlowsOf(V) {
   const flows = (SR.model && SR.model.flows) || [];
@@ -15523,6 +15795,9 @@ function srFlowPos(V, id) {
 
 /* After each build: the cones over the nodes that start a flow drawn now, and the layers the player draws on. */
 function srFlowBuild(V) {
+  const pref = srFlowPref();
+  SR_FLOW.speed = SR_FLOW_SPEEDS.includes(pref.speed) ? pref.speed : 1.0;
+  SR_FLOW.show = SR_FLOW_SHOWS[pref.show] ? pref.show : 'flow';
   V.flowStarts = [...new Set(srFlowsOf(V).map((f) => f.start))];
   V.flowLayer = new THREE.Group();
   V.near.add(V.flowLayer);
@@ -15550,26 +15825,56 @@ function srFlowPlay(id) {
   const V = SR.view, flow = V && srFlowsOf(V).find((f) => f.id === id);
   if (!flow) return false;
   srFlowStop();
+  // departs / reached / chose: where and when (the e2e reads the pace and the rests from them)
   const P = SR_FLOW.player = { flow, frames: [{ steps: flow.steps, i: 0 }], pos: flow.start, state: 'play', anim: null, history: [],
-    chosen: [], toasts: [], lights: [], branch: null, arrivals: [], reached: [], log: [], dirty: true };
+    chosen: [], lights: [], branch: null, arrivals: [], reached: [], departs: [], chose: [], log: [], dirty: true,
+    all: srFlowNodesOf(flow), seen: new Set([flow.start]) };
   const t = SR_TRIGGERS[flow.trigger] || SR_TRIGGERS.user;
+  $('sr-route-list').replaceChildren();
+  $('sr-route-title').textContent = `${t[0]} ${flow.label || flow.id}`;
+  // the side bar takes its column from the room: a room seen whole stays whole, its shapes and tags in what is left of
+  // the room above the player's bar (srFit frames the 3D by its height alone, and a node's middle in view can be a tag
+  // cut by the page's edge: the requester's stills at 900 wide)
+  const whole = srFlowWhole(V);
+  $('sr-route').hidden = false;
+  srResize(V);
+  srFlowRenderBar();
+  if (whole && srFlowRoomOut(V).length) srFlowFrameRoom(V);
   srFlowToast(P, flow.start, `${t[0]} ${flow.label || flow.id}`, flow.schedule || t[1]);
   srFlowGlow(P, flow.start);
   srFlowRenderBar();
+  srFlowShowApply(V);
   return true;
+}
+/* Every node a flow names: its start, each step's, every branch's and lane's, and the flows a choice goes to. */
+function srFlowNodesOf(flow, out = new Set(), done = new Set()) {
+  if (!flow || done.has(flow.id)) return out;
+  done.add(flow.id);
+  out.add(flow.start);
+  const walk = (steps) => {
+    for (const s of steps || []) {
+      for (const k of ['from', 'to', 'at', 'node']) if (s[k]) out.add(s[k]);
+      if (s.branch) for (const c of s.branch.choices) { walk(c.steps); if (c.goto) srFlowNodesOf(srFlowsOf(SR.view).find((f) => f.id === c.goto), out, done); }
+      if (s.parallel) for (const lane of s.parallel) walk(lane);
+    }
+  };
+  walk(flow.steps);
+  return out;
 }
 function srFlowStop() {
   const P = SR_FLOW.player;
   if (!P) return;
-  for (const x of P.toasts) x.el.remove();
+  $('sr-route-list').replaceChildren();
+  $('sr-route').hidden = true;
   const layer = SR.view && SR.view.flowLayer;
   if (layer) for (const o of [...layer.children]) if (!o.userData.flowStarts) { layer.remove(o); if (o.userData.flowLight) srFlowLightDispose(o); else if (o.geometry) o.geometry.dispose(); }
   SR_FLOW.player = null;
   $('sr-choices').hidden = true;
   srFlowRenderBar();
+  if (SR.view && SR.view.flowLayer) srFlowShowApply(SR.view);   // every node drawn again
 }
 function srFlowSnapshot(P) {
-  return { flow: P.flow, frames: P.frames.map((f) => ({ steps: f.steps, i: f.i })), pos: P.pos, chosen: P.chosen.slice() };
+  return { flow: P.flow, frames: P.frames.map((f) => ({ steps: f.steps, i: f.i })), pos: P.pos, chosen: P.chosen.slice(), seen: new Set(P.seen), rows: P.log.length };
 }
 /* Take the next step (or wait at a branch). One step at a time: the frame loop calls it when the last one is done. */
 function srFlowNext(P) {
@@ -15589,7 +15894,7 @@ function srFlowNext(P) {
       return;
     }
     if (step.from && step.to) { P.anim = srFlowMove(P, step); return; }
-    if (step.at || step.node) { srFlowSay(P, step, step.at || step.node); P.anim = { kind: 'wait', left: SR_FLOW.nodeMs }; return; }
+    if (step.at || step.node) { srFlowSay(P, step, step.at || step.node); P.anim = { kind: 'wait', left: SR_FLOW.nodeMs, at: step.at || step.node }; return; }
   }
 }
 /* A lane plays its moves and node steps (a branch inside a lane takes its default, else its first choice). */
@@ -15607,13 +15912,16 @@ function srFlowLaneNext(P, L) {
   L.k += 1;
   if (!s) { L.anim = null; L.done = true; return; }
   if (s.from && s.to) L.anim = srFlowMove(P, s);
-  else { srFlowSay(P, s, s.at || s.node); L.anim = { kind: 'wait', left: SR_FLOW.nodeMs }; }
+  else { srFlowSay(P, s, s.at || s.node); L.anim = { kind: 'wait', left: SR_FLOW.nodeMs, at: s.at || s.node }; }
 }
+/* A move takes its cable's length at SR_FLOW.unitsPerSec (at 1.0), then rests at the node it reached (rest: ms left). */
 function srFlowMove(P, step) {
   const V = SR.view, light = srFlowLight(V, step.from, step.to);
   V.flowLayer.add(light);
   P.lights.push(light);
-  return { kind: 'move', step, light, done: 0 };
+  P.seen.add(step.from);
+  P.departs.push([step.from, step.to, srNow()]);
+  return { kind: 'move', step, light, done: 0, ms: light.userData.total / SR_FLOW.unitsPerSec * 1000, rest: null };
 }
 
 /* ---- the light in the cable: no object travels. The move's edge gets a tube as long as its cable, at the cable's
@@ -15701,16 +16009,23 @@ function srFlowAtBranch(P, b) {
   P.branch = { b, at: P.pos, shownAt: srNow() };
   P.state = 'branch';
   P.stepOnce = false;        // a step taken to here ends here: the choice made plays on
-  srFlowHints(P, b);
-  const box = $('sr-choices');
-  setHTML(box, `<p class="sr-choice-q">${esc(b.label)}</p>${b.choices.map((c) => `<button type="button" class="wb-btn" data-sr-choice="${esc(c.id)}"${c.id === b.default ? ' data-default' : ''}>${esc(c.label)}${c.id === b.default ? ` <small>${esc(tl('sr.flow.choice.default'))}</small>` : ''}</button>`).join('')}`);
-  box.hidden = false;
+  srFlowHints(P, b.choices);
+  srFlowChoices();
   srFlowRenderBar();
 }
-/* Each choice's first edge, faint, while the branch waits. */
-function srFlowHints(P, b) {
+/* The branch's question and its ways, in the side bar under the last row (Auto on: the default says it is taken by itself). */
+function srFlowChoices() {
+  const P = SR_FLOW.player, box = $('sr-choices');
+  if (!P || !P.branch) { box.hidden = true; return; }
+  const b = P.branch.b, mark = tl(SR_FLOW.auto ? 'sr.flow.choice.auto' : 'sr.flow.choice.default');
+  setHTML(box, `<span class="sr-rt-arrow" aria-hidden="true">↓</span><p class="sr-choice-q">${esc(b.label)}</p>${b.choices.map((c) => `<button type="button" class="wb-btn" data-sr-choice="${esc(c.id)}"${c.id === b.default ? ' data-default' : ''}>${esc(c.label)}${c.id === b.default ? ` <small>${esc(mark)}</small>` : ''}</button>`).join('')}`);
+  box.hidden = false;
+  srFlowRouteScroll(box);
+}
+/* Each choice's first edge, faint, while the branch waits (and the chosen one's alone while it rests there). */
+function srFlowHints(P, choices) {
   const V = SR.view, arr = [];
-  for (const c of b.choices) {
+  for (const c of choices) {
     const first = (c.steps || []).find((s) => s.from && s.to);
     if (!first) continue;
     const path = srCablePathOf(V, first.from, first.to, srFlowCrossing(V, first.from, first.to));   // as its cable runs
@@ -15728,9 +16043,15 @@ function srFlowChoose(id) {
   const b = P.branch.b, c = b.choices.find((x) => x.id === id);
   if (!c) return false;
   P.chosen.push(`${b.label} → ${c.label}`);
+  P.chose.push([P.branch.at, c.id, srNow()]);
+  // it rests at the branch twice as long as at a node, the way chosen lit, before it goes on
+  const at = P.branch.at;
+  srFlowToast(P, at, `${b.label} → ${c.label}`, '');
   P.branch = null;
   $('sr-choices').hidden = true;
-  if (P.hints) { SR.view.flowLayer.remove(P.hints); P.hints.geometry.dispose(); P.hints.material.dispose(); P.hints = null; }
+  srFlowHintsOff(P);
+  srFlowHints(P, [c]);
+  P.anim = { kind: 'wait', left: SR_FLOW.restMs * SR_FLOW.branchRest, at, way: c, then: () => srFlowHintsOff(P) };
   if (c.goto) {
     const next = srFlowsOf(SR.view).find((f) => f.id === c.goto);
     if (next) {
@@ -15751,21 +16072,46 @@ function srFlowBack() {
   const P = SR_FLOW.player;
   if (!P || !P.history.length) return false;
   const s = P.history.pop();
-  P.flow = s.flow; P.frames = s.frames; P.pos = s.pos; P.chosen = s.chosen;
+  P.flow = s.flow; P.frames = s.frames; P.pos = s.pos; P.chosen = s.chosen; P.seen = s.seen;
   P.branch = null; $('sr-choices').hidden = true;
-  if (P.hints) { SR.view.flowLayer.remove(P.hints); P.hints.geometry.dispose(); P.hints.material.dispose(); P.hints = null; }
+  P.log.length = s.rows;   // the side bar back to the rows it had then
+  const list = $('sr-route-list');
+  while (list.children.length > s.rows) list.lastElementChild.remove();
+  if (list.lastElementChild) { for (const x of list.querySelectorAll('.sr-rt-step[aria-current]')) x.removeAttribute('aria-current'); list.lastElementChild.querySelector('.sr-rt-step').setAttribute('aria-current', 'true'); }
+  srFlowHintsOff(P);
   for (const d of P.lights) { SR.view.flowLayer.remove(d); if (d.userData.flowLight) srFlowLightDispose(d); }
   P.lights = []; P.anim = null; P.state = 'pause';
   srFlowRenderBar();
   return true;
 }
+function srFlowHintsOff(P) {
+  if (!P.hints) return;
+  SR.view.flowLayer.remove(P.hints); P.hints.geometry.dispose(); P.hints.material.dispose(); P.hints = null;
+}
+/* A step said in the side bar (requester 10-24: 「3d/2dのオブジェクト上に文字が出るのみづらいからサイドに光に合わせて順番に
+   履歴として出てそれが下矢印で繋がっていく感じに」): a row at the end, a down arrow from the one before, it the current one;
+   pressed, its node is chosen. Nothing is written over the room. */
 function srFlowToast(P, at, head, sub) {
-  const el = document.createElement('div');
-  el.className = 'sr-toast';
-  el.innerHTML = `<b>${esc(head)}</b>${sub ? `<span>${esc(sub)}</span>` : ''}`;
-  $('sr-toasts').append(el);
-  P.toasts.push({ el, at, left: SR_FLOW.toastMs });
+  const list = $('sr-route-list'), li = document.createElement('li');
+  const part = (tag, cls, text) => { const el = document.createElement(tag); if (cls) el.className = cls; if (text) el.textContent = text; return el; };
+  if (list.children.length) { const arrow = part('span', 'sr-rt-arrow', '↓'); arrow.setAttribute('aria-hidden', 'true'); li.append(arrow); }
+  const step = part('button', 'sr-rt-step');
+  step.type = 'button';
+  if (at) step.dataset.srRt = at;
+  step.append(part('b', '', head));
+  if (sub) step.append(part('span', '', sub));
+  li.append(step);
+  for (const x of list.querySelectorAll('.sr-rt-step[aria-current]')) x.removeAttribute('aria-current');
+  li.className = 'sr-rt'; li.querySelector('.sr-rt-step').setAttribute('aria-current', 'true');
+  list.append(li);
+  srFlowRouteScroll(li);
   P.log.push(head);
+}
+/* The side bar turned so el (the current row, or the branch's ways) is in view. */
+function srFlowRouteScroll(el) {
+  const box = $('sr-route'), top = el.offsetTop, bottom = top + el.offsetHeight;
+  if (bottom > box.scrollTop + box.clientHeight) box.scrollTop = bottom - box.clientHeight + 8;
+  else if (top < box.scrollTop) box.scrollTop = top - 8;
 }
 function srFlowGlow(P, at) {
   const p = srFlowPos(SR.view, at);
@@ -15791,7 +16137,149 @@ function srFlowKeepSize(V, o) {
   o.scale.setScalar(Math.max(1, o.userData.minPx / (o.userData.r * srFlowPxPerUnit(V, o.position))));
 }
 
-/* ---- each frame: the light along its edge, the toasts' places and lives, the next step when one is done */
+/* ---- the nodes shown while it plays (null: all of them) */
+function srFlowNow(P) {
+  const now = new Set([P.pos]);
+  const add = (A) => {
+    if (!A) return;
+    if (A.kind === 'move') { now.add(A.step.from); now.add(A.step.to); } else if (A.at) now.add(A.at);
+  };
+  if (P.anim && P.anim.kind === 'lanes') for (const L of P.anim.lanes) add(L.anim); else add(P.anim);
+  const ways = P.branch ? P.branch.b.choices : P.anim && P.anim.way ? [P.anim.way] : [];   // a branch's first cables, or the way chosen
+  for (const c of ways) { const first = (c.steps || []).find((s) => s.from && s.to); if (first) { now.add(first.from); now.add(first.to); } }
+  return now;
+}
+function srFlowShown(P) {
+  if (!P || SR_FLOW.show === 'all') return null;
+  const now = srFlowNow(P);
+  if (SR_FLOW.show === 'now') return now;
+  return new Set([...(SR_FLOW.show === 'seen' ? P.seen : P.all), ...now]);
+}
+function srFlowHides(id) { const V = SR.view; return !!(V && V.flowHidden && V.flowHidden.has(id)); }
+function srFlowEdgeHidden(e) { return srFlowHides(e.from) || srFlowHides(e.to); }
+/* Writes the nodes shown on the 3D when they change (and when the icons come, after the build): a node not shown is
+   drawn at no size (its shapes, icon, cone), its model hidden, its tag left out (56-server-room.js srPlaceLabels), and
+   its cables not drawn; the floors go faint toward the ground while any node is hidden, so they stay as a map. */
+function srFlowShowApply(V, force = false) {
+  const shown = srFlowShown(SR_FLOW.player);
+  const key = `${shown ? [...shown].sort().join('|') : '*'}#${V.iconCount || 0}`;
+  if (!force && key === V.flowShowKey) return;
+  V.flowShowKey = key;
+  const hidden = new Set();
+  if (shown) for (const id of V.L.pos.keys()) if (!shown.has(id)) hidden.add(id);
+  const was = V.flowHidden ? V.flowHidden.size : 0;
+  V.flowHidden = hidden;
+  if (!hidden.size && !was && !force) return;
+  const m4 = new THREE.Matrix4(), pos = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
+  V.near.traverse((mesh) => {
+    const ids = mesh.isInstancedMesh && (mesh.userData.nodes || mesh.userData.flowStarts);
+    if (!ids) return;
+    if (!mesh.userData.flowBase) { if (!hidden.size) return; mesh.userData.flowBase = mesh.instanceMatrix.array.slice(); }
+    const base = mesh.userData.flowBase;
+    ids.forEach((id, i) => {
+      m4.fromArray(base, i * 16);
+      if (hidden.has(id)) { m4.decompose(pos, q, sc); m4.compose(pos, q, sc.multiplyScalar(1e-4)); }
+      mesh.setMatrixAt(i, m4);
+    });
+    mesh.instanceMatrix.needsUpdate = true; mesh.boundingSphere = null;
+    if (!hidden.size) mesh.userData.flowBase = null;
+  });
+  if (V.models) for (const [id, g] of V.models) g.visible = !hidden.has(id);
+  const segs = { plain: 0, cross: 0 };
+  for (const e of V.L.edges) {   // the same order srBuild laid them in: a cable each
+    const set = e.crossProvider ? 'cross' : 'plain', j = segs[set]++;
+    srCableShow(set === 'cross' ? V.crossLines : V.plainLines, j, 0, hidden.has(e.from) || hidden.has(e.to) ? 0 : 1);
+  }
+  srCableDone(V.plainLines); srCableDone(V.crossLines);
+  const fm = V.floorMesh;
+  if (fm && fm.instanceColor) {
+    const bg = new THREE.Color(V.scene.background), c = new THREE.Color();
+    V.floorColors.forEach((hex, i) => { c.set(hex); if (hidden.size) c.lerp(bg, SR_FLOW.floorFade); fm.setColorAt(i, c); });
+    fm.instanceColor.needsUpdate = true;
+  }
+  srFocusLines(V);
+  V.labelAt = 0;   // the tags placed again on the next frame
+}
+
+/* What the room draws on the page (px, in the canvas): each node's shape (a box round its cell, as tall as a model) and
+   its tag (srTagOf, srTagWidth: 20 px over its point). */
+function srFlowRoomRects(V) {
+  const w = V.renderer.domElement.clientWidth, h = V.renderer.domElement.clientHeight, v = new THREE.Vector3(), out = [];
+  const px = (x, y, z) => { v.set(x, y, z).project(V.camera); return [(v.x + 1) / 2 * w, (1 - v.y) / 2 * h, v.z]; };
+  for (const p of V.L.pos.values()) {
+    if (p.hiddenIn) continue;
+    const pts = [];
+    for (const dx of [-0.9, 0.9]) for (const dz of [-0.9, 0.9]) for (const dy of [0, 1.6]) pts.push(px(p.x + dx, p.y + dy, p.z + dz));
+    out.push({ id: p.n.id, kind: 'shape', box: [Math.min(...pts.map((q) => q[0])), Math.min(...pts.map((q) => q[1])), Math.max(...pts.map((q) => q[0])), Math.max(...pts.map((q) => q[1]))],
+      behind: pts.some((q) => q[2] > 1) });
+    const t = srTagOf(V, p), a = px(...t.at), wd = srTagWidth(t.text);
+    out.push({ id: p.n.id, kind: 'tag', box: [a[0] - wd / 2, a[1] - 20, a[0] + wd / 2, a[1]], behind: a[2] > 1 });
+  }
+  // the groups' tags up close, where they are given out (srGroupTagBoxes: from the floor's corner rightward, a row higher where
+  // an inner floor's tag is under it); one out of view is counted where it would stand, so a frame that leaves it out does not fit
+  if (V.lod !== 'far') {
+    const g = srGroupTagBoxes(V);
+    for (const t of [...g.boxes, ...g.outside]) out.push({ id: t.G.g.id, kind: 'group', box: t.box, behind: t.z > 1 });
+  }
+  return out;
+}
+/* The shapes and tags not inside the seen part of the canvas ([id, kind]). */
+function srFlowRoomOut(V) {
+  const S = srFlowSeen(V);
+  return srFlowRoomRects(V).filter((r) => r.behind || r.box[0] < S[0] || r.box[1] < S[1] || r.box[2] > S[2] || r.box[3] > S[3]).map((r) => [r.id, r.kind]);
+}
+/* The part of the canvas the room can be seen in (px): all of it but what the player's bar covers. */
+function srFlowSeen(V) {
+  const c = V.renderer.domElement.getBoundingClientRect(), bar = $('sr-player'), b = !bar.hidden && bar.getBoundingClientRect();
+  return [0, 0, c.width, b && b.top > c.top ? Math.min(c.height, b.top - c.top) : c.height];
+}
+/* The camera moved (its distance in 3D, its span in 2D, the same way it looks) until every shape and tag is inside the
+   seen part of the canvas with SR_FLOW.frame of it to spare round the edges; at the room's middle. */
+function srFlowFrameRoom(V) {
+  const L = V.L, cx = L.width / 2, cz = L.depth / 2, S = srFlowSeen(V), m = (1 - SR_FLOW.frame) / 2;
+  const inner = [S[0] + (S[2] - S[0]) * m, S[1] + (S[3] - S[1]) * m, S[2] - (S[2] - S[0]) * m, S[3] - (S[3] - S[1]) * m];
+  const dir = V.camera.position.clone().sub(V.controls.target).normalize();
+  if (!(dir.lengthSq() > 0)) dir.set(0, 0.78, 0.62).normalize();
+  const tan = 2 * Math.tan(SR_FLAT.fov * Math.PI / 360);
+  const place = (d) => {
+    if (V.flat) { srSetSpan(V, cx, cz, d * tan); return; }
+    V.controls.target.set(cx, 0, cz); V.camera.position.copy(V.controls.target).addScaledVector(dir, d); V.camera.updateMatrixWorld();
+  };
+  const fits = (d) => { place(d); return srFlowRoomRects(V).every((r) => !r.behind && r.box[0] >= inner[0] && r.box[1] >= inner[1] && r.box[2] <= inner[2] && r.box[3] <= inner[3]); };
+  let lo = V.controls.minDistance, hi = Math.max(srViewDist(V), lo);
+  while (!fits(hi) && hi < V.controls.maxDistance) hi = Math.min(V.controls.maxDistance, hi * 2);
+  for (let i = 0; i < 32 && hi - lo > 0.01; i++) { const mid = (lo + hi) / 2; if (fits(mid)) hi = mid; else lo = mid; }
+  place(hi);
+  if (!V.flat) { V.camera.far = Math.max(V.camera.far, hi * 6); V.camera.updateProjectionMatrix(); }
+  V.controls.update();
+}
+/* The camera after a light about to leave the page: moved over the floor (the same distance, the same angle) until the
+   light is well inside again. Not while the whole room is in view: there the light never leaves it. */
+function srFlowWhole(V) {
+  const v = new THREE.Vector3();
+  for (const p of V.L.pos.values()) {
+    if (p.hiddenIn) continue;
+    v.set(p.x, p.y, p.z).project(V.camera);
+    if (v.z > 1 || Math.abs(v.x) > 1.02 || Math.abs(v.y) > 1.02) return false;
+  }
+  return true;
+}
+function srFlowFollow(V, P, dt) {
+  const moving = P.state === 'play' ? P.lights.filter((o) => o.userData.flowLight && o.userData.moving) : [];
+  if (!moving.length) { V.flowFollowing = false; return; }
+  const head = moving[moving.length - 1].userData.head, v = head.clone().project(V.camera), off = v.z > 1 ? Infinity : Math.max(Math.abs(v.x), Math.abs(v.y));
+  if (!V.flowFollowing) {
+    if (off <= SR_FLOW.follow.out) return;
+    V.flowWhole = srFlowWhole(V);
+    if (V.flowWhole) return;
+    V.flowFollowing = true;
+  } else if (off < SR_FLOW.follow.in) { V.flowFollowing = false; return; }
+  const k = 1 - Math.exp(-dt / SR_FLOW.follow.ms), d = new THREE.Vector3(head.x - V.controls.target.x, 0, head.z - V.controls.target.z).multiplyScalar(k);
+  V.controls.target.add(d); V.camera.position.add(d); V.camera.updateMatrixWorld();
+  P.follows = (P.follows || 0) + 1;   // frames the camera went after the light (the e2e)
+}
+
+/* ---- each frame: the light along its edge, the next step when one is done */
 function srFlowTick(V, dt) {
   const P = SR_FLOW.player;
   if (!P) return;
@@ -15799,17 +16287,20 @@ function srFlowTick(V, dt) {
   const run = P.state === 'play';
   const advance = (A) => {
     if (!A) return true;
-    if (A.kind === 'wait') { A.left -= step; return A.left <= 0; }
-    A.done = Math.min(1, A.done + step / SR_FLOW.moveMs);
+    if (A.kind === 'wait') { A.left -= step; if (A.left <= 0 && A.then) { A.then(); A.then = null; } return A.left <= 0; }
+    if (A.rest !== null) { A.rest -= step; return A.rest <= 0; }   // resting at the node it reached
+    A.done = Math.min(1, A.done + step / A.ms);
     srFlowLightAt(A.light, A.done);
     if (A.done < 1) return false;
     A.light.userData.moving = false;               // its tail drains into the node, on the same clock
     A.light.userData.left = SR_FLOW_LIGHT.drainMs;
     P.pos = A.step.to;
+    P.seen.add(A.step.to);
     P.arrivals.push(srNow());
-    P.reached.push([A.step.to, srNow()]);       // where and when (the e2e reads that lanes arrive together)
+    P.reached.push([A.step.to, srNow()]);       // where and when (the e2e reads each move's time and each rest)
     srFlowSay(P, A.step, A.step.to);
-    return true;
+    A.rest = SR_FLOW.restMs;
+    return false;
   };
   if (run || P.stepOnce) {
     if (P.anim && P.anim.kind === 'lanes') {
@@ -15825,27 +16316,16 @@ function srFlowTick(V, dt) {
     srFlowLightKeepSize(V, o);
   }
   if (P.state === 'branch' && SR_FLOW.auto && P.branch && P.branch.b.default && srNow() - P.branch.shownAt > 600 / SR_FLOW.speed) srFlowChoose(P.branch.b.default);
+  srFlowShowApply(V);
+  srFlowFollow(V, P, dt);
   for (const o of [...V.flowLayer.children]) if (o.userData.left !== undefined && (o.userData.left -= step) <= 0) {
     V.flowLayer.remove(o); P.lights = P.lights.filter((x) => x !== o);
     if (o.userData.flowLight) srFlowLightDispose(o);
   }
-  // the toasts over their nodes, stacked when several are on one
-  const w = V.renderer.domElement.clientWidth, h = V.renderer.domElement.clientHeight, per = {};
-  P.toasts = P.toasts.filter((x) => { x.left -= step; if (x.left > 0) return true; x.el.remove(); return false; });
-  for (const x of P.toasts.slice().reverse()) {
-    const p = srFlowPos(V, x.at);
-    if (!p) continue;
-    const v = p.clone(); v.y += 1.6; v.project(V.camera);
-    const n = per[x.at] = (per[x.at] || 0) + 1;
-    x.el.style.transform = `translate(${Math.round((v.x + 1) / 2 * w)}px, ${Math.round((1 - v.y) / 2 * h - (n - 1) * 44)}px) translate(-50%, -100%)`;
-  }
-  if (P.branch) {
-    const p = srFlowPos(V, P.branch.at);
-    if (p) { const v = p.clone(); v.y -= 1.0; v.project(V.camera); $('sr-choices').style.transform = `translate(${Math.round((v.x + 1) / 2 * w)}px, ${Math.round((1 - v.y) / 2 * h)}px) translate(-50%, 0)`; }
-  }
 }
 
-/* The player's bar over the 3D: the flow, play / pause, one step, back, stop, the speed, 自動, the choices taken. */
+/* The player's bar over the 3D: the flow, play / pause, one step, back, stop, the speed, 自動, the nodes shown, the
+   choices taken. */
 function srFlowRenderBar() {
   const bar = $('sr-player'), P = SR_FLOW.player;
   if (!P) { bar.hidden = true; return; }
@@ -15856,12 +16336,15 @@ function srFlowRenderBar() {
 <button type="button" class="wb-btn" data-sr-fp="step" aria-label="${esc(tl('sr.flow.step'))}">⏭</button>
 <button type="button" class="wb-btn" data-sr-fp="back" aria-label="${esc(tl('sr.flow.back'))}"${P.history.length ? '' : ' disabled'}>⏮</button>
 <button type="button" class="wb-btn" data-sr-fp="stop" aria-label="${esc(tl('sr.flow.stop'))}">■</button>
-<label>${esc(tl('sr.flow.speed'))} <select data-sr-fp="speed">${SR_FLOW_SPEEDS.map((s) => `<option value="${esc(String(s))}"${s === SR_FLOW.speed ? ' selected' : ''}>${esc(s.toFixed(1))}×</option>`).join('')}</select></label>
+<label>${esc(tl('sr.flow.speed'))} <select data-sr-fp="speed">${SR_FLOW_SPEEDS.map((s) => `<option value="${esc(String(s))}"${s === SR_FLOW.speed ? ' selected' : ''}>${esc(s.toFixed(s * 2 % 1 ? 2 : 1))}×</option>`).join('')}</select></label>
 <label><input type="checkbox" data-sr-fp="auto"${SR_FLOW.auto ? ' checked' : ''}> ${esc(tl('sr.flow.auto'))}</label>
+<span class="sr-fp-show" role="group" aria-label="${esc(tl('sr.flow.show'))}">${Object.entries(SR_FLOW_SHOWS).map(([k, w]) => `<button type="button" class="wb-btn" data-sr-fp-show="${esc(k)}" title="${esc(w[1])}" aria-pressed="${k === SR_FLOW.show}">${esc(w[0])}</button>`).join('')}</span>
 <span class="sr-fp-state">${esc(SR_FLOW_STATE[P.state] || '')}</span>
 ${P.chosen.length ? `<ol class="sr-fp-chosen">${P.chosen.map((c) => `<li>${esc(c)}</li>`).join('')}</ol>` : ''}`);
 }
 $('sr-player').addEventListener('click', (e) => {
+  const show = e.target.closest('[data-sr-fp-show]');
+  if (show) { srFlowShowSet(show.dataset.srFpShow); return; }
   const b = e.target.closest('[data-sr-fp]'), P = SR_FLOW.player;
   if (!b || !P || b.tagName === 'SELECT' || b.type === 'checkbox') return;
   const what = b.dataset.srFp;
@@ -15873,12 +16356,23 @@ $('sr-player').addEventListener('click', (e) => {
 });
 $('sr-player').addEventListener('change', (e) => {
   const t = e.target;
-  if (t.dataset.srFp === 'speed') SR_FLOW.speed = Number(t.value);
-  else if (t.dataset.srFp === 'auto') SR_FLOW.auto = t.checked;
+  if (t.dataset.srFp === 'speed') { SR_FLOW.speed = Number(t.value); srFlowPrefSet('speed', SR_FLOW.speed); }
+  else if (t.dataset.srFp === 'auto') { SR_FLOW.auto = t.checked; srFlowChoices(); }
 });
+function srFlowShowSet(how) {
+  if (!SR_FLOW_SHOWS[how]) return;
+  SR_FLOW.show = how;
+  srFlowPrefSet('show', how);
+  if (SR.view && SR.view.flowLayer) srFlowShowApply(SR.view);
+  srFlowRenderBar();
+}
 $('sr-choices').addEventListener('click', (e) => {
   const b = e.target.closest('[data-sr-choice]');
   if (b) srFlowChoose(b.dataset.srChoice);
+});
+$('sr-route-list').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-sr-rt]');
+  if (b) srSelect(b.dataset.srRt);
 });
 // ---- web/js/59-sr-migration.js ----
 /* ---------- the server room's migration plans played (ticket 2026-10-22-viz-infra-migration-plan) ----------

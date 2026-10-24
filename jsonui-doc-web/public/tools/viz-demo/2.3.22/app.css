@@ -293,9 +293,10 @@ body { background: var(--bg); color: var(--ink); font-family: var(--font-body); 
 .sess-groups { display: grid; gap: 10px; }
 .pgroup { display: grid; gap: 6px; }
 .pg-toggle { display: flex; align-items: baseline; gap: 8px; width: 100%; min-width: 0; padding: 2px 0; border: 0; background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
-.pg-toggle b { font: 700 13px/1.5 var(--font-mono); }
+/* a folder name never breaks inside itself ("shop-" / "app/"): one line, cut with … beside its count line, which takes the rest (ticket 2026-10-24-viz-english-phone-chip-and-folder-wrap, the requester's A) */
+.pg-toggle b { flex: 0 1 auto; min-width: 0; max-width: 65%; overflow: hidden; font: 700 13px/1.5 var(--font-mono); text-overflow: ellipsis; white-space: nowrap; }
 /* min-width: 0 above: a grid item, the button is otherwise as wide as its summary unshortened (English on a phone: 441 on 390) */
-.pg-toggle small { overflow: hidden; color: var(--ink-soft); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
+.pg-toggle small { flex: 1 1 0; min-width: 0; overflow: hidden; color: var(--ink-soft); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
 .pg-caret { width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 7px solid var(--ink-soft); transform: rotate(90deg); transition: transform 0.15s ease; }
 .pg-toggle[aria-expanded="false"] .pg-caret { transform: none; }
 .sl-group { display: flex; justify-content: space-between; margin-top: 6px; padding: 0 2px; color: var(--ink-soft); font: 700 11.5px/1.5 var(--font-mono); }
@@ -322,17 +323,19 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .pop-list [role="option"]:hover { background: var(--bg); }
 .pop-list [role="option"][aria-selected="true"] { background: var(--info-bg); box-shadow: inset 3px 0 0 var(--info); }
 .po-main { display: grid; min-width: 0; }
-.po-main b { font: 700 13px/1.45 var(--font-mono); }
+.po-main b { overflow: hidden; font: 700 13px/1.45 var(--font-mono); text-overflow: ellipsis; white-space: nowrap; }
 .po-main small { overflow: hidden; color: var(--ink-soft); font: 500 11px/1.45 var(--font-body); text-overflow: ellipsis; white-space: nowrap; }
 .po-badges { display: flex; flex-wrap: wrap; gap: 3px; }
 .po-badges:empty { display: none; }
 .pop-groups { display: grid; gap: 2px; }
-.pg-label { margin: 8px 2px 2px; color: var(--ink-soft); font: 700 11.5px/1.5 var(--font-mono); }
+.pg-label { overflow: hidden; margin: 8px 2px 2px; color: var(--ink-soft); font: 700 11.5px/1.5 var(--font-mono); text-overflow: ellipsis; white-space: nowrap; }
 .pg-label:first-child { margin-top: 0; }
 .pg-item { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 8px; font-size: 12.5px; cursor: pointer; }
 .pg-item:hover { background: var(--bg); }
 .pg-item.pg-sub { margin-left: 22px; }
 .pg-name { display: grid; min-width: 0; }
+/* a robot's name never breaks inside itself ("jsonui-" / "implement" beside a long state): one line, cut with …, whole in its title (ticket 2026-10-24-viz-robot-picker-name-breaks-after-hyphen) */
+.pg-nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pg-name small { color: var(--ink-soft); font: 500 11px/1.4 var(--font-mono); }
 .pop-none { margin: 4px 2px; color: var(--ink-soft); font-size: 12px; }
 .session { display: grid; gap: 4px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; }
@@ -896,6 +899,16 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
    top-left corner, the waits' amber (the bubbles' "!"); in the head row as a badge where the card has the width. */
 .rb-waits { position: absolute; z-index: 6; display: grid; gap: 6px; width: max-content; max-width: 260px; padding: 8px 10px; border: 1px solid var(--line); border-left: 4px solid #ffb020; border-radius: 10px; background: var(--panel); color: var(--ink); box-shadow: 0 6px 18px var(--shadow); }
 .rb-waits[hidden] { display: none; }
+/* a robot's waits answered where they are listed: under the block, or under the card's head where it has no room */
+.rb-wait-pane { position: absolute; z-index: 7; display: grid; align-content: start; gap: 8px; overflow-y: auto; padding: 8px 10px 10px; border: 1px solid var(--line); border-left: 4px solid #ffb020; border-radius: 10px; background: var(--panel); color: var(--ink); box-shadow: 0 10px 28px var(--shadow); }
+.rb-wait-pane[hidden] { display: none; }
+.rb-wait-pane.rbwp-in-head { position: fixed; z-index: 41; }   /* over the fixed card (a phone's sheet 40, widened 30) */
+.rbwp-head { display: flex; align-items: center; gap: 8px; }
+.rbwp-title { flex: 1; margin: 0; font: 700 12px/1.4 var(--font-body); }
+.rbwp-x { width: 26px; height: 26px; border: 1px solid var(--line); border-radius: 8px; background: none; color: var(--ink); font: 700 15px/1 var(--font-body); cursor: pointer; }
+.rbwp-x:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.rbwp-items { display: grid; gap: 8px; }
+.rbw-robot[aria-expanded="true"] { background: var(--chip); }
 .rbw-title { margin: 0; color: var(--ink-soft); font: 700 11px/1.4 var(--font-body); }
 .rbw-sum { justify-self: stretch; padding: 4px 10px; border: 1px solid #7a4b00; border-radius: 8px; text-align: left; background: #ffb020; color: #1f1400; font: 800 12px/1.5 var(--font-body); cursor: pointer; }
 .rbw-list { display: grid; gap: 3px; margin: 0; padding: 0; list-style: none; }
@@ -1652,16 +1665,27 @@ button.talk-peer:focus-visible { outline: 2px solid var(--focus); outline-offset
 .sr-box[hidden] { display: none; }
 .sr-stage[data-box="armed"] canvas { cursor: crosshair; }
 #sr-boxzoom[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--panel); }
-/* a flow playing (59-sr-flows.js): toasts over the nodes, a branch's choices, the player's bar */
+/* a migration's tags over the nodes (59-sr-migration.js); a flow playing: the player's bar */
 .sr-toasts { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 2; }
-.sr-toast { position: absolute; left: 0; top: 0; display: grid; gap: 1px; max-width: 260px; padding: 4px 9px; border: 1px solid var(--line); border-left: 4px solid #e0a800; border-radius: 6px; background: var(--panel); color: var(--ink); font: 600 12.5px/1.4 var(--font-body); box-shadow: 0 2px 6px var(--shadow); white-space: nowrap; }
-.sr-toast span { font-weight: 400; color: var(--ink-soft); white-space: normal; }
-.sr-choices { position: absolute; left: 0; top: 0; z-index: 3; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; max-width: 320px; padding: 6px 8px; border: 2px solid #e0a800; border-radius: 8px; background: var(--panel); color: var(--ink); box-shadow: 0 2px 8px var(--shadow); }
+/* the flow's route (59-sr-flows.js): a column left of the room while a flow plays, a row a step, a down arrow between */
+.sr-route { position: relative; width: min(260px, 30vw); overflow: auto; padding: 8px 10px; border-right: 1px solid var(--line); background: var(--panel); color: var(--ink); font: 13px/1.4 var(--font-body); }
+.sr-route[hidden] { display: none; }
+.sr-route-title { margin: 0 0 6px; font: 700 13px/1.3 var(--font-body); }
+.sr-route-list { margin: 0; padding: 0; list-style: none; }
+.sr-rt { display: grid; }
+.sr-rt-arrow { display: block; text-align: center; color: var(--ink-soft); font-size: 14px; line-height: 18px; }
+.sr-rt-step { display: grid; gap: 1px; width: 100%; padding: 4px 8px; border: 1px solid var(--line); border-left: 4px solid transparent; border-radius: 6px; background: var(--bg); color: var(--ink); font: 500 12.5px/1.4 var(--font-body); text-align: left; cursor: pointer; }
+.sr-rt-step span { font-weight: 400; color: var(--ink-soft); }
+.sr-rt-step[aria-current="true"] { border-left-color: var(--ink); background: var(--panel); font-weight: 700; box-shadow: 0 1px 4px var(--shadow); }
+.sr-choices { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 0 0 4px; }
+.sr-choices > .sr-rt-arrow { width: 100%; }
+.sr-choices .sr-choice-q { width: 100%; margin: 0; padding: 4px 8px; border: 2px solid #e0a800; border-radius: 6px; font-weight: 700; }
 .sr-choices[hidden] { display: none; }
 .sr-choice-q { width: 100%; margin: 0; font: 700 12.5px/1.4 var(--font-body); }
 .sr-player { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 3; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font: 13px/1.4 var(--font-body); }
 .sr-player[hidden] { display: none; }
 .sr-fp-state { color: var(--ink-soft); }
+.sr-fp-show { display: inline-flex; flex-wrap: wrap; gap: 4px; }   /* the nodes shown while it plays: one of four, pressed */
 .sr-fp-chosen { display: grid; gap: 2px; width: 100%; margin: 0; padding-left: 22px; font-size: 12px; }   /* one choice a line, its number before it */
 .sr-mp-cost { font-variant-numeric: tabular-nums; }
 .sr-mp-unpriced { color: var(--bad); }
@@ -1762,6 +1786,7 @@ button.talk-peer:focus-visible { outline: 2px solid var(--focus); outline-offset
   .sr-main { flex-direction: column; }
   .sr-stage { flex: 1 1 60%; }
   .sr-board { width: auto; max-height: 40%; border-left: 0; border-top: 1px solid var(--line); }
+  .sr-route { width: auto; max-height: 30%; border-right: 0; border-bottom: 1px solid var(--line); }
 }
 .sr-board h3 { margin: 10px 0 4px; font: 700 13px/1.3 var(--font-body); }
 .sr-board dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 0; }
@@ -1808,7 +1833,18 @@ button.talk-peer:focus-visible { outline: 2px solid var(--focus); outline-offset
 .dev-load[data-load="ok"] { border-color: var(--ok); background: var(--ok-bg); }
 .dev-load[data-load="busy"] { border-color: var(--warn); background: var(--warn-bg); }
 .dev-load[data-load="high"] { border-color: var(--bad); background: var(--bad-bg); }
+.dev-stat { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 0; font-weight: 700; }
+.dev-stat .dev-level { color: var(--ink-soft); font-size: 12px; font-weight: 600; }
+.dev-what { margin: 0; font-size: 12.5px; }
+.dev-stat[data-dev-mem] { margin-top: 6px; }
+.dev-bar { position: relative; display: block; height: 8px; border-radius: 4px; background: var(--chip); overflow: visible; }
+.dev-bar-fill { position: absolute; inset: 0 auto 0 0; border-radius: 4px; background: var(--ok); }
+.dev-bar[data-tone="busy"] .dev-bar-fill { background: var(--warn); }
+.dev-bar[data-tone="high"] .dev-bar-fill { background: var(--bad); }
+.dev-bar-mark { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--ink); }
 .dev-level { font-weight: 700; }
+/* the load box and each kind's group apart (the requester, 10-23: the iOS simulators' heading sat on the load box) */
+#dev-body { display: grid; gap: 14px; }
 .dev-group { display: grid; gap: 6px; }
 .dev-list { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .dev-row { display: grid; gap: 2px; width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: 13px/1.45 var(--font-body); text-align: left; overflow-wrap: anywhere; }
