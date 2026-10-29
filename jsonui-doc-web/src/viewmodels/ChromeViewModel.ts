@@ -181,6 +181,7 @@ const NAV_CATALOG: ReadonlyArray<{
     entries: [
       { id: "index", titleKey: "viz_index_nav_title", titleEn: "Overview", url: "/viz" },
       { id: "setup", titleKey: "viz_setup_nav_title", titleEn: "Set up", url: "/viz/setup" },
+      { id: "codex", titleKey: "viz_codex_nav_title", titleEn: "Codex sessions", url: "/viz/codex" },
       { id: "room", titleKey: "viz_room_nav_title", titleEn: "The room and its robots", url: "/viz/room" },
       { id: "spirits", titleKey: "viz_spirits_nav_title", titleEn: "Skill spirits", url: "/viz/spirits" },
       { id: "panels", titleKey: "viz_panels_nav_title", titleEn: "Panels, cards and boards", url: "/viz/panels" },

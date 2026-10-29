@@ -50,7 +50,7 @@ flowchart TD
 | Signature | Platforms | Description |
 |---|---|---|
 | `onAppear()` | all | Seed articleLinks from the static catalog of the /viz section (eleven rows). Each row's titleKey / descriptionKey is resolved through StringManager with the tools_viz_ namespace prefix. |
-| `onNavigate(url: String)` | all | Client-side navigation via router.push(url). Destinations: /tools, /viz, /viz/setup, /viz/room, /viz/spirits, /viz/panels, /viz/sessions, /viz/approvals, /viz/tests, /viz/server-room, /viz/infra-model, /viz/cost. |
+| `onNavigate(url: String)` | all | Client-side navigation via router.push(url). Destinations: /tools, /viz, /viz/setup, /viz/codex, /viz/room, /viz/spirits, /viz/panels, /viz/sessions, /viz/approvals, /viz/tests, /viz/server-room, /viz/infra-model, /viz/cost. |
 
 #### Vars
 

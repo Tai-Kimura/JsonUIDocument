@@ -71,11 +71,11 @@ export class RoomViewModel {
         onNavigate: () => this.navigate("/viz"),
       },
       {
-        id: "next_setup",
-        titleKey: lookup("next_setup_title"),
-        descriptionKey: lookup("next_setup_description"),
-        url: "/viz/setup",
-        onNavigate: () => this.navigate("/viz/setup"),
+        id: "next_codex",
+        titleKey: lookup("next_codex_title"),
+        descriptionKey: lookup("next_codex_description"),
+        url: "/viz/codex",
+        onNavigate: () => this.navigate("/viz/codex"),
       },
       {
         id: "next_spirits",

@@ -71,11 +71,11 @@ export class SetupViewModel {
         onNavigate: () => this.navigate("/viz"),
       },
       {
-        id: "next_room",
-        titleKey: lookup("next_room_title"),
-        descriptionKey: lookup("next_room_description"),
-        url: "/viz/room",
-        onNavigate: () => this.navigate("/viz/room"),
+        id: "next_codex",
+        titleKey: lookup("next_codex_title"),
+        descriptionKey: lookup("next_codex_description"),
+        url: "/viz/codex",
+        onNavigate: () => this.navigate("/viz/codex"),
       },
     ];
 

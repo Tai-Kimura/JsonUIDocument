@@ -77,7 +77,7 @@ flowchart TD
 | Signature | Platforms | Description |
 |---|---|---|
 | `onAppear()` | all | Seed the card collections from a static catalog; each title / description is resolved through StringManager with the viz_index_ prefix. |
-| `onNavigate(url: String)` | all | router.push(url). Destinations: /viz/setup, /viz/room, /viz/spirits, /viz/panels, /viz/sessions, /viz/approvals, /viz/tests, /viz/server-room, /viz/infra-model, /viz/cost, /tools. |
+| `onNavigate(url: String)` | all | router.push(url). Destinations: /viz/setup, /viz/codex, /viz/room, /viz/spirits, /viz/panels, /viz/sessions, /viz/approvals, /viz/tests, /viz/server-room, /viz/infra-model, /viz/cost, /tools. |
 
 #### Vars
 

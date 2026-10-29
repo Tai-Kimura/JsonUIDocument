@@ -3473,6 +3473,111 @@
     },
     {
       "binary": "jui",
+      "command": "viz codex-local ensure",
+      "synopsis": "jui viz codex-local ensure {lmstudio,ollama} [--json]",
+      "purpose": {
+        "en": "Make the Codex home of a local model server when it is missing (from 2.3.25): ~/.codex-local/lmstudio/ or ~/.codex-local/ollama/, with a config.toml that names the server as Codex's model provider and copies the [features] and [mcp_servers.*] tables of ~/.codex/config.toml. A home that has a config.toml is never rewritten. A codex started with CODEX_HOME set to the home attaches to that home's daemon, which jui viz reads; the Codex tab of jui viz's Call dialog runs this command in the line it builds. Prints made: or already there: with the home, and exits 0 either way.",
+        "ja": "ローカルのモデルのサーバー用の Codex の home を、無ければ作る（2.3.25 から）。~/.codex-local/lmstudio/ か ~/.codex-local/ollama/ に、そのサーバーを Codex のモデルの提供元として書き、~/.codex/config.toml の [features] と [mcp_servers.*] の表を写した config.toml を置く。config.toml がある home は書き換えない。CODEX_HOME をその home にして起動した codex は、その home の daemon につながり、jui viz はそれを読む。jui viz の呼び出しダイアログの Codex タブが組み立てる行は、このコマンドを走らせる。made: か already there: と home を出し、どちらでも exit 0。"
+      },
+      "options": [
+        {
+          "name": "{lmstudio,ollama}",
+          "type": "choice",
+          "default": "none",
+          "description": {
+            "en": "The local model server. Required for ensure: without it the command prints the usage and exits 1.",
+            "ja": "ローカルのモデルのサーバー。ensure には必須で、無いと使い方を出して exit 1。"
+          }
+        },
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "One JSON object: provider, home, and made (true when it was made now).",
+            "ja": "provider、home、made（今作ったなら true）の JSON を 1 つ出す。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz codex-local ensure lmstudio"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz codex-local list",
+        "jui viz doctor"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.25",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "fff08ee46cafa22bcac6a3015dbddda5466ee6b6dc71fd4b2797e9bdb602ceda",
+        "cardHash": "e9673174c6adc0ad79c6a59685f6af1b78ee72112548f9f8ba5d52c4fa1f7cf4",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "ff80ad9f0174",
+          "synopsis": "88544241f7c3",
+          "purpose": "48e8a834dcf5",
+          "options": "fa06e14777ec",
+          "examples": "bdaf6812b433",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "3f471d933c41"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz codex-local list",
+      "synopsis": "jui viz codex-local [list] [--json]",
+      "purpose": {
+        "en": "List the Codex homes of local model servers that exist (from 2.3.25): each provider whose ~/.codex-local/<provider>/ has a config.toml, with its folder. With none, it says that jui viz codex-local ensure lmstudio makes LM Studio's. list is what jui viz codex-local does with no action.",
+        "ja": "ある分のローカルのモデルのサーバー用の Codex の home を一覧する（2.3.25 から）。~/.codex-local/<provider>/ に config.toml がある提供元ごとに、そのフォルダを出す。1 つも無ければ、jui viz codex-local ensure lmstudio で LM Studio の分ができると書く。jui viz codex-local を何も付けずに走らせると list になる。"
+      },
+      "options": [
+        {
+          "name": "--json",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "A JSON array of {provider, home}; [] when there is none.",
+            "ja": "{provider, home} の JSON の配列。無ければ []。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz codex-local\n  none (jui viz codex-local ensure lmstudio makes LM Studio's)"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz codex-local ensure",
+        "jui viz doctor"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.25",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "382c0aa5b91db457dd9652445d0f34abc0468ed86f45a00c19421b0afcc39bc3",
+        "cardHash": "ca1e0b9fde3032e6e2b217e22244f32e8f842795e4b73034cbed65e912ba48d8",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "8f9e5d63c53d",
+          "synopsis": "6b1afcd4c651",
+          "purpose": "1e9004dadb2d",
+          "options": "38ed1c65e4e2",
+          "examples": "fcc4368cf94d",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "0bd9860a8f0f"
+        }
+      }
+    },
+    {
+      "binary": "jui",
       "command": "viz relay install",
       "synopsis": "jui viz relay install [--dry-run] [--yes]",
       "purpose": {

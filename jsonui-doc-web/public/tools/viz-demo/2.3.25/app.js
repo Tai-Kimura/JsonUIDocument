@@ -1564,7 +1564,13 @@ const pillInk = (role) => ROLE_INK[role] || '#ffffff';
 const NAME_MAX = 80;
 const sessionName = (t) => (typeof t === 'string' ? t.replace(/\s+/g, ' ').trim().slice(0, NAME_MAX) : '');
 const NAMES = { rev: 0 };   // bumped when a robot's name changes: the panels' keys carry it
-const pill = (label, role) => `<span class="pill" style="--c:${ROLES[role].pill || ROLES[role].color};--t:${ROLE_INK[role] || '#ffffff'}">${esc(label)}</span>`;   // = pillBg / pillInk (the escape gate reads the tables)
+/* Which CLI runs a robot (codex_app_server.py; requester 10-26: 「UIでclaudeかcodexかわかるようにしたい」): a robot's
+   pill is ringed in its CLI's colour (--cli-claude / --cli-codex, app.css), and so are its tag in the 3D, its card's
+   number and its talk mark. A label that is no robot's (a session id head, a test's) gets no ring. */
+const CLI_NAME = { claude: 'Claude', codex: 'Codex' };
+const cliOf = (label) => (DEF[label] && DEF[label].cli === 'codex' ? 'codex' : 'claude');
+const pillCli = (label) => (DEF[label] ? ` cli-${cliOf(label)}` : '');
+const pill = (label, role) => `<span class="pill${esc(pillCli(label))}" style="--c:${ROLES[role].pill || ROLES[role].color};--t:${ROLE_INK[role] || '#ffffff'}">${esc(label)}</span>`;   // = pillBg / pillInk (the escape gate reads the tables)
 /* The time the view shows (the sky, the 8-hour tiredness): the machine's clock, unless a test or the demo sets one. */
 const VIZ_CLOCK = { at: null };
 const vizNow = () => (VIZ_CLOCK.at !== null ? VIZ_CLOCK.at : Date.now());
@@ -1722,13 +1728,14 @@ const ROOMS = [
 const PROJECT = Object.fromEntries(ROOMS.map((r) => [r.id, r]));
 const SESSIONS = [
   { id: 'a0', project: 'shop', robots: ['a0', 'a3', 'a5', 'a2', 'a7'] },
-  { id: 'b4', project: 'shop', robots: ['b4', 'e6', 'f2'] },
+  { id: 'b4', cli: 'codex', project: 'shop', robots: ['b4', 'e6', 'f2'] },
   { id: 'd8', project: 'shop', robots: ['d8'] },
   { id: '4f', project: 'cli', robots: ['4f'] },
-  { id: '7c', project: 'cli', robots: ['7c'] },
+  { id: '7c', cli: 'codex', project: 'cli', robots: ['7c'] },
   { id: 'c9', project: 'doc', robots: ['c9'] },
   { id: 'e1', project: 'doc', robots: ['e1'] },
 ].map((s) => ({ ...s, room: PROJECT[s.project].name }));
+// cli: which CLI runs the session (the demo has two Codex sessions, b4 and 7c; the rest are Claude Code's)
 const ROBOT_DEFS = [
   { id: 'a0', role: 'main', agent: tl('demo.robot.session.a07c'), pos: [0.7, -2.5], ry: 0.3, furnished: true,
     plan: [[0, 'reading', 'Read docs/screens/json/cart.spec.json'], [12, 'typing', tl('demo.robot.taskcreate.7.8')], [20, 'idle', tl('demo.robot.waiting.subagent.reports')], [62, 'reading', tl('demo.robot.reviewing.a3.s.report')], [70, 'typing', tl('demo.robot.checking.what.s.left.tasklist')], [76, 'idle', tl('demo.robot.waiting.subagent.reports')]] },
@@ -1739,17 +1746,17 @@ const ROBOT_DEFS = [
   { id: 'a2', role: 'test', agent: 'jsonui-test', pos: [-7.3, 1.2], ry: 0.75,
     plan: [[0, 'idle', tl('demo.robot.idle')], [10, 'command', 'test_validate cart.test.json'], [18, 'phone', tl('demo.robot.xcodebuild.test.iphone.16')], [60, 'done', tl('demo.robot.cart.tests.8.8.passed')], [66, 'idle', tl('demo.robot.idle')]] },
   { id: 'a7', role: 'navigation', agent: 'jsonui-navigation-ios', walk: true },
-  { id: 'b4', role: 'main', agent: tl('demo.robot.session.b47e'), pos: [-0.4, 3.5], ry: 0.15, furnished: true,
+  { id: 'b4', cli: 'codex', role: 'main', agent: tl('demo.robot.session.b47e'), pos: [-0.4, 3.5], ry: 0.15, furnished: true,
     plan: [[0, 'typing', 'TaskCreate #5'], [6, 'idle', tl('demo.robot.waiting.subagent.reports')], [70, 'reading', tl('demo.robot.reviewing.e6.s.report')], [74, 'idle', tl('demo.robot.waiting.subagent.reports')]] },
-  { id: 'e6', role: 'define', agent: 'jsonui-define', pos: [-2.9, 3.4], ry: 0.25, furnished: true,
+  { id: 'e6', cli: 'codex', role: 'define', agent: 'jsonui-define', pos: [-2.9, 3.4], ry: 0.25, furnished: true,
     plan: [[0, 'reading', tl('demo.robot.read.login.spec.json.reference')], [8, 'typing', 'Write docs/screens/json/signup.spec.json'], [70, 'done', tl('demo.robot.finished.signup.spec')], [74, 'idle', tl('demo.robot.idle')]] },
-  { id: 'f2', role: 'implement', agent: 'jsonui-implement', pos: [-5.3, 3.3], ry: 0.4, furnished: true,
+  { id: 'f2', cli: 'codex', role: 'implement', agent: 'jsonui-implement', pos: [-5.3, 3.3], ry: 0.4, furnished: true,
     plan: [[0, 'typing', 'Edit docs/screens/layouts/product-detail.json'], [30, 'command', 'Bash jui build'], [36, 'typing', 'Edit ProductDetailViewModel.swift'], [74, 'command', 'jui_verify product-detail.spec.json'], [78, 'done', tl('demo.robot.finished.implementing.productdetail')], [82, 'idle', tl('demo.robot.idle')]] },
   { id: 'd8', role: 'main', agent: tl('demo.robot.session.d8a5'), pos: [-8.5, -3.5], ry: 0.6, furnished: true,
     plan: [[0, 'idle', tl('demo.robot.idle.waiting.next.prompt')], [34, 'thinking', tl('demo.robot.thinking')], [50, 'idle', tl('demo.robot.idle.waiting.next.prompt')]] },
   { id: '4f', role: 'main', agent: tl('demo.robot.session.4f2b'), pos: [6.0, -2.9], ry: 0.05, furnished: true,
     plan: [[0, 'command', 'Bash jui build --ios-only'], [22, 'done', tl('demo.robot.build.complete')], [26, 'idle', tl('demo.robot.idle')], [38, 'reading', 'Read jui_cli/commands/hotload_cmd.py'], [44, 'command', 'Bash pip install aiohttp watchdog'], [47, 'typing', 'Edit jui_cli/commands/viz_cmd.py'], [78, 'reading', tl('demo.robot.reviewing.diff')]] },
-  { id: '7c', role: 'main', agent: tl('demo.robot.session.7c3f'), pos: [8.9, -2.6], ry: -0.15, furnished: true,
+  { id: '7c', cli: 'codex', role: 'main', agent: tl('demo.robot.session.7c3f'), pos: [8.9, -2.6], ry: -0.15, furnished: true,
     plan: [[0, 'typing', 'Edit src/reporter/progress.ts'], [30, 'command', 'Bash npm test -- --progress'], [36, 'typing', 'Edit src/cli/run.ts'], [60, 'command', 'Bash npm test'], [66, 'reading', tl('demo.robot.checking.test.results')]] },
   { id: 'c9', role: 'main', agent: tl('demo.robot.session.c91e'), pos: [6.4, 2.0], ry: 0.1, furnished: true,
     plan: [[0, 'reading', 'Read docs/screens/json/spec-anatomy.spec.json'], [38, 'command', 'Bash jsonui-doc generate html'], [52, 'done', tl('demo.robot.generated.html')], [56, 'idle', tl('demo.robot.idle')]] },
@@ -2430,6 +2437,7 @@ const SOURCE = {
   denial() { return Promise.resolve({ ok: false, status: 0, error: 'demo' }); },
   notifyPresence() { return Promise.resolve(); },
   callCommand() { return Promise.resolve({ ok: false, why: tl('demo.perm.not.available.demo.there.no') }); },
+  localModels() { return Promise.resolve({ ok: false }); },
   setWeather() { return Promise.resolve({ ok: false, error: 'demo' }); },   // the demo asks nobody about the weather
   // the server room (ticket 2026-10-20-jui-viz-server-room): shop-app/'s door reads a made-up, generic layout (no real
   // service's values, requester 10-20), after a moment so the keypad's * are seen
@@ -4646,6 +4654,7 @@ function buildDemoOffice() {
     scene.add(robot.root);
     const tag = addTag('bot', `${pill(d.id, d.role)}<span class="nm"></span><span></span>`);
     tag.dataset.robot = d.id;   // a click on the tag selects the robot (tagPress in build3D)
+    tag.classList.add(`cli-${cliOf(d.id)}`);   // its CLI's ring (20-core.js cliOf)
     robots.push({ def: d, robot, tag, text: tag.lastElementChild, act: '' });
   }
 }
@@ -4904,6 +4913,7 @@ function liveAddRobot(d, i) {
   scene.add(robot.root);
   const tag = addTag('bot', `${pill(d.id, d.role)}<span class="nm"></span><span></span>`);
   tag.dataset.robot = d.id;   // a click on the tag selects the robot (tagPress in build3D)
+  tag.classList.add(`cli-${cliOf(d.id)}`);   // its CLI's ring (20-core.js cliOf)
   const R = { def: d, robot, tag, text: tag.lastElementChild, act: '', path: [], room: d.room, seatKey: '', exitAt: 0 };
   if (route.length) R.path = route.slice(1);
   d.enter = false;
@@ -8091,7 +8101,7 @@ function renderSessions() {
     const folded = UI.collapsed.has(r.id), any = scoped.some((x) => x.project === r.id);
     const itemsHTML = list.map((x) => {
       const subsHTML = x.robots.filter((id) => id !== x.id).map((id) => `<li><button type="button" class="who-btn" data-robot-open="${esc(id)}" data-fk="ss-${esc(id)}">${pill(id, DEF[id].role)}<span>${esc(DEF[id].agent)}</span></button><span class="state" data-st="${esc(id)}"></span><p class="act" data-sact="${esc(id)}"></p></li>`).join('');
-      return `<li class="session"><div class="srow"><button type="button" class="who-btn" data-robot-open="${esc(x.id)}" data-fk="ss-${esc(x.id)}">${pill(x.id, 'main')}<span class="sname">${esc(DEF[x.id].agent)}</span></button><span class="state" data-sst="${esc(x.id)}"></span></div><p class="act" data-sact="${esc(x.id)}"></p>${subsHTML ? `<ul class="subs">${subsHTML}</ul>` : ''}</li>`;
+      return `<li class="session"><div class="srow"><button type="button" class="who-btn" data-robot-open="${esc(x.id)}" data-fk="ss-${esc(x.id)}">${pill(x.id, 'main')}<span class="sname">${esc(DEF[x.id].agent)}</span><span class="cli-tag cli-${esc(cliOf(x.id))}" data-cli-name="${esc(CLI_NAME[cliOf(x.id)])}" title="${esc(CLI_NAME[cliOf(x.id)])}"></span></button><span class="state" data-sst="${esc(x.id)}"></span></div><p class="act" data-sact="${esc(x.id)}"></p>${subsHTML ? `<ul class="subs">${subsHTML}</ul>` : ''}</li>`;
     }).join('');
     return `<section class="pgroup"><button type="button" class="pg-toggle" data-fold="${esc(r.id)}" data-fk="pg-${esc(r.id)}" aria-expanded="${!folded}"><span class="pg-caret" aria-hidden="true"></span><b title="${esc(r.name)}">${esc(r.name)}</b><small data-pgsum="${esc(r.id)}"></small></button>${folded ? '' : itemsHTML ? `<ul class="sessions">${itemsHTML}</ul>` : `<p class="empty-note">${any ? esc(tl('panel.sess.nomatch')) : esc(tl('panel.sess.none'))}</p>`}</section>`;
   }).join(''));
@@ -9836,13 +9846,14 @@ function renderRobot(model) {
   const order = { doing: 0, wait: 1, todo: 2, done: 3 };
   const owned = model.tasks.filter((x) => (isMain ? x.list === id : x.owner === id)).sort((a, b) => order[a.col] - order[b.col] || a.id - b.id);
   const subs = isMain ? (SESSIONS.find((s) => s.id === id) || { robots: [] }).robots.filter((r) => r !== id) : [];
-  keyed(rbEl, JSON.stringify([id, NAMES.rev, projectOfRobot(id) || '', rbState.moved, permSig(pending), specIdx, owned.map((x) => `${x.key}:${x.col}:${x.perm ? 1 : 0}:${x.subject}`)]), () => {
+  const llm = ((sess && DEF[sess]) || d).llm || null;   // the session's model (30-source-live.js): a subagent shows its session's
+  keyed(rbEl, JSON.stringify([id, NAMES.rev, llm && llm.name, projectOfRobot(id) || '', rbState.moved, permSig(pending), specIdx, owned.map((x) => `${x.key}:${x.col}:${x.perm ? 1 : 0}:${x.subject}`)]), () => {
     const room = (SESSIONS.find((s) => s.id === sess) || { room: (PROJECT[projectOfRobot(id)] || {}).name || '' }).room;
     const tasksHTML = owned.length ? `<ul class="rb-tasks">${owned.map((x) => {
       const [c, l] = x.perm ? ['st-waiting', tl('status.waiting')] : x.col === 'wait' ? [x.waitingFor === 'question' ? 'st-asking' : 'st-waiting', waitLabel(x)] : COL_STATE[x.col];
       return `<li><button type="button" class="task-open" data-open="${esc(x.key)}" data-fk="rt-${esc(x.key)}"><span class="state ${esc(c)}">${esc(l)}</span><span class="tid">${esc(x.list)} ${esc(taskRef(x))}</span><span class="subject">${x.harness ? `<span class="h-tag">${esc(x.harness)}</span>` : ''}${esc(x.subject)}</span>${!isMain || !x.owner ? '' : `<span class="rb-owner">${pill(x.owner, DEF[x.owner].role)}</span>`}</button></li>`;
     }).join('')}</ul>` : `<p class="rb-none">${esc(tl(isMain ? 'panel.rb.tasks.empty' : 'panel.rb.owned.none'))}</p>`;
-    return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge" aria-hidden="true">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? d.title || tl('panel.rb.main', { id }) : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.title ? tl('panel.rb.main.head', { id, head: d.head }) : d.agent} · ${room}` : tl('panel.rb.sub', { role: ROLE_JA[d.role], sess, room }))}</p></div><div class="rb-side"><div class="rb-menu"><button type="button" class="wb-btn rb-talk" data-rb-talk data-fk="rb-talk" aria-pressed="false" aria-label="${esc(tl('talk.title'))}" title="${esc(tl('panel.rb.talk.title'))}">${TALK_ICON}<span>${esc(tl('talk.title'))}</span><span class="rb-talk-n" data-rb-talk-n hidden></span></button><button type="button" class="wb-btn rb-clock" data-rb-clock data-fk="rb-clock" aria-haspopup="dialog" aria-describedby="rb-clock-why">${esc(tl('panel.clk.button'))}</button></div><div class="rb-nav"><button type="button" class="rb-step" data-rb-step="-1" data-fk="rb-prev" aria-label="${esc(tl('panel.rb.prev'))}" title="${esc(tl('panel.rb.prev'))}">‹</button><button type="button" class="rb-step" data-rb-step="1" data-fk="rb-next" aria-label="${esc(tl('panel.rb.next'))}" title="${esc(tl('panel.rb.next'))}">›</button><span class="rbw-slot" data-rbw-slot></span><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">${esc(tl('panel.rb.back'))}</button></div></div><p class="rb-clock-why" id="rb-clock-why" data-rb-clock-why hidden></p>${rbMovedHTML()}</div>
+    return `<div class="rb-head" style="--c:${ROLES[d.role].color}"><span class="rb-badge cli-${esc(cliOf(id))}" aria-hidden="true" data-cli-name="${esc(CLI_NAME[cliOf(id)])}">${esc(id)}</span><div><h2 class="rb-name" id="rb-title">${esc(isMain ? d.title || tl('panel.rb.main', { id }) : d.agent)}</h2><p class="rb-sub">${esc(isMain ? `${d.title ? tl('panel.rb.main.head', { id, head: d.head }) : d.agent} · ${room}` : tl('panel.rb.sub', { role: ROLE_JA[d.role], sess, room }))}</p>${llm ? `<p class="rb-model">${esc(llm.name)}${llm.local ? `<span class="rb-local">${esc(tl('panel.rb.local'))}</span>` : ''}</p>` : ''}</div><div class="rb-side"><div class="rb-menu"><button type="button" class="wb-btn rb-talk" data-rb-talk data-fk="rb-talk" aria-pressed="false" aria-label="${esc(tl('talk.title'))}" title="${esc(tl('panel.rb.talk.title'))}">${TALK_ICON}<span>${esc(tl('talk.title'))}</span><span class="rb-talk-n" data-rb-talk-n hidden></span></button><button type="button" class="wb-btn rb-clock" data-rb-clock data-fk="rb-clock" aria-haspopup="dialog" aria-describedby="rb-clock-why">${esc(tl('panel.clk.button'))}</button></div><div class="rb-nav"><button type="button" class="rb-step" data-rb-step="-1" data-fk="rb-prev" aria-label="${esc(tl('panel.rb.prev'))}" title="${esc(tl('panel.rb.prev'))}">‹</button><button type="button" class="rb-step" data-rb-step="1" data-fk="rb-next" aria-label="${esc(tl('panel.rb.next'))}" title="${esc(tl('panel.rb.next'))}">›</button><span class="rbw-slot" data-rbw-slot></span><button type="button" class="wb-btn" id="rb-close" data-rb-close data-fk="rb-close">${esc(tl('panel.rb.back'))}</button></div></div><p class="rb-clock-why" id="rb-clock-why" data-rb-clock-why hidden></p>${rbMovedHTML()}</div>
 <div class="rb-tabs"><button type="button" class="wb-btn rb-wide-btn" data-rb-wide data-fk="rb-wide" aria-pressed="false" aria-controls="rb" hidden>${esc(tl('hist.wide.on'))}</button><div class="rb-tablist" role="tablist" aria-label="${esc(tl('panel.rb.tabs'))}"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">${esc(tl('panel.rb.tab.now'))}</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">${esc(tl('panel.rb.tab.history'))}</button></div></div>
 <div class="rb-body rb-hist" data-rb-hist hidden aria-label="${esc(tl('panel.rb.tab.history'))}" tabindex="0"></div>
 <div class="rb-body" tabindex="0" aria-label="${esc(tl('panel.rb.tab.now'))}">
@@ -10078,7 +10089,9 @@ function closeAlwaysConfirm(back) {
    callcmd.py) and a copy button. Each edit asks again; only the latest answer is shown (CALL.seq), and the copy button
    is off whenever the shown line is not the one for what is typed now. Copy: the clipboard API (127.0.0.1 is a secure
    context); when that fails, the line is selected for a manual copy. viz runs nothing. */
-const CALL = { project: null, opener: null, seq: 0, command: '', timer: 0 };
+// cli: the chosen tab, kept for the next opening; model: the Codex tab's choice ('' = Codex's default, else
+// "<provider>\t<model id>"), kept too; mseq: the latest ask for the local models (callModelsAsk)
+const CALL = { project: null, opener: null, seq: 0, command: '', timer: 0, cli: 'claude', model: '', mseq: 0 };
 const callEl = $('call');
 function openCall(project, opener) {
   if (!project || !PROJECT[project]) return;
@@ -10086,6 +10099,7 @@ function openCall(project, opener) {
   const p = PROJECT[project];
   setText($('call-lead'), tl('panel.call.lead', { name: p.name, path: p.path || '' }));
   $('call-cmd').value = ''; setText($('call-why'), tl('panel.call.name')); $('call-copy').disabled = true;
+  callTab(CALL.cli, false);
   callEl.hidden = false;
   $('call-name').focus();
   callAsk();
@@ -10101,13 +10115,15 @@ function callAsk() {
   clearTimeout(CALL.timer);
   const seq = ++CALL.seq, project = CALL.project, name = $('call-name').value, role = $('call-role').value;
   CALL.command = ''; $('call-copy').disabled = true;
+  const [provider, model] = CALL.model ? CALL.model.split('\t') : [];
+  const local = CALL.cli === 'codex' && provider && model ? { provider, model } : null;
   if (!name.trim()) { $('call-cmd').value = ''; setText($('call-why'), tl('panel.call.name')); return; }
   CALL.timer = setTimeout(async () => {
-    const got = await SOURCE.callCommand(project, name, role);
+    const got = await SOURCE.callCommand(project, name, role, CALL.cli, local);
     if (seq !== CALL.seq || callEl.hidden) return;   // typed again (or closed) meanwhile: a newer answer comes
     if (!got.ok) { $('call-cmd').value = ''; setText($('call-why'), got.why || tl('panel.call.failed')); return; }
     CALL.command = got.command; $('call-cmd').value = got.command; $('call-copy').disabled = false;
-    setText($('call-why'), got.flag === '--channels' ? tl('panel.call.ready')
+    setText($('call-why'), got.flag === 'codex' ? tl('panel.call.ready.codex') : got.flag === '--channels' ? tl('panel.call.ready')
       : tl('panel.call.ready.dev'));
   }, 150);
 }
@@ -10124,6 +10140,51 @@ async function callCopy() {
     setText($('call-why'), tl('panel.call.nocopy'));
   }
 }
+/* The CLI's tabs: Claude Code's command (callcmd.command) or Codex's (callcmd.codex_command), asked again on a change.
+   Arrow keys move between the two (the tabs' own keys, as a tablist has them). */
+function callTab(cli, ask = true) {
+  CALL.cli = cli === 'codex' ? 'codex' : 'claude';
+  for (const b of callEl.querySelectorAll('[data-call-cli]')) {
+    const on = b.dataset.callCli === CALL.cli;
+    b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1;
+  }
+  $('call-model-row').hidden = CALL.cli !== 'codex';
+  if (CALL.cli === 'codex') callModelsAsk();   // read again each time: a server started since shows its models
+  if (ask) callAsk();
+}
+/* The Codex tab's models: Codex's own default, then each local server's (SOURCE.localModels -> local_models.py), built
+   as nodes. A server that does not answer, or lists none, is one disabled line saying so. The choice is kept while it
+   is still listed. */
+async function callModelsAsk() {
+  const seq = ++CALL.mseq;
+  setText($('call-model-note'), tl('panel.call.model.reading'));
+  const got = await SOURCE.localModels();
+  if (seq !== CALL.mseq || callEl.hidden) return;
+  const pick = $('call-model'), opts = [];
+  const opt = (value, text, disabled = false) => { const o = document.createElement('option'); o.value = value; o.textContent = text; o.disabled = disabled; return o; };
+  opts.push(opt('', tl('panel.call.model.default')));
+  const values = new Set(['']);
+  for (const p of got.ok ? got.providers : []) {
+    const group = document.createElement('optgroup');
+    group.label = String(p.name || p.id);
+    if (!p.ok) group.append(opt(`-${p.id}`, tl('panel.call.model.down', { name: p.name, port: p.port }), true));
+    else if (!p.models.length) group.append(opt(`-${p.id}`, tl('panel.call.model.none', { name: p.name }), true));
+    for (const m of p.ok ? p.models : []) { const v = `${p.id}\t${m}`; values.add(v); group.append(opt(v, m)); }
+    opts.push(group);
+  }
+  pick.replaceChildren(...opts);
+  if (!values.has(CALL.model)) { CALL.model = ''; callAsk(); }
+  pick.value = CALL.model;
+  setText($('call-model-note'), tl('panel.call.model.note'));
+}
+$('call-model').addEventListener('change', (e) => { CALL.model = e.target.value; callAsk(); });
+callEl.querySelector('.call-tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-call-cli]'); if (b) callTab(b.dataset.callCli); });
+callEl.querySelector('.call-tabs').addEventListener('keydown', (e) => {
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  e.preventDefault();
+  callTab(CALL.cli === 'codex' ? 'claude' : 'codex');
+  $(CALL.cli === 'codex' ? 'call-tab-codex' : 'call-tab-claude').focus();
+});
 $('call-name').addEventListener('input', callAsk);
 $('call-role').addEventListener('input', callAsk);
 $('call-copy').addEventListener('click', callCopy);
@@ -10137,7 +10198,7 @@ callEl.addEventListener('click', (e) => { if (e.target === callEl) closeCall(); 
 callEl.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeCall(); return; }
   if (e.key === 'Tab') {   // the focus stays in the dialog
-    const f = [...callEl.querySelectorAll('input, textarea, button')].filter((x) => !x.disabled);
+    const f = [...callEl.querySelectorAll('input, textarea, select, button')].filter((x) => !x.disabled && x.tabIndex >= 0 && !x.closest('[hidden]'));   // the tab not chosen is reached by the arrows
     const i = f.indexOf(document.activeElement);
     e.preventDefault();
     f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
@@ -12451,6 +12512,9 @@ function composeTarget(id) {
   if (DEF[id].kind === 'sub') return { why: tl('hist.why.sub', { main: SESSION_OF[id] }) };
   if (location.hostname !== '127.0.0.1') return { why: tl('hist.why.local', { port: location.port }) };
   if (!sess || sess.status === 'ended') return { why: tl('hist.why.ended') };
+  // a Codex session (codex_app_server.py): the daemon could take a prompt (turn/start), but the prototype does not send
+  // one yet — its history comes from Codex's own rollout files, not read yet either
+  if (sess.cli === 'codex') return { why: tl('hist.why.codex') };
   if (!sess.relay) return { why: tl('hist.why.norelay') + RELAY_HOW_TEXT };
   if (!sess.prompt) return { why: tl('hist.why.old') };
   const L = LAUNCH_WHY[sess.launch] || LAUNCH_WHY.unreadable;
@@ -15534,7 +15598,7 @@ function talkPeerMark(peer, label = SOURCE.talkLabel(peer.agentId)) {
   const span = hNode('span', 'talk-mark');
   span.setAttribute('aria-hidden', 'true');
   if (label && DEF[label]) {   // the robot's mark, as pill() draws it (built as nodes here)
-    const role = DEF[label].role, mark = hNode('span', 'pill', label);
+    const role = DEF[label].role, mark = hNode('span', `pill cli-${cliOf(label)}`, label);
     mark.style.setProperty('--c', pillBg(role)); mark.style.setProperty('--t', pillInk(role));
     span.appendChild(mark);
   }

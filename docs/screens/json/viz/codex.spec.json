@@ -1,0 +1,147 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "Codex",
+    "displayName": "Watch Codex sessions in jui viz",
+    "description": "jui viz > Codex sessions. One article of the /viz section, added on 2026-10-29. Sections: Start the Codex daemon / What you see / Answer Codex's permission requests / Stop a turn / Start a Codex session from the bell / Local models (LM Studio and Ollama) / Codex's usage limits in the header / Not in 2.3.25. Written from the shipped jsonui-cli source.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "viz/codex",
+    "createdAt": "2026-10-29",
+    "updatedAt": "2026-10-29"
+  },
+  "structure": {
+    "components": [],
+    "customComponents": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Closing 'keep reading' cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed the card collections."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed the card collections from a static catalog; each title / description is resolved through StringManager with the viz_codex_ prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "router.push(url). Destinations: /viz, /viz/setup, /viz/room."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Closing 'keep reading' cards."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is spec-mapped",
+      "destination": "Target screen",
+      "description": "v1: /viz, /viz/setup, /viz/room."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/viz/codex.json",
+      "description": "Layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/viz/CodexViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/viz/codex/page.tsx",
+      "description": "Page."
+    }
+  ],
+  "notes": [
+    "Screenshots live in docs/screens/images/viz/ and are taken with sample data only."
+  ]
+}
