@@ -110,6 +110,13 @@ export class VizViewModel {
       onNavigate: () => this.navigate("/viz/sessions"),
     },
     {
+      id: "next_messages",
+      titleKey: lookup("next_messages_title"),
+      descriptionKey: lookup("next_messages_description"),
+      url: "/viz/messages",
+      onNavigate: () => this.navigate("/viz/messages"),
+    },
+    {
       id: "next_approvals",
       titleKey: lookup("next_approvals_title"),
       descriptionKey: lookup("next_approvals_description"),

@@ -107,7 +107,8 @@ const COL = {
 const WEAR = { overall: '#ff8c1a', stripe: '#e8edf3', brim: '#c25e00', rim: '#ffffff', edge: '#1f2a44' };
 const SUB_SIZE = 0.8;
 // asking: a question waits (ticket 2026-10-20-jui-viz-3d-waiting-kinds-question-permission-input): a violet far from the permission's amber
-const LAMP = { idle: '#8fa3bf', busy: '#35d07f', think: '#8fe0b4', bg: '#4cc3d9', waiting: '#ffb020', asking: '#b48cff', done: '#35d07f', off: '#2a3a30' };
+// limited: stopped at the plan's usage limit (ticket 2026-10-29-viz-limit-stopped-robot-dazed), a pink apart from amber and violet
+const LAMP = { idle: '#8fa3bf', busy: '#35d07f', think: '#8fe0b4', bg: '#4cc3d9', waiting: '#ffb020', asking: '#b48cff', limited: '#ff5fa2', done: '#35d07f', off: '#2a3a30' };
 const STATES = {
   idle: { name: tl('status.idle'), lamp: 'idle', face: 'normal' },
   thinking: { name: tl('status.thinking'), lamp: 'think', face: 'normal' },
@@ -120,8 +121,9 @@ const STATES = {
   carry: { name: tl('robot.state.carry'), lamp: 'busy', face: 'normal' },
   stroll: { name: tl('robot.state.stroll'), lamp: 'idle', face: 'normal' },   // to and from play (10-18): no papers; the lamp is the real state's
   done: { name: tl('status.done'), lamp: 'done', face: 'happy' },
+  limited: { name: tl('status.limited'), lamp: 'limited', face: 'dizzy' },   // dazed: × eyes, stars circle its head (BUILDERS.limited)
 };
-const LAMP_TEXT = { idle: tl('lamp.idle'), busy: tl('lamp.busy'), think: tl('lamp.think'), waiting: tl('lamp.waiting'), asking: tl('lamp.asking'), done: tl('lamp.done'), bg: tl('lamp.bg') };
+const LAMP_TEXT = { idle: tl('lamp.idle'), busy: tl('lamp.busy'), think: tl('lamp.think'), waiting: tl('lamp.waiting'), asking: tl('lamp.asking'), done: tl('lamp.done'), bg: tl('lamp.bg'), limited: tl('lamp.limited') };
 
 const HIPS_Y = 0.36;
 const HEAD = { w: 1.1, h: 0.9, d: 0.92, r: 0.17 };
@@ -288,6 +290,17 @@ function drawCover(c) {
   ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'; ctx.font = `700 18px ${FONT_MONO}`; ctx.fillText('Login', c.width / 2, 150);
 }
 
+/* A yellow five-pointed star with a dark edge (BUILDERS.limited's sprites). */
+function starCanvas() {
+  const c = makeCanvas(96, 96), ctx = c.getContext('2d');
+  ctx.beginPath();
+  for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + (k * Math.PI) / 5, rad = k % 2 ? 18 : 42; ctx[k ? 'lineTo' : 'moveTo'](48 + Math.cos(a) * rad, 50 + Math.sin(a) * rad); }
+  ctx.closePath();
+  ctx.fillStyle = '#ffd23f'; ctx.fill();
+  ctx.lineJoin = 'round'; ctx.lineWidth = 5; ctx.strokeStyle = '#7a5200'; ctx.stroke();
+  return c;
+}
+
 /* ---------- per-robot drawings ---------- */
 function drawFace(ctx, mode, tint = null, eyes = null) {   // eyes: a skill spirit's {shape, color} (mode 'spirit', 45-spirits.js)
   const W = ctx.canvas.width, H = ctx.canvas.height;
@@ -319,6 +332,10 @@ function drawFace(ctx, mode, tint = null, eyes = null) {   // eyes: a skill spir
       ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(x - side * 22, ey - 24); ctx.lineTo(x + side * 20, ey - 12); ctx.stroke();
     } else if (mode === 'drained') {                      // drained: small eyes sunk low, looking down
       ctx.beginPath(); ctx.arc(x, ey + 12, 8, 0, Math.PI * 2); ctx.fill();
+    } else if (mode === 'dizzy') {                        // dazed at the usage limit: × eyes (the requester, 10-29)
+      ctx.lineWidth = 10; ctx.beginPath();
+      ctx.moveTo(x - 16, ey - 16); ctx.lineTo(x + 16, ey + 16); ctx.moveTo(x + 16, ey - 16); ctx.lineTo(x - 16, ey + 16);
+      ctx.stroke();
     } else if (mode === 'whistle') {                      // blowing the whistle: eyes squeezed shut with the effort
       ctx.lineWidth = 9; ctx.beginPath();                 // > <
       ctx.moveTo(x + side * 17, ey - 12); ctx.lineTo(x - side * 5, ey); ctx.lineTo(x + side * 17, ey + 12); ctx.stroke();
@@ -327,6 +344,7 @@ function drawFace(ctx, mode, tint = null, eyes = null) {   // eyes: a skill spir
   ctx.lineWidth = 6; ctx.beginPath();
   if (mode === 'whistle') { /* the whistle covers the mouth */ }
   else if (mode === 'fired') { ctx.moveTo(cx - 14, 96); ctx.lineTo(cx + 14, 96); }   // a set jaw
+  else if (mode === 'dizzy') { ctx.moveTo(cx - 20, 98); for (let k = 1; k <= 4; k++) ctx.quadraticCurveTo(cx - 20 + k * 10 - 5, 98 + (k % 2 ? -7 : 7), cx - 20 + k * 10, 98); }   // a zigzag mouth
   else if (mode === 'drained') { ctx.moveTo(cx - 16, 98); ctx.quadraticCurveTo(cx - 8, 90, cx, 98); ctx.quadraticCurveTo(cx + 8, 106, cx + 16, 98); }   // a wobbly mouth
   else if (mode === 'happy') ctx.arc(cx, 86, 14, Math.PI * 0.1, Math.PI * 0.9);
   else if (mode === 'wide') ctx.arc(cx, 98, 7, 0, Math.PI * 2);
@@ -1227,6 +1245,22 @@ const BUILDERS = {
     return { group };
   },
   background(r) { return BUILDERS.typing(r); },   // the same laptop (and desk where the room has none) as typing
+  limited(r) {   // 上限で停止: five stars circling over the head (気絶), tilting as they go; reduced motion: still
+    const group = new THREE.Group(), ring = new THREE.Group(); ring.position.set(0, 2.02, 0.05); group.add(ring);
+    if (!S.mat.star) S.mat.star = new THREE.SpriteMaterial({ map: texFrom(starCanvas()), transparent: true, depthWrite: false });
+    const n = 5;
+    for (let i = 0; i < n; i++) { const star = new THREE.Sprite(S.mat.star); star.scale.set(0.24, 0.24, 1); ring.add(star); }
+    const place = (s) => {
+      const turn = reduceMotion ? 0 : s * 2.6;
+      ring.children.forEach((star, i) => {
+        const a = turn + (i / n) * Math.PI * 2;
+        star.position.set(Math.cos(a) * 0.58, Math.sin(a * 2 + i) * 0.05, Math.sin(a) * 0.46);
+      });
+      ring.rotation.z = reduceMotion ? 0.08 : Math.sin(s * 1.7) * 0.14;   // with the lolling head
+    };
+    place(0);
+    return { group, update: place };
+  },
   reading(r) {
     const g = S.geo, m = S.mat, group = new THREE.Group();
     const book = new THREE.Group(); book.position.set(0, 0.93, 0.47); book.rotation.x = -0.35; book.scale.setScalar(1.2); group.add(book);
@@ -1438,6 +1472,13 @@ function poseFor(state, s) {
       const w = s * 7;
       p.lLx = Math.sin(w) * 0.5; p.lRx = -Math.sin(w) * 0.5; p.hipsY = Math.abs(Math.cos(w)) * 0.03; p.torsoY = Math.sin(w) * 0.05;
       p.aLx = -0.95; p.aLz = -0.5; p.aRx = -0.95; p.aRz = 0.5; p.headX = 0.04;
+      break;
+    }
+    case 'limited': {   // dazed at the usage limit: slumped, arms hanging, the head lolling round
+      const roll = reduceMotion ? 0 : s * 1.7;
+      p.torsoX = 0.12; p.hipsY = -0.01;
+      p.headX = 0.16 + Math.cos(roll) * 0.08; p.headZ = Math.sin(roll) * 0.2; p.headY = Math.sin(roll * 0.5) * 0.1;
+      p.aLx = 0.12; p.aLz = 0.05; p.aRx = 0.12; p.aRz = -0.05;
       break;
     }
     case 'done': {
@@ -2662,7 +2703,7 @@ setTimeout(() => {
 const TALK_DEMO_BY_LANGUAGE = {
  "en": {
   "about": "The talk view's demo data (frames as talk_contract.json says), for the demo page only. Times are ms around base; the page moves them by its own clock (now - base). script: frames that arrive t seconds into the demo.",
-  "contractVersion": 2,
+  "contractVersion": 3,
   "base": 1792300000000,
   "badges": {
    "type": "talk.badges",
@@ -3415,7 +3456,7 @@ const TALK_DEMO_BY_LANGUAGE = {
  },
  "ja": {
   "about": "The talk view's demo data (frames as talk_contract.json says), for the demo page only. Times are ms around base; the page moves them by its own clock (now - base). script: frames that arrive t seconds into the demo.",
-  "contractVersion": 2,
+  "contractVersion": 3,
   "base": 1792300000000,
   "badges": {
    "type": "talk.badges",
@@ -5402,7 +5443,10 @@ function liveSoloSync() {
   rosterSync(solo);
   const box = document.getElementById('room-solo');
   if (!box) return;
-  box.hidden = !solo || !has3D || TOWER.on || zoom.zoomed || ds.open || pr.open;   // the data server's sheet covers it (2.3.5)
+  // a robot's card keeps it (requester, 10-29: 「この状態でもサーバールームの入り口と呼び鈴は押せるようにして」 — the card and the
+  // room's list open over the 3D); the spec and task boards still take the view
+  const cardOnly = zoom.zoomed && !!rbState.id && !wb.open && !tb.open;
+  box.hidden = !solo || !has3D || TOWER.on || (zoom.zoomed && !cardOnly) || ds.open || pr.open;   // the data server's sheet covers it (2.3.5)
   if (solo) setText(document.getElementById('room-solo-name'), PROJECT[solo].name);
   const call = document.getElementById('room-call');
   if (call) call.hidden = SOURCE.mode !== 'live';   // the call bell's keyboard way in (2.3.5); the demo has no folder
@@ -7986,13 +8030,13 @@ const STATUS_CLASS = { idle: 'st-idle', write: 'st-write', written: 'st-idle', i
 const BADGES = {
   waiting: ['st-waiting', 'status.waiting'], asking: ['st-asking', 'status.asking'], done: ['st-done', 'status.done'],
   idle: ['st-idle', 'status.idle'], thinking: ['st-busy', 'status.thinking'], background: ['st-bg', 'status.background'],
-  busy: ['st-busy', 'status.busy'],
+  busy: ['st-busy', 'status.busy'], limited: ['st-limited', 'status.limited'],
 };
 function robotBadgeKind(id) {
   const s = robotState[id].state;
   // a question waits for the person too, but it is no permission: its own badge and filter (requester, 10-18)
   if (s === 'waiting') return robotState[id].asking ? 'asking' : 'waiting';
-  return ['done', 'idle', 'thinking', 'background'].includes(s) ? s : 'busy';
+  return ['done', 'idle', 'thinking', 'background', 'limited'].includes(s) ? s : 'busy';
 }
 const badgeOf = (kind) => [BADGES[kind][0], tl(BADGES[kind][1])];
 const robotBadge = (id) => badgeOf(robotBadgeKind(id));
@@ -8014,7 +8058,7 @@ const scopeLabel = () => (UI.project === 'all' ? tl('panel.scope.all') : PROJECT
 function sessionBadge(s) {
   const kinds = new Set(s.robots.map(robotBadgeKind));
   // A session whose busy robots only think says 考え中, as its robot row does (they disagreed — 10-18 review).
-  return badgeOf(['waiting', 'asking', 'busy', 'thinking', 'background'].find((k) => kinds.has(k)) || 'idle');
+  return badgeOf(['waiting', 'asking', 'limited', 'busy', 'thinking', 'background'].find((k) => kinds.has(k)) || 'idle');
 }
 /* A robot on the whiteboards (10-19): its mark, and its session's name when it has one. */
 const robotWho = (id) => `${pill(id, DEF[id].role)}${DEF[id].title ? `<span class="who-name">${esc(DEF[id].title)}</span>` : ''}`;
@@ -8073,7 +8117,7 @@ $('btn-taskboard').addEventListener('click', (e) => openTaskBoard(e.currentTarge
 
 const COL_STATE = { doing: ['st-busy', tl('status.busy')], wait: ['st-waiting', tl('panel.col.wait')], todo: ['st-idle', tl('panel.col.todo')], done: ['st-done', tl('status.done')] };
 const paintState = (node, [cls, label]) => { if (!node) return; const c = `state ${cls}`; if (node.className !== c) node.className = c; setText(node, label); };
-const SESS_FILTERS = [['all', tl('panel.scope.all')], ['active', tl('panel.sf.active')], ['waiting', tl('status.waiting')], ['asking', tl('panel.sf.asking')], ['background', tl('status.background')], ['idle', tl('status.idle')]];
+const SESS_FILTERS = [['all', tl('panel.scope.all')], ['active', tl('panel.sf.active')], ['waiting', tl('status.waiting')], ['asking', tl('panel.sf.asking')], ['limited', tl('status.limited')], ['background', tl('status.background')], ['idle', tl('status.idle')]];
 const sessFilterEl = $('sess-filter');
 sessFilterEl.innerHTML = SESS_FILTERS.map(([k, label]) => `<button type="button" data-sf="${esc(k)}" aria-pressed="${k === UI.sessFilter}">${esc(label)}<b></b></button>`).join('');
 sessFilterEl.addEventListener('click', (e) => {
@@ -8083,7 +8127,7 @@ sessFilterEl.addEventListener('click', (e) => {
   [...sessFilterEl.children].forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
   renderSessions();
 });
-const sessMatch = (s, f) => { const [c] = sessionBadge(s); return f === 'all' || (f === 'active' && c !== 'st-idle') || (f === 'waiting' && c === 'st-waiting') || (f === 'asking' && c === 'st-asking') || (f === 'background' && c === 'st-bg') || (f === 'idle' && c === 'st-idle'); };
+const sessMatch = (s, f) => { const [c] = sessionBadge(s); return f === 'all' || (f === 'active' && c !== 'st-idle' && c !== 'st-limited') || (f === 'limited' && c === 'st-limited') || (f === 'waiting' && c === 'st-waiting') || (f === 'asking' && c === 'st-asking') || (f === 'background' && c === 'st-bg') || (f === 'idle' && c === 'st-idle'); };
 $('sessions').addEventListener('click', (e) => {
   const b = e.target.closest('[data-fold]');
   if (!b) return;
@@ -8091,7 +8135,7 @@ $('sessions').addEventListener('click', (e) => {
   writePref('collapsed', JSON.stringify([...UI.collapsed]));
   renderSessions();
 });
-const SB_ORDER = { 'st-waiting': 0, 'st-asking': 1, 'st-busy': 2, 'st-bg': 3, 'st-idle': 4 };
+const SB_ORDER = { 'st-waiting': 0, 'st-asking': 1, 'st-limited': 2, 'st-busy': 3, 'st-bg': 4, 'st-idle': 5 };
 function renderSessions() {
   const el = $('sessions'), scoped = SESSIONS.filter((s) => inScope(s.project));
   [...sessFilterEl.children].forEach((b) => setText(b.lastElementChild, String(scoped.filter((s) => sessMatch(s, b.dataset.sf)).length)));
@@ -9857,7 +9901,7 @@ function renderRobot(model) {
 <div class="rb-tabs"><button type="button" class="wb-btn rb-wide-btn" data-rb-wide data-fk="rb-wide" aria-pressed="false" aria-controls="rb" hidden>${esc(tl('hist.wide.on'))}</button><div class="rb-tablist" role="tablist" aria-label="${esc(tl('panel.rb.tabs'))}"><button type="button" role="tab" data-rb-tab="now" data-fk="rb-tab-now" aria-selected="true">${esc(tl('panel.rb.tab.now'))}</button><button type="button" role="tab" data-rb-tab="history" data-fk="rb-tab-history" aria-selected="false">${esc(tl('panel.rb.tab.history'))}</button></div></div>
 <div class="rb-body rb-hist" data-rb-hist hidden aria-label="${esc(tl('panel.rb.tab.history'))}" tabindex="0"></div>
 <div class="rb-body" tabindex="0" aria-label="${esc(tl('panel.rb.tab.now'))}">
-<section class="rb-sec" aria-labelledby="rb-h-now"><h3 id="rb-h-now">${esc(tl('panel.rb.now'))}</h3><div class="rb-now"><p class="rb-state"><span class="rb-lamp" data-rb-lamp></span><b data-rb-state></b><span class="rb-since">${esc(tl('panel.rb.lamp'))}<span data-rb-lampname></span></span></p><p class="rb-act" data-rb-act></p><p class="rb-git" data-rb-git hidden title="${esc(tl('panel.rb.git.title'))}"></p><p class="rb-cond" data-rb-cond></p><p class="rb-looks" data-rb-looks hidden></p>${spec ? `<p class="rb-spec"><button type="button" class="link-btn" data-spec-open="${specIdx}" data-fk="rb-spec">${esc(tl('panel.rb.spec', { name: spec.name, screen: spec.screen }))}</button> <span data-rb-specnow></span></p><span class="rb-segs" style="--c:${ROLES[d.role].color}">${SEGS}</span>` : ''}${(SOURCE.mode === 'demo' && id === 'a2') ? '<p class="rb-test" data-rb-test></p><div class="prog" data-rb-prog role="img"><span class="p"></span><span class="r"></span></div>' : ''}</div></section>
+<section class="rb-sec" aria-labelledby="rb-h-now"><h3 id="rb-h-now">${esc(tl('panel.rb.now'))}</h3><div class="rb-now"><p class="rb-state"><span class="rb-lamp" data-rb-lamp></span><b data-rb-state></b><span class="rb-since">${esc(tl('panel.rb.lamp'))}<span data-rb-lampname></span></span></p><p class="rb-act" data-rb-act></p><p class="rb-limit" data-rb-limit hidden></p><p class="rb-git" data-rb-git hidden title="${esc(tl('panel.rb.git.title'))}"></p><p class="rb-cond" data-rb-cond></p><p class="rb-looks" data-rb-looks hidden></p>${spec ? `<p class="rb-spec"><button type="button" class="link-btn" data-spec-open="${specIdx}" data-fk="rb-spec">${esc(tl('panel.rb.spec', { name: spec.name, screen: spec.screen }))}</button> <span data-rb-specnow></span></p><span class="rb-segs" style="--c:${ROLES[d.role].color}">${SEGS}</span>` : ''}${(SOURCE.mode === 'demo' && id === 'a2') ? '<p class="rb-test" data-rb-test></p><div class="prog" data-rb-prog role="img"><span class="p"></span><span class="r"></span></div>' : ''}</div></section>
 ${pending ? `<section class="rb-sec" aria-label="${esc(tl('panel.rb.perm'))}">${permDetail(pending, 'rb')}</section>` : ''}
 ${SOURCE.mode === 'live' ? `<section class="rb-sec" aria-labelledby="rb-h-tests"><h3 id="rb-h-tests">${esc(tl('panel.rb.tests'))}</h3><div data-rb-tests></div></section>` : ''}
 <section class="rb-sec" aria-labelledby="rb-h-tasks"><h3 id="rb-h-tasks">${esc(tl(isMain ? 'panel.rb.tasks' : 'panel.rb.owned'))}<small>${esc(tl('panel.tb.count', { n: owned.length }))}</small></h3>${tasksHTML}</section>
@@ -9871,6 +9915,8 @@ ${subs.length ? `<section class="rb-sec" aria-labelledby="rb-h-subs"><h3 id="rb-
   setText(rbEl.querySelector('[data-rb-lampname]'), st.asking ? LAMP_TEXT.asking : LAMP_TEXT[S.lamp] || '');
   const lamp = rbEl.querySelector('[data-rb-lamp]'); if (lamp) lamp.style.background = st.asking ? LAMP.asking : LAMP[S.lamp];   // its swatch as its name
   setText(rbEl.querySelector('[data-rb-act]'), st.act);
+  const limitEl = rbEl.querySelector('[data-rb-limit]');
+  if (limitEl) { limitEl.hidden = !st.limitWords; setText(limitEl, st.limitWords || ''); }
   // the box (2.3.4): its last push / pull, from the server's agent.git
   const gitEl = rbEl.querySelector('[data-rb-git]');
   if (gitEl) { const g = st.git; gitEl.hidden = !g; if (g) setText(gitEl, tl('panel.rb.git', { label: g.label || '', time: new Date(g.at || 0).toTimeString().slice(0, 5) })); }
@@ -9930,7 +9976,7 @@ const CLOCK_WHY = {
   other: tl('panel.clk.why.other'),
   unknown: tl('panel.clk.why.unknown'),
 };
-const CLIENT_JA = { terminal: tl('panel.client.terminal'), vscode: tl('panel.client.vscode'), desktop: tl('panel.client.desktop'), other: tl('panel.client.other'), unknown: tl('panel.client.unknown') };
+const CLIENT_JA = { terminal: tl('panel.client.terminal'), vscode: tl('panel.client.vscode'), desktop: tl('panel.client.desktop'), other: tl('panel.client.other'), unknown: tl('panel.client.unknown'), codex: tl('panel.client.codex') };
 const CLOCK = { busy: null, last: null };
 let clockDlg = null;
 function clockTarget(id) {
@@ -9939,8 +9985,9 @@ function clockTarget(id) {
   if (DEF[id].kind === 'sub') return { why: tl('panel.clk.why.sub', { id: SESSION_OF[id] }) };
   const sess = SESSIONS.find((x) => x.id === SESSION_OF[id]);
   if (!sess || sess.status === 'ended' || LIVE.leaving[id]) return { why: tl('panel.clk.why.ended') };
-  const client = sess.client || 'unknown';
-  if (client !== 'terminal') return { why: CLOCK_WHY[client] || CLOCK_WHY.unknown, client };
+  // a Codex session leaves its thread (the server unsubscribes; no process is signalled), whatever started it
+  const client = sess.cli === 'codex' ? 'codex' : sess.client || 'unknown';
+  if (client !== 'terminal' && client !== 'codex') return { why: CLOCK_WHY[client] || CLOCK_WHY.unknown, client };
   if (location.hostname !== '127.0.0.1') return { why: tl('panel.clk.why.host', { port: location.port }), client };
   return { why: '', sess, client };
 }
@@ -9965,7 +10012,7 @@ function openClockConfirm(id) {
   const title = t.sess.title || tl('talk.noname');
   el.innerHTML = `<div class="pcf-box"><h3 id="clk-title">${esc(tl('panel.clk.title', { id }))}</h3>
 <dl class="clk-facts"><dt>${esc(tl('panel.sb.robot'))}</dt><dd data-clk-robot>${pill(id, DEF[id].role)} ${esc(tl('panel.rb.main', { id }))}</dd><dt>${esc(tl('panel.sb.session'))}</dt><dd data-clk-title>${esc(title)}</dd><dt>${esc(tl('panel.clk.folder'))}</dt><dd data-clk-cwd><code>${esc(CWD[id] || '?')}</code></dd><dt>${esc(tl('panel.clk.client'))}</dt><dd data-clk-client>${esc(CLIENT_JA[t.client] || t.client)}</dd></dl>
-<p id="clk-note">${esc(tl('panel.clk.note'))}</p>
+<p id="clk-note">${esc(tl(t.client === 'codex' ? 'panel.clk.note.codex' : 'panel.clk.note'))}</p>
 <div class="pcf-acts"><button type="button" class="pa clk-go" data-clk-go>${esc(tl('panel.clk.go'))}</button><button type="button" class="pa clk-cancel" data-clk-cancel>${esc(tl('panel.cancel'))}</button></div></div>`;
   document.body.append(el);
   clockDlg = { el, id, opener, at: Date.now() };
@@ -9996,9 +10043,10 @@ async function clockGo(id) {
   if (clockTarget(id).why || CLOCK.busy) return;
   CLOCK.busy = id; CLOCK.last = null;
   if (rbState.id === id) clockPaint(id);
+  const codex = clockTarget(id).client === 'codex';
   const got = await SOURCE.clockOut(id);
   CLOCK.busy = null;
-  if (got.ok) showToast(tl('panel.clk.done', { id }));
+  if (got.ok) showToast(tl(!codex ? 'panel.clk.done' : got.note ? 'panel.clk.done.codex_held' : 'panel.clk.done.codex', { id }));
   else { CLOCK.last = { id, error: got.error || `HTTP ${got.status}` }; showToast(tl('panel.clk.failed.id', { id, error: CLOCK.last.error })); }
   if (rbState.id === id) clockPaint(id);
 }
@@ -10522,8 +10570,28 @@ const sdListKey = (project, app) => `${project}|${app}`;
 function sdOverviewApp(model) {
   if (wb.app === 'all' || wb.app.indexOf('@') < 0) return null;
   const s = model.specs.find((x) => (x.app || '') === wb.app && inScope(x.project) && sdIsWorktree(x));
-  return s ? { project: s.project, app: wb.app, branch: s.checkout.branch } : null;
+  return s ? { project: s.project, app: wb.app, branch: s.checkout.branch, worktree: s.checkout.worktree } : null;
 }
+/* The sessions working in a worktree now (ticket 2026-10-29-viz-spec-board-worktree-session-name; requester: 「これ差分ボタンの
+   右に作成者のセッション名出せる？」): who made it is recorded nowhere, but a worktree is on the board only while a session not
+   ended works there (ingest.py _worktrees_tick: its cwd, or a checkout its tools named within 30 minutes, session.touched) —
+   those, by name, beside the button. */
+function sdWorkers(worktree) {
+  if (!worktree) return [];
+  const w = String(worktree).replace(/\/+$/, '');
+  return SESSIONS.filter((x) => x.status !== 'ended' && (x.cwd === w || x.cwd.startsWith(w + '/') || x.touched.includes(w)));
+}
+function sdWhoRender(worktree) {
+  const el = $('wb-wt-who');
+  const who = SOURCE.mode === 'live' ? sdWorkers(worktree) : [];
+  const shown = who.slice(0, SD_WHO_MAX);
+  const whoHTML = shown.map((x) => `<span class="sd-who-one">${pill(x.id, DEF[x.id] ? DEF[x.id].role : 'main')}<span class="sd-who-nm">${esc(x.title || tl('panel.rb.main', { id: x.id }))}</span></span>`).join('')
+    + (who.length > shown.length ? `<span class="sd-who-more">${esc(tl('sd.who.more', { n: who.length - shown.length }))}</span>` : '');
+  el.hidden = !who.length;
+  el.title = who.length ? tl('sd.who.title') : '';
+  setHTML(el, whoHTML);
+}
+const SD_WHO_MAX = 2;
 /* The head's button: shown and named as the open sheet or the overview needs (renderSheet / renderOverview). */
 function sdHeadButton(model, s) {
   const b = $('wb-diff');
@@ -10532,10 +10600,12 @@ function sdHeadButton(model, s) {
     b.hidden = !(live && sdIsWorktree(s));
     setText(b, tl('sd.button'));
     b.dataset.sdFor = 'spec';
+    sdWhoRender(b.hidden ? null : s.checkout.worktree);
     return;
   }
   const ov = live ? sdOverviewApp(model) : null;
   b.hidden = !ov;
+  sdWhoRender(ov ? ov.worktree : null);
   if (!ov) return;
   const st = SD.lists[sdListKey(ov.project, ov.app)];
   setText(b, !st || st.state === 'off' ? tl('sd.button') : st.state === 'loading' ? tl('sd.button.loading') : tl('sd.button.hide'));
@@ -11066,8 +11136,9 @@ $('chip-input').addEventListener('click', () => {
 /* ---------- the waits beside an open card (requester 10-23: 「質問や許可まちがカード開いてると見えないので、開いてるときは
    カードの左側の上の方に許可が来たのがわかるようにしてほしい」) ----------
    While a robot's card is open, the header's chips and the other robots' bubbles are behind it. Beside the card, out of
-   it at its top-left corner, a small block says what the other sessions wait on — permissions, questions, stopped calls
-   — how many, and whose (each robot's mark). The open card's own session is left out: its wait is in the card. A
+   it at its top-left corner, a small block says what the sessions wait on — permissions, questions, stopped calls
+   — how many, and whose (each robot's mark). The open robot's own permission is listed too (requester 10-29: 「サイドの一覧に
+   現在のロボットの許可も出るようにして」); its own question and stopped call stay left out (their card is open). A
    robot's button opens its wait's card (waitOpen, as its bubble does); the sum opens the task board's waiting strip (as
    the chips do). Where the card is the page's width (a phone's sheet, or the card widened to the whole stage) the block
    has no room beside it: the count goes in the card's head row as a badge that opens the same board. Something new moves
@@ -11080,7 +11151,7 @@ const rbwKinds = (ks) => ks.map((x) => tl(RBW_KIND[x])).join(tl('rbw.sep'));
 const CARD_WAIT_MAX = 6;   // robots listed; the rest said as ほか N
 function cardWaitItems() {
   const own = rbState.id, out = [];
-  for (const p of (latestModel && latestModel.pending) || []) if (p.who !== own && p.status === 'pending') out.push({ kind: 'perm', who: p.who, key: `p:${p.id}`, it: p });
+  for (const p of (latestModel && latestModel.pending) || []) if (p.status === 'pending') out.push({ kind: 'perm', who: p.who, key: `p:${p.id}`, it: p });
   for (const d of denialsWaiting()) if (d.who !== own) out.push({ kind: 'denied', who: d.who, key: `d:${d.id}`, it: d });
   for (const q of questionsWaiting()) if (q.who !== own) out.push({ kind: 'ask', who: q.who, key: `q:${q.id}`, it: q });
   return out.filter((x) => DEF[x.who]);
@@ -12512,9 +12583,7 @@ function composeTarget(id) {
   if (DEF[id].kind === 'sub') return { why: tl('hist.why.sub', { main: SESSION_OF[id] }) };
   if (location.hostname !== '127.0.0.1') return { why: tl('hist.why.local', { port: location.port }) };
   if (!sess || sess.status === 'ended') return { why: tl('hist.why.ended') };
-  // a Codex session (codex_app_server.py): the daemon could take a prompt (turn/start), but the prototype does not send
-  // one yet — its history comes from Codex's own rollout files, not read yet either
-  if (sess.cli === 'codex') return { why: tl('hist.why.codex') };
+  if (sess.cli === 'codex') return sess.prompt ? { why: '', name, note: '' } : { why: tl('hist.why.codex') };
   if (!sess.relay) return { why: tl('hist.why.norelay') + RELAY_HOW_TEXT };
   if (!sess.prompt) return { why: tl('hist.why.old') };
   const L = LAUNCH_WHY[sess.launch] || LAUNCH_WHY.unreadable;
@@ -12730,34 +12799,39 @@ function histCardsBox() {
    opens it again. Folded, nothing is taken away: the cards stay (hidden), with what was typed and picked in them.
    Remembered per robot (HIST_FOLD: its id -> the waits it had when folded). A new wait while folded: the box stays
    folded (the person is reading), the bar says the new count, moves once and stays marked until opened (h-fold-new). When nothing waits any more
-   the robot's fold is forgotten: the next question comes open. */
+   the robot's fold is forgotten: the next question or permission comes open (requester 10-29: 「許可の応答の履歴での表示は
+   初期表示は開いた状態で閉じる押したら１行にして」 — #64's permission folded at first is reversed). A fold chosen stays
+   through pending → sent. */
 const HIST_FOLD = new Map();
-const histFoldKeys = (perms, qs, ds) => [...perms.filter((p) => p.status === 'pending').map((p) => `p:${p.id}`),
-  ...qs.filter((q) => q.status === 'pending').map((q) => `q:${q.id}`), ...ds.filter((d) => d.status === 'pending').map((d) => `d:${d.id}`)];
+const histFoldKeys = (perms, qs, ds) => [...perms.filter((p) => p.status === 'pending' || p.status === 'sent').map((p) => `p:${p.id}`),
+  ...qs.filter((q) => q.status === 'pending' || q.status === 'sent').map((q) => `q:${q.id}`), ...ds.filter((d) => d.status === 'pending').map((d) => `d:${d.id}`)];
 function histFoldState(id, perms, qs, ds) {
-  const keys = histFoldKeys(perms, qs, ds), fold = HIST_FOLD.get(id);
+  const keys = histFoldKeys(perms, qs, ds);
+  const fold = HIST_FOLD.get(id);
   if (!keys.length) { HIST_FOLD.delete(id); return { folded: false, n: 0, fresh: false }; }
-  if (!fold) return { folded: false, n: keys.length, fresh: false };
-  if (fold.init) fold.init = false;   // folded now: what waits now is what was seen
-  else if (keys.some((k) => !fold.seen.has(k))) fold.fresh = true;   // a new wait: marked until the box is opened
+  if (!fold || fold.opened) return { folded: false, n: keys.length, fresh: false };
+  if (fold.init) fold.init = false;
+  else if (keys.some((k) => !fold.seen.has(k))) fold.fresh = true;
   for (const k of keys) fold.seen.add(k);
   return { folded: true, n: keys.length, fresh: fold.fresh };
 }
 function histFoldBar(fold, perms, qs, ds) {
-  const pend = (xs) => xs.filter((x) => x.status === 'pending').length;
+  const pend = (xs) => xs.filter((x) => x.status === 'pending' || x.status === 'sent').length;
   const n = { q: pend(qs), p: pend(perms), d: pend(ds) };
   if (!n.q && !n.p && !n.d) return '';
-  if (!fold.folded) return `<button type="button" class="h-fold" data-h-fold="close" data-fk="h-fold" aria-expanded="true">${esc(tl('hist.fold.close'))}</button>`;
   const what = [['q', 'hist.fold.q'], ['p', 'hist.fold.p'], ['d', 'hist.fold.d']].filter(([k]) => n[k]).map(([k, key]) => tl(key, { n: n[k] })).join(tl('hist.fold.sep'));
-  const first = qs.find((q) => q.status === 'pending'), text = first && first.questions[0] ? first.questions[0].question : '';
+  // open: the bar closes, and says what it closes (a permission's bar no longer says この質問の欄)
+  if (!fold.folded) return `<button type="button" class="h-fold" data-h-fold="close" data-fk="h-fold" aria-expanded="true"><span class="h-fold-count">${esc(tl('hist.fold.close', { what }))}</span></button>`;
+  const first = qs.find((q) => q.status === 'pending'), permission = perms.find((p) => p.status === 'pending' || p.status === 'sent');
+  const text = first && first.questions[0] ? first.questions[0].question : permission ? permSummary(permission) : '';
   const textHTML = text ? `<span class="h-fold-text">${esc(text)}</span>` : '';
-  return `<button type="button" class="h-fold${fold.fresh ? ' h-fold-new' : ''}" data-h-fold="open" data-fk="h-fold" aria-expanded="false">${esc(tl('hist.fold.open', { what }))}${textHTML}</button>`;
+  return `<button type="button" class="h-fold${fold.fresh ? ' h-fold-new' : ''}" data-h-fold="open" data-fk="h-fold" aria-expanded="false"><span class="h-fold-count">${esc(tl('hist.fold.open', { what }))}</span>${textHTML}</button>`;
 }
 function histFoldToggle(how) {
   const id = HIST.compose && HIST.compose._for;
   if (!id) return;
   if (how === 'close') HIST_FOLD.set(id, { seen: new Set(), fresh: false, init: true });
-  else HIST_FOLD.delete(id);
+  else HIST_FOLD.set(id, { opened: true });
   histCardsPaint();
   if (how === 'close') { const pane = histPane(); if (pane && HIST.atEnd) histToEnd(pane); }   // the newest stays in view as the history grows
 }
@@ -12886,13 +12960,14 @@ async function composeSend() {
 }
 /* The prompt sent shows in the receiver's transcript as a channel item of jui-viz (sources/history.py: the CLI's own
    record, origin.kind "channel", measured 10-19 on a real receiver started with --channels plugin:jui-viz@jsonui),
-   its text the text sent: 届いた. Our own POST proves only that it was sent; the same words typed by hand do not count. */
+   its text the text sent: 届いた. Codex records accepted page prompts as user messages; match their recent text. */
 function composeArrived(items) {
   const sent = HIST.sent;
   if (!sent || sent.error || sent.arrivedAt || sent.id !== HIST.id || !Array.isArray(items)) return;
   const want = composeNorm(sent.text).slice(0, 120) || 'attached:';   // only files: the server's first line
   const fresh = (x) => !(Number(x.at) < sent.at - 60000);   // an older item with the same words is not this one
-  const ours = (x) => x.kind === 'channel' && /(^|:)jui-viz$/.test(String(x.server || ''));
+  const codex = SESSIONS.some((s) => s.id === SESSION_OF[sent.id] && s.cli === 'codex');
+  const ours = (x) => (codex && x.kind === 'user') || x.kind === 'channel' && /(^|:)jui-viz$/.test(String(x.server || ''));
   if (items.some((x) => ours(x) && fresh(x) && composeNorm(x.text).startsWith(want))) { sent.arrivedAt = Date.now(); composePaint(); }
 }
 
@@ -15385,7 +15460,7 @@ document.addEventListener('keydown', (e) => {   // first (capture): Esc closes t
    The rulings (TALK_CONTRACT.md): read only — no box, no button and no request that sends; no browser notification (the
    badge and the order of the list are the news); a talk whose peer ended goes when the server removes it.
 
-   The wire is talk_contract.json (version 2): the page asks talk.open / talk.get / talk.seen / talk.close and hears
+   The wire is talk_contract.json (version 3): the page asks talk.open / talk.get / talk.seen / talk.close and hears
    talk.list / talk.messages / talk.update / talk.badges. Every request is built by talkFrame, which checks it against the
    contract's rules first and refuses (null, nothing sent) what would not conform; tests/test_viz_talk_ui_frames.py runs
    the block below under node and validates what it builds with talk_contract.validate, and pins these rules to the JSON.
@@ -15709,7 +15784,7 @@ function talkGo(label, opener) {
   TALK.on = false; TALK.conv = null; TALK.note = '';
   selectRobot(label, opener);
 }
-const TALK_STATE = { read: tl('talk.state.read'), delivered: tl('talk.state.delivered'), sent: tl('talk.state.sent'), undelivered: tl('talk.state.undelivered') };
+const TALK_STATE = { read: tl('talk.state.read'), delivered: tl('talk.state.delivered'), sent: tl('talk.state.sent'), undelivered: tl('talk.state.undelivered'), unknown: tl('talk.state.unknown') };
 function talkMsgSig(m) { return JSON.stringify([m.id, m.state, m.readAt, m.deliveredAt, m.text, m.cut, m.merged, m.dir]); }
 function talkMsgNode(m) {
   const n = hNode('div', `talk-msg talk-${m.dir === 'out' ? 'out' : 'in'}`);
@@ -15726,7 +15801,7 @@ function talkMsgNode(m) {
   if (m.merged) bubble.appendChild(hNode('p', 'talk-note', tl('talk.merged')));
   const meta = hNode('p', 'talk-meta');
   meta.appendChild(hNode('time', 'talk-at', talkTime(m.at)));
-  if (m.dir === 'out') {
+  if (m.dir === 'out' || m.state === 'unknown') {
     const st = hNode('span', `talk-state talk-state-${m.state}`, m.state === 'read' && Number.isFinite(m.readAt) ? tl('talk.state.read.at', { at: talkTime(m.readAt) }) : TALK_STATE[m.state] || '');
     st.dataset.tkState = m.state;
     if (m.state === 'undelivered') st.title = tl('talk.state.undelivered.why');

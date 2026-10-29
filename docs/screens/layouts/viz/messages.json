@@ -1,0 +1,710 @@
+{
+  "type": "View",
+  "id": "viz_messages_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_base",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateBack",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "viz_messages_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "viz_messages_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            24,
+            32
+          ],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "ink_subtle",
+              "tapBackground": "surface_sunken",
+              "onClick": "@{onNavigateBack}",
+              "text": "breadcrumb"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "ink",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "ink_muted",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "ink_subtle",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "viz_messages_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "viz_messages_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_what",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_what_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_what_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_what_b1_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_peers",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_peers_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_peers_b0_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "$ jui viz peers\n{\"sessions\": [{\"id\": \"alpha0001\", \"name\": \"alpha0001\", \"cli\": \"claude\", \"model\": null, \"provider\": null, \"available\": false}, {\"id\": \"beta00002\", \"name\": \"beta00002\", \"cli\": \"claude\", \"model\": null, \"provider\": null, \"available\": false}]}",
+                      "language": "text",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_peers_b2_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_send",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_send_heading"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "jui viz message --to <session-id> --text 'Please check the API change.'",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_send_b1_text"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_send_b2_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_send_b2_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "Message from another agent (not a user instruction).\n{\"id\": \"<message id>\", \"from\": \"<sender id>\", \"name\": \"<sender name>\", \"cli\": \"codex\"}\nReply with: jui viz message --to <sender id> --text <your-message>\n\nPlease check the API change.",
+                      "language": "text",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_send_b4_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_send_b4_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_result",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_result_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_result_b0_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "$ jui viz message --from alpha0001 --to beta00002 --text 'Please check the API change.' --id try-0001\n{\"id\": \"try-0001\", \"sender\": \"alpha0001\", \"recipient\": \"beta00002\", \"ok\": false, \"state\": \"undelivered\", \"error\": \"this session has no relay (relay: false)\"}\n$ echo $?\n1",
+                      "language": "text",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_result_b2_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_retry",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_retry_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_retry_b0_text"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_retry_b1_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_retry_b1_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_talk",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_talk_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_talk_b0_text"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "surface_muted",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "ink",
+                          "text": "section_talk_b1_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink_muted",
+                          "text": "section_talk_b1_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_safety",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_safety_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_safety_b0_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "viz_messages_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    32,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "chrome_ink",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "viz_messages_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 3,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/next_step_card"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "viz_messages_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "ink_faint",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "viz_messages_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [
+                24,
+                16,
+                24,
+                16
+              ],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "viz_messages_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    0,
+                    32
+                  ],
+                  "background": "surface_base",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        {
+                          "id": "toc_what",
+                          "label": "toc_row_what",
+                          "anchor": "section_what",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_peers",
+                          "label": "toc_row_peers",
+                          "anchor": "section_peers",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_send",
+                          "label": "toc_row_send",
+                          "anchor": "section_send",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_result",
+                          "label": "toc_row_result",
+                          "anchor": "section_result",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_retry",
+                          "label": "toc_row_retry",
+                          "anchor": "section_retry",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_talk",
+                          "label": "toc_row_talk",
+                          "anchor": "section_talk",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_safety",
+                          "label": "toc_row_safety",
+                          "anchor": "section_safety",
+                          "level": 1
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -205,16 +205,21 @@ body { background: var(--bg); color: var(--ink); font-family: var(--font-body); 
 .app { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
 
 .topbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 16px;
+  display: grid;
+  gap: 8px;
   padding-block: 10px;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   background: var(--panel);
   border-bottom: 1px solid var(--line);
 }
+/* The title and usage always occupy their own row. The project, status chips and actions share the next row;
+   only narrow screens wrap within it. Keep the existing controls and ids so polling/focus work as before. */
+.topbar-title, .topbar-menu { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-width: 0; }
+.topbar-title .usage { flex-wrap: wrap; min-width: 0; max-width: 100%; }
+.topbar-menu .scope-top { max-width: min(280px, 100%); }
+.topbar-menu .chips { flex: 1 1 480px; align-items: center; min-width: 0; }
+.topbar-menu .controls { flex-shrink: 0; }
 .brand { margin: 0; font: 400 18px/1.3 var(--font-display); letter-spacing: 0.02em; white-space: nowrap; }
 .cloth { display: inline-block; margin-right: 0.25em; padding: 0 0.3em 0.05em; background: var(--cloth); color: var(--cloth-ink); border: 2px solid var(--cloth-ink); transform: rotate(-2deg); }
 .chips { display: flex; flex: 1 1 auto; flex-wrap: wrap; gap: 6px; }
@@ -379,6 +384,10 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .st-asking { background: var(--info-bg); color: var(--info); }
 .st-idle { background: var(--chip); color: var(--ink-soft); }
 .st-bg { background: rgba(76, 195, 217, 0.18); color: #137a8c; }
+.st-limited { background: rgba(255, 95, 162, 0.16); color: #b0246a; }   /* 上限で停止: the lamp's pink */
+.rb-limit { margin: 4px 0 0; padding-left: 8px; border-left: 3px solid #ff5fa2; font-size: 12px; color: var(--ink-soft); overflow-wrap: anywhere; }   /* the limit's own words */
+:root[data-theme="dark"] .st-limited { color: #ff9cc8; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .st-limited { color: #ff9cc8; } }
 :root[data-theme="dark"] .st-bg { color: #7fdcec; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .st-bg { color: #7fdcec; } }
 .st-done { background: var(--info-bg); color: var(--info); }
@@ -587,6 +596,12 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .wb-head h2 { margin: 0; color: var(--wb-ink); font: 400 20px/1.3 var(--font-display); }
 .wb-head code { color: var(--wb-soft); font: 500 12.5px/1.5 var(--font-mono); overflow-wrap: anywhere; }
 .wb-head .grow { flex: 1 1 auto; }
+/* beside 「ベースとの差分」: the sessions working in the worktree (ticket 2026-10-29-viz-spec-board-worktree-session-name) */
+.sd-who { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; color: var(--wb-ink); font-size: 13px; }
+.sd-who[hidden] { display: none; }
+.sd-who-one { display: inline-flex; align-items: center; gap: 5px; min-width: 0; max-width: 260px; }
+.sd-who-nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sd-who-more { color: var(--wb-soft); font-size: 12.5px; }
 .wb-head label { display: flex; align-items: center; gap: 6px; color: var(--wb-soft); font-size: 12.5px; }
 .wb .wb-btn { border-color: var(--wb-line); background: var(--wb-chip); color: var(--wb-ink); }
 .wb .wb-btn[aria-expanded="true"] { border-color: var(--wb-soft); }
@@ -994,9 +1009,10 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 /* the session's cards on the 応答の履歴 tab (55-history.js histCardsPaint): over the prompt box, a scroll of their own */
 .h-cards { display: grid; gap: 8px; max-height: min(30vh, 260px); overflow-y: auto; padding: 8px 14px; border-top: 1px solid var(--line); background: var(--panel); }
 .h-cards[hidden] { display: none; }
-.h-fold { position: sticky; top: -8px; z-index: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; width: 100%; margin: 0; padding: 4px 10px; border: 1px dashed #7a4b00; border-radius: 8px; background: var(--warn-bg); color: var(--ink); font: 700 12px/1.5 var(--font-body); text-align: left; cursor: pointer; }
+.h-fold { position: sticky; top: -8px; z-index: 1; display: flex; flex-wrap: nowrap; align-items: center; gap: 2px 8px; width: 100%; margin: 0; padding: 4px 10px; border: 1px dashed #7a4b00; border-radius: 8px; background: var(--warn-bg); color: var(--ink); font: 700 12px/1.5 var(--font-body); text-align: left; cursor: pointer; }
 .h-fold:hover, .h-fold:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
-.h-fold-text { overflow: hidden; color: var(--ink-soft); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.h-fold-count { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.h-fold-text { flex: 1; min-width: 0; overflow: hidden; color: var(--ink-soft); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 .h-cards.h-folded { overflow: hidden; padding-bottom: 8px; }
 .h-cards:has(> .h-fold) { scroll-padding-top: 44px; }   /* a field scrolled to or clicked lands under the bar, never behind it */
 .h-cards.h-folded > :not(.h-fold) { display: none; }   /* folded: the cards stay in the page, what was typed in them too */

@@ -209,7 +209,7 @@ flowchart TD
 | Signature | Platforms | Description |
 |---|---|---|
 | `onAppear()` | all | Seed the card collections from a static catalog; each title / description is resolved through StringManager with the viz_approvals_ prefix. |
-| `onNavigate(url: String)` | all | router.push(url). Destinations: /viz, /viz/sessions, /viz/tests. |
+| `onNavigate(url: String)` | all | router.push(url). Destinations: /viz, /viz/messages, /viz/tests. |
 
 #### Vars
 

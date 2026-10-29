@@ -186,6 +186,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "spirits", titleKey: "viz_spirits_nav_title", titleEn: "Skill spirits", url: "/viz/spirits" },
       { id: "panels", titleKey: "viz_panels_nav_title", titleEn: "Panels, cards and boards", url: "/viz/panels" },
       { id: "sessions", titleKey: "viz_sessions_nav_title", titleEn: "Talk, prompts and notifications", url: "/viz/sessions" },
+      { id: "messages", titleKey: "viz_messages_nav_title", titleEn: "Messages between sessions", url: "/viz/messages" },
       { id: "approvals", titleKey: "viz_approvals_nav_title", titleEn: "Permissions and questions", url: "/viz/approvals" },
       { id: "tests", titleKey: "viz_tests_nav_title", titleEn: "Watching tests", url: "/viz/tests" },
       { id: "server-room", titleKey: "viz_server_room_nav_title", titleEn: "Server room", url: "/viz/server-room" },

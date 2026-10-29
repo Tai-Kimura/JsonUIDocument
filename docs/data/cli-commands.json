@@ -3578,6 +3578,119 @@
     },
     {
       "binary": "jui",
+      "command": "viz peers",
+      "synopsis": "jui viz peers",
+      "purpose": {
+        "en": "List the live Claude Code and Codex sessions that `jui viz message` can reach (from 2.3.26), as one JSON object {\"sessions\": [...]}: each session's id, name (its title, or the id), cli (claude or codex), model and provider when known, and available (whether it can receive a prompt now). It asks the running jui viz server on 127.0.0.1; with no server it prints jui viz message: jui viz is not running and exits 1.",
+        "ja": "`jui viz message` で届けられる、生きている Claude Code と Codex のセッションを一覧する（2.3.26 から）。JSON を 1 つ {\"sessions\": [...]} で出し、それぞれの id、name（題。無ければ id）、cli（claude か codex）、分かれば model と provider、今プロンプトを受け取れるかの available を持つ。127.0.0.1 で動いている jui viz のサーバーに聞き、サーバーが無ければ jui viz message: jui viz is not running と出して exit 1。"
+      },
+      "options": [],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz peers"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz message",
+        "jui viz start"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.26",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "225f4c2e819bcc7dffcb40ae50877702714d335703678feeb3349e702443ced6",
+        "cardHash": "efa65ab8d54ada3f4c9087e6e3e2f3728abf9b2e99120ba900f6339091ae461c",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "e4f49d98d7a0",
+          "synopsis": "c0169eaea26f",
+          "purpose": "46115b90f27a",
+          "options": "357b9e47f539",
+          "examples": "7d23c91410a4",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "015d0c47c11a"
+        }
+      }
+    },
+    {
+      "binary": "jui",
+      "command": "viz message",
+      "synopsis": "jui viz message --to RECIPIENT [--from SENDER] --text TEXT [--id MESSAGE_ID]",
+      "purpose": {
+        "en": "Send a message from one live session on this machine to another (from 2.3.26): Claude Code or Codex, either way. It reaches the receiver as a prompt that says it is from another agent, not a user instruction, with the sender and the reply command, and both robots' Talk shows it. A Claude Code receiver needs the jui-viz channel, a Codex one its daemon connection; otherwise nothing is sent. Prints one JSON object with state sent (the receiver's transport took it, not that the model read it), undelivered (with error) or unknown (arrival not confirmed; never resent automatically), and exits 0 only when sent.",
+        "ja": "この機械の生きているセッションから別のセッションへメッセージを送る（2.3.26 から）。Claude Code と Codex のどちら向きでもよい。相手には、ユーザーの指示ではなく別のエージェントからだと書いたプロンプトとして、送り主と返し方を付けて届き、両方のロボットのトークに出る。Claude Code の相手には jui-viz のチャンネル、Codex の相手には daemon への接続が要り、無ければ何も送らない。JSON を 1 つ出し、state は sent（相手の経路が受け取った。モデルが読んだという意味ではない）、undelivered（error 付き）、unknown（届いたか確かめられない。自動では送り直さない）のどれかで、sent のときだけ exit 0。"
+      },
+      "options": [
+        {
+          "name": "--to",
+          "type": "string",
+          "default": "none",
+          "description": {
+            "en": "Required. The receiver: its exact session id, or a name only one live session has (409 when two have it, 404 when none).",
+            "ja": "必須。相手。セッションの正確な id か、生きているセッションのうち 1 つだけが持つ名前（2 つあれば 409、無ければ 404）。"
+          }
+        },
+        {
+          "name": "--from",
+          "type": "string",
+          "default": "the current agent session",
+          "description": {
+            "en": "Who sends it. Left out, the session the command runs in (CODEX_THREAD_ID, CLAUDE_SESSION_ID, or the Claude Code process it runs under); outside an agent the command says cannot identify this session; use --from <session-id> and exits 1.",
+            "ja": "送り主。省くと、コマンドを走らせたセッション（CODEX_THREAD_ID、CLAUDE_SESSION_ID、またはその下で動いている Claude Code のプロセス）。エージェントの外では cannot identify this session; use --from <session-id> と出して exit 1。"
+          }
+        },
+        {
+          "name": "--text",
+          "type": "string",
+          "default": "none",
+          "description": {
+            "en": "Required. The message, 1 to 20,000 characters.",
+            "ja": "必須。本文。1〜20,000 文字。"
+          }
+        },
+        {
+          "name": "--id",
+          "type": "string",
+          "default": "a new UUID",
+          "description": {
+            "en": "A stable id (8 to 100 letters, digits, _ and -) for a retry of this same message: the same id with the same content sends nothing again and prints the first result; with other content it is refused (409). A failed command prints the id it used.",
+            "ja": "同じメッセージを送り直すための id（英数字・_・- で 8〜100 文字）。同じ id・同じ内容ならもう一度は送らず最初の結果を出し、内容が違えば断る（409）。失敗したコマンドは使った id を出す。"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "language": "bash",
+          "code": "$ jui viz message --to <session-id> --text 'Please check the API change.'"
+        }
+      ],
+      "aliases": [],
+      "seeAlso": [
+        "jui viz peers",
+        "jui viz start"
+      ],
+      "verifiedAgainst": {
+        "version": "2.3.26",
+        "columns": 80,
+        "python": "3.12",
+        "helpHash": "1336f74e06ec8fe46ee38c70256b38c3ee75063d7005c31ad97583320fab41f0",
+        "cardHash": "1f6de39e0018f2a9613245d1e5b64b6875408f4c42c4bd2a1a40d29475d18819",
+        "fieldHashes": {
+          "binary": "7ef9768d037d",
+          "command": "98099a17aa70",
+          "synopsis": "96618948b2a7",
+          "purpose": "63151317f9ee",
+          "options": "b40890772877",
+          "examples": "ce2d980c1e55",
+          "aliases": "98edafdd23a8",
+          "seeAlso": "09deeec4aae7"
+        }
+      }
+    },
+    {
+      "binary": "jui",
       "command": "viz relay install",
       "synopsis": "jui viz relay install [--dry-run] [--yes]",
       "purpose": {
