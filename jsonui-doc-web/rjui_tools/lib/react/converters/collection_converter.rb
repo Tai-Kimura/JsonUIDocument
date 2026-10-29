@@ -277,10 +277,7 @@ module RjuiTools
             # a column of them, one per section, the blocks spaced as the
             # lines. The gaps: grid_gap_classes.
             classes << (flow_per_section? ? 'flex flex-col' : 'flex flex-row flex-wrap content-start')
-            if is_lazy && attributes['scrollEnabled'] != false
-              classes << 'overflow-y-auto'
-              dynamic_styles['overflowY'] = "#{lazy_expr} === 'none' ? 'visible' : 'auto'" if lazy_expr
-            end
+            classes.concat(scroll_box_classes('y', is_lazy, lazy_expr))
             if flow_per_section?
               row_gap = grid_row_gap
               classes << "gap-y-#{TailwindMapper.spacing_value(row_gap)}" if row_gap
@@ -289,12 +286,11 @@ module RjuiTools
             end
           elsif is_horizontal
             # Horizontal scroll collection
-            if is_lazy
-              classes << 'overflow-x-auto'
-              dynamic_styles['overflowX'] = "#{lazy_expr} === 'none' ? 'visible' : 'auto'" if lazy_expr
-            end
+            classes.concat(scroll_box_classes('x', is_lazy, lazy_expr))
             classes << 'flex flex-row'
-            if is_lazy && attributes['scrollEnabled'] != false
+            # One row: a box that does not scroll keeps its cells in the row
+            # and clips them, as a scrolling one does past its end.
+            if is_lazy
               classes << 'flex-nowrap'
               dynamic_styles['flexWrap'] = "#{lazy_expr} === 'none' ? 'wrap' : 'nowrap'" if lazy_expr
             end
@@ -310,10 +306,7 @@ module RjuiTools
             # time so we always route through the grid path below to keep
             # the layout structure stable across runtime column changes.
             classes << 'flex flex-col'
-            if is_lazy && attributes['scrollEnabled'] != false
-              classes << 'overflow-y-auto'
-              dynamic_styles['overflowY'] = "#{lazy_expr} === 'none' ? 'visible' : 'auto'" if lazy_expr
-            end
+            classes.concat(scroll_box_classes('y', is_lazy, lazy_expr))
             # lineSpacing for vertical spacing between items
             spacing = attributes['lineSpacing'] || attributes['itemSpacing']
             classes << "gap-#{TailwindMapper.spacing_value(spacing)}" if spacing
@@ -542,17 +535,46 @@ module RjuiTools
         end
 
         # The vertical scroll container of the grid routes, as the list and
-        # the flow are one: `overflow-y-auto` unless `lazy: none` (a bound
-        # `lazy` switches it at run time) or `scrollEnabled: false`. The grid
-        # had none until jsonui-cli 1.9.0, so a grid of a declared height
-        # drew its overflow past its box, and a scrollTo — which scrolls the
-        # Collection's own box (collectionScroll's scrollCollectionToCell) —
-        # moved nothing.
+        # the flow are one. The grid had none until jsonui-cli 1.9.0, so a
+        # grid of a declared height drew its overflow past its box, and a
+        # scrollTo — which scrolls the Collection's own box
+        # (collectionScroll's scrollCollectionToCell) — moved nothing.
         def vertical_scroll_classes(is_lazy, lazy_expr)
-          return [] unless is_lazy && attributes['scrollEnabled'] != false
+          scroll_box_classes('y', is_lazy, lazy_expr)
+        end
 
-          dynamic_styles['overflowY'] = "#{lazy_expr} === 'none' ? 'visible' : 'auto'" if lazy_expr
-          ['overflow-y-auto']
+        # The Collection's own scroll box along *axis* ('x' / 'y'), unless
+        # `lazy: none` (a bound `lazy` switches it at run time).
+        #
+        # scrollEnabled false stops the user's scrolling only: a scrollTo or
+        # a defaultScrollAnchor still moves the Collection, on every route
+        # with a scroll box of its own (attribute_definitions Collection
+        # .scrollEnabled, the 4f ruling 2026-09-27). So the box stays and
+        # clips (overflow-hidden — a wheel or a drag moves nothing, a
+        # programmatic scroll does), as a ScrollView's false does. Until
+        # jsonui-cli 2.3.28 a false dropped the box: the cells drew past it,
+        # a scrollTo moved nothing, and a horizontal one kept
+        # overflow-x-auto and scrolled. A bound false is the same, decided at
+        # run time (the inline overflow wins over the class); any other
+        # bound value scrolls, as an undeclared one does.
+        def scroll_box_classes(axis, is_lazy, lazy_expr)
+          return [] unless is_lazy
+
+          property = axis == 'x' ? 'overflowX' : 'overflowY'
+          cross = axis == 'x' ? 'overflowY' : 'overflowX'
+          declared_off = attributes['scrollEnabled'] == false
+          bound = bound_value_expr(attributes['scrollEnabled'])
+          scrolling = if bound then "(#{bound} === false ? 'hidden' : 'auto')"
+                      else "'#{declared_off ? 'hidden' : 'auto'}'"
+                      end
+          if lazy_expr
+            dynamic_styles[property] = "#{lazy_expr} === 'none' ? 'visible' : #{scrolling}"
+          elsif bound
+            dynamic_styles[property] = "#{bound} === false ? 'hidden' : undefined"
+          end
+          # the other axis too: beside a hidden one, a visible one computes to auto
+          dynamic_styles[cross] = "#{bound} === false ? 'hidden' : undefined" if bound
+          [declared_off ? 'overflow-hidden' : "overflow-#{axis}-auto"]
         end
 
         # A grid's or a flow's gaps (attribute_semantics.json ->

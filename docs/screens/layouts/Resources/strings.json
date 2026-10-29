@@ -15403,8 +15403,8 @@
       "ja": "ベースとの差分: worktree の spec を元と並べる"
     },
     "section_boards_b6_body": {
-      "en": "Open a worktree's spec and the whiteboard's head has a Diff against base (ベースとの差分) button. It opens a full-screen view with the base on the left and the worktree's spec on the right. The base is the commit where the worktree's branch left the room's checkout (the merge-base of the two HEADs). The right side is the file the board reads now, uncommitted edits included.\n\nBoth sides are read the way the spec sheet reads them; the left takes its texts file and its Layout from the same commit. Rows are paired section by section by their key: a component's id, a variable's, an event's or a method's name, an API's method and path, an action, a transition, a branch. Each row is Same (同じ), Added (足した), Removed (消した) or Changed (書き換えた). On a changed row only the part that changed is marked, on both sides. The head counts them as +added −removed ~changed, and Show differences only (差だけ見せる) hides the rows that are the same. Close (閉じる) or Esc goes back.\n\nThe same button works on a worktree's whole list: choose the worktree's app in the overview and press it. Every card gets a mark against the base: +n −n ~n, New (新規) or No change (差なし). The specs the worktree deleted appear as faint cards under Specs deleted in this worktree (このワークツリーで消したスペック); each opens the same view, with every row on the left removed. Press the button again (Hide the diff marks / 差分の印を消す) to take the marks off. A list compares up to 300 specs and lists the rest without a mark.\n\nThe button is there only for a worktree's spec or list, and only with a running server; the exported demo has no worktrees. git runs only when you press it, read-only (merge-base, show and ls-tree), and gives up after 3 seconds. When the base cannot be read, the view says why, for example when the histories do not meet or git does not answer in time.\n\nFrom 2.3.26, on the live page, the sessions working in that worktree stand by name to the right of the button: those whose working folder is in it, or whose tools touched it in the last 30 minutes. Two are named, then +n more; the tooltip says how they were found. Who made the worktree is recorded nowhere, so these are who works there now.",
-      "ja": "worktree の spec を開くと、ホワイトボードの見出しに「ベースとの差分」のボタンが出ます。押すと全画面になり、左に元、右に worktree の spec が並びます。元は、worktree のブランチが部屋のチェックアウトから分かれたコミット（2 つの HEAD の merge-base）です。右は、ボードが今読んでいるファイルで、まだコミットしていない変更も入ります。\n\nどちらも spec のシートと同じ読み方で読み、左は文のファイルとレイアウトも同じコミットから取ります。行は区分ごとに、キー（部品の id、変数・イベント・メソッドの名前、API のメソッドとパス、操作、遷移、分岐）で組にします。行は「同じ」「足した」「消した」「書き換えた」のどれかで、書き換えた行は、変わった所だけに両側で印が付きます。見出しには数が「+足した −消した ~書き換えた」で出て、「差だけ見せる」で同じ行を隠せます。「閉じる」か Esc で戻ります。\n\n同じボタンは worktree の一覧全体にも効きます。全体表示で worktree のアプリを選んで押すと、どのカードにも元と比べた印が付きます（+n −n ~n、「新規」、「差なし」）。worktree で消した spec は「このワークツリーで消したスペック」の下に薄いカードで出て、開くと同じ画面になり、左の行がすべて「消した」になります。もう一度押す（「差分の印を消す」）と印が消えます。一覧で比べるのは 300 件までで、残りは印なしで並びます。\n\nボタンが出るのは worktree の spec か一覧のときで、サーバーが動いているときだけです（書き出したデモには worktree がありません）。git を実行するのは押したときだけで、読むだけ（merge-base・show・ls-tree）、3 秒で諦めます。元が読めないときは、その理由を画面に出します（たとえば、履歴がつながらないときや、git が時間内に答えなかったとき）。\n\n2.3.26 からは、ライブのページで、ボタンの右に、その worktree で作業しているセッションが名前で出ます。作業ディレクトリがその中にあるか、30 分以内にツールがそこに触ったセッションです。名前は 2 つまでで、残りは「ほか n」です。ツールチップに見分け方が出ます。worktree を誰が作ったかはどこにも記録されていないので、出るのは今そこで作業しているセッションです。"
+      "en": "Open a worktree's spec and the whiteboard's head has a Diff against base (ベースとの差分) button. It opens a full-screen view with the base on the left and the worktree's spec on the right. The base is the commit where the worktree's branch left the room's checkout (the merge-base of the two HEADs). The right side is the file the board reads now, uncommitted edits included.\n\nBoth sides are read the way the spec sheet reads them; the left takes its texts file and its Layout from the same commit. Rows are paired section by section by their key: a component's id, a variable's, an event's or a method's name, an API's method and path, an action, a transition, a branch. Each row is Same (同じ), Added (足した), Removed (消した) or Changed (書き換えた). On a changed row only the part that changed is marked, on both sides. The head counts them as +added −removed ~changed, and Show differences only (差だけ見せる) hides the rows that are the same. Close (閉じる) or Esc goes back.\n\nFrom 2.3.27 the rows that are the same fold, as a code review folds a diff. In a section that changed, the 3 rows on each side of a change are shown, and a longer run of same rows between them is one line, ⋯ n unchanged rows. A run of 20 rows or fewer opens with Show n rows; a longer one opens 20 rows at a time from the change above (↓ 20 more below) or from the change below (↑ 20 more above), or all at once (All (n rows)). A section with no change starts folded to its head, No changes · n rows. Pressing a section's head folds or opens it. What you opened stays open until you close the view; it starts folded the next time. Show differences only shows the changed rows alone, so nothing folds there.\n\nThe same button works on a worktree's whole list: choose the worktree's app in the overview and press it. Every card gets a mark against the base: +n −n ~n, New (新規) or No change (差なし). The specs the worktree deleted appear as faint cards under Specs deleted in this worktree (このワークツリーで消したスペック); each opens the same view, with every row on the left removed. Press the button again (Hide the diff marks / 差分の印を消す) to take the marks off. A list compares up to 300 specs and lists the rest without a mark.\n\nThe button is there only for a worktree's spec or list, and only with a running server; the exported demo has no worktrees. git runs only when you press it, read-only (merge-base, show and ls-tree), and gives up after 3 seconds. When the base cannot be read, the view says why, for example when the histories do not meet or git does not answer in time.\n\nFrom 2.3.26, on the live page, the sessions working in that worktree stand by name to the right of the button: those whose working folder is in it, or whose tools touched it in the last 30 minutes. Two are named, then +n more; the tooltip says how they were found. Who made the worktree is recorded nowhere, so these are who works there now.",
+      "ja": "worktree の spec を開くと、ホワイトボードの見出しに「ベースとの差分」のボタンが出ます。押すと全画面になり、左に元、右に worktree の spec が並びます。元は、worktree のブランチが部屋のチェックアウトから分かれたコミット（2 つの HEAD の merge-base）です。右は、ボードが今読んでいるファイルで、まだコミットしていない変更も入ります。\n\nどちらも spec のシートと同じ読み方で読み、左は文のファイルとレイアウトも同じコミットから取ります。行は区分ごとに、キー（部品の id、変数・イベント・メソッドの名前、API のメソッドとパス、操作、遷移、分岐）で組にします。行は「同じ」「足した」「消した」「書き換えた」のどれかで、書き換えた行は、変わった所だけに両側で印が付きます。見出しには数が「+足した −消した ~書き換えた」で出て、「差だけ見せる」で同じ行を隠せます。「閉じる」か Esc で戻ります。\n\n2.3.27 からは、同じ行が、コードレビューの差分のように畳まれます。変わった区分では、変更の上下 3 行が出て、その間に続く同じ行は「⋯ 変わらない n 行」の 1 行にまとまります。20 行以下なら「n 行を表示」で開きます。それより長いときは、上の変更から 20 行ずつ（「↓ 下へ 20 行」）、下の変更から 20 行ずつ（「↑ 上へ 20 行」）、または一度に（「全部（n 行）」）開きます。変更のない区分は、見出しの「変更なし · n 行」だけに畳まれた状態で始まります。区分の見出しを押すと、その区分を畳んだり開いたりできます。開いたところは画面を閉じるまで開いたままで、次に開くときはまた畳まれた状態から始まります。「差だけ見せる」では変わった行だけが出るので、畳むものはありません。\n\n同じボタンは worktree の一覧全体にも効きます。全体表示で worktree のアプリを選んで押すと、どのカードにも元と比べた印が付きます（+n −n ~n、「新規」、「差なし」）。worktree で消した spec は「このワークツリーで消したスペック」の下に薄いカードで出て、開くと同じ画面になり、左の行がすべて「消した」になります。もう一度押す（「差分の印を消す」）と印が消えます。一覧で比べるのは 300 件までで、残りは印なしで並びます。\n\nボタンが出るのは worktree の spec か一覧のときで、サーバーが動いているときだけです（書き出したデモには worktree がありません）。git を実行するのは押したときだけで、読むだけ（merge-base・show・ls-tree）、3 秒で諦めます。元が読めないときは、その理由を画面に出します（たとえば、履歴がつながらないときや、git が時間内に答えなかったとき）。\n\n2.3.26 からは、ライブのページで、ボタンの右に、その worktree で作業しているセッションが名前で出ます。作業ディレクトリがその中にあるか、30 分以内にツールがそこに触ったセッションです。名前は 2 つまでで、残りは「ほか n」です。ツールチップに見分け方が出ます。worktree を誰が作ったかはどこにも記録されていないので、出るのは今そこで作業しているセッションです。"
     },
     "section_boards_b7_since": {
       "en": "from 2.3.20",
@@ -16350,11 +16350,23 @@
       "en": "If you answer in the terminal first, that answer is used.",
       "ja": "ターミナルで先に答えると、そちらが使われます。"
     },
+    "section_permission_card_b6_since": {
+      "en": "from 2.3.28",
+      "ja": "2.3.28 から"
+    },
     "section_permission_card_b6_title": {
+      "en": "A card no hook closes",
+      "ja": "どの hook も閉じないカード"
+    },
+    "section_permission_card_b6_body": {
+      "en": "When Claude Code's built-in safety check asks about a call and nobody answers, its prompt times out after about two minutes. No hook reports that, and the turn goes on, so before 2.3.28 the card stayed waiting while the session worked on.\n\nFrom 2.3.28 jui viz closes such a card from the call's result in the session's transcript, which it reads every 2 seconds, the subagents' too. A card you had not answered on the page then reads Ended without an answer when that prompt timed out, Denied in the terminal when the person or the auto mode classifier refused, and Allowed in the terminal when the call ran, whether it succeeded or failed. A card is tied to its call by the call's id, never by order, so another call that ends meanwhile does not close it. A card that never learnt its call's id is closed only when it is that agent's one waiting card with the same tool and the same input.",
+      "ja": "Claude Code の組み込みの安全検査がある呼び出しについて尋ね、誰も答えないと、その問いは約 2 分で時間切れになります。これを知らせる hook はなく、ターンはそのまま続きます。そのため 2.3.28 より前は、セッションが作業を続けている間も、カードが待っているまま残っていました。\n\n2.3.28 からは、jui viz がセッションの transcript にあるその呼び出しの結果を見て、カードを閉じます。transcript は 2 秒ごとに読み、サブエージェントの分も読みます。ページで答えていなかったカードは、その問いが時間切れなら「答えないまま終わった」、本人か auto mode の分類器が断ったなら「ターミナルで拒否された」、呼び出しが実行されたなら、成功でも失敗でも「ターミナルで許可された」になります。カードと呼び出しは呼び出しの id で結び、順番では結ばないので、待っている間に別の呼び出しが終わっても閉じません。呼び出しの id を知らないままのカードは、そのエージェントの待っているカードのうち、同じ道具で同じ入力のものが 1 枚だけのときに限って閉じます。"
+    },
+    "section_permission_card_b7_title": {
       "en": "When the card sends you to the terminal",
       "ja": "ターミナルで答えるように言われたとき"
     },
-    "section_permission_card_b6_body": {
+    "section_permission_card_b7_body": {
       "en": "A card says Please answer in the terminal when the relay is off for that session, or when the request is too long to show in full.",
       "ja": "そのセッションの中継が無効のとき、または要求が長すぎて全部を表示できないときは、カードに「ターミナルで答えてください」と出ます。"
     },
@@ -18477,16 +18489,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.3.26",
-      "ja": "2.3.26 でまだできないこと"
+      "en": "Not in 2.3.28",
+      "ja": "2.3.28 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.3.26",
-      "ja": "2.3.26 でまだできないこと"
+      "en": "Not in 2.3.28",
+      "ja": "2.3.28 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
