@@ -177,13 +177,13 @@ module RjuiTools
       # the structural keys by nobody.
       HANDLED_ELSEWHERE = %w[gravity type child data responsive].freeze
 
+      # The keys a matchParent width's calc reads (BaseConverter#horizontal_margins).
+      WIDTH_CALC_KEYS = %w[width leftMargin rightMargin startMargin endMargin margins].freeze
+
       # Why an attribute a size class names is not drawn on web, by the shape
       # it has there. Every other key gets the generic reason.
       UNDRAWN_REASONS = {
-        %w[offsetX offsetY] => 'the web draws an offset as an inline transform, which no class can replace',
-        %w[borderWidth borderColor borderStyle] => "the web draws a border by the type (an ::after, a border or an outline), so a class cannot switch it alone",
-        %w[alignTop alignBottom alignLeft alignRight centerInParent centerVertical centerHorizontal] =>
-          'a relative position is laid out by the parent, not by a class of the node'
+        %w[offsetX offsetY] => 'the web draws an offset as an inline transform, which no class can replace'
       }.freeze
 
       class << self
@@ -219,14 +219,15 @@ module RjuiTools
         # the author thought it held). iOS and Android draw a size class by
         # redrawing the node with the block merged in, so on those faces it
         # may well hold — the warning names the web.
-        def warn_undrawn(component, size_class, attr, value)
+        def warn_undrawn(component, size_class, attr, value, why = nil)
           return if HANDLED_ELSEWHERE.include?(attr)
 
           reason = if bound?(value)
                      'a bound value exists at run time only, and a size class is switched by classes'
+                   elsif (known = UNDRAWN_REASONS.find { |keys, _| keys.include?(attr) }&.last)
+                     known
                    else
-                     UNDRAWN_REASONS.find { |keys, _| keys.include?(attr) }&.last ||
-                       'the web switches a size class by classes, and this attribute is not one a class carries'
+                     why || 'the web switches a size class by classes, and this attribute is not one a class carries'
                    end
           id = component['id'] ? "'#{component['id']}'" : '(no id)'
           RjuiTools::Core::Logger.warn(
@@ -238,9 +239,17 @@ module RjuiTools
           mapper.arity == 3 ? mapper.call(value, prefix, component['type']) : mapper.call(value, prefix)
         end
 
-        def build_responsive(component)
+        # *carry*: a callable (BaseConverter#carry_size_class) given the keys
+        # of one size class that no mapper draws, answering { tokens:, refused:
+        # { key => why } }; without it those keys are said, as before.
+        # *width_for*: a callable (BaseConverter#size_class_width) given the
+        # width and horizontal-margin keys of one size class, answering the
+        # node's width classes with them merged in, or nil when unchanged.
+        def build_responsive(component, carry = nil, width_for = nil)
           result = {
             classes: [],
+            carried: [],
+            carried_outer: [],
             stripped_keys: Set.new
           }
 
@@ -265,53 +274,59 @@ module RjuiTools
             overrides = component.dig('responsive', sc)
             next unless overrides.is_a?(Hash)
 
-            if runtime
-              # The windows it wins in, as media variants (landscape: /
-              # portrait: and the width bands). A variant's class comes after
-              # the base classes in the stylesheet, so it wins over them; the
-              # unprefixed classes under a run-time isLandscape this replaced
-              # (jsonui-cli 2.3.28) tied with the base classes and the
-              # stylesheet's order chose — measured in Chromium, a landscape
-              # height, padding, margin, textAlign or colour lost to the base.
-              prefixes = landscape_variants(sc, present)
-              scoped = lambda do |cls|
-                cls.to_s.split.flat_map { |token| prefixes.map { |prefix| "#{prefix}#{token}" } }
+            # The variants this key's classes are scoped by. A key of a block
+            # with a landscape key: the windows it wins in, as media variants
+            # (landscape: / portrait: and the width bands) — a variant's class
+            # comes after the base classes in the stylesheet, so it wins over
+            # them; the unprefixed classes under a run-time isLandscape this
+            # replaced (jsonui-cli 2.3.28) tied with the base classes and the
+            # stylesheet's order chose. Otherwise a width breakpoint's prefix,
+            # or the band in which a width condition is the one that wins.
+            prefixes = if runtime
+                         landscape_variants(sc, present)
+                       else
+                         [width_prefixes[sc] || BREAKPOINT_PREFIX[parsed[:width]] || '']
+                       end
+            scoped = lambda do |cls|
+              cls.to_s.split.flat_map { |token| prefixes.map { |prefix| "#{prefix}#{token}" } }
+            end
+
+            pending = {}
+            overrides.each do |attr, value|
+              next if %w[type child data responsive].include?(attr)
+
+              mapper = ATTRIBUTE_MAPPERS[attr]
+              if mapper && !bound?(value)
+                result[:classes].concat(scoped.call(call_mapper(mapper, value, '', component)))
+              elsif bound?(value) || HANDLED_ELSEWHERE.include?(attr)
+                warn_undrawn(component, sc, attr, value)
+              else
+                pending[attr] = value
               end
+            end
 
-              overrides.each do |attr, value|
-                next if %w[type child data responsive].include?(attr)
+            # The keys no mapper carries: the converter's own classes for the
+            # node with them merged in, against its classes without them
+            # (BaseConverter#carry_size_class) — what iOS and Android draw by
+            # redrawing the node with the block merged in. What it cannot
+            # carry is said, with why.
+            unless pending.empty?
+              carried = carry ? carry.call(pending) : { tokens: [], outer: [], refused: pending.keys.to_h { |k| [k, nil] } }
+              result[:carried].concat(scoped.call(carried[:tokens].join(' ')))
+              result[:carried_outer].concat(scoped.call(carried[:outer].to_a.join(' ')))
+              carried[:refused].each { |attr, why| warn_undrawn(component, sc, attr, pending[attr], why) }
+            end
 
-                mapper = ATTRIBUTE_MAPPERS[attr]
-                if mapper && !bound?(value)
-                  result[:classes].concat(scoped.call(call_mapper(mapper, value, '', component)))
-                else
-                  warn_undrawn(component, sc, attr, value)
-                end
-              end
+            responsive_gravity_classes(component, overrides).each do |cls|
+              result[:classes].concat(scoped.call(cls))
+            end
 
-              responsive_gravity_classes(component, overrides).each do |cls|
-                result[:classes].concat(scoped.call(cls))
-              end
-            else
-              # Pure width breakpoint -> Tailwind responsive prefix; a width
-              # condition -> the band in which it is the one that wins.
-              prefix = width_prefixes[sc] || BREAKPOINT_PREFIX[parsed[:width]] || ''
-
-              overrides.each do |attr, value|
-                next if %w[type child data responsive].include?(attr)
-
-                mapper = ATTRIBUTE_MAPPERS[attr]
-                if mapper && !bound?(value)
-                  cls = call_mapper(mapper, value, prefix, component)
-                  result[:classes] << cls if cls
-                else
-                  warn_undrawn(component, sc, attr, value)
-                end
-              end
-
-              responsive_gravity_classes(component, overrides).each do |cls|
-                result[:classes] << "#{prefix}#{cls}"
-              end
+            # A matchParent width less its margins is one calc of the width
+            # and the margins together: a size class that changes either
+            # draws the width the merged node has.
+            calc_keys = overrides.select { |k, v| WIDTH_CALC_KEYS.include?(k) && !bound?(v) }
+            if width_for && !calc_keys.empty? && (width = width_for.call(calc_keys))
+              result[:classes].concat(scoped.call(width.join(' ')))
             end
           end
 

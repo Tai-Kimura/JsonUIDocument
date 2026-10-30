@@ -2165,8 +2165,8 @@
       "ja": "Generated モード: ラッパー関数"
     },
     "section_generated_body": {
-      "en": "In generated mode each platform's converter inlines the resolution at compile time, one branch per key in priority order, so only the winner's values are drawn. SwiftUI lifts the responsive container into a `@ViewBuilder` helper to keep type-checker work bounded; the children are emitted once and threaded through `content()`, so an inner `Collection` or `Label` is not duplicated per branch. Compose emits the `if` / `else` chain inline at the call site — no `@Composable` wrapper — so each branch stays in the caller's `Row` / `Column` / `Box` scope and reads the screen's `data` and `viewModel` directly. React draws a block of size classes with breakpoint classes whose ranges do not overlap (`md:max-lg:` for medium); a block with a landscape key gives each key media variants for the windows where it is the winner (`landscape:` / `portrait:` with the width bands), which come after the base classes, so the winner always wins (from jsonui-cli 2.3.30; before, those keys were switched at run time and could lose to a base class by the stylesheet's order).",
-      "ja": "Generated モードでは各プラットフォームの converter が解決をコンパイル時に展開し、優先順に 1 キー 1 分岐を出すので、描かれるのは勝ったキーの値だけです。SwiftUI は responsive コンテナを `@ViewBuilder` ヘルパーに切り出して型チェッカーの負荷を制限し、子は一度だけ出力されて `content()` 越しに流し込まれるので、内側の `Collection` や `Label` が分岐ごとに複製されることはありません。Compose は `if` / `else` の連なりを呼び出し箇所にその場で出します（`@Composable` の wrapper は作らない）。各分岐は呼び出し元の `Row` / `Column` / `Box` のスコープに置かれ、画面の `data` と `viewModel` をそのまま読みます。React は size class だけのブロックを範囲の重ならないブレークポイントのクラスで描き（medium は `md:max-lg:`）、landscape 系のキーを持つブロックは、各キーを、そのキーが勝つ窓だけの media variant（`landscape:` / `portrait:` と幅の帯）で描きます。variant のクラスはベースのクラスより後に来るので、勝つキーが必ず勝ちます（jsonui-cli 2.3.30 から。それまでは実行時に切り替えていて、stylesheet の順番によってはベースのクラスに負けることがありました）。"
+      "en": "In generated mode each platform's converter inlines the resolution at compile time, one branch per key in priority order, so only the winner's values are drawn. SwiftUI lifts the responsive container into a `@ViewBuilder` helper to keep type-checker work bounded; the children are emitted once and threaded through `content()`, so an inner `Collection` or `Label` is not duplicated per branch. Compose emits the `if` / `else` chain inline at the call site — no `@Composable` wrapper — so each branch stays in the caller's `Row` / `Column` / `Box` scope and reads the screen's `data` and `viewModel` directly. React draws a block of size classes with breakpoint classes whose ranges do not overlap (`md:max-lg:` for medium); a block with a landscape key gives each key media variants for the windows where it is the winner (`landscape:` / `portrait:` with the width bands), which come after the base classes, so the winner always wins (from jsonui-cli 2.3.30; before, those keys were switched at run time and could lose to a base class by the stylesheet's order). On web a size class's other keys are drawn when the override only adds classes (from 2.3.31: a Collection's columns and spacings, a border's colour, width and style, borderWidth 0 to take a border away, the relative align and center keys); a key it cannot carry — an offset, an override that is itself a binding, one that would take a base class away or change an inline style or the markup — is a `jui build` WARNING that names the node, the size class, the key and why.",
+      "ja": "Generated モードでは各プラットフォームの converter が解決をコンパイル時に展開し、優先順に 1 キー 1 分岐を出すので、描かれるのは勝ったキーの値だけです。SwiftUI は responsive コンテナを `@ViewBuilder` ヘルパーに切り出して型チェッカーの負荷を制限し、子は一度だけ出力されて `content()` 越しに流し込まれるので、内側の `Collection` や `Label` が分岐ごとに複製されることはありません。Compose は `if` / `else` の連なりを呼び出し箇所にその場で出します（`@Composable` の wrapper は作らない）。各分岐は呼び出し元の `Row` / `Column` / `Box` のスコープに置かれ、画面の `data` と `viewModel` をそのまま読みます。React は size class だけのブロックを範囲の重ならないブレークポイントのクラスで描き（medium は `md:max-lg:`）、landscape 系のキーを持つブロックは、各キーを、そのキーが勝つ窓だけの media variant（`landscape:` / `portrait:` と幅の帯）で描きます。variant のクラスはベースのクラスより後に来るので、勝つキーが必ず勝ちます（jsonui-cli 2.3.30 から。それまでは実行時に切り替えていて、stylesheet の順番によってはベースのクラスに負けることがありました）。Web では、size class のそのほかの鍵も、上書きがクラスを足すだけなら描きます（2.3.31 から: Collection の columns と間隔、枠の色・太さ・線の種類、枠を消す borderWidth 0、相対配置の align と center の鍵）。運べない鍵（offset、上書きの値そのものが束縛のもの、ベースのクラスを取り去る・inline の style やマークアップを変えるもの）は、`jui build` が部品・size class・鍵・理由を名指しした WARNING を出します。"
     },
     "section_dynamic_heading": {
       "en": "Dynamic mode: tree resolution",
@@ -11383,8 +11383,8 @@
       "ja": "使える型語彙"
     },
     "section_types_body": {
-      "en": "The cheat sheet below lists the canonical forms the validator / generator recognize. Anything not on this list has to be wrapped in a customType or registered in `.jsonui-type-map.json`. Nesting works as expected — `[Map(String, ActivityRow)]?` is legal and means 'optional array of string-keyed ActivityRow maps'.",
-      "ja": "下のチートシートが validator / ジェネレータが認識する正規形の一覧。このリストに無いものは customType でラップするか `.jsonui-type-map.json` に登録する必要があります。ネストは想定通りに動き — `[Map(String, ActivityRow)]?` は合法で、「String キーの ActivityRow マップの配列のオプショナル」を意味します。"
+      "en": "The cheat sheet below lists the canonical forms the validator / generator recognize. Anything not on this list has to be wrapped in a customType or registered in `.jsonui-type-map.json`. Nesting works as expected — `[Map(String, ActivityRow)]?` is legal and means 'optional array of string-keyed ActivityRow maps'. From jsonui-cli 2.3.32 the collection spellings `[K: V]`, `Array(T)`, `List(T)` and `Dictionary(K, V)` come out as each language's own type too, and a type a language has no form for (a tuple in Kotlin or TypeScript, `Set(T)`) stops the protocol sync with an ERROR that names the type, the platform and the spellings to use instead. One gap as of 2.3.32: `jsonui-doc validate` still reads `[K: V]` as an array when it checks an initial value, so `{}` warns and `[]` passes; write `Map(K, V)` for a dictionary that has a `defaultValue` until that is fixed.",
+      "ja": "下のチートシートが validator / ジェネレータが認識する正規形の一覧。このリストに無いものは customType でラップするか `.jsonui-type-map.json` に登録する必要があります。ネストは想定通りに動き — `[Map(String, ActivityRow)]?` は合法で、「String キーの ActivityRow マップの配列のオプショナル」を意味します。jsonui-cli 2.3.32 からは、集まりの書き方 `[K: V]`・`Array(T)`・`List(T)`・`Dictionary(K, V)` も、それぞれの言語の型として出ます。言語に形の無い型（Kotlin や TypeScript のタプル、`Set(T)`）は Protocol の sync を ERROR で止め、型・プラットフォーム・代わりに使える書き方を名指しします。2.3.32 の時点の抜けが 1 つあります。`jsonui-doc validate` は初期値を確かめるとき `[K: V]` を配列として読むので、`{}` が警告され、`[]` が通ります。`defaultValue` を持つ辞書は、直るまで `Map(K, V)` で書いてください。"
     },
     "section_sharing_heading": {
       "en": "Sharing types across specs",
@@ -18489,16 +18489,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.3.30",
-      "ja": "2.3.30 でまだできないこと"
+      "en": "Not in 2.3.32",
+      "ja": "2.3.32 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.3.30",
-      "ja": "2.3.30 でまだできないこと"
+      "en": "Not in 2.3.32",
+      "ja": "2.3.32 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
