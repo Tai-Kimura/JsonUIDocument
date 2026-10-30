@@ -357,8 +357,8 @@
       "command": "g converter",
       "synopsis": "jui g converter [<Name>] [--from SPEC | --all] [--skip-existing | --force]",
       "purpose": {
-        "en": "Generate a custom-component converter — from a name + --attributes, from a component spec with --from, or from every component spec with --all. Re-running never replaces a converter or implementation stub that already exists unless you ask: on a terminal it asks per file, with no terminal to answer it replaces nothing and exits 0. attribute_definitions/<Name>.json is rewritten from the spec on every run, and the mappings and registration files never are.",
-        "ja": "カスタムコンポーネントの converter を生成 — 名前 + --attributes、--from で component spec から、--all で全 component spec から。再実行は、既にある converter や実装の雛形を、頼まない限り置き換えません: 端末があればファイルごとに聞き、答える端末が無ければ何も置き換えずに exit 0 で終わります。attribute_definitions/<Name>.json は毎回 spec から書き直され、mappings と登録のファイルは書き直されません。"
+        "en": "Generate a custom-component converter — from a name + --attributes, from a component spec with --from, or from every component spec with --all. Re-running never replaces a converter or implementation stub that already exists unless you ask: on a terminal it asks per file, with no terminal to answer it replaces nothing and exits 0. attribute_definitions/<Name>.json is rewritten from the spec on every run, and the mappings and registration files never are. Since jsonui-cli 2.3.30 --from uses --container / --no-container over what the spec's slots say, and a flag these forms cannot use is an ERROR before anything is generated (exit 1): --attributes, or a name that is not the spec's, with --from; --container, --no-container, --attributes, a name or --from with --all. Before, they were dropped without a word.",
+        "ja": "カスタムコンポーネントの converter を生成 — 名前 + --attributes、--from で component spec から、--all で全 component spec から。再実行は、既にある converter や実装の雛形を、頼まない限り置き換えません: 端末があればファイルごとに聞き、答える端末が無ければ何も置き換えずに exit 0 で終わります。attribute_definitions/<Name>.json は毎回 spec から書き直され、mappings と登録のファイルは書き直されません。jsonui-cli 2.3.30 からは、--from は --container / --no-container を、spec の slots より優先して使います。この形で使えない旗は、何かを生成する前に ERROR になります（exit 1）: --from に --attributes や spec と違う名前、--all に --container・--no-container・--attributes・名前・--from。それまでは、何も言わずに捨てていました。"
       },
       "options": [
         {
@@ -445,16 +445,16 @@
         "jui g project"
       ],
       "verifiedAgainst": {
-        "version": "1.9.0",
+        "version": "2.3.30",
         "columns": 80,
         "python": "3.12",
         "helpHash": "8546204ce40d672c009aa9e2db3aadea7d92c5ddc03232bd39bc0b710efae017",
-        "cardHash": "1061e37eaab072e94ae669bcb4c5cd1475d554d21f2e5ed5dbcc0d0a6185fd68",
+        "cardHash": "442f3e483ea11cd1261604689802fb2eff82840570a3962a961179098c80687b",
         "fieldHashes": {
           "binary": "7ef9768d037d",
           "command": "fcbcb49594f1",
           "synopsis": "b826a5d176d1",
-          "purpose": "a14d01a51320",
+          "purpose": "8912ada991db",
           "options": "7619d796eedf",
           "examples": "3cd3dac507ae",
           "aliases": "98edafdd23a8",

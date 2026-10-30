@@ -4,6 +4,7 @@ require_relative '../core/responsive_resolver'
 require_relative 'tailwind_mapper'
 require_relative '../core/enum_spelling'
 require_relative '../core/type_synonyms'
+require_relative '../core/logger'
 
 module RjuiTools
   module React
@@ -127,7 +128,62 @@ module RjuiTools
         'textAlign' => ->(v, prefix, type) {
           raw = TailwindMapper.map_text_align(v, type)
           raw.empty? ? nil : "#{prefix}#{raw}"
+        },
+        # The size bounds, paddings, margins, stacking, clip, hidden, weight
+        # and opacity: classes the base converter writes with these same
+        # TailwindMapper calls (BaseConverter#build_class_name), each one
+        # scoped by the size class's prefix. Until jsonui-cli 2.3.29 a size
+        # class dropped them, silently (ticket
+        # rjui-responsive-unmapped-attributes-are-dropped-silently).
+        'minWidth' => ->(v, prefix) { prefixed(TailwindMapper.map_min_width(v), prefix) },
+        'maxWidth' => ->(v, prefix) { prefixed(TailwindMapper.map_max_width(v), prefix) },
+        'minHeight' => ->(v, prefix) { prefixed(TailwindMapper.map_min_height(v), prefix) },
+        'maxHeight' => ->(v, prefix) { prefixed(TailwindMapper.map_max_height(v), prefix) },
+        'paddings' => ->(v, prefix) { map_responsive_padding(v, prefix) },
+        'topPadding' => ->(v, prefix) { prefixed(TailwindMapper.map_individual_paddings(v, nil, nil, nil), prefix) },
+        'paddingTop' => ->(v, prefix) { prefixed(TailwindMapper.map_individual_paddings(v, nil, nil, nil), prefix) },
+        'rightPadding' => ->(v, prefix) { prefixed(TailwindMapper.map_individual_paddings(nil, v, nil, nil), prefix) },
+        'paddingRight' => ->(v, prefix) { prefixed(TailwindMapper.map_individual_paddings(nil, v, nil, nil), prefix) },
+        'bottomPadding' => ->(v, prefix) { prefixed(TailwindMapper.map_individual_paddings(nil, nil, v, nil), prefix) },
+        'paddingBottom' => ->(v, prefix) { prefixed(TailwindMapper.map_individual_paddings(nil, nil, v, nil), prefix) },
+        'leftPadding' => ->(v, prefix) { prefixed(TailwindMapper.map_individual_paddings(nil, nil, nil, v), prefix) },
+        'paddingLeft' => ->(v, prefix) { prefixed(TailwindMapper.map_individual_paddings(nil, nil, nil, v), prefix) },
+        'paddingStart' => ->(v, prefix) { prefixed(TailwindMapper.map_rtl_paddings(v, nil), prefix) },
+        'paddingEnd' => ->(v, prefix) { prefixed(TailwindMapper.map_rtl_paddings(nil, v), prefix) },
+        'margins' => ->(v, prefix) { prefixed(TailwindMapper.map_margin(v), prefix) },
+        'topMargin' => ->(v, prefix) { prefixed(TailwindMapper.map_individual_margins(v, nil, nil, nil), prefix) },
+        'rightMargin' => ->(v, prefix) { prefixed(TailwindMapper.map_individual_margins(nil, v, nil, nil), prefix) },
+        'bottomMargin' => ->(v, prefix) { prefixed(TailwindMapper.map_individual_margins(nil, nil, v, nil), prefix) },
+        'leftMargin' => ->(v, prefix) { prefixed(TailwindMapper.map_individual_margins(nil, nil, nil, v), prefix) },
+        'startMargin' => ->(v, prefix) { prefixed(TailwindMapper.map_rtl_margins(v, nil), prefix) },
+        'endMargin' => ->(v, prefix) { prefixed(TailwindMapper.map_rtl_margins(nil, v), prefix) },
+        'zIndex' => ->(v, prefix) { prefixed(TailwindMapper.map_z_index(v), prefix) },
+        # false too: a size class that shows (or stops clipping) what the base
+        # hides (or clips) has to say so, or the base class keeps applying.
+        'hidden' => ->(v, prefix) { prefixed(v ? 'invisible' : 'visible', prefix) },
+        'clipToBounds' => ->(v, prefix) { prefixed(v ? 'overflow-hidden' : 'overflow-visible', prefix) },
+        'fontWeight' => ->(v, prefix) { prefixed(TailwindMapper.map_font_weight(v), prefix) },
+        # The base writes nothing at 1 (fully opaque), so a size class at 1
+        # names opacity-100 to undo a base below it.
+        'opacity' => ->(v, prefix) {
+          next nil unless v.is_a?(Numeric)
+
+          prefixed(v >= 1 ? 'opacity-100' : TailwindMapper.map_opacity(v), prefix)
         }
+      }.freeze
+
+      # The keys of a size class's block that are not drawn by
+      # ATTRIBUTE_MAPPERS but elsewhere: gravity by responsive_gravity_classes,
+      # the structural keys by nobody.
+      HANDLED_ELSEWHERE = %w[gravity type child data responsive].freeze
+
+      # Why an attribute a size class names is not drawn on web, by the shape
+      # it has there. Every other key gets the generic reason.
+      UNDRAWN_REASONS = {
+        %w[offsetX offsetY] => 'the web draws an offset as an inline transform, which no class can replace',
+        %w[borderWidth borderColor borderStyle] => "the web draws a border by the type (an ::after, a border or an outline), so a class cannot switch it alone",
+        %w[alignTop alignBottom alignLeft alignRight centerInParent centerVertical centerHorizontal] =>
+          'a relative position is laid out by the parent, not by a class of the node'
       }.freeze
 
       class << self
@@ -135,18 +191,49 @@ module RjuiTools
         #
         # Returns a Hash:
         #   {
-        #     classes: "lg:flex-row lg:gap-6",
-        #     needs_landscape_hook: true,
-        #     landscape_classes: { "isLandscape" => "flex-row gap-8" },
+        #     classes: "lg:flex-row lg:gap-6 landscape:flex-row",
         #     stripped_keys: Set["orientation", "spacing"]
         #   }
         #
-        # `classes` holds only the breakpoint-scoped override classes; the
+        # `classes` holds only the breakpoint-scoped override classes (a
+        # landscape key's under media variants too: landscape_variants); the
         # base (default) value of each attribute is emitted unprefixed by
         # the converters' normal attribute mapping. `stripped_keys` lists
         # the attribute keys that have responsive overrides (informational).
         # A mapper that judges a value by the node's type (textAlign) takes it
         # as a third argument.
+        # *raw*'s classes (TailwindMapper's space-separated string), each
+        # scoped by *prefix*; nil when there are none.
+        def prefixed(raw, prefix)
+          tokens = raw.to_s.split
+          tokens.empty? ? nil : tokens.map { |c| "#{prefix}#{c}" }.join(' ')
+        end
+
+        def bound?(value)
+          value.is_a?(String) && value.include?('@{')
+        end
+
+        # A size class's key that is not drawn on web is said at build time:
+        # the type, the id, the size class, the key and why (ticket rjui-responsive-unmapped-attributes-are-dropped-
+        # silently: until jsonui-cli 2.3.29 it was dropped with no word, and
+        # the author thought it held). iOS and Android draw a size class by
+        # redrawing the node with the block merged in, so on those faces it
+        # may well hold — the warning names the web.
+        def warn_undrawn(component, size_class, attr, value)
+          return if HANDLED_ELSEWHERE.include?(attr)
+
+          reason = if bound?(value)
+                     'a bound value exists at run time only, and a size class is switched by classes'
+                   else
+                     UNDRAWN_REASONS.find { |keys, _| keys.include?(attr) }&.last ||
+                       'the web switches a size class by classes, and this attribute is not one a class carries'
+                   end
+          id = component['id'] ? "'#{component['id']}'" : '(no id)'
+          RjuiTools::Core::Logger.warn(
+            "#{component['type']} #{id}: responsive '#{size_class}' sets '#{attr}', which is not drawn on web — #{reason}"
+          )
+        end
+
         def call_mapper(mapper, value, prefix, component)
           mapper.arity == 3 ? mapper.call(value, prefix, component['type']) : mapper.call(value, prefix)
         end
@@ -154,8 +241,6 @@ module RjuiTools
         def build_responsive(component)
           result = {
             classes: [],
-            needs_landscape_hook: false,
-            landscape_styles: {},
             stripped_keys: Set.new
           }
 
@@ -166,12 +251,13 @@ module RjuiTools
 
           size_classes = JsonUIShared::ResponsiveResolver.size_classes(component)
           width_prefixes = width_condition_prefixes(component)
-          # A block with a landscape key draws EVERY key at run time, each
-          # where it is the one that wins (exclusive_condition): a size
-          # class's breakpoint classes beside a landscape key's runtime
-          # classes both held on a regular landscape window
-          # (rjui-responsive-landscape-classes-stack-on-breakpoint-classes).
+          # A block with a landscape key draws EVERY key where it is the one
+          # that wins (landscape_variants): a size class's classes beside a
+          # landscape key's both held on a regular landscape window until
+          # each was scoped (rjui-responsive-landscape-classes-stack-on-
+          # breakpoint-classes).
           runtime = landscape_block?(component)
+          present = JsonUIShared::ResponsiveResolver.size_classes(component)
 
           # For each size class, generate prefixed Tailwind classes
           size_classes.each do |sc|
@@ -180,24 +266,31 @@ module RjuiTools
             next unless overrides.is_a?(Hash)
 
             if runtime
-              # Landscape requires useMediaQuery hook
-              result[:needs_landscape_hook] = true
-              landscape_key = sc
-              result[:landscape_styles][landscape_key] ||= []
+              # The windows it wins in, as media variants (landscape: /
+              # portrait: and the width bands). A variant's class comes after
+              # the base classes in the stylesheet, so it wins over them; the
+              # unprefixed classes under a run-time isLandscape this replaced
+              # (jsonui-cli 2.3.28) tied with the base classes and the
+              # stylesheet's order chose — measured in Chromium, a landscape
+              # height, padding, margin, textAlign or colour lost to the base.
+              prefixes = landscape_variants(sc, present)
+              scoped = lambda do |cls|
+                cls.to_s.split.flat_map { |token| prefixes.map { |prefix| "#{prefix}#{token}" } }
+              end
 
               overrides.each do |attr, value|
                 next if %w[type child data responsive].include?(attr)
 
                 mapper = ATTRIBUTE_MAPPERS[attr]
-                if mapper
-                  # For landscape compound size classes, use width prefix inside the hook conditional
-                  cls = call_mapper(mapper, value, '', component)
-                  result[:landscape_styles][landscape_key] << cls if cls
+                if mapper && !bound?(value)
+                  result[:classes].concat(scoped.call(call_mapper(mapper, value, '', component)))
+                else
+                  warn_undrawn(component, sc, attr, value)
                 end
               end
 
               responsive_gravity_classes(component, overrides).each do |cls|
-                result[:landscape_styles][landscape_key] << cls
+                result[:classes].concat(scoped.call(cls))
               end
             else
               # Pure width breakpoint -> Tailwind responsive prefix; a width
@@ -208,9 +301,11 @@ module RjuiTools
                 next if %w[type child data responsive].include?(attr)
 
                 mapper = ATTRIBUTE_MAPPERS[attr]
-                if mapper
+                if mapper && !bound?(value)
                   cls = call_mapper(mapper, value, prefix, component)
                   result[:classes] << cls if cls
+                else
+                  warn_undrawn(component, sc, attr, value)
                 end
               end
 
@@ -259,53 +354,6 @@ module RjuiTools
           prefixes
         end
 
-        # Generate the useMediaQuery hook call string for landscape detection.
-        # Returns the TypeScript/JSX code string.
-        # A tree with a size-class + landscape combination also reads the
-        # widths its bands need (landscape_condition).
-        def landscape_hook_declaration(width_bands: false)
-          declaration = "const isLandscape = useMediaQuery('(orientation: landscape)');"
-          return declaration unless width_bands
-
-          "#{declaration}\n  const isMinMd = useMediaQuery('(min-width: 768px)');" \
-            "\n  const isMinLg = useMediaQuery('(min-width: 1024px)');"
-        end
-
-        # Whether any run-time block in the tree has a condition on the width
-        # bands (a combination, or a size class beside a landscape key).
-        def needs_landscape_width_bands?(component)
-          return false unless component.is_a?(Hash)
-
-          if landscape_block?(component)
-            present = JsonUIShared::ResponsiveResolver.size_classes(component)
-            return true if present.any? { |key| exclusive_condition(key, present).include?('isMin') }
-          end
-
-          children = component['child']
-          children = [children] if children.is_a?(Hash)
-          Array(children).any? { |child| needs_landscape_width_bands?(child) }
-        end
-
-        # Build a conditional className expression for landscape overrides.
-        #
-        # Example output:
-        #   `${isLandscape ? "flex-row gap-8" : ""}`
-        def build_landscape_class_expression(landscape_styles)
-          return '' if landscape_styles.empty?
-
-          present = landscape_styles.keys
-          parts = landscape_styles.map do |key, classes|
-            classes_str = classes.compact.join(' ')
-            next if classes_str.empty?
-
-            condition = exclusive_condition(key, present)
-            next if condition == 'false'
-            "${#{condition} ? \"#{classes_str}\" : \"\"}"
-          end.compact
-
-          parts.join(' ')
-        end
-
         # Whether a responsive block is drawn at run time: it has a landscape
         # key (and is not a block of width conditions).
         def landscape_block?(component)
@@ -320,22 +368,21 @@ module RjuiTools
         BANDS = %w[compact medium regular].freeze
 
         # Where `key` is the one key of `present` that wins (the first of
-        # PRIORITY_ORDER present and holding), as a condition on isLandscape /
-        # isMinMd / isMinLg; 'false' where it never wins.
-        def exclusive_condition(key, present)
+        # PRIORITY_ORDER present and holding), as the media variants of those
+        # windows: [] where it never wins. The orientation is the one
+        # useMediaQuery('(orientation: landscape)') read, and the bands the
+        # breakpoint variants every other size class uses (measured in
+        # Chromium on 14 windows — square, one wider or taller by a pixel, each
+        # band's edge: landscape: / portrait: and max-md: / md: / lg: agreed
+        # with the hooks every time).
+        def landscape_variants(key, present)
           wins = ->(landscape, band) { winning_key(present, landscape, band) == key }
           in_landscape = BANDS.select { |band| wins.call(true, band) }
           in_portrait = BANDS.select { |band| wins.call(false, band) }
-          if in_landscape == in_portrait
-            band_condition(in_landscape)
-          elsif in_portrait.empty?
-            join_conditions('isLandscape', band_condition(in_landscape))
-          elsif in_landscape.empty?
-            join_conditions('!isLandscape', band_condition(in_portrait))
-          else
-            "(#{join_conditions('isLandscape', band_condition(in_landscape))}) || " \
-              "(#{join_conditions('!isLandscape', band_condition(in_portrait))})"
-          end
+          return BAND_VARIANTS.fetch(in_landscape) if in_landscape == in_portrait
+
+          BAND_VARIANTS.fetch(in_landscape).map { |band| "landscape:#{band}" } +
+            BAND_VARIANTS.fetch(in_portrait).map { |band| "portrait:#{band}" }
         end
 
         def winning_key(present, landscape, band)
@@ -347,51 +394,17 @@ module RjuiTools
           end
         end
 
-        BAND_CONDITIONS = {
-          %w[compact] => '!isMinMd',
-          %w[medium] => 'isMinMd && !isMinLg',
-          %w[regular] => 'isMinLg',
-          %w[compact medium] => '!isMinLg',
-          %w[medium regular] => 'isMinMd',
-          %w[compact regular] => '(!isMinMd || isMinLg)',
-          %w[compact medium regular] => 'true',
-          [] => 'false'
+        # A set of width bands as the breakpoint variants that cover it.
+        BAND_VARIANTS = {
+          %w[compact] => %w[max-md:],
+          %w[medium] => %w[md:max-lg:],
+          %w[regular] => %w[lg:],
+          %w[compact medium] => %w[max-lg:],
+          %w[medium regular] => %w[md:],
+          %w[compact regular] => %w[max-md: lg:],
+          %w[compact medium regular] => [''],
+          [] => []
         }.freeze
-
-        def band_condition(bands)
-          BAND_CONDITIONS.fetch(bands)
-        end
-
-        def join_conditions(orientation, band)
-          return 'false' if band == 'false'
-          return orientation if band == 'true'
-
-          "#{orientation} && #{band}"
-        end
-
-        # Check if a component (or any descendant) needs the landscape hook.
-        # Walks the entire subtree even when the current node has no
-        # `responsive` block of its own, because a parent view without
-        # responsive overrides may still contain a child that does.
-        def needs_landscape_hook?(component)
-          return false unless component.is_a?(Hash)
-
-          if JsonUIShared::ResponsiveResolver.responsive?(component)
-            size_classes = JsonUIShared::ResponsiveResolver.size_classes(component)
-            return true if size_classes.any? { |sc| sc.include?('landscape') }
-          end
-
-          children = component['child']
-          if children.is_a?(Array)
-            children.each do |child|
-              return true if child.is_a?(Hash) && needs_landscape_hook?(child)
-            end
-          elsif children.is_a?(Hash)
-            return true if needs_landscape_hook?(children)
-          end
-
-          false
-        end
 
         private
 
@@ -467,32 +480,6 @@ module RjuiTools
         # row and maps its gravity itself.
         def label_row?(component)
           %w[Label Text].include?(JsonUIShared::TypeSynonyms.drawn_type(component['type']))
-        end
-
-        def build_landscape_key(parsed)
-          if parsed[:width]
-            "#{parsed[:width]}-landscape"
-          else
-            'landscape'
-          end
-        end
-
-        # A combination's width is its size class's band — compact below
-        # 768px, medium 768..1023, regular from 1024, as the variant-file
-        # dispatch reads them — AND landscape. Until jsonui-cli 1.9.26 every
-        # combination returned `isLandscape` alone, so regular-landscape held
-        # on a narrow landscape window too
-        # (rjui-responsive-width-plus-landscape-drops-width-condition).
-        LANDSCAPE_WIDTH_CONDITIONS = {
-          'compact' => '!isMinMd',
-          'medium' => 'isMinMd && !isMinLg',
-          'regular' => 'isMinLg'
-        }.freeze
-
-        def landscape_condition(key)
-          width = JsonUIShared::ResponsiveResolver.parse_size_class(key)[:width]
-          band = LANDSCAPE_WIDTH_CONDITIONS[width]
-          band ? "isLandscape && #{band}" : 'isLandscape'
         end
 
         def map_responsive_padding(value, prefix)
