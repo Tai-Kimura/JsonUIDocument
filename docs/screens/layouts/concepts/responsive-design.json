@@ -394,7 +394,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "{/* React — the JSON from the priority section. It has landscape keys, so\n    every key is drawn at run time, each under the one condition where it is\n    the winner. A block of size classes alone uses breakpoint classes\n    instead (`lg:` for regular, `md:max-lg:` for medium). */}\nconst isLandscape = useMediaQuery('(orientation: landscape)');\nconst isMinMd = useMediaQuery('(min-width: 768px)');\nconst isMinLg = useMediaQuery('(min-width: 1024px)');\n\n<div\n  className={`flex flex-col gap-[0.5rem] ${!isLandscape && isMinLg ? \"flex-row gap-[1.5rem]\" : \"\"} ${isLandscape && !isMinLg ? \"gap-[1rem]\" : \"\"} ${isLandscape && isMinLg ? \"flex-row gap-[2rem]\" : \"\"}`}\n/>",
+                      "code": "{/* React — the JSON from the priority section. Since jsonui-cli 2.3.30 each\n    key is a set of media variants for the windows where it is the winner:\n    portrait: / landscape: with the width bands (lg: is 1024px and wider,\n    max-lg: narrower). Tailwind writes variant classes after the plain ones,\n    so the winner always wins over the base. A block of size classes alone\n    uses breakpoint classes (`lg:` for regular, `md:max-lg:` for medium). */}\n<div className=\"flex flex-col portrait:lg:flex-row portrait:lg:gap-[1.5rem] landscape:max-lg:gap-[1rem] landscape:lg:flex-row landscape:lg:gap-[2rem] gap-[0.5rem]\" />",
                       "language": "tsx",
                       "filename": "Generated.tsx",
                       "showLineNumbers": false,
