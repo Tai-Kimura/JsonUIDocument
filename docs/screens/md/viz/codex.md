@@ -2,7 +2,7 @@
 
 ## Overview
 
-jui viz > Codex sessions. One article of the /viz section, added on 2026-10-29. Sections: Start the Codex daemon / What you see / Answer Codex's permission requests / Stop a turn / Start a Codex session from the bell / Local models (LM Studio and Ollama) / Codex's usage limits in the header / Send a prompt / Read the history / Clock out / Stopped at the usage limit / Not in 2.3.32. Written from the shipped jsonui-cli source.
+jui viz > Codex sessions. One article of the /viz section, added on 2026-10-29. Sections: Start the Codex daemon / What you see / Answer Codex's permission requests / Stop a turn / Start a Codex session from the bell / Local models (LM Studio and Ollama) / Codex's usage limits in the header / Send a prompt / Read the history / Clock out / Stopped at the usage limit / Not in 2.3.34. Written from the shipped jsonui-cli source.
 
 | | |
 |---|---|

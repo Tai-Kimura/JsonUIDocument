@@ -11383,8 +11383,8 @@
       "ja": "使える型語彙"
     },
     "section_types_body": {
-      "en": "The cheat sheet below lists the canonical forms the validator / generator recognize. Anything not on this list has to be wrapped in a customType or registered in `.jsonui-type-map.json`. Nesting works as expected — `[Map(String, ActivityRow)]?` is legal and means 'optional array of string-keyed ActivityRow maps'. From jsonui-cli 2.3.32 the collection spellings `[K: V]`, `Array(T)`, `List(T)` and `Dictionary(K, V)` come out as each language's own type too, and a type a language has no form for (a tuple in Kotlin or TypeScript, `Set(T)`) stops the protocol sync with an ERROR that names the type, the platform and the spellings to use instead. One gap as of 2.3.32: `jsonui-doc validate` still reads `[K: V]` as an array when it checks an initial value, so `{}` warns and `[]` passes; write `Map(K, V)` for a dictionary that has a `defaultValue` until that is fixed.",
-      "ja": "下のチートシートが validator / ジェネレータが認識する正規形の一覧。このリストに無いものは customType でラップするか `.jsonui-type-map.json` に登録する必要があります。ネストは想定通りに動き — `[Map(String, ActivityRow)]?` は合法で、「String キーの ActivityRow マップの配列のオプショナル」を意味します。jsonui-cli 2.3.32 からは、集まりの書き方 `[K: V]`・`Array(T)`・`List(T)`・`Dictionary(K, V)` も、それぞれの言語の型として出ます。言語に形の無い型（Kotlin や TypeScript のタプル、`Set(T)`）は Protocol の sync を ERROR で止め、型・プラットフォーム・代わりに使える書き方を名指しします。2.3.32 の時点の抜けが 1 つあります。`jsonui-doc validate` は初期値を確かめるとき `[K: V]` を配列として読むので、`{}` が警告され、`[]` が通ります。`defaultValue` を持つ辞書は、直るまで `Map(K, V)` で書いてください。"
+      "en": "The cheat sheet below lists the canonical forms the validator / generator recognize. Anything not on this list has to be wrapped in a customType or registered in `.jsonui-type-map.json`. Nesting works as expected — `[Map(String, ActivityRow)]?` is legal and means 'optional array of string-keyed ActivityRow maps'. From jsonui-cli 2.3.32 the collection spellings `[K: V]`, `Array(T)`, `List(T)` and `Dictionary(K, V)` come out as each language's own type too, and a type a language has no form for (a tuple in Kotlin or TypeScript, `Set(T)`) stops the protocol sync with an ERROR that names the type, the platform and the spellings to use instead. `jsonui-doc validate` reads every dictionary spelling as a dictionary when it checks an initial value from 2.3.33: `{}` passes for `[String: Int]` and `[]` warns (in 2.3.32 it read `[K: V]` as an array, the other way round).",
+      "ja": "下のチートシートが validator / ジェネレータが認識する正規形の一覧。このリストに無いものは customType でラップするか `.jsonui-type-map.json` に登録する必要があります。ネストは想定通りに動き — `[Map(String, ActivityRow)]?` は合法で、「String キーの ActivityRow マップの配列のオプショナル」を意味します。jsonui-cli 2.3.32 からは、集まりの書き方 `[K: V]`・`Array(T)`・`List(T)`・`Dictionary(K, V)` も、それぞれの言語の型として出ます。言語に形の無い型（Kotlin や TypeScript のタプル、`Set(T)`）は Protocol の sync を ERROR で止め、型・プラットフォーム・代わりに使える書き方を名指しします。`jsonui-doc validate` は、2.3.33 から、初期値を確かめるときに辞書の書き方をどれも辞書として読みます。`[String: Int]` に `{}` は通り、`[]` は警告されます（2.3.32 では `[K: V]` を配列として読み、逆になっていました）。"
     },
     "section_sharing_heading": {
       "en": "Sharing types across specs",
@@ -18489,16 +18489,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.3.32",
-      "ja": "2.3.32 でまだできないこと"
+      "en": "Not in 2.3.34",
+      "ja": "2.3.34 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.3.32",
-      "ja": "2.3.32 でまだできないこと"
+      "en": "Not in 2.3.34",
+      "ja": "2.3.34 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
