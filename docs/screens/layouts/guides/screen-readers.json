@@ -1,0 +1,495 @@
+{
+  "type": "View",
+  "id": "guides_screen_readers_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateGuides",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "guides_screen_readers_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "guides_screen_readers_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            24,
+            32
+          ],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateGuides}",
+              "text": "breadcrumb"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "#475467",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "#64748B",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "guides_screen_readers_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "guides_screen_readers_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_what",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontColor": "#0B1220",
+                      "text": "section_what_heading",
+                      "fontWeight": "bold"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_what_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 13,
+                      "fontColor": "#64748B",
+                      "text": "section_what_caption"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 8,
+                      "code": "{\n  \"type\": \"View\", \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Button\", \"id\": \"open_button\", \"text\": \"Open\",\n      \"onClick\": \"@{onOpen}\",\n      \"accessibilityLabel\": \"Open the second image\" },\n    { \"type\": \"Label\", \"id\": \"save_status\", \"text\": \"@{saveStatus}\",\n      \"accessibilityLiveRegion\": \"polite\" }\n  ]\n}",
+                      "language": "json",
+                      "filename": "layout",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_what_bullet_image"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_label",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontColor": "#0B1220",
+                      "text": "section_label_heading",
+                      "fontWeight": "bold"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_label_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 13,
+                      "fontColor": "#64748B",
+                      "text": "section_label_caption"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 8,
+                      "code": "// web (rjui)\n<button id=\"open_button\" className=\"…\" onClick={() => data.onOpen?.()}\n        aria-label=\"Open the second image\">Open</button>\n\n// iOS (sjui, SwiftUI)\nStateAwareButtonView(\n    text: \"Open\",\n    action: { data.onOpen?() },\n    isEnabled: true\n)\n    .accessibilityIdentifier(\"open_button\")\n    .accessibilityLabel(Text(\"Open the second image\"))\n\n// Android (kjui, Compose)\nButton(onClick = { data.onOpen?.invoke() },\n    modifier = Modifier\n        .testTag(\"open_button\")\n        .semantics { testTagsAsResourceId = true }\n        .then((\"Open the second image\").let { label -> Modifier.semantics { contentDescription = label } }),\n    …) { Text(\"Open\") }",
+                      "language": "text",
+                      "filename": "generated (excerpts)",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_label_bullet_before"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_label_bullet_binding"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_label_bullet_view"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_live",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontColor": "#0B1220",
+                      "text": "section_live_heading",
+                      "fontWeight": "bold"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_live_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 13,
+                      "fontColor": "#64748B",
+                      "text": "section_live_caption"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 8,
+                      "code": "// layout\n{ \"type\": \"Label\", \"id\": \"save_status\", \"text\": \"@{saveStatus}\", \"accessibilityLiveRegion\": \"polite\" }\n{ \"type\": \"Label\", \"id\": \"save_error\",  \"text\": \"@{saveError}\",  \"accessibilityLiveRegion\": \"assertive\" }\n\n// web (rjui)\n<span id=\"save_status\" className=\"…\" role=\"status\" aria-live=\"polite\">{`${data.saveStatus ?? \"\"}`}</span>\n<span id=\"save_error\"  className=\"…\" role=\"alert\" aria-live=\"assertive\">{`${data.saveError ?? \"\"}`}</span>\n\n// Android (kjui, Compose) — on each Text's modifier\n.semantics { liveRegion = LiveRegionMode.Polite }\n.semantics { liveRegion = LiveRegionMode.Assertive }\n\n// iOS (sjui, SwiftUI) — save_status; save_error is the same with .high\n.onChange(of: (data.saveStatus ?? \"\")) { _, newValue in\n    var announcement = AttributedString(newValue)\n    announcement.accessibilitySpeechAnnouncementPriority = .default\n    AccessibilityNotification.Announcement(announcement).post()\n}",
+                      "language": "text",
+                      "filename": "generated (excerpts)",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_live_bullet_off"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_live_bullet_static"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_live_bullet_view"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_limits",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontColor": "#0B1220",
+                      "text": "section_limits_heading",
+                      "fontWeight": "bold"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_limits_body"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_screen_readers_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    32,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "chrome_ink",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "guides_screen_readers_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 3,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/next_step_card"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_screen_readers_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "#94A3B8",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "guides_screen_readers_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [
+                24,
+                16,
+                24,
+                16
+              ],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_screen_readers_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    0,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        {
+                          "id": "toc_what",
+                          "label": "toc_row_what",
+                          "anchor": "section_what",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_label",
+                          "label": "toc_row_label",
+                          "anchor": "section_label",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_live",
+                          "label": "toc_row_live",
+                          "anchor": "section_live",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_limits",
+                          "label": "toc_row_limits",
+                          "anchor": "section_limits",
+                          "level": 1
+                        }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

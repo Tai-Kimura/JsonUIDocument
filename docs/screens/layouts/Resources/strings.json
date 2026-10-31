@@ -11383,8 +11383,8 @@
       "ja": "使える型語彙"
     },
     "section_types_body": {
-      "en": "The cheat sheet below lists the canonical forms the validator / generator recognize. Anything not on this list has to be wrapped in a customType or registered in `.jsonui-type-map.json`. Nesting works as expected — `[Map(String, ActivityRow)]?` is legal and means 'optional array of string-keyed ActivityRow maps'. From jsonui-cli 2.3.32 the collection spellings `[K: V]`, `Array(T)`, `List(T)` and `Dictionary(K, V)` come out as each language's own type too, and a type a language has no form for (a tuple in Kotlin or TypeScript, `Set(T)`) stops the protocol sync with an ERROR that names the type, the platform and the spellings to use instead. `jsonui-doc validate` reads every dictionary spelling as a dictionary when it checks an initial value from 2.3.33: `{}` passes for `[String: Int]` and `[]` warns (in 2.3.32 it read `[K: V]` as an array, the other way round).",
-      "ja": "下のチートシートが validator / ジェネレータが認識する正規形の一覧。このリストに無いものは customType でラップするか `.jsonui-type-map.json` に登録する必要があります。ネストは想定通りに動き — `[Map(String, ActivityRow)]?` は合法で、「String キーの ActivityRow マップの配列のオプショナル」を意味します。jsonui-cli 2.3.32 からは、集まりの書き方 `[K: V]`・`Array(T)`・`List(T)`・`Dictionary(K, V)` も、それぞれの言語の型として出ます。言語に形の無い型（Kotlin や TypeScript のタプル、`Set(T)`）は Protocol の sync を ERROR で止め、型・プラットフォーム・代わりに使える書き方を名指しします。`jsonui-doc validate` は、2.3.33 から、初期値を確かめるときに辞書の書き方をどれも辞書として読みます。`[String: Int]` に `{}` は通り、`[]` は警告されます（2.3.32 では `[K: V]` を配列として読み、逆になっていました）。"
+      "en": "The cheat sheet below lists the canonical forms the validator / generator recognize. Anything not on this list has to be wrapped in a customType or registered in `.jsonui-type-map.json`. Nesting works as expected — `[Map(String, ActivityRow)]?` is legal and means 'optional array of string-keyed ActivityRow maps'. From jsonui-cli 2.3.32 the collection spellings `[K: V]`, `Array(T)`, `List(T)` and `Dictionary(K, V)` come out as each language's own type too, and a type a language has no form for (a tuple in Kotlin or TypeScript, `Set(T)`) stops the protocol sync with an ERROR that names the type, the platform and the spellings to use instead. `jsonui-doc validate` reads every dictionary spelling as a dictionary when it checks an initial value from 2.3.33: `{}` passes for `[String: Int]` and `[]` warns (in 2.3.32 it read `[K: V]` as an array, the other way round). From 2.3.38 a collection, a function or a label inside a function type is converted as one outside it is: `(([Photo]) -> Void)?` is `((arg0: Photo[]) => void) | undefined` in TypeScript, where 2.3.37 wrote the tuple `[Photo]`, and `((List<Photo>) -> Unit)?` in Kotlin.",
+      "ja": "下のチートシートが validator / ジェネレータが認識する正規形の一覧。このリストに無いものは customType でラップするか `.jsonui-type-map.json` に登録する必要があります。ネストは想定通りに動き — `[Map(String, ActivityRow)]?` は合法で、「String キーの ActivityRow マップの配列のオプショナル」を意味します。jsonui-cli 2.3.32 からは、集まりの書き方 `[K: V]`・`Array(T)`・`List(T)`・`Dictionary(K, V)` も、それぞれの言語の型として出ます。言語に形の無い型（Kotlin や TypeScript のタプル、`Set(T)`）は Protocol の sync を ERROR で止め、型・プラットフォーム・代わりに使える書き方を名指しします。`jsonui-doc validate` は、2.3.33 から、初期値を確かめるときに辞書の書き方をどれも辞書として読みます。`[String: Int]` に `{}` は通り、`[]` は警告されます（2.3.32 では `[K: V]` を配列として読み、逆になっていました）。2.3.38 からは、関数の型の中の collection・関数・ラベルも、関数の外と同じに変換されます。`(([Photo]) -> Void)?` は TypeScript で `((arg0: Photo[]) => void) | undefined`（2.3.37 はタプルの `[Photo]` を書いていました）、Kotlin で `((List<Photo>) -> Unit)?` です。"
     },
     "section_sharing_heading": {
       "en": "Sharing types across specs",
@@ -18501,16 +18501,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.3.37",
-      "ja": "2.3.37 でまだできないこと"
+      "en": "Not in 2.3.38",
+      "ja": "2.3.38 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.3.37",
-      "ja": "2.3.37 でまだできないこと"
+      "en": "Not in 2.3.38",
+      "ja": "2.3.38 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
@@ -18737,6 +18737,152 @@
     "nav_title": {
       "en": "Messages between sessions",
       "ja": "セッション間のメッセージ"
+    }
+  },
+  "guides_screen_readers": {
+    "meta_title": {
+      "en": "Screen readers — JsonUI",
+      "ja": "スクリーンリーダー — JsonUI"
+    },
+    "breadcrumb": {
+      "en": "← Guides",
+      "ja": "← ガイド"
+    },
+    "title": {
+      "en": "Screen readers",
+      "ja": "スクリーンリーダー"
+    },
+    "lead": {
+      "en": "Two attributes tell a screen reader what a layout cannot say by itself, on all three platforms from jsonui-cli 2.3.38: `accessibilityLabel` names a control by something other than what it shows, and `accessibilityLiveRegion` reads a text out when it changes. Every code block on this page is what the shipped converters write for the layout above it.",
+      "ja": "レイアウトだけでは伝えられないことをスクリーンリーダーに伝える属性が、jsonui-cli 2.3.38 から 3 つのプラットフォームで 2 つ使えます。`accessibilityLabel` はコントロールを見た目とは別の名前で読ませ、`accessibilityLiveRegion` は文が変わったときに読み上げさせます。このページのコードは、どれもその上のレイアウトを配布されたコンバーターに通して出たものです。"
+    },
+    "read_time": {
+      "en": "~4 min read",
+      "ja": "約 4 分"
+    },
+    "section_what_heading": {
+      "en": "1. Two attributes",
+      "ja": "1. 2 つの属性"
+    },
+    "section_what_body": {
+      "en": "`accessibilityLabel` (also spelled `contentDescription`) goes on a control: Button, CheckBox, Switch, Radio, Segment, Slider, SelectBox, TextField, and a View with a tap of its own. `accessibilityLiveRegion` goes on a Label or a View and takes `polite`, `assertive` or `off`. Both are optional, and a layout that writes neither generates what it did before: this site writes neither, and moving it from 2.3.37 to 2.3.38 changed no generated file.",
+      "ja": "`accessibilityLabel`（`contentDescription` とも書けます）はコントロールに付けます。Button、CheckBox、Switch、Radio、Segment、Slider、SelectBox、TextField と、自分のタップを持つ View です。`accessibilityLiveRegion` は Label か View に付け、`polite`・`assertive`・`off` のどれかを書きます。どちらも省略でき、どちらも書かないレイアウトは前と同じものを生成します。このサイトはどちらも書いておらず、2.3.37 から 2.3.38 に上げても、生成されたファイルは 1 つも変わりませんでした。"
+    },
+    "section_what_caption": {
+      "en": "Both in one layout:",
+      "ja": "1 つのレイアウトに両方:"
+    },
+    "section_what_bullet_image": {
+      "en": "• An Image is not on the list because it already has a name: `alt`, which takes `accessibilityLabel` and `contentDescription` as other spellings. IconLabel's `contentDescription` is its icon's name, a separate attribute.",
+      "ja": "• Image が一覧に無いのは、もう名前を持っているからです。`alt` がそれで、`accessibilityLabel` と `contentDescription` とも書けます。IconLabel の `contentDescription` はアイコンの名前で、別の属性です。"
+    },
+    "section_label_heading": {
+      "en": "2. accessibilityLabel: the name a control is read by",
+      "ja": "2. accessibilityLabel: コントロールを読む名前"
+    },
+    "section_label_body": {
+      "en": "A screen reader reads a control by what it shows. Where that is not enough, as with a row's \"Open\" that should be read \"Open the second image\", the label replaces it. The value is a strings.json key or text, localized like `text`, or a binding. Each platform writes it where its screen reader looks: web `aria-label` on the element that takes focus, iOS `.accessibilityLabel(Text(…))` last on the chain, Android `contentDescription` in the semantics of the modifier.",
+      "ja": "スクリーンリーダーは、コントロールを見えているもので読みます。それだけでは足りないとき、たとえば行の「開く」を「2 枚目の画像を開く」と読ませたいときに、この名前が置き換わります。値は strings.json のキーか文字（`text` と同じようにローカライズされます）、または binding です。各プラットフォームは、それぞれのスクリーンリーダーが見る所に書きます。Web はフォーカスを受ける要素の `aria-label`、iOS はチェーンの最後の `.accessibilityLabel(Text(…))`、Android は modifier の semantics の `contentDescription` です。"
+    },
+    "section_label_caption": {
+      "en": "One Button, through the three converters (2.3.38):",
+      "ja": "1 つの Button を 3 つのコンバーターに通したもの（2.3.38）:"
+    },
+    "section_label_bullet_before": {
+      "en": "• The same Button through 2.3.37 writes none of these lines: the attribute was not declared on these types, and nothing was emitted for it.",
+      "ja": "• 同じ Button を 2.3.37 に通すと、これらの行はどれも出ません。これらの型には属性が宣言されておらず、何も書かれませんでした。"
+    },
+    "section_label_bullet_binding": {
+      "en": "• A binding is written as one: `\"contentDescription\": \"@{openLabel}\"` became `aria-label={`${data.openLabel ?? \"\"}`}` on web.",
+      "ja": "• binding は binding のまま書かれます。`\"contentDescription\": \"@{openLabel}\"` は、Web で `aria-label={`${data.openLabel ?? \"\"}`}` になりました。"
+    },
+    "section_label_bullet_view": {
+      "en": "• On a View the name lands only when the View is one button to a screen reader, that is when it has an `onClick` of its own. A View that taps nothing is not one element, so the name would land on its children instead, and it is not written: on web the View with `onClick` got `aria-label=\"Open item\"` and the same View without it got nothing.",
+      "ja": "• View では、スクリーンリーダーにとってその View が 1 つのボタンのとき、つまり自分の `onClick` を持つときだけ名前が付きます。何もタップしない View は 1 つの要素ではなく、名前が子に付いてしまうので、書かれません。Web では、`onClick` のある View に `aria-label=\"Open item\"` が付き、`onClick` の無い同じ View には何も付きませんでした。"
+    },
+    "section_live_heading": {
+      "en": "3. accessibilityLiveRegion: text read out when it changes",
+      "ja": "3. accessibilityLiveRegion: 変わったときに読み上げる文"
+    },
+    "section_live_body": {
+      "en": "A saved or failed line, or a progress count, changes where focus is not, and a screen reader says nothing about it unless told to. `polite` reads the new text when the screen reader has finished what it is saying; `assertive` interrupts it, for an error; `off`, or leaving the attribute out, reads nothing. Web and Android have live regions and write one. iOS has none, so a Label whose text is bound posts an announcement of the new text each time it changes.",
+      "ja": "保存できた・失敗した、の 1 行や進み具合の数は、フォーカスの無い所で変わります。言われなければ、スクリーンリーダーは何も読みません。`polite` は、スクリーンリーダーが今読んでいるものを読み終えてから新しい文を読みます。`assertive` は割り込むので、エラーに使います。`off` か、属性を書かないときは何も読みません。Web と Android には live region があり、それを書きます。iOS には無いので、文が bind された Label は、文が変わるたびに新しい文の読み上げを通知します。"
+    },
+    "section_live_caption": {
+      "en": "Two Labels, through the three converters (2.3.38):",
+      "ja": "2 つの Label を 3 つのコンバーターに通したもの（2.3.38）:"
+    },
+    "section_live_bullet_off": {
+      "en": "• `off` writes nothing on web: the Label came out exactly as one without the attribute.",
+      "ja": "• `off` は Web で何も書きません。属性の無い Label とまったく同じものが出ました。"
+    },
+    "section_live_bullet_static": {
+      "en": "• On iOS the announcement follows a bound text. A static text never changes, so it announces nothing; put the attribute on a Label whose text is `@{…}`.",
+      "ja": "• iOS の読み上げは、bind された文についてきます。固定の文は変わらないので、何も読み上げません。`@{…}` の文を持つ Label に付けてください。"
+    },
+    "section_live_bullet_view": {
+      "en": "• On a View the attribute is written on web (`role` and `aria-live` on the View) and Android (`liveRegion`), and on iOS it does nothing: a View holds no one text to announce. The build does not warn about it, because one layout is written for all three platforms. To be read out on iOS too, put it on the Label whose text changes rather than on the View around it.",
+      "ja": "• View に付けると、Web（View に `role` と `aria-live`）と Android（`liveRegion`）では書かれ、iOS では何もしません。View には読み上げる 1 つの文が無いからです。1 つのレイアウトを 3 つのプラットフォームで使うので、build は警告しません。iOS でも読み上げたいときは、外側の View ではなく、文が変わる Label に付けてください。"
+    },
+    "section_limits_heading": {
+      "en": "4. What this page measured, and what it did not",
+      "ja": "4. このページが測ったこと、測っていないこと"
+    },
+    "section_limits_body": {
+      "en": "The code blocks are the converters' output, measured against jsonui-cli 2.3.37 and 2.3.38 on the layouts shown. Nothing here ran a screen reader: whether VoiceOver, TalkBack or a browser's reader then says the name, or reads the change, is the platform's behaviour and is not measured on this page. This site draws none of these controls with either attribute, so its own pages are no example of them.",
+      "ja": "コードは、示したレイアウトを jsonui-cli 2.3.37 と 2.3.38 のコンバーターに通して測った出力です。スクリーンリーダーは動かしていません。VoiceOver、TalkBack、ブラウザーの読み上げが、その名前を実際に読むか、変化を読み上げるかはプラットフォームの振る舞いで、このページでは測っていません。このサイトは、どちらかの属性を付けたこれらのコントロールを描いていないので、このサイトのページはその例になりません。"
+    },
+    "next_heading": {
+      "en": "Keep reading",
+      "ja": "続けて読む"
+    },
+    "next_layouts_title": {
+      "en": "Writing layouts",
+      "ja": "レイアウトを書く"
+    },
+    "next_layouts_description": {
+      "en": "Where these attributes sit among the rest of a layout.",
+      "ja": "これらの属性が、レイアウトのほかの部分とどう並ぶか。"
+    },
+    "next_localization_title": {
+      "en": "Localization",
+      "ja": "ローカライズ"
+    },
+    "next_localization_description": {
+      "en": "How a strings.json key in a label is resolved per language.",
+      "ja": "名前に書いた strings.json のキーが、言語ごとにどう解決されるか。"
+    },
+    "next_testing_title": {
+      "en": "Testing",
+      "ja": "テスト"
+    },
+    "next_testing_description": {
+      "en": "Finding controls in UI tests, which reads ids rather than these names.",
+      "ja": "UI テストでコントロールを見つける方法。こちらは名前ではなく id を読みます。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. Built by the same toolchain documented here."
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの内容"
+    },
+    "toc_row_what": {
+      "en": "1. Two attributes",
+      "ja": "1. 2 つの属性"
+    },
+    "toc_row_label": {
+      "en": "2. accessibilityLabel",
+      "ja": "2. accessibilityLabel"
+    },
+    "toc_row_live": {
+      "en": "3. accessibilityLiveRegion",
+      "ja": "3. accessibilityLiveRegion"
+    },
+    "toc_row_limits": {
+      "en": "4. Measured, and not",
+      "ja": "4. 測ったこと、測っていないこと"
     }
   }
 }

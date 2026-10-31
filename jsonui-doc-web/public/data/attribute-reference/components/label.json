@@ -45,15 +45,15 @@
   "canonicalCode": "{\n  \"type\": \"Label\",\n  \"text\": \"Hello, JsonUI\",\n  \"fontSize\": 16,\n  \"fontColor\": \"#111827\"\n}",
   "canonicalLanguage": "json",
   "statRequired": "0",
-  "statOptional": "29",
+  "statOptional": "30",
   "statEvents": "0",
   "statRequiredText": {
     "en": "0 required",
     "ja": "必須 0"
   },
   "statOptionalText": {
-    "en": "29 optional",
-    "ja": "任意 29"
+    "en": "30 optional",
+    "ja": "任意 30"
   },
   "statEventsText": {
     "en": "0 events",
@@ -1550,6 +1550,89 @@
               "platformMatrixVisibility": "visible",
               "platformIosLabel": "—",
               "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_accessibilityLiveRegion",
+              "name": "accessibilityLiveRegion",
+              "anchorId": "attr-accessibilityLiveRegion",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "polite",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "assertive",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "off",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Reads this text out whenever it changes, without moving focus (a saved or failed line, a progress count): `polite` waits for the screen reader to finish, `assertive` interrupts it, `off` (or leaving it out) reads nothing. Web writes `role=\"status\" aria-live=\"polite\"` or `role=\"alert\" aria-live=\"assertive\"`, Android `liveRegion = LiveRegionMode.Polite` or `Assertive`. iOS has no live region, so a Label whose text is bound posts an announcement of its new text when it changes, at high priority for `assertive`; a static text never changes and announces nothing (all measured with jsonui-cli 2.3.38).",
+                "ja": "この文が変わるたびに、フォーカスを動かさずに読み上げます（保存できた・失敗した、の 1 行や、進み具合の数など）。`polite` はスクリーンリーダーが読み終わるのを待ち、`assertive` は割り込み、`off`（または書かない）は何も読みません。Web は `role=\"status\" aria-live=\"polite\"` か `role=\"alert\" aria-live=\"assertive\"`、Android は `liveRegion = LiveRegionMode.Polite` か `Assertive` を書きます。iOS には live region が無いので、文が bind された Label は、文が変わったときに新しい文の読み上げを通知します。`assertive` では高い優先度です。固定の文は変わらないので、何も読み上げません（すべて jsonui-cli 2.3.38 で実測）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
                 "en": "",
@@ -4038,6 +4121,89 @@
               "platformMatrixVisibility": "visible",
               "platformIosLabel": "—",
               "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_accessibilityLiveRegion",
+              "name": "accessibilityLiveRegion",
+              "anchorId": "attr-accessibilityLiveRegion",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "polite",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "assertive",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "off",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Reads this text out whenever it changes, without moving focus (a saved or failed line, a progress count): `polite` waits for the screen reader to finish, `assertive` interrupts it, `off` (or leaving it out) reads nothing. Web writes `role=\"status\" aria-live=\"polite\"` or `role=\"alert\" aria-live=\"assertive\"`, Android `liveRegion = LiveRegionMode.Polite` or `Assertive`. iOS has no live region, so a Label whose text is bound posts an announcement of its new text when it changes, at high priority for `assertive`; a static text never changes and announces nothing (all measured with jsonui-cli 2.3.38).",
+                "ja": "この文が変わるたびに、フォーカスを動かさずに読み上げます（保存できた・失敗した、の 1 行や、進み具合の数など）。`polite` はスクリーンリーダーが読み終わるのを待ち、`assertive` は割り込み、`off`（または書かない）は何も読みません。Web は `role=\"status\" aria-live=\"polite\"` か `role=\"alert\" aria-live=\"assertive\"`、Android は `liveRegion = LiveRegionMode.Polite` か `Assertive` を書きます。iOS には live region が無いので、文が bind された Label は、文が変わったときに新しい文の読み上げを通知します。`assertive` では高い優先度です。固定の文は変わらないので、何も読み上げません（すべて jsonui-cli 2.3.38 で実測）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
                 "en": "",

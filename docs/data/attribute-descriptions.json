@@ -1164,5 +1164,13 @@
   "$jui": {
     "en": "Normalization marker injected by `jui build` when build.normalizeLayouts is enabled. Metadata only, not rendered.",
     "ja": "build.normalizeLayouts 有効時に `jui build` が刻印する正規化マーカー。メタデータであり描画はされない。"
+  },
+  "accessibilityLabel": {
+    "en": "What a screen reader says for this control in place of what it shows: a strings.json key or text, localized like `text`, or a binding. Web writes `aria-label`, iOS `.accessibilityLabel(Text(…))` last on the chain and Android `contentDescription` in the modifier's semantics (measured on a Button with jsonui-cli 2.3.38; 2.3.37 wrote none of them). Use it where the visible text does not say enough, as with a row's \"Open\" that should be read \"Open the second image\". Left out, the control is read by what it shows, as before. Also spelled `contentDescription`. An Image's name is `alt`, which takes both spellings.",
+    "ja": "スクリーンリーダーが、このコントロールの見た目の代わりに読み上げる名前です。strings.json のキーか文字（`text` と同じようにローカライズされます）、または binding を書きます。Web は `aria-label`、iOS はチェーンの最後に `.accessibilityLabel(Text(…))`、Android は modifier の semantics の `contentDescription` を書きます（jsonui-cli 2.3.38 の Button で実測。2.3.37 はどれも書きませんでした）。見えている文だけでは足りない所に使います。たとえば行の「開く」を「2 枚目の画像を開く」と読ませたいときです。書かなければ、これまでどおり見えている文で読まれます。`contentDescription` とも書けます。Image の名前は `alt` で、こちらも両方の書き方を受け付けます。"
+  },
+  "accessibilityLiveRegion": {
+    "en": "Reads this text out whenever it changes, without moving focus (a saved or failed line, a progress count): `polite` waits for the screen reader to finish, `assertive` interrupts it, `off` (or leaving it out) reads nothing. Web writes `role=\"status\" aria-live=\"polite\"` or `role=\"alert\" aria-live=\"assertive\"`, Android `liveRegion = LiveRegionMode.Polite` or `Assertive`. iOS has no live region, so a Label whose text is bound posts an announcement of its new text when it changes, at high priority for `assertive`; a static text never changes and announces nothing (all measured with jsonui-cli 2.3.38).",
+    "ja": "この文が変わるたびに、フォーカスを動かさずに読み上げます（保存できた・失敗した、の 1 行や、進み具合の数など）。`polite` はスクリーンリーダーが読み終わるのを待ち、`assertive` は割り込み、`off`（または書かない）は何も読みません。Web は `role=\"status\" aria-live=\"polite\"` か `role=\"alert\" aria-live=\"assertive\"`、Android は `liveRegion = LiveRegionMode.Polite` か `Assertive` を書きます。iOS には live region が無いので、文が bind された Label は、文が変わったときに新しい文の読み上げを通知します。`assertive` では高い優先度です。固定の文は変わらないので、何も読み上げません（すべて jsonui-cli 2.3.38 で実測）。"
   }
 }

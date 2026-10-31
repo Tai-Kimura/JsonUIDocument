@@ -45,15 +45,15 @@
   "canonicalCode": "{\n  \"type\": \"Slider\",\n  \"value\": \"@{volume}\",\n  \"minimum\": 0,\n  \"maximum\": 100,\n  \"step\": 1,\n  \"onValueChange\": \"@{onVolumeChanged}\"\n}",
   "canonicalLanguage": "json",
   "statRequired": "0",
-  "statOptional": "12",
+  "statOptional": "13",
   "statEvents": "1",
   "statRequiredText": {
     "en": "0 required",
     "ja": "必須 0"
   },
   "statOptionalText": {
-    "en": "12 optional",
-    "ja": "任意 12"
+    "en": "13 optional",
+    "ja": "任意 13"
   },
   "statEventsText": {
     "en": "1 events",
@@ -167,6 +167,83 @@
                 "ja": "数値の two-way binding。"
               },
               "type": "number | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_accessibilityLabel",
+              "name": "accessibilityLabel",
+              "anchorId": "attr-accessibilityLabel",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "contentDescription",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "What a screen reader says for this control in place of what it shows: a strings.json key or text, localized like `text`, or a binding. Web writes `aria-label`, iOS `.accessibilityLabel(Text(…))` last on the chain and Android `contentDescription` in the modifier's semantics (measured on a Button with jsonui-cli 2.3.38; 2.3.37 wrote none of them). Use it where the visible text does not say enough, as with a row's \"Open\" that should be read \"Open the second image\". Left out, the control is read by what it shows, as before. Also spelled `contentDescription`. An Image's name is `alt`, which takes both spellings.",
+                "ja": "スクリーンリーダーが、このコントロールの見た目の代わりに読み上げる名前です。strings.json のキーか文字（`text` と同じようにローカライズされます）、または binding を書きます。Web は `aria-label`、iOS はチェーンの最後に `.accessibilityLabel(Text(…))`、Android は modifier の semantics の `contentDescription` を書きます（jsonui-cli 2.3.38 の Button で実測。2.3.37 はどれも書きませんでした）。見えている文だけでは足りない所に使います。たとえば行の「開く」を「2 枚目の画像を開く」と読ませたいときです。書かなければ、これまでどおり見えている文で読まれます。`contentDescription` とも書けます。Image の名前は `alt` で、こちらも両方の書き方を受け付けます。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -1308,6 +1385,83 @@
                 "ja": "thumb より左側の track 色。"
               },
               "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_accessibilityLabel",
+              "name": "accessibilityLabel",
+              "anchorId": "attr-accessibilityLabel",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "contentDescription",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "What a screen reader says for this control in place of what it shows: a strings.json key or text, localized like `text`, or a binding. Web writes `aria-label`, iOS `.accessibilityLabel(Text(…))` last on the chain and Android `contentDescription` in the modifier's semantics (measured on a Button with jsonui-cli 2.3.38; 2.3.37 wrote none of them). Use it where the visible text does not say enough, as with a row's \"Open\" that should be read \"Open the second image\". Left out, the control is read by what it shows, as before. Also spelled `contentDescription`. An Image's name is `alt`, which takes both spellings.",
+                "ja": "スクリーンリーダーが、このコントロールの見た目の代わりに読み上げる名前です。strings.json のキーか文字（`text` と同じようにローカライズされます）、または binding を書きます。Web は `aria-label`、iOS はチェーンの最後に `.accessibilityLabel(Text(…))`、Android は modifier の semantics の `contentDescription` を書きます（jsonui-cli 2.3.38 の Button で実測。2.3.37 はどれも書きませんでした）。見えている文だけでは足りない所に使います。たとえば行の「開く」を「2 枚目の画像を開く」と読ませたいときです。書かなければ、これまでどおり見えている文で読まれます。`contentDescription` とも書けます。Image の名前は `alt` で、こちらも両方の書き方を受け付けます。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | binding",
               "required": ""
             },
             {

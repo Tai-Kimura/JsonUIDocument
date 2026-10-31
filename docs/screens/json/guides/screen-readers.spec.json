@@ -1,0 +1,78 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "ScreenReaders",
+    "displayName": "Screen readers",
+    "description": "Guides > Screen readers. The two screen-reader attributes jsonui-cli 2.3.38 added on all three platforms: accessibilityLabel (alias contentDescription) on Button, CheckBox, Switch, Radio, Segment, Slider, SelectBox, TextField and a View with a tap of its own, and accessibilityLiveRegion (polite / assertive / off) on Label and View. Four sections: what the two attributes are and where they go, what each platform writes for a label, what each writes for a live region (iOS announces a bound Label's change; a View's does nothing on iOS), and what the page measured and did not.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "guides/screen-readers",
+    "createdAt": "2026-10-31",
+    "updatedAt": "2026-10-31"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Three closing cards: writing layouts, localization (a label's strings key), testing (ids, not these names)."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "customTypes": [
+    {
+      "name": "NextReadLink",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String"
+        },
+        {
+          "name": "titleKey",
+          "type": "String"
+        },
+        {
+          "name": "descriptionKey",
+          "type": "String"
+        },
+        {
+          "name": "url",
+          "type": "String"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "2026-10-31 — New page for the v2.3.38 uptake (standing order: every new feature gets its article). No existing page covered screen readers; the Image alt description in the attribute reference is the only earlier mention.",
+    "Every code block is converter output, not illustration: the layouts were run through rjui (ConverterTable), sjui (ConverterFactory, with TapAccessibility.annotate!) and kjui (ComposeBuilder.generate_component) at 2.3.38, and through rjui at 2.3.37 for the before side (no aria-label, no role / aria-live). className values and Compose colour arguments are elided with an ellipsis and say so in the block's filename (excerpts).",
+    "Measured negatives, published: off writes nothing on web; a View without onClick gets no aria-label on web; a View's accessibilityLiveRegion writes nothing on iOS. The iOS and Android side of the View-without-tap rule is the declaration's and upstream's spec, not measured here, so the page states the measured web result.",
+    "No screen reader was run. The page says so in section 4, because the generated code is the only thing this lane can measure."
+  ]
+}

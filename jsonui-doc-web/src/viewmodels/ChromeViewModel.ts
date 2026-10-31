@@ -124,6 +124,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "unit-contracts",          titleKey: "guides_unit_contracts_title",          titleEn: "Unit contracts",              url: "/guides/unit-contracts" },
       { id: "initial-state",           titleKey: "guides_initial_state_title",           titleEn: "Initial state",               url: "/guides/initial-state" },
       { id: "writing-layouts",         titleKey: "guides_writing_layouts_title",         titleEn: "Writing layouts",             url: "/guides/writing-layouts" },
+      { id: "screen-readers",          titleKey: "guides_screen_readers_title",          titleEn: "Screen readers",              url: "/guides/screen-readers" },
       { id: "navigation",              titleKey: "guides_navigation_title",              titleEn: "Navigation between screens", url: "/guides/navigation" },
       { id: "testing",                 titleKey: "guides_testing_title",                 titleEn: "Writing screen tests",        url: "/guides/testing" },
       { id: "api-mock",                titleKey: "guides_api_mock_title",                titleEn: "Mocking APIs in tests",       url: "/guides/api-mock" },

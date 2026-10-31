@@ -106,6 +106,18 @@
         "en": "Enables drag-and-drop. Used with the `onDragStart` / `onDragEnter` / `onDragOver` / `onDragLeave` / `onDrop` handlers.",
         "ja": "ドラッグ&ドロップを有効化。`onDragStart` / `onDragEnter` / `onDragOver` / `onDragLeave` / `onDrop` ハンドラと組み合わせて使う。"
       }
+    },
+    "accessibilityLabel": {
+      "summary": {
+        "en": "What a screen reader says for this View when the View is one button to it: a View with a tap of its own (`onClick`). A strings.json key or text, localized like `text`, or a binding. A View that taps nothing is not one element to a screen reader, and the name is not written (measured on web with jsonui-cli 2.3.38: `aria-label` on a View with `onClick`, nothing on one without). Also spelled `contentDescription`.",
+        "ja": "スクリーンリーダーにとってこの View が 1 つのボタンのとき（View 自身にタップ `onClick` があるとき）に読み上げる名前です。strings.json のキーか文字（`text` と同じようにローカライズされます）、または binding を書きます。何もタップしない View はスクリーンリーダーにとって 1 つの要素ではないので、名前は書かれません（jsonui-cli 2.3.38 の Web で実測: `onClick` のある View には `aria-label`、無い View には何も出ませんでした）。`contentDescription` とも書けます。"
+      }
+    },
+    "accessibilityLiveRegion": {
+      "summary": {
+        "en": "Reads what this View holds out whenever it changes, without moving focus: `polite` waits for the screen reader to finish, `assertive` interrupts it, `off` (or leaving it out) reads nothing. Web writes `role` and `aria-live` on the View, Android `liveRegion`. iOS has no live region and a View holds no one text to announce, so on iOS it does nothing, and the build does not warn because one layout serves all three platforms (measured with jsonui-cli 2.3.38: nothing is written for it on iOS). To be read out on iOS too, put it on the Label whose text changes.",
+        "ja": "この View の中身が変わるたびに、フォーカスを動かさずに読み上げます。`polite` はスクリーンリーダーが読み終わるのを待ち、`assertive` は割り込み、`off`（または書かない）は何も読みません。Web は View に `role` と `aria-live` を、Android は `liveRegion` を書きます。iOS には live region が無く、View には読み上げる 1 つの文が無いので、iOS では何もしません。1 つのレイアウトを 3 つのプラットフォームで使うので、build も警告しません（jsonui-cli 2.3.38 で実測: iOS では何も書かれませんでした）。iOS でも読み上げたいときは、文が変わる Label に付けてください。"
+      }
     }
   },
   "commonAttributes": {
