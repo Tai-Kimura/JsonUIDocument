@@ -71,7 +71,9 @@ jobs:
   # is red, and every gate prints its own exit code — a gate that could not
   # run must not read as a gate that passed.
   gates:
-    runs-on: ubuntu-latest
+    # ubuntu-24.04, not ubuntu-latest: on ubuntu-26.04 setup-ruby builds only the latest patch of a series,
+    # so the 3.2.2 that rjui_tools pins is unavailable there (run 41149691550 failed before any gate).
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -489,7 +491,9 @@ jobs:
     # this rests on GitHub Actions' documented `needs` behaviour, not on a
     # measurement from this repository.
     needs: gates
-    runs-on: ubuntu-latest
+    # ubuntu-24.04, not ubuntu-latest: on ubuntu-26.04 setup-ruby builds only the latest patch of a series,
+    # so the 3.2.2 that rjui_tools pins is unavailable there (run 41149691550 failed before any gate).
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
