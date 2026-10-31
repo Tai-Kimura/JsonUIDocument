@@ -781,8 +781,8 @@
       "ja": "Ruby（>= 3.2）"
     },
     "prereq_ruby_note": {
-      "en": "Only required if you will use sjui / kjui / rjui. From jsonui-cli 1.9.0 each of them checks the Ruby it runs on at start and stops below 3.2 with one line naming the version it found (measured on Ruby 2.6: all three exit 1). The Ruby that counts is the one the directory it runs in selects — the nearest .ruby-version at or above it, read by rbenv, asdf or mise — not the one your shell starts with. `jui sync_tool` writes the tools' pin (3.2.2) into a platform directory that has none, since jsonui-cli 1.9.2 only when that Ruby is installed under rbenv, and it no longer rewrites a pin that is there: one below 3.2 is named and left for you to change (measured: a 2.7.0 pin was rewritten to 3.2.2 by 1.9.1 and kept and named by 1.9.2).",
-      "ja": "sjui / kjui / rjui を使う場合のみ必要です。jsonui-cli 1.9.0 から、この 3 つは起動時に自分が動く Ruby を確かめ、3.2 未満なら、見つけた版を名指す 1 行を出して止まります（Ruby 2.6 で実測: 3 つとも exit 1）。効くのは、動くディレクトリが選ぶ Ruby — そこかその上でいちばん近い .ruby-version を rbenv / asdf / mise が読む — で、シェルが最初に使う Ruby ではありません。`jui sync_tool` は、pin の無いプラットフォームのディレクトリにツールの pin（3.2.2）を書きます。jsonui-cli 1.9.2 からは、その Ruby が rbenv に入っているときだけ書き、既にある pin は書き換えません: 3.2 未満の pin は名指して、直すのをあなたに任せます（実測: 2.7.0 の pin は、1.9.1 では 3.2.2 に書き換えられ、1.9.2 では残されて名指された）。"
+      "en": "Only required if you will use sjui / kjui / rjui. From jsonui-cli 1.9.0 each of them checks the Ruby it runs on at start and stops below 3.2 with one line naming the version it found (measured on Ruby 2.6: all three exit 1). Each tool carries its own pin, a .ruby-version beside it: 3.2.11 from jsonui-cli 2.3.37, 3.2.2 before. Under rbenv that pin is the one that counts, because rbenv reads the .ruby-version nearest the script it starts, not the one nearest the directory you run it from (measured with rbenv 1.3.2: a vendored rjui started from a directory pinned to 3.2.2 ran on its own pin, and when its own pin named a Ruby that was not installed it stopped with `rbenv: version … is not installed` before it started). So install the Ruby the tools pin. From 2.3.37 `jui sync_tool` says so when rbenv lacks it: `ruby pin:     the tool's Ruby 3.2.11 (its .ruby-version) is not installed under rbenv, and rbenv stops the tool before it starts — run: rbenv install 3.2.11` (2.3.36 printed nothing in the same case). `jui sync_tool` also writes the tools' pin into a platform directory that has none, since jsonui-cli 1.9.2 only when that Ruby is installed under rbenv, and it no longer rewrites a pin that is there: one below 3.2 is named and left for you to change (measured: a 2.7.0 pin was rewritten to 3.2.2 by 1.9.1 and kept and named by 1.9.2). That pin is what a Ruby started in the platform directory sees.",
+      "ja": "sjui / kjui / rjui を使う場合のみ必要です。jsonui-cli 1.9.0 から、この 3 つは起動時に自分が動く Ruby を確かめ、3.2 未満なら、見つけた版を名指す 1 行を出して止まります（Ruby 2.6 で実測: 3 つとも exit 1）。ツールはそれぞれ自分の pin を、隣の .ruby-version に持っています。jsonui-cli 2.3.37 からは 3.2.11、それより前は 3.2.2 です。rbenv では、効くのはこの pin です。rbenv は、起動するスクリプトにいちばん近い .ruby-version を読み、あなたがコマンドを打つディレクトリに近いものは読まないからです（rbenv 1.3.2 で実測: 3.2.2 を pin したディレクトリから vendored の rjui を起動すると、rjui 自身の pin の Ruby で動きました。自身の pin が入っていない Ruby を指すと、起動する前に `rbenv: version … is not installed` で止まりました）。なので、ツールが pin する Ruby を入れてください。2.3.37 からは、rbenv にそれが無いと `jui sync_tool` が知らせます: `ruby pin:     the tool's Ruby 3.2.11 (its .ruby-version) is not installed under rbenv, and rbenv stops the tool before it starts — run: rbenv install 3.2.11`（同じ条件で 2.3.36 は何も出しませんでした）。`jui sync_tool` は、pin の無いプラットフォームのディレクトリにもツールの pin を書きます。jsonui-cli 1.9.2 からは、その Ruby が rbenv に入っているときだけ書き、既にある pin は書き換えません: 3.2 未満の pin は名指して、直すのをあなたに任せます（実測: 2.7.0 の pin は、1.9.1 では 3.2.2 に書き換えられ、1.9.2 では残されて名指された）。この pin が効くのは、プラットフォームのディレクトリで起動した Ruby です。"
     },
     "prereq_python_label": {
       "en": "Developer tools",
@@ -1005,8 +1005,8 @@
       "ja": "インストーラは、自分が動くシェルの Ruby と Python を確かめ、ツールが必要とする版 — Ruby 3.2（jsonui-cli 1.9.0 から）と Python 3.10 — を下回ると警告します。ただし `jui` 自体は Python 3.11 以上を要求する（jui_tools/setup.py）ので、インストーラの確認を通る 3.10 でも `jui` は入りません。警告だけなのは、sjui / kjui / rjui がプロジェクトのディレクトリの Ruby で動き、それが別の Ruby かもしれないからです。"
     },
     "trouble_versions_fix": {
-      "en": "Ignore it for a tool you will not use. Otherwise upgrade. For sjui / kjui / rjui, what counts is the nearest .ruby-version at or above the directory the tool runs in: if the platform directory has one, install the Ruby it names, or change it to 3.2 or later if it is older (`jui sync_tool` names such a pin and leaves it alone); if it has none, put one naming Ruby 3.2 or later there, or install 3.2.2 so `jui sync_tool` writes it. A tool that ends up on a Ruby below 3.2 stops with `ERROR: rjui needs Ruby 3.2 or later (jsonui-cli 1.9.0), and this is Ruby 2.6.10 at …` (sjui and kjui print the same with their own name).",
-      "ja": "使わないツールの分は無視して構いません。使うなら版を上げてください。sjui / kjui / rjui で効くのは、ツールが動くディレクトリかその上でいちばん近い .ruby-version です: プラットフォームのディレクトリにあれば、それが名指す Ruby を入れるか、古ければ 3.2 以上に書き換えてください（`jui sync_tool` はそうした pin を名指して、手を付けません）。無ければ、Ruby 3.2 以上を指すものをそこに置くか、3.2.2 を入れて `jui sync_tool` に書かせてください。3.2 未満の Ruby で動いたツールは `ERROR: rjui needs Ruby 3.2 or later (jsonui-cli 1.9.0), and this is Ruby 2.6.10 at …` と出して止まります（sjui と kjui も自分の名前で同じ行を出します）。"
+      "en": "Ignore it for a tool you will not use. Otherwise upgrade. For sjui / kjui / rjui under rbenv, the Ruby that counts is the one the tool's own .ruby-version names (3.2.11 from jsonui-cli 2.3.37): install it with `rbenv install 3.2.11` (from 2.3.37 `jui sync_tool` names it when it is missing). A .ruby-version in the platform directory counts for a Ruby started there: if it is older than 3.2, change it to 3.2 or later (`jui sync_tool` names such a pin and leaves it alone). A tool that ends up on a Ruby below 3.2 stops with `ERROR: rjui needs Ruby 3.2 or later (jsonui-cli 1.9.0), and this is Ruby 2.6.10 at …` (sjui and kjui print the same with their own name).",
+      "ja": "使わないツールの分は無視して構いません。使うなら版を上げてください。rbenv の下の sjui / kjui / rjui で効くのは、ツール自身の .ruby-version が指す Ruby です（jsonui-cli 2.3.37 からは 3.2.11）。`rbenv install 3.2.11` で入れてください（2.3.37 からは、入っていないと `jui sync_tool` が名指します）。プラットフォームのディレクトリの .ruby-version は、そこで起動した Ruby に効きます。3.2 より古ければ、3.2 以上に書き換えてください（`jui sync_tool` はそうした pin を名指して、手を付けません）。3.2 未満の Ruby で動いたツールは `ERROR: rjui needs Ruby 3.2 or later (jsonui-cli 1.9.0), and this is Ruby 2.6.10 at …` と出して止まります（sjui と kjui も自分の名前で同じ行を出します）。"
     },
     "related_heading": {
       "en": "Related pages",
@@ -18501,16 +18501,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.3.36",
-      "ja": "2.3.36 でまだできないこと"
+      "en": "Not in 2.3.37",
+      "ja": "2.3.37 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.3.36",
-      "ja": "2.3.36 でまだできないこと"
+      "en": "Not in 2.3.37",
+      "ja": "2.3.37 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
