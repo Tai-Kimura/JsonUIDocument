@@ -15715,7 +15715,13 @@ function sfRenderIntake() {
    here again. */
 const SF_KEY_SHAPE = /\b(?:xox[a-z]-|xapp-|sk-ant-)[A-Za-z0-9_-]+/g;
 function sfFetchHint(text) {
-  if (/apps\.connections\.open: [^:]*(?:missing_scope|not_allowed_token_type|invalid_auth)\b/.test(text)) return tl('sf.intake.hint.appToken');
+  /* Socket Mode's line (slack/socket_mode.py): no appToken; apps.connections.open's Slack error, HTTP status or
+     aiohttp's words; the connection closed; disconnect: link_disabled; aiohttp's or the OS's words from the WebSocket. */
+  if (/^no appToken\b/.test(text)) return tl('sf.intake.hint.appTokenMissing');
+  if (/^disconnect: link_disabled\b/.test(text)) return tl('sf.intake.hint.socketOff');
+  if (/apps\.connections\.open: [^:]*(?:missing_scope|not_allowed_token_type|invalid_auth|not_authed|token_revoked|token_expired|account_inactive)\b/.test(text)) return tl('sf.intake.hint.appToken');
+  if (/^(?:apps\.connections\.open: )?(?:Cannot connect to host|Connection timeout|Timeout|TimeoutError$|Server disconnected|\[Errno \d+\]|Connection reset)/.test(text)) return tl('sf.intake.hint.network');
+  if (/^apps\.connections\.open: (?:HTTP 429|HTTP 5\d\d|ratelimited|internal_error|fatal_error|service_unavailable|request_timeout|not JSON)\b|^the connection closed$|^\d{3}, message='Invalid response status'/.test(text)) return tl('sf.intake.hint.socketRetry');
   const scope = /\/([CDG])[A-Z0-9]+: [^:]*: missing_scope\b/.exec(text);
   if (scope) return tl(scope[1] === 'D' ? 'sf.intake.hint.im' : scope[1] === 'G' ? 'sf.intake.hint.groups' : 'sf.intake.hint.channels');
   if (/: (?:not_in_channel|channel_not_found)\b/.test(text)) return tl('sf.intake.hint.invite');
@@ -16006,9 +16012,9 @@ function sfChatRowHTML(m, k, rows) {
   const at = sfTs(m.ts), newThread = k === 0 || rows[k - 1].threadTs !== m.threadTs, reply = m.threadTs && m.threadTs !== m.ts;
   const when = at ? `${at.toLocaleDateString()} ${at.toTimeString().slice(0, 5)}` : '';
   return (newThread && k > 0 ? `<li class="sf-chat-sep" aria-hidden="true"></li>` : '')
-    + `<li class="sf-bubble${reply ? ' sf-reply' : ''}"><p class="sf-bubble-head"><b>${esc(m.user || '?')}</b> <span>${esc(m.channel)}</span> <time>${esc(when)}</time></p>`
-    + `<p class="sf-bubble-text">${esc(m.text)}</p>`
-    + (m.permalink ? `<a class="sf-bubble-link" href="${esc(m.permalink)}" target="_blank" rel="noopener noreferrer">${esc(tl('sf.chat.open'))}</a>` : '') + '</li>';
+    + `<li class="sf-msgb${reply ? ' sf-reply' : ''}"><p class="sf-msgb-head"><b>${esc(m.user || '?')}</b> <span>${esc(m.channel)}</span> <time>${esc(when)}</time></p>`
+    + `<p class="sf-msgb-text">${esc(m.text)}</p>`
+    + (m.permalink ? `<a class="sf-msgb-link" href="${esc(m.permalink)}" target="_blank" rel="noopener noreferrer">${esc(tl('sf.chat.open'))}</a>` : '') + '</li>';
 }
 async function sfChatOpen(id, opener) {
   SF.chatOpener = opener || null;

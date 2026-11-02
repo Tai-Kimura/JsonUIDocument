@@ -18533,16 +18533,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.5.0",
-      "ja": "2.5.0 でまだできないこと"
+      "en": "Not in 2.5.1",
+      "ja": "2.5.1 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.5.0",
-      "ja": "2.5.0 でまだできないこと"
+      "en": "Not in 2.5.1",
+      "ja": "2.5.1 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
@@ -19465,8 +19465,8 @@
       "ja": "部屋を開きます。取り込みの行に前回と次回の取得が出ます。代わりに「slack.json を読めません」なら、ファイルが拒まれたか壊れていて、行に理由が出ます。"
     },
     "section_check_b0_s2": {
-      "en": "With mode socket, the bar shows acme: connected through Socket Mode (since … · last message …). Not connected shows the connection's error under it.",
-      "ja": "mode が socket なら、帯に「acme: Socket Mode で接続中（… から · 最後に受けた …）」と出ます。つながっていなければ、その下に接続のエラーが出ます。"
+      "en": "With mode socket, the bar shows acme: connected through Socket Mode (since … · last message …). Not connected shows the connection's error under it, and from 2.5.1 a hint for the fix.",
+      "ja": "mode が socket なら、帯に「acme: Socket Mode で接続中（… から · 最後に受けた …）」と出ます。つながっていなければ、その下に接続のエラーが出ます。2.5.1 からは直し方の手がかりも続きます。"
     },
     "section_check_b0_s3": {
       "en": "Write a message in one of the listed channels. With socket, the robot says A message came from Slack and carries it to a bin; with api, press Fetch now.",
@@ -19489,16 +19489,16 @@
       "ja": "9. よくあるエラー"
     },
     "section_errors_b0_text": {
-      "en": "The bar under Fetch now shows the last fetch's errors as The last fetch had n error(s): <the first one>, followed by a hint when the fix is known. A socket's error is shown under its line as Connection error: <error>. Keys are never shown; a key-shaped word is replaced by ….",
-      "ja": "「今すぐ取る」の下の帯に、前回の取得のエラーが「前回の取得でエラー n 件: <最初の 1 件>」と出て、直し方がわかっているものには手がかりが続きます。接続のエラーは、その行の下に「接続のエラー: <エラー>」と出ます。キーは出しません。キーの形の語は … に置き換えます。"
+      "en": "The bar under Fetch now shows the last fetch's errors as The last fetch had n error(s): <the first one>, followed by a hint when the fix is known. A socket's error is shown under its line as Connection error: <error>, and from 2.5.1 every error it can show is followed by a hint (2.5.0 gave one only when the app token was refused). Keys are never shown; a key-shaped word is replaced by …. From 2.5.1 a web address in a socket's error is cut after its path (wss://…/link/?…), so Slack's one-time ticket is never shown.",
+      "ja": "「今すぐ取る」の下の帯に、前回の取得のエラーが「前回の取得でエラー n 件: <最初の 1 件>」と出て、直し方がわかっているものには手がかりが続きます。接続のエラーは、その行の下に「接続のエラー: <エラー>」と出ます。2.5.1 からは、出うるエラーのどれにも手がかりが続きます（2.5.0 では、アプリトークンが拒まれたときだけでした）。キーは出しません。キーの形の語は … に置き換えます。2.5.1 からは、接続のエラーに出るウェブのアドレスをパスの後ろで切る（wss://…/link/?…）ので、Slack の使い捨ての ticket は出ません。"
     },
     "section_errors_b2_text": {
-      "en": "The room's hints, word for word:\n• C…: To read a public channel (an ID starting with C), add the channels:history scope to the token\n• D…: To read a DM (an ID starting with D), add the im:history scope to the token\n• G…: To read a private channel (an ID starting with G), add the groups:history scope to the token (mpim:history for a group DM)\n• not_in_channel or channel_not_found: Invite the app to that channel (/invite)\n• invalid_auth, not_authed, token_revoked, account_inactive or no token: The token is missing or no longer valid: check the token in slack.json\n• apps.connections.open with invalid_auth, missing_scope or not_allowed_token_type: Socket Mode needs an xapp- app token with connections:write (workspaces[].appToken)",
-      "ja": "部屋の手がかりの文（そのまま）:\n• C…: 公開チャンネル（C で始まる ID）を読むには、トークンに channels:history の権限を足してください\n• D…: DM（D で始まる ID）を読むには、トークンに im:history の権限を足してください\n• G…: 非公開チャンネル（G で始まる ID）を読むには、トークンに groups:history（グループ DM なら mpim:history）の権限を足してください\n• not_in_channel か channel_not_found: アプリをそのチャンネルに招待してください（/invite）\n• invalid_auth、not_authed、token_revoked、account_inactive、no token: トークンが無いか、無効です。slack.json のトークンを確かめてください\n• apps.connections.open の invalid_auth、missing_scope、not_allowed_token_type: Socket Mode には、connections:write の付いた xapp- のアプリトークン（workspaces[].appToken）が要ります"
+      "en": "The room's hints, word for word:\n• C…: To read a public channel (an ID starting with C), add the channels:history scope to the token\n• D…: To read a DM (an ID starting with D), add the im:history scope to the token\n• G…: To read a private channel (an ID starting with G), add the groups:history scope to the token (mpim:history for a group DM)\n• not_in_channel or channel_not_found: Invite the app to that channel (/invite)\n• invalid_auth, not_authed, token_revoked, account_inactive or no token: The token is missing or no longer valid: check the token in slack.json\n• apps.connections.open with invalid_auth, missing_scope, not_allowed_token_type (from 2.5.1 also not_authed, token_revoked, token_expired or account_inactive): Socket Mode needs an xapp- app token with connections:write (workspaces[].appToken)\n• no appToken (from 2.5.1): Make an xapp-… token (connections:write) under the Slack app's Basic Information → App-Level Tokens, and put it in slack.json's workspaces[].appToken\n• disconnect: link_disabled (from 2.5.1): Turn Socket Mode on for the Slack app (Settings → Socket Mode → Enable Socket Mode)\n• the connection closed, HTTP 429 or 5xx, ratelimited and Slack's other passing errors (from 2.5.1): A passing error on Slack's side: it connects again by itself\n• Cannot connect to host, a timeout or a reset connection (from 2.5.1): Slack cannot be reached: check the network or the proxy (it connects again by itself)",
+      "ja": "部屋の手がかりの文（そのまま）:\n• C…: 公開チャンネル（C で始まる ID）を読むには、トークンに channels:history の権限を足してください\n• D…: DM（D で始まる ID）を読むには、トークンに im:history の権限を足してください\n• G…: 非公開チャンネル（G で始まる ID）を読むには、トークンに groups:history（グループ DM なら mpim:history）の権限を足してください\n• not_in_channel か channel_not_found: アプリをそのチャンネルに招待してください（/invite）\n• invalid_auth、not_authed、token_revoked、account_inactive、no token: トークンが無いか、無効です。slack.json のトークンを確かめてください\n• apps.connections.open の invalid_auth、missing_scope、not_allowed_token_type（2.5.1 からは not_authed、token_revoked、token_expired、account_inactive も）: Socket Mode には、connections:write の付いた xapp- のアプリトークン（workspaces[].appToken）が要ります\n• no appToken（2.5.1 から）: Slack のアプリの Basic Information → App-Level Tokens で xapp-…（connections:write）を作り、slack.json の workspaces[].appToken に入れてください\n• disconnect: link_disabled（2.5.1 から）: Slack のアプリの Socket Mode をオンにしてください（Settings → Socket Mode → Enable Socket Mode）\n• the connection closed、HTTP 429 や 5xx、ratelimited などの Slack 側の一時的なエラー（2.5.1 から）: Slack 側の一時的なエラーです。自動で繋ぎ直します\n• Cannot connect to host、タイムアウト、接続のリセット（2.5.1 から）: Slack に届きません。ネットワークやプロキシを確かめてください（自動で繋ぎ直します）"
     },
     "section_errors_b3_text": {
-      "en": "Measured on 2.5.0 against real Slack with made-up tokens: acme: auth.test: invalid_auth with its token hint, and apps.connections.open: invalid_auth with the app-token hint; and on an isolated viz, no appToken, which shows no hint. The hints for missing_scope and not_in_channel were checked by running the room's own code on those error lines; Slack itself was not asked for them.",
-      "ja": "2.5.0 で、架空のトークンを本物の Slack に送って測りました: acme: auth.test: invalid_auth とトークンの手がかり、apps.connections.open: invalid_auth とアプリトークンの手がかり。隔離した viz では no appToken（手がかりは出ません）。missing_scope と not_in_channel の手がかりは、部屋のコードそのものにそのエラーの行を通して確かめました。Slack そのものには尋ねていません。"
+      "en": "Measured on 2.5.0 against real Slack with made-up tokens: acme: auth.test: invalid_auth with its token hint, and apps.connections.open: invalid_auth with the app-token hint; and on an isolated viz, no appToken. Measured on 2.5.1: on an isolated viz, no appToken now shows its hint under the socket line (read in a headless browser); against a fake server on this machine, link_disabled, HTTP 429, a closed port and a WebSocket refused with ?ticket=… in its address (shown as ?…), each followed by the hint listed above when run through the room's own code in English and Japanese (2.5.0's code gave a hint for invalid_auth only). The hints for missing_scope and not_in_channel were checked by running the room's own code on those error lines; Slack itself was not asked for them.",
+      "ja": "2.5.0 で、架空のトークンを本物の Slack に送って測りました: acme: auth.test: invalid_auth とトークンの手がかり、apps.connections.open: invalid_auth とアプリトークンの手がかり。隔離した viz では no appToken。2.5.1 で測ったこと: 隔離した viz で、no appToken の接続の行の下に手がかりが出ました（ヘッドレスのブラウザで読みました）。手元の偽のサーバーで、link_disabled、HTTP 429、閉じたポート、アドレスに ?ticket=… の付いた WebSocket の拒否（?… と出ます）を起こし、部屋のコードそのものに英語と日本語で通すと、どれも上の手がかりが続きました（2.5.0 のコードでは invalid_auth にだけ手がかりが出ました）。missing_scope と not_in_channel の手がかりは、部屋のコードそのものにそのエラーの行を通して確かめました。Slack そのものには尋ねていません。"
     },
     "section_errors_b4_text": {
       "en": "A message vanished",
@@ -19533,8 +19533,8 @@
       "ja": "ここで測ったこと"
     },
     "section_measured_b0_text": {
-      "en": "Measured on 2.5.0 with an isolated viz on another port and state folder: the room's error lines and hints, the connector note, the socket line and the robot's words, read in a headless browser; the robot's start command with and without robotName; made-up tokens sent to real Slack; and Socket Mode against a fake server on this machine.",
-      "ja": "2.5.0 で、別のポートと状態フォルダの viz で測ったこと: 部屋のエラーの行と手がかり、connector の注意、接続の行、ロボットの言葉（ヘッドレスのブラウザで読みました）、robotName の有無での起動のコマンド、本物の Slack に送った架空のトークン、手元の偽のサーバーを相手にした Socket Mode。"
+      "en": "Measured on 2.5.0 with an isolated viz on another port and state folder: the room's error lines and hints, the connector note, the socket line and the robot's words, read in a headless browser; the robot's start command with and without robotName; made-up tokens sent to real Slack; and Socket Mode against a fake server on this machine. Measured on 2.5.1: the socket line's hints and the cut ticket, as in Common errors.",
+      "ja": "2.5.0 で、別のポートと状態フォルダの viz で測ったこと: 部屋のエラーの行と手がかり、connector の注意、接続の行、ロボットの言葉（ヘッドレスのブラウザで読みました）、robotName の有無での起動のコマンド、本物の Slack に送った架空のトークン、手元の偽のサーバーを相手にした Socket Mode。2.5.1 で測ったこと: 接続の行の手がかりと、切られた ticket（「よくあるエラー」のとおり）。"
     },
     "section_measured_b1_text": {
       "en": "Not measured here: creating a real Slack app and its screens, real scopes and tokens, a real Socket Mode connection, and real messages. Those steps follow the Slack app settings as named at the time of writing. Upstream says Socket Mode was checked only against a fake server before 2.5.0 shipped, and is to be tried on a real workspace after.",
