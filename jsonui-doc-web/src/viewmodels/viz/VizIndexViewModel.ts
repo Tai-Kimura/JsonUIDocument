@@ -124,6 +124,13 @@ export class VizIndexViewModel {
         onNavigate: () => this.navigate("/viz/messages"),
       },
       {
+        id: "next_slack",
+        titleKey: lookup("next_slack_title"),
+        descriptionKey: lookup("next_slack_description"),
+        url: "/viz/slack",
+        onNavigate: () => this.navigate("/viz/slack"),
+      },
+      {
         id: "next_approvals",
         titleKey: lookup("next_approvals_title"),
         descriptionKey: lookup("next_approvals_description"),

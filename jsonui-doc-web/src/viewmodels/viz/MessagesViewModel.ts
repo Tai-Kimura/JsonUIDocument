@@ -78,11 +78,11 @@ export class MessagesViewModel {
         onNavigate: () => this.navigate("/viz/sessions"),
       },
       {
-        id: "next_approvals",
-        titleKey: lookup("next_approvals_title"),
-        descriptionKey: lookup("next_approvals_description"),
-        url: "/viz/approvals",
-        onNavigate: () => this.navigate("/viz/approvals"),
+        id: "next_slack",
+        titleKey: lookup("next_slack_title"),
+        descriptionKey: lookup("next_slack_description"),
+        url: "/viz/slack",
+        onNavigate: () => this.navigate("/viz/slack"),
       },
     ];
 

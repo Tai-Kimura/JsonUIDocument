@@ -1,0 +1,1056 @@
+{
+  "type": "View",
+  "id": "viz_slack_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_base",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateBack",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "viz_slack_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "viz_slack_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            24,
+            32
+          ],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "ink_subtle",
+              "tapBackground": "surface_sunken",
+              "onClick": "@{onNavigateBack}",
+              "text": "breadcrumb"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "ink",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "ink_muted",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "ink_subtle",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "viz_slack_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "viz_slack_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_what",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_what_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_what_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_what_b1_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "~/slack-orchestration/          orchestrationDir (the default)\n  inbox/                        raw messages as fetched; deleted once placed\n  projects/<project id>/        filtered messages sorted to a project\n  _unsorted/                    low confidence, or a choice not in the list\n  tasks/<task id>.json          the robot's tasks (T-0001.json, ...)\n  .state/                       cursor, threads, routes, status, board",
+                      "language": "text",
+                      "filename": "folders",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_what_b3_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_outside",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_outside_heading"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "warning_chip_bg",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "warning_chip_fg",
+                          "text": "section_outside_b0_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink",
+                          "text": "section_outside_b0_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_outside_b1_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_config",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_config_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_config_b0_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "{\n  \"orchestrationDir\": \"~/slack-orchestration\",\n  \"schedule\": {\"everyHours\": 24, \"at\": \"09:00\"},\n  \"source\": {\n    \"mode\": \"api\",\n    \"workspaces\": [\n      {\"name\": \"acme\", \"token\": \"xoxb-…\", \"channels\": [\"C0123456789\"]}\n    ]\n  },\n  \"filter\": {\"adapter\": \"builtin\", \"extraPatterns\": [{\"name\": \"ticket\", \"pattern\": \"TCK-[0-9]+\"}]},\n  \"router\": {\n    \"adapter\": \"haiku\",\n    \"anthropicApiKey\": \"sk-ant-…\",\n    \"prompt\": {\n      \"instructions\": \"Decide which project this Slack message is about.\",\n      \"projects\": {\"web\": \"The web app: pages, sign-in, the API it calls.\"},\n      \"chitchat\": \"Small talk, greetings, thanks and anything that asks for no work.\"\n    }\n  }\n}",
+                      "language": "json",
+                      "filename": "slack.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_config_b2_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "<state folder>/slack.json is readable by others (mode 0644); chmod 600 it",
+                      "language": "text",
+                      "filename": "status",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "chmod 600 ~/.local/state/jui-viz/slack.json",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_config_b5_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_config_b6_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_fetch",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_fetch_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_fetch_b0_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_filter",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_filter_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_filter_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_filter_b1_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "inbox/1793500000.000100-acme-C012.json   (as fetched)\n  \"text\": \"The login page fails for ann@example.com, password: hunter22 and see TCK-1234\",\n  \"files\": [{\"name\": \"shot.png\"}]\n\nprojects/web/1793500000.000100-acme-C012.json   (filtered and routed)\n  \"text\": \"The login page fails for [REDACTED:email], [REDACTED:password] and see [REDACTED:ticket]\",\n  \"removedFiles\": 1,\n  \"redactions\": 3,\n  \"router\": {\"adapter\": \"path\", \"choice\": \"web\", \"confidence\": 0.9}",
+                      "language": "text",
+                      "filename": "before and after",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "accent_tint",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "accent",
+                          "text": "section_filter_b3_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink",
+                          "text": "section_filter_b3_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_filter_b4_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "def filter_message(record: dict) -> tuple[dict, dict]:\n    # record: one inbox file {workspace, channel, ts, permalink, message, via}\n    text = record[\"message\"].get(\"text\", \"\")\n    ...\n    return ({\"text\": text, \"user\": \"U1\", \"permalink\": record.get(\"permalink\", \"\")},\n            {\"removedFiles\": 0, \"redactions\": 0})",
+                      "language": "python",
+                      "filename": "my_filter.py",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_filter_b6_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_route",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_route_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_route_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_route_b1_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "message                              router said            went to\n\"The login page fails …\"             web, 0.9               projects/web/\n\"also on Safari …\" (a reply to it)   (not asked)            projects/web/   router.adapter \"thread\"\n\"maybe the header is off\"            web, 0.3               _unsorted/      under confidenceMin 0.6\n\"thanks all!\"                        chitchat, 0.95         deleted, nothing written\n\"a question for the infra team\"      somewhere-else, 0.9    _unsorted/      not a project id",
+                      "language": "text",
+                      "filename": "routing",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_route_b3_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "def route(message: dict, prompt: dict) -> dict:\n    # message: {workspace, channel, user, ts, text} after the filter\n    # prompt: router.prompt from slack.json\n    return {\"choice\": \"web\", \"confidence\": 0.9}",
+                      "language": "python",
+                      "filename": "my_router.py",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_room",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_room_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_room_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_room_b1_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_room_b2_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "not a project id: 'inbox'",
+                      "language": "text",
+                      "filename": "Prompts",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_robot",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_robot_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_robot_b0_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "cd ~/slack-orchestration && claude --channels plugin:jui-viz@jsonui",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_robot_b2_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_robot_b3_text"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "warning_chip_bg",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "warning_chip_fg",
+                          "text": "section_robot_b4_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink",
+                          "text": "section_robot_b4_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_board",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_board_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_board_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_board_b1_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_board_b2_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "Start on a Draft          only a ready task is started\nStart without a session   choose the session to send it to\nDone on a Ready           only a started task is done",
+                      "language": "text",
+                      "filename": "refusals",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_retention",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_retention_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_retention_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_retention_b1_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "jui viz: slack room: removed 1 done task(s) and their messages: T-0001",
+                      "language": "text",
+                      "filename": "log",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_measured",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_measured_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_measured_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_measured_b1_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "viz_slack_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    32,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "chrome_ink",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "viz_slack_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 3,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/next_step_card"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "viz_slack_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "ink_faint",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "viz_slack_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [
+                24,
+                16,
+                24,
+                16
+              ],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "viz_slack_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    0,
+                    32
+                  ],
+                  "background": "surface_base",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        {
+                          "id": "toc_what",
+                          "label": "toc_row_what",
+                          "anchor": "section_what",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_outside",
+                          "label": "toc_row_outside",
+                          "anchor": "section_outside",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_config",
+                          "label": "toc_row_config",
+                          "anchor": "section_config",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_fetch",
+                          "label": "toc_row_fetch",
+                          "anchor": "section_fetch",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_filter",
+                          "label": "toc_row_filter",
+                          "anchor": "section_filter",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_route",
+                          "label": "toc_row_route",
+                          "anchor": "section_route",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_room",
+                          "label": "toc_row_room",
+                          "anchor": "section_room",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_robot",
+                          "label": "toc_row_robot",
+                          "anchor": "section_robot",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_board",
+                          "label": "toc_row_board",
+                          "anchor": "section_board",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_retention",
+                          "label": "toc_row_retention",
+                          "anchor": "section_retention",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_measured",
+                          "label": "toc_row_measured",
+                          "anchor": "section_measured",
+                          "level": 1
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

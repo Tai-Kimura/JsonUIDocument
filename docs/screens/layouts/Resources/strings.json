@@ -5970,6 +5970,14 @@
       "en": "From 2.3.26: `jui viz message` sends a message from one session to another, Claude Code and Codex alike, and both robots' Talk shows it.",
       "ja": "2.3.26 から: `jui viz message` で、あるセッションから別のセッションへメッセージを送ります。Claude Code と Codex のどちらの間でも送れ、両方のロボットのトークに出ます。"
     },
+    "next_slack_title": {
+      "en": "Slack intake and the sorting factory",
+      "ja": "Slack の取り込みと仕分け工場"
+    },
+    "next_slack_description": {
+      "en": "From 2.4.0: fetch Slack messages, mask secrets on your machine, sort them into projects, and send the tasks a session makes of them to running sessions.",
+      "ja": "2.4.0 から: Slack のメッセージを取り、手元で機密を伏せ、プロジェクトに振り分け、セッションが作ったタスクを動いているセッションへ送ります。"
+    },
     "next_approvals_title": {
       "en": "Permissions and questions",
       "ja": "許可と質問"
@@ -13403,8 +13411,8 @@
       "ja": "画面はあなたのマシンの中だけで動きます。サーバーは `127.0.0.1` だけで待ち受けます。"
     },
     "section_local_b1_text": {
-      "en": "It makes only two kinds of outside connection:\n• the daily fetch of public cloud price lists (from 2.3.12, on by default; `jui viz cloud-prices off` stops it)\n• the near weather, only when you turn it on",
-      "ja": "外への通信は次の 2 つだけです。\n• 公開されているクラウドの単価表の、日に 1 回の取得（2.3.12 から。既定でオン。`jui viz cloud-prices off` で止まります）\n• 近所の天気（オンにしたときだけ）"
+      "en": "It makes only these outside connections:\n• the daily fetch of public cloud price lists (from 2.3.12, on by default; `jui viz cloud-prices off` stops it)\n• the near weather, only when you turn it on\n• the Slack intake (from 2.4.0), only once you write slack.json: Slack itself, the router you choose, and with mode connector Claude. See the Slack intake article for what goes where.",
+      "ja": "外への通信は次のものだけです。\n• 公開されているクラウドの単価表の、日に 1 回の取得（2.3.12 から。既定でオン。`jui viz cloud-prices off` で止まります）\n• 近所の天気（オンにしたときだけ）\n• Slack の取り込み（2.4.0 から。slack.json を書いたときだけ）: Slack そのもの、選んだ振り分け先、mode を connector にしたときは Claude。何がどこへ行くかは「Slack の取り込み」の記事にあります。"
     },
     "toc_row_local": {
       "en": "It stays on your machine",
@@ -13489,6 +13497,14 @@
     "next_messages_description": {
       "en": "From 2.3.26: `jui viz message` sends a message from one session to another, Claude Code and Codex alike, and both robots' Talk shows it.",
       "ja": "2.3.26 から: `jui viz message` で、あるセッションから別のセッションへメッセージを送ります。Claude Code と Codex のどちらの間でも送れ、両方のロボットのトークに出ます。"
+    },
+    "next_slack_title": {
+      "en": "Slack intake",
+      "ja": "Slack の取り込み"
+    },
+    "next_slack_description": {
+      "en": "From 2.4.0: fetch Slack messages, mask secrets on your machine, sort them into projects, and turn them into tasks on a whiteboard that you send to a running session.",
+      "ja": "2.4.0 から: Slack のメッセージを取り、手元で機密を伏せ、プロジェクトに振り分け、ホワイトボードのタスクにして、動いているセッションへ送ります。"
     },
     "next_approvals_title": {
       "en": "Permissions and questions",
@@ -13897,8 +13913,8 @@
       "ja": "外への通信"
     },
     "section_safety_b3_body": {
-      "en": "From 2.3.12 a running server fetches public cloud price lists for the infra cost simulator 10 minutes after it starts and then once a day (from 2.3.24 a file that failed is fetched again alone an hour later), on by default: https to pricing.us-east-1.amazonaws.com and prices.azure.com only, sending nothing about your project. `jui viz cloud-prices off` turns it off (from the next start), and `jui viz doctor` says which.\n\nThe near weather connects only when you turn it on.",
-      "ja": "2.3.12 からは、動いているサーバーが、インフラのコストのシミュレーターのために、公開されているクラウドの単価表を起動の 10 分後とその後は日に 1 回取ります（2.3.24 からは、取れなかったファイルだけを 1 時間後にもう一度取ります）。既定でオンで、通信は pricing.us-east-1.amazonaws.com と prices.azure.com への https だけ、プロジェクトのことは何も送りません。`jui viz cloud-prices off` でオフになり（次の起動から）、`jui viz doctor` がどちらかを出します。\n\n近所の天気は、オンにしたときだけ通信します。"
+      "en": "From 2.3.12 a running server fetches public cloud price lists for the infra cost simulator 10 minutes after it starts and then once a day (from 2.3.24 a file that failed is fetched again alone an hour later), on by default: https to pricing.us-east-1.amazonaws.com and prices.azure.com only, sending nothing about your project. `jui viz cloud-prices off` turns it off (from the next start), and `jui viz doctor` says which.\n\nThe near weather connects only when you turn it on.\n\nThe Slack intake (from 2.4.0) connects only once you write slack.json: to Slack, to the router you choose, and with mode connector to Claude. See the Slack intake article.",
+      "ja": "2.3.12 からは、動いているサーバーが、インフラのコストのシミュレーターのために、公開されているクラウドの単価表を起動の 10 分後とその後は日に 1 回取ります（2.3.24 からは、取れなかったファイルだけを 1 時間後にもう一度取ります）。既定でオンで、通信は pricing.us-east-1.amazonaws.com と prices.azure.com への https だけ、プロジェクトのことは何も送りません。`jui viz cloud-prices off` でオフになり（次の起動から）、`jui viz doctor` がどちらかを出します。\n\n近所の天気は、オンにしたときだけ通信します。\n\nSlack の取り込み（2.4.0 から）は、slack.json を書いたときだけ通信します。行き先は Slack、選んだ振り分け先、mode を connector にしたときは Claude です。「Slack の取り込み」の記事を見てください。"
     },
     "toc_row_safety": {
       "en": "Safety",
@@ -16642,13 +16658,13 @@
       "en": "`jui viz` shows the Claude Code sessions and subagents running on your machine (from 2.3.25 the Codex sessions too) as rooms and robots in the browser. Start with the demo below, then pick the article for what you want to do.",
       "ja": "`jui viz` は、手元で動いている Claude Code のセッションとサブエージェントを（2.3.25 からは Codex のセッションも）、ブラウザの中の部屋とロボットで見せるツールです。まず下のデモを触ってみて、やりたいことに合った記事へ進んでください。"
     },
-    "next_messages_title": {
-      "en": "Messages between sessions",
-      "ja": "セッション間のメッセージ"
+    "next_slack_title": {
+      "en": "Slack intake",
+      "ja": "Slack の取り込み"
     },
-    "next_messages_description": {
-      "en": "From 2.3.26: `jui viz message` sends a message from one session to another, Claude Code and Codex alike, and both robots' Talk shows it.",
-      "ja": "2.3.26 から: `jui viz message` で、あるセッションから別のセッションへメッセージを送ります。Claude Code と Codex のどちらの間でも送れ、両方のロボットのトークに出ます。"
+    "next_slack_description": {
+      "en": "From 2.4.0: fetch Slack messages, mask secrets on your machine, sort them into projects, and turn them into tasks on a whiteboard that you send to a running session.",
+      "ja": "2.4.0 から: Slack のメッセージを取り、手元で機密を伏せ、プロジェクトに振り分け、ホワイトボードのタスクにして、動いているセッションへ送ります。"
     },
     "next_tests_title": {
       "en": "Watching tests",
@@ -18501,16 +18517,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.3.38",
-      "ja": "2.3.38 でまだできないこと"
+      "en": "Not in 2.4.0",
+      "ja": "2.4.0 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.3.38",
-      "ja": "2.3.38 でまだできないこと"
+      "en": "Not in 2.4.0",
+      "ja": "2.4.0 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
@@ -18726,13 +18742,13 @@
       "en": "Reading the messages sessions send each other, sending a session a prompt from the page, and getting browser notifications.",
       "ja": "セッション同士のメッセージを読む、ページからセッションにプロンプトを送る、ブラウザの通知を受け取る、の 3 つです。"
     },
-    "next_approvals_title": {
-      "en": "Permissions and questions",
-      "ja": "許可と質問"
+    "next_slack_title": {
+      "en": "Slack intake",
+      "ja": "Slack の取り込み"
     },
-    "next_approvals_description": {
-      "en": "Answering Claude Code's permission requests and questions from the browser instead of the terminal.",
-      "ja": "Claude Code の許可の要求や質問に、ターミナルでなくブラウザから答えます。"
+    "next_slack_description": {
+      "en": "From 2.4.0: fetch Slack messages, mask secrets on your machine, sort them into projects, and turn them into tasks on a whiteboard that you send to a running session.",
+      "ja": "2.4.0 から: Slack のメッセージを取り、手元で機密を伏せ、プロジェクトに振り分け、ホワイトボードのタスクにして、動いているセッションへ送ります。"
     },
     "nav_title": {
       "en": "Messages between sessions",
@@ -18883,6 +18899,292 @@
     "toc_row_limits": {
       "en": "4. Measured, and not",
       "ja": "4. 測ったこと、測っていないこと"
+    }
+  },
+  "viz_slack": {
+    "breadcrumb": {
+      "en": "← jui viz",
+      "ja": "← jui viz"
+    },
+    "title": {
+      "en": "Turn Slack messages into tasks with jui viz",
+      "ja": "jui viz で Slack のメッセージをタスクにする"
+    },
+    "lead": {
+      "en": "From jsonui-cli 2.4.0, `jui viz` can fetch messages from Slack channels, mask secrets on your machine, sort each message into one of your projects, and have a Claude Code session turn them into tasks. The tasks are notes on a whiteboard in a room of their own, the sorting factory, and you send each one to a running session. Nothing of this runs until you write slack.json.",
+      "ja": "jsonui-cli 2.4.0 から、`jui viz` は Slack のチャンネルのメッセージを取り、手元で機密を伏せ、メッセージごとにどのプロジェクトの話かを振り分け、Claude Code のセッションにタスクにさせられます。タスクは、専用の部屋「仕分け工場」のホワイトボードに貼られたメモ紙で、1 枚ずつ動いているセッションへ送ります。slack.json を書くまで、どれも動きません。"
+    },
+    "read_time": {
+      "en": "8 min read",
+      "ja": "8 分で読めます"
+    },
+    "section_what_heading": {
+      "en": "How it works",
+      "ja": "しくみ"
+    },
+    "section_what_b0_text": {
+      "en": "The intake runs in four steps inside the `jui viz` server:\n• Fetch: the new messages of the channels you list, once a day by default or when you press Fetch now (今すぐ取る).\n• Filter: on your machine, attached files are dropped and secrets are masked.\n• Route: a router you choose decides which project each filtered message is about, or that it is small talk.\n• Make tasks: a Claude Code session started in the intake's folder, the task-making robot, groups the sorted messages into tasks.",
+      "ja": "取り込みは、`jui viz` のサーバーの中で 4 つの段で動きます。\n• 取得: 指定したチャンネルの新しいメッセージを、既定では 1 日 1 回、または「今すぐ取る」を押したときに取ります。\n• フィルタ: 手元で、添付ファイルを外し、機密を伏せます。\n• 振り分け: 選んだ振り分け器が、フィルタ済みのメッセージがどのプロジェクトの話か、雑談かを決めます。\n• タスク作り: 取り込みのフォルダで起動した Claude Code のセッション（タスク作りのロボット）が、振り分け済みのメッセージをタスクにまとめます。"
+    },
+    "section_what_b1_text": {
+      "en": "Every step writes plain files under one folder, orchestrationDir (by default ~/slack-orchestration). Each file and folder is made readable by you only (0600 and 0700).",
+      "ja": "どの段も、1 つのフォルダ orchestrationDir（既定は ~/slack-orchestration）の下に普通のファイルを書きます。ファイルとフォルダは、あなただけが読める権限（0600 と 0700）で作られます。"
+    },
+    "section_what_b3_text": {
+      "en": "From 2.4.0 the header has a Slack button whenever the page is connected to a running server, with or without slack.json. Without it, the room says No slack.json yet (nothing is fetched) (slack.json がまだありません（取得は止まっています）). Measured on 2.4.0.",
+      "ja": "2.4.0 から、ページが動いているサーバーにつながっていれば、slack.json の有無にかかわらず、ヘッダーに Slack のボタンが出ます。slack.json が無いと、部屋には「slack.json がまだありません（取得は止まっています）」と出ます。2.4.0 で測りました。"
+    },
+    "toc_row_what": {
+      "en": "How it works",
+      "ja": "しくみ"
+    },
+    "section_outside_heading": {
+      "en": "What leaves your machine",
+      "ja": "何が手元の外へ出るか"
+    },
+    "section_outside_b0_title": {
+      "en": "Know where each message goes",
+      "ja": "メッセージの行き先を知っておく"
+    },
+    "section_outside_b0_body": {
+      "en": "• Fetch with mode api talks to Slack's Web API with each workspace's token. No language model is used.\n• Fetch with mode connector runs `claude -p` with your Slack connector. The messages then pass through Claude (Anthropic) before the filter. In 2.4.0 the room shows no warning for this; only the server's status data carries the note.\n• The router sees the filtered message only: its text, user, workspace and channel. haiku sends it to the Anthropic API, jev to TypeSafe's System One API, and a path adapter to your own Python file.\n• The task-making robot is a Claude Code session, so the filtered messages it reads go to Claude as well.",
+      "ja": "• mode が api の取得は、ワークスペースごとのトークンで Slack の Web API と通信します。言語モデルは使いません。\n• mode が connector の取得は、あなたの Slack コネクタを使う `claude -p` を動かします。メッセージはフィルタより前に Claude（Anthropic）を通ります。2.4.0 では部屋にこの警告は出ません。注意書きはサーバーの状態のデータにあるだけです。\n• 振り分け器が見るのは、フィルタ済みのメッセージ（本文・ユーザー・ワークスペース・チャンネル）だけです。haiku は Anthropic API へ、jev は TypeSafe の System One API へ、パスで指定したアダプターはあなたの Python ファイルへ渡します。\n• タスク作りのロボットは Claude Code のセッションなので、ロボットが読むフィルタ済みのメッセージも Claude へ行きます。"
+    },
+    "section_outside_b1_text": {
+      "en": "Neither mode can read a workspace you have no access to. A channel the token's app or your connector cannot read gives an error in the status, and the other channels are still fetched.",
+      "ja": "どちらのモードでも、あなたが入れないワークスペースは読めません。トークンのアプリやコネクタが読めないチャンネルは状態にエラーとして出て、ほかのチャンネルは取り続けます。"
+    },
+    "toc_row_outside": {
+      "en": "What leaves your machine",
+      "ja": "何が手元の外へ出るか"
+    },
+    "section_config_heading": {
+      "en": "Write slack.json",
+      "ja": "slack.json を書く"
+    },
+    "section_config_b0_text": {
+      "en": "The intake reads slack.json in jui viz's state folder: ~/.local/state/jui-viz/slack.json by default, or under JUI_VIZ_HOME or XDG_STATE_HOME when you set one. No command writes it for you, except the room's Prompts (プロンプトの設定), which keeps your other keys.",
+      "ja": "取り込みは、jui viz の状態フォルダにある slack.json を読みます。既定では ~/.local/state/jui-viz/slack.json で、JUI_VIZ_HOME か XDG_STATE_HOME を設定していればその下です。これを書くコマンドはありません。例外は部屋の「プロンプトの設定」で、ほかの鍵はそのまま残します。"
+    },
+    "section_config_b2_text": {
+      "en": "It holds tokens and keys, so it must be readable by you only. A file readable by anyone else is refused, and nothing is read from it. Measured on 2.4.0 with mode 0644:",
+      "ja": "トークンや鍵が入るので、あなただけが読める権限にします。ほかの人も読めるファイルは拒まれ、中身は何も読まれません。2.4.0 で、権限 0644 のときに測りました。"
+    },
+    "section_config_b5_text": {
+      "en": "The keys and their defaults:\n• orchestrationDir: ~/slack-orchestration.\n• schedule.everyHours: 24, and schedule.at: 09:00 (local time). everyHours 0 means by hand only.\n• source.mode: api or connector. source.workspaces: a list of {name, token, channels}; channels are channel ids. Names and ids take letters, digits, '.', '_' and '-' only.\n• source.threadWatchDays: 14. source.connectorModel: claude-haiku-5-5 (\"\" leaves --model off). source.claudeCommand: the claude to run for connector, by default the one on PATH.\n• filter.adapter: builtin or the path of a Python file. filter.extraPatterns: more patterns to mask.\n• router.adapter: haiku, jev or the path of a Python file. router.anthropicApiKey or router.typesafeApiKey for the first two. router.confidenceMin: 0.6.\n• router.prompt: instructions, projects (id: description) and chitchat. The ids chitchat, _unsorted, inbox and tasks are reserved.\n• taskPrompt: what the robot is told with each batch of messages (\"\" uses the built-in one).\n• doneRetentionMinutes: 60.",
+      "ja": "鍵と既定値:\n• orchestrationDir: ~/slack-orchestration。\n• schedule.everyHours: 24、schedule.at: 09:00（手元の時刻）。everyHours が 0 なら手でだけ取ります。\n• source.mode: api か connector。source.workspaces: {name, token, channels} の並び。channels はチャンネルの id です。名前と id に使えるのは英数字と '.'、'_'、'-' だけです。\n• source.threadWatchDays: 14。source.connectorModel: claude-haiku-5-5（\"\" なら --model を付けません）。source.claudeCommand: connector で動かす claude。既定は PATH にあるものです。\n• filter.adapter: builtin か、Python ファイルのパス。filter.extraPatterns: 追加で伏せるパターン。\n• router.adapter: haiku、jev、または Python ファイルのパス。前の 2 つには router.anthropicApiKey か router.typesafeApiKey が要ります。router.confidenceMin: 0.6。\n• router.prompt: instructions、projects（id: 説明）、chitchat。id の chitchat、_unsorted、inbox、tasks は予約済みです。\n• taskPrompt: メッセージが届くたびにロボットへ添える文（\"\" なら組み込みの文）。\n• doneRetentionMinutes: 60。"
+    },
+    "section_config_b6_text": {
+      "en": "The file is read again on every pass, so an edit applies without restarting the server.",
+      "ja": "ファイルは処理のたびに読み直されるので、書き換えはサーバーを再起動しなくても効きます。"
+    },
+    "toc_row_config": {
+      "en": "Write slack.json",
+      "ja": "slack.json を書く"
+    },
+    "section_fetch_heading": {
+      "en": "When messages are fetched",
+      "ja": "いつ取るか"
+    },
+    "section_fetch_b0_text": {
+      "en": "• The schedule runs every everyHours hours, counted from schedule.at. A run missed while the server was down runs as soon as it is back.\n• Fetch now (今すぐ取る) in the room fetches at once. It also retries the messages that failed earlier.\n• A channel fetched for the first time starts from the last everyHours hours (24 when the schedule is by hand only).\n• A reply to a thread is taken too, even when the thread started before the last fetch, for threads started in the last threadWatchDays days.\n• Slack's own notices (joins, leaves, topic and name changes, pins) are skipped.\n• A channel's position moves only after its messages are written, so a failed fetch takes the same messages again next time.",
+      "ja": "• 予定の取得は、schedule.at を起点に everyHours 時間ごとに動きます。サーバーが止まっていて逃した回は、戻ったらすぐに動きます。\n• 部屋の「今すぐ取る」は、その場で取ります。前に失敗したメッセージもやり直します。\n• 初めて取るチャンネルは、直前の everyHours 時間ぶんから始めます（手でだけのときは 24 時間）。\n• スレッドへの返信も取ります。スレッドが前回の取得より前に始まっていても、直近 threadWatchDays 日に始まったスレッドなら取ります。\n• Slack 自身のお知らせ（参加・退出・トピックや名前の変更・ピン留め）は飛ばします。\n• チャンネルの読んだ位置は、メッセージを書き終えてから進みます。失敗した取得は、次回に同じメッセージをもう一度取ります。"
+    },
+    "toc_row_fetch": {
+      "en": "When messages are fetched",
+      "ja": "いつ取るか"
+    },
+    "section_filter_heading": {
+      "en": "The filter: files dropped, secrets masked",
+      "ja": "フィルタ: 添付を外し、機密を伏せる"
+    },
+    "section_filter_b0_text": {
+      "en": "The built-in filter runs on your machine and sends nothing anywhere. It drops the message's attached files and masks each match as [REDACTED:<kind>]. The kinds are private-key, slack-token, slack-app-token, slack-webhook, aws-access-key, aws-secret-key, github-token, anthropic-key, openai-key, google-api-key, jwt, password, email and phone. A pattern in filter.extraPatterns is a string, or {name, pattern} to name its kind.",
+      "ja": "組み込みのフィルタは手元で動き、どこにも何も送りません。メッセージの添付ファイルを外し、当てはまる所を [REDACTED:<種類>] に置き換えます。種類は private-key、slack-token、slack-app-token、slack-webhook、aws-access-key、aws-secret-key、github-token、anthropic-key、openai-key、google-api-key、jwt、password、email、phone です。filter.extraPatterns のパターンは文字列か、種類の名前を付けるなら {name, pattern} です。"
+    },
+    "section_filter_b1_text": {
+      "en": "Measured on 2.4.0 with a message placed in inbox/ by hand and the extra pattern from the example above:",
+      "ja": "2.4.0 で、inbox/ に手で置いたメッセージと、上の例の追加パターンで測りました。"
+    },
+    "section_filter_b3_title": {
+      "en": "What the filter does not promise",
+      "ja": "フィルタが約束しないこと"
+    },
+    "section_filter_b3_body": {
+      "en": "It masks shapes, not meaning. A customer's name, an address, or a secret written in a shape it does not know reaches the router as written. Add patterns of your own, or write your own filter.",
+      "ja": "伏せるのは形であって、意味ではありません。お客さまの名前、住所、知らない形で書かれた機密は、そのまま振り分け器に届きます。自分のパターンを足すか、自分のフィルタを書いてください。"
+    },
+    "section_filter_b4_text": {
+      "en": "Your own filter is a Python file, given by its absolute path (or ~) in filter.adapter. It runs in a separate `python -I` process and must answer within 60 seconds:",
+      "ja": "自分のフィルタは Python ファイルで、filter.adapter に絶対パス（か ~ で始まるパス）で指定します。別の `python -I` のプロセスで動き、60 秒以内に答える必要があります。"
+    },
+    "section_filter_b6_text": {
+      "en": "When a filter fails — an error, a timeout, a wrong shape, a missing file — the message stays in inbox/ and nothing is routed, so nothing unfiltered leaves your machine. It is tried again when the filter settings or the file change, or on Fetch now. Measured on 2.4.0: with a missing adapter file the message stayed in inbox/ with stage filter in the status, and was routed once the setting was put back.",
+      "ja": "フィルタが失敗すると（エラー、時間切れ、形の違い、ファイルが無い）、メッセージは inbox/ に残り、振り分けには進みません。フィルタを通っていないものが手元の外へ出ることはありません。フィルタの設定かファイルが変わったとき、または「今すぐ取る」のときに、やり直します。2.4.0 で測りました: アダプターのファイルが無いとメッセージは inbox/ に残り、状態に stage filter と出ました。設定を戻すと振り分けられました。"
+    },
+    "toc_row_filter": {
+      "en": "The filter: files dropped, secrets masked",
+      "ja": "フィルタ: 添付を外し、機密を伏せる"
+    },
+    "section_route_heading": {
+      "en": "The router: which project",
+      "ja": "振り分け: どのプロジェクトか"
+    },
+    "section_route_b0_text": {
+      "en": "The router's choices are your project ids and chitchat. Where a message goes:\n• chitchat with confidence at or above router.confidenceMin: deleted. Nothing is written and nothing is logged.\n• a project id at or above confidenceMin: projects/<id>/.\n• anything else (low confidence, or an answer that is not in the list): _unsorted/.\n• a reply in a thread that already went to a project or to _unsorted/: the same place, without asking the router.",
+      "ja": "振り分け器の選択肢は、あなたのプロジェクトの id と chitchat です。行き先:\n• chitchat で、確信度が router.confidenceMin 以上: 消します。何も書かず、記録も残しません。\n• プロジェクトの id で、confidenceMin 以上: projects/<id>/。\n• それ以外（確信度が低い、選択肢に無い答え）: _unsorted/。\n• すでにプロジェクトか _unsorted/ へ行ったスレッドへの返信: 振り分け器に聞かず、同じ所へ。"
+    },
+    "section_route_b1_text": {
+      "en": "Measured on 2.4.0 with a path adapter that answers by keyword:",
+      "ja": "2.4.0 で、キーワードで答えるパスのアダプターを使って測りました。"
+    },
+    "section_route_b3_text": {
+      "en": "When the router fails, the message stays in inbox/ and is tried again after 10 minutes, or on Fetch now. Your own router is a Python file in router.adapter, run the same way as a filter:",
+      "ja": "振り分け器が失敗すると、メッセージは inbox/ に残り、10 分後か「今すぐ取る」のときにやり直します。自分の振り分け器は router.adapter に指定する Python ファイルで、フィルタと同じように動きます。"
+    },
+    "toc_row_route": {
+      "en": "The router: which project",
+      "ja": "振り分け: どのプロジェクトか"
+    },
+    "section_room_heading": {
+      "en": "The sorting factory",
+      "ja": "仕分け工場"
+    },
+    "section_room_b0_text": {
+      "en": "Press Slack in the header. The sorting factory (仕分け工場) opens over the whole page. When tasks wait on you — a draft to look at, one ready to start, or one whose work ended — the button shows their number.",
+      "ja": "ヘッダーの Slack を押すと、仕分け工場がページ全体に開きます。あなたの手を待つタスク（見てほしい下書き、開始待ち、作業が終わったもの）があると、ボタンにその数が出ます。"
+    },
+    "section_room_b1_text": {
+      "en": "• Left, at the top: the factory in 3D. Messages ride a belt into one bin per project.\n• What was sorted (仕分けの様子): how many arrived, how many the robot has not been told of, how many could not be sorted, the latest ones, and the intake's line — the last and the next fetch, or by hand only — with Fetch now.\n• Tell the robot (ロボットへの指示): a box that sends the task-making robot a prompt.\n• Right: the task board, a whiteboard with one note per task.",
+      "ja": "• 左上: 3D の工場。メッセージがベルトに乗って、プロジェクトごとの箱へ運ばれます。\n• 仕分けの様子: 届いた数、ロボットにまだ知らせていない数、仕分けられない数、最近のメッセージ、そして取り込みの行（前回と次回の取得、または手でだけ）と「今すぐ取る」。\n• ロボットへの指示: タスク作りのロボットにプロンプトを送る欄。\n• 右: タスクボード。1 タスク 1 枚のメモ紙を貼ったホワイトボードです。"
+    },
+    "section_room_b2_text": {
+      "en": "Prompts (プロンプトの設定) edits the router's instructions, the projects, the chitchat definition and the task prompt. Saving writes only router.prompt and taskPrompt into slack.json; the other keys stay as you wrote them, and the file stays 0600. A reserved id is refused. Measured on 2.4.0:",
+      "ja": "「プロンプトの設定」では、振り分けの指示、プロジェクト、雑談の定義、タスク作りのプロンプトを直せます。保存すると、slack.json の router.prompt と taskPrompt だけを書き換えます。ほかの鍵は書いたまま残り、ファイルは 0600 のままです。予約済みの id は拒まれます。2.4.0 で測りました。"
+    },
+    "toc_row_room": {
+      "en": "The sorting factory",
+      "ja": "仕分け工場"
+    },
+    "section_robot_heading": {
+      "en": "The task-making robot",
+      "ja": "タスク作りのロボット"
+    },
+    "section_robot_b0_text": {
+      "en": "The robot is a Claude Code session whose folder is orchestrationDir. Start it with the jui-viz channel, so that the page can send it prompts. The room shows this command, and you can copy it:",
+      "ja": "ロボットは、orchestrationDir をフォルダにした Claude Code のセッションです。ページからプロンプトを送れるように、jui-viz のチャンネル付きで起動します。部屋にこのコマンドが出ていて、コピーできます。"
+    },
+    "section_robot_b2_text": {
+      "en": "When your viz keeps its files somewhere other than the default, the command starts with JUI_VIZ_HOME=<that folder>, so the session reaches this viz.",
+      "ja": "viz のファイルを既定以外の場所に置いているときは、コマンドの頭に JUI_VIZ_HOME=<そのフォルダ> が付きます。セッションがこの viz につながるようにするためです。"
+    },
+    "section_robot_b3_text": {
+      "en": "• The robot sits in the factory, not in a project's room.\n• When sorted messages come that no task names yet, and the robot is idle, the server tells it: the new files, the open tasks, the sessions a task can go to, and the next id (T-0001, T-0002, …). It is told at most 40 files at a time, and no sooner than 20 seconds after the last time.\n• The robot writes one file per task in tasks/. A thread always stays in one task, and related messages may join it. Only a Talking, Draft or Ready task takes more messages. A message about a task already Working, Ended or Done gets a new task that points at the old one.",
+      "ja": "• ロボットはプロジェクトの部屋ではなく、工場にいます。\n• まだどのタスクにも入っていないメッセージが届き、ロボットの手が空いていると、サーバーが知らせます。新しいファイル、今のタスク、タスクを送れるセッション、次の id（T-0001、T-0002、…）です。1 回に知らせるのは 40 ファイルまでで、前回から 20 秒は空けます。\n• ロボットは tasks/ に 1 タスク 1 ファイルを書きます。同じスレッドは必ず 1 つのタスクにまとめ、関係するメッセージも足すことがあります。メッセージを足せるのは、やり取り中・下書き・開始待ちのタスクだけです。作業中・作業終了・完了のタスクについてのメッセージは、元のタスクを指す新しいタスクになります。"
+    },
+    "section_robot_b4_title": {
+      "en": "Slack messages are other people's words",
+      "ja": "Slack のメッセージは他人の言葉"
+    },
+    "section_robot_b4_body": {
+      "en": "The robot reads what other people wrote in Slack, and a task's prompt is built from it. Read a task as data, not as an instruction, before you send it on.",
+      "ja": "ロボットが読むのは、他人が Slack に書いた文で、タスクのプロンプトはそこから作られます。タスクは指示ではなくデータとして読み、確かめてから送ってください。"
+    },
+    "toc_row_robot": {
+      "en": "The task-making robot",
+      "ja": "タスク作りのロボット"
+    },
+    "section_board_heading": {
+      "en": "The task board",
+      "ja": "タスクボード"
+    },
+    "section_board_b0_text": {
+      "en": "The whiteboard has one lane per state: Talking (やり取り中) → Draft (下書き) → Ready (開始待ち) → Working (作業中) → Ended (作業終了) → Done (完了).",
+      "ja": "ホワイトボードには、状態ごとに 1 列あります: やり取り中 → 下書き → 開始待ち → 作業中 → 作業終了 → 完了。"
+    },
+    "section_board_b1_text": {
+      "en": "• Talking: the robot judged the exchange not settled yet. It, or you, raises it to Draft.\n• On a Draft or Ready note you edit the title and the prompt in place, and choose the session it goes to. Save (保存) keeps it. A prompt you changed is marked, and the robot leaves it; messages that came after your change are listed on the note.\n• Start (開始) sends the prompt to the chosen session and moves the note to Working. Only a session started with the jui-viz channel takes it. A session that cannot says why, and the note offers the command to start one.\n• Working becomes Ended once that session was seen at work and is idle again, or has gone. You move it to Done.\n• The State (状態) select moves a note to any state at once. It sends nothing, and a note moved this way is no longer followed to Ended.\n• Ask for a change (直しを頼む) sends your words to the robot, which rewrites that task.\n• A note's messages open in a side panel, each with Open in Slack (Slack で開く). Whole board (ボード全体) shows only the board.",
+      "ja": "• やり取り中: やり取りがまだ続いていて結論が出ていない、とロボットが判断したタスク。ロボットかあなたが下書きに上げます。\n• 下書きと開始待ちのメモ紙では、題とプロンプトをその場で直し、送り先のセッションを選べます。「保存」で残ります。手で直したプロンプトには印が付き、ロボットは書き換えません。直した後に届いたメッセージはメモ紙に並びます。\n• 「開始」は、選んだセッションにプロンプトを送り、メモ紙を作業中へ移します。受け取れるのは jui-viz のチャンネル付きで起動したセッションだけです。受け取れないセッションには理由が出て、メモ紙から起動のコマンドをコピーできます。\n• 作業中は、そのセッションが働いているのを一度見て、また手が空いたとき（または居なくなったとき）に作業終了になります。完了へはあなたが移します。\n• 「状態」の選択で、メモ紙をどの状態にもすぐ移せます。何も送りません。こうして移したメモ紙は、作業終了への追跡から外れます。\n• 「直しを頼む」は、あなたの言葉をロボットに送り、ロボットがそのタスクを書き直します。\n• メモ紙のメッセージは横の欄に開き、それぞれに「Slack で開く」があります。「ボード全体」はボードだけを広げます。"
+    },
+    "section_board_b2_text": {
+      "en": "The buttons check the state. Measured on 2.4.0 against the server:",
+      "ja": "ボタンは状態を確かめます。2.4.0 で、サーバーに対して測りました。"
+    },
+    "toc_row_board": {
+      "en": "The task board",
+      "ja": "タスクボード"
+    },
+    "section_retention_heading": {
+      "en": "Done tasks are removed",
+      "ja": "完了したタスクは消える"
+    },
+    "section_retention_b0_text": {
+      "en": "A task that has been Done for doneRetentionMinutes (60 by default) is removed, together with its messages under projects/, unless another task still names them. The note counts down: Removed in N min (あと N 分で消えます). The server does this whether the room is open or not. Moving a note out of Done keeps it; moving it to Done again starts the time again.",
+      "ja": "完了になってから doneRetentionMinutes（既定 60 分）たったタスクは、projects/ の下の元のメッセージと一緒に消えます。ほかのタスクがまだ指しているメッセージは残します。メモ紙には「あと N 分で消えます」と出ます。部屋を開いているかどうかにかかわらず、サーバーが消します。完了から外せば残り、もう一度完了にすると時間は最初からです。"
+    },
+    "section_retention_b1_text": {
+      "en": "Measured on 2.4.0 with doneRetentionMinutes 0: the task file and both of its messages were removed, and the server log said:",
+      "ja": "2.4.0 で doneRetentionMinutes を 0 にして測りました。タスクのファイルと、その 2 つのメッセージが消え、サーバーのログにはこう出ました。"
+    },
+    "toc_row_retention": {
+      "en": "Done tasks are removed",
+      "ja": "完了したタスクは消える"
+    },
+    "section_measured_heading": {
+      "en": "What was measured here",
+      "ja": "ここで測ったこと"
+    },
+    "section_measured_b0_text": {
+      "en": "Measured on 2.4.0, with an isolated viz on another port and state folder, messages placed in inbox/ by hand, and a path router adapter: the refusal of a 0644 slack.json, the filter, the routing, a reply following its thread, a failed filter keeping its message, the board's refusals, Prompts keeping the other keys, and the removal of a done task.",
+      "ja": "2.4.0 で、別のポートと状態フォルダの viz、inbox/ に手で置いたメッセージ、パスの振り分けアダプターを使って測りました: 0644 の slack.json の拒否、フィルタ、振り分け、スレッドへの返信の追従、失敗したフィルタでメッセージが残ること、ボードの拒否、プロンプトの設定がほかの鍵を残すこと、完了したタスクの削除。"
+    },
+    "section_measured_b1_text": {
+      "en": "Not measured here: fetching from Slack in either mode, the haiku and jev routers, and the robot writing tasks. These are written from the shipped source. Upstream says the connector mode has not been tried on a real machine yet.",
+      "ja": "ここで測っていないこと: どちらのモードでも Slack からの取得、haiku と jev の振り分け、ロボットがタスクを書くところ。これらは出荷したソースから書いています。connector のモードは実機ではまだ試していない、と上流は述べています。"
+    },
+    "toc_row_measured": {
+      "en": "What was measured here",
+      "ja": "ここで測ったこと"
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの内容"
+    },
+    "next_heading": {
+      "en": "Keep reading",
+      "ja": "次に読む"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI",
+      "ja": "© 2026 JsonUI"
+    },
+    "next_index_title": {
+      "en": "jui viz",
+      "ja": "jui viz"
+    },
+    "next_index_description": {
+      "en": "`jui viz` shows the Claude Code sessions and subagents running on your machine (from 2.3.25 the Codex sessions too) as rooms and robots in the browser. Start with the demo below, then pick the article for what you want to do.",
+      "ja": "`jui viz` は、手元で動いている Claude Code のセッションとサブエージェントを（2.3.25 からは Codex のセッションも）、ブラウザの中の部屋とロボットで見せるツールです。まず下のデモを触ってみて、やりたいことに合った記事へ進んでください。"
+    },
+    "next_messages_title": {
+      "en": "Messages between sessions",
+      "ja": "セッション間のメッセージ"
+    },
+    "next_messages_description": {
+      "en": "From 2.3.26: `jui viz message` sends a message from one session to another, Claude Code and Codex alike, and both robots' Talk shows it.",
+      "ja": "2.3.26 から: `jui viz message` で、あるセッションから別のセッションへメッセージを送ります。Claude Code と Codex のどちらの間でも送れ、両方のロボットのトークに出ます。"
+    },
+    "next_approvals_title": {
+      "en": "Permissions and questions",
+      "ja": "許可と質問"
+    },
+    "next_approvals_description": {
+      "en": "Answering Claude Code's permission requests and questions from the browser instead of the terminal.",
+      "ja": "Claude Code の許可の要求や質問に、ターミナルでなくブラウザから答えます。"
+    },
+    "nav_title": {
+      "en": "Slack intake",
+      "ja": "Slack の取り込み"
     }
   }
 }

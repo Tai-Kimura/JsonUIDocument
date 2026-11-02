@@ -71,11 +71,11 @@ export class ApprovalsViewModel {
         onNavigate: () => this.navigate("/viz"),
       },
       {
-        id: "next_messages",
-        titleKey: lookup("next_messages_title"),
-        descriptionKey: lookup("next_messages_description"),
-        url: "/viz/messages",
-        onNavigate: () => this.navigate("/viz/messages"),
+        id: "next_slack",
+        titleKey: lookup("next_slack_title"),
+        descriptionKey: lookup("next_slack_description"),
+        url: "/viz/slack",
+        onNavigate: () => this.navigate("/viz/slack"),
       },
       {
         id: "next_tests",

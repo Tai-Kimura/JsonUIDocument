@@ -26,7 +26,7 @@ import { useLocalizedString } from "@/hooks/useLocalizedString";
 
 // Versioned path: deploy uploads every non-HTML file as immutable for a year,
 // and the export keeps its file names, so a new export goes in a new folder.
-const DEMO_DIR = "/tools/viz-demo/2.3.38/";
+const DEMO_DIR = "/tools/viz-demo/2.4.0/";
 
 interface VizDemoProps {
   id?: string;
