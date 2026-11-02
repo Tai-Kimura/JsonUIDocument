@@ -263,7 +263,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "{\n  \"orchestrationDir\": \"~/slack-orchestration\",\n  \"schedule\": {\"everyHours\": 24, \"at\": \"09:00\"},\n  \"source\": {\n    \"mode\": \"api\",\n    \"workspaces\": [\n      {\"name\": \"acme\", \"token\": \"xoxb-…\", \"channels\": [\"C0123456789\"]}\n    ]\n  },\n  \"filter\": {\"adapter\": \"builtin\", \"extraPatterns\": [{\"name\": \"ticket\", \"pattern\": \"TCK-[0-9]+\"}]},\n  \"router\": {\n    \"adapter\": \"haiku\",\n    \"anthropicApiKey\": \"sk-ant-…\",\n    \"prompt\": {\n      \"instructions\": \"Decide which project this Slack message is about.\",\n      \"projects\": {\"web\": \"The web app: pages, sign-in, the API it calls.\"},\n      \"chitchat\": \"Small talk, greetings, thanks and anything that asks for no work.\"\n    }\n  }\n}",
+                      "code": "{\n  \"orchestrationDir\": \"~/slack-orchestration\",\n  \"schedule\": {\"everyHours\": 24, \"at\": \"09:00\"},\n  \"source\": {\n    \"mode\": \"api\",\n    \"workspaces\": [\n      {\"name\": \"acme\", \"token\": \"xoxp-…\", \"channels\": [\"C0123456789\"]}\n    ]\n  },\n  \"filter\": {\"adapter\": \"builtin\", \"extraPatterns\": [{\"name\": \"ticket\", \"pattern\": \"TCK-[0-9]+\"}]},\n  \"router\": {\n    \"adapter\": \"haiku\",\n    \"anthropicApiKey\": \"sk-ant-…\",\n    \"prompt\": {\n      \"instructions\": \"Decide which project this Slack message is about.\",\n      \"projects\": {\"web\": \"The web app: pages, sign-in, the API it calls.\"},\n      \"chitchat\": \"Small talk, greetings, thanks and anything that asks for no work.\"\n    }\n  }\n}",
                       "language": "json",
                       "filename": "slack.json",
                       "showLineNumbers": false,
@@ -351,6 +351,15 @@
                       "fontSize": 16,
                       "fontColor": "ink_muted",
                       "text": "section_fetch_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_fetch_b1_text"
                     }
                   ]
                 },
@@ -400,6 +409,26 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
+                      "code": "as Slack sent it:\n  The login page fails &amp; returns &lt;500&gt; for <@U012ABC>, see <https://example.com/log|the log> in <#C0123456789|web-bugs>\n\nin projects/web/:\n  The login page fails & returns <500> for @U012ABC, see the log (https://example.com/log) in #web-bugs",
+                      "language": "text",
+                      "filename": "text",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_filter_b3_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
                       "code": "inbox/1793500000.000100-acme-C012.json   (as fetched)\n  \"text\": \"The login page fails for ann@example.com, password: hunter22 and see TCK-1234\",\n  \"files\": [{\"name\": \"shot.png\"}]\n\nprojects/web/1793500000.000100-acme-C012.json   (filtered and routed)\n  \"text\": \"The login page fails for [REDACTED:email], [REDACTED:password] and see [REDACTED:ticket]\",\n  \"removedFiles\": 1,\n  \"redactions\": 3,\n  \"router\": {\"adapter\": \"path\", \"choice\": \"web\", \"confidence\": 0.9}",
                       "language": "text",
                       "filename": "before and after",
@@ -430,7 +459,7 @@
                           "fontSize": 17,
                           "fontWeight": "semibold",
                           "fontColor": "accent",
-                          "text": "section_filter_b3_title"
+                          "text": "section_filter_b5_title"
                         },
                         {
                           "type": "Label",
@@ -438,7 +467,7 @@
                           "height": "wrapContent",
                           "fontSize": 15,
                           "fontColor": "ink",
-                          "text": "section_filter_b3_body",
+                          "text": "section_filter_b5_body",
                           "topMargin": 8
                         }
                       ]
@@ -450,7 +479,7 @@
                       "topMargin": 12,
                       "fontSize": 16,
                       "fontColor": "ink_muted",
-                      "text": "section_filter_b4_text"
+                      "text": "section_filter_b6_text"
                     },
                     {
                       "type": "CodeBlock",
@@ -470,7 +499,7 @@
                       "topMargin": 12,
                       "fontSize": 16,
                       "fontColor": "ink_muted",
-                      "text": "section_filter_b6_text"
+                      "text": "section_filter_b8_text"
                     }
                   ]
                 },
@@ -648,7 +677,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "cd ~/slack-orchestration && claude --channels plugin:jui-viz@jsonui",
+                      "code": "cd ~/slack-orchestration && claude --channels plugin:jui-viz@jsonui -n 'Sorting factory'",
                       "language": "bash",
                       "filename": "shell",
                       "showLineNumbers": false,
@@ -868,6 +897,15 @@
                       "fontSize": 16,
                       "fontColor": "ink_muted",
                       "text": "section_measured_b1_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_measured_b2_text"
                     }
                   ]
                 },

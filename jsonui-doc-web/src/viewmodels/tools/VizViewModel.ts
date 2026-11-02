@@ -124,6 +124,13 @@ export class VizViewModel {
       onNavigate: () => this.navigate("/viz/slack"),
     },
     {
+      id: "next_slack_setup",
+      titleKey: lookup("next_slack_setup_title"),
+      descriptionKey: lookup("next_slack_setup_description"),
+      url: "/viz/slack-setup",
+      onNavigate: () => this.navigate("/viz/slack-setup"),
+    },
+    {
       id: "next_approvals",
       titleKey: lookup("next_approvals_title"),
       descriptionKey: lookup("next_approvals_description"),

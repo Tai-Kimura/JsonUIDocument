@@ -78,11 +78,11 @@ export class SlackViewModel {
         onNavigate: () => this.navigate("/viz/messages"),
       },
       {
-        id: "next_approvals",
-        titleKey: lookup("next_approvals_title"),
-        descriptionKey: lookup("next_approvals_description"),
-        url: "/viz/approvals",
-        onNavigate: () => this.navigate("/viz/approvals"),
+        id: "next_slack_setup",
+        titleKey: lookup("next_slack_setup_title"),
+        descriptionKey: lookup("next_slack_setup_description"),
+        url: "/viz/slack-setup",
+        onNavigate: () => this.navigate("/viz/slack-setup"),
       },
     ];
 

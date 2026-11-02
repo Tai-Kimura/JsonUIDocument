@@ -189,6 +189,7 @@ const NAV_CATALOG: ReadonlyArray<{
       { id: "sessions", titleKey: "viz_sessions_nav_title", titleEn: "Talk, prompts and notifications", url: "/viz/sessions" },
       { id: "messages", titleKey: "viz_messages_nav_title", titleEn: "Messages between sessions", url: "/viz/messages" },
       { id: "slack", titleKey: "viz_slack_nav_title", titleEn: "Slack intake", url: "/viz/slack" },
+      { id: "slack-setup", titleKey: "viz_slack_setup_nav_title", titleEn: "Slack setup", url: "/viz/slack-setup" },
       { id: "approvals", titleKey: "viz_approvals_nav_title", titleEn: "Permissions and questions", url: "/viz/approvals" },
       { id: "tests", titleKey: "viz_tests_nav_title", titleEn: "Watching tests", url: "/viz/tests" },
       { id: "server-room", titleKey: "viz_server_room_nav_title", titleEn: "Server room", url: "/viz/server-room" },

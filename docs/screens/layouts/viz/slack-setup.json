@@ -1,0 +1,1764 @@
+{
+  "type": "View",
+  "id": "viz_slack_setup_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_base",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateBack",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "viz_slack_setup_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "viz_slack_setup_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            24,
+            32
+          ],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "ink_subtle",
+              "tapBackground": "surface_sunken",
+              "onClick": "@{onNavigateBack}",
+              "text": "breadcrumb"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "ink",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "ink_muted",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "ink_subtle",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "viz_slack_setup_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "viz_slack_setup_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_before",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_before_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_before_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_before_b1_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_app",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_app_heading"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "accent_tint",
+                      "cornerRadius": 12,
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_app_b0_s1"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_2"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_app_b0_s2"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_3"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_app_b0_s3"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "accent_tint",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "accent",
+                          "text": "section_app_b1_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink",
+                          "text": "section_app_b1_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_scopes",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_scopes_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_scopes_b0_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "channels:history   public channels (IDs starting with C)\ngroups:history     private channels (IDs starting with G, or C in newer workspaces)\nim:history         direct messages (IDs starting with D)\nmpim:history       group direct messages",
+                      "language": "text",
+                      "filename": "User Token Scopes",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "accent_tint",
+                      "cornerRadius": 12,
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_scopes_b2_s1"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_2"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_scopes_b2_s2"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_3"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_scopes_b2_s3"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_4"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_scopes_b2_s4"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_socket",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_socket_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_socket_b0_text"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "accent_tint",
+                      "cornerRadius": 12,
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_socket_b1_s1"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_2"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_socket_b1_s2"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_3"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_socket_b1_s3"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_4"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_socket_b1_s4"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_socket_b2_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_channels",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_channels_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_channels_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_channels_b1_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_config",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_config_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_config_b0_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "{\n  \"orchestrationDir\": \"~/slack-orchestration\",\n  \"schedule\": {\"everyHours\": 24, \"at\": \"09:00\"},\n  \"source\": {\n    \"mode\": \"socket\",\n    \"workspaces\": [\n      {\n        \"name\": \"acme\",\n        \"token\": \"xoxp-…\",\n        \"appToken\": \"xapp-…\",\n        \"channels\": [\"C0123456789\", \"D0123456789\"]\n      }\n    ],\n    \"threadWatchDays\": 14\n  },\n  \"filter\": {\"adapter\": \"builtin\", \"extraPatterns\": []},\n  \"router\": {\n    \"adapter\": \"haiku\",\n    \"anthropicApiKey\": \"sk-ant-…\",\n    \"confidenceMin\": 0.6,\n    \"prompt\": {\n      \"projects\": {\"web\": \"The web app: pages, sign-in, the API it calls.\"}\n    }\n  },\n  \"taskPrompt\": \"\",\n  \"robotName\": \"Sorter\"\n}",
+                      "language": "json",
+                      "filename": "slack.json",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_config_b2_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "chmod 600 ~/.local/state/jui-viz/slack.json",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_config_b4_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_config_b5_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_robot",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_robot_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_robot_b0_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "cd ~/slack-orchestration && claude --channels plugin:jui-viz@jsonui -n Sorter",
+                      "language": "bash",
+                      "filename": "shell",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_robot_b2_text"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "accent_tint",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "accent",
+                          "text": "section_robot_b3_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink",
+                          "text": "section_robot_b3_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_room",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_room_heading"
+                    },
+                    {
+                      "type": "View",
+                      "width": 32,
+                      "height": 3,
+                      "topMargin": 32,
+                      "background": "accent",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 10,
+                      "fontSize": 20,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_room_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_room_b1_text"
+                    },
+                    {
+                      "type": "View",
+                      "width": 32,
+                      "height": 3,
+                      "topMargin": 32,
+                      "background": "accent",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 10,
+                      "fontSize": 20,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_room_b2_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_room_b3_text"
+                    },
+                    {
+                      "type": "View",
+                      "width": 32,
+                      "height": 3,
+                      "topMargin": 32,
+                      "background": "accent",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 10,
+                      "fontSize": 20,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_room_b4_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_room_b5_text"
+                    },
+                    {
+                      "type": "View",
+                      "width": 32,
+                      "height": 3,
+                      "topMargin": 32,
+                      "background": "accent",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 10,
+                      "fontSize": 20,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_room_b6_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_room_b7_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_check",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_check_heading"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "accent_tint",
+                      "cornerRadius": 12,
+                      "child": [
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_check_b0_s1"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_2"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_check_b0_s2"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_3"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_check_b0_s3"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "View",
+                          "orientation": "horizontal",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "topMargin": 14,
+                          "child": [
+                            {
+                              "type": "View",
+                              "orientation": "horizontal",
+                              "width": "wrapContent",
+                              "height": "wrapContent",
+                              "paddings": [
+                                3,
+                                10,
+                                3,
+                                10
+                              ],
+                              "background": "accent",
+                              "cornerRadius": 999,
+                              "child": [
+                                {
+                                  "type": "Label",
+                                  "width": "wrapContent",
+                                  "height": "wrapContent",
+                                  "fontSize": 13,
+                                  "fontWeight": "bold",
+                                  "fontColor": "accent_ink",
+                                  "text": "step_4"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "height": "wrapContent",
+                              "weight": 1,
+                              "leftMargin": 12,
+                              "fontSize": 15,
+                              "fontColor": "ink",
+                              "text": "section_check_b0_s4"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_check_b1_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_errors",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_errors_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_errors_b0_text"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "what the room shows                                     what to do\nacme/C0123456789: conversations.history: missing_scope  add channels:history, Reinstall, paste the new xoxp-\nacme/D0123456789: conversations.history: missing_scope  add im:history, Reinstall, paste the new xoxp-\nacme/G0123456789: conversations.history: missing_scope  add groups:history (mpim:history for a group DM)\nacme/C0123456789: conversations.history: not_in_channel invite the app to the channel; check the ID\nacme: auth.test: invalid_auth                           the token is wrong or revoked: paste it again\nacme: no token                                          workspaces[].token is empty (socket needs it too)\nConnection error: apps.connections.open: invalid_auth   the appToken is wrong: an xapp- token, connections:write\nConnection error: no appToken                           workspaces[].appToken is missing (no hint is shown)\nConnection error: disconnect: link_disabled (…)         Socket Mode is off in the app: turn it on again\nConnection error: the connection closed                 it reconnects by itself; the schedule picks up the rest",
+                      "language": "text",
+                      "filename": "errors",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_errors_b2_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_errors_b3_text"
+                    },
+                    {
+                      "type": "View",
+                      "width": 32,
+                      "height": 3,
+                      "topMargin": 32,
+                      "background": "accent",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 10,
+                      "fontSize": 20,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_errors_b4_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_errors_b5_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_cautions",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_cautions_heading"
+                    },
+                    {
+                      "type": "View",
+                      "orientation": "vertical",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "paddings": [
+                        18,
+                        20,
+                        18,
+                        20
+                      ],
+                      "background": "warning_chip_bg",
+                      "cornerRadius": 12,
+                      "borderWidth": 1,
+                      "borderColor": "border",
+                      "child": [
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 17,
+                          "fontWeight": "semibold",
+                          "fontColor": "warning_chip_fg",
+                          "text": "section_cautions_b0_title"
+                        },
+                        {
+                          "type": "Label",
+                          "width": "matchParent",
+                          "height": "wrapContent",
+                          "fontSize": 15,
+                          "fontColor": "ink",
+                          "text": "section_cautions_b0_body",
+                          "topMargin": 8
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_measured",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "surface",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "ink",
+                      "text": "section_measured_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_measured_b0_text"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "ink_muted",
+                      "text": "section_measured_b1_text"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "viz_slack_setup_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    32,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "chrome_ink",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "viz_slack_setup_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 3,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/next_step_card"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "viz_slack_setup_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "ink_faint",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "viz_slack_setup_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [
+                24,
+                16,
+                24,
+                16
+              ],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "viz_slack_setup_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    0,
+                    32
+                  ],
+                  "background": "surface_base",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        {
+                          "id": "toc_before",
+                          "label": "toc_row_before",
+                          "anchor": "section_before",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_app",
+                          "label": "toc_row_app",
+                          "anchor": "section_app",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_scopes",
+                          "label": "toc_row_scopes",
+                          "anchor": "section_scopes",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_socket",
+                          "label": "toc_row_socket",
+                          "anchor": "section_socket",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_channels",
+                          "label": "toc_row_channels",
+                          "anchor": "section_channels",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_config",
+                          "label": "toc_row_config",
+                          "anchor": "section_config",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_robot",
+                          "label": "toc_row_robot",
+                          "anchor": "section_robot",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_room",
+                          "label": "toc_row_room",
+                          "anchor": "section_room",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_check",
+                          "label": "toc_row_check",
+                          "anchor": "section_check",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_errors",
+                          "label": "toc_row_errors",
+                          "anchor": "section_errors",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_cautions",
+                          "label": "toc_row_cautions",
+                          "anchor": "section_cautions",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_measured",
+                          "label": "toc_row_measured",
+                          "anchor": "section_measured",
+                          "level": 1
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
