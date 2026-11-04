@@ -15749,8 +15749,8 @@
       "ja": "ページは 127.0.0.1 で開く"
     },
     "section_send_b8_body": {
-      "en": "Sending works only on the page opened at http://127.0.0.1:<port>/ (not localhost), with this server's token, up to 8 KB per prompt. The log keeps the time, the session and the first 40 characters; the text is never exported.",
-      "ja": "送れるのは、ページを http://127.0.0.1:<port>/ で開いたときだけです（localhost では使えません）。このサーバーのトークンが要り、1 回 8 KB までです。ログには、時刻、宛先、先頭 40 字だけが残り、本文は書き出しに入りません。"
+      "en": "Sending works only on the page opened at http://127.0.0.1:<port>/ (not localhost), with this server's token. The log keeps the time, the session and the first 40 characters; the text is never exported.",
+      "ja": "送れるのは、ページを http://127.0.0.1:<port>/ で開いたときだけです（localhost では使えません）。このサーバーのトークンが要ります。ログには、時刻、宛先、先頭 40 字だけが残り、本文は書き出しに入りません。"
     },
     "section_send_b9_text": {
       "en": "Send",
@@ -15797,26 +15797,38 @@
       "ja": "カードには「送信中」、続いて「届いた」か「届いていない」が出ます。受け手のセッションの記録を読んで確かめます。\n\n「届いていない」は、送ったのに受け手の記録に出ないということです。カードには考えられる理由が出ます。起動の指定が無い、組織の channelsEnabled が無い、セッションが閉じた、のどれかです。"
     },
     "section_send_b12_since": {
+      "en": "from 2.5.3",
+      "ja": "2.5.3 から"
+    },
+    "section_send_b12_title": {
+      "en": "A long prompt goes as a file",
+      "ja": "長いプロンプトはファイルで渡す"
+    },
+    "section_send_b12_body": {
+      "en": "Until 2.5.2 the box refused a prompt whose request passed 8,192 bytes. From 2.5.3 the text goes as a file instead. The 8,192 bytes are the whole request, not the text alone: with nothing attached, plain English fits up to 8,113 bytes, a line break counts as 2 bytes, and a Japanese character as 3.\n\n• Before you send, the line under the box reads Long text: goes as a file (<size>) when sent (長い文: 送る時にファイル（<size>）にして渡す), and the confirmation names prompt.md and its size.\n• The server keeps the text as prompt.md with the attachments. The session receives its attached: line after one fixed line: The whole prompt is in the attached file (it was too long to send as text). Read all of it, in parts if it is long, then follow it as this prompt.\n• The file counts as one of the 10 attachments, and the 20 MB file limit becomes the text's limit. With 10 attached already, or over 20 MB, the box stops and says why. If the prompt is refused, its file is taken back and the text stays in the box.\n• Over 256 KB it still goes, and the line adds that the receiver may not read all of it.\n• History (応答の履歴) shows your words, not the fixed line: Long prompt (<size>), given to the receiver as a file (長いプロンプト（<size>）。受け手にはファイルで渡した), the first 300 characters, and Show all (全文を見る), which shows up to 1 MB; the rest is in the file. The file goes an hour after the session ends, like any attachment, and History then says so. The log's 40 characters are yours too.\n• The sorting factory's box for the robot sends the same way.\n\nWhat the receiver does is jsonui-cli's measurement, on Claude Code 2.1.318 and with Claude Sonnet 5.5 as the receiver only: Read refuses a file over 256 KB in one go, so reading all of it cannot be promised. Auto mode asks for no permission for the Read; default and acceptEdits ask on each Read until you allow it from now on in the card. jsonui-cli has not measured the real channel route, Opus or Codex as the receiver.\n\nMeasured here on 2.5.3: the page's own limit code run outside the browser, at 8,113 and 8,114 bytes, with line breaks and Japanese, with 9 and 10 attached, and at exactly 20 MB and one byte over. jsonui-cli's 17 tests of the file route pass. Not measured here: the box in a browser, and a real session reading the file.",
+      "ja": "2.5.2 までは、リクエストが 8,192 バイトを超えるプロンプトを入力欄が断っていました。2.5.3 からは、文をファイルにして渡します。8,192 バイトは文だけでなくリクエスト全体の大きさです。何も添付しなければ、英語の平文は 8,113 バイトまで入ります。改行は 2 バイト、日本語は 1 字 3 バイトに数えます。\n\n• 送る前に、入力欄の下の行に「長い文: 送る時にファイル（<大きさ>）にして渡す」と出て、確認の画面に prompt.md とその大きさが出ます。\n• サーバーは文を prompt.md として添付と一緒に置きます。セッションには、決まった 1 行の後に attached: の行が届きます。決まった 1 行は次の英語です: The whole prompt is in the attached file (it was too long to send as text). Read all of it, in parts if it is long, then follow it as this prompt.\n• このファイルは添付 10 個のうちの 1 個に数え、ファイルの上限 20 MB が文の上限になります。すでに 10 個添付しているときと 20 MB を超えるときは、入力欄が止めて理由を言います。プロンプトが断られたら、ファイルは取り消され、文は入力欄に残ります。\n• 256 KB を超えても送れます。そのときは、受け手が全部読むとは限らないと行に出ます。\n• 「応答の履歴」には、決まった 1 行ではなくあなたの文が出ます。「長いプロンプト（<大きさ>）。受け手にはファイルで渡した」、先頭の 300 字、「全文を見る」です。全文は 1 MB まで出て、続きはファイルにあります。ファイルはほかの添付と同じくセッションの終了から 1 時間で消え、履歴にそう出ます。ログの 40 字もあなたの文です。\n• 仕分け工場のロボットへの入力欄も同じ送り方です。\n\n受け手の動きは jsonui-cli の測定で、Claude Code 2.1.318、受け手は Claude Sonnet 5.5 だけです。Read は 256 KB を超えるファイルを一度には読まないので、全部を読むとは約束できません。Read の許可は、auto モードでは聞かれません。default と acceptEdits では、札で以後も許可するまで Read ごとに聞かれます。本物のチャンネルの経路、受け手が Opus や Codex の場合は、jsonui-cli も測っていません。\n\nここで 2.5.3 で測ったこと: ページの上限のコードをブラウザの外で動かしました。8,113 と 8,114 バイト、改行と日本語、添付 9 個と 10 個、ちょうど 20 MB とその 1 バイト上です。ファイルの経路の jsonui-cli のテスト 17 本は通ります。ここで測っていないこと: ブラウザでの入力欄、本物のセッションがファイルを読むところ。"
+    },
+    "section_send_b13_since": {
       "en": "from 2.3.21",
       "ja": "2.3.21 から"
     },
-    "section_send_b12_title": {
+    "section_send_b13_title": {
       "en": "What you type is kept",
       "ja": "書きかけは消えません"
     },
-    "section_send_b12_body": {
+    "section_send_b13_body": {
       "en": "Text you have typed in the prompt box stays when the card redraws, and each robot has its own: open another robot's card and come back, and your unsent text is there again. It is cleared when you send it, and kept only while the page is open.",
       "ja": "プロンプトの入力欄に書いた文は、カードが描き直されても消えません。書きかけはロボットごとに別々で、ほかのロボットのカードを開いて戻ってくると、送っていない文がまた出ます。送ると消え、覚えているのはページを開いている間だけです。"
     },
-    "section_send_b13_since": {
+    "section_send_b14_since": {
       "en": "from 2.3.7",
       "ja": "2.3.7 から"
     },
-    "section_send_b13_title": {
+    "section_send_b14_title": {
       "en": "Hiding the note above the field",
       "ja": "入力欄の上の説明を消す"
     },
-    "section_send_b13_body": {
+    "section_send_b14_body": {
       "en": "The --channels note above the field can be closed with ×. It then stays hidden on every card; Settings (設定) › Show the card notes again (カードの説明をまた出す) brings it back. The reason a field is disabled cannot be closed.",
       "ja": "入力欄の上の --channels の説明は × で消せます。ほかのカードでも出なくなり、設定の「カードの説明をまた出す」で戻ります。無効の理由は消せません。"
     },
@@ -15861,8 +15873,8 @@
       "ja": "添付しても許可は広がりません"
     },
     "section_attach_b3_body": {
-      "en": "jui viz does not widen the receiving session's permissions. The file is outside its working folder, so unless your own settings allow the Read, a permission prompt appears.",
-      "ja": "jui viz は受け手の許可を広げません。作業フォルダの外のファイルなので、あなたの設定が Read を許していなければ、許可の確かめが出ます。"
+      "en": "jui viz does not widen the receiving session's permissions. The file is outside its working folder, so unless your own settings allow the Read, a permission prompt appears. jsonui-cli measured on Claude Code 2.1.318 that auto mode does not ask for this Read, and that default and acceptEdits do.",
+      "ja": "jui viz は受け手の許可を広げません。作業フォルダの外のファイルなので、あなたの設定が Read を許していなければ、許可の確かめが出ます。jsonui-cli が Claude Code 2.1.318 で測ったところ、auto モードではこの Read は聞かれず、default と acceptEdits では聞かれます。"
     },
     "section_attach_b4_since": {
       "en": "from 2.3.9",
@@ -16607,7 +16619,7 @@
       "ja": "札の欄を広げる"
     },
     "section_history_tab_b3_body": {
-      "en": "A button next to the one that widens the card gives the cards and the prompt box the height they need and leaves the rest to the history; pressed again it goes back. The choice is kept in this browser (from 2.3.13).\n\nFrom 2.3.20 each of these buttons says what grows: ▲ Grow this box of cards upwards to see them all (the history gets thin) (▲ この札の欄を上へ広げて、全部見る（履歴は細くなる）) and ▼ This box of cards back to its height (more history) (▼ この札の欄を元の高さに戻す（履歴を広く）), beside ↔ Card to full screen (↔ カードを全画面に) and ↔ Card back to its width (↔ カードを元の幅に). Before, they read Expand the bottom (下を広げる), Normal height (元の高さに戻す), Widen (広げる) and Normal width (元の幅に戻す).",
+      "en": "A button next to the one that widens the card gives the cards and the prompt box the height they need and leaves the rest to the history; pressed again it goes back. The choice is kept in this browser (from 2.3.13).\n\nFrom 2.3.20 each of these buttons says what grows: ▲ Grow this box to see all cards (less history) (shorter from 2.5.3) (▲ この札の欄を上へ広げて、全部見る（履歴は細くなる）) and ▼ This box of cards back to its height (more history) (▼ この札の欄を元の高さに戻す（履歴を広く）), beside ↔ Card to full screen (↔ カードを全画面に) and ↔ Card back to its width (↔ カードを元の幅に). Before, they read Expand the bottom (下を広げる), Normal height (元の高さに戻す), Widen (広げる) and Normal width (元の幅に戻す).",
       "ja": "カードを広げるボタンの横のボタンで、札と入力欄が要るだけの高さを取り、残りを履歴に回します。もう一度押すと戻り、どちらにしたかはこのブラウザが覚えます（2.3.13 から）。\n\n2.3.20 からは、どちらのボタンも何が広がるかを言います。「▲ この札の欄を上へ広げて、全部見る（履歴は細くなる）」と「▼ この札の欄を元の高さに戻す（履歴を広く）」、その横に「↔ カードを全画面に」と「↔ カードを元の幅に」です。それより前は「下を広げる」「元の高さに戻す」「広げる」「元の幅に戻す」でした。"
     },
     "section_history_tab_b4_since": {
@@ -16631,7 +16643,7 @@
       "ja": "札をたたんで履歴を読む"
     },
     "section_history_tab_b5_body": {
-      "en": "When cards wait in the box, a bar on top reads ▼ Close to one line and read the history above (1 permission(s)) (from 2.3.26; ▼ Fold these cards and read the history above before). Press it and the box folds to one line, ▲ Open and answer (1 question(s), 1 permission(s)), followed by the first question's words, or the first permission's, and the history gets the height. Folded cards are only hidden: what you typed or picked in them stays. The bar stays in view while the box scrolls.\n\nThe fold is per robot. A new wait while folded keeps it folded: the bar counts it and stays marked until you open it (it moves once, not with reduced motion). The fold you choose holds while an answer is on its way, and is forgotten when nothing waits any more, so the next question or permission comes open. While folded, the button that grows the box is hidden.",
+      "en": "When cards wait in the box, a bar on top reads ▼ Close to one line (1 permission(s)). The English is this short from 2.5.3; from 2.3.26 it read ▼ Close to one line and read the history above, and before that ▼ Fold these cards and read the history above. Press it and the box folds to one line, ▲ Open and answer (1 question(s), 1 permission(s)), followed by the first question's words, or the first permission's, and the history gets the height. Folded cards are only hidden: what you typed or picked in them stays. The bar stays in view while the box scrolls.\n\nThe fold is per robot. A new wait while folded keeps it folded: the bar counts it and stays marked until you open it (it moves once, not with reduced motion). The fold you choose holds while an answer is on its way, and is forgotten when nothing waits any more, so the next question or permission comes open. While folded, the button that grows the box is hidden.",
       "ja": "箱に札が待っていると、上に「▼ 閉じて 1 行にし、上の履歴を読む（許可 1 件）」の帯が出ます（2.3.26 から。前は「▼ この質問の欄をたたんで、上の履歴を読む」）。押すと箱が 1 行の「▲ 開いて答える（質問 1 件・許可 1 件）」にたたまれ、その後ろに最初の質問の文か、最初の許可の内容が続きます。空いた高さは履歴に回ります。たたんだ札は隠れるだけで、書いたことや選んだものは残ります。箱をスクロールしても帯は見えたままです。\n\nたたむのはロボットごとです。たたんでいる間に新しい待ちが来ても開かず、帯の数が増えて、開くまで印が付いたままになります（一度だけ動きます。動きを減らす設定では動きません）。選んだ開け閉めは、答えを送っている間も保たれ、待っているものが無くなると忘れられます。次の質問や許可は開いた状態で出ます。たたんでいる間は、箱を広げるボタンは出ません。"
     },
     "section_history_tab_b6_alt": {
@@ -18545,16 +18557,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.5.2",
-      "ja": "2.5.2 でまだできないこと"
+      "en": "Not in 2.5.3",
+      "ja": "2.5.3 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.5.2",
-      "ja": "2.5.2 でまだできないこと"
+      "en": "Not in 2.5.3",
+      "ja": "2.5.3 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",

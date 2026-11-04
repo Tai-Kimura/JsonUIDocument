@@ -1011,14 +1011,17 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .h-newer { position: sticky; bottom: 0; justify-self: center; padding: 5px 14px; border: 0; border-radius: 999px; background: var(--info); color: var(--bg); font: 700 12px/1.4 var(--font-body); box-shadow: 0 2px 8px rgba(0, 0, 0, .25); cursor: pointer; }
 .h-newer[hidden] { display: none; }
 /* the session's cards on the 応答の履歴 tab (55-history.js histCardsPaint): over the prompt box, a scroll of their own */
-.h-cards { display: grid; gap: 8px; max-height: min(30vh, 260px); overflow-y: auto; padding: 8px 14px; border-top: 1px solid var(--line); background: var(--panel); }
+.h-cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; max-height: min(30vh, 260px); overflow-y: auto; padding: 8px 14px; border-top: 1px solid var(--line); background: var(--panel); }
 .h-cards[hidden] { display: none; }
 .h-fold { position: sticky; top: -8px; z-index: 1; display: flex; flex-wrap: nowrap; align-items: center; gap: 2px 8px; width: 100%; margin: 0; padding: 4px 10px; border: 1px dashed #7a4b00; border-radius: 8px; background: var(--warn-bg); color: var(--ink); font: 700 12px/1.5 var(--font-body); text-align: left; cursor: pointer; }
 .h-fold:hover, .h-fold:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
 .h-fold-count { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .h-fold-text { flex: 1; min-width: 0; overflow: hidden; color: var(--ink-soft); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+/* minmax(0, 1fr): the bar's words no longer set the column. A long one (three kinds, or English) widened it and the box slid
+   sideways, cutting the cards' left. Open, the bar wraps so its counts are read; folded it stays one line. */
+.h-fold[data-h-fold="close"] .h-fold-count { white-space: normal; }
 .h-cards.h-folded { overflow: hidden; padding-bottom: 8px; }
-.h-cards:has(> .h-fold) { scroll-padding-top: 44px; }   /* a field scrolled to or clicked lands under the bar, never behind it */
+.h-cards:has(> .h-fold) { scroll-padding-top: 62px; }   /* a field scrolled to or clicked lands under the bar, never behind it */
 .h-cards.h-folded > :not(.h-fold) { display: none; }   /* folded: the cards stay in the page, what was typed in them too */
 @keyframes h-fold-new { 0% { box-shadow: inset 0 0 0 0 rgba(255, 176, 32, 0.9); } 50% { box-shadow: inset 0 0 0 3px rgba(255, 176, 32, 0.9); } 100% { box-shadow: none; } }
 .h-fold.h-fold-new { animation: h-fold-new 0.8s ease-out 1; }
@@ -1030,14 +1033,17 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
    history's least height is its row's: a min-height on the pane alone left the row shorter and the pane ran 41 px
    under the cards, the newest rows hidden there (measured 10-21, a 900 px window). Short of room the cards give way
    first (their own scroll). 下を広げる: the cards their full height, the history a strip (its padding and a line). */
-.rb.rb-histtab:not(.rb-talking) { grid-template-rows: auto auto minmax(120px, 1fr) minmax(0, max-content) auto; }
+.rb.rb-histtab:not(.rb-talking) { grid-template-rows: auto auto minmax(120px, 1fr) minmax(var(--rb-cards-min, 0px), max-content) auto; }
 .rb.rb-histtab:not(.rb-talking) > .rb-hist { grid-row: 3; min-height: 0; }
 .rb.rb-histtab:not(.rb-talking) > .h-low { grid-area: 4 / 1; align-self: start; position: relative; z-index: 2; margin-top: -26px; }   /* in the cards' row, pulled up over the history's bottom edge: no row or gap of its own, the cards keep all their height */
 .rb.rb-histtab:not(.rb-talking):has(> .h-low:not([hidden])) > .rb-hist { padding-bottom: 44px; }   /* the newest line clears the handle */
 .rb.rb-histtab:not(.rb-talking):has(> .h-low:not([hidden])) .h-newer { bottom: 30px; }
 .rb.rb-histtab:not(.rb-talking) > .h-cards { grid-area: 4 / 1; }   /* the column too: two items in one row would open a second column */
 .rb.rb-histtab:not(.rb-talking) > .h-compose { grid-row: 5; }
-.rb.rb-histtab.rb-low:not(.rb-talking) { grid-template-rows: auto auto minmax(56px, 1fr) minmax(0, max-content) auto; }
+.rb.rb-histtab.rb-low:not(.rb-talking) { grid-template-rows: auto auto minmax(56px, 1fr) minmax(var(--rb-cards-min, 0px), max-content) auto; }
+@media (max-width: 900px) {   /* a short phone: the card scrolls, so the cards keep a height to answer in rather than give way to nothing */
+  .rb:has(> .h-cards:not([hidden], .h-folded)) { --rb-cards-min: 88px; }
+}
 .rb.rb-low .h-cards { max-height: none; }
 .h-compose { display: grid; gap: 6px; padding: 8px 14px 12px; border-top: 1px solid var(--line); background: var(--panel); }
 .h-compose[hidden], .h-confirm[hidden], .h-compose-why[hidden] { display: none; }
@@ -1086,6 +1092,10 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .h-who { display: flex; gap: 8px; margin: 0 0 2px; color: var(--ink-soft); font: 700 11px/1.4 var(--font-body); }
 .h-at { color: var(--ink-soft); font: 500 11px/1.4 var(--font-mono); }
 .h-plain { margin: 0; white-space: pre-wrap; }
+.h-long-note { margin: 0 0 4px; color: var(--ink-soft); font: 700 11.5px/1.5 var(--font-body); overflow-wrap: anywhere; }
+.h-long-head { overflow-wrap: anywhere; }
+.h-long-open { max-height: 60vh; overflow: auto; }
+.h-long-more { margin-top: 4px; font: 700 11.5px/1.5 var(--font-body); color: inherit; background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
 .h-md { display: grid; gap: 6px; line-height: 1.6; }
 .h-md p, .h-md .h-h, .h-md .h-list, .h-md blockquote { margin: 0; }
 .h-md .h-list { padding-left: 1.3em; }
@@ -1116,14 +1126,17 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 .h-item .h-at, .h-who > *, .h-tool summary > .h-err, .h-tool summary > .h-run { flex: none; white-space: nowrap; overflow-wrap: normal; }
 .h-who { white-space: nowrap; overflow-wrap: normal; }   /* 依頼者 is a bare text node in the row: the row itself keeps it whole */
 .h-tool summary > b, .h-harness summary > b, .h-peer summary > b { flex: 0 1 auto; min-width: 3em; max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; overflow-wrap: normal; }
-.h-item summary > .h-head { flex: 1 1 0; }   /* the body narrows first: the labels get their own width before it */
+.h-item summary > .h-head { flex: 1 1 0; min-width: 3em; }   /* the body narrows first: the labels get their own width before it */
 /* A message from another session reads top to bottom (requester 10-19, issue #34): the sender, then the body, then
    the time, each on its own line. The sender takes the row's width (cut with … if longer still); the body wraps, up to
    three lines folded — the whole text is in the opened item. */
 .h-peer summary { flex-direction: column; align-items: stretch; gap: 2px; }
 .h-peer summary > b { max-width: none; }
 /* SendMessage's recipient and a received message's sender (2.3.6): a robot here is a link-like button */
-.h-tool summary > .h-to { flex: none; max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-soft); }
+.h-tool summary > .h-to { display: inline-flex; align-items: baseline; gap: 0.3em; flex: 0 1 auto; min-width: 5em; max-width: 45%; overflow: hidden; white-space: nowrap; color: var(--ink-soft); }
+/* The name gives way before the summary vanishes, and a long name is cut inside its own link: a button cannot be split by the
+   line's ellipsis, so the whole link used to turn into "…" with nothing to press. */
+.h-tool summary > .h-to > * { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .h-peerlink { padding: 0; border: 0; background: none; font: inherit; color: var(--info); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
 .h-peerlink:hover { text-decoration-thickness: 2px; }
 .h-peerlink:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-radius: 3px; }
@@ -1268,7 +1281,7 @@ details.h-item[open] > :not(summary) :is(a[href], button, img, .h-thumb) { curso
   #ticker .kind { display: none; }
   .wb { position: fixed; z-index: 40; padding: 6px; }
   .wb-frame { border-width: 6px; }
-  .rb { position: fixed; inset: auto 0 0 0; z-index: 40; width: 100%; max-height: 70vh; border-radius: 16px 16px 0 0; transform: translateY(16px); }
+  .rb { position: fixed; inset: auto 0 0 0; z-index: 40; width: 100%; max-height: 70vh; max-height: min(70vh, max(100dvh - var(--topbar-h, 0px), 40vh)); overflow: hidden auto; border-radius: 16px 16px 0 0; transform: translateY(16px); }   /* stops under the header, whose buttons wrap to more lines on a phone (--topbar-h, 50-panel.js), and keeps 40% of the screen for itself; what does not fit on a short phone scrolls in the card, Send included */
   .toast { bottom: 24px; }
 }
 
@@ -1466,7 +1479,7 @@ details.h-item[open] > :not(summary) :is(a[href], button, img, .h-thumb) { curso
 .rb-tabs .rb-wide-btn { order: 2; margin: 0 0 4px auto; align-self: center; padding: 3px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font: 700 12px/1.5 var(--font-body); }
 .rb-tabs .rb-wide-btn[aria-pressed="true"] { border-color: var(--info); background: var(--info); color: var(--panel); }
 /* the cards box's handle (55-history.js histSync): a row of its own on the box's top edge, outside the box's scroll */
-.h-low { display: block; box-sizing: border-box; width: 100%; height: 26px; padding: 3px 12px; border: 0; border-top: 1px solid var(--line); border-bottom: 1px dashed var(--info); background: var(--info-bg); color: var(--info); font: 700 12px/1.5 var(--font-body); text-align: center; cursor: pointer; }
+.h-low { display: block; box-sizing: border-box; width: 100%; height: 26px; padding: 3px 12px; border: 0; border-top: 1px solid var(--line); border-bottom: 1px dashed var(--info); background: var(--info-bg); color: var(--info); font: 700 12px/1.5 var(--font-body); text-align: center; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }   /* one line whatever the words: the layout counts on its 26 px (the pull over the history, the history's padding, the newer button) */
 .h-low[hidden] { display: none; }
 .h-low:hover, .h-low:focus-visible { background: var(--bg); outline: 2px solid var(--info); outline-offset: -2px; }
 /* Wide, the head is one row (requester 10-19, issue #36): the mark and the name on the left, ‹ › 「← 3D に戻る」 and 退勤
