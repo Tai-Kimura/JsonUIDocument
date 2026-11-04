@@ -15981,8 +15981,8 @@
       "ja": "ロボットのカードで「退勤…」を押します。"
     },
     "section_clock_out_b0_s2": {
-      "en": "Confirm. The server sends that session's claude one SIGTERM, and the robot walks out of the door.",
-      "ja": "確認します。サーバーがそのセッションの claude に SIGTERM を 1 回だけ送り、ロボットはドアから出ていきます。"
+      "en": "Confirm. The server sends that session's claude one SIGTERM (a background session: it runs claude stop once, with no signal), and the robot walks out of the door.",
+      "ja": "確認します。サーバーがそのセッションの claude に SIGTERM を 1 回だけ送り（裏のセッションには合図を送らず、claude stop を 1 回だけ実行します）、ロボットはドアから出ていきます。"
     },
     "section_clock_out_b1_since": {
       "en": "from 2.3.4",
@@ -15993,20 +15993,32 @@
       "ja": "退勤させられるもの"
     },
     "section_clock_out_b1_body": {
-      "en": "Only terminal sessions can be ended this way, after checking the process again just before. Never a subagent, jui viz itself, the VS Code extension or the desktop app.\n\nA Codex session's Clock out (from 2.3.26) sends no signal: jui viz stops following its thread (see Codex sessions).",
-      "ja": "終わらせられるのは、送る直前にプロセスを照合し直したターミナルのセッションだけです。サブエージェント、jui viz 自身、VS Code 拡張、デスクトップアプリは終わらせません。\n\nCodex のセッションの退勤（2.3.26 から）は合図を送りません。jui viz がそのスレッドを追うのをやめます（「Codex のセッション」を参照）。"
+      "en": "Only sessions started in a terminal can be ended this way, after checking the process again just before. From 2.5.2 that includes a background session (below). Never a subagent, jui viz itself, the VS Code extension or the desktop app.\n\nA Codex session's Clock out (from 2.3.26) sends no signal: jui viz stops following its thread (see Codex sessions).",
+      "ja": "終わらせられるのは、送る直前にプロセスを照合し直した、ターミナルで始めたセッションだけです。2.5.2 からは裏のセッションも入ります（下を参照）。サブエージェント、jui viz 自身、VS Code 拡張、デスクトップアプリは終わらせません。\n\nCodex のセッションの退勤（2.3.26 から）は合図を送りません。jui viz がそのスレッドを追うのをやめます（「Codex のセッション」を参照）。"
     },
     "section_clock_out_b2_since": {
+      "en": "from 2.5.2",
+      "ja": "2.5.2 から"
+    },
+    "section_clock_out_b2_title": {
+      "en": "A background session",
+      "ja": "裏のセッション"
+    },
+    "section_clock_out_b2_body": {
+      "en": "A background session is one the claude daemon runs, started by claude --bg or similar. Until 2.5.1 Clock out refused it. From 2.5.2 its card has a background (裏のセッション) mark, which tells it from a terminal's session of the same name, and the dialog's Client (クライアント) row says Background session (claude --bg).\n\nClock out runs claude stop <job id> once and sends no signal: jsonui-cli measured on Claude Code 2.1.317 that a session ended by SIGTERM is started again by the daemon about 10 s later, every time. Work in progress stops there. The conversation is kept, and claude attach <job id> opens it again.\n\n• claude stop can answer before the process has gone, so the session counts as ended only when the process has gone. Within 6 s the event log reads Clock-out (claude stop) → <robot> (pid n) ended. After that the page says it did not end, and nothing more is sent.\n• If claude stop fails, or claude is not on the server's PATH, the clock-out is refused with what it said, for example claude stop <job id>: No job matching. No signal is sent instead.\n• An entry without a whole job id is refused, because claude stop matches prefixes. A background entry from the VS Code extension or the desktop app is refused like any other from those clients.\n\nMeasured on 2.5.2: the shipped checks and clock-out code, with ps and claude stop replaced by stand-ins, in each case above; no signal was sent in any of them. 2.5.1's check on the same entry answers 409, not an interactive session. Not measured here: a real background session, and the mark and the dialog in a browser.",
+      "ja": "裏のセッションは、claude --bg などで始まり、claude のデーモンが動かしているセッションです。2.5.1 までは「退勤」が断っていました。2.5.2 からは、カードに「裏のセッション」の印が付き、同じ名前のターミナルのセッションと見分けられます。確認の画面の「クライアント」の行には「裏のセッション（claude --bg）」と出ます。\n\n「退勤」は claude stop <ジョブ ID> を 1 回だけ実行し、合図は送りません。jsonui-cli が Claude Code 2.1.317 で測ったところ、SIGTERM で落としても、デーモンが約 10 秒後に毎回起こし直すからです。途中の作業はそこで止まります。会話は残り、claude attach <ジョブ ID> で戻せます。\n\n• claude stop はプロセスが消える前に答えることがあるので、プロセスが消えて初めて終わったとみなします。6 秒以内なら、イベントログに「退勤（claude stop）→ <ロボット>（pid n） 終わった」と出ます。過ぎると「終わらなかった」と出すだけで、それ以上は何も送りません。\n• claude stop が失敗したとき、サーバーの PATH に claude が無いときは、その言葉を添えて断ります（例: claude stop <ジョブ ID>: No job matching）。代わりに合図を送ることはありません。\n• claude stop は前方一致で探すので、ジョブ ID が完全な形でないエントリは断ります。VS Code 拡張やデスクトップアプリの裏のエントリは、それらのクライアントのほかのものと同じく断ります。\n\n2.5.2 で測ったこと: 出荷された照合と退勤のコードを、ps と claude stop を身代わりにして、上のそれぞれの場合で動かしました。どの場合も合図は送られませんでした。同じエントリに 2.5.1 の照合は 409、not an interactive session と答えます。ここで測っていないこと: 本物の裏のセッション、印と確認の画面のブラウザでの見た目。"
+    },
+    "section_clock_out_b3_since": {
       "en": "from 2.3.26",
       "ja": "2.3.26 から"
     },
-    "section_clock_out_b2_title": {
+    "section_clock_out_b3_title": {
       "en": "A session that ended without saying so",
       "ja": "終わったと言わずに終わったセッション"
     },
-    "section_clock_out_b2_body": {
-      "en": "A claude killed without its SessionEnd (closed with its terminal, say) used to stay in the room. From 2.3.26 the server ends it once it is gone both from `claude agents --json` and from every ~/.claude/sessions entry; one of the two alone ends nothing, and neither does a list that could not be read. The log reads Clock out (process gone). It needs the server's reading of `claude agents --json`, which --no-agents-poll turns off.\n\nClock out on such a session, whose entry and process are both gone, takes it out without sending anything.",
-      "ja": "SessionEnd を出さずに殺された claude（ターミナルごと閉じたものなど）は、部屋に残ったままでした。2.3.26 からは、`claude agents --json` からも ~/.claude/sessions のどのエントリからも消えたところで、サーバーがそのセッションを終わらせます。片方だけでは終わらせず、読めなかった一覧でも終わらせません。ログには「退勤 (process gone)」と出ます。サーバーが `claude agents --json` を読んでいることが要り、--no-agents-poll にすると働きません。\n\nエントリもプロセスも無くなったそのようなセッションで「退勤」を押すと、何も送らずに部屋から出します。"
+    "section_clock_out_b3_body": {
+      "en": "A claude killed without its SessionEnd (closed with its terminal, say) used to stay in the room. From 2.3.26 the server ends it once it is gone both from `claude agents --json` and from every ~/.claude/sessions entry; one of the two alone ends nothing, and neither does a list that could not be read. The log reads Clock out (process gone). It needs the server's reading of `claude agents --json`, which --no-agents-poll turns off.\n\nClock out on such a session, whose entry and process are both gone, takes it out without sending anything. From 2.5.2 a background session is the exception: with its entry gone the daemon may still mean to start it again, so claude stop runs on the job id the server last saw.",
+      "ja": "SessionEnd を出さずに殺された claude（ターミナルごと閉じたものなど）は、部屋に残ったままでした。2.3.26 からは、`claude agents --json` からも ~/.claude/sessions のどのエントリからも消えたところで、サーバーがそのセッションを終わらせます。片方だけでは終わらせず、読めなかった一覧でも終わらせません。ログには「退勤 (process gone)」と出ます。サーバーが `claude agents --json` を読んでいることが要り、--no-agents-poll にすると働きません。\n\nエントリもプロセスも無くなったそのようなセッションで「退勤」を押すと、何も送らずに部屋から出します。2.5.2 からは裏のセッションだけ別で、エントリが無くてもデーモンが起こし直すことがあるので、サーバーが最後に見たジョブ ID に claude stop を実行します。"
     },
     "toc_row_clock_out": {
       "en": "Clock a session out",
@@ -18533,16 +18545,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.5.1",
-      "ja": "2.5.1 でまだできないこと"
+      "en": "Not in 2.5.2",
+      "ja": "2.5.2 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.5.1",
-      "ja": "2.5.1 でまだできないこと"
+      "en": "Not in 2.5.2",
+      "ja": "2.5.2 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
@@ -19127,7 +19139,7 @@
       "ja": "ホワイトボードには、状態ごとに 1 列あります: やり取り中 → 下書き → 開始待ち → 作業中 → 作業終了 → 完了。"
     },
     "section_board_b1_text": {
-      "en": "• Talking: the robot judged the exchange not settled yet. It, or you, raises it to Draft.\n• On a Draft or Ready note you edit the title and the prompt in place, and choose the session it goes to. Save (保存) keeps it. A prompt you changed is marked, and the robot leaves it; messages that came after your change are listed on the note.\n• Start (開始) sends the prompt to the chosen session and moves the note to Working. Only a session started with the jui-viz channel takes it. A session that cannot says why, and the note offers the command to start one.\n• Working becomes Ended once that session was seen at work and is idle again, or has gone. You move it to Done.\n• The State (状態) select moves a note to any state at once. It sends nothing, and a note moved this way is no longer followed to Ended.\n• Ask for a change (直しを頼む) sends your words to the robot, which rewrites that task.\n• A note's messages open in a side panel, each with Open in Slack (Slack で開く). Whole board (ボード全体) lays the six lanes over the room without shrinking them, and from 2.5.0 a lane's heading shows that lane alone, a note's prompt opens large in a popup, and the arrow keys move between notes. See Set up the Slack intake.",
+      "en": "• Talking: the robot judged the exchange not settled yet. It, or you, raises it to Draft.\n• On a Draft or Ready note you edit the title and the prompt in place, and choose the session it goes to. Save (保存) keeps it. A prompt you changed is marked, and the robot leaves it; messages that came after your change are listed on the note.\n• Start (開始) sends the prompt to the chosen session and moves the note to Working. Only a session started with the jui-viz channel takes it. A session that cannot says why, and the note offers the command to start one.\n• Working becomes Ended once that session was seen at work and is idle again, or has gone. You move it to Done.\n• The State (状態) select moves a note to any state at once. It sends nothing, and a note moved this way is no longer followed to Ended.\n• Ask to edit (直しを頼む) sends your words to the robot, which rewrites that task.\n• A note's messages open in a side panel, each with Open in Slack (Slack で開く). Whole board (ボード全体) lays the six lanes over the room without shrinking them, and from 2.5.0 a lane's heading shows that lane alone, a note's prompt opens large in a popup, and the arrow keys move between notes. See Set up the Slack intake.",
       "ja": "• やり取り中: やり取りがまだ続いていて結論が出ていない、とロボットが判断したタスク。ロボットかあなたが下書きに上げます。\n• 下書きと開始待ちのメモ紙では、題とプロンプトをその場で直し、送り先のセッションを選べます。「保存」で残ります。手で直したプロンプトには印が付き、ロボットは書き換えません。直した後に届いたメッセージはメモ紙に並びます。\n• 「開始」は、選んだセッションにプロンプトを送り、メモ紙を作業中へ移します。受け取れるのは jui-viz のチャンネル付きで起動したセッションだけです。受け取れないセッションには理由が出て、メモ紙から起動のコマンドをコピーできます。\n• 作業中は、そのセッションが働いているのを一度見て、また手が空いたとき（または居なくなったとき）に作業終了になります。完了へはあなたが移します。\n• 「状態」の選択で、メモ紙をどの状態にもすぐ移せます。何も送りません。こうして移したメモ紙は、作業終了への追跡から外れます。\n• 「直しを頼む」は、あなたの言葉をロボットに送り、ロボットがそのタスクを書き直します。\n• メモ紙のメッセージは横の欄に開き、それぞれに「Slack で開く」があります。「ボード全体」は 6 つの列を縮めずに部屋の上に広げます。2.5.0 からは、列の見出しでその列だけを出し、メモ紙のプロンプトはポップアップで大きく開き、矢印キーでメモ紙の間を動けます。「Slack 連携の手順」を見てください。"
     },
     "section_board_b2_text": {
@@ -19441,7 +19453,7 @@
       "ja": "メモ紙"
     },
     "section_room_b5_text": {
-      "en": "• A note shows its id and state, the title, its project, and the first lines of its prompt. Press the prompt to open it whole in a large popup: on a Draft or Ready note you edit it there (⌘Enter saves); after it was sent it is read only.\n• When the robot rewrote the note while you were looking, it says There is newer content (press to reload; what you typed is dropped).\n• Choose the session it goes to, then Start (開始). Ask for a change (直しを頼む) opens a popup for your words to the robot.\n• The note's messages open in a side panel, each with Open in Slack.",
+      "en": "• A note shows its id and state, the title, its project, and the first lines of its prompt. Press the prompt to open it whole in a large popup: on a Draft or Ready note you edit it there (⌘Enter saves); after it was sent it is read only.\n• When the robot rewrote the note while you were looking, it says There is newer content (press to reload; what you typed is dropped).\n• Choose the session it goes to, then Start (開始). Ask to edit (直しを頼む) opens a popup for your words to the robot.\n• The note's messages open in a side panel, each with Open in Slack.",
       "ja": "• メモ紙には、id と状態、題、プロジェクト、プロンプトの初めの数行が出ます。プロンプトを押すと、大きいポップアップで全体が開きます。下書きと開始待ちならそこで直せます（⌘Enter で保存）。送った後は読むだけです。\n• 見ている間にロボットが書き直すと、「新しい中身があります（押して読み直す。打った分は消えます）」と出ます。\n• 送り先のセッションを選び、「開始」を押します。「直しを頼む」は、ロボットへの言葉を書くポップアップを開きます。\n• メモ紙のメッセージは横の欄に開き、それぞれに「Slack で開く」があります。"
     },
     "section_room_b6_text": {

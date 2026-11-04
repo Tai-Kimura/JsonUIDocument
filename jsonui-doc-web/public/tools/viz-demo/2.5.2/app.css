@@ -219,7 +219,9 @@ body { background: var(--bg); color: var(--ink); font-family: var(--font-body); 
 .topbar-title .usage { flex-wrap: wrap; min-width: 0; max-width: 100%; }
 .topbar-menu .scope-top { max-width: min(280px, 100%); }
 .topbar-menu .chips { flex: 1 1 480px; align-items: center; min-width: 0; }
-.topbar-menu .controls { flex-shrink: 0; }
+.topbar-menu .controls { flex-shrink: 0; max-width: 100%; }
+/* max-width: flex-shrink 0 keeps the buttons from giving way to the chips, but it also held them on one line wider than a
+   phone: 4 English buttons are 384 px, so the page scrolled sideways once the Slack button came. Capped, they wrap. */
 .brand { margin: 0; font: 400 18px/1.3 var(--font-display); letter-spacing: 0.02em; white-space: nowrap; }
 .cloth { display: inline-block; margin-right: 0.25em; padding: 0 0.3em 0.05em; background: var(--cloth); color: var(--cloth-ink); border: 2px solid var(--cloth-ink); transform: rotate(-2deg); }
 .chips { display: flex; flex: 1 1 auto; flex-wrap: wrap; gap: 6px; }
@@ -997,6 +999,7 @@ body:not([data-scope="all"]) .scope-btn[data-scope-btn] { border-color: var(--in
 /* the session's model (30-source-live.js llm), and the mark of a local one (LM Studio / Ollama, codex --oss) */
 .rb-model { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 2px 0 0; color: var(--ink-soft); font: 500 11px/1.5 var(--font-mono); overflow-wrap: anywhere; }
 .rb-local { padding: 0 5px; border: 1.5px solid var(--ok); border-radius: 4px; color: var(--ok); font: 700 9.5px/1.5 var(--font-mono); }
+.rb-bg { padding: 0 5px; border: 1.5px solid var(--ink-soft); border-radius: 4px; color: var(--ink-soft); font: 700 9.5px/1.5 var(--font-mono); }
 .rb-body { display: grid; align-content: start; gap: 16px; min-height: 0; overflow-y: auto; padding: 12px 14px 20px; }
 .rb-body[hidden] { display: none; }
 .rb-tabs { display: flex; gap: 4px; padding: 6px 14px 0; border-bottom: 1px solid var(--line); }
@@ -2193,6 +2196,12 @@ body.sd-on { overflow: hidden; }
 .sf-edit-box textarea { min-height: min(60vh, 34em); font-size: 14px; }
 .sf-edit-box textarea[readonly] { background: var(--panel); }
 .sf-note .wb-btn { white-space: normal; }
+/* a note's actions at its narrowest (108 px inside, a 1280 px window or less): 保存 and 開始 on one row in either language, 開始 at
+   its right; the spacer's own two gaps were what broke the row. 直しを頼む keeps to one line */
+.sf-note .sf-note-acts { flex-wrap: nowrap; gap: 4px; }
+.sf-note-acts .grow { display: none; }
+.sf-note-acts [data-sf-op="start"] { margin-left: auto; }
+.sf-note .sf-note-acts .wb-btn, .sf-note .sf-revise-open { padding-left: 7px; padding-right: 7px; }
 
 /* ---- the sorting factory's left column: the fetch bar fixed, two tabs (the requester, 11-02) ---- */
 .sf-fetchbar { flex: none; padding: 8px 12px 6px; border-top: 1px solid var(--line); background: var(--panel); font: 13px/1.5 var(--font-body); }
