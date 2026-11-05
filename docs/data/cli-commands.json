@@ -1514,7 +1514,7 @@
     {
       "binary": "jui",
       "command": "conformance baseline update",
-      "synopsis": "jui conformance baseline update --platform ios|android|web [--dir DIR] [--artifacts DIR] [--env ENV] [--only-new] [--fail-on-moved] [--rendered-by NAME=SHA] [--threshold T]",
+      "synopsis": "jui conformance baseline update --platform ios|android|web [--dir DIR] [--artifacts DIR] [--env ENV] [--only-new] [--fail-on-moved] [--take SCREENSHOT.png] [--drop SCREENSHOT.png] [--rehash] [--rendered-by NAME=SHA] [--threshold T]",
       "purpose": {
         "en": "Hash artifacts/<platform>/*.png into baselines/<platform>.hashes.json (perceptual-hash screenshot baselines).",
         "ja": "artifacts/<platform>/*.png をハッシュ化して baselines/<platform>.hashes.json に記録（perceptual-hash ベースライン）。"
@@ -1571,8 +1571,35 @@
           "type": "flag",
           "default": "false",
           "description": {
-            "en": "Exit non-zero when a fixture that already had a baseline moved. Which of two behaviours you get is decided by the jui version the machine resolves, and by nothing else — not the flag, not a project setting. From jsonui-cli 1.8.85 the command refuses before writing, so the baseline file is left untouched; up to 1.8.84 it wrote the file first and chose the exit code afterwards, so a run stopped there had already replaced the baseline — restore it from version control before re-running, and do not read the non-zero exit as \"nothing was written\". Pairing this with `--only-new` turns the refusal off: that combination writes entries for fixtures that had no baseline, and only leaves the existing ones alone.",
-            "ja": "既に baseline を持つ fixture が動いていたら非ゼロで終わる。2 つの挙動のどちらになるかは、その機械が解決する jui の版だけで決まる — 旗でもプロジェクト設定でもない。jsonui-cli 1.8.85 以降は書き込みの前に拒否するので、baseline ファイルは動かない。1.8.84 までは先にファイルを書き、終了コードはその後で決めていたため、そこで止まった実行では既に baseline が置き換わっている — 再実行の前にバージョン管理から戻し、非ゼロ終了を「何も書かれていない」と読まないこと。`--only-new` と併用するとこの拒否は無効になる: その組み合わせでは baseline を持たない fixture の entry は書かれ、既存の entry だけが据え置かれる。"
+            "en": "Exit non-zero when a fixture that already had a baseline moved. Which of two behaviours you get is decided by the jui version the machine resolves, and by nothing else — not the flag, not a project setting. From jsonui-cli 1.8.85 the command refuses before writing, so the baseline file is left untouched; up to 1.8.84 it wrote the file first and chose the exit code afterwards, so a run stopped there had already replaced the baseline — restore it from version control before re-running, and do not read the non-zero exit as \"nothing was written\". Pairing this with `--only-new` turns the refusal off: that combination writes entries for fixtures that had no baseline, and only leaves the existing ones alone. From 2.5.5 an entry the run does not draw refuses too, because a partial artifacts folder reports moved 0 and would otherwise remove what it did not draw. A run that passes leaves the committed entries as they are: new entries are added, and with none the file is not written (`baseline not written, nothing to change`). Up to 2.5.4 a run reporting moved 0 still rewrote the whole file.",
+            "ja": "既に baseline を持つ fixture が動いていたら非ゼロで終わる。2 つの挙動のどちらになるかは、その機械が解決する jui の版だけで決まる — 旗でもプロジェクト設定でもない。jsonui-cli 1.8.85 以降は書き込みの前に拒否するので、baseline ファイルは動かない。1.8.84 までは先にファイルを書き、終了コードはその後で決めていたため、そこで止まった実行では既に baseline が置き換わっている — 再実行の前にバージョン管理から戻し、非ゼロ終了を「何も書かれていない」と読まないこと。`--only-new` と併用するとこの拒否は無効になる: その組み合わせでは baseline を持たない fixture の entry は書かれ、既存の entry だけが据え置かれる。2.5.5 からは、実行が描かなかった entry でも拒否する。artifacts の一部だけだと moved 0 と出て、描かなかった分を消してしまうからだ。通った実行は確定済みの entry を変えない。新しい entry だけを足し、無ければファイルを書かない（`baseline not written, nothing to change`）。2.5.4 までは moved 0 でもファイル全体を書き直していた。"
+          }
+        },
+        {
+          "name": "--take",
+          "type": "string",
+          "default": "",
+          "description": {
+            "en": "From 2.5.5. Write only this entry from the run (hash, vertical hash, ink); repeatable. Everything else stays as committed. With `--fail-on-moved`, an entry that moved or dropped and was not named still refuses. An entry that already matches, or one the run did not draw, is an error, and nothing is written. Does not combine with `--only-new` or `--rehash`.",
+            "ja": "2.5.5 から。この entry だけを実行の結果で書く（hash、vertical hash、ink）。繰り返し指定可。それ以外は確定済みのまま。`--fail-on-moved` と併用すると、指名していない moved・dropped の entry があれば拒否する。すでに一致している entry、実行が描かなかった entry はエラーで、何も書かない。`--only-new`、`--rehash` とは併用できない。"
+          }
+        },
+        {
+          "name": "--drop",
+          "type": "string",
+          "default": "",
+          "description": {
+            "en": "From 2.5.5. Remove only this entry, which the run no longer draws; repeatable. Everything else stays as committed. With `--fail-on-moved`, an entry that moved or dropped and was not named still refuses. An entry the run still drew, or one not in the baseline, is an error, and nothing is written. Does not combine with `--only-new` or `--rehash`.",
+            "ja": "2.5.5 から。実行が描かなくなったこの entry だけを消す。繰り返し指定可。それ以外は確定済みのまま。`--fail-on-moved` と併用すると、指名していない moved・dropped の entry があれば拒否する。まだ描かれている entry、baseline に無い entry はエラーで、何も書かない。`--only-new`、`--rehash` とは併用できない。"
+          }
+        },
+        {
+          "name": "--rehash",
+          "type": "flag",
+          "default": "false",
+          "description": {
+            "en": "Re-bake a baseline whose hashes another hashing library made. Its entries are listed as REHASHED instead of same or moved, because a distance across two hashers is not a measurement. Refused when the hasher did not change.",
+            "ja": "別のハッシュのライブラリが作った baseline を焼き直す。entry は same や moved ではなく REHASHED と出る。2 つのハッシュをまたぐ距離は測定にならないからだ。ハッシュのライブラリが変わっていなければ拒否する。"
           }
         },
         {

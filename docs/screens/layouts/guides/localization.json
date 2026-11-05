@@ -376,7 +376,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 8,
-                      "code": "{ \"languages\": [\"en\", \"ja\", \"ko\"], \"default_language\": \"en\" }",
+                      "code": "// rjui.config.json (Web)\n{ \"languages\": [\"en\", \"ja\", \"ko\"], \"default_language\": \"en\" }\n\n// sjui.config.json (iOS): paths under source_directory\n{ \"string_files\": [\"Localizable.strings\", \"ja.lproj/Localizable.strings\", \"ko.lproj/Localizable.strings\"] }\n\n// kjui.config.json (Android)\n{ \"string_files\": [\"res/values/strings.xml\", \"res/values-ja/strings.xml\", \"res/values-ko/strings.xml\"] }",
                       "language": "json",
                       "filename": "② jui.config.json",
                       "showLineNumbers": false,
@@ -396,7 +396,7 @@
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 8,
-                      "code": "jui build\n# → ja.lproj/ and ko.lproj/ appear for iOS\n# → res/values-ja/ and res/values-ko/ for Android\n# → StringManager.ts gets a `ko` branch",
+                      "code": "# iOS: the file must be there first, under source_directory\nmkdir -p ko.lproj && touch ko.lproj/Localizable.strings\n\njui build\n# → ko.lproj/Localizable.strings is filled for iOS\n# → res/values-ko/strings.xml is created for Android\n# → StringManager.ts gets a `ko` branch",
                       "language": "bash",
                       "filename": "③ shell",
                       "showLineNumbers": false,
@@ -419,6 +419,70 @@
                       "fontSize": 14,
                       "fontColor": "#475467",
                       "text": "section_new_lang_step5"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 24,
+                      "fontSize": 18,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_new_lang_tags_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_new_lang_tags_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_new_lang_tags_folders"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_new_lang_tags_which"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_new_lang_tags_chinese"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_new_lang_tags_warning"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_new_lang_tags_measured"
                     }
                   ]
                 },

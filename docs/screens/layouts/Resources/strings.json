@@ -8721,16 +8721,16 @@
       "ja": "機械的な作業のみ、schema 更新は不要です。BCP-47 コード (fr / de / zh-Hans / ko …) を決めて以下を実行:"
     },
     "section_new_lang_step1": {
-      "en": "① Add the locale to each object in strings.json. Plain-string keys fall through to their existing value at runtime, so you only add the third key where translation actually exists.",
-      "ja": "① strings.json の各オブジェクトに新 locale を追加。平文字列の key は既存値にフォールバックするので、実際に翻訳した箇所だけ 3 番目の key を足します。"
+      "en": "① Add the locale to each object in strings.json. Plain-string keys fall through to their existing value at runtime, so you only add the third key where translation actually exists. An object with no text for the new code shows another language's text; from jsonui-cli 2.5.5 the build says so (below).",
+      "ja": "① strings.json の各オブジェクトに新 locale を追加。平文字列の key は既存値にフォールバックするので、実際に翻訳した箇所だけ 3 番目の key を足します。新しいコードの文が無いオブジェクトは別の言語の文を出します。jsonui-cli 2.5.5 からは build がそれを知らせます（下）。"
     },
     "section_new_lang_step2": {
-      "en": "② Add the code to languages[] in the platform configs (jui.config.json / sjui.config.json / kjui.config.json / rjui.config.json) so the generators know to produce the locale's output files.",
-      "ja": "② 各プラットフォームの config (jui.config.json / sjui.config.json / kjui.config.json / rjui.config.json) の languages[] にコードを追加。これでジェネレータが locale 用の出力ファイルを作ります。"
+      "en": "② Name the output. Web: add the code to languages[] in rjui.config.json. iOS and Android: add the output's path to string_files in sjui.config.json and kjui.config.json, such as ko.lproj/Localizable.strings and res/values-ko/strings.xml. On iOS the path is read under source_directory, and the entry jui init writes, <project>/Localizable.strings, is not found on that reading (measured on 2.5.5 with an empty .xcodeproj). languages[] in sjui.config.json, kjui.config.json or jui.config.json makes no output: measured on 2.5.5, fr added to all three produced no fr.lproj and no values-fr.",
+      "ja": "② 出力先を書きます。Web: rjui.config.json の languages[] にコードを追加。iOS と Android: sjui.config.json と kjui.config.json の string_files に出力先のパスを追加します（ko.lproj/Localizable.strings、res/values-ko/strings.xml など）。iOS のパスは source_directory の下として読まれます。jui init が書く <project>/Localizable.strings は、その読み方では見つかりません（2.5.5 で空の .xcodeproj を置いて測定）。sjui.config.json、kjui.config.json、jui.config.json の languages[] からは何も出ません。2.5.5 で 3 つに fr を足して測ったところ、fr.lproj も values-fr もできませんでした。"
     },
     "section_new_lang_step3": {
-      "en": "③ Run jui build. iOS gets a new ko.lproj/Localizable.strings, Android gets res/values-ko/strings.xml, Web's StringManager.ts gets a ko branch in its strings object.",
-      "ja": "③ jui build を実行。iOS に ko.lproj/Localizable.strings、Android に res/values-ko/strings.xml、Web の StringManager.ts の strings object に ko ブランチが追加されます。"
+      "en": "③ Run jui build. Android creates res/values-ko/strings.xml. iOS writes only into a file that is already there: create an empty ko.lproj/Localizable.strings first, or the build prints WARNING: Strings file not found with the path it looked at, writes nothing for that language and still exits 0. Web's StringManager.ts gets a ko branch in its strings object.",
+      "ja": "③ jui build を実行。Android は res/values-ko/strings.xml を作ります。iOS はすでにあるファイルにだけ書きます。先に空の ko.lproj/Localizable.strings を作ってください。無いと、build は探したパスと一緒に WARNING: Strings file not found を出し、その言語には何も書かず、exit 0 で終わります。Web の StringManager.ts の strings object に ko ブランチが追加されます。"
     },
     "section_new_lang_step4": {
       "en": "④ iOS only: open Xcode → Project > Info > Localizations and add the language there once. Android and Web pick up the new files automatically, no IDE action needed.",
@@ -8739,6 +8739,34 @@
     "section_new_lang_step5": {
       "en": "⑤ Web only: expose a language toggle that calls StringManager.setLanguage('ko'). On iOS and Android this would happen via OS-level language change; the app will refresh on next launch.",
       "ja": "⑤ Web のみ: StringManager.setLanguage('ko') を呼ぶ言語切替 UI を追加。iOS/Android は OS レベルの言語変更で切り替わり、次回起動時に反映されます。"
+    },
+    "section_new_lang_tags_heading": {
+      "en": "Language tags with more than one word",
+      "ja": "語が 2 つ以上ある言語のタグ"
+    },
+    "section_new_lang_tags_body": {
+      "en": "From jsonui-cli 2.5.5 strings.json keys such as zh-Hant, zh-TW, pt-BR and es-419 reach their output. Up to 2.5.4 the tools read only part of the folder name: zh-Hant.lproj, zh-TW.lproj, zh-CN.lproj, pt-BR.lproj, es-419.lproj, values-b+zh+Hant and values-b+es+419 got the en text, values-zh-rTW and values-zh-rCN got zh, and values-pt-rBR got pt, all with nothing said.",
+      "ja": "jsonui-cli 2.5.5 からは、strings.json の zh-Hant、zh-TW、pt-BR、es-419 のようなキーが出力先に届きます。2.5.4 まではフォルダ名の一部しか読んでいませんでした。zh-Hant.lproj、zh-TW.lproj、zh-CN.lproj、pt-BR.lproj、es-419.lproj、values-b+zh+Hant、values-b+es+419 には en の文が、values-zh-rTW と values-zh-rCN には zh が、values-pt-rBR には pt が、何も言わずに出ていました。"
+    },
+    "section_new_lang_tags_folders": {
+      "en": "• Folders: zh-Hant.lproj, zh-TW.lproj, pt-BR.lproj and es-419.lproj on iOS; values-b+zh+Hant, values-zh-rTW, values-pt-rBR and values-b+es+419 on Android. Not values-es-r419: jsonui-cli measured that aapt2 34, 35 and 37 refuse it. On the web the name is the languages[] entry.",
+      "ja": "• フォルダ: iOS は zh-Hant.lproj、zh-TW.lproj、pt-BR.lproj、es-419.lproj、Android は values-b+zh+Hant、values-zh-rTW、values-pt-rBR、values-b+es+419 です。values-es-r419 は使えません。aapt2 の 34、35、37 が拒否することを jsonui-cli が測っています。web では languages[] の値がそのまま名前です。"
+    },
+    "section_new_lang_tags_which": {
+      "en": "• Which text: the tag's own key first, then a shorter one, so pt-BR takes pt and es-419 takes es. With neither, the default language's text.",
+      "ja": "• どの文が出るか: タグと同じキーが先で、次に短いキーです。pt-BR は pt を、es-419 は es を取ります。どちらも無ければ既定の言語の文です。"
+    },
+    "section_new_lang_tags_chinese": {
+      "en": "• Chinese: zh-Hant and zh-TW stand in for each other and never take zh, because iOS and Android treat a plain zh as Simplified (jsonui-cli's measurement on iOS 26.2 and Android API 35). A key with only en and zh shows en on those two, with the warning below. zh-Hans and zh-CN stand in for each other and do take zh. Up to 2.5.4 values-zh-rTW showed that zh text.",
+      "ja": "• 中国語: zh-Hant と zh-TW は互いの文を使い、zh は取りません。iOS と Android は素の zh を簡体字として扱うためです（jsonui-cli が iOS 26.2 と Android API 35 で測定）。en と zh しか無いキーは、この 2 つでは en を出し、下の WARNING が出ます。zh-Hans と zh-CN は互いの文を使い、zh も取ります。2.5.4 までは values-zh-rTW にその zh の文が出ていました。"
+    },
+    "section_new_lang_tags_warning": {
+      "en": "• The warning: one line per output, for any language, one-word tags too, and the build still exits 0: zh-Hant.lproj: 4 key(s) have no zh-Hant text and show another language's: home_a, home_b, home_c, home_d. After 5 keys it adds and N more. Android names values-b+zh+Hant, and the web names languages[zh-Hant]. A key whose shorter form has text, such as pt for pt-BR, is not counted, and neither is a plain-string key (read from the code).",
+      "ja": "• WARNING: 出力先ごとに 1 行です。1 語のタグを含むどの言語でも出て、build は exit 0 のままです。zh-Hant.lproj: 4 key(s) have no zh-Hant text and show another language's: home_a, home_b, home_c, home_d。6 キー以上なら and N more が続きます。Android は values-b+zh+Hant、web は languages[zh-Hant] と名乗ります。pt-BR に対する pt のように短いキーに文があれば数えません。平文字列のキーも数えません（コードを読んだもの）。"
+    },
+    "section_new_lang_tags_measured": {
+      "en": "Measured here on 2.5.5 and 2.5.4: jui build on a three-platform scratch project with ten folders per mobile platform, reading the generated files, and 2.5.4's string code run on the same strings.json. On this site's en and ja, the generated files did not move and the warnings stayed at 0. Not measured here: a real Xcode or Gradle build with these folders, and any device. jsonui-cli has measured the language a device picks on iOS 26.2 and API 35 only, not API 24 to 34, not the plural form picked at run time, and not other scripts such as sr-Latn.",
+      "ja": "ここで 2.5.5 と 2.5.4 で測ったこと: 3 プラットフォームの使い捨てのプロジェクトに、モバイルは 1 プラットフォーム 10 フォルダを用意して jui build を撃ち、生成物を読みました。2.5.4 は文字列のコードを同じ strings.json で動かしました。このサイトの en と ja では、生成物は動かず、WARNING は 0 のままです。ここで測っていないこと: これらのフォルダを載せた本物の Xcode と Gradle の build、実機。端末がどの言語を選ぶかは jsonui-cli が iOS 26.2 と API 35 でだけ測っており、API 24〜34、実行時の複数形の選択、sr-Latn など別の文字体系は測っていません。"
     },
     "section_limits_heading": {
       "en": "6. Limits and asymmetries",
@@ -8757,8 +8785,8 @@
       "ja": "• Interpolation: iOS は %@、Android は %s — build が相互変換し、positional 指定子 (%1$@ / %1$s) も対応。Web はこれらの指定子については literal のまま（printf エンジン非搭載）で、web ランタイムが行う置換は plural エントリ内の `{count}`（Intl.PluralRules で解決）のみです。"
     },
     "section_limits_bullet_pseudo": {
-      "en": "• Pseudo-localisation: no tool for auto-wrapping keys with brackets to surface missing translations. Reviewers are expected to catch missing locales in code review.",
-      "ja": "• Pseudo-localisation: key を角括弧で包んで未翻訳を可視化するツールはありません。未翻訳の検知はコードレビューで担保する想定です。"
+      "en": "• Pseudo-localisation: no tool for auto-wrapping keys with brackets to surface missing translations. From jsonui-cli 2.5.5 jui build names them instead: one WARNING line per output, with the count and the first 5 keys (below in section 5).",
+      "ja": "• Pseudo-localisation: key を角括弧で包んで未翻訳を可視化するツールはありません。jsonui-cli 2.5.5 からは jui build が未翻訳を名指しします。出力先ごとに 1 行の WARNING で、件数と先頭 5 キーが出ます（5 節の下）。"
     },
     "section_limits_bullet_images": {
       "en": "• Images: `alt` text IS localizable — a registered strings.json key in `alt` resolves through StringManager just like `text` / `hint` (measured on web: `alt={$s.homeHeroTitle}`). An image with no `alt` is decorative: on web it renders `alt=\"\"`, exactly as `\"alt\": \"\"` does, on 1.8.120 and 1.9.0 alike. Since jsonui-cli 1.9.0 iOS and Android read `alt` too — VoiceOver and TalkBack speak it, `accessibilityLabel` and `contentDescription` are accepted as its spellings, and it takes a binding — and treat a missing one as decorative as well, except on an image that operates a control, which keeps the id or asset name it was read by before and is named by the build. That native half is the declaration's and is not measured here; on web the same tappable image kept `alt=\"\"` and the build named nothing. So give every image that carries meaning an alt. Image sources are NOT localizable: `src` / `url` literals never go through the string table — registering an image name as a string key is the classic way to break a picture — and a bare-name `src` triggers a build warning telling you to use `srcName` instead.",
@@ -15079,8 +15107,8 @@
       "ja": "待っているものへ飛ぶ"
     },
     "section_right_panel_b1_body": {
-      "en": "Press the header chip Questions N (質問 N) or Waiting for permission N (許可待ち N). The task board opens with the questions and the permission requests at the top, oldest first.\n\nThe chips count every project. From 2.5.4, while the page is narrowed to one project, they add how many are outside it: Waiting for permission 3 (other projects: 1) (許可待ち 3（他のプロジェクト 1）), and the same for questions. This is read from the page's code and not measured in a browser here; jsonui-cli's own browser check of the question chip was red at the 2.5.4 release, and whether that is a fault in the chip was not decided then.",
-      "ja": "ヘッダの「質問 N」か「許可待ち N」のチップを押すと、タスクのボードが開き、いちばん上に質問と許可の要求が古い順に並びます。\n\nチップはすべてのプロジェクトを数えます。2.5.4 からは、ページを 1 つのプロジェクトに絞っている間は、その外の件数を足して「許可待ち 3（他のプロジェクト 1）」と出ます。質問も同じです。これはページのコードを読んだもので、ここではブラウザで測っていません。2.5.4 の配布の時点で jsonui-cli 自身のブラウザの確認は質問のチップで赤で、チップの不具合かどうかはまだ判定されていません。"
+      "en": "Press the header chip Questions N (質問 N) or Waiting for permission N (許可待ち N). The task board opens with the questions and the permission requests at the top, oldest first.\n\nThe chips count every project. From 2.5.4, while the page is narrowed to one project, they add how many are outside it: Waiting for permission 3 (other projects: 1) (許可待ち 3（他のプロジェクト 1）), and the same for questions. This is read from the page's code and not measured in a browser here; jsonui-cli's own browser check of the question chip was red at the 2.5.4 release because the check still waited for the old words; jsonui-cli corrected the check in 2.5.5, and the chip itself did not change.",
+      "ja": "ヘッダの「質問 N」か「許可待ち N」のチップを押すと、タスクのボードが開き、いちばん上に質問と許可の要求が古い順に並びます。\n\nチップはすべてのプロジェクトを数えます。2.5.4 からは、ページを 1 つのプロジェクトに絞っている間は、その外の件数を足して「許可待ち 3（他のプロジェクト 1）」と出ます。質問も同じです。これはページのコードを読んだもので、ここではブラウザで測っていません。2.5.4 の配布の時点で jsonui-cli 自身のブラウザの確認は質問のチップで赤でしたが、確認が古い語を待っていたためでした。jsonui-cli は 2.5.5 で確認を直し、チップ自体は変わっていません。"
     },
     "section_right_panel_b2_since": {
       "en": "from 2.3.7",
@@ -18581,16 +18609,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.5.4",
-      "ja": "2.5.4 でまだできないこと"
+      "en": "Not in 2.5.5",
+      "ja": "2.5.5 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.5.4",
-      "ja": "2.5.4 でまだできないこと"
+      "en": "Not in 2.5.5",
+      "ja": "2.5.5 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
