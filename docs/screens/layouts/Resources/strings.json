@@ -14355,8 +14355,8 @@
       "ja": "お札"
     },
     "section_states_b14_body": {
-      "en": "A banknote with the estimated cost of each response (≈ $0.12) rises over its robot. It is the official price times the response's tokens, an estimate: on a subscription it does not match what you pay. A model the table has no price for shows ? and the tokens, never a made-up amount.\n\nTurn it on or off with Bills (estimated amounts) (お札（概算の金額）) in the side panel's Settings (設定). Price table (単価の表) there, or `jui viz prices`, changes the prices, from the next response, with no restart.",
-      "ja": "応答ごとの概算の金額（≈ $0.12）が、お札と一緒にロボットの頭上に上がります。公式の単価 × 応答のトークン数の概算で、サブスクリプションでの利用では、実際の請求とは一致しません。単価の分からないモデルは ? とトークン数を出し、金額を作りません。\n\n右のパネルの「設定」の「お札（概算の金額）」でオン／オフします。そこの「単価の表」か `jui viz prices` で単価を変えられ、変更は再起動なしで、次の応答から効きます。"
+      "en": "A banknote with the estimated cost of each response (≈ $0.12) rises over its robot. It is the official price times the response's tokens, an estimate: on a subscription it does not match what you pay. A model the table has no price for shows ? and the tokens, never a made-up amount.\n\nTurn it on or off with Bills (estimated amounts) (お札（概算の金額）) in the side panel's Settings (設定). Price table (単価の表) there, or `jui viz prices`, changes the prices, from the next response, with no restart.\n\nFrom 2.5.4 a workflow's child has bills too, because jui viz now finds its transcript (the session's subagents/workflows/<run>/ folder). Measured here: that a transcript in such a folder is found, and that another id is not. Not measured here: a bill from a real child.",
+      "ja": "応答ごとの概算の金額（≈ $0.12）が、お札と一緒にロボットの頭上に上がります。公式の単価 × 応答のトークン数の概算で、サブスクリプションでの利用では、実際の請求とは一致しません。単価の分からないモデルは ? とトークン数を出し、金額を作りません。\n\n右のパネルの「設定」の「お札（概算の金額）」でオン／オフします。そこの「単価の表」か `jui viz prices` で単価を変えられ、変更は再起動なしで、次の応答から効きます。\n\n2.5.4 からは、ワークフローの子にもお札が出ます。jui viz がその transcript（セッションの subagents/workflows/<run>/ の中）を見つけるようになったからです。ここで測ったこと: その場所の transcript が見つかること、別の id は見つからないこと。ここで測っていないこと: 本物の子のお札。"
     },
     "toc_row_states": {
       "en": "Reading a robot at a glance",
@@ -15079,8 +15079,8 @@
       "ja": "待っているものへ飛ぶ"
     },
     "section_right_panel_b1_body": {
-      "en": "Press the header chip Questions N (質問 N) or Waiting for permission N (許可待ち N). The task board opens with the questions and the permission requests at the top, oldest first.",
-      "ja": "ヘッダの「質問 N」か「許可待ち N」のチップを押すと、タスクのボードが開き、いちばん上に質問と許可の要求が古い順に並びます。"
+      "en": "Press the header chip Questions N (質問 N) or Waiting for permission N (許可待ち N). The task board opens with the questions and the permission requests at the top, oldest first.\n\nThe chips count every project. From 2.5.4, while the page is narrowed to one project, they add how many are outside it: Waiting for permission 3 (other projects: 1) (許可待ち 3（他のプロジェクト 1）), and the same for questions. This is read from the page's code and not measured in a browser here; jsonui-cli's own browser check of the question chip was red at the 2.5.4 release, and whether that is a fault in the chip was not decided then.",
+      "ja": "ヘッダの「質問 N」か「許可待ち N」のチップを押すと、タスクのボードが開き、いちばん上に質問と許可の要求が古い順に並びます。\n\nチップはすべてのプロジェクトを数えます。2.5.4 からは、ページを 1 つのプロジェクトに絞っている間は、その外の件数を足して「許可待ち 3（他のプロジェクト 1）」と出ます。質問も同じです。これはページのコードを読んだもので、ここではブラウザで測っていません。2.5.4 の配布の時点で jsonui-cli 自身のブラウザの確認は質問のチップで赤で、チップの不具合かどうかはまだ判定されていません。"
     },
     "section_right_panel_b2_since": {
       "en": "from 2.3.7",
@@ -16427,14 +16427,26 @@
       "ja": "どの hook も閉じないカード"
     },
     "section_permission_card_b6_body": {
-      "en": "When Claude Code's built-in safety check asks about a call and nobody answers, its prompt times out after about two minutes. No hook reports that, and the turn goes on, so before 2.3.28 the card stayed waiting while the session worked on.\n\nFrom 2.3.28 jui viz closes such a card from the call's result in the session's transcript, which it reads every 2 seconds, the subagents' too. A card you had not answered on the page then reads Ended without an answer when that prompt timed out, Denied in the terminal when the person or the auto mode classifier refused, and Allowed in the terminal when the call ran, whether it succeeded or failed. A card is tied to its call by the call's id, never by order, so another call that ends meanwhile does not close it. A card that never learnt its call's id is closed only when it is that agent's one waiting card with the same tool and the same input.",
-      "ja": "Claude Code の組み込みの安全検査がある呼び出しについて尋ね、誰も答えないと、その問いは約 2 分で時間切れになります。これを知らせる hook はなく、ターンはそのまま続きます。そのため 2.3.28 より前は、セッションが作業を続けている間も、カードが待っているまま残っていました。\n\n2.3.28 からは、jui viz がセッションの transcript にあるその呼び出しの結果を見て、カードを閉じます。transcript は 2 秒ごとに読み、サブエージェントの分も読みます。ページで答えていなかったカードは、その問いが時間切れなら「答えないまま終わった」、本人か auto mode の分類器が断ったなら「ターミナルで拒否された」、呼び出しが実行されたなら、成功でも失敗でも「ターミナルで許可された」になります。カードと呼び出しは呼び出しの id で結び、順番では結ばないので、待っている間に別の呼び出しが終わっても閉じません。呼び出しの id を知らないままのカードは、そのエージェントの待っているカードのうち、同じ道具で同じ入力のものが 1 枚だけのときに限って閉じます。"
+      "en": "When Claude Code's built-in safety check asks about a call and nobody answers, its prompt times out after about two minutes. No hook reports that, and the turn goes on, so before 2.3.28 the card stayed waiting while the session worked on.\n\nFrom 2.3.28 jui viz closes such a card from the call's result in the session's transcript, which it reads every 2 seconds, the subagents' too (from 2.5.4 a workflow's child's as well, which it did not find before). A card you had not answered on the page then reads Ended without an answer when that prompt timed out, Denied in the terminal when the person or the auto mode classifier refused, and Allowed in the terminal when the call ran, whether it succeeded or failed. A card is tied to its call by the call's id, never by order, so another call that ends meanwhile does not close it. A card that never learnt its call's id is closed only when it is that agent's one waiting card with the same tool and the same input.",
+      "ja": "Claude Code の組み込みの安全検査がある呼び出しについて尋ね、誰も答えないと、その問いは約 2 分で時間切れになります。これを知らせる hook はなく、ターンはそのまま続きます。そのため 2.3.28 より前は、セッションが作業を続けている間も、カードが待っているまま残っていました。\n\n2.3.28 からは、jui viz がセッションの transcript にあるその呼び出しの結果を見て、カードを閉じます。transcript は 2 秒ごとに読み、サブエージェントの分も読みます（2.5.4 からは、それまで見つけられなかったワークフローの子の分も読みます）。ページで答えていなかったカードは、その問いが時間切れなら「答えないまま終わった」、本人か auto mode の分類器が断ったなら「ターミナルで拒否された」、呼び出しが実行されたなら、成功でも失敗でも「ターミナルで許可された」になります。カードと呼び出しは呼び出しの id で結び、順番では結ばないので、待っている間に別の呼び出しが終わっても閉じません。呼び出しの id を知らないままのカードは、そのエージェントの待っているカードのうち、同じ道具で同じ入力のものが 1 枚だけのときに限って閉じます。"
+    },
+    "section_permission_card_b7_since": {
+      "en": "from 2.5.4",
+      "ja": "2.5.4 から"
     },
     "section_permission_card_b7_title": {
+      "en": "A card over 10 minutes old",
+      "ja": "10 分を超えたカード"
+    },
+    "section_permission_card_b7_body": {
+      "en": "Until 2.5.3 a card ended by itself after 10 minutes, even when its call still waited. From 2.5.4 time alone closes nothing. The card stays and says Over 10 minutes old. Whether it still waits cannot be told from here (the receiver's own screen shows it) (10 分以上たっています。まだ待っているかは、ここからは分かりません（受け手の画面で確かめられます）). It can still be answered.\n\n• A card ends when its call does: an answer, the call's result in the transcript, the session's Stop or SessionEnd, or the session's process having gone. A subagent's card also ends with that subagent's SubagentStop, and only that subagent's. A Stop of the main session while background work goes on ends the main session's own cards and leaves the subagents'.\n• Close (閉じる) appears from 10 minutes on, and the server refuses it earlier. Closing only removes the card from viz. Nothing goes to the receiver: it is neither allowed nor denied. If the receiver is still waiting, answer it on its own screen.\n• A closed card does not come back on a reload, and a result that arrives later brings none. The event log reads Card closed (nothing went to the receiver) and the robot reads Card closed (the receiver may still be waiting), unless another card of its own is still open.\n\nMeasured here on 2.5.4 by driving the shipped card code directly, with no server and no browser: a card stays at 10 minutes and at 12.9 hours; Close is refused just before 10 minutes; an old card's answer reaches a waiting hook; closing gives that hook nothing to print and the session nothing to read; the endings of a subagent and of a Stop with background work close only the cards named above. Not measured here: the card in a browser, a real workflow's child, and the receiver's screen after Close, which jsonui-cli has not measured either.",
+      "ja": "2.5.3 までは、呼び出しがまだ待っていても、カードは 10 分で自動的に終わっていました。2.5.4 からは、時間だけではカードを閉じません。カードは残り、「10 分以上たっています。まだ待っているかは、ここからは分かりません（受け手の画面で確かめられます）」と出ます。このカードにはまだ答えられます。\n\n• カードが終わるのは呼び出しが終わったときです。つまり、答えたとき、transcript に呼び出しの結果が出たとき、セッションの Stop か SessionEnd、セッションのプロセスが消えたときです。サブエージェントのカードは、そのサブエージェントの SubagentStop でも終わります。ほかのサブエージェントのカードは終わりません。裏の作業が続いている間のメインセッションの Stop では、メインセッション自身のカードだけが終わり、サブエージェントのカードは残ります。\n• 「閉じる」は 10 分から出ます。それより前はサーバーが断ります。閉じても viz から消えるだけで、受け手には何も送りません（許可も拒否もしません）。受け手がまだ待っているなら、受け手の画面で答えます。\n• 閉じたカードは再読み込みしても戻らず、後から結果が届いても戻りません。イベントログには「カードを閉じた（受け手には何も送っていない）」と出ます。ロボットには、ほかに自分のカードが開いていなければ「カードを閉じた（受け手はまだ待っているかもしれない）」と出ます。\n\nここで 2.5.4 で測ったこと: 出荷されたカードのコードを、サーバーとブラウザなしで直接動かしました。10 分でも 12.9 時間でもカードは残ること、10 分の直前は「閉じる」が断られること、古いカードの答えは待っている hook に届くこと、閉じると hook に出すものもセッションが読むものも無いこと、サブエージェントの終わりと裏の作業がある Stop では上に書いたカードだけが閉じることです。ここで測っていないこと: ブラウザでのカード、本物のワークフローの子、「閉じる」の後の受け手の画面（受け手の画面は jsonui-cli も測っていません）。"
+    },
+    "section_permission_card_b8_title": {
       "en": "When the card sends you to the terminal",
       "ja": "ターミナルで答えるように言われたとき"
     },
-    "section_permission_card_b7_body": {
+    "section_permission_card_b8_body": {
       "en": "A card says Please answer in the terminal when the relay is off for that session, or when the request is too long to show in full.",
       "ja": "そのセッションの中継が無効のとき、または要求が長すぎて全部を表示できないときは、カードに「ターミナルで答えてください」と出ます。"
     },
@@ -16499,14 +16511,26 @@
       "ja": "ページの答えをもう待っていないとき（時間が過ぎた、ターミナルに返した、そのセッションが答えの中継を待っていない）は、カードの上にその理由が出て、選択肢は押せない見た目になります。"
     },
     "section_questions_b7_since": {
+      "en": "from 2.5.4",
+      "ja": "2.5.4 から"
+    },
+    "section_questions_b7_title": {
+      "en": "A question over 10 minutes old",
+      "ja": "10 分を超えた質問"
+    },
+    "section_questions_b7_body": {
+      "en": "Until 2.5.3 a question's card ended by itself after 10 minutes. From 2.5.4 it stays until the session moves on: its Stop or SessionEnd, or its next question or prompt.\n\nA card over 10 minutes old whose answer is no longer waited for (above) says Over 10 minutes old. Whether it still waits cannot be told from here. (10 分以上たっています。まだ待っているかは、ここからは分かりません。) and has Close (閉じる). Closing only removes it from viz: no answer is given. A question a hook still waits on has no such words and cannot be closed.\n\nMeasured here on 2.5.4 by driving the shipped card code directly, with no server and no browser. Not measured here: the card in a browser.",
+      "ja": "2.5.3 までは、質問のカードは 10 分で自動的に終わっていました。2.5.4 からは、セッションが先へ進むまで残ります。つまり、その Stop か SessionEnd、次の質問やプロンプトまでです。\n\n10 分を超え、答えをもう待っていないカード（上を参照）には、「10 分以上たっています。まだ待っているかは、ここからは分かりません。」と「閉じる」が出ます。閉じても viz から消えるだけで、受け手には答えを送りません。hook がまだ待っている質問には、この文は出ず、閉じられません。\n\nここで 2.5.4 で測ったこと: 出荷されたカードのコードを、サーバーとブラウザなしで直接動かしました。ここで測っていないこと: ブラウザでのカード。"
+    },
+    "section_questions_b8_since": {
       "en": "from 2.3.21",
       "ja": "2.3.21 から"
     },
-    "section_questions_b7_title": {
+    "section_questions_b8_title": {
       "en": "Your answer stays while you write it",
       "ja": "書きかけの答えは消えません"
     },
-    "section_questions_b7_body": {
+    "section_questions_b8_body": {
       "en": "The choices you pick and the text you type in a question card, and a deny reason on a permission card, stay when the card is drawn again, for example when another question or permission arrives. The same question in the panel, on the board's strip and in a robot card's box shares one draft. It is dropped when you send the answer or hand the question back to the terminal.",
       "ja": "質問の札で選んだ答えや書いた文、許可の札の拒否の理由は、ほかの質問や許可が届いて札が描き直されても消えません。パネル・ボードの欄・ロボットのカードの欄に出る同じ質問は、書きかけを 1 つ共有します。答えを送るか、質問をターミナルに返すと消えます。"
     },
@@ -18557,16 +18581,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.5.3",
-      "ja": "2.5.3 でまだできないこと"
+      "en": "Not in 2.5.4",
+      "ja": "2.5.4 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.5.3",
-      "ja": "2.5.3 でまだできないこと"
+      "en": "Not in 2.5.4",
+      "ja": "2.5.4 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",

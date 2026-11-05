@@ -119,8 +119,8 @@
     },
     "lines": {
       "note": {
-        "en": "`0` = unlimited (default wrap). Positive integer = max line count; further text is truncated per `lineBreakMode`.",
-        "ja": "`0` は無制限（デフォルトで折り返し）。正の整数は最大行数で、超過分は `lineBreakMode` に従って切り詰められる。"
+        "en": "`0` = unlimited (default wrap). Positive integer = max line count; further text is truncated per `lineBreakMode`. On iOS with SwiftUI, `0` alone does not promise every line. From jsonui-cli 2.5.4 (SwiftJsonUI 10.31.1 for Dynamic), a Label of height `wrapContent` inside a vertical ScrollView keeps all its lines, up to `lines` when set, unless a node between them bounds the height (a declared height or maxHeight, or a weight in a vertical stack). On a screen that does not scroll it can still be cut to fewer lines and an ellipsis, because the text would otherwise push what is below it off the screen; to keep the lines, put that screen in a ScrollView. Labels in a Collection cell or an Embed screen are as before. Measured here on the generated code; what the screen draws is jsonui-cli's measurement.",
+        "ja": "`0` は無制限（デフォルトで折り返し）。正の整数は最大行数で、超過分は `lineBreakMode` に従って切り詰められる。iOS の SwiftUI では、`0` だけで全部の行が出るとは限らない。jsonui-cli 2.5.4 から（Dynamic は SwiftJsonUI 10.31.1 から）、縦の ScrollView の中の高さ `wrapContent` の Label は全部の行を出す。`lines` があればその行数までで、間に高さを決める要素（height か maxHeight の指定、縦のスタックの weight）があれば別。スクロールしない画面では、下の要素を画面の外へ押し出さないように、今も少ない行と省略記号に切れることがある。行を出すには、その画面を ScrollView に入れる。Collection の cell と Embed の画面の中の Label は今までどおり。生成コードはここで測り、画面の描画は jsonui-cli の測定による。"
       }
     },
     "lineBreakMode": {
