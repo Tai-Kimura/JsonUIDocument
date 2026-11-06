@@ -5,8 +5,8 @@
     "ja": "離散的な選択肢から 1 件を選ぶピッカー。`selectItemType` が `Date` のとき日付／時刻ピッカーになる（`datePickerMode` はその中で date / time / dateAndTime を選ぶ）。iOS/Android ではネイティブピッカー、Web では `<select>`。"
   },
   "usage": {
-    "en": "Use SelectBox when the option count is >= 5 or the options are long strings. For 2-4 short options prefer Segment. For date/time input, set `selectItemType` to `Date` and `datePickerMode` to `date` / `time` / `dateAndTime`. On web, a focused SelectBox shows a blue ring outside its border, as a TextField does; since jsonui-cli 2.3.22 a borderColor written in the layout, fixed or bound, stays while it has focus (through 2.3.21 the border turned blue). Without one the border turns blue with the ring, as before.",
-    "ja": "選択肢が 5 件以上、または各項目が長い場合に使う。2〜4 件の短い選択肢なら Segment。日付／時刻入力は `selectItemType` に `Date`、`datePickerMode` に `date` / `time` / `dateAndTime` を指定。web では、フォーカスのある SelectBox は TextField と同じく、枠の外に青い輪が出る。jsonui-cli 2.3.22 から、レイアウトに書いた borderColor（固定でも binding でも）は、フォーカスの間もそのまま残る（2.3.21 までは枠が青になっていた）。書いていなければ、前と同じく枠も輪と一緒に青になる。"
+    "en": "Use SelectBox when the option count is >= 5 or the options are long strings. For 2-4 short options prefer Segment. For date/time input, set `selectItemType` to `Date` and `datePickerMode` to `date` / `time` / `dateAndTime`. On web, a focused SelectBox shows a blue ring outside its border, as a TextField does; since jsonui-cli 2.3.22 a borderColor written in the layout, fixed or bound, stays while it has focus (through 2.3.21 the border turned blue). Without one the border turns blue with the ring, as before. The words on the sheet follow the app's language from KotlinJsonUI 2.46.0 and SwiftJsonUI 10.32.0, and `sheetTitle`, `cancelButtonText` and `doneButtonText` replace them on one SelectBox.",
+    "ja": "選択肢が 5 件以上、または各項目が長い場合に使う。2〜4 件の短い選択肢なら Segment。日付／時刻入力は `selectItemType` に `Date`、`datePickerMode` に `date` / `time` / `dateAndTime` を指定。web では、フォーカスのある SelectBox は TextField と同じく、枠の外に青い輪が出る。jsonui-cli 2.3.22 から、レイアウトに書いた borderColor（固定でも binding でも）は、フォーカスの間もそのまま残る（2.3.21 までは枠が青になっていた）。書いていなければ、前と同じく枠も輪と一緒に青になる。シートの語は KotlinJsonUI 2.46.0 と SwiftJsonUI 10.32.0 からアプリの言語に従い、1 つの SelectBox では `sheetTitle`、`cancelButtonText`、`doneButtonText` で置き換えられる。"
   },
   "examples": [
     {
@@ -151,6 +151,18 @@
         "en": "Two-way binding to the picked date (Date object). Alternative to `selectedValue` when in date-picker mode. **Nil binding stays nil**: when the bound value is `nil` or empty string, the picker shows no selection and emits `nil` back through the binding — it does NOT silently fall back to today's date. If a default is required, seed the ViewModel with an explicit Date value before the picker mounts.",
         "ja": "選択された日付（Date オブジェクト）への two-way binding。日付ピッカーモード時の `selectedValue` 代替。**nil binding はそのまま nil**：binding 値が `nil` または空文字のときピッカーは未選択で描画され、binding にも `nil` が伝播する（暗黙的に今日の日付にフォールバックしない）。デフォルト値が必要なら、ピッカーが mount される前に ViewModel 側で明示的に Date を初期化すること。"
       }
+    },
+    "sheetTitle": {
+      "summary": {"en": "Title of the picker sheet (Android).", "ja": "ピッカーのシートの題（Android）。"},
+      "note": {"en": "A text, a strings.json key or a binding, read as `prompt` is. Absent: the library's word in the app's language, from KotlinJsonUI 2.46.0. On iOS and web `jui build` prints a Kotlin only warning and generates nothing. See Adding a new language for the words and for replacing them in the whole app.", "ja": "文、strings.json のキー、binding を受け取り、`prompt` と同じように読まれる。書かなければ、KotlinJsonUI 2.46.0 からはアプリの言語のライブラリの語。iOS と web では `jui build` が Kotlin only の警告を出し、何も生成しない。語とアプリ全体での置き換えは「Adding a new language」のガイドを参照。"}
+    },
+    "cancelButtonText": {
+      "summary": {"en": "Cancel button of the picker sheet (Android).", "ja": "ピッカーのシートのキャンセルのボタン（Android）。"},
+      "note": {"en": "Read as `sheetTitle` is. Absent: the library's word in the app's language (`kjui_sheet_cancel`). A calendar date sheet has no cancel button, so it changes nothing there. On iOS and web `jui build` prints a Kotlin only warning and generates nothing.", "ja": "`sheetTitle` と同じように読まれる。書かなければ、アプリの言語のライブラリの語（`kjui_sheet_cancel`）。カレンダーの日付のシートにはキャンセルのボタンが無いので、そこでは何も変えない。iOS と web では `jui build` が Kotlin only の警告を出し、何も生成しない。"}
+    },
+    "doneButtonText": {
+      "summary": {"en": "Button that closes the picker sheet with the choice (iOS, and an Android date sheet).", "ja": "選んでシートを閉じるボタン（iOS と Android の日付のシート）。"},
+      "note": {"en": "Read as `sheetTitle` is. Absent on iOS: the app's own `Done` key in Localizable.strings, then the library's word in the app's language, from SwiftJsonUI 10.32.0. Absent on Android: `kjui_sheet_confirm`, or `kjui_sheet_select` on a calendar sheet. An Android list sheet has no such button, and the web has no sheet: there it generates nothing and `jui build` says nothing.", "ja": "`sheetTitle` と同じように読まれる。iOS で書かなければ、Localizable.strings のアプリの `Done` のキー、次に SwiftJsonUI 10.32.0 からはアプリの言語のライブラリの語。Android で書かなければ `kjui_sheet_confirm`、カレンダーのシートでは `kjui_sheet_select`。Android の一覧のシートにはこのボタンが無く、web にはシートが無いので、そこでは何も生成せず、`jui build` も何も言わない。"}
     }
   },
   "relatedComponents": ["Segment", "Radio"]
