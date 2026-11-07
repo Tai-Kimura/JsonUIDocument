@@ -1697,8 +1697,8 @@
       "ja": "jsonui-cli 2.5.8 から、数の属性に書いた binding は 3 面とも式として生成コードに届きます。それまでは build は通り、結果は書く場所によって違いました。iOS では TextView の `\"alpha\": \"@{a}\"` が `.opacity(@{a})` になってコンパイルが通らず、Button の `\"cornerRadius\": \"@{r}\"` は 0 になっていました。Android では shadow の radius が `@{r}.dp` になっていました。web では TextField の cornerRadius が `'@{r}px'` になり、shadow は `@{r}` を含むクラスになっていました。値を直接書いたときの出力は変わりません。iOS の opacity は常に Double に変換するようになったので、Label の opacity の binding は生成し直すと `.opacity(data.a)` から `.opacity(Double(data.a ?? 0))` に変わります。この節の例は使い捨ての 3 面プロジェクトで 2.5.7 を対照に比べました。Xcode や Gradle のビルドと画面は撃っていません。これは生成コードの話です。iOS の Dynamic モードは shadow の binding をまだ読みません（jsonui-cli の測定）。"
     },
     "section_syntax_names": {
-      "en": "Three attributes name something at generation time and take no binding: `nextFocus`, `group` and `screen`. Write the name out. From 2.5.8 what a binding does there depends on the platform. iOS warns for all three and reads them as absent. Android warns for `nextFocus` and `screen` and reads them as absent, but says nothing for `group` and uses the text `@{g}` as the group's name. Web warns for `screen` and removes the Embed, but leaves an import line that does not parse, so the page does not build. Web says nothing for `nextFocus`, which does nothing, or for `group`, where `@{g}` becomes the name. Read from generated code on a scratch project; the gaps are filed with jsonui-cli.",
-      "ja": "`nextFocus`、`group`、`screen` の 3 つは生成の時点で名前を決める属性で、binding を受けられません。名前を直接書いてください。2.5.8 で binding を書いたときの動きは面によって違います。iOS は 3 つとも警告を出し、書いていないものとして扱います。Android は `nextFocus` と `screen` で警告を出して同じ扱いにしますが、`group` では何も言わず、`@{g}` という文字をそのまま群の名前にします。web は `screen` で警告を出して Embed を消しますが、パースできない import の行が残るので、そのページはビルドできません。web の `nextFocus` は何も言わず何もしません。web の `group` も何も言わず、`@{g}` が名前になります。使い捨てのプロジェクトの生成コードを読んだもので、足りない部分は jsonui-cli に起票しました。"
+      "en": "Some attributes name something at generation time and take no binding: Radio's `group`, Embed's `screen` and `navigationMode`, TextField's `nextFocus`, the ten `align…View` attributes, and `defaultScrollAnchor` on ScrollView and Collection. Write the name out. From jsonui-cli 2.5.9 a binding on any of them makes `jui build` print a warning on every platform, and the attribute reads as absent. In 2.5.8 the platforms differed: Android and web used `@{g}` itself as a group's name with no warning, web left an import line for a bound screen that does not parse, and a bound `defaultScrollAnchor` stopped the iOS build. Six of these slots were compared on a scratch three-platform project with 2.5.8 as the control. This is generated code; Dynamic mode reads the JSON at run time and is not covered.",
+      "ja": "生成の時点で名前を決める属性は binding を受けられません。Radio の `group`、Embed の `screen` と `navigationMode`、TextField の `nextFocus`、10 個の `align…View`、ScrollView と Collection の `defaultScrollAnchor` です。名前を直接書いてください。jsonui-cli 2.5.9 から、これらに binding を書くと `jui build` が 3 面とも警告を出し、書いていないものとして扱います。2.5.8 では面によって違いました。Android と web は `@{g}` という文字を警告なしで群の名前にし、web は binding の screen にパースできない import の行を残し、binding の `defaultScrollAnchor` は iOS の build を止めていました。このうち 6 つの枠を、使い捨ての 3 面プロジェクトで 2.5.8 を対照に比べました。これは生成コードの話です。Dynamic モードは実行時に JSON を読むので、ここには含みません。"
     },
     "section_typed_heading": {
       "en": "How typing works per platform",
@@ -18649,16 +18649,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.5.8",
-      "ja": "2.5.8 でまだできないこと"
+      "en": "Not in 2.5.9",
+      "ja": "2.5.9 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.5.8",
-      "ja": "2.5.8 でまだできないこと"
+      "en": "Not in 2.5.9",
+      "ja": "2.5.9 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
