@@ -88,7 +88,11 @@ module RjuiTools
           # unreachable from the inline style the rest of the font handling
           # uses — Tailwind's `placeholder:` variant with an arbitrary value is
           # the only surface that can carry it.
-          if (hint_font = attributes['hintFont'])
+          if (hint_font = attributes['hintFont']) && has_binding?(hint_font) && (font = bound_value_expr(hint_font))
+            # A bound font reaches the pseudo-element through a custom property.
+            dynamic_styles['--jui-hint-font'] = font
+            classes << 'placeholder:[font-family:var(--jui-hint-font)]'
+          elsif hint_font
             classes << "placeholder:[font-family:#{hint_font.to_s.gsub(/\s+/, '_')}]"
           end
           if (hint_font_size = attributes['hintFontSize'])
@@ -136,16 +140,15 @@ module RjuiTools
           end
 
           # Shadow
-          if attributes['shadow']
-            if attributes['shadow'].is_a?(Hash)
-              radius = attributes['shadow']['radius'] || 5
-              x = attributes['shadow']['offsetX'] || 0
-              y = attributes['shadow']['offsetY'] || 0
-              color = attributes['shadow']['color'] || 'rgba(0,0,0,0.2)'
-              @dynamic_styles['boxShadow'] = css_style_value("#{x}px #{y}px #{radius}px #{color}")
-            else
-              @dynamic_styles['boxShadow'] = "'0 2px 4px rgba(0,0,0,0.1)'"
-            end
+          # The one shadow value every web path writes (shadow_css_expr): its
+          # opacity and a colors.json key were dropped here before. The pipe
+          # form is the class (or the style) the common path wrote; this style
+          # overrode it with a fixed shadow, so it never drew on a TextField.
+          shadow = attributes['shadow']
+          if shadow.is_a?(Hash)
+            @dynamic_styles['boxShadow'] = shadow_css_expr(shadow)
+          elsif shadow && !(shadow.is_a?(String) && shadow.include?('|'))
+            @dynamic_styles['boxShadow'] = "'0 2px 4px rgba(0,0,0,0.1)'"
           end
 
           # One renderer for every converter (BaseConverter#style_attr_for):
@@ -167,7 +170,7 @@ module RjuiTools
           attrs << (secure_expr ? " type={(#{secure_expr}) ? 'password' : '#{input_type}'}" : " type=\"#{input_type}\"")
 
           # Name attribute
-          attrs << " name=\"#{attributes['name']}\"" if attributes['name']
+          attrs << jsx_attr_text('name', attributes['name']) if attributes['name']
 
           # Placeholder (hint in SwiftJsonUI terminology)
           placeholder = attributes['hint'] || attributes['placeholder']

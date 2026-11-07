@@ -689,8 +689,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Not an alias for `onClick` — a different face of the same event. `onClick` takes a binding (`@{handler}`); lowercase `onclick` takes a bare handler name resolved against the ViewModel, and since 2026-08 it also accepts an array (`[\"a\", \"b\"]`), calling every handler in declared order on all three platforms. Before that the array form silently called nothing on iOS dynamic, broke generation on Android, and emitted invalid syntax on web.",
-                "ja": "`onClick` のエイリアスではなく、同じイベントの別の面です。`onClick` は binding（`@{handler}`）を取り、小文字の `onclick` は ViewModel に対して解決されるハンドラ名を直接取ります。2026-08 からは配列（`[\"a\", \"b\"]`）も受け付け、3 プラットフォームとも宣言順に全ハンドラを呼びます。それ以前の配列形は iOS dynamic で無呼び出し、Android で生成死、web で不正構文でした。"
+                "en": "Not an alias for `onClick` — a different face of the same event. `onClick` takes a binding (`@{handler}`); lowercase `onclick` takes a bare handler name resolved against the ViewModel, and since 2026-08 it also accepts an array (`[\"a\", \"b\"]`), calling every handler in declared order on all three platforms. Before that the array form silently called nothing on iOS dynamic, broke generation on Android, and emitted invalid syntax on web. A binding on `onclick` makes `jui build` warn and reads as absent on every platform from jsonui-cli 2.5.10 (in an array only the bound names go); write it on `onClick`. In 2.5.9 iOS and Android called it.",
+                "ja": "`onClick` のエイリアスではなく、同じイベントの別の面です。`onClick` は binding（`@{handler}`）を取り、小文字の `onclick` は ViewModel に対して解決されるハンドラ名を直接取ります。2026-08 からは配列（`[\"a\", \"b\"]`）も受け付け、3 プラットフォームとも宣言順に全ハンドラを呼びます。それ以前の配列形は iOS dynamic で無呼び出し、Android で生成死、web で不正構文でした。jsonui-cli 2.5.10 から、`onclick` に書いた binding は 3 面とも `jui build` が警告し、書いていないものとして扱われます（配列では binding の名前だけを落とす）。binding は `onClick` に書きます。2.5.9 では iOS と Android が呼んでいました。"
               },
               "type": "string | array",
               "required": ""

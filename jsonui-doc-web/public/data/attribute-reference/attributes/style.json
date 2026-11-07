@@ -31,8 +31,8 @@
               "name": "background",
               "type": "string | binding",
               "summary": {
-                "en": "Background color. Accepts hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`, named colors, or `@color/token`. For …",
-                "ja": "背景色。hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`、色名、または `@color/token`。グラデーションは `gradient` 属性または GradientView…"
+                "en": "Background color. Accepts hex `#RGB`/`#RRGGBB`/`#AARRGGBB` (alpha first, on every platform), name…",
+                "ja": "背景色。hex `#RGB`/`#RRGGBB`/`#AARRGGBB`（アルファが先、全プラットフォーム共通）、色名、または `@color/token`。グラデーションは `gradient…"
               },
               "anchorUrl": "#attr-background"
             },
@@ -281,8 +281,8 @@
                 ]
               },
               "description": {
-                "en": "Background color. Accepts hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`, named colors, or `@color/token`. For gradients use the `gradient` attribute or GradientView.",
-                "ja": "背景色。hex `#RGB`/`#RRGGBB`/`#RRGGBBAA`、色名、または `@color/token`。グラデーションは `gradient` 属性または GradientView を使う。"
+                "en": "Background color. Accepts hex `#RGB`/`#RRGGBB`/`#AARRGGBB` (alpha first, on every platform), named colors, or `@color/token`. For gradients use the `gradient` attribute or GradientView.",
+                "ja": "背景色。hex `#RGB`/`#RRGGBB`/`#AARRGGBB`（アルファが先、全プラットフォーム共通）、色名、または `@color/token`。グラデーションは `gradient` 属性または GradientView を使う。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
@@ -1104,7 +1104,7 @@
               "defaultChipVisibility": "gone",
               "enumChipsVisibility": "gone",
               "aliasChipsVisibility": "gone",
-              "noteVisibility": "gone",
+              "noteVisibility": "visible",
               "typeChips": {
                 "sections": [
                   {
@@ -1154,8 +1154,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "",
-                "ja": ""
+                "en": "Every field takes a binding. From jsonui-cli 2.5.10 a field left out takes the declared default on every platform: radius 5, offsets 0, opacity 1, and no colour is black at 33%. Before it Android drew radius 4 in opaque black and web an offsetY of 2 in black at 10%; iOS already drew the defaults. On web a shadow whose colour is a colors.json key, which every written hex becomes at build time, went into a class the browser drops, so it drew nothing; from 2.5.10 it goes through `ColorManager.resolveColor`. Generated code compared on a scratch project with 2.5.9 as the control; what the browser drew is jsonui-cli's measurement. From SwiftJsonUI 10.33.0 iOS Dynamic reads a bound shadow and draws it on a Button, and from KotlinJsonUI 2.49.0 Android Dynamic no longer draws a bound shadow colour as black; both are jsonui-cli's measurement.",
+                "ja": "どのフィールドも binding を取れる。jsonui-cli 2.5.10 から、書かなかったフィールドは 3 面とも宣言の既定値になる: radius 5、offset 0、opacity 1、色なしは黒の 33%。それまで Android は radius 4 の不透明な黒、web は offsetY 2 の黒 10% で描き、iOS は前から既定値どおりだった。web では、色が colors.json のキー（書いた hex は build ですべてキーになる）の shadow はブラウザが捨てるクラスに入り、何も描かれなかった。2.5.10 からは `ColorManager.resolveColor` を通る。生成コードは使い捨てのプロジェクトで 2.5.9 を対照に比べ、ブラウザの描画は jsonui-cli の測定。SwiftJsonUI 10.33.0 から iOS の Dynamic は shadow の binding を読み Button にも描き、KotlinJsonUI 2.49.0 から Android の Dynamic は binding の shadow の色を黒にしない。どちらも jsonui-cli の測定。"
               },
               "type": "string | object",
               "required": ""
