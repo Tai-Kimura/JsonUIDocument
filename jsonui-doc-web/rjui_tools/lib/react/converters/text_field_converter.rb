@@ -119,7 +119,7 @@ module RjuiTools
 
           # Corner radius
           if attributes['cornerRadius']
-            @dynamic_styles['borderRadius'] = "'#{attributes['cornerRadius']}px'"
+            px_style('borderRadius', attributes['cornerRadius'])
           end
 
           # Hint/placeholder color is now handled via Tailwind class in build_class_name
@@ -142,7 +142,7 @@ module RjuiTools
               x = attributes['shadow']['offsetX'] || 0
               y = attributes['shadow']['offsetY'] || 0
               color = attributes['shadow']['color'] || 'rgba(0,0,0,0.2)'
-              @dynamic_styles['boxShadow'] = "'#{x}px #{y}px #{radius}px #{color}'"
+              @dynamic_styles['boxShadow'] = css_style_value("#{x}px #{y}px #{radius}px #{color}")
             else
               @dynamic_styles['boxShadow'] = "'0 2px 4px rgba(0,0,0,0.1)'"
             end
@@ -162,7 +162,9 @@ module RjuiTools
 
           # Type based on input attribute
           input_type = determine_input_type
-          attrs << " type=\"#{input_type}\""
+          # A bound secure follows the data: as written, a binding is truthy.
+          secure_expr = bound_value_expr(attributes['secure'])
+          attrs << (secure_expr ? " type={(#{secure_expr}) ? 'password' : '#{input_type}'}" : " type=\"#{input_type}\"")
 
           # Name attribute
           attrs << " name=\"#{attributes['name']}\"" if attributes['name']
@@ -283,7 +285,7 @@ module RjuiTools
 
         def determine_input_type
           # Secure field takes precedence
-          return 'password' if attributes['secure'] || JsonUIShared::EnumSpelling.lowered(attributes['input'], 'TextField', 'input') == 'password'
+          return 'password' if (attributes['secure'] && !has_binding?(attributes['secure'])) || JsonUIShared::EnumSpelling.lowered(attributes['input'], 'TextField', 'input') == 'password'
 
           case JsonUIShared::EnumSpelling.lowered(attributes['input'], 'TextField', 'input')
           when 'email'

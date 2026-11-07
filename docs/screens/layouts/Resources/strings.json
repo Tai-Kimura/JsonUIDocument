@@ -1689,8 +1689,16 @@
       "ja": "バインディングが置ける場所"
     },
     "section_syntax_body": {
-      "en": "Bindings are not limited to text. Any attribute value that is not a layout primitive (`type`, `orientation`, `style` name) can be bound to a ViewModel field. Group the real uses into five families — text (Label `text`, TextField `hint`), style (colors, opacity, fontWeight, borderWidth), layout (width, height, `visibility` — which is a `String` enum `'visible' | 'invisible' | 'gone'`, not a Bool), events (`onClick`, `onTextChange`, `onValueChanged`, `onPageChanged`), and collection / resource (`items` on a Collection, `src` on a NetworkImage, `currentPage` on a pager).",
+      "en": "Bindings are not limited to text. Any attribute value that is not a layout primitive (`type`, `orientation`, `style` name) can be bound to a ViewModel field, except the three that name something at generation time (below the example). Group the real uses into five families — text (Label `text`, TextField `hint`), style (colors, opacity, fontWeight, borderWidth), layout (width, height, `visibility` — which is a `String` enum `'visible' | 'invisible' | 'gone'`, not a Bool), events (`onClick`, `onTextChange`, `onValueChanged`, `onPageChanged`), and collection / resource (`items` on a Collection, `src` on a NetworkImage, `currentPage` on a pager).",
       "ja": "バインディングはテキストに限りません。`type` / `orientation` / `style` 名のような Layout プリミティブ以外のほぼ全ての属性値に `@{…}` を置けます。実用上は 5 グループ: text（Label の `text`、TextField の `hint` など）・style（色・opacity・fontWeight・borderWidth など）・layout（width / height / `visibility`。ただし `visibility` は Bool ではなく `'visible' | 'invisible' | 'gone'` の String enum）・event（`onClick` / `onTextChange` / `onValueChanged` / `onPageChanged` など）・collection / resource（Collection の `items`、NetworkImage の `src`、ページャの `currentPage` など）。"
+    },
+    "section_syntax_numbers": {
+      "en": "A binding on a number reaches the generated code as an expression on all three platforms from jsonui-cli 2.5.8. Before it, the build passed and the result depended on the slot. On iOS, `\"alpha\": \"@{a}\"` on a TextView wrote `.opacity(@{a})`, which does not compile, and `\"cornerRadius\": \"@{r}\"` on a Button wrote 0. On Android, a shadow's radius wrote `@{r}.dp`. On web, a TextField's cornerRadius wrote `'@{r}px'` and a shadow went into a class with `@{r}` in it. A written number keeps its bytes. opacity on iOS now always converts to Double, so a Label's bound opacity changes from `.opacity(data.a)` to `.opacity(Double(data.a ?? 0))` when you regenerate. These cases were compared on a scratch three-platform project with 2.5.7 as the control; no Xcode or Gradle build and no screen were run here. This is generated code. iOS Dynamic mode still ignores a bound shadow, which is jsonui-cli's measurement.",
+      "ja": "jsonui-cli 2.5.8 から、数の属性に書いた binding は 3 面とも式として生成コードに届きます。それまでは build は通り、結果は書く場所によって違いました。iOS では TextView の `\"alpha\": \"@{a}\"` が `.opacity(@{a})` になってコンパイルが通らず、Button の `\"cornerRadius\": \"@{r}\"` は 0 になっていました。Android では shadow の radius が `@{r}.dp` になっていました。web では TextField の cornerRadius が `'@{r}px'` になり、shadow は `@{r}` を含むクラスになっていました。値を直接書いたときの出力は変わりません。iOS の opacity は常に Double に変換するようになったので、Label の opacity の binding は生成し直すと `.opacity(data.a)` から `.opacity(Double(data.a ?? 0))` に変わります。この節の例は使い捨ての 3 面プロジェクトで 2.5.7 を対照に比べました。Xcode や Gradle のビルドと画面は撃っていません。これは生成コードの話です。iOS の Dynamic モードは shadow の binding をまだ読みません（jsonui-cli の測定）。"
+    },
+    "section_syntax_names": {
+      "en": "Three attributes name something at generation time and take no binding: `nextFocus`, `group` and `screen`. Write the name out. From 2.5.8 what a binding does there depends on the platform. iOS warns for all three and reads them as absent. Android warns for `nextFocus` and `screen` and reads them as absent, but says nothing for `group` and uses the text `@{g}` as the group's name. Web warns for `screen` and removes the Embed, but leaves an import line that does not parse, so the page does not build. Web says nothing for `nextFocus`, which does nothing, or for `group`, where `@{g}` becomes the name. Read from generated code on a scratch project; the gaps are filed with jsonui-cli.",
+      "ja": "`nextFocus`、`group`、`screen` の 3 つは生成の時点で名前を決める属性で、binding を受けられません。名前を直接書いてください。2.5.8 で binding を書いたときの動きは面によって違います。iOS は 3 つとも警告を出し、書いていないものとして扱います。Android は `nextFocus` と `screen` で警告を出して同じ扱いにしますが、`group` では何も言わず、`@{g}` という文字をそのまま群の名前にします。web は `screen` で警告を出して Embed を消しますが、パースできない import の行が残るので、そのページはビルドできません。web の `nextFocus` は何も言わず何もしません。web の `group` も何も言わず、`@{g}` が名前になります。使い捨てのプロジェクトの生成コードを読んだもので、足りない部分は jsonui-cli に起票しました。"
     },
     "section_typed_heading": {
       "en": "How typing works per platform",
@@ -18641,16 +18649,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.5.7",
-      "ja": "2.5.7 でまだできないこと"
+      "en": "Not in 2.5.8",
+      "ja": "2.5.8 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.5.7",
-      "ja": "2.5.7 でまだできないこと"
+      "en": "Not in 2.5.8",
+      "ja": "2.5.8 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",

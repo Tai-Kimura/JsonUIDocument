@@ -8,8 +8,8 @@
     "ja": "短い文字列を受け取る単一行の入力フィールド。複数行は TextView を使う。パスワード入力は `secure: true` を指定。"
   },
   "usage": {
-    "en": "TextField owns its text state via two-way binding. The ViewModel declares the property as mutable (`@Published var text: String` on iOS / `MutableStateFlow<String>` on Android / plain mutable on web). TextField writes back through the bound property on every commit.",
-    "ja": "TextField は two-way binding で自身の text 状態を保持する。ViewModel 側で mutable プロパティ（iOS なら `@Published var text: String`、Android なら `MutableStateFlow<String>`、Web は通常の mutable）を宣言すると、確定ごとに書き戻される。"
+    "en": "TextField owns its text state via two-way binding. The ViewModel declares the property as mutable (`@Published var text: String` on iOS / `MutableStateFlow<String>` on Android / plain mutable on web). TextField writes back through the bound property on every commit. On Android from jsonui-cli 2.5.8 and KotlinJsonUI 2.47.0, `borderWidth` sets the outline's width: the declared width unfocused, the larger of it and 2dp under focus, and no line at 0. A bound width with no value yet draws 1dp. Before, any outline was Material's 1dp, 2dp under focus, so a declared 1 draws what it drew. The generated code passes `borderWidth`, which KotlinJsonUI 2.46.0 does not take, so a field that declares it needs 2.47.0. A TextView on Android does not take it: its generated code has no width on 2.5.8. iOS and web did not move. Generated code compared on a scratch project with 2.5.7 as the control, the widths read from KotlinJsonUI's source; no screen was drawn here.",
+    "ja": "TextField は two-way binding で自身の text 状態を保持する。ViewModel 側で mutable プロパティ（iOS なら `@Published var text: String`、Android なら `MutableStateFlow<String>`、Web は通常の mutable）を宣言すると、確定ごとに書き戻される。Android では jsonui-cli 2.5.8 と KotlinJsonUI 2.47.0 から、`borderWidth` が枠の太さになる。未フォーカスは宣言の太さ、フォーカス中は宣言の太さと 2dp の大きいほう、0 は線なし。binding の値がまだ無いときは 1dp。それまで枠は常に Material の 1dp、フォーカス中 2dp だったので、1 を宣言した欄は同じ線のまま。生成コードが `borderWidth` を渡し、KotlinJsonUI 2.46.0 はそれを受けないので、宣言した欄には 2.47.0 が要る。Android の TextView には届かない（2.5.8 の生成コードに太さは出ない）。iOS と web は変わらない。生成コードは使い捨てのプロジェクトで 2.5.7 を対照に比べ、太さは KotlinJsonUI のソースから読んだ。画面は描いていない。"
   },
   "aliasNotice": null,
   "kicker": "Component · Reference",
@@ -480,8 +480,8 @@
               "platformAndroidLabel": "—",
               "platformWebLabel": "—",
               "note": {
-                "en": "Boolean. When `true`, characters are obscured. Required for password fields. Pair with `contentType: 'password'` for autofill.",
-                "ja": "Boolean。`true` で入力文字を伏せ字に。パスワードには必須。自動入力のために `contentType: 'password'` と併用する。"
+                "en": "Boolean. When `true`, characters are obscured. Required for password fields. Pair with `contentType: 'password'` for autofill. A binding follows the data on all three platforms' generated code from jsonui-cli 2.5.8. Before it, Android showed the text and web always hid it; iOS already followed. Until the bound value arrives the field is not obscured: Android and iOS read a missing value as false and web as falsy, so give a password field a written `true` rather than a binding that starts empty. Generated code compared on a scratch project with 2.5.7 as the control. Android Dynamic follows from KotlinJsonUI 2.47.0, jsonui-cli's measurement; iOS Dynamic is not measured.",
+                "ja": "Boolean。`true` で入力文字を伏せ字に。パスワードには必須。自動入力のために `contentType: 'password'` と併用する。 binding は jsonui-cli 2.5.8 から、3 面の生成コードともデータに従う。それまでは Android は平文で、web は常に伏せ字だった（iOS は前から従っていた）。値が届くまでは伏せ字にならない。Android と iOS は値が無いと false、web は偽として読むので、パスワードの欄には、空で始まる binding ではなく `true` を直接書く。生成コードは使い捨てのプロジェクトで 2.5.7 を対照に比べた。Android の Dynamic は KotlinJsonUI 2.47.0 から従う（jsonui-cli の測定）。iOS の Dynamic は未測定。"
               },
               "type": "boolean | binding",
               "required": ""
@@ -867,8 +867,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "ID of the next TextField to focus when user taps `next` key. Enables keyboard-driven form traversal without tapping each field.",
-                "ja": "`next` キー押下で次にフォーカスする TextField の ID。各フィールドをタップせずキーボードだけでフォーム移動できる。"
+                "en": "ID of the next TextField to focus when user taps `next` key. Enables keyboard-driven form traversal without tapping each field. Takes no binding: write the id out. From jsonui-cli 2.5.8 a binding warns on iOS and Android and reads as absent; web reads it as absent with no warning.",
+                "ja": "`next` キー押下で次にフォーカスする TextField の ID。各フィールドをタップせずキーボードだけでフォーム移動できる。 binding は受けられないので、ID を直接書く。jsonui-cli 2.5.8 から、binding は iOS と Android で警告を出して書いていない扱いになる。web は警告なしで同じ扱い。"
               },
               "type": "string",
               "required": ""
@@ -5486,8 +5486,8 @@
               "platformAndroidLabel": "—",
               "platformWebLabel": "—",
               "note": {
-                "en": "Boolean. When `true`, characters are obscured. Required for password fields. Pair with `contentType: 'password'` for autofill.",
-                "ja": "Boolean。`true` で入力文字を伏せ字に。パスワードには必須。自動入力のために `contentType: 'password'` と併用する。"
+                "en": "Boolean. When `true`, characters are obscured. Required for password fields. Pair with `contentType: 'password'` for autofill. A binding follows the data on all three platforms' generated code from jsonui-cli 2.5.8. Before it, Android showed the text and web always hid it; iOS already followed. Until the bound value arrives the field is not obscured: Android and iOS read a missing value as false and web as falsy, so give a password field a written `true` rather than a binding that starts empty. Generated code compared on a scratch project with 2.5.7 as the control. Android Dynamic follows from KotlinJsonUI 2.47.0, jsonui-cli's measurement; iOS Dynamic is not measured.",
+                "ja": "Boolean。`true` で入力文字を伏せ字に。パスワードには必須。自動入力のために `contentType: 'password'` と併用する。 binding は jsonui-cli 2.5.8 から、3 面の生成コードともデータに従う。それまでは Android は平文で、web は常に伏せ字だった（iOS は前から従っていた）。値が届くまでは伏せ字にならない。Android と iOS は値が無いと false、web は偽として読むので、パスワードの欄には、空で始まる binding ではなく `true` を直接書く。生成コードは使い捨てのプロジェクトで 2.5.7 を対照に比べた。Android の Dynamic は KotlinJsonUI 2.47.0 から従う（jsonui-cli の測定）。iOS の Dynamic は未測定。"
               },
               "type": "boolean | binding",
               "required": ""
@@ -6260,8 +6260,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "ID of the next TextField to focus when user taps `next` key. Enables keyboard-driven form traversal without tapping each field.",
-                "ja": "`next` キー押下で次にフォーカスする TextField の ID。各フィールドをタップせずキーボードだけでフォーム移動できる。"
+                "en": "ID of the next TextField to focus when user taps `next` key. Enables keyboard-driven form traversal without tapping each field. Takes no binding: write the id out. From jsonui-cli 2.5.8 a binding warns on iOS and Android and reads as absent; web reads it as absent with no warning.",
+                "ja": "`next` キー押下で次にフォーカスする TextField の ID。各フィールドをタップせずキーボードだけでフォーム移動できる。 binding は受けられないので、ID を直接書く。jsonui-cli 2.5.8 から、binding は iOS と Android で警告を出して書いていない扱いになる。web は警告なしで同じ扱い。"
               },
               "type": "string",
               "required": ""
