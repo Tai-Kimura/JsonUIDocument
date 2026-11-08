@@ -3,6 +3,7 @@ import "./globals.css";
 
 import { ChromeMount } from "@/components/chrome/ChromeMount";
 import { LanguageReloader } from "@/components/chrome/LanguageReloader";
+import { colorModeScript } from "@/generated/colorModeScript";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jsonui.dev";
 
@@ -60,6 +61,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* A kept colour mode on the page before the first paint (jui build's
+            colorModeScript). Without it a visitor who chose dark saw the
+            server-rendered light page until hydration. */}
+        <script dangerouslySetInnerHTML={{ __html: colorModeScript }} />
+      </head>
       <body>
         <ChromeMount />
         <main className="site-main">

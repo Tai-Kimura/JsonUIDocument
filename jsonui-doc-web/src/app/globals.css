@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* The theme jui build generates from colors.json: every --color-<name>, each
+   non-base mode under :root[data-theme], and the OS's dark through
+   prefers-color-scheme before any script runs. The tokens below carry the
+   same names and values, so this changes no colour; what it adds is the OS
+   rule, and the variables a bound colour reads (ColorManager.cssColor). */
+@import "../generated/theme.css";
+
 /* Tailwind v4 auto-detection respects .gitignore; src/generated is ignored
    so Turbopack dev would skip it without this directive. */
 @source "../generated";
@@ -217,6 +224,15 @@ body {
 
 [data-color-mode="dark"] {
   color-scheme: dark;
+}
+
+/* Before ChromeMount sets data-color-mode (it does after hydration), the OS's
+   dark already darkens the tokens through theme.css; the browser-drawn UI
+   follows it too, unless a kept light choice is on the page. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-color-mode]):not(:has(#jsonui-color-mode)) {
+    color-scheme: dark;
+  }
 }
 
 /* The scroll region inside a CodeBlock. `color-scheme` above already darkens

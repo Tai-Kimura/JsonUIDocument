@@ -305,11 +305,11 @@ export class ChromeViewModel extends ChromeViewModelBase {
     }
   };
 
-  // Flip ColorManager between light and dark. Opting out of followSystemMode
-  // here is intentional: once the user expresses a preference, we stop
-  // tracking the OS until they next reload with no stored choice.
+  // Flip ColorManager between light and dark. setMode is an explicit choice:
+  // ColorManager stops following the OS and keeps the mode for the next visit
+  // (colorModeScript in the root layout puts it on the page before the first
+  // paint). `ColorManager.followSystemMode = true` would hand it back to the OS.
   onToggleColorMode = (): void => {
-    ColorManager.followSystemMode = false;
     const next: ColorMode =
       ColorManager.currentMode === "dark" ? "light" : "dark";
     ColorManager.setMode(next);
