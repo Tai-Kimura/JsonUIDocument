@@ -266,11 +266,20 @@
                       "text": "section_when_body"
                     },
                     {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_when_arg_list"
+                    },
+                    {
                       "type": "CodeBlock",
                       "width": "matchParent",
                       "height": "wrapContent",
                       "topMargin": 12,
-                      "code": "key           | value                          | means\n--------------+--------------------------------+-------------------------------------------------\ndata.<field>  | literal                        | the declared data field holds this value\nstate.<name>  | literal (seedableState)        | the declared view-model-internal state holds this value\narg.<name>    | literal                        | the method argument holds this value\napi.<op>      | named mock scenario            | the API operation answers with this scenario\ncond          | condition name ('!' prefix ok) | a named condition from branchContracts.conditions\nharness.<name>| one of the declared values      | the harness sets up this precondition (harnessConditions, 1.8.118)",
+                      "code": "key           | value                          | means\n--------------+--------------------------------+-------------------------------------------------\ndata.<field>  | literal                        | the declared data field holds this value\nstate.<name>  | literal (seedableState)        | the declared view-model-internal state holds this value\narg.<name>    | literal, or [literal, ...]     | the method argument holds this value (a list from 2.5.17)\napi.<op>      | named mock scenario            | the API operation answers with this scenario\ncond          | condition name ('!' prefix ok) | a named condition from branchContracts.conditions\nharness.<name>| one of the declared values      | the harness sets up this precondition (harnessConditions, 1.8.118)",
                       "language": "text",
                       "filename": "when keys",
                       "showLineNumbers": false,
