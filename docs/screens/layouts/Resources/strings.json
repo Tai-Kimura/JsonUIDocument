@@ -1887,8 +1887,8 @@
       "ja": "正規化レベル (L0 / L1 / L2)"
     },
     "section_norm_levels_body": {
-      "en": "The one Layout JSON exists at three normalization levels. L0 is the raw source you edit under `docs/screens/layouts/*.json` — this is the only surface authors touch. L1 is what `jui build` distributes to each platform: aliases are rewritten to canonical attribute names, a `$jui: { normalized: \"L1\", schemaVersion: 1 }` marker is stamped at the top of the file, and every platform's codegen consumes this uniform shape. Since 2026-07, L1 is default-on — the `normalizeLayouts` build flag is opt-out via `jui.config.json`'s `\"normalizeLayouts\": false`, not opt-in. L2 is the runtime shape used by Dynamic mode and the hot-reload path — L1 with style merge, `include` expansion, and per-platform filtering applied. Authors only ever edit L0; L1 and L2 are auto-generated and carry `@generated` markers so hand-edits are rejected at build time. The upshot: one write in L0 becomes three synchronized deliveries downstream, and the attribute names in error messages, MCP tools, and generated code all agree because the alias table lives in one place. From jsonui-cli 2.5.13 Styles are distributed the same way, with the same `WARNING [normalize]` line: the copy each platform gets has a value alias rewritten (`gradientDirection: LeftToRight` to `Horizontal`, `datePickerMode: datetime` to `dateAndTime`), your Style is not touched, and a Style carries no `$jui` marker. In 2.5.13 an attribute alias in a Style (`placeholderColor`, `alpha`) is rewritten only when the Style has a `type` and also a value alias; otherwise it reaches the converters, which warn it as an unknown attribute and drop it. That is filed with jsonui-cli; write the canonical attribute name in a Style. Before 2.5.13 a Style was copied as written. Compared on a scratch three-platform project with 2.5.12 as the control.",
-      "ja": "1 つの Layout JSON は 3 段階の正規化レベルで存在します。L0 は作者が編集する原本 (`docs/screens/layouts/*.json`) — 手書き surface はここだけです。L1 は `jui build` が 各プラットフォームへ配布する形: エイリアスは正準属性名に書き換えられ、ファイル先頭に `$jui: { normalized: \"L1\", schemaVersion: 1 }` marker が刻印され、各プラットフォームの codegen はこの統一形を消費します。2026-07 以降 L1 は default 有効 — build フラグ `normalizeLayouts` は opt-in ではなく opt-out (`jui.config.json` で `\"normalizeLayouts\": false` を指定すると従来動作)。L2 は runtime (Dynamic mode / hot-reload) が使う形 — L1 に style merge・`include` 展開・プラットフォーム別 filter を 適用した最終形です。作者は常に L0 のみを編集 — L1 と L2 は自動生成で `@generated` marker が付き、手編集は build 時に弾かれます。効果: L0 での 1 回の変更が下流の 3 系統 配布に同期反映され、エラーメッセージ・MCP ツール・生成コードで使われる属性名がすべて 一致するのは、エイリアステーブルが単一の場所にあるからです。jsonui-cli 2.5.13 からは Style も同じように配られ、同じ `WARNING [normalize]` の行が出ます。各プラットフォームに配る写しで値の別名が書き換わり（`gradientDirection: LeftToRight` は `Horizontal`、`datePickerMode: datetime` は `dateAndTime`）、元の Style は書き換わらず、Style には `$jui` marker が付きません。2.5.13 では、Style の属性名の別名（`placeholderColor`、`alpha`）が書き換わるのは、Style に `type` があり、しかも値の別名もあるときだけです。それ以外は変換器に届き、知らない属性として警告されて捨てられます。これは jsonui-cli に起票済みなので、Style には正準の属性名を書いてください。2.5.13 より前は Style を書いたまま写していました。使い捨ての 3 面プロジェクトで 2.5.12 を対照に比べました。"
+      "en": "The one Layout JSON exists at three normalization levels. L0 is the raw source you edit under `docs/screens/layouts/*.json` — this is the only surface authors touch. L1 is what `jui build` distributes to each platform: aliases are rewritten to canonical attribute names, a `$jui: { normalized: \"L1\", schemaVersion: 1 }` marker is stamped at the top of the file, and every platform's codegen consumes this uniform shape. Since 2026-07, L1 is default-on — the `normalizeLayouts` build flag is opt-out via `jui.config.json`'s `\"normalizeLayouts\": false`, not opt-in. L2 is the runtime shape used by Dynamic mode and the hot-reload path — L1 with style merge, `include` expansion, and per-platform filtering applied. Authors only ever edit L0; L1 and L2 are auto-generated and carry `@generated` markers so hand-edits are rejected at build time. The upshot: one write in L0 becomes three synchronized deliveries downstream, and the attribute names in error messages, MCP tools, and generated code all agree because the alias table lives in one place. From jsonui-cli 2.5.13 Styles are distributed the same way, with the same `WARNING [normalize]` line: the copy each platform gets has a value alias rewritten (`gradientDirection: LeftToRight` to `Horizontal`, `datePickerMode: datetime` to `dateAndTime`), your Style is not touched, and a Style carries no `$jui` marker. A Style with a `type` also has its attribute aliases rewritten (`placeholderColor` to `hintColor`, `alpha` to `opacity`), with no warning, as in a Layout; in 2.5.13 that happened only when the same Style also had a value alias, and otherwise the alias reached the converters, which warned it as an unknown attribute and dropped it, fixed in 2.5.14. A Style without a `type` rewrites value aliases only, because an attribute alias means different things on different components. Before 2.5.13 a Style was copied as written. Compared on scratch three-platform projects with 2.5.12 and then 2.5.13 as the control.",
+      "ja": "1 つの Layout JSON は 3 段階の正規化レベルで存在します。L0 は作者が編集する原本 (`docs/screens/layouts/*.json`) — 手書き surface はここだけです。L1 は `jui build` が 各プラットフォームへ配布する形: エイリアスは正準属性名に書き換えられ、ファイル先頭に `$jui: { normalized: \"L1\", schemaVersion: 1 }` marker が刻印され、各プラットフォームの codegen はこの統一形を消費します。2026-07 以降 L1 は default 有効 — build フラグ `normalizeLayouts` は opt-in ではなく opt-out (`jui.config.json` で `\"normalizeLayouts\": false` を指定すると従来動作)。L2 は runtime (Dynamic mode / hot-reload) が使う形 — L1 に style merge・`include` 展開・プラットフォーム別 filter を 適用した最終形です。作者は常に L0 のみを編集 — L1 と L2 は自動生成で `@generated` marker が付き、手編集は build 時に弾かれます。効果: L0 での 1 回の変更が下流の 3 系統 配布に同期反映され、エラーメッセージ・MCP ツール・生成コードで使われる属性名がすべて 一致するのは、エイリアステーブルが単一の場所にあるからです。jsonui-cli 2.5.13 からは Style も同じように配られ、同じ `WARNING [normalize]` の行が出ます。各プラットフォームに配る写しで値の別名が書き換わり（`gradientDirection: LeftToRight` は `Horizontal`、`datePickerMode: datetime` は `dateAndTime`）、元の Style は書き換わらず、Style には `$jui` marker が付きません。`type` のある Style では、属性名の別名も Layout と同じく警告なしで書き換わります（`placeholderColor` は `hintColor`、`alpha` は `opacity`）。2.5.13 では、同じ Style に値の別名もあるときだけ書き換わり、それ以外は変換器に届いて、知らない属性として警告されて捨てられていました。2.5.14 で直りました。`type` の無い Style は値の別名だけを書き換えます。属性名の別名は部品によって意味が違うからです。2.5.13 より前は Style を書いたまま写していました。使い捨ての 3 面プロジェクトで、2.5.12、次に 2.5.13 を対照に比べました。"
     },
     "toc_row_norm_levels": {
       "en": "Normalization levels",
@@ -8931,8 +8931,8 @@
       "ja": "1. パレットファイル"
     },
     "section_palette_body": {
-      "en": "`Resources/colors.json` sits next to `strings.json` and is distributed to every platform by `jui build`. Its shape is themed: a `modes` list, a `fallback_mode` used when a key is missing from the current mode, a `systemModeMapping` that says which mode the OS appearance selects, and one `{ key: hex }` object per mode. A flat `{ key: hex }` file from an older project is still accepted — the first build migrates it into the themed shape and says so in the log.",
-      "ja": "`Resources/colors.json` は `strings.json` と同じ場所に置かれ、`jui build` が全プラットフォームへ配布します。形式はテーマ対応で、`modes` のリスト、現在のモードにキーが無いときに使う `fallback_mode`、OS の外観がどのモードを選ぶかを決める `systemModeMapping`、そしてモードごとの `{ キー: hex }` から成ります。古いプロジェクトのフラットな `{ キー: hex }` 形式も受け付けます — 最初のビルドがテーマ形式へ移行し、その旨をログに出します。"
+      "en": "`Resources/colors.json` sits next to `strings.json` and is distributed to every platform by `jui build`. Its shape is themed: a `modes` list, a `fallback_mode` used when a key is missing from the current mode, a `systemModeMapping` that says which mode the OS appearance selects, and one `{ key: hex }` object per mode. A flat `{ key: hex }` file from an older project is still accepted — the first build migrates it into the themed shape and says so in the log. From jsonui-cli 2.5.14 a key starting with `_` (`_comment`) is a note, at the top level or inside a palette: not a colour and not a mode, and it stays where it was when the build writes the file back. Before 2.5.14 a note inside a palette became a colour on every platform (each ColorManager had an accessor for its text), and one at the top of a themed file made the whole file read as flat, so the distributed copy kept the note and dropped every palette (compared with 2.5.13 as the control).",
+      "ja": "`Resources/colors.json` は `strings.json` と同じ場所に置かれ、`jui build` が全プラットフォームへ配布します。形式はテーマ対応で、`modes` のリスト、現在のモードにキーが無いときに使う `fallback_mode`、OS の外観がどのモードを選ぶかを決める `systemModeMapping`、そしてモードごとの `{ キー: hex }` から成ります。古いプロジェクトのフラットな `{ キー: hex }` 形式も受け付けます — 最初のビルドがテーマ形式へ移行し、その旨をログに出します。jsonui-cli 2.5.14 からは、`_` で始まる鍵（`_comment`）は、最上位でもパレットの中でも注記です。色にもモードにもならず、ビルドがファイルを書き戻すときも元の場所に残ります。2.5.14 より前は、パレットの中の注記はどの面でも色になり（各 ColorManager にその文の取り出し口ができた）、テーマ形のファイルの先頭の注記はファイル全体を平らな形と読ませたので、配る写しには注記だけが残り、パレットはすべて落ちていました（2.5.13 を対照に比べた）。"
     },
     "section_palette_note": {
       "en": "The file travels the same route as strings.json — see /guides/localization for the other half of the Resources pipeline. Keys are mode-agnostic on the layout side: a layout says `\"fontColor\": \"ink_muted\"` and the runtime picks the value for whichever mode is current. Two modes may give the same key completely different values — that is the point.",
@@ -9019,8 +9019,8 @@
       "ja": "自動登録された色はまさにこの状態です: 1 モードにしか入らないので、人が他モードの値を与えるまで警告が出続けます。この警告はビルドの仮置きからあなたのパレットへの引き継ぎ点であり、黙らせるためのものではありません。"
     },
     "section_gotchas_heading": {
-      "en": "7. Things worth knowing before you rely on it",
-      "ja": "7. 頼りきる前に知っておくこと"
+      "en": "8. Things worth knowing before you rely on it",
+      "ja": "8. 頼りきる前に知っておくこと"
     },
     "section_gotchas_body": {
       "en": "Automatic registration is a safety net for hexes that slipped into a layout. It is not a palette designer, and a few of its edges are sharp.",
@@ -9093,6 +9093,34 @@
     "next_rjui_description": {
       "en": "How token classes and theme.css fit into the web output.",
       "ja": "トークンクラスと theme.css が web 出力にどう収まるか。"
+    },
+    "section_images_heading": {
+      "en": "7. A picture per mode",
+      "ja": "7. モードごとの画像"
+    },
+    "toc_row_images": {
+      "en": "Pictures per mode",
+      "ja": "モードごとの画像"
+    },
+    "section_images_body": {
+      "en": "From jsonui-cli 2.5.14 an image can change with the colour mode. Put `<name>.<mode>.svg` beside `<name>.svg` in `docs/screens/images` — `logo.dark.svg`, or a mode of your own such as `logo.sepia.svg` — and keep writing `logo` in the layout. The picture follows the same mode as the colours: the OS until a mode is chosen, then the kept choice. An image with no picture for a mode is drawn as before, and a bound image name takes the same route as a written one.",
+      "ja": "jsonui-cli 2.5.14 から、画像をカラーモードで切り替えられます。`docs/screens/images` の `<名前>.svg` の隣に `<名前>.<mode>.svg` を置き（`logo.dark.svg` や、自前のモードの `logo.sepia.svg` など）、レイアウトには今までどおり `logo` と書きます。絵は色と同じモードに従います: モードが選ばれるまでは OS、選ばれた後は残した選択です。モードの絵の無い画像は今までどおり描かれ、binding した画像の名前も、書いた名前と同じ道を通ります。"
+    },
+    "section_images_bullet_web": {
+      "en": "• Web keeps `src` as the base picture and adds `content: var(--image-<name>)`. theme.css binds that variable under the colours' own selectors (`:root`, `:root[data-theme]`, the OS's dark), and a chosen mode's `<style>` from colorModeScript binds it too, so the picture is right at the first paint with no script. With no theme.css imported the variable is unbound and the `src` is drawn.",
+      "ja": "• web は `src` を base の絵のまま残し、`content: var(--image-<名前>)` を足します。theme.css はその変数を色と同じセレクタ（`:root`、`:root[data-theme]`、OS の暗い外観）で束縛し、colorModeScript が置く選んだモードの `<style>` も束縛するので、スクリプトなしで最初の描画から正しい絵になります。theme.css を読み込んでいなければ変数は束縛されず、`src` の絵が描かれます。"
+    },
+    "section_images_bullet_native": {
+      "en": "• iOS writes `Image(ColorManager.image(\"logo\"))` and Android `painterResource(ColorManager.compose.drawable(R.drawable.logo, \"dark\" to R.drawable.logo__dark, ...))`; a mode's picture becomes the drawable `logo__dark`, because an Android resource name cannot hold a dot. A bound name goes through `ColorManager.image(...)` on iOS and `ColorManager.compose.drawableName(...)` on Android. Dynamic mode needs SwiftJsonUI 10.35.0 and KotlinJsonUI 2.52.0 (jsonui-cli's measurement).",
+      "ja": "• iOS は `Image(ColorManager.image(\"logo\"))`、Android は `painterResource(ColorManager.compose.drawable(R.drawable.logo, \"dark\" to R.drawable.logo__dark, ...))` を書きます。Android のリソース名には点が使えないので、モードの絵は `logo__dark` という drawable になります。binding した名前は、iOS は `ColorManager.image(...)`、Android は `ColorManager.compose.drawableName(...)` を通ります。Dynamic モードには SwiftJsonUI 10.35.0 と KotlinJsonUI 2.52.0 が要ります（jsonui-cli の実測）。"
+    },
+    "section_images_bullet_errors": {
+      "en": "• A `<name>.<x>.svg` beside `<name>.svg` whose `x` is not a mode of colors.json stops `jui build` with `ERROR [image-modes]` and exit 1. In 2.5.14 that check also reads a themed colors.json whose first key is a `_` note (section 1) as having the single mode `light`, so `logo.dark.svg` fails there as well; this is filed with jsonui-cli. Until it is fixed, keep a note out of the top of a file that has pictures per mode, or put it inside a palette, which the check does not read.",
+      "ja": "• `<名前>.svg` の隣の `<名前>.<x>.svg` の `x` が colors.json のモードでなければ、`jui build` は `ERROR [image-modes]` を出して exit 1 で止まります。2.5.14 では、テーマ形の colors.json の最初の鍵が `_` の注記（1 節）だと、この確かめが「モードは `light` だけ」と読むので、`logo.dark.svg` でも止まります。これは jsonui-cli に起票済みです。直るまでは、モードの絵があるファイルでは注記を先頭に置かないか、確かめが読まないパレットの中に置いてください。"
+    },
+    "section_images_note": {
+      "en": "Before 2.5.14 `logo.dark.svg` was simply another image called `logo.dark`: drawn only where a layout named it, and written on Android as a drawable `logo.dark`, a name Android resources do not accept. Generated code compared on a scratch three-platform project with 2.5.13 (its own jui_tools) as the control, a written name, a bound one and a Button's image, and an image with no mode picture that did not move; no picture was drawn on a device or in a browser here.",
+      "ja": "2.5.14 より前の `logo.dark.svg` は、`logo.dark` という別の画像でした。レイアウトがその名前を書いたところでだけ描かれ、Android には `logo.dark` という drawable として書かれていました。Android のリソース名としては受け付けられない名前です。生成コードは使い捨ての 3 面プロジェクトで、2.5.13（その版の jui_tools）を対照に、書いた名前、binding した名前、Button の画像で比べ、モードの絵の無い画像が動かないことも確かめました。端末やブラウザで絵は描いていません。"
     }
   },
   "guides_custom_components": {
@@ -18661,16 +18689,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.5.13",
-      "ja": "2.5.13 でまだできないこと"
+      "en": "Not in 2.5.14",
+      "ja": "2.5.14 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.5.13",
-      "ja": "2.5.13 でまだできないこと"
+      "en": "Not in 2.5.14",
+      "ja": "2.5.14 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
