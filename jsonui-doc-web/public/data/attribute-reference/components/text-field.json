@@ -290,96 +290,102 @@
                         },
                         {
                           "id": "ec_1",
-                          "label": "password",
+                          "label": "usernameWebauthn",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_2",
-                          "label": "newPassword",
+                          "label": "password",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_3",
-                          "label": "oneTimeCode",
+                          "label": "newPassword",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_4",
-                          "label": "email",
+                          "label": "oneTimeCode",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_5",
-                          "label": "emailAddress",
+                          "label": "email",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_6",
-                          "label": "name",
+                          "label": "emailAddress",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_7",
-                          "label": "givenName",
+                          "label": "name",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_8",
-                          "label": "familyName",
+                          "label": "givenName",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_9",
-                          "label": "telephoneNumber",
+                          "label": "familyName",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_10",
-                          "label": "tel",
+                          "label": "telephoneNumber",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_11",
-                          "label": "phone",
+                          "label": "tel",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_12",
-                          "label": "streetAddress",
+                          "label": "phone",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_13",
-                          "label": "postalCode",
+                          "label": "streetAddress",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_14",
-                          "label": "country",
+                          "label": "postalCode",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_15",
-                          "label": "creditCardNumber",
+                          "label": "country",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_16",
+                          "label": "creditCardNumber",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_17",
                           "label": "URL",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
@@ -407,8 +413,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Hints the keyboard / autofill behavior. Common values: `emailAddress`, `password`, `username`, `telephoneNumber`, `URL`, `fullStreetAddress`, `postalCode`, `creditCardNumber`. Maps to `UITextContentType` on iOS, `inputType` on Android, `autocomplete` on Web.",
-                "ja": "キーボードと自動入力の挙動ヒント。主な値: `emailAddress`, `password`, `username`, `telephoneNumber`, `URL`, `fullStreetAddress`, `postalCode`, `creditCardNumber`。iOS では `UITextContentType`、Android では `inputType`、Web では `autocomplete` にマップ。"
+                "en": "Hints the keyboard and autofill. Common values: `emailAddress`, `password`, `username`, `usernameWebauthn`, `telephoneNumber`, `URL`, `streetAddress`, `postalCode`, `creditCardNumber`. Maps to `UITextContentType` on iOS, the keyboard type on Android, and `autocomplete` on web. From jsonui-cli 2.5.11 Android also gives the field Compose's autofill hint (`.semantics { contentType = ContentType.Username }` and so on, a bound value through a `when`) for every value but `URL`, which Compose has no type for; before it no value gave one. `usernameWebauthn` (2.5.11) is a username field that also offers passkeys: web writes `autocomplete=\"username webauthn\"`, iOS `.textContentType(.username)`, and Android draws it as `username` with no warning, because a passkey on Android comes from the app's own credential request, not from the field. In 2.5.10 `jui build` warned it as an invalid value and iOS wrote `.textContentType(.none)`. Generated code compared on a scratch three-platform project with 2.5.10 as the control, eleven written values and a bound one; no password manager was run here.",
+                "ja": "キーボードと自動入力のヒント。主な値: `emailAddress`、`password`、`username`、`usernameWebauthn`、`telephoneNumber`、`URL`、`streetAddress`、`postalCode`、`creditCardNumber`。iOS では `UITextContentType`、Android ではキーボードの種類、web では `autocomplete` にマップする。jsonui-cli 2.5.11 から、Android は Compose の自動入力の印（`.semantics { contentType = ContentType.Username }` など。binding の値は `when` を通す）も欄に付ける。`URL` だけは Compose に型が無いので付かない。それまではどの値も印を付けなかった。`usernameWebauthn`（2.5.11）はパスキーも出すユーザー名の欄: web は `autocomplete=\"username webauthn\"`、iOS は `.textContentType(.username)` を書き、Android は警告なしで `username` と同じに描く。Android のパスキーは欄ではなくアプリ自身の資格情報の要求から出るため。2.5.10 では `jui build` が無効な値として警告し、iOS は `.textContentType(.none)` を書いていた。生成コードは使い捨ての 3 面プロジェクトで 2.5.10 を対照に、書いた 11 の値と binding 1 つで比べた。パスワード マネージャは動かしていない。"
               },
               "type": "string | binding",
               "required": ""
@@ -5296,96 +5302,102 @@
                         },
                         {
                           "id": "ec_1",
-                          "label": "password",
+                          "label": "usernameWebauthn",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_2",
-                          "label": "newPassword",
+                          "label": "password",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_3",
-                          "label": "oneTimeCode",
+                          "label": "newPassword",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_4",
-                          "label": "email",
+                          "label": "oneTimeCode",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_5",
-                          "label": "emailAddress",
+                          "label": "email",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_6",
-                          "label": "name",
+                          "label": "emailAddress",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_7",
-                          "label": "givenName",
+                          "label": "name",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_8",
-                          "label": "familyName",
+                          "label": "givenName",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_9",
-                          "label": "telephoneNumber",
+                          "label": "familyName",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_10",
-                          "label": "tel",
+                          "label": "telephoneNumber",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_11",
-                          "label": "phone",
+                          "label": "tel",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_12",
-                          "label": "streetAddress",
+                          "label": "phone",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_13",
-                          "label": "postalCode",
+                          "label": "streetAddress",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_14",
-                          "label": "country",
+                          "label": "postalCode",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_15",
-                          "label": "creditCardNumber",
+                          "label": "country",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
                         },
                         {
                           "id": "ec_16",
+                          "label": "creditCardNumber",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_17",
                           "label": "URL",
                           "background": "var(--color-surface_sunken)",
                           "fontColor": "var(--color-ink)"
@@ -5413,8 +5425,8 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Hints the keyboard / autofill behavior. Common values: `emailAddress`, `password`, `username`, `telephoneNumber`, `URL`, `fullStreetAddress`, `postalCode`, `creditCardNumber`. Maps to `UITextContentType` on iOS, `inputType` on Android, `autocomplete` on Web.",
-                "ja": "キーボードと自動入力の挙動ヒント。主な値: `emailAddress`, `password`, `username`, `telephoneNumber`, `URL`, `fullStreetAddress`, `postalCode`, `creditCardNumber`。iOS では `UITextContentType`、Android では `inputType`、Web では `autocomplete` にマップ。"
+                "en": "Hints the keyboard and autofill. Common values: `emailAddress`, `password`, `username`, `usernameWebauthn`, `telephoneNumber`, `URL`, `streetAddress`, `postalCode`, `creditCardNumber`. Maps to `UITextContentType` on iOS, the keyboard type on Android, and `autocomplete` on web. From jsonui-cli 2.5.11 Android also gives the field Compose's autofill hint (`.semantics { contentType = ContentType.Username }` and so on, a bound value through a `when`) for every value but `URL`, which Compose has no type for; before it no value gave one. `usernameWebauthn` (2.5.11) is a username field that also offers passkeys: web writes `autocomplete=\"username webauthn\"`, iOS `.textContentType(.username)`, and Android draws it as `username` with no warning, because a passkey on Android comes from the app's own credential request, not from the field. In 2.5.10 `jui build` warned it as an invalid value and iOS wrote `.textContentType(.none)`. Generated code compared on a scratch three-platform project with 2.5.10 as the control, eleven written values and a bound one; no password manager was run here.",
+                "ja": "キーボードと自動入力のヒント。主な値: `emailAddress`、`password`、`username`、`usernameWebauthn`、`telephoneNumber`、`URL`、`streetAddress`、`postalCode`、`creditCardNumber`。iOS では `UITextContentType`、Android ではキーボードの種類、web では `autocomplete` にマップする。jsonui-cli 2.5.11 から、Android は Compose の自動入力の印（`.semantics { contentType = ContentType.Username }` など。binding の値は `when` を通す）も欄に付ける。`URL` だけは Compose に型が無いので付かない。それまではどの値も印を付けなかった。`usernameWebauthn`（2.5.11）はパスキーも出すユーザー名の欄: web は `autocomplete=\"username webauthn\"`、iOS は `.textContentType(.username)` を書き、Android は警告なしで `username` と同じに描く。Android のパスキーは欄ではなくアプリ自身の資格情報の要求から出るため。2.5.10 では `jui build` が無効な値として警告し、iOS は `.textContentType(.none)` を書いていた。生成コードは使い捨ての 3 面プロジェクトで 2.5.10 を対照に、書いた 11 の値と binding 1 つで比べた。パスワード マネージャは動かしていない。"
               },
               "type": "string | binding",
               "required": ""
