@@ -215,25 +215,11 @@ body {
 }
 
 /* Browser-drawn UI (scrollbar tracks, form controls) follows the site theme
-   rather than the OS default. Without this, an always-visible scrollbar —
-   macOS "Show scroll bars: Always", and every scrollbar on Windows — paints
-   its track white inside a dark code block. */
-:root {
-  color-scheme: light;
-}
-
-[data-color-mode="dark"] {
-  color-scheme: dark;
-}
-
-/* Before ChromeMount sets data-color-mode (it does after hydration), the OS's
-   dark already darkens the tokens through theme.css; the browser-drawn UI
-   follows it too, unless a kept light choice is on the page. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-color-mode]):not(:has(#jsonui-color-mode)) {
-    color-scheme: dark;
-  }
-}
+   rather than the OS default: theme.css (imported above) sets color-scheme
+   for each mode and the OS's dark, and a chosen mode's <style> carries its
+   own (jsonui-cli 2.5.15). Without it, an always-visible scrollbar — macOS
+   "Show scroll bars: Always", and every scrollbar on Windows — paints its
+   track white inside a dark code block. */
 
 /* The scroll region inside a CodeBlock. `color-scheme` above already darkens
    the track; this keeps the bar thin and tints it to the code surface so a
