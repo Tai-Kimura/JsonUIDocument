@@ -16217,8 +16217,8 @@
       "ja": "入るもの"
     },
     "section_talk_b6_body": {
-      "en": "SendMessage between Claude Code sessions on this machine, and between a subagent and its parent. The prompt that started a subagent and its final answer are not included.\n\nA peer in the cloud, on another machine, or whose name could not be resolved shows as Someone outside this machine (この機械の外の相手) and cannot be opened. Only this machine's transcripts are read; the other machine is never.",
-      "ja": "この機械の Claude Code のセッションどうしと、サブエージェントと親の間の SendMessage です。サブエージェントを起動したときの指示と、最後の返事は入りません。\n\nクラウドや別の機械の相手、名前が解けなかった相手は「この機械の外の相手」として出て、押しても移れません。読むのはこの機械の transcript だけで、相手の機械は読みません。"
+      "en": "SendMessage between Claude Code sessions on this machine, and between a subagent and its parent. The prompt that started a subagent and its final answer are not included.\n\nA peer in the cloud, on another machine, or whose name could not be resolved shows as Someone outside this machine (この機械の外の相手) and cannot be opened. Only this machine's transcripts are read; the other machine is never.\n\nFrom 2.5.20 a SendMessage that goes through Remote Control's bridge (addressed bridge:session_…) is one message: the receiver's copy is matched to the send, so it shows once and takes Read (既読), and the receiver's talk names the sending session when it is on this machine. Before 2.5.20 such a message could show twice, once from Someone outside this machine, and stay without Read. This is jsonui-cli's measurement; it was not sent through Remote Control here.",
+      "ja": "この機械の Claude Code のセッションどうしと、サブエージェントと親の間の SendMessage です。サブエージェントを起動したときの指示と、最後の返事は入りません。\n\nクラウドや別の機械の相手、名前が解けなかった相手は「この機械の外の相手」として出て、押しても移れません。読むのはこの機械の transcript だけで、相手の機械は読みません。\n\n2.5.20 からは、Remote Control の bridge を通る SendMessage（宛先が bridge:session_…）は 1 つのメッセージになります: 受け手の側の記録が送った側と結び付くので、1 回だけ出て「既読」が付き、送った側のセッションがこの機械にいれば、受け手のトークはそのセッションの名前で出ます。2.5.20 より前は、こうしたメッセージが「この機械の外の相手」からのものとして二重に出たり、「既読」が付かなかったりしました。これは jsonui-cli の測定で、ここでは Remote Control を通して送っていません。"
     },
     "section_talk_b7_title": {
       "en": "When a talk goes",
@@ -18709,16 +18709,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.5.19",
-      "ja": "2.5.19 でまだできないこと"
+      "en": "Not in 2.5.20",
+      "ja": "2.5.20 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.5.19",
-      "ja": "2.5.19 でまだできないこと"
+      "en": "Not in 2.5.20",
+      "ja": "2.5.20 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
@@ -18802,7 +18802,11 @@
       "en": "`jui viz peers` prints the live sessions as JSON: each one's id, name (its title, or the id when it has none), cli (claude or codex), model and provider when known, and available, which says whether it can receive a prompt now.",
       "ja": "`jui viz peers` は、生きているセッションを JSON で出します。それぞれの id、name（題。無ければ id）、cli（claude か codex）、分かれば model と provider、そして今プロンプトを受け取れるかを表す available です。"
     },
-    "section_peers_b2_text": {
+    "section_peers_b1_text": {
+      "en": "From 2.5.20 a session whose relay connected before the server knew the session (after jui viz restarts, the relay reconnects at once and the hooks come later) is tied to it once one of its hooks names its process, with the jui-viz plugin 1.4.0 or newer. Before that such a session could stay available: false. This part is jsonui-cli's measurement.",
+      "ja": "2.5.20 からは、サーバーがまだセッションを知らないうちに中継がつながったセッション（jui viz を起動し直すと、中継はすぐにつなぎ直し、フックは後から来ます）も、jui-viz プラグイン 1.4.0 以上なら、フックがそのプロセスを名指した時点でセッションに結び付きます。それまでは、そうしたセッションが available: false のままになることがありました。ここは jsonui-cli の測定です。"
+    },
+    "section_peers_b3_text": {
       "en": "Measured on 2.3.26 with a fresh HOME and two made-up sessions that have no relay, which is why both are available: false.",
       "ja": "2.3.26 で、新しい HOME と、中継の無い 2 つの架空のセッションで測りました。どちらも available: false なのはそのためです。"
     },
@@ -18815,8 +18819,8 @@
       "ja": "送る"
     },
     "section_send_b1_text": {
-      "en": "• --to: the session's exact id, or a name only one live session has. Two sessions with that name give 409 ambiguous session name; use the session id, and none gives 404 no such live session.\n• --text: 1 to 20,000 characters.\n• --from: who sends it. Left out, it is the session the command runs in: the Codex thread or the Claude Code session in the agent's environment, or the Claude Code process it runs under. Outside an agent, give it, or the command says cannot identify this session; use --from <session-id>.\n• --id: an id of your own for this message (8 to 100 letters, digits, _ and -), to retry it safely (see below). Left out, a new one is made.",
-      "ja": "• --to: セッションの正確な id か、生きているセッションのうち 1 つだけが持つ名前。同じ名前が 2 つあれば 409 ambiguous session name; use the session id、無ければ 404 no such live session です。\n• --text: 1〜20,000 文字。\n• --from: 送り主。省くと、コマンドを走らせたセッションです（エージェントの環境の Codex のスレッドか Claude Code のセッション、またはその下で動いている Claude Code のプロセス）。エージェントの外で走らせるなら指定します。無いと cannot identify this session; use --from <session-id> と出ます。\n• --id: このメッセージに付ける自分の id（英数字・_・- で 8〜100 文字）。安全に送り直すためのものです（下を参照）。省くと新しく作ります。"
+      "en": "• --to: the session's exact id, or a name only one live session has. Two sessions with that name give 409 ambiguous session name; use the session id, and none gives 404 no such live session.\n• --text: 1 to 20,000 characters.\n• --from: who sends it. Left out, it is the session the command runs in: the Codex thread or the Claude Code session in the agent's environment, or the Claude Code process it runs under. Outside an agent, give it, or the command says cannot identify this session; use --from <session-id>. From 2.5.20, when ~/.claude/sessions has no entry for the Claude Code process (entries can go missing, as after a restart), the command asks the jui viz server instead, which knows the session's process from its hooks when the jui-viz plugin is 1.4.0 or newer: its hooks send the claude process's pid. After updating the plugin, run /reload-plugins or restart the session. Measured on 2.5.20 with an isolated server: with no hook the command said cannot identify this session, and once a SessionStart hook named the process the command ran under, the message went out from that session.\n• --id: an id of your own for this message (8 to 100 letters, digits, _ and -), to retry it safely (see below). Left out, a new one is made.",
+      "ja": "• --to: セッションの正確な id か、生きているセッションのうち 1 つだけが持つ名前。同じ名前が 2 つあれば 409 ambiguous session name; use the session id、無ければ 404 no such live session です。\n• --text: 1〜20,000 文字。\n• --from: 送り主。省くと、コマンドを走らせたセッションです（エージェントの環境の Codex のスレッドか Claude Code のセッション、またはその下で動いている Claude Code のプロセス）。エージェントの外で走らせるなら指定します。無いと cannot identify this session; use --from <session-id> と出ます。 2.5.20 からは、~/.claude/sessions にその Claude Code のプロセスの記録が無いとき（起動し直しの後などに無くなることがあります）、コマンドは代わりに jui viz のサーバーに尋ねます。jui-viz プラグインが 1.4.0 以上なら、セッションのフックが claude のプロセスの pid を送るので、サーバーはそのプロセスがどのセッションかを知っています。プラグインを上げたら /reload-plugins をするか、セッションを起動し直してください。2.5.20 で、別に立てたサーバーで測りました: フックが無いとコマンドは cannot identify this session と言い、コマンドが動くプロセスを SessionStart のフックが名指した後は、そのセッションから送られました。\n• --id: このメッセージに付ける自分の id（英数字・_・- で 8〜100 文字）。安全に送り直すためのものです（下を参照）。省くと新しく作ります。"
     },
     "section_send_b2_title": {
       "en": "What the other session receives",
