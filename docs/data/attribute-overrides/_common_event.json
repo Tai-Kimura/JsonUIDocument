@@ -56,6 +56,10 @@
       "summary": {
         "en": "Pinch gesture (two-finger zoom). Receives a `scale` factor per frame.",
         "ja": "ピンチジェスチャ（2 本指ズーム）。フレームごとに `scale` 係数を受け取る。"
+      },
+      "note": {
+        "en": "Declare the handler `((Double) -> Void)?`, or `((Double?) -> Void)?`, or `((String, Double) -> Void)?` to take the view's id first. One declaration serves both platforms: iOS hands the handler a CGFloat, which Swift passes to a Double parameter, and Compose's scale is a Float that the generated code passes as `.toDouble()` from jsonui-cli 2.5.18 (KotlinJsonUI 2.54.0 does the same in Dynamic). Up to 2.5.17 the Compose passed the Float as it was and the screen did not compile, and Dynamic did not call the handler, without an error. A `(Float)` or `(CGFloat)` handler still takes the Float as it is on Android. The generated call was compared with 2.5.17 as the control; that it compiles, the iOS side and Dynamic are jsonui-cli's measurement.",
+        "ja": "ハンドラーは `((Double) -> Void)?` と宣言します。`((Double?) -> Void)?` でも、ビューの id を先に受け取る `((String, Double) -> Void)?` でも構いません。1 つの宣言が両プラットフォームに効きます: iOS はハンドラーに CGFloat を渡し、Swift はそれを Double の引数に渡せます。Compose の scale は Float ですが、jsonui-cli 2.5.18 から生成されるコードはそれを `.toDouble()` で渡します（Dynamic では KotlinJsonUI 2.54.0 が同じことをします）。2.5.17 までは Compose が Float をそのまま渡して画面がコンパイルを通らず、Dynamic はエラーも出さずにハンドラーを呼びませんでした。`(Float)` や `(CGFloat)` のハンドラーは、Android では今も Float をそのまま受け取ります。生成される呼び出しは 2.5.17 を対照に比べました。コンパイルが通ること、iOS 側、Dynamic は jsonui-cli の測定です。"
       }
     },
     "events": {

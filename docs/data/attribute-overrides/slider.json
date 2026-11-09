@@ -72,8 +72,8 @@
     },
     "onValueChange": {
       "note": {
-        "en": "Fires on drag release (or continuously during drag depending on platform).",
-        "ja": "ドラッグ解放時に発火（プラットフォームによってはドラッグ中も発火）。"
+        "en": "Fires on drag release (or continuously during drag depending on platform). Declare the handler `((Double) -> Void)?`, or `((Double?) -> Void)?`, or `((String, Double) -> Void)?` to take the Slider's id first; the same holds for the alias `onValueChanged`. One declaration serves both platforms: iOS hands the handler a Double, and Android's Slider gives a Float that the generated Compose passes as `.toDouble()` from jsonui-cli 2.5.18, inside a cell or not (KotlinJsonUI 2.54.0 does the same in Dynamic). Up to 2.5.17 the Compose passed the Float as it was and the screen did not compile, and Dynamic did not call the handler, without an error. A `(Float)` handler still takes the Float as it is, and an `(Int)` one gets no conversion on either platform. The generated call was compared with 2.5.17 as the control; that it compiles, the iOS side and Dynamic are jsonui-cli's measurement.",
+        "ja": "ドラッグ解放時に発火（プラットフォームによってはドラッグ中も発火）。ハンドラーは `((Double) -> Void)?` と宣言します。`((Double?) -> Void)?` でも、Slider の id を先に受け取る `((String, Double) -> Void)?` でも構いません。別名の `onValueChanged` も同じです。1 つの宣言が両プラットフォームに効きます: iOS はハンドラーに Double を渡し、Android の Slider は Float を出しますが、jsonui-cli 2.5.18 から生成される Compose はそれを `.toDouble()` で渡します（セルの中でも外でも。Dynamic では KotlinJsonUI 2.54.0 が同じことをします）。2.5.17 までは Compose が Float をそのまま渡して画面がコンパイルを通らず、Dynamic はエラーも出さずにハンドラーを呼びませんでした。`(Float)` のハンドラーは今も Float をそのまま受け取り、`(Int)` はどちらのプラットフォームでも変換されません。生成される呼び出しは 2.5.17 を対照に比べました。コンパイルが通ること、iOS 側、Dynamic は jsonui-cli の測定です。"
       }
     }
   },
