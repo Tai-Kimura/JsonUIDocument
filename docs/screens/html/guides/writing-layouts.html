@@ -799,6 +799,33 @@
 <td>-</td>
 <td>-</td>
 </tr>
+<tr data-row-id="1-1-2-1-7-9" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-10" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr data-row-id="1-1-2-1-7-11" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
 <tr data-row-id="1-1-2-1-8" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>guides_writing_layouts_next</code></td>
@@ -984,6 +1011,7 @@ flowchart TD
 <li>2026-11-10 (pin v2.5.24): section_include_note_place added under the include section: on web an included layout&#x27;s root takes its place in the including container from 2.5.24 (overlay placement, row axis for a matchParent height, distribution, wrapContent cap), via a jsonuiPlace prop and the generated includePlace helper; read from the JSX jui build wrote on a scratch web project (2.5.23 control: no prop; 2.5.24: add &quot;absolute bottom-0 left-0&quot; in an overlay, add &quot;self-stretch&quot; / drop &quot;flex-1 min-w-0 min-h-0&quot; in a row, nothing for the same include alone). Rendered positions and the sibling-constraint gap (next release) are jsonui-cli&#x27;s word. section_pitfalls_bullet_visibility: the &#x27;uniform across platforms&#x27; sentence now says iOS honours a literal visibility on a relatively placed child only from 2.5.24; read from the sjui converter&#x27;s output on both versions (2.5.23 wrapped only a binding), drawing is jsonui-cli&#x27;s measurement.</li>
 <li>2026-11-10 (pin v2.5.25): section_include_note_place: the &#x27;sibling constraint across the include still does not apply on web&#x27; sentence rewritten: from 2.5.25 the container runs applyRelativePositions for an include root constrained against a sibling (scratch web project: 2.5.25 emits it for alignTopOfView &quot;anchor&quot;, 2.5.24 nothing); constraints between siblings inside an id&#x27;d include still split on all four platforms (jsonui-cli&#x27;s word). New section_pitfalls_bullet_relative_overlap: in a View with no orientation and a sibling-constrained child, unconstrained children share the grid&#x27;s one cell on web from 2.5.25 (alignBottom child: 2.5.24 own auto row under grid content-start, 2.5.25 col-start-1 row-start-1 self-end); drawing is jsonui-cli&#x27;s measurement; the site has 0 sibling constraints.</li>
 <li>2026-11-10 (pin v2.5.26): section_include_note_place: the &#x27;still splits on all four platforms&#x27; sentence rewritten: constraint targets inside an include with an id get the include&#x27;s prefix in sjui, kjui and rjui codegen from 2.5.26 (include expansion of sjui/kjui: sidePin alignTopOfView anchor -&gt; sideAnchor, 2.5.25 left &#x27;anchor&#x27;; rjui JSX: above jsonuiIncludeId(idPrefix, &quot;anchor&quot;) where 2.5.25 wrote &#x27;anchor&#x27;); Dynamic runtimes still miss it until their next release (jsonui-cli&#x27;s word); per-platform 2.5.25 symptoms are jsonui-cli&#x27;s word.</li>
+<li>2026-11-11 (pin v2.5.27): section_include_note_place: Dynamic sentence now names SwiftJsonUI 10.35.1 / KotlinJsonUI 2.54.1 (jsonui-cli&#x27;s word, runtimes not run). New bullets: section_pitfalls_bullet_gone_anchor (gone has no box; drawn in headless Chromium via jsonui-cli&#x27;s rjui_chromium_draw harness with own fixtures: gone anchor 2.5.26 0,-120 / 2.5.27 0,0, visible control 0,30; isGone read from sjui output 2.5.27, absent 2.5.26), section_pitfalls_bullet_center_margin (centerInParent + leftMargin/topMargin 20: 2.5.26 20,40 / 40,20, 2.5.27 40,40 = no-margin control; alignLeft control 20,0 both), section_pitfalls_bullet_build_checks (ERROR [relative-constraints] for parent/cousin/self/missing targets, sibling control not named, web-only exit 1 and 0 with --allow-partial; INFO [ios-tap] for a 20x20 Button with iOS configured, 44x44 not named; 2.5.26 printed neither).</li>
 </ul>
 </section>
 </div>
