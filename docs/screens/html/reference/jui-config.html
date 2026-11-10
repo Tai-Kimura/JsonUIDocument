@@ -370,6 +370,15 @@
 <td>-</td>
 <td>-</td>
 </tr>
+<tr data-row-id="1-1-2-1-3-4" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>ink_muted</code><span class="swatch-hex">#475467</span></span></div><div class="style-row"><span class="style-key">Font</span>16</div></div></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
 <tr data-row-id="1-1-2-1-4" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_build</code></td>
@@ -753,6 +762,7 @@ flowchart TD
 <li>document_tools_path caveat added 2026-09-09 to the core-directories section. The page had stated only when the key is NEEDED (jsonui-doc not importable from the standard install) and said nothing about what setting it DOES: with a path that exists, document_tools resolves to that working copy rather than the installed distribution, so jui --version stops describing what runs; with a path that does not exist the setting has no effect at all. Both were silent before jsonui-cli 1.8.58, which now prints a NOTE on stderr naming which case occurred. The second paragraph records that jui build reports only the broken case and stays silent when the path exists, because it never prepends it -- a command that did not do the work does not report having done it.</li>
 <li>2026-09-25 — v1.8.119: test.appOwnedIds (ids the app draws outside every layout; a trailing `*` is a prefix; a declaration no step names is listed) added to the test section and the example; the lint section now names lint.stringsUsage and the new lint.stringsUsageTestPaths. Both keys are read from the shipped README and source. The element-id check they serve was measured on this site&#x27;s own tests (see the testing guide&#x27;s note).</li>
 <li>2026-09-30 — The lead said &#x27;every key&#x27;; the page does not list lint.strings / lint.stringsAllowlist, test.artifacts, verify.requireSpecPerScreen, spec.transitionAliases, mock.* or server.port, which jsonui-cli 1.9.5 reads. The lead is narrowed rather than the keys added in this pass.</li>
+<li>2026-11-10 — v2.5.22 uptake: section_platforms_images_body added under the platforms CodeBlock: what jui build writes per platform from docs/screens/images, iOS writing a raster-only SVG&#x27;s PNG/JPEG (scale 2x/3x) instead of a PDF from 2.5.22 under four conditions, Android&#x27;s new WARNINGs, and the vector/raster switch removing the other form&#x27;s file. Measured by calling ImageConverter.convert_ios / convert_android of 2.5.21 and 2.5.22 on 9 scratch SVGs plus a vector-raster-vector switch; no app compiled; the site builds web only.</li>
 </ul>
 </section>
 </div>
