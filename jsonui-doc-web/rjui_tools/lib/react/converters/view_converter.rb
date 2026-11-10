@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'base_converter'
+require_relative '../include_place'
 
 module RjuiTools
   module React
@@ -180,15 +181,16 @@ module RjuiTools
               # static position of an absolute child of a grid is the content
               # box's start, which is the container default the zstack
               # declares (rjui-relative-child-stacks-on-the-axis-it-does-not-
-              # align). The unconstrained children are left to the grid's auto
-              # placement, one per row, as the block flow placed them —
-              # `content-start` keeps those rows at their content height
-              # instead of stretching them over a taller container.
-              if stacked_overlay?
-                classes << 'grid'
-              elsif relative_positioned_children?
-                classes << 'grid content-start'
-              end
+              # align). The unconstrained children share the grid's one cell,
+              # as a stacked overlay's do (convert_children): a View without
+              # orientation overlays them, and their own alignBottom /
+              # centerVertical / matchParent height place them in a cell as
+              # tall as the container. They were left to the grid's auto
+              # placement, one per row with `content-start` holding each row
+              # at its content height — stacked one under the other where
+              # iOS and Android overlap them, and with no height to align in
+              # (rjui-relative-grid-unconstrained-child-align-bottom-ignored).
+              classes << 'grid' if stacked_overlay? || relative_positioned_children?
             else
               # No orientation + single child = simple wrapper
               classes.unshift('flex flex-col')
@@ -347,7 +349,12 @@ module RjuiTools
           alignCenterVerticalView alignCenterHorizontalView
         ].freeze
 
+        # An include is laid out as the root its partial draws, so a
+        # constraint on that root makes the include a constrained child (ticket
+        # rjui-include-root-sibling-constraint-dropped). MUST stay in sync with
+        # ReactGenerator#relative_constraint_for.
         def relative_positioned?(child)
+          child = IncludePlace.laid_out(child, config)
           return false unless child.is_a?(Hash)
 
           id = child['id']
@@ -371,7 +378,7 @@ module RjuiTools
           first = items.find { |child| relative_positioned?(child) }
           return '' unless first
 
-          " ref={#{snake_to_camel_id(first['id'])}RelRef}"
+          " ref={#{snake_to_camel_id(IncludePlace.laid_out(first, config)['id'])}RelRef}"
         end
 
         def convert_children(indent)
@@ -388,7 +395,12 @@ module RjuiTools
               # constraint pointing at it meaningless.
               absolute = relative_positioned?(child) ||
                          (overlay_layout? && !relative_positioned_children?)
-              if stacked_overlay?
+              # An unconstrained child of an overlay with a sibling
+              # constraint is stacked in the grid's one cell, as every child
+              # of a stacked overlay is: it stays in the flow (it sizes the
+              # container and is measured against) and is placed by its own
+              # alignment, not one row below the child before it.
+              if stacked_overlay? || (overlay_layout? && !absolute && relative_positioned_children?)
                 child = child.merge('_overlay' => 'stack')
               elsif absolute
                 child = child.merge('_overlay' => true)
