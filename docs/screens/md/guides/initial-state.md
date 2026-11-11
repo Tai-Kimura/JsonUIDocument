@@ -106,5 +106,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 ## Notes
 
 - 2026-10-17 - Page created on the release that made initialState apply (jsonui-cli 1.9.34 train). Facts are read from jsonui-test-runner v1.14.0 specs §5, §6 and §10 and the published drivers; the validate block is output measured on jsonui-cli 1.9.34 against a scratch fixture; the claim that the web bridge is absent from a production bundle was measured on this site's own export (no occurrence of __JSONUI_STATE__).
+- 2026-11-11 (pin v2.5.28): section_keys_types no longer says Visibility cannot be set. jsonui-test validate on a scratch layout declaring Visibility, Visibility? and [Visibility]: 2.5.28 passes gone and null-for-Visibility?, reports type mismatch for hidden, Gone and false, null for non-optional for null, unsupported type for [Visibility]; 2.5.27 reported unsupported type for every Visibility value. This site's jsonuiTestBridge.ts gains the visibility case (3 lines). The iOS / Android library versions are jsonui-cli's word; no app was run.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->
