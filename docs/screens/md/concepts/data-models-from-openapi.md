@@ -36,6 +36,8 @@ Concept essay: how `jui build` reads OpenAPI files in docs/api/ and emits two la
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Collection | `concepts_data_models_from_openapi_dto_tabs` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `dto_panel_swift` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
@@ -251,5 +253,6 @@ activeDomainTab == 'ts':
 - Strings prefix: concepts_data_models_from_openapi_. Estimated 95-120 keys (section headings, body paragraphs, the four catalog cells, the two code-tab labels, the closing NextRead). en + ja content is jsonui-implement / jsonui-localize's responsibility — only key shapes are declared here.
 - Only CodeBlock is referenced as a custom component (already whitelisted). The four cell layouts (comparison_row / lifecycle_step_row / halt_row / mcp_tool_cell) are standard Layout JSON authored alongside the page Layout — they are not custom JsonUI types.
 - 2026-08-31 — section_dto_body gains the 1.7.25 description escaping. Measured on a one-field schema whose description contains both '/*' and '*/': the v1.7.24 generated .ts fails to compile (TS1131 plus five more errors on the comment line, from tsc run directly on the file), and the v1.7.25 output contains '/api/admin/ *' and '* /' inside an intact comment and type-checks. The web half was measured here rather than transcribed because the upstream report is Kotlin-first — nesting is the Kotlin hazard, while on web the closing marker alone is enough, and the two need different sentences.
+- 2026-11-11 (pin v2.5.29): section_dto_map_alias and section_dto_map_both added under the DTO section. Measured by calling the shipped loader and the iOS / Android (moshi, kotlinx) / web generators of 2.5.28 and 2.5.29 the way jui build does, on a scratch doc: LocalizedText (only additionalProperties: string) is an empty struct / data class / interface on 2.5.28 and typealias [String: String] / Map<String, String> / Record<string, string> on 2.5.29, a field referring to it typed LocalizedTextDto on both; properties + typed additionalProperties prints the quoted WARNING at the top level and a keeps-the-map WARNING in place on 2.5.29, nothing on 2.5.28; additionalProperties: true prints nothing; top-level additionalProperties: {} halts unknown-type on 2.5.29 and passed silently on 2.5.28; a two-schema map cycle halts map-alias-cycle. What the empty type did at runtime (iOS dropping entries, Kotlin not compiling, web TS7053) is jsonui-cli's word; nothing was compiled here.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->
