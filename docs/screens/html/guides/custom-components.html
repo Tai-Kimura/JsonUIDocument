@@ -541,6 +541,15 @@
 <td>-</td>
 <td>-</td>
 </tr>
+<tr data-row-id="1-1-2-1-6-7" data-parent-id="1-1-2-1-6">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
 <tr data-row-id="1-1-2-1-7" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_handedit</code></td>
@@ -819,6 +828,7 @@ flowchart TD
 <li>Identity section added 2026-09-08 as section 3, which renumbered the former 3-7 to 4-8 in both the headings and the table of contents. It states that a custom component&#x27;s identity is its own spec&#x27;s metadata.name, required with no substituted default, and that a screen&#x27;s customComponents entry must spell it the same way. The rule is enforced by jsonui-test generate unit-stubs; jsonui-doc validate spec does not check it, so a green run here says nothing about compliance -- measured on this face by mutating a declared name and by removing a component spec&#x27;s metadata.name, both of which left validate spec reporting PASSED with zero errors.</li>
 <li>2026-09-25 — v1.8.117 uptake: section 6 rewritten from the shipped tool rather than the release notices. Measured on fresh three-platform projects (jui init at 1.8.117, SwiftUI and Compose modes): from a spec that declares props, `jui g converter --from` writes 18 files — per platform the three tool-side files under extensions/ (converter, attribute_definitions/&lt;Name&gt;.json, mappings) plus the app-side stubs (web 1, iOS 3, Android 5); from a spec with no props attribute_definitions is not written (15 files). Re-runs measured by marking every written file: no flag with stdin closed, and --skip-existing, both exit 0 and keep 15 of 18 marks (the three attribute_definitions files are rewritten on every run); --force replaces 11 (converters, stubs, attribute_definitions) and keeps the 7 mappings and registration files. At 1.8.110 the same re-run with no terminal exited 1, and so did --skip-existing, because the iOS and Android stub prompts failed on a closed stdin — so the old sentence (&#x27;--skip-existing … exits 0 instead of erroring on conflict&#x27;) was already false on a three-platform project at the previous pin. The Android file names (&lt;name&gt;_component.rb, component_mappings.rb) and the --force hazard for stubs you have written into are added.</li>
 <li>2026-11-09 — v2.5.21 uptake: section 3 gains a bullet (section_identity_bullet_synonym): a project component named as a type-synonym spelling or alias section (ProgressBar, SeekBar, EditText) is checked against its own definition and its attributes are no longer rewritten. Measured with jui build on a scratch web project with an extension SeekBar bound to minValue and barLabel: 2.5.20 warned Unknown attribute for barLabel only and the distributed layout carried minimum, so the generated JSX dropped minValue; 2.5.21 warned nothing and kept both. iOS and Android not run.</li>
+<li>2026-11-12 (pin v2.5.31): section_scaffold_note_id added after section_scaffold_bullet_mappings. The web scaffold writes `id_attr = build_id_attr` from 2.5.31; an older scaffold keeps the id as written and jui build prints WARN [converter-id] once a build per converter. Measured on a scratch web project (2.5.30 scaffold built under 2.5.30 and 2.5.31, then the line replaced; a fresh 2.5.31 scaffold). The site&#x27;s 7 converters were switched in the same commit: 5 WARN before, 0 after.</li>
 </ul>
 </section>
 </div>

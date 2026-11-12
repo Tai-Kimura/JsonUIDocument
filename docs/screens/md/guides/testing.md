@@ -224,5 +224,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - 2026-10-03 — pin v1.9.7: section_dsl_action_select_tab says a Segment tab is reachable by selectTab since 1.9.7, which gives each tab the id `<id>_tab_<n>` in generated code. Dynamic mode gets those ids in the next SwiftJsonUI / KotlinJsonUI releases (latest today: SwiftJsonUI v10.29.2 tag, KotlinJsonUI 2.43.0 on Maven Central). Per the orchestrator's 1.9.7 notice; not measured here.
 - 2026-10-03 — SwiftJsonUI 10.29.3 is out (tag v10.29.3 → adc358b4, checked by ls-remote). iOS Dynamic Segment tab ids now name it, per the orchestrator. Android Dynamic still waits for the next KotlinJsonUI (Maven Central latest is 2.43.0, re-checked).
 - 2026-10-03 — KotlinJsonUI 2.43.2 is on Maven Central (kotlinjsonui and kotlinjsonui-dynamic, maven-metadata latest=release=2.43.2 and the POMs return 200; tag v2.43.2 → 4c9d31f8, all checked here). The Android Dynamic scope is removed, and the pre-2.43.2 behaviour is kept as a since-when.
+- 2026-11-12 (pin v2.5.31): section_dsl_bullet_within and section_dsl_action_select_tab gained one sentence each: under an include with an id the `_item_` / `_tab_` ids carry the include's prefix on web from 2.5.31 (measured on a scratch web project, see /guides/writing-layouts).
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

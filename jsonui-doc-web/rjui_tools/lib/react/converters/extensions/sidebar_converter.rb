@@ -29,7 +29,7 @@ module RjuiTools
         class SidebarConverter < BaseConverter
           def convert(indent = 2)
             class_name = build_class_name
-            id_attr = extract_id ? %( id="#{extract_id}") : ''
+            id_attr = build_id_attr
 
             props = []
             emit_array_prop(props, 'items',          json['items'])

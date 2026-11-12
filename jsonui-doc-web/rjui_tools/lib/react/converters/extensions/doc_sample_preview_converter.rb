@@ -11,7 +11,7 @@ module RjuiTools
         class DocSamplePreviewConverter < BaseConverter
           def convert(indent = 2)
             class_name = build_class_name
-            id_attr = extract_id ? %( id="#{extract_id}") : ''
+            id_attr = build_id_attr
 
             # No custom attributes
 
