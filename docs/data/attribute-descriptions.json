@@ -465,6 +465,22 @@
     "en": "Cell data property key to use as unique ID for ForEach identity. When set, scrollTo uses String type instead of Int.",
     "ja": "ForEach の identity に使うデータフィールド名。指定時は `scrollTo` の型が Int から String になる。"
   },
+  "reorderable": {
+    "en": "Lets the user reorder the rows: long-press a row (or its reorderHandle), drag it within its section and release it; onReorder is then called. true, or a binding that turns it on only while it is true (an edit mode). Vertical single-column Collections only: a grid, horizontal or flow Collection does not reorder. The ViewModel moves the data. Set cellIdProperty too: without it the layout validator warns. Screen readers and keyboards get move up / move down actions. On iOS a stack-drawn Collection uses SwiftUI's reorderable from iOS 27 and the library's drag below it (jui build prints INFO [ios-reorder] when the app's minimum iOS is below 27). jsonui-cli 2.5.34.",
+    "ja": "行を並べ替えられるようにする。行（または reorderHandle）を長押しし、同じ section の中でドラッグして離すと onReorder が呼ばれる。true か、true の間だけ有効にする binding（編集モードなど）。縦 1 列の Collection だけで、グリッド・横向き・flow は並べ替えない。データを動かすのは ViewModel。cellIdProperty も指定する（無いとレイアウトの検査が警告する）。読み上げとキーボードには「上へ移動」「下へ移動」の操作が付く。iOS で stack として描かれる Collection は iOS 27 から SwiftUI の reorderable、それより前はライブラリのドラッグを使う（アプリの最低 iOS が 27 より下なら jui build が INFO [ios-reorder] を出す）。jsonui-cli 2.5.34 から。"
+  },
+  "onReorder": {
+    "en": "Called when a dragged row is released at a new place: `@{handler}` with (section, from, to) — Swift (Int, Int, Int) -> Void, Kotlin (Int, Int, Int) -> Unit, TypeScript (section: number, from: number, to: number) => void. to is the row's index after the move. Rows move within their own section only; a single-section Collection is section 0. Not called when the row is released where it started or outside the Collection. Move up / move down call it with to = from - 1 / from + 1. jsonui-cli 2.5.34.",
+    "ja": "ドラッグした行を新しい位置で離したときに呼ばれる。`@{handler}` で (section, from, to)。Swift は (Int, Int, Int) -> Void、Kotlin は (Int, Int, Int) -> Unit、TypeScript は (section: number, from: number, to: number) => void。to は移動した後の位置。行は自分の section の中でだけ動き、section が 1 つなら section は 0。元の位置や Collection の外で離したときは呼ばれない。「上へ移動」「下へ移動」は to = from - 1 / from + 1 で呼ぶ。jsonui-cli 2.5.34 から。"
+  },
+  "reorderHandle": {
+    "en": "The id of an element in the cell layout (a grip at the row's right edge, say). Only a long press on it picks the row up; the rest of the row keeps its taps. Without it, a long press anywhere on the row picks it up. On iOS a Collection with a handle uses the library's drag on every version. jsonui-cli 2.5.34.",
+    "ja": "cell レイアウトの中の要素の id（行の右端のつまみなど）。その要素の長押しでだけ行がつかめ、行の他の部分のタップはそのまま。指定しなければ行のどこを長押ししてもつかめる。iOS では handle のある Collection はどの版でもライブラリのドラッグを使う。jsonui-cli 2.5.34 から。"
+  },
+  "reorderLockedProperty": {
+    "en": "A key of the cell data: a row whose value for it is true cannot be picked up, and no other row can be moved past it (a divider row, say). Section headers and footers are not rows and never move. On iOS a Collection with locked rows uses the library's drag on every version. jsonui-cli 2.5.34.",
+    "ja": "cell データのキー。その値が true の行はつかめず、他の行もそれを越えて動かせない（区切りの行など）。section の header と footer は行ではないので動かない。iOS では固定した行のある Collection はどの版でもライブラリのドラッグを使う。jsonui-cli 2.5.34 から。"
+  },
   "autoChangeTrackingId": {
     "en": "When true (and cellIdProperty is set), the library auto-computes each cellId as '<primary>_<hash>' so differential updates work without a manual hashForCell helper. If cellIdProperty is missing, the build emits a warning and cells fall back to index-based identity.",
     "ja": "`true`（かつ `cellIdProperty` 指定時）で `<primary>_<hash>` 形式の cellId を自動計算し、差分更新を hashForCell なしで動かす。`cellIdProperty` 未指定時は build warning が出てインデックスベース identity にフォールバック。"

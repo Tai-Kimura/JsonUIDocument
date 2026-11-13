@@ -7780,6 +7780,50 @@
       "en": "• Tip: when a Collection has multiple sections, the item row that ships from the ViewModel must already be partitioned by section — Section 0 gets rows that fit its cell, Section 1 gets rows that fit its. Do not try to mix types in one section's cells array.",
       "ja": "• Tip: multi-section の Collection では、ViewModel から送る行データは section ごとに分割済みである必要があります — Section 0 にはその cell に合う行だけ、Section 1 にはそれ用の行だけ。1 つの section の cells 配列に異なる type を混ぜないこと。"
     },
+    "section_collection_reorder_heading": {
+      "en": "Letting the user reorder rows (jsonui-cli 2.5.34)",
+      "ja": "行を並べ替えられるようにする (jsonui-cli 2.5.34)"
+    },
+    "section_collection_reorder_body": {
+      "en": "A vertical, single-column Collection can let the user reorder its rows on iOS, Android and web: long-press a row, drag it up or down within its section, and release it. Set reorderable to true, or to a binding that turns it on only while the value is true (an edit mode, say), and name a handler in onReorder. The Collection does not change the data itself: the ViewModel moves the row in its own list, and the rows are drawn from that list as usual. A grid, a horizontal Collection and a flow layout are drawn as before and do not reorder.",
+      "ja": "縦 1 列の Collection は、iOS・Android・web で行を並べ替えられるようにできます。行を長押しし、同じ section の中で上下にドラッグして離します。reorderable に true か、値が true の間だけ有効にする binding（編集モードなど）を書き、onReorder にハンドラを指定します。Collection 自身はデータを変えません。ViewModel が自分のリストの中で行を動かし、行はいつもどおりそのリストから描かれます。グリッド・横向き・flow の Collection は今までどおり描かれ、並べ替えはできません。"
+    },
+    "section_collection_reorder_bullet_onreorder": {
+      "en": "• onReorder — called once per release with (section, from, to). to is the row's index after the move, so moving the first of three rows to the end gives (0, 0, 2). Rows move only within their own section, and releasing a row where it started does not call the handler. SwiftUI's onMove counts its destination before the row is taken out (3 in that example); the library converts it, so the handler gets the same to on every platform.",
+      "ja": "• onReorder — 離すたびに (section, from, to) で 1 回呼ばれます。to は移動した後の位置なので、3 行の先頭を末尾へ動かすと (0, 0, 2) です。行は自分の section の中でだけ動き、元の位置で離したときはハンドラは呼ばれません。SwiftUI の onMove は行を抜く前の数え方で移動先を渡します（この例では 3）が、ライブラリが変換するので、どのプラットフォームでもハンドラが受け取る to は同じです。"
+    },
+    "section_collection_reorder_bullet_handle": {
+      "en": "• reorderHandle — the id of an element inside the cell, such as a grip at the row's right edge. Only a long press on that element picks the row up, and the rest of the row keeps its taps. Without it, a long press anywhere on the row picks it up.",
+      "ja": "• reorderHandle — cell の中の要素の id です（行の右端のつまみなど）。その要素を長押ししたときだけ行がつかめ、行の他の部分のタップはそのまま使えます。指定しなければ、行のどこを長押ししてもつかめます。"
+    },
+    "section_collection_reorder_bullet_locked": {
+      "en": "• reorderLockedProperty — a key of the cell data. A row whose value for that key is true cannot be picked up, and no other row can be moved past it, so a locked row splits the list into stretches that are reordered separately. Section headers and footers are not rows and never move.",
+      "ja": "• reorderLockedProperty — cell データのキーです。そのキーの値が true の行はつかめず、他の行もそれを越えて動かせません。固定した行で一覧は区切られ、区切りごとに並べ替えます。section の header と footer は行ではないので動きません。"
+    },
+    "section_collection_reorder_bullet_release": {
+      "en": "• Where a release counts: anywhere inside the Collection's frame, header and footer included. Released over the header, the row goes to the first place it may take; over the footer, to the last. Released outside the frame, the move is cancelled and onReorder is not called.",
+      "ja": "• 離した位置の扱い: Collection の枠（header と footer を含む）の中ならどこでも有効です。header の上で離すとその行が入れる一番上へ、footer の上で離すと一番下へ動きます。枠の外で離すと取り消しになり、onReorder は呼ばれません。"
+    },
+    "section_collection_reorder_bullet_a11y": {
+      "en": "• Screen readers and keyboards: on the web every row gets “Move up” and “Move down” buttons (“上へ移動” / “下へ移動” on a Japanese page), hidden until they have focus, which call onReorder with to = from − 1 or from + 1 and announce the new position. A button is left out where that move is not allowed: up on the first row, down on the last, into or across a locked row. jsonui-cli says VoiceOver on iOS and TalkBack on Android offer the same two actions.",
+      "ja": "• 読み上げとキーボード: web では各行に「上へ移動」「下へ移動」のボタン（英語のページでは Move up / Move down）が付きます。フォーカスが当たるまでは隠れていて、押すと to = from − 1 か from + 1 で onReorder を呼び、移動後の位置を読み上げます。動かせない方向のボタンは付きません（先頭の行の上、末尾の行の下、固定した行へ入る・越える方向）。iOS の VoiceOver と Android の TalkBack でも同じ 2 つの操作が出る、と jsonui-cli は述べています。"
+    },
+    "section_collection_reorder_bullet_identity": {
+      "en": "• Set cellIdProperty. Without it the rows are keyed by position, and while a row moves the wrong one can be shown for a moment. From 2.5.34 the layout validator warns about a reorderable Collection (true or a binding) that has no cellIdProperty. It is a warning, not an error, so the build still finishes.",
+      "ja": "• cellIdProperty を指定してください。無いと行は位置で区別され、動かしている間に一瞬別の行が見えることがあります。2.5.34 から、cellIdProperty の無い reorderable な Collection（true でも binding でも）にはレイアウトの検査が警告を出します。エラーではないので、ビルドは最後まで通ります。"
+    },
+    "section_collection_reorder_bullet_ios": {
+      "en": "• iOS has two ways to drag. A Collection drawn as a stack (with sections and no listStyle, or lazy: 'none') uses SwiftUI's own reorderable / reorderContainer from iOS 27 and the library's drag below that. For such a Collection jui build prints one line, INFO [ios-reorder], when the app's minimum iOS is below 27 or cannot be read. It reads that minimum from platforms.ios.minimumOS in jui.config.json, then the Xcode project's IPHONEOS_DEPLOYMENT_TARGET, then Package.swift. The line is information, not a warning. A Collection with a reorderHandle or a reorderLockedProperty uses the library's drag on every iOS version, because SwiftUI's reorderable has no handle-only form and moves a locked row too. A Collection drawn as a List (a listStyle, or no sections, without lazy: 'none') uses onMove. Neither of these gets the line.",
+      "ja": "• iOS のドラッグには 2 通りあります。stack として描かれる Collection（sections があり listStyle が無いもの、または lazy: 'none'）は、iOS 27 からは SwiftUI 標準の reorderable / reorderContainer を、それより前はライブラリのドラッグを使います。そうした Collection について、アプリの最低 iOS が 27 より下か読み取れないとき、jui build は INFO [ios-reorder] を 1 行出します。最低 iOS は jui.config.json の platforms.ios.minimumOS、Xcode プロジェクトの IPHONEOS_DEPLOYMENT_TARGET、Package.swift の順に読みます。この行はお知らせで、警告ではありません。reorderHandle か reorderLockedProperty のある Collection は、どの iOS でもライブラリのドラッグを使います。SwiftUI の reorderable にはつまみだけでつかむ形が無く、固定した行も動かしてしまうためです。List として描かれる Collection（lazy: 'none' でなく、listStyle がある、または sections が無い）は onMove を使います。どちらにもこの行は出ません。"
+    },
+    "section_collection_reorder_bullet_web": {
+      "en": "• On the web the generator wraps the rows in a helper it writes to src/generated only when a layout uses reorderable. The helper follows the pointer rather than HTML drag and drop, so it works with touch as well as a mouse. This site uses no reorderable Collection, so its generated files did not change with 2.5.34.",
+      "ja": "• web では、生成器が行をヘルパーで包みます。このヘルパーは、reorderable を使うレイアウトがあるときだけ src/generated に書き出されます。HTML のドラッグ＆ドロップではなくポインターの動きを追うので、マウスだけでなくタッチでも動きます。このサイトには reorderable な Collection が無いので、2.5.34 で生成物は変わりませんでした。"
+    },
+    "section_collection_reorder_note_measured": {
+      "en": "Measured on jsonui-cli 2.5.34 against 2.5.33 for this page: the web output for the Collection above (2.5.33 wraps nothing); the web helper's release and move-up/move-down rules, run in Node on five rows with a locked middle row, which agree with the rule jsonui-cli shares across the platforms; the iOS INFO check, called on variants of that Collection; and the layout validator. No row was dragged in a browser or on a device here. How the drag looks is jsonui-cli's conformance measurement.",
+      "ja": "このページのために jsonui-cli 2.5.34 で測り、2.5.33 と比べました: 上の Collection の web 出力（2.5.33 は何も包みません）、web ヘルパーの「離した位置」と「上へ・下へ」の決まり（中央の行を固定した 5 行で Node から呼び、jsonui-cli が各プラットフォームで共有する決まりと一致）、iOS の INFO の判定（この Collection の変形で呼び出し）、レイアウトの検査。ブラウザや実機で行をドラッグしてはいません。ドラッグの見た目は jsonui-cli の conformance の計測です。"
+    },
     "section_binding_heading": {
       "en": "6. Binding and visibility",
       "ja": "6. Binding と visibility"
@@ -8267,6 +8311,10 @@
     "section_dsl_action_select_tab": {
       "en": "• `selectTab` — switch a TabView / Segment tab by index. A Segment tab is reachable since jsonui-cli 1.9.7, which gives each tab the id `<id>_tab_<n>` in generated code; In Dynamic mode the ids arrive with SwiftJsonUI 10.29.3 and KotlinJsonUI 2.43.2. Under an include with an id, the tab's id carries the include's prefix (heroTabs_tab_1 for a Segment 'tabs' under include id 'hero'), on web from 2.5.31.",
       "ja": "• `selectTab` — TabView / Segment のタブを index で切り替える。Segment のタブに届くのは jsonui-cli 1.9.7 からで、生成コードの各タブに `<id>_tab_<n>` の id が付きます。Dynamic モードでは、SwiftJsonUI 10.29.3 と KotlinJsonUI 2.43.2 からこの id が付きます。id 付きの include の下では、タブの id に include の前置きが付きます（include の id 'hero' の下の Segment 'tabs' なら heroTabs_tab_1。web は 2.5.31 から）。"
+    },
+    "section_dsl_action_move_item": {
+      "en": "• `moveItem` (jsonui-cli 2.5.34; drivers iOS 2.4.0, Android 1.23.0, web 1.20.0) — long-press row `<id>_item_<from>` of a reorderable Collection (on the element named by `handle` when the Collection has a reorderHandle), drag it, and release it over `<id>_item_<to>`: {\"action\": \"moveItem\", \"id\": \"task_list\", \"from\": 0, \"to\": 2}. `to` is the row's index after the move, the same `to` onReorder receives. Both rows must be on screen. Assert the new order in a following step. validate rejects a step whose `from` equals `to`, a missing `to` and a `section` other than 0, and names the driver versions the step needs. 2.5.33's validate rejects the action as unsupported.",
+      "ja": "• `moveItem`（jsonui-cli 2.5.34。driver は iOS 2.4.0・Android 1.23.0・web 1.20.0 から）— reorderable な Collection の行 `<id>_item_<from>` を長押しし（Collection に reorderHandle があれば `handle` の要素を）、ドラッグして `<id>_item_<to>` の上で離します: {\"action\": \"moveItem\", \"id\": \"task_list\", \"from\": 0, \"to\": 2}。`to` は移動した後の位置で、onReorder が受け取る `to` と同じです。両方の行が画面に出ている必要があります。新しい並びは次の step で確かめてください。validate は、`from` と `to` が同じ step、`to` の無い step、`section` が 0 以外の step を弾き、この step に必要な driver の版を知らせます。2.5.33 の validate は未対応の action として弾きます。"
     },
     "section_dsl_action_set_slider_value": {
       "en": "• `setSliderValue` (drivers iOS 2.3.0, Android 1.22.0, web 1.19.0) — put a Slider at `value` in the slider's own units, not a 0–1 position: {\"action\": \"setSliderValue\", \"id\": \"volume\", \"value\": 9, \"range\": [0, 10], \"step\": 1}. `range` and `step` may be left out. A value outside the bounds, or off the step grid that starts at the minimum, fails before anything moves and names the nearest value; with `range` / `step` written, `jsonui-test validate` says so first (measured on jsonui-cli 2.5.19: \"12 is above the slider's range [0, 10]; the nearest value it can take is 10\" and \"2.5 is not on the slider's steps (0 + k * 1); the nearest values are 2 and 3\"). Android and web put the slider at the value exactly. iOS drags the thumb as a finger does, so the step passes when the value it landed on is within half of `step`, else 0.5% of the range, and that value is recorded in the case's warnings. iOS cannot read a slider's bounds: write `range`, or the driver moves the thumb to both ends to read them (the app sees those values) and a 0…1 or 0…100 slider fails; validate warns on a step that reaches iOS without it. A driver older than the floor fails the step as an unknown action when the file runs; validate names the floor when it can read the installed driver. Up to jsonui-cli 2.5.18 validate refused the step as an unsupported action.",
@@ -18761,16 +18809,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.5.33",
-      "ja": "2.5.33 でまだできないこと"
+      "en": "Not in 2.5.34",
+      "ja": "2.5.34 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.5.33",
-      "ja": "2.5.33 でまだできないこと"
+      "en": "Not in 2.5.34",
+      "ja": "2.5.34 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",

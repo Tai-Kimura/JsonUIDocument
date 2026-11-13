@@ -84,6 +84,7 @@ Guides > Writing screen tests. Nine sections + TOC + next-reads. There is no `ju
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_drivers` | - | - | - | - |
@@ -225,5 +226,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - 2026-10-03 — SwiftJsonUI 10.29.3 is out (tag v10.29.3 → adc358b4, checked by ls-remote). iOS Dynamic Segment tab ids now name it, per the orchestrator. Android Dynamic still waits for the next KotlinJsonUI (Maven Central latest is 2.43.0, re-checked).
 - 2026-10-03 — KotlinJsonUI 2.43.2 is on Maven Central (kotlinjsonui and kotlinjsonui-dynamic, maven-metadata latest=release=2.43.2 and the POMs return 200; tag v2.43.2 → 4c9d31f8, all checked here). The Android Dynamic scope is removed, and the pre-2.43.2 behaviour is kept as a since-when.
 - 2026-11-12 (pin v2.5.31): section_dsl_bullet_within and section_dsl_action_select_tab gained one sentence each: under an include with an id the `_item_` / `_tab_` ids carry the include's prefix on web from 2.5.31 (measured on a scratch web project, see /guides/writing-layouts).
+- 2026-11-13 (pin v2.5.34): section_dsl_action_move_item added after selectTab. jsonui-test validate on 2.5.34 accepts {id, from, to} and {.., handle, section 0}, rejects a missing to, from == to and section 1, and warns the driver floor; 2.5.33 rejects the action as unsupported. Driver floors from the schema's action table; no driver run.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->
