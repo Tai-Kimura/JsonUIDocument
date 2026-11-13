@@ -362,5 +362,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 
 - Screenshots live in docs/screens/images/viz/ and are taken with sample data only.
 - 2026-11-10 — v2.5.22 uptake: section_states_b14_body says the built-in price table has claude-fable-5-2 from 2.5.22 (checked 2026-11-10), read from the shipped jui_cli/viz/prices.json diff against 2.5.21; no bill was drawn here.
+- 2026-11-13 (pin v2.5.33): section_outside_b4_body gained the weather retry steps (1, 2, 4, 8, 16 min, then 30; 20 s timeout, 5 until 2.5.32), read by calling the shipped weather source of 2.5.33 with 2.5.32 as the control (no retry function); Open-Meteo not contacted.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

@@ -192,5 +192,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 ## Notes
 
 - Screenshots live in docs/screens/images/viz/ and are taken with sample data only.
+- 2026-11-13 (pin v2.5.33): section_fetch_b0_text gained the scheduled-fetch retry steps (1, 2, 4, 8, 16 min, then the schedule's times; a fetch without an error ends them; by hand unchanged), read by calling record_outcome of the shipped 2.5.33 intake; Slack not contacted.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

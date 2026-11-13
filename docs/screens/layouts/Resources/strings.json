@@ -7809,8 +7809,8 @@
       "ja": "layout を書いていると誰もが 1 度は引っかかる挙動の短いリスト。ジェネレータのバグではなく、クロスプラットフォームの属性語彙が各プラットフォームのレイアウトモデル (Web の flexbox、SwiftUI のスタックレイアウト、Android Compose の Row / Column + weight) に写像される過程から自然に出てくる挙動です。知っていれば対処できます。"
     },
     "section_pitfalls_bullet_weight": {
-      "en": "• weight vs matchParent inside a horizontal parent: in a horizontal View, matchParent on the cross-axis (height) means 'fill the row's height', not 'take all the remaining horizontal space'. If you want a child to claim unused main-axis space among its siblings, write weight: 1. The rule is the same on every platform — flex-row on Web, HStack on SwiftUI, Row on Android Compose: matchParent is cross-axis fill, weight is main-axis growth.",
-      "ja": "• horizontal 親の中での weight と matchParent: horizontal View で cross axis (height) の matchParent は「行の高さいっぱいに広げる」であって「残りの横方向スペースを取る」ではない。兄弟の間で残りの main axis スペースを取りたいなら weight: 1 を使う。この規則はプラットフォーム共通 (Web の flex-row、SwiftUI の HStack、Android Compose の Row): matchParent は cross axis 方向の fill、weight は main axis の成長。"
+      "en": "• weight vs matchParent inside a horizontal parent: in a horizontal View, matchParent on the cross-axis (height) means 'fill the row's height', not 'take all the remaining horizontal space'. If you want a child to claim unused main-axis space among its siblings, write weight: 1. The rule is the same on every platform — flex-row on Web, HStack on SwiftUI, Row on Android Compose: matchParent is cross-axis fill, weight is main-axis growth. When the weights differ (3:2) and the row's height is wrapContent or not given, the row is as tall as its tallest child, as on Android and web; SwiftJsonUI's SwiftUI weighted stack does this from 10.35.3, where until 10.35.2 it took the height its parent proposed, so a 3:2 row of buttons in a column grew to the column's remaining height. A vertical stack with differing weights is likewise as wide as its widest child. A matchParent or fixed cross axis, and equal weights, are unchanged. Read from WeightedStackView in SwiftJsonUI 10.35.3, nothing drawn here; that the drawn boxes now match Android and web is jsonui-cli's conformance measurement.",
+      "ja": "• horizontal 親の中での weight と matchParent: horizontal View で cross axis (height) の matchParent は「行の高さいっぱいに広げる」であって「残りの横方向スペースを取る」ではない。兄弟の間で残りの main axis スペースを取りたいなら weight: 1 を使う。この規則はプラットフォーム共通 (Web の flex-row、SwiftUI の HStack、Android Compose の Row): matchParent は cross axis 方向の fill、weight は main axis の成長。weight が不揃い（3:2）で、行の高さが wrapContent か指定なしの時、行の高さは一番高い子の高さになります。Android と web と同じです。SwiftJsonUI の SwiftUI の weight の並びは 10.35.3 からこうなり、10.35.2 までは親が提案した高さをそのまま採ったので、縦の並びの中の 3:2 のボタンの行が、残りの高さいっぱいに伸びました。weight が不揃いな縦の並びも同じく、一番幅の広い子の幅になります。交わる軸が matchParent か固定の大きさの時と、weight がそろう時は変わりません。SwiftJsonUI 10.35.3 の WeightedStackView から読みました。ここでは描画していません。描かれた箱が Android と web にそろうことは、jsonui-cli の conformance の測定です。"
     },
     "section_pitfalls_bullet_topmargin": {
       "en": "• topMargin is orientation-agnostic: on every platform it always means 'space above this element', regardless of whether the parent flow is horizontal or vertical. In a horizontal View that adds space above the element, not between it and its left neighbour. Use leftMargin (or the parent's itemSpacing) for sibling gaps in a row.",
@@ -14647,8 +14647,8 @@
       "ja": "何が、どのくらい送られるか"
     },
     "section_outside_b4_body": {
-      "en": "It is off by default, and then jui viz makes no connection for the weather (the cloud price fetch is separate, see Safety).\n\nWhen it is on, the position is rounded to about 1 km before it is stored or sent, and the jui viz server asks Open-Meteo for the weather there once every 30 minutes; the page itself asks no one but the server. Turning it off removes the position.",
-      "ja": "既定はオフで、そのとき jui viz は天気のための通信を 1 本もしません（クラウドの単価の取得は別で、「安全について」を参照）。\n\nオンのときは、位置を約 1 km に丸めてから保存・送信し、jui viz のサーバーが 30 分に 1 回、その場所の天気を Open-Meteo に問い合わせます。ページ自身はサーバー以外に問い合わせません。オフにすると、保存した位置を消します。"
+      "en": "It is off by default, and then jui viz makes no connection for the weather (the cloud price fetch is separate, see Safety).\n\nWhen it is on, the position is rounded to about 1 km before it is stored or sent, and the jui viz server asks Open-Meteo for the weather there once every 30 minutes; the page itself asks no one but the server. Turning it off removes the position. From jsonui-cli 2.5.33 a failed query is asked again sooner: after 1, 2, 4, 8 and 16 minutes, then every 30 minutes, and back to every 30 minutes once an answer comes; one query waits up to 20 seconds (5 until 2.5.32, when a failure waited the full 30 minutes). `jui viz doctor` says when it tries again. Read by calling the shipped weather source of 2.5.33 (2.5.32 has no retry step), without asking Open-Meteo.",
+      "ja": "既定はオフで、そのとき jui viz は天気のための通信を 1 本もしません（クラウドの単価の取得は別で、「安全について」を参照）。\n\nオンのときは、位置を約 1 km に丸めてから保存・送信し、jui viz のサーバーが 30 分に 1 回、その場所の天気を Open-Meteo に問い合わせます。ページ自身はサーバー以外に問い合わせません。オフにすると、保存した位置を消します。jsonui-cli 2.5.33 からは、問い合わせが失敗すると、1・2・4・8・16 分後に問い合わせ直し、その後は 30 分ごとに戻り、答えが来れば 30 分に 1 回に戻ります。1 回の問い合わせは最長 20 秒待ちます（2.5.32 までは 5 秒で、失敗すると 30 分まるごと待ちました）。次に試す時刻は `jui viz doctor` が言います。2.5.33 の天気の取得部を直に呼んで読みました（2.5.32 には試し直しの段がありません）。Open-Meteo には問い合わせていません。"
     },
     "section_outside_b5_title": {
       "en": "What you see",
@@ -18761,16 +18761,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.5.21",
-      "ja": "2.5.21 でまだできないこと"
+      "en": "Not in 2.5.33",
+      "ja": "2.5.33 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.5.21",
-      "ja": "2.5.21 でまだできないこと"
+      "en": "Not in 2.5.33",
+      "ja": "2.5.33 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
@@ -19235,8 +19235,8 @@
       "ja": "いつ取るか"
     },
     "section_fetch_b0_text": {
-      "en": "• The schedule runs every everyHours hours, counted from schedule.at. A run missed while the server was down runs as soon as it is back.\n• Fetch now (今すぐ取る) in the room fetches at once. It also retries the messages that failed earlier.\n• A channel fetched for the first time starts from the last everyHours hours (24 when the schedule is by hand only).\n• A reply to a thread is taken too, even when the thread started before the last fetch, for threads started in the last threadWatchDays days.\n• Slack's own notices (joins, leaves, topic and name changes, pins) are skipped.\n• With mode socket (from 2.5.0), Slack pushes each new message in a listed channel, DM or group, and it takes the same road at once. Edits and deletions are not taken. The schedule and Fetch now still read the Web API, to pick up what a dropped connection missed, and a message taken one way is not taken again the other way.\n• A channel's position moves only after its messages are written, so a failed fetch takes the same messages again next time.",
-      "ja": "• 予定の取得は、schedule.at を起点に everyHours 時間ごとに動きます。サーバーが止まっていて逃した回は、戻ったらすぐに動きます。\n• 部屋の「今すぐ取る」は、その場で取ります。前に失敗したメッセージもやり直します。\n• 初めて取るチャンネルは、直前の everyHours 時間ぶんから始めます（手でだけのときは 24 時間）。\n• スレッドへの返信も取ります。スレッドが前回の取得より前に始まっていても、直近 threadWatchDays 日に始まったスレッドなら取ります。\n• Slack 自身のお知らせ（参加・退出・トピックや名前の変更・ピン留め）は飛ばします。\n• mode が socket なら（2.5.0 から）、指定したチャンネル・DM・グループの新しいメッセージを Slack が送ってきて、その場で同じ道を通ります。編集と削除は取りません。予定の取得と「今すぐ取る」は今までどおり Web API を読み、切れていた間に取りこぼした分を拾います。片方で取ったメッセージを、もう片方でまた取ることはありません。\n• チャンネルの読んだ位置は、メッセージを書き終えてから進みます。失敗した取得は、次回に同じメッセージをもう一度取ります。"
+      "en": "• The schedule runs every everyHours hours, counted from schedule.at. A run missed while the server was down runs as soon as it is back.\n• Fetch now (今すぐ取る) in the room fetches at once. It also retries the messages that failed earlier.\n• A channel fetched for the first time starts from the last everyHours hours (24 when the schedule is by hand only).\n• A reply to a thread is taken too, even when the thread started before the last fetch, for threads started in the last threadWatchDays days.\n• Slack's own notices (joins, leaves, topic and name changes, pins) are skipped.\n• With mode socket (from 2.5.0), Slack pushes each new message in a listed channel, DM or group, and it takes the same road at once. Edits and deletions are not taken. The schedule and Fetch now still read the Web API, to pick up what a dropped connection missed, and a message taken one way is not taken again the other way.\n• A channel's position moves only after its messages are written, so a failed fetch takes the same messages again next time.\n• From 2.5.33 a scheduled fetch that fails (an error from Slack or the connector, or the run itself failing) is tried again after 1, 2, 4, 8 and 16 minutes, then at the schedule's times; a fetch without an error ends the steps. Until 2.5.32 it waited for the next scheduled time, hours away. Fetch now is as it was. Read by calling the retry bookkeeping of the shipped 2.5.33 intake, with no Slack contacted.",
+      "ja": "• 予定の取得は、schedule.at を起点に everyHours 時間ごとに動きます。サーバーが止まっていて逃した回は、戻ったらすぐに動きます。\n• 部屋の「今すぐ取る」は、その場で取ります。前に失敗したメッセージもやり直します。\n• 初めて取るチャンネルは、直前の everyHours 時間ぶんから始めます（手でだけのときは 24 時間）。\n• スレッドへの返信も取ります。スレッドが前回の取得より前に始まっていても、直近 threadWatchDays 日に始まったスレッドなら取ります。\n• Slack 自身のお知らせ（参加・退出・トピックや名前の変更・ピン留め）は飛ばします。\n• mode が socket なら（2.5.0 から）、指定したチャンネル・DM・グループの新しいメッセージを Slack が送ってきて、その場で同じ道を通ります。編集と削除は取りません。予定の取得と「今すぐ取る」は今までどおり Web API を読み、切れていた間に取りこぼした分を拾います。片方で取ったメッセージを、もう片方でまた取ることはありません。\n• チャンネルの読んだ位置は、メッセージを書き終えてから進みます。失敗した取得は、次回に同じメッセージをもう一度取ります。\n• 2.5.33 から、予定の取得が失敗すると（Slack かコネクタのエラー、または取得そのものの失敗）、1・2・4・8・16 分後に取り直し、その後は予定の時刻に戻ります。エラーの無い取得で、この段は終わります。2.5.32 までは、何時間も先の次の予定の時刻まで待ちました。「今すぐ取る」は前と同じです。2.5.33 の取り込み部の試し直しの記録を直に呼んで読みました。Slack には繋いでいません。"
     },
     "section_fetch_b1_text": {
       "en": "Measured on 2.5.0 with the shipped intake and a fake Socket Mode server on this machine: the message was acknowledged at once, an edit of it was acknowledged and not taken, the message went to projects/web/, and a Web API fetch returning the same message afterwards took 0.",
