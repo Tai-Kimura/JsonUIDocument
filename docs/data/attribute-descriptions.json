@@ -481,6 +481,14 @@
     "en": "A key of the cell data: a row whose value for it is true cannot be picked up, and no other row can be moved past it (a divider row, say). Section headers and footers are not rows and never move. On iOS a Collection with locked rows uses the library's drag on every version. jsonui-cli 2.5.34.",
     "ja": "cell データのキー。その値が true の行はつかめず、他の行もそれを越えて動かせない（区切りの行など）。section の header と footer は行ではないので動かない。iOS では固定した行のある Collection はどの版でもライブラリのドラッグを使う。jsonui-cli 2.5.34 から。"
   },
+  "fontScaling": {
+    "en": "Whether this component's text follows the user's text size (iOS Dynamic Type, Android font scale, the browser's font size). Absent: the app default (true unless the app sets it). false: the declared fontSize is drawn at that size whatever the setting (web: px). With either this or maxFontScale and no fontSize, the component's default size is held to it. jsonui-cli 2.5.36; see /guides/text-size.",
+    "ja": "この部品の字が、使う人の文字の大きさ（iOS の Dynamic Type、Android のフォントの拡大率、ブラウザの文字の大きさ）に追従するか。書かなければアプリ全体の既定（アプリが変えなければ true）。false なら、設定にかかわらず書いた fontSize の大きさで描く（web は px）。fontSize が無くてもこれか maxFontScale を書けば、部品の既定の大きさがそれに従う。jsonui-cli 2.5.36 から。/guides/text-size を参照。"
+  },
+  "maxFontScale": {
+    "en": "The largest size this component's text is drawn at, as a multiple of its fontSize (1 or more). Counts only while the text follows (fontScaling true, declared or by the app default). Absent: the app default cap, or none. iOS rounds it down to a Dynamic Type step; the web draws the smaller of the rem size and fontSize × maxFontScale px. jsonui-cli 2.5.36; see /guides/text-size.",
+    "ja": "この部品の字を描く最大の大きさを、fontSize の何倍か（1 以上）で書く。字が追従しているとき（fontScaling が true。書いた値でもアプリ全体の既定でも）だけ効く。書かなければアプリ全体の既定の上限、それも無ければ上限なし。iOS は Dynamic Type の段に切り下げ、web は rem の大きさと fontSize × maxFontScale px の小さい方で描く。jsonui-cli 2.5.36 から。/guides/text-size を参照。"
+  },
   "autoChangeTrackingId": {
     "en": "When true (and cellIdProperty is set), the library auto-computes each cellId as '<primary>_<hash>' so differential updates work without a manual hashForCell helper. If cellIdProperty is missing, the build emits a warning and cells fall back to index-based identity.",
     "ja": "`true`（かつ `cellIdProperty` 指定時）で `<primary>_<hash>` 形式の cellId を自動計算し、差分更新を hashForCell なしで動かす。`cellIdProperty` 未指定時は build warning が出てインデックスベース identity にフォールバック。"

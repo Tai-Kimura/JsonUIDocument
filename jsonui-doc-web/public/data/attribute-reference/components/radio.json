@@ -45,15 +45,15 @@
   "canonicalCode": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"S\", \"selectedValue\": \"@{size}\", \"label\": \"@string/small\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"M\", \"selectedValue\": \"@{size}\", \"label\": \"@string/medium\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"L\", \"selectedValue\": \"@{size}\", \"label\": \"@string/large\" }\n  ]\n}",
   "canonicalLanguage": "json",
   "statRequired": "1",
-  "statOptional": "18",
+  "statOptional": "20",
   "statEvents": "1",
   "statRequiredText": {
     "en": "1 required",
     "ja": "必須 1"
   },
   "statOptionalText": {
-    "en": "18 optional",
-    "ja": "任意 18"
+    "en": "20 optional",
+    "ja": "任意 20"
   },
   "statEventsText": {
     "en": "1 events",
@@ -977,6 +977,70 @@
               "required": ""
             },
             {
+              "id": "attr_fontScaling",
+              "name": "fontScaling",
+              "anchorId": "attr-fontScaling",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Whether this component's text follows the user's text size (iOS Dynamic Type, Android font scale, the browser's font size). Absent: the app default (true unless the app sets it). false: the declared fontSize is drawn at that size whatever the setting (web: px). With either this or maxFontScale and no fontSize, the component's default size is held to it. jsonui-cli 2.5.36; see /guides/text-size.",
+                "ja": "この部品の字が、使う人の文字の大きさ（iOS の Dynamic Type、Android のフォントの拡大率、ブラウザの文字の大きさ）に追従するか。書かなければアプリ全体の既定（アプリが変えなければ true）。false なら、設定にかかわらず書いた fontSize の大きさで描く（web は px）。fontSize が無くてもこれか maxFontScale を書けば、部品の既定の大きさがそれに従う。jsonui-cli 2.5.36 から。/guides/text-size を参照。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
               "id": "attr_group",
               "name": "group",
               "anchorId": "attr-group",
@@ -1108,6 +1172,70 @@
                 "ja": "ラジオアイコンの右に表示するインラインラベル。独自配置が必要なら `label` を省略し、水平 View で Radio + Label を並べる。"
               },
               "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_maxFontScale",
+              "name": "maxFontScale",
+              "anchorId": "attr-maxFontScale",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "The largest size this component's text is drawn at, as a multiple of its fontSize (1 or more). Counts only while the text follows (fontScaling true, declared or by the app default). Absent: the app default cap, or none. iOS rounds it down to a Dynamic Type step; the web draws the smaller of the rem size and fontSize × maxFontScale px. jsonui-cli 2.5.36; see /guides/text-size.",
+                "ja": "この部品の字を描く最大の大きさを、fontSize の何倍か（1 以上）で書く。字が追従しているとき（fontScaling が true。書いた値でもアプリ全体の既定でも）だけ効く。書かなければアプリ全体の既定の上限、それも無ければ上限なし。iOS は Dynamic Type の段に切り下げ、web は rem の大きさと fontSize × maxFontScale px の小さい方で描く。jsonui-cli 2.5.36 から。/guides/text-size を参照。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number",
               "required": ""
             },
             {
@@ -2550,6 +2678,70 @@
               "required": ""
             },
             {
+              "id": "attr_fontScaling",
+              "name": "fontScaling",
+              "anchorId": "attr-fontScaling",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Whether this component's text follows the user's text size (iOS Dynamic Type, Android font scale, the browser's font size). Absent: the app default (true unless the app sets it). false: the declared fontSize is drawn at that size whatever the setting (web: px). With either this or maxFontScale and no fontSize, the component's default size is held to it. jsonui-cli 2.5.36; see /guides/text-size.",
+                "ja": "この部品の字が、使う人の文字の大きさ（iOS の Dynamic Type、Android のフォントの拡大率、ブラウザの文字の大きさ）に追従するか。書かなければアプリ全体の既定（アプリが変えなければ true）。false なら、設定にかかわらず書いた fontSize の大きさで描く（web は px）。fontSize が無くてもこれか maxFontScale を書けば、部品の既定の大きさがそれに従う。jsonui-cli 2.5.36 から。/guides/text-size を参照。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
               "id": "attr_group",
               "name": "group",
               "anchorId": "attr-group",
@@ -2681,6 +2873,70 @@
                 "ja": "ラジオアイコンの右に表示するインラインラベル。独自配置が必要なら `label` を省略し、水平 View で Radio + Label を並べる。"
               },
               "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_maxFontScale",
+              "name": "maxFontScale",
+              "anchorId": "attr-maxFontScale",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "The largest size this component's text is drawn at, as a multiple of its fontSize (1 or more). Counts only while the text follows (fontScaling true, declared or by the app default). Absent: the app default cap, or none. iOS rounds it down to a Dynamic Type step; the web draws the smaller of the rem size and fontSize × maxFontScale px. jsonui-cli 2.5.36; see /guides/text-size.",
+                "ja": "この部品の字を描く最大の大きさを、fontSize の何倍か（1 以上）で書く。字が追従しているとき（fontScaling が true。書いた値でもアプリ全体の既定でも）だけ効く。書かなければアプリ全体の既定の上限、それも無ければ上限なし。iOS は Dynamic Type の段に切り下げ、web は rem の大きさと fontSize × maxFontScale px の小さい方で描く。jsonui-cli 2.5.36 から。/guides/text-size を参照。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number",
               "required": ""
             },
             {

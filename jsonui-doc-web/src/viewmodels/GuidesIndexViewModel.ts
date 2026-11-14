@@ -43,7 +43,8 @@ const CATALOG: ReadonlyArray<{ id: string; url: string; titleKey: string; platfo
   { id: "unit-contracts", url: "/guides/unit-contracts", titleKey: "guides_unit_contracts_title" },
   { id: "initial-state", url: "/guides/initial-state", titleKey: "guides_initial_state_title" },
   { id: "canonical-marks", url: "/guides/canonical-marks", titleKey: "guides_canonical_marks_title" },
-  { id: "screen-readers", url: "/guides/screen-readers", titleKey: "guides_screen_readers_title" }
+  { id: "screen-readers", url: "/guides/screen-readers", titleKey: "guides_screen_readers_title" },
+  { id: "text-size", url: "/guides/text-size", titleKey: "guides_text_size_title" }
 ];
 
 export class GuidesIndexViewModel {

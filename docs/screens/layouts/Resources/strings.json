@@ -7888,6 +7888,10 @@
       "en": "• Duplicate layout basenames. Layout file basenames must be unique across the whole project: Data models and generated components are emitted flat per basename on every platform (SummaryRowData.swift / .kt / .ts), so `sales/summary_row.json` and `dashboard/summary_row.json` collide. `jui build` detects duplicates and aborts with the full pair list — fix by renaming one file (e.g. `sales_summary_row.json`) and updating its references. Cell layouts shared by several screens are the usual place this bites.",
       "ja": "• layout ファイル名 (basename) の重複。basename はプロジェクト全体で一意である必要があります: Data モデルと生成コンポーネントは全プラットフォームで basename ごとにフラットに出力されるため (SummaryRowData.swift / .kt / .ts)、`sales/summary_row.json` と `dashboard/summary_row.json` は衝突します。`jui build` は重複を検出しペア一覧付きで停止します — どちらかをリネームして参照を更新してください (例: `sales_summary_row.json`)。複数画面で共有する cell layout が典型的な発生箇所です。"
     },
+    "section_pitfalls_bullet_selectbox": {
+      "en": "• SelectBox draws alike on iOS, Android and web from jsonui-cli 2.5.36: by default 0 above and below, 12 at the sides, a 16 × 16 arrow 8 from the text, and the height of its content when height is not given (Android's fixed 56dp is gone, so an Android SelectBox without a height gets shorter). A side is set by the default, then padding, then paddings, then that side's own attribute. On the web a declared padding now replaces the built-in one, where 2.5.35 wrote both (rjui's SelectBoxConverter at 2.5.35 and 2.5.36: paddingRight 4 moves the arrow to 4 from the edge with 28 of padding; iOS and Android drawing is jsonui-cli's word).",
+      "ja": "• jsonui-cli 2.5.36 から、SelectBox は iOS・Android・web で同じに描かれます。既定は上下 0・左右 12、矢印は 16 × 16 で字との間は 8、height を書かなければ中身の高さです（Android の固定の 56dp が無くなったので、height の無い Android の SelectBox は低くなります）。各辺は、既定 → padding → paddings → その辺の属性の順で決まります。web では、書いた余白が組み込みの余白に置き換わるようになりました。2.5.35 は両方を書いていました（rjui の SelectBoxConverter を 2.5.35 と 2.5.36 で呼び出し: paddingRight 4 で矢印は端から 4、余白は 28。iOS・Android の描画は jsonui-cli の言です）。"
+    },
     "next_first_spec_title": {
       "en": "Writing your first spec",
       "ja": "spec を書く"
@@ -18809,16 +18813,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.5.35",
-      "ja": "2.5.35 でまだできないこと"
+      "en": "Not in 2.5.36",
+      "ja": "2.5.36 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.5.35",
-      "ja": "2.5.35 でまだできないこと"
+      "en": "Not in 2.5.36",
+      "ja": "2.5.36 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
@@ -19195,6 +19199,160 @@
     "toc_row_limits": {
       "en": "4. Measured, and not",
       "ja": "4. 測ったこと、測っていないこと"
+    }
+  },
+  "guides_text_size": {
+    "title": {
+      "en": "Following the user's text size",
+      "ja": "文字の大きさへの追従"
+    },
+    "meta_title": {
+      "en": "Following the user's text size — JsonUI",
+      "ja": "文字の大きさへの追従 — JsonUI"
+    },
+    "breadcrumb": {
+      "en": "← Guides",
+      "ja": "← ガイド"
+    },
+    "lead": {
+      "en": "Text in a JsonUI layout grows with the user's text size: Dynamic Type on iOS, the font scale on Android, the browser's font size on the web. From jsonui-cli 2.5.36 a text component can opt out (fontScaling: false) or cap how far it grows (maxFontScale), and an app can set both defaults once. A layout that declares neither draws as before.",
+      "ja": "JsonUI のレイアウトの字は、使う人の文字の大きさに合わせて大きくなります。iOS は Dynamic Type、Android はフォントの拡大率、web はブラウザの文字の大きさです。jsonui-cli 2.5.36 から、字を描く部品ごとに追従を止める（fontScaling: false）か、どこまで大きくなるかに上限を付ける（maxFontScale）ことができ、アプリ全体の既定も 1 か所で決められます。どちらも書かないレイアウトの見た目は今までどおりです。"
+    },
+    "read_time": {
+      "en": "~5 min read",
+      "ja": "約 5 分"
+    },
+    "section_what_heading": {
+      "en": "1. Two attributes",
+      "ja": "1. 2 つの属性"
+    },
+    "section_what_body": {
+      "en": "fontScaling (true or false) and maxFontScale (a number, 1 or more) go on any component that draws text: Label, Button, TextField (also written Input or EditText), TextView, IconLabel, SelectBox, Switch (Toggle), CheckBox (Check), Radio and Segment. Leave both out and the text follows the user's size with no cap, as before 2.5.36. fontScaling: false draws the declared fontSize at that size whatever the user's setting. maxFontScale caps the drawn size at fontSize × maxFontScale, and only counts while the text follows. A component's own declaration wins over the app default (section 3).",
+      "ja": "fontScaling（true か false）と maxFontScale（1 以上の数）は、字を描く部品に書けます: Label、Button、TextField（Input・EditText とも書く）、TextView、IconLabel、SelectBox、Switch（Toggle）、CheckBox（Check）、Radio、Segment。どちらも書かなければ、2.5.36 より前と同じく、字は使う人の大きさに上限なしで追従します。fontScaling: false は、使う人の設定にかかわらず、書いた fontSize の大きさで描きます。maxFontScale は描く大きさを fontSize × maxFontScale までに抑え、字が追従しているときだけ効きます。部品に書いた値は、アプリ全体の既定（3 章）より優先します。"
+    },
+    "section_what_caption": {
+      "en": "A price that may grow to 1.5 times, a badge that keeps its size, and a note that follows the user without a cap:",
+      "ja": "1.5 倍まで大きくなる値段、大きさを変えないバッジ、上限なしで追従する注記:"
+    },
+    "section_what_bullet_nosize": {
+      "en": "• A component that declares either attribute without a fontSize is still held to it, at that component's default size: the iOS and Android generators write the declaration with no size.",
+      "ja": "• fontSize を書かずにどちらかの属性を書いた部品も、その部品の既定の大きさで、書いた値に従います。iOS と Android の生成器は、大きさ無しで宣言だけを書きます。"
+    },
+    "section_generated_heading": {
+      "en": "2. What each platform writes",
+      "ja": "2. 各プラットフォームが書くもの"
+    },
+    "section_generated_body": {
+      "en": "The generators turn the two attributes into code that the libraries read at run time. Here is what jsonui-cli 2.5.36 writes for a Label with fontSize 13 (excerpts).",
+      "ja": "生成器は 2 つの属性を、ライブラリが実行時に読むコードに変えます。fontSize 13 の Label について、jsonui-cli 2.5.36 が書くものは次のとおりです（抜粋）。"
+    },
+    "section_generated_bullet_web": {
+      "en": "• Web: a size that follows is a rem length, so it grows with the browser's font size. fontScaling: false gives a px length, which does not. maxFontScale gives the px length fontSize × maxFontScale, and the browser draws the smaller of the two. Two CSS custom properties carry the app defaults (section 3). A page that never sets them draws N / 16 rem with no cap, the size 2.5.35 wrote.",
+      "ja": "• web: 追従する大きさは rem の長さなので、ブラウザの文字の大きさに合わせて大きくなります。fontScaling: false は px の長さになり、追従しません。maxFontScale は fontSize × maxFontScale の px の長さになり、ブラウザは 2 つのうち小さい方で描きます。アプリ全体の既定は 2 つの CSS カスタムプロパティが運びます（3 章）。一度も設定しないページは N / 16 rem を上限なしで描き、2.5.35 が書いた大きさと同じです。"
+    },
+    "section_generated_bullet_ios": {
+      "en": "• iOS: the modifier hands the declaration to SwiftJsonUI 10.37.0, which works out the size from the Dynamic Type setting. A cap is rounded down to a Dynamic Type step: the largest step whose ratio to the standard size is at most maxFontScale. That rule was read from SwiftJsonUI's FontScaling.swift, not drawn here.",
+      "ja": "• iOS: この modifier が宣言を SwiftJsonUI 10.37.0 に渡し、SwiftJsonUI が Dynamic Type の設定から大きさを決めます。上限は Dynamic Type の段に切り下げられます。標準の大きさとの比が maxFontScale 以下で一番大きい段です。この決まりは SwiftJsonUI の FontScaling.swift から読んだもので、ここで描いてはいません。"
+    },
+    "section_generated_bullet_android": {
+      "en": "• Android: from 2.5.36 every size, and the line height with it, goes through KotlinJsonUI 2.56.0's jsonUIFontSize, so the app default reaches a text with no declaration too. KotlinJsonUI says Android 14 and later grow small text more than large text, and the cap applies after that conversion.",
+      "ja": "• Android: 2.5.36 から、すべての大きさが行の高さとともに KotlinJsonUI 2.56.0 の jsonUIFontSize を通ります。宣言の無い字にもアプリ全体の既定が届きます。Android 14 以降は小さい字ほど大きく拡大し、上限はその変換の後にかかる、と KotlinJsonUI は述べています。"
+    },
+    "section_defaults_heading": {
+      "en": "3. Defaults for the whole app",
+      "ja": "3. アプリ全体の既定"
+    },
+    "section_defaults_body": {
+      "en": "Each platform has one place for two defaults: whether text follows when a component does not say, and the cap for a component that sets none. The settings mean the same on all three. Out of the box, text follows and there is no cap.",
+      "ja": "どのプラットフォームにも、既定を決める場所が 1 つあります。決めるのは 2 つで、部品が何も書かないときに字が追従するかどうかと、上限を書かない部品の上限です。意味は 3 つのプラットフォームで同じです。何も設定しなければ、字は追従し、上限はありません。"
+    },
+    "section_defaults_bullet_web": {
+      "en": "• Web: configureScaling sets two custom properties on the document root, and the generated sizes read them: --jui-font-unit (0.0625rem while text follows, 1px when it does not) and --jui-font-max (the cap). jui sync_tool places the Configuration template at src/lib/jsonui/Configuration.ts by default.",
+      "ja": "• web: configureScaling は文書のルートに 2 つのカスタムプロパティを設定し、生成された大きさがそれを読みます。--jui-font-unit（追従するときは 0.0625rem、しないときは 1px）と --jui-font-max（上限）です。Configuration の雛形は、jui sync_tool が既定で src/lib/jsonui/Configuration.ts に置きます。"
+    },
+    "section_defaults_bullet_nosize": {
+      "en": "• On the web, a component with neither a fontSize nor a declaration writes no size and inherits the browser's, so scaling: false for the app does not pin it. On iOS, such a text keeps the environment's .body font when no font provider answers for it.",
+      "ja": "• web では、fontSize も宣言も無い部品は大きさを書かず、ブラウザの大きさを受け継ぎます。そのため、アプリ全体で scaling: false にしても固定されません。iOS では、そうした字は、font provider が答えなければ環境の .body の書体のままです。"
+    },
+    "section_browser_heading": {
+      "en": "4. Measured in a browser",
+      "ja": "4. ブラウザで測った大きさ"
+    },
+    "section_browser_body": {
+      "en": "The four web lengths from section 2, set on elements in headless Chromium and read back with getComputedStyle. 16px is the browser's default root size; 32px stands for a user who doubled it. The two app-default rows set the custom properties to the values configureScaling writes.",
+      "ja": "2 章の web の 4 つの長さを headless Chromium の要素に付け、getComputedStyle で読み返しました。16px はブラウザの既定のルートの大きさで、32px はそれを 2 倍にした人の代わりです。アプリ全体の既定の 2 行は、configureScaling が書く値をカスタムプロパティに設定しています。"
+    },
+    "section_browser_bullet_same": {
+      "en": "• With no app default set, every length is drawn as 2.5.35 drew it, at either root size. This site sets none, and each of its rewritten size classes resolves to the size it had before, so its pages did not change with 2.5.36.",
+      "ja": "• アプリ全体の既定を設定しなければ、どの長さもルートの大きさによらず 2.5.35 と同じに描かれます。このサイトは設定しておらず、書き換わった大きさのクラスはどれも前と同じ大きさになるので、2.5.36 でページの見た目は変わっていません。"
+    },
+    "section_browser_bullet_order": {
+      "en": "• The component wins over the app default. With scaling: false for the app, a Label that says fontScaling: true still grows (26px). One that only says maxFontScale stops following (13px), because the cap counts only while the text follows.",
+      "ja": "• 部品の宣言はアプリ全体の既定に勝ちます。アプリ全体で scaling: false にしても、fontScaling: true と書いた Label は大きくなります（26px）。maxFontScale だけを書いた Label は追従しなくなります（13px）。上限は字が追従しているときだけ効くからです。"
+    },
+    "section_limits_heading": {
+      "en": "5. What this page measured, and what it did not",
+      "ja": "5. このページで測ったこと・測っていないこと"
+    },
+    "section_limits_body": {
+      "en": "Measured on jsonui-cli 2.5.36, with 2.5.35 as the control: the code the web, iOS and Android generators write for a Label under each declaration (rjui's LabelConverter, sjui's ConverterFactory and kjui's ComposeBuilder, called directly), and the web lengths in headless Chromium. Read from source, not run: SwiftJsonUI 10.37.0's FontScaling.swift and KotlinJsonUI 2.56.0's Configuration.kt. No app ran on a device or simulator, and no Dynamic Type or Android font scale setting was changed here. That the three platforms draw the same sizes at a text scale of 2.0 is jsonui-cli's conformance measurement.",
+      "ja": "jsonui-cli 2.5.36 で測り、2.5.35 と比べました: 宣言ごとに web・iOS・Android の生成器が Label について書くコード（rjui の LabelConverter、sjui の ConverterFactory、kjui の ComposeBuilder を直に呼び出し）と、headless Chromium での web の長さです。ソースを読んだだけで動かしていないもの: SwiftJsonUI 10.37.0 の FontScaling.swift、KotlinJsonUI 2.56.0 の Configuration.kt。実機やシミュレーターでアプリは動かしておらず、Dynamic Type や Android のフォントの拡大率も変えていません。文字の拡大率 2.0 で 3 つのプラットフォームが同じ大きさに描くことは、jsonui-cli の conformance の計測です。"
+    },
+    "next_heading": {
+      "en": "Keep reading",
+      "ja": "続けて読む"
+    },
+    "next_layouts_title": {
+      "en": "Writing layouts",
+      "ja": "レイアウトの書き方"
+    },
+    "next_layouts_description": {
+      "en": "fontSize, styles and the rest of a layout these attributes sit in.",
+      "ja": "fontSize やスタイルなど、これらの属性が置かれるレイアウトの残りの部分。"
+    },
+    "next_readers_title": {
+      "en": "Screen readers",
+      "ja": "スクリーンリーダー"
+    },
+    "next_readers_description": {
+      "en": "The other accessibility attributes: names and live regions.",
+      "ja": "もう 1 つのアクセシビリティの属性: 名前とライブリージョン。"
+    },
+    "next_reference_title": {
+      "en": "Label reference",
+      "ja": "Label のリファレンス"
+    },
+    "next_reference_description": {
+      "en": "Every Label attribute, fontScaling and maxFontScale included.",
+      "ja": "fontScaling と maxFontScale を含む、Label のすべての属性。"
+    },
+    "footer_copyright": {
+      "en": "© 2026 JsonUI contributors. Built by the same toolchain documented here.",
+      "ja": "© 2026 JsonUI contributors. Built by the same toolchain documented here."
+    },
+    "toc_title": {
+      "en": "On this page",
+      "ja": "このページの内容"
+    },
+    "toc_row_what": {
+      "en": "1. Two attributes",
+      "ja": "1. 2 つの属性"
+    },
+    "toc_row_generated": {
+      "en": "2. What each platform writes",
+      "ja": "2. 各プラットフォームが書くもの"
+    },
+    "toc_row_defaults": {
+      "en": "3. App defaults",
+      "ja": "3. アプリ全体の既定"
+    },
+    "toc_row_browser": {
+      "en": "4. In a browser",
+      "ja": "4. ブラウザで測った大きさ"
+    },
+    "toc_row_limits": {
+      "en": "5. Measured, and not",
+      "ja": "5. 測ったこと・測っていないこと"
     }
   },
   "viz_slack": {

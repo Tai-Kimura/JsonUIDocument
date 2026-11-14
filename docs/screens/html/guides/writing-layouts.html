@@ -955,6 +955,15 @@
 <td>-</td>
 <td>-</td>
 </tr>
+<tr data-row-id="1-1-2-1-7-12" data-parent-id="1-1-2-1-7">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=6</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
 <tr data-row-id="1-1-2-1-8" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>guides_writing_layouts_next</code></td>
@@ -1147,6 +1156,7 @@ flowchart TD
 <li>2026-11-12 (pin v2.5.31): section_include_note_ids added after section_include_note_place. On web, Segment/TabView `&lt;id&gt;_tab_&lt;n&gt;`, Collection `&lt;id&gt;_item_&lt;n&gt;` and a custom component&#x27;s id take the include&#x27;s prefix from 2.5.31; read from the TSX jui build wrote on a scratch web project (2.5.30 as the control) and the generated includeId helper, no page rendered. iOS/Android spelling is jsonui-cli&#x27;s word. The site has no include, so no id moves.</li>
 <li>2026-11-13 (pin v2.5.33): section_pitfalls_bullet_weight gained the unequal-weight cross-axis rule, read from SwiftJsonUI 10.35.3&#x27;s WeightedStackView (fillsCrossAxis only for matchParent; otherwise the largest child); drawing parity is jsonui-cli&#x27;s conformance measurement, nothing drawn here.</li>
 <li>2026-11-13 (pin v2.5.34): section_collection_reorder_* added at the end of section 5 (reorderable / onReorder / reorderHandle / reorderLockedProperty). Measured with 2.5.33 as the control: rjui&#x27;s CollectionConverter on the example (2.5.34 wraps the rows in JsonuiReorderSection/Item with handleId, locked and a bound enabled; 2.5.33 none); the generated web helper&#x27;s release/a11y functions run in Node on 5 rows with index 2 locked, header and footer 40 (header -&gt; first allowed place, footer -&gt; last, outside -&gt; cancel, a locked row not picked up, no move past it, no move-up/down button into it), equal to shared/core/reorder_rule.py; reorder_info.tree_lines on variants (stack path named below 27 or unread, not at 27, not with a handle, locked property, listStyle or no sections); LayoutValidator.check_collection (warning for true or a binding without cellIdProperty, not blocking). iOS/Android drawing and VoiceOver/TalkBack are jsonui-cli&#x27;s word; nothing dragged here.</li>
+<li>2026-11-14 (pin v2.5.36): section_pitfalls_bullet_selectbox added. Web measured with rjui&#x27;s SelectBoxConverter at 2.5.35 and 2.5.36: no default py-2 / pr-8, arrow as a 16px background image at right 12px with padding-right 36 (paddingRight 4: right 4px, 28), a declared paddings no longer joined by the built-in pl-3 pr-8 py-2. iOS / Android padding and Android&#x27;s 56dp removal are jsonui-cli&#x27;s word.</li>
 </ul>
 </section>
 </div>
