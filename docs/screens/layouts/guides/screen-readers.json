@@ -320,7 +320,7 @@
                 {
                   "type": "View",
                   "orientation": "vertical",
-                  "id": "section_limits",
+                  "id": "section_selected",
                   "width": "matchParent",
                   "height": "wrapContent",
                   "paddings": [
@@ -330,6 +330,78 @@
                     32
                   ],
                   "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontColor": "#0B1220",
+                      "text": "section_selected_heading",
+                      "fontWeight": "bold"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_selected_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 13,
+                      "fontColor": "#64748B",
+                      "text": "section_selected_caption"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 8,
+                      "code": "Button, accessibilitySelected: true      aria-pressed=\"true\"\nButton, accessibilitySelected: @{isA}    aria-pressed={(data.isA) ? true : undefined}\nButton, accessibilitySelected: false     (nothing)\nView with onClick, @{isA}                aria-pressed={(data.isA) ? true : undefined}\nIconLabel with onClick, @{isA}           aria-pressed={(data.isA) ? true : undefined}\nView without onClick, true               (nothing; the validator warns)\n\nSegment, selectedIndex @{i}              aria-pressed={data.i === 0}, aria-pressed={data.i === 1}\nSwitch                                   role=\"switch\"\nTabView                                  role=\"tablist\", role=\"tab\" aria-selected={… === 0}",
+                      "language": "text",
+                      "filename": "generated (web, excerpts)",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_selected_bullet_misplaced"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_selected_bullet_state"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_limits",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
                   "child": [
                     {
                       "type": "Label",
@@ -472,6 +544,12 @@
                           "id": "toc_live",
                           "label": "toc_row_live",
                           "anchor": "section_live",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_selected",
+                          "label": "toc_row_selected",
+                          "anchor": "section_selected",
                           "level": 1
                         },
                         {

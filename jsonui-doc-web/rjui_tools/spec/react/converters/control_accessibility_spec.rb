@@ -25,7 +25,8 @@ RSpec.describe 'web control accessibility' do
       'CheckBox' => [{ 'type' => 'CheckBox', 'id' => 'c', 'checked' => '@{on}' }, /<input id="c" type="checkbox" aria-label="Name"/],
       'CheckBox with a label' => [{ 'type' => 'CheckBox', 'label' => 'Wine', 'checked' => '@{on}' }, /<label.*?>\s*<input type="checkbox" aria-label="Name"/],
       'Check (the alias section)' => [{ 'type' => 'Check', 'checked' => '@{on}' }, /<input type="checkbox" aria-label="Name"/],
-      'Switch' => [{ 'type' => 'Switch', 'isOn' => '@{on}' }, /<input type="checkbox" aria-label="Name" className="sr-only peer"/],
+      # The switch says it is one (role="switch", 0e1bceb7c); the name still rides the element that takes focus.
+      'Switch' => [{ 'type' => 'Switch', 'isOn' => '@{on}' }, /<input type="checkbox" role="switch" aria-label="Name" className="sr-only peer"/],
       'Radio' => [{ 'type' => 'Radio', 'id' => 'r', 'text' => 'A' }, /<input type="radio" aria-label="Name" name="r"/],
       'a Radio group' => [{ 'type' => 'Radio', 'id' => 'g', 'items' => %w[a b], 'selectedValue' => '@{v}' }, /<div id="g".*? role="radiogroup" aria-label="Name">/],
       'Segment' => [{ 'type' => 'Segment', 'id' => 'sg', 'items' => %w[a b] }, /<div id="sg".*? role="group" aria-label="Name">/],
@@ -113,6 +114,41 @@ RSpec.describe 'web control accessibility' do
       code = convert({ 'type' => 'Label', 'text' => '@{s}', 'accessibilityLiveRegion' => 'off' })
       expect(code).not_to include('aria-live')
       expect(code).not_to include('role=')
+    end
+  end
+
+  # accessibilitySelected (shared/core/control_accessibility_vectors.json, the table every face runs): the selected
+  # control is aria-pressed — "true", or pressed while its binding holds — on the element that takes focus (the
+  # <button>, or the View / IconLabel the tap rule makes one button); false, no value, or a node where it takes no
+  # effect says nothing, as iOS's .isSelected and Android's selected say nothing.
+  describe 'accessibilitySelected' do
+    vectors = JSON.parse(File.read(File.expand_path('../../../../shared/core/control_accessibility_vectors.json', __dir__)))
+    vectors['cases'].each do |c|
+      it "#{c['name']}: #{c['selected'].inspect}" do
+        # The vectors spell types as a layout does (HStack is a synonym): drawn by the generator's dispatch.
+        layout = JsonUIShared::ComponentAliases.resolve(JsonUIShared::TypeSynonyms.canonicalize(
+          JsonUIShared::TapAccessibility.annotate!(JSON.parse(JSON.generate(c['layout'])))
+        ))
+        type = JsonUIShared::TypeSynonyms.drawn_type(layout['type']) || layout['type']
+        code = RjuiTools::React::ReactGenerator::CONVERTERS.fetch(type).new(layout, { 'use_tailwind' => true }).convert_node(2)
+        pressed = code.scan(/ aria-pressed=(?:"true"|\{\(([^)]*)\) \? true : undefined\})/)
+        case c['selected']
+        when nil
+          expect(code).not_to include('aria-pressed')
+        when true
+          expect(code.scan(' aria-pressed="true"').size).to eq(1)
+          expect(pressed.size).to eq(1)
+        else
+          expect(pressed.size).to eq(1)
+          expect(pressed.first.first).to include(c['selected'][2..-2])
+        end
+        if c['selected']
+          # on the element that takes focus: the <button>, or the element with role="button"
+          at = code.index(' aria-pressed')
+          tag = code[code.rindex(/<[A-Za-z]/, at)...at]
+          expect(tag + code[at, 200]).to match(/\A<button\b| role=(?:"button"|\{[^}]*'button')/), tag
+        end
+      end
     end
   end
 end

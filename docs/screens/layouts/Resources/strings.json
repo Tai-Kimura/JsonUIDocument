@@ -7800,29 +7800,45 @@
       "en": "• reorderLockedProperty — a key of the cell data. A row whose value for that key is true cannot be picked up, and no other row can be moved past it, so a locked row splits the list into stretches that are reordered separately. Section headers and footers are not rows and never move.",
       "ja": "• reorderLockedProperty — cell データのキーです。そのキーの値が true の行はつかめず、他の行もそれを越えて動かせません。固定した行で一覧は区切られ、区切りごとに並べ替えます。section の header と footer は行ではないので動きません。"
     },
+    "section_collection_reorder_bullet_fixed": {
+      "en": "• reorderFixedProperty (jsonui-cli 2.5.37) — a key of the cell data for a row that stays put but is not a barrier, such as a finished task. The row cannot be picked up and has no move-up or move-down action, but other rows are moved past it and count it in their to. A Collection with a reorderHandle treats a row whose handle is not drawn the same way. A row that is both locked and fixed is locked.",
+      "ja": "• reorderFixedProperty（jsonui-cli 2.5.37）— cell データのキーで、その場から動かないが境目にはならない行（済んだ作業など）に使います。その行はつかめず、「上へ移動」「下へ移動」もありませんが、他の行はそれを越えて動き、to にもその行を数えます。reorderHandle のある Collection では、つまみが描かれていない行も同じ扱いです。reorderLockedProperty と両方に当たる行は、reorderLockedProperty の扱いになります。"
+    },
+    "section_collection_reorder_bullet_pass": {
+      "en": "• A dragged row passes another when the dragged row's centre goes beyond that row's near edge, as iOS 27's own reordering does; until 2.5.36 it had to go beyond that row's centre. With rows 60 high, a drag of 31 now passes the next row, where 2.5.36 needed 61.",
+      "ja": "• ドラッグしている行は、その行の中央が隣の行の手前の端を越えたときに隣の行を越えます。iOS 27 の標準の並べ替えと同じです。2.5.36 までは、隣の行の中央を越える必要がありました。高さ 60 の行なら、今は 31 動かせば隣の行を越えます（2.5.36 では 61 必要でした）。"
+    },
+    "section_collection_reorder_bullet_callbacks": {
+      "en": "• onReorderStart (section, index) and onReorderEnd (section), from 2.5.37: start is called when a row is picked up, and end once when that drag is over, after onReorder when the row moved. A ViewModel that rebuilds its rows on a timer can hold the rebuild between the two. A drag let go where it started or outside the Collection calls start and end with no onReorder between. Move up and move down call start, onReorder and end in one go.",
+      "ja": "• onReorderStart (section, index) と onReorderEnd (section)（2.5.37 から）: start は行をつかんだときに、end はそのドラッグが終わったときに 1 回呼ばれます。行が動いたときは onReorder の後です。一定の間隔で行を作り直す ViewModel は、この 2 つの間だけ作り直しを止められます。元の位置や Collection の外で離したときは、onReorder を挟まずに start と end が呼ばれます。「上へ移動」「下へ移動」は start・onReorder・end を続けて呼びます。"
+    },
+    "section_collection_reorder_bullet_change": {
+      "en": "• If the rows change while a row is dragged, so that the ids differ in number or order or the locked or fixed rows differ, the drag is cancelled when the row is let go: the order goes back and onReorder is not called, because its indexes would name other rows. A change to text or colour alone is not a change, and the drag commits.",
+      "ja": "• ドラッグの間に行が変わり、id の数や順番、reorderLockedProperty や reorderFixedProperty の行が変わっていたら、離したときにドラッグは取り消されます。並びは元に戻り、onReorder は呼ばれません。その位置の番号が別の行を指してしまうためです。字や色だけの変化は変化に数えず、ドラッグはそのまま決まります。"
+    },
     "section_collection_reorder_bullet_release": {
       "en": "• Where a release counts: anywhere inside the Collection's frame, header and footer included. Released over the header, the row goes to the first place it may take; over the footer, to the last. Released outside the frame, the move is cancelled and onReorder is not called.",
       "ja": "• 離した位置の扱い: Collection の枠（header と footer を含む）の中ならどこでも有効です。header の上で離すとその行が入れる一番上へ、footer の上で離すと一番下へ動きます。枠の外で離すと取り消しになり、onReorder は呼ばれません。"
     },
     "section_collection_reorder_bullet_a11y": {
-      "en": "• Screen readers and keyboards: on the web every row gets “Move up” and “Move down” buttons (“上へ移動” / “下へ移動” on a Japanese page), hidden until they have focus, which call onReorder with to = from − 1 or from + 1 and announce the new position. A button is left out where that move is not allowed: up on the first row, down on the last, into or across a locked row. jsonui-cli says VoiceOver on iOS and TalkBack on Android offer the same two actions.",
-      "ja": "• 読み上げとキーボード: web では各行に「上へ移動」「下へ移動」のボタン（英語のページでは Move up / Move down）が付きます。フォーカスが当たるまでは隠れていて、押すと to = from − 1 か from + 1 で onReorder を呼び、移動後の位置を読み上げます。動かせない方向のボタンは付きません（先頭の行の上、末尾の行の下、固定した行へ入る・越える方向）。iOS の VoiceOver と Android の TalkBack でも同じ 2 つの操作が出る、と jsonui-cli は述べています。"
+      "en": "• Screen readers and keyboards: on the web every row gets “Move up” and “Move down” buttons (“上へ移動” / “下へ移動” on a Japanese page), hidden until they have focus, which call onReorder with to = from − 1 or from + 1 and announce the new position. A button is left out where that move is not allowed: up on the first row, down on the last, into or across a locked row, and on a fixed row. From 2.5.37 the words come from the app's strings.json when it has the keys jsonui.reorder_move_up, jsonui.reorder_move_down and jsonui.reorder_moved_to (the place in {count}), in the page's language, so any language the app translates is read out; without them the helper falls back to Japanese or English. jsonui-cli says VoiceOver on iOS and TalkBack on Android offer the same two actions.",
+      "ja": "• 読み上げとキーボード: web では各行に「上へ移動」「下へ移動」のボタン（英語のページでは Move up / Move down）が付きます。フォーカスが当たるまでは隠れていて、押すと to = from − 1 か from + 1 で onReorder を呼び、移動後の位置を読み上げます。動かせない方向のボタンは付きません（先頭の行の上、末尾の行の下、固定した行へ入る・越える方向、reorderFixedProperty の行）。2.5.37 から、アプリの strings.json にキー jsonui.reorder_move_up・jsonui.reorder_move_down・jsonui.reorder_moved_to（位置は {count}）があれば、ページの言語でその語を使います。アプリが訳した言語ならどれでも読み上げられ、キーが無ければヘルパーは日本語か英語に戻ります。iOS の VoiceOver と Android の TalkBack でも同じ 2 つの操作が出る、と jsonui-cli は述べています。"
     },
     "section_collection_reorder_bullet_identity": {
       "en": "• Set cellIdProperty. Without it the rows are keyed by position, and while a row moves the wrong one can be shown for a moment. From 2.5.34 the layout validator warns about a reorderable Collection (true or a binding) that has no cellIdProperty. It is a warning, not an error, so the build still finishes.",
       "ja": "• cellIdProperty を指定してください。無いと行は位置で区別され、動かしている間に一瞬別の行が見えることがあります。2.5.34 から、cellIdProperty の無い reorderable な Collection（true でも binding でも）にはレイアウトの検査が警告を出します。エラーではないので、ビルドは最後まで通ります。"
     },
     "section_collection_reorder_bullet_ios": {
-      "en": "• iOS has two ways to drag. A Collection drawn as a stack (with sections and no listStyle, or lazy: 'none') uses SwiftUI's own reorderable / reorderContainer from iOS 27 and the library's drag below that. For such a Collection jui build prints one line, INFO [ios-reorder], when the app's minimum iOS is below 27 or cannot be read. It reads that minimum from platforms.ios.minimumOS in jui.config.json, then the Xcode project's IPHONEOS_DEPLOYMENT_TARGET, then Package.swift. The line is information, not a warning. A Collection with a reorderHandle or a reorderLockedProperty uses the library's drag on every iOS version, because SwiftUI's reorderable has no handle-only form and moves a locked row too. A Collection drawn as a List (a listStyle, or no sections, without lazy: 'none') uses onMove. Neither of these gets the line.",
-      "ja": "• iOS のドラッグには 2 通りあります。stack として描かれる Collection（sections があり listStyle が無いもの、または lazy: 'none'）は、iOS 27 からは SwiftUI 標準の reorderable / reorderContainer を、それより前はライブラリのドラッグを使います。そうした Collection について、アプリの最低 iOS が 27 より下か読み取れないとき、jui build は INFO [ios-reorder] を 1 行出します。最低 iOS は jui.config.json の platforms.ios.minimumOS、Xcode プロジェクトの IPHONEOS_DEPLOYMENT_TARGET、Package.swift の順に読みます。この行はお知らせで、警告ではありません。reorderHandle か reorderLockedProperty のある Collection は、どの iOS でもライブラリのドラッグを使います。SwiftUI の reorderable にはつまみだけでつかむ形が無く、固定した行も動かしてしまうためです。List として描かれる Collection（lazy: 'none' でなく、listStyle がある、または sections が無い）は onMove を使います。どちらにもこの行は出ません。"
+      "en": "• iOS has two ways to drag. A Collection drawn as a stack (with sections and no listStyle, or lazy: 'none') uses SwiftUI's own reorderable / reorderContainer from iOS 27 and the library's drag below that. For such a Collection jui build prints one line, INFO [ios-reorder], when the app's minimum iOS is below 27 or cannot be read. It reads that minimum from platforms.ios.minimumOS in jui.config.json, then the Xcode project's IPHONEOS_DEPLOYMENT_TARGET, then Package.swift. The line is information, not a warning. A Collection with a reorderHandle or a reorderLockedProperty uses the library's drag on every iOS version, because SwiftUI's reorderable has no handle-only form and moves a locked row too. From 2.5.37 a Collection that declares onReorderStart or onReorderEnd also uses the library's drag on every iOS version, since SwiftUI's container has no pick-up or let-go hook. A Collection drawn as a List (a listStyle, or no sections, without lazy: 'none') uses onMove. None of these gets the line. A List that declares the callbacks gets INFO [ios-reorder-callbacks] instead: onMove has no pick-up, so start and end come together when the row lands.",
+      "ja": "• iOS のドラッグには 2 通りあります。stack として描かれる Collection（sections があり listStyle が無いもの、または lazy: 'none'）は、iOS 27 からは SwiftUI 標準の reorderable / reorderContainer を、それより前はライブラリのドラッグを使います。そうした Collection について、アプリの最低 iOS が 27 より下か読み取れないとき、jui build は INFO [ios-reorder] を 1 行出します。最低 iOS は jui.config.json の platforms.ios.minimumOS、Xcode プロジェクトの IPHONEOS_DEPLOYMENT_TARGET、Package.swift の順に読みます。この行はお知らせで、警告ではありません。reorderHandle か reorderLockedProperty のある Collection は、どの iOS でもライブラリのドラッグを使います。SwiftUI の reorderable にはつまみだけでつかむ形が無く、固定した行も動かしてしまうためです。2.5.37 からは、onReorderStart か onReorderEnd を書いた Collection も、どの iOS でもライブラリのドラッグを使います。SwiftUI のコンテナには、つかんだ時・離した時の合図が無いためです。List として描かれる Collection（lazy: 'none' でなく、listStyle がある、または sections が無い）は onMove を使います。どれにもこの行は出ません。コールバックを書いた List には、代わりに INFO [ios-reorder-callbacks] が出ます。onMove にはつかむ合図が無いので、start と end は行が落ちたときに続けて来ます。"
     },
     "section_collection_reorder_bullet_web": {
       "en": "• On the web the generator wraps the rows in a helper it writes to src/generated only when a layout uses reorderable. The helper follows the pointer rather than HTML drag and drop, so it works with touch as well as a mouse. This site uses no reorderable Collection, so its generated files did not change with 2.5.34.",
       "ja": "• web では、生成器が行をヘルパーで包みます。このヘルパーは、reorderable を使うレイアウトがあるときだけ src/generated に書き出されます。HTML のドラッグ＆ドロップではなくポインターの動きを追うので、マウスだけでなくタッチでも動きます。このサイトには reorderable な Collection が無いので、2.5.34 で生成物は変わりませんでした。"
     },
     "section_collection_reorder_note_measured": {
-      "en": "Measured on jsonui-cli 2.5.34 against 2.5.33 for this page: the web output for the Collection above (2.5.33 wraps nothing); the web helper's release and move-up/move-down rules, run in Node on five rows with a locked middle row, which agree with the rule jsonui-cli shares across the platforms; the iOS INFO check, called on variants of that Collection; and the layout validator. No row was dragged in a browser or on a device here. How the drag looks is jsonui-cli's conformance measurement.",
-      "ja": "このページのために jsonui-cli 2.5.34 で測り、2.5.33 と比べました: 上の Collection の web 出力（2.5.33 は何も包みません）、web ヘルパーの「離した位置」と「上へ・下へ」の決まり（中央の行を固定した 5 行で Node から呼び、jsonui-cli が各プラットフォームで共有する決まりと一致）、iOS の INFO の判定（この Collection の変形で呼び出し）、レイアウトの検査。ブラウザや実機で行をドラッグしてはいません。ドラッグの見た目は jsonui-cli の conformance の計測です。"
+      "en": "Measured on jsonui-cli 2.5.34 against 2.5.33 for this page: the web output for the Collection above (2.5.33 wraps nothing); the web helper's release and move-up/move-down rules, run in Node on five rows with a locked middle row, which agree with the rule jsonui-cli shares across the platforms; the iOS INFO check, called on variants of that Collection; and the layout validator. No row was dragged in a browser or on a device here. How the drag looks is jsonui-cli's conformance measurement. Re-measured on 2.5.37 against 2.5.36: the converter passes onReorderStart, onReorderEnd and the fixed rows (2.5.36 dropped them); the helper's drag, release, move-up/move-down and changed-rows rules, run in Node on five rows 60 high (fixed row 2 passed by row 1, which lands at 3; a locked row 2 stops it at 1); and the iOS INFO check with and without the callbacks.",
+      "ja": "このページのために jsonui-cli 2.5.34 で測り、2.5.33 と比べました: 上の Collection の web 出力（2.5.33 は何も包みません）、web ヘルパーの「離した位置」と「上へ・下へ」の決まり（中央の行を固定した 5 行で Node から呼び、jsonui-cli が各プラットフォームで共有する決まりと一致）、iOS の INFO の判定（この Collection の変形で呼び出し）、レイアウトの検査。ブラウザや実機で行をドラッグしてはいません。ドラッグの見た目は jsonui-cli の conformance の計測です。2.5.37 でも測り直し、2.5.36 と比べました: コンバーターが onReorderStart・onReorderEnd と reorderFixedProperty の行を渡すこと（2.5.36 は落とします）、ヘルパーのドラッグ・離した位置・「上へ・下へ」・行が変わったときの決まり（高さ 60 の 5 行で Node から呼び出し。行 2 が reorderFixedProperty の行なら行 1 はそれを越えて 3 に、reorderLockedProperty の行なら 1 で止まる）、コールバックの有無での iOS の INFO の判定です。"
     },
     "section_binding_heading": {
       "en": "6. Binding and visibility",
@@ -7889,8 +7905,8 @@
       "ja": "• layout ファイル名 (basename) の重複。basename はプロジェクト全体で一意である必要があります: Data モデルと生成コンポーネントは全プラットフォームで basename ごとにフラットに出力されるため (SummaryRowData.swift / .kt / .ts)、`sales/summary_row.json` と `dashboard/summary_row.json` は衝突します。`jui build` は重複を検出しペア一覧付きで停止します — どちらかをリネームして参照を更新してください (例: `sales_summary_row.json`)。複数画面で共有する cell layout が典型的な発生箇所です。"
     },
     "section_pitfalls_bullet_selectbox": {
-      "en": "• SelectBox draws alike on iOS, Android and web from jsonui-cli 2.5.36: by default 0 above and below, 12 at the sides, a 16 × 16 arrow 8 from the text, and the height of its content when height is not given (Android's fixed 56dp is gone, so an Android SelectBox without a height gets shorter). A side is set by the default, then padding, then paddings, then that side's own attribute. On the web a declared padding now replaces the built-in one, where 2.5.35 wrote both (rjui's SelectBoxConverter at 2.5.35 and 2.5.36: paddingRight 4 moves the arrow to 4 from the edge with 28 of padding; iOS and Android drawing is jsonui-cli's word).",
-      "ja": "• jsonui-cli 2.5.36 から、SelectBox は iOS・Android・web で同じに描かれます。既定は上下 0・左右 12、矢印は 16 × 16 で字との間は 8、height を書かなければ中身の高さです（Android の固定の 56dp が無くなったので、height の無い Android の SelectBox は低くなります）。各辺は、既定 → padding → paddings → その辺の属性の順で決まります。web では、書いた余白が組み込みの余白に置き換わるようになりました。2.5.35 は両方を書いていました（rjui の SelectBoxConverter を 2.5.35 と 2.5.36 で呼び出し: paddingRight 4 で矢印は端から 4、余白は 28。iOS・Android の描画は jsonui-cli の言です）。"
+      "en": "• SelectBox draws alike on iOS, Android and web from jsonui-cli 2.5.36: by default 0 above and below, 12 at the sides, a 16 × 16 arrow 8 from the text, and the height of its content when height is not given (Android's fixed 56dp is gone, so an Android SelectBox without a height gets shorter). A side is set by the default, then padding, then paddings, then that side's own attribute. On the web a declared padding replaces the built-in one, where 2.5.35 wrote both. From 2.5.37 the web arrow is an icon drawn beside the select in the text colour, so it follows fontColor and a dark theme. caretAttributes.tintColor paints the default arrow, and an image given as caretAttributes.src keeps its own colours. caretAttributes.rightMargin moves the arrow (rjui's SelectBoxConverter at 2.5.36 and 2.5.37: paddingRight 4 puts the arrow 4 from the edge with 28 of padding; tintColor #FF0000 colours the icon, which 2.5.36 left black; iOS and Android drawing is jsonui-cli's word).",
+      "ja": "• jsonui-cli 2.5.36 から、SelectBox は iOS・Android・web で同じに描かれます。既定は上下 0・左右 12、矢印は 16 × 16 で字との間は 8、height を書かなければ中身の高さです（Android の固定の 56dp が無くなったので、height の無い Android の SelectBox は低くなります）。各辺は、既定 → padding → paddings → その辺の属性の順で決まります。web では、書いた余白が組み込みの余白に置き換わります。2.5.35 は両方を書いていました。2.5.37 から、web の矢印は select の横に字の色で描くアイコンになり、fontColor や dark のテーマに従います。caretAttributes.tintColor は既定の矢印を塗り、caretAttributes.src で渡した絵は絵の色のまま描きます。caretAttributes.rightMargin で矢印の位置を変えられます（rjui の SelectBoxConverter を 2.5.36 と 2.5.37 で呼び出し: paddingRight 4 で矢印は端から 4、余白は 28。tintColor #FF0000 でアイコンが色付き、2.5.36 は黒のまま。iOS・Android の描画は jsonui-cli の言です）。"
     },
     "next_first_spec_title": {
       "en": "Writing your first spec",
@@ -8317,8 +8333,8 @@
       "ja": "• `selectTab` — TabView / Segment のタブを index で切り替える。Segment のタブに届くのは jsonui-cli 1.9.7 からで、生成コードの各タブに `<id>_tab_<n>` の id が付きます。Dynamic モードでは、SwiftJsonUI 10.29.3 と KotlinJsonUI 2.43.2 からこの id が付きます。id 付きの include の下では、タブの id に include の前置きが付きます（include の id 'hero' の下の Segment 'tabs' なら heroTabs_tab_1。web は 2.5.31 から）。"
     },
     "section_dsl_action_move_item": {
-      "en": "• `moveItem` (jsonui-cli 2.5.34; drivers iOS 2.4.0, Android 1.23.0, web 1.20.0) — long-press row `<id>_item_<from>` of a reorderable Collection (on the element named by `handle` when the Collection has a reorderHandle), drag it, and release it over `<id>_item_<to>`: {\"action\": \"moveItem\", \"id\": \"task_list\", \"from\": 0, \"to\": 2}. `to` is the row's index after the move, the same `to` onReorder receives. Both rows must be on screen. Assert the new order in a following step. validate rejects a step whose `from` equals `to`, a missing `to` and a `section` other than 0, and names the driver versions the step needs. 2.5.33's validate rejects the action as unsupported.",
-      "ja": "• `moveItem`（jsonui-cli 2.5.34。driver は iOS 2.4.0・Android 1.23.0・web 1.20.0 から）— reorderable な Collection の行 `<id>_item_<from>` を長押しし（Collection に reorderHandle があれば `handle` の要素を）、ドラッグして `<id>_item_<to>` の上で離します: {\"action\": \"moveItem\", \"id\": \"task_list\", \"from\": 0, \"to\": 2}。`to` は移動した後の位置で、onReorder が受け取る `to` と同じです。両方の行が画面に出ている必要があります。新しい並びは次の step で確かめてください。validate は、`from` と `to` が同じ step、`to` の無い step、`section` が 0 以外の step を弾き、この step に必要な driver の版を知らせます。2.5.33 の validate は未対応の action として弾きます。"
+      "en": "• `moveItem` (jsonui-cli 2.5.34; drivers iOS 2.4.0, Android 1.23.0, web 1.20.0) — long-press row `<id>_item_<from>` of a reorderable Collection (on the element named by `handle` when the Collection has a reorderHandle), drag it, and release it over `<id>_item_<to>`: {\"action\": \"moveItem\", \"id\": \"task_list\", \"from\": 0, \"to\": 2}. `to` is the row's index after the move, the same `to` onReorder receives. Both rows must be on screen. Assert the new order in a following step. validate rejects a step whose `from` equals `to`, a missing `to` and a `section` other than 0, and names the driver versions the step needs. 2.5.33's validate rejects the action as unsupported. With `handle`, drivers before web 1.21.0, iOS 2.5.0 and Android 1.24.0 could release one row too far when the handle sits away from the row's vertical centre; jsonui-test-runner v1.21.0 releases where the dragged row's centre lands (its commit 8a7cfc7). Raise the drivers if your tests use `handle`.",
+      "ja": "• `moveItem`（jsonui-cli 2.5.34。driver は iOS 2.4.0・Android 1.23.0・web 1.20.0 から）— reorderable な Collection の行 `<id>_item_<from>` を長押しし（Collection に reorderHandle があれば `handle` の要素を）、ドラッグして `<id>_item_<to>` の上で離します: {\"action\": \"moveItem\", \"id\": \"task_list\", \"from\": 0, \"to\": 2}。`to` は移動した後の位置で、onReorder が受け取る `to` と同じです。両方の行が画面に出ている必要があります。新しい並びは次の step で確かめてください。validate は、`from` と `to` が同じ step、`to` の無い step、`section` が 0 以外の step を弾き、この step に必要な driver の版を知らせます。2.5.33 の validate は未対応の action として弾きます。`handle` を使うとき、web 1.21.0・iOS 2.5.0・Android 1.24.0 より前の driver は、つまみが行の縦の中央から外れていると 1 行行き過ぎて離すことがありました。jsonui-test-runner v1.21.0 は、ドラッグした行の中央が落ちる位置で離します（コミット 8a7cfc7）。`handle` を使うテストがあれば driver を上げてください。"
     },
     "section_dsl_action_set_slider_value": {
       "en": "• `setSliderValue` (drivers iOS 2.3.0, Android 1.22.0, web 1.19.0) — put a Slider at `value` in the slider's own units, not a 0–1 position: {\"action\": \"setSliderValue\", \"id\": \"volume\", \"value\": 9, \"range\": [0, 10], \"step\": 1}. `range` and `step` may be left out. A value outside the bounds, or off the step grid that starts at the minimum, fails before anything moves and names the nearest value; with `range` / `step` written, `jsonui-test validate` says so first (measured on jsonui-cli 2.5.19: \"12 is above the slider's range [0, 10]; the nearest value it can take is 10\" and \"2.5 is not on the slider's steps (0 + k * 1); the nearest values are 2 and 3\"). Android and web put the slider at the value exactly. iOS drags the thumb as a finger does, so the step passes when the value it landed on is within half of `step`, else 0.5% of the range, and that value is recorded in the case's warnings. iOS cannot read a slider's bounds: write `range`, or the driver moves the thumb to both ends to read them (the app sees those values) and a 0…1 or 0…100 slider fails; validate warns on a step that reaches iOS without it. A driver older than the floor fails the step as an unknown action when the file runs; validate names the floor when it can read the installed driver. Up to jsonui-cli 2.5.18 validate refused the step as an unsupported action.",
@@ -18813,16 +18829,16 @@
       "ja": "使用量の上限で止まったとき"
     },
     "section_not_yet_heading": {
-      "en": "Not in 2.5.36",
-      "ja": "2.5.36 でまだできないこと"
+      "en": "Not in 2.5.37",
+      "ja": "2.5.37 でまだできないこと"
     },
     "section_not_yet_b0_text": {
       "en": "• Bills and the cost of a Codex session: Codex's token counts are not read.\n• Codex's own records of its agents talking to each other do not show in Talk. A message sent with `jui viz message` does (see Messages between sessions).\n• The sessions in Sessions jui viz does not see above.",
       "ja": "• Codex のセッションのお札とコスト。Codex のトークンの数は読みません。\n• Codex 自身が記録するエージェント同士のやりとりは、トークに出ません。`jui viz message` で送ったメッセージは出ます（「セッション間のメッセージ」を参照）。\n• 上の「見えないセッション」に挙げたセッション。"
     },
     "toc_row_not_yet": {
-      "en": "Not in 2.5.36",
-      "ja": "2.5.36 でまだできないこと"
+      "en": "Not in 2.5.37",
+      "ja": "2.5.37 でまだできないこと"
     },
     "toc_title": {
       "en": "On this page",
@@ -19069,8 +19085,8 @@
       "ja": "スクリーンリーダー"
     },
     "lead": {
-      "en": "Two attributes tell a screen reader what a layout cannot say by itself, on all three platforms from jsonui-cli 2.3.38: `accessibilityLabel` names a control by something other than what it shows, and `accessibilityLiveRegion` reads a text out when it changes. Every code block on this page is what the shipped converters write for the layout above it.",
-      "ja": "レイアウトだけでは伝えられないことをスクリーンリーダーに伝える属性が、jsonui-cli 2.3.38 から 3 つのプラットフォームで 2 つ使えます。`accessibilityLabel` はコントロールを見た目とは別の名前で読ませ、`accessibilityLiveRegion` は文が変わったときに読み上げさせます。このページのコードは、どれもその上のレイアウトを配布されたコンバーターに通して出たものです。"
+      "en": "Two attributes tell a screen reader what a layout cannot say by itself, on all three platforms from jsonui-cli 2.3.38: `accessibilityLabel` names a control by something other than what it shows, and `accessibilityLiveRegion` reads a text out when it changes. Every code block on this page is what the shipped converters write for the layout above it. From 2.5.37 a third, `accessibilitySelected`, says which of a set of buttons is the chosen one (section 4).",
+      "ja": "レイアウトだけでは伝えられないことをスクリーンリーダーに伝える属性が、jsonui-cli 2.3.38 から 3 つのプラットフォームで 2 つ使えます。`accessibilityLabel` はコントロールを見た目とは別の名前で読ませ、`accessibilityLiveRegion` は文が変わったときに読み上げさせます。このページのコードは、どれもその上のレイアウトを配布されたコンバーターに通して出たものです。2.5.37 からは、3 つ目の `accessibilitySelected` で、ボタンの組のどれが選ばれているかを伝えられます（4 章）。"
     },
     "read_time": {
       "en": "~4 min read",
@@ -19140,13 +19156,33 @@
       "en": "• On a View the attribute is written on web (`role` and `aria-live` on the View) and Android (`liveRegion`), and on iOS it does nothing: a View holds no one text to announce. The build does not warn about it, because one layout is written for all three platforms. To be read out on iOS too, put it on the Label whose text changes rather than on the View around it.",
       "ja": "• View に付けると、Web（View に `role` と `aria-live`）と Android（`liveRegion`）では書かれ、iOS では何もしません。View には読み上げる 1 つの文が無いからです。1 つのレイアウトを 3 つのプラットフォームで使うので、build は警告しません。iOS でも読み上げたいときは、外側の View ではなく、文が変わる Label に付けてください。"
     },
+    "section_selected_heading": {
+      "en": "4. accessibilitySelected, and controls that say their own state",
+      "ja": "4. accessibilitySelected と、自分の状態を伝えるコントロール"
+    },
+    "section_selected_body": {
+      "en": "`accessibilitySelected` (jsonui-cli 2.5.37) takes true or a binding and tells a screen reader that a button is the selected one, such as one of two buttons used as a choice: the selected trait on iOS, semantics selected on Android, aria-pressed on the web. false tells nothing on all three, as VoiceOver says nothing of a control that is not selected. It takes effect on a Button, and on a View or IconLabel whose onClick makes it one button.",
+      "ja": "`accessibilitySelected`（jsonui-cli 2.5.37）は true か binding を取り、ボタンが選ばれていることをスクリーンリーダーに伝えます。選択肢として並べた 2 つのボタンのうちの 1 つ、などです。iOS は selected の trait、Android は semantics の selected、web は aria-pressed になります。false はどのプラットフォームでも何も伝えません。VoiceOver が選ばれていないコントロールについて何も言わないのと同じです。効くのは Button と、onClick で 1 つのボタンになる View・IconLabel です。"
+    },
+    "section_selected_caption": {
+      "en": "What the web converter writes (2.5.37; 2.5.36 wrote none of these):",
+      "ja": "web のコンバーターが書くもの（2.5.37。2.5.36 はどれも書きません）:"
+    },
+    "section_selected_bullet_misplaced": {
+      "en": "• Anywhere else the validator warns and nothing is told: a View without an onClick, or a tappable View that holds a control of its own (\"accessibilitySelected tells a screen reader nothing here\"). A Button, or a View or IconLabel with an onClick and no control inside, gets no warning.",
+      "ja": "• それ以外の場所ではレイアウトの検査が警告し、何も伝わりません。onClick の無い View や、中に自分のコントロールを持つタップできる View です（\"accessibilitySelected tells a screen reader nothing here\"）。Button と、onClick があり中にコントロールの無い View・IconLabel には警告は出ません。"
+    },
+    "section_selected_bullet_state": {
+      "en": "• Controls that have a state say it themselves, without this attribute. On the web from 2.5.37 a Segment's buttons carry aria-pressed for the selected one, a Switch is role=\"switch\", and a TabView is a tablist of tabs with aria-selected. jsonui-cli says iOS's Radio and CheckBox now read their selected state too.",
+      "ja": "• 状態を持つコントロールは、この属性が無くても自分で伝えます。2.5.37 から web では、Segment のボタンは選ばれたものに aria-pressed が付き、Switch は role=\"switch\"、TabView は aria-selected を持つ tab の tablist になります。iOS の Radio と CheckBox も選択状態を読むようになった、と jsonui-cli は述べています。"
+    },
     "section_limits_heading": {
-      "en": "4. What this page measured, and what it did not",
-      "ja": "4. このページが測ったこと、測っていないこと"
+      "en": "5. What this page measured, and what it did not",
+      "ja": "5. このページが測ったこと、測っていないこと"
     },
     "section_limits_body": {
-      "en": "The code blocks are the converters' output, measured against jsonui-cli 2.3.37 and 2.3.38 on the layouts shown. Nothing here ran a screen reader: whether VoiceOver, TalkBack or a browser's reader then says the name, or reads the change, is the platform's behaviour and is not measured on this page. This site draws none of these controls with either attribute, so its own pages are no example of them.",
-      "ja": "コードは、示したレイアウトを jsonui-cli 2.3.37 と 2.3.38 のコンバーターに通して測った出力です。スクリーンリーダーは動かしていません。VoiceOver、TalkBack、ブラウザーの読み上げが、その名前を実際に読むか、変化を読み上げるかはプラットフォームの振る舞いで、このページでは測っていません。このサイトは、どちらかの属性を付けたこれらのコントロールを描いていないので、このサイトのページはその例になりません。"
+      "en": "The code blocks are the converters' output, measured against jsonui-cli 2.3.37 and 2.3.38 on the layouts shown. Nothing here ran a screen reader: whether VoiceOver, TalkBack or a browser's reader then says the name, or reads the change, is the platform's behaviour and is not measured on this page. This site draws none of these controls with either attribute, so its own pages are no example of them. Section 4 was measured the same way on 2.5.36 and 2.5.37, with the Button, View, IconLabel, Segment, Switch and TabView converters and the attribute validator; iOS and Android output for it was not read here.",
+      "ja": "コードは、示したレイアウトを jsonui-cli 2.3.37 と 2.3.38 のコンバーターに通して測った出力です。スクリーンリーダーは動かしていません。VoiceOver、TalkBack、ブラウザーの読み上げが、その名前を実際に読むか、変化を読み上げるかはプラットフォームの振る舞いで、このページでは測っていません。このサイトは、どちらかの属性を付けたこれらのコントロールを描いていないので、このサイトのページはその例になりません。4 章も同じやり方で 2.5.36 と 2.5.37 を測りました。Button・View・IconLabel・Segment・Switch・TabView のコンバーターと属性の検査を使い、iOS と Android の出力はここでは読んでいません。"
     },
     "next_heading": {
       "en": "Keep reading",
@@ -19196,9 +19232,13 @@
       "en": "3. accessibilityLiveRegion",
       "ja": "3. accessibilityLiveRegion"
     },
+    "toc_row_selected": {
+      "en": "4. accessibilitySelected",
+      "ja": "4. accessibilitySelected"
+    },
     "toc_row_limits": {
-      "en": "4. Measured, and not",
-      "ja": "4. 測ったこと、測っていないこと"
+      "en": "5. Measured, and not",
+      "ja": "5. 測ったこと、測っていないこと"
     }
   },
   "guides_text_size": {
@@ -19270,6 +19310,10 @@
       "en": "• Web: configureScaling sets two custom properties on the document root, and the generated sizes read them: --jui-font-unit (0.0625rem while text follows, 1px when it does not) and --jui-font-max (the cap). jui sync_tool places the Configuration template at src/lib/jsonui/Configuration.ts by default.",
       "ja": "• web: configureScaling は文書のルートに 2 つのカスタムプロパティを設定し、生成された大きさがそれを読みます。--jui-font-unit（追従するときは 0.0625rem、しないときは 1px）と --jui-font-max（上限）です。Configuration の雛形は、jui sync_tool が既定で src/lib/jsonui/Configuration.ts に置きます。"
     },
+    "section_defaults_bullet_provider": {
+      "en": "• From 2.5.37 every text the web generator writes calls Configuration.Font.resolve, so an app's fontProvider and the new Configuration.Font.family (the family for text that names none) reach text with no font settings too; iOS did this from 2.5.36, and jsonui-cli says Android does from KotlinJsonUI 2.57.0. jui build replaces Configuration.ts with the current template when the file is still an earlier template byte for byte, and leaves an edited one alone with an INFO line. The template also maps weight names to CSS weights: semibold went into font-weight as written, the browser dropped it, and the text drew at the inherited weight. On this site five reference cells that name a monospace family with semibold went from 400 to 600 with 2.5.37 (the dropped value measured in headless Chromium).",
+      "ja": "• 2.5.37 から、web の生成器が書くすべての字が Configuration.Font.resolve を呼びます。そのため、アプリの fontProvider と新しい Configuration.Font.family（書体を書いていない字の書体）が、字の設定の無い字にも届きます。iOS は 2.5.36 から、Android は KotlinJsonUI 2.57.0 から同じだ、と jsonui-cli は述べています。jui build は、Configuration.ts が前の雛形とバイトまで同じなら今の雛形に置き換え、手で変えたものは残して INFO を 1 行出します。雛形は weight の名前を CSS の太さに直すようにもなりました。semibold はそのまま font-weight に入り、ブラウザが捨てて、字は受け継いだ太さで描かれていました。このサイトでは、monospace の書体と semibold を書いた 5 つのリファレンスのセルが、2.5.37 で 400 から 600 になりました（捨てられる値は headless Chromium で測定）。"
+    },
     "section_defaults_bullet_nosize": {
       "en": "• On the web, a component with neither a fontSize nor a declaration writes no size and inherits the browser's, so scaling: false for the app does not pin it. On iOS, such a text keeps the environment's .body font when no font provider answers for it.",
       "ja": "• web では、fontSize も宣言も無い部品は大きさを書かず、ブラウザの大きさを受け継ぎます。そのため、アプリ全体で scaling: false にしても固定されません。iOS では、そうした字は、font provider が答えなければ環境の .body の書体のままです。"
@@ -19295,8 +19339,8 @@
       "ja": "5. このページで測ったこと・測っていないこと"
     },
     "section_limits_body": {
-      "en": "Measured on jsonui-cli 2.5.36, with 2.5.35 as the control: the code the web, iOS and Android generators write for a Label under each declaration (rjui's LabelConverter, sjui's ConverterFactory and kjui's ComposeBuilder, called directly), and the web lengths in headless Chromium. Read from source, not run: SwiftJsonUI 10.37.0's FontScaling.swift and KotlinJsonUI 2.56.0's Configuration.kt. No app ran on a device or simulator, and no Dynamic Type or Android font scale setting was changed here. That the three platforms draw the same sizes at a text scale of 2.0 is jsonui-cli's conformance measurement.",
-      "ja": "jsonui-cli 2.5.36 で測り、2.5.35 と比べました: 宣言ごとに web・iOS・Android の生成器が Label について書くコード（rjui の LabelConverter、sjui の ConverterFactory、kjui の ComposeBuilder を直に呼び出し）と、headless Chromium での web の長さです。ソースを読んだだけで動かしていないもの: SwiftJsonUI 10.37.0 の FontScaling.swift、KotlinJsonUI 2.56.0 の Configuration.kt。実機やシミュレーターでアプリは動かしておらず、Dynamic Type や Android のフォントの拡大率も変えていません。文字の拡大率 2.0 で 3 つのプラットフォームが同じ大きさに描くことは、jsonui-cli の conformance の計測です。"
+      "en": "Measured on jsonui-cli 2.5.36, with 2.5.35 as the control: the code the web, iOS and Android generators write for a Label under each declaration (rjui's LabelConverter, sjui's ConverterFactory and kjui's ComposeBuilder, called directly), and the web lengths in headless Chromium. Read from source, not run: SwiftJsonUI 10.37.0's FontScaling.swift and KotlinJsonUI 2.56.0's Configuration.kt. No app ran on a device or simulator, and no Dynamic Type or Android font scale setting was changed here. That the three platforms draw the same sizes at a text scale of 2.0 is jsonui-cli's conformance measurement. The provider bullet in section 3 was measured on 2.5.37 against 2.5.36 with rjui's LabelConverter and this site's own build.",
+      "ja": "jsonui-cli 2.5.36 で測り、2.5.35 と比べました: 宣言ごとに web・iOS・Android の生成器が Label について書くコード（rjui の LabelConverter、sjui の ConverterFactory、kjui の ComposeBuilder を直に呼び出し）と、headless Chromium での web の長さです。ソースを読んだだけで動かしていないもの: SwiftJsonUI 10.37.0 の FontScaling.swift、KotlinJsonUI 2.56.0 の Configuration.kt。実機やシミュレーターでアプリは動かしておらず、Dynamic Type や Android のフォントの拡大率も変えていません。文字の拡大率 2.0 で 3 つのプラットフォームが同じ大きさに描くことは、jsonui-cli の conformance の計測です。3 章の provider の項目は、rjui の LabelConverter とこのサイト自身のビルドで 2.5.37 と 2.5.36 を比べて測りました。"
     },
     "next_heading": {
       "en": "Keep reading",

@@ -45,19 +45,19 @@
   "canonicalCode": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{users}\",\n  \"cellIdProperty\": \"id\",\n  \"sections\": [ { \"cell\": \"cells/user_row\" } ]\n}",
   "canonicalLanguage": "json",
   "statRequired": "0",
-  "statOptional": "47",
-  "statEvents": "3",
+  "statOptional": "50",
+  "statEvents": "5",
   "statRequiredText": {
     "en": "0 required",
     "ja": "必須 0"
   },
   "statOptionalText": {
-    "en": "47 optional",
-    "ja": "任意 47"
+    "en": "50 optional",
+    "ja": "任意 50"
   },
   "statEventsText": {
-    "en": "3 events",
-    "ja": "イベント 3"
+    "en": "5 events",
+    "ja": "イベント 5"
   },
   "usageVisibility": "visible",
   "attributeCategories": {
@@ -2501,6 +2501,70 @@
               "required": ""
             },
             {
+              "id": "attr_reorderFixedProperty",
+              "name": "reorderFixedProperty",
+              "anchorId": "attr-reorderFixedProperty",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "A key of the cell data: a row whose value for it is true cannot be picked up and has no move up / move down, but other rows are moved past it (unlike reorderLockedProperty). With a reorderHandle, a row whose handle is not drawn is fixed too. A row both locked and fixed is locked. jsonui-cli 2.5.37.",
+                "ja": "cell データのキー。その値が true の行はつかめず、「上へ移動」「下へ移動」も無いが、他の行はそれを越えて動く（reorderLockedProperty とは違う）。reorderHandle があるとき、つまみが描かれていない行も同じ扱い。両方に当たる行は reorderLockedProperty の扱い。jsonui-cli 2.5.37 から。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
               "id": "attr_reorderHandle",
               "name": "reorderHandle",
               "anchorId": "attr-reorderHandle",
@@ -3315,6 +3379,134 @@
               "description": {
                 "en": "Called when a dragged row is released at a new place: `@{handler}` with (section, from, to) — Swift (Int, Int, Int) -> Void, Kotlin (Int, Int, Int) -> Unit, TypeScript (section: number, from: number, to: number) => void. to is the row's index after the move. Rows move within their own section only; a single-section Collection is section 0. Not called when the row is released where it started or outside the Collection. Move up / move down call it with to = from - 1 / from + 1. jsonui-cli 2.5.34.",
                 "ja": "ドラッグした行を新しい位置で離したときに呼ばれる。`@{handler}` で (section, from, to)。Swift は (Int, Int, Int) -> Void、Kotlin は (Int, Int, Int) -> Unit、TypeScript は (section: number, from: number, to: number) => void。to は移動した後の位置。行は自分の section の中でだけ動き、section が 1 つなら section は 0。元の位置や Collection の外で離したときは呼ばれない。「上へ移動」「下へ移動」は to = from - 1 / from + 1 で呼ぶ。jsonui-cli 2.5.34 から。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onReorderEnd",
+              "name": "onReorderEnd",
+              "anchorId": "attr-onReorderEnd",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Called once when a drag that onReorderStart began is over: `@{handler}` with (section). It follows onReorder when the row moved, and comes alone when the row was let go where it started, outside the Collection, or the drag was cancelled because the rows changed. jsonui-cli 2.5.37.",
+                "ja": "onReorderStart で始まったドラッグが終わったときに 1 回呼ばれる。`@{handler}` で (section)。行が動いたときは onReorder の後、元の位置や Collection の外で離したとき、行が変わってドラッグが取り消されたときは単独で来る。jsonui-cli 2.5.37 から。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onReorderStart",
+              "name": "onReorderStart",
+              "anchorId": "attr-onReorderStart",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Called when a row is picked up: `@{handler}` with (section, index), index being the row's place when picked up. A ViewModel that rebuilds its rows on a timer can hold the rebuild until onReorderEnd. Move up / move down call it just before their onReorder. On iOS, declaring it makes a stack-drawn Collection use the library's drag on every version. jsonui-cli 2.5.37.",
+                "ja": "行をつかんだときに呼ばれる。`@{handler}` で (section, index)。index はつかんだときの位置。一定の間隔で行を作り直す ViewModel は onReorderEnd まで作り直しを止められる。「上へ移動」「下へ移動」は onReorder の直前に呼ぶ。iOS では、書くと stack として描かれる Collection がどの版でもライブラリのドラッグを使う。jsonui-cli 2.5.37 から。"
               },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
@@ -6429,6 +6621,134 @@
               "required": ""
             },
             {
+              "id": "attr_onReorderEnd",
+              "name": "onReorderEnd",
+              "anchorId": "attr-onReorderEnd",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Called once when a drag that onReorderStart began is over: `@{handler}` with (section). It follows onReorder when the row moved, and comes alone when the row was let go where it started, outside the Collection, or the drag was cancelled because the rows changed. jsonui-cli 2.5.37.",
+                "ja": "onReorderStart で始まったドラッグが終わったときに 1 回呼ばれる。`@{handler}` で (section)。行が動いたときは onReorder の後、元の位置や Collection の外で離したとき、行が変わってドラッグが取り消されたときは単独で来る。jsonui-cli 2.5.37 から。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onReorderStart",
+              "name": "onReorderStart",
+              "anchorId": "attr-onReorderStart",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Called when a row is picked up: `@{handler}` with (section, index), index being the row's place when picked up. A ViewModel that rebuilds its rows on a timer can hold the rebuild until onReorderEnd. Move up / move down call it just before their onReorder. On iOS, declaring it makes a stack-drawn Collection use the library's drag on every version. jsonui-cli 2.5.37.",
+                "ja": "行をつかんだときに呼ばれる。`@{handler}` で (section, index)。index はつかんだときの位置。一定の間隔で行を作り直す ViewModel は onReorderEnd まで作り直しを止められる。「上へ移動」「下へ移動」は onReorder の直前に呼ぶ。iOS では、書くと stack として描かれる Collection がどの版でもライブラリのドラッグを使う。jsonui-cli 2.5.37 から。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
               "id": "attr_onValueChange",
               "name": "onValueChange",
               "anchorId": "attr-onValueChange",
@@ -6509,6 +6829,70 @@
                 "ja": "paged 位置が変わったとき、新しいページを引数に発火する — スワイプ・scrollTo・`currentPage` への書き込みのいずれでも。jsonui-cli 1.9.6 から、pager が最初に表示されたときには呼ばれない — iOS・Android・web の生成コードと Dynamic モードで（KotlinJsonUI は 2.43.2 から。それより前の Android の Dynamic は、pager の表示時に page 0 を 1 回通知していた）。別名の `onValueChanged` と `onPageChanged` は同じ 1 つの属性。`paging: true` のときのみ意味を持つ。"
               },
               "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_reorderFixedProperty",
+              "name": "reorderFixedProperty",
+              "anchorId": "attr-reorderFixedProperty",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "A key of the cell data: a row whose value for it is true cannot be picked up and has no move up / move down, but other rows are moved past it (unlike reorderLockedProperty). With a reorderHandle, a row whose handle is not drawn is fixed too. A row both locked and fixed is locked. jsonui-cli 2.5.37.",
+                "ja": "cell データのキー。その値が true の行はつかめず、「上へ移動」「下へ移動」も無いが、他の行はそれを越えて動く（reorderLockedProperty とは違う）。reorderHandle があるとき、つまみが描かれていない行も同じ扱い。両方に当たる行は reorderLockedProperty の扱い。jsonui-cli 2.5.37 から。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
               "required": ""
             },
             {

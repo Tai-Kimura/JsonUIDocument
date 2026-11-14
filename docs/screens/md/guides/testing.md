@@ -227,5 +227,6 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - 2026-10-03 — KotlinJsonUI 2.43.2 is on Maven Central (kotlinjsonui and kotlinjsonui-dynamic, maven-metadata latest=release=2.43.2 and the POMs return 200; tag v2.43.2 → 4c9d31f8, all checked here). The Android Dynamic scope is removed, and the pre-2.43.2 behaviour is kept as a since-when.
 - 2026-11-12 (pin v2.5.31): section_dsl_bullet_within and section_dsl_action_select_tab gained one sentence each: under an include with an id the `_item_` / `_tab_` ids carry the include's prefix on web from 2.5.31 (measured on a scratch web project, see /guides/writing-layouts).
 - 2026-11-13 (pin v2.5.34): section_dsl_action_move_item added after selectTab. jsonui-test validate on 2.5.34 accepts {id, from, to} and {.., handle, section 0}, rejects a missing to, from == to and section 1, and warns the driver floor; 2.5.33 rejects the action as unsupported. Driver floors from the schema's action table; no driver run.
+- 2026-11-14 (pin v2.5.37): section_dsl_action_move_item gained the handle overshoot fix (jsonui-test-runner v1.21.0 commit 8a7cfc7, drivers web 1.21.0 / ios 2.5.0 / android 1.24.0); the schema's driver floor for moveItem stays 1.20.0 / 2.4.0 / 1.23.0, so the sentence says raise them when using handle. No driver run.
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

@@ -489,6 +489,22 @@
     "en": "The largest size this component's text is drawn at, as a multiple of its fontSize (1 or more). Counts only while the text follows (fontScaling true, declared or by the app default). Absent: the app default cap, or none. iOS rounds it down to a Dynamic Type step; the web draws the smaller of the rem size and fontSize × maxFontScale px. jsonui-cli 2.5.36; see /guides/text-size.",
     "ja": "この部品の字を描く最大の大きさを、fontSize の何倍か（1 以上）で書く。字が追従しているとき（fontScaling が true。書いた値でもアプリ全体の既定でも）だけ効く。書かなければアプリ全体の既定の上限、それも無ければ上限なし。iOS は Dynamic Type の段に切り下げ、web は rem の大きさと fontSize × maxFontScale px の小さい方で描く。jsonui-cli 2.5.36 から。/guides/text-size を参照。"
   },
+  "reorderFixedProperty": {
+    "en": "A key of the cell data: a row whose value for it is true cannot be picked up and has no move up / move down, but other rows are moved past it (unlike reorderLockedProperty). With a reorderHandle, a row whose handle is not drawn is fixed too. A row both locked and fixed is locked. jsonui-cli 2.5.37.",
+    "ja": "cell データのキー。その値が true の行はつかめず、「上へ移動」「下へ移動」も無いが、他の行はそれを越えて動く（reorderLockedProperty とは違う）。reorderHandle があるとき、つまみが描かれていない行も同じ扱い。両方に当たる行は reorderLockedProperty の扱い。jsonui-cli 2.5.37 から。"
+  },
+  "onReorderStart": {
+    "en": "Called when a row is picked up: `@{handler}` with (section, index), index being the row's place when picked up. A ViewModel that rebuilds its rows on a timer can hold the rebuild until onReorderEnd. Move up / move down call it just before their onReorder. On iOS, declaring it makes a stack-drawn Collection use the library's drag on every version. jsonui-cli 2.5.37.",
+    "ja": "行をつかんだときに呼ばれる。`@{handler}` で (section, index)。index はつかんだときの位置。一定の間隔で行を作り直す ViewModel は onReorderEnd まで作り直しを止められる。「上へ移動」「下へ移動」は onReorder の直前に呼ぶ。iOS では、書くと stack として描かれる Collection がどの版でもライブラリのドラッグを使う。jsonui-cli 2.5.37 から。"
+  },
+  "onReorderEnd": {
+    "en": "Called once when a drag that onReorderStart began is over: `@{handler}` with (section). It follows onReorder when the row moved, and comes alone when the row was let go where it started, outside the Collection, or the drag was cancelled because the rows changed. jsonui-cli 2.5.37.",
+    "ja": "onReorderStart で始まったドラッグが終わったときに 1 回呼ばれる。`@{handler}` で (section)。行が動いたときは onReorder の後、元の位置や Collection の外で離したとき、行が変わってドラッグが取り消されたときは単独で来る。jsonui-cli 2.5.37 から。"
+  },
+  "accessibilitySelected": {
+    "en": "Tells screen readers this control is the selected one (iOS the selected trait, Android semantics selected, web aria-pressed): true or a binding. false tells nothing. Takes effect on a Button, and on a View or IconLabel whose onClick makes it one button; elsewhere the validator warns. Radio, CheckBox, Switch, Segment, TabView and SelectBox say their own state. jsonui-cli 2.5.37; see /guides/screen-readers.",
+    "ja": "このコントロールが選ばれていることをスクリーンリーダーに伝える（iOS は selected の trait、Android は semantics の selected、web は aria-pressed）。true か binding。false は何も伝えない。効くのは Button と、onClick で 1 つのボタンになる View・IconLabel で、それ以外では検査が警告する。Radio・CheckBox・Switch・Segment・TabView・SelectBox は自分の状態を伝える。jsonui-cli 2.5.37 から。/guides/screen-readers を参照。"
+  },
   "autoChangeTrackingId": {
     "en": "When true (and cellIdProperty is set), the library auto-computes each cellId as '<primary>_<hash>' so differential updates work without a manual hashForCell helper. If cellIdProperty is missing, the build emits a warning and cells fall back to index-based identity.",
     "ja": "`true`（かつ `cellIdProperty` 指定時）で `<primary>_<hash>` 形式の cellId を自動計算し、差分更新を hashForCell なしで動かす。`cellIdProperty` 未指定時は build warning が出てインデックスベース identity にフォールバック。"

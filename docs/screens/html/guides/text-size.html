@@ -432,6 +432,15 @@
 <td>-</td>
 <td>-</td>
 </tr>
+<tr data-row-id="1-1-2-1-3-6" data-parent-id="1-1-2-1-3">
+<td class="tree-col"><span class="tree-indent" style="width:80px"></span><span class="tree-spacer"></span><span class="component-type">Label</span></td>
+<td><code>-</code></td>
+<td>-</td>
+<td><div class="style-rows"><div class="style-row"><span class="style-key">Size</span>W=matchParent H=wrapContent</div><div class="style-row"><span class="style-key">Margins</span>tm=16</div><div class="style-row"><span class="style-key">Colors</span><span class="style-lbl">fg:</span><span class="swatch"><i style="background:#475467"></i><code>#475467</code></span></div><div class="style-row"><span class="style-key">Font</span>14</div></div></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
 <tr data-row-id="1-1-2-1-4" data-parent-id="1-1-2-1" data-has-children="true">
 <td class="tree-col"><span class="tree-indent" style="width:64px"></span><span class="tree-toggle" role="button" aria-label="toggle">▶</span><span class="component-type">View</span></td>
 <td><code>section_browser</code></td>
@@ -623,6 +632,7 @@ guides_text_size_root
 <li>Section 4&#x27;s table: the four web lengths set as font-size on spans in headless Chromium (playwright, chromium_headless_shell), html font-size 16px and 32px, then --jui-font-unit: 1px and --jui-font-max: 1.5px as configureScaling writes them (read from the 2.5.36 Configuration.ts template), read with getComputedStyle.</li>
 <li>Read from source, not run: SwiftJsonUI v10.37.0 FontScaling.swift (capStep rounds down to a Dynamic Type step; keepsEnvironmentFont), KotlinJsonUI v2.56.0 Configuration.kt (Font.scaling, Font.maxScale). Android&#x27;s non-linear scaling and three-platform parity at 2.0 are the libraries&#x27; and jsonui-cli&#x27;s word.</li>
 <li>This site sets neither custom property; its 2.5.36 size classes each resolve to the size they replaced (every [font-size:min(...)] pairs with the Tailwind class of the same size, every text-[length:min(...)] reduces to the rem it replaced), and the built CSS contains all 17 distinct new classes.</li>
+<li>2026-11-14 (pin v2.5.37): section_defaults_bullet_provider added. rjui LabelConverter 2.5.36 wrote no style for a text with or without fontSize, 2.5.37 writes ...Configuration.Font.resolve({...}); jui build on this site printed &#x27;Updated Configuration template ... (it was an earlier rjui template, unchanged)&#x27;; every new inline size and weight equals the classes beside it (4079 elements), the 104 family calls are unchanged, and the 5 with weight semibold now map to 600 where the browser dropped &#x27;semibold&#x27; (headless Chromium: style.fontWeight=&#x27;semibold&#x27; -&gt; dropped, computed 400). Android&#x27;s routing is jsonui-cli&#x27;s word (kjui&#x27;s generated code already resolved through the provider at 2.5.36).</li>
 </ul>
 </section>
 </div>
