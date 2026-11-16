@@ -281,7 +281,10 @@
                   }
                 ]
               },
-              "description": "'delegate' (default): embedded screen shares the parent's NavController/Router. push() bubbles to the parent; pop/dismiss/navigateBack are bounded at the embed (do not close the embed itself). 'isolated': the embed owns a private navigation stack (nested NavigationStack/NavHost/memory stack); push stays inside the embed, pop stops at the embed stack's root, OS gestures/browser back are platform-delegated, and present-type transitions (sheet/dialog/dismiss) are forbidden in the embedded screen's spec. Requires SwiftJsonUI >= 10.5.0 / KotlinJsonUI >= 2.12.0 / EmbedContainer.tsx template v2.",
+              "description": {
+                "en": "How navigation inside the embedded screen reaches the parent. 'delegate' (default): the embedded screen shares the parent's NavController/Router; push() bubbles to the parent, and pop/dismiss/navigateBack stop at the embed (they do not close the embed itself). 'isolated': the embed owns its own navigation stack (a nested NavigationStack, NavHost or memory stack); push stays inside the embed, pop stops at the embed stack's root, OS gestures and browser back are left to the platform, and present-type transitions (sheet/dialog/dismiss) are forbidden in the embedded screen's spec.",
+                "ja": "埋め込んだ画面の中の遷移を、親にどう渡すか。'delegate'（既定）: 埋め込んだ画面は親の NavController/Router を共有する。push() は親に渡り、pop/dismiss/navigateBack は embed で止まる（embed 自身は閉じない）。'isolated': embed が自分の遷移の stack（入れ子の NavigationStack・NavHost・メモリの stack）を持つ。push は embed の中に留まり、pop は embed の stack の底で止まる。OS のジェスチャとブラウザの戻るはプラットフォームに任せ、埋め込んだ画面の spec では present 系の遷移（sheet/dialog/dismiss）を書けない。"
+              },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
@@ -936,7 +939,10 @@
                   }
                 ]
               },
-              "description": "'delegate' (default): embedded screen shares the parent's NavController/Router. push() bubbles to the parent; pop/dismiss/navigateBack are bounded at the embed (do not close the embed itself). 'isolated': the embed owns a private navigation stack (nested NavigationStack/NavHost/memory stack); push stays inside the embed, pop stops at the embed stack's root, OS gestures/browser back are platform-delegated, and present-type transitions (sheet/dialog/dismiss) are forbidden in the embedded screen's spec. Requires SwiftJsonUI >= 10.5.0 / KotlinJsonUI >= 2.12.0 / EmbedContainer.tsx template v2.",
+              "description": {
+                "en": "How navigation inside the embedded screen reaches the parent. 'delegate' (default): the embedded screen shares the parent's NavController/Router; push() bubbles to the parent, and pop/dismiss/navigateBack stop at the embed (they do not close the embed itself). 'isolated': the embed owns its own navigation stack (a nested NavigationStack, NavHost or memory stack); push stays inside the embed, pop stops at the embed stack's root, OS gestures and browser back are left to the platform, and present-type transitions (sheet/dialog/dismiss) are forbidden in the embedded screen's spec.",
+                "ja": "埋め込んだ画面の中の遷移を、親にどう渡すか。'delegate'（既定）: 埋め込んだ画面は親の NavController/Router を共有する。push() は親に渡り、pop/dismiss/navigateBack は embed で止まる（embed 自身は閉じない）。'isolated': embed が自分の遷移の stack（入れ子の NavigationStack・NavHost・メモリの stack）を持つ。push は embed の中に留まり、pop は embed の stack の底で止まる。OS のジェスチャとブラウザの戻るはプラットフォームに任せ、埋め込んだ画面の spec では present 系の遷移（sheet/dialog/dismiss）を書けない。"
+              },
               "platformMatrixVisibility": "gone",
               "platformIosLabel": "✓",
               "platformAndroidLabel": "✓",
